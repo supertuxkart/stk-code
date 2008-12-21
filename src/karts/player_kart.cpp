@@ -65,14 +65,9 @@ PlayerKart::~PlayerKart()
 //-----------------------------------------------------------------------------
 void PlayerKart::reset()
 {
-    m_steer_val_l = 0;
-    m_steer_val_r = 0;
-    m_steer_val = 0;
-    m_controls.accel = 0.0;
-    m_controls.brake =false;
-    m_controls.fire = false;
-    m_controls.wheelie = false;
-    m_controls.jump = false;
+    m_steer_val_l  = 0;
+    m_steer_val_r  = 0;
+    m_steer_val    = 0;
     m_penalty_time = 0;
     Kart::reset();
     m_camera->reset();
@@ -100,27 +95,27 @@ void PlayerKart::action(KartAction action, int value)
 
         break;
     case KA_ACCEL:
-        m_controls.accel = value/32768.0f;
+        m_controls.m_accel = value/32768.0f;
         break;
     case KA_BRAKE:
         if (value)
-            m_controls.accel = 0;
-        m_controls.brake = (value!=0);  // This syntax avoid visual c++ warning (when brake=value)
+            m_controls.m_accel = 0;
+        m_controls.m_brake = (value!=0);  // This syntax avoid visual c++ warning (when brake=value)
         break;
-    case KA_WHEELIE:
-        m_controls.wheelie = (value!=0);
+    case KA_NITRO:
+        m_controls.m_nitro = (value!=0);
         break;
     case KA_RESCUE:
-        m_controls.rescue = (value!=0);
+        m_controls.m_rescue = (value!=0);
         break;
     case KA_FIRE:
-        m_controls.fire = (value!=0);
+        m_controls.m_fire = (value!=0);
         break;
     case KA_LOOK_BACK:
         m_camera->setMode(value!=0 ? Camera::CM_REVERSE : Camera::CM_NORMAL);
         break;
-    case KA_JUMP:
-        m_controls.jump = (value!=0);
+    case KA_DRIFT:
+        m_controls.m_drift = (value!=0);
         break;
     }
 }   // action
@@ -133,33 +128,33 @@ void PlayerKart::steer(float dt, int steer_val)
     {
       // If we got analog values do not cumulate.
       if (steer_val > -32767)
-        m_controls.lr = -steer_val/32767.0f;
+        m_controls.m_steer = -steer_val/32767.0f;
       else
-        m_controls.lr += STEER_CHANGE;
+        m_controls.m_steer += STEER_CHANGE;
     }
     else if(steer_val > 0)
     {
       // If we got analog values do not cumulate.
       if (steer_val < 32767)
-        m_controls.lr = -steer_val/32767.0f;
+        m_controls.m_steer = -steer_val/32767.0f;
       else
-        m_controls.lr -= STEER_CHANGE;
+        m_controls.m_steer -= STEER_CHANGE;
     }
     else
     {   // no key is pressed
-        if(m_controls.lr>0.0f)
+        if(m_controls.m_steer>0.0f)
         {
-            m_controls.lr -= STEER_CHANGE;
-            if(m_controls.lr<0.0f) m_controls.lr=0.0f;
+            m_controls.m_steer -= STEER_CHANGE;
+            if(m_controls.m_steer<0.0f) m_controls.m_steer=0.0f;
         }
         else
-        {   // m_controls.lr<=0.0f;
-            m_controls.lr += STEER_CHANGE;
-            if(m_controls.lr>0.0f) m_controls.lr=0.0f;
-        }   // if m_controls.lr<=0.0f
+        {   // m_controls.m_steer<=0.0f;
+            m_controls.m_steer += STEER_CHANGE;
+            if(m_controls.m_steer>0.0f) m_controls.m_steer=0.0f;
+        }   // if m_controls.m_steer<=0.0f
     }   // no key is pressed
 
-    m_controls.lr = std::min(1.0f, std::max(-1.0f, m_controls.lr));
+    m_controls.m_steer = std::min(1.0f, std::max(-1.0f, m_controls.m_steer));
 
 }   // steer
 
@@ -174,8 +169,8 @@ void PlayerKart::update(float dt)
 
     if(RaceManager::getWorld()->isStartPhase())
     {
-        if(m_controls.accel!=0.0 || m_controls.brake!=false ||
-           m_controls.fire|m_controls.wheelie|m_controls.jump)
+        if(m_controls.m_accel!=0.0 || m_controls.m_brake!=false ||
+           m_controls.m_fire|m_controls.m_nitro|m_controls.m_drift)
         {
             if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
@@ -200,7 +195,7 @@ void PlayerKart::update(float dt)
         return;
     }
 
-    if ( m_controls.fire && !isRescue())
+    if ( m_controls.m_fire && !isRescue())
     {
         if (m_powerup.getType()==POWERUP_NOTHING) 
             Kart::beep();
@@ -209,11 +204,11 @@ void PlayerKart::update(float dt)
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
-    if ( m_controls.rescue )
+    if ( m_controls.m_rescue )
     {
         //m_beep_sound->play();
         forceRescue();
-        m_controls.rescue=false;
+        m_controls.m_rescue=false;
     }
     // FIXME: This is the code previously done in Kart::update (for player 
     //        karts). Does this mean that there are actually two sounds played

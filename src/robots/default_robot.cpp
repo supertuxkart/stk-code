@@ -183,7 +183,7 @@ void DefaultRobot::handleBraking()
         getPosition() < RaceManager::getKart(0)->getPosition()             &&
         getInitialPosition()>1                                       )
     {
-        m_controls.brake = true;
+        m_controls.m_brake = true;
         return;
     }
         
@@ -212,7 +212,7 @@ void DefaultRobot::handleBraking()
             if(!(m_world->getDistanceToCenterForKart(getWorldKartId()) > m_track->getWidth()[m_track_sector] *
                  -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE(getMaxSteerAngle())))
             {
-                m_controls.brake = false;
+                m_controls.m_brake = false;
                 return;
             }
         }
@@ -221,7 +221,7 @@ void DefaultRobot::handleBraking()
             if(!(m_world->getDistanceToCenterForKart( getWorldKartId() ) < m_track->getWidth()[m_track_sector] *
                  CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE(getMaxSteerAngle())))
             {
-                m_controls.brake = false;
+                m_controls.m_brake = false;
                 return;
             }
         }
@@ -235,13 +235,13 @@ void DefaultRobot::handleBraking()
 #ifdef AI_DEBUG
         std::cout << "BRAKING" << std::endl;
 #endif
-            m_controls.brake = true;
+            m_controls.m_brake = true;
             return;
         }
 
     }
 
-    m_controls.brake = false;
+    m_controls.m_brake = false;
 }   // handleBraking
 
 //-----------------------------------------------------------------------------
@@ -345,7 +345,7 @@ void DefaultRobot::handleSteering(float dt)
 //-----------------------------------------------------------------------------
 void DefaultRobot::handleItems( const float DELTA, const int STEPS )
 {
-    m_controls.fire = false;
+    m_controls.m_fire = false;
 
     if(isRescue() )
     {
@@ -360,7 +360,7 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
         case IT_TEN_SECONDS:
             if( m_time_since_last_shot > 10.0f )
             {
-                m_controls.fire = true;
+                m_controls.m_fire = true;
                 m_time_since_last_shot = 0.0f;
             }
             break;
@@ -376,7 +376,7 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
                     if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
                         15.0f && !m_crashes.m_road && STEPS > 8 )
                     {
-                        m_controls.fire = true;
+                        m_controls.m_fire = true;
                         m_time_since_last_shot = 0.0f;
                     }
                 }
@@ -389,7 +389,7 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
                     if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
                         m_kart_length * 2.5f )
                     {
-                        m_controls.fire = true;
+                        m_controls.m_fire = true;
                         m_time_since_last_shot = 0.0f;
                     }
                 }
@@ -399,12 +399,12 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
             case POWERUP_PLUNGER:
                 if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
                 {
-                    m_controls.fire = true;
+                    m_controls.m_fire = true;
                     m_time_since_last_shot = 0.0f;
                 }
                 break;
             default:
-                m_controls.fire = true;
+                m_controls.m_fire = true;
                 m_time_since_last_shot = 0.0f;
                 return;
             }
@@ -421,13 +421,13 @@ void DefaultRobot::handleAcceleration( const float DELTA )
     if( m_time_till_start > 0.0f )
     {
         m_time_till_start -= DELTA;
-        m_controls.accel = 0.0f;
+        m_controls.m_accel = 0.0f;
         return;
     }
 
-    if( m_controls.brake == true )
+    if( m_controls.m_brake == true )
     {
-        m_controls.accel = 0.0f;
+        m_controls.m_accel = 0.0f;
         return;
     }
 
@@ -444,12 +444,12 @@ void DefaultRobot::handleAcceleration( const float DELTA )
 
         if( player_winning )
         {
-            m_controls.accel = m_max_handicap_accel;
+            m_controls.m_accel = m_max_handicap_accel;
             return;
         }
     }
 
-    m_controls.accel = 1.0f;
+    m_controls.m_accel = 1.0f;
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------
@@ -492,7 +492,7 @@ void DefaultRobot::handleRescue(const float DELTA)
  */
 void DefaultRobot::handleNitro()
 {
-    m_controls.wheelie = false;
+    m_controls.m_nitro = false;
     // Don't use nitro if the kart doesn't have any, is not on ground,
     if(getEnergy()==0            || !isOnGround() || 
        m_nitro_level==NITRO_NONE || hasFinishedRace() ) return;
@@ -507,7 +507,7 @@ void DefaultRobot::handleNitro()
     // If the kart is very slow (e.g. after rescue), use nitro
     if(getSpeed()<5)
     {
-        m_controls.wheelie = true;
+        m_controls.m_nitro = true;
         return;
     }
 
@@ -517,7 +517,7 @@ void DefaultRobot::handleNitro()
     const unsigned int num_karts = race_manager->getNumKarts();
     if(getPosition()== (int)num_karts && getEnergy()>2.0f)
     {
-        m_controls.wheelie = true;
+        m_controls.m_nitro = true;
         return;
     }
 
@@ -530,7 +530,7 @@ void DefaultRobot::handleNitro()
         float finish = m_world->getEstimatedFinishTime(getWorldKartId());
         if( 1.3f*getEnergy() >= finish - m_world->getTime() )
         {
-            m_controls.wheelie = true;
+            m_controls.m_nitro = true;
             return;
         }
     }
@@ -560,7 +560,7 @@ void DefaultRobot::handleNitro()
             if(kart->getSpeed() < getSpeed()) continue;
 
             // Only prevent overtaking on highest level
-            m_controls.wheelie = m_nitro_level==NITRO_ALL;
+            m_controls.m_nitro = m_nitro_level==NITRO_ALL;
             return;
         }
 
@@ -568,7 +568,7 @@ void DefaultRobot::handleNitro()
         // -----------------------------------------------
         if(kart->getSpeed()+5.0f > getSpeed())
         {
-            m_controls.wheelie = true;
+            m_controls.m_nitro = true;
         }
     }
 }   // handleNitro
@@ -886,7 +886,7 @@ int DefaultRobot::calcSteps()
 
     //Increase the steps depending on the width, if we steering hard,
     //mostly for curves.
-    if( fabsf(m_controls.lr) > 0.95 )
+    if( fabsf(m_controls.m_steer) > 0.95 )
     {
         const int WIDTH_STEPS = 
             (int)( m_track->getWidth()[m_future_sector] 
@@ -912,23 +912,23 @@ int DefaultRobot::calcSteps()
 void DefaultRobot::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / getMaxSteerAngle();
-    m_controls.jump      = fabsf(steer_fraction)>=m_skidding_threshold;
-    float old_lr         = m_controls.lr;
+    m_controls.m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
+    float old_steer      = m_controls.m_steer;
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
     // The AI has its own 'time full steer' value (which is the time
     float max_steer_change = dt/m_kart_properties->getTimeFullSteerAI();
-    if(old_lr < steer_fraction)
+    if(old_steer < steer_fraction)
     {
-        m_controls.lr = (old_lr+max_steer_change > steer_fraction) 
-                      ? steer_fraction : old_lr+max_steer_change;
+        m_controls.m_steer = (old_steer+max_steer_change > steer_fraction) 
+                           ? steer_fraction : old_steer+max_steer_change;
     }
     else
     {
-        m_controls.lr = (old_lr-max_steer_change < steer_fraction) 
-                      ? steer_fraction : old_lr-max_steer_change;
+        m_controls.m_steer = (old_steer-max_steer_change < steer_fraction) 
+                           ? steer_fraction : old_steer-max_steer_change;
     }
 }   // setSteering
 

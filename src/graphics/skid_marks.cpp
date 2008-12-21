@@ -84,7 +84,7 @@ void SkidMarks::update(float dt)
         // delta is 0, and the behaviour is undefined. In this case 
         // just stop doing skid marks as well. 
         // ---------------------------------------------------------
-        if(!raycast_right.m_isInContact || !m_kart.getControls().jump ||
+        if(!raycast_right.m_isInContact || !m_kart.getControls().m_drift ||
             delta.length2()<0.0001)
         {
             m_skid_marking = false;
@@ -108,7 +108,7 @@ void SkidMarks::update(float dt)
     }
     // Currently no skid marking
     // -------------------------
-    if(!m_kart.getControls().jump) return;   // no skidmarking
+    if(!m_kart.getControls().m_drift) return;   // no skidmarking
         
     // Start new skid marks
     // --------------------

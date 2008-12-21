@@ -76,7 +76,6 @@ Kart::Kart (const std::string& kart_name, int position,
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
-    m_wheelie_angle        = 0.0f;
     m_smoke_system         = NULL;
     m_nitro                = NULL;
     m_skidmarks            = NULL;
@@ -325,17 +324,16 @@ void Kart::reset()
     m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
     m_wheel_rotation       = 0;
-    m_wheelie_angle        = 0.0f;
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
 
-    m_controls.lr          = 0.0f;
-    m_controls.accel       = 0.0f;
-    m_controls.brake       = false;
-    m_controls.wheelie     = false;
-    m_controls.jump        = false;
-    m_controls.fire        = false;
+    m_controls.m_steer     = 0.0f;
+    m_controls.m_accel     = 0.0f;
+    m_controls.m_brake     = false;
+    m_controls.m_nitro     = false;
+    m_controls.m_drift     = false;
+    m_controls.m_fire      = false;
 
     // Set the brakes so that karts don't slide downhill
     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
@@ -377,9 +375,7 @@ void Kart::collectedItem(const Item &item, int add_info)
         { 
             // In wheelie style, karts get more items depending on energy,
             // in nitro mode it's only one item.
-            int n = (int)(stk_config->m_game_style==STKConfig::GS_WHEELIE
-                           ? 1 + 4*getEnergy() / MAX_ITEMS_COLLECTED
-                           : 1);
+            int n = 1;
             m_powerup.hitBonusBox(n, item,add_info);   
             break;
         }
@@ -479,13 +475,13 @@ void Kart::update(float dt)
     }
 
     // On a client fiering is done upon receiving the command from the server.
-    if ( m_controls.fire && network_manager->getMode()!=NetworkManager::NW_CLIENT 
+    if ( m_controls.m_fire && network_manager->getMode()!=NetworkManager::NW_CLIENT 
          && !isRescue())
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
         m_powerup.use() ;
-        m_controls.fire = false;
+        m_controls.m_fire = false;
     }
 
     // Only use the upright constraint if the kart is in the air!
@@ -596,7 +592,7 @@ void Kart::update(float dt)
 void Kart::handleZipper()
 {
     // Ignore a zipper that's activated while braking
-    if(m_controls.brake) return;
+    if(m_controls.m_brake) return;
     m_zipper_time_left  = stk_config->m_zipper_time;
     const btVector3& v  = m_body->getLinearVelocity();
     float current_speed = v.length();
@@ -638,7 +634,7 @@ void Kart::draw()
  */
 float Kart::handleNitro(float dt)
 {
-    if(!m_controls.wheelie) return 0.0;
+    if(!m_controls.m_nitro) return 0.0;
     m_collected_energy -= dt;
     if(m_collected_energy<0)
     {
@@ -696,7 +692,7 @@ void Kart::updatePhysics (float dt)
     float engine_power = getActualWheelForce() + handleNitro(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
-    if(m_controls.accel)   // accelerating
+    if(m_controls.m_accel)   // accelerating
     {   // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
         if(m_bounce_back_time>0.0f) engine_power = 0.0f;
@@ -715,7 +711,7 @@ void Kart::updatePhysics (float dt)
     }
     else
     {   // not accelerating
-        if(m_controls.brake)
+        if(m_controls.m_brake)
         {   // check if the player is currently only slowing down or moving backwards
             if(m_speed > 0.0f)
             {   // going forward
@@ -733,7 +729,7 @@ void Kart::updatePhysics (float dt)
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
                 if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
-                    if(m_controls.brake)
+                    if(m_controls.m_brake)
                     {
                         // the backwards acceleration is artificially increased to allow
                         // players to get "unstuck" quicker if they hit e.g. a wall
@@ -752,8 +748,8 @@ void Kart::updatePhysics (float dt)
         else
         {
             // lift the foot from throttle, brakes with 10% engine_power
-            m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 2);
-            m_vehicle->applyEngineForce(-m_controls.accel*engine_power*0.1f, 3);
+            m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 2);
+            m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 3);
 
             if(!RaceManager::getWorld()->isStartPhase())
                 resetBrakes();
@@ -771,39 +767,30 @@ void Kart::updatePhysics (float dt)
 
     }
 #endif
-    if(m_wheelie_angle<=0.0f)
+    if(m_controls.m_drift)
     {
-
-       if(m_controls.jump)
-       {
-           m_skidding*= m_kart_properties->getSkidIncrease();
-           if(m_skidding>m_kart_properties->getMaxSkid())
-               m_skidding=m_kart_properties->getMaxSkid();
-       }
-       else if(m_skidding>1.0f)
-       {
-           m_skidding *= m_kart_properties->getSkidDecrease();
-           if(m_skidding<1.0f) m_skidding=1.0f;
-       }
-       if(m_skidding>1.0f)
-       {
-            if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
-                m_skid_sound->play();
-       }
-       else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
-       {
-           m_skid_sound->stop();
-       }
-       float steering = getMaxSteerAngle() * m_controls.lr*m_skidding;
-
-        m_vehicle->setSteeringValue(steering, 0);
-        m_vehicle->setSteeringValue(steering, 1);
-    } 
-    else 
-    {
-        m_vehicle->setSteeringValue(0.0f, 0);
-        m_vehicle->setSteeringValue(0.0f, 1);
+        m_skidding*= m_kart_properties->getSkidIncrease();
+        if(m_skidding>m_kart_properties->getMaxSkid())
+            m_skidding=m_kart_properties->getMaxSkid();
     }
+    else if(m_skidding>1.0f)
+    {
+        m_skidding *= m_kart_properties->getSkidDecrease();
+        if(m_skidding<1.0f) m_skidding=1.0f;
+    }
+    if(m_skidding>1.0f)
+    {
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
+            m_skid_sound->play();
+    }
+    else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
+    {
+        m_skid_sound->stop();
+    }
+    float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
+
+    m_vehicle->setSteeringValue(steering, 0);
+    m_vehicle->setSteeringValue(steering, 1);
 
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
@@ -959,7 +946,7 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         wheel_z_axis[i] = m_default_suspension_length[i]
                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    kart_model->adjustWheels(m_wheel_rotation, m_controls.lr*30.0f,
+    kart_model->adjustWheels(m_wheel_rotation, m_controls.m_steer*30.0f,
                              wheel_z_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
@@ -967,24 +954,22 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
             - m_default_suspension_length[0]
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
             - (kart_model->getWheelGraphicsRadius(0)
-               -kart_model->getWheelGraphicsPosition(0).getZ() )
-            + getKartLength()*0.5f*fabs(sin(DEGREE_TO_RAD(m_wheelie_angle)));
+               -kart_model->getWheelGraphicsPosition(0).getZ() );
     center_shift.setZ(X);
-    const float offset_pitch  = DEGREE_TO_RAD(m_wheelie_angle);
 
     if(m_smoke_system)
     {
-        float f = fabsf(m_controls.lr) > 0.8 ? 50.0f : 0.0f;
+        float f = fabsf(m_controls.m_steer) > 0.8 ? 50.0f : 0.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
     }
     if(m_nitro)
-        m_nitro->setCreationRate(m_controls.wheelie && m_collected_energy>0
+        m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
                                  ? getSpeed()*5.0f : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
-    Moveable::updateGraphics(center_shift, Vec3(offset_heading, offset_pitch, 0));
+    Moveable::updateGraphics(center_shift, Vec3(offset_heading, 0, 0));
 }   // updateGraphics
 
 /* EOF */

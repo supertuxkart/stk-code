@@ -125,7 +125,7 @@ void RaceState::receive(ENetPacket *pkt)
         Kart *kart     = RaceManager::getKart(i);
         // Firing needs to be done from here to guarantee that any potential
         // new rockets are created before the update for the rockets is handled
-        if(kc.fire)
+        if(kc.m_fire)
             kart->getPowerup()->use();
         kart->setXYZ(xyz);
         kart->setRotation(q);

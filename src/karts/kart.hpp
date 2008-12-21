@@ -57,7 +57,6 @@ protected:
     float        m_max_speed;          // maximum speed of the kart, computed from
     float        m_max_gear_rpm;       //maximum engine rpm's for the current gear
     float        m_max_speed_reverse_ratio;
-    float        m_wheelie_angle;
     float        m_zipper_time_left;   // zipper time left
     float        m_bounce_back_time;   // a short time after a collision acceleration
                                        // is disabled to allow the karts to bounce back
@@ -168,7 +167,7 @@ public:
                        {return m_kart_properties->getMaxSteerAngle(getSpeed());}
     const Vec3&    getGravityCenterShift   () const
         {return m_kart_properties->getGravityCenterShift();                    }
-    float          getSteerPercent  () const {return m_controls.lr;            }
+    float          getSteerPercent  () const {return m_controls.m_steer;       }
     const KartControl&
                    getControls      () const {return m_controls;               }
     /** Sets the kart controls. Used e.g. by replaying history. */
@@ -180,7 +179,6 @@ public:
     /** Returns the height of the kart. */
     float          getKartHeight    () const 
                    {return m_kart_properties->getKartModel()->getHeight();     }
-    float          getWheelieAngle  () const {return m_wheelie_angle;          }
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           createPhysics    ();

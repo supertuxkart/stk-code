@@ -25,31 +25,31 @@
 class KartControl
 {
 public:
-    float lr;
-    float accel;
-    bool  brake;
-    bool  wheelie;
-    bool  jump;
-    bool  rescue;
-    bool  fire;
+    float m_steer;
+    float m_accel;
+    bool  m_brake;
+    bool  m_nitro;
+    bool  m_drift;
+    bool  m_rescue;
+    bool  m_fire;
 
-    KartControl() : lr(0.0f), accel(0.0f), brake(false),
-                    wheelie(false), jump(false),  rescue(false), 
-                    fire(false)
+    KartControl() : m_steer(0.0f), m_accel(0.0f), m_brake(false),
+                    m_nitro(false), m_drift(false),  m_rescue(false), 
+                    m_fire(false)
     {
     }
     // ------------------------------------------------------------------------
     /** Construct kart control from a Message (i.e. unserialise)             */
     KartControl(Message *m)
     {
-        lr      = m->getFloat();
-        accel   = m->getFloat();
-        char c  = m->getChar();
-        brake   = (c &  1) != 0;
-        wheelie = (c &  2) != 0;
-        jump    = (c &  4) != 0;
-        rescue  = (c &  8) != 0;
-        fire    = (c & 16) != 0;
+        m_steer  = m->getFloat();
+        m_accel  = m->getFloat();
+        char c   = m->getChar();
+        m_brake  = (c &  1) != 0;
+        m_nitro  = (c &  2) != 0;
+        m_drift  = (c &  4) != 0;
+        m_rescue = (c &  8) != 0;
+        m_fire   = (c & 16) != 0;
     }   // KartControl(Message*)
     // ------------------------------------------------------------------------
     /** Return the serialised size in bytes.                                 */
@@ -58,26 +58,26 @@ public:
     /** Serialises the kart control into a message.                          */
     void serialise(Message *m) const
     {
-        m->addFloat(lr);
-        m->addFloat(accel);
+        m->addFloat(m_steer);
+        m->addFloat(m_accel);
         m->addChar(getButtonsCompressed());
     }   // compress
     // ------------------------------------------------------------------------
     void uncompress(char *c)
     {
-        lr      = ((float*)c)[0];  
-        accel   = ((float*)c)[1];
+        m_steer = ((float*)c)[0];  
+        m_accel = ((float*)c)[1];
         setButtonsCompressed(c[8]);
     }   // uncompress
     // ------------------------------------------------------------------------
     /** Compresses all buttons into a single integer value. */
     char getButtonsCompressed() const
     {
-        return  brake   ?  1 : 0
-              + wheelie ?  2 : 0
-              + jump    ?  4 : 0
-              + rescue  ?  8 : 0
-              + fire    ? 16 : 0;
+        return  m_brake  ?  1 : 0
+              + m_nitro  ?  2 : 0
+              + m_drift  ?  4 : 0
+              + m_rescue ?  8 : 0
+              + m_fire   ? 16 : 0;
     }   // getButtonsCompressed
     // ------------------------------------------------------------------------
     /** Sets the buttons from a compressed representation.
@@ -85,11 +85,11 @@ public:
      */
     void setButtonsCompressed(char c)
     {
-        brake   = (c &  1) != 0;
-        wheelie = (c &  2) != 0;
-        jump    = (c &  4) != 0;
-        rescue  = (c &  8) != 0;
-        fire    = (c & 16) != 0;
+        m_brake  = (c &  1) != 0;
+        m_nitro  = (c &  2) != 0;
+        m_drift  = (c &  4) != 0;
+        m_rescue = (c &  8) != 0;
+        m_fire   = (c & 16) != 0;
     }   // setButtonsCompressed
 };
 

@@ -215,9 +215,9 @@ void UserConfig::setDefaults()
                 Input(IT_KEYBOARD, SDLK_UP));
     set(GA_P1_BRAKE,
                 Input(IT_KEYBOARD, SDLK_DOWN));
-    set(GA_P1_WHEELIE,
+    set(GA_P1_NITRO,
                 Input(IT_KEYBOARD, SDLK_RSHIFT));
-    set(GA_P1_JUMP,
+    set(GA_P1_DRIFT,
                 Input(IT_KEYBOARD, SDLK_MINUS));
     set(GA_P1_RESCUE,
                 Input(IT_KEYBOARD, SDLK_BACKSPACE));
@@ -235,9 +235,9 @@ void UserConfig::setDefaults()
                 Input(IT_KEYBOARD, SDLK_w));
     set(GA_P2_BRAKE,
                 Input(IT_KEYBOARD, SDLK_s));
-    set(GA_P2_WHEELIE,
+    set(GA_P2_NITRO,
                 Input(IT_KEYBOARD, SDLK_LSHIFT));
-    set(GA_P2_JUMP,
+    set(GA_P2_DRIFT,
                 Input(IT_KEYBOARD, SDLK_CAPSLOCK));
     set(GA_P2_RESCUE,
                 Input(IT_KEYBOARD, SDLK_q));
@@ -255,9 +255,9 @@ void UserConfig::setDefaults()
                 Input(IT_KEYBOARD, SDLK_t));
     set(GA_P3_BRAKE,
                 Input(IT_KEYBOARD, SDLK_g));
-    set(GA_P3_WHEELIE,
+    set(GA_P3_NITRO,
                 Input(IT_KEYBOARD, SDLK_c));
-    set(GA_P3_JUMP,
+    set(GA_P3_DRIFT,
                 Input(IT_KEYBOARD, SDLK_v));
     set(GA_P3_RESCUE,
                 Input(IT_KEYBOARD, SDLK_r));
@@ -275,9 +275,9 @@ void UserConfig::setDefaults()
                 Input(IT_KEYBOARD, SDLK_i));
     set(GA_P4_BRAKE,
                 Input(IT_KEYBOARD, SDLK_k));
-    set(GA_P4_WHEELIE,
+    set(GA_P4_NITRO,
                 Input(IT_KEYBOARD, SDLK_m));
-    set(GA_P4_JUMP,
+    set(GA_P4_DRIFT,
                 Input(IT_KEYBOARD, SDLK_COMMA));
     set(GA_P4_RESCUE,
                 Input(IT_KEYBOARD, SDLK_u));
@@ -362,6 +362,9 @@ void UserConfig::loadConfig(const std::string& filename)
         return;
     }
 
+    // In older config files, nitro is still named 'wheelie', and drift is jump
+    std::string nitro_name="nitro";
+    std::string drift_name="drift";
     try
     {
         const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
@@ -392,6 +395,10 @@ void UserConfig::loadConfig(const std::string& filename)
             case 3:  printf("Added username for all players.\n");
                      needToAbort=std::max(needToAbort,0);
             case 4:  printf("Added jumping, which invalidates all key bindings.\n");
+                     needToAbort=std::max(needToAbort,0);
+            case 6:  printf("Added nitro and drifting, removed jumping and wheelie.\n");
+                     nitro_name="wheelie";
+                     drift_name="jump";
                      needToAbort=std::max(needToAbort,0);
             case 99: break;
             default: printf("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n", configFileVersion);
@@ -503,8 +510,8 @@ void UserConfig::loadConfig(const std::string& filename)
             readPlayerInput(reader, "right",    KA_RIGHT,     i);
             readPlayerInput(reader, "accel",    KA_ACCEL,     i);
             readPlayerInput(reader, "brake",    KA_BRAKE,     i);
-            readPlayerInput(reader, "wheelie",  KA_WHEELIE,   i);
-            readPlayerInput(reader, "jump",     KA_JUMP,      i);
+            readPlayerInput(reader, nitro_name, KA_NITRO,     i);
+            readPlayerInput(reader, drift_name, KA_DRIFT,     i);
             readPlayerInput(reader, "rescue",   KA_RESCUE,    i);
             readPlayerInput(reader, "fire",     KA_FIRE,      i);
             readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
@@ -557,14 +564,14 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
 }   // readStickConfigs
 
 // -----------------------------------------------------------------------------
-void UserConfig::readPlayerInput(const lisp::Lisp *r, const char *node,
+void UserConfig::readPlayerInput(const lisp::Lisp *r, const std::string &node,
                                  KartAction ka, int playerIndex)
 {
     readInput(r, node, (GameAction) (playerIndex * KC_COUNT + ka + GA_P1_LEFT));
 }   // readPlayerInput
 
 // -----------------------------------------------------------------------------
-void UserConfig::readInput(const lisp::Lisp* r, const char *node,
+void UserConfig::readInput(const lisp::Lisp* r, const std::string &node,
                            GameAction action)
 {
     std::string inputTypeName;
@@ -721,8 +728,8 @@ void UserConfig::saveConfig(const std::string& filename)
             writePlayerInput(writer, "right\t", KA_RIGHT, i);
             writePlayerInput(writer, "accel\t", KA_ACCEL, i);
             writePlayerInput(writer, "brake\t", KA_BRAKE, i);
-            writePlayerInput(writer, "wheelie\t", KA_WHEELIE, i);
-            writePlayerInput(writer, "jump\t", KA_JUMP, i);
+            writePlayerInput(writer, "nitro\t", KA_NITRO, i);
+            writePlayerInput(writer, "drift\t", KA_DRIFT, i);
             writePlayerInput(writer, "rescue\t", KA_RESCUE, i);
             writePlayerInput(writer, "fire\t", KA_FIRE, i);
             writePlayerInput(writer, "lookBack\t", KA_LOOK_BACK, i);

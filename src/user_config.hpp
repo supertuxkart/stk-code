@@ -40,7 +40,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
-#define CURRENT_CONFIG_VERSION   6
+#define CURRENT_CONFIG_VERSION   7
 
 #include <string>
 #include <vector>
@@ -102,7 +102,7 @@ private:
 	void writeStickConfigs(lisp::Writer *);
 			
 	void readPlayerInput(const lisp::Lisp *,
-						 const char *,
+                         const std::string& node,
 						 KartAction ka,
 						 int);
 
@@ -113,7 +113,7 @@ private:
 
 
     void readInput(const lisp::Lisp *,
-                   const char *,
+                   const std::string &node,
 				   GameAction);
 
     void writeInput(lisp::Writer *,

@@ -182,8 +182,8 @@ void History::Save()
             // FIXME: kart number is not really necessary
             fprintf(fd, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
                     k,
-                    m_all_controls[j].lr,
-                    m_all_controls[j].accel,
+                    m_all_controls[j].m_steer,
+                    m_all_controls[j].m_accel,
                     m_all_controls[j].getButtonsCompressed(),
                     m_all_xyz[j].getX(), m_all_xyz[j].getY(),
                     m_all_xyz[j].getZ(),
@@ -293,8 +293,8 @@ void History::Load()
             float x,y,z,rx,ry,rz,rw;
             sscanf(s, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
                     &j, 
-                    &m_all_controls[i].lr,
-                    &m_all_controls[i].accel,
+                    &m_all_controls[i].m_steer,
+                    &m_all_controls[i].m_accel,
                     &buttonsCompressed,
                     &x, &y, &z, &rx, &ry, &rz, &rw);
             m_all_xyz[i]       = Vec3(x,y,z);
