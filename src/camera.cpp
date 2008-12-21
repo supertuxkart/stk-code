@@ -188,12 +188,13 @@ void Camera::update (float dt)
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
     bool reverse = m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
-    Vec3 cam_rel_pos(0.f, -m_distance, reverse ? 0.75f : 1.5f);
+    Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
 
     // Set the camera rotation
     // -----------------------
+    float sign = reverse ? 1.0f : -1.0f;
     btQuaternion cam_rot(0.0f,
-                         m_mode==CM_CLOSEUP ? -0.2618f : -0.0873f,  // -15 or -5 degrees
+                         m_mode==CM_CLOSEUP ? (sign * 25.0f * M_PI / 180.0f) : (sign * 15.0f * M_PI / 180.0f),  // it was +-15 or +-5 degrees, giving too much unnecesary sky and few track around kart
                          reverse            ? M_PI     : 0.0f);
     // Camera position relative to the kart
     btTransform relative_to_kart(cam_rot, cam_rel_pos);
