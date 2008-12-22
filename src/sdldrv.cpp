@@ -519,7 +519,7 @@ void SDLDriver::input()
         case SDL_JOYAXISMOTION:
             if(user_config->m_gamepad_debug)
             {
-                printf("axis motion: which %d %axis d value %d\n",
+                printf("axis motion: which %d axis %d value %d\n",
                     ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
             }
             stickIndex = stickInfos[ev.jaxis.which]->m_index;
