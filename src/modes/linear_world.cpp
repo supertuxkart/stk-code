@@ -163,7 +163,8 @@ void LinearWorld::update(float delta)
         if(kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
            m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
         {
-            forceRescue(kart, kart_info, /*is shortcut*/ true);  // bring karts back to where they left the track.
+            // bring karts back to where they left the track.
+            rescueKartAfterShortcut(kart, kart_info);
         }
                 
         if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR)
@@ -216,6 +217,7 @@ void LinearWorld::update(float delta)
             // This is used to play the faster music, and by the AI
             if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
                 m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_kart[i]);
+            checkForWrongDirection(i);
         }
     }
 #ifdef DEBUG
@@ -240,35 +242,6 @@ void LinearWorld::update(float delta)
     }
 #endif
 
-    // ------- check the kart isn't going in the wrong way ------
-    // only relevant for player karts
-    for(unsigned int n=0; n<kart_amount; n++)
-    {
-        if(m_kart[n]->isPlayerKart())
-        {
-            RaceGUI* m=menu_manager->getRaceMenu();
-            // This can happen if the option menu is called, since the
-            // racegui gets deleted
-            if(!m) return;
-            const Kart *kart=m_kart[n];
-            // check if the player is going in the wrong direction
-            if(race_manager->getDifficulty()==RaceManager::RD_EASY)
-            {
-                float angle_diff = RAD_TO_DEGREE(kart->getHPR().getHeading()) -
-                                   m_track->m_angle[m_kart_info[n].m_track_sector];
-                if(angle_diff > 180.0f) angle_diff -= 360.0f;
-                else if (angle_diff < -180.0f) angle_diff += 360.0f;
-                // Display a warning message if the kart is going back way (unless
-                // the kart has already finished the race).
-                if ((angle_diff > 120.0f || angle_diff < -120.0f)   &&
-                    kart->getVelocity().getY() > 0.0f  && !kart->hasFinishedRace() )
-                {
-                    m->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
-                }  // if angle is too big
-            }  // if difficulty easy
-        }// end if is player kart
-        
-    }// next kart
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -536,28 +509,29 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     
 }   // estimateFinishTime
 //-----------------------------------------------------------------------------
-// override 'forceRescue' to do some linear-race-specific actions
-void LinearWorld::forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut)
+/** Rescues a kart after a shortcut was detected. The kart is placed at the
+ *  last valid position.
+ */
+void LinearWorld::rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info)
 {
-    // If rescue is triggered while doing a shortcut, reset the kart to the
-    // segment where the shortcut started!! And then reset the shortcut
-    // flag, so that this shortcut is not counted!
-    if(shortcut)
+    // Reset the kart to the segment where the shortcut started!! And then 
+    // reset the shortcut flag, so that this shortcut is not counted!
+    const bool warp_around = kart_info.m_last_valid_sector == 0;
+
+    // add one because 'moveKartAfterRescue' removes 1
+    kart_info.m_track_sector   = kart_info.m_last_valid_sector+1; 
+
+    // don't let kart get a new free lap cause he was dropped at begin line...
+    if(warp_around)
     {
-        const bool warp_around = kart_info.m_last_valid_sector == 0;
-        kart_info.m_track_sector   = kart_info.m_last_valid_sector+1; // add one because 'moveKartAfterRescue' removes 1
-        
-        // don't let kart get a new free lap cause he was dropped at begin line...
-        if(warp_around)
-        {
-            kart_info.m_race_lap--;
-            kart_info.m_lap_start_time = -1; // invalidate time so he doesn't get a best time
-        }
-        kart->doingShortcut();
-    }   // if shortcut
-    
+        kart_info.m_race_lap--;
+        kart_info.m_lap_start_time = -1; // invalidate time so he doesn't get a best time
+    }
+    kart->doingShortcut();
+
     kart->forceRescue();
-}
+}   // rescueKartAfterShortcut
+
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart
   */
@@ -655,3 +629,36 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
         m_faster_music_active=true;
     }
 }   // updateRacePosition
+//-----------------------------------------------------------------------------
+/** Checks if a kart is going in the wrong direction. This is done only for
+ *  player karts to display a message to the player.
+ *  \param i Kart id.
+ */
+void LinearWorld::checkForWrongDirection(unsigned int i)
+{
+    if(!m_kart[i]->isPlayerKart()) return;
+
+    RaceGUI* m=menu_manager->getRaceMenu();
+    // This can happen if the option menu is called, since the
+    // racegui gets deleted
+    if(!m) return;
+
+    const Kart *kart=m_kart[i];
+    // check if the player is going in the wrong direction
+    float angle_diff = kart->getHPR().getHeading() -
+                       m_track->m_angle[m_kart_info[i].m_track_sector];
+    if(angle_diff > M_PI) angle_diff -= 2*M_PI;
+    else if (angle_diff < -M_PI) angle_diff += 2*M_PI;
+    // Display a warning message if the kart is going back way (unless
+    // the kart has already finished the race).
+    if (( angle_diff > DEGREE_TO_RAD( 120.0f) ||
+          angle_diff < DEGREE_TO_RAD(-120.0f))   &&
+        kart->getVelocityLC().getY() > 0.0f        &&
+        !kart->hasFinishedRace() )
+    {
+        m->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
+    }  // if angle is too big
+
+}   // checkForWrongDirection
+
+//-----------------------------------------------------------------------------

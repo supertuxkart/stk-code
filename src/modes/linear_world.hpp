@@ -57,8 +57,9 @@ protected:
     /** Linear races can trigger rescues for one additional reason : shortcuts.
     * It may need to do some specific world before calling the generic Kart::forceRescue
     */
-    void            forceRescue(Kart* kart, KartInfo& kart_info, bool shortcut);
+    void            rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
     
+    void            checkForWrongDirection(unsigned int i);
     void            doLapCounting ( KartInfo& kart_info, Kart* kart );
     float           estimateFinishTimeForKart(Kart* kart);
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
