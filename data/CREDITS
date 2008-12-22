@@ -3,14 +3,21 @@ Super TuxKart - SVN
 Visit us at http://supertuxkart.sourceforge.net
 
 
-Project Leaders
----------------
+SuperTuxKart Administrators:
+----------------------------
 
 Joerg Henrichs (hiker)
+- Project leader
+- Programming
 
 Marianne Gagnon (Auria)
+- Art director
+- Programming
 
-Eduardo Hernandez Munoz (Coz) (retired)
+Constantin Pelikan (conso)
+- Art director
+- Add-on package administrator
+
 
 Additional Programming
 ----------------------
@@ -23,9 +30,6 @@ Canarix
 
 Damien
 - Ogg vorbis support
-
-Maik Semder (Ikework)
-- Bug fixes
 
 Yann Leprince (sciyann)
 - Bug fixes
@@ -173,7 +177,7 @@ Marianne Gagnon (Auria)
 Testing
 -------
 
-Canarix
+Canarix, JPenguin
 
 The friendly people at the Games4Mac Forum
 Website: http://community.games4mac.de
@@ -204,6 +208,14 @@ Website: http://www.retrax.de
 
 Sam Clarke
 - Windows Installer
+
+Previous contributors (version 0.5 and earlier):
+------------------------------------------------
+Eduardo Hernandez Munoz (Coz) (former Co-admin)
+
+Maik Semder (Ikework)
+- Bug fixes
+
 
 
 Game of the Month, STK version 0.0.0
