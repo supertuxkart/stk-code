@@ -1,0 +1,10 @@
+;; -*- mode: lisp -*-
+
+(item
+  (gold   "nitrotank-big"  )
+  (silver "nitrotank-small")
+  (green  "warning"    )
+  (red    "bonusblock2")
+)
+
+;; EOF ;;
