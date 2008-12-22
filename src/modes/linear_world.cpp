@@ -53,17 +53,13 @@ void LinearWorld::init()
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
-        if (info.m_track_sector == Track::UNKNOWN_SECTOR )
+        info.m_on_road = info.m_track_sector != Track::UNKNOWN_SECTOR;
+        if (!info.m_on_road)
         {
-            info.m_on_road = false;
             info.m_track_sector =
                 m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
                                              Track::RS_DONT_KNOW,
                                              Track::UNKNOWN_SECTOR );
-        }
-        else
-        {
-            info.m_on_road = true;
         }
         
         m_track->spatialToTrack(info.m_curr_track_coords,
@@ -105,17 +101,13 @@ void LinearWorld::restartRace()
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
-        if (info.m_track_sector == Track::UNKNOWN_SECTOR )
+        info.m_on_road = info.m_track_sector != Track::UNKNOWN_SECTOR;
+        if (!info.m_on_road)
         {
-            info.m_on_road = false;
             info.m_track_sector =
                 m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
                                              Track::RS_DONT_KNOW,
                                              Track::UNKNOWN_SECTOR );
-        }
-        else
-        {
-            info.m_on_road = true;
         }
         
         m_track->spatialToTrack(info.m_curr_track_coords,
@@ -160,35 +152,28 @@ void LinearWorld::update(float delta)
         
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
-        if(kart_info.m_last_valid_sector != Track::UNKNOWN_SECTOR &&
-           m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
+        kart_info.m_on_road = kart_info.m_track_sector != Track::UNKNOWN_SECTOR;
+        if(kart_info.m_on_road)
         {
-            // bring karts back to where they left the track.
-            rescueKartAfterShortcut(kart, kart_info);
-        }
-                
-        if(kart_info.m_track_sector != Track::UNKNOWN_SECTOR)
-            kart_info.m_last_valid_sector = kart_info.m_track_sector;
-        
-        // check if kart is on the road - if not, find the closest sector
-        if (kart_info.m_track_sector == Track::UNKNOWN_SECTOR)
-        {
-            kart_info.m_on_road = false;
-            if( kart_info.m_curr_track_coords[0] > 0.0 )
-                kart_info.m_track_sector =
-                    m_track->findOutOfRoadSector( kart->getXYZ(),
-                                                  Track::RS_RIGHT,
-                                                  prev_sector );
-            else
-                kart_info.m_track_sector =
-                    m_track->findOutOfRoadSector( kart->getXYZ(),
-                                                  Track::RS_LEFT,
-                                                  prev_sector );
-        }
+            if(m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
+            {
+                // bring karts back to where they left the track.
+                rescueKartAfterShortcut(kart, kart_info);
+            }                
+            kart_info.m_last_valid_sector = kart_info.m_track_sector;        
+        }   // last_valid_sectpr!=UNKNOWN_SECTOR
         else
         {
-            kart_info.m_on_road = true;
-        }
+            // Kart off road. Find the closest sector instead.
+            kart_info.m_track_sector =
+                m_track->findOutOfRoadSector(kart->getXYZ(), 
+                                             kart_info.m_curr_track_coords[0] > 0.0
+                                                 ? Track::RS_RIGHT 
+                                                 : Track::RS_LEFT,
+                                             prev_sector );
+            if(m_track->isShortcut(prev_sector, kart_info.m_track_sector))
+                rescueKartAfterShortcut(kart, kart_info);
+        }   
         
         // Update track coords (=progression)
         m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
@@ -221,7 +206,7 @@ void LinearWorld::update(float delta)
         }
     }
 #ifdef DEBUG
-    // Debug output in case that the double position error
+    // FIXME: Debug output in case that the double position error
     // occurs again. It can most likely be removed.
     int pos_used[10];
     for(int i=0; i<10; i++) pos_used[i]=-99;
@@ -313,7 +298,12 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
     else if ( kart_info.m_curr_track_coords.getY() > track_length-delta &&
               kart_info.m_last_track_coords.getY() <  delta)
     {
-        kart_info.m_race_lap-- ;
+        // Previously we had bugs where (on taking shortcuts etc) a lap was
+        // 'uncounted' more than once, resulting in m_race_lap=-2, and even if
+        // the starting line was then crossed correctly, it would still not be
+        // counted. The if can most likely be removed mid term.
+        if(kart_info.m_race_lap>-1)
+            kart_info.m_race_lap-- ;
         // Prevent cheating by setting time to a negative number, indicating
         // that the line wasn't crossed properly.
         kart_info.m_lap_start_time = -1.0f;
@@ -629,6 +619,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
         m_faster_music_active=true;
     }
 }   // updateRacePosition
+
 //-----------------------------------------------------------------------------
 /** Checks if a kart is going in the wrong direction. This is done only for
  *  player karts to display a message to the player.
@@ -637,6 +628,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
 void LinearWorld::checkForWrongDirection(unsigned int i)
 {
     if(!m_kart[i]->isPlayerKart()) return;
+    if(!m_kart_info[i].m_on_road) return;
 
     RaceGUI* m=menu_manager->getRaceMenu();
     // This can happen if the option menu is called, since the
