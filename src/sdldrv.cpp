@@ -517,6 +517,11 @@ void SDLDriver::input()
             break;
 
         case SDL_JOYAXISMOTION:
+            if(user_config->m_gamepad_debug)
+            {
+                printf("axis motion: which %d %axis d value %d\n",
+                    ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
+            }
             stickIndex = stickInfos[ev.jaxis.which]->m_index;
             // If the joystick axis exceeds the deadzone report the input.
             // In menu mode (mode = MENU = 0) the joystick number is reported

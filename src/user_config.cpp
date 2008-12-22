@@ -90,7 +90,7 @@ void UserConfig::setDefaults()
 {
     setFilename();
     m_warning           = "";
-    m_keyboard_debug    = false;
+    m_gamepad_debug     = false;
     m_track_debug       = 0;
     m_bullet_debug      = false;
     m_fullscreen        = false;

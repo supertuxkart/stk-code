@@ -123,6 +123,10 @@ void PlayerKart::action(KartAction action, int value)
 //-----------------------------------------------------------------------------
 void PlayerKart::steer(float dt, int steer_val)
 {
+    if(user_config->m_gamepad_debug)
+    {
+        printf("steering: steer_val %d ", steer_val);
+    }
     const float STEER_CHANGE = dt/getTimeFullSteer();  // amount the steering is changed
     if (steer_val < 0)
     {
@@ -153,6 +157,10 @@ void PlayerKart::steer(float dt, int steer_val)
             if(m_controls.m_steer>0.0f) m_controls.m_steer=0.0f;
         }   // if m_controls.m_steer<=0.0f
     }   // no key is pressed
+    if(user_config->m_gamepad_debug)
+    {
+        printf("  set to: %f\n", m_controls.m_steer);
+    }
 
     m_controls.m_steer = std::min(1.0f, std::max(-1.0f, m_controls.m_steer));
 

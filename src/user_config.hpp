@@ -158,7 +158,7 @@ public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
 
     // Attributes that are accessed directly.
-    bool        m_keyboard_debug;
+    bool        m_gamepad_debug;
     int         m_track_debug;
     bool        m_bullet_debug;
     bool        m_fullscreen;

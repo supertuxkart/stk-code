@@ -142,9 +142,9 @@ int handleCmdLine(int argc, char **argv)
             cmdLineHelp(argv[0]);
             return 0;
         }
-        else if(!strcmp(argv[i], "--keyboard-debug"))
+        else if(!strcmp(argv[i], "--gamepad-debug"))
         {
-            user_config->m_keyboard_debug=true;
+            user_config->m_gamepad_debug=true;
         }
         else if(sscanf(argv[i], "--track-debug=%d",&n)==1)
         {
