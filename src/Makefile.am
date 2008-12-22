@@ -42,7 +42,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	network/flyable_info.hpp	 network/item_info.hpp                  \
 	network/race_state.hpp		 network/race_state.cpp			\
 	network/race_result_message.hpp	 network/race_result_message.cpp	\
-	network/race_result_ack_message						\
+	network/race_result_ack_message.hpp                                     \
 	audio/music.hpp								\
 	audio/music_information.cpp audio/music_information.hpp 		\
 	audio/music_ogg.cpp	   	    audio/music_ogg.hpp          	\
@@ -69,7 +69,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	items/projectile_manager.cpp   items/projectile_manager.hpp             \
 	items/bubblegumitem.cpp	       items/bubblegumitem.hpp		        \
 	items/plunger.cpp              items/plunger.hpp                        \
-        items/rubber_band.cpp          items/rubber_band/hpp                    \
+        items/rubber_band.cpp          items/rubber_band.hpp                    \
 	items/cake.cpp                 items/cake.hpp                           \
 	items/bowling.cpp              items/bowling.hpp                        \
         karts/auto_kart.hpp            karts/kart_control.hpp                   \
@@ -167,7 +167,7 @@ supertuxkart_SOURCES =     main.cpp  			\
 	ide/vc9/supertuxkart.sln   ide/vc9/supertuxkart.vcproj	\
 	ide/vc9/bullet_lib.vcproj  ide/vc9/enet.vcproj		\
 	ide/vc9/README						\
-	Xcode/STK_XCode.xcodeproj/project/pbxproj
+	ide/Xcode/STK_XCode.xcodeproj/project.pbxproj
 #Is this the right place for those non-source files ?
 
 # Link in the specific gcc 4.1 bug work around
