@@ -64,20 +64,21 @@ MainMenu::MainMenu()
     widget_manager->addTextButtonWgt( WTOK_OPTIONS, WIDTH, 7, _("Options") );
     widget_manager->addTextButtonWgt( WTOK_QUIT, WIDTH, 7, _("Quit") );
 
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 27 );
+    if(user_config->getWarning()!="")
+    {
+        widget_manager->addTextWgt( WTOK_WARNING, 80, 10, user_config->getWarning().c_str() );
+        widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
+        widget_manager->hideWgtRect(WTOK_WARNING);
+        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 17 );
+    }
+    else
+        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 27 );
 
     widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, 7, _("Help") );
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
 
     widget_manager->addTextButtonWgt( WTOK_CREDITS, WIDTH, 7, _("Credits") );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
-
-    if(user_config->getWarning()!="")
-    {
-        widget_manager->addTextWgt( WTOK_WARNING, 80, 8, user_config->getWarning().c_str() );
-        widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
-        widget_manager->hideWgtRect(WTOK_WARNING);
-    }
     
     widget_manager->activateWgt(WTOK_SINGLE);
     widget_manager->layout(WGT_AREA_ALL);
