@@ -154,8 +154,8 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     // print shadow
     // ------------
     glColor4f(0.0f,0.0f,0.0f,1.0f);
-    float xf=(GLfloat)x+3;
-    float yf=(GLfloat)y-3;
+    float xf=(GLfloat)x+2;
+    float yf=(GLfloat)y-2;
     for(float r=-1; r<=0; r+=0.5)
     {
         m_text_out->start2f(xf-r, yf-r);
