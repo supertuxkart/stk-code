@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name "Bubble Gum")
  (model "../items/bubblegum.ac")
- (icon  "bubblegumicon.rgb")
+ (icon  "bubblegum-icon.rgb")
  (speed 50.0)
  (min-height 0.3)
  (max-height 1.0)

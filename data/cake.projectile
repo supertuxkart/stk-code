@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "cake")
  (model "cake.ac")
- (icon  "cakeicon.rgb")
+ (icon  "cake-icon.rgb")
  (speed          50.0)
  (min-height      0.2)
  (max-height      1.0)

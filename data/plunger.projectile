@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "Plunger")
  (model "plunger.ac")
- (icon  "plungericon.rgb")
+ (icon  "plunger-icon.rgb")
  (speed 35.0)
  (min-height 0.2)      ; height above terrain below which a spark is 
                        ; started to be pulled up 

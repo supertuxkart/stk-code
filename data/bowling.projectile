@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "Bowling")
  (model "bowling.ac")
- (icon  "bowlingicon.rgb")
+ (icon  "bowling-icon.rgb")
  (speed 2.0)
  (min-height 0.2)      ; height above terrain below which a spark is 
                        ; started to be pulled up 
