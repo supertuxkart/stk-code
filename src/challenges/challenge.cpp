@@ -24,6 +24,7 @@
 #include "track.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "grand_prix_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
@@ -130,8 +131,11 @@ const std::string Challenge::getUnlockedMessage() const
                 snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
                 break;
             case UNLOCK_GP:
-                snprintf(message, 127, _("New Grand Prix '%s'\nnow available"), m_feature[n].name.c_str() );
+            {
+                std::string gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
+                snprintf(message, 127, _("New Grand Prix '%s'\nnow available"), gp_user_name.c_str() );
                 break;
+            }
             case UNLOCK_DIFFICULTY:
                 snprintf(message, 127, _("New difficulty\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
                 break;
