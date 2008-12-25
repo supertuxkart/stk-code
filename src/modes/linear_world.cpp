@@ -533,8 +533,8 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     if(!info.m_on_road)
     {
         info.m_track_sector = info.m_last_valid_sector;
-        info.m_race_lap =  info.m_last_valid_race_lap;
     }
+    info.m_race_lap =  info.m_last_valid_race_lap;
     // FIXME - removing 1 here makes it less likely to fall in a rescue loop since the kart
     // moves back on each attempt. This is still a weak hack. Also some other code depends
     // on 1 being substracted, like 'forceRescue'
@@ -542,6 +542,9 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     info.m_last_valid_sector = info.m_track_sector;
     if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
         
+    // check if by removing 1 we 'warped around'; if so, remove a lap.
+    if(info.m_track_sector <= 0) info.m_race_lap--;   
+    
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
     
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
