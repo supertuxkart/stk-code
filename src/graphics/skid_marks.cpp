@@ -111,7 +111,9 @@ void SkidMarks::update(float dt)
     if(!m_kart.getControls().m_drift) return;   // no skidmarking
         
     // not turning enough, don't draw skidmarks if kart is going straight ahead
-    if( fabsf(m_kart.getSteerPercent()) < 0.55) return;
+    // this is even stricter for Ai karts, since they tend to use LOTS of skidding
+    const float min_skid_angle = m_kart.isPlayerKart() ? 0.55 : 0.95;
+    if( fabsf(m_kart.getSteerPercent()) < min_skid_angle) return;
     
     // Start new skid marks
     // --------------------
