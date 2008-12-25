@@ -110,7 +110,8 @@ private:
         KartType    m_kart_type;        // Kart type: AI, player, network player etc.
         int         m_local_player_id;  // player controling the kart, for AI: -1
         int         m_global_player_id; // global ID of player
-
+        int         m_gp_final_rank;    // In GPs, at the end, will hold the overall rank of this kart.
+        
         KartStatus(const std::string& ident, const int& prev_finish_pos, 
                    int local_player_id, int global_player_id, KartType kt) :
                    m_ident(ident), m_score(0), m_last_score(0), 
@@ -194,7 +195,11 @@ public:
     const GrandPrixData  *getGrandPrix()  const { return &m_grand_prix;             }
     unsigned int getFinishedKarts()       const { return m_num_finished_karts;      }
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
-    const std::string& getItemStyle()  const { return m_grand_prix.getItemStyle(); }
+    const std::string& getItemStyle()     const { return m_grand_prix.getItemStyle(); }
+    
+    int          getKartFinalGPRank(const int kart_id)
+                                          const { return m_kart_status[kart_id].m_gp_final_rank; }
+    
     const std::string&  
                  getKartName(int kart)    const { return m_kart_status[kart].m_ident;}
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;     }

@@ -249,7 +249,7 @@ bool ChallengeData::raceFinished()
 // ----------------------------------------------------------------------------
 bool ChallengeData::grandPrixFinished()
 {
-    printf("checking if GP challenge is solved");
+   // printf("----- checking if GP challenge is solved\n");
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
         race_manager->getGrandPrix()->getId() != m_gp_id                     ||
@@ -259,54 +259,9 @@ bool ChallengeData::grandPrixFinished()
 
     // check if the player came first.
     Kart* kart = RaceManager::getPlayerKart(0);
-
-    // FIXME - this code is duplicated from GrandPrixEnding. We should find a cleaner way to solve this.
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    const int rank = race_manager->getKartFinalGPRank(kart->getWorldKartId());
+    //printf("getting rank for %s : %i \n", kart->getName().c_str(), rank );
+    if( rank != 0 ) return false;
     
-    int *scores   = new int[NUM_KARTS];
-    int *position = new int[NUM_KARTS];
-    double *race_time = new double[NUM_KARTS];
-    // Ignore the first kart if it's a follow-the-leader race.
-    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
-    for( unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id )
-    {
-        position[kart_id]  = kart_id;
-        scores[kart_id]    = race_manager->getKartScore(kart_id);
-        race_time[kart_id] = race_manager->getOverallTime(kart_id);
-    }
-    
-    //Bubblesort
-    bool sorted;
-    do
-    {
-        sorted = true;
-        for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
-        {
-            if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
-                                            && race_time[i] > race_time[i+1]))
-            {
-                int tmp_score[2];
-                double tmp_time;
-                
-                tmp_score[0] = position[i];
-                tmp_score[1] = scores[i];
-                tmp_time = race_time[i];
-                
-                position[i] = position[i+1];
-                scores[i] = scores[i+1];
-                race_time[i] = race_time[i+1];
-                
-                position[i+1] = tmp_score[0];
-                scores[i+1] = tmp_score[1];
-                race_time[i+1] = tmp_time;
-                
-                sorted = false;
-            }
-        }
-    } while(!sorted);
-    
-    if(kart->getIdent() != race_manager->getKartName(position[start])) return false; // winner is not player
-    return true;
-    
-    
+    return true;    
 }   // grandPrixFinished

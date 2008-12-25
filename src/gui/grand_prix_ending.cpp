@@ -63,52 +63,25 @@ GrandPrixEnd::GrandPrixEnd()
 
     const unsigned int MAX_STR_LEN = 60;
     const unsigned int NUM_KARTS = race_manager->getNumKarts();
-
-    int *scores   = new int[NUM_KARTS];
-    int *position = new int[NUM_KARTS];
-    double *race_time = new double[NUM_KARTS];
+    
     // Ignore the first kart if it's a follow-the-leader race.
     int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
-    for( unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id )
+    
+    
+    int winner_kart_id = -1;
+    // find which kart ended at rank '0'
+    for(unsigned int j=start; j < NUM_KARTS; ++j)
     {
-        position[kart_id]  = kart_id;
-        scores[kart_id]    = race_manager->getKartScore(kart_id);
-        race_time[kart_id] = race_manager->getOverallTime(kart_id);
-    }
-
-    //Bubblesort
-    bool sorted;
-    do
-    {
-        sorted = true;
-        for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
+        if( race_manager->getKartFinalGPRank(j) == 0 )
         {
-            if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
-              && race_time[i] > race_time[i+1]))
-            {
-                int tmp_score[2];
-                double tmp_time;
-
-                tmp_score[0] = position[i];
-                tmp_score[1] = scores[i];
-                tmp_time = race_time[i];
-
-                position[i] = position[i+1];
-                scores[i] = scores[i+1];
-                race_time[i] = race_time[i+1];
-
-                position[i+1] = tmp_score[0];
-                scores[i+1] = tmp_score[1];
-                race_time[i+1] = tmp_time;
-
-                sorted = false;
-            }
+            winner_kart_id = j;
+            break;
         }
-    } while(!sorted);
+    }
     
     static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
-        _("The winner is %s!"),race_manager->getKartName(position[start]).c_str()); // FIXME - uses inner-name and not user name
+        _("The winner is %s!"),race_manager->getKartName(winner_kart_id).c_str()); // FIXME - uses inner-name and not user name
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);
@@ -120,15 +93,26 @@ GrandPrixEnd::GrandPrixEnd()
 
     for(unsigned int i=start; i < NUM_KARTS; ++i)
     {
-        char sTime[20];sTime[0]=0;
-        //if(race_manager->getWorld()->getClockMode()==CHRONO)
+       // char sTime[20];sTime[0]=0;
+       // if(RaceManager::isLinearRaceMode(race_manager->getMinorMode()) &&
+       //    RaceManager::modeHasLaps(race_manager->getMinorMode()) )
+       //     TimeToString(race_time[i], sTime);
         
-        if(RaceManager::isLinearRaceMode(race_manager->getMinorMode()) &&
-           RaceManager::modeHasLaps(race_manager->getMinorMode()) )
-            TimeToString(race_time[i], sTime);
-            
-        sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
-            i + 1-start, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
+        int this_kart_id = -1;
+        // find which kart ended at rank 'i'
+        for(unsigned int j=start; j < NUM_KARTS; ++j)
+        {
+            if( race_manager->getKartFinalGPRank(j) == i-start )
+            {
+                this_kart_id = j;
+                break;
+            }
+        }
+        
+        sprintf((char*)(m_score + MAX_STR_LEN * i), "#%d (%d) : %s",
+            i-start + 1 /* add 1 because, while the inner ranks start at 0, users expect them to start at 1 */,
+            race_manager->getKartScore(this_kart_id),
+            race_manager->getKartName(this_kart_id).c_str() );
         
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);
@@ -138,11 +122,8 @@ GrandPrixEnd::GrandPrixEnd()
         widget_manager->setWgtTextSize(WTOK_FIRSTKART + i, WGT_FNT_SML);
         widget_manager->breakLine();
     }
-    const std::string KART_NAME = race_manager->getKartName(position[start]);
-    const KartProperties* WINNING_KART = kart_properties_manager->getKart(KART_NAME);
-    delete []scores;
-    delete []position;
-    delete []race_time;
+    const std::string WINNER_KART_NAME = race_manager->getKartName(winner_kart_id);
+    const KartProperties* WINNING_KART = kart_properties_manager->getKart(WINNER_KART_NAME);
 
     widget_manager->addWgt(WTOK_QUIT, 50, 7);
     widget_manager->activateWgt(WTOK_QUIT);

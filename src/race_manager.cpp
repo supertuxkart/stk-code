@@ -299,6 +299,60 @@ void RaceManager::exit_race()
     // were finished, and not when a race is aborted.
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
+        // calculate the rank of each kart
+        const unsigned int NUM_KARTS = race_manager->getNumKarts();
+        
+        int *scores   = new int[NUM_KARTS];
+        int *position = new int[NUM_KARTS];
+        double *race_time = new double[NUM_KARTS];
+        // Ignore the first kart if it's a follow-the-leader race.
+        int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
+        for( unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id )
+        {
+            position[kart_id]  = kart_id;
+            scores[kart_id]    = race_manager->getKartScore(kart_id);
+            race_time[kart_id] = race_manager->getOverallTime(kart_id);
+        }
+        
+        //Bubblesort
+        bool sorted;
+        do
+        {
+            sorted = true;
+            for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
+            {
+                if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
+                                                && race_time[i] > race_time[i+1]))
+                {
+                    int tmp_score[2];
+                    double tmp_time;
+                    
+                    tmp_score[0] = position[i];
+                    tmp_score[1] = scores[i];
+                    tmp_time = race_time[i];
+                    
+                    position[i] = position[i+1];
+                    scores[i] = scores[i+1];
+                    race_time[i] = race_time[i+1];
+                    
+                    position[i+1] = tmp_score[0];
+                    scores[i+1] = tmp_score[1];
+                    race_time[i+1] = tmp_time;
+                    
+                    sorted = false;
+                }
+            }
+        } while(!sorted);
+        
+        for(unsigned int i=start; i < NUM_KARTS; ++i)
+        {
+            //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i);
+            m_kart_status[position[i]].m_gp_final_rank = i;
+        }
+        delete []scores;
+        delete []position;
+        delete []race_time;
+        
         unlock_manager->grandPrixFinished();
         menu_manager->switchToGrandPrixEnding();
     }
