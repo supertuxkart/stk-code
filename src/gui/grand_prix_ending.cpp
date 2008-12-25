@@ -102,7 +102,7 @@ GrandPrixEnd::GrandPrixEnd()
         // find which kart ended at rank 'i'
         for(unsigned int j=start; j < NUM_KARTS; ++j)
         {
-            if( race_manager->getKartFinalGPRank(j) == i-start )
+            if( (int)race_manager->getKartFinalGPRank(j) == (int)(i-start) )
             {
                 this_kart_id = j;
                 break;

@@ -173,10 +173,12 @@ Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizo
         //This shows position + driver name + time + points earned + total points
         if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
-            sprintf((char*)(score + MAX_STR_LEN * i), "#%d. %s (%d -> %d)",
+            const int prev_score = race_manager->getKartPrevScore(order[i]);
+            const int new_score = race_manager->getKartScore(order[i]);
+
+            sprintf((char*)(score + MAX_STR_LEN * i), "#%d. %s (%d + %d = %d)",
                 current_kart->getPosition(), kart_name.c_str(),// sTime,
-                race_manager->getKartPrevScore(order[i]),
-                race_manager->getKartScore(order[i]));
+                prev_score, (new_score - prev_score), new_score);
         }
         else
         {

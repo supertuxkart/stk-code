@@ -103,7 +103,7 @@ private:
         std::string m_ident;            // The .tkkf filename without the .tkkf
         std::string m_player_name;      // for networked karts
         int         m_score;            // score for this kart
-        int         m_last_score;       // needed for restart race
+        int         m_last_score;       // needed for restart race, and for race results GUI.
         double      m_overall_time;     // sum of times of all races
         double      m_last_time;        // needed for restart
         int         m_prev_finish_pos;  // previous finished position

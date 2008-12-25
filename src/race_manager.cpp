@@ -384,8 +384,8 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     assert(pos-1 >= 0);
     assert(pos-1 < (int)m_kart_status.size());
 
+    m_kart_status[id].m_last_score    = m_kart_status[id].m_score;
     m_kart_status[id].m_score        += m_score_for_position[pos-1];
-    m_kart_status[id].m_last_score    = m_score_for_position[pos-1];
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
@@ -401,7 +401,7 @@ void RaceManager::rerunRace()
     // Subtract last score from all karts:
     for(int i=0; i<m_num_karts; i++)
     {
-        m_kart_status[i].m_score        -= m_kart_status[i].m_last_score;
+        m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
     world->restartRace();
