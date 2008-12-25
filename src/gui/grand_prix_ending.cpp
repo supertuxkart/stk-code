@@ -108,7 +108,7 @@ GrandPrixEnd::GrandPrixEnd()
     
     static char output[MAX_MESSAGE_LENGTH];
     snprintf(output, sizeof(output),
-        _("The winner is %s!"),race_manager->getKartName(position[start]).c_str());
+        _("The winner is %s!"),race_manager->getKartName(position[start]).c_str()); // FIXME - uses inner-name and not user name
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);
@@ -129,7 +129,7 @@ GrandPrixEnd::GrandPrixEnd()
             
         sprintf((char*)(m_score + MAX_STR_LEN * i), "%d. %s %d %s",
             i + 1-start, race_manager->getKartName(position[i]).c_str(), scores[i], sTime );
-
+        
         widget_manager->addWgt(WTOK_FIRSTKART + i, 40, 5);
         widget_manager->showWgtRect(WTOK_FIRSTKART + i);
         widget_manager->showWgtText(WTOK_FIRSTKART + i);
