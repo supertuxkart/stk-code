@@ -48,6 +48,7 @@ void LinearWorld::init()
         KartInfo info;
         info.m_track_sector         = Track::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
+        info.m_last_valid_race_lap  = -1;
         info.m_lap_start_time       = -1.0f;
         m_track->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
         
@@ -160,7 +161,8 @@ void LinearWorld::update(float delta)
                 // bring karts back to where they left the track.
                 rescueKartAfterShortcut(kart, kart_info);
             }                
-            kart_info.m_last_valid_sector = kart_info.m_track_sector;        
+            kart_info.m_last_valid_sector = kart_info.m_track_sector;
+            kart_info.m_last_valid_race_lap = kart_info.m_race_lap;
         }   // last_valid_sectpr!=UNKNOWN_SECTOR
         else
         {
@@ -504,21 +506,13 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
  */
 void LinearWorld::rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info)
 {
-    // Reset the kart to the segment where the shortcut started!! And then 
-    // reset the shortcut flag, so that this shortcut is not counted!
-    const bool warp_around = kart_info.m_last_valid_sector == 0;
-
+    // Reset the kart to the segment where the shortcut started
+    
     // add one because 'moveKartAfterRescue' removes 1
     kart_info.m_track_sector   = kart_info.m_last_valid_sector+1; 
-
-    // don't let kart get a new free lap cause he was dropped at begin line...
-    if(warp_around)
-    {
-        kart_info.m_race_lap--;
-        kart_info.m_lap_start_time = -1; // invalidate time so he doesn't get a best time
-    }
+    kart_info.m_race_lap =  kart_info.m_last_valid_race_lap;
+    
     kart->doingShortcut();
-
     kart->forceRescue();
 }   // rescueKartAfterShortcut
 
@@ -537,7 +531,10 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     // when hitting the books, press rescue --> you are rescued to the
     // end of the track).
     if(!info.m_on_road)
+    {
         info.m_track_sector = info.m_last_valid_sector;
+        info.m_race_lap =  info.m_last_valid_race_lap;
+    }
     // FIXME - removing 1 here makes it less likely to fall in a rescue loop since the kart
     // moves back on each attempt. This is still a weak hack. Also some other code depends
     // on 1 being substracted, like 'forceRescue'
