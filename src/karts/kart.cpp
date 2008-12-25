@@ -780,7 +780,8 @@ void Kart::updatePhysics (float dt)
     }
     if(m_skidding>1.0f)
     {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
+           fabsf(getSteerPercent()) > 0.55 )
             m_skid_sound->play();
     }
     else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)

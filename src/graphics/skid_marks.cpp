@@ -110,6 +110,9 @@ void SkidMarks::update(float dt)
     // -------------------------
     if(!m_kart.getControls().m_drift) return;   // no skidmarking
         
+    // not turning enough, don't draw skidmarks if kart is going straight ahead
+    if( fabsf(m_kart.getSteerPercent()) < 0.55) return;
+    
     // Start new skid marks
     // --------------------
     const btWheelInfo::RaycastInfo &raycast_right = 
