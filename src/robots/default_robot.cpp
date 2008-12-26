@@ -449,6 +449,12 @@ void DefaultRobot::handleAcceleration( const float DELTA )
         }
     }
 
+    if(hasViewBlockedByPlunger())
+    {
+        m_controls.m_accel = 0.2f;
+        return;
+    }
+    
     m_controls.m_accel = 1.0f;
 }   // handleAcceleration
 
@@ -493,6 +499,10 @@ void DefaultRobot::handleRescue(const float DELTA)
 void DefaultRobot::handleNitro()
 {
     m_controls.m_nitro = false;
+    
+    // don't use nitro when has a plunger in the face!
+    if(hasViewBlockedByPlunger()) return;
+    
     // Don't use nitro if the kart doesn't have any, is not on ground,
     if(getEnergy()==0            || !isOnGround() || 
        m_nitro_level==NITRO_NONE || hasFinishedRace() ) return;
