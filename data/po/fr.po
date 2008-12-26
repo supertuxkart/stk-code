@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-15 21:33-0500\n"
-"PO-Revision-Date: 2008-12-16 09:20+0100\n"
+"POT-Creation-Date: 2008-12-26 11:15-0500\n"
+"PO-Revision-Date: 2008-12-26 11:25-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -88,7 +88,7 @@ msgstr "Au bout du monde"
 msgid "Avoid bananas"
 msgstr "Évite les bananes"
 
-#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/grand_prix_ending.cpp:138
 #: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Retour au menu principal"
@@ -204,7 +204,7 @@ msgid "Connected:"
 msgstr "Connecté :"
 
 #: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/grand_prix_ending.cpp:134
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Continer"
@@ -232,7 +232,7 @@ msgstr ""
 "Créé par Oliver & Steve Baker\n"
 "modifié par Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:72
+#: src/gui/main_menu.cpp:80
 msgid "Credits"
 msgstr "Crédits"
 
@@ -298,19 +298,19 @@ msgstr ""
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
-"in under 3:00 minutes."
+"in under 3:35 minutes."
 msgstr ""
 "Finis 3 tours dans 'L'autoroute\n"
 "de Tux' contre 3 opposants\n"
-"virtuels en 3:00."
+"virtuels en 3:35."
 
 #: data/tracks/jungle/jungle.challenge:5
 msgid "Finish Race track in 2:40"
 msgstr "Piste de course en 2:40"
 
 #: data/tracks/canyon/canyon.challenge:5
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "L'autoroute de Tux en 3:00"
+msgid "Finish Tux Tollway track in 3:35"
+msgstr "L'autoroute de Tux en 3:35"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
 msgid "Finish the City track in 4:20"
@@ -418,8 +418,8 @@ msgid "Go!"
 msgstr "Partez!"
 
 #: src/gui/help_page_one.cpp:73
-msgid "Grab blue boxes and coins"
-msgstr "Attrape les boîtes bleues et les sous"
+msgid "Grab blue boxes and nitro"
+msgstr "Attrape les boîtes bleues et la nitro"
 
 #: src/gui/game_mode.cpp:99
 msgid "Grand Prix"
@@ -435,7 +435,7 @@ msgstr ""
 "accumulant le plus de points dans\n"
 "plusieurs courses contre des adversaires."
 
-#: src/gui/main_menu.cpp:69
+#: src/gui/main_menu.cpp:77
 #: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Aide"
@@ -456,12 +456,12 @@ msgstr ""
 msgid "Increase Resolution"
 msgstr "Augmenter la résolution"
 
-#: src/user_config.cpp:870
+#: src/user_config.cpp:877
 #, c-format
 msgid "Invalid"
 msgstr "Invalide"
 
-#: src/modes/linear_world.cpp:171
+#: src/karts/player_kart.cpp:332
 msgid "Invalid short-cut!!"
 msgstr "Raccourci invalide!"
 
@@ -477,7 +477,7 @@ msgstr "Tour"
 msgid "Last grand prix, longer and harder"
 msgstr "Dernier grand prix, plus long et difficile"
 
-#: src/modes/follow_the_leader.cpp:138
+#: src/modes/follow_the_leader.cpp:139
 msgid "Leader"
 msgstr "Meneur"
 
@@ -486,7 +486,7 @@ msgstr "Meneur"
 msgid "Left"
 msgstr "Gauche"
 
-#: src/gui/race_results_gui.cpp:301
+#: src/gui/race_results_gui.cpp:303
 #: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Chargement en cours..."
@@ -504,7 +504,7 @@ msgstr "Jeu en ligne"
 msgid "New Feature Unlocked"
 msgstr "Une nouvelle fonctionnalité a été déverrouillée"
 
-#: src/challenges/challenge.cpp:133
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -513,7 +513,7 @@ msgstr ""
 "Nouveau grand prix\n"
 "'%s' déverrouillé"
 
-#: src/challenges/challenge.cpp:136
+#: src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -523,11 +523,11 @@ msgstr ""
 "Nouvelle difficulté\n"
 "'%s' déverrouillée"
 
-#: src/modes/linear_world.cpp:339
+#: src/modes/linear_world.cpp:285
 msgid "New fastest lap"
 msgstr "Meilleur temps"
 
-#: src/challenges/challenge.cpp:130
+#: src/challenges/challenge.cpp:131
 #, c-format
 msgid ""
 "New game mode\n"
@@ -538,7 +538,7 @@ msgstr ""
 "jeu déverrouillé :\n"
 "'%s'"
 
-#: src/challenges/challenge.cpp:140
+#: src/challenges/challenge.cpp:144
 #, c-format
 msgid ""
 "New kart\n"
@@ -549,7 +549,7 @@ msgstr ""
 "'%s'\n"
 "déverrouillé"
 
-#: src/challenges/challenge.cpp:126
+#: src/challenges/challenge.cpp:127
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -590,7 +590,7 @@ msgstr "Nombre de tours"
 msgid "OK"
 msgstr "OK"
 
-#: src/user_config.cpp:498
+#: src/user_config.cpp:505
 msgid "Old config file found, check your key bindings!"
 msgstr "Un vieux fichier de configuration a été trouvé, vérifie tes contrôles !"
 
@@ -820,7 +820,7 @@ msgstr "Commencer la course"
 msgid "Synchronising network..."
 msgstr "Synchronisation du réseau..."
 
-#: src/gui/race_results_gui.cpp:271
+#: src/gui/race_results_gui.cpp:273
 msgid "Synchronising."
 msgstr "Synchronisation..."
 
@@ -856,7 +856,7 @@ msgstr ""
 msgid "The old mine"
 msgstr "La vieille mine"
 
-#: src/gui/grand_prix_ending.cpp:111
+#: src/gui/grand_prix_ending.cpp:84
 #, c-format
 msgid "The winner is %s!"
 msgstr "Le gagnant est %s !"
@@ -906,7 +906,7 @@ msgstr "Activer la musique"
 msgid "Turn on sound effects"
 msgstr "Activer les sons"
 
-#: data/tracks/tuxtrack/tuxtrack.track:4
+#: data/tracks/tuxtollway/tuxtollway.track:4
 msgid "Tux Tollway"
 msgstr "Autoroute de Tux"
 
@@ -914,7 +914,7 @@ msgstr "Autoroute de Tux"
 msgid "Two Players"
 msgstr "Deux joueurs"
 
-#: src/modes/linear_world.cpp:278
+#: src/modes/linear_world.cpp:651
 msgid "WRONG WAY!"
 msgstr "MAUVAISE DIRECTION !"
 
@@ -1017,7 +1017,7 @@ msgstr "Mode fenêtré"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:270
 msgid "You finished the race!"
 msgstr "Tu as fini la course !"
 
@@ -1029,7 +1029,7 @@ msgstr ""
 "Tu as été\n"
 "éliminé !"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:270
 msgid "You won the race!"
 msgstr "Tu as gagné la course !"
 
@@ -1039,21 +1039,31 @@ msgstr "Zipper - augmente la vitesse"
 
 #: src/user_config.cpp:860
 #, c-format
+msgid "joy %d axis %d  %c"
+msgstr "joy %d axe %d %c"
+
+#: src/user_config.cpp:864
+#, c-format
+msgid "joy %d btn %d"
+msgstr "joy %d btn %d"
+
+#: src/user_config.cpp:867
+#, c-format
 msgid "joy %d hat %d"
 msgstr "joy %d hat %d"
 
-#: src/user_config.cpp:866
+#: src/user_config.cpp:873
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "souris, axe %d %c"
 
-#: src/user_config.cpp:863
+#: src/user_config.cpp:870
 #, c-format
 msgid "mouse btn %d"
 msgstr "souris, btn %d"
 
-#: src/user_config.cpp:847
-#: src/user_config.cpp:891
+#: src/user_config.cpp:854
+#: src/user_config.cpp:898
 #, c-format
 msgid "not set"
 msgstr "non défini"
