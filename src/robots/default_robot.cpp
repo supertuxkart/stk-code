@@ -102,6 +102,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_nitro_level        = NITRO_ALL;
         break;
     }
+
 }   // DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -431,6 +432,15 @@ void DefaultRobot::handleAcceleration( const float DELTA )
         return;
     }
 
+    if(hasViewBlockedByPlunger())
+    {
+        if(!(getSpeed() > getMaxSpeed() / 2))
+            m_controls.m_accel = 0.05f;
+        else 
+            m_controls.m_accel = 0.0f;
+        return;
+    }
+    
     if( m_wait_for_players )
     {
         //Find if any player is ahead of this kart
@@ -449,12 +459,6 @@ void DefaultRobot::handleAcceleration( const float DELTA )
         }
     }
 
-    if(hasViewBlockedByPlunger())
-    {
-        m_controls.m_accel = 0.2f;
-        return;
-    }
-    
     m_controls.m_accel = 1.0f;
 }   // handleAcceleration
 
@@ -591,7 +595,10 @@ float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - getHPR().getHeading();
 
-    steer_angle += ANGLE;
+    if(hasViewBlockedByPlunger())
+        steer_angle += ANGLE/5;
+    else
+        steer_angle += ANGLE;
     steer_angle = normalizeAngle( steer_angle );
 
     return steer_angle;
@@ -923,11 +930,18 @@ void DefaultRobot::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / getMaxSteerAngle();
     m_controls.m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
+    if(hasViewBlockedByPlunger()) m_controls.m_drift = false;
     float old_steer      = m_controls.m_steer;
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
+    if(hasViewBlockedByPlunger())
+    {
+        if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
+        else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
+    }
+    
     // The AI has its own 'time full steer' value (which is the time
     float max_steer_change = dt/m_kart_properties->getTimeFullSteerAI();
     if(old_steer < steer_fraction)
