@@ -82,7 +82,8 @@ protected:
         Useful e.g. for throwing projectiles in front only.
      */
     void              getClosestKart(const Kart **minKart, float *minDistSquared, 
-                                     btVector3 *minDelta, const Kart* inFrontOf=NULL) const;
+                                     btVector3 *minDelta, const Kart* inFrontOf=NULL,
+                                     const bool backwards=false) const;
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset, 
                                     const btVector3 velocity,

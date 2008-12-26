@@ -141,7 +141,7 @@ Flyable::~Flyable()
 
 //-----------------------------------------------------------------------------
 void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
-                             btVector3 *minDelta, const Kart* inFrontOf) const
+                             btVector3 *minDelta, const Kart* inFrontOf, const bool backwards) const
 {
     btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() : getTrans());
     
@@ -170,7 +170,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
                                 trans.getBasis()[1][1],
                                 trans.getBasis()[2][1]);
             
-            float angle = to_target.angle(direction);
+            const float angle = to_target.angle( backwards ? -direction : direction );
             
             if(fabsf(angle) > 1) continue;
         }

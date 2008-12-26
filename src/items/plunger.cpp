@@ -39,7 +39,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */);
+    getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */, m_reverse_mode);
     
     btTransform trans = kart->getTrans();
     
@@ -52,7 +52,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
-    if(closest_kart != NULL && kartDistSquared < 30*30 && !m_reverse_mode) // aiming doesn't work backwards
+    if(closest_kart != NULL && kartDistSquared < 30*30)
     {
         const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
         
@@ -69,14 +69,17 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
         btMatrix3x3 m;
         m.setEulerZYX(pitch, 0.0f, projectileAngle);
         trans.setBasis(m);
+        
+        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
+                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, false, &trans );
     }
     else
     {
         trans = kart->getKartHeading();
+
+        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
+                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
     }
-    
-    createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
     
     if(m_reverse_mode)
         m_rubber_band = NULL;
