@@ -69,7 +69,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min = 
         m_max_speed_turn = m_angle_at_max =
         m_rubber_band_max_length = m_rubber_band_force = 
-        m_rubber_band_duration = 
+        m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_camera_max_accel = m_camera_max_brake = 
         m_camera_distance = UNDEFINED;
@@ -253,6 +253,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
 
     lisp->get("skid-increase",             m_skid_increase            );
     lisp->get("skid-decrease",             m_skid_decrease            );
+    lisp->get("time-till-max-skid",        m_time_till_max_skid       );
     lisp->get("skid-max",                  m_skid_max                 );
     lisp->get("skid-visual",               m_skid_visual              );
 
@@ -339,6 +340,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_rubber_band_force,         "rubber-band-force"          );
     CHECK_NEG(m_rubber_band_duration,      "rubber-band-duration"       );
     CHECK_NEG(m_skid_decrease,             "skid-decrease"              );
+    CHECK_NEG(m_time_till_max_skid,        "time-till-max-skid"         );
     CHECK_NEG(m_skid_increase,             "skid-increase"              );
     CHECK_NEG(m_skid_max,                  "skid-max"                   );
     CHECK_NEG(m_skid_visual,               "skid-visual"                );

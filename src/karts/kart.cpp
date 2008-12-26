@@ -721,7 +721,8 @@ void Kart::updatePhysics (float dt)
                 //apply the brakes
                 for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor() * 4.0f, i);
                 m_skidding*= 1.08f;//skid a little when the brakes are hit (just enough to make the skiding sound)
-                if(m_skidding>2.0f) m_skidding=2.0f;
+                if(m_skidding>m_kart_properties->getMaxSkid())
+                    m_skidding=m_kart_properties->getMaxSkid();
             }
             else
             {
@@ -769,7 +770,8 @@ void Kart::updatePhysics (float dt)
 #endif
     if(m_controls.m_drift)
     {
-        m_skidding*= m_kart_properties->getSkidIncrease();
+        m_skidding +=  m_kart_properties->getSkidIncrease()
+                      *dt/m_kart_properties->getTimeTillMaxSkid();
         if(m_skidding>m_kart_properties->getMaxSkid())
             m_skidding=m_kart_properties->getMaxSkid();
     }

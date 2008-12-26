@@ -136,6 +136,8 @@ protected:
                                        *   m_skid_increase. */
     float m_skid_decrease;            /**< Skidding is multiplied by this when
                                        *   not skidding to decrease to 1.0. */
+    float m_time_till_max_skid;       /**< Time till maximum skidding is 
+                                       *   reached. */
     // Camera related setting
     // ----------------------
     float m_camera_max_accel;         // maximum acceleration of camera
@@ -218,6 +220,9 @@ public:
     /** Returns the factor by which m_skidding is multiplied when the kart is 
      *  not skidding to decrease it back to 1.0f . */
     float getSkidDecrease           () const {return m_skid_decrease;            }
+    /** Returns the time (in seconds) of drifting till the maximum skidding
+     *  is reached. */
+    float getTimeTillMaxSkid        () const {return m_time_till_max_skid;       }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 
