@@ -137,7 +137,7 @@ void RubberBand::update(float dt)
         Vec3 diff   = p-k;
         
         // detach rubber band if kart gets very close to hit point
-        if(diff.length2() < 10*10)
+        if(m_attached_state==RB_TO_TRACK && diff.length2() < 10*10)
         {
             // Rubber band snaps
             m_plunger->hit(NULL);
