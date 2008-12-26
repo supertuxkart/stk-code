@@ -135,6 +135,17 @@ void RubberBand::update(float dt)
     {
         float force = m_owner.getKartProperties()->getRubberBandForce();
         Vec3 diff   = p-k;
+        
+        // detach rubber band if kart gets very close to hit point
+        if(diff.length2() < 10*10)
+        {
+            // Rubber band snaps
+            m_plunger->hit(NULL);
+            // This causes the plunger to be removed at the next update
+            m_plunger->setKeepAlive(0.0f);
+            return;
+        }
+        
         diff.normalize();   // diff can't be zero here
         m_owner.getBody()->applyCentralForce(diff*force);
         if(m_attached_state==RB_TO_KART)
