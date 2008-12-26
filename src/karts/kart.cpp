@@ -80,7 +80,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_nitro                = NULL;
     m_skidmarks            = NULL;
 
-    m_view_blocked_by_plunger = false;
+    m_view_blocked_by_plunger = 0;
     
     // Set position and heading:
     m_reset_transform      = init_transform;
@@ -468,6 +468,9 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
+    // if its view is blocked by plunger, decrease remaining time
+    if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
+    
     // Store the actual kart controls at the start of update in the server
     // state. This makes it easier to reset some fields when they are not used 
     // anymore (e.g. controls.fire).

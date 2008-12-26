@@ -91,7 +91,9 @@ private:
     float               m_finish_time;
     bool                m_finished_race;
 
-    bool                m_view_blocked_by_plunger;
+    /* When a kart has its view blocked by the plunger, this variable will be > 0
+       the number it contains is the time left before removing plunger */
+    float               m_view_blocked_by_plunger;
     
     float               m_speed;
     float               m_rpm;
@@ -145,8 +147,8 @@ public:
     void           updatePhysics       (float dt);
 
     bool           hasViewBlockedByPlunger() const
-                                                { return m_view_blocked_by_plunger; }
-    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = true; }
+                                                { return m_view_blocked_by_plunger > 0; }
+    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 20; }
     
    /**
        returns a bullet transform object located at the kart's position

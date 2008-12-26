@@ -35,7 +35,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     
     // if the kart is looking backwards, release from the back
     PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
-    const bool reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
+    m_reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
     
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
@@ -52,7 +52,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
-    if(closest_kart != NULL && kartDistSquared < 30*30 && !reverse_mode) // aiming doesn't work backwards
+    if(closest_kart != NULL && kartDistSquared < 30*30 && !m_reverse_mode) // aiming doesn't work backwards
     {
         const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
         
@@ -76,9 +76,9 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     }
     
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, reverse_mode, &trans );
+                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
     
-    if(reverse_mode)
+    if(m_reverse_mode)
         m_rubber_band = NULL;
     else
     {
@@ -116,13 +116,13 @@ void Plunger::update(float dt)
             m->removeAllKids();
             scene->remove(m);
         }
-        m_rubber_band->update(dt);
+        if(!m_reverse_mode) m_rubber_band->update(dt);
         return;
     }
 
     // Else: update the flyable and rubber band
     Flyable::update(dt);
-    m_rubber_band->update(dt);
+    if(!m_reverse_mode) m_rubber_band->update(dt);
     
     // FIXME - don't hardcode, put in config file
     const float max_height = 1.0;
@@ -155,30 +155,50 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
 {
     if(isOwnerImmunity(kart)) return;
 
-    m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
-
-    // Make this object invisible by placing it faaar down. Not that if this
-    // objects is simply removed from the scene graph, it might be auto-deleted
-    // because the ref count reaches zero.
-    Vec3 hell(0, 0, -10000);
-    getModelTransform()->setTransform(hell.toFloat());
-    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
-    
-    if(kart)
+    if(m_reverse_mode)
     {
-        m_rubber_band->hit(kart);
-        return;
-    }
-    else if(mp)
-    {
-        Vec3 pos(mp->getBody()->getWorldTransform().getOrigin());
-        m_rubber_band->hit(NULL, &pos);
+        if(kart)
+        {
+            kart->blockViewWithPlunger();
+        }
+        else
+        {
+            m_keep_alive = 0;
+            // Make this object invisible by placing it faaar down. Not that if this
+            // objects is simply removed from the scene graph, it might be auto-deleted
+            // because the ref count reaches zero.
+            Vec3 hell(0, 0, -10000);
+            getModelTransform()->setTransform(hell.toFloat());
+            RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+            //hitTrack();
+        }
     }
     else
     {
-        m_rubber_band->hit(NULL, &(getXYZ()));
-    }
+        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
 
+        // Make this object invisible by placing it faaar down. Not that if this
+        // objects is simply removed from the scene graph, it might be auto-deleted
+        // because the ref count reaches zero.
+        Vec3 hell(0, 0, -10000);
+        getModelTransform()->setTransform(hell.toFloat());
+        RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+        
+        if(kart)
+        {
+            m_rubber_band->hit(kart);
+            return;
+        }
+        else if(mp)
+        {
+            Vec3 pos(mp->getBody()->getWorldTransform().getOrigin());
+            m_rubber_band->hit(NULL, &pos);
+        }
+        else
+        {
+            m_rubber_band->hit(NULL, &(getXYZ()));
+        }
+    }
 }   // hit
 
 // -----------------------------------------------------------------------------

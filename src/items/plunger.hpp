@@ -34,6 +34,7 @@ private:
     /** Timer to keep the plunger alive while the rubber band is working. */
     float        m_keep_alive;
 
+    bool m_reverse_mode;
 public:
                  Plunger(Kart *kart);
                 ~Plunger();
