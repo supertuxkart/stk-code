@@ -81,7 +81,9 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
                       new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
     }
     
-    if(m_reverse_mode)
+    // pulling back makes no sense in battle mode, since this mode is not a race.
+    // so in battle mode, always hide view
+    if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
         m_rubber_band = NULL;
     else
     {
@@ -119,13 +121,13 @@ void Plunger::update(float dt)
             m->removeAllKids();
             scene->remove(m);
         }
-        if(!m_reverse_mode) m_rubber_band->update(dt);
+        if(m_rubber_band != NULL) m_rubber_band->update(dt);
         return;
     }
 
     // Else: update the flyable and rubber band
     Flyable::update(dt);
-    if(!m_reverse_mode) m_rubber_band->update(dt);
+    if(m_rubber_band != NULL) m_rubber_band->update(dt);
     
     if(getHoT()==Track::NOHIT) return;
     float hat = getTrans().getOrigin().getZ()-getHoT();
@@ -153,12 +155,11 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
 {
     if(isOwnerImmunity(kart)) return;
 
-    if(m_reverse_mode)
+    // pulling back makes no sense in battle mode, since this mode is not a race.
+    // so in battle mode, always hide view
+    if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
     {
-        if(kart)
-        {
-            kart->blockViewWithPlunger();
-        }
+        if(kart) kart->blockViewWithPlunger();
 
         m_keep_alive = 0;
         // Make this object invisible by placing it faaar down. Not that if this
