@@ -91,6 +91,8 @@ private:
     float               m_finish_time;
     bool                m_finished_race;
 
+    bool                m_view_blocked_by_plunger;
+    
     float               m_speed;
     float               m_rpm;
     float               m_current_gear_ratio;
@@ -142,6 +144,10 @@ public:
     void           getClosestKart      (float *cdist, int *closest);
     void           updatePhysics       (float dt);
 
+    bool           hasViewBlockedByPlunger() const
+                                                { return m_view_blocked_by_plunger; }
+    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = true; }
+    
    /**
        returns a bullet transform object located at the kart's position
        and oriented in the direction the kart is going. Can be useful

@@ -102,6 +102,7 @@ private:
     const char    *m_pos_string [11];
     Material      *m_speed_back_icon;
     Material      *m_speed_fore_icon;
+    Material      *m_plunger_face;
     typedef        std::vector<TimedMessage> AllMessageType;
     AllMessageType m_messages;
 

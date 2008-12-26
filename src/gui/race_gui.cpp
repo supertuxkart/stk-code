@@ -102,7 +102,10 @@ RaceGUI::RaceGUI()
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
     m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");
     m_speed_fore_icon->getState()->disable(GL_CULL_FACE);
-
+    
+    m_plunger_face = material_manager->getMaterial("plungerface.rgb");
+    m_plunger_face->getState()->disable(GL_CULL_FACE);
+    
     m_fps_counter = 0;
     m_fps_string[0]=0;
     m_fps_timer.reset();
@@ -637,7 +640,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 
         if ( speedRatio > 1 )
             speedRatio = 1;
-
+        
         m_speed_fore_icon->getState()->force();
         glBegin ( GL_POLYGON ) ;
         glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y);
@@ -876,8 +879,7 @@ void RaceGUI::drawStatusText(const float dt)
 
         for(int pla = 0; pla < numPlayers; pla++)
         {
-            int offset_x, offset_y;
-            offset_x = offset_y = 0;
+            int offset_x = 0, offset_y = 0;
 
             if(numPlayers == 2)
             {
@@ -917,6 +919,24 @@ void RaceGUI::drawStatusText(const float dt)
                                  split_screen_ratio_x, split_screen_ratio_y );
             drawAllMessages     (player_kart, offset_x, offset_y,
                                  split_screen_ratio_x, split_screen_ratio_y );
+            
+            if(player_kart->hasViewBlockedByPlunger())
+            {
+                const int screen_width = (numPlayers > 2) ? user_config->m_width/2 : user_config->m_width;
+                const int plunger_size = (numPlayers > 1) ? user_config->m_height/2 : user_config->m_height;
+                int plunger_x = offset_x + screen_width/2 - plunger_size/2;
+                
+                if (numPlayers == 3 && pla > 1)
+                    plunger_x = offset_x + user_config->m_width/2 - plunger_size/2;
+                        
+                m_plunger_face->getState()->force();
+                glBegin ( GL_QUADS ) ;
+                glTexCoord2f(1, 0); glVertex2i(plunger_x+plunger_size,    offset_y);
+                glTexCoord2f(0, 0); glVertex2i(plunger_x,                 offset_y);
+                glTexCoord2f(0, 1); glVertex2i(plunger_x,                 offset_y+plunger_size);
+                glTexCoord2f(1, 1); glVertex2i(plunger_x+plunger_size,    offset_y+plunger_size);
+                glEnd () ;                
+            }
         }   // next player
         
         drawTimer();

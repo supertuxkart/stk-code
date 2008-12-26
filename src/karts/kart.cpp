@@ -80,6 +80,8 @@ Kart::Kart (const std::string& kart_name, int position,
     m_nitro                = NULL;
     m_skidmarks            = NULL;
 
+    m_view_blocked_by_plunger = false;
+    
     // Set position and heading:
     m_reset_transform      = init_transform;
 
