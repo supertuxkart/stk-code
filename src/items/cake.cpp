@@ -44,8 +44,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     m_speed = 25.0f + kart->getSpeed()/25.0f * m_speed;
     
     btTransform trans = kart->getTrans();
-    
-    const float pitch = 0.0f; //getTerrainPitch(heading);
+
+    const float pitch = 0.0f; //getTerrainPitch(heading); TODO: take pitch in account
     
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
@@ -59,7 +59,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 
         // calculate appropriate initial up velocity so that the
         // projectile lands on the aimed kart (9.8 is the gravity)
-        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/1.6f); // the division is an empirical estimation
+        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/1.2f); // division is an empirical estimation
         up_velocity = time*9.8f;
         
         // calculate the approximate location of the aimed kart in 'time' seconds
@@ -131,8 +131,8 @@ void Cake::update(float dt)
 
         ideal_direction.setInterpolate3(actual_direction.normalized(), ideal_direction, dt);
         
-        const int current_xy_speed = (int)sqrt( actual_direction.getX()*actual_direction.getX() +
-                                                actual_direction.getY()*actual_direction.getY());
+        const float current_xy_speed = sqrt( actual_direction.getX()*actual_direction.getX() +
+                                             actual_direction.getY()*actual_direction.getY());
         
         m_body->setLinearVelocity( btVector3(ideal_direction.getX()*current_xy_speed,
                                              ideal_direction.getY()*current_xy_speed,
