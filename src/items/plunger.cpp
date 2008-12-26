@@ -136,7 +136,7 @@ void Plunger::update(float dt)
     hat = std::max(std::min(hat, m_max_height) , m_min_height);
     float delta = m_average_height - hat;
     btVector3 v=getVelocity();
-    v.setZ( /* up-down force */ 10*delta); // FIXME - don't hardcode, move to config file
+    v.setZ( m_st_force_updown[POWERUP_PLUNGER]*delta); // FIXME - don't hardcode, move to config file
     setVelocity(v);
     
 }   // update
