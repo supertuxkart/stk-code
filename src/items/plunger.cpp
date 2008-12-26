@@ -37,10 +37,54 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
     const bool reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
     
+    // find closest kart in front of the current one
+    const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
+    getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */);
+    
+    btTransform trans = kart->getTrans();
+    
+    btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
+    btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
+                                thisKartDirMatrix[1][1],
+                                thisKartDirMatrix[2][1]);
+    
+    float heading=atan2(-thisKartDirVector.getX(), thisKartDirVector.getY());
+    float pitch = kart->getTerrainPitch(heading);
+
+    // aim at this kart if it's not too far
+    if(closest_kart != NULL && kartDistSquared < 30*30 && !reverse_mode) // aiming doesn't work backwards
+    {
+        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
+        
+        // calculate the approximate location of the aimed kart in 'time' seconds
+        btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
+        closestKartLoc += time*closest_kart->getVelocity();
+        
+        // calculate the angle at which the projectile should be thrown
+        // to hit the aimed kart
+        float projectileAngle=atan2(-(closestKartLoc.getX() - kart->getTrans().getOrigin().getX()),
+                                    closestKartLoc.getY() - kart->getTrans().getOrigin().getY() );
+        
+        // apply transformation to the bullet object
+        btMatrix3x3 m;
+        m.setEulerZYX(pitch, 0.0f, projectileAngle);
+        trans.setBasis(m);
+    }
+    else
+    {
+        trans = kart->getKartHeading();
+    }
+    
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, reverse_mode );
-    m_rubber_band = new RubberBand(this, *kart);
-    m_rubber_band->ref();
+                  new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, reverse_mode, &trans );
+    
+    if(reverse_mode)
+        m_rubber_band = NULL;
+    else
+    {
+        m_rubber_band = new RubberBand(this, *kart);
+        m_rubber_band->ref();
+    }
     m_keep_alive = -1;
 }   // Plunger
 
@@ -79,6 +123,24 @@ void Plunger::update(float dt)
     // Else: update the flyable and rubber band
     Flyable::update(dt);
     m_rubber_band->update(dt);
+    
+    // FIXME - don't hardcode, put in config file
+    const float max_height = 1.0;
+    const float min_height = 0.2;
+    const float average_height = (m_max_height + m_min_height)/2;
+    
+    if(getHoT()==Track::NOHIT) return;
+    float hat = getTrans().getOrigin().getZ()-getHoT();
+    
+    // Use the Height Above Terrain to set the Z velocity.
+    // HAT is clamped by min/max height. This might be somewhat
+    // unphysical, but feels right in the game.
+    hat = std::max(std::min(hat, max_height) , min_height);
+    float delta = average_height - hat;
+    btVector3 v=getVelocity();
+    v.setZ( /* up-down force */ 10*delta); // FIXME - don't hardcode, move to config file
+    setVelocity(v);
+    
 }   // update
 
 // -----------------------------------------------------------------------------
