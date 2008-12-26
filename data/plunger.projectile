@@ -5,9 +5,9 @@
  (model "plunger.ac")
  (icon  "plunger-icon.rgb")
  (speed 35.0)
- (min-height 0.2)      ; height above terrain below which a spark is 
+ (min-height 0.2)      ; height above terrain below which a plunger is 
                        ; started to be pulled up 
- (max-height 1.0)      ; height above terrain at which a spark is 
+ (max-height 1.0)      ; height above terrain at which a plunger is 
                        ; started to be pulled back to ground
  (force-updown 1.0)    ; force pushing the spark down 
                        ; when it's too high above ground

@@ -127,19 +127,14 @@ void Plunger::update(float dt)
     Flyable::update(dt);
     if(!m_reverse_mode) m_rubber_band->update(dt);
     
-    // FIXME - don't hardcode, put in config file
-    const float max_height = 1.0;
-    const float min_height = 0.2;
-    const float average_height = (m_max_height + m_min_height)/2;
-    
     if(getHoT()==Track::NOHIT) return;
     float hat = getTrans().getOrigin().getZ()-getHoT();
     
     // Use the Height Above Terrain to set the Z velocity.
     // HAT is clamped by min/max height. This might be somewhat
     // unphysical, but feels right in the game.
-    hat = std::max(std::min(hat, max_height) , min_height);
-    float delta = average_height - hat;
+    hat = std::max(std::min(hat, m_max_height) , m_min_height);
+    float delta = m_average_height - hat;
     btVector3 v=getVelocity();
     v.setZ( /* up-down force */ 10*delta); // FIXME - don't hardcode, move to config file
     setVelocity(v);
