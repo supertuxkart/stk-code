@@ -148,7 +148,7 @@ public:
 
     bool           hasViewBlockedByPlunger() const
                                                 { return m_view_blocked_by_plunger > 0; }
-    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 20; }
+    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 15; }
     
    /**
        returns a bullet transform object located at the kart's position

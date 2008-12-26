@@ -161,17 +161,14 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         {
             kart->blockViewWithPlunger();
         }
-        else
-        {
-            m_keep_alive = 0;
-            // Make this object invisible by placing it faaar down. Not that if this
-            // objects is simply removed from the scene graph, it might be auto-deleted
-            // because the ref count reaches zero.
-            Vec3 hell(0, 0, -10000);
-            getModelTransform()->setTransform(hell.toFloat());
-            RaceManager::getWorld()->getPhysics()->removeBody(getBody());
-            //hitTrack();
-        }
+
+        m_keep_alive = 0;
+        // Make this object invisible by placing it faaar down. Not that if this
+        // objects is simply removed from the scene graph, it might be auto-deleted
+        // because the ref count reaches zero.
+        Vec3 hell(0, 0, -10000);
+        getModelTransform()->setTransform(hell.toFloat());
+        RaceManager::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
     {
