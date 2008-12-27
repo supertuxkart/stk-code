@@ -1,21 +1,21 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: SuperTuxKart 0.6\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2008-08-15 22:13-0800\n"
+"PO-Revision-Date: 2008-12-26 16:16-0800\n"
 "Last-Translator: Aaron Kearns <ajkearns6@gmail.com>\n"
-"Language-Team: \n"
+"Language-Team: Aaron Kearns <ajkearns6@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Irish\n"
 
-#: src/gui/config_display.cpp:385
+#: src/gui/config_display.cpp:387
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d dubhliosta"
 
-#: src/world.cpp:619
+#: src/modes/world.cpp:413
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -24,19 +24,35 @@ msgstr ""
 "Bhí %s\n"
 "eisiamh!"
 
-#: src/gui/player_controls.cpp:64
+#: src/gui/game_mode.cpp:87
+msgid "3 Strikes Battle"
+msgstr "Trí Bhuillí Cath"
+
+#: src/gui/help_page_three.cpp:75
+msgid ""
+"3 Strikes Battle : only in multiplayer games.\n"
+"Hit others with weapons until they lose all their lives."
+msgstr ""
+
+#: src/gui/help_page_three.cpp:83
+#: src/gui/help_page_two.cpp:128
+msgid "< Back"
+msgstr "< Ar Ais"
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:72
 msgid "Accelerate"
 msgstr "Luathaigh"
 
-#: src/gui/challenges_menu.cpp:36
+#: src/gui/challenges_menu.cpp:37
 msgid "Active Challenges"
 msgstr "Dúshláin Gníomhach"
 
-#: data/all.cup:4
+#: data/grandprix/alltracks.grandprix:4
 msgid "All tracks"
 msgstr "Iomlán na ráschúrsaí"
 
-#: data/all.cup:5
+#: data/grandprix/alltracks.grandprix:5
 msgid "All tracks included in SuperTuxKart"
 msgstr "Iomlán na ráschúrsaí"
 
@@ -44,15 +60,15 @@ msgstr "Iomlán na ráschúrsaí"
 msgid "Amazonian Journey"
 msgstr "Turas Amazon"
 
-#: src/gui/help_page_two.cpp:108
+#: src/gui/help_page_two.cpp:111
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Inneoin - moilligh an chéad kart"
 
-#: src/gui/config_display.cpp:92
+#: src/gui/config_display.cpp:94
 msgid "Apply "
 msgstr "Cuir i bhfeidhm"
 
-#: src/gui/config_display.cpp:351
+#: src/gui/config_display.cpp:353
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Cuir i bhfeidhm %dx%d"
@@ -61,44 +77,62 @@ msgstr "Cuir i bhfeidhm %dx%d"
 msgid "Around the Lighthouse"
 msgstr "Timpeall an Teach Solais"
 
-#: src/gui/help_page_one.cpp:107
-msgid ""
-"At high speeds wheelies drive you faster, but you can't steer. If you\n"
-"get stuck or fall too far, use the rescue button to get back on track."
-msgstr "Ardaíonn wheelies luas, ach ní féidir leat a stiúradh."
-
-#: src/challenges/worlds_end_gp.cpp:54
-#: data/gp4.cup:4
+#: data/grandprix/atworldsend.grandprix:4
 msgid "At world's end"
 msgstr "Ag Deireadh an Domhain"
 
-#: src/gui/help_page_one.cpp:73
+#: src/gui/help_page_one.cpp:74
 msgid "Avoid bananas"
 msgstr "Seachain bananaí"
 
-#: src/gui/grand_prix_ending.cpp:148
-#: src/gui/leader_result.cpp:152
-#: src/gui/race_results_gui.cpp:144
+#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Téigh ar ais go príomh-roghchlár"
 
-#: src/gui/help_page_two.cpp:122
+#: src/gui/help_page_one.cpp:153
+#: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_two.cpp:131
 msgid "Back to the menu"
 msgstr "Téigh ar ais go roghchlár"
 
-#: src/gui/player_controls.cpp:65
+#: src/gui/network_gui.cpp:60
+msgid "Become server"
+msgstr "Bíonn freastalaí"
+
+#: src/gui/help_page_two.cpp:84
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back,\n"
+"it will be thrown backwards."
+msgstr ""
+
+#: src/gui/player_controls.cpp:72
 msgid "Brake"
 msgstr "Coisc"
+
+#: src/gui/help_page_two.cpp:66
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr ""
+
+#: src/gui/help_page_two.cpp:75
+msgid ""
+"Cake - thrown at the closest rival,\n"
+"best on short ranges and long straights"
+msgstr ""
+
+#: src/gui/network_gui.cpp:179
+msgid "Can't connect to server"
+msgstr "Ní féidir le ceangail le freastalaí"
 
 #: data/tracks/canyon/canyon.track:4
 msgid "Canyon"
 msgstr "Cainneon"
 
-#: src/gui/main_menu.cpp:53
+#: src/gui/main_menu.cpp:62
 msgid "Challenges"
 msgstr "Dúshláin"
 
-#: src/gui/player_controls.cpp:74
+#: src/gui/player_controls.cpp:85
 #, c-format
 msgid "Choose your controls, %s"
 msgstr "Togair do rialtán, %s"
@@ -107,54 +141,26 @@ msgstr "Togair do rialtán, %s"
 msgid "City"
 msgstr "Cathair"
 
-#: src/gui/config_display.cpp:97
+#: src/gui/config_display.cpp:99
 msgid "Clear from Blacklist"
 msgstr "Glan ó Dubhliosta"
 
-#: src/challenges/energy_math_class.cpp:26
-msgid "Collect Coins in Math Class"
-msgstr "Bailigh boinn i Rang matamaitic"
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
+msgid "Collect Nitro in Math Class"
+msgstr "Bailigh nítro i Rang matamaitic"
 
-#: src/challenges/energy_math_class.cpp:28
-msgid ""
-"Collect at least 6 points\n"
-"worth of coins\n"
-"on three laps of\n"
-"Oliver's Math Class\n"
-"in under 1 minute."
-msgstr ""
-"Bailigh ar a laghad 9 boinn\n"
-"istigh 3 cuairteanna\n"
-"ar Rang matamaitic Oliver\n"
-"lasitigh de 2:20."
-
-#: src/challenges/energy_shifting_sands.cpp:27
-msgid ""
-"Collect at least 9 coins\n"
-"on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
-msgstr ""
-"Bailigh ar a laghad 9 boinn\n"
-"istigh 3 cuairteanna ar Shifting Sands\n"
-"lasitigh de 2:20."
-
-#: src/challenges/energy_shifting_sands.cpp:25
+#: data/grandprix/tothemoonandback.challenge:5
 msgid "Collect the Pharaohs Treasure"
 msgstr "Bailigh Stór na Pharaohs"
 
-#: src/gui/help_page_one.cpp:117
+#: src/gui/help_page_one.cpp:123
 msgid ""
-"Collecting coins increases the number of collectables you receive.\n"
-"After 5 silver coins, each blue box will yield 2 collectables,\n"
-"after 10, 3 collectables and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
+"Collecting nitro allows you to get speed boosts whenever you\n"
+"wish by pressing the appropriate key. You can see your\n"
+"current level of nitro in the bar at the right of the game screen."
 msgstr ""
-"Collecting coins increases the number of collectables you receive.\n"
-"After 5 silver coins, each blue box will yield 2 collectables,\n"
-"after 10, 3 collectables and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
 
-#: src/challenges/worlds_end_gp.cpp:27
+#: data/grandprix/alltracks.challenge:6
 msgid ""
 "Come first in the At World's End\n"
 "Grand Prix with 3 'Racer'\n"
@@ -164,11 +170,11 @@ msgstr ""
 "Grand Prix in aghaidh\n"
 "3 Karts Karts leibhéal  'racer'."
 
-#: src/gui/display_res_confirm.cpp:55
+#: src/gui/display_res_confirm.cpp:56
 msgid "Confirm Resolution"
 msgstr "Deimhnigh Taifeach"
 
-#: src/gui/display_res_confirm.cpp:109
+#: src/gui/display_res_confirm.cpp:110
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
 msgstr "Deimhnigh Taifeach taobh istigh de %d soicindí"
@@ -177,14 +183,21 @@ msgstr "Deimhnigh Taifeach taobh istigh de %d soicindí"
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr "Deimhnigh Taifeach taobh istigh de 5 soicindí"
 
-#: src/gui/grand_prix_ending.cpp:144
-#: src/gui/leader_result.cpp:148
-#: src/gui/feature_unlocked.cpp:47
-#: src/gui/race_results_gui.cpp:135
+#: src/gui/network_gui.cpp:56
+msgid "Connect to server"
+msgstr "Ceangail le freastalaí"
+
+#: src/gui/network_gui.cpp:155
+msgid "Connected:"
+msgstr "Ceangailte:"
+
+#: src/gui/feature_unlocked.cpp:48
+#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Lean"
 
-#: src/gui/race_results_gui.cpp:140
+#: src/gui/race_results_gui.cpp:66
 msgid "Continue Grand Prix"
 msgstr "Lean Grand Prix"
 
@@ -207,7 +220,7 @@ msgstr ""
 "Le Oliver & Steve Baker\n"
 "maolaíodh le Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:72
 msgid "Credits"
 msgstr "Búiochas le"
 
@@ -215,20 +228,21 @@ msgstr "Búiochas le"
 msgid "Crescent Crossing"
 msgstr "Crosbhealach na Crescent"
 
-#: src/gui/config_display.cpp:83
+#. I18N: displays current resolution
+#: src/gui/config_display.cpp:85
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Reatha: %dx%d"
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:91
 msgid "Decrease Resolution"
 msgstr "Laghdófar Taifeach"
 
-#: src/gui/race_options.cpp:67
+#: src/gui/race_options.cpp:86
 msgid "Difficulty"
 msgstr "Deacracht"
 
-#: src/gui/options.cpp:49
+#: src/gui/options.cpp:50
 msgid "Display"
 msgstr "Taispeáint"
 
@@ -236,7 +250,7 @@ msgstr "Taispeáint"
 msgid "Display Settings"
 msgstr "Leaganacha Taispeáint"
 
-#: src/gui/race_options.cpp:279
+#: src/gui/race_options.cpp:304
 msgid "Driver"
 msgstr "Tiománaí"
 
@@ -244,31 +258,31 @@ msgstr "Tiománaí"
 msgid "Edit controls for who?"
 msgstr "Cuir in eagar rialtáin do cé?"
 
-#: src/gui/race_menu.cpp:60
+#: src/gui/race_menu.cpp:58
 msgid "Exit Race"
 msgstr " Scortha Rás"
 
-#: src/challenges/race_track_time.cpp:28
+#: data/tracks/jungle/jungle.challenge:6
 msgid ""
-"Finish 3 laps in the Race track\n"
-"with 3 AI karts\n"
-"in under 1:15 minutes."
+"Finish 3 laps in Racetrack\n"
+"with 3 easy AI karts\n"
+"in under 2:40 minutes."
 msgstr ""
 "Críochnaigh 3 cuairteanna sa Raon Rás\n"
 "le 3 Karts\n"
-"lasitigh de 1:15."
+"lasitigh de 2:40."
 
-#: src/challenges/city_time.cpp:27
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
 msgid ""
 "Finish 3 laps on the City track\n"
 "with 3 AI karts\n"
-"in under 5:20 minutes."
+"in under 4:20 minutes."
 msgstr ""
 "Críochnaigh 3 cuairteanna sa Raon Cathair\n"
 "le 3 Karts\n"
-"lasitigh de 5:20."
+"lasitigh de 4:20."
 
-#: src/challenges/tollway_time.cpp:27
+#: data/tracks/canyon/canyon.challenge:6
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
@@ -278,41 +292,65 @@ msgstr ""
 "le 3 Karts\n"
 "lasitigh de 3:00."
 
-#: src/challenges/race_track_time.cpp:26
-msgid "Finish Race track in 1:15"
-msgstr "Críochnaigh Raon Rásaí i 3:00"
+#: data/tracks/jungle/jungle.challenge:5
+msgid "Finish Race track in 2:40"
+msgstr "Críochnaigh Raon Rásaí i 2:40"
 
-#: src/challenges/tollway_time.cpp:25
+#: data/tracks/canyon/canyon.challenge:5
 msgid "Finish Tux Tollway track in 3:00"
 msgstr "Críochnaigh Dolabóthar Tux i 3:00"
 
-#: src/challenges/city_time.cpp:25
-msgid "Finish the City track in 5:20"
-msgstr "Críochnaigh Raon Cathair i 3:00"
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
+msgid "Finish the City track in 4:20"
+msgstr "Críochnaigh Raon Cathair i 4:20"
 
-#: src/gui/race_gui.cpp:800
+#: data/grandprix/tothemoonandback.challenge:6
+msgid ""
+"Finish with at least 9 nitro \n"
+"points on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Bailigh ar a laghad 9 boinn nitro\n"
+"istigh 3 cuairteanna ar Shifting Sands\n"
+"lasitigh de 2:20."
+
+#: src/gui/race_gui.cpp:677
 #, c-format
 msgid "Finished"
 msgstr "Críochnaithe"
 
-#: src/gui/player_controls.cpp:66
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
+msgid ""
+"Finsih with at least 6 points\n"
+" of intro on three laps of\n"
+"Oliver's Math Class\n"
+"in under 52 seconds."
+msgstr ""
+"Bailigh ar a laghad 6 boinn nitro\n"
+"istigh 3 cuairteanna\n"
+"ar Rang matamaitic Oliver\n"
+"lasitigh de 0:52."
+
+#. I18N: name of controls, like in "fire missile"
+#: src/gui/player_controls.cpp:74
 msgid "Fire"
 msgstr "Scaoil"
 
-#: data/gp1.cup:5
+#: data/grandprix/penguinplayground.grandprix:5
 msgid "First grand prix, easy to get started"
 msgstr "Grand Prix céad, furasta a tionscain"
 
-#: src/gui/game_mode.cpp:68
-#: src/challenges/penguin_playground_gp.cpp:28
+#: src/gui/game_mode.cpp:77
+#: src/gui/game_mode.cpp:115
+#: data/followtheleader.challenge:7
 msgid "Follow the Leader"
 msgstr "Leantar an Tosaí"
 
-#: src/challenges/jungle_follow.cpp:25
+#: data/tracks/city/city.challenge:5
 msgid "Follow the Leader in the Jungle"
 msgstr "Leantar an Tosaí sa Mothar"
 
-#: src/challenges/island_follow.cpp:25
+#: data/grandprix/atworldsend.challenge:5
 msgid ""
 "Follow the Leader on a\n"
 "Desert Island"
@@ -320,16 +358,14 @@ msgstr ""
 "Lean an Tosaí ar\n"
 "an t-Oileán Fásaigh"
 
-#: src/gui/help_page_three.cpp:74
+#: src/gui/help_page_three.cpp:70
 msgid ""
-"Follow the leader: Stay behind the leader kart.                 \n"
-"When the countdown reaches zero, a kart ahead\n"
-"of the leader or the last kart is eliminated."
+"Follow the leader: run for second place, as the last kart\n"
+"will be disqualified every time the counter hits zero.\n"
+" Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
-"Lean an tosaí: \n"
-"Fan siar an kart tosaí"
 
-#: src/gui/help_page_one.cpp:68
+#: src/gui/help_page_one.cpp:69
 msgid "Force your rivals bite *your* dust!"
 msgstr "Force your rivals to eat *your* dust!"
 
@@ -337,124 +373,117 @@ msgstr "Force your rivals to eat *your* dust!"
 msgid "Fort Magma"
 msgstr "Dún Magma"
 
-#: src/gui/num_players.cpp:40
+#: src/gui/num_players.cpp:41
 msgid "Four Players"
 msgstr "Ceithre Imreoirí"
 
-#: src/gui/config_display.cpp:76
-#: src/gui/config_display.cpp:128
-#: src/gui/config_display.cpp:183
+#: src/gui/config_display.cpp:77
+#: src/gui/config_display.cpp:130
+#: src/gui/config_display.cpp:185
 msgid "Fullscreen mode"
 msgstr "Mód lánscáileán"
 
-#: src/gui/help_page_two.cpp:84
-msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
-msgstr "McFuzzy - An-mhall, an-phléascach"
-
-#: src/gui/game_mode.cpp:82
+#: src/gui/game_mode.cpp:152
 msgid "Game mode help"
 msgstr "Mód cluiche cabhrach"
 
-#: src/gui/help_page_three.cpp:47
+#: src/gui/help_page_three.cpp:43
 msgid "Game modes"
 msgstr "móideanna cluiche"
 
-#: src/gui/credits_menu.cpp:76
-#: src/gui/challenges_menu.cpp:51
+#: src/gui/challenges_menu.cpp:54
+#: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Téigh ar ais go príomh-roghchlár "
 
-#: src/gui/help_page_three.cpp:87
-#: src/gui/help_page_one.cpp:133
-msgid "Go back to the menu"
-msgstr "Téigh ar ais go roghchlár"
-
-#: src/gui/race_gui.cpp:948
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:828
 msgid "Go!"
 msgstr "Téigh!"
 
-#: src/gui/help_page_one.cpp:72
-msgid "Grab blue boxes and coins"
-msgstr "Glám boscaí gorme agus boinn"
+#: src/gui/help_page_one.cpp:73
+msgid "Grab blue boxes and nitro"
+msgstr "Glám boscaí gorme agus nítro"
 
-#: src/gui/game_mode.cpp:46
+#: src/gui/game_mode.cpp:99
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
-#: src/gui/help_page_three.cpp:54
+#: src/gui/help_page_three.cpp:50
 msgid ""
 "Grand Prix: Win victory points \n"
 "by racing through a group of tracks,  \n"
 "most points wins (shortest time in case of a tie!)          "
 msgstr "Grand Prix: Buaigh"
 
-#: src/gui/main_menu.cpp:61
-#: src/gui/race_menu.cpp:51
+#: src/gui/main_menu.cpp:69
+#: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Cabhair"
 
-#: src/gui/race_results_gui.cpp:55
+#: src/gui/race_results_gui.cpp:120
 msgid "Highscores"
 msgstr "Scór Ard"
 
-#: src/gui/help_page_two.cpp:76
-msgid "Homing missile - follows rivals, but is slower than the missile"
-msgstr "Diúracán a leanann"
+#: src/gui/help_page_one.cpp:130
+msgid ""
+"If you see a button with a lock like the one to the right,\n"
+"you need to complete a challenge to unlock it."
+msgstr ""
 
-#: src/gui/config_display.cpp:87
+#: src/gui/config_display.cpp:89
 msgid "Increase Resolution"
 msgstr "Méadaigh Taifeach"
 
-#: src/user_config.cpp:861
+#: src/user_config.cpp:870
 #, c-format
 msgid "Invalid"
 msgstr "Neamhbhailí"
 
-#: src/kart.cpp:635
+#: src/modes/linear_world.cpp:171
 msgid "Invalid short-cut!!"
 msgstr "Aicearra neamhbhailí!!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Jump"
-msgstr "Léim"
+#: data/tracks/castle/castle.track:4
+msgid "King Weird's Castle"
+msgstr "Dún Aisteach"
 
-#: src/gui/race_gui.cpp:805
+#: src/gui/race_gui.cpp:682
 msgid "Lap"
 msgstr "Cuairt"
 
-#: data/gp4.cup:5
+#: data/grandprix/atworldsend.grandprix:5
 msgid "Last grand prix, longer and harder"
 msgstr "Deiridh grand prix, níos faide agus níos crua"
 
-#: src/gui/race_gui.cpp:409
+#: src/modes/follow_the_leader.cpp:139
 msgid "Leader"
 msgstr "Tosaí"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:68
 msgid "Left"
 msgstr "Clé"
 
-#: src/gui/start_race_feedback.cpp:35
+#: src/gui/race_results_gui.cpp:301
+#: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Lódála rás..."
 
-#: src/gui/player_controls.cpp:66
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:76
 msgid "Look back"
 msgstr "Féachtar siar"
 
-#: src/gui/help_page_two.cpp:68
-msgid "Missile - fast stopper in a straight line"
-msgstr "Diúracán"
-
-#: src/gui/main_menu.cpp:48
-msgid "Multiplayer"
-msgstr "Ilimreoir"
+#: src/gui/main_menu.cpp:59
+msgid "Networking"
+msgstr "Líonrú"
 
 #: src/gui/feature_unlocked.cpp:37
 msgid "New Feature Unlocked"
 msgstr "Gné Glasáladh Nua"
 
-#: src/challenges/challenge.cpp:121
+#: src/challenges/challenge.cpp:133
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -463,7 +492,7 @@ msgstr ""
 "Grand Prix nua '%s'\n"
 "ar fáil anois"
 
-#: src/challenges/challenge.cpp:124
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -473,11 +502,11 @@ msgstr ""
 "Deacracht nua '%s'\n"
 "ar fáil anois"
 
-#: src/kart.cpp:400
+#: src/modes/linear_world.cpp:339
 msgid "New fastest lap"
 msgstr "Cuairt is tapaidh nua"
 
-#: src/challenges/challenge.cpp:118
+#: src/challenges/challenge.cpp:130
 #, c-format
 msgid ""
 "New game mode\n"
@@ -487,7 +516,18 @@ msgstr ""
 "Mód cluiche nua '%s'\n"
 "ar fáil anois"
 
-#: src/challenges/challenge.cpp:114
+#: src/challenges/challenge.cpp:140
+#, c-format
+msgid ""
+"New kart\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Kart nua\n"
+"'%s'\n"
+"ar fáil anois"
+
+#: src/challenges/challenge.cpp:126
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -496,34 +536,39 @@ msgstr ""
 "Raon nua '%s'\n"
 "ar fáil anois"
 
-#: src/gui/help_page_two.cpp:118
-#: src/gui/help_page_one.cpp:129
-msgid "Next help screen"
-msgstr "An chéad scáileáin cabhair eile"
+#: src/gui/help_page_one.cpp:156
+#: src/gui/help_page_two.cpp:134
+msgid "Next >"
+msgstr "Ar Aghaidh >"
 
-#: src/gui/grand_prix_select.cpp:71
-#: src/gui/grand_prix_select.cpp:77
+#: src/gui/player_controls.cpp:72
+msgid "Nitro"
+msgstr "Nítro"
+
+#: src/gui/grand_prix_select.cpp:63
+#: src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
 msgstr "Níl Grand Prix ag togradh"
 
-#: src/gui/track_sel.cpp:87
-msgid "No track selected"
-msgstr "Níl raon ag roghnaithe"
-
-#: src/gui/race_options.cpp:278
-#: src/gui/race_options.cpp:282
+#: src/gui/race_options.cpp:303
+#: src/gui/race_options.cpp:306
 msgid "Novice"
 msgstr "Nóibhíseach"
 
-#: src/gui/race_options.cpp:83
+#: src/gui/race_options.cpp:102
 msgid "Number of karts"
 msgstr "Líon na cairteacha"
 
-#: src/gui/race_options.cpp:104
+#: src/gui/race_options.cpp:124
 msgid "Number of laps"
 msgstr "Líon na cuairteanna"
 
-#: src/user_config.cpp:488
+#: src/gui/network_gui.cpp:158
+#: src/gui/race_results_gui.cpp:49
+msgid "OK"
+msgstr "Ceart go leor"
+
+#: src/user_config.cpp:498
 msgid "Old config file found, check your key bindings!"
 msgstr "Bunófar comhaid cumraíochta sean, seiceáil do ceangail eochair."
 
@@ -535,103 +580,107 @@ msgstr "Rang matamaitic Oliver"
 msgid "On the Beach"
 msgstr "Ar an Trá"
 
+#: src/gui/main_menu.cpp:64
 #: src/gui/options.cpp:40
-#: src/gui/main_menu.cpp:56
-#: src/gui/race_menu.cpp:50
+#: src/gui/race_menu.cpp:48
 msgid "Options"
 msgstr "Roghanna"
 
-#: src/gui/help_page_two.cpp:100
+#: src/gui/help_page_two.cpp:102
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Parasiút - moillighs an karts romhat!"
 
-#: src/gui/race_menu.cpp:47
+#: src/gui/race_menu.cpp:45
 msgid "Paused"
 msgstr "Moillithe"
 
-#: src/gui/race_gui.cpp:977
+#: src/gui/race_gui.cpp:857
 msgid "Penalty time!!"
 msgstr "Am píonóis!!"
 
-#: src/challenges/penguin_playground_gp.cpp:46
-#: data/gp1.cup:4
+#: data/grandprix/penguinplayground.grandprix:4
 msgid "Penguin Playground"
 msgstr "Áit Shúgartha na Phiongáin"
 
-#: src/gui/player_controls.cpp:251
+#. I18N: as in 'Player 2'
+#: src/gui/player_controls.cpp:264
 msgid "Player "
 msgstr "Imreoir"
 
-#: src/gui/char_sel.cpp:68
+#: src/gui/char_sel.cpp:86
 #, c-format
 msgid "Player %d, choose a driver"
-msgstr "A Imreoir %d, roghnaigh tiománaí"
+msgstr "A imreoir %d, roghnaigh tiománaí"
 
-#: src/gui/config_controls.cpp:45
+#: src/gui/config_controls.cpp:46
 msgid "Player 1"
 msgstr "Imreoir 1"
 
-#: src/gui/config_controls.cpp:46
+#: src/gui/config_controls.cpp:47
 msgid "Player 2"
 msgstr "Imreoir 2"
 
-#: src/gui/config_controls.cpp:47
+#: src/gui/config_controls.cpp:48
 msgid "Player 3"
 msgstr "Imreoir 3"
 
-#: src/gui/config_controls.cpp:48
+#: src/gui/config_controls.cpp:49
 msgid "Player 4"
 msgstr "Imreoir 4"
 
-#: src/gui/options.cpp:41
+#: src/gui/options.cpp:42
 msgid "Player Config"
 msgstr "Cumraíocht Imreoir"
 
-#: src/gui/player_controls.cpp:80
+#: src/gui/player_controls.cpp:92
 msgid "Player name"
 msgstr "Ainm an imreora"
 
-#: src/gui/display_res_confirm.cpp:59
+#: src/gui/help_page_two.cpp:120
+msgid ""
+"Plunger - throw straight to pull an opponent back,\n"
+"or throw while looking back to make one lose sight!"
+msgstr ""
+
+#: data/tracks/prehistoric/prehistoric.track:4
+msgid "Prehistoric Island"
+msgstr "Oileán Réamhstairiúil"
+
+#: src/gui/display_res_confirm.cpp:60
 msgid "Press <ESC> to Cancel"
 msgstr "Brúigh <ESC> a Chealú"
 
-#: src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:131
-#: src/gui/config_display.cpp:101
-#: src/gui/game_mode.cpp:87
-#: src/gui/config_sound.cpp:63
-#: src/gui/config_controls.cpp:52
-#: src/gui/grand_prix_select.cpp:88
-#: src/gui/num_players.cpp:45
+#: src/gui/config_controls.cpp:53
+#: src/gui/config_display.cpp:103
+#: src/gui/config_sound.cpp:64
+#: src/gui/game_mode.cpp:158
+#: src/gui/grand_prix_select.cpp:80
+#: src/gui/network_gui.cpp:79
+#: src/gui/num_players.cpp:46
+#: src/gui/options.cpp:58
+#: src/gui/player_controls.cpp:124
+#: src/gui/race_options.cpp:154
 msgid "Press <ESC> to go back"
 msgstr "Brúigh <ESC> a dhul ar ais"
 
-#: src/gui/player_controls.cpp:156
+#: src/gui/player_controls.cpp:168
 msgid "Press key"
 msgstr "Brúigh eochair"
 
-#: src/gui/help_page_three.cpp:83
-msgid "Previous help screen"
-msgstr "Scáileáin chabhrach roimh sin"
-
-#: src/gui/help_page_two.cpp:114
-msgid "Previous screen"
-msgstr "Scáileáin roimh sin"
-
-#: src/gui/game_mode.cpp:59
+#: src/gui/game_mode.cpp:67
+#: src/gui/game_mode.cpp:105
 msgid "Quick Race"
 msgstr "Rás Tapa"
 
-#: src/gui/help_page_three.cpp:62
+#: src/gui/help_page_three.cpp:58
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Rás tapa: Togair raon, buaigh is am tapa."
 
-#: src/gui/main_menu.cpp:57
+#: src/gui/main_menu.cpp:65
 msgid "Quit"
 msgstr "Scoir"
 
-#: src/gui/race_gui.cpp:746
+#: src/gui/race_gui.cpp:629
 msgid "REV"
 msgstr "Cúl"
 
@@ -639,76 +688,95 @@ msgstr "Cúl"
 msgid "Race Track"
 msgstr "Raon Rásaí"
 
-#: src/gui/race_results_gui.cpp:148
+#: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
 msgstr "Téigh i raon seo arís"
 
-#: src/gui/race_results_gui.cpp:54
+#: src/gui/race_results_gui.cpp:92
 msgid "Race results"
 msgstr "Torthaí Rás"
 
-#: src/gui/race_options.cpp:280
+#: src/gui/race_options.cpp:305
 msgid "Racer"
 msgstr "Tiománaí rása"
 
-#: src/gui/race_gui.cpp:930
+#: data/tracks/racetrack/racetrack.track:4
+msgid "Racetrack"
+msgstr "Raon Rásaí"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:808
 msgid "Ready!"
 msgstr "Ullmhaigh!"
 
-#: src/gui/player_controls.cpp:66
+#: src/gui/player_controls.cpp:72
 msgid "Rescue"
 msgstr "Tarrtháil"
 
-#: src/gui/race_menu.cpp:52
+#: src/gui/race_menu.cpp:50
 msgid "Restart Race"
 msgstr "Tosaigh Rás"
 
-#: src/gui/race_results_gui.cpp:48
-msgid "Result"
-msgstr "Toradh"
-
-#: src/gui/race_menu.cpp:49
+#: src/gui/race_menu.cpp:47
 msgid "Return To Race"
 msgstr "Téigh ar ais go Rás"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
+#: src/gui/player_controls.cpp:70
 msgid "Right"
 msgstr "Deas"
 
-#: data/gp2.cup:5
+#: data/grandprix/tothemoonandback.grandprix:5
 msgid "Second grand prix"
 msgstr "An dóú grand prix"
 
-#: src/gui/race_gui.cpp:939
+#: src/gui/network_gui.cpp:52
+msgid "Select network mode"
+msgstr "Togair mód líonra"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:818
 msgid "Set!"
 msgstr "Ullmhaigh!"
 
-#: src/gui/race_menu.cpp:57
-#: src/gui/race_results_gui.cpp:153
+#: src/gui/race_menu.cpp:55
+#: src/gui/race_results_gui.cpp:79
 msgid "Setup New Race"
 msgstr "Buanaigh Rás Nua"
+
+#: src/gui/player_controls.cpp:72
+msgid "Sharp Turn"
+msgstr "Coradh Géar"
 
 #: data/tracks/sandtrack/sandtrack.track:4
 msgid "Shifting Sands"
 msgstr "Shifting Sands"
 
-#: src/gui/main_menu.cpp:47
+#: src/gui/main_menu.cpp:54
 msgid "Single Player"
 msgstr "Aon Imreoir Amháin"
 
-#: src/gui/race_options.cpp:281
-msgid "Skidding Preview"
-msgstr "Réamhthaispeántas Sciorradh"
+#: src/gui/game_mode.cpp:61
+msgid "Single Race"
+msgstr "Aon Rás Amháin"
 
-#: data/gp3.cup:4
+#: data/tracks/skyline/skyline.track:4
+msgid "Skyline"
+msgstr "Spéirlíne"
+
+#: data/grandprix/snagdrive.grandprix:4
 msgid "Snag Drive"
 msgstr "Snag Drive"
 
+#: data/tracks/snowmountain/snowmountain.track:4
+msgid "Snow Mountain"
+msgstr "Sliabh Sneachta"
+
 #: data/tracks/snowtuxpeak/snowtuxpeak.track:4
 msgid "SnowTux Peak"
-msgstr "Sliabh Tux"
+msgstr "Sliabh SneachtaTux"
 
-#: src/gui/options.cpp:52
+#: src/gui/options.cpp:53
 msgid "Sound"
 msgstr "Fuaim"
 
@@ -716,23 +784,37 @@ msgstr "Fuaim"
 msgid "Sound Settings"
 msgstr "Socrú Fuaim"
 
+#: src/gui/main_menu.cpp:55
+msgid "Splitscreen"
+msgstr "Scáileán roinnte"
+
 #: data/tracks/startrack/startrack.track:4
 msgid "Star Track"
 msgstr "Raon na Réalta"
 
-#: src/gui/race_options.cpp:124
+#: src/gui/race_options.cpp:144
 msgid "Start race"
 msgstr "Tosaigh rás"
 
-#: data/tracks/subseatrack/subseatrack.track:4
-msgid "Sub Sea"
-msgstr "Fofharraige"
+#: src/gui/start_race_feedback.cpp:39
+msgid "Synchronising network..."
+msgstr "Ag sioncronú líonra..."
+
+#: src/gui/race_results_gui.cpp:271
+msgid "Synchronising."
+msgstr "Ag sioncronú."
+
+#: src/gui/help_page_one.cpp:145
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns\n"
+"and have better control in tight curves"
+msgstr ""
 
 #: data/tracks/islandtrack/islandtrack.track:4
 msgid "The Island"
 msgstr "An Oileán"
 
-#: src/gui/help_page_one.cpp:113
+#: src/gui/help_page_one.cpp:117
 msgid ""
 "The current key bindings can be seen/changed in the\n"
 "Options->Player Config menu."
@@ -740,54 +822,63 @@ msgstr ""
 "Is féidir leat na ceangail eochair a fheiceáil agus ag\n"
 "Roghanna->Cumraíocht Imreoir."
 
-#: src/gui/grand_prix_ending.cpp:107
-#: src/gui/leader_result.cpp:109
+#: src/highscore_manager.cpp:108
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+
+#: data/tracks/mines/mines.track:4
+msgid "The old mine"
+msgstr "An Sean-Mianach"
+
+#: src/gui/grand_prix_ending.cpp:111
 #, c-format
 msgid "The winner is %s!"
 msgstr "Tá %s an buaiteoir!"
 
-#: data/gp3.cup:5
+#: data/grandprix/snagdrive.grandprix:5
 msgid "Third grand prix"
 msgstr "Tríú grand prix"
 
-#: src/gui/num_players.cpp:39
+#: src/gui/num_players.cpp:40
 msgid "Three Players"
 msgstr "Triúr Imreoir"
 
-#: src/gui/game_mode.cpp:63
+#: src/gui/game_mode.cpp:72
+#: src/gui/game_mode.cpp:110
 msgid "Time Trial"
 msgstr "Rás Am"
 
-#: src/gui/help_page_three.cpp:67
-msgid "Time Trial: As quick race, but no items.                       "
-msgstr "Rás Am: Rás tapa"
+#: src/gui/help_page_three.cpp:63
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr ""
 
-#: src/gui/help_page_two.cpp:61
-msgid "To help you win, there are certain collectables you can grab:"
-msgstr "Glám siad seo cuidiú leat ag buachan:"
+#: src/gui/help_page_two.cpp:58
+msgid "To help you win, there are certain powerups you can grab:"
+msgstr ""
 
-#: src/challenges/moon_and_back_gp.cpp:49
-#: data/gp2.cup:4
+#: data/grandprix/tothemoonandback.grandprix:4
 msgid "To the Moon and Back"
 msgstr "Chun an Gealach agus Ar Ais"
 
-#: src/gui/config_sound.cpp:45
-#: src/gui/config_sound.cpp:90
+#: src/gui/config_sound.cpp:46
+#: src/gui/config_sound.cpp:91
 msgid "Turn off music"
 msgstr "Múch ceol."
 
-#: src/gui/config_sound.cpp:54
-#: src/gui/config_sound.cpp:103
+#: src/gui/config_sound.cpp:55
+#: src/gui/config_sound.cpp:104
 msgid "Turn off sound effects"
 msgstr "Múch maisíocht fuaime"
 
-#: src/gui/config_sound.cpp:49
-#: src/gui/config_sound.cpp:84
+#: src/gui/config_sound.cpp:50
+#: src/gui/config_sound.cpp:85
 msgid "Turn on music"
 msgstr "Cuir ar siúl ceol."
 
-#: src/gui/config_sound.cpp:58
-#: src/gui/config_sound.cpp:98
+#: src/gui/config_sound.cpp:59
+#: src/gui/config_sound.cpp:99
 msgid "Turn on sound effects"
 msgstr "Cuir ar siúl maisíocht fuaime"
 
@@ -795,23 +886,25 @@ msgstr "Cuir ar siúl maisíocht fuaime"
 msgid "Tux Tollway"
 msgstr "Dolabóthar Tux"
 
-#: src/gui/num_players.cpp:38
+#: src/gui/num_players.cpp:39
 msgid "Two Players"
 msgstr "Beirt Imreoirí"
 
-#: data/tracks/volcano/volcano.track:4
-msgid "Volcano"
-msgstr "Bolcán"
-
-#: src/player_kart.cpp:262
+#: src/modes/linear_world.cpp:278
 msgid "WRONG WAY!"
 msgstr "Aird chontráilte!!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Wheelie"
-msgstr "Wheelie"
+#: src/gui/char_sel.cpp:126
+#: src/gui/network_gui.cpp:162
+msgid "Waiting for clients"
+msgstr "Ag fanacht le cliant"
 
-#: src/challenges/penguin_playground_gp.cpp:25
+#: src/gui/char_sel.cpp:124
+#: src/gui/network_gui.cpp:118
+msgid "Waiting for server"
+msgstr "Ag fanacht le freastalaí"
+
+#: data/followtheleader.challenge:5
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix"
@@ -819,7 +912,7 @@ msgstr ""
 "Buaigh Áit Shúgartha na Phiongáin\n"
 "Grand Prix"
 
-#: src/challenges/penguin_playground_gp.cpp:27
+#: data/followtheleader.challenge:6
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix with 3 'Racer' Level AI karts."
@@ -827,7 +920,7 @@ msgstr ""
 "Buaigh Áit Shúgartha na Phiongáin\n"
 "Grand Prix le 3 Karts leibhéal  'racer'"
 
-#: src/challenges/moon_and_back_gp.cpp:25
+#: data/grandprix/snagdrive.challenge:5
 msgid ""
 "Win To the Moon and Back\n"
 "Grand Prix"
@@ -835,14 +928,14 @@ msgstr ""
 "Buaigh Chun an Gealach agus Ar Ais\n"
 "Grand Prix"
 
-#: src/challenges/tollway_head2head.cpp:27
+#: data/tracks/fortmagma/fortmagma.challenge:6
 msgid ""
 "Win a 1 lap Head to Head\n"
 "on Tux Tollway against 1 'Racer'\n"
 "level AI kart."
 msgstr "Buaigh in aghaidh aon kart amháin ar an nDolabóthar Tux."
 
-#: src/challenges/jungle_follow.cpp:27
+#: data/tracks/city/city.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
@@ -852,7 +945,7 @@ msgstr ""
 "in aghaidh 3 Karts\n"
 "sa Turas Amazon."
 
-#: src/challenges/island_follow.cpp:27
+#: data/grandprix/atworldsend.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
@@ -862,7 +955,7 @@ msgstr ""
 "in aghaidh 3 Karts\n"
 "ar oileán fásaigh."
 
-#: src/challenges/tollway_head2head.cpp:25
+#: data/tracks/fortmagma/fortmagma.challenge:5
 msgid ""
 "Win a Head to Head on\n"
 "Tux Tollway"
@@ -870,7 +963,7 @@ msgstr ""
 "Buaigh Head to Head ar\n"
 "Tux Tollway"
 
-#: src/challenges/worlds_end_gp.cpp:25
+#: data/grandprix/alltracks.challenge:5
 msgid ""
 "Win the At World's End\n"
 "Grand Prix"
@@ -878,7 +971,7 @@ msgstr ""
 "Buaigh an Ag Deireadh na Dhomhan\n"
 "Grand Prix"
 
-#: src/challenges/moon_and_back_gp.cpp:27
+#: data/grandprix/snagdrive.challenge:6
 msgid ""
 "Win the To the Moon and Back\n"
 "Grand Prix with 3 'Racer'\n"
@@ -887,15 +980,19 @@ msgstr ""
 "Buaigh an Chun an Gealach agus Ar Ais\n"
 "Grand Prix le 3 AI Karts leibhéal 'racer'"
 
-#: src/gui/config_display.cpp:71
+#: src/gui/config_display.cpp:72
 msgid "Window mode"
 msgstr "Mód Fuinneog"
 
-#: src/world.cpp:535
-msgid "You finished"
-msgstr "Chríochnaigh tú"
+#: data/tracks/xr591/xr591.track:4
+msgid "XR591"
+msgstr "XR591"
 
-#: src/world.cpp:614
+#: src/karts/player_kart.cpp:267
+msgid "You finished the race!"
+msgstr "Chríochnaigh tú an rás!"
+
+#: src/modes/world.cpp:408
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -903,46 +1000,42 @@ msgstr ""
 "Bhí tú\n"
 "eisiamh!"
 
-#: src/world.cpp:534
-msgid "You won"
-msgstr "Bhuaigh tú"
+#: src/karts/player_kart.cpp:267
+msgid "You won the race!"
+msgstr "Bhuaigh tú an rás!"
 
-#: src/gui/help_page_two.cpp:92
+#: src/gui/help_page_two.cpp:93
 msgid "Zipper - speed boost"
 msgstr "Zipper - méadú luas"
 
-#: src/user_config.cpp:844
+#: src/user_config.cpp:853
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "Luamhán stiúrtha %d ais %d %c"
 
-#: src/user_config.cpp:848
+#: src/user_config.cpp:857
 #, c-format
 msgid "joy %d btn %d"
 msgstr "luamhán stiúrtha %d cnaip %d"
 
-#: src/user_config.cpp:851
+#: src/user_config.cpp:860
 #, c-format
 msgid "joy %d hat %d"
 msgstr "luamhán stiúrtha %d hat %d"
 
-#: src/user_config.cpp:857
+#: src/user_config.cpp:866
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "ais na luiche %d %c"
 
-#: src/user_config.cpp:854
+#: src/user_config.cpp:863
 #, c-format
 msgid "mouse btn %d"
 msgstr "cnaip na luiche %d"
 
-#: src/user_config.cpp:838
-#: src/user_config.cpp:883
+#: src/user_config.cpp:847
+#: src/user_config.cpp:891
 #, c-format
 msgid "not set"
 msgstr "ní réidh"
-
-#: src/world.cpp:537
-msgid "the race!"
-msgstr "an rás!"
 
