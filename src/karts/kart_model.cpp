@@ -227,9 +227,17 @@ void KartModel::adjustWheels(float rotation, float steer,
     // the graphical wheel models don't look too wrong.
     for(unsigned int i=0; i<4; i++)
     {
-        clamped_suspension[i] = std::min(std::max(suspension[i],
+        m_min_suspension[i] = -1.3; // FIXME - why are these still not inited at this point?
+        m_max_suspension[i] = 1.3;
+        const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
+        
+        clamped_suspension[i] = std::min(std::max(suspension[i]/2.5f, // somewhat arbitrary constant to reduce visible wheel movement
                                                   m_min_suspension[i]),
-                                         m_max_suspension[i]);
+                                                  m_max_suspension[i]);
+        float ratio = clamped_suspension[i] / suspension_length;
+        const int sign = ratio < 0 ? -1 : 1;
+        ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
+        clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
     sgMakeRotMat4( wheel_rot,   0,      RAD_TO_DEGREE(-rotation), 0);
