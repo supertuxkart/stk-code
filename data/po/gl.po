@@ -1,0 +1,1072 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SuperTuxKart 0.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-16 15:52+1100\n"
+"PO-Revision-Date: 2008-12-27 13:48+0100\n"
+"Last-Translator: Adrián Chaves Fernández <adriyetichaves@gmail.com>\n"
+"Language-Team: Proxecto Trasno <proxecto@trasno.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Galician\n"
+"X-Poedit-Country: SPAIN\n"
+
+#: src/gui/config_display.cpp:387
+#, c-format
+msgid "%dx%d Blacklisted"
+msgstr "%dx%d está na lista negra"
+
+#: src/modes/world.cpp:413
+#, c-format
+msgid ""
+"'%s' has\n"
+"been eliminated."
+msgstr "\"%s\" foi eliminado."
+
+#: src/gui/game_mode.cpp:87
+msgid "3 Strikes Battle"
+msgstr "Batalla a 3 impactos"
+
+#: src/gui/help_page_three.cpp:75
+msgid ""
+"3 Strikes Battle : only in multiplayer games.\n"
+"Hit others with weapons until they lose all their lives."
+msgstr ""
+"Batalla a 3 impactos: só en partidas en liña.\n"
+"Deixa aos demais sen vidas coas túas armas."
+
+#: src/gui/help_page_three.cpp:83
+#: src/gui/help_page_two.cpp:128
+msgid "< Back"
+msgstr "< Volver"
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:72
+msgid "Accelerate"
+msgstr "Acelerar"
+
+#: src/gui/challenges_menu.cpp:37
+msgid "Active Challenges"
+msgstr "Retos activos"
+
+#: data/grandprix/alltracks.grandprix:4
+msgid "All tracks"
+msgstr "Todos os circuítos"
+
+#: data/grandprix/alltracks.grandprix:5
+msgid "All tracks included in SuperTuxKart"
+msgstr "Todos os circuítos incluídos no SuperTuxKart"
+
+#: data/tracks/jungle/jungle.track:4
+msgid "Amazonian Journey"
+msgstr "A Xornada Amazónica"
+
+#: src/gui/help_page_two.cpp:111
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr "Bigornia - reduce considerablemente a velocidade do primeiro"
+
+#: src/gui/config_display.cpp:94
+msgid "Apply "
+msgstr "Aplicar"
+
+#: src/gui/config_display.cpp:353
+#, c-format
+msgid "Apply %dx%d"
+msgstr "Aplicar %dx%d"
+
+#: data/tracks/lighthouse/lighthouse.track:4
+msgid "Around the Lighthouse"
+msgstr "Ao Redor do Faro"
+
+#: data/grandprix/atworldsend.grandprix:4
+msgid "At world's end"
+msgstr "Na Fin do Mundo"
+
+#: src/gui/help_page_one.cpp:74
+msgid "Avoid bananas"
+msgstr "Evitar os plátanos"
+
+#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/race_results_gui.cpp:70
+msgid "Back to the main menu"
+msgstr "Volver ao menú principal"
+
+#: src/gui/help_page_one.cpp:153
+#: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_two.cpp:131
+msgid "Back to the menu"
+msgstr "Volver ao menú"
+
+#: src/gui/network_gui.cpp:60
+msgid "Become server"
+msgstr "Converterse nun servidor"
+
+#: src/gui/help_page_two.cpp:84
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back,\n"
+"it will be thrown backwards."
+msgstr ""
+"Bóla dos bolos - rebota nas paredes. Se miras cara atrás,\n"
+"lanzarala cara atrás."
+
+#: src/gui/player_controls.cpp:72
+msgid "Brake"
+msgstr "Freo"
+
+#: src/gui/help_page_two.cpp:66
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr "Goma de mascar - deixa unha goma rosa pegañenta"
+
+#: src/gui/help_page_two.cpp:75
+msgid ""
+"Cake - thrown at the closest rival,\n"
+"best on short ranges and long straights"
+msgstr ""
+"Pastel - atínalle ao rival máis próximo,\n"
+"mellor nas distancias curtas e terreo chan."
+
+#: src/gui/network_gui.cpp:179
+msgid "Can't connect to server"
+msgstr "Non se puido conectar co servidor"
+
+#: data/tracks/canyon/canyon.track:4
+msgid "Canyon"
+msgstr "O Cañón"
+
+#: src/gui/main_menu.cpp:62
+msgid "Challenges"
+msgstr "Retos"
+
+#: src/gui/player_controls.cpp:85
+#, c-format
+msgid "Choose your controls, %s"
+msgstr "Elixe os teus controis, %s"
+
+#: data/tracks/city/city.track:4
+msgid "City"
+msgstr "A Cidade"
+
+#: src/gui/config_display.cpp:99
+msgid "Clear from Blacklist"
+msgstr "Sacar da lista negra"
+
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
+msgid "Collect Nitro in Math Class"
+msgstr "Recolle nitro n'A Clase de Mates"
+
+#: data/grandprix/tothemoonandback.challenge:5
+msgid "Collect the Pharaohs Treasure"
+msgstr "Recolle o tesouro do faraón"
+
+#: src/gui/help_page_one.cpp:123
+msgid ""
+"Collecting nitro allows you to get speed boosts whenever you\n"
+"wish by pressing the appropriate key. You can see your\n"
+"current level of nitro in the bar at the right of the game screen."
+msgstr ""
+"Coller nitro permíteche acelerar sempre que queiras\n"
+"premendo a tecla correspondente. Podes ver o teu nivel de\n"
+"nitro actual na barra á dereita da pantalla."
+
+#: data/grandprix/alltracks.challenge:6
+msgid ""
+"Come first in the At World's End\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Queda primeiro no Grand Prix\n"
+"Na Fin do Mundo con 3 opoñentes\n"
+"profesionais."
+
+#: src/gui/display_res_confirm.cpp:56
+msgid "Confirm Resolution"
+msgstr "Confirmar a resolución"
+
+#: src/gui/display_res_confirm.cpp:110
+#, c-format
+msgid "Confirm Resolution Within %d Seconds"
+msgstr "Confirmar a resolución en %d segundos"
+
+#: src/gui/display_res_confirm.cpp:51
+msgid "Confirm Resolution Within 5 Seconds"
+msgstr "Confirmar a resolución en 5 segundos"
+
+#: src/gui/network_gui.cpp:56
+msgid "Connect to server"
+msgstr "Conectar ao servidor"
+
+#: src/gui/network_gui.cpp:155
+msgid "Connected:"
+msgstr "Conectado:"
+
+#: src/gui/feature_unlocked.cpp:48
+#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/race_results_gui.cpp:59
+msgid "Continue"
+msgstr "Continuar"
+
+#: src/gui/race_results_gui.cpp:66
+msgid "Continue Grand Prix"
+msgstr "Continuar o Grand Prix"
+
+#: data/tracks/beach/beach.track:5
+#: data/tracks/lighthouse/lighthouse.track:5
+msgid ""
+"Created by Ingo Ruhnke,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Creado por Ingo Ruhnke,\n"
+"modificado por M. Gagnon"
+
+#: data/tracks/fortmagma/fortmagma.track:5
+#: data/tracks/sandtrack/sandtrack.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+msgid ""
+"Created by Oliver & Steve Baker\n"
+"modified by Marianne Gagnon"
+msgstr ""
+"Creado por Oliver e Steve Baker\n"
+"modificado por Marianne Gagnon"
+
+#: src/gui/main_menu.cpp:72
+msgid "Credits"
+msgstr "Créditos"
+
+#: data/tracks/crescentcrossing/crescentcrossing.track:4
+msgid "Crescent Crossing"
+msgstr "Paso Elevado"
+
+#. I18N: displays current resolution
+#: src/gui/config_display.cpp:85
+#, c-format
+msgid "Current: %dx%d"
+msgstr "Actual: %dx%d"
+
+#: src/gui/config_display.cpp:91
+msgid "Decrease Resolution"
+msgstr "Reducir a resolución"
+
+#: src/gui/race_options.cpp:86
+msgid "Difficulty"
+msgstr "Dificultade"
+
+#: src/gui/options.cpp:50
+msgid "Display"
+msgstr "Vídeo"
+
+#: src/gui/config_display.cpp:55
+msgid "Display Settings"
+msgstr "Opcións de vídeo"
+
+#: src/gui/race_options.cpp:304
+msgid "Driver"
+msgstr "Condutor"
+
+#: src/gui/config_controls.cpp:43
+msgid "Edit controls for who?"
+msgstr "Cambiar os controis de quen?"
+
+#: src/gui/race_menu.cpp:58
+msgid "Exit Race"
+msgstr "Saír da carreira"
+
+#: data/tracks/jungle/jungle.challenge:6
+msgid ""
+"Finish 3 laps in Racetrack\n"
+"with 3 easy AI karts\n"
+"in under 2:40 minutes."
+msgstr ""
+"Completa 3 voltas n'O Circuíto de\n"
+"Carreiras con 3 opoñentes de nivel\n"
+"fácil en menos de 2:40 minutos."
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
+msgid ""
+"Finish 3 laps on the City track\n"
+"with 3 AI karts\n"
+"in under 4:20 minutes."
+msgstr ""
+"Completa 3 voltas n'A Cidade\n"
+"con 3 opoñentes\n"
+"en menos de 4:20 minutos."
+
+#: data/tracks/canyon/canyon.challenge:6
+msgid ""
+"Finish 3 laps on the Tux Tollway\n"
+"track with 3 AI karts\n"
+"in under 3:00 minutes."
+msgstr ""
+"Completa 3 voltas n'A Autopista\n"
+"de Tux con 3 opoñentes\n"
+"en menos de 3:00 minutos."
+
+#: data/tracks/jungle/jungle.challenge:5
+msgid "Finish Race track in 2:40"
+msgstr "Completa O Circuíto de Carreiras en 2:40"
+
+#: data/tracks/canyon/canyon.challenge:5
+msgid "Finish Tux Tollway track in 3:00"
+msgstr "Completa A Autopista de Tux en 3:00"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
+msgid "Finish the City track in 4:20"
+msgstr "Completa A Cidade en 4:20"
+
+#: data/grandprix/tothemoonandback.challenge:6
+msgid ""
+"Finish with at least 9 nitro \n"
+"points on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Remata cun mínimo de 9 puntos\n"
+"de nitro en 3 voltas A Tormenta de\n"
+"Area en menos de 2:20 minutos."
+
+#: src/gui/race_gui.cpp:677
+#, c-format
+msgid "Finished"
+msgstr "Rematada"
+
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
+msgid ""
+"Finsih with at least 6 points\n"
+" of intro on three laps of\n"
+"Oliver's Math Class\n"
+"in under 52 seconds."
+msgstr ""
+"Remata cun mínimo de 6 puntos\n"
+"de nitro en 3 voltas A Clase de\n"
+"Mates de Oliver en menos\n"
+"de 52 segundos."
+
+#. I18N: name of controls, like in "fire missile"
+#: src/gui/player_controls.cpp:74
+msgid "Fire"
+msgstr "Fogo"
+
+#: data/grandprix/penguinplayground.grandprix:5
+msgid "First grand prix, easy to get started"
+msgstr "Primeiro grand prix, fácil para iniciarse"
+
+#: src/gui/game_mode.cpp:77
+#: src/gui/game_mode.cpp:115
+#: data/followtheleader.challenge:7
+msgid "Follow the Leader"
+msgstr "Segue ao líder"
+
+#: data/tracks/city/city.challenge:5
+msgid "Follow the Leader in the Jungle"
+msgstr "Segue ao líder na xungla"
+
+#: data/grandprix/atworldsend.challenge:5
+msgid ""
+"Follow the Leader on a\n"
+"Desert Island"
+msgstr ""
+"Segue ao líder nunha\n"
+"illa deserta"
+
+#: src/gui/help_page_three.cpp:70
+msgid ""
+"Follow the leader: run for second place, as the last kart\n"
+"will be disqualified every time the counter hits zero.\n"
+" Beware : going in front of the leader will get you eliminated too!"
+msgstr ""
+"Segue ao líder: mantente de segundo, mentres se elimina\n"
+"ao último cada vez que o contador chega a cero.\n"
+"Coidado: ir diante do líder tamén é motivo de descualificación!"
+
+#: src/gui/help_page_one.cpp:69
+msgid "Force your rivals bite *your* dust!"
+msgstr "Forza aos teus rivais a bicar o chan que pisas!"
+
+#: data/tracks/fortmagma/fortmagma.track:4
+msgid "Fort Magma"
+msgstr "O Castelo de Lava"
+
+#: src/gui/num_players.cpp:41
+msgid "Four Players"
+msgstr "Catro xogadores"
+
+#: src/gui/config_display.cpp:77
+#: src/gui/config_display.cpp:130
+#: src/gui/config_display.cpp:185
+msgid "Fullscreen mode"
+msgstr "Modo a pantalla completa"
+
+#: src/gui/game_mode.cpp:152
+msgid "Game mode help"
+msgstr "Axuda dos modos de xogo"
+
+#: src/gui/help_page_three.cpp:43
+msgid "Game modes"
+msgstr "Modos de xogo"
+
+#: src/gui/challenges_menu.cpp:54
+#: src/gui/credits_menu.cpp:79
+msgid "Go back to the main menu"
+msgstr "Volver ao menú principal"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:828
+msgid "Go!"
+msgstr "Adiante!"
+
+#: src/gui/help_page_one.cpp:73
+msgid "Grab blue boxes and nitro"
+msgstr "Colle caixas azuis e nitro"
+
+#: src/gui/game_mode.cpp:99
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#: src/gui/help_page_three.cpp:50
+msgid ""
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
+msgstr ""
+"Grand Prix: consegue puntos de vitoria\n"
+"conducindo nunha serie de circuítos,\n"
+"gaña o que teña unha maior puntuación\n"
+"(o máis rápido en caso de empate!)"
+
+#: src/gui/main_menu.cpp:69
+#: src/gui/race_menu.cpp:49
+msgid "Help"
+msgstr "Axuda"
+
+#: src/gui/race_results_gui.cpp:120
+msgid "Highscores"
+msgstr "Récords"
+
+#: src/gui/help_page_one.cpp:130
+msgid ""
+"If you see a button with a lock like the one to the right,\n"
+"you need to complete a challenge to unlock it."
+msgstr ""
+"Se ves un botón cun cadeado coma o da dereita,\n"
+"terás que completar un reto para desbloquealo."
+
+#: src/gui/config_display.cpp:89
+msgid "Increase Resolution"
+msgstr "Aumentar a resolución"
+
+#: src/user_config.cpp:870
+#, c-format
+msgid "Invalid"
+msgstr "Non válido"
+
+#: src/modes/linear_world.cpp:171
+msgid "Invalid short-cut!!"
+msgstr "Atallo non válido!!!"
+
+#: data/tracks/castle/castle.track:4
+msgid "King Weird's Castle"
+msgstr "O Castelo Estraño do Rei"
+
+#: src/gui/race_gui.cpp:682
+msgid "Lap"
+msgstr "Volta"
+
+#: data/grandprix/atworldsend.grandprix:5
+msgid "Last grand prix, longer and harder"
+msgstr "Último grand prix, máis longo e duro"
+
+#: src/modes/follow_the_leader.cpp:139
+msgid "Leader"
+msgstr "Líder"
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:68
+msgid "Left"
+msgstr "Esquerda"
+
+#: src/gui/race_results_gui.cpp:301
+#: src/gui/start_race_feedback.cpp:86
+msgid "Loading race..."
+msgstr "Cargando a carreira..."
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:76
+msgid "Look back"
+msgstr "Mirar cara atrás"
+
+#: src/gui/main_menu.cpp:59
+msgid "Networking"
+msgstr "Rede"
+
+#: src/gui/feature_unlocked.cpp:37
+msgid "New Feature Unlocked"
+msgstr "Desbloqueouse unha nova característica"
+
+#: src/challenges/challenge.cpp:133
+#, c-format
+msgid ""
+"New Grand Prix '%s'\n"
+"now available"
+msgstr ""
+"Dispoñible un novo\n"
+"Grand Prix, \"%s\""
+
+#: src/challenges/challenge.cpp:136
+#, c-format
+msgid ""
+"New difficulty\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Dispoñible unha nova\n"
+"dificultade, \"%s\""
+
+#: src/modes/linear_world.cpp:339
+msgid "New fastest lap"
+msgstr "Nova volta máis rápida"
+
+#: src/challenges/challenge.cpp:130
+#, c-format
+msgid ""
+"New game mode\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Dispoñible un novo\n"
+"modo de xogo, \"%s\""
+
+#: src/challenges/challenge.cpp:140
+#, c-format
+msgid ""
+"New kart\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Dispoñible un novo\n"
+"kart, \"%s\""
+
+#: src/challenges/challenge.cpp:126
+#, c-format
+msgid ""
+"New track '%s'\n"
+"now available"
+msgstr ""
+"Dispoñible un novo\n"
+"circuíto, \"%s\""
+
+#: src/gui/help_page_one.cpp:156
+#: src/gui/help_page_two.cpp:134
+msgid "Next >"
+msgstr "Seguir >"
+
+#: src/gui/player_controls.cpp:72
+msgid "Nitro"
+msgstr "Nitro"
+
+#: src/gui/grand_prix_select.cpp:63
+#: src/gui/grand_prix_select.cpp:69
+msgid "No Grand Prix selected"
+msgstr "Non se seleccionou Grand Prix ningún"
+
+#: src/gui/race_options.cpp:303
+#: src/gui/race_options.cpp:306
+msgid "Novice"
+msgstr "Principiante"
+
+#: src/gui/race_options.cpp:102
+msgid "Number of karts"
+msgstr "Número de condutores"
+
+#: src/gui/race_options.cpp:124
+msgid "Number of laps"
+msgstr "Número de voltas"
+
+#: src/gui/network_gui.cpp:158
+#: src/gui/race_results_gui.cpp:49
+msgid "OK"
+msgstr "Listo"
+
+#: src/user_config.cpp:498
+msgid "Old config file found, check your key bindings!"
+msgstr ""
+"Atopouse un ficheiro de configuración vello,\n"
+"bótalle unha ollada aos novos controis!"
+
+#: data/tracks/olivermath/olivermath.track:4
+msgid "Oliver's Math Class"
+msgstr "A Clase de Mates de Oliver"
+
+#: data/tracks/beach/beach.track:4
+msgid "On the Beach"
+msgstr "Na Praia"
+
+#: src/gui/main_menu.cpp:64
+#: src/gui/options.cpp:40
+#: src/gui/race_menu.cpp:48
+msgid "Options"
+msgstr "Configuración"
+
+#: src/gui/help_page_two.cpp:102
+msgid "Parachute - slows down all karts in a better position!"
+msgstr ""
+"Paracaídas - reduce a velocidade dos opoñentes\n"
+"que vaian diante túa!"
+
+#: src/gui/race_menu.cpp:45
+msgid "Paused"
+msgstr "Pausa"
+
+#: src/gui/race_gui.cpp:857
+msgid "Penalty time!!"
+msgstr "Penalización de tempo!!!"
+
+#: data/grandprix/penguinplayground.grandprix:4
+msgid "Penguin Playground"
+msgstr "O Patio do Pingüín"
+
+#. I18N: as in 'Player 2'
+#: src/gui/player_controls.cpp:264
+msgid "Player "
+msgstr "Xogador"
+
+#: src/gui/char_sel.cpp:86
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr "Xogador %d, escolle un condutor"
+
+#: src/gui/config_controls.cpp:46
+msgid "Player 1"
+msgstr "Xogador 1"
+
+#: src/gui/config_controls.cpp:47
+msgid "Player 2"
+msgstr "Xogador 2"
+
+#: src/gui/config_controls.cpp:48
+msgid "Player 3"
+msgstr "Xogador 3"
+
+#: src/gui/config_controls.cpp:49
+msgid "Player 4"
+msgstr "Xogador 4"
+
+#: src/gui/options.cpp:42
+msgid "Player Config"
+msgstr "Configuración do xogador"
+
+#: src/gui/player_controls.cpp:92
+msgid "Player name"
+msgstr "Nome do xogador"
+
+#: src/gui/help_page_two.cpp:120
+msgid ""
+"Plunger - throw straight to pull an opponent back,\n"
+"or throw while looking back to make one lose sight!"
+msgstr ""
+"Chupón - lánzao cara diante para empurrar cara\n"
+"atrás a un opoñente, ou cara atrás para non\n"
+"deixalo ver!"
+
+#: data/tracks/prehistoric/prehistoric.track:4
+msgid "Prehistoric Island"
+msgstr "Illa prehistórica"
+
+#: src/gui/display_res_confirm.cpp:60
+msgid "Press <ESC> to Cancel"
+msgstr "Preme Esc para cancelar"
+
+#: src/gui/config_controls.cpp:53
+#: src/gui/config_display.cpp:103
+#: src/gui/config_sound.cpp:64
+#: src/gui/game_mode.cpp:158
+#: src/gui/grand_prix_select.cpp:80
+#: src/gui/network_gui.cpp:79
+#: src/gui/num_players.cpp:46
+#: src/gui/options.cpp:58
+#: src/gui/player_controls.cpp:124
+#: src/gui/race_options.cpp:154
+msgid "Press <ESC> to go back"
+msgstr "Preme Esc para volver atrás"
+
+#: src/gui/player_controls.cpp:168
+msgid "Press key"
+msgstr "Preme a tecla"
+
+#: src/gui/game_mode.cpp:67
+#: src/gui/game_mode.cpp:105
+msgid "Quick Race"
+msgstr "Carreira rápida"
+
+#: src/gui/help_page_three.cpp:58
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr "Carreira rápida: escolle un circuíto, o primeiro gaña."
+
+#: src/gui/main_menu.cpp:65
+msgid "Quit"
+msgstr "Saír"
+
+#: src/gui/race_gui.cpp:629
+msgid "REV"
+msgstr "Marcha atrás"
+
+#: data/tracks/race/race.track:4
+msgid "Race Track"
+msgstr "Circuíto de carreiras"
+
+#: src/gui/race_results_gui.cpp:74
+msgid "Race in this track again"
+msgstr "Correr neste circuíto de novo"
+
+#: src/gui/race_results_gui.cpp:92
+msgid "Race results"
+msgstr "Resultados da carreira"
+
+#: src/gui/race_options.cpp:305
+msgid "Racer"
+msgstr "Profesional"
+
+#: data/tracks/racetrack/racetrack.track:4
+msgid "Racetrack"
+msgstr "Circuíto de Carreiras"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:808
+msgid "Ready!"
+msgstr "Preparados!"
+
+#: src/gui/player_controls.cpp:72
+msgid "Rescue"
+msgstr "Rescatar"
+
+#: src/gui/race_menu.cpp:50
+msgid "Restart Race"
+msgstr "Reiniciar a carreira"
+
+#: src/gui/race_menu.cpp:47
+msgid "Return To Race"
+msgstr "Volver á carreira"
+
+#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
+#: src/gui/player_controls.cpp:70
+msgid "Right"
+msgstr "Dereita"
+
+#: data/grandprix/tothemoonandback.grandprix:5
+msgid "Second grand prix"
+msgstr "Segundo grand prix"
+
+#: src/gui/network_gui.cpp:52
+msgid "Select network mode"
+msgstr "Selecciona o tipo de rede"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:818
+msgid "Set!"
+msgstr "Listos!"
+
+#: src/gui/race_menu.cpp:55
+#: src/gui/race_results_gui.cpp:79
+msgid "Setup New Race"
+msgstr "Preparar unha nova carreira"
+
+#: src/gui/player_controls.cpp:72
+msgid "Sharp Turn"
+msgstr "Xiro brusco"
+
+#: data/tracks/sandtrack/sandtrack.track:4
+msgid "Shifting Sands"
+msgstr "A Tormenta de Area"
+
+#: src/gui/main_menu.cpp:54
+msgid "Single Player"
+msgstr "Xogador individual"
+
+#: src/gui/game_mode.cpp:61
+msgid "Single Race"
+msgstr "Carreira individual"
+
+#: data/tracks/skyline/skyline.track:4
+msgid "Skyline"
+msgstr "Estrada aérea"
+
+#: data/grandprix/snagdrive.grandprix:4
+msgid "Snag Drive"
+msgstr "Obstáculo"
+
+#: data/tracks/snowmountain/snowmountain.track:4
+msgid "Snow Mountain"
+msgstr "Montaña nevada"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
+msgid "SnowTux Peak"
+msgstr "Cume Nevada de Tux"
+
+#: src/gui/options.cpp:53
+msgid "Sound"
+msgstr "Son"
+
+#: src/gui/config_sound.cpp:40
+msgid "Sound Settings"
+msgstr "Configuración do son"
+
+#: src/gui/main_menu.cpp:55
+msgid "Splitscreen"
+msgstr "Pantalla dividida"
+
+#: data/tracks/startrack/startrack.track:4
+msgid "Star Track"
+msgstr "Circuíto Espacial"
+
+#: src/gui/race_options.cpp:144
+msgid "Start race"
+msgstr "Comezar a carreira"
+
+#: src/gui/start_race_feedback.cpp:39
+msgid "Synchronising network..."
+msgstr "Sincronizando coa rede..."
+
+#: src/gui/race_results_gui.cpp:271
+msgid "Synchronising."
+msgstr "Sincronizando."
+
+#: src/gui/help_page_one.cpp:145
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns\n"
+"and have better control in tight curves"
+msgstr ""
+"A tecla de \"xiro brusco\" permíteche xirar bruscamente\n"
+"para ter un mellor control nas curvas pechadas"
+
+#: data/tracks/islandtrack/islandtrack.track:4
+msgid "The Island"
+msgstr "A Illa"
+
+#: src/gui/help_page_one.cpp:117
+msgid ""
+"The current key bindings can be seen/changed in the\n"
+"Options->Player Config menu."
+msgstr ""
+"Pódense cambiar os controis actuais no menú\n"
+"Configuración > Configuración do xogador"
+
+#: src/highscore_manager.cpp:108
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+"O ficheiro dos récords era vello de máis,\n"
+"e elimináronse todas as marcas."
+
+#: data/tracks/mines/mines.track:4
+msgid "The old mine"
+msgstr "A Vella Mina"
+
+#: src/gui/grand_prix_ending.cpp:111
+#, c-format
+msgid "The winner is %s!"
+msgstr "O gañador é %s!"
+
+#: data/grandprix/snagdrive.grandprix:5
+msgid "Third grand prix"
+msgstr "Terceiro grand prix"
+
+#: src/gui/num_players.cpp:40
+msgid "Three Players"
+msgstr "Tres xogadores"
+
+#: src/gui/game_mode.cpp:72
+#: src/gui/game_mode.cpp:110
+msgid "Time Trial"
+msgstr "Competición simple"
+
+#: src/gui/help_page_three.cpp:63
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr ""
+"Competición simple: non hai potenciadores, polo que\n"
+"o único que importa é a túa habilidade ao volante!"
+
+#: src/gui/help_page_two.cpp:58
+msgid "To help you win, there are certain powerups you can grab:"
+msgstr "Para axudarche a gañar, hai certos potenciadores que podes utilizar:"
+
+#: data/grandprix/tothemoonandback.grandprix:4
+msgid "To the Moon and Back"
+msgstr "Á Lúa e Alén"
+
+#: src/gui/config_sound.cpp:46
+#: src/gui/config_sound.cpp:91
+msgid "Turn off music"
+msgstr "Desactivar a música"
+
+#: src/gui/config_sound.cpp:55
+#: src/gui/config_sound.cpp:104
+msgid "Turn off sound effects"
+msgstr "Desactivar os efectos de son"
+
+#: src/gui/config_sound.cpp:50
+#: src/gui/config_sound.cpp:85
+msgid "Turn on music"
+msgstr "Activar a música"
+
+#: src/gui/config_sound.cpp:59
+#: src/gui/config_sound.cpp:99
+msgid "Turn on sound effects"
+msgstr "Activar os efectos de son"
+
+#: data/tracks/tuxtrack/tuxtrack.track:4
+msgid "Tux Tollway"
+msgstr "A Autopista de Tux"
+
+#: src/gui/num_players.cpp:39
+msgid "Two Players"
+msgstr "Dous xogadores"
+
+#: src/modes/linear_world.cpp:278
+msgid "WRONG WAY!"
+msgstr "Sentido contrario!!!"
+
+#: src/gui/char_sel.cpp:126
+#: src/gui/network_gui.cpp:162
+msgid "Waiting for clients"
+msgstr "Agardando polos clientes"
+
+#: src/gui/char_sel.cpp:124
+#: src/gui/network_gui.cpp:118
+msgid "Waiting for server"
+msgstr "Agardando polo servidor"
+
+#: data/followtheleader.challenge:5
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix"
+msgstr ""
+"Gaña o Grand Prix\n"
+"d'O Patio do Pingüín"
+
+#: data/followtheleader.challenge:6
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix with 3 'Racer' Level AI karts."
+msgstr ""
+"Gaña o Grand Prix d'O Patio do\n"
+"Pingüín con 3 opoñentes profesionais. "
+
+#: data/grandprix/snagdrive.challenge:5
+msgid ""
+"Win To the Moon and Back\n"
+"Grand Prix"
+msgstr ""
+"Gaña o Grand Prix\n"
+"Á Lúa e Alén"
+
+#: data/tracks/fortmagma/fortmagma.challenge:6
+msgid ""
+"Win a 1 lap Head to Head\n"
+"on Tux Tollway against 1 'Racer'\n"
+"level AI kart."
+msgstr ""
+"Gaña un man a man dunha\n"
+"volta n'A Autopista de Tux contra\n"
+"un opoñente profesional."
+
+#: data/tracks/city/city.challenge:6
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"in the Amazonian Jungle."
+msgstr ""
+"Gaña un \"seguir ao líder\"\n"
+"con tres opoñentes\n"
+"n'A Xornada Amazónica."
+
+#: data/grandprix/atworldsend.challenge:6
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"on a Desert Island."
+msgstr ""
+"Gaña un \"seguir ao líder\"\n"
+"con tres opoñentes\n"
+"n'A Illa."
+
+#: data/tracks/fortmagma/fortmagma.challenge:5
+msgid ""
+"Win a Head to Head on\n"
+"Tux Tollway"
+msgstr ""
+"Gaña un man a man\n"
+"n'A Autopista de Tux"
+
+#: data/grandprix/alltracks.challenge:5
+msgid ""
+"Win the At World's End\n"
+"Grand Prix"
+msgstr ""
+"Gaña o Grand Prix\n"
+"Na Fin do Mundo"
+
+#: data/grandprix/snagdrive.challenge:6
+msgid ""
+"Win the To the Moon and Back\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Gaña o Grand Prix Á Lúa e Alén\n"
+"con tres opoñentes profesionais."
+
+#: src/gui/config_display.cpp:72
+msgid "Window mode"
+msgstr "Modo de fiestra"
+
+#: data/tracks/xr591/xr591.track:4
+msgid "XR591"
+msgstr "XR591"
+
+#: src/karts/player_kart.cpp:267
+msgid "You finished the race!"
+msgstr "Remataches a carreira!"
+
+#: src/modes/world.cpp:408
+msgid ""
+"You have been\n"
+"eliminated!"
+msgstr "Fuches eliminado!"
+
+#: src/karts/player_kart.cpp:267
+msgid "You won the race!"
+msgstr "Gañaches a carreira!"
+
+#: src/gui/help_page_two.cpp:93
+msgid "Zipper - speed boost"
+msgstr "Acelerador - incrementador da velocidade"
+
+#: src/user_config.cpp:853
+#, c-format
+msgid "joy %d axis %d  %c"
+msgstr "joy %d axis %d  %c"
+
+#: src/user_config.cpp:857
+#, c-format
+msgid "joy %d btn %d"
+msgstr "joy %d btn %d"
+
+#: src/user_config.cpp:860
+#, c-format
+msgid "joy %d hat %d"
+msgstr "joy %d hat %d"
+
+#: src/user_config.cpp:866
+#, c-format
+msgid "mouse axis %d %c"
+msgstr "rato axis %d %c"
+
+#: src/user_config.cpp:863
+#, c-format
+msgid "mouse btn %d"
+msgstr "rato btn %d"
+
+#: src/user_config.cpp:847
+#: src/user_config.cpp:891
+#, c-format
+msgid "not set"
+msgstr "sen establecer"
+
