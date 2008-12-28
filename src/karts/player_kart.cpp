@@ -68,6 +68,8 @@ void PlayerKart::reset()
     m_steer_val_l  = 0;
     m_steer_val_r  = 0;
     m_steer_val    = 0;
+    m_prev_brake   = 0;
+    m_prev_accel   = 0;
     m_penalty_time = 0;
     Kart::reset();
     m_camera->reset();
@@ -95,12 +97,30 @@ void PlayerKart::action(KartAction action, int value)
 
         break;
     case KA_ACCEL:
-        m_controls.m_accel = value/32768.0f;
+        m_prev_accel = value;
+        if(value)
+        {
+            m_controls.m_accel = value/32768.0f;
+            m_controls.m_brake = false;
+        }
+        else
+        {
+            m_controls.m_accel = 0.0f;
+            m_controls.m_brake = m_prev_brake;
+        }
         break;
     case KA_BRAKE:
-        if (value)
-            m_controls.m_accel = 0;
-        m_controls.m_brake = (value!=0);  // This syntax avoid visual c++ warning (when brake=value)
+        m_prev_brake = value!=0;
+        if(value)
+        {
+            m_controls.m_brake = true;
+            m_controls.m_accel = 0.0f;
+        }
+        else
+        {
+            m_controls.m_brake = false;
+            m_controls.m_accel = m_prev_accel/32768.0f;
+        }
         break;
     case KA_NITRO:
         m_controls.m_nitro = (value!=0);
@@ -118,6 +138,7 @@ void PlayerKart::action(KartAction action, int value)
         m_controls.m_drift = (value!=0);
         break;
     }
+
 }   // action
 
 //-----------------------------------------------------------------------------
@@ -177,8 +198,8 @@ void PlayerKart::update(float dt)
 
     if(RaceManager::getWorld()->isStartPhase())
     {
-        if(m_controls.m_accel!=0.0 || m_controls.m_brake!=false ||
-           m_controls.m_fire|m_controls.m_nitro|m_controls.m_drift)
+        if(m_controls.m_accel || m_controls.m_brake ||
+           m_controls.m_fire || m_controls.m_nitro  || m_controls.m_drift)
         {
             if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
