@@ -70,6 +70,10 @@ private:
      *  any longer, the wheel would look too far away from the chassis. */
     float         m_max_suspension[4];
 
+    /** value used to divide the visual movement of wheels (because the actual movement
+        of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
+    float         m_dampen_suspension_amplitude[4];
+    
     /** The transform for the wheels, used to rotate the wheels and display
      *  the suspension in the race.      */
     ssgTransform *m_wheel_transform[4]; 

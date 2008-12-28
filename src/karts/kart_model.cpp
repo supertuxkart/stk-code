@@ -38,8 +38,10 @@ KartModel::KartModel()
         m_wheel_physics_position[i]  = Vec3(UNDEFINED);
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
-        m_min_suspension[i]          = -99.9f;
-        m_max_suspension[i]          =  99.9f;
+        // default value for kart suspensions. move to config file later if we find each kart needs custom values
+        m_min_suspension[i] = -1.3;
+        m_max_suspension[i] = 1.3;
+        m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "wheel-front-right.ac";
     m_wheel_filename[1] = "wheel-front-left.ac";
@@ -227,11 +229,11 @@ void KartModel::adjustWheels(float rotation, float steer,
     // the graphical wheel models don't look too wrong.
     for(unsigned int i=0; i<4; i++)
     {
-        m_min_suspension[i] = -1.3; // FIXME - why are these still not inited at this point?
-        m_max_suspension[i] = 1.3;
         const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
         
-        clamped_suspension[i] = std::min(std::max(suspension[i]/2.5f, // somewhat arbitrary constant to reduce visible wheel movement
+        // limit amplitude between set limits, first dividing it by a
+        // somewhat arbitrary constant to reduce visible wheel movement
+        clamped_suspension[i] = std::min(std::max(suspension[i]/m_dampen_suspension_amplitude[i],
                                                   m_min_suspension[i]),
                                                   m_max_suspension[i]);
         float ratio = clamped_suspension[i] / suspension_length;
