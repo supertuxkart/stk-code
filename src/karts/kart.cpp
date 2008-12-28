@@ -700,19 +700,21 @@ void Kart::updatePhysics (float dt)
     if(m_controls.m_accel)   // accelerating
     {   // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
-        if(m_bounce_back_time>0.0f) engine_power = 0.0f;
+        if(m_bounce_back_time>0.0f) 
+            engine_power = 0.0f;
+        // let a player going backwards accelerate quickly (e.g. if a player hits a
+        // wall, he needs to be able to start again quickly after going backwards)
+        else if(m_speed < 0.0f)
+            engine_power *= 5.0f;
+
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
-        
-        
-        if(m_speed < 0.0f)
-        {
-            // let a player going backwards accelerate quickly (e.g. if a player hits a
-            // wall, he needs to be able to start again quickly after going backwards)
-            m_vehicle->applyEngineForce(engine_power*5, 2);
-            m_vehicle->applyEngineForce(engine_power*5, 3);
-        }
-        
+        // Either all or no brake is set, so test only one to avoid
+        // resetting all brakes most of the time.
+        if(m_vehicle->getWheelInfo(0).m_brake && 
+            !RaceManager::getWorld()->isStartPhase())
+            resetBrakes();
+                
     }
     else
     {   // not accelerating
@@ -735,13 +737,10 @@ void Kart::updatePhysics (float dt)
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
                 if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
                 {
-                    if(m_controls.m_brake)
-                    {
-                        // the backwards acceleration is artificially increased to allow
-                        // players to get "unstuck" quicker if they hit e.g. a wall
-                        m_vehicle->applyEngineForce(-engine_power*2.5f, 2);
-                        m_vehicle->applyEngineForce(-engine_power*2.5f, 3);
-                    }
+                    // the backwards acceleration is artificially increased to allow
+                    // players to get "unstuck" quicker if they hit e.g. a wall
+                    m_vehicle->applyEngineForce(-engine_power*2.5f, 2);
+                    m_vehicle->applyEngineForce(-engine_power*2.5f, 3);
                 }
                 else
                 {
