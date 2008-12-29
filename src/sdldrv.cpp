@@ -398,7 +398,7 @@ void SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
                 // Notify the completion of the input sensing.
                 menu->handle(GA_SENSE_COMPLETE, 0);
             }
-        }
+        }   // if mode==INPUT_SENSE
         else if (ga != GA_NULL)
         {
             if(type==IT_MOUSEBUTTON)
@@ -549,15 +549,25 @@ void SDLDriver::input()
                 // determine which one has to be brought into the released
                 // state. This allows us to regard two directions of an axis
                 // as completely independent input variants (as if they where
-                // two buttons).                
+                // two buttons).
+                // FIXME: I don't really see the advantage of this. It esp. has
+                // the problem that if '0' is passed as steering value to then
+                // player kart, the steering switches back to the previously 
+                // steering value (think of a sequence press left, press right,
+                // release right  --> steering must switch back to 'left').
+                // This can result (esp. if the joystick is released quickly)
+                // in the gamepad apparently being locked in one direction.
+                // As a work around we pass on a value of '1' - which 
+                // corresponds to a rotation of 1/32767 - straight enough for
+                // all practical purposes.
                 if (stickInfos[ev.jaxis.which]
                     ->m_prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
                     input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_NEGATIVE, 0);
+                          ev.jaxis.axis, AD_NEGATIVE, 1);
                 else if (stickInfos[ev.jaxis.which]
                          ->m_prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
                     input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_POSITIVE, 0);
+                          ev.jaxis.axis, AD_POSITIVE, 1);
                 
                 stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
                     = AD_NEUTRAL;
