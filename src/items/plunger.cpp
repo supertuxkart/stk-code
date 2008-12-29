@@ -56,7 +56,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     {
         btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
         
-        if(!m_reverse_mode)
+        if(!m_reverse_mode) // substracting speeds doesn't work backwards, since both speeds go in opposite directions
         {
             // FIXME - this approximation will be wrong if both karts' directions are not colinear
             const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
