@@ -76,6 +76,18 @@ void PlayerKart::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** This function interprets a kart action and value, and set the corresponding
+ *  entries in the kart control data structure. This function handles esp. 
+ *  cases like 'press left, press right, release right' - in this case after
+ *  releasing right, the steering must switch to left again. Similarly it 
+ *  handles 'press left, press right, release left' (in which case still
+ *  right must be selected). Similarly for braking and acceleration.
+ * \param action  The action to be executed.
+ * \param value   If 32768, it indicates a digital value of 'fully set'
+ *                if between 1 and 32767, it indicates an analog value,
+ *                and if it's 0 it indicates that the corresponding button
+ *                was released.
+ */
 void PlayerKart::action(KartAction action, int value)
 {
     switch (action)
