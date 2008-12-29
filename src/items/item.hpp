@@ -56,8 +56,12 @@ private:
 
     bool          m_rotate;       // set to false if item should not rotate
     
-    Kart*         m_parent;        // optional, if item was placed by a kart, a timer
-    float         m_deactive_time; // can be used so it's not hit by its own item
+    /** optionally, set this if this item was laid by a particular kart. in this case,
+        the 'm_deactive_time' will also be set - see below. */ 
+    Kart*         m_parent;
+    /** optionally, if item was placed by a kart, a timer can be used to temporarly
+       deactivate collision so a kart is not hit by its own item */
+    float         m_deactive_time;
     
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
