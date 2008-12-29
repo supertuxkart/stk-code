@@ -54,11 +54,16 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     // aim at this kart if it's not too far
     if(closest_kart != NULL && kartDistSquared < 30*30)
     {
-        const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
-        
-        // calculate the approximate location of the aimed kart in 'time' seconds
         btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
-        closestKartLoc += time*closest_kart->getVelocity();
+        
+        if(!m_reverse_mode)
+        {
+            // FIXME - this approximation will be wrong if both karts' directions are not colinear
+            const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
+            
+            // calculate the approximate location of the aimed kart in 'time' seconds
+            closestKartLoc += time*closest_kart->getVelocity();
+        }
         
         // calculate the angle at which the projectile should be thrown
         // to hit the aimed kart
