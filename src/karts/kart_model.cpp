@@ -39,8 +39,8 @@ KartModel::KartModel()
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
         // default value for kart suspensions. move to config file later if we find each kart needs custom values
-        m_min_suspension[i] = -1.3;
-        m_max_suspension[i] = 1.3;
+        m_min_suspension[i] = -1.3f;
+        m_max_suspension[i] = 1.3f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "wheel-front-right.ac";
