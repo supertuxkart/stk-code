@@ -786,9 +786,7 @@ void Kart::updatePhysics (float dt)
     }
     if(m_skidding>1.0f)
     {
-        const float min_skid_angle = isPlayerKart() ? 0.55f : 0.95f;
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING &&
-           fabsf(getSteerPercent()) > min_skid_angle )
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
             m_skid_sound->play();
     }
     else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
