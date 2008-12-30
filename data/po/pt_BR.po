@@ -615,7 +615,7 @@ msgstr "Pausado"
 
 #: src/gui/race_gui.cpp:857
 msgid "Penalty time!!"
-msgstr "Tempo de penalidade"
+msgstr "Penalidade de Tempo!"
 
 #: data/grandprix/penguinplayground.grandprix:4
 msgid "Penguin Playground"
@@ -703,7 +703,7 @@ msgstr "Sair"
 
 #: src/gui/race_gui.cpp:629
 msgid "REV"
-msgstr "REV"
+msgstr "Ré"
 
 #: data/tracks/race/race.track:4
 msgid "Race Track"
