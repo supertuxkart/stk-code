@@ -59,6 +59,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 
         // calculate appropriate initial up velocity so that the
         // projectile lands on the aimed kart (9.8 is the gravity)
+        // FIXME - this approximation will be wrong if both karts' directions are not colinear
+        // FIXME - this approximation will be wrong if both karts' directions are not at the same height
         const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed()/1.2f); // division is an empirical estimation
         up_velocity = time*9.8f;
         
