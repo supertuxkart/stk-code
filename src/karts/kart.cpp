@@ -104,7 +104,8 @@ Kart::Kart (const std::string& kart_name, int position,
     m_beep_sound   = sfx_manager->newSFX(  SFXManager::SOUND_BEEP             );
     m_crash_sound  = sfx_manager->newSFX(  SFXManager::SOUND_CRASH            );
     m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
-
+    m_goo_sound    = sfx_manager->newSFX(  SFXManager::SOUND_GOO              );
+    
     if(!m_engine_sound)
     {
         fprintf(stdout, "Error: Could not allocate a sfx object for the kart. Further errors may ensue!\n");
@@ -241,7 +242,8 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_beep_sound   );
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
-
+    sfx_manager->deleteSFX(m_goo_sound    );
+    
     if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
     if(m_nitro)        ssgDeRefDelete(m_nitro);
 
@@ -384,7 +386,8 @@ void Kart::collectedItem(const Item &item, int add_info)
     case ITEM_BUBBLEGUM:
         // slow down
         m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
-        m_skid_sound->play();
+        m_goo_sound->position(getXYZ());
+        m_goo_sound->play();
         break;
     default        : break;
     }   // switch TYPE
