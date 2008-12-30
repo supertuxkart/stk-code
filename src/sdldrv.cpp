@@ -529,6 +529,10 @@ void SDLDriver::input()
             // joysticks can be used to control the menu.
             if(ev.jaxis.value <= -stickInfos[ev.jaxis.which]->m_deadzone)
             {
+                if (stickInfos[ev.jaxis.which]
+                         ->m_prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
+                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
+                          ev.jaxis.axis, AD_POSITIVE, 0);
                 input(IT_STICKMOTION, !mode ? 0 : stickIndex,
                       ev.jaxis.axis, AD_NEGATIVE, -ev.jaxis.value);
                 stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
@@ -536,6 +540,10 @@ void SDLDriver::input()
             }
             else if(ev.jaxis.value >= stickInfos[ev.jaxis.which]->m_deadzone)
             {
+                if (stickInfos[ev.jaxis.which]
+                    ->m_prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
+                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
+                          ev.jaxis.axis, AD_NEGATIVE, 0);
                 input(IT_STICKMOTION, !mode ? 0 : stickIndex,
                       ev.jaxis.axis, AD_POSITIVE, ev.jaxis.value);
                 stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
@@ -563,11 +571,11 @@ void SDLDriver::input()
                 if (stickInfos[ev.jaxis.which]
                     ->m_prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
                     input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_NEGATIVE, 1);
+                          ev.jaxis.axis, AD_NEGATIVE, 0);
                 else if (stickInfos[ev.jaxis.which]
                          ->m_prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
                     input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_POSITIVE, 1);
+                          ev.jaxis.axis, AD_POSITIVE, 0);
                 
                 stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
                     = AD_NEUTRAL;

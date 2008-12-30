@@ -18,6 +18,8 @@ SuperTuxKart 0.6
 * Improved shortcut-detection
 * Initial work towards networking (disabled and hidden by default)
 * Bug fixes and code refactor/cleanup/documentation
+  - Fixed 'joystick locks' (kart would turn even if the joystick is in neutral),
+    thanks to Samjam for the patch.
 
 SuperTuxKart 0.5 (May 2008)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
