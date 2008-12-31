@@ -22,40 +22,38 @@
 #include "input.hpp"
 #include "actionmap.hpp"
 
-using namespace std;
-
-void
-ActionMap::putEntry(Input input, GameAction ga)
+// ----------------------------------------------------------------------------
+void ActionMap::putEntry(Input input, GameAction ga)
 {
 	inputMap[key(input)] = ga;
-}
+}   // putEntry
 
-GameAction
-ActionMap::getEntry(Input input)
+// ----------------------------------------------------------------------------
+GameAction ActionMap::getEntry(Input input)
 {
 	return inputMap[key(input)];
-}
+}   // getEntry
 
-GameAction
-ActionMap::getEntry(InputType type, int id0, int id1, int id2)
+// ----------------------------------------------------------------------------
+GameAction ActionMap::getEntry(Input::InputType type, int id0, int id1, int id2)
 {
 	return inputMap[key(type, id0, id1, id2)];
-}
+}   // getEntry
 
-void
-ActionMap::clear()
+// ----------------------------------------------------------------------------
+void ActionMap::clear()
 {
     inputMap.clear();
 }
 
-ActionMap::Key
-ActionMap::key(Input input)
+// ----------------------------------------------------------------------------
+ActionMap::Key ActionMap::key(Input input)
 {
 	return key(input.type, input.id0, input.id1, input.id2);
-}
+}   // key
 
-ActionMap::Key
-ActionMap::key(InputType it, int id0, int id1, int id2)
+// ----------------------------------------------------------------------------
+ActionMap::Key ActionMap::key(Input::InputType it, int id0, int id1, int id2)
 {
     /*
      * A short reminder on the bit distribution and their usage:
@@ -68,5 +66,5 @@ ActionMap::key(InputType it, int id0, int id1, int id2)
      * Assumption: int is (at least) 32 bit
      */
     return Key(it << 24 | id1 << 8 | id2, id0);
-}
+}   // key
 

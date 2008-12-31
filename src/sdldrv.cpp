@@ -56,8 +56,8 @@ SDLDriver *inputDriver;
 /** Initialise SDL.
  */
 SDLDriver::SDLDriver()
-    : sensedInput(0), actionMap(0), mainSurface(0), flags(0), stickInfos(0),
-    mode(BOOTSTRAP), mouseValX(0), mouseValY(0)
+    : m_sensed_input(0), m_action_map(0), m_main_surface(0), m_flags(0), m_stick_infos(0),
+    m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
     {
@@ -65,7 +65,7 @@ SDLDriver::SDLDriver()
         exit(1);
     }
 
-    flags = SDL_OPENGL | SDL_HWSURFACE;
+    m_flags = SDL_OPENGL | SDL_HWSURFACE;
         
     //detect if previous resolution crashed STK
     if (user_config->m_crashed)
@@ -98,7 +98,7 @@ SDLDriver::SDLDriver()
     }
     
     if(user_config->m_fullscreen)
-        flags |= SDL_FULLSCREEN;
+        m_flags |= SDL_FULLSCREEN;
         
     setVideoMode(false);
 
@@ -122,10 +122,10 @@ void SDLDriver::initStickInfos()
     
     // Prepare a list of connected joysticks.
     const int numSticks = SDL_NumJoysticks();
-    stickInfos = new StickInfo *[numSticks];
+    m_stick_infos = new StickInfo *[numSticks];
     std::vector<StickInfo *> *si = new std::vector<StickInfo *>;
     for (int i = 0; i < numSticks; i++)
-        si->push_back(stickInfos[i] = new StickInfo(i));
+        si->push_back(m_stick_infos[i] = new StickInfo(i));
         
     // Get the list of known configs and make a copy of it.
     std::vector<UserConfig::StickConfig *> *sc
@@ -225,11 +225,11 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
 {
     user_config->m_fullscreen = !user_config->m_fullscreen;
 
-    flags = SDL_OPENGL | SDL_HWSURFACE;
+    m_flags = SDL_OPENGL | SDL_HWSURFACE;
 
     if(user_config->m_fullscreen)
     {
-        flags |= SDL_FULLSCREEN;
+        m_flags |= SDL_FULLSCREEN;
 
         if(menu_manager->isSomewhereOnStack(MENUID_RACE))
           showPointer();
@@ -256,7 +256,7 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
 void SDLDriver::setVideoMode(bool resetTextures)
 {
     //Is SDL_FreeSurface necessary? SDL wiki says not??
-    SDL_FreeSurface(mainSurface);
+    SDL_FreeSurface(m_main_surface);
  
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,     8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,   8);
@@ -266,9 +266,9 @@ void SDLDriver::setVideoMode(bool resetTextures)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,  24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
 
-    mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
+    m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
 
-    if (!mainSurface)
+    if (!m_main_surface)
     {
         //ask for lower quality as a fallback
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE,    5);
@@ -276,8 +276,8 @@ void SDLDriver::setVideoMode(bool resetTextures)
         SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,   5);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
-        mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
-        if (mainSurface)
+        m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
+        if (m_main_surface)
         {
             fprintf(stderr, "Using fallback OpenGL settings\n");
         }
@@ -286,8 +286,8 @@ void SDLDriver::setVideoMode(bool resetTextures)
             //one last attempt: get rid of the alpha channel
             SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
 
-            mainSurface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, flags);
-            if (mainSurface)
+            m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
+            if (m_main_surface)
             {
                 fprintf(stderr, "Using fallback OpenGL settings, without alpha channel\n");
             }
@@ -297,8 +297,8 @@ void SDLDriver::setVideoMode(bool resetTextures)
                         user_config->m_width, user_config->m_height, SDL_GetError());
                 exit(1);
             }
-        }   // !mainSurface
-    }   // !mainSurface
+        }   // !m_main_surface
+    }   // !m_main_surface
 
 #if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
@@ -314,16 +314,16 @@ void SDLDriver::setVideoMode(bool resetTextures)
         // startScreen             -> removeTextures();
         attachment_manager      -> removeTextures();
         projectile_manager      -> removeTextures();
-        item_manager         -> removeTextures();
+        item_manager            -> removeTextures();
         kart_properties_manager -> removeTextures();
-        powerup_manager     -> removeTextures();
+        powerup_manager         -> removeTextures();
 
         material_manager->reInit();
 
 
-        powerup_manager     -> loadPowerups();
+        powerup_manager         -> loadPowerups();
         kart_properties_manager -> loadKartData();
-        item_manager         -> loadDefaultItems();
+        item_manager            -> loadDefaultItems();
         projectile_manager      -> loadData();
         attachment_manager      -> loadModels();
 
@@ -348,11 +348,11 @@ SDLDriver::~SDLDriver()
 {
     const int NUM_STICKS = SDL_NumJoysticks();
     for (int i = 0; i < NUM_STICKS; i++)
-        delete stickInfos[i];
+        delete m_stick_infos[i];
     
-    delete [] stickInfos;
+    delete [] m_stick_infos;
 
-    SDL_FreeSurface(mainSurface);
+    SDL_FreeSurface(m_main_surface);
 
     SDL_Quit();
 }   // ~SDLDriver
@@ -362,7 +362,7 @@ SDLDriver::~SDLDriver()
   * to the currently active menu.
   * It also handles whether the game is currently sensing input. It does so by
   * suppressing the distribution of the input as a GameAction. Instead the
-  * input is stored in 'sensedInput' and GA_SENSE_COMPLETE is distributed. If
+  * input is stored in 'm_sensed_input' and GA_SENSE_COMPLETE is distributed. If
   * however the input in question has resolved to GA_LEAVE this is treated as
   * an attempt of the user to cancel the sensing. In that case GA_SENSE_CANCEL
   * is distributed.
@@ -370,38 +370,60 @@ SDLDriver::~SDLDriver()
   * Note: It is the obligation of the called menu to switch of the sense mode.
   *
   */
-void SDLDriver::input(InputType type, int id0, int id1, int id2, int value)
+void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
+                      int value)
 {
     BaseGUI* menu = menu_manager->getCurrentMenu();
 
-    GameAction ga = actionMap->getEntry(type, id0, id1, id2);
+    GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 
     if (menu != NULL)
     {
         // Act different in input sensing mode.
-        if (mode == INPUT_SENSE)
+        if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
+            m_mode <= INPUT_SENSE_PREFER_BUTTON)
         {
             // Input sensing should be canceled.
-            if (ga == GA_LEAVE && sensedInput->type==IT_KEYBOARD)
+            if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
             {
                 menu->handle(GA_SENSE_CANCEL, value);
             }
             // Stores the sensed input when the button/key/axes/<whatever> is
             // released only and is not used in a fixed mapping.
-            else if (!(value || user_config->isFixedInput(type, id0, id1, id2)))
+            else if (!user_config->isFixedInput(type, id0, id1, id2) )
             {
-                sensedInput->type = type;
-                sensedInput->id0 = id0;
-                sensedInput->id1 = id1;
-                sensedInput->id2 = id2;
-
-                // Notify the completion of the input sensing.
-                menu->handle(GA_SENSE_COMPLETE, 0);
+                // See if the new input should be stored. This happens if:
+                // 1) the value is larger
+                // 2) nothing has been saved yet
+                // 3) the new event has the preferred type
+                // The latter is necessary since some gamepads have analog
+                // buttons that can return two different events when pressed
+                bool store_new = abs(value) > m_max_sensed_input         ||
+                    m_max_sensed_type   == Input::IT_NONE                ||
+                    ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
+                      type              == Input::IT_STICKMOTION && 
+                      m_max_sensed_type != Input::IT_STICKMOTION      )  ||
+                    ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
+                      type              == Input::IT_STICKBUTTON && 
+                      m_max_sensed_type != Input::IT_STICKBUTTON      );
+                if(store_new)
+                {
+                    m_sensed_input->type = type;
+                    m_sensed_input->id0  = id0;
+                    m_sensed_input->id1  = id1;
+                    m_sensed_input->id2  = id2;
+                    m_max_sensed_input   = abs(value);
+                    m_max_sensed_type    = type;
+                }
+                // Notify the completion of the input sensing if the key/stick/
+                // ... is released.
+                if(value==0)
+                    menu->handle(GA_SENSE_COMPLETE, 0);
             }
-        }   // if mode==INPUT_SENSE
+        }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
         else if (ga != GA_NULL)
         {
-            if(type==IT_MOUSEBUTTON)
+            if(type==Input::IT_MOUSEBUTTON)
             {
                 // If a mouse button is pressed, make sure that the
                 // widget the mouse is on is actually highlighted (since
@@ -453,10 +475,10 @@ void SDLDriver::input()
             break;
 
         case SDL_KEYUP:
-            input(IT_KEYBOARD, ev.key.keysym.sym, 0, 0, 0);
+            input(Input::IT_KEYBOARD, ev.key.keysym.sym, 0, 0, 0);
             break;
         case SDL_KEYDOWN:
-            if (mode == LOWLEVEL)
+            if (m_mode == LOWLEVEL)
             {
                 // Unicode translation in SDL is only done for keydown events.
                 // Therefore for lowlevel keyboard handling we provide no notion
@@ -465,7 +487,7 @@ void SDLDriver::input()
                     ->inputKeyboard(ev.key.keysym.sym,
                                     ev.key.keysym.unicode);
             }
-            input(IT_KEYBOARD, ev.key.keysym.sym,
+            input(Input::IT_KEYBOARD, ev.key.keysym.sym,
                   ev.key.keysym.unicode, 0, 32768);
 
             break;
@@ -475,45 +497,46 @@ void SDLDriver::input()
             // system to avoid the trouble that arises because all other input
             // methods have only one value to inspect (pressed/release,
             // axis value) while the pointer has two.
-            if (!mode)
+            if (!m_mode)
             {
                 BaseGUI* menu = menu_manager->getCurrentMenu();
                 if (menu != NULL)
-                    menu->inputPointer(ev.motion.x, mainSurface->h - ev.motion.y);
+                    menu->inputPointer(ev.motion.x, m_main_surface->h - ev.motion.y);
             }
             // If sensing input mouse movements are made less sensitive in order
             // to avoid it being detected unwantedly.
-            else if (mode == INPUT_SENSE)
+            else if (m_mode >= INPUT_SENSE_PREFER_AXIS &&
+                     m_mode <= INPUT_SENSE_PREFER_BUTTON  )
             {
                 if (ev.motion.xrel <= -DEADZONE_MOUSE_SENSE)
-                    input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, 0);
+                    input(Input::IT_MOUSEMOTION, 0, Input::AD_NEGATIVE, 0, 0);
                 else if (ev.motion.xrel >= DEADZONE_MOUSE_SENSE)
-                    input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, 0);
+                    input(Input::IT_MOUSEMOTION, 0, Input::AD_POSITIVE, 0, 0);
 
                 if (ev.motion.yrel <= -DEADZONE_MOUSE_SENSE)
-                    input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, 0);
+                    input(Input::IT_MOUSEMOTION, 1, Input::AD_NEGATIVE, 0, 0);
                 else if (ev.motion.yrel >= DEADZONE_MOUSE_SENSE)
-                    input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, 0);
+                    input(Input::IT_MOUSEMOTION, 1, Input::AD_POSITIVE, 0, 0);
             }
             else
             {
                 // Calculates new values for the mouse helper variables. It
                 // keeps them in the [-32768, 32768] range. The same values are
                 // used by SDL for stick axes. 
-                mouseValX = std::max(-32768, std::min(32768,
-                                                      mouseValX + ev.motion.xrel
+                m_mouse_val_x = std::max(-32768, std::min(32768,
+                                                      m_mouse_val_x + ev.motion.xrel
                                                       * MULTIPLIER_MOUSE));
-                mouseValY = std::max(-32768,
-                                     std::min(32768, mouseValY + ev.motion.yrel
+                m_mouse_val_y = std::max(-32768,
+                                     std::min(32768, m_mouse_val_y + ev.motion.yrel
                                                      * MULTIPLIER_MOUSE));
             }
             break;
         case SDL_MOUSEBUTTONUP:
-            input(IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
+            input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            input(IT_MOUSEBUTTON, ev.button.button, 0, 0, 32768);
+            input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 32768);
             break;
 
         case SDL_JOYAXISMOTION:
@@ -522,32 +545,36 @@ void SDLDriver::input()
                 printf("axis motion: which %d axis %d value %d\n",
                     ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
             }
-            stickIndex = stickInfos[ev.jaxis.which]->m_index;
+            stickIndex = m_stick_infos[ev.jaxis.which]->m_index;
             // If the joystick axis exceeds the deadzone report the input.
             // In menu mode (mode = MENU = 0) the joystick number is reported
             // to be zero in all cases. This has the neat effect that all
             // joysticks can be used to control the menu.
-            if(ev.jaxis.value <= -stickInfos[ev.jaxis.which]->m_deadzone)
+            if(ev.jaxis.value <= -m_stick_infos[ev.jaxis.which]->m_deadzone)
             {
-                if (stickInfos[ev.jaxis.which]
-                         ->m_prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
-                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_POSITIVE, 0);
-                input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                      ev.jaxis.axis, AD_NEGATIVE, -ev.jaxis.value);
-                stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = AD_NEGATIVE;
+                if (m_stick_infos[ev.jaxis.which]
+                    ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
+                {
+                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                        ev.jaxis.axis, Input::AD_POSITIVE, 0);
+                }
+                input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                    ev.jaxis.axis, Input::AD_NEGATIVE, -ev.jaxis.value);
+                m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
+                    = Input::AD_NEGATIVE;
             }
-            else if(ev.jaxis.value >= stickInfos[ev.jaxis.which]->m_deadzone)
+            else if(ev.jaxis.value >= m_stick_infos[ev.jaxis.which]->m_deadzone)
             {
-                if (stickInfos[ev.jaxis.which]
-                    ->m_prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
-                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_NEGATIVE, 0);
-                input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                      ev.jaxis.axis, AD_POSITIVE, ev.jaxis.value);
-                stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = AD_POSITIVE;
+                if (m_stick_infos[ev.jaxis.which]
+                    ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
+                {
+                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                        ev.jaxis.axis, Input::AD_NEGATIVE, 0);
+                }
+                input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                      ev.jaxis.axis, Input::AD_POSITIVE, ev.jaxis.value);
+                m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
+                    = Input::AD_POSITIVE;
             }
             else
             {
@@ -558,43 +585,33 @@ void SDLDriver::input()
                 // state. This allows us to regard two directions of an axis
                 // as completely independent input variants (as if they where
                 // two buttons).
-                // FIXME: I don't really see the advantage of this. It esp. has
-                // the problem that if '0' is passed as steering value to then
-                // player kart, the steering switches back to the previously 
-                // steering value (think of a sequence press left, press right,
-                // release right  --> steering must switch back to 'left').
-                // This can result (esp. if the joystick is released quickly)
-                // in the gamepad apparently being locked in one direction.
-                // As a work around we pass on a value of '1' - which 
-                // corresponds to a rotation of 1/32767 - straight enough for
-                // all practical purposes.
-                if (stickInfos[ev.jaxis.which]
-                    ->m_prevAxisDirections[ev.jaxis.axis] == AD_NEGATIVE)
-                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_NEGATIVE, 0);
-                else if (stickInfos[ev.jaxis.which]
-                         ->m_prevAxisDirections[ev.jaxis.axis] == AD_POSITIVE)
-                    input(IT_STICKMOTION, !mode ? 0 : stickIndex,
-                          ev.jaxis.axis, AD_POSITIVE, 0);
+                if (m_stick_infos[ev.jaxis.which]
+                ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
+                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                          ev.jaxis.axis, Input::AD_NEGATIVE, 0);
+                else if (m_stick_infos[ev.jaxis.which]
+                         ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
+                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
+                          ev.jaxis.axis, Input::AD_POSITIVE, 0);
                 
-                stickInfos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = AD_NEUTRAL;
+                m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
+                    = Input::AD_NEUTRAL;
             }
 
             break;
         case SDL_JOYBUTTONUP:
-            stickIndex = stickInfos[ev.jbutton.which]->m_index;
+            stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
                     
-            // See the SDL_JOYAXISMOTION case label because of !mode thingie.
-            input(IT_STICKBUTTON, !mode ? 0 : stickIndex, ev.jbutton.button, 0,
-                  0);
+            // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
+            input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
+                  ev.jbutton.button, 0, 0);
             break;
         case SDL_JOYBUTTONDOWN:
-            stickIndex = stickInfos[ev.jbutton.which]->m_index;
+            stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
 
-            // See the SDL_JOYAXISMOTION case label because of !mode thingie.
-            input(IT_STICKBUTTON, !mode ? 0 : stickIndex, ev.jbutton.button, 0,
-                  32768);
+            // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
+            input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
+                   ev.jbutton.button, 0, 32768);
             break;
         case SDL_USEREVENT:
         // used in display_res_confirm for the countdown timer
@@ -604,19 +621,19 @@ void SDLDriver::input()
     }   // while (SDL_PollEvent())
 
     // Makes mouse behave like an analog axis.
-    if (mouseValX <= -DEADZONE_MOUSE)
-      input(IT_MOUSEMOTION, 0, AD_NEGATIVE, 0, -mouseValX);
-    else if (mouseValX >= DEADZONE_MOUSE)
-      input(IT_MOUSEMOTION, 0, AD_POSITIVE, 0, mouseValX);
+    if (m_mouse_val_x <= -DEADZONE_MOUSE)
+        input(Input::IT_MOUSEMOTION, 0, Input::AD_NEGATIVE, 0, -m_mouse_val_x);
+    else if (m_mouse_val_x >= DEADZONE_MOUSE)
+        input(Input::IT_MOUSEMOTION, 0, Input::AD_POSITIVE, 0, m_mouse_val_x);
     else
-      mouseValX = 0;
+      m_mouse_val_x = 0;
 
-    if (mouseValY <= -DEADZONE_MOUSE)
-      input(IT_MOUSEMOTION, 1, AD_NEGATIVE, 0, -mouseValY);
-    else if (mouseValY >= DEADZONE_MOUSE)
-      input(IT_MOUSEMOTION, 1, AD_POSITIVE, 0, mouseValY);
+    if (m_mouse_val_y <= -DEADZONE_MOUSE)
+        input(Input::IT_MOUSEMOTION, 1, Input::AD_NEGATIVE, 0, -m_mouse_val_y);
+    else if (m_mouse_val_y >= DEADZONE_MOUSE)
+      input(Input::IT_MOUSEMOTION, 1, Input::AD_POSITIVE, 0, m_mouse_val_y);
     else
-      mouseValY = 0;
+      m_mouse_val_y = 0;
 
 }   // input
 
@@ -632,12 +649,13 @@ void SDLDriver::input()
   */
 Input &SDLDriver::getSensedInput()
 {
-    assert (mode == INPUT_SENSE);
+    assert (m_mode >= INPUT_SENSE_PREFER_AXIS &&
+            m_mode <= INPUT_SENSE_PREFER_BUTTON   );
 
-    // sensedInput should be available in input sense mode.
-    assert (sensedInput);
+    // m_sensed_input should be available in input sense mode.
+    assert (m_sensed_input);
     
-    return *sensedInput;
+    return *m_sensed_input;
 }   // getSensedInput
 
 //-----------------------------------------------------------------------------
@@ -645,7 +663,7 @@ Input &SDLDriver::getSensedInput()
   */
 bool SDLDriver::isInMode(InputDriverMode expMode)
 {
-    return mode == expMode;
+    return m_mode == expMode;
 }   // isInMode
 
 //-----------------------------------------------------------------------------
@@ -667,7 +685,7 @@ bool SDLDriver::isInMode(InputDriverMode expMode)
   *
   * In input sense mode the pointer is invisible (any movement reports are
   * suppressed). If an input happens it is stored internally and can be
-  * retrieved through drv_getSensedInput() *after* GA_SENSE_COMPLETE has been
+  * retrieved through drv_getm_sensed_input() *after* GA_SENSE_COMPLETE has been
   * distributed to a menu (Normally the menu that received GA_SENSE_COMPLETE
   * will request the sensed input ...). If GA_SENSE_CANCEL is received instead
   * the user decided to cancel input sensing. No other game action values are
@@ -688,22 +706,22 @@ bool SDLDriver::isInMode(InputDriverMode expMode)
   * once per application instance. It is the state the input driver is first.
   *
   */
-void SDLDriver::setMode(InputDriverMode newMode)
+void SDLDriver::setMode(InputDriverMode new_mode)
 {
-    switch (newMode)
+    switch (new_mode)
     {
     case MENU:
-        switch (mode)
+        switch (m_mode)
         {
         case INGAME:
             // Leaving ingame mode.
                 
-            if (actionMap)
-                delete actionMap;
+            if (m_action_map)
+                delete m_action_map;
     
             // Reset the helper values for the relative mouse movement
             // supresses to the notification of them as an input.
-            mouseValX = mouseValY = 0;
+            m_mouse_val_x = m_mouse_val_y = 0;
             
             showPointer();
             
@@ -712,23 +730,24 @@ void SDLDriver::setMode(InputDriverMode newMode)
             // Leaving boot strap mode.
                 
             // Installs the action map for the menu.
-            actionMap = user_config->newMenuActionMap();
+            m_action_map = user_config->newMenuActionMap();
             
-            mode = MENU;
+            m_mode = MENU;
 
             break;
-        case INPUT_SENSE:
+        case INPUT_SENSE_PREFER_AXIS:
+        case INPUT_SENSE_PREFER_BUTTON:
             // Leaving input sense mode.
                 
             showPointer();
             
             // The order is deliberate just in case someone starts to make
-            // STK multithreaded: sensedInput must not be 0 when
-            // mode == INPUT_SENSE.
-            mode = MENU;
+            // STK multithreaded: m_sensed_input must not be 0 when
+            // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
+            m_mode = MENU;
             
-            delete sensedInput;
-            sensedInput = 0;
+            delete m_sensed_input;
+            m_sensed_input = 0;
 
             break;
         case LOWLEVEL:
@@ -738,7 +757,7 @@ void SDLDriver::setMode(InputDriverMode newMode)
 
             showPointer();
 
-            mode = MENU;
+            m_mode = MENU;
             
             break;
         default:
@@ -749,43 +768,45 @@ void SDLDriver::setMode(InputDriverMode newMode)
         break;
     case INGAME:
         // We must be in menu mode now in order to switch.
-        assert (mode == MENU);
+        assert (m_mode == MENU);
     
-        if (actionMap)
-            delete actionMap;
+        if (m_action_map)
+            delete m_action_map;
 
         // Installs the action map for the ingame mode.
-        actionMap = user_config->newIngameActionMap();
+        m_action_map = user_config->newIngameActionMap();
 
         hidePointer();
 
-        mode = INGAME;
+        m_mode = INGAME;
         
         break;
-    case INPUT_SENSE:
+    case INPUT_SENSE_PREFER_AXIS:
+    case INPUT_SENSE_PREFER_BUTTON:
         // We must be in menu mode now in order to switch.
-        assert (mode == MENU);
+        assert (m_mode == MENU);
         
         // Reset the helper values for the relative mouse movement supresses to
         // the notification of them as an input.
-        mouseValX = mouseValY = 0;
-
-        sensedInput = new Input();
+        m_mouse_val_x      = m_mouse_val_y = 0;
+        m_max_sensed_input = 0;
+        m_max_sensed_type  = Input::IT_NONE;
+        m_sensed_input     = new Input();
     
         hidePointer();
     
-        mode = INPUT_SENSE;
+        m_mode = new_mode;
         
         break;
     case LOWLEVEL:
         // We must be in menu mode now in order to switch.
-        assert (mode == MENU);
+        assert (m_mode == MENU);
         
         SDL_EnableUNICODE(SDL_ENABLE);
 
         hidePointer();
 
-        mode = LOWLEVEL;
+        m_mode = LOWLEVEL;
 
         break;
     default:
@@ -805,10 +826,10 @@ SDLDriver::StickInfo::StickInfo(int sdlIndex)
     m_id = SDL_JoystickName(sdlIndex);
     
     const int count = SDL_JoystickNumAxes(m_sdlJoystick);
-    m_prevAxisDirections = new AxisDirection[count];
+    m_prevAxisDirections = new Input::AxisDirection[count];
     
     for (int i = 0; i < count; i++)
-        m_prevAxisDirections[i] = AD_NEUTRAL;
+        m_prevAxisDirections[i] = Input::AD_NEUTRAL;
     
     m_deadzone = DEADZONE_JOYSTICK;
     

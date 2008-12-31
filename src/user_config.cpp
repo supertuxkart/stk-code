@@ -141,65 +141,65 @@ void UserConfig::setDefaults()
 
     /* general game input settings */
     set(GA_ENTER,
-        Input(IT_KEYBOARD, SDLK_RETURN),
-        Input(IT_KEYBOARD, SDLK_SPACE),
-        Input(IT_STICKBUTTON, 0, 0),
-        Input(IT_MOUSEBUTTON, 1));
+        Input(Input::IT_KEYBOARD, SDLK_RETURN),
+        Input(Input::IT_KEYBOARD, SDLK_SPACE),
+        Input(Input::IT_STICKBUTTON, 0, 0),
+        Input(Input::IT_MOUSEBUTTON, 1));
     set(GA_LEAVE,
-        Input(IT_KEYBOARD, SDLK_ESCAPE),
-        Input(IT_STICKBUTTON, 0, 1),
-        Input(IT_MOUSEBUTTON, 2),
-        Input(IT_MOUSEBUTTON, 3));
+        Input(Input::IT_KEYBOARD, SDLK_ESCAPE),
+        Input(Input::IT_STICKBUTTON, 0, 1),
+        Input(Input::IT_MOUSEBUTTON, 2),
+        Input(Input::IT_MOUSEBUTTON, 3));
     set(GA_CURSOR_UP,
-        Input(IT_KEYBOARD, SDLK_UP),
-        Input(IT_MOUSEBUTTON, 4),
-        Input(IT_STICKMOTION, 0, 1, AD_NEGATIVE));
+        Input(Input::IT_KEYBOARD, SDLK_UP),
+        Input(Input::IT_MOUSEBUTTON, 4),
+        Input(Input::IT_STICKMOTION, 0, 1, Input::AD_NEGATIVE));
 
     set(GA_CURSOR_DOWN,
-        Input(IT_KEYBOARD, SDLK_DOWN),
-        Input(IT_MOUSEBUTTON, 5),
-        Input(IT_STICKMOTION, 0, 1, AD_POSITIVE));
+        Input(Input::IT_KEYBOARD, SDLK_DOWN),
+        Input(Input::IT_MOUSEBUTTON, 5),
+        Input(Input::IT_STICKMOTION, 0, 1, Input::AD_POSITIVE));
 
     set(GA_CURSOR_LEFT,
-        Input(IT_KEYBOARD, SDLK_LEFT),
-        Input(IT_STICKMOTION, 0, 0, AD_NEGATIVE));
+        Input(Input::IT_KEYBOARD, SDLK_LEFT),
+        Input(Input::IT_STICKMOTION, 0, 0, Input::AD_NEGATIVE));
 
     set(GA_CURSOR_RIGHT,
-        Input(IT_KEYBOARD, SDLK_RIGHT),
-        Input(IT_STICKMOTION, 0, 0, AD_POSITIVE));
+        Input(Input::IT_KEYBOARD, SDLK_RIGHT),
+        Input(Input::IT_STICKMOTION, 0, 0, Input::AD_POSITIVE));
 
     set(GA_CLEAR_MAPPING,
-        Input(IT_KEYBOARD, SDLK_BACKSPACE),
-        Input(IT_STICKBUTTON, 0, 2));
+        Input(Input::IT_KEYBOARD, SDLK_BACKSPACE),
+        Input(Input::IT_STICKBUTTON, 0, 2));
 
     set(GA_INC_SCROLL_SPEED,
-        Input(IT_KEYBOARD, SDLK_PLUS));
+        Input(Input::IT_KEYBOARD, SDLK_PLUS));
     set(GA_INC_SCROLL_SPEED_FAST,
-        Input(IT_KEYBOARD, SDLK_PAGEDOWN));
+        Input(Input::IT_KEYBOARD, SDLK_PAGEDOWN));
 
     set(GA_DEC_SCROLL_SPEED,
-        Input(IT_KEYBOARD, SDLK_MINUS));
+        Input(Input::IT_KEYBOARD, SDLK_MINUS));
     set(GA_DEC_SCROLL_SPEED_FAST,
-        Input(IT_KEYBOARD, SDLK_PAGEUP));
+        Input(Input::IT_KEYBOARD, SDLK_PAGEUP));
 
     set(GA_TOGGLE_FULLSCREEN,
-        Input(IT_KEYBOARD, SDLK_F9));
+        Input(Input::IT_KEYBOARD, SDLK_F9));
     set(GA_LEAVE_RACE,
-        Input(IT_KEYBOARD, SDLK_ESCAPE));
+        Input(Input::IT_KEYBOARD, SDLK_ESCAPE));
 #ifdef DEBUG
     set(GA_DEBUG_ADD_BOWLING,
-        Input(IT_KEYBOARD, SDLK_F1));
+        Input(Input::IT_KEYBOARD, SDLK_F1));
     set(GA_DEBUG_ADD_MISSILE,
-        Input(IT_KEYBOARD, SDLK_F2));
+        Input(Input::IT_KEYBOARD, SDLK_F2));
     set(GA_DEBUG_ADD_HOMING,
-        Input(IT_KEYBOARD, SDLK_F3));
+        Input(Input::IT_KEYBOARD, SDLK_F3));
 #endif
     set(GA_DEBUG_TOGGLE_FPS,
-        Input(IT_KEYBOARD, SDLK_F12));
+        Input(Input::IT_KEYBOARD, SDLK_F12));
     set(GA_DEBUG_TOGGLE_WIREFRAME,
-        Input(IT_KEYBOARD, SDLK_F11));
+        Input(Input::IT_KEYBOARD, SDLK_F11));
     set(GA_DEBUG_HISTORY,
-        Input(IT_KEYBOARD, SDLK_F10));
+        Input(Input::IT_KEYBOARD, SDLK_F10));
 
     // TODO: The following should become a static
     // array. This allows:
@@ -208,83 +208,83 @@ void UserConfig::setDefaults()
 
     /* Player 1 default input settings */
     set(GA_P1_LEFT,
-                Input(IT_KEYBOARD, SDLK_LEFT));
+                Input(Input::IT_KEYBOARD, SDLK_LEFT));
     set(GA_P1_RIGHT,
-                Input(IT_KEYBOARD, SDLK_RIGHT));
+                Input(Input::IT_KEYBOARD, SDLK_RIGHT));
     set(GA_P1_ACCEL,
-                Input(IT_KEYBOARD, SDLK_UP));
+                Input(Input::IT_KEYBOARD, SDLK_UP));
     set(GA_P1_BRAKE,
-                Input(IT_KEYBOARD, SDLK_DOWN));
+                Input(Input::IT_KEYBOARD, SDLK_DOWN));
     set(GA_P1_NITRO,
-                Input(IT_KEYBOARD, SDLK_RSHIFT));
+                Input(Input::IT_KEYBOARD, SDLK_RSHIFT));
     set(GA_P1_DRIFT,
-                Input(IT_KEYBOARD, SDLK_MINUS));
+                Input(Input::IT_KEYBOARD, SDLK_MINUS));
     set(GA_P1_RESCUE,
-                Input(IT_KEYBOARD, SDLK_BACKSPACE));
+                Input(Input::IT_KEYBOARD, SDLK_BACKSPACE));
     set(GA_P1_FIRE,
-                Input(IT_KEYBOARD, SDLK_RCTRL));
+                Input(Input::IT_KEYBOARD, SDLK_RCTRL));
     set(GA_P1_LOOK_BACK,
-                Input(IT_KEYBOARD, SDLK_RALT));
+                Input(Input::IT_KEYBOARD, SDLK_RALT));
 
     /* Player 2 default input settings */
     set(GA_P2_LEFT,
-                Input(IT_KEYBOARD, SDLK_a));
+                Input(Input::IT_KEYBOARD, SDLK_a));
     set(GA_P2_RIGHT,
-                Input(IT_KEYBOARD, SDLK_d));
+                Input(Input::IT_KEYBOARD, SDLK_d));
     set(GA_P2_ACCEL,
-                Input(IT_KEYBOARD, SDLK_w));
+                Input(Input::IT_KEYBOARD, SDLK_w));
     set(GA_P2_BRAKE,
-                Input(IT_KEYBOARD, SDLK_s));
+                Input(Input::IT_KEYBOARD, SDLK_s));
     set(GA_P2_NITRO,
-                Input(IT_KEYBOARD, SDLK_LSHIFT));
+                Input(Input::IT_KEYBOARD, SDLK_LSHIFT));
     set(GA_P2_DRIFT,
-                Input(IT_KEYBOARD, SDLK_CAPSLOCK));
+                Input(Input::IT_KEYBOARD, SDLK_CAPSLOCK));
     set(GA_P2_RESCUE,
-                Input(IT_KEYBOARD, SDLK_q));
+                Input(Input::IT_KEYBOARD, SDLK_q));
     set(GA_P2_FIRE,
-                Input(IT_KEYBOARD, SDLK_LCTRL));
+                Input(Input::IT_KEYBOARD, SDLK_LCTRL));
     set(GA_P2_LOOK_BACK,
-                Input(IT_KEYBOARD, SDLK_LALT));
+                Input(Input::IT_KEYBOARD, SDLK_LALT));
 
     /* Player 3 default input settings */
     set(GA_P3_LEFT,
-                Input(IT_KEYBOARD, SDLK_f));
+                Input(Input::IT_KEYBOARD, SDLK_f));
     set(GA_P3_RIGHT,
-                Input(IT_KEYBOARD, SDLK_h));
+                Input(Input::IT_KEYBOARD, SDLK_h));
     set(GA_P3_ACCEL,
-                Input(IT_KEYBOARD, SDLK_t));
+                Input(Input::IT_KEYBOARD, SDLK_t));
     set(GA_P3_BRAKE,
-                Input(IT_KEYBOARD, SDLK_g));
+                Input(Input::IT_KEYBOARD, SDLK_g));
     set(GA_P3_NITRO,
-                Input(IT_KEYBOARD, SDLK_c));
+                Input(Input::IT_KEYBOARD, SDLK_c));
     set(GA_P3_DRIFT,
-                Input(IT_KEYBOARD, SDLK_v));
+                Input(Input::IT_KEYBOARD, SDLK_v));
     set(GA_P3_RESCUE,
-                Input(IT_KEYBOARD, SDLK_r));
+                Input(Input::IT_KEYBOARD, SDLK_r));
     set(GA_P3_FIRE,
-                Input(IT_KEYBOARD, SDLK_b));
+                Input(Input::IT_KEYBOARD, SDLK_b));
     set(GA_P3_LOOK_BACK,
-                Input(IT_KEYBOARD, SDLK_n));
+                Input(Input::IT_KEYBOARD, SDLK_n));
 
     /* Player 4 default input settings  */
     set(GA_P4_LEFT,
-                Input(IT_KEYBOARD, SDLK_j));
+                Input(Input::IT_KEYBOARD, SDLK_j));
     set(GA_P4_RIGHT,
-                Input(IT_KEYBOARD, SDLK_l));
+                Input(Input::IT_KEYBOARD, SDLK_l));
     set(GA_P4_ACCEL,
-                Input(IT_KEYBOARD, SDLK_i));
+                Input(Input::IT_KEYBOARD, SDLK_i));
     set(GA_P4_BRAKE,
-                Input(IT_KEYBOARD, SDLK_k));
+                Input(Input::IT_KEYBOARD, SDLK_k));
     set(GA_P4_NITRO,
-                Input(IT_KEYBOARD, SDLK_m));
+                Input(Input::IT_KEYBOARD, SDLK_m));
     set(GA_P4_DRIFT,
-                Input(IT_KEYBOARD, SDLK_COMMA));
+                Input(Input::IT_KEYBOARD, SDLK_COMMA));
     set(GA_P4_RESCUE,
-                Input(IT_KEYBOARD, SDLK_u));
+                Input(Input::IT_KEYBOARD, SDLK_u));
     set(GA_P4_FIRE,
-                Input(IT_KEYBOARD, SDLK_PERIOD));
+                Input(Input::IT_KEYBOARD, SDLK_PERIOD));
     set(GA_P4_LOOK_BACK,
-                Input(IT_KEYBOARD, SDLK_SLASH));
+                Input(Input::IT_KEYBOARD, SDLK_SLASH));
 
 }   // setDefaults
 
@@ -583,44 +583,44 @@ void UserConfig::readInput(const lisp::Lisp* r, const std::string &node,
     // Every unused id variable *must* be set to
     // something different than -1. Otherwise
     // the restored mapping will not be applied.
-    Input input = Input(IT_NONE, -1, -1, -1);
+    Input input = Input(Input::IT_NONE, -1, -1, -1);
 
     nodeReader->get("type", inputTypeName);
     if (inputTypeName == "keyboard")
     {
-        input.type = IT_KEYBOARD;
+        input.type = Input::IT_KEYBOARD;
         nodeReader->get("key", input.id0);
         input.id1 = input.id2 = 0;
     }
     else if (inputTypeName == "stickaxis")
     {
-        input.type = IT_STICKMOTION;
+        input.type = Input::IT_STICKMOTION;
         nodeReader->get("stick", input.id0);
         nodeReader->get("axis", input.id1);
         nodeReader->get("direction", input.id2);
     }
     else if (inputTypeName == "stickbutton")
     {
-        input.type = IT_STICKBUTTON;
+        input.type = Input::IT_STICKBUTTON;
         nodeReader->get("stick", input.id0);
         nodeReader->get("button", input.id1);
         input.id2 = 0;
     }
     else if (inputTypeName == "stickhat")
     {
-        input.type = IT_STICKHAT;
+        input.type = Input::IT_STICKHAT;
         // TODO: Implement me
     }
     else if (inputTypeName == "mouseaxis")
     {
-        input.type = IT_MOUSEMOTION;
+        input.type = Input::IT_MOUSEMOTION;
         nodeReader->get("axis", input.id0);
         nodeReader->get("direction", input.id1);
         input.id2 = 0;
     }
     else if (inputTypeName == "mousebutton")
     {
-        input.type = IT_MOUSEBUTTON;
+        input.type = Input::IT_MOUSEBUTTON;
         nodeReader->get("button", input.id0);
         input.id1 = input.id2 = 0;
     }
@@ -798,38 +798,38 @@ void UserConfig::writeInput(lisp::Writer *writer, const char *node,
 
         const Input input = inputMap[action].inputs[0];
 
-        if (input.type != IT_NONE)
+        if (input.type != Input::IT_NONE)
         {
             switch (input.type)
             {
-            case IT_NONE:
+            case Input::IT_NONE:
                 break;
-            case IT_KEYBOARD:
+            case Input::IT_KEYBOARD:
                 writer->write("type", "keyboard");
                 writer->write("key", input.id0);
                 break;
-            case IT_STICKMOTION:
+            case Input::IT_STICKMOTION:
                 writer->write("type", "stickaxis");
                 writer->write("stick", input.id0);
                 writer->write("axis", input.id1);
                 writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
                 writer->write("direction", input.id2);
                 break;
-            case IT_STICKBUTTON:
+            case Input::IT_STICKBUTTON:
                 writer->write("type", "stickbutton");
                 writer->write("stick", input.id0);
                 writer->write("button", input.id1);
                 break;
-            case IT_STICKHAT:
+            case Input::IT_STICKHAT:
                 // TODO: Implement me
                 break;
-            case IT_MOUSEMOTION:
+            case Input::IT_MOUSEMOTION:
                 writer->write("type", "mouseaxis");
                 writer->write("axis", input.id0);
                 writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
                 writer->write("direction", input.id1);
                 break;
-            case IT_MOUSEBUTTON:
+            case Input::IT_MOUSEBUTTON:
                 writer->write("type", "mousebutton");
                 writer->writeComment("0 is left, 1 is middle, 2 is right, 3 is wheel up, 4 is wheel down");
                 writer->writeComment("other values denote auxillary buttons");
@@ -850,28 +850,29 @@ std::string UserConfig::getInputAsString(Input &input)
     
     switch (input.type)
     {
-    case IT_NONE:
+    case Input::IT_NONE:
         snprintf(msg, sizeof(msg), _("not set"));
         break;
-    case IT_KEYBOARD:
+    case Input::IT_KEYBOARD:
         snprintf(msg, sizeof(msg), "%s", SDL_GetKeyName((SDLKey) input.id0));
         break;
-    case IT_STICKMOTION:
+    case Input::IT_STICKMOTION:
         snprintf(msg, sizeof(msg), _("joy %d axis %d  %c"),
-                 input.id0, input.id1, (input.id2 == AD_NEGATIVE) ? '-' : '+');
+                 input.id0, input.id1, 
+                 (input.id2 == Input::AD_NEGATIVE) ? '-' : '+');
         break;
-    case IT_STICKBUTTON:
+    case Input::IT_STICKBUTTON:
         snprintf(msg, sizeof(msg), _("joy %d btn %d"), input.id0, input.id1);
         break;
-    case IT_STICKHAT:
+    case Input::IT_STICKHAT:
         snprintf(msg, sizeof(msg), _("joy %d hat %d"), input.id0, input.id1);
         break;
-    case IT_MOUSEBUTTON:
+    case Input::IT_MOUSEBUTTON:
         snprintf(msg, sizeof(msg), _("mouse btn %d"), input.id0);
         break;
-    case IT_MOUSEMOTION:
+    case Input::IT_MOUSEMOTION:
         snprintf(msg, sizeof(msg), _("mouse axis %d %c"),
-                 input.id0, ((input.id1 == AD_NEGATIVE) ? '-' : '+'));
+                 input.id0, ((input.id1 == Input::AD_NEGATIVE) ? '-' : '+'));
         break;
     default:
         snprintf(msg, sizeof(msg), _("Invalid"));
@@ -923,7 +924,7 @@ void UserConfig::unsetDuplicates(GameAction ga, Input &i)
                 && inputMap[cga].inputs[0].id2 == i.id2)
             {
                 // Delete it.
-                inputMap[cga].inputs[0].type = IT_NONE;
+                inputMap[cga].inputs[0].type = Input::IT_NONE;
             }
         }
     }
@@ -1054,7 +1055,7 @@ ActionMap *UserConfig::newIngameActionMap()
   * as fixed. This allows the input driver to discard the mapping and not
   * allow the user to use it.
   */
-bool UserConfig::isFixedInput(InputType type, int id0, int id1, int id2)
+bool UserConfig::isFixedInput(Input::InputType type, int id0, int id1, int id2)
 {
     for (int i = GA_FIRST_INGAME_FIXED; i <= GA_LAST_INGAME_FIXED; i++)
     {

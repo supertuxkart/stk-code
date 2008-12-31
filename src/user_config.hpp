@@ -225,7 +225,7 @@ public:
 	/** Clears the mapping for a given Player and KartAction. */
 	void clearInput(int, KartAction);
 	
-	bool isFixedInput(InputType, int, int, int);
+    bool isFixedInput(Input::InputType, int, int, int);
     const std::string& getWarning() {return m_warning;}
     void  resetWarning() {m_warning="";}
 	void  setWarning(std::string& warning) {m_warning=warning;}

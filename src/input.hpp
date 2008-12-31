@@ -17,28 +17,29 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_INPUT_H
-#define TUXKART_INPUT_H
+#ifndef HEADER_INPUT_HPP
+#define HEADER_INPUT_HPP
 
-enum AxisDirection {
-	AD_NEGATIVE,
-	AD_POSITIVE,
-	AD_NEUTRAL
-};
-
-enum InputType {
-	IT_NONE = 0,
-	IT_KEYBOARD,
-	IT_STICKMOTION,
-	IT_STICKBUTTON,
-	IT_STICKHAT,
-	IT_MOUSEMOTION,
-	IT_MOUSEBUTTON
-};
-const int IT_LAST = IT_MOUSEBUTTON;
 
 struct Input
 {
+    enum AxisDirection {
+        AD_NEGATIVE,
+        AD_POSITIVE,
+        AD_NEUTRAL
+    };
+
+    enum InputType {
+        IT_NONE = 0,
+        IT_KEYBOARD,
+        IT_STICKMOTION,
+        IT_STICKBUTTON,
+        IT_STICKHAT,
+        IT_MOUSEMOTION,
+        IT_MOUSEBUTTON
+    };
+    static const int IT_LAST = IT_MOUSEBUTTON;
+
     InputType type;
     int id0;
     int id1;

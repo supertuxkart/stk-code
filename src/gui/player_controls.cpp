@@ -166,8 +166,12 @@ PlayerControls::select()
 			
 		    m_edit_action = static_cast<KartAction>(selected - WTOK_LEFT);
 		    widget_manager->setWgtText(selected, _("Press key"));
-			
-            inputDriver->setMode(SDLDriver::INPUT_SENSE);
+            // Prefer axis (in case of gamepads that deliver two different
+            // events for buttons, e.g. a digital event and an anlogue one)
+            // for left/right, in all other cases prefer the button.
+            inputDriver->setMode( (selected==WTOK_RIGHT||selected==WTOK_LEFT)
+                                  ? SDLDriver::INPUT_SENSE_PREFER_AXIS
+                                  : SDLDriver::INPUT_SENSE_PREFER_BUTTON     );
 			
 			break;
 	}

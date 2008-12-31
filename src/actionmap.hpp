@@ -37,11 +37,11 @@ class ActionMap
     void putEntry(Input, GameAction);
 
     GameAction getEntry(Input);
-    GameAction getEntry(InputType, int, int, int);
+    GameAction getEntry(Input::InputType, int, int, int);
 
   private:
     inline Key key(Input);
-    Key key(InputType, int, int, int);
+    Key key(Input::InputType, int, int, int);
 
     std::map<Key, GameAction> inputMap;
 

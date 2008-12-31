@@ -37,7 +37,8 @@ public:
     enum InputDriverMode {
         MENU = 0,
         INGAME,
-        INPUT_SENSE,
+        INPUT_SENSE_PREFER_AXIS,
+        INPUT_SENSE_PREFER_BUTTON,
         LOWLEVEL,
         BOOTSTRAP
     };
@@ -45,31 +46,35 @@ public:
 private:
     class StickInfo {
 	public:
-		SDL_Joystick  *m_sdlJoystick;
-		std::string    m_id;
-  	    int            m_deadzone;
-		int            m_index;
-		AxisDirection *m_prevAxisDirections;
+		SDL_Joystick         *m_sdlJoystick;
+		std::string           m_id;
+  	    int                   m_deadzone;
+		int                   m_index;
+        Input::AxisDirection *m_prevAxisDirections;
 		StickInfo(int);
 		~StickInfo();
 	};   // Stickinfo
 
-	Input          *sensedInput;
-	ActionMap      *actionMap;
-	SDL_Surface    *mainSurface;
-	long            flags;
-	StickInfo     **stickInfos;
-	InputDriverMode mode;
+	Input          *m_sensed_input;
+    /** Stores the maximum sensed input values. This allows to select the
+     *  axis which was pushed the furthest when sensing input. */
+    int              m_max_sensed_input;
+    Input::InputType m_max_sensed_type;
+	ActionMap       *m_action_map;
+	SDL_Surface     *m_main_surface;
+	long             m_flags;
+	StickInfo      **m_stick_infos;
+	InputDriverMode  m_mode;
 	
 	/* Helper values to store and track the relative mouse movements. If these
 	* values exceed the deadzone value the input is reported to the game. This
   	* makes the mouse behave like an analog axis on a gamepad/joystick.
 	*/
-	int    mouseValX, mouseValY;
+	int    m_mouse_val_x, m_mouse_val_y;
 	
 	void   showPointer();
 	void   hidePointer();
-	void   input(InputType, int, int, int, int);
+    void   input(Input::InputType, int, int, int, int);
 public:
 	       SDLDriver();
           ~SDLDriver();
