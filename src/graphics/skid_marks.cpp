@@ -31,6 +31,7 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
     m_skid_state   = new ssgSimpleState();
     m_skid_state->ref();
     m_skid_state->enable(GL_BLEND);
+    m_skid_state->setShininess(0.0f);
     m_skid_marking = false;
     m_current      = -1;
 }   // SkidMark
