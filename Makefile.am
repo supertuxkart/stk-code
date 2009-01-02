@@ -1,10 +1,13 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = @BULLETTREE@ @ENETTREE@ src doc data
+SUBDIRS = $(BULLETTREE) $(ENETTREE) src doc data
 
-EXTRA_DIST = README README.cygwin README.macosx README.windows ChangeLog COPYING missing
+EXTRA_DIST = \
+ README.cygwin \
+ README.macosx \
+ README.windows
 
-pkgdatadir=$(datadir)/doc/@PACKAGE@
-pkgdata_DATA=AUTHORS ChangeLog COPYING README
+pkgdatadir=$(datadir)/doc/$(PACKAGE)
+dist_pkgdata_DATA=AUTHORS ChangeLog COPYING README
 # NEWS only contains "see changelog"
 # CHANGES only contains "see NEW"

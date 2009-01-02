@@ -22,7 +22,7 @@ Constantin Pelikan (conso)
 Additional Programming
 ----------------------
 
-Stepehen Dunn
+Stephen Dunn
 - Work on Audio
 
 Canarix
@@ -32,6 +32,7 @@ Damien
 - Ogg vorbis support
 
 Yann Leprince (sciyann)
+- Improved build system
 - Bug fixes
 
 Patrick Ammann

@@ -20,7 +20,7 @@
 #ifndef TRANSLATION_H
 #define TRANSLATION_H
 
-#ifdef HAS_GETTEXT
+#if ENABLE_NLS
 #  include <libintl.h>
 #  define _(String) gettext(String)
 #  define gettext_noop(String) String

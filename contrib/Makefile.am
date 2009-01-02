@@ -1,3 +1,0 @@
-# contrib/
-
-EXTRA_DIST = 

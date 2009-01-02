@@ -24,7 +24,7 @@
 Translations* translations=NULL;
 
 Translations::Translations() { 
-#ifdef HAS_GETTEXT
+#ifdef HAVE_GETTEXT
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.

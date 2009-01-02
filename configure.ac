@@ -3,15 +3,14 @@ dnl Process this file with autogen.sh to produce a configure script.
 AC_INIT(supertuxkart, SVN)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
-dnl Require at least automake 2.59
-AC_PREREQ(2.59)
+AC_PREREQ(2.61)
 
 dnl ================================================
 dnl Initialize the automake stuff
 dnl set the $host variable based on local machine/os
 dnl ================================================
-AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([tar-ustar])
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE([foreign tar-ustar])
 
 
 dnl =====================================================
@@ -20,7 +19,7 @@ dnl If these were not set, the AC_PROG_CC and AC_PROG_CXX
 dnl scripts set them to "-g -O2".
 dnl =====================================================
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
-CXXFLAGS="$CXXFLAGS -Wall -DHAS_GETTEXT"
+CXXFLAGS="$CXXFLAGS -Wall"
 
 dnl ===================
 dnl Check for compilers
@@ -28,26 +27,18 @@ dnl ===================
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+
+# This macro defines WORDS_BIGENDIAN if building for a big endian machine.
+# This is required by ov_read (Ogg Vorbis)
+AC_C_BIGENDIAN
+
+
 AC_LANG(C++)
 
-# Do a quick check to ensure the c++ compiler works
-AC_RUN_IFELSE([
-int main()  { return 0; }
-],[],
-[
-   echo
-   echo "Compiling a simple program failed, so something is broken with"
-   echo "the building process. Please check that your system is setup"
-   echo "so it can compile C++ code."
-   echo
-   echo "Configure aborted."
-   exit
-])
 
-dnl =============================================
-dnl Define debug which enables some cheats
-dnl This should be DISABLED when doing a release!
-dnl =============================================
+dnl ===========================
+dnl Check for `configure' flags
+dnl ===========================
 SUMMARY="\nSummary of optional components:\n==============================="
 
 if test "x$with_plib" != "x" ; then
@@ -55,9 +46,10 @@ if test "x$with_plib" != "x" ; then
    EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
 fi
 
-AC_ARG_ENABLE(debug, [  --enable-debug    Enable debugging info])
+AC_ARG_ENABLE(debug, [AS_HELP_STRING(--enable-debug,
+                                     [enable debugging info])])
 if test x$enable_debug = xyes; then
-    AC_DEFINE([DEBUG], [],  [Enable debugging cheats and shortcuts])
+    AC_DEFINE([DEBUG], [],  [enable debugging cheats and shortcuts])
     CFLAGS="$CFLAGS -g -pg"
     CXXFLAGS="$CXXFLAGS -g -pg"
     SUMMARY="$SUMMARY\nEnabled debugging, please disable for a release!!"
@@ -67,7 +59,8 @@ else
     SUMMARY="$SUMMARY\nDisabled debugging, asserts have been turned off"
 fi
 
-AC_ARG_ENABLE(optimization, [  --disable-optimization    Disable compiler optimizations],,
+AC_ARG_ENABLE(optimization, [AS_HELP_STRING(--disable-optimization,
+                                            [disable compiler optimizations])],,
     enable_optimization=yes)
 if test x$enable_optimization = xyes; then
     CFLAGS="$CFLAGS -O2"
@@ -88,23 +81,9 @@ dnl Check for MS Windows environment
 dnl ================================
 AC_CHECK_HEADER(windows.h)
 
-
-dnl ================================================
-dnl Add special compiler flags for certain platforms
-dnl ================================================
-case "${host}" in
-*darwin*|*macosx*)
-  LDFLAGS="$LDFLAGS -lintl"
-esac
-
-
 dnl ==================================
 dnl check for OpenGL related libraries
 dnl ==================================
-dnl We check for openal headers here, too - since otherwise
-dnl the test further down is even more complicated. This test
-dnl depends on the platform, since Macs are using OpenAL/al.h
-dnl instead of AL/al.h.
 case "${host}" in
 *darwin*|*macosx*)
     opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
@@ -140,67 +119,57 @@ esac
 dnl ========================================
 dnl check for OpenAL libraries
 dnl ========================================
-dnl FIXME: this all appears too complicated, doing unnecesary
-dnl        tests etc --> needs cleanup
-
-dnl The check for OpenAL headers depends on the OS, since 
-dnl Apple has the headers in OpenAL/al.h instead of AL/al.h 
-AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)   
-
-dnl We also check for ogg vorbis support now.
-dnl we have 4 sound libraries to check, first we check for OpenAL   
-if test x$have_al_lib = xyes; then
-  case "${host}" in
-    *darwin*|*macosx*)
-       AC_CHECK_HEADER(OpenAL/al.h, have_al_hdr=yes)
-       ;;
-    *)
-       AC_CHECK_HEADER(AL/al.h,     have_al_hdr=yes)
-       ;;
-  esac
-fi
-
-   if test x$have_al_hdr != xyes; then
-        echo ""
-        echo "You need to install OpenAL"
-        echo "Configure aborted"
-        echo ""
-        exit
-   fi
-
+save_LIBS=$LIBS
 
 case "${host}" in
+*darwin*|*macosx*)
+    LIBS="-framework OpenAL $LIBS"
+    have_al_lib=yes
+    ;;
 *)
-   dnl default unix style machines
-
-   dnl check for libraries
-   save_LIBS=$LIBS
-
-   dnl search for the libraries needed to use ogg vorbis
-   AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
-
-   if test x$have_vorbisfile_lib = xyes; then       
-       dnl check for the headers needed by ogg vorbis
-       AC_CHECK_HEADER(vorbis/vorbisfile.h, have_vorbisfile_hdr=yes)
-       AC_CHECK_HEADER(ogg/ogg.h, have_ogg_hdr=yes)
-   fi
-
-   SUMMARY="$SUMMARY\n"
-
-   openal_LIBS="$LIBS"
-   if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
-       AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
-       SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
-       # ov_read for ogg music needs endianness flag. This macro defines
-       # WORDS_BIGENDIAN if it's a big endian machine. See music_ogg.cpp
-   AC_C_BIGENDIAN
-   else
-       SUMMARY="$SUMMARY\nNo Ogg Vorbis support - the game will play with sound effects, but without music."
-       SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
-   fi
-
-   LIBS=$save_LIBS
+    AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)
+    ;;
 esac
+
+if test x$have_al_lib = xyes; then
+    # Apple has the headers in OpenAL/al.h instead of AL/al.h 
+    AC_CHECK_HEADERS([AL/al.h OpenAL/al.h], have_al_hdr=yes)
+fi
+
+if test x$have_al_hdr != xyes; then
+    AC_MSG_ERROR([[cannot find useable OpenAL installation. You need to install OpenAL.]])
+fi
+
+openal_LIBS="$LIBS"
+LIBS="$save_LIBS"
+
+# ====================
+# check for Ogg Vorbis
+# ====================
+
+save_LIBS=$LIBS
+
+dnl search for the libraries needed to use ogg vorbis
+AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
+
+if test x$have_vorbisfile_lib = xyes; then       
+    dnl check for the headers needed by ogg vorbis
+    AC_CHECK_HEADER(vorbis/vorbisfile.h, have_vorbisfile_hdr=yes)
+    AC_CHECK_HEADER(ogg/ogg.h, have_ogg_hdr=yes)
+fi
+SUMMARY="$SUMMARY\n"
+
+if test x$have_vorbisfile_hdr = xyes -a x$have_ogg_hdr = xyes; then
+    AC_DEFINE([HAVE_OGGVORBIS], 1, [Defined when Ogg Vorbis is available])
+    SUMMARY="$SUMMARY\nWe have Ogg Vorbis support."
+else
+    AC_MSG_ERROR([[cannot find useable Ogg Vorbis installation. You need to install libogg and libvorbis.]])
+    #SUMMARY="$SUMMARY\nNo Ogg Vorbis support - the game will play with sound effects, but without music."
+    #SUMMARY="$SUMMARY\nPlease install ogg vorbis!"
+fi
+
+oggvorbis_LIBS="$LIBS"
+LIBS=$save_LIBS
 
 # The following are C++ items that need to be tested for with the c++
 # compiler
@@ -211,7 +180,8 @@ AC_LANG_PUSH(C++)
 # Check for "plib" without which we cannot go on
 # ==============================================
 # specify the plib location
-AC_ARG_WITH(plib, [  --with-plib=PREFIX      Specify the prefix path to plib])
+AC_ARG_WITH(plib, [AS_HELP_STRING(--with-plib=PREFIX,
+                                  [specify the prefix path to plib])])
 if test "x$with_plib" != "x" ; then
    echo "plib prefix is $with_plib"
    EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
@@ -219,13 +189,7 @@ fi
 
 AC_CHECK_HEADER(plib/ul.h)
 if test "x$ac_cv_header_plib_ul_h" != "xyes"; then
-   echo
-   echo "You *must* have the plib library installed on your system to build!"
-   echo
-   echo "Please see README for more details."
-   echo
-   echo "configure aborted."
-   exit
+    AC_MSG_ERROR([[cannot find useable plib installation. You need to install plib 1.8.4 or newer.]])
 fi
 
 AC_MSG_CHECKING([for plib 1.8.4 or newer])
@@ -242,7 +206,7 @@ AC_TRY_RUN([
  ],
   AC_MSG_RESULT(yes),
   [ AC_MSG_RESULT(wrong version);
-    AC_MSG_ERROR([Install plib 1.8.4 or later first...])],
+    AC_MSG_ERROR([plib 1.8.4 or later is needed. Please intall it first.])],
   AC_MSG_RESULT(yes)
 )
 
@@ -281,40 +245,19 @@ case "${host}" in
      ],
       :,
         AC_MSG_WARN([Your SDL version uses deprecated
-    headers update to version 1.2.10 or higher if possible. Currently this
-    doesn't affects the game at all.])
+    headers. Please update to version 1.2.10 or higher if possible.
+    Currently this doesn't affects the game at all.])
     )
 
 esac
 
-dnl =======================================================
-dnl Add special compiler flags for SDL on certain platforms
-dnl =======================================================
-case "${host}" in
-*darwin*|*macosx*)
-  dnl SDL on Macs needs to link in SDLmain, since it includes the
-  dnl actual main program (on Macs #include "SDL/SDL.h" renames
-  dnl main into SDL_main, which then gets called from the new
-  dnl main program included in SDLmain. This is necessary to 
-  dnl install a proper framework for SDL).
-  dnl This can't be done earlier, since all SDL tests program
-  dnl from configure do NOT include SDL/SDL.h, therefore the 
-  dnl main program gets not replaced, and then getting an linking
-  dnl error about main defined twice :((
-  LDFLAGGS="$LDFLAGS -framework OpenAL"
-  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
-  if test x$have_sdl_config != xno; then
-    LDFLAGS="$LDFLAGS `sdl-config --libs`"
-    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
-  fi
-esac
 
 dnl ======================================================
 dnl Try to supply the SVN revision number for the compiler
 dnl ======================================================
 AC_CHECK_PROGS(have_svnversion,[svnversion],"no")
 if test x$have_svnversion != xno; then
-  SVNVERSION="`svnversion .`"
+  SVNVERSION="`svnversion $srcdir`"
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
@@ -328,7 +271,7 @@ dnl g++) triggers an optimisation problem with static_ssg:
 ORIGCXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS -fno-regmove"
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-	          AC_MSG_RESULT(yes); NOREGMOVE=-fno-regmove,
+                  AC_MSG_RESULT(yes); NOREGMOVE=-fno-regmove,
                   AC_MSG_RESULT(no);  NOREGMOVE="")
 CXXFLAGS="$ORIGCXXFLAGS"
 AC_SUBST(NOREGMOVE)
@@ -370,9 +313,32 @@ AC_EGREP_HEADER(MSG_MAXIOVLEN, /usr/include/sys/socket.h, AC_DEFINE(ENET_BUFFER_
 AC_EGREP_HEADER(MSG_MAXIOVLEN, socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
 
 enet_LIBS="-Lenet -lenet"
-SUMMARY="$SUMMARY\nUsing enet network support	."
+SUMMARY="$SUMMARY\nUsing enet network support."
 ENETTREE="src/enet"
 
+# Check for gettext
+CHECK_GETTEXT(external)
+
+dnl =======================================================
+dnl Add special compiler flags for SDL on certain platforms
+dnl =======================================================
+case "${host}" in
+*darwin*|*macosx*)
+  dnl SDL on Macs needs to link in SDLmain, since it includes the
+  dnl actual main program (on Macs #include "SDL/SDL.h" renames
+  dnl main into SDL_main, which then gets called from the new
+  dnl main program included in SDLmain. This is necessary to 
+  dnl install a proper framework for SDL).
+  dnl This can't be done earlier, since all SDL tests program
+  dnl from configure do NOT include SDL/SDL.h, therefore the 
+  dnl main program gets not replaced, and then getting an linking
+  dnl error about main defined twice :((
+  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
+  if test x$have_sdl_config != xno; then
+    LDFLAGS="$LDFLAGS `sdl-config --libs`"
+    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
+  fi
+esac
 
 # =========================
 # subst bars in Makefile.am
@@ -381,6 +347,7 @@ AC_SUBST(bullet_LIBS)
 AC_SUBST(enet_LIBS)
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
+AC_SUBST(oggvorbis_LIBS)
 AC_SUBST(sdl_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)
@@ -403,7 +370,7 @@ AC_CONFIG_FILES([                   \
  data/tracks/Makefile               \
  doc/Makefile                       \
  src/Makefile                       \
- src/robots/Makefile                \
+ src/ide/Makefile                   \
  src/bullet/Makefile                \
  src/bullet/src/Makefile            \
  src/bullet/Demos/OpenGL/Makefile   \
