@@ -74,7 +74,7 @@ private:
 	typedef struct 
 	{
 		int count;
-		Input *inputs;
+		Input inputs[4];
 	} InputMapEntry;
 		
     /** Filename of the user config file. */
@@ -87,7 +87,7 @@ private:
 	  * 
 	  * It is named after what is put in as values.
 	  */
-	InputMapEntry inputMap[GA_COUNT];
+	InputMapEntry m_input_map[GA_COUNT];
 
     void        setFilename      ();
     int         CheckAndCreateDir();
@@ -126,21 +126,21 @@ private:
 	 * 
 	 * This makes sure an input is not bound multiple times.
 	 */
-	void unsetDuplicates(GameAction, Input &);
+	void unsetDuplicates(GameAction, const Input &);
 	
 	/** Creates an GameAction->Input mapping with one Input */
-	void set(GameAction, Input);
+	void set(GameAction, const Input &);
 	
 	/** Creates an GameAction->Input mapping with two Inputs */
-	void set(GameAction, Input, Input);
+	void set(GameAction, const Input &, const Input &);
 	
 	/** Creates an GameAction->Input mapping with three Inputs */
-	void set(GameAction, Input, Input, Input);
+	void set(GameAction, const Input &, const Input &, const Input &);
 	
 	/** Creates an GameAction->Input mapping with four Inputs */
-	void set(GameAction, Input, Input, Input, Input);
+	void set(GameAction, const Input &, const Input &, const Input &, const Input &);
 
-	std::string getInputAsString(Input &);
+	std::string getInputAsString(const Input &);
 
 	/** Creates an ActionMap for the GameAction values of the specified
 	  * range.
@@ -152,7 +152,7 @@ private:
 	  *
 	  * For use when reading from file.
 	  */
-	void setInput(GameAction, Input &);
+	void setInput(GameAction, const Input &);
 
 public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
@@ -220,8 +220,10 @@ public:
 	  *
 	  * For use when sensing input.
 	  */
-	void setInput(int, KartAction, Input &);
-	
+	void setInput(int player_number, KartAction ka, const Input &i0);
+
+    const Input &getInput(int player_index, KartAction ka);
+
 	/** Clears the mapping for a given Player and KartAction. */
 	void clearInput(int, KartAction);
 	

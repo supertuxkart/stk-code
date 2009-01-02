@@ -137,7 +137,7 @@ void UserConfig::setDefaults()
     }
 
     // Clear every entry.
-    memset(inputMap, 0, sizeof(inputMap));
+    memset(m_input_map, 0, sizeof(m_input_map));
 
     /* general game input settings */
     set(GA_ENTER,
@@ -793,10 +793,10 @@ void UserConfig::writeInput(lisp::Writer *writer, const char *node,
 {
     writer->beginList(node);
 
-    if (inputMap[action].count)
+    if (m_input_map[action].count)
     {
 
-        const Input input = inputMap[action].inputs[0];
+        const Input input = m_input_map[action].inputs[0];
 
         if (input.type != Input::IT_NONE)
         {
@@ -843,7 +843,7 @@ void UserConfig::writeInput(lisp::Writer *writer, const char *node,
 }   // writeInput
 
 // -----------------------------------------------------------------------------
-std::string UserConfig::getInputAsString(Input &input)
+std::string UserConfig::getInputAsString(const Input &input)
 {
     char msg[MAX_MESSAGE_LENGTH];
     std::ostringstream stm;
@@ -886,11 +886,11 @@ std::string UserConfig::getInputAsString(Input &input)
 // -----------------------------------------------------------------------------
 std::string UserConfig::getMappingAsString(GameAction ga)
 {
-    if (inputMap[ga].count &&
-        inputMap[ga].inputs[0].type)
+    if (m_input_map[ga].count &&
+        m_input_map[ga].inputs[0].type)
     {
         std::stringstream s;
-        s << getInputAsString(inputMap[ga].inputs[0]);
+        s << getInputAsString(m_input_map[ga].inputs[0]);
 
         return s.str();
     }
@@ -908,7 +908,7 @@ std::string UserConfig::getMappingAsString(int playerIndex, KartAction ka)
 }   // getMappingAsString
 
 // -----------------------------------------------------------------------------
-void UserConfig::unsetDuplicates(GameAction ga, Input &i)
+void UserConfig::unsetDuplicates(GameAction ga, const Input &i)
 {
     for (int cga = GA_FIRST_KARTACTION; cga <= GA_LAST_KARTACTION; cga++)
     {
@@ -917,56 +917,53 @@ void UserConfig::unsetDuplicates(GameAction ga, Input &i)
             // If the input occurs in any other mapping
             // delete it properly from there.
 
-            if (inputMap[cga].count
-                && inputMap[cga].inputs[0].type == i.type
-                && inputMap[cga].inputs[0].id0 == i.id0
-                && inputMap[cga].inputs[0].id1 == i.id1
-                && inputMap[cga].inputs[0].id2 == i.id2)
+            if (m_input_map[cga].count
+                && m_input_map[cga].inputs[0].type == i.type
+                && m_input_map[cga].inputs[0].id0 == i.id0
+                && m_input_map[cga].inputs[0].id1 == i.id1
+                && m_input_map[cga].inputs[0].id2 == i.id2)
             {
                 // Delete it.
-                inputMap[cga].inputs[0].type = Input::IT_NONE;
+                m_input_map[cga].inputs[0].type = Input::IT_NONE;
             }
         }
     }
 }   // unsetDuplicates
 
 // -----------------------------------------------------------------------------
-void UserConfig::set(GameAction ga, Input i)
+void UserConfig::set(GameAction ga, const Input &i)
 {
-    inputMap[ga].count = 1;
-    inputMap[ga].inputs = new Input[1];
-    inputMap[ga].inputs[0] = i;
+    m_input_map[ga].count = 1;
+    m_input_map[ga].inputs[0] = i;
 }   // set(1 input)
 // -----------------------------------------------------------------------------
-void UserConfig::set(GameAction ga, Input i0, Input i1)
+void UserConfig::set(GameAction ga, const Input &i0, const Input &i1)
 {
-    inputMap[ga].count = 2;
-    inputMap[ga].inputs = new Input[2];
-    inputMap[ga].inputs[0] = i0;
-    inputMap[ga].inputs[1] = i1;
+    m_input_map[ga].count = 2;
+    m_input_map[ga].inputs[0] = i0;
+    m_input_map[ga].inputs[1] = i1;
 }   // set(2 inputs)
 // -----------------------------------------------------------------------------
-void UserConfig::set(GameAction ga, Input i0, Input i1, Input i2)
+void UserConfig::set(GameAction ga, const Input &i0, const Input &i1, const Input &i2)
 {
-    inputMap[ga].count = 3;
-    inputMap[ga].inputs = new Input[3];
-    inputMap[ga].inputs[0] = i0;
-    inputMap[ga].inputs[1] = i1;
-    inputMap[ga].inputs[2] = i2;
+    m_input_map[ga].count = 3;
+    m_input_map[ga].inputs[0] = i0;
+    m_input_map[ga].inputs[1] = i1;
+    m_input_map[ga].inputs[2] = i2;
 }   //set(3 inputs)
 // -----------------------------------------------------------------------------
-void UserConfig::set(GameAction ga, Input i0, Input i1, Input i2, Input i3)
+void UserConfig::set(GameAction ga, const Input &i0, const Input &i1, 
+                     const Input &i2, const Input &i3)
 {
-    inputMap[ga].count = 4;
-    inputMap[ga].inputs = new Input[4];
-    inputMap[ga].inputs[0] = i0;
-    inputMap[ga].inputs[1] = i1;
-    inputMap[ga].inputs[2] = i2;
-    inputMap[ga].inputs[3] = i3;
+    m_input_map[ga].count = 4;
+    m_input_map[ga].inputs[0] = i0;
+    m_input_map[ga].inputs[1] = i1;
+    m_input_map[ga].inputs[2] = i2;
+    m_input_map[ga].inputs[3] = i3;
 }   // set(4 inputs)
 
 // -----------------------------------------------------------------------------
-void UserConfig::setInput(GameAction ga, Input &input)
+void UserConfig::setInput(GameAction ga, const Input &input)
 {
     // Removes the input from all mappings where it occurs.
     unsetDuplicates(ga, input);
@@ -975,17 +972,28 @@ void UserConfig::setInput(GameAction ga, Input &input)
 }   // setInput
 
 // -----------------------------------------------------------------------------
-void UserConfig::setInput(int playerIndex, KartAction ka, Input &input)
+void UserConfig::setInput(int playerIndex, KartAction ka, const Input &input)
 {
     setInput((GameAction) (GA_FIRST_KARTACTION
-        + playerIndex * KC_COUNT + ka),
-        input);
+                            + playerIndex * KC_COUNT + ka),
+             input);
 }   // setInput
+
+// -----------------------------------------------------------------------------
+/** Returns a reference to the first entry in the user's input mapping.
+ *  \param player_index Index of player (starting with zero)
+ *  \param ka           Kart action for which the input is requested.
+ */
+const Input &UserConfig::getInput(int player_index, KartAction ka)
+{
+    return m_input_map[(GameAction) (GA_FIRST_KARTACTION
+                        + player_index * KC_COUNT + ka)].inputs[0];
+}   // getInput
 
 // -----------------------------------------------------------------------------
 void UserConfig::clearInput(int playerIndex, KartAction ka)
 {
-    inputMap[(GameAction) (GA_FIRST_KARTACTION + playerIndex * KC_COUNT + ka)]
+    m_input_map[(GameAction) (GA_FIRST_KARTACTION + playerIndex * KC_COUNT + ka)]
     .count = 0;
 }   // clearInput
 
@@ -996,9 +1004,9 @@ ActionMap *UserConfig::newActionMap(const int from, const int to)
 
     for (int i = from; i <= to; i++)
     {
-        const int count = inputMap[i].count;
+        const int count = m_input_map[i].count;
         for (int j = 0;j < count; j++)
-            am->putEntry(inputMap[i].inputs[j], (GameAction) i);
+            am->putEntry(m_input_map[i].inputs[j], (GameAction) i);
     }
 
     return am;
@@ -1042,9 +1050,9 @@ ActionMap *UserConfig::newIngameActionMap()
 
     for (int i = GA_FIRST_INGAME_FIXED; i <= GA_LAST_INGAME_FIXED; i++)
     {
-        const int count = inputMap[i].count;
+        const int count = m_input_map[i].count;
         for (int j = 0;j < count; j++)
-            am->putEntry(inputMap[i].inputs[j], (GameAction) i);
+            am->putEntry(m_input_map[i].inputs[j], (GameAction) i);
     }
 
     return am;
@@ -1059,12 +1067,12 @@ bool UserConfig::isFixedInput(Input::InputType type, int id0, int id1, int id2)
 {
     for (int i = GA_FIRST_INGAME_FIXED; i <= GA_LAST_INGAME_FIXED; i++)
     {
-        const int count = inputMap[i].count;
+        const int count = m_input_map[i].count;
         for (int j = 0;j < count; j++)
-            if (inputMap[i].inputs[j].type == type
-                && inputMap[i].inputs[j].id0 == id0
-                && inputMap[i].inputs[j].id1 == id1
-                && inputMap[i].inputs[j].id2 == id2)
+            if (m_input_map[i].inputs[j].type == type
+                && m_input_map[i].inputs[j].id0 == id0
+                && m_input_map[i].inputs[j].id1 == id1
+                && m_input_map[i].inputs[j].id2 == id2)
                 return true;
     }
 

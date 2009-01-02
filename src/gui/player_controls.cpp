@@ -245,11 +245,33 @@ void PlayerControls::handle(GameAction ga, int value)
 
 			break;
 		case GA_SENSE_COMPLETE:
-			// Updates the configuration with the newly sensed input.
-            user_config->setInput(m_player_index,
-								  m_edit_action,
-								  inputDriver->getSensedInput());
-			// Fall through to recover the widget labels.
+            {
+                // Updates the configuration with the newly sensed input.
+                const Input &new_input = inputDriver->getSensedInput();
+                // Don't use reference for old_input, otherwise old_input
+                // is changed when setInput is called.
+                const Input old_input = user_config->getInput(m_player_index, 
+                                                               m_edit_action);
+                user_config->setInput(m_player_index,
+                                      m_edit_action,
+                                      new_input);
+                // If left/right is set to a stick motion, and right/left is
+                // currently set to be something else
+                if(new_input.type == Input::IT_STICKMOTION &&
+                   new_input.id2 != Input::AD_NEUTRAL     &&
+                   old_input.type != Input::IT_STICKMOTION)
+                {
+                    Input inp(new_input);
+                    inp.id2 = (inp.id2==Input::AD_NEGATIVE) ? Input::AD_POSITIVE
+                                                            : Input::AD_NEGATIVE;
+                    user_config->setInput(m_player_index,
+                                          m_edit_action==KA_LEFT ? KA_RIGHT 
+                                                                 : KA_LEFT,
+                                          inp);
+                }
+
+                // Fall through to recover the widget labels.
+            }
 		case GA_SENSE_CANCEL:
             inputDriver->setMode(SDLDriver::MENU);
 		
