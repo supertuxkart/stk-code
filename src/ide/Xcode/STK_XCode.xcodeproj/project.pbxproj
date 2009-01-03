@@ -1627,12 +1627,7 @@
 			isa = PBXGroup;
 			children = (
 				95B0C9730EB69DCD001A0D06 /* src */,
-				95F423400E26E65B00692113 /* GLUT.framework */,
-				95F423380E26E59700692113 /* AGL.framework */,
-				95F423340E26E58E00692113 /* IOKit.framework */,
-				95F4232F0E26E58400692113 /* Carbon.framework */,
-				95F4231E0E26E44800692113 /* Cocoa.framework */,
-				95F423120E26E3DC00692113 /* OpenGL.framework */,
+				9513B40E0F0EDE80005D29F6 /* Frameworks */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				95E104FE0E28F65D00503124 /* bullet */,
 			);
@@ -1645,6 +1640,19 @@
 				95B0D4090EB6A160001A0D06 /* SuperTuxKart */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9513B40E0F0EDE80005D29F6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				95F423400E26E65B00692113 /* GLUT.framework */,
+				95F423380E26E59700692113 /* AGL.framework */,
+				95F423340E26E58E00692113 /* IOKit.framework */,
+				95F4232F0E26E58400692113 /* Carbon.framework */,
+				95F4231E0E26E44800692113 /* Cocoa.framework */,
+				95F423120E26E3DC00692113 /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		9515D8F30EC3CF59007F60D3 /* physics */ = {
@@ -3070,7 +3078,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_MODEL_TUNING = G5;
+				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = "$(HOME)/bin";
@@ -3108,7 +3116,8 @@
 					"-DHAS_INET_PTON=1",
 					"-DHAS_INET_NTOP=1",
 					"-DHAS_MSGHDR_FLAGS=1",
-					"-DHAS_GETTEXT=1",
+					"-DENABLE_NLS=1",
+					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
@@ -3143,7 +3152,7 @@
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_MODEL_TUNING = G5;
+				GCC_MODEL_TUNING = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -3180,7 +3189,11 @@
 					"-DHAS_INET_PTON=1",
 					"-DHAS_INET_NTOP=1",
 					"-DHAS_MSGHDR_FLAGS=1",
+					"-DENABLE_NLS=1",
+					"-DHAVE_GETTEXT=1",
+					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 				);
+				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
 					"-L/usr/local/lib",
 					"-lSDL",
@@ -3197,6 +3210,7 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
+					"-lintl",
 				);
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";
