@@ -955,7 +955,13 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         wheel_z_axis[i] = m_default_suspension_length[i]
                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-    kart_model->adjustWheels(m_wheel_rotation, m_controls.m_steer*30.0f,
+#define AUTO_SKID_VISUAL 1.7f
+    float auto_skid; 
+    if (m_skidding>AUTO_SKID_VISUAL) // Above a limit, start counter rotating the wheels to get drifting look 
+        auto_skid = m_controls.m_steer*30.0f*((AUTO_SKID_VISUAL - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
+    else
+        auto_skid = m_controls.m_steer*30.0f;
+    kart_model->adjustWheels(m_wheel_rotation, auto_skid,
                              wheel_z_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
