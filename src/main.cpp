@@ -537,12 +537,12 @@ int main(int argc, char *argv[] )
         // so this next call can't be in InitTuxkart. And InitPlib needs
         // config, which gets defined in InitTuxkart, so swapping those two
         // calls is not possible either ... so loadMaterial has to be done here :(
-        material_manager        -> loadMaterial       ();
-        kart_properties_manager -> loadKartData       ();
-        projectile_manager      -> loadData           ();
-        powerup_manager     -> loadPowerups   ();
-        item_manager         -> loadDefaultItems();
-        attachment_manager      -> loadModels         ();
+        material_manager        -> loadMaterial    ();
+        kart_properties_manager -> loadKartData    ();
+        projectile_manager      -> loadData        ();
+        powerup_manager         -> loadPowerups    ();
+        item_manager            -> loadDefaultItems();
+        attachment_manager      -> loadModels      ();
         scene = new Scene();
 
         //For some reason, calling this before the material loading screws

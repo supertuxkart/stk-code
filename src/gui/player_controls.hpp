@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PLAYERCONTROLS_H
-#define HEADER_PLAYERCONTROLS_H
+#ifndef HEADER_PLAYER_CONTROLS_HPP
+#define HEADER_PLAYER_CONTROLS_HPP
 
 #include <string>
 #include <SDL/SDL.h>

@@ -43,6 +43,7 @@
 #define CURRENT_CONFIG_VERSION   7
 
 #include <string>
+#include <map>
 #include <vector>
 #include "input.hpp"
 #include "player.hpp"
@@ -51,6 +52,7 @@
 #include "lisp/writer.hpp"
 
 class ActionMap;
+struct Input;
 
 /** Class for managing general STK user configuration data. */
 class UserConfig
@@ -68,7 +70,20 @@ public:
 	};
 
 private:
-			
+    // This class stores the last used input configuration (i.e. which action 
+    // is used for left, right, ..., look back) for a certain input
+    // device (i.e. keyboard, joystick, ...)
+    struct InputConfiguration
+    {
+        Input m_input[KC_COUNT];
+    };
+    // The mapping of input device name to the last used configuration.
+    // Note that std::map can not be used with Input[KC_COUNT] as 2nd
+    // parameter
+    std::map<std::string, InputConfiguration> m_last_input_configuration;
+
+    std::string getInputDeviceName(int player_index) const;
+
 	std::vector <StickConfig *> m_stickconfigs;
 			
 	typedef struct 
@@ -98,29 +113,34 @@ private:
     std::string m_warning;
 
 	void readStickConfigs(const lisp::Lisp *);
+    void readLastInputConfigurations(const lisp::Lisp *);
 
 	void writeStickConfigs(lisp::Writer *);
-			
+    void writeLastInputConfigurations(lisp::Writer *);
+
 	void readPlayerInput(const lisp::Lisp *,
                          const std::string& node,
 						 KartAction ka,
 						 int);
 
 	void writePlayerInput(lisp::Writer *,
-						  const char *,
+                          const std::string &node,
 						  KartAction,
 						  int);
 
 
-    void readInput(const lisp::Lisp *,
-                   const std::string &node,
-				   GameAction);
+    void readInputNode(const lisp::Lisp *,
+                       const std::string &node,
+				       GameAction);
 
-    void writeInput(lisp::Writer *,
-                    const char *,
-					GameAction);
-	
-	
+    Input readInput(const lisp::Lisp* nodeReader);
+
+    void writeInputNode(lisp::Writer *,
+                        const std::string &node,
+					    GameAction);
+
+	void writeInput(lisp::Writer *writer, const Input &input);
+
 	/** Iterates through the input mapping and unsets all
 	 * where the given input occurs.
 	 * 
@@ -222,7 +242,7 @@ public:
 	  */
 	void setInput(int player_number, KartAction ka, const Input &i0);
 
-    const Input &getInput(int player_index, KartAction ka);
+    const Input &getInput(int player_index, KartAction ka) const;
 
 	/** Clears the mapping for a given Player and KartAction. */
 	void clearInput(int, KartAction);

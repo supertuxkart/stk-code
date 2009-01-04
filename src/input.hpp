@@ -20,6 +20,7 @@
 #ifndef HEADER_INPUT_HPP
 #define HEADER_INPUT_HPP
 
+#include <string>
 
 struct Input
 {
@@ -84,6 +85,7 @@ struct Input
 	}
 };
 
+//FIXME: KartAction and Gameaction should probably go in their own files.
 //When adding any action at the beginning or at the end, remember to update
 //the KA_FIRST and/or KA_LAST constants.
 enum KartAction {
@@ -100,6 +102,15 @@ enum KartAction {
 const int KA_FIRST = KA_LEFT;
 const int KA_LAST = KA_LOOK_BACK;
 const int KC_COUNT = (KA_LAST + 1);
+static std::string KartActionStrings[KC_COUNT] = {std::string("left"), 
+                                                  std::string("right"),
+                                                  std::string("accel"),
+                                                  std::string("brake"),
+                                                  std::string("nitro"),
+                                                  std::string("drift"),
+                                                  std::string("rescue"),
+                                                  std::string("fire"),
+                                                  std::string("lookBack")};
 
 enum GameAction
 {

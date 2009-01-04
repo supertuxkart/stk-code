@@ -358,6 +358,11 @@ void UserConfig::loadConfig(const std::string& filename)
         (void)e;  // avoid warning about unreferenced local variable
         printf("Config file '%s' does not exist, it will be created.\n", 
                filename.c_str());
+        // This will initialise the last input configuration with the
+        // default values from the current (=default) player input
+        // device configuration.
+        readLastInputConfigurations(NULL);
+
         delete root;
         return;
     }
@@ -506,16 +511,24 @@ void UserConfig::loadConfig(const std::string& filename)
             }  // configFileVersion <= 4
 
             // Retrieves a player's INPUT configuration
-            readPlayerInput(reader, "left",     KA_LEFT,      i);
-            readPlayerInput(reader, "right",    KA_RIGHT,     i);
-            readPlayerInput(reader, "accel",    KA_ACCEL,     i);
-            readPlayerInput(reader, "brake",    KA_BRAKE,     i);
+            for(int ka=KA_FIRST; ka<=KA_LAST; ka++)
+            {
+                readPlayerInput(reader, KartActionStrings[ka],
+                    (KartAction)ka, i);
+            }
+            // Leave those in for backwards compatibility (i.e. config files
+            // with jump/wheelie). If jump/wheelie are not defined, nothing
+            // happens (the same input is read again).
             readPlayerInput(reader, nitro_name, KA_NITRO,     i);
             readPlayerInput(reader, drift_name, KA_DRIFT,     i);
-            readPlayerInput(reader, "rescue",   KA_RESCUE,    i);
-            readPlayerInput(reader, "fire",     KA_FIRE,      i);
-            readPlayerInput(reader, "lookBack", KA_LOOK_BACK, i);
         }   // for i < PLAYERS
+
+        // Read the last input device configurations. It is important that this
+        // happens after reading the player config, since if no last config
+        // is given, the last config is initialised with the current player
+        // config.
+        readLastInputConfigurations(lisp);
+
     }
     catch(std::exception& e)
     {
@@ -564,15 +577,65 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
 }   // readStickConfigs
 
 // -----------------------------------------------------------------------------
+/** Reads the last used configuration of an input device. If reader - NULL or
+ *  if no last-input-configuration node is contained in the config file, the
+ *  last input configuration will be initialised with the current player
+ *  configuration.
+ *  \param reader The lisp reader.
+ */
+void UserConfig::readLastInputConfigurations(const lisp::Lisp *reader)
+{
+    const lisp::Lisp* nodeReader = reader 
+                                 ? reader->getLisp("last-input-configurations")
+                                 : NULL;
+    // No last input configuration specified. Use the current player mappings
+    // to initialise this mapping.
+    if (!nodeReader)
+    {
+        for(unsigned int player_index=0; player_index<PLAYERS; player_index++)
+        {
+            for(int ka=KA_FIRST; ka<=KA_LAST; ka++)
+            {
+                const Input &inp = getInput(player_index, (KartAction)ka);
+                std::string device = getInputDeviceName(player_index);
+                if(device.size()>0)
+                    m_last_input_configuration[device].m_input[ka] = inp;
+            }   // for ka in KA_FIRST, ..., KA_LAST
+        }   // for player_index<PLAYERS
+        return;
+    }
+
+    int count;
+    nodeReader->get("count", count);
+    for(int i=0; i<count; i++)
+    {
+        std::ostringstream s;
+        s<<"index-"<<i;
+        const lisp::Lisp *node = nodeReader->getLisp(s.str());
+        if(!node) continue;
+        std::string device_name;
+        node->get("id", device_name);
+        for(int ka=KA_FIRST; ka<=KA_LAST; ka++)
+        {
+            const lisp::Lisp *action = node->getLisp(KartActionStrings[ka]);
+            if(!action) continue;
+            Input input = readInput(action);
+            m_last_input_configuration[device_name].m_input[ka] = input;
+        }   // for ka=KA_FIRST, KA_LAST
+    }   // for i<count
+
+}   // readLastInputConfigurations
+
+// -----------------------------------------------------------------------------
 void UserConfig::readPlayerInput(const lisp::Lisp *r, const std::string &node,
                                  KartAction ka, int playerIndex)
 {
-    readInput(r, node, (GameAction) (playerIndex * KC_COUNT + ka + GA_P1_LEFT));
+    readInputNode(r, node, (GameAction) (playerIndex * KC_COUNT + ka + GA_P1_LEFT));
 }   // readPlayerInput
 
 // -----------------------------------------------------------------------------
-void UserConfig::readInput(const lisp::Lisp* r, const std::string &node,
-                           GameAction action)
+void UserConfig::readInputNode(const lisp::Lisp* r, const std::string &node,
+                               GameAction action)
 {
     std::string inputTypeName;
 
@@ -583,7 +646,23 @@ void UserConfig::readInput(const lisp::Lisp* r, const std::string &node,
     // Every unused id variable *must* be set to
     // something different than -1. Otherwise
     // the restored mapping will not be applied.
+    Input input = readInput(nodeReader);
+
+    if (input.id0 != -1 && input.id1 != -1 && input.id2 != -1)
+    {
+        setInput(action, input);
+    }
+
+}   // readInputNode
+
+// -----------------------------------------------------------------------------
+Input UserConfig::readInput(const lisp::Lisp* nodeReader)
+{
+    // Every unused id variable *must* be set to
+    // something different than -1. Otherwise
+    // the restored mapping will not be applied.
     Input input = Input(Input::IT_NONE, -1, -1, -1);
+    std::string inputTypeName;
 
     nodeReader->get("type", inputTypeName);
     if (inputTypeName == "keyboard")
@@ -624,12 +703,7 @@ void UserConfig::readInput(const lisp::Lisp* r, const std::string &node,
         nodeReader->get("button", input.id0);
         input.id1 = input.id2 = 0;
     }
-
-    if (input.id0 != -1 && input.id1 != -1 && input.id2 != -1)
-    {
-        setInput(action, input);
-    }
-
+    return input;
 }   // readInput
 
 // -----------------------------------------------------------------------------
@@ -702,6 +776,7 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("server-port",      m_server_port);
 
         writeStickConfigs(writer);
+        writeLastInputConfigurations(writer);
 
         // Write unlock information back
         writer->beginList("unlock-info");
@@ -724,16 +799,11 @@ void UserConfig::saveConfig(const std::string& filename)
             writer->writeComment("optional");
             writer->write("lastKartId", m_player[i].getLastKartId());
 
-            writePlayerInput(writer, "left\t", KA_LEFT, i);
-            writePlayerInput(writer, "right\t", KA_RIGHT, i);
-            writePlayerInput(writer, "accel\t", KA_ACCEL, i);
-            writePlayerInput(writer, "brake\t", KA_BRAKE, i);
-            writePlayerInput(writer, "nitro\t", KA_NITRO, i);
-            writePlayerInput(writer, "drift\t", KA_DRIFT, i);
-            writePlayerInput(writer, "rescue\t", KA_RESCUE, i);
-            writePlayerInput(writer, "fire\t", KA_FIRE, i);
-            writePlayerInput(writer, "lookBack\t", KA_LOOK_BACK, i);
-
+            for(int ka=KA_FIRST; ka<=KA_LAST; ka++)
+            {
+                writePlayerInput(writer, KartActionStrings[ka]+"\t", 
+                                 (KartAction)ka, i);
+            }
             writer->endList(temp);
         }   // for i
 
@@ -781,65 +851,97 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
 }   // writeStickConfigs
 
 // -----------------------------------------------------------------------------
-void UserConfig::writePlayerInput(lisp::Writer *writer, const char *node,
+/** Saves the last configuration for each used input device to the player 
+ *  config file.
+ *  \param writer The config file writer object.
+ */
+void UserConfig::writeLastInputConfigurations(lisp::Writer *writer)
+{
+    writer->beginList("last-input-configurations");
+    writer->write("count\t", m_last_input_configuration.size());
+    std::map<std::string, InputConfiguration>::iterator i;
+    int index =0;
+    for(i =m_last_input_configuration.begin();
+        i!=m_last_input_configuration.end();
+        i++)
+    {
+        std::ostringstream s;
+        s<<"index-"<<index;
+        index++;
+        writer->beginList(s.str());
+        writer->write("id", i->first);
+        for(int ka=KA_FIRST; ka<=KA_LAST; ka++)
+        {
+            writer->beginList(KartActionStrings[ka]);
+            writeInput(writer, i->second.m_input[ka]);
+            writer->endList(KartActionStrings[ka]);
+        }   // for i
+        writer->endList(s.str());
+    }   // for i
+    writer->endList("last-input-configurations");
+}   // writeLastInputConfigurations
+
+// -----------------------------------------------------------------------------
+void UserConfig::writePlayerInput(lisp::Writer *writer, const std::string &node,
                                   KartAction ka, int playerIndex)
 {
-    writeInput(writer, node, (GameAction) (playerIndex * KC_COUNT + ka + GA_P1_LEFT));
+    writeInputNode(writer, node, (GameAction) (playerIndex * KC_COUNT + ka + GA_P1_LEFT));
 }   // writePlayerInput
 
 // -----------------------------------------------------------------------------
-void UserConfig::writeInput(lisp::Writer *writer, const char *node,
+void UserConfig::writeInputNode(lisp::Writer *writer, const std::string &node,
                             GameAction action)
 {
     writer->beginList(node);
 
     if (m_input_map[action].count)
     {
-
-        const Input input = m_input_map[action].inputs[0];
-
-        if (input.type != Input::IT_NONE)
-        {
-            switch (input.type)
-            {
-            case Input::IT_NONE:
-                break;
-            case Input::IT_KEYBOARD:
-                writer->write("type", "keyboard");
-                writer->write("key", input.id0);
-                break;
-            case Input::IT_STICKMOTION:
-                writer->write("type", "stickaxis");
-                writer->write("stick", input.id0);
-                writer->write("axis", input.id1);
-                writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
-                writer->write("direction", input.id2);
-                break;
-            case Input::IT_STICKBUTTON:
-                writer->write("type", "stickbutton");
-                writer->write("stick", input.id0);
-                writer->write("button", input.id1);
-                break;
-            case Input::IT_STICKHAT:
-                // TODO: Implement me
-                break;
-            case Input::IT_MOUSEMOTION:
-                writer->write("type", "mouseaxis");
-                writer->write("axis", input.id0);
-                writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
-                writer->write("direction", input.id1);
-                break;
-            case Input::IT_MOUSEBUTTON:
-                writer->write("type", "mousebutton");
-                writer->writeComment("0 is left, 1 is middle, 2 is right, 3 is wheel up, 4 is wheel down");
-                writer->writeComment("other values denote auxillary buttons");
-                writer->write("button", input.id0);
-                break;
-            }
-        }
+        writeInput(writer, m_input_map[action].inputs[0]);
     }
 
     writer->endList(node);
+}   // writeInputNode
+
+// -----------------------------------------------------------------------------
+void UserConfig::writeInput(lisp::Writer *writer, const Input &input)
+{
+    if (input.type == Input::IT_NONE) return;
+    switch (input.type)
+    {
+    case Input::IT_NONE:
+        break;
+    case Input::IT_KEYBOARD:
+        writer->write("type", "keyboard");
+        writer->write("key", input.id0);
+        break;
+    case Input::IT_STICKMOTION:
+        writer->write("type", "stickaxis");
+        writer->write("stick", input.id0);
+        writer->write("axis", input.id1);
+        writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
+        writer->write("direction", input.id2);
+        break;
+    case Input::IT_STICKBUTTON:
+        writer->write("type", "stickbutton");
+        writer->write("stick", input.id0);
+        writer->write("button", input.id1);
+        break;
+    case Input::IT_STICKHAT:
+        // TODO: Implement me
+        break;
+    case Input::IT_MOUSEMOTION:
+        writer->write("type", "mouseaxis");
+        writer->write("axis", input.id0);
+        writer->writeComment("0 is negative/left/up, 1 is positive/right/down");
+        writer->write("direction", input.id1);
+        break;
+    case Input::IT_MOUSEBUTTON:
+        writer->write("type", "mousebutton");
+        writer->writeComment("0 is left, 1 is middle, 2 is right, 3 is wheel up, 4 is wheel down");
+        writer->writeComment("other values denote auxillary buttons");
+        writer->write("button", input.id0);
+        break;
+    }
 }   // writeInput
 
 // -----------------------------------------------------------------------------
@@ -972,11 +1074,78 @@ void UserConfig::setInput(GameAction ga, const Input &input)
 }   // setInput
 
 // -----------------------------------------------------------------------------
-void UserConfig::setInput(int playerIndex, KartAction ka, const Input &input)
+/** Determines a name for a 'input configuration' (i.e. which input action 
+ *  triggers what kart action like left, right, ...). The result is the
+ *  name of the gamepad, "keyboard-"+keycode for left, or "mouse" (or "" if 
+ *  something else).
+ *  \param player_index Player index 0, ..., max
+ */
+std::string UserConfig::getInputDeviceName(int player_index) const
+{
+    std::string config_name;
+    const Input &left_input = getInput(player_index, KA_LEFT);
+    switch(left_input.type)
+    {
+    case Input::IT_KEYBOARD    : {   // config name: keyboard+player_index
+                                     std::ostringstream s;
+                                     s<<"keyboard-"<<left_input.id0; 
+                                     config_name = s.str();
+                                     break;
+                                 }
+    case Input::IT_STICKBUTTON :
+    case Input::IT_STICKHAT    :
+    case Input::IT_STICKMOTION : config_name=m_stickconfigs[left_input.id0]->m_id; 
+                                 break;
+    case Input::IT_MOUSEBUTTON :
+    case Input::IT_MOUSEMOTION : config_name="mouse"; break;
+    default                    : config_name="";      break;
+    }   // switch left_input.type
+    return config_name;
+}   // getInputDeviceName
+// -----------------------------------------------------------------------------
+void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
 {
     setInput((GameAction) (GA_FIRST_KARTACTION
-                            + playerIndex * KC_COUNT + ka),
+                            + player_index * KC_COUNT + ka),
              input);
+
+    // Now save the (complete) current configuration as the last used 
+    // configuration for the input device that is defined for the left
+    // action. First determine the name of the device, and then
+    // copy the configuration.
+    std::string device_name = getInputDeviceName(player_index);
+    if(device_name.size()==0) return;
+
+    // If left is set, grab the corresponding last used configuration:
+    if(ka==KA_LEFT)
+    {
+        if(m_last_input_configuration.find(device_name)!=m_last_input_configuration.end())
+        {
+            for(int i=KA_FIRST; i<=KA_LAST; i++)
+            {
+                Input last_inp = m_last_input_configuration[device_name].m_input[(KartAction)i];
+                if(last_inp.type==Input::IT_STICKBUTTON || 
+                   last_inp.type==Input::IT_STICKHAT    || 
+                   last_inp.type==Input::IT_STICKMOTION    )
+                {   // in case of joystick, adjust the joystick index - in case
+                    // that there are two joystickts with the same name
+                    last_inp.id0 = input.id0;
+                }
+                setInput((GameAction) (GA_FIRST_KARTACTION
+                            + player_index * KC_COUNT + i),
+                          last_inp                           );
+            }   // for i=KA_FIRST, KA_LAST
+        }   // if device_name found in last_input_configuration
+    }
+    else
+    {
+        // We change an entry (but not left) --> save as new 'last configuration'
+        for(int i=KA_FIRST; i<=KA_LAST; i++)
+        {
+            m_last_input_configuration[device_name].m_input[(KartAction)i] = 
+                getInput(player_index, (KartAction)i);
+        }   // for i=KA_FIRST, KA_LAST
+    }   // ka!=KA_LEFT
 }   // setInput
 
 // -----------------------------------------------------------------------------
@@ -984,7 +1153,7 @@ void UserConfig::setInput(int playerIndex, KartAction ka, const Input &input)
  *  \param player_index Index of player (starting with zero)
  *  \param ka           Kart action for which the input is requested.
  */
-const Input &UserConfig::getInput(int player_index, KartAction ka)
+const Input &UserConfig::getInput(int player_index, KartAction ka) const
 {
     return m_input_map[(GameAction) (GA_FIRST_KARTACTION
                         + player_index * KC_COUNT + ka)].inputs[0];
@@ -1034,7 +1203,7 @@ ActionMap *UserConfig::newIngameActionMap()
 
     GameAction gaEnd = GA_NULL;
 
-        switch (race_manager->getNumLocalPlayers())
+    switch (race_manager->getNumLocalPlayers())
     {
     case 1:
         gaEnd = GA_P1_LOOK_BACK; break;
