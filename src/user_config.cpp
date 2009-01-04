@@ -858,7 +858,8 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
 void UserConfig::writeLastInputConfigurations(lisp::Writer *writer)
 {
     writer->beginList("last-input-configurations");
-    writer->write("count\t", m_last_input_configuration.size());
+    std::string count = "count\t";
+    writer->write(count, (int)m_last_input_configuration.size());
     std::map<std::string, InputConfiguration>::iterator i;
     int index =0;
     for(i =m_last_input_configuration.begin();
