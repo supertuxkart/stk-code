@@ -99,15 +99,20 @@ Material::Material(const std::string& fname, char *description,
         m_clamp_tex    = parseBool (&description) ? UCLAMP : 0 ;
         m_clamp_tex   += parseBool (&description) ? VCLAMP : 0 ;
         
-        m_transparency = parseBool (&description);
-        m_alpha_ref    = parseFloat(&description);
-        m_lighting     = parseBool (&description);
-        m_sphere_map   = parseBool (&description);
-        m_friction     = parseFloat(&description);
-        m_ignore       = parseBool (&description);
-        m_zipper       = parseBool (&description);
-        m_resetter     = parseBool (&description);
-        m_collideable  = parseBool (&description);
+        m_transparency       = parseBool (&description);
+        m_alpha_ref          = parseFloat(&description);
+        m_lighting           = parseBool (&description);
+        m_sphere_map         = parseBool (&description);
+        m_friction           = parseFloat(&description);
+        m_ignore             = parseBool (&description);
+        m_zipper             = parseBool (&description);
+        m_resetter           = parseBool (&description);
+        m_collideable        = parseBool (&description);
+        m_max_speed_fraction = parseFloat(&description);
+        m_slowdown           = parseFloat(&description);
+        // Set the optional parameters.
+        if(m_max_speed_fraction <= 0.0f) m_max_speed_fraction = 1.0f;
+        if(m_slowdown           <= 0.0f) m_slowdown           = 50.0f;
     }
     install(is_full_path);
 }   // Material

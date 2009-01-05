@@ -326,11 +326,13 @@ void Kart::reset()
     m_rescue               = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
-    m_collected_energy     = 0;
+    m_collected_energy     = 50;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
+    m_max_speed_reduction  = 0.0f;
+    m_power_reduction      = 50.0f;
 
     m_controls.m_steer     = 0.0f;
     m_controls.m_accel     = 0.0f;
@@ -414,7 +416,7 @@ float Kart::getActualWheelForce()
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
-        if(m_speed <= m_max_speed*gear_ratio[i])
+        if(m_speed <= getMaxSpeed()*gear_ratio[i])
         {
             m_current_gear_ratio = gear_ratio[i];
             return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]+zipperF;
@@ -569,6 +571,7 @@ void Kart::update(float dt)
     TerrainInfo::update(pos_plus_epsilon);
 
     const Material* material=getMaterial();
+    m_power_reduction = 50.0f;
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
@@ -587,6 +590,18 @@ void Kart::update(float dt)
         // track again)
         if     (material->isReset()  && isOnGround()) forceRescue();
         else if(material->isZipper() && isOnGround()) handleZipper();
+        else
+        {
+            m_power_reduction = material->getSlowDown();
+            // Normal driving on terrain. Adjust for maximum terrain speed
+            float max_speed_here = material->getMaxSpeedFraction()*m_max_speed;
+            // If the speed is too fast, reduce the maximum speed gradually.
+            // The actual capping happens in updatePhysics
+            if(max_speed_here<m_speed)
+                m_max_speed_reduction += dt*material->getSlowDown();
+            else
+                m_max_speed_reduction = 0.0f;
+        }
     }   // if there is material
 
     // Check if any item was hit.
@@ -709,7 +724,9 @@ void Kart::updatePhysics (float dt)
         // wall, he needs to be able to start again quickly after going backwards)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
-
+        // Engine slow down due to terrain (see m_power_reduction is set in
+        // update() depending on terrain type.
+        engine_power *= m_power_reduction/50.0f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
         // Either all or no brake is set, so test only one to avoid
@@ -738,7 +755,7 @@ void Kart::updatePhysics (float dt)
             {
                 resetBrakes();
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
-                if ( fabs(m_speed) <  m_max_speed*m_max_speed_reverse_ratio )
+                if ( fabs(m_speed) <  getMaxSpeed()*m_max_speed_reverse_ratio )
                 {
                     // the backwards acceleration is artificially increased to allow
                     // players to get "unstuck" quicker if they hit e.g. a wall

@@ -55,6 +55,10 @@ protected:
     KartControl  m_controls;           // The position of the karts controls
 
     float        m_max_speed;          // maximum speed of the kart, computed from
+    /** Depending on terrain a certain reduction to the maximum speed applies.
+     *  This reduction is accumulated in m_max_speed_reduction. */
+    float        m_max_speed_reduction;
+    float        m_power_reduction;
     float        m_max_gear_rpm;       //maximum engine rpm's for the current gear
     float        m_max_speed_reverse_ratio;
     float        m_zipper_time_left;   // zipper time left
@@ -96,6 +100,7 @@ private:
     float               m_view_blocked_by_plunger;
     
     float               m_speed;
+
     float               m_rpm;
     float               m_current_gear_ratio;
     bool                m_rescue;
@@ -181,7 +186,8 @@ public:
                    getControls      () const {return m_controls;               }
     /** Sets the kart controls. Used e.g. by replaying history. */
     void           setControls(const KartControl &c) { m_controls = c;         }
-    float          getMaxSpeed      () const {return m_max_speed;              }
+    float          getMaxSpeed      () const {return m_max_speed-
+                                                     m_max_speed_reduction;    }
     /** Returns the length of the kart. */
     float          getKartLength    () const
                    {return m_kart_properties->getKartModel()->getLength();     }
