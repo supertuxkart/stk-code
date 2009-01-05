@@ -1124,6 +1124,9 @@ void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
         {
             for(int i=KA_FIRST; i<=KA_LAST; i++)
             {
+                // Don't use the stored value for KA_LEFT, otherwise it's not possible
+                // to change the left axis for a gamepad anymore.
+                if(i==KA_LEFT) continue;
                 Input last_inp = m_last_input_configuration[device_name].m_input[(KartAction)i];
                 if(last_inp.type==Input::IT_STICKBUTTON || 
                    last_inp.type==Input::IT_STICKHAT    || 
