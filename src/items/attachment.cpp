@@ -61,10 +61,6 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
     m_type           = _type;
     m_time_left      = time;
     m_previous_owner = current_kart;
-    
-    // debug code, DO NOT COMMIT!
-    m_type = ATTACH_PARACHUTE;
-    
 }   // set
 
 // -----------------------------------------------------------------------------
