@@ -509,7 +509,9 @@ void LinearWorld::rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info)
     // Reset the kart to the segment where the shortcut started
     
     // add one because 'moveKartAfterRescue' removes 1
-    kart_info.m_track_sector   = kart_info.m_last_valid_sector+1; 
+    kart_info.m_track_sector   = kart_info.m_last_valid_sector+1;
+    if(kart_info.m_track_sector>=(int)m_track->m_driveline.size())
+        kart_info.m_track_sector = 0;
     kart_info.m_race_lap =  kart_info.m_last_valid_race_lap;
     
     kart->doingShortcut();
