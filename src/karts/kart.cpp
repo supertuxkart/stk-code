@@ -326,7 +326,7 @@ void Kart::reset()
     m_rescue               = false;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
-    m_collected_energy     = 50;
+    m_collected_energy     = 0;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
     m_skidding             = 1.0f;
