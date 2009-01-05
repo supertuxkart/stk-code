@@ -605,7 +605,7 @@ void UserConfig::readLastInputConfigurations(const lisp::Lisp *reader)
         return;
     }
 
-    int count;
+    int count=0;
     nodeReader->get("count", count);
     for(int i=0; i<count; i++)
     {
@@ -858,8 +858,7 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
 void UserConfig::writeLastInputConfigurations(lisp::Writer *writer)
 {
     writer->beginList("last-input-configurations");
-    std::string count = "count\t";
-    writer->write(count, (int)m_last_input_configuration.size());
+    writer->write("count\t", (int)m_last_input_configuration.size());
     std::map<std::string, InputConfiguration>::iterator i;
     int index =0;
     for(i =m_last_input_configuration.begin();
