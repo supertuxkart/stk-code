@@ -16,12 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/clock.hpp"
-#include "modes/world.hpp"
-#include "audio/sound_manager.hpp"
+
+#include "stk_config.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "network/network_manager.hpp"
-#include "network/race_state.hpp"
 
 //-----------------------------------------------------------------------------
 TimedRace::TimedRace()

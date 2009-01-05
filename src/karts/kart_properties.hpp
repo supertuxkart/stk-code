@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#define _WINSOCKAPI_
 #include "plib/ssg.h"
 
 #include "race_manager.hpp"
