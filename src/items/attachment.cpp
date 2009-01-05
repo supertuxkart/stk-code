@@ -61,6 +61,10 @@ void Attachment::set(attachmentType _type, float time, Kart *current_kart)
     m_type           = _type;
     m_time_left      = time;
     m_previous_owner = current_kart;
+    
+    // debug code, DO NOT COMMIT!
+    m_type = ATTACH_PARACHUTE;
+    
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -124,6 +128,7 @@ void Attachment::hitBanana(const Item &item, int new_attachment)
     case 0: 
         set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
         m_initial_speed = m_kart->getSpeed();
+        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
         // if ( m_kart == m_kart[0] )
         //   sound -> playSfx ( SOUND_SHOOMF ) ;
         break ;
@@ -166,8 +171,7 @@ void Attachment::update(float dt)
         // Partly handled in Kart::updatePhysics
         // Otherwise: disable if a certain percantage of
         // initial speed was lost
-        if(m_kart->getSpeed()<=
-           m_initial_speed*stk_config->m_parachute_done_fraction)
+        if(m_kart->getSpeed() <= m_initial_speed*stk_config->m_parachute_done_fraction)
         {
             m_time_left = -1;
         }
