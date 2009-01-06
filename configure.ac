@@ -123,8 +123,16 @@ save_LIBS=$LIBS
 
 case "${host}" in
 *darwin*|*macosx*)
-    LIBS="-framework OpenAL $LIBS"
-    have_al_lib=yes
+    # search for OpenAL installed in a UNIX way first. This is necessary since OS X 10.4
+    # comes with an OpenAL framework that's too old, so to retain 10.4 support we need to
+    # build OpenAL from source, and can't use Apple's framework.
+    AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)
+    
+    # We couldn't find OpenAL installed the UNIX way, so fall back to using frameworks
+    if test x$have_al_lib != xyes; then
+        LIBS="-framework OpenAL $LIBS"
+        have_al_lib=yes
+    fi
     ;;
 *)
     AC_SEARCH_LIBS(alGenBuffers, [openal alut], have_al_lib=yes)
