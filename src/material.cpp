@@ -126,17 +126,19 @@ Material::~Material()
 //-----------------------------------------------------------------------------
 void Material::init(int index)
 {
-    m_index        = index ;
-    m_clamp_tex    = 0     ;
-    m_transparency = false ;
-    m_alpha_ref    = 0.1f  ;
-    m_lighting     = true  ;
-    m_sphere_map   = false ;
-    m_friction     = 1.0f  ;
-    m_ignore       = false ;
-    m_zipper       = false ;
-    m_resetter     = false ;
-    m_collideable  = true  ;
+    m_index              = index ;
+    m_clamp_tex          = 0     ;
+    m_transparency       = false ;
+    m_alpha_ref          = 0.1f  ;
+    m_lighting           = true  ;
+    m_sphere_map         = false ;
+    m_friction           = 1.0f  ;
+    m_ignore             = false ;
+    m_zipper             = false ;
+    m_resetter           = false ;
+    m_collideable        = true  ;
+    m_max_speed_fraction = 1.0f;
+    m_slowdown           = 50.0f;
 }
 
 //-----------------------------------------------------------------------------
