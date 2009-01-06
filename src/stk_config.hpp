@@ -68,7 +68,7 @@ public:
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
-    
+    float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */    
     bool  m_enable_networking;
     
     std::vector<float> 

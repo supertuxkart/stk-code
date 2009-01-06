@@ -107,6 +107,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
+    CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     m_kart_properties.checkAllSet(filename);
@@ -127,7 +128,7 @@ void STKConfig::init_defaults()
         m_zipper_force         = m_zipper_speed_gain         =
         m_explosion_impulse    = m_explosion_impulse_objects = 
         m_shortcut_length      = m_music_credit_time         =
-        m_delay_finish_time    =
+        m_delay_finish_time    = m_skid_fadeout_time         =
         UNDEFINED;
     m_max_karts                = -100;
     m_grid_order               = -100;
@@ -169,6 +170,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->getVector("scores",                 m_scores                   );
     lisp->get("max-history",                  m_max_history              );
     lisp->get("max-skidmarks",                m_max_skidmarks            );
+    lisp->get("skid-fadeout-time",            m_skid_fadeout_time        );
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->get("menu-background",              m_menu_background          );

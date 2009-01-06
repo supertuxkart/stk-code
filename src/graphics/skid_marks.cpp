@@ -23,6 +23,8 @@
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
 
+float SkidMarks::m_avoid_z_fighting  = 0.0f;
+const float SkidMarks::m_start_alpha = 0.5f;
 
 /** Initialises empty skid marks. */
 SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
@@ -68,6 +70,13 @@ void SkidMarks::reset()
  */
 void SkidMarks::update(float dt)
 {
+    float f = dt/stk_config->m_skid_fadeout_time;
+    for(int i=0; i<m_current; i++)
+    {
+        m_left[i]->fade(f);
+        m_right[i]->fade(f);
+    }
+
     if(m_skid_marking)
     {
         // Get raycast information
@@ -135,14 +144,21 @@ void SkidMarks::update(float dt)
     delta.normalize();
     delta *= m_width;
 
+    m_avoid_z_fighting += 0.001f;
+    if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
+
     SkidMarkQuads *smq_left = new SkidMarkQuads(raycast_left.m_contactPointWS,
                                          raycast_left.m_contactPointWS + delta,
-                                         m_skid_state);
+                                         m_skid_state, m_avoid_z_fighting);
     scene->add(smq_left);
+
+    m_avoid_z_fighting += 0.001f;
+    if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
     SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS
                                                   - delta,
                                                   raycast_right.m_contactPointWS,
-                                                  m_skid_state);
+                                                  m_skid_state,
+                                                  m_avoid_z_fighting);
     scene->add(smq_right);
     m_current++;
     if(m_current>=stk_config->m_max_skidmarks)
@@ -167,23 +183,57 @@ void SkidMarks::update(float dt)
 
 //=============================================================================
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
-                                        ssgSimpleState *state)
+                                        ssgSimpleState *state, float z_offset)
         : ssgVtxTable(GL_QUAD_STRIP,
                       new ssgVertexArray,
                       new ssgNormalArray,
                       new ssgTexCoordArray,
                       new ssgColourArray )
 {
+    m_z_offset = z_offset;
+    m_fade_out = 0.0f;
+    // If only one colours and/or normal is specified, it is used for
+    // all fertices in the table.
+    sgVec4 colour;
+    sgSetVec4(colour, 0.00f, 0.00f, 0.00f, SkidMarks::m_start_alpha);
+    colours->add(colour);
+    sgVec3 normal;
+    sgSetVec3(normal, 0, 0, 1);
+    normals->add(normal);
+    
     setState(state);
+    m_aabb_min = Vec3(10000);
+    m_aabb_max = Vec3(-10000);
     add(left, right);
 }   // SkidMarkQuads
 
 
 //-----------------------------------------------------------------------------
+/** Fades the current skid marks. 
+ *  \param f fade factor.
+ */
+void SkidMarks::SkidMarkQuads::fade(float f)
+{
+    m_fade_out += f;
+    // Only actually change the alpha value every 0.1. Otherwise we can't use
+    // display lists, which makes skid marks too slow
+    if(m_fade_out>0.1f)
+    {
+        float *c=colours->get(0);
+        c[3] -= m_fade_out;
+        if(c[3]<0.0f) c[3]=0.0f;
+        makeDList();
+        m_fade_out = 0.0f;
+    }
+}   // fade
+
+//-----------------------------------------------------------------------------
 void SkidMarks::SkidMarkQuads::recalcBSphere()
 {
-    bsphere.setRadius(1000.0f);
-    bsphere.setCenter(0, 0, 0);
+    Vec3 diff = m_aabb_max - m_aabb_min;
+    bsphere.setRadius(diff.length()*0.5f);
+    Vec3 center = (m_aabb_min + m_aabb_max)*0.5f;
+    bsphere.setCenter(center.toFloat());
 }   // recalcBSphere
 
 //-----------------------------------------------------------------------------
@@ -193,19 +243,15 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
     // too much with the track.
     sgVec3 l;
     sgCopyVec3(l, left.toFloat());
-    l[2]+=0.01f;
+    l[2]+=0.01f+m_z_offset;
     sgVec3 r;
     sgCopyVec3(r, right.toFloat());
     r[2]+=0.01f;
     vertices->add(l);
     vertices->add(r);
-    sgVec3 normal;
-    sgSetVec3(normal, 0, 0, 1);
-    normals->add(normal);normals->add(normal);
-    
-    sgVec4 colour;
-    sgSetVec4(colour, 0.00f, 0.00f, 0.00f, 0.5f);
-    colours->add(colour); colours->add(colour);
+    // Adjust the axis-aligned boundary boxes.
+    m_aabb_min.min(left);m_aabb_min.min(right);
+    m_aabb_max.max(left);m_aabb_max.max(right);
 
     dirtyBSphere();
 }   // add

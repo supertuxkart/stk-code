@@ -42,21 +42,35 @@ private:
                  /** Index of current (last added) skid mark quad. */
     int          m_current;
 
+                /** Initial alpha value. */
+    static const float m_start_alpha;
+
     class SkidMarkQuads : public ssgVtxTable
     {
+        /** Used to move skid marks at the same location slightly on
+         *  top of each other to avoid a 'wobbling' effect when sometines
+         *  the first and sometimes the 2nd one is drawn on top
+         */
+        float m_z_offset;
+        /** Fade out = alpha value. */
+        float m_fade_out;
+        /** For culling, we need the overall radius of the skid marks. We
+         *  approximate this by maintaining an axis-aligned boundary box. */
+        Vec3        m_aabb_min, m_aabb_max;
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
-                           ssgSimpleState *state);
+                           ssgSimpleState *state, float z_offset);
         void recalcBSphere();
         void add          (const Vec3 &left,
                            const Vec3 &right);
+        void fade         (float f);
     };  // SkidMarkQuads
 
     /** Two skidmark objects for the left and right wheel. */
     std::vector <SkidMarkQuads *> m_left, m_right;
     /** The state for colour etc. */
     ssgSimpleState               *m_skid_state;
-
+    static float m_avoid_z_fighting;
 public:
          SkidMarks(const Kart& kart, float width=0.2f);
         ~SkidMarks();
