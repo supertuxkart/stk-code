@@ -328,8 +328,13 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 
     int x = 5;
     int y;
-#define ICON_WIDTH 40
-#define ICON_PLAYER_WIDHT 50
+    int ICON_WIDTH=40;
+    int ICON_PLAYER_WIDTH=50;
+    if(user_config->m_height<600)
+    {
+        ICON_WIDTH        = 27;
+        ICON_PLAYER_WIDTH = 35;
+    }
 
     //glEnable(GL_TEXTURE_2D);
     Material *last_players_gst = 0;
@@ -344,15 +349,15 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         if(kart->isEliminated()) continue;
         const int position = kart->getPosition();
 
-        y = user_config->m_height*3/4-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDHT+2));
+        y = user_config->m_height*7/8-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
 
         GLfloat COLOR[] = {info[i].r, info[i].g, info[i].b, 1.0f};
-        font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDHT+x, y+5, COLOR);
+        font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDTH+x, y+5, COLOR);
         
         if(info[i].special_title.length() >0)
         {
             GLfloat const RED[] = { 1.0f, 0, 0, 1.0f};
-            font_race->PrintShadow(info[i].special_title.c_str(), 30, ICON_PLAYER_WIDHT+x, y+5, RED );
+            font_race->PrintShadow(info[i].special_title.c_str(), 30, ICON_PLAYER_WIDTH+x, y+5, RED );
         }
         
         glEnable(GL_CULL_FACE);
@@ -377,9 +382,9 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         if (kart -> isPlayerKart ())
         {
             glTexCoord2f ( 0, 0 ) ; glVertex2i ( x                  , y                   ) ;
-            glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_PLAYER_WIDHT, y                   ) ;
-            glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_PLAYER_WIDHT, y+ICON_PLAYER_WIDHT ) ;
-            glTexCoord2f ( 0, 1 ) ; glVertex2i ( x                  , y+ICON_PLAYER_WIDHT ) ;
+            glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_PLAYER_WIDTH, y                   ) ;
+            glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_PLAYER_WIDTH, y+ICON_PLAYER_WIDTH ) ;
+            glTexCoord2f ( 0, 1 ) ; glVertex2i ( x                  , y+ICON_PLAYER_WIDTH ) ;
         }
         else
         {
