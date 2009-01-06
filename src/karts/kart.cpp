@@ -801,7 +801,8 @@ void Kart::updatePhysics (float dt)
     }
     else if(m_skidding>1.0f)
     {
-        m_skidding *= m_kart_properties->getSkidDecrease();
+        m_skidding -= m_kart_properties->getSkidDecrease()
+                     *dt/m_kart_properties->getTimeTillMaxSkid();
         if(m_skidding<1.0f) m_skidding=1.0f;
     }
     if(m_skidding>1.0f)
