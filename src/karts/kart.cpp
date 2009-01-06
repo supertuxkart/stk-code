@@ -792,18 +792,23 @@ void Kart::updatePhysics (float dt)
 
     }
 #endif
-    if(m_controls.m_drift && fabs(m_controls.m_steer) > 0.001f && isOnGround() )
-    {
-        m_skidding +=  m_kart_properties->getSkidIncrease()
-                      *dt/m_kart_properties->getTimeTillMaxSkid();
-        if(m_skidding>m_kart_properties->getMaxSkid())
-            m_skidding=m_kart_properties->getMaxSkid();
+    if (isOnGround()){
+        if((fabs(m_controls.m_steer) > 0.001f) && m_controls.m_drift)
+        {
+            m_skidding +=  m_kart_properties->getSkidIncrease()
+                          *dt/m_kart_properties->getTimeTillMaxSkid();
+            if(m_skidding>m_kart_properties->getMaxSkid())
+                m_skidding=m_kart_properties->getMaxSkid();
+        }
+        else if(m_skidding>1.0f)
+        {
+            m_skidding *= m_kart_properties->getSkidDecrease();
+            if(m_skidding<1.0f) m_skidding=1.0f;
+        }
     }
-    else if(m_skidding>1.0f)
+    else
     {
-        m_skidding -= m_kart_properties->getSkidDecrease()
-                     *dt/m_kart_properties->getTimeTillMaxSkid();
-        if(m_skidding<1.0f) m_skidding=1.0f;
+        m_skidding = 1.0f; // Lose any skid factor as soon as we fly
     }
     if(m_skidding>1.0f)
     {

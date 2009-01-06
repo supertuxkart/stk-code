@@ -120,7 +120,7 @@ void SkidMarks::update(float dt)
     }
     // Currently no skid marking
     // -------------------------
-    if(!m_kart.getControls().m_drift) return;   // no skidmarking
+    if((!m_kart.getControls().m_drift) || (fabsf(m_kart.getControls().m_steer) < 0.001f)) return;   // no skidmarking
         
     // not turning enough, don't draw skidmarks if kart is going straight ahead
     // this is even stricter for Ai karts, since they tend to use LOTS of skidding
