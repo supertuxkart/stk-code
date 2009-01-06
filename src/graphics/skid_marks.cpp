@@ -96,6 +96,7 @@ void SkidMarks::update(float dt)
         // just stop doing skid marks as well. 
         // ---------------------------------------------------------
         if(!raycast_right.m_isInContact || !m_kart.getControls().m_drift ||
+            fabsf(m_kart.getControls().m_steer) < 0.001f                 ||
             delta.length2()<0.0001)
         {
             m_skid_marking = false;
