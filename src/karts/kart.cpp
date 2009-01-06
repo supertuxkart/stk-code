@@ -792,7 +792,7 @@ void Kart::updatePhysics (float dt)
 
     }
 #endif
-    if(m_controls.m_drift)
+    if(m_controls.m_drift && fabs(m_controls.m_steer) > 0.001f && isOnGround() )
     {
         m_skidding +=  m_kart_properties->getSkidIncrease()
                       *dt/m_kart_properties->getTimeTillMaxSkid();
