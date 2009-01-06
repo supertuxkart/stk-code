@@ -726,7 +726,7 @@ void Kart::updatePhysics (float dt)
             engine_power *= 5.0f;
         // Engine slow down due to terrain (see m_power_reduction is set in
         // update() depending on terrain type.
-        engine_power *= m_power_reduction/50.0f;
+        engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
         // Either all or no brake is set, so test only one to avoid

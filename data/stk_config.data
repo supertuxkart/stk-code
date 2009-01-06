@@ -15,6 +15,8 @@
  (max-history              10000)   ;; maximum number of history frames.
  (max-skidmarks              100)   ;; max. number of skidmarks per kart.
  (skid-fadeout-time           60)   ;; Time till skidm marks fade out
+ (slowdown-factor             10)   ;; Engine reduction depending on terrain, see
+                                    ;; kart for details.
  (delay-finish-time           10)   ;; delay till race results are displayed.
  (music-credit-time           10)   ;; time for which the music credits are displayed.
 

@@ -20,6 +20,7 @@
 #include "file_manager.hpp"
 #include "material.hpp"
 #include "string_utils.hpp"
+#include "stk_config.hpp"
 
 #define UCLAMP   1
 #define VCLAMP   2
@@ -111,8 +112,10 @@ Material::Material(const std::string& fname, char *description,
         m_max_speed_fraction = parseFloat(&description);
         m_slowdown           = parseFloat(&description);
         // Set the optional parameters.
-        if(m_max_speed_fraction <= 0.0f) m_max_speed_fraction = 1.0f;
-        if(m_slowdown           <= 0.0f) m_slowdown           = 50.0f;
+        if(m_max_speed_fraction <= 0.0f)
+            m_max_speed_fraction = 1.0f;
+        if(m_slowdown           <= 0.0f)
+            m_slowdown           = stk_config->m_slowdown_factor;
     }
     install(is_full_path);
 }   // Material
@@ -138,7 +141,7 @@ void Material::init(int index)
     m_resetter           = false ;
     m_collideable        = true  ;
     m_max_speed_fraction = 1.0f;
-    m_slowdown           = 50.0f;
+    m_slowdown           = stk_config->m_slowdown_factor;
 }
 
 //-----------------------------------------------------------------------------
