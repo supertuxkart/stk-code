@@ -186,13 +186,13 @@ Widget *RaceResultsGUI::displayKartList(Widget *w_prev, int *order, float horizo
                     current_kart->getPosition(), kart_name.c_str(), sTime);
         }
 
-        Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + kart_id, 7, 7,
+        Widget *image=widget_manager->addImgButtonWgt(WTOK_FIRST_IMAGE + kart_id, 5, 7,
                                        current_kart->getKartProperties()->getIconFile() );
         widget_manager->deactivateWgt(WTOK_FIRST_IMAGE+kart_id);
 
         image->setPosition(WGT_DIR_FROM_LEFT, horizontal, NULL, 
                            WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
-        Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + kart_id, 5, 7,
+        Widget *w=widget_manager->addTextWgt(WTOK_FIRST_RESULT + kart_id, 6, 7,
                                              (char*)(score + MAX_STR_LEN * i) );
         w->setPosition(WGT_DIR_RIGHT_WIDGET, 0.0f, image,
                        WGT_DIR_UNDER_WIDGET, 0.0f, w_prev);
