@@ -24,6 +24,7 @@
 #include "translation.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
+#include "track_manager.hpp"
 #include "karts/kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
@@ -135,13 +136,40 @@ ChallengeData::ChallengeData(const std::string& filename)
 }   // ChallengeData
 
 // ----------------------------------------------------------------------------
-void ChallengeData::error(const char *id)
+void ChallengeData::error(const char *id) const
 {
     char msg[MAX_ERROR_MESSAGE_LENGTH];
     snprintf(msg, sizeof(msg), "Undefined or incorrect value for '%s' in challenge file '%s'.",
              id, m_filename.c_str());
     throw std::runtime_error(msg);
 }   // error
+// ----------------------------------------------------------------------------
+/** Checks if this challenge is valid, i.e. contains a valid track or a valid
+ *  GP. If incorrect data are found, STK is aborted with an error message. 
+ *  (otherwise STK aborts when trying to do this challenge, which is worse).
+ */
+void ChallengeData::check() const
+{
+    if(m_major==RaceManager::MAJOR_MODE_SINGLE)
+    {
+        try
+        {
+            track_manager->getTrack(m_track_name);
+        }
+        catch(std::exception&)
+        {
+            error("track");
+        }
+    }
+    else if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        if(!grand_prix_manager->getGrandPrix(m_gp_id))
+        {
+            error("gp");
+        }
+    }
+}   // check
+
 // ----------------------------------------------------------------------------
 
 

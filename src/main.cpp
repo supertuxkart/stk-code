@@ -451,6 +451,8 @@ void InitTuxkart()
     grand_prix_manager      = new GrandPrixManager     ();
     network_manager         = new NetworkManager       ();
     track_manager->loadTrackList();
+    // Check needs GP and track manager.
+    unlock_manager->check();
     sound_manager->addMusicToTracks();
 
     stk_config->load(file_manager->getConfigFile("stk_config.data"));

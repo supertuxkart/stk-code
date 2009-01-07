@@ -45,11 +45,12 @@ private:
 
     std::string                    m_filename;
     void getUnlocks(const lisp::Lisp *lisp, const char* type, REWARD_TYPE reward);
-    void error(const char *id);
+    void error(const char *id) const;
 
 public:
                  ChallengeData(const std::string& filename);
     void         setRace() const;
+    virtual void check() const;
     virtual bool raceFinished();
     virtual bool grandPrixFinished();
 };   // ChallengeData

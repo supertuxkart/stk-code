@@ -53,6 +53,7 @@ public:
     void       unlockFeature      (Challenge* c, bool save=true);
     void       lockFeature        (Challenge* challenge);
     bool       isLocked           (const std::string& feature);
+    void       check              () const;
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;

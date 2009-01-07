@@ -129,6 +129,20 @@ void UnlockManager::addChallenge(const std::string& filename)
     addChallenge(new ChallengeData(filename));
 }   // addChallenge
 //-----------------------------------------------------------------------------
+/** Checks if all challenges are valid, i.e. contain a valid track or GP. 
+ *  If not, STK is aborted with an error message.
+ */
+void UnlockManager::check() const
+{
+    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
+                                    i!=m_all_challenges.end();  i++)
+    {
+        i->second->check();
+    }   // for i
+           
+}   // check
+
+//-----------------------------------------------------------------------------
 std::vector<const Challenge*> UnlockManager::getActiveChallenges()
 {
     computeActive();
