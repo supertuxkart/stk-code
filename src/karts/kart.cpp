@@ -311,7 +311,7 @@ void Kart::updatedWeight()
 void Kart::reset()
 {
     // If the kart was eliminated or rescued, the body was removed from the
-    // physics world. add it again.
+    // physics world. Add it again.
     if(m_eliminated || m_rescue)
     {
         RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);

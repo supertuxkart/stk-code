@@ -101,7 +101,6 @@ private:
     
     float               m_speed;
 
-    float               m_rpm;
     float               m_current_gear_ratio;
     bool                m_rescue;
     bool                m_eliminated;
