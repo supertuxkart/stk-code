@@ -64,7 +64,7 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
     // A parachute can be attached as result of the usage of an item. In this
     // case we have to save the current kart speed so that it can be detached
     // by slowing down.
-    if(m_type==POWERUP_PARACHUTE)
+    if(m_type==ATTACH_PARACHUTE)
     {
         m_initial_speed = m_kart->getSpeed();
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
