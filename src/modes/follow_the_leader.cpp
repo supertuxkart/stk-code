@@ -186,13 +186,4 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     delete []scores;
     delete []race_time;
 }
-//-----------------------------------------------------------------------------
-bool FollowTheLeaderRace::acceptPowerup(const int type) const
-{
-    // anvil makes no sense in FTL, the leader is supposed to stay first,
-    // you don't want to stop him
-    if(type == POWERUP_ANVIL) return false;
-    
-    return true;
-}
 

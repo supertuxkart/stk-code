@@ -38,7 +38,6 @@ public:
     virtual std::string getInternalCode() const;
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
-    virtual bool acceptPowerup(const int type) const;
     
     virtual bool raceHasLaps(){ return false; }
     
