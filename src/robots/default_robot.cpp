@@ -650,8 +650,10 @@ float DefaultRobot::steerToPoint(const sgVec2 point, float dt)
         theta, angle_2_point, m_body->getAngularVelocity().getZ(),
         radius, sin_steer_angle);
 #endif
-    if(sin_steer_angle <= -1.0f) return -getMaxSteerAngle()*m_skidding_threshold;
-    if(sin_steer_angle >=  1.0f) return  getMaxSteerAngle()*m_skidding_threshold;
+    // Add 0.1 since rouding errors will otherwise result in the kart
+    // not using drifting.
+    if(sin_steer_angle <= -1.0f) return -getMaxSteerAngle()*m_skidding_threshold-0.1f;
+    if(sin_steer_angle >=  1.0f) return  getMaxSteerAngle()*m_skidding_threshold+0.1f;
     float steer_angle     = asin(sin_steer_angle);    
     return steer_angle;
 }   // steerToPoint
