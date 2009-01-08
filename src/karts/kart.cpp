@@ -568,8 +568,21 @@ void Kart::update(float dt)
     //btVector3 pos_plus_epsilon (-54.449902, -139.99402, -3.4524240);
     // motionstate:               -52.449902, -139.99402, -3.6524241
     // collision object           -52.221024, -139.99614, -3.5276926
-    TerrainInfo::update(pos_plus_epsilon);
 
+    // Make sure that the ray doesn't hit the kart. This is done by
+    // resetting the collision filter group, so that this collision
+    // object is ignored during raycasting.
+    short int old_group = 0;
+    if(m_body->getBroadphaseHandle())
+    {
+        old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
+        m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
+    TerrainInfo::update(pos_plus_epsilon);
+    if(m_body->getBroadphaseHandle())
+    {
+        m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
+    }
     const Material* material=getMaterial();
     m_power_reduction = 50.0f;
     if (getHoT()==Track::NOHIT)   // kart falling off the track

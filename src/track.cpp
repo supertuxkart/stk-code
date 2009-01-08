@@ -1422,6 +1422,16 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
              {
                  m_material = ((TriangleMesh*)rayResult.m_collisionObject->getUserPointer())->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
              }
+             else
+             {
+                 // This can happen if the raycast hits a kart. This should 
+                 // actually be impossible (since the kart is removed from
+                 // the collision group), but now and again the karts don't
+                 // have the broadphase handle set (kart::update() for 
+                 // details), and it might still happen. So in this case
+                 // just ignore this callback and don't add it.
+                 return 1.0f;
+             }
              return btCollisionWorld::ClosestRayResultCallback::AddSingleResult(rayResult, 
                                                                                 normalInWorldSpace);
         }   // AddSingleResult
