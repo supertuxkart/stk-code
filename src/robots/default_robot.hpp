@@ -145,7 +145,7 @@ private:
     void  handleItems(const float DELTA, const int STEPS);
     void  handleRescue(const float DELTA);
     void  handleBraking();
-    void  handleNitro();
+    void  handleNitroAndZipper();
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);

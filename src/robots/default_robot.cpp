@@ -132,7 +132,7 @@ void DefaultRobot::update(float dt)
         return;
     }
 
-    if( RaceManager::getWorld()->isStartPhase() )
+    if( m_world->isStartPhase() )
     {
         handleRaceStart();
         AutoKart::update(dt);
@@ -168,7 +168,14 @@ void DefaultRobot::update(float dt)
     handleItems(dt, steps);
     handleRescue(dt);
     handleBraking();
-    handleNitro();
+    handleNitroAndZipper();
+    // If we are supposed to use nitro, but have a zipper, 
+    // use the zipper instead
+    if(m_controls.m_nitro && m_powerup.getType()==POWERUP_ZIPPER)
+    {
+        m_controls.m_nitro = false;
+        m_controls.m_fire  = true;
+    }
 
     /*And obviously general kart stuff*/
     AutoKart::update(dt);
@@ -347,71 +354,60 @@ void DefaultRobot::handleSteering(float dt)
 void DefaultRobot::handleItems( const float DELTA, const int STEPS )
 {
     m_controls.m_fire = false;
+    if(isRescue() || m_powerup.getType() == POWERUP_NOTHING ) return;
 
-    if(isRescue() )
+    m_time_since_last_shot += DELTA;
+
+    // Tactic 1: wait ten seconds, then use item
+    // -----------------------------------------
+    if(m_item_tactic==IT_TEN_SECONDS)
     {
+        if( m_time_since_last_shot > 10.0f )
+        {
+            m_controls.m_fire = true;
+            m_time_since_last_shot = 0.0f;
+        }
         return;
     }
-    
-    m_time_since_last_shot += DELTA;
-    if( m_powerup.getType() != POWERUP_NOTHING )
+
+    // Tactic 2: calculate
+    // -------------------
+    switch( m_powerup.getType() )
     {
-        switch( m_item_tactic )
+    case POWERUP_ZIPPER:
+        // Do nothing. Further up a zipper is used if nitro should be selected,
+        // saving the (potential more valuable nitro) for later
+        break;
+
+    case POWERUP_BUBBLEGUM:
+    case POWERUP_CAKE:
+        if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
         {
-        case IT_TEN_SECONDS:
-            if( m_time_since_last_shot > 10.0f )
-            {
-                m_controls.m_fire = true;
-                m_time_since_last_shot = 0.0f;
-            }
-            break;
-        case IT_CALCULATE:
-            switch( m_powerup.getType() )
-            {
-            case POWERUP_ZIPPER:
-                {
-                    const float ANGLE_DIFF = fabsf( normalizeAngle(
-                        m_track->m_angle[m_track_sector]-
-                        RAD_TO_DEGREE(getHPR().getHeading()) ) );
-
-                    if( m_time_since_last_shot > 10.0f && ANGLE_DIFF <
-                        15.0f && !m_crashes.m_road && STEPS > 8 )
-                    {
-                        m_controls.m_fire = true;
-                        m_time_since_last_shot = 0.0f;
-                    }
-                }
-                break;
-
-            case POWERUP_BUBBLEGUM:
-            case POWERUP_CAKE:
-                if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
-                {
-                    if( (getXYZ()-RaceManager::getKart(m_crashes.m_kart)->getXYZ() ).length_2d() >
-                        m_kart_length * 2.5f )
-                    {
-                        m_controls.m_fire = true;
-                        m_time_since_last_shot = 0.0f;
-                    }
-                }
-                break;
-
-            case POWERUP_BOWLING:
-            case POWERUP_PLUNGER:
-                if ( m_time_since_last_shot > 3.0f && m_crashes.m_kart != -1 )
-                {
-                    m_controls.m_fire = true;
-                    m_time_since_last_shot = 0.0f;
-                }
-                break;
-            default:
-                m_controls.m_fire = true;
-                m_time_since_last_shot = 0.0f;
-                return;
-            }
-            break;
+            const Vec3 diff = getXYZ() - 
+                              RaceManager::getKart(m_crashes.m_kart)->getXYZ();
+            m_controls.m_fire = diff.length_2d() > m_kart_length * 2.5f;
         }
+        break;
+
+    case POWERUP_BOWLING:
+    case POWERUP_PLUNGER:
+        m_controls.m_fire = m_time_since_last_shot > 3.0f && 
+                            m_crashes.m_kart != -1;
+        break;
+    case POWERUP_ANVIL:
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            m_controls.m_fire = m_world->getTime()<1.0f;
+        }
+        else
+        {
+            m_controls.m_fire = m_time_since_last_shot > 3.0f && 
+                                getPosition()>1;
+        }
+    default:
+        m_controls.m_fire = true;
     }
+    if(m_controls.m_fire)  m_time_since_last_shot = 0.0f;
     return;
 }   // handleItems
 
@@ -482,7 +478,7 @@ void DefaultRobot::handleRaceStart()
 void DefaultRobot::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(getSpeed()<2.0f && !isRescue() && !RaceManager::getWorld()->isStartPhase())
+    if(getSpeed()<2.0f && !isRescue() && !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
@@ -500,16 +496,22 @@ void DefaultRobot::handleRescue(const float DELTA)
 //-----------------------------------------------------------------------------
 /** Decides wether to use nitro or not.
  */
-void DefaultRobot::handleNitro()
+void DefaultRobot::handleNitroAndZipper()
 {
     m_controls.m_nitro = false;
     
-    // don't use nitro when has a plunger in the face!
+    // Don't use nitro when the AI has a plunger in the face!
     if(hasViewBlockedByPlunger()) return;
     
-    // Don't use nitro if the kart doesn't have any, is not on ground,
-    if(getEnergy()==0            || !isOnGround() || 
-       m_nitro_level==NITRO_NONE || hasFinishedRace() ) return;
+    // Don't use nitro if the kart doesn't have any or is not on ground.
+    if(!isOnGround() || hasFinishedRace()) return;
+    
+    // Don't compute nitro usage if we don't have nitro or are not supposed
+    // to use it, and we don't have a zipper or are not supposed to use
+    // it (calculated).
+    if( (getEnergy()==0                       || m_nitro_level==NITRO_NONE)  &&
+        (m_powerup.getType()!=POWERUP_ZIPPER  || m_item_tactic==IT_TEN_SECONDS) )
+        return;
 
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
@@ -585,7 +587,7 @@ void DefaultRobot::handleNitro()
             m_controls.m_nitro = true;
         }
     }
-}   // handleNitro
+}   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------
 float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
