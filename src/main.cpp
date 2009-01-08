@@ -388,7 +388,7 @@ int handleCmdLine(int argc, char **argv)
 	    else
             {
 	        printf("Profiling: %d seconds.\n",user_config->m_profile);
-                race_manager->setNumLaps   (999999); // profile end depends on time
+                race_manager->setNumLaps(999999); // profile end depends on time
             }
         }
         else if( !strcmp(argv[i], "--profile") )
@@ -600,7 +600,6 @@ int main(int argc, char *argv[] )
         {
             // Profiling
             // =========
-            race_manager->setLocalKartInfo(0, kart_properties_manager->getKart("tux")->getIdent());
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
