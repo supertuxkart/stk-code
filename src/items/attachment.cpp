@@ -54,13 +54,21 @@ Attachment::~Attachment()
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
-void Attachment::set(attachmentType _type, float time, Kart *current_kart)
+void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
-    m_holder->selectStep(_type);
-    m_type           = _type;
+    m_holder->selectStep(type);
+    m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;
+    // A parachute can be attached as result of the usage of an item. In this
+    // case we have to save the current kart speed so that it can be detached
+    // by slowing down.
+    if(m_type==POWERUP_PARACHUTE)
+    {
+        m_initial_speed = m_kart->getSpeed();
+        if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
+    }
 }   // set
 
 // -----------------------------------------------------------------------------
