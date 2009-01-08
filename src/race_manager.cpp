@@ -314,6 +314,15 @@ void RaceManager::exit_race()
             race_time[kart_id] = race_manager->getOverallTime(kart_id);
         }
         
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            // fill values for leader
+            position[0]  = -1;
+            scores[0]    = -1;
+            race_time[0] = -1; 
+            m_kart_status[0].m_gp_final_rank = -1;
+        }
+        
         //Bubblesort
         bool sorted;
         do
@@ -346,9 +355,10 @@ void RaceManager::exit_race()
         
         for(unsigned int i=start; i < NUM_KARTS; ++i)
         {
-            //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i);
-            m_kart_status[position[i]].m_gp_final_rank = i;
+            //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i-start);
+            m_kart_status[position[i]].m_gp_final_rank = i - start;
         }
+       // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_final_rank);
         delete []scores;
         delete []position;
         delete []race_time;
