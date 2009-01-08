@@ -159,6 +159,7 @@ void DefaultRobot::update(float dt)
         steps = calcSteps();
     }
 
+    computeNearestKarts();
     checkCrashes( steps, getXYZ() );
     findCurve();
 
@@ -380,24 +381,40 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
         break;
 
     case POWERUP_BUBBLEGUM:
-    case POWERUP_CAKE:
-        if( m_time_since_last_shot > 5.0f && m_crashes.m_kart != -1 )
-        {
-            const Vec3 diff = getXYZ() - 
-                              RaceManager::getKart(m_crashes.m_kart)->getXYZ();
-            m_controls.m_fire = diff.length_2d() > m_kart_length * 2.5f;
-        }
+        // Either use the bubble gum after 10 seconds, or if the next kart 
+        // behind is 'close' but not too close (too close likely means that the
+        // kart is not behind but more to the side of this kart and so won't 
+        // be hit by the bubble gum anyway). Should we check the speed of the
+        // kart as well? I.e. only drop if the kart behind is faster? Otoh 
+        // this approach helps preventing an overtaken kart to overtake us 
+        // again.
+        m_controls.m_fire = (m_distance_behind < 15.0f &&
+                               m_distance_behind > 3.0f   ) || 
+                            m_time_since_last_shot>10.0f;
+        if(m_distance_behind < 10.0f && m_distance_behind > 2.0f   )
+            m_distance_behind *= 1.0f;
         break;
-
+    // All the thrown/fired items might be improved by considering the angle
+    // towards m_kart_ahead. And some of them can fire backwards, too - which
+    // isn't yet supported for AI karts.
+    case POWERUP_CAKE:
+        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 20.0f) ||
+                             m_time_since_last_shot > 10.0f;
+        break;
     case POWERUP_BOWLING:
+        // Bowling balls are more slow, so only fire on closer karts
+        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 10.0f) ||
+                             m_time_since_last_shot > 10.0f;
+        break;
     case POWERUP_PLUNGER:
-        m_controls.m_fire = m_time_since_last_shot > 3.0f && 
-                            m_crashes.m_kart != -1;
+        // Plungers are faster, so allow more distance for shooting.
+        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 30.0f) ||
+                             m_time_since_last_shot > 10.0f;
         break;
     case POWERUP_ANVIL:
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_controls.m_fire = m_world->getTime()<1.0f;
+            m_controls.m_fire = m_world->getTime()<1.0f && getPosition()>2;
         }
         else
         {
@@ -410,6 +427,50 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
     if(m_controls.m_fire)  m_time_since_last_shot = 0.0f;
     return;
 }   // handleItems
+
+//-----------------------------------------------------------------------------
+/** Determines the closest karts just behind and in front of this kart. The
+ *  'closeness' is for now simply based on the position, i.e. if a kart is
+ *  more than one lap behind or ahead, it is not considered to be closest.
+ */
+void DefaultRobot::computeNearestKarts()
+{
+    bool need_to_check = false;
+    int my_position    = getPosition();
+    // See if the kart ahead has changed:
+    if( ( m_kart_ahead && m_kart_ahead->getPosition()+1!=my_position ) ||
+        (!m_kart_ahead && my_position>1                              )    )
+       need_to_check = true;
+    // See if the kart behind has changed:
+    if( ( m_kart_behind && m_kart_behind->getPosition()-1!=my_position   ) ||
+        (!m_kart_behind && my_position<(int)m_world->getCurrentNumKarts())    )
+        need_to_check = true;
+    if(!need_to_check) return;
+
+    m_kart_behind    = m_kart_ahead      = NULL;
+    m_distance_ahead = m_distance_behind = 9999999.9f;
+    float my_dist = m_world->getDistanceDownTrackForKart(getWorldKartId());
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    {
+        Kart *k = m_world->getKart(i);
+        if(k->isEliminated() || k==this) continue;
+        if(k->getPosition()==my_position+1) 
+        {
+            m_kart_behind = k;
+            m_distance_behind = my_dist - m_world->getDistanceDownTrackForKart(i);
+            if(m_distance_behind<0.0f)
+                m_distance_behind += m_track->getTrackLength();
+        }
+        else 
+            if(k->getPosition()==my_position-1)
+            {
+                m_kart_ahead = k;
+                m_distance_ahead = m_world->getDistanceDownTrackForKart(i) - my_dist;
+                if(m_distance_ahead<0.0f)
+                    m_distance_ahead += m_track->getTrackLength();
+            }
+    }   // for i<world->getNumKarts()
+}   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
 void DefaultRobot::handleAcceleration( const float DELTA )
@@ -530,7 +591,7 @@ void DefaultRobot::handleNitroAndZipper()
     // If this kart is the last kart, and we have enough 
     // (i.e. more than 2) nitro, use it.
     // -------------------------------------------------
-    const unsigned int num_karts = race_manager->getNumKarts();
+    const unsigned int num_karts = m_world->getCurrentNumKarts();
     if(getPosition()== (int)num_karts && getEnergy()>2.0f)
     {
         m_controls.m_nitro = true;
@@ -555,38 +616,27 @@ void DefaultRobot::handleNitroAndZipper()
     // A kart within this distance is considered to be overtaking (or to be
     // overtaken).
     const float overtake_distance = 10.0f;
-    for(unsigned int i=0; i<num_karts; i++)
+
+    // Try to overtake a kart that is close ahead, except 
+    // when we are already much faster than that kart
+    // --------------------------------------------------
+    if(m_kart_ahead                               && 
+        m_distance_ahead < overtake_distance      &&
+        m_kart_ahead->getSpeed()+5.0f > getSpeed()   )
     {
-        Kart *kart = RaceManager::getKart(i);
-        if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
-
-        float dist = m_world->getDistanceDownTrackForKart(i);
-
-        // Kart too far behind to be a risk
-        if(dist+overtake_distance<my_dist) continue;
-
-        // Kart too far ahead to try overtake
-        if(dist-overtake_distance>my_dist) continue;
-
-        // Kart behind might overtake this kart
-        // ------------------------------------
-        if(dist<my_dist)
-        {
-            // Kart behind is slower than this kart - no need to use nitro
-            if(kart->getSpeed() < getSpeed()) continue;
-
-            // Only prevent overtaking on highest level
-            m_controls.m_nitro = m_nitro_level==NITRO_ALL;
-            return;
-        }
-
-        // Now there is a kart close ahead, try overtaking
-        // -----------------------------------------------
-        if(kart->getSpeed()+5.0f > getSpeed())
-        {
             m_controls.m_nitro = true;
-        }
+            return;
     }
+
+    if(m_kart_behind                          &&
+        m_distance_behind < overtake_distance &&
+        m_kart_behind->getSpeed() > getSpeed()    )
+    {
+        // Only prevent overtaking on highest level
+        m_controls.m_nitro = m_nitro_level==NITRO_ALL;
+        return;
+    }
+    
 }   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------
@@ -861,24 +911,23 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
 //-----------------------------------------------------------------------------
 void DefaultRobot::reset()
 {
-    m_time_since_last_shot = 0.0f;
+    m_time_since_last_shot       = 0.0f;
     m_start_kart_crash_direction = 0;
-
-    m_sector      = Track::UNKNOWN_SECTOR;
-    m_inner_curve = 0;
-    m_curve_target_speed = getMaxSpeed();
-    m_curve_angle = 0.0;
-
-    m_future_location[0] = 0.0;
-    m_future_location[1] = 0.0;
-
-    m_future_sector = 0;
-    m_time_till_start = -1.0f;
-    m_crash_time = 0.0f;
-    m_collided = false;
-
-
-    m_time_since_stuck     = 0.0f;
+    m_sector                     = Track::UNKNOWN_SECTOR;
+    m_inner_curve                = 0;
+    m_curve_target_speed         = getMaxSpeed();
+    m_curve_angle                = 0.0;
+    m_future_location[0]         = 0.0;
+    m_future_location[1]         = 0.0;
+    m_future_sector              = 0;
+    m_time_till_start            = -1.0f;
+    m_crash_time                 = 0.0f;
+    m_collided                   = false;
+    m_time_since_stuck           = 0.0f;
+    m_kart_ahead                 = NULL;
+    m_distance_ahead             = 0.0f;
+    m_kart_behind                = NULL;
+    m_distance_behind            = 0.0f;
 
     AutoKart::reset();
 }   // reset

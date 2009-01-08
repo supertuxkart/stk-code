@@ -76,9 +76,6 @@ private:
                                       //that re too small to need special
                                       //handling.
     
-    float m_wheelie_check_dist; //How far to check for the space needed for
-                                //wheelies, in percentage. Used only when
-                                //m_use_wheelies == true.
     ItemTactic m_item_tactic; //How are items going to be used?
 
     /*General purpose variables*/
@@ -87,6 +84,19 @@ private:
     float m_crash_time;
     int   m_collided;           // true if the kart collided with the track
 
+    /** Pointer to the closest kart ahead of this kart. NULL if this
+     *  kart is first. */
+    Kart *m_kart_ahead;
+    /** Distance to the kart ahead. */
+    float m_distance_ahead;
+
+    /** Pointer to the closest kart behind this kart. NULL if this kart
+     *  is last. */
+    Kart *m_kart_behind;
+    /** Distance to the kard behind. */
+    float m_distance_behind;
+
+    /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
     int   m_future_sector;
     sgVec2 m_future_location;
@@ -146,6 +156,7 @@ private:
     void  handleRescue(const float DELTA);
     void  handleBraking();
     void  handleNitroAndZipper();
+    void  computeNearestKarts();
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
