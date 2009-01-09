@@ -404,15 +404,37 @@ void DefaultRobot::handleItems( const float DELTA, const int STEPS )
                              m_time_since_last_shot > 10.0f;
         break;
     case POWERUP_BOWLING:
-        // Bowling balls are more slow, so only fire on closer karts
-        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 10.0f) ||
-                             m_time_since_last_shot > 10.0f;
-        break;
+        {
+            // Bowling balls slower, so only fire on closer karts - but when
+            // firing backwards, the kart can be further away, since the ball
+            // acts a bit like a mine (and the kart is racing towards it, too)
+            bool fire_backwards = (m_kart_behind && m_kart_ahead && 
+                                   m_distance_behind < m_distance_ahead) ||
+                                  !m_kart_ahead;
+            float distance = fire_backwards ? m_distance_behind 
+                                            : m_distance_ahead;
+            m_controls.m_fire = (fire_backwards && distance < 30.0f)  || 
+                                (!fire_backwards && distance <10.0f)  ||
+                                m_time_since_last_shot > 10.0f;
+            if(m_controls.m_fire)
+                m_controls.m_look_back = fire_backwards;
+            break;
+        }
     case POWERUP_PLUNGER:
-        // Plungers are faster, so allow more distance for shooting.
-        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 30.0f) ||
-                             m_time_since_last_shot > 10.0f;
-        break;
+        {
+            // Plungers can be fired backwards and are faster,
+            // so allow more distance for shooting.
+            bool fire_backwards = (m_kart_behind && m_kart_ahead && 
+                                   m_distance_behind < m_distance_ahead) ||
+                                  !m_kart_ahead;
+            float distance = fire_backwards ? m_distance_behind 
+                                            : m_distance_ahead;
+            m_controls.m_fire = distance < 30.0f                 || 
+                                m_time_since_last_shot > 10.0f;
+            if(m_controls.m_fire)
+                m_controls.m_look_back = fire_backwards;
+            break;
+        }
     case POWERUP_ANVIL:
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
@@ -562,7 +584,9 @@ void DefaultRobot::handleRescue(const float DELTA)
 void DefaultRobot::handleNitroAndZipper()
 {
     m_controls.m_nitro = false;
-    
+    // If we are already very fast, save nitro.
+    if(getSpeed() > 0.95f*getMaxSpeed())
+        return;
     // Don't use nitro when the AI has a plunger in the face!
     if(hasViewBlockedByPlunger()) return;
     
@@ -601,13 +625,14 @@ void DefaultRobot::handleNitroAndZipper()
     }
 
     // On the last track shortly before the finishing line, use nitro 
-    // anyway. Since the kart is faster with nitro, estimate a 30% time
-    // decrease.
+    // anyway. Since the kart is faster with nitro, estimate a 50% time
+    // decrease (additionally some nitro will be saved when top speed
+    // is reached).
     if(m_world->getLapForKart(getWorldKartId())==race_manager->getNumLaps()-1 &&
         m_nitro_level == NITRO_ALL)
     {
         float finish = m_world->getEstimatedFinishTime(getWorldKartId());
-        if( 1.3f*getEnergy() >= finish - m_world->getTime() )
+        if( 1.5f*getEnergy() >= finish - m_world->getTime() )
         {
             m_controls.m_nitro = true;
             return;
