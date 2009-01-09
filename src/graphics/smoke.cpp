@@ -41,6 +41,7 @@ Smoke::Smoke(Kart* kart)
     m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
     m_smokepuff -> disable           ( GL_CULL_FACE ) ;
     m_smokepuff -> enable            ( GL_BLEND ) ;
+    m_smokepuff -> disable           ( GL_ALPHA_TEST ) ;
     m_smokepuff -> enable            ( GL_LIGHTING ) ;
     m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
     m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
