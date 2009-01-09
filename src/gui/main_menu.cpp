@@ -50,7 +50,6 @@ MainMenu::MainMenu()
     const bool challenges_active = all_challenges.size()>0 && network_manager->getMode()==NetworkManager::NW_NONE;
     
     const int WIDTH=30;
-    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, challenges_active ? 23 : 30 );
     widget_manager->addTextButtonWgt( WTOK_SINGLE, WIDTH, 7, _("Single Player") );
     widget_manager->addTextButtonWgt( WTOK_MULTI, WIDTH, 7, _("Splitscreen") );
 
@@ -66,13 +65,12 @@ MainMenu::MainMenu()
 
     if(user_config->getWarning()!="")
     {
-        widget_manager->addTextWgt( WTOK_WARNING, 80, 10, user_config->getWarning().c_str() );
+        widget_manager->addTextWgt( WTOK_WARNING, 80, 6, user_config->getWarning().c_str() );
         widget_manager->setWgtTextSize( WTOK_WARNING, WGT_FNT_SML );
         widget_manager->hideWgtRect(WTOK_WARNING);
-        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 17 );
     }
     else
-        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 27 );
+        widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 6 );
 
     widget_manager->addTextButtonWgt( WTOK_HELP, WIDTH, 7, _("Help") );
     widget_manager->setWgtTextSize( WTOK_HELP, WGT_FNT_SML );
@@ -80,6 +78,8 @@ MainMenu::MainMenu()
     widget_manager->addTextButtonWgt( WTOK_CREDITS, WIDTH, 7, _("Credits") );
     widget_manager->setWgtTextSize( WTOK_CREDITS, WGT_FNT_SML );
     
+    widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, WIDTH, 15 );
+
     widget_manager->activateWgt(WTOK_SINGLE);
     widget_manager->layout(WGT_AREA_ALL);
 }
