@@ -34,8 +34,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     float y_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getY();
     
     // if the kart is looking backwards, release from the back
-    PlayerKart* pk = dynamic_cast<PlayerKart*>(kart);
-    m_reverse_mode = (pk != NULL && pk->getCamera()->getMode() == Camera::CM_REVERSE);
+    m_reverse_mode = kart->getControls().m_look_back;
     
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;

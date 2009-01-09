@@ -118,16 +118,18 @@ void Camera::setMode(Mode mode)
     if(m_mode==CM_CLOSEUP)
         m_distance = 2.5f;
     else
-		{
-      m_distance = m_kart->getKartProperties()->getCameraDistance();
+    {
+        m_distance = m_kart->getKartProperties()->getCameraDistance();
 
-			// In 2 and 3 player mode we have a different FOV and would not see our
-			// kart at the default distance. We use 1.5 times the distance to fix that.
-	    const int num_players = race_manager->getNumPlayers();
-			if (num_players == 2 || num_players == 3)
-				m_distance += m_distance / 2;
-		}
+        // In 2 and 3 player mode we have a different FOV and would not see our
+        // kart at the default distance. We use 1.5 times the distance to fix that.
+        const int num_players = race_manager->getNumPlayers();
+        if (num_players == 2 || num_players == 3)
+            m_distance += m_distance / 2;
+    }
 }   // setMode
+
+// ----------------------------------------------------------------------------
 Camera::Mode Camera::getMode()
 {
     return m_mode;
@@ -187,7 +189,7 @@ void Camera::update (float dt)
     // --------------------------------------------
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
-    bool reverse = m_mode==CM_REVERSE || m_mode==CM_LEADER_MODE;
+    bool reverse = m_kart->getControls().m_look_back || m_mode==CM_LEADER_MODE;
     Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
 
     // Set the camera rotation

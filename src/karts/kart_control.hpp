@@ -32,24 +32,21 @@ public:
     bool  m_drift;
     bool  m_rescue;
     bool  m_fire;
+    bool  m_look_back;
 
     KartControl() : m_steer(0.0f), m_accel(0.0f), m_brake(false),
                     m_nitro(false), m_drift(false),  m_rescue(false), 
-                    m_fire(false)
+                    m_fire(false), m_look_back(false)
     {
     }
     // ------------------------------------------------------------------------
     /** Construct kart control from a Message (i.e. unserialise)             */
     KartControl(Message *m)
     {
-        m_steer  = m->getFloat();
-        m_accel  = m->getFloat();
-        char c   = m->getChar();
-        m_brake  = (c &  1) != 0;
-        m_nitro  = (c &  2) != 0;
-        m_drift  = (c &  4) != 0;
-        m_rescue = (c &  8) != 0;
-        m_fire   = (c & 16) != 0;
+        m_steer     = m->getFloat();
+        m_accel     = m->getFloat();
+        char c      = m->getChar();
+        setButtonsCompressed(c);
     }   // KartControl(Message*)
     // ------------------------------------------------------------------------
     /** Return the serialised size in bytes.                                 */
@@ -73,11 +70,12 @@ public:
     /** Compresses all buttons into a single integer value. */
     char getButtonsCompressed() const
     {
-        return  m_brake  ?  1 : 0
-              + m_nitro  ?  2 : 0
-              + m_drift  ?  4 : 0
-              + m_rescue ?  8 : 0
-              + m_fire   ? 16 : 0;
+        return  m_brake     ?  1 : 0
+              + m_nitro     ?  2 : 0
+              + m_drift     ?  4 : 0
+              + m_rescue    ?  8 : 0
+              + m_fire      ? 16 : 0
+              + m_look_back ? 32 : 0;
     }   // getButtonsCompressed
     // ------------------------------------------------------------------------
     /** Sets the buttons from a compressed representation.
@@ -85,11 +83,12 @@ public:
      */
     void setButtonsCompressed(char c)
     {
-        m_brake  = (c &  1) != 0;
-        m_nitro  = (c &  2) != 0;
-        m_drift  = (c &  4) != 0;
-        m_rescue = (c &  8) != 0;
-        m_fire   = (c & 16) != 0;
+        m_brake     = (c &  1) != 0;
+        m_nitro     = (c &  2) != 0;
+        m_drift     = (c &  4) != 0;
+        m_rescue    = (c &  8) != 0;
+        m_fire      = (c & 16) != 0;
+        m_look_back = (c & 32) != 0;
     }   // setButtonsCompressed
 };
 

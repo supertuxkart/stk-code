@@ -35,7 +35,6 @@ public:
         CM_CLOSEUP,       // Normal camera, closer to kart
         CM_DRIFTING,      // FIXME: drifting behind when accelerating = not yet implemented
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
-        CM_REVERSE,       // Camera is pointing backwards
         CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY
     };

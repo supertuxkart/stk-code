@@ -144,7 +144,7 @@ void PlayerKart::action(KartAction action, int value)
         m_controls.m_fire = (value!=0);
         break;
     case KA_LOOK_BACK:
-        m_camera->setMode(value!=0 ? Camera::CM_REVERSE : Camera::CM_NORMAL);
+        m_controls.m_look_back = (value!=0);
         break;
     case KA_DRIFT:
         m_controls.m_drift = (value!=0);
