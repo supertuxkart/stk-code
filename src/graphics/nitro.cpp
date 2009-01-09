@@ -71,7 +71,7 @@ void Nitro::particle_create(int, Particle *p)
     sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
     sgSetVec3(p->m_vel, 0, 0, 0 );
     sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
-    p->m_size         = 0.5f;
+    p->m_size         = 1.0f;
     p->m_time_to_live = 0.8f;
 
     Vec3 xyz       = m_kart->getXYZ();
