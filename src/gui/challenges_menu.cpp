@@ -48,6 +48,7 @@ ChallengesMenu::ChallengesMenu()
 
     widget_manager->addTextButtonWgt( WTOK_DESCRIPTION, 60, 30, "");
     widget_manager->deactivateWgt(WTOK_DESCRIPTION);
+    widget_manager->hideWgtRect(WTOK_DESCRIPTION);
     widget_manager->breakLine();
 
     widget_manager->addTextButtonWgt(WTOK_BACK, 50, 7,
