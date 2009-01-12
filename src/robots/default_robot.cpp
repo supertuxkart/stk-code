@@ -174,10 +174,18 @@ void DefaultRobot::update(float dt)
     handleNitroAndZipper();
     // If we are supposed to use nitro, but have a zipper, 
     // use the zipper instead
-    if(m_controls.m_nitro && m_powerup.getType()==POWERUP_ZIPPER)
+    if(m_controls.m_nitro && m_powerup.getType()==POWERUP_ZIPPER && 
+        getSpeed()>1.0f && m_zipper_time_left<=0)
     {
-        m_controls.m_nitro = false;
-        m_controls.m_fire  = true;
+        // Make sure that not all AI karts use the zipper at the same
+        // time in time trial at start up, so during the first 5 seconds
+        // this is done at random only.
+        if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_TIME_TRIAL ||
+            (m_world->getTime()<3.0f && rand()%50==1) )
+        {
+            m_controls.m_nitro = false;
+            m_controls.m_fire  = true;
+        }
     }
 
     /*And obviously general kart stuff*/
