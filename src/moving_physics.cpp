@@ -220,6 +220,7 @@ void MovingPhysics::reset()
     m_body->setCenterOfMassTransform(m_init_pos);
     m_body->setAngularVelocity(btVector3(0,0,0));
     m_body->setLinearVelocity(btVector3(0,0,0));
+    m_body->activate();
 }   // reset 
 
 // -----------------------------------------------------------------------------
