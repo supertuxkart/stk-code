@@ -10,7 +10,8 @@
 				    ;; points 1st, 0 is least points
 				    ;; 1st
  (title-music              "main_theme.music")
- (menu-background          "st_title_screen.rgb")
+ (mainmenu-background      "st_title_screen.rgb")
+ (menu-background          "menu_background.rgb")
  (game-style               "nitro") ;; "wheelie" or "nitro"
  (max-history              10000)   ;; maximum number of history frames.
  (max-skidmarks              100)   ;; max. number of skidmarks per kart.

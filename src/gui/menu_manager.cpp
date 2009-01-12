@@ -121,6 +121,12 @@ void MenuManager::pushMenu(MenuManagerIDs id)
 }
 
 //-----------------------------------------------------------------------------
+const bool MenuManager::isMainMenuActive() const
+{
+    return m_menu_stack[ m_menu_stack.size()-1 ].first == MENUID_MAINMENU;
+}
+
+//-----------------------------------------------------------------------------
 void MenuManager::popMenu()
 {
     m_back_sound->play();

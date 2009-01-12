@@ -61,9 +61,13 @@ MainLoop::~MainLoop()
  */
 void MainLoop::run()
 {
-    const GLuint TITLE_SCREEN_TEXTURE = 
+    static const GLuint TITLE_SCREEN_TEXTURE = 
+        material_manager->getMaterial(stk_config->m_mainmenu_background)->getState()->getTextureHandle();
+    
+    static const GLuint MENUS_BG_TEXTURE = 
         material_manager->getMaterial(stk_config->m_menu_background)->getState()->getTextureHandle();
-       
+
+    
     bool music_on = false;
     m_curr_time = SDL_GetTicks();
     float dt;
@@ -181,9 +185,16 @@ void MainLoop::run()
 //                usleep(2000);
         #endif
 
+            
+            
+            
             //Draw the splash screen
-            glBindTexture(GL_TEXTURE_2D,TITLE_SCREEN_TEXTURE);
-
+            
+            if(menu_manager->isMainMenuActive())
+                glBindTexture(GL_TEXTURE_2D, TITLE_SCREEN_TEXTURE);
+            else 
+                glBindTexture(GL_TEXTURE_2D, MENUS_BG_TEXTURE);
+            
             glBegin ( GL_QUADS ) ;
             glColor3f   (1, 1, 1 ) ;
             glTexCoord2f(0, 0); glVertex2i(-1, -1);

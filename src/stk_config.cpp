@@ -89,6 +89,11 @@ void STKConfig::load(const std::string &filename)
         fprintf(stderr,"No menu background defined in stk_config");
         exit(-1);
     }
+    if(m_mainmenu_background.size()==0)
+    {
+        fprintf(stderr,"No mainmenu background defined in stk_config");
+        exit(-1);
+    }
     CHECK_NEG(m_max_karts,                 "max-karts"                  );
     CHECK_NEG(m_grid_order,                "grid-order"                 );
     CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
@@ -177,6 +182,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->get("menu-background",              m_menu_background          );
+    lisp->get("mainmenu-background",          m_mainmenu_background          );
     lisp->get("enable_networking",            m_enable_networking        );
     std::string title_music;
     lisp->get("title-music",                  title_music                );

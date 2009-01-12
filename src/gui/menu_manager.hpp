@@ -92,7 +92,8 @@ public:
     BaseGUI* getCurrentMenu() const {return m_current_menu;}
     RaceGUI* getRaceMenu   () const {return (RaceGUI*)m_RaceGUI;}
     void     update();
-
+    const bool isMainMenuActive() const;
+    
 private:
     std::vector< std::pair<MenuManagerIDs, int> > 
              m_menu_stack;

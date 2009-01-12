@@ -81,8 +81,10 @@ public:
     MusicInformation 
          *m_title_music;             /**<Filename of the title music to play.*/
     std::string 
-          m_menu_background;         /**<Picture used as menu background.    */
-
+          m_mainmenu_background;     /**<Picture used as menu background.    */
+    std::string 
+          m_menu_background;         /**<Picture used as background for other menus.    */
+    
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {};
     void init_defaults    ();
