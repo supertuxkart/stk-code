@@ -67,7 +67,7 @@ Kart* RaceManager::getKart(const unsigned int n)
  */
 RaceManager::RaceManager()
 {
-    m_num_karts          = user_config->m_karts;
+    m_num_karts          = user_config->getDefaultNumKarts();
     m_difficulty         = RD_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_QUICK_RACE;

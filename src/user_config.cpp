@@ -113,7 +113,10 @@ void UserConfig::setDefaults()
     m_prev_windowed     = false;
     m_crashed           = false;
     m_blacklist_res.clear();
-    m_karts             = 4;
+    m_num_karts         = 4;
+    m_num_laps          = 4;
+    m_difficulty        = 0;
+    m_background_index  = 0;
     m_log_errors        = false;
     m_kart_group        = "standard";
     m_track_group       = "standard";
@@ -448,12 +451,17 @@ void UserConfig::loadConfig(const std::string& filename)
         // blacklisted resolutions
         lisp->getVector("blacklisted_resolutions", 
                                       m_blacklist_res);
-        /*get number of karts*/
-        lisp->get("karts",            m_karts);
+        /*Get default number of karts, number of laps, and difficulty. */
+        lisp->get("karts",            m_num_karts);
+        lisp->get("laps",             m_num_laps);
+        lisp->get("difficulty",       m_difficulty);
 
         lisp->get("kart-group",       m_kart_group);
         lisp->get("track-group",      m_track_group);
         lisp->get("last-track",       m_last_track);
+
+        // Get background image index.
+        lisp->get("background",       m_background_index);
 
         // Handle loading the stick config in it own method.
         readStickConfigs(lisp);
@@ -763,14 +771,20 @@ void UserConfig::saveConfig(const std::string& filename)
                                           m_blacklist_res);
         writer->write("fullscreen\t",     m_fullscreen);
 
-        writer->writeComment("number of karts. -1 means use all");
-        writer->write("karts\t",          m_karts);
+        writer->writeComment("Number of karts. -1 means use all");
+        writer->write("karts\t",          m_num_karts);
+        writer->writeComment("Number of laps.");
+        writer->write("laps\t",            m_num_laps);
+        writer->writeComment("Difficulty: 0=easy, 1=medium, 2=hard");
+        writer->write("difficulty\t",     m_difficulty);
         writer->writeComment("Last selected kart group");
         writer->write("kart-group",       m_kart_group);
         writer->writeComment("Last selected track group");
         writer->write("track-group",      m_track_group);
         writer->writeComment("Last track played");
         writer->write("last-track",       m_last_track);
+        writer->writeComment("Menu background image to use");
+        writer->write("background",       m_background_index);
         writer->writeComment("Information about last server used");
         writer->write("server-address",   m_server_address);
         writer->write("server-port",      m_server_port);

@@ -28,12 +28,14 @@ private:
     int m_min_karts;         // minimum number of karts, depending on mode etc.
     int m_num_laps;
     const char *getDifficultyString(int) const;
+    void setAllValues();
 public:
     RaceOptions();
     ~RaceOptions();
 
     void select();
     void update(float dt);
+    virtual void handle(GameAction, int);
 };
 
 #endif

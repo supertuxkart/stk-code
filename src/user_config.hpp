@@ -111,6 +111,15 @@ private:
     int         m_sfx;
     int         m_music;
     std::string m_warning;
+    /** Default number of karts. */
+    int         m_num_karts;
+    /** Default number of laps. */
+    int         m_num_laps;
+    /** Default difficulty. */
+    int         m_difficulty;
+
+    /** Index of current background image. */
+    int         m_background_index;
 
 	void readStickConfigs(const lisp::Lisp *);
     void readLastInputConfigurations(const lisp::Lisp *);
@@ -206,7 +215,6 @@ public:
     bool		m_prev_windowed;
     bool		m_crashed;
     std::vector<std::string> m_blacklist_res;
-    int         m_karts;
     Player      m_player[PLAYERS];
     bool        m_log_errors;
 
@@ -214,10 +222,33 @@ public:
     UserConfig(const std::string& filename);
     ~UserConfig();
     void setDefaults();
-    void setMusic(int m)     { m_music        =  m;        }
-    void setSFX  (int m)     { m_sfx          =  m;        }
-    bool doMusic() const     { return m_music == UC_ENABLE;}
-    bool doSFX()   const     { return m_sfx   == UC_ENABLE;}
+    void setMusic(int m)                  { m_music        =  m;        }
+    void setSFX  (int m)                  { m_sfx          =  m;        }
+    bool doMusic() const                  { return m_music == UC_ENABLE;}
+    bool doSFX()   const                  { return m_sfx   == UC_ENABLE;}
+    /** Sets the default number of karts. This is only used to store
+     *  this number in the user config file as a default next time. */
+    void setDefaultNumKarts(int n)        { m_num_karts = n;            }
+    /** Returns the default number of karts. */
+    int  getDefaultNumKarts() const       { return m_num_karts;         }
+
+    /** Sets the default number of laps. This is only used to store
+     *  this number in the user config file as a default next time. */
+    void setDefaultNumLaps(int n)         { m_num_laps = n;             }
+    /** Returns the default number of laps. */
+    int getDefaultNumLaps() const         { return m_num_laps;          }
+
+    /** Sets the default difficulty. This is only used to store
+     *  this number in the user config file as a default next time. */
+    void setDefaultNumDifficulty(int n)   { m_difficulty = n;           }
+    /** Returns the default difficulty. */
+    int getDefaultDifficulty() const      { return m_difficulty;        }
+
+    /** Sets the index of the background image. */
+    void setBackgroundIndex(int n)        { m_background_index = n;     }
+    /** Get the index of the background image. */
+    int getBackgroundIndex() const        { return m_background_index;  }
+
     void loadConfig();
     void loadConfig(const std::string& filename);
     void saveConfig();

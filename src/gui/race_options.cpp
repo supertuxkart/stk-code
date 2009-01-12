@@ -55,10 +55,8 @@ enum WidgetTokens
 RaceOptions::RaceOptions() 
 {
 
-    m_difficulty=race_manager->getDifficulty();
-    // FIXME: no medium AI atm
-    if(m_difficulty==RaceManager::RD_MEDIUM) m_difficulty=RaceManager::RD_HARD;
-    m_num_laps=race_manager->getNumLaps();
+    m_difficulty=user_config->getDefaultDifficulty();
+    m_num_laps=user_config->getDefaultNumLaps();
     // Determine the minimum number of karts
     m_min_karts = (int)race_manager->getNumPlayers();
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -67,7 +65,7 @@ RaceOptions::RaceOptions()
         // least one opponent in addition to the leader
         m_min_karts += (race_manager->getNumPlayers()==1 ? 2 : 1);
     }
-    m_num_karts=std::max((int)race_manager->getNumKarts(), m_min_karts);
+    m_num_karts=std::max(user_config->getDefaultNumKarts(), m_min_karts);
 
 
     const int DESC_WIDTH=48;
@@ -262,38 +260,62 @@ void RaceOptions::select()
             break;
 
     case WTOK_START:
-        if( m_difficulty >= RaceManager::RD_EASY &&
-            m_difficulty <= RaceManager::RD_HARD)
-        {
-            race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
-        }
-        else // invalid difficulty
-        {
-            race_manager->setDifficulty( RaceManager::RD_EASY );
-        }
-
-        // if there is no AI, there's no point asking the player for the amount of karts.
-        // It will always be the same as the number of human players
-        if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
-            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-        else
-            race_manager->setNumKarts(m_num_karts);
-            
-
-        if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
-            RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
-        {
-            race_manager->setNumLaps( m_num_laps );
-        }
-
-        menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
-        break;
+            setAllValues();
+            menu_manager->pushMenu(MENUID_START_RACE_FEEDBACK);
+            break;
     case WTOK_QUIT:
-        menu_manager->popMenu();
+            // Save the current values as a default for later.
+            setAllValues();
+            menu_manager->popMenu();
         break;
     default: break;
     }   // switch
 }   // select
+
+// ----------------------------------------------------------------------------
+/** If the user presses a leave key, still save the values as default. */
+void RaceOptions::handle(GameAction ga, int value)
+{
+    // Attempts to close the menu are silently discarded
+    // since they do not make sense at this point.
+    if(ga == GA_LEAVE)
+        setAllValues();  
+    BaseGUI::handle(ga, value);
+}   // handle
+
+// ----------------------------------------------------------------------------
+/** Stores the selected parameters (#laps etc) in the race manager and in
+ *  user_config, so that they will be available as default next time.
+ */
+void RaceOptions::setAllValues()
+{
+    if( m_difficulty >= RaceManager::RD_EASY &&
+        m_difficulty <= RaceManager::RD_HARD)
+    {
+        race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
+        user_config->setDefaultNumDifficulty(m_difficulty);
+    }
+    else // invalid difficulty
+    {
+        race_manager->setDifficulty( RaceManager::RD_EASY );
+        user_config->setDefaultNumDifficulty(RaceManager::RD_EASY);
+    }
+
+    // if there is no AI, there's no point asking the player for the amount of karts.
+    // It will always be the same as the number of human players
+    if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
+        race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+    else
+        race_manager->setNumKarts(m_num_karts);
+    user_config->setDefaultNumKarts(race_manager->getNumKarts());
+
+    if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
+        RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
+    {
+        race_manager->setNumLaps( m_num_laps );
+        user_config->setDefaultNumLaps(m_num_laps);
+    }
+}   // setAllValues
 
 // ----------------------------------------------------------------------------
 const char *RaceOptions::getDifficultyString(int difficulty) const

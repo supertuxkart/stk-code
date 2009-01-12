@@ -233,14 +233,15 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
-            user_config->m_karts = atoi(argv[i+1]);
-            if(user_config->m_karts>stk_config->m_max_karts) {
+            user_config->setDefaultNumKarts(atoi(argv[i+1]));
+            if(user_config->getDefaultNumKarts()>stk_config->m_max_karts) {
                 fprintf(stdout, "Number of karts reset to maximum number %d\n",
                                   stk_config->m_max_karts);
-                user_config->m_karts = stk_config->m_max_karts;
+                user_config->setDefaultNumKarts(stk_config->m_max_karts);
             }
-            race_manager->setNumKarts(user_config->m_karts );
-            fprintf ( stdout, "%d karts will be used.\n", user_config->m_karts);
+            race_manager->setNumKarts(user_config->getDefaultNumKarts() );
+            fprintf(stdout, "%d karts will be used.\n", 
+                     user_config->getDefaultNumKarts());
             i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
