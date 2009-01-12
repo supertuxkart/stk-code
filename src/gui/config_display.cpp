@@ -18,6 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config_display.hpp"
+
+#include "main_loop.hpp"
 #include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
@@ -35,6 +37,7 @@ enum WidgetTokens
     WTOK_TITLE,
 
     WTOK_FULLSCREEN,
+    WTOK_NEXT_BACKGROUND,
     WTOK_INCR_RES,
     WTOK_DECR_RES,
     WTOK_CURRENT_RES,
@@ -78,12 +81,14 @@ ConfigDisplay::ConfigDisplay()
         }
     }
 
+    widget_manager->addTextButtonWgt(WTOK_NEXT_BACKGROUND, 60, 7, _("Next background"));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 2 );
 
     char msg [MAX_MESSAGE_LENGTH];
     //I18N: displays current resolution
     snprintf( msg, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), m_curr_width, m_curr_height );
     widget_manager->addTextWgt( WTOK_CURRENT_RES, 60, 7, msg);
+    widget_manager->hideWgtRect(WTOK_CURRENT_RES);
 
     widget_manager->addTextButtonWgt( WTOK_INCR_RES, 60, 7,
         _("Increase Resolution"));
@@ -131,7 +136,10 @@ void ConfigDisplay::select()
         }
         changeApplyButton();
         break;
-
+    case WTOK_NEXT_BACKGROUND:
+        user_config->nextBackgroundIndex();
+        main_loop->loadBackgroundImages();
+        break;
     case WTOK_INCR_RES:
         {
             const int NUM_RES = (int)m_sizes.size();

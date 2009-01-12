@@ -80,9 +80,9 @@ public:
 
     MusicInformation 
          *m_title_music;             /**<Filename of the title music to play.*/
-    std::string 
+    std::vector<std::string>
           m_mainmenu_background;     /**<Picture used as menu background.    */
-    std::string 
+    std::vector<std::string>
           m_menu_background;         /**<Picture used as background for other menus.    */
     
     /** Empty constructor. The actual work is done in load. */
@@ -93,6 +93,8 @@ public:
     /** Returns the default kart properties for each kart. */
     const KartProperties &
          getDefaultKartProperties() const {return m_kart_properties; }
+    const std::string &getMainMenuPicture(int n);
+    const std::string &getBackgroundPicture(int n);
 }
 ;   // STKConfig
 

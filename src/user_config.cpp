@@ -17,8 +17,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#include <stdio.h>
 
+#include "user_config.hpp"
+
+#include <stdio.h>
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -38,8 +40,8 @@
 #define _WINSOCKAPI_
 #include <plib/ul.h>
 
+#include "stk_config.hpp"
 #include "actionmap.hpp"
-#include "user_config.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
@@ -291,7 +293,15 @@ void UserConfig::setDefaults()
 
 }   // setDefaults
 
-
+// -----------------------------------------------------------------------------
+/** Sets the next background image index. */
+void UserConfig::nextBackgroundIndex()
+{
+    m_background_index++;
+    if(m_background_index>=(int)stk_config->m_mainmenu_background.size())
+        m_background_index = 0;
+}
+ 
 // -----------------------------------------------------------------------------
 /**
  * load default configuration file for this platform

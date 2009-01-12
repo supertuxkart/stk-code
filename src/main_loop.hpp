@@ -19,6 +19,16 @@
 
 #ifndef HEADER_MAIN_LOOP_HPP
 #define HEADER_MAIN_LOOP_HPP
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#else
+#  ifdef WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
+#  endif
+#  include <GL/gl.h>
+#endif
+
 #include <SDL/SDL_types.h>
 
 /** Management class for the whole gameflow, this is where the
@@ -31,12 +41,15 @@ private:
     int      m_frame_count;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
+    GLuint   m_title_screen_texture;
+    GLuint   m_bg_texture;
 
 public:
          MainLoop();
         ~MainLoop();
     void run();
     void abort();
+    void loadBackgroundImages();
 };   // MainLoop
 
 extern MainLoop* main_loop;

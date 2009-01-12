@@ -148,6 +148,24 @@ void STKConfig::init_defaults()
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
+const std::string &STKConfig::getMainMenuPicture(int n)
+{
+    if(n>=0 && n<(int)m_mainmenu_background.size())
+        return m_mainmenu_background[n];
+    else
+        return m_mainmenu_background[0];
+}   // getMainMenuPicture
+
+//-----------------------------------------------------------------------------
+const std::string &STKConfig::getBackgroundPicture(int n)
+{
+    if(n>=0 && n<(int)m_menu_background.size())
+        return m_menu_background[n];
+    else
+        return m_menu_background[0];
+}   // getBackgroundPicture
+
+//-----------------------------------------------------------------------------
 /** Extracts the actual information from a lisp file.
  *  \param lisp Pointer to the lisp data structure.
  */
@@ -181,8 +199,8 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("slowdown-factor",              m_slowdown_factor          );
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
-    lisp->get("menu-background",              m_menu_background          );
-    lisp->get("mainmenu-background",          m_mainmenu_background          );
+    lisp->getVector("menu-background",        m_menu_background          );
+    lisp->getVector("mainmenu-background",    m_mainmenu_background          );
     lisp->get("enable_networking",            m_enable_networking        );
     std::string title_music;
     lisp->get("title-music",                  title_music                );

@@ -19,15 +19,6 @@
 
 #include "main_loop.hpp"
 
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#else
-#  ifdef WIN32
-#    define WIN32_LEAN_AND_MEAN
-#    include <windows.h>
-#  endif
-#  include <GL/gl.h>
-#endif
 #include <SDL/SDL.h>
 #include <assert.h>
 #include "sdldrv.hpp"
@@ -57,16 +48,22 @@ MainLoop::~MainLoop()
 }   // ~MainLoop
 
 //-----------------------------------------------------------------------------
+void MainLoop::loadBackgroundImages()
+{
+    int ind = user_config->getBackgroundIndex();
+    const std::string &main = stk_config->getMainMenuPicture(ind);
+    m_title_screen_texture = material_manager->getMaterial(main)->getState()->getTextureHandle();
+    
+    const std::string &background = stk_config->getBackgroundPicture(ind);
+    m_bg_texture = material_manager->getMaterial(background)->getState()->getTextureHandle();
+}   // loadBackgroundImages
+
+//-----------------------------------------------------------------------------
 /** Run the actual main loop.
  */
 void MainLoop::run()
 {
-    static const GLuint TITLE_SCREEN_TEXTURE = 
-        material_manager->getMaterial(stk_config->m_mainmenu_background)->getState()->getTextureHandle();
-    
-    static const GLuint MENUS_BG_TEXTURE = 
-        material_manager->getMaterial(stk_config->m_menu_background)->getState()->getTextureHandle();
-
+    loadBackgroundImages();
     
     bool music_on = false;
     m_curr_time = SDL_GetTicks();
@@ -191,9 +188,9 @@ void MainLoop::run()
             //Draw the splash screen
             
             if(menu_manager->isMainMenuActive())
-                glBindTexture(GL_TEXTURE_2D, TITLE_SCREEN_TEXTURE);
+                glBindTexture(GL_TEXTURE_2D, m_title_screen_texture);
             else 
-                glBindTexture(GL_TEXTURE_2D, MENUS_BG_TEXTURE);
+                glBindTexture(GL_TEXTURE_2D, m_bg_texture);
             
             glBegin ( GL_QUADS ) ;
             glColor3f   (1, 1, 1 ) ;

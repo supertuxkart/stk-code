@@ -10,9 +10,11 @@
 				    ;; points 1st, 0 is least points
 				    ;; 1st
  (title-music              "main_theme.music")
- (mainmenu-background      "st_title_screen.rgb")
- (menu-background          "menu_background.rgb")
- (game-style               "nitro") ;; "wheelie" or "nitro"
+ ;; Two lists which must have the same length, containing the list of all
+ ;; possible main menu and background images.
+ (mainmenu-background      "st_title_screen.rgb" "st_title_screen2.rgb")
+ (menu-background          "menu_background.rgb" "menu_background2.rgb")
+
  (max-history              10000)   ;; maximum number of history frames.
  (max-skidmarks              100)   ;; max. number of skidmarks per kart.
  (skid-fadeout-time           60)   ;; Time till skidm marks fade out

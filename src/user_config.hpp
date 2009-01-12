@@ -244,8 +244,8 @@ public:
     /** Returns the default difficulty. */
     int getDefaultDifficulty() const      { return m_difficulty;        }
 
-    /** Sets the index of the background image. */
-    void setBackgroundIndex(int n)        { m_background_index = n;     }
+    void nextBackgroundIndex();
+
     /** Get the index of the background image. */
     int getBackgroundIndex() const        { return m_background_index;  }
 
