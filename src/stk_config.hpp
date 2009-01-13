@@ -55,6 +55,9 @@ public:
     float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
     float m_shortcut_length;         /**<Skipping more than this distance
                                          in segments triggers a shortcut.    */
+    float m_offroad_tolerance;       /**<Road width is extended by that 
+                                         fraction to make shortcut detection
+                                         more forgiving.                     */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving 
                                          objects, e.g. road cones, ...       */

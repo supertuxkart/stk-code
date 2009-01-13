@@ -451,12 +451,13 @@ void InitTuxkart()
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
     network_manager         = new NetworkManager       ();
+
+    stk_config->load(file_manager->getConfigFile("stk_config.data"));
     track_manager->loadTrackList();
-    // Check needs GP and track manager.
+    // unlock_manager->check needs GP and track manager.
     unlock_manager->check();
     sound_manager->addMusicToTracks();
 
-    stk_config->load(file_manager->getConfigFile("stk_config.data"));
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
     race_manager->setNumPlayers(1);

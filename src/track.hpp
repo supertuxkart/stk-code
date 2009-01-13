@@ -97,7 +97,11 @@ public:
     //FIXME: Maybe the next 4 vectors should be inside an struct and be used
     //from a vector of structs?
     //FIXME: should the driveline be set as a sgVec2?
-    std::vector<Vec3> m_driveline;
+    std::vector<Vec3>    m_driveline;
+    /** Same as drivelines, but with stk_config->m_offroad_tolerance applied
+     *  to widen the road (to make shortcut detection less severe). */
+    std::vector<Vec3>    m_dl_with_tolerance_left;
+    std::vector<Vec3>    m_dl_with_tolerance_right;
     std::vector<SGfloat> m_distance_from_start;
     std::vector<SGfloat> m_path_width;
     std::vector<SGfloat> m_angle;
@@ -134,7 +138,8 @@ public:
     void               drawScaled2D      (float x, float y, float w,
                                           float h                     ) const;
 
-    void               findRoadSector    (const Vec3& XYZ, int *sector) const;
+    void               findRoadSector    (const Vec3& XYZ, int *sector,
+                                          bool with_tolerance=false) const;
     int                findOutOfRoadSector(const Vec3& XYZ,
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR

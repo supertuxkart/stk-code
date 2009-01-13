@@ -149,8 +149,9 @@ void LinearWorld::update(float delta)
         
         // update sector variables
         int prev_sector = kart_info.m_track_sector;
-        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
-        
+        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector,
+                                /*tolerance*/ true);
+
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
         kart_info.m_on_road = kart_info.m_track_sector != Track::UNKNOWN_SECTOR;

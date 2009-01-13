@@ -141,17 +141,37 @@ int Track::pointInQuad
  *
  *  The 'sector' could be defined as the number of the closest track
  *  segment to XYZ.
+ *  \param XYZ Position for which the segment should be determined.
+ *  \param sector Contains the previous sector (as a shortcut, since usually
+ *         the sector is the same as the last one), and on return the result
+ *  \param with_tolerance If true, the drivelines with tolerance are used.
+ *         This reduces the impact of driving slightly off road.
  */
-void Track::findRoadSector(const Vec3& XYZ, int *sector )const
+void Track::findRoadSector(const Vec3& XYZ, int *sector, 
+                           bool with_tolerance )const
 {
     if(*sector!=UNKNOWN_SECTOR)
     {
         int next = (unsigned)(*sector) + 1 <  m_left_driveline.size() ? *sector + 1 : 0;
-        if(pointInQuad( m_left_driveline[*sector], m_right_driveline[*sector],
-                        m_right_driveline[next],   m_left_driveline[next], 
-                        XYZ ) != QUAD_TRI_NONE)
-            // Still in the same sector, no changes
-            return;
+        if(with_tolerance)
+        {
+            if(pointInQuad(m_dl_with_tolerance_left[*sector],
+                           m_dl_with_tolerance_right[*sector],
+                           m_dl_with_tolerance_right[next],
+                           m_dl_with_tolerance_left[next], 
+                           XYZ                                ) != QUAD_TRI_NONE)
+                // Still in the same sector, no changes
+                return;
+        }
+        else
+        {
+            if(pointInQuad(m_left_driveline[*sector],
+                           m_right_driveline[*sector],
+                           m_right_driveline[next],   
+                           m_left_driveline[next], XYZ ) != QUAD_TRI_NONE)
+                // Still in the same sector, no changes
+                return;
+        }
     }
     /* To find in which 'sector' of the track the kart is, we use a
        'point in triangle' algorithm for each triangle in the quad
@@ -165,9 +185,14 @@ void Track::findRoadSector(const Vec3& XYZ, int *sector )const
     for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
         next = (unsigned int)i + 1 <  DRIVELINE_SIZE ? (int)i + 1 : 0;
-        triangle = pointInQuad( m_left_driveline[i],     m_right_driveline[i],
-                                m_right_driveline[next], m_left_driveline[next], 
-                                XYZ );
+        triangle = with_tolerance 
+                ? pointInQuad(m_dl_with_tolerance_left[i], 
+                              m_dl_with_tolerance_right[i],
+                              m_dl_with_tolerance_right[next],
+                              m_dl_with_tolerance_left[next], XYZ )
+                 : pointInQuad(m_left_driveline[i], m_right_driveline[i],
+                               m_right_driveline[next], m_left_driveline[next],
+                               XYZ );
 
         if (triangle != QUAD_TRI_NONE && ((XYZ.getZ()-m_left_driveline[i].getZ()) < 1.0f))
         {
@@ -202,6 +227,9 @@ void Track::findRoadSector(const Vec3& XYZ, int *sector )const
         segment = possible_segment_tris[i].segment;
         next = segment + 1 < DRIVELINE_SIZE ? (int)segment + 1 : 0;
         
+        // Note: we can make the plane with the normal driveliens
+        // (not the one with tolerance), since the driveliens with
+        // tolerance lie in the same plane.
         if( possible_segment_tris[i].triangle == QUAD_TRI_FIRST )
         {
             sgMakePlane( plane, m_left_driveline[segment].toFloat(),
@@ -500,20 +528,25 @@ void Track::addDebugToScene(int type) const
             scene->add(sphere);
         }   // for i
     }  /// type ==1
-    if(type&2)
+    // 2: drivelines, 4: driveline with tolerance
+    if(type&6)
     {
         ssgVertexArray* v_array = new ssgVertexArray();
         ssgColourArray* c_array = new ssgColourArray();
+        const std::vector<Vec3> &left  = type&2 ? m_left_driveline 
+                                                : m_dl_with_tolerance_left;
+        const std::vector<Vec3> &right = type&2 ? m_right_driveline 
+                                               : m_dl_with_tolerance_right;
         for(unsigned int i = 0; i < m_driveline.size(); i++)
         {
             int ip1 = i==m_driveline.size()-1 ? 0 : i+1;
             // The segment display must be slightly higher than the
             // track, otherwise it's not clearly visible.
             sgVec3 v;
-            sgCopyVec3(v,m_left_driveline [i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_right_driveline[ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,m_left_driveline [ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,left [i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,right[i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,right[ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
+            sgCopyVec3(v,left [ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
             sgVec4 vc;
             vc[0] = i%2==0 ? 1.0f : 0.0f;
             vc[1] = 1.0f-v[0];
@@ -902,8 +935,7 @@ void Track::startMusic() const {
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-void
-Track::loadDriveline()
+void Track::loadDriveline()
 {
     readDrivelineFromFile(m_left_driveline, ".drvl");
 
@@ -917,6 +949,8 @@ Track::loadDriveline()
         "and the left driveline is " << m_left_driveline.size()
         << " vertex long. Track is " << m_name << " ." << std::endl;
 
+    m_dl_with_tolerance_left.reserve(DRIVELINE_SIZE);
+    m_dl_with_tolerance_right.reserve(DRIVELINE_SIZE);
     m_driveline.reserve(DRIVELINE_SIZE);
     m_path_width.reserve(DRIVELINE_SIZE);
     m_angle.reserve(DRIVELINE_SIZE);
@@ -927,6 +961,13 @@ Track::loadDriveline()
 
         float width = ( m_right_driveline[i] - center_point ).length();
         m_path_width.push_back(width);
+
+        // Compute the drivelines with tolerance
+        Vec3 diff = (m_left_driveline[i] - m_right_driveline[i]) 
+                  * stk_config->m_offroad_tolerance;
+        m_dl_with_tolerance_left.push_back(m_left_driveline[i]+diff);
+        m_dl_with_tolerance_right.push_back(m_right_driveline[i]-diff);
+
     }
 
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)

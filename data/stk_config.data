@@ -39,8 +39,9 @@
  (zipper-force             250.0 )  ;; additional zipper force
  (zipper-speed-gain          4.5 )  ;; one time additional speed  
 
- (shortcut-length           120  )  ;; leaving the road and coming back on it more than
+ (shortcut-length            50  )  ;; leaving the road and coming back on it more than
                                     ;; x 'meters" later is considered to be a shortcut
+ (offroad-tolerance          0.15)  ;; Widen the road 15% for shortcut detection.
  (enable_networking          #f  )  ;; For now disable networking
  (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
  (explosion-impulse-objects 500.0)  ;; explosion impulse for physics objects (smaller
