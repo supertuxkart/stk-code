@@ -88,6 +88,15 @@ void RubberBand::removeFromScene()
  */
 void RubberBand::update(float dt)
 {
+    if(m_owner.isEliminated())
+    {
+        // Rubber band snaps
+        m_plunger->hit(NULL);
+        // This causes the plunger to be removed at the next update
+        m_plunger->setKeepAlive(0.0f);
+        return;
+    }
+
     Vec3 p;
     const Vec3 &k = m_owner.getXYZ();
 
