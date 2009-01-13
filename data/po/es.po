@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-26 11:15-0500\n"
-"PO-Revision-Date: 2008-12-30 01:48+0100\n"
+"POT-Creation-Date: 2009-01-13 15:03+1100\n"
+"PO-Revision-Date: 2009-01-13 10:16+0100\n"
 "Last-Translator: David Ballesteros Mayo <davidio@telefonica.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Spanish\n"
 
-#: src/gui/config_display.cpp:387
+#: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d en la Lista Negra"
@@ -67,11 +67,11 @@ msgstr "Viaje por el Amazonas"
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Yunque - ralentiza el kart que está en primera posición"
 
-#: src/gui/config_display.cpp:94
+#: src/gui/config_display.cpp:99
 msgid "Apply "
 msgstr "Aplicar "
 
-#: src/gui/config_display.cpp:353
+#: src/gui/config_display.cpp:361
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Aplicar %dx%d"
@@ -135,7 +135,7 @@ msgstr "No se pudo conectar con el servidor"
 msgid "Canyon"
 msgstr "Cañón"
 
-#: src/gui/main_menu.cpp:62
+#: src/gui/main_menu.cpp:61
 msgid "Challenges"
 msgstr "Desafíos"
 
@@ -148,7 +148,7 @@ msgstr "Elige tus controles, %s"
 msgid "City"
 msgstr "Ciudad"
 
-#: src/gui/config_display.cpp:99
+#: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
 msgstr "Eliminar de la Lista Negra"
 
@@ -230,7 +230,7 @@ msgstr ""
 "Creado por Oliver y Steve Baker\n"
 "modificado por Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:80
+#: src/gui/main_menu.cpp:78
 msgid "Credits"
 msgstr "Créditos"
 
@@ -239,16 +239,16 @@ msgid "Crescent Crossing"
 msgstr "Cruce de media luna"
 
 #. I18N: displays current resolution
-#: src/gui/config_display.cpp:85
+#: src/gui/config_display.cpp:89
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Actual: %dx%d"
 
-#: src/gui/config_display.cpp:91
+#: src/gui/config_display.cpp:96
 msgid "Decrease Resolution"
 msgstr "Reducir Resolución"
 
-#: src/gui/race_options.cpp:86
+#: src/gui/race_options.cpp:84
 msgid "Difficulty"
 msgstr "Dificultad"
 
@@ -256,11 +256,11 @@ msgstr "Dificultad"
 msgid "Display"
 msgstr "Vídeo"
 
-#: src/gui/config_display.cpp:55
+#: src/gui/config_display.cpp:58
 msgid "Display Settings"
 msgstr "Opciones de Vídeo"
 
-#: src/gui/race_options.cpp:304
+#: src/gui/race_options.cpp:326
 msgid "Driver"
 msgstr "Conductor"
 
@@ -324,7 +324,7 @@ msgstr ""
 "en 3 vueltas de Arenas Movedizas\n"
 "en menos de 2:20 minutos."
 
-#: src/gui/race_gui.cpp:677
+#: src/gui/race_gui.cpp:685
 #, c-format
 msgid "Finished"
 msgstr "Finalizado"
@@ -390,9 +390,9 @@ msgstr "Fuerte Magma"
 msgid "Four Players"
 msgstr "Cuatro Jugadores"
 
-#: src/gui/config_display.cpp:77
-#: src/gui/config_display.cpp:130
-#: src/gui/config_display.cpp:185
+#: src/gui/config_display.cpp:80
+#: src/gui/config_display.cpp:135
+#: src/gui/config_display.cpp:193
 msgid "Fullscreen mode"
 msgstr "Modo Pantalla Completa"
 
@@ -404,13 +404,13 @@ msgstr "Ayuda de los modos de juego"
 msgid "Game modes"
 msgstr "Modos de juego"
 
-#: src/gui/challenges_menu.cpp:54
+#: src/gui/challenges_menu.cpp:55
 #: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Volver al menú principal"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:828
+#: src/gui/race_gui.cpp:836
 msgid "Go!"
 msgstr "Ya!"
 
@@ -432,7 +432,7 @@ msgstr ""
 "corriendo en un grupo de pistas,  \n"
 "el que más puntos tenga gana (menor tiempo en caso de empate!)          "
 
-#: src/gui/main_menu.cpp:77
+#: src/gui/main_menu.cpp:75
 #: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Ayuda"
@@ -449,16 +449,16 @@ msgstr ""
 "Si ves un botón con un candado como el de la derecha,\n"
 "necesitas completar algún desafío para desbloquearlo."
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
 msgstr "Aumentar Resolución"
 
-#: src/user_config.cpp:877
+#: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Inválido"
 
-#: src/karts/player_kart.cpp:332
+#: src/karts/player_kart.cpp:365
 msgid "Invalid short-cut!!"
 msgstr "Atajo inválido!!"
 
@@ -466,7 +466,7 @@ msgstr "Atajo inválido!!"
 msgid "King Weird's Castle"
 msgstr "El Misterioso Castillo del Rey"
 
-#: src/gui/race_gui.cpp:682
+#: src/gui/race_gui.cpp:690
 msgid "Lap"
 msgstr "Vuelta"
 
@@ -493,7 +493,7 @@ msgstr "Cargando carrera..."
 msgid "Look back"
 msgstr "Mirar atrás"
 
-#: src/gui/main_menu.cpp:59
+#: src/gui/main_menu.cpp:58
 msgid "Networking"
 msgstr "Red"
 
@@ -521,7 +521,7 @@ msgstr ""
 "'%s'\n"
 "ahora disponible"
 
-#: src/modes/linear_world.cpp:285
+#: src/modes/linear_world.cpp:286
 msgid "New fastest lap"
 msgstr "Nueva vuelta rápida"
 
@@ -561,6 +561,10 @@ msgstr ""
 msgid "Next >"
 msgstr "Siguiente >"
 
+#: src/gui/config_display.cpp:84
+msgid "Next background"
+msgstr "Siguiente fondo"
+
 #: src/gui/player_controls.cpp:72
 msgid "Nitro"
 msgstr "Nitro"
@@ -570,16 +574,16 @@ msgstr "Nitro"
 msgid "No Grand Prix selected"
 msgstr "Gran Premio no seleccionado"
 
-#: src/gui/race_options.cpp:303
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:325
+#: src/gui/race_options.cpp:328
 msgid "Novice"
 msgstr "Novato"
 
-#: src/gui/race_options.cpp:102
+#: src/gui/race_options.cpp:100
 msgid "Number of karts"
 msgstr "Número de karts"
 
-#: src/gui/race_options.cpp:124
+#: src/gui/race_options.cpp:122
 msgid "Number of laps"
 msgstr "Número de vueltas"
 
@@ -588,7 +592,7 @@ msgstr "Número de vueltas"
 msgid "OK"
 msgstr "OK"
 
-#: src/user_config.cpp:505
+#: src/user_config.cpp:528
 msgid "Old config file found, check your key bindings!"
 msgstr "Encontrado un fichero de configuración antiguo, comprueba tu asignación de teclas!"
 
@@ -600,7 +604,7 @@ msgstr "Clase de Mates de Oliver"
 msgid "On the Beach"
 msgstr "En la Playa"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:63
 #: src/gui/options.cpp:40
 #: src/gui/race_menu.cpp:48
 msgid "Options"
@@ -614,7 +618,7 @@ msgstr "Paracaídas - ralentiza todos los karts en mejor posición!"
 msgid "Paused"
 msgstr "Pausa"
 
-#: src/gui/race_gui.cpp:857
+#: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
 msgstr "Penalización!!"
 
@@ -623,7 +627,7 @@ msgid "Penguin Playground"
 msgstr "Patio del Pingüino"
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:264
+#: src/gui/player_controls.cpp:290
 msgid "Player "
 msgstr "Jugador"
 
@@ -673,7 +677,7 @@ msgid "Press <ESC> to Cancel"
 msgstr "Pulsa <ESC> para Cancelar"
 
 #: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:103
+#: src/gui/config_display.cpp:108
 #: src/gui/config_sound.cpp:64
 #: src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80
@@ -681,7 +685,7 @@ msgstr "Pulsa <ESC> para Cancelar"
 #: src/gui/num_players.cpp:46
 #: src/gui/options.cpp:58
 #: src/gui/player_controls.cpp:124
-#: src/gui/race_options.cpp:154
+#: src/gui/race_options.cpp:152
 msgid "Press <ESC> to go back"
 msgstr "Pulsa <ESC> para volver"
 
@@ -698,11 +702,11 @@ msgstr "Carrera Rápida"
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Carrera Rápida: Elige una pista, el menor tiempo gana."
 
-#: src/gui/main_menu.cpp:65
+#: src/gui/main_menu.cpp:64
 msgid "Quit"
 msgstr "Salir"
 
-#: src/gui/race_gui.cpp:629
+#: src/gui/race_gui.cpp:637
 msgid "REV"
 msgstr "RET"
 
@@ -714,7 +718,7 @@ msgstr "Correr en la pista otra vez"
 msgid "Race results"
 msgstr "Resultados de la carrera"
 
-#: src/gui/race_options.cpp:305
+#: src/gui/race_options.cpp:327
 msgid "Racer"
 msgstr "Corredor"
 
@@ -723,7 +727,7 @@ msgid "Racetrack"
 msgstr "Circuito de Carreras"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:808
+#: src/gui/race_gui.cpp:816
 msgid "Ready!"
 msgstr "Preparados!"
 
@@ -753,7 +757,7 @@ msgid "Select network mode"
 msgstr "Selecciona modo de red"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:818
+#: src/gui/race_gui.cpp:826
 msgid "Set!"
 msgstr "Listos!"
 
@@ -770,7 +774,7 @@ msgstr "Giro agudo"
 msgid "Shifting Sands"
 msgstr "Arenas Movedizas"
 
-#: src/gui/main_menu.cpp:54
+#: src/gui/main_menu.cpp:53
 msgid "Single Player"
 msgstr "Un jugador"
 
@@ -802,7 +806,7 @@ msgstr "Sonido"
 msgid "Sound Settings"
 msgstr "Opciones de Sonido"
 
-#: src/gui/main_menu.cpp:55
+#: src/gui/main_menu.cpp:54
 msgid "Splitscreen"
 msgstr "Pantalla partida"
 
@@ -810,7 +814,7 @@ msgstr "Pantalla partida"
 msgid "Star Track"
 msgstr "Pista de Estrellas"
 
-#: src/gui/race_options.cpp:144
+#: src/gui/race_options.cpp:142
 msgid "Start race"
 msgstr "Empezar carrera"
 
@@ -912,7 +916,7 @@ msgstr "La Autopista de Tux"
 msgid "Two Players"
 msgstr "Dos Jugadores"
 
-#: src/modes/linear_world.cpp:651
+#: src/modes/linear_world.cpp:654
 msgid "WRONG WAY!"
 msgstr "VAS AL REVÉS!"
 
@@ -1007,7 +1011,7 @@ msgstr ""
 "Ida y Vuelta hasta la Luna contra 3 karts\n"
 "con IA de nivel 'Corredor'"
 
-#: src/gui/config_display.cpp:72
+#: src/gui/config_display.cpp:75
 msgid "Window mode"
 msgstr "Modo ventana"
 
@@ -1015,7 +1019,7 @@ msgstr "Modo ventana"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:270
+#: src/karts/player_kart.cpp:303
 msgid "You finished the race!"
 msgstr "Has acabado la carrera!"
 
@@ -1027,7 +1031,7 @@ msgstr ""
 "Has sido\n"
 "eliminado!"
 
-#: src/karts/player_kart.cpp:270
+#: src/karts/player_kart.cpp:303
 msgid "You won the race!"
 msgstr "Ganaste la carrera!"
 
@@ -1035,33 +1039,33 @@ msgstr "Ganaste la carrera!"
 msgid "Zipper - speed boost"
 msgstr "Zipper - acelerador de velocidad"
 
-#: src/user_config.cpp:860
+#: src/user_config.cpp:986
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joy %d eje %d  %c"
 
-#: src/user_config.cpp:864
+#: src/user_config.cpp:991
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joy %d btn %d"
 
-#: src/user_config.cpp:867
+#: src/user_config.cpp:994
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joy %d hat %d"
 
-#: src/user_config.cpp:873
+#: src/user_config.cpp:1000
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "ratón eje %d %c"
 
-#: src/user_config.cpp:870
+#: src/user_config.cpp:997
 #, c-format
 msgid "mouse btn %d"
 msgstr "ratón btn %d"
 
-#: src/user_config.cpp:854
-#: src/user_config.cpp:898
+#: src/user_config.cpp:980
+#: src/user_config.cpp:1025
 #, c-format
 msgid "not set"
 msgstr "sin definir"

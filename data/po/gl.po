@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 15:52+1100\n"
-"PO-Revision-Date: 2008-12-27 13:48+0100\n"
+"POT-Creation-Date: 2009-01-13 15:03+1100\n"
+"PO-Revision-Date: 2009-01-13 07:41+0100\n"
 "Last-Translator: Adrián Chaves Fernández <adriyetichaves@gmail.com>\n"
 "Language-Team: Proxecto Trasno <proxecto@trasno.net>\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "X-Poedit-Language: Galician\n"
 "X-Poedit-Country: SPAIN\n"
 
-#: src/gui/config_display.cpp:387
+#: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d está na lista negra"
@@ -66,11 +66,11 @@ msgstr "A Xornada Amazónica"
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Bigornia - reduce considerablemente a velocidade do primeiro"
 
-#: src/gui/config_display.cpp:94
+#: src/gui/config_display.cpp:99
 msgid "Apply "
 msgstr "Aplicar"
 
-#: src/gui/config_display.cpp:353
+#: src/gui/config_display.cpp:361
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Aplicar %dx%d"
@@ -87,7 +87,7 @@ msgstr "Na Fin do Mundo"
 msgid "Avoid bananas"
 msgstr "Evitar os plátanos"
 
-#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/grand_prix_ending.cpp:138
 #: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Volver ao menú principal"
@@ -134,7 +134,7 @@ msgstr "Non se puido conectar co servidor"
 msgid "Canyon"
 msgstr "O Cañón"
 
-#: src/gui/main_menu.cpp:62
+#: src/gui/main_menu.cpp:61
 msgid "Challenges"
 msgstr "Retos"
 
@@ -147,7 +147,7 @@ msgstr "Elixe os teus controis, %s"
 msgid "City"
 msgstr "A Cidade"
 
-#: src/gui/config_display.cpp:99
+#: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
 msgstr "Sacar da lista negra"
 
@@ -201,7 +201,7 @@ msgid "Connected:"
 msgstr "Conectado:"
 
 #: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/grand_prix_ending.cpp:134
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Continuar"
@@ -229,7 +229,7 @@ msgstr ""
 "Creado por Oliver e Steve Baker\n"
 "modificado por Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:72
+#: src/gui/main_menu.cpp:78
 msgid "Credits"
 msgstr "Créditos"
 
@@ -238,16 +238,16 @@ msgid "Crescent Crossing"
 msgstr "Paso Elevado"
 
 #. I18N: displays current resolution
-#: src/gui/config_display.cpp:85
+#: src/gui/config_display.cpp:89
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Actual: %dx%d"
 
-#: src/gui/config_display.cpp:91
+#: src/gui/config_display.cpp:96
 msgid "Decrease Resolution"
 msgstr "Reducir a resolución"
 
-#: src/gui/race_options.cpp:86
+#: src/gui/race_options.cpp:84
 msgid "Difficulty"
 msgstr "Dificultade"
 
@@ -255,11 +255,11 @@ msgstr "Dificultade"
 msgid "Display"
 msgstr "Vídeo"
 
-#: src/gui/config_display.cpp:55
+#: src/gui/config_display.cpp:58
 msgid "Display Settings"
 msgstr "Opcións de vídeo"
 
-#: src/gui/race_options.cpp:304
+#: src/gui/race_options.cpp:326
 msgid "Driver"
 msgstr "Condutor"
 
@@ -295,19 +295,19 @@ msgstr ""
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
-"in under 3:00 minutes."
+"in under 3:35 minutes."
 msgstr ""
 "Completa 3 voltas n'A Autopista\n"
 "de Tux con 3 opoñentes\n"
-"en menos de 3:00 minutos."
+"en menos de 3:35 minutos."
 
 #: data/tracks/jungle/jungle.challenge:5
 msgid "Finish Race track in 2:40"
 msgstr "Completa O Circuíto de Carreiras en 2:40"
 
 #: data/tracks/canyon/canyon.challenge:5
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "Completa A Autopista de Tux en 3:00"
+msgid "Finish Tux Tollway track in 3:35"
+msgstr "Completa A Autopista de Tux en 3:35"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
 msgid "Finish the City track in 4:20"
@@ -323,7 +323,7 @@ msgstr ""
 "de nitro en 3 voltas A Tormenta de\n"
 "Area en menos de 2:20 minutos."
 
-#: src/gui/race_gui.cpp:677
+#: src/gui/race_gui.cpp:685
 #, c-format
 msgid "Finished"
 msgstr "Rematada"
@@ -389,9 +389,9 @@ msgstr "O Castelo de Lava"
 msgid "Four Players"
 msgstr "Catro xogadores"
 
-#: src/gui/config_display.cpp:77
-#: src/gui/config_display.cpp:130
-#: src/gui/config_display.cpp:185
+#: src/gui/config_display.cpp:80
+#: src/gui/config_display.cpp:135
+#: src/gui/config_display.cpp:193
 msgid "Fullscreen mode"
 msgstr "Modo a pantalla completa"
 
@@ -403,13 +403,13 @@ msgstr "Axuda dos modos de xogo"
 msgid "Game modes"
 msgstr "Modos de xogo"
 
-#: src/gui/challenges_menu.cpp:54
+#: src/gui/challenges_menu.cpp:55
 #: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Volver ao menú principal"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:828
+#: src/gui/race_gui.cpp:836
 msgid "Go!"
 msgstr "Adiante!"
 
@@ -432,7 +432,7 @@ msgstr ""
 "gaña o que teña unha maior puntuación\n"
 "(o máis rápido en caso de empate!)"
 
-#: src/gui/main_menu.cpp:69
+#: src/gui/main_menu.cpp:75
 #: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Axuda"
@@ -449,16 +449,16 @@ msgstr ""
 "Se ves un botón cun cadeado coma o da dereita,\n"
 "terás que completar un reto para desbloquealo."
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
 msgstr "Aumentar a resolución"
 
-#: src/user_config.cpp:870
+#: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Non válido"
 
-#: src/modes/linear_world.cpp:171
+#: src/karts/player_kart.cpp:365
 msgid "Invalid short-cut!!"
 msgstr "Atallo non válido!!!"
 
@@ -466,7 +466,7 @@ msgstr "Atallo non válido!!!"
 msgid "King Weird's Castle"
 msgstr "O Castelo Estraño do Rei"
 
-#: src/gui/race_gui.cpp:682
+#: src/gui/race_gui.cpp:690
 msgid "Lap"
 msgstr "Volta"
 
@@ -483,7 +483,7 @@ msgstr "Líder"
 msgid "Left"
 msgstr "Esquerda"
 
-#: src/gui/race_results_gui.cpp:301
+#: src/gui/race_results_gui.cpp:303
 #: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Cargando a carreira..."
@@ -493,7 +493,7 @@ msgstr "Cargando a carreira..."
 msgid "Look back"
 msgstr "Mirar cara atrás"
 
-#: src/gui/main_menu.cpp:59
+#: src/gui/main_menu.cpp:58
 msgid "Networking"
 msgstr "Rede"
 
@@ -501,7 +501,7 @@ msgstr "Rede"
 msgid "New Feature Unlocked"
 msgstr "Desbloqueouse unha nova característica"
 
-#: src/challenges/challenge.cpp:133
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -510,7 +510,7 @@ msgstr ""
 "Dispoñible un novo\n"
 "Grand Prix, \"%s\""
 
-#: src/challenges/challenge.cpp:136
+#: src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -520,11 +520,11 @@ msgstr ""
 "Dispoñible unha nova\n"
 "dificultade, \"%s\""
 
-#: src/modes/linear_world.cpp:339
+#: src/modes/linear_world.cpp:286
 msgid "New fastest lap"
 msgstr "Nova volta máis rápida"
 
-#: src/challenges/challenge.cpp:130
+#: src/challenges/challenge.cpp:131
 #, c-format
 msgid ""
 "New game mode\n"
@@ -534,7 +534,7 @@ msgstr ""
 "Dispoñible un novo\n"
 "modo de xogo, \"%s\""
 
-#: src/challenges/challenge.cpp:140
+#: src/challenges/challenge.cpp:144
 #, c-format
 msgid ""
 "New kart\n"
@@ -544,7 +544,7 @@ msgstr ""
 "Dispoñible un novo\n"
 "kart, \"%s\""
 
-#: src/challenges/challenge.cpp:126
+#: src/challenges/challenge.cpp:127
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -558,6 +558,10 @@ msgstr ""
 msgid "Next >"
 msgstr "Seguir >"
 
+#: src/gui/config_display.cpp:84
+msgid "Next background"
+msgstr "Seguinte fondo"
+
 #: src/gui/player_controls.cpp:72
 msgid "Nitro"
 msgstr "Nitro"
@@ -567,16 +571,16 @@ msgstr "Nitro"
 msgid "No Grand Prix selected"
 msgstr "Non se seleccionou Grand Prix ningún"
 
-#: src/gui/race_options.cpp:303
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:325
+#: src/gui/race_options.cpp:328
 msgid "Novice"
 msgstr "Principiante"
 
-#: src/gui/race_options.cpp:102
+#: src/gui/race_options.cpp:100
 msgid "Number of karts"
 msgstr "Número de condutores"
 
-#: src/gui/race_options.cpp:124
+#: src/gui/race_options.cpp:122
 msgid "Number of laps"
 msgstr "Número de voltas"
 
@@ -585,7 +589,7 @@ msgstr "Número de voltas"
 msgid "OK"
 msgstr "Listo"
 
-#: src/user_config.cpp:498
+#: src/user_config.cpp:528
 msgid "Old config file found, check your key bindings!"
 msgstr ""
 "Atopouse un ficheiro de configuración vello,\n"
@@ -599,7 +603,7 @@ msgstr "A Clase de Mates de Oliver"
 msgid "On the Beach"
 msgstr "Na Praia"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:63
 #: src/gui/options.cpp:40
 #: src/gui/race_menu.cpp:48
 msgid "Options"
@@ -615,7 +619,7 @@ msgstr ""
 msgid "Paused"
 msgstr "Pausa"
 
-#: src/gui/race_gui.cpp:857
+#: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
 msgstr "Penalización de tempo!!!"
 
@@ -624,7 +628,7 @@ msgid "Penguin Playground"
 msgstr "O Patio do Pingüín"
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:264
+#: src/gui/player_controls.cpp:290
 msgid "Player "
 msgstr "Xogador"
 
@@ -675,7 +679,7 @@ msgid "Press <ESC> to Cancel"
 msgstr "Preme Esc para cancelar"
 
 #: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:103
+#: src/gui/config_display.cpp:108
 #: src/gui/config_sound.cpp:64
 #: src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80
@@ -683,7 +687,7 @@ msgstr "Preme Esc para cancelar"
 #: src/gui/num_players.cpp:46
 #: src/gui/options.cpp:58
 #: src/gui/player_controls.cpp:124
-#: src/gui/race_options.cpp:154
+#: src/gui/race_options.cpp:152
 msgid "Press <ESC> to go back"
 msgstr "Preme Esc para volver atrás"
 
@@ -700,17 +704,13 @@ msgstr "Carreira rápida"
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Carreira rápida: escolle un circuíto, o primeiro gaña."
 
-#: src/gui/main_menu.cpp:65
+#: src/gui/main_menu.cpp:64
 msgid "Quit"
 msgstr "Saír"
 
-#: src/gui/race_gui.cpp:629
+#: src/gui/race_gui.cpp:637
 msgid "REV"
 msgstr "Marcha atrás"
-
-#: data/tracks/race/race.track:4
-msgid "Race Track"
-msgstr "Circuíto de carreiras"
 
 #: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
@@ -720,7 +720,7 @@ msgstr "Correr neste circuíto de novo"
 msgid "Race results"
 msgstr "Resultados da carreira"
 
-#: src/gui/race_options.cpp:305
+#: src/gui/race_options.cpp:327
 msgid "Racer"
 msgstr "Profesional"
 
@@ -729,7 +729,7 @@ msgid "Racetrack"
 msgstr "Circuíto de Carreiras"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:808
+#: src/gui/race_gui.cpp:816
 msgid "Ready!"
 msgstr "Preparados!"
 
@@ -759,7 +759,7 @@ msgid "Select network mode"
 msgstr "Selecciona o tipo de rede"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:818
+#: src/gui/race_gui.cpp:826
 msgid "Set!"
 msgstr "Listos!"
 
@@ -776,7 +776,7 @@ msgstr "Xiro brusco"
 msgid "Shifting Sands"
 msgstr "A Tormenta de Area"
 
-#: src/gui/main_menu.cpp:54
+#: src/gui/main_menu.cpp:53
 msgid "Single Player"
 msgstr "Xogador individual"
 
@@ -808,7 +808,7 @@ msgstr "Son"
 msgid "Sound Settings"
 msgstr "Configuración do son"
 
-#: src/gui/main_menu.cpp:55
+#: src/gui/main_menu.cpp:54
 msgid "Splitscreen"
 msgstr "Pantalla dividida"
 
@@ -816,7 +816,7 @@ msgstr "Pantalla dividida"
 msgid "Star Track"
 msgstr "Circuíto Espacial"
 
-#: src/gui/race_options.cpp:144
+#: src/gui/race_options.cpp:142
 msgid "Start race"
 msgstr "Comezar a carreira"
 
@@ -824,7 +824,7 @@ msgstr "Comezar a carreira"
 msgid "Synchronising network..."
 msgstr "Sincronizando coa rede..."
 
-#: src/gui/race_results_gui.cpp:271
+#: src/gui/race_results_gui.cpp:273
 msgid "Synchronising."
 msgstr "Sincronizando."
 
@@ -860,7 +860,7 @@ msgstr ""
 msgid "The old mine"
 msgstr "A Vella Mina"
 
-#: src/gui/grand_prix_ending.cpp:111
+#: src/gui/grand_prix_ending.cpp:84
 #, c-format
 msgid "The winner is %s!"
 msgstr "O gañador é %s!"
@@ -912,7 +912,7 @@ msgstr "Activar a música"
 msgid "Turn on sound effects"
 msgstr "Activar os efectos de son"
 
-#: data/tracks/tuxtrack/tuxtrack.track:4
+#: data/tracks/tuxtollway/tuxtollway.track:4
 msgid "Tux Tollway"
 msgstr "A Autopista de Tux"
 
@@ -920,7 +920,7 @@ msgstr "A Autopista de Tux"
 msgid "Two Players"
 msgstr "Dous xogadores"
 
-#: src/modes/linear_world.cpp:278
+#: src/modes/linear_world.cpp:654
 msgid "WRONG WAY!"
 msgstr "Sentido contrario!!!"
 
@@ -1013,7 +1013,7 @@ msgstr ""
 "Gaña o Grand Prix Á Lúa e Alén\n"
 "con tres opoñentes profesionais."
 
-#: src/gui/config_display.cpp:72
+#: src/gui/config_display.cpp:75
 msgid "Window mode"
 msgstr "Modo de fiestra"
 
@@ -1021,7 +1021,7 @@ msgstr "Modo de fiestra"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You finished the race!"
 msgstr "Remataches a carreira!"
 
@@ -1031,7 +1031,7 @@ msgid ""
 "eliminated!"
 msgstr "Fuches eliminado!"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You won the race!"
 msgstr "Gañaches a carreira!"
 
@@ -1039,34 +1039,37 @@ msgstr "Gañaches a carreira!"
 msgid "Zipper - speed boost"
 msgstr "Acelerador - incrementador da velocidade"
 
-#: src/user_config.cpp:853
+#: src/user_config.cpp:986
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joy %d axis %d  %c"
 
-#: src/user_config.cpp:857
+#: src/user_config.cpp:991
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joy %d btn %d"
 
-#: src/user_config.cpp:860
+#: src/user_config.cpp:994
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joy %d hat %d"
 
-#: src/user_config.cpp:866
+#: src/user_config.cpp:1000
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "rato axis %d %c"
 
-#: src/user_config.cpp:863
+#: src/user_config.cpp:997
 #, c-format
 msgid "mouse btn %d"
 msgstr "rato btn %d"
 
-#: src/user_config.cpp:847
-#: src/user_config.cpp:891
+#: src/user_config.cpp:980
+#: src/user_config.cpp:1025
 #, c-format
 msgid "not set"
 msgstr "sen establecer"
+
+#~ msgid "Race Track"
+#~ msgstr "Circuíto de carreiras"
 
