@@ -485,6 +485,10 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
 {
     // If the kart was off the road, don't do any shortcuts
     if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
+    int next_sector = OLDSEC==(int)m_driveline.size()-1 ? 0 : OLDSEC+1;
+    if(next_sector==NEWSEC) 
+        return false;
+
     int distance_sectors = (int)(m_distance_from_start[std::max(NEWSEC, OLDSEC)] -
                                  m_distance_from_start[std::min(NEWSEC, OLDSEC)]  );
     
