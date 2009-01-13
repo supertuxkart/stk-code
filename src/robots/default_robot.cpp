@@ -77,6 +77,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_min_steps          = 0;
         m_skidding_threshold = 4.0f;
         m_nitro_level        = NITRO_NONE;
+        m_handle_bomb        = false;
         break;
     case RaceManager::RD_MEDIUM:
         m_wait_for_players   = true;
@@ -90,6 +91,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_min_steps          = 1;
         m_skidding_threshold = 2.0f;
         m_nitro_level        = NITRO_SOME;
+        m_handle_bomb        = true;
         break;
     case RaceManager::RD_HARD:
         m_wait_for_players   = false;
@@ -100,6 +102,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_min_steps          = 2;
         m_skidding_threshold = 1.3f;
         m_nitro_level        = NITRO_ALL;
+        m_handle_bomb        = true;
         break;
     }
 
@@ -126,6 +129,7 @@ void DefaultRobot::update(float dt)
 {
     // This is used to enable firing an item backwards.
     m_controls.m_look_back = false;
+    m_controls.m_nitro     = false;
     m_track_sector = m_world->m_kart_info[ getWorldKartId() ].m_track_sector;
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
@@ -165,13 +169,47 @@ void DefaultRobot::update(float dt)
     checkCrashes( steps, getXYZ() );
     findCurve();
 
-    /*Response handling functions*/
-    handleAcceleration(dt);
-    handleSteering(dt);
-    handleItems(dt, steps);
-    handleRescue(dt);
-    handleBraking();
-    handleNitroAndZipper();
+    // Special behaviour if we have a bomb attach: try to hit the kart ahead 
+    // of us.
+    bool commands_set = false;
+    if(m_handle_bomb && getAttachment()->getType()==ATTACH_BOMB && 
+        m_kart_ahead )
+    {
+        // Use nitro if the kart is far ahead, or faster than this kart
+        m_controls.m_nitro = m_distance_ahead>10.0f || 
+                             m_kart_ahead->getSpeed() > getSpeed();
+        // If we are close enough, try to hit this kart
+        if(m_distance_ahead<=10)
+        {
+            Vec3 target = m_kart_ahead->getXYZ();
+
+            // If we are faster, try to predict the point where we will hit
+            // the other kart
+            if(m_kart_ahead->getSpeed() < getSpeed())
+            {
+                float time_till_hit = m_distance_ahead
+                                    / (getSpeed()-m_kart_ahead->getSpeed());
+                target += m_kart_ahead->getVelocity()*time_till_hit;
+            }
+            float steer_angle = steerToPoint(m_kart_ahead->getXYZ().toFloat(), 
+                                             dt);
+            setSteering(steer_angle, dt);
+            commands_set = true;
+        }
+        handleRescue(dt);
+    }
+    if(!commands_set)
+    {
+        /*Response handling functions*/
+        handleAcceleration(dt);
+        handleSteering(dt);
+        handleItems(dt, steps);
+        handleRescue(dt);
+        handleBraking();
+        // If a bomb is attached, nitro might already be set.
+        if(!m_controls.m_nitro)
+            handleNitroAndZipper();
+    }
     // If we are supposed to use nitro, but have a zipper, 
     // use the zipper instead
     if(m_controls.m_nitro && m_powerup.getType()==POWERUP_ZIPPER && 

@@ -78,6 +78,9 @@ private:
     
     ItemTactic m_item_tactic; //How are items going to be used?
 
+    /** True if the kart should try to pass on a bomb to another kart. */
+
+    bool m_handle_bomb;
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
