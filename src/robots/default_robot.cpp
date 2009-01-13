@@ -647,7 +647,6 @@ void DefaultRobot::handleNitroAndZipper()
         }
     }
 
-    const float my_dist = m_world->getDistanceDownTrackForKart(getWorldKartId());
     // A kart within this distance is considered to be overtaking (or to be
     // overtaken).
     const float overtake_distance = 10.0f;

@@ -53,8 +53,8 @@ public:
     const std::string& getPlayerName() const { return m_user_name;           }
     bool operator<(const RemoteKartInfo& other) const
     {
-        return (m_host_id<other.m_host_id ||
-                m_host_id==other.m_host_id && m_local_player_id<other.m_local_player_id);
+        return ((m_host_id<other.m_host_id) ||
+                (m_host_id==other.m_host_id && m_local_player_id<other.m_local_player_id));
     }
 };   // RemoteKartInfo
 
