@@ -561,7 +561,7 @@ void DefaultRobot::handleAcceleration( const float DELTA )
 
     if(hasViewBlockedByPlunger())
     {
-        if(!(getSpeed() > getMaxSpeed() / 2))
+        if(!(getSpeed() > getMaxSpeedOnTerrain() / 2))
             m_controls.m_accel = 0.05f;
         else 
             m_controls.m_accel = 0.0f;
@@ -631,7 +631,7 @@ void DefaultRobot::handleNitroAndZipper()
 {
     m_controls.m_nitro = false;
     // If we are already very fast, save nitro.
-    if(getSpeed() > 0.95f*getMaxSpeed())
+    if(getSpeed() > 0.95f*getMaxSpeedOnTerrain())
         return;
     // Don't use nitro when the AI has a plunger in the face!
     if(hasViewBlockedByPlunger()) return;
@@ -987,7 +987,7 @@ void DefaultRobot::reset()
     m_start_kart_crash_direction = 0;
     m_sector                     = Track::UNKNOWN_SECTOR;
     m_inner_curve                = 0;
-    m_curve_target_speed         = getMaxSpeed();
+    m_curve_target_speed         = getMaxSpeedOnTerrain();
     m_curve_angle                = 0.0;
     m_future_location[0]         = 0.0;
     m_future_location[1]         = 0.0;
@@ -1182,5 +1182,5 @@ void DefaultRobot::findCurve()
     m_curve_angle = normalizeAngle(m_track->m_angle[i] - m_track->m_angle[m_track_sector]);
     m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
     
-    m_curve_target_speed = getMaxSpeed();
+    m_curve_target_speed = getMaxSpeedOnTerrain();
 }   // findCurve

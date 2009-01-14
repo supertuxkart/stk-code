@@ -116,6 +116,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_slowdown_factor,           "slowdown-factor"            );
+    CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
     m_kart_properties.checkAllSet(filename);
@@ -138,7 +139,7 @@ void STKConfig::init_defaults()
         m_shortcut_length      = m_music_credit_time         =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_slowdown_factor      = m_offroad_tolerance         =
-        m_final_camera_time    =
+        m_final_camera_time    = m_near_ground               =
         UNDEFINED;
     m_max_karts                = -100;
     m_grid_order               = -100;
@@ -202,6 +203,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("max-skidmarks",                m_max_skidmarks            );
     lisp->get("skid-fadeout-time",            m_skid_fadeout_time        );
     lisp->get("slowdown-factor",              m_slowdown_factor          );
+    lisp->get("near-ground",                  m_near_ground              );
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->getVector("menu-background",        m_menu_background          );

@@ -75,6 +75,10 @@ public:
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
     float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */ 
     float m_slowdown_factor;         /**<Used in terrain specific slowdown.  */
+    float m_near_ground;             /**<Determines when a kart is not near 
+                                      *  ground anymore and the upright
+                                      *  constraint is disabled to allow for
+                                      *  more violent explosions.            */
     bool  m_enable_networking;
     
     std::vector<float> 

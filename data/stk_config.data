@@ -20,6 +20,9 @@
  (skid-fadeout-time           60)   ;; Time till skidm marks fade out
  (slowdown-factor             10)   ;; Engine reduction depending on terrain,
                                     ;; see kart for details.
+ (near-ground                  2)   ;; Distance above ground when the upright
+                                    ;; constraint will be disabled to allow 
+                                    ;; more violent explosions.
  (delay-finish-time           10)   ;; delay till race results are displayed.
  (music-credit-time           10)   ;; time for which the music credits 
                                     ;; are displayed.

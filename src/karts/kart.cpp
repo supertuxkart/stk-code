@@ -437,6 +437,19 @@ bool Kart::isOnGround() const
            m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
 }   // isOnGround
 //-----------------------------------------------------------------------------
+/** The kart is near the ground, but not necesarily on it (small jumps). This
+ *  is used to determine when to switch off the upright constraint, so that
+ *  explosions can be more violent, while still 
+*/
+
+bool Kart::isNearGround() const
+{
+    if(getHoT()==Track::NOHIT)
+        return false;
+    else
+        return ((getXYZ().getZ() - getHoT()) < stk_config->m_near_ground);
+}   // isNearGround
+//-----------------------------------------------------------------------------
 void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 {
     if(direct_hit) 
@@ -473,6 +486,8 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
+    if(m_body->getAngularVelocity().getZ()>1.9f)
+        dt=1.0f*dt;
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
     
@@ -494,8 +509,8 @@ void Kart::update(float dt)
         m_controls.m_fire = false;
     }
 
-    // Only use the upright constraint if the kart is in the air!
-    if(isOnGround())
+    // When really on air, free fly, when near ground, try to glide / adjust for landing
+    if(!isNearGround())
         m_uprightConstraint->setLimit(M_PI);
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
@@ -607,7 +622,7 @@ void Kart::update(float dt)
         {
             m_power_reduction = material->getSlowDown();
             // Normal driving on terrain. Adjust for maximum terrain speed
-            float max_speed_here = material->getMaxSpeedFraction()*m_max_speed;
+            float max_speed_here = material->getMaxSpeedFraction()*getMaxSpeed();
             // If the speed is too fast, reduce the maximum speed gradually.
             // The actual capping happens in updatePhysics
             if(max_speed_here<m_speed)
@@ -633,7 +648,7 @@ void Kart::handleZipper()
     btVector3 v         = m_body->getLinearVelocity();
     float current_speed = v.length();
     float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain, 
-                                   getMaxSpeed());
+                                   getMaxSpeedOnTerrain());
     // If the speed is too low, very minor components of the velocity vector
     // can become too big. E.g. each kart has a z component (to offset gravity
     // I assume, around 0.16) --> if the karts are (nearly) at standstill,
@@ -773,7 +788,7 @@ void Kart::updatePhysics (float dt)
             {
                 resetBrakes();
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
-                if ( fabs(m_speed) <  getMaxSpeed()*m_max_speed_reverse_ratio )
+                if ( fabs(m_speed) <  getMaxSpeedOnTerrain()*m_max_speed_reverse_ratio )
                 {
                     // the backwards acceleration is artificially increased to allow
                     // players to get "unstuck" quicker if they hit e.g. a wall
@@ -858,7 +873,7 @@ void Kart::updatePhysics (float dt)
         m_speed *= -1.f;
 
     //cap at maximum velocity
-    const float max_speed = m_kart_properties->getMaxSpeed();
+    const float max_speed = getMaxSpeedOnTerrain();
     if ( m_speed >  max_speed )
     {
         const float velocity_ratio = max_speed/m_speed;

@@ -185,7 +185,12 @@ public:
                    getControls      () const {return m_controls;               }
     /** Sets the kart controls. Used e.g. by replaying history. */
     void           setControls(const KartControl &c) { m_controls = c;         }
-    float          getMaxSpeed      () const {return m_max_speed-
+    /** Returns the maximum speed of the kart independent of the 
+     *  terrain it is on. */
+    float          getMaxSpeed      () const {return m_max_speed;              }    
+    /** Returns the maximum speed of the kart but includes the effect of 
+     *  the terrain it is on. */    
+    float          getMaxSpeedOnTerrain() const {return m_max_speed-
                                                      m_max_speed_reduction;    }
     /** Returns the length of the kart. */
     float          getKartLength    () const
@@ -207,6 +212,7 @@ public:
     float          handleNitro      (float dt);
     float          getActualWheelForce();
     bool           isOnGround       () const;
+    bool           isNearGround     () const;
     bool           isEliminated     () const {return m_eliminated;}
     void           eliminate        ();
     bool           isRescue         () const {return m_rescue;}
