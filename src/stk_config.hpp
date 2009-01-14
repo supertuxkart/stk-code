@@ -58,6 +58,8 @@ public:
     float m_offroad_tolerance;       /**<Road width is extended by that 
                                          fraction to make shortcut detection
                                          more forgiving.                     */
+    float m_final_camera_time;       /**<Time for the movement of the final
+                                      *  camera.                             */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving 
                                          objects, e.g. road cones, ...       */

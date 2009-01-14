@@ -108,9 +108,10 @@ void Camera::setMode(Mode mode)
         const Track* track=RaceManager::getTrack();
         // If the track doesn't have a final position, ignore this mode
         if(!track->hasFinalCamera()) return;
-        const float duration = 1.0f;
-        m_velocity           = (track->getCameraPosition()-m_xyz)/duration;
-        m_angular_velocity   = (track->getCameraHPR()-m_hpr)/duration;
+        m_velocity           = (track->getCameraPosition()-m_xyz)
+                             / stk_config->m_final_camera_time;
+        m_angular_velocity   = (track->getCameraHPR()-m_hpr)
+                             / stk_config->m_final_camera_time;
         m_final_time         = 0.0f;
     }
     m_mode       = mode;
@@ -219,7 +220,7 @@ void Camera::finalCamera(float dt)
 {
     // Turn/move the camera for 1 second only
     m_final_time += dt;    
-    if( m_final_time<1.0f )
+    if( m_final_time<stk_config->m_final_camera_time )
     {
         m_xyz += m_velocity*dt;
         m_hpr += m_angular_velocity*dt;

@@ -109,6 +109,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_shortcut_length,           "shortcut-length"            );
     CHECK_NEG(m_offroad_tolerance,         "offroad-tolerance"          );
+    CHECK_NEG(m_final_camera_time,         "final-camera-time"          );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
@@ -137,6 +138,7 @@ void STKConfig::init_defaults()
         m_shortcut_length      = m_music_credit_time         =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_slowdown_factor      = m_offroad_tolerance         =
+        m_final_camera_time    =
         UNDEFINED;
     m_max_karts                = -100;
     m_grid_order               = -100;
@@ -178,6 +180,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("anvil-weight",                 m_anvil_weight             );
     lisp->get("shortcut-length",              m_shortcut_length          );
     lisp->get("offroad-tolerance",            m_offroad_tolerance        );
+    lisp->get("final-camera-time",            m_final_camera_time        );
     lisp->get("anvil-speed-factor",           m_anvil_speed_factor       );
     lisp->get("parachute-friction",           m_parachute_friction       );
     lisp->get("parachute-time",               m_parachute_time           );
