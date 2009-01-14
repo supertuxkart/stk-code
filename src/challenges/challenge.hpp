@@ -54,7 +54,7 @@ class Challenge
     std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
              Challenge(std::string id, std::string name);
-             Challenge() {m_Id=""; m_Name="";}
+             Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
     const std::string& getId() const             { return m_Id;                  }
     const std::string& getName() const           { return m_Name;                }
