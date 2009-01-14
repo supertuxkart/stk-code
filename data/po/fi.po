@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 15:52+1100\n"
+"POT-Creation-Date: 2009-01-13 15:03+1100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Kristian Laakkonen <kristian.laakkonen@gmail.com>\n"
 "Language-Team: \n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: finnish\n"
 
-#: src/gui/config_display.cpp:387
+#: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d mustalistattu"
@@ -67,11 +67,11 @@ msgstr "Reissu Amazonissa"
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Alasin - hidastaa kärjessä olevaa kilpailijaa merkittävästi"
 
-#: src/gui/config_display.cpp:94
+#: src/gui/config_display.cpp:99
 msgid "Apply "
 msgstr "Käytä"
 
-#: src/gui/config_display.cpp:353
+#: src/gui/config_display.cpp:361
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Käytä %dx%d"
@@ -88,7 +88,7 @@ msgstr "Maailman reunalla"
 msgid "Avoid bananas"
 msgstr "Vältä banaaneja"
 
-#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/grand_prix_ending.cpp:138
 #: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Takaisin päävalikkoon"
@@ -135,7 +135,7 @@ msgstr "Yhdistäminen palvelimeen epäonnistui"
 msgid "Canyon"
 msgstr "Kanjoni"
 
-#: src/gui/main_menu.cpp:62
+#: src/gui/main_menu.cpp:61
 msgid "Challenges"
 msgstr "Haasteet"
 
@@ -148,7 +148,7 @@ msgstr "Valitse näppäimet, %s"
 msgid "City"
 msgstr "Kaupunki"
 
-#: src/gui/config_display.cpp:99
+#: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
 msgstr "Poista mustalta listalta"
 
@@ -176,9 +176,10 @@ msgid ""
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
 msgstr ""
-"Voita ”Maailman reunalla” -grand prix\n"
-"kolmea tietokoneen ohjaamaa\n"
-"”kilpa-ajaja” -tasoista pelaajaa vastaan."
+"Voita ”Maailman reunalla” -grand\n"
+"prix kolmea tietokoneen ohjaamaa\n"
+"”kilpa-ajaja” -tasoista pelaajaa\n"
+"vastaan."
 
 #: src/gui/display_res_confirm.cpp:56
 msgid "Confirm Resolution"
@@ -202,7 +203,7 @@ msgid "Connected:"
 msgstr "Yhdistetty:"
 
 #: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/grand_prix_ending.cpp:134
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Jatka"
@@ -230,7 +231,7 @@ msgstr ""
 "Tehnyt Olivier & Steve Baker\n"
 "muokannut Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:72
+#: src/gui/main_menu.cpp:78
 msgid "Credits"
 msgstr "Tekijät"
 
@@ -239,16 +240,16 @@ msgid "Crescent Crossing"
 msgstr "Puolikuun risteys"
 
 #. I18N: displays current resolution
-#: src/gui/config_display.cpp:85
+#: src/gui/config_display.cpp:89
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Nykyinen: %dx%d"
 
-#: src/gui/config_display.cpp:91
+#: src/gui/config_display.cpp:96
 msgid "Decrease Resolution"
 msgstr "Pienennä resoluutiota"
 
-#: src/gui/race_options.cpp:86
+#: src/gui/race_options.cpp:84
 msgid "Difficulty"
 msgstr "Vaikeusaste"
 
@@ -256,11 +257,11 @@ msgstr "Vaikeusaste"
 msgid "Display"
 msgstr "Näyttö"
 
-#: src/gui/config_display.cpp:55
+#: src/gui/config_display.cpp:58
 msgid "Display Settings"
 msgstr "Näyttöasetukset"
 
-#: src/gui/race_options.cpp:304
+#: src/gui/race_options.cpp:326
 msgid "Driver"
 msgstr "Kuljettaja"
 
@@ -288,27 +289,29 @@ msgid ""
 "with 3 AI karts\n"
 "in under 4:20 minutes."
 msgstr ""
-"Aja kolme kierrosta Kaupunki-radalla\n"
-"kolmen tietokoneen ohjaaman pelaajan\n"
-"kanssa alle 4 min 20 sek."
+"Aja kolme kierrosta Kaupunki-\n"
+"radalla kolmen tietokoneen\n"
+"ohjaaman pelaajan kanssa\n"
+"alle 4 min 20 sek."
 
 #: data/tracks/canyon/canyon.challenge:6
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
-"in under 3:00 minutes."
+"in under 3:35 minutes."
 msgstr ""
-"Aja kolme kierrosta Tuxin tullitie -radalla\n"
-"kolmen tietokoneen ohjaaman pelaajan\n"
-"kanssa alle 3 minuutin."
+"Aja kolme kierrosta Tuxin tullitie\n"
+"-radalla kolmen tietokoneen\n"
+"ohjaaman pelaajan kanssa\n"
+"alle 3 min 35 sek."
 
 #: data/tracks/jungle/jungle.challenge:5
 msgid "Finish Race track in 2:40"
 msgstr "Aja Kilparata alle 2 min 40 sek"
 
 #: data/tracks/canyon/canyon.challenge:5
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "Aja Tuxin tullitie alle 3 minuutin"
+msgid "Finish Tux Tollway track in 3:35"
+msgstr "Aja Tuxin tullitie alle 3 min 35 sek"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
 msgid "Finish the City track in 4:20"
@@ -321,11 +324,11 @@ msgid ""
 "in under 2:20 minutes."
 msgstr ""
 "Kerää vähintään yhdeksän\n"
-"nitro-pistettä kolmen kierroksen aikana\n"
-"Liikkuvat hiekat -radalla\n"
+"nitro-pistettä kolmen kierroksen\n"
+"aikana Liikkuvat hiekat -radalla\n"
 "alle 2:20 minuutin aikana."
 
-#: src/gui/race_gui.cpp:677
+#: src/gui/race_gui.cpp:685
 #, c-format
 msgid "Finished"
 msgstr "Päättynyt"
@@ -391,9 +394,9 @@ msgstr "Magman linnake"
 msgid "Four Players"
 msgstr "Neljä pelaajaa"
 
-#: src/gui/config_display.cpp:77
-#: src/gui/config_display.cpp:130
-#: src/gui/config_display.cpp:185
+#: src/gui/config_display.cpp:80
+#: src/gui/config_display.cpp:135
+#: src/gui/config_display.cpp:193
 msgid "Fullscreen mode"
 msgstr "Kokonäyttötila"
 
@@ -405,13 +408,13 @@ msgstr "Pelimuotojen apu"
 msgid "Game modes"
 msgstr "Pelimuodot"
 
-#: src/gui/challenges_menu.cpp:54
+#: src/gui/challenges_menu.cpp:55
 #: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Palaa päävalikkoon"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:828
+#: src/gui/race_gui.cpp:836
 msgid "Go!"
 msgstr "Aja!"
 
@@ -433,7 +436,7 @@ msgstr ""
 "Eniten pisteitä kerännyt voittaa (Vähiten aikaa käyttänyt\n"
 "voittaa pisteiden ollessa tasan)."
 
-#: src/gui/main_menu.cpp:69
+#: src/gui/main_menu.cpp:75
 #: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Apu"
@@ -447,19 +450,19 @@ msgid ""
 "If you see a button with a lock like the one to the right,\n"
 "you need to complete a challenge to unlock it."
 msgstr ""
-"Jos näet samanlaisen lukollisen painikkeen kuin oikealla,\n"
-"sinun on suoritettava haaste onnistuneesti avataksesi lukituksen."
+"Jos näet tällaisen lukollisen painikkeen, sinun on\n"
+"suoritettava haaste onnistuneesti avataksesi lukituksen."
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
 msgstr "Suurenna resoluutiota"
 
-#: src/user_config.cpp:870
+#: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Virheellinen"
 
-#: src/modes/linear_world.cpp:171
+#: src/karts/player_kart.cpp:365
 msgid "Invalid short-cut!!"
 msgstr "Oikaisit liikaa!"
 
@@ -467,7 +470,7 @@ msgstr "Oikaisit liikaa!"
 msgid "King Weird's Castle"
 msgstr "Kuningas Oudon linna"
 
-#: src/gui/race_gui.cpp:682
+#: src/gui/race_gui.cpp:690
 msgid "Lap"
 msgstr "Kierros"
 
@@ -484,7 +487,7 @@ msgstr "Johtaja"
 msgid "Left"
 msgstr "Vasen"
 
-#: src/gui/race_results_gui.cpp:301
+#: src/gui/race_results_gui.cpp:303
 #: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Ladataan kilpailua..."
@@ -494,7 +497,7 @@ msgstr "Ladataan kilpailua..."
 msgid "Look back"
 msgstr "Katso taakse"
 
-#: src/gui/main_menu.cpp:59
+#: src/gui/main_menu.cpp:58
 msgid "Networking"
 msgstr "Verkkoyhteydet"
 
@@ -502,7 +505,7 @@ msgstr "Verkkoyhteydet"
 msgid "New Feature Unlocked"
 msgstr "Uusi ominaisuus avattu"
 
-#: src/challenges/challenge.cpp:133
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -512,7 +515,7 @@ msgstr ""
 "”%s”\n"
 "on nyt käytössäsi"
 
-#: src/challenges/challenge.cpp:136
+#: src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -523,11 +526,11 @@ msgstr ""
 "”%s”\n"
 "on nyt käytössäsi"
 
-#: src/modes/linear_world.cpp:339
+#: src/modes/linear_world.cpp:286
 msgid "New fastest lap"
 msgstr "Uusi nopein kierros"
 
-#: src/challenges/challenge.cpp:130
+#: src/challenges/challenge.cpp:131
 #, c-format
 msgid ""
 "New game mode\n"
@@ -538,7 +541,7 @@ msgstr ""
 "”%s”\n"
 "on nyt käytössäsi"
 
-#: src/challenges/challenge.cpp:140
+#: src/challenges/challenge.cpp:144
 #, c-format
 msgid ""
 "New kart\n"
@@ -549,7 +552,7 @@ msgstr ""
 "”%s”\n"
 "on nyt käytössäsi"
 
-#: src/challenges/challenge.cpp:126
+#: src/challenges/challenge.cpp:127
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -564,6 +567,10 @@ msgstr ""
 msgid "Next >"
 msgstr "Seuraava >"
 
+#: src/gui/config_display.cpp:84
+msgid "Next background"
+msgstr "Seuraava taustakuva"
+
 #: src/gui/player_controls.cpp:72
 msgid "Nitro"
 msgstr "Nitro"
@@ -573,16 +580,16 @@ msgstr "Nitro"
 msgid "No Grand Prix selected"
 msgstr "Ei grand prixiä valittuna"
 
-#: src/gui/race_options.cpp:303
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:325
+#: src/gui/race_options.cpp:328
 msgid "Novice"
 msgstr "Aloittelija"
 
-#: src/gui/race_options.cpp:102
+#: src/gui/race_options.cpp:100
 msgid "Number of karts"
 msgstr "Autojen määrä"
 
-#: src/gui/race_options.cpp:124
+#: src/gui/race_options.cpp:122
 msgid "Number of laps"
 msgstr "Kierrosmäärä"
 
@@ -591,7 +598,7 @@ msgstr "Kierrosmäärä"
 msgid "OK"
 msgstr "OK"
 
-#: src/user_config.cpp:498
+#: src/user_config.cpp:528
 msgid "Old config file found, check your key bindings!"
 msgstr "Vanha asetustiedosto löydetty, tarkista näppäinasetukset!"
 
@@ -603,7 +610,7 @@ msgstr "Oliverin matikantunti"
 msgid "On the Beach"
 msgstr "Rannalla"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:63
 #: src/gui/options.cpp:40
 #: src/gui/race_menu.cpp:48
 msgid "Options"
@@ -617,7 +624,7 @@ msgstr "Laskuvarjo - hidastaa kaikkia edelläsi olevia kilpailijoita!"
 msgid "Paused"
 msgstr "Pysäytetty"
 
-#: src/gui/race_gui.cpp:857
+#: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
 msgstr "Sakkoaika!"
 
@@ -626,7 +633,7 @@ msgid "Penguin Playground"
 msgstr "Pingviinien leikkikenttä"
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:264
+#: src/gui/player_controls.cpp:290
 msgid "Player "
 msgstr "Pelaaja"
 
@@ -665,7 +672,7 @@ msgid ""
 "or throw while looking back to make one lose sight!"
 msgstr ""
 "Imukuppi - heitä suoraan eteenpäin vetääksesi edellä\n"
-"ajavaa taaksepäin, tai heitä taaksepäin katsoessasi\n"
+"ajavaa taaksepäin, tai taaksepäin katsoessasi heitä se\n"
 "takaa tulevan eteen näköesteeksi!"
 
 #: data/tracks/prehistoric/prehistoric.track:4
@@ -677,7 +684,7 @@ msgid "Press <ESC> to Cancel"
 msgstr "Paina ESCiä poistuaksesi"
 
 #: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:103
+#: src/gui/config_display.cpp:108
 #: src/gui/config_sound.cpp:64
 #: src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80
@@ -685,7 +692,7 @@ msgstr "Paina ESCiä poistuaksesi"
 #: src/gui/num_players.cpp:46
 #: src/gui/options.cpp:58
 #: src/gui/player_controls.cpp:124
-#: src/gui/race_options.cpp:154
+#: src/gui/race_options.cpp:152
 msgid "Press <ESC> to go back"
 msgstr "Paina ESCiä palataksesi takaisin"
 
@@ -702,17 +709,13 @@ msgstr "Pikakisa"
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Pikakisa: Valitse yksi rata, nopeimman ajan ajanut voittaa."
 
-#: src/gui/main_menu.cpp:65
+#: src/gui/main_menu.cpp:64
 msgid "Quit"
 msgstr "Poistu"
 
-#: src/gui/race_gui.cpp:629
+#: src/gui/race_gui.cpp:637
 msgid "REV"
 msgstr "Pakki"
-
-#: data/tracks/race/race.track:4
-msgid "Race Track"
-msgstr "Kilparata"
 
 #: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
@@ -722,7 +725,7 @@ msgstr "Aja uudestaan tällä radalla"
 msgid "Race results"
 msgstr "Kilpailun tulokset"
 
-#: src/gui/race_options.cpp:305
+#: src/gui/race_options.cpp:327
 msgid "Racer"
 msgstr "Kilpa-ajaja"
 
@@ -731,7 +734,7 @@ msgid "Racetrack"
 msgstr "Kilparata"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:808
+#: src/gui/race_gui.cpp:816
 msgid "Ready!"
 msgstr "Paikoillenne!"
 
@@ -761,7 +764,7 @@ msgid "Select network mode"
 msgstr "Valitse verkkoyhteyden muoto"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:818
+#: src/gui/race_gui.cpp:826
 msgid "Set!"
 msgstr "Valmiit!"
 
@@ -778,7 +781,7 @@ msgstr "Tiukka käännös"
 msgid "Shifting Sands"
 msgstr "Liikkuvat hiekat"
 
-#: src/gui/main_menu.cpp:54
+#: src/gui/main_menu.cpp:53
 msgid "Single Player"
 msgstr "Yksinpeli"
 
@@ -810,8 +813,7 @@ msgstr "Ääni"
 msgid "Sound Settings"
 msgstr "Ääniasetukset"
 
-#: src/gui/main_menu.cpp:55
-#, fuzzy
+#: src/gui/main_menu.cpp:54
 msgid "Splitscreen"
 msgstr "Jaettu ruutu"
 
@@ -819,7 +821,7 @@ msgstr "Jaettu ruutu"
 msgid "Star Track"
 msgstr "Tähtirata"
 
-#: src/gui/race_options.cpp:144
+#: src/gui/race_options.cpp:142
 msgid "Start race"
 msgstr "Aloita kilpailu"
 
@@ -827,7 +829,7 @@ msgstr "Aloita kilpailu"
 msgid "Synchronising network..."
 msgstr "Synkronoidaan verkkoyhteyttä..."
 
-#: src/gui/race_results_gui.cpp:271
+#: src/gui/race_results_gui.cpp:273
 msgid "Synchronising."
 msgstr "Synkronoidaan."
 
@@ -849,7 +851,7 @@ msgid ""
 "Options->Player Config menu."
 msgstr ""
 "Nykyisiä näppäinasetuksia voi katsella/muuttaa\n"
-"valikosta Asetukset -> Pelaaja-asetukset."
+"valikossa Asetukset -> Pelaaja-asetukset."
 
 #: src/highscore_manager.cpp:108
 msgid ""
@@ -863,7 +865,7 @@ msgstr ""
 msgid "The old mine"
 msgstr "Vanha kaivos"
 
-#: src/gui/grand_prix_ending.cpp:111
+#: src/gui/grand_prix_ending.cpp:84
 #, c-format
 msgid "The winner is %s!"
 msgstr "Voittaja on %s!"
@@ -883,7 +885,9 @@ msgstr "Aika-ajo"
 
 #: src/gui/help_page_three.cpp:63
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "Aika-ajo: Käytettävissäsi ei ole apuvälineitä, joten vain ajotaidoillasi on merkitystä!"
+msgstr ""
+"Aika-ajo: Käytettävissäsi ei ole apuvälineitä,\n"
+"joten vain ajotaidoillasi on merkitystä!"
 
 #: src/gui/help_page_two.cpp:58
 msgid "To help you win, there are certain powerups you can grab:"
@@ -913,7 +917,7 @@ msgstr "Laita musiikki päälle"
 msgid "Turn on sound effects"
 msgstr "Laita ääniefektit päälle"
 
-#: data/tracks/tuxtrack/tuxtrack.track:4
+#: data/tracks/tuxtollway/tuxtollway.track:4
 msgid "Tux Tollway"
 msgstr "Tuxin tullitie"
 
@@ -921,7 +925,7 @@ msgstr "Tuxin tullitie"
 msgid "Two Players"
 msgstr "Kaksi pelaajaa"
 
-#: src/modes/linear_world.cpp:278
+#: src/modes/linear_world.cpp:654
 msgid "WRONG WAY!"
 msgstr "VÄÄRÄ SUUNTA!"
 
@@ -964,8 +968,9 @@ msgid ""
 "level AI kart."
 msgstr ""
 "Voita yhden kierroksen\n"
-"Tuxin tullitie -kisa yhtä tietokoneen\n"
-"ohjaamaa pelaajaa vastaan."
+"Tuxin tullitie -kisa yhtä\n"
+"tietokoneen ohjaamaa\n"
+"pelaajaa vastaan."
 
 #: data/tracks/city/city.challenge:6
 msgid ""
@@ -974,8 +979,9 @@ msgid ""
 "in the Amazonian Jungle."
 msgstr ""
 "Voita Seuraa johtajaa -kilpailu\n"
-"kolmea tietokoneen ohjaamaa pelaajaa\n"
-"vastaan Amazonin viidakossa."
+"kolmea tietokoneen ohjaamaa\n"
+"pelaajaa vastaan Amazonin\n"
+"viidakossa."
 
 #: data/grandprix/atworldsend.challenge:6
 msgid ""
@@ -984,8 +990,9 @@ msgid ""
 "on a Desert Island."
 msgstr ""
 "Voita Seuraa johtajaa -kilpailu\n"
-"kolmea tietokoneen ohjaamaa pelaajaa\n"
-"vastaan autiolla saarella."
+"kolmea tietokoneen ohjaamaa\n"
+"pelaajaa vastaan autiolla\n"
+"saarella."
 
 #: data/tracks/fortmagma/fortmagma.challenge:5
 msgid ""
@@ -1009,11 +1016,11 @@ msgid ""
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
 msgstr ""
-"Voita Kuuhun ja takaisin -grand prix\n"
-"kolmea tietokoneen ohjaamaa\n"
-"pelaajaa vastaan."
+"Voita Kuuhun ja takaisin -grand\n"
+"prix kolmea tietokoneen\n"
+"ohjaamaa pelaajaa vastaan."
 
-#: src/gui/config_display.cpp:72
+#: src/gui/config_display.cpp:75
 msgid "Window mode"
 msgstr "Ikkunoitu tila"
 
@@ -1021,7 +1028,7 @@ msgstr "Ikkunoitu tila"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You finished the race!"
 msgstr "Saavuit maaliin!"
 
@@ -1031,7 +1038,7 @@ msgid ""
 "eliminated!"
 msgstr "Sinut poistettiin kisasta!"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You won the race!"
 msgstr "Voitit kilpailun!"
 
@@ -1039,37 +1046,39 @@ msgstr "Voitit kilpailun!"
 msgid "Zipper - speed boost"
 msgstr "Zipper - vauhtilisä"
 
-#: src/user_config.cpp:853
+#: src/user_config.cpp:986
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joystick %d akseli %d  %c"
 
-#: src/user_config.cpp:857
+#: src/user_config.cpp:991
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joystick %d nappi %d"
 
-#: src/user_config.cpp:860
+#: src/user_config.cpp:994
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joystick %d hattu %d"
 
-#: src/user_config.cpp:866
+#: src/user_config.cpp:1000
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "hiiren akseli %d %c"
 
-#: src/user_config.cpp:863
+#: src/user_config.cpp:997
 #, c-format
 msgid "mouse btn %d"
 msgstr "hiiren nappi %d"
 
-#: src/user_config.cpp:847
-#: src/user_config.cpp:891
+#: src/user_config.cpp:980
+#: src/user_config.cpp:1025
 #, c-format
 msgid "not set"
 msgstr "ei asetettu"
 
+#~ msgid "Race Track"
+#~ msgstr "Kilparata"
 #~ msgid "Skidding Preview"
 #~ msgstr "Liukumisen esittely"
 #~ msgid ""
