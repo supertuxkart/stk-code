@@ -381,7 +381,7 @@ void CharSel::update(float dt)
         m_context -> setNearFar ( 0.05f, 1000.0f ) ;
 
         sgCoord cam_pos;
-        sgSetCoord(&cam_pos, 0, 0, 0, 0, 0, 0);
+        sgSetCoord(&cam_pos, 0.5f, 0, 0.4f, 0, 0, 0);
         m_context -> setCamera ( &cam_pos ) ;
 
         glEnable (GL_DEPTH_TEST);
