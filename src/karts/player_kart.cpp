@@ -296,7 +296,10 @@ void PlayerKart::setPosition(int p)
 void PlayerKart::raceFinished(float time)
 {
     Kart::raceFinished(time);
-    m_camera->setMode(Camera::CM_FINAL);   // set race over camera
+    // Set race over camera (but not in follow the leader mode, since the kart
+    // will most likely not be at the starting line at the end of the race
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        m_camera->setMode(Camera::CM_FINAL);
     RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
     if(m)
     {
