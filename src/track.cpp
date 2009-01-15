@@ -934,8 +934,11 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
 }   // getMusicInformation
 
 //-----------------------------------------------------------------------------
-void Track::startMusic() const {
-    sound_manager->startMusic(m_music[rand()% m_music.size()]);
+void Track::startMusic() const 
+{
+    // In case that the music wasn't found (a warning was already printed)
+    if(m_music.size()>0)
+        sound_manager->startMusic(m_music[rand()% m_music.size()]);
 }   // startMusic
 
 //-----------------------------------------------------------------------------
