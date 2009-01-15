@@ -48,17 +48,22 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                                       m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
                                            -RaceManager::getTrack()->getGravity()));
+#ifdef HAVE_GLUT
     if(user_config->m_bullet_debug)
-    {
+      {
         m_debug_drawer=new GLDebugDrawer();
         m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
         m_dynamics_world->setDebugDrawer(m_debug_drawer);
     }
+#endif
 }   // init
+
 //-----------------------------------------------------------------------------
 Physics::~Physics()
 {
+#ifdef HAVE_GLUT
     if(user_config->m_bullet_debug) delete m_debug_drawer;
+#endif
     delete m_dynamics_world;
     delete m_axis_sweep;
     delete m_dispatcher;
@@ -318,9 +323,11 @@ void Physics::draw()
 void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
     
 {
+#ifdef HAVE_GLUT
     m_shape_drawer.drawOpenGL(m, s, color, 0);
     //                               btIDebugDraw::DBG_DrawWireframe);
     //                               btIDebugDraw::DBG_DrawAabb);
+#endif
 
 }   // debugDraw
 // -----------------------------------------------------------------------------

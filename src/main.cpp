@@ -74,10 +74,12 @@
 #include "network/network_manager.hpp"
 
 // Only needed for bullet debug!
-#ifdef __APPLE__
-#  include <GLUT/glut.h>
-#else
-#  include <GL/glut.h>
+#ifdef HAVE_GLUT
+#  ifdef __APPLE__
+#    include <GLUT/glut.h>
+#  else
+#    include <GL/glut.h>
+#  endif
 #endif
 
 void cmdLineHelp (char* invocation)
@@ -154,10 +156,12 @@ int handleCmdLine(int argc, char **argv)
         {
             user_config->m_track_debug=1;
         }
+#ifdef HAVE_GLUT
         else if(!strcmp(argv[i], "--bullet-debug"))
         {
             user_config->m_bullet_debug=1;
         }
+#endif
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             user_config->m_print_kart_sizes=true;
@@ -507,7 +511,10 @@ void CleanTuxKart()
 int main(int argc, char *argv[] ) 
 {
     try {
+#ifdef HAVE_GLUT
+        // only needed for bullet debugging.
         glutInit(&argc, argv);
+#endif
         InitTuxkart();
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first

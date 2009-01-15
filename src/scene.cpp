@@ -26,10 +26,12 @@
 #include "user_config.hpp"
 
 #include "btBulletDynamicsCommon.h"
-#ifdef __APPLE__
-#  include <GLUT/glut.h>
-#else
-#  include <GL/glut.h>
+#ifdef HAVE_GLUT
+#  ifdef __APPLE__
+#    include <GLUT/glut.h>
+#  else
+#    include <GL/glut.h>
+#  endif
 #endif
 
 #include "scene.hpp"
@@ -143,6 +145,7 @@ void Scene::draw(float dt)
             //if(!user_config->m_profile)ssgCullAndDraw ( m_scenegraph );
             ssgCullAndDraw ( m_scenegraph );
         }
+#ifdef HAVE_GLUT
         else
         {
             // Use bullets debug drawer
@@ -191,6 +194,7 @@ void Scene::draw(float dt)
             }
             RaceManager::getWorld()->getPhysics()->draw();
         }   //  bullet_debug
+#endif
     }   // for cameras
 
     if (TRACK->useFog())

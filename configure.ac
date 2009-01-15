@@ -284,21 +284,45 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
 CXXFLAGS="$ORIGCXXFLAGS"
 AC_SUBST(NOREGMOVE)
 
+dnl ==============================================
+dnl Glut (optional), used by bullet debugging only
+dnl ==============================================
+save_LIBS=$LIBS
+save_LDFLAGS=$LDFLAGS
+save_CXXFLAGS=$CXXFLAGS
+case "${host}" in
+*darwin*|*macosx*)
+    dnl Apparently -framework is needed for include files and libraries
+    CXXFLAGS="$CXXFLAGS -framework GLUT"
+    LDFLAGS="$LDFLAGS -framework GLUT"
+esac
+AC_SEARCH_LIBS(glutInit, [glut], have_glut_lib=yes)
+
+if test x$have_glut_lib = xyes; then
+    # Apple has the headers in GLUT/glut.h instead of GL/glut.h 
+    AC_CHECK_HEADERS([GL/glut.h GLUT/glut.h], have_glut_hdr=yes)
+fi
+if test x$have_glut_hdr = xyes; then
+  AC_DEFINE(HAVE_GLUT)
+  SUMMARY="$SUMMARY\nGlut found, enabling optional bullet debug"
+else
+  SUMMARY="$SUMMARY\nNo glut found, disabling bullet debug"
+  dnl Remove the unnecessary -framework GLUT on Macs (no impact
+  dnl of this on any other platforms)
+  CXXFLAGS=$save_CSSFLAGS
+  LDFLAGS=$save_LDFLAGS
+fi
+glut_LIBS="$LIBS"
+LIBS=$save_LIBS
+
 dnl ==============
 dnl Bullet physics
 dnl ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
+bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
-case "${host}" in
-*darwin*|*macosx*)
-    bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath -framework GLUT"
-    ;;
-*)
-    bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath -lglut"
-    ;;
-esac
 
 dnl ====
 dnl enet
@@ -356,6 +380,7 @@ AC_SUBST(enet_LIBS)
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(oggvorbis_LIBS)
+AC_SUBST(glut_LIBS)
 AC_SUBST(sdl_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)

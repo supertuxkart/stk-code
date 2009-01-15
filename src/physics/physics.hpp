@@ -39,8 +39,10 @@ class Physics : public btSequentialImpulseConstraintSolver
 private:
     btDynamicsWorld                 *m_dynamics_world;
     Kart                            *m_kart;
+#ifdef HAVE_GLUT
     GLDebugDrawer                   *m_debug_drawer;
     GL_ShapeDrawer                   m_shape_drawer;
+#endif
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;

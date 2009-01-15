@@ -295,9 +295,10 @@ libstatic_ssg_a_CXXFLAGS = $(NOREGMOVE)
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = libstatic_ssg.a \
-	-lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-	-lplibul -lplibssgaux $(bullet_LIBS) $(enet_LIBS) $(opengl_LIBS) \
-        $(sdl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) $(INTLLIBS)
+        -lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
+        -lplibul -lplibssgaux $(bullet_LIBS) $(enet_LIBS) $(glut_LIBS) \
+        $(opengl_LIBS) $(sdl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
+        $(INTLLIBS)
 
 EXTRA_DIST = robots/empty_robot.cpp robots/empty_robot.hpp
 
