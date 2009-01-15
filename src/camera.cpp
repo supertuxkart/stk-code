@@ -227,6 +227,23 @@ void Camera::finalCamera(float dt)
         Coord coord(m_xyz, m_hpr);
         m_context->setCamera(&coord.toSgCoord());
     }
+#undef TEST_END_CAMERA_POSITION
+#ifdef TEST_END_CAMERA_POSITION
+    else
+    {
+        // This code is helpful when tweaking the final camera position:
+        // Just set a breakpoint here, change the values for x,y,z,h,p,r,
+        // and then keep on running, and you can see what the final position
+        // looks like. When happy, just put these value as 
+        // camera-final-position and camera-final-hpr in the .track file.
+        static float x=5,y=20,z=3,h=180,p=-10,r=0.0f;
+        Vec3 xyz(x,y,z);
+        Vec3 hpr(DEGREE_TO_RAD(h),DEGREE_TO_RAD(p),DEGREE_TO_RAD(r));
+        Coord coord(xyz, hpr);
+        m_context->setCamera(&coord.toSgCoord());
+    }
+#endif
+
 }   // finalCamera
 
 //-----------------------------------------------------------------------------
