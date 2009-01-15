@@ -50,7 +50,9 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
                   new btSphereShape(0.5f*m_extend.getY()), 
                   -70.0f /*gravity*/, 
                   true /*rotates*/);
-
+    // Even if the ball is fired backwards, m_speed must be positive,
+    // otherwise the ball can start to vibrate when enery is added.
+    m_speed = fabsf(m_speed);
     // Do not adjust the z velociy depending on height above terrain, since
     // this would disable gravity.
     setAdjustZVelocity(false);
