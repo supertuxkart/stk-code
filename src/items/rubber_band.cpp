@@ -172,16 +172,22 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
     btCollisionWorld::ClosestRayResultCallback ray_callback(k, p);
     // Disable raycast collision detection for this plunger and this kart!
     short int old_plunger_group = m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
-    short int old_kart_group    = m_owner.getBody()   ->getBroadphaseHandle()->m_collisionFilterGroup;
+    short int old_kart_group=0;
+
+    // If the owner is being rescued, the broadphase handle does not exist!
+    if(m_owner.getBody()->getBroadphaseHandle())
+        old_kart_group = m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup;
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
-    m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    if(m_owner.getBody()->getBroadphaseHandle())
+        m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
     RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
                                                                       ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
-    m_owner.getBody()   ->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
+    if(m_owner.getBody()->getBroadphaseHandle())
+        m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_kart_group;
     if(ray_callback.HasHit())
     {
         Vec3 pos(ray_callback.m_hitPointWorld);
