@@ -33,6 +33,7 @@
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()
 {
+    m_kart_display_info = NULL;
 }   // LinearWorld
 
 // ----------------------------------------------------------------------------
@@ -82,7 +83,10 @@ void LinearWorld::init()
 //-----------------------------------------------------------------------------
 LinearWorld::~LinearWorld()
 {
-    delete[] m_kart_display_info;
+    // In case that a track is not found, m_kart_display info was never
+    // initialised.
+    if(m_kart_display_info)
+        delete[] m_kart_display_info;
 }   // ~LinearWorld
 
 //-----------------------------------------------------------------------------

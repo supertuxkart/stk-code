@@ -57,6 +57,7 @@
 //-----------------------------------------------------------------------------
 World::World() : TimedRace()
 {
+    m_physics = NULL;
 }
 void World::init()
 {
@@ -172,7 +173,9 @@ World::~World()
 {
     item_manager->cleanup();
     delete race_state;
-    m_track->cleanup();
+    // In case that a race is aborted (e.g. track not found) m_track is 0.
+    if(m_track)
+        m_track->cleanup();
     // Clear all callbacks
     callback_manager->clear(CB_TRACK);
 
@@ -181,7 +184,9 @@ World::~World()
 
     m_kart.clear();
     projectile_manager->cleanup();
-    delete m_physics;
+    // In case that the track is not found, m_physics is still undefined.
+    if(m_physics)
+        delete m_physics;
 
     sound_manager -> stopMusic();
 
