@@ -321,7 +321,11 @@ dnl ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
-bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
+bullet_LIBS=""
+if test x$have_glut_hdr = xyes; then
+  bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport"
+fi
+bullet_LIBS="$bullet_LIBS -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
 
 dnl ====
@@ -344,7 +348,14 @@ AC_CHECK_TYPE(socklen_t, [AC_DEFINE(HAS_SOCKLEN_T)], ,
 AC_EGREP_HEADER(MSG_MAXIOVLEN, /usr/include/sys/socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
 AC_EGREP_HEADER(MSG_MAXIOVLEN, socket.h, AC_DEFINE(ENET_BUFFER_MAXIMUM, [MSG_MAXIOVLEN]))
 
-enet_LIBS="-Lenet -lenet"
+case "${host}" in
+*-*-cygwin* | *-*-mingw32*)
+  enet_LIBS="-Lenet -lenet -lws2_32"
+  ;;
+*)
+  enet_LIBS="-Lenet -lenet"
+  ;;
+esac
 SUMMARY="$SUMMARY\nUsing enet network support."
 ENETTREE="src/enet"
 
