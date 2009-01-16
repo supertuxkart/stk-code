@@ -47,7 +47,6 @@ protected:
     sgVec4          *m_normal_hot;      /* plane on which HOT was computed             */
     Material        *m_material_hot;    /* Material at HOT                             */
     ssgTransform    *m_model_transform;            // The transform where the model is under
-    ssgTransform    *m_shadow;
     int              m_first_time ;
     btRigidBody     *m_body;
     KartMotionState *m_motion_state;

@@ -75,6 +75,11 @@ protected:
 private:
     /** The amount of energy collected bu hitting coins. */
     float               m_collected_energy;
+    /** The shadow of the kart. */
+    ssgTransform       *m_shadow;
+    /** If a kart is flying, the shadow is disabled (since it is
+     *  stuck to the kart, i.e. the shadow would be flying, too). */
+    bool                m_shadow_enabled;
 
     /** Smoke from skidding. */
     Smoke              *m_smoke_system;

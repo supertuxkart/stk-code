@@ -30,7 +30,6 @@ Moveable::Moveable()
 {
     m_body            = 0;
     m_motion_state    = 0;
-    m_shadow          = 0;
     m_first_time      = true ;
     m_model_transform = new ssgTransform();
 
