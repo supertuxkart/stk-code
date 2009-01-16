@@ -638,13 +638,16 @@ void Kart::update(float dt)
     item_manager->hitItem(this);
     m_skidmarks->update(dt);
 
-    // Remove the shadow if the kart is not on the ground
-    if(!isOnGround() && m_shadow_enabled)
+    // Remove the shadow if the kart is not on the ground (if a kart
+    // is rescued isOnGround might still be true, since the kart rigid
+    // body was removed from the physics, but still retain the old
+    // values for the raycasts).
+    if( (!isOnGround() || m_rescue) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_model_transform->removeKid(m_shadow);
     }
-    if(isOnGround() && !m_shadow_enabled)
+    if(!m_shadow_enabled && isOnGround() && !m_rescue)
     {
         m_shadow_enabled = true;
         m_model_transform->addKid(m_shadow);
