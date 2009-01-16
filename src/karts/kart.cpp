@@ -76,6 +76,8 @@ Kart::Kart (const std::string& kart_name, int position,
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
+    m_shadow_enabled       = false;
+    m_shadow               = NULL;
     m_smoke_system         = NULL;
     m_nitro                = NULL;
     m_skidmarks            = NULL;
@@ -635,6 +637,18 @@ void Kart::update(float dt)
     // Check if any item was hit.
     item_manager->hitItem(this);
     m_skidmarks->update(dt);
+
+    // Remove the shadow if the kart is not on the ground
+    if(!isOnGround() && m_shadow_enabled)
+    {
+        m_shadow_enabled = false;
+        m_model_transform->removeKid(m_shadow);
+    }
+    if(isOnGround() && !m_shadow_enabled)
+    {
+        m_shadow_enabled = true;
+        m_model_transform->addKid(m_shadow);
+    }
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -981,6 +995,7 @@ void Kart::loadData()
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();
     m_model_transform->addKid ( m_shadow );
+    m_shadow_enabled = true;
 }   // loadData
 
 //-----------------------------------------------------------------------------
