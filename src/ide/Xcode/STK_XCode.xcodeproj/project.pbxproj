@@ -3119,6 +3119,7 @@
 					"-DENABLE_NLS=1",
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
+					"-DHAVE_GLUT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
@@ -3192,6 +3193,7 @@
 					"-DENABLE_NLS=1",
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
+					"-DHAVE_GLUT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
