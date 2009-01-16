@@ -25,6 +25,7 @@
 
 #include "file_manager.hpp"
 #include "string_utils.hpp"
+#include "stk_config.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
 #include "unlock_manager.hpp"
@@ -92,6 +93,18 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
         fclose(f);
         KartProperties* kp = new KartProperties();
         kp->load(kart_file, "tuxkart-kart", dont_load_models);
+
+        // If the version of the kart file is not supported,
+        // ignore this .kart file
+        if(kp->getVersion()<stk_config->m_min_kart_version ||
+            kp->getVersion()>stk_config->m_max_kart_version)
+        {
+            fprintf(stderr, "Warning: kart '%s' is not supported by this binary, ignored.\n",
+                    kp->getIdent().c_str());
+            delete kp;
+            continue;
+        }
+
         m_karts_properties.push_back(kp);
         m_kart_available.push_back(true);
         const std::vector<std::string>& groups=kp->getGroups();

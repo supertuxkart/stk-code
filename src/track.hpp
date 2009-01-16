@@ -58,6 +58,7 @@ private:
     Vec3                     m_camera_final_position;
     Vec3                     m_camera_final_hpr;
     bool                     m_is_arena;
+    int                      m_version;
     
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
@@ -154,6 +155,8 @@ public:
                                                   {m_music.push_back(mi);       }
     ssgBranch*         getModel          () const {return m_model;              }
     float              getGravity        () const {return m_gravity;            }
+    /** Returns the version of the .track file. */
+    int                getVersion        () const {return m_version;            }
     float              getTrackLength    () const {return m_total_distance;     }
     const std::string& getIdent          () const {return m_ident;              }
     const char*        getName           () const {return m_name.c_str();       }

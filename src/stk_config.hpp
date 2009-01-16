@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STKCONFIG_H
-#define HEADER_STKCONFIG_H
+#ifndef HEADER_STK_CONFIG_HPP
+#define HEADER_STK_CONFIG_HPP
 
 #include "karts/kart_properties.hpp"
 
@@ -79,6 +79,10 @@ public:
                                       *  ground anymore and the upright
                                       *  constraint is disabled to allow for
                                       *  more violent explosions.            */
+    int   m_min_kart_version,        /**<The minimum and maximum .kart file  */
+          m_max_kart_version;        /**<version supported by this binary.   */
+    int   m_min_track_version,       /**<The minimum and maximum .track file */
+          m_max_track_version;       /**<version supported by this binary.   */
     bool  m_enable_networking;
     
     std::vector<float> 

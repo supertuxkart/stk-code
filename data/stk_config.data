@@ -4,6 +4,10 @@
 
  ;; STK parameters
  ;; --------------
+ (min-kart-version           1   )  ;; Minimum and maximum .kart files supported
+ (max-kart-version           1   )  ;; by this binary. Older/newer files are ignored.
+ (min-track-version          1   )  ;; Minimum and maximum .track files supported
+ (max-track-version          1   )  ;; by this binary, older/newer files are ignored.
  (max-karts                  8   )  ;; maximum number of karts
  (scores            10 8 6 5 4 3 2 1 ) ;; 10 8 6 5 4 3 2 1 0 0 
  (grid-order	   	     1   )  ;; order for grand prix, 1 is most 

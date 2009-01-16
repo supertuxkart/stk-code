@@ -24,6 +24,7 @@
 #include "string_utils.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
+#include "stk_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "translation.hpp"
 
@@ -141,6 +142,14 @@ void TrackManager::loadTrackList ()
         fclose(f);
 
         Track *track = new Track(config_file);
+        if(track->getVersion()<stk_config->m_min_track_version ||
+            track->getVersion()>stk_config->m_max_track_version)
+        {
+            fprintf(stderr, "Warning: track '%s' is not supported by this binary, ignored.\n",
+                track->getIdent().c_str());
+            delete track;
+            continue;
+        }
         m_tracks.push_back(track);
         m_track_avail.push_back(true);
         updateGroups(track);

@@ -51,8 +51,8 @@ private:
                                                     belongs to. */
     static float UNDEFINED;
     float m_speed_angle_increase;     /**< Increase of turn angle with speed. */
+    int   m_version;                  /**< Version of the .kart file.         */
 
-protected:
     // Display and gui
     // --------------- 
     std::string m_name;               /**< The human readable Name of the kart
@@ -164,14 +164,16 @@ public:
     void  checkAllSet(const std::string &filename);
 
     float getMaxSteerAngle          (float speed) const;
-    Material*     getIconMaterial   () const {return m_icon_material;          }
+    Material*     getIconMaterial   () const {return m_icon_material;            }
     /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModel      () const {return &m_kart_model;            }
-    const std::string& getName      () const {return m_name;                   }
-    const std::string& getIdent     () const {return m_ident;                  }
-    const std::string& getShadowFile() const {return m_shadow_file;            }
-    const std::string& getIconFile  () const {return m_icon_file;              }
-    const Vec3   &getColor          () const {return m_color;                  }
+    KartModel*    getKartModel      () const {return &m_kart_model;              }
+    const std::string& getName      () const {return m_name;                     }
+    const std::string& getIdent     () const {return m_ident;                    }
+    const std::string& getShadowFile() const {return m_shadow_file;              }
+    const std::string& getIconFile  () const {return m_icon_file;                }
+    /** Returns the version of the .kart file. */
+    int   getVersion                () const {return m_version;                  }
+    const Vec3   &getColor          () const {return m_color;                    }
     const std::vector<std::string>&
                   getGroups         () const {return m_groups;                   }
     float getMass                   () const {return m_mass;                     }

@@ -66,6 +66,7 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_designer         = "";
     m_screenshot       = "";
     m_top_view         = "";
+    m_version          = 0;
     m_has_final_camera = false;
     m_is_arena         = false;
     loadTrack(m_filename);
@@ -869,6 +870,7 @@ void Track::loadTrack(std::string filename_)
     LISP->get      ("name",                  m_name);
     LISP->get      ("description",           m_description);
     LISP->get      ("designer",              m_designer);
+    LISP->get      ("version",               m_version);
     std::vector<std::string> filenames;
     LISP->getVector("music",                 filenames);
     getMusicInformation(filenames, m_music);

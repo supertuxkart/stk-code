@@ -74,6 +74,7 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_camera_max_accel = m_camera_max_brake = 
         m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_version                = 0;
     m_color.setValue(1.0f, 0.0f, 0.0f);
     m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
 }   // KartProperties
@@ -142,7 +143,10 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     // Load model, except when called as part of --list-karts
     if(!dont_load_models)
     {
-        m_kart_model.loadModels();
+        // Only load the model if the .kart file has the appropriate version,
+        // otherwise warnings are printed.
+        if(m_version>=1)
+            m_kart_model.loadModels();
         if(m_gravity_center_shift.getX()==UNDEFINED)
         {
             m_gravity_center_shift.setX(0);
@@ -179,7 +183,10 @@ void KartProperties::load(const std::string &filename, const std::string &node,
 //-----------------------------------------------------------------------------
 void KartProperties::getAllData(const lisp::Lisp* lisp)
 {
-    m_kart_model.loadInfo(lisp);
+    lisp->get("version",                    m_version);
+    // Only load the kart_model data if the .kart file has the appropriate
+    if(m_version>=1)
+        m_kart_model.loadInfo(lisp);
     lisp->get("name",                       m_name);
     lisp->get("icon-file",                  m_icon_file);
     lisp->get("shadow-file",                m_shadow_file);

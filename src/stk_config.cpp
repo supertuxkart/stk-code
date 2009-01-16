@@ -114,6 +114,10 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
+    CHECK_NEG(m_min_kart_version,          "min-kart-version"           );
+    CHECK_NEG(m_max_kart_version,          "max-kart-version"           );
+    CHECK_NEG(m_min_track_version,         "min-track-version"          );
+    CHECK_NEG(m_max_track_version,         "max-track-version"          );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
     CHECK_NEG(m_slowdown_factor,           "slowdown-factor"            );
     CHECK_NEG(m_near_ground,               "near-ground"                );
@@ -145,6 +149,10 @@ void STKConfig::init_defaults()
     m_grid_order               = -100;
     m_max_history              = -100;
     m_max_skidmarks            = -100;
+    m_min_kart_version         = -100;
+    m_max_kart_version         = -100;
+    m_min_track_version        = -100;
+    m_max_track_version        = -100;
     m_title_music              = NULL;
     m_enable_networking        = true;
     m_scores.clear();
@@ -201,6 +209,10 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->getVector("scores",                 m_scores                   );
     lisp->get("max-history",                  m_max_history              );
     lisp->get("max-skidmarks",                m_max_skidmarks            );
+    lisp->get("min-kart-version",             m_min_kart_version         );
+    lisp->get("max-kart-version",             m_max_kart_version         );
+    lisp->get("min-track-version",            m_min_track_version        );
+    lisp->get("max-track-version",            m_max_track_version        );
     lisp->get("skid-fadeout-time",            m_skid_fadeout_time        );
     lisp->get("slowdown-factor",              m_slowdown_factor          );
     lisp->get("near-ground",                  m_near_ground              );
