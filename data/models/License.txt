@@ -1,5 +1,5 @@
 All models are released under GPL except :
 
-* bowling.ac, plunger.ac, cake.ac, bomb.ac
+* bowling.ac, plunger.ac, cake.ac, bomb.ac, anchor.ac
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]

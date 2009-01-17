@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "anvil")
  (model "anvil.ac")
- (icon  "anvil.rgb")
+ (icon  "anchor-icon.rgb")
 )
 
 ;; EOF ;;
