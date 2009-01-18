@@ -11,7 +11,7 @@ dist_pkgdata_DATA = \
  $(shell find $(srcdir) -maxdepth 1 -name "*.challenge") \
  $(shell find $(srcdir) -name "*.collectable") \
  $(shell find $(srcdir) -name "*.projectile") \
- CREDITS licenses
+ CREDITS
 
 desktopdir = $(prefix)/share/applications
 desktop_DATA = supertuxkart.desktop
