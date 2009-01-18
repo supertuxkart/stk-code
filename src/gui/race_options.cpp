@@ -315,6 +315,8 @@ void RaceOptions::setAllValues()
         race_manager->setNumLaps( m_num_laps );
         user_config->setDefaultNumLaps(m_num_laps);
     }
+    // Might still be set from a previous challenge
+    race_manager->setCoinTarget(0);
 }   // setAllValues
 
 // ----------------------------------------------------------------------------
