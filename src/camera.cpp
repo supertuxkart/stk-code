@@ -53,6 +53,7 @@ Camera::Camera(int camera_index, const Kart* kart)
 Camera::~Camera()
 {
     reset();
+    if(m_context) delete m_context;
 }
 
 // ----------------------------------------------------------------------------
@@ -196,9 +197,15 @@ void Camera::update (float dt)
     // Set the camera rotation
     // -----------------------
     float sign = reverse ? 1.0f : -1.0f;
-    btQuaternion cam_rot(0.0f,
-                         m_mode==CM_CLOSEUP ? (sign * 25.0f * M_PI / 180.0f) : (sign * 15.0f * M_PI / 180.0f),  // it was +-15 or +-5 degrees, giving too much unnecesary sky and few track around kart
-                         reverse            ? M_PI     : 0.0f);
+    const int num_players = race_manager->getNumLocalPlayers();
+    float pitch;
+    if(m_mode!=CM_CLOSEUP)
+        pitch = race_manager->getNumLocalPlayers()>1 ? sign * DEGREE_TO_RAD(10.0f)
+                                                     : sign * DEGREE_TO_RAD(15.0f);
+    else
+        pitch = sign * DEGREE_TO_RAD(25.0f);
+      
+    btQuaternion cam_rot(0.0f, pitch, reverse ? M_PI : 0.0f);
     // Camera position relative to the kart
     btTransform relative_to_kart(cam_rot, cam_rel_pos);
 
