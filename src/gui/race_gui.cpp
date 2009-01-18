@@ -675,25 +675,25 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
     const int lap = info[kart->getWorldKartId()].lap;
     
     if(lap<0) return;  // don't display 'lap 0/...', or do nothing if laps are disabled (-1)
-    float maxRatio = std::max(ratio_x, ratio_y);
+    float minRatio = std::min(ratio_x, ratio_y);
     char str[256];
     offset_x += (int)(120*ratio_x);
-    offset_y += (int)(70*maxRatio);
+    offset_y += (int)(70*minRatio);
 
     if(kart->hasFinishedRace())
     {
         sprintf(str, _("Finished"));
-        font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);
+        font_race->PrintShadow(str, (int)(48*minRatio), offset_x, offset_y);
     }
     else
     {
-        font_race->PrintShadow( _("Lap"), (int)(48*maxRatio), offset_x, offset_y);
+        font_race->PrintShadow( _("Lap"), (int)(48*minRatio), offset_x, offset_y);
 
         offset_y -= (int)(50*ratio_y);
 
         sprintf(str, "%d/%d", lap < 0 ? 0 : lap+1, 
                 race_manager->getNumLaps());
-        font_race->PrintShadow(str, (int)(48*maxRatio), offset_x, offset_y);
+        font_race->PrintShadow(str, (int)(48*minRatio), offset_x, offset_y);
     }
 } // drawLap
 
