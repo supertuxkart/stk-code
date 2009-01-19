@@ -34,6 +34,10 @@ private:
     std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
     int                      m_numLoops;
+    /** If faster music is enabled at all (either separate file or using
+     *  the pitch shift approach). */
+    bool                     m_enable_fast;    
+                                                
     float                    m_gain;
     float                    m_adjustedGain;
     float                    m_faster_time;    // Either time for fading faster

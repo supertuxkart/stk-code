@@ -43,6 +43,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_fast_filename   = "";
     m_normal_music    = NULL;
     m_fast_music      = NULL;
+    m_enable_fast     = false;
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;
@@ -77,6 +78,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     LISP->get      ("composer",    m_composer       );
     LISP->get      ("loop",        m_numLoops       );
     LISP->get      ("music",       m_normal_filename);
+    LISP->get      ("enable-fast", m_enable_fast    );
     LISP->get      ("fast-music",  m_fast_filename  );
     // m_faster_time is used for twice: either as time to fade in faster music
     // (if available), or the time to increase the pitch (if no faster music 
@@ -261,6 +263,7 @@ void MusicInformation::volumeMusic(float gain)
 //-----------------------------------------------------------------------------
 void MusicInformation::switchToFastMusic()
 {    
+    if(!m_enable_fast) return;
     m_time_since_faster = 0.0f;
     if(m_fast_music)
     {
