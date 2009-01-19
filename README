@@ -40,9 +40,9 @@ Player 1:
   Accelerate : Up arrow
   Brake      : Down arrow
   Use item   : Right control
-  Wheelie    : Right shift
+  Sharp Turn : Right shift
   Rescue     : Backspace
-  Jump       : - (minus key)
+  Nitro      : - (minus key)
   Look back  : Right alt
 
 Player 2:
@@ -50,9 +50,9 @@ Player 2:
   Accelerate : W key
   Brake      : S key
   Use item   : Left control
-  Wheelie    : Left shift
+  Sharp Turn : Left shift
   Rescue     : Q key
-  Jump       : Caps lock
+  Nitro      : Caps lock
   Look back  : Left alt
 
 Player 3:
@@ -60,9 +60,9 @@ Player 3:
   Accelerate : T key
   Brake      : G key
   Use item   : N key
-  Wheelie    : C key
+  Sharp Turn : C key
   Rescue     : R key
-  Jump       : V key
+  Nitro      : V key
   Look back  : N key
 
 Player 4:
@@ -70,9 +70,9 @@ Player 4:
   Accelerate : I key
   Brake      : K key
   Use item   : . key
-  Wheelie    : M key
+  Sharp Turn : M key
   Rescue     : u key
-  Jump       : , key
+  Nitro      : , key
   Look back  : / key
 
 The Escape key pauses the game and shows the race menu.
