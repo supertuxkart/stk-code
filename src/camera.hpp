@@ -39,12 +39,12 @@ public:
         CM_SIMPLE_REPLAY
     };
 protected:
-    ssgContext *m_context ;
-//    sgCoord     m_current_pos;
+    ssgContext *m_context;
     Vec3        m_xyz;                  // current position of camera
     Vec3        m_hpr;                  // heading, pitch, roll of camera
     const Kart *m_kart;                 // the kart the camera is attached to
     Mode        m_mode;                 // CM_ value, see above
+    int         m_index;                /**<Index of camera. */
     float       m_x, m_y, m_w, m_h;     // window to us
     float       m_current_speed;        // current speed of camera
     float       m_last_pitch;           // for tiling the camera when going downhill

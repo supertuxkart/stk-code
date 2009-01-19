@@ -33,6 +33,7 @@
 Camera::Camera(int camera_index, const Kart* kart)
 {
     m_mode     = CM_NORMAL;
+    m_index    = camera_index;
     m_context  = new ssgContext ;
     m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
@@ -126,8 +127,10 @@ void Camera::setMode(Mode mode)
         // In 2 and 3 player mode we have a different FOV and would not see our
         // kart at the default distance. We use 1.5 times the distance to fix that.
         const int num_players = race_manager->getNumPlayers();
-        if (num_players == 2 || num_players == 3)
-            m_distance += m_distance / 2;
+        if(num_players==2 || (num_players==3 && m_index==3) )
+            m_distance += m_distance*0.5f;
+        else if(num_players>=3)
+            m_distance += m_distance*0.3333333f;
     }
 }   // setMode
 
