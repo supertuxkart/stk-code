@@ -221,15 +221,20 @@ void UserConfig::setDefaults()
     set(GA_P1_BRAKE,
                 Input(Input::IT_KEYBOARD, SDLK_DOWN));
     set(GA_P1_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_RSHIFT));
+                Input(Input::IT_KEYBOARD, SDLK_f),
+                Input(Input::IT_KEYBOARD, SDLK_l));
     set(GA_P1_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_MINUS));
+                Input(Input::IT_KEYBOARD, SDLK_d),
+                Input(Input::IT_KEYBOARD, SDLK_k));
     set(GA_P1_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_BACKSPACE));
+                Input(Input::IT_KEYBOARD, SDLK_a),
+                Input(Input::IT_KEYBOARD, SDLK_h));
     set(GA_P1_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_RCTRL));
+                Input(Input::IT_KEYBOARD, SDLK_SPACE),
+                Input(Input::IT_KEYBOARD, SDLK_m));
     set(GA_P1_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_RALT));
+                Input(Input::IT_KEYBOARD, SDLK_s),
+                Input(Input::IT_KEYBOARD, SDLK_j));
 
     /* Player 2 default input settings */
     set(GA_P2_LEFT,
