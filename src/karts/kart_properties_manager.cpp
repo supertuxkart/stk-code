@@ -219,7 +219,7 @@ bool KartPropertiesManager::testAndSetKart(int kartid)
     if(!kartAvailable(kartid)) return false;
     m_selected_karts.push_back(kartid);
     return true;
-}   // testAndSetKart
+}   // kartAvailable
 
 //-----------------------------------------------------------------------------
 /** Returns true if a kart is available to be selected. A kart is available to
