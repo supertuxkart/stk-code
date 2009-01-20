@@ -238,13 +238,24 @@ void RaceResultsGUI::select()
 //-----------------------------------------------------------------------------
 void RaceResultsGUI::handle(GameAction ga, int value)
 {
-  // Attempts to close the menu are silently discarded
-  // since they do not make sense at this point.
-  if (ga == GA_LEAVE)
-   return;
-  else
+    // Only accept 'esc' when it's the end of a race, otherwise silently 
+    // discard attempts to close the menu with esc.
+    if (ga == GA_LEAVE)
+    {
+        // Don't accept it when a GP is done, or a new feature is unlocked
+        if(widget_manager &&
+           race_manager->getMajorMode()!=RaceManager::MAJOR_MODE_GRAND_PRIX &&
+           unlock_manager->getUnlockedFeatures().size()==0)
+        {
+            RaceManager::getWorld()->unpause();
+            widget_manager->setWgtText(WTOK_CONTINUE, _("Loading race..."));
+            race_manager->next();
+        }
+        return;
+    }
     BaseGUI::handle(ga, value);
-}
+}   // handle
+
 //-----------------------------------------------------------------------------
 /** Sets the selected token. This is used on the clients to allow the 
  *  NetworkManager to set the widget selected on the server. The clients will
