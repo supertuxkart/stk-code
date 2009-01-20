@@ -221,19 +221,14 @@ void UserConfig::setDefaults()
     set(GA_P1_BRAKE,
                 Input(Input::IT_KEYBOARD, SDLK_DOWN));
     set(GA_P1_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_f),
                 Input(Input::IT_KEYBOARD, SDLK_l));
     set(GA_P1_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_d),
                 Input(Input::IT_KEYBOARD, SDLK_k));
     set(GA_P1_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_a),
                 Input(Input::IT_KEYBOARD, SDLK_h));
     set(GA_P1_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_SPACE),
-                Input(Input::IT_KEYBOARD, SDLK_m));
+                Input(Input::IT_KEYBOARD, SDLK_SPACE));
     set(GA_P1_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_s),
                 Input(Input::IT_KEYBOARD, SDLK_j));
 
     /* Player 2 default input settings */
@@ -256,6 +251,13 @@ void UserConfig::setDefaults()
     set(GA_P2_LOOK_BACK,
                 Input(Input::IT_KEYBOARD, SDLK_LALT));
 
+    // If the same key is used for more than one player, the setting 
+    // is overwritten when reading back the file. To allow us to have 
+    // good settings for player 1 (and considering that 3 or 4 people 
+    // on a single keyboard is crazy anyway), we disable the defaults 
+    // for player 3 and 4.
+#undef DEFAULTS_FOR_PLAYER34
+#ifdef DEFAULTS_FOR_PLAYER34
     /* Player 3 default input settings */
     set(GA_P3_LEFT,
                 Input(Input::IT_KEYBOARD, SDLK_f));
@@ -295,6 +297,7 @@ void UserConfig::setDefaults()
                 Input(Input::IT_KEYBOARD, SDLK_PERIOD));
     set(GA_P4_LOOK_BACK,
                 Input(Input::IT_KEYBOARD, SDLK_SLASH));
+#endif
 
 }   // setDefaults
 
