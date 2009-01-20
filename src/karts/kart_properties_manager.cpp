@@ -237,7 +237,7 @@ bool KartPropertiesManager::kartAvailable(int kartid)
     const KartProperties *kartprop=getKartById(kartid);
     if(unlock_manager->isLocked(kartprop->getIdent())) return false;
     return true;
-}   // testAndSetKart
+}   // kartAvailable
 
 //-----------------------------------------------------------------------------
 /** Sets a kart to be selected by specifying the identifier (name) of the kart.
@@ -285,7 +285,8 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     // (i.e. locked or not available on all clients)
     for(unsigned int i=0; i<karts.size();)
     {
-        if(used[karts[i]] || !m_kart_available[karts[i]])
+        if(used[karts[i]] || !m_kart_available[karts[i]] || 
+            unlock_manager->isLocked(m_karts_properties[karts[i]]->getIdent()))
             karts.erase(karts.begin()+i);
         else
             i++;
@@ -310,7 +311,9 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     karts.clear();
     for(unsigned int i=0; i<getNumberOfKarts(); i++)
     {
-        if(!used[i] && m_kart_available[i]) karts.push_back(i);
+        if(!used[i] && m_kart_available[i] &&
+            !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
+            karts.push_back(i);
     }
     std::random_shuffle(karts.begin(), karts.end());
     // Then fill up the remaining empty spaces
