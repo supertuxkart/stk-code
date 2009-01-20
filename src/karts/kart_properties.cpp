@@ -72,8 +72,9 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_camera_max_accel = m_camera_max_brake = 
-        m_camera_distance = UNDEFINED;
+        m_camera_distance    = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
+    m_has_skidmarks          = true;
     m_version                = 0;
     m_color.setValue(1.0f, 0.0f, 0.0f);
     m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
@@ -261,6 +262,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("skid-increase",             m_skid_increase            );
     lisp->get("skid-decrease",             m_skid_decrease            );
     lisp->get("time-till-max-skid",        m_time_till_max_skid       );
+    lisp->get("has-skidmarks",             m_has_skidmarks            );
     lisp->get("skid-max",                  m_skid_max                 );
     lisp->get("skid-visual",               m_skid_visual              );
 

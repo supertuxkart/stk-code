@@ -352,7 +352,7 @@ void Kart::reset()
     m_vehicle->applyEngineForce (0.0f, 3);
 
     Moveable::reset();
-    m_skidmarks->reset();
+    if(m_skidmarks) m_skidmarks->reset();
     for(int j=0; j<m_vehicle->getNumWheels(); j++)
     {
         m_vehicle->updateWheelTransform(j, true);
@@ -636,7 +636,8 @@ void Kart::update(float dt)
 
     // Check if any item was hit.
     item_manager->hitItem(this);
-    m_skidmarks->update(dt);
+    if(m_kart_properties->hasSkidmarks())
+        m_skidmarks->update(dt);
 
     // Remove the shadow if the kart is not on the ground (if a kart
     // is rescued isOnGround might still be true, since the kart rigid
@@ -862,7 +863,8 @@ void Kart::updatePhysics (float dt)
     }
     if(m_skidding>1.0f)
     {
-        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING)
+        if(m_skid_sound->getStatus() != SFXManager::SFX_PLAYING && 
+            m_kart_properties->hasSkidmarks())
             m_skid_sound->play();
     }
     else if(m_skid_sound->getStatus() == SFXManager::SFX_PLAYING)
@@ -993,7 +995,8 @@ void Kart::loadData()
     m_nitro = new Nitro(this);
     m_nitro->ref();
 
-    m_skidmarks  = new SkidMarks(*this);
+    if(m_kart_properties->hasSkidmarks())
+        m_skidmarks = new SkidMarks(*this);
 
     m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
     m_shadow->ref();
