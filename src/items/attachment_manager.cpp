@@ -66,6 +66,8 @@ void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
     {
+        // FIXME LEAK: these models are not removed (unimportant, since they
+        // have to be in memory till the end of the game.
         m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
         m_attachments[iat[i].attachment]->ref();
     }   // for

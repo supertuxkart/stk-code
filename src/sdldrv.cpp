@@ -352,6 +352,7 @@ SDLDriver::~SDLDriver()
     
     delete [] m_stick_infos;
 
+    // FIXME LEAK: delete m_action_map if defined
     SDL_FreeSurface(m_main_surface);
 
     SDL_Quit();

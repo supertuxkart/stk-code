@@ -39,6 +39,9 @@ Explosion::Explosion(const Vec3& coord, const int explosion_sound) : ssgTransfor
 //-----------------------------------------------------------------------------
 Explosion::~Explosion()
 {
+    // FIXME LEAK: Explosion that are still playing when a race ends might
+    // not get freed correctly (ssgCutout is removed when removing this
+    // from the scene node).
     sfx_manager->deleteSFX(m_explode_sound);
     // cut will be cleaned up when the explosion is rerefed by plib
 }

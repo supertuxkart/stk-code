@@ -38,8 +38,7 @@
 
 Scene *scene = 0;
 
-Scene::Scene() :
-m_scenegraph(new ssgRoot)
+Scene::Scene() : m_scenegraph(new ssgRoot)
 {
 }
 

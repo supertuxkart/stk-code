@@ -146,6 +146,7 @@ void ItemManager::loadDefaultItems()
         }   // for i
 
 
+    // FIXME LEAK: these can be deleted
     // Load the old, internal only models
     // ----------------------------------
     sgVec3 yellow = { 1.0f, 1.0f, 0.4f }; createDefaultItem(yellow, "OLD_GOLD"  );

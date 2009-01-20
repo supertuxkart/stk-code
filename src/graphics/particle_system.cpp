@@ -33,6 +33,7 @@ ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
                       new ssgTexCoordArray(num*4, new sgVec2[num*4] ),
                       new ssgColourArray  (num*4, new sgVec4[num*4] )
                      )
+                     //FIXME LEAK: these arrays are never freed!
 {
 #ifdef DEBUG
     setName("particle-system");

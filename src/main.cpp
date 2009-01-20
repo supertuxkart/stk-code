@@ -504,6 +504,7 @@ void CleanTuxKart()
     if(loader)                  delete loader;
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
+    if(scene)                   delete scene;
 }
 
 //=============================================================================

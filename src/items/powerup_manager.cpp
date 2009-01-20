@@ -125,6 +125,8 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     if(sModel!="")
     {
+        // FIXME LEAK: not freed (uniportant, since the models have to exist
+        // for the whole game anyway).
         ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();

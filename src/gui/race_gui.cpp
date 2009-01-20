@@ -852,6 +852,14 @@ void RaceGUI::drawStatusText(const float dt)
                              20, 20, 200 -i*20, COLORS );
         }
     }
+
+    float split_screen_ratio_x, split_screen_ratio_y;
+    split_screen_ratio_x = split_screen_ratio_y = 1.0;
+    if(race_manager->getNumLocalPlayers() >= 2)
+        split_screen_ratio_y = 0.5;
+    if(race_manager->getNumLocalPlayers() >= 3)
+        split_screen_ratio_x = 0.5;
+
     // The penalty message needs to be displayed for up to one second
     // after the start of the race, otherwise it disappears if 
     // "Go" is displayed and the race starts
@@ -862,6 +870,7 @@ void RaceGUI::drawStatusText(const float dt)
             if(RaceManager::getWorld()->getLocalPlayerKart(i)->earlyStartPenalty())
             {
                 GLfloat const COLORS[] = { 0.78f, 0.025f, 0.025f, 1.0f };
+
                 font_race->PrintShadow( _("Penalty time!!"), 80,
                                        Font::CENTER_OF_SCREEN, 200,
                                         COLORS );
@@ -869,12 +878,6 @@ void RaceGUI::drawStatusText(const float dt)
         }  // for i < getNumPlayers
     }  // if not RACE_PHASE
 
-    float split_screen_ratio_x, split_screen_ratio_y;
-    split_screen_ratio_x = split_screen_ratio_y = 1.0;
-    if(race_manager->getNumLocalPlayers() >= 2)
-        split_screen_ratio_y = 0.5;
-    if(race_manager->getNumLocalPlayers() >= 3)
-        split_screen_ratio_x = 0.5;
 
     if ( RaceManager::getWorld()->isRacePhase() )
     {
