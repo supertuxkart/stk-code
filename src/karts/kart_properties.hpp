@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KARTPROPERTIES_H
-#define HEADER_KARTPROPERTIES_H
+#ifndef HEADER_KART_PROPERTIES_HPP
+#define HEADER_KART_PROPERTIES_HPP
 
 #include <string>
 #include <vector>
@@ -139,6 +139,8 @@ private:
                                        *   not skidding to decrease to 1.0. */
     float m_time_till_max_skid;       /**< Time till maximum skidding is 
                                        *   reached. */
+    bool  m_has_skidmarks;            /**< Kart leaves skid marks. */
+
     // Camera related setting
     // ----------------------
     float m_camera_max_accel;         // maximum acceleration of camera
@@ -226,6 +228,8 @@ public:
     /** Returns the time (in seconds) of drifting till the maximum skidding
      *  is reached. */
     float getTimeTillMaxSkid        () const {return m_time_till_max_skid;       }
+    /** Returns if the kart leaves skidmarks or not. */
+    bool hasSkidmarks               () const {return m_has_skidmarks;            }
     const std::vector<float>& 
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>& 
