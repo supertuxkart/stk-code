@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 15:52+1100\n"
-"PO-Revision-Date: 2008-12-20 19:01-0500\n"
-"Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
+"POT-Creation-Date: 2009-01-13 15:03+1100\n"
+"PO-Revision-Date: 2009-01-20 00:01+0100\n"
+"Last-Translator: Asciimonster <asciimonster@myrealbox.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/gui/config_display.cpp:387
+#: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d op Verbanningslijst"
@@ -71,11 +71,11 @@ msgstr "Tocht door de Amazone"
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Aambeeld – Remt de kart in leidende positie af"
 
-#: src/gui/config_display.cpp:94
+#: src/gui/config_display.cpp:99
 msgid "Apply "
 msgstr "Toepassen"
 
-#: src/gui/config_display.cpp:353
+#: src/gui/config_display.cpp:361
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Toepassen %dx%d"
@@ -92,7 +92,7 @@ msgstr "Het einde van de wereld"
 msgid "Avoid bananas"
 msgstr "Vermijd bananen"
 
-#: src/gui/grand_prix_ending.cpp:157
+#: src/gui/grand_prix_ending.cpp:138
 #: src/gui/race_results_gui.cpp:70
 msgid "Back to the main menu"
 msgstr "Terug naar het hoofdmenu"
@@ -139,7 +139,7 @@ msgstr "Kan niet verbinden met server"
 msgid "Canyon"
 msgstr "Het ravijn"
 
-#: src/gui/main_menu.cpp:62
+#: src/gui/main_menu.cpp:61
 msgid "Challenges"
 msgstr "Uitdagingen"
 
@@ -152,7 +152,7 @@ msgstr "Stel de toetsen in, %s"
 msgid "City"
 msgstr "In de stad"
 
-#: src/gui/config_display.cpp:99
+#: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
 msgstr "Verwijderen uit verbanningslijst"
 
@@ -206,7 +206,7 @@ msgid "Connected:"
 msgstr "Verbonden:"
 
 #: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:153
+#: src/gui/grand_prix_ending.cpp:134
 #: src/gui/race_results_gui.cpp:59
 msgid "Continue"
 msgstr "Doorgaan"
@@ -234,7 +234,7 @@ msgstr ""
 "Ontworpen door Oliver & Steve Baker,\n"
 "aangepast door Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:72
+#: src/gui/main_menu.cpp:78
 msgid "Credits"
 msgstr "Auteurs"
 
@@ -243,16 +243,16 @@ msgid "Crescent Crossing"
 msgstr "Krakend Kerkhof"
 
 #. I18N: displays current resolution
-#: src/gui/config_display.cpp:85
+#: src/gui/config_display.cpp:89
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Huidig: %dx%d"
 
-#: src/gui/config_display.cpp:91
+#: src/gui/config_display.cpp:96
 msgid "Decrease Resolution"
 msgstr "Verlaag resolutie"
 
-#: src/gui/race_options.cpp:86
+#: src/gui/race_options.cpp:84
 msgid "Difficulty"
 msgstr "Niveau"
 
@@ -260,11 +260,11 @@ msgstr "Niveau"
 msgid "Display"
 msgstr "Grafisch"
 
-#: src/gui/config_display.cpp:55
+#: src/gui/config_display.cpp:58
 msgid "Display Settings"
 msgstr "Grafische instellingen"
 
-#: src/gui/race_options.cpp:304
+#: src/gui/race_options.cpp:326
 msgid "Driver"
 msgstr "Chauffeur"
 
@@ -300,10 +300,10 @@ msgstr ""
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
-"in under 3:00 minutes."
+"in under 3:35 minutes."
 msgstr ""
 "Rij 3 ronden over de \n"
-"Tolweg binnen 1:15 \n"
+"Tolweg binnen 3:35 \n"
 "met 3 tegenstanders"
 
 #: data/tracks/jungle/jungle.challenge:5
@@ -311,8 +311,8 @@ msgid "Finish Race track in 2:40"
 msgstr "Voltooi het racecircuit binnen 2:40"
 
 #: data/tracks/canyon/canyon.challenge:5
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "Doe de tolweg binnen 3 minuten"
+msgid "Finish Tux Tollway track in 3:35"
+msgstr "Doe de tolweg binnen 3 minuten en 35 seconden"
 
 #: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
 msgid "Finish the City track in 4:20"
@@ -325,10 +325,10 @@ msgid ""
 "in under 2:20 minutes."
 msgstr ""
 "Verzamel binnen 2 minuut 20 \n"
-"ten minste 9 munten op 3 \n"
+"ten minste 9 vaten lachgas op 3 \n"
 "ronden van 'de Zandduinen'"
 
-#: src/gui/race_gui.cpp:677
+#: src/gui/race_gui.cpp:685
 #, c-format
 msgid "Finished"
 msgstr "Klaar"
@@ -394,9 +394,9 @@ msgstr "Fort magma"
 msgid "Four Players"
 msgstr "Vier spelers"
 
-#: src/gui/config_display.cpp:77
-#: src/gui/config_display.cpp:130
-#: src/gui/config_display.cpp:185
+#: src/gui/config_display.cpp:80
+#: src/gui/config_display.cpp:135
+#: src/gui/config_display.cpp:193
 msgid "Fullscreen mode"
 msgstr "Volledig scherm"
 
@@ -408,13 +408,13 @@ msgstr "Spelvorm informatie"
 msgid "Game modes"
 msgstr "Spelvormen"
 
-#: src/gui/challenges_menu.cpp:54
+#: src/gui/challenges_menu.cpp:55
 #: src/gui/credits_menu.cpp:79
 msgid "Go back to the main menu"
 msgstr "Terug naar het hoofdmenu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:828
+#: src/gui/race_gui.cpp:836
 msgid "Go!"
 msgstr "Af!"
 
@@ -436,7 +436,7 @@ msgstr ""
 "eindigen in de groep. De beste over alle parcoursen wit! \n"
 "(Bij gelijkspel geldt de laaste totaaltijd)"
 
-#: src/gui/main_menu.cpp:69
+#: src/gui/main_menu.cpp:75
 #: src/gui/race_menu.cpp:49
 msgid "Help"
 msgstr "Hulp"
@@ -453,16 +453,16 @@ msgstr ""
 "Het icoontje van een slot geeft aan dat je een uitdaging\n"
 " moet winnen voordat deze optie actief wordt."
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
 msgstr "Verhoog resolutie"
 
-#: src/user_config.cpp:870
+#: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Ongeldig"
 
-#: src/modes/linear_world.cpp:171
+#: src/karts/player_kart.cpp:365
 msgid "Invalid short-cut!!"
 msgstr "Niet afsteken!!"
 
@@ -470,7 +470,7 @@ msgstr "Niet afsteken!!"
 msgid "King Weird's Castle"
 msgstr "Het Krankioreme Kasteel van de Koning"
 
-#: src/gui/race_gui.cpp:682
+#: src/gui/race_gui.cpp:690
 msgid "Lap"
 msgstr "Ronde"
 
@@ -487,7 +487,7 @@ msgstr "Leider"
 msgid "Left"
 msgstr "Links"
 
-#: src/gui/race_results_gui.cpp:301
+#: src/gui/race_results_gui.cpp:303
 #: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
 msgstr "Bezig met het laden..."
@@ -497,7 +497,7 @@ msgstr "Bezig met het laden..."
 msgid "Look back"
 msgstr "Achteruit kijken"
 
-#: src/gui/main_menu.cpp:59
+#: src/gui/main_menu.cpp:58
 msgid "Networking"
 msgstr "Netwerk"
 
@@ -505,7 +505,7 @@ msgstr "Netwerk"
 msgid "New Feature Unlocked"
 msgstr "Nieuwe optie geactiveerd"
 
-#: src/challenges/challenge.cpp:133
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -514,7 +514,7 @@ msgstr ""
 "Grand Prix '%s'\n"
 "is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:136
+#: src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -525,11 +525,11 @@ msgstr ""
 "'%s'\n"
 "is nu beschikbaar!"
 
-#: src/modes/linear_world.cpp:339
+#: src/modes/linear_world.cpp:286
 msgid "New fastest lap"
 msgstr "Nieuwe snelste ronde"
 
-#: src/challenges/challenge.cpp:130
+#: src/challenges/challenge.cpp:131
 #, c-format
 msgid ""
 "New game mode\n"
@@ -539,7 +539,7 @@ msgstr ""
 "Nieuwe spelvorm\n"
 "'%s'is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:140
+#: src/challenges/challenge.cpp:144
 #, c-format
 msgid ""
 "New kart\n"
@@ -549,7 +549,7 @@ msgstr ""
 "Nieuwe kart '%s'\n"
 "is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:126
+#: src/challenges/challenge.cpp:127
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -563,6 +563,10 @@ msgstr ""
 msgid "Next >"
 msgstr "Volgende >"
 
+#: src/gui/config_display.cpp:84
+msgid "Next background"
+msgstr "Volgende achtergrond"
+
 #: src/gui/player_controls.cpp:72
 msgid "Nitro"
 msgstr "Lachgas"
@@ -572,16 +576,16 @@ msgstr "Lachgas"
 msgid "No Grand Prix selected"
 msgstr "Geen Grand Prix geselecteerd"
 
-#: src/gui/race_options.cpp:303
-#: src/gui/race_options.cpp:306
+#: src/gui/race_options.cpp:325
+#: src/gui/race_options.cpp:328
 msgid "Novice"
 msgstr "Beginneling"
 
-#: src/gui/race_options.cpp:102
+#: src/gui/race_options.cpp:100
 msgid "Number of karts"
 msgstr "Kies het aantal karts"
 
-#: src/gui/race_options.cpp:124
+#: src/gui/race_options.cpp:122
 msgid "Number of laps"
 msgstr "Kies het aantal ronden"
 
@@ -590,7 +594,7 @@ msgstr "Kies het aantal ronden"
 msgid "OK"
 msgstr "OK"
 
-#: src/user_config.cpp:498
+#: src/user_config.cpp:528
 msgid "Old config file found, check your key bindings!"
 msgstr "Oud configuratiebestand gevonden, controleer toetsinstellingen!"
 
@@ -602,7 +606,7 @@ msgstr "De wiskundeklas van Olivier"
 msgid "On the Beach"
 msgstr "Strandvakantie"
 
-#: src/gui/main_menu.cpp:64
+#: src/gui/main_menu.cpp:63
 #: src/gui/options.cpp:40
 #: src/gui/race_menu.cpp:48
 msgid "Options"
@@ -616,7 +620,7 @@ msgstr "Parachute – remt alle karts voor je af!"
 msgid "Paused"
 msgstr "Gepauzeerd"
 
-#: src/gui/race_gui.cpp:857
+#: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
 msgstr "Straftijd!!"
 
@@ -625,7 +629,7 @@ msgid "Penguin Playground"
 msgstr "Speeltuin voor pinguïns"
 
 #. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:264
+#: src/gui/player_controls.cpp:290
 msgid "Player "
 msgstr "Speler"
 
@@ -676,7 +680,7 @@ msgid "Press <ESC> to Cancel"
 msgstr "Druk op <ESC> om te annuleren"
 
 #: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:103
+#: src/gui/config_display.cpp:108
 #: src/gui/config_sound.cpp:64
 #: src/gui/game_mode.cpp:158
 #: src/gui/grand_prix_select.cpp:80
@@ -684,7 +688,7 @@ msgstr "Druk op <ESC> om te annuleren"
 #: src/gui/num_players.cpp:46
 #: src/gui/options.cpp:58
 #: src/gui/player_controls.cpp:124
-#: src/gui/race_options.cpp:154
+#: src/gui/race_options.cpp:152
 msgid "Press <ESC> to go back"
 msgstr "Druk op <ESC> om terug te keren"
 
@@ -701,17 +705,13 @@ msgstr "Instant wedstrijd"
 msgid "Quick race: Pick a single track, shortest time wins.         "
 msgstr "Snelle race: Één enkel parcours, snelste tijd wint"
 
-#: src/gui/main_menu.cpp:65
+#: src/gui/main_menu.cpp:64
 msgid "Quit"
 msgstr "Einde"
 
-#: src/gui/race_gui.cpp:629
+#: src/gui/race_gui.cpp:637
 msgid "REV"
 msgstr "R"
-
-#: data/tracks/race/race.track:4
-msgid "Race Track"
-msgstr "Racecircuit"
 
 #: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
@@ -721,7 +721,7 @@ msgstr "Doe dit parcours opnieuw"
 msgid "Race results"
 msgstr "Wedstrijdresultaat"
 
-#: src/gui/race_options.cpp:305
+#: src/gui/race_options.cpp:327
 msgid "Racer"
 msgstr "Coureur"
 
@@ -730,7 +730,7 @@ msgid "Racetrack"
 msgstr "Racecircuit"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:808
+#: src/gui/race_gui.cpp:816
 msgid "Ready!"
 msgstr "Op uw plaatsen?"
 
@@ -760,7 +760,7 @@ msgid "Select network mode"
 msgstr "Kies netwerk type"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:818
+#: src/gui/race_gui.cpp:826
 msgid "Set!"
 msgstr "Klaar?"
 
@@ -777,7 +777,7 @@ msgstr "Korte bocht"
 msgid "Shifting Sands"
 msgstr "De zandduinen"
 
-#: src/gui/main_menu.cpp:54
+#: src/gui/main_menu.cpp:53
 msgid "Single Player"
 msgstr "Enkele speler"
 
@@ -809,7 +809,7 @@ msgstr "Geluid"
 msgid "Sound Settings"
 msgstr "Geluid instellingen"
 
-#: src/gui/main_menu.cpp:55
+#: src/gui/main_menu.cpp:54
 msgid "Splitscreen"
 msgstr "Gesplitst scherm"
 
@@ -817,7 +817,7 @@ msgstr "Gesplitst scherm"
 msgid "Star Track"
 msgstr "Tussen de sterren"
 
-#: src/gui/race_options.cpp:144
+#: src/gui/race_options.cpp:142
 msgid "Start race"
 msgstr "Start wedstrijd"
 
@@ -825,7 +825,7 @@ msgstr "Start wedstrijd"
 msgid "Synchronising network..."
 msgstr "Netwerk synchoniseren..."
 
-#: src/gui/race_results_gui.cpp:271
+#: src/gui/race_results_gui.cpp:273
 msgid "Synchronising."
 msgstr "Synchroniseren."
 
@@ -861,7 +861,7 @@ msgstr ""
 msgid "The old mine"
 msgstr "De oude mijn"
 
-#: src/gui/grand_prix_ending.cpp:111
+#: src/gui/grand_prix_ending.cpp:84
 #, c-format
 msgid "The winner is %s!"
 msgstr "De winnar is %s!"
@@ -911,7 +911,7 @@ msgstr "Muziek aan"
 msgid "Turn on sound effects"
 msgstr "Geluidseffecten aan"
 
-#: data/tracks/tuxtrack/tuxtrack.track:4
+#: data/tracks/tuxtollway/tuxtollway.track:4
 msgid "Tux Tollway"
 msgstr "Tolweg van Tux"
 
@@ -919,7 +919,7 @@ msgstr "Tolweg van Tux"
 msgid "Two Players"
 msgstr "Twee spelers"
 
-#: src/modes/linear_world.cpp:278
+#: src/modes/linear_world.cpp:654
 msgid "WRONG WAY!"
 msgstr "VERKEERDE RICHTING!"
 
@@ -1014,7 +1014,7 @@ msgstr ""
 "maan' met drie tegenstandes \n"
 "op 'Coureur' niveau"
 
-#: src/gui/config_display.cpp:72
+#: src/gui/config_display.cpp:75
 msgid "Window mode"
 msgstr "In venster"
 
@@ -1022,7 +1022,7 @@ msgstr "In venster"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You finished the race!"
 msgstr "Race afgelopen!"
 
@@ -1034,7 +1034,7 @@ msgstr ""
 "Je bent\n"
 "geëlimineerd!"
 
-#: src/karts/player_kart.cpp:267
+#: src/karts/player_kart.cpp:303
 msgid "You won the race!"
 msgstr "Je hebt de race gewonnen!"
 
@@ -1042,34 +1042,37 @@ msgstr "Je hebt de race gewonnen!"
 msgid "Zipper - speed boost"
 msgstr "Pijltje – extra snelheid"
 
-#: src/user_config.cpp:853
+#: src/user_config.cpp:986
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joystick %d as %d  %c"
 
-#: src/user_config.cpp:857
+#: src/user_config.cpp:991
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joystick %d knop %d"
 
-#: src/user_config.cpp:860
+#: src/user_config.cpp:994
 #, c-format
 msgid "joy %d hat %d"
 msgstr "joystick %d hat %d"
 
-#: src/user_config.cpp:866
+#: src/user_config.cpp:1000
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "muis as %d %c"
 
-#: src/user_config.cpp:863
+#: src/user_config.cpp:997
 #, c-format
 msgid "mouse btn %d"
 msgstr "muisknop %d"
 
-#: src/user_config.cpp:847
-#: src/user_config.cpp:891
+#: src/user_config.cpp:980
+#: src/user_config.cpp:1025
 #, c-format
 msgid "not set"
 msgstr "geen waarde"
+
+#~ msgid "Race Track"
+#~ msgstr "Racecircuit"
 
