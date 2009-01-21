@@ -124,13 +124,14 @@ void Camera::setMode(Mode mode)
     {
         m_distance = m_kart->getKartProperties()->getCameraDistance();
 
-        // In 2 and 3 player mode we have a different FOV and would not see our
-        // kart at the default distance. We use 1.5 times the distance to fix that.
+        // In splitscreen mode we have a different FOVs and rotations so we use
+        // 1.333 or 1.5 times the normal distance to compensate and make the 
+        // kart visible
         const int num_players = race_manager->getNumPlayers();
         if(num_players==2 || (num_players==3 && m_index==3) )
-            m_distance += m_distance*0.5f;
+            m_distance *= 1.5f;
         else if(num_players>=3)
-            m_distance += m_distance*0.3333333f;
+            m_distance *= 1.3333333f;
     }
 }   // setMode
 
