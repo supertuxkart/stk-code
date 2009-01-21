@@ -314,7 +314,13 @@ void CharSel::switchCharacter(int n)
 {
     int indx=m_index_avail_karts[n];
         // if a group is hovered about, don't do anything
-    if(indx<0) return;
+    if(indx<0)
+    {
+        m_current_kart = -1;
+        ssgDeRefDelete(m_kart);
+        m_kart = NULL;
+        return;
+    }
     
     const KartProperties* kp= kart_properties_manager->getKartById(indx);
     if (m_current_kart != n && kp != NULL)
@@ -385,7 +391,7 @@ void CharSel::update(float dt)
         int token = widget_manager->getSelectedWgt() - WTOK_RACER0;
         if(token<0 || token>(int)m_index_avail_karts.size())
             token = widget_manager->getSelectedWgt() - WTOK_NAME0;
-                switchCharacter((token+m_offset)%m_index_avail_karts.size());
+        switchCharacter((token+m_offset)%m_index_avail_karts.size());
     }
 
     if (m_kart != NULL)
