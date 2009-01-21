@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-01-13 15:03+1100\n"
-"PO-Revision-Date: 2009-01-13 11:16-0500\n"
+"PO-Revision-Date: 2009-01-21 17:10-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -521,7 +521,8 @@ msgid ""
 "now available"
 msgstr ""
 "Nouvelle difficulté\n"
-"'%s' déverrouillée"
+"'%s'\n"
+"déverrouillée"
 
 #: src/modes/linear_world.cpp:286
 msgid "New fastest lap"
@@ -556,7 +557,8 @@ msgid ""
 "now available"
 msgstr ""
 "Nouvelle piste\n"
-"'%s' déverrouillée"
+"'%s'\n"
+"déverrouillée"
 
 #: src/gui/help_page_one.cpp:156
 #: src/gui/help_page_two.cpp:134
