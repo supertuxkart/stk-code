@@ -79,6 +79,32 @@ CharSel::CharSel(int whichPlayer)
     if (m_player_index == 0)
         kart_properties_manager->clearAllSelectedKarts();
 
+    // Determine the list of all groups to display. A call to
+    // kart_properties_manager->getAllGroups() will return even groups without
+    // karts in it (e.g. because all karts are locked), so in this case we
+    // don't want to display this list.
+    m_all_groups = kart_properties_manager->getAllGroups();
+    std::vector<std::string>::iterator it = m_all_groups.begin();
+    while(it!=m_all_groups.end())
+    {
+        const std::vector<int> &kig=kart_properties_manager->getKartsInGroup(*it);
+        bool can_be_deleted=true;
+        for(unsigned int i=0; i<kig.size(); i++)
+        {
+            const KartProperties *k=kart_properties_manager->getKartById(kig[i]);
+            if(!unlock_manager->isLocked(k->getIdent()))
+            {
+                can_be_deleted=false;
+                break;
+            }   // if isLocked
+        }   // for i<kig.size
+        if(can_be_deleted)
+            it=m_all_groups.erase(it);
+        else
+            it++;
+    }
+
+
     if (m_player_index < (int)kart_properties_manager->getNumSelectedKarts())
         kart_properties_manager->removeLastSelectedKart();
 
@@ -210,8 +236,7 @@ void CharSel::updateScrollPosition()
         }
         else
         {
-            const std::vector<std::string> &groups=kart_properties_manager->getAllGroups();
-            widget_manager->setWgtText(WTOK_NAME0+i, groups[-indx-1]);
+            widget_manager->setWgtText(WTOK_NAME0+i, m_all_groups[-indx-1]);
             widget_manager->hideWgtTexture(WTOK_RACER0 + i);
             widget_manager->hideWgtRect(WTOK_RACER0 + i);
         }
@@ -239,11 +264,10 @@ void CharSel::switchGroup()
 
     // Now add the groups, indicated by a negative number as kart index
     // ----------------------------------------------------------------
-    const std::vector<std::string> groups=kart_properties_manager->getAllGroups();
-    for(int i =0; i<(int)groups.size(); i++)
+    for(int i =0; i<(int)m_all_groups.size(); i++)
     {
         // Only add groups other than the current one
-        if(groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
+        if(m_all_groups[i]!=user_config->m_kart_group) m_index_avail_karts.push_back(-i-1);
     }
     if(m_index_avail_karts.size()>=m_max_entries) 
     {
@@ -501,7 +525,7 @@ void CharSel::select()
     int kart_id = m_index_avail_karts[token];
     if(kart_id < 0) // group selected
     {
-        user_config->m_kart_group = kart_properties_manager->getAllGroups()[-kart_id-1];
+        user_config->m_kart_group = m_all_groups[-kart_id-1];
         switchGroup();
         // forces redraw of the model, otherwise (if m_current_kart=0) the new
         // model would not be displayed.
