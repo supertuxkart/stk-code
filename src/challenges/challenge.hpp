@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHALLENGE_H
-#define HEADER_CHALLENGE_H
+#ifndef HEADER_CHALLENGE_HPP
+#define HEADER_CHALLENGE_HPP
 
 #include <string>
 #include <vector>
@@ -36,7 +36,7 @@ enum REWARD_TYPE
 
 struct UnlockableFeature
 {
-    std::string name; // itnernal name
+    std::string name; // internal name
     std::string user_name; // not all types of feature have one
     REWARD_TYPE type;
 };
@@ -44,6 +44,7 @@ struct UnlockableFeature
 // A base class for all challenges
 class Challenge
 {
+private:
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
@@ -56,15 +57,17 @@ public:
              Challenge(std::string id, std::string name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
-    const std::string& getId() const             { return m_Id;                  }
-    const std::string& getName() const           { return m_Name;                }
-    void setName(const std::string& s)           { m_Name = s;                   }
-    void setId(const std::string& s)             { m_Id = s;                     }
-    void addUnlockTrackReward(std::string track_name);
-    void addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name);
-    void addUnlockGPReward(std::string gp_name);
-    void addUnlockDifficultyReward(std::string internal_name, std::string user_name);
-    void addUnlockKartReward(std::string internal_name, std::string user_name);
+    const std::string
+         &getId() const                           { return m_Id;                  }
+    const std::string
+         &getName() const                         { return m_Name;                }
+    void  setName(const std::string& s)           { m_Name = s;                   }
+    void  setId(const std::string& s)             { m_Id = s;                     }
+    void  addUnlockTrackReward(std::string track_name);
+    void  addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name);
+    void  addUnlockGPReward(std::string gp_name);
+    void  addUnlockDifficultyReward(std::string internal_name, std::string user_name);
+    void  addUnlockKartReward(std::string internal_name, std::string user_name);
     
     const std::string getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&

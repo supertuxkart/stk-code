@@ -27,6 +27,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
+#include "physics/moving_physics.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)

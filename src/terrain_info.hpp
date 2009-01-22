@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TERRAIN_INFO_H
-#define HEADER_TERRAIN_INFO_H
+#ifndef HEADER_TERRAIN_INFO_HPP
+#define HEADER_TERRAIN_INFO_HPP
 
 #include "material.hpp"
 #include "utils/vec3.hpp"
@@ -36,16 +36,16 @@ private:
     float             m_HoT;                // height of terrain
 
 public:
-                     TerrainInfo(int frequency=1) {m_HoT_frequency=frequency;
-                                                   m_HoT_counter=frequency;  }
-                     TerrainInfo(const Vec3 &pos, int frequency=1);
-    virtual         ~TerrainInfo() {};
-    virtual void     update(const Vec3 &pos);
-    float            getHoT()      const { return m_HoT;      }
-    const Material  *getMaterial() const { return m_material; }
-    const Vec3      &getNormal()   const { return m_normal;   }
-    float            getTerrainPitch(float heading) const;
+    TerrainInfo(int frequency=1);
+    TerrainInfo(const Vec3 &pos, int frequency=1);
+    virtual ~TerrainInfo() {};
 
-};   // TerrainInfo
+    virtual void update(const Vec3 &pos);
 
-#endif
+    float getHoT()                       const {return m_HoT;     }
+    const Material *getMaterial()        const {return m_material;}
+    const Vec3 &getNormal()              const {return m_normal;  }
+    float getTerrainPitch(float heading) const;
+};  // TerrainInfo
+
+#endif // HEADER_TERRAIN_INFO_HPP

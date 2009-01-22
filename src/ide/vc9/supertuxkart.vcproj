@@ -736,31 +736,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\moving_physics.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\moving_texture.cpp"
 				>
 			</File>
 			<File
 				RelativePath="../../../src\race_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_base.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_buffers.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_player.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_recorder.cpp"
 				>
 			</File>
 			<File
@@ -793,10 +773,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\track.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\track_manager.cpp"
 				>
 			</File>
 			<File
@@ -1107,6 +1083,18 @@
 				Name="physics"
 				>
 				<File
+					RelativePath="..\..\physics\btKart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\btUprightConstraint.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\moving_physics.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\physics.cpp"
 					>
 				</File>
@@ -1196,6 +1184,34 @@
 				</File>
 				<File
 					RelativePath="..\..\network\race_state.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tracks"
+				>
+				<File
+					RelativePath="..\..\tracks\track_manager.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="replay"
+				>
+				<File
+					RelativePath="..\..\replay\replay_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_buffers.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_player.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_recorder.cpp"
 					>
 				</File>
 			</Filter>
@@ -1314,26 +1330,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\replay_base.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_buffer_tpl.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_buffers.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_player.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\replay_recorder.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\scene.hpp"
 				>
 			</File>
@@ -1367,10 +1363,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\track.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\track_manager.hpp"
 				>
 			</File>
 			<File
@@ -1781,6 +1773,14 @@
 				Name="physics"
 				>
 				<File
+					RelativePath="..\..\physics\btKart.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\btUprightConstraint.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\kart_motion_state.hpp"
 					>
 				</File>
@@ -1842,6 +1842,38 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\smoke.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tracks"
+				>
+				<File
+					RelativePath="..\..\tracks\track_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="replay"
+				>
+				<File
+					RelativePath="..\..\replay\replay_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_buffer_tpl.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_buffers.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_player.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\replay\replay_recorder.hpp"
 					>
 				</File>
 			</Filter>

@@ -24,16 +24,15 @@
 #include "translation.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
-#include "track_manager.hpp"
 #include "karts/kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
+#include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-
 
 ChallengeData::ChallengeData(const std::string& filename)
 {
@@ -72,7 +71,7 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_major = RaceManager::MAJOR_MODE_SINGLE;
     else
         error("major");
-        
+
     lisp->get("minor", mode);
     if(mode=="timetrial")
         m_minor = RaceManager::MINOR_MODE_TIME_TRIAL;
@@ -91,9 +90,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     setChallengeDescription(s); 
     if(!lisp->get("karts", m_num_karts)  ) error("karts");
     // Position is optional except in GP and FTL
-    if(!lisp->get("position", m_position) && 
+    if(!lisp->get("position", m_position) &&
        //RaceManager::getWorld()->areKartsOrdered() ) // FIXME - order and optional are not the same thing
-        (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER || 
+        (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
          m_major==RaceManager::MAJOR_MODE_GRAND_PRIX))
                                            error("position");
     lisp->get("difficulty", s);
@@ -115,13 +114,13 @@ ChallengeData::ChallengeData(const std::string& filename)
         if(!lisp->get("track",  m_track_name )) error("track");
         if(!lisp->get("laps",   m_num_laps   ) && 
            m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-           error("laps");        
+           error("laps");
     }
     else   // GP
     {
         if(!lisp->get("gp",   m_gp_id )) error("gp");
     }
-    
+
     getUnlocks(lisp, "unlock-track",      UNLOCK_TRACK);
     getUnlocks(lisp, "unlock-gp",         UNLOCK_GP   );
     getUnlocks(lisp, "unlock-mode",       UNLOCK_MODE );
@@ -275,6 +274,7 @@ bool ChallengeData::raceFinished()
     if(m_time>0.0f && kart->getFinishTime()>m_time) return false;    // too slow
     return true;
 }   // raceFinished
+
 // ----------------------------------------------------------------------------
 bool ChallengeData::grandPrixFinished()
 {
@@ -291,6 +291,6 @@ bool ChallengeData::grandPrixFinished()
     const int rank = race_manager->getKartFinalGPRank(kart->getWorldKartId());
     //printf("getting rank for %s : %i \n", kart->getName().c_str(), rank );
     if( rank != 0 ) return false;
-    
-    return true;    
+
+    return true;
 }   // grandPrixFinished

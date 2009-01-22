@@ -487,10 +487,6 @@
 						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp"
 						>
 					</File>
-					<File
-						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btUprightConstraint.cpp"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="Dynamics"
@@ -519,10 +515,6 @@
 				<Filter
 					Name="Vehicle"
 					>
-					<File
-						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btKart.cpp"
-						>
-					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp"
 						>
@@ -1089,10 +1081,6 @@
 						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btTypedConstraint.h"
 						>
 					</File>
-					<File
-						RelativePath="..\..\bullet\src\BulletDynamics\ConstraintSolver\btUprightConstraint.h"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="Dynamics"
@@ -1121,10 +1109,6 @@
 				<Filter
 					Name="Vehicle"
 					>
-					<File
-						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btKart.h"
-						>
-					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btRaycastVehicle.h"
 						>

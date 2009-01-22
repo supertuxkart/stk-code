@@ -25,7 +25,6 @@
 
 #include "file_manager.hpp"
 #include "track.hpp"
-#include "track_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "callback_manager.hpp"
@@ -45,10 +44,11 @@
 #include "karts/auto_kart.hpp"
 #include "karts/player_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "robots/default_robot.hpp"
-#include "modes/world.hpp"
+#include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf

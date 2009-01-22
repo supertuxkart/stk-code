@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_USERCONFIG_HPP
-#define HEADER_USERCONFIG_HPP
+#ifndef HEADER_USER_CONFIG_HPP
+#define HEADER_USER_CONFIG_HPP
 
 #define PLAYERS 4
 
@@ -59,18 +59,17 @@ class UserConfig
 {
 public:
     /** Stores information about joystick and gamepads. */
-	class StickConfig
-	{
-	public:
-		std::string  m_id;
-		int          m_preferredIndex;
-		int          m_deadzone;
-		StickConfig(const std::string &id);
-				
-	};
+    class StickConfig
+    {
+    public:
+        std::string  m_id;
+        int          m_preferredIndex;
+        int          m_deadzone;
+        StickConfig(const std::string &id) : m_id(id) {}
+    };
 
 private:
-    // This class stores the last used input configuration (i.e. which action 
+    // This class stores the last used input configuration (i.e. which action
     // is used for left, right, ..., look back) for a certain input
     // device (i.e. keyboard, joystick, ...)
     struct InputConfiguration
@@ -84,25 +83,25 @@ private:
 
     std::string getInputDeviceName(int player_index) const;
 
-	std::vector <StickConfig *> m_stickconfigs;
-			
-	typedef struct 
-	{
-		int count;
-		Input inputs[4];
-	} InputMapEntry;
-		
+    std::vector <StickConfig *> m_stickconfigs;
+
+    typedef struct
+    {
+        int count;
+        Input inputs[4];
+    } InputMapEntry;
+
     /** Filename of the user config file. */
     std::string m_filename;
-	
-	/** Stores the GameAction->Input mappings in a way that is suitable for
-	  * quick modification of the mappings. Internally this allows multiple
-	  * Input instances per GameAction but the public methods allow only one
-	  * mapping.
-	  * 
-	  * It is named after what is put in as values.
-	  */
-	InputMapEntry m_input_map[GA_COUNT];
+
+    /** Stores the GameAction->Input mappings in a way that is suitable for
+     * quick modification of the mappings. Internally this allows multiple
+     * Input instances per GameAction but the public methods allow only one
+     * mapping.
+     *
+     * It is named after what is put in as values.
+     */
+    InputMapEntry m_input_map[GA_COUNT];
 
     void        setFilename      ();
     int         CheckAndCreateDir();
@@ -121,67 +120,67 @@ private:
     /** Index of current background image. */
     int         m_background_index;
 
-	void readStickConfigs(const lisp::Lisp *);
+    void readStickConfigs(const lisp::Lisp *);
     void readLastInputConfigurations(const lisp::Lisp *);
 
-	void writeStickConfigs(lisp::Writer *);
+    void writeStickConfigs(lisp::Writer *);
     void writeLastInputConfigurations(lisp::Writer *);
 
-	void readPlayerInput(const lisp::Lisp *,
+    void readPlayerInput(const lisp::Lisp *,
                          const std::string& node,
-						 KartAction ka,
-						 int);
+                         KartAction ka,
+                         int);
 
-	void writePlayerInput(lisp::Writer *,
+    void writePlayerInput(lisp::Writer *,
                           const std::string &node,
-						  KartAction,
-						  int);
+                          KartAction,
+                          int);
 
 
     void readInputNode(const lisp::Lisp *,
                        const std::string &node,
-				       GameAction);
+                       GameAction);
 
     Input readInput(const lisp::Lisp* nodeReader);
 
     void writeInputNode(lisp::Writer *,
                         const std::string &node,
-					    GameAction);
+                        GameAction);
 
-	void writeInput(lisp::Writer *writer, const Input &input);
+    void writeInput(lisp::Writer *writer, const Input &input);
 
-	/** Iterates through the input mapping and unsets all
-	 * where the given input occurs.
-	 * 
-	 * This makes sure an input is not bound multiple times.
-	 */
-	void unsetDuplicates(GameAction, const Input &);
-	
-	/** Creates an GameAction->Input mapping with one Input */
-	void set(GameAction, const Input &);
-	
-	/** Creates an GameAction->Input mapping with two Inputs */
-	void set(GameAction, const Input &, const Input &);
-	
-	/** Creates an GameAction->Input mapping with three Inputs */
-	void set(GameAction, const Input &, const Input &, const Input &);
-	
-	/** Creates an GameAction->Input mapping with four Inputs */
-	void set(GameAction, const Input &, const Input &, const Input &, const Input &);
+    /** Iterates through the input mapping and unsets all
+     * where the given input occurs.
+     *
+     * This makes sure an input is not bound multiple times.
+     */
+    void unsetDuplicates(GameAction, const Input &);
 
-	std::string getInputAsString(const Input &);
+    /** Creates an GameAction->Input mapping with one Input */
+    void set(GameAction, const Input &);
 
-	/** Creates an ActionMap for the GameAction values of the specified
-	  * range.
-	  */
-	ActionMap *newActionMap(const int, const int);
-	
-	/** Sets the Input for the given GameAction. Includes a check for
-	  * duplicates and automatic removing of the other candidate(s).
-	  *
-	  * For use when reading from file.
-	  */
-	void setInput(GameAction, const Input &);
+    /** Creates an GameAction->Input mapping with two Inputs */
+    void set(GameAction, const Input &, const Input &);
+
+    /** Creates an GameAction->Input mapping with three Inputs */
+    void set(GameAction, const Input &, const Input &, const Input &);
+
+    /** Creates an GameAction->Input mapping with four Inputs */
+    void set(GameAction, const Input &, const Input &, const Input &, const Input &);
+
+    std::string getInputAsString(const Input &);
+
+    /** Creates an ActionMap for the GameAction values of the specified
+     * range.
+     */
+    ActionMap *newActionMap(const int, const int);
+
+    /** Sets the Input for the given GameAction. Includes a check for
+     * duplicates and automatic removing of the other candidate(s).
+     *
+     * For use when reading from file.
+     */
+    void setInput(GameAction, const Input &);
 
 public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
@@ -202,28 +201,29 @@ public:
     std::string m_item_style;
     std::string m_username;
     std::string m_background_music;
-    std::string m_kart_group;      //< Kart group used last
-    std::string m_track_group;     //< Track group used last
-    std::string m_last_track;      //< name of the last track used
+    std::string m_kart_group;      /**< Kart group used last.        */
+    std::string m_track_group;     /**< Track group used last.       */
+    std::string m_last_track;      /**< name of the last track used. */
     std::string m_server_address;
     int         m_server_port;
     bool        m_use_kph;
     int         m_width;
     int         m_height;
-    int			m_prev_width;
-    int			m_prev_height;
-    bool		m_prev_windowed;
-    bool		m_crashed;
-    std::vector<std::string> m_blacklist_res;
+    int         m_prev_width;
+    int         m_prev_height;
+    bool        m_prev_windowed;
+    bool        m_crashed;
+    std::vector<std::string>
+                m_blacklist_res;
     Player      m_player[PLAYERS];
     bool        m_log_errors;
 
-    UserConfig();
-    UserConfig(const std::string& filename);
-    ~UserConfig();
+         UserConfig();
+         UserConfig(const std::string& filename);
+        ~UserConfig();
     void setDefaults();
     void setMusic(int m)                  { m_music        =  m;        }
-    void setSFX  (int m)                  { m_sfx          =  m;        }
+    void setSFX(int m)                    { m_sfx          =  m;        }
     bool doMusic() const                  { return m_music == UC_ENABLE;}
     bool doSFX()   const                  { return m_sfx   == UC_ENABLE;}
     /** Sets the default number of karts. This is only used to store
@@ -243,52 +243,50 @@ public:
     void setDefaultNumDifficulty(int n)   { m_difficulty = n;           }
     /** Returns the default difficulty. */
     int getDefaultDifficulty() const      { return m_difficulty;        }
-
     void nextBackgroundIndex();
 
     /** Get the index of the background image. */
-    int getBackgroundIndex() const        { return m_background_index;  }
+    int   getBackgroundIndex() const      { return m_background_index;  }
 
-    void loadConfig();
-    void loadConfig(const std::string& filename);
-    void saveConfig();
-    void saveConfig(const std::string& filename);
-			
-	void addStickConfig(UserConfig::StickConfig *);
-			
-	const std::vector<StickConfig *> *getStickConfigs() const;
+    void  loadConfig();
+    void  loadConfig(const std::string& filename);
+    void  saveConfig()                    { saveConfig(m_filename);     }
+    void  saveConfig(const std::string& filename);
+    void  addStickConfig(UserConfig::StickConfig *sc)
+                                          {m_stickconfigs.push_back(sc);}
+    const std::vector<StickConfig *>
+         *getStickConfigs() const         { return &m_stickconfigs;     }
 
-			
-	/** Retrieves a human readable string of the mapping for a GameAction */
+
+    /** Retrieves a human readable string of the mapping for a GameAction */
     std::string getMappingAsString(GameAction);
-	/** Retrieves a human readable string of the mapping for the given
-	  * player and KartAction.
-	  */
-	std::string getMappingAsString(int, KartAction);
-	
-	/** Sets the Input for the given Player and KartAction. Includes a check
-	  * for duplicates and automatic removing of the other candidate(s).
-	  *
-	  * For use when sensing input.
-	  */
-	void setInput(int player_number, KartAction ka, const Input &i0);
-
+    /** Retrieves a human readable string of the mapping for the given
+      * player and KartAction.
+      */
+    std::string getMappingAsString(int, KartAction);
+    
+    /** Sets the Input for the given Player and KartAction. Includes a check
+     * for duplicates and automatic removing of the other candidate(s).
+     *
+     * For use when sensing input.
+     */
+    void setInput(int player_number, KartAction ka, const Input &i0);
     const Input &getInput(int player_index, KartAction ka) const;
 
-	/** Clears the mapping for a given Player and KartAction. */
-	void clearInput(int, KartAction);
-	
-    bool isFixedInput(Input::InputType, int, int, int);
-    const std::string& getWarning() {return m_warning;}
-    void  resetWarning() {m_warning="";}
-	void  setWarning(std::string& warning) {m_warning=warning;}
+    /** Clears the mapping for a given Player and KartAction. */
+    void  clearInput(int, KartAction);
+    bool  isFixedInput(Input::InputType, int, int, int);
+    const std::string
+         &getWarning()                     { return m_warning;  }
+    void  resetWarning()                   { m_warning="";      }
+    void  setWarning(std::string& warning) { m_warning=warning; }
     
-	/** Creates ActionMap for use in menu mode. */
-	ActionMap *newMenuActionMap();
-	
-	/** Creates ActionMap for use in ingame mode. */
-	ActionMap *newIngameActionMap();
-			
+    /** Creates ActionMap for use in menu mode. */
+    ActionMap *newMenuActionMap();
+
+    /** Creates ActionMap for use in ingame mode. */
+    ActionMap *newIngameActionMap();
+    
 };
 
 

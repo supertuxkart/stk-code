@@ -20,47 +20,15 @@
 #include "translation.hpp"
 #include "challenges/challenge.hpp"
 #include "race_manager.hpp"
-#include "track_manager.hpp"
 #include "track.hpp"
+#include "grand_prix_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
-#include "grand_prix_manager.hpp"
+#include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-
-
-Challenge::Challenge(std::string id, std::string name) : 
-    m_state(CH_INACTIVE), m_Id(id), m_Name(name)
-{
-}   // Challenge
-
-//-----------------------------------------------------------------------------
-/** Loads the state for a challenge object (esp. m_state), and calls the 
- *  virtual function loadState for additional information
- */
-void Challenge::load(const lisp::Lisp* config)
-{
-    const lisp::Lisp* subnode= config->getLisp(getId());
-    if(!subnode) return;
-    
-    // See if the challenge is solved (it's activated later from the
-    // unlock_manager).
-    bool finished=false;
-    subnode->get("solved", finished);
-    m_state = finished ? CH_SOLVED : CH_INACTIVE;
-    if(!finished) loadState(subnode);
-}   // load
-
-//-----------------------------------------------------------------------------
-void Challenge::save(lisp::Writer* writer)
-{
-    writer->beginList(getId());
-    writer->write("solved", isSolved());
-    if(!isSolved()) saveState(writer);
-    writer->endList(getId());
-}   // save
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockTrackReward(std::string track_name)
@@ -70,6 +38,7 @@ void Challenge::addUnlockTrackReward(std::string track_name)
     feature.type = UNLOCK_TRACK;
     m_feature.push_back(feature);
 }
+
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name)
 {
@@ -79,6 +48,7 @@ void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string 
     feature.user_name = user_mode_name;
     m_feature.push_back(feature);
 }
+
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockGPReward(std::string gp_name)
 {
@@ -87,6 +57,7 @@ void Challenge::addUnlockGPReward(std::string gp_name)
     feature.type = UNLOCK_GP;
     m_feature.push_back(feature);
 }
+
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string user_name)
 {
@@ -96,6 +67,7 @@ void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string
     feature.user_name = user_name;
     m_feature.push_back(feature);
 }
+
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockKartReward(std::string internal_name, std::string user_name)
 {
@@ -105,19 +77,20 @@ void Challenge::addUnlockKartReward(std::string internal_name, std::string user_
     feature.user_name = user_name;
     m_feature.push_back(feature);
 }
+
 //-----------------------------------------------------------------------------
 const std::string Challenge::getUnlockedMessage() const
 {
     std::string unlocked_message;
-    
+
     const unsigned int amount = (unsigned int)m_feature.size();
     for(unsigned int n=0; n<amount; n++)
     {
         // add line break if we are showing multiple messages
         if(n>0) unlocked_message+='\n';
-        
+
         char message[128];
-        
+
         // write message depending on feature type
         switch(m_feature[n].type)
         {
@@ -125,7 +98,7 @@ const std::string Challenge::getUnlockedMessage() const
                 {    // {} avoids compiler warning
                     Track* track = track_manager->getTrack( m_feature[n].name );
                     snprintf(message, 127, _("New track '%s'\nnow available"), _(track->getName()) );
-                    break; 
+                    break;
                 }
             case UNLOCK_MODE:
                 snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
@@ -146,6 +119,32 @@ const std::string Challenge::getUnlockedMessage() const
         }   // switch
         unlocked_message += message;
     }   // for n
-    
+
     return unlocked_message;
 }
+
+//-----------------------------------------------------------------------------
+/** Loads the state for a challenge object (esp. m_state), and calls the
+ *  virtual function loadState for additional information
+ */
+void Challenge::load(const lisp::Lisp* config)
+{
+    const lisp::Lisp* subnode= config->getLisp(getId());
+    if(!subnode) return;
+
+    // See if the challenge is solved (it's activated later from the
+    // unlock_manager).
+    bool finished=false;
+    subnode->get("solved", finished);
+    m_state = finished ? CH_SOLVED : CH_INACTIVE;
+    if(!finished) loadState(subnode);
+}   // load
+
+//-----------------------------------------------------------------------------
+void Challenge::save(lisp::Writer* writer)
+{
+    writer->beginList(getId());
+    writer->write("solved", isSolved());
+    if(!isSolved()) saveState(writer);
+    writer->endList(getId());
+}   // save

@@ -25,7 +25,7 @@
 #include "lisp/lisp.hpp"
 #include "grand_prix_data.hpp"
 #include "string_utils.hpp"
-#include "track_manager.hpp"
+#include "tracks/track_manager.hpp"
 
 GrandPrixData::GrandPrixData(const std::string filename)
 {

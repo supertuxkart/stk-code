@@ -159,34 +159,27 @@ void UserConfig::setDefaults()
         Input(Input::IT_KEYBOARD, SDLK_UP),
         Input(Input::IT_MOUSEBUTTON, 4),
         Input(Input::IT_STICKMOTION, 0, 1, Input::AD_NEGATIVE));
-
     set(GA_CURSOR_DOWN,
         Input(Input::IT_KEYBOARD, SDLK_DOWN),
         Input(Input::IT_MOUSEBUTTON, 5),
         Input(Input::IT_STICKMOTION, 0, 1, Input::AD_POSITIVE));
-
     set(GA_CURSOR_LEFT,
         Input(Input::IT_KEYBOARD, SDLK_LEFT),
         Input(Input::IT_STICKMOTION, 0, 0, Input::AD_NEGATIVE));
-
     set(GA_CURSOR_RIGHT,
         Input(Input::IT_KEYBOARD, SDLK_RIGHT),
         Input(Input::IT_STICKMOTION, 0, 0, Input::AD_POSITIVE));
-
     set(GA_CLEAR_MAPPING,
         Input(Input::IT_KEYBOARD, SDLK_BACKSPACE),
         Input(Input::IT_STICKBUTTON, 0, 2));
-
     set(GA_INC_SCROLL_SPEED,
         Input(Input::IT_KEYBOARD, SDLK_PLUS));
     set(GA_INC_SCROLL_SPEED_FAST,
         Input(Input::IT_KEYBOARD, SDLK_PAGEDOWN));
-
     set(GA_DEC_SCROLL_SPEED,
         Input(Input::IT_KEYBOARD, SDLK_MINUS));
     set(GA_DEC_SCROLL_SPEED_FAST,
         Input(Input::IT_KEYBOARD, SDLK_PAGEUP));
-
     set(GA_TOGGLE_FULLSCREEN,
         Input(Input::IT_KEYBOARD, SDLK_F9));
     set(GA_LEAVE_RACE,
@@ -212,44 +205,26 @@ void UserConfig::setDefaults()
     // b) prevent loading those defaults if config file contains any bindings
 
     /* Player 1 default input settings */
-    set(GA_P1_LEFT,
-                Input(Input::IT_KEYBOARD, SDLK_LEFT));
-    set(GA_P1_RIGHT,
-                Input(Input::IT_KEYBOARD, SDLK_RIGHT));
-    set(GA_P1_ACCEL,
-                Input(Input::IT_KEYBOARD, SDLK_UP));
-    set(GA_P1_BRAKE,
-                Input(Input::IT_KEYBOARD, SDLK_DOWN));
-    set(GA_P1_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_l));
-    set(GA_P1_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_k));
-    set(GA_P1_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_h));
-    set(GA_P1_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_SPACE));
-    set(GA_P1_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_j));
+    set(GA_P1_LEFT,      Input(Input::IT_KEYBOARD, SDLK_LEFT));
+    set(GA_P1_RIGHT,     Input(Input::IT_KEYBOARD, SDLK_RIGHT));
+    set(GA_P1_ACCEL,     Input(Input::IT_KEYBOARD, SDLK_UP));
+    set(GA_P1_BRAKE,     Input(Input::IT_KEYBOARD, SDLK_DOWN));
+    set(GA_P1_NITRO,     Input(Input::IT_KEYBOARD, SDLK_l));
+    set(GA_P1_DRIFT,     Input(Input::IT_KEYBOARD, SDLK_k));
+    set(GA_P1_RESCUE,    Input(Input::IT_KEYBOARD, SDLK_h));
+    set(GA_P1_FIRE,      Input(Input::IT_KEYBOARD, SDLK_SPACE));
+    set(GA_P1_LOOK_BACK, Input(Input::IT_KEYBOARD, SDLK_j));
 
     /* Player 2 default input settings */
-    set(GA_P2_LEFT,
-                Input(Input::IT_KEYBOARD, SDLK_a));
-    set(GA_P2_RIGHT,
-                Input(Input::IT_KEYBOARD, SDLK_d));
-    set(GA_P2_ACCEL,
-                Input(Input::IT_KEYBOARD, SDLK_w));
-    set(GA_P2_BRAKE,
-                Input(Input::IT_KEYBOARD, SDLK_s));
-    set(GA_P2_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_LSHIFT));
-    set(GA_P2_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_CAPSLOCK));
-    set(GA_P2_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_q));
-    set(GA_P2_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_LCTRL));
-    set(GA_P2_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_LALT));
+    set(GA_P2_LEFT,      Input(Input::IT_KEYBOARD, SDLK_a));
+    set(GA_P2_RIGHT,     Input(Input::IT_KEYBOARD, SDLK_d));
+    set(GA_P2_ACCEL,     Input(Input::IT_KEYBOARD, SDLK_w));
+    set(GA_P2_BRAKE,     Input(Input::IT_KEYBOARD, SDLK_s));
+    set(GA_P2_NITRO,     Input(Input::IT_KEYBOARD, SDLK_LSHIFT));
+    set(GA_P2_DRIFT,     Input(Input::IT_KEYBOARD, SDLK_CAPSLOCK));
+    set(GA_P2_RESCUE,    Input(Input::IT_KEYBOARD, SDLK_q));
+    set(GA_P2_FIRE,      Input(Input::IT_KEYBOARD, SDLK_LCTRL));
+    set(GA_P2_LOOK_BACK, Input(Input::IT_KEYBOARD, SDLK_LALT));
 
     // If the same key is used for more than one player, the setting 
     // is overwritten when reading back the file. To allow us to have 
@@ -259,44 +234,26 @@ void UserConfig::setDefaults()
 #undef DEFAULTS_FOR_PLAYER34
 #ifdef DEFAULTS_FOR_PLAYER34
     /* Player 3 default input settings */
-    set(GA_P3_LEFT,
-                Input(Input::IT_KEYBOARD, SDLK_f));
-    set(GA_P3_RIGHT,
-                Input(Input::IT_KEYBOARD, SDLK_h));
-    set(GA_P3_ACCEL,
-                Input(Input::IT_KEYBOARD, SDLK_t));
-    set(GA_P3_BRAKE,
-                Input(Input::IT_KEYBOARD, SDLK_g));
-    set(GA_P3_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_c));
-    set(GA_P3_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_v));
-    set(GA_P3_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_r));
-    set(GA_P3_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_b));
-    set(GA_P3_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_n));
+    set(GA_P3_LEFT,      Input(Input::IT_KEYBOARD, SDLK_f));
+    set(GA_P3_RIGHT,     Input(Input::IT_KEYBOARD, SDLK_h));
+    set(GA_P3_ACCEL,     Input(Input::IT_KEYBOARD, SDLK_t));
+    set(GA_P3_BRAKE,     Input(Input::IT_KEYBOARD, SDLK_g));
+    set(GA_P3_NITRO,     Input(Input::IT_KEYBOARD, SDLK_c));
+    set(GA_P3_DRIFT,     Input(Input::IT_KEYBOARD, SDLK_v));
+    set(GA_P3_RESCUE,    Input(Input::IT_KEYBOARD, SDLK_r));
+    set(GA_P3_FIRE,      Input(Input::IT_KEYBOARD, SDLK_b));
+    set(GA_P3_LOOK_BACK, Input(Input::IT_KEYBOARD, SDLK_n));
 
     /* Player 4 default input settings  */
-    set(GA_P4_LEFT,
-                Input(Input::IT_KEYBOARD, SDLK_j));
-    set(GA_P4_RIGHT,
-                Input(Input::IT_KEYBOARD, SDLK_l));
-    set(GA_P4_ACCEL,
-                Input(Input::IT_KEYBOARD, SDLK_i));
-    set(GA_P4_BRAKE,
-                Input(Input::IT_KEYBOARD, SDLK_k));
-    set(GA_P4_NITRO,
-                Input(Input::IT_KEYBOARD, SDLK_m));
-    set(GA_P4_DRIFT,
-                Input(Input::IT_KEYBOARD, SDLK_COMMA));
-    set(GA_P4_RESCUE,
-                Input(Input::IT_KEYBOARD, SDLK_u));
-    set(GA_P4_FIRE,
-                Input(Input::IT_KEYBOARD, SDLK_PERIOD));
-    set(GA_P4_LOOK_BACK,
-                Input(Input::IT_KEYBOARD, SDLK_SLASH));
+    set(GA_P4_LEFT,      Input(Input::IT_KEYBOARD, SDLK_j));
+    set(GA_P4_RIGHT,     Input(Input::IT_KEYBOARD, SDLK_l));
+    set(GA_P4_ACCEL,     Input(Input::IT_KEYBOARD, SDLK_i));
+    set(GA_P4_BRAKE,     Input(Input::IT_KEYBOARD, SDLK_k));
+    set(GA_P4_NITRO,     Input(Input::IT_KEYBOARD, SDLK_m));
+    set(GA_P4_DRIFT,     Input(Input::IT_KEYBOARD, SDLK_COMMA));
+    set(GA_P4_RESCUE,    Input(Input::IT_KEYBOARD, SDLK_u));
+    set(GA_P4_FIRE,      Input(Input::IT_KEYBOARD, SDLK_PERIOD));
+    set(GA_P4_LOOK_BACK, Input(Input::IT_KEYBOARD, SDLK_SLASH));
 #endif
 
 }   // setDefaults
@@ -354,7 +311,6 @@ int UserConfig::CheckAndCreateDir()
         printf("Config directory '%s' successfully created.\n",DIRNAME.c_str());
         return 2;
     }
-
 }   // CheckAndCreateDir
 
 // -----------------------------------------------------------------------------
@@ -377,7 +333,7 @@ void UserConfig::loadConfig(const std::string& filename)
     catch(std::exception& e)
     {
         (void)e;  // avoid warning about unreferenced local variable
-        printf("Config file '%s' does not exist, it will be created.\n", 
+        printf("Config file '%s' does not exist, it will be created.\n",
                filename.c_str());
         // This will initialise the last input configuration with the
         // default values from the current (=default) player input
@@ -461,13 +417,13 @@ void UserConfig::loadConfig(const std::string& filename)
         /*get resolution width/height*/
         lisp->get("width",            m_width);
         lisp->get("height",           m_height);
-        lisp->get("prev_width",           m_prev_width);
-        lisp->get("prev_height",          m_prev_height);
-        lisp->get("prev_windowed",        m_prev_windowed);
+        lisp->get("prev_width",       m_prev_width);
+        lisp->get("prev_height",      m_prev_height);
+        lisp->get("prev_windowed",    m_prev_windowed);
         //detect if resolution change previously crashed STK
-        lisp->get("crash_detected",       m_crashed);
+        lisp->get("crash_detected",   m_crashed);
         // blacklisted resolutions
-        lisp->getVector("blacklisted_resolutions", 
+        lisp->getVector("blacklisted_resolutions",
                                       m_blacklist_res);
         /*Get default number of karts, number of laps, and difficulty. */
         lisp->get("karts",            m_num_karts);
@@ -507,9 +463,9 @@ void UserConfig::loadConfig(const std::string& filename)
             }
             std::string name;
             reader->get("name", name);
-            if (configFileVersion <= 3) 
+            if (configFileVersion <= 3)
             {
-                // For older config files, replace the default player 
+                // For older config files, replace the default player
                 // names "Player %d" with the user name
                 char sDefaultName[10];
                 snprintf(sDefaultName, sizeof(sDefaultName),
@@ -524,14 +480,14 @@ void UserConfig::loadConfig(const std::string& filename)
             reader->get("lastKartId", lastKartId);
             m_player[i].setLastKartId(lastKartId);
 
-            // Don't read the key bindings from a config file earlier than 
-            // version 5. These config files contain (unused) keybindings for 
-            // jumping, so it is possible that the same key is used for 
+            // Don't read the key bindings from a config file earlier than
+            // version 5. These config files contain (unused) keybindings for
+            // jumping, so it is possible that the same key is used for
             // jumping for player 1 and something else for another player.
             // In this case jumping for player one would be disabled (see
-            // unsetDuplicates). To be on the safe side, old key bindings 
+            // unsetDuplicates). To be on the safe side, old key bindings
             // are just discarded.
-            if (configFileVersion <= 4) 
+            if (configFileVersion <= 4)
             {
                 m_warning=_("Old config file found, check your key bindings!");
             }  // configFileVersion <= 4
@@ -545,8 +501,8 @@ void UserConfig::loadConfig(const std::string& filename)
             // Leave those in for backwards compatibility (i.e. config files
             // with jump/wheelie). If jump/wheelie are not defined, nothing
             // happens (the same input is read again).
-            readPlayerInput(reader, nitro_name, KA_NITRO,     i);
-            readPlayerInput(reader, drift_name, KA_DRIFT,     i);
+            readPlayerInput(reader, nitro_name, KA_NITRO, i);
+            readPlayerInput(reader, drift_name, KA_DRIFT, i);
         }   // for i < PLAYERS
 
         // Read the last input device configurations. It is important that this
@@ -554,7 +510,6 @@ void UserConfig::loadConfig(const std::string& filename)
         // is given, the last config is initialised with the current player
         // config.
         readLastInputConfigurations(lisp);
-
     }
     catch(std::exception& e)
     {
@@ -563,12 +518,10 @@ void UserConfig::loadConfig(const std::string& filename)
         fprintf(stderr, "\n");
     }
 
-
     delete root;
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
-
 void UserConfig::readStickConfigs(const lisp::Lisp *r)
 {
     std::string temp;
@@ -597,9 +550,7 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
                 m_stickconfigs.push_back(sc);
             }
         }
-
     }
-
 }   // readStickConfigs
 
 // -----------------------------------------------------------------------------
@@ -611,7 +562,7 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
  */
 void UserConfig::readLastInputConfigurations(const lisp::Lisp *reader)
 {
-    const lisp::Lisp* nodeReader = reader 
+    const lisp::Lisp* nodeReader = reader
                                  ? reader->getLisp("last-input-configurations")
                                  : NULL;
     // No last input configuration specified. Use the current player mappings
@@ -649,7 +600,6 @@ void UserConfig::readLastInputConfigurations(const lisp::Lisp *reader)
             m_last_input_configuration[device_name].m_input[ka] = input;
         }   // for ka=KA_FIRST, KA_LAST
     }   // for i<count
-
 }   // readLastInputConfigurations
 
 // -----------------------------------------------------------------------------
@@ -678,7 +628,6 @@ void UserConfig::readInputNode(const lisp::Lisp* r, const std::string &node,
     {
         setInput(action, input);
     }
-
 }   // readInputNode
 
 // -----------------------------------------------------------------------------
@@ -731,13 +680,6 @@ Input UserConfig::readInput(const lisp::Lisp* nodeReader)
     }
     return input;
 }   // readInput
-
-// -----------------------------------------------------------------------------
-/** Call saveConfig with the default filename for this platform. */
-void UserConfig::saveConfig()
-{
-    saveConfig(m_filename);
-}   // saveConfig
 
 // -----------------------------------------------------------------------------
 /** Write settings to config file. */
@@ -847,12 +789,11 @@ void UserConfig::saveConfig(const std::string& filename)
         fprintf(stderr, e.what());
         fprintf(stderr, "\n");
     }
-        
-        delete writer;
+
+    delete writer;
 }   // saveConfig
 
 // -----------------------------------------------------------------------------
-
 void UserConfig::writeStickConfigs(lisp::Writer *writer)
 {
     int count = 0;
@@ -922,7 +863,7 @@ void UserConfig::writePlayerInput(lisp::Writer *writer, const std::string &node,
 
 // -----------------------------------------------------------------------------
 void UserConfig::writeInputNode(lisp::Writer *writer, const std::string &node,
-                            GameAction action)
+                                GameAction action)
 {
     writer->beginList(node);
 
@@ -981,7 +922,7 @@ std::string UserConfig::getInputAsString(const Input &input)
 {
     char msg[MAX_MESSAGE_LENGTH];
     std::ostringstream stm;
-    
+
     switch (input.type)
     {
     case Input::IT_NONE:
@@ -1011,9 +952,9 @@ std::string UserConfig::getInputAsString(const Input &input)
     default:
         snprintf(msg, sizeof(msg), _("Invalid"));
     }
-    
+
     stm << msg;
-    
+
     return stm.str();
 }   // GetKeyAsString
 
@@ -1120,13 +1061,13 @@ std::string UserConfig::getInputDeviceName(int player_index) const
     {
     case Input::IT_KEYBOARD    : {   // config name: keyboard+player_index
                                      std::ostringstream s;
-                                     s<<"keyboard-"<<left_input.id0; 
+                                     s<<"keyboard-"<<left_input.id0;
                                      config_name = s.str();
                                      break;
                                  }
     case Input::IT_STICKBUTTON :
     case Input::IT_STICKHAT    :
-    case Input::IT_STICKMOTION : config_name=m_stickconfigs[left_input.id0]->m_id; 
+    case Input::IT_STICKMOTION : config_name=m_stickconfigs[left_input.id0]->m_id;
                                  break;
     case Input::IT_MOUSEBUTTON :
     case Input::IT_MOUSEMOTION : config_name="mouse"; break;
@@ -1134,6 +1075,7 @@ std::string UserConfig::getInputDeviceName(int player_index) const
     }   // switch left_input.type
     return config_name;
 }   // getInputDeviceName
+
 // -----------------------------------------------------------------------------
 void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
 {
@@ -1141,7 +1083,7 @@ void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
                             + player_index * KC_COUNT + ka),
              input);
 
-    // Now save the (complete) current configuration as the last used 
+    // Now save the (complete) current configuration as the last used
     // configuration for the input device that is defined for the left
     // action. First determine the name of the device, and then
     // copy the configuration.
@@ -1159,8 +1101,8 @@ void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
                 // to change the left axis for a gamepad anymore.
                 if(i==KA_LEFT) continue;
                 Input last_inp = m_last_input_configuration[device_name].m_input[(KartAction)i];
-                if(last_inp.type==Input::IT_STICKBUTTON || 
-                   last_inp.type==Input::IT_STICKHAT    || 
+                if(last_inp.type==Input::IT_STICKBUTTON ||
+                   last_inp.type==Input::IT_STICKHAT    ||
                    last_inp.type==Input::IT_STICKMOTION    )
                 {   // in case of joystick, adjust the joystick index - in case
                     // that there are two joystickts with the same name
@@ -1177,7 +1119,7 @@ void UserConfig::setInput(int player_index, KartAction ka, const Input &input)
         // We change an entry (but not left) --> save as new 'last configuration'
         for(int i=KA_FIRST; i<=KA_LAST; i++)
         {
-            m_last_input_configuration[device_name].m_input[(KartAction)i] = 
+            m_last_input_configuration[device_name].m_input[(KartAction)i] =
                 getInput(player_index, (KartAction)i);
         }   // for i=KA_FIRST, KA_LAST
     }   // ka!=KA_LEFT
@@ -1234,7 +1176,7 @@ ActionMap *UserConfig::newIngameActionMap()
     // (in MenuManager) and RaceGUI needs race_manager, too.
 
     // TODO: Reorder ingame GameAction values so that they start with
-    // the fixed ones. This would allow simpler looking code here. 
+    // the fixed ones. This would allow simpler looking code here.
 
     GameAction gaEnd = GA_NULL;
 
@@ -1282,24 +1224,3 @@ bool UserConfig::isFixedInput(Input::InputType type, int id0, int id1, int id2)
 
     return false;
 }   // isFixedInput
-
-// -----------------------------------------------------------------------------
-void UserConfig::addStickConfig(StickConfig *sc)
-{
-    m_stickconfigs.push_back(sc);
-}   // addStickConfig
-
-// -----------------------------------------------------------------------------
-const std::vector<UserConfig::StickConfig *> *UserConfig::getStickConfigs() const
-{
-    return &m_stickconfigs;
-}   // getStickConfigs
-// -----------------------------------------------------------------------------
-
-UserConfig::StickConfig::StickConfig(const std::string &newId)
-                        : m_id(newId)
-{
-        // Nothing else to do.
-}
-
-/*EOF*/

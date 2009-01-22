@@ -29,22 +29,21 @@ class Vec3 : public btVector3
 {
 private:
     inline float clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
-    void           setPitchRoll(const Vec3 &normal);
+    void setPitchRoll(const Vec3 &normal);
+
 public:
-                   inline Vec3(sgVec3 a) : btVector3(a[0], a[1], a[2]) {}
-                   inline Vec3(const btVector3& a) : btVector3(a)      {}
-                   inline Vec3()                   : btVector3()       {}
-                   inline Vec3(float x, float y, float z) 
-                                                   : btVector3(x,y,z)  {}
-                   inline Vec3(float x)            : btVector3(x,x,x)  {}
-                   /** Sets the heading, and computes pitch and roll dependent
-                    *  on the normal it is displayed on.
-                    *  \param heading The heading to set.
-                    *  \param normal The normal from which pitch and roll
-                              should be computed. */
-                   inline Vec3(float heading, const Vec3& normal)
-                                                   {m_x=heading;
-                                                    setPitchRoll(normal);}
+    inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
+    inline Vec3(const btVector3& a)        : btVector3(a)                {}
+    inline Vec3()                          : btVector3()                 {}
+    inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
+    inline Vec3(float x)                   : btVector3(x,x,x)            {}
+    /** Sets the heading, and computes pitch and roll dependent
+     *  on the normal it is displayed on.
+     *  \param heading The heading to set.
+     *  \param normal The normal from which pitch and roll should be computed. */
+    inline Vec3(float heading, const Vec3& normal)
+        {m_x=heading;
+         setPitchRoll(normal);}
 
     void                  setHPR(const btMatrix3x3& m);
     inline const float    operator[](int n) const         {return *(&m_x+n); }

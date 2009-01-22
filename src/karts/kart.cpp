@@ -51,6 +51,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "physics/btUprightConstraint.hpp"
 #include "physics/physics.hpp"
 #include "utils/coord.hpp"
 #include "utils/ssg_help.hpp"
@@ -221,7 +222,7 @@ void Kart::createPhysics()
     m_uprightConstraint->setErp(1.0f);
     m_uprightConstraint->setLimitSoftness(1.0f);
     m_uprightConstraint->setDamping(0.0f);
-    RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
+    RaceManager::getWorld()->getPhysics()->addKart(this);
 
     //create the engine sound
     if(m_engine_sound)
@@ -316,7 +317,7 @@ void Kart::reset()
     // physics world. Add it again.
     if(m_eliminated || m_rescue)
     {
-        RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
+        RaceManager::getWorld()->getPhysics()->addKart(this);
     }
 
     m_attachment.clear();
@@ -968,7 +969,7 @@ void Kart::endRescue()
     // let the mode decide where to put the kart
     RaceManager::getWorld()->moveKartAfterRescue(this, m_body);
     
-    RaceManager::getWorld()->getPhysics()->addKart(this, m_vehicle);
+    RaceManager::getWorld()->getPhysics()->addKart(this);
 }   // endRescue
 
 //-----------------------------------------------------------------------------

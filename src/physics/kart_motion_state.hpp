@@ -65,4 +65,4 @@ public:
 
 };   // KartMotionState
 
-#endif // HEADER_KART_MOTION_STATE
+#endif // HEADER_KART_MOTION_STATE_HPP

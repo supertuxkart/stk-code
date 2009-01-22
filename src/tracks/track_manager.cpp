@@ -25,8 +25,8 @@
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "stk_config.hpp"
-#include "audio/sound_manager.hpp"
 #include "translation.hpp"
+#include "audio/sound_manager.hpp"
 
 TrackManager* track_manager = 0;
 

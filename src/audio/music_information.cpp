@@ -21,14 +21,14 @@
 
 #include <stdexcept>
 
-#include "audio/music_ogg.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
 #include "string_utils.hpp"
-#include "track_manager.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
 #include "track.hpp"
+#include "audio/music_ogg.hpp"
+#include "lisp/lisp.hpp"
+#include "lisp/parser.hpp"
+#include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

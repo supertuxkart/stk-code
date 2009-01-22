@@ -24,6 +24,13 @@
 #include "constants.hpp"
 #include "track.hpp"
 
+TerrainInfo::TerrainInfo(int frequency)
+{
+    m_HoT_frequency=frequency;
+    m_HoT_counter=frequency;
+}
+
+//-----------------------------------------------------------------------------
 TerrainInfo::TerrainInfo(const Vec3 &pos, int frequency)
 {
     m_HoT_frequency = frequency;
@@ -37,8 +44,8 @@ void TerrainInfo::update(const Vec3& pos)
     m_HoT_counter++;
     if(m_HoT_counter>=m_HoT_frequency)
     {
-        RaceManager::getTrack()->getTerrainInfo(pos, &m_HoT, 
-                                          &m_normal, &m_material);
+        RaceManager::getTrack()->getTerrainInfo(pos, &m_HoT,
+                                               &m_normal, &m_material);
         m_normal.normalize();
         m_HoT_counter = 0;
     }
@@ -56,13 +63,9 @@ float TerrainInfo::getTerrainPitch(float heading) const {
     // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
     // simplifying the computation of the scalar product.
     float pitch = ( m_normal.getX()*X + m_normal.getY()*Y );  // use ( x,y,0)
-        
+
     // The actual angle computed above is between the normal and the (x,y,0)
     // line, so to compute the actual angles 90 degrees must be subtracted.
     pitch = acosf(pitch) - NINETY_DEGREE_RAD;
     return pitch;
 }   // getTerrainPitch
-
-// -----------------------------------------------------------------------------
-
-/* EOF */

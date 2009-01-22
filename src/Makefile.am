@@ -139,11 +139,7 @@ supertuxkart_SOURCES = \
  race_manager.hpp \
  string_utils.cpp \
  string_utils.hpp \
- track_manager.cpp \
- track_manager.hpp \
  callback.hpp \
- moving_physics.hpp \
- moving_physics.cpp \
  moving_texture.hpp \
  moving_texture.cpp \
  callback_manager.cpp \
@@ -244,13 +240,6 @@ supertuxkart_SOURCES = \
  gui/feature_unlocked.hpp \
  gui/font.hpp \
  gui/font.cpp \
- physics/physics.cpp \
- physics/physics.hpp \
- physics/kart_motion_state.hpp \
- robots/default_robot.cpp \
- robots/default_robot.hpp \
- robots/track_info.cpp \
- robots/track_info.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/standard_race.cpp \
@@ -263,15 +252,32 @@ supertuxkart_SOURCES = \
  modes/linear_world.hpp \
  modes/three_strikes_battle.cpp \
  modes/three_strikes_battle.hpp \
- replay_buffer_tpl.hpp \
- replay_buffers.hpp \
- replay_buffers.cpp \
- replay_base.hpp \
- replay_base.cpp \
- replay_player.hpp \
- replay_player.cpp \
- replay_recorder.hpp \
- replay_recorder.cpp
+ physics/btKart.cpp \
+ physics/btKart.hpp \
+ physics/btUprightConstraint.cpp \
+ physics/btUprightConstraint.hpp \
+ physics/moving_physics.hpp \
+ physics/moving_physics.hpp \
+ physics/moving_physics.cpp \
+ physics/moving_physics.cpp \
+ physics/physics.cpp \
+ physics/physics.hpp \
+ physics/kart_motion_state.hpp \
+ robots/default_robot.cpp \
+ robots/default_robot.hpp \
+ robots/track_info.cpp \
+ robots/track_info.hpp \
+ tracks/track_manager.cpp \
+ tracks/track_manager.hpp \
+ replay/replay_buffer_tpl.hpp \
+ replay/replay_buffers.hpp \
+ replay/replay_buffers.cpp \
+ replay/replay_base.hpp \
+ replay/replay_base.cpp \
+ replay/replay_player.hpp \
+ replay/replay_player.cpp \
+ replay/replay_recorder.hpp \
+ replay/replay_recorder.cpp
 
 # This is a VERY ugly work-around for a compiler bug: if static_ssg s compiled with -O2
 # (more particularly: with -fregmove, which is part of -O2), it will causes the kart

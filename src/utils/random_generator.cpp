@@ -20,7 +20,6 @@
 #include "random_generator.hpp"
 
 #include <stdlib.h>
-#include <algorithm>
 #include <ctime>
 
 std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
@@ -28,7 +27,7 @@ std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
 RandomGenerator::RandomGenerator()
 {
     m_a = 1103515245;
-    m_c = 12345;    
+    m_c = 12345;
     m_all_random_generators.push_back(this);
     m_random_value = 3141591;
     std::srand((unsigned int)std::time(0));
@@ -42,32 +41,19 @@ std::vector<int> RandomGenerator::generateAllSeeds()
     {
         int seed = rand();
         all_seeds.push_back(seed);
+        m_all_random_generators[i]->seed(seed);
     }
-    seedAll(all_seeds);
     return all_seeds;
-
 }   // generateAllSeeds
-// ----------------------------------------------------------------------------
-void RandomGenerator::seedAll(std::vector<int> all_seeds)
-{
-    for(unsigned int i=0; i<all_seeds.size(); i++)
-    {
-        m_all_random_generators[i]->seed(all_seeds[i]);
-    }
-}   // seed
 
-// ----------------------------------------------------------------------------
-void RandomGenerator::seed(int s)
-{
-    m_random_value = s;
-}   // seed
+#if 0
 
 // ----------------------------------------------------------------------------
 int RandomGenerator::get(int n)
 {
     // This generator is (currently) not good enough, i.e. it often gives
     // long sequences of same numbers. And the seeding is not done (the
-    // mid term goal is to synchronise all random number generators on 
+    // mid term goal is to synchronise all random number generators on
     // client and server to make less communication necessary).
     // For now: just use standard random numbers:
     return rand() % n;
@@ -81,5 +67,4 @@ int RandomGenerator::get(int n)
 #endif
 }   // get
 
-// ----------------------------------------------------------------------------
-
+#endif // if 0

@@ -14,12 +14,12 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef UPRIGHT_CONSTRAINT_H
-#define UPRIGHT_CONSTRAINT_H
+#ifndef HEADER_UPRIGHT_CONSTRAINT_HPP
+#define HEADER_UPRIGHT_CONSTRAINT_HPP
 
 #include "LinearMath/btVector3.h"
-#include "btJacobianEntry.h"
-#include "btTypedConstraint.h"
+#include "BulletDynamics/ConstraintSolver/btJacobianEntry.h"
+#include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 
 class btRigidBody;
 

@@ -21,6 +21,7 @@
 
 #include "user_config.hpp"
 #include "network/race_state.hpp"
+#include "physics/btUprightConstraint.hpp"
 #include "utils/ssg_help.hpp"
 #include "track.hpp"
 
@@ -30,8 +31,8 @@
  */
 Physics::Physics() : btSequentialImpulseConstraintSolver()
 {
-    m_collision_conf    = new btDefaultCollisionConfiguration();
-    m_dispatcher        = new btCollisionDispatcher(m_collision_conf);
+    m_collision_conf = new btDefaultCollisionConfiguration();
+    m_dispatcher     = new btCollisionDispatcher(m_collision_conf);
 }   // Physics
 
 //-----------------------------------------------------------------------------
@@ -41,17 +42,17 @@ Physics::Physics() : btSequentialImpulseConstraintSolver()
  */
 void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 {
-    m_axis_sweep        = new btAxisSweep3(world_min, world_max);
-    m_dynamics_world    = new btDiscreteDynamicsWorld(m_dispatcher, 
-                                                      m_axis_sweep, 
-                                                      this,
-                                                      m_collision_conf);
+    m_axis_sweep     = new btAxisSweep3(world_min, world_max);
+    m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher, 
+                                                    m_axis_sweep, 
+                                                   this,
+                                                   m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
                                            -RaceManager::getTrack()->getGravity()));
 #ifdef HAVE_GLUT
     if(user_config->m_bullet_debug)
       {
-        m_debug_drawer=new GLDebugDrawer();
+        m_debug_drawer = new GLDebugDrawer();
         m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
         m_dynamics_world->setDebugDrawer(m_debug_drawer);
     }
@@ -68,7 +69,6 @@ Physics::~Physics()
     delete m_axis_sweep;
     delete m_dispatcher;
     delete m_collision_conf;
-    
 }   // ~Physics
 
 // -----------------------------------------------------------------------------
@@ -77,10 +77,10 @@ Physics::~Physics()
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
-void Physics::addKart(const Kart *kart, btKart *vehicle)
+void Physics::addKart(const Kart *kart)
 {
     m_dynamics_world->addRigidBody(kart->getBody());
-    m_dynamics_world->addVehicle(vehicle);
+    m_dynamics_world->addVehicle(kart->getVehicle());
     m_dynamics_world->addConstraint(kart->getUprightConstraint());
 }   // addKart
 
@@ -102,9 +102,9 @@ void Physics::removeKart(const Kart *kart)
  */
 void Physics::update(float dt)
 {
-    // Bullet can report the same collision more than once (up to 4 
+    // Bullet can report the same collision more than once (up to 4
     // contact points per collision. Additionally, more than one internal
-    // substep might be taken, resulting in potentially even more 
+    // substep might be taken, resulting in potentially even more
     // duplicates. To handle this, all collisions (i.e. pair of objects)
     // are stored in a vector, but only one entry per collision pair
     // of objects.
@@ -154,7 +154,7 @@ void Physics::update(float dt)
 
 //-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which means
- *  that bombs must be passed on. If both karts have a bomb, they'll explode 
+ *  that bombs must be passed on. If both karts have a bomb, they'll explode
  *  immediately. This function is called from physics::update on the server
  *  (and if no networking is used), and from race_state on the client to replay
  *  what happened on the server.
@@ -164,7 +164,7 @@ void Physics::update(float dt)
 void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 {
     kartA->crashed(kartB);   // will play crash sound for player karts
-    kartB->crashed(kartA); 
+    kartB->crashed(kartA);
     Attachment *attachmentA=kartA->getAttachment();
     Attachment *attachmentB=kartB->getAttachment();
 
@@ -175,7 +175,7 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
         {
             attachmentA->setTimeLeft(0.0f);
             attachmentB->setTimeLeft(0.0f);
-        } 
+        }
         else  // only A has a bomb, move it to B (unless it was from B)
         {
             if(attachmentA->getPreviousOwner()!=kartB) 
@@ -321,15 +321,14 @@ void Physics::draw()
  *  \param color Colour to use.
  */
 void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
-    
 {
 #ifdef HAVE_GLUT
     m_shape_drawer.drawOpenGL(m, s, color, 0);
     //                               btIDebugDraw::DBG_DrawWireframe);
     //                               btIDebugDraw::DBG_DrawAabb);
 #endif
-
 }   // debugDraw
+
 // -----------------------------------------------------------------------------
 
 /* EOF */

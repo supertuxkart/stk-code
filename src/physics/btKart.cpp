@@ -9,18 +9,16 @@
  * It is provided "as is" without express or implied warranty.
 */
 
-#include "LinearMath/btVector3.h"
-#include "btKart.h"
+#include "physics/btKart.hpp"
 
+#include "LinearMath/btMinMax.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 #include "BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btJacobianEntry.h"
-#include "LinearMath/btQuaternion.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-#include "btVehicleRaycaster.h"
-#include "btWheelInfo.h"
-#include "LinearMath/btMinMax.h"
-
-
+#include "BulletDynamics/Vehicle/btVehicleRaycaster.h"
+#include "bulletDynamics/Vehicle/btWheelInfo.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
 struct btWheelContactPoint;

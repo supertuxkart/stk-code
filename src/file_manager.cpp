@@ -42,8 +42,6 @@
 #include <plib/ul.h>
 #include "file_manager.hpp"
 #include "btBulletDynamicsCommon.h"
-#include "moving_physics.hpp"
-#include "moving_texture.hpp"
 #include "translation.hpp"
 #include "material_manager.hpp"
 #include "string_utils.hpp"

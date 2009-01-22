@@ -46,11 +46,19 @@ Moveable::~Moveable()
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------
+void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
+{
+    Vec3 xyz=getXYZ()+off_xyz;
+    Vec3 hpr=getHPR()+off_hpr;
+    sgCoord c=Coord(xyz, hpr).toSgCoord();
+
+    m_model_transform->setTransform(&c);
+}   // updateGraphics
+
+//-----------------------------------------------------------------------------
 // The reset position must be set before calling reset
 void Moveable::reset()
 {
-    m_material_hot     = NULL;
-    m_normal_hot       = NULL;
     if(m_body)
     {
         m_body->setLinearVelocity(btVector3(0.0, 0.0, 0.0));
@@ -62,9 +70,20 @@ void Moveable::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-void Moveable::createBody(float mass, btTransform& trans, 
+void Moveable::update(float dt)
+{
+    m_motion_state->getWorldTransform(m_transform);
+    m_velocityLC = getVelocity()*getTrans().getBasis();
+    m_hpr.setHPR(m_transform.getBasis());
+
+    updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
+    m_first_time = false ;
+}   // update
+
+
+//-----------------------------------------------------------------------------
+void Moveable::createBody(float mass, btTransform& trans,
                           btCollisionShape *shape) {
-    
     btVector3 inertia;
     shape->calculateLocalInertia(mass, inertia);
     m_transform = trans;
@@ -95,25 +114,3 @@ void Moveable::setTrans(const btTransform &t)
     m_transform=t;
     m_motion_state->setWorldTransform(t);
 }   // setTrans
-
-//-----------------------------------------------------------------------------
-void Moveable::update(float dt)
-{
-    m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC = getVelocity()*getTrans().getBasis();
-    m_hpr.setHPR(m_transform.getBasis());
-
-    updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
-    m_first_time = false ;
-}   // update
-
-//-----------------------------------------------------------------------------
-void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
-{
-    Vec3 xyz=getXYZ()+off_xyz;
-    Vec3 hpr=getHPR()+off_hpr;
-    sgCoord c=Coord(xyz, hpr).toSgCoord();
-    
-    m_model_transform->setTransform(&c);
-}   // updateGraphics
-

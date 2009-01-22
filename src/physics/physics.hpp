@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PHYSICS_H
-#define HEADER_PHYSICS_H
+#ifndef HEADER_PHYSICS_HPP
+#define HEADER_PHYSICS_HPP
 
 #include <set>
 #include <vector>
@@ -37,19 +37,10 @@ class Kart;
 class Physics : public btSequentialImpulseConstraintSolver
 {
 private:
-    btDynamicsWorld                 *m_dynamics_world;
-    Kart                            *m_kart;
-#ifdef HAVE_GLUT
-    GLDebugDrawer                   *m_debug_drawer;
-    GL_ShapeDrawer                   m_shape_drawer;
-#endif
-    btCollisionDispatcher           *m_dispatcher;
-    btBroadphaseInterface           *m_axis_sweep;
-    btDefaultCollisionConfiguration *m_collision_conf;
 
-    // Bullet can report the same collision more than once (up to 4 
+    // Bullet can report the same collision more than once (up to 4
     // contact points per collision. Additionally, more than one internal
-    // substep might be taken, resulting in potentially even more 
+    // substep might be taken, resulting in potentially even more
     // duplicates. To handle this, all collisions (i.e. pair of objects)
     // are stored in a vector, but only one entry per collision pair
     // of objects.
@@ -61,23 +52,21 @@ private:
     class CollisionPair {
     public:
         const UserPointer *a, *b;
-       
+
         // The entries in Collision Pairs are sorted: if a projectile
         // is included, it's always 'a'. If only two karts are reported
         // the first kart pointer is the smaller one
         CollisionPair(const UserPointer *a1, const UserPointer *b1) {
-            if(a1->is(UserPointer::UP_KART) && 
+            if(a1->is(UserPointer::UP_KART) &&
                b1->is(UserPointer::UP_KART) && a1>b1) {
-	        a=b1;b=a1;
-	    } else {
-	        a=a1; b=b1; 
-	    }
+                a=b1;b=a1;
+            } else {
+                a=a1; b=b1;
+            }
         };  //    CollisionPair
-        bool operator==(const CollisionPair p) {
-            return (p.a==a && p.b==b);
-        }   // operator==
-    };   // CollisionPair
-    // ------------------------------------------------------------------------
+        bool operator==(const CollisionPair p) {return (p.a==a && p.b==b);}
+    };  // CollisionPair
+
     // This class is the list of collision objects, where each collision
     // pair is stored as most once.
     class CollisionList : public std::vector<CollisionPair> {
@@ -88,20 +77,28 @@ private:
                 if((*i)==p) return;
             }
             std::vector<CollisionPair>::push_back(p);
-        };   // push_back
+        };  // push_back
     public:
         void push_back(const UserPointer* a, const UserPointer*b) {
             push_back(CollisionPair(a, b));
         }
-    };   // CollisionList
-    // ------------------------------------------------------------------------
-    CollisionList m_all_collisions;
+    };  // CollisionList
+
+    btDynamicsWorld                 *m_dynamics_world;
+#ifdef HAVE_GLUT
+    GLDebugDrawer                   *m_debug_drawer;
+    GL_ShapeDrawer                   m_shape_drawer;
+#endif
+    btCollisionDispatcher           *m_dispatcher;
+    btBroadphaseInterface           *m_axis_sweep;
+    btDefaultCollisionConfiguration *m_collision_conf;
+    CollisionList                    m_all_collisions;
 
 public:
           Physics          ();
          ~Physics          ();
     void  init             (const Vec3 &min_world, const Vec3 &max_world);
-    void  addKart          (const Kart *k, btKart *v);
+    void  addKart          (const Kart *k);
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
     void  removeKart       (const Kart *k);
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
@@ -118,6 +115,5 @@ public:
                                 btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,
                                 btDispatcher* dispatcher);
 };
-#endif
-/* EOF */
 
+#endif // HEADER_PHYSICS_HPP

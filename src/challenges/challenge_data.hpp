@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHALLENGE_DATA_H
-#define HEADER_CHALLENGE_DATA_H
+#ifndef HEADER_CHALLENGE_DATA_HPP
+#define HEADER_CHALLENGE_DATA_HPP
 
 #include <string>
 #include <vector>
@@ -27,7 +27,7 @@
 #include "challenges/challenge.hpp"
 #include "race_manager.hpp"
 
-class ChallengeData : public Challenge 
+class ChallengeData : public Challenge
 {
 private:
     RaceManager::MajorRaceModeType m_major;
@@ -42,8 +42,8 @@ private:
     int                            m_energy;
     std::vector<std::string>       m_depends_on;
     std::vector<UnlockableFeature> m_unlock;
-
     std::string                    m_filename;
+
     void getUnlocks(const lisp::Lisp *lisp, const char* type, REWARD_TYPE reward);
     void error(const char *id) const;
 
@@ -55,4 +55,4 @@ public:
     virtual bool grandPrixFinished();
 };   // ChallengeData
 
-#endif
+#endif   // HEADER_CHALLENGE_DATA_HPP

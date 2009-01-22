@@ -199,8 +199,6 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/ConstraintSolver/btSolverBody.h				 \
 	BulletDynamics/ConstraintSolver/btSolverConstraint.h			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.cpp			 \
-	BulletDynamics/ConstraintSolver/btUprightConstraint.h			 \
-	BulletDynamics/ConstraintSolver/btUprightConstraint.cpp			 \
 	BulletDynamics/ConstraintSolver/btTypedConstraint.h			 \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp			 \
 	BulletDynamics/Dynamics/btContinuousDynamicsWorld.h			 \
@@ -212,8 +210,6 @@ libbulletdynamics_a_SOURCES	= \
 	BulletDynamics/Dynamics/btSimpleDynamicsWorld.cpp			 \
 	BulletDynamics/Dynamics/btSimpleDynamicsWorld.h				 \
 	BulletDynamics/Dynamics/Bullet-C-API.cpp				 \
-	BulletDynamics/Vehicle/btKart.cpp					 \
-	BulletDynamics/Vehicle/btKart.h						 \
 	BulletDynamics/Vehicle/btRaycastVehicle.cpp				 \
 	BulletDynamics/Vehicle/btRaycastVehicle.h				 \
 	BulletDynamics/Vehicle/btVehicleRaycaster.h				 \

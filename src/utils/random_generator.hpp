@@ -17,12 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RANDOM_NUMBER_H
-#define HEADER_RANDOM_NUMBER_H
+#ifndef HEADER_RANDOM_GENERATOR_HPP
+#define HEADER_RANDOM_GENERATOR_HPP
 
+#include <algorithm>
 #include <vector>
 
-/** A random number generator. Each objects that needs a random number uses 
+/** A random number generator. Each objects that needs a random number uses
     its own number random generator. They are all seeded with number provided
     by the server. This guarantees that in a network game all 'random' values
     are actually identical among all machines.
@@ -32,18 +33,17 @@
 class RandomGenerator
 {
 private:
-    unsigned int     m_random_value;
-    unsigned int     m_a, m_c;    
+    unsigned int m_random_value;
+    unsigned int m_a, m_c;
     static std::vector<RandomGenerator*> m_all_random_generators;
+
 public:
-                     RandomGenerator();
-    static void      seedAll(std::vector<int> all_seeds);
+    RandomGenerator();
+
     std::vector<int> generateAllSeeds();
-    void             seed(int s);
     /** Returns a pseudo random number between 0 and n-1 inclusive */
-    int              get (int n);
+    int  get(int n)  {return rand() % n; }
+    void seed(int s) {m_random_value = s;}
+};  // RandomGenerator
 
-
-};   // RandomGenerator
-#endif
-
+#endif // HEADER_RANDOM_GENERATOR_HPP

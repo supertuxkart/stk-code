@@ -46,7 +46,7 @@
 
 #include "user_config.hpp"
 #include "unlock_manager.hpp"
-#include "track_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "track.hpp"
 #include "race_manager.hpp"
 #include "file_manager.hpp"

@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MOVEABLE_H
-#define HEADER_MOVEABLE_H
+#ifndef HEADER_MOVEABLE_HPP
+#define HEADER_MOVEABLE_HPP
 
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
@@ -36,50 +36,66 @@ class Material;
 #define MAX_ITEMS_COLLECTED    20
 
 
-class Moveable 
+class Moveable
 {
 private:
-    btVector3        m_velocityLC;      /* velocity in kart coordinates                */
+    btVector3        m_velocityLC;      /**<Velocity in kart coordinates            */
     btTransform      m_transform;
     Vec3             m_hpr;
+
 protected:
     UserPointer      m_user_pointer;
-    sgVec4          *m_normal_hot;      /* plane on which HOT was computed             */
-    Material        *m_material_hot;    /* Material at HOT                             */
-    ssgTransform    *m_model_transform;            // The transform where the model is under
+    ssgTransform    *m_model_transform; /**<The transform the model is attached to. */
     int              m_first_time ;
     btRigidBody     *m_body;
     KartMotionState *m_motion_state;
+
 public:
-
-    Moveable ();
-    virtual ~Moveable();
-
-    ssgTransform* getModelTransform()          {return m_model_transform;          }
-    virtual const btVector3 &getVelocity() const {return m_body->getLinearVelocity();}
-    const btVector3 &getVelocityLC() const     {return m_velocityLC;               }
+                  Moveable();
+    virtual      ~Moveable();
+    ssgTransform *getModelTransform()          {return m_model_transform;          }
+    virtual const btVector3 
+                 &getVelocity()   const          {return m_body->getLinearVelocity();}
+    const btVector3
+                 &getVelocityLC() const        {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
-    const Vec3&   getXYZ       () const        {return (Vec3&)m_transform.getOrigin();}
-    const Vec3&   getHPR       () const        {return m_hpr;                      }
-    const btQuaternion getRotation() const     {return m_transform.getRotation();  }
-    void          setXYZ       (const Vec3& a) {m_transform.setOrigin(a);
-                                                m_motion_state->setWorldTransform(m_transform);}
-    void          setRotation  (const btQuaternion&a){m_transform.setRotation(a);
-                                                m_motion_state->setWorldTransform(m_transform);}
-    void          setXYZRotation(const Vec3& xyz, const btQuaternion& a)
-                                               {m_transform.setRotation(a);
-                                                m_transform.setOrigin(xyz);
-                                                m_motion_state->setWorldTransform(m_transform);}
-    const sgVec4* getNormalHOT () const        {return m_normal_hot;               }
+    const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
+    const Vec3&   getHPR()        const        {return m_hpr;                      }
+    const btQuaternion 
+                  getRotation()   const          {return m_transform.getRotation();  }
+
+    /** Sets the XYZ coordinates of the moveable. */
+    void setXYZ(const Vec3& a) 
+    {
+        m_transform.setOrigin(a);
+        m_motion_state->setWorldTransform(m_transform);
+    }
+    // ------------------------------------------------------------------------
+    /** Sets the rotation of this moveable. */
+    void setRotation(const btQuaternion&a)
+    {
+        m_transform.setRotation(a);
+        m_motion_state->setWorldTransform(m_transform);
+    }
+    // ------------------------------------------------------------------------
+    /** Sets XYZ position and rotation of this moveable. */
+    void setXYZRotation(const Vec3& xyz, const btQuaternion& a)
+    {
+        m_transform.setRotation(a);
+        m_transform.setOrigin(xyz);
+        m_motion_state->setWorldTransform(m_transform);
+    }
+    // ------------------------------------------------------------------------
+    virtual void  handleZipper ()  {};
     virtual void  updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr);
-    virtual void  handleZipper ()              {};
-    virtual void  reset        ();
-    virtual void  update       (float dt) ;
-    btRigidBody*  getBody   () const {return m_body; }
+    virtual void  reset();
+    virtual void  update(float dt) ;
+    btRigidBody  *getBody() const {return m_body; }
     void          createBody(float mass, btTransform& trans, 
                              btCollisionShape *shape);
-    const btTransform&  getTrans() const {return m_transform;}
-    void          setTrans  (const btTransform& t);
+    const btTransform 
+                 &getTrans() const {return m_transform;}
+    void          setTrans(const btTransform& t);
 }
 ;   // class Moveable
 

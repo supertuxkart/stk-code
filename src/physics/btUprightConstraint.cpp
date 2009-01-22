@@ -15,11 +15,13 @@ subject to the following restrictions:
 
 */
 
-#include "btUprightConstraint.h"
+#include "physics/btUprightConstraint.hpp"
+
+#include <new>
+#include <stdio.h>
+
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "LinearMath/btTransformUtil.h"
-#include <new>
-#include "stdio.h"
 
 //!
 //!

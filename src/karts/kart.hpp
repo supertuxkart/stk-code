@@ -26,25 +26,27 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "terrain_info.hpp"
+#include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "karts/moveable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_control.hpp"
-#include "items/attachment.hpp"
-#include "items/powerup.hpp"
 #include "karts/kart_model.hpp"
+#include "physics/btKart.hpp"
 
 class SkidMarks;
 class Item;
 class Smoke;
 class Nitro;
 class SFXBase;
+class btUprightConstraint;
 
 class Kart : public TerrainInfo, public Moveable
 {
 private:
     btTransform  m_reset_transform;    // reset position
     unsigned int m_world_kart_id;      // index of kart in world
-    float        m_skidding;           /**< Accumulated skidding factor. */
+    float        m_skidding;           ///< Accumulated skidding factor.
 
 protected:
     Attachment   m_attachment;
@@ -59,63 +61,58 @@ protected:
      *  This reduction is accumulated in m_max_speed_reduction. */
     float        m_max_speed_reduction;
     float        m_power_reduction;
-    float        m_max_gear_rpm;       //maximum engine rpm's for the current gear
+    float        m_max_gear_rpm;       /**<Maximum engine rpm's for the current gear*/
     float        m_max_speed_reverse_ratio;
-    float        m_zipper_time_left;   // zipper time left
-    float        m_bounce_back_time;   // a short time after a collision acceleration
-                                       // is disabled to allow the karts to bounce back
+    float        m_zipper_time_left;   /**<Zipper time left. */
+    float        m_bounce_back_time;   /**<A short time after a collision acceleration
+                                        *  is disabled to allow the karts to bounce back*/
 
     // physics parameters, storing it saves time
-    btKart::btVehicleTuning           *m_tuning;
-    btCompoundShape                    m_kart_chassis;
-    btVehicleRaycaster                *m_vehicle_raycaster;
-    btKart                            *m_vehicle;
-    btUprightConstraint               *m_uprightConstraint;
+    btKart::btVehicleTuning *m_tuning;
+    btCompoundShape          m_kart_chassis;
+    btVehicleRaycaster      *m_vehicle_raycaster;
+    btKart                  *m_vehicle;
+    btUprightConstraint     *m_uprightConstraint;
 
 private:
-    /** The amount of energy collected bu hitting coins. */
-    float               m_collected_energy;
-    /** The shadow of the kart. */
-    ssgTransform       *m_shadow;
+                       /** The amount of energy collected by hitting coins. */
+    float         m_collected_energy;
+    ssgTransform *m_shadow;  /**<The shadow of the kart. */
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
-    bool                m_shadow_enabled;
-
-    /** Smoke from skidding. */
-    Smoke              *m_smoke_system;
+    bool          m_shadow_enabled;
+    Smoke        *m_smoke_system;    /**<Smoke from skidding. */
 
     /** Fire when using a nitro. */
-    Nitro              *m_nitro;
+    Nitro        *m_nitro;
 
-    float               m_wheel_rotation;
+    float         m_wheel_rotation;
     /** For each wheel it stores the suspension length after the karts are at 
      *  the start position, i.e. the suspension will be somewhat compressed.
      *  The bullet suspensionRestLength is the value when the suspension is not
      *  at all compressed. */
-    float               m_default_suspension_length[4];
+    float         m_default_suspension_length[4];
 
     /** The skidmarks object for this kart. */
-    SkidMarks*          m_skidmarks;
+    SkidMarks    *m_skidmarks;
 
-    float               m_finish_time;
-    bool                m_finished_race;
+    float         m_finish_time;
+    bool          m_finished_race;
 
-    /* When a kart has its view blocked by the plunger, this variable will be > 0
-       the number it contains is the time left before removing plunger */
-    float               m_view_blocked_by_plunger;
-    
-    float               m_speed;
+    /** When a kart has its view blocked by the plunger, this variable will be 
+     *  > 0 the number it contains is the time left before removing plunger. */
+    float         m_view_blocked_by_plunger;
+    float         m_speed;
+    float         m_current_gear_ratio;
+    bool          m_rescue;
+    bool          m_eliminated;
 
-    float               m_current_gear_ratio;
-    bool                m_rescue;
-    bool                m_eliminated;
-
-    SFXBase            *m_engine_sound;
-    SFXBase            *m_beep_sound;
-    SFXBase            *m_crash_sound;
-    SFXBase            *m_skid_sound;
-    SFXBase            *m_goo_sound;
-    float               m_time_last_crash;
+    SFXBase      *m_engine_sound;
+    SFXBase      *m_beep_sound;
+    SFXBase      *m_crash_sound;
+    SFXBase      *m_skid_sound;
+    SFXBase      *m_goo_sound;
+    float         m_time_last_crash;
 
 protected:
     float                 m_rescue_pitch, m_rescue_roll;
@@ -129,22 +126,45 @@ public:
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData();
-    virtual void   updateGraphics      (const Vec3& off_xyz,  const Vec3& off_hpr);
+    virtual void   updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr);
     const KartProperties* 
-                   getKartProperties   () const      { return m_kart_properties; }
-    void           setKartProperties   (const KartProperties *kp)
-                                          { m_kart_properties=kp;                }
-    void           attach              (attachmentType attachment_, float time)
-                                          { m_attachment.set(attachment_, time); }
-    void           setPowerup      (PowerupType t, int n)
-                                          { m_powerup.set(t, n);             }
-    virtual void   setPosition         (int p)    
-                                          { m_race_position = p;                 }
-    
-    Attachment    *getAttachment       ()       { return &m_attachment;          }
-    void           setAttachmentType   (attachmentType t, float time_left=0.0f,
-                                        Kart*k=NULL)
-                                          { m_attachment.set(t, time_left, k);   }
+                   getKartProperties() const      { return m_kart_properties; }
+    // ------------------------------------------------------------------------
+    /** Sets the kart properties. */
+    void setKartProperties(const KartProperties *kp)
+    {
+        m_kart_properties=kp;                
+    }
+    // ------------------------------------------------------------------------
+    /** Sets the attachment and time it stays attached. */
+    void attach(attachmentType attachment_, float time)
+    { 
+        m_attachment.set(attachment_, time); 
+    }
+    // ------------------------------------------------------------------------
+    /** Sets a new powerup. */
+    void setPowerup (PowerupType t, int n)
+    { 
+        m_powerup.set(t, n);
+    }
+    // ------------------------------------------------------------------------
+    /** Sets the position in race this kart has (1<=p<=n). */
+    virtual void setPosition(int p)    
+    {
+        m_race_position = p;
+    }
+    // ------------------------------------------------------------------------
+    Attachment *getAttachment() 
+    {
+        return &m_attachment;          
+    }
+    // ------------------------------------------------------------------------
+    void setAttachmentType(attachmentType t, float time_left=0.0f, Kart*k=NULL)
+    {
+        m_attachment.set(t, time_left, k);   
+    }
+    // ------------------------------------------------------------------------
+
     Powerup       *getPowerup          ()       { return &m_powerup;         }
     int            getNumPowerup       () const { return  m_powerup.getNum();}
     float          getEnergy           () const { return  m_collected_energy;}

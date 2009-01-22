@@ -20,12 +20,12 @@
 #include "track_sel.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
-#include "track_manager.hpp"
 #include "track.hpp"
 #include "menu_manager.hpp"
 #include "user_config.hpp"
 #include "translation.hpp"
 #include "unlock_manager.hpp"
+#include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

@@ -17,13 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef CALLBACK_MANAGER_H
-#define CALLBACK_MANAGER_H
+#ifndef CALLBACK_MANAGER_HPP
+#define CALLBACK_MANAGER_HPP
 
 #include <vector>
 #include "btBulletDynamicsCommon.h"
 #include "callback.hpp"
-#include "moving_physics.hpp"
+
+class MovingPhysics;
 
 // It might actually be enough to have only two different values: track (which
 // get deleted and loaded more than one), and everything else, which only

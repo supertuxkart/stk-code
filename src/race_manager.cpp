@@ -21,7 +21,6 @@
 
 #include <iostream>
 
-#include "track_manager.hpp"
 #include "unlock_manager.hpp"
 #include "modes/world.hpp"
 #include "scene.hpp"
@@ -33,6 +32,7 @@
 #include "modes/standard_race.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "tracks/track_manager.hpp"
 
 RaceManager* race_manager= NULL;
 

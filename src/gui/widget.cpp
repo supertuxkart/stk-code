@@ -19,15 +19,16 @@
 
 #include "widget.hpp"
 
+#include <cmath>
+#include <iostream>
+
 //FIXME: this should be removed when the scrolling is cleaned
 #include "user_config.hpp"
 
 #include "constants.hpp"
-#include "track_manager.hpp"
 #include "material_manager.hpp"
 #include "track.hpp"
-#include <cmath>
-#include <iostream>
+#include "tracks/track_manager.hpp"
 
 const int Widget::MAX_SCROLL = 1000000;
 

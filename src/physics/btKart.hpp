@@ -8,13 +8,10 @@
  * of this software for any purpose.  
  * It is provided "as is" without express or implied warranty.
 */
-#ifndef BT_KART_H
-#define BT_KART_H
+#ifndef HEADER_BT_KART_HPP
+#define HEADER_BT_KART_HPP
 
-#include "BulletDynamics/Dynamics/btRigidBody.h"
-#include "btVehicleRaycaster.h"
-#include "LinearMath/btAlignedObjectArray.h"
-#include "btRaycastVehicle.h"
+#include "btBulletDynamicsCommon.h"
 
 class btDynamicsWorld;
 struct btWheelInfo;
