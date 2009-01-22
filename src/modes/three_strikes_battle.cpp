@@ -16,10 +16,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/three_strikes_battle.hpp"
-#include "gui/race_gui.hpp"
-#include "audio/sound_manager.hpp"
 
 #include <string>
+
+#include "gui/race_gui.hpp"
+#include "audio/sound_manager.hpp"
+#include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::ThreeStrikesBattle() : World()

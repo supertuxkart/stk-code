@@ -16,8 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/standard_race.hpp"
+
 #include "user_config.hpp"
-#include "unlock_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "gui/menu_manager.hpp"
 
 //-----------------------------------------------------------------------------

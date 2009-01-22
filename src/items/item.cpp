@@ -19,7 +19,7 @@
 
 #include "items/item.hpp"
 
-#include "scene.hpp"
+#include "graphics/scene.hpp"
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
 #include "utils/vec3.hpp"

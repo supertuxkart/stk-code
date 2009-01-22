@@ -20,9 +20,9 @@
 #include <plib/ssg.h>
 #include "explosion.hpp"
 #include "items/projectile_manager.hpp"
-#include "scene.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/scene.hpp"
 #include "utils/vec3.hpp"
 
 Explosion::Explosion(const Vec3& coord, const int explosion_sound) : ssgTransform()

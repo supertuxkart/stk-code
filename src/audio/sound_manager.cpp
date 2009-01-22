@@ -36,11 +36,11 @@
 #endif
 
 #include "user_config.hpp"
-#include "string_utils.hpp"
 #include "file_manager.hpp"
 #include "translation.hpp"
 #include "audio/music_ogg.hpp"
 #include "audio/sfx_openal.hpp"
+#include "utils/string_utils.hpp"
 
 SoundManager* sound_manager= NULL;
 

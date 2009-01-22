@@ -24,12 +24,12 @@
 
 #include "widget_manager.hpp"
 #include "network_gui.hpp"
-#include "network/network_manager.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "sdldrv.hpp"
-#include "string_utils.hpp"
 #include "user_config.hpp"
+#include "network/network_manager.hpp"
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {

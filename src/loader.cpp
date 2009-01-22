@@ -33,10 +33,10 @@
 #endif
 
 #include "loader.hpp"
-#include "moving_texture.hpp"
 #include "material_manager.hpp"
 #include "file_manager.hpp"
 #include "material.hpp"
+#include "graphics/moving_texture.hpp"
 #include "physics/moving_physics.hpp"
 
 Loader* loader = 0;

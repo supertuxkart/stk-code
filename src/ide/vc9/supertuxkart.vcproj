@@ -688,10 +688,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\flyable.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\grand_prix_data.cpp"
 				>
 			</File>
@@ -736,23 +732,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\moving_texture.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\race_manager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="../../../src\scene.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\sdldrv.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\shadow.cpp"
 				>
 			</File>
 			<File
@@ -764,15 +748,7 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\string_utils.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\terrain_info.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\track.cpp"
 				>
 			</File>
 			<File
@@ -781,10 +757,6 @@
 			</File>
 			<File
 				RelativePath="..\..\triangle_mesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\unlock_manager.cpp"
 				>
 			</File>
 			<File
@@ -958,6 +930,10 @@
 					RelativePath="..\..\challenges\challenge_data.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\challenges\unlock_manager.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="utils"
@@ -968,6 +944,10 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\ssg_help.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\string_utils.cpp"
 					>
 				</File>
 				<File
@@ -1051,6 +1031,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\flyable.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\item.cpp"
 					>
 				</File>
@@ -1131,11 +1115,23 @@
 				Name="graphics"
 				>
 				<File
+					RelativePath="..\..\graphics\moving_texture.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\nitro.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\graphics\particle_system.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\scene.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\shadow.cpp"
 					>
 				</File>
 				<File
@@ -1191,6 +1187,10 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\track.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\track_manager.cpp"
 					>
 				</File>
@@ -1243,10 +1243,6 @@
 			</File>
 			<File
 				RelativePath="..\..\file_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\flyable.hpp"
 				>
 			</File>
 			<File
@@ -1306,14 +1302,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\moving_physics.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\moving_texture.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\no_copy.hpp"
 				>
 			</File>
@@ -1330,15 +1318,7 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\scene.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\sdldrv.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\shadow.hpp"
 				>
 			</File>
 			<File
@@ -1354,15 +1334,7 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\string_utils.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\terrain_info.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\track.hpp"
 				>
 			</File>
 			<File
@@ -1371,10 +1343,6 @@
 			</File>
 			<File
 				RelativePath="..\..\triangle_mesh.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\unlock_manager.hpp"
 				>
 			</File>
 			<File
@@ -1556,6 +1524,10 @@
 					RelativePath="..\..\challenges\challenge_data.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\challenges\unlock_manager.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="network"
@@ -1641,6 +1613,10 @@
 				Name="utils"
 				>
 				<File
+					RelativePath="..\..\utils\constants.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\coord.hpp"
 					>
 				</File>
@@ -1650,6 +1626,10 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\ssg_help.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\string_utils.hpp"
 					>
 				</File>
 				<File
@@ -1741,6 +1721,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\items\flyable.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\items\item.hpp"
 					>
 				</File>
@@ -1829,11 +1813,23 @@
 				Name="graphics"
 				>
 				<File
+					RelativePath="..\..\graphics\moving_texture.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\nitro.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\graphics\particle_system.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\scene.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\shadow.hpp"
 					>
 				</File>
 				<File
@@ -1848,6 +1844,10 @@
 			<Filter
 				Name="tracks"
 				>
+				<File
+					RelativePath="..\..\tracks\track.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\tracks\track_manager.hpp"
 					>

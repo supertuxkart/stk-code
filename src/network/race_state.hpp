@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACE_STATE_H
-#define HEADER_RACE_STATE_H
+#ifndef HEADER_RACE_STATE_HPP
+#define HEADER_RACE_STATE_HPP
 
 #include <vector>
 
-#include "flyable.hpp"
 #include "race_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_control.hpp"
+#include "items/flyable.hpp"
 #include "items/item.hpp"
 #include "network/message.hpp"
 #include "network/item_info.hpp"

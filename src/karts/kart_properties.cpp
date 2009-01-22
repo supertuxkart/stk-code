@@ -25,7 +25,6 @@
 #include "material_manager.hpp"
 #include "loader.hpp"
 #include "file_manager.hpp"
-#include "string_utils.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
@@ -33,6 +32,7 @@
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "utils/ssg_help.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

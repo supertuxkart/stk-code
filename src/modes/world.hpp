@@ -24,19 +24,19 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
-#include "track.hpp"
 #include "highscores.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
 #include "physics/physics.hpp"
+#include "modes/clock.hpp"
 #include "network/network_kart.hpp"
 #include "utils/random_generator.hpp"
-#include "modes/clock.hpp"
 
 class SFXBase;
 struct KartIconDisplayInfo;
 class RaceGUI;
 class btRigidBody;
+class Track;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created

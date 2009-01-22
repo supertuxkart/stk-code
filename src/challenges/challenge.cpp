@@ -20,10 +20,10 @@
 #include "translation.hpp"
 #include "challenges/challenge.hpp"
 #include "race_manager.hpp"
-#include "track.hpp"
 #include "grand_prix_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
@@ -31,7 +31,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-void Challenge::addUnlockTrackReward(std::string track_name)
+void Challenge::addUnlockTrackReward(const std::string &track_name)
 {
     UnlockableFeature feature;
     feature.name = track_name;
@@ -40,7 +40,8 @@ void Challenge::addUnlockTrackReward(std::string track_name)
 }
 
 //-----------------------------------------------------------------------------
-void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name)
+void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
+                                    const std::string &user_mode_name)
 {
     UnlockableFeature feature;
     feature.name = internal_mode_name;
@@ -50,7 +51,7 @@ void Challenge::addUnlockModeReward(std::string internal_mode_name, std::string 
 }
 
 //-----------------------------------------------------------------------------
-void Challenge::addUnlockGPReward(std::string gp_name)
+void Challenge::addUnlockGPReward(const std::string &gp_name)
 {
     UnlockableFeature feature;
     feature.name = _(gp_name.c_str());
@@ -59,7 +60,8 @@ void Challenge::addUnlockGPReward(std::string gp_name)
 }
 
 //-----------------------------------------------------------------------------
-void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string user_name)
+void Challenge::addUnlockDifficultyReward(const std::string &internal_name, 
+                                          const std::string &user_name)
 {
     UnlockableFeature feature;
     feature.name = internal_name;
@@ -69,7 +71,8 @@ void Challenge::addUnlockDifficultyReward(std::string internal_name, std::string
 }
 
 //-----------------------------------------------------------------------------
-void Challenge::addUnlockKartReward(std::string internal_name, std::string user_name)
+void Challenge::addUnlockKartReward(const std::string &internal_name, 
+                                    const std::string &user_name)
 {
     UnlockableFeature feature;
     feature.name = internal_name;

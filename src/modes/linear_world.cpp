@@ -20,15 +20,14 @@
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
-
-#include "gui/race_gui.hpp"
  
-#include "constants.hpp"
-#include "track.hpp"
-#include "gui/menu_manager.hpp"
 #include "translation.hpp"
 #include "audio/sound_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
 #include "network/network_manager.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()

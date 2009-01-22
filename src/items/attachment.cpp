@@ -20,7 +20,6 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
-#include "constants.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "items/attachment.hpp"
@@ -29,6 +28,7 @@
 #include "karts/kart.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "utils/constants.hpp"
 
 Attachment::Attachment(Kart* _kart)
 {

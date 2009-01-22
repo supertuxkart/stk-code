@@ -20,7 +20,6 @@
 
 #include <stdexcept>
 
-#include "track.hpp"
 #include "translation.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
@@ -28,6 +27,7 @@
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

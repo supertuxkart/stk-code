@@ -21,10 +21,10 @@
 
 #include <stdio.h>
 
-#include "track.hpp"
 #include "race_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 History* history = 0;
 

@@ -39,12 +39,13 @@
 #include <ctime>
 #include <cstdio>
 #include <iostream>
-#include "constants.hpp"
 #include "race_manager.hpp"
-#include "scene.hpp"
+#include "graphics/scene.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "robots/track_info.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 const TrackInfo *DefaultRobot::m_track_info = NULL;
 int DefaultRobot::m_num_of_track_info_instances = 0;

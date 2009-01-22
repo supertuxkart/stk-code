@@ -25,10 +25,10 @@
 //FIXME: this should be removed when the scrolling is cleaned
 #include "user_config.hpp"
 
-#include "constants.hpp"
 #include "material_manager.hpp"
-#include "track.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/constants.hpp"
 
 const int Widget::MAX_SCROLL = 1000000;
 

@@ -30,6 +30,7 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
 Powerup::Powerup(Kart* kart_)

@@ -21,13 +21,13 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "modes/world.hpp"
-#include "track.hpp"
 #include "camera.hpp"
 #include "user_config.hpp"
-#include "constants.hpp"
 #include "race_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "karts/player_kart.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 #include "utils/coord.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)

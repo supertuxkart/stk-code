@@ -27,14 +27,13 @@
 
 #include "file_manager.hpp"
 #include "loader.hpp"
-#include "string_utils.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
-#include "scene.hpp"
 #include "material_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "graphics/scene.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "lisp/lisp.hpp"
@@ -43,6 +42,7 @@
 #include "physics/moving_physics.hpp"
 #include "race_manager.hpp"
 #include "utils/ssg_help.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

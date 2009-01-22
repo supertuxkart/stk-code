@@ -17,18 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "moving_physics.hpp"
+#include "physics/moving_physics.hpp"
 
 #include <string>
 #include <vector>
 #define _WINSOCKAPI_
 #include <plib/sg.h>
 
-#include "string_utils.hpp"
-#include "scene.hpp"
+#include "graphics/scene.hpp"
+#include "modes/world.hpp"
 #include "utils/coord.hpp"
 #include "utils/ssg_help.hpp"
-#include "modes/world.hpp"
+#include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
 MovingPhysics::MovingPhysics(const std::string data)

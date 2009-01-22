@@ -21,8 +21,8 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "camera.hpp"
-#include "track.hpp"
 #include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "user_config.hpp"
 
 #include "btBulletDynamicsCommon.h"

@@ -23,10 +23,11 @@
 #include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "material_manager.hpp"
-#include "unlock_manager.hpp"
 #include "translation.hpp"
 #include "grand_prix_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
 
 enum WidgetTokens
 {

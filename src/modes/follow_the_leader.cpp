@@ -15,13 +15,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "modes/follow_the_leader.hpp"
-#include "unlock_manager.hpp"
-#include "gui/menu_manager.hpp"
 #include "user_config.hpp"
 #include "translation.hpp"
 #include "audio/sound_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "gui/menu_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "modes/follow_the_leader.hpp"
+#include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()

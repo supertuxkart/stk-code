@@ -22,7 +22,7 @@
 #include "file_manager.hpp"
 #include "user_config.hpp"
 #include "gui/font.hpp"
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 Font* font_gui;
 Font* font_race;

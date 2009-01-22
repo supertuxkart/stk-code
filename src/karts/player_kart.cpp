@@ -20,19 +20,19 @@
 
 #include "karts/player_kart.hpp"
 
-#include "constants.hpp"
 #include "history.hpp"
 #include "player.hpp"
 #include "sdldrv.hpp"
 #include "translation.hpp"
-#include "scene.hpp"
 #include "camera.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
+#include "utils/constants.hpp"
 
 PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *player,
                        const btTransform& init_pos, int player_index) :

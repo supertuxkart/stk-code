@@ -21,11 +21,11 @@
 
 #include <iostream>
 
-#include "unlock_manager.hpp"
 #include "modes/world.hpp"
-#include "scene.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"

@@ -25,9 +25,9 @@
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "explosion.hpp"
+#include "graphics/scene.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
-#include "scene.hpp"
 
 static ssgSelector *find_selector ( ssgBranch *b );
 

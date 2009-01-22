@@ -17,19 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/flyable.hpp"
+
 #include <math.h>
 
-#include "flyable.hpp"
-#include "track.hpp"
-#include "constants.hpp"
 #include "callback_manager.hpp"
-#include "scene.hpp"
 #include "race_manager.hpp"
+#include "graphics/scene.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "modes/linear_world.hpp"
 #include "network/flyable_info.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 #include "utils/ssg_help.hpp"
 
 // static variables:

@@ -28,15 +28,15 @@
 #include <SDL/SDL.h>
 
 #include "loader.hpp"
-#include "unlock_manager.hpp"
 #include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "translation.hpp"
-#include "scene.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "graphics/scene.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"

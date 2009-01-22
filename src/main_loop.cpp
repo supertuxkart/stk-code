@@ -22,14 +22,14 @@
 #include <SDL/SDL.h>
 #include <assert.h>
 #include "sdldrv.hpp"
-#include "gui/menu_manager.hpp"
-#include "audio/sound_manager.hpp"
 #include "material_manager.hpp"
 #include "race_manager.hpp"
 #include "modes/world.hpp"
 #include "user_config.hpp"
-#include "scene.hpp"
 #include "history.hpp"
+#include "audio/sound_manager.hpp"
+#include "graphics/scene.hpp"
+#include "gui/menu_manager.hpp"
 #include "network/network_manager.hpp"
 
 MainLoop* main_loop = 0;

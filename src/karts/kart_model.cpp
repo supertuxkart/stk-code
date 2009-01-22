@@ -19,10 +19,10 @@
 
 #include "karts/kart_model.hpp"
 
-#include "constants.hpp"
 #include "loader.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
+#include "utils/constants.hpp"
 #include "utils/ssg_help.hpp"
 
 float KartModel::UNDEFINED = -99.9f;

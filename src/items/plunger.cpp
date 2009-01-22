@@ -19,15 +19,16 @@
 
 #include "items/plunger.hpp"
 
-#include "constants.hpp"
 #include "camera.hpp"
 #include "race_manager.hpp"
-#include "scene.hpp"
+#include "graphics/scene.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "physics/moving_physics.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)

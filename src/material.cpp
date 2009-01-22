@@ -17,10 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "file_manager.hpp"
 #include "material.hpp"
-#include "string_utils.hpp"
+
+#include "file_manager.hpp"
 #include "stk_config.hpp"
+#include "utils/string_utils.hpp"
 
 #define UCLAMP   1
 #define VCLAMP   2

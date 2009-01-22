@@ -18,6 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "file_manager.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -39,12 +40,13 @@
 #endif
 // ul.h includes windows.h, so this define is necessary
 #define _WINSOCKAPI_
+
 #include <plib/ul.h>
-#include "file_manager.hpp"
 #include "btBulletDynamicsCommon.h"
+
 #include "translation.hpp"
 #include "material_manager.hpp"
-#include "string_utils.hpp"
+#include "utils/string_utils.hpp"
 
 #ifdef __APPLE__
 // dynamic data path detection onmac

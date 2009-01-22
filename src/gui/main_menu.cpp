@@ -25,7 +25,7 @@
 #include "menu_manager.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
-#include "unlock_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "network/network_manager.hpp"
 
 enum WidgetTokens

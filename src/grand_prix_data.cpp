@@ -21,11 +21,11 @@
 #include <iostream>
 #include <stdexcept>
 #include "file_manager.hpp"
+#include "grand_prix_data.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
-#include "grand_prix_data.hpp"
-#include "string_utils.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 
 GrandPrixData::GrandPrixData(const std::string filename)
 {

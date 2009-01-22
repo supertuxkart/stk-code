@@ -26,12 +26,12 @@
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
-#include "string_utils.hpp"
 #include "translation.hpp"
 #include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

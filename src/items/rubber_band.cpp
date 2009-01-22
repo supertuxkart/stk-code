@@ -21,11 +21,11 @@
 
 #include "material_manager.hpp"
 #include "race_manager.hpp"
-#include "scene.hpp"
+#include "graphics/scene.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
-#include "modes/world.hpp"
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
 #include "physics/physics.hpp"
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the

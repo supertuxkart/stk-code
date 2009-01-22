@@ -24,12 +24,12 @@
 #include <ctime>
 
 #include "file_manager.hpp"
-#include "string_utils.hpp"
 #include "stk_config.hpp"
 #include "translation.hpp"
 #include "user_config.hpp"
-#include "unlock_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

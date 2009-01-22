@@ -16,16 +16,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "unlock_manager.hpp"
+
 #include <set>
 #include <string>
 #include <stdio.h>
 
-#include "unlock_manager.hpp"
 #include "race_manager.hpp"
 #include "file_manager.hpp"
-#include "string_utils.hpp"
 #include "user_config.hpp"
 #include "challenges/challenge_data.hpp"
+#include "utils/string_utils.hpp"
 
 UnlockManager* unlock_manager=0;
 //-----------------------------------------------------------------------------

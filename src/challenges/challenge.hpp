@@ -54,7 +54,7 @@ private:
     std::vector<UnlockableFeature> m_feature;         // Features to unlock
     std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
-             Challenge(std::string id, std::string name);
+             Challenge(const std::string &id, const std::string &name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
     const std::string
@@ -63,11 +63,14 @@ public:
          &getName() const                         { return m_Name;                }
     void  setName(const std::string& s)           { m_Name = s;                   }
     void  setId(const std::string& s)             { m_Id = s;                     }
-    void  addUnlockTrackReward(std::string track_name);
-    void  addUnlockModeReward(std::string internal_mode_name, std::string user_mode_name);
-    void  addUnlockGPReward(std::string gp_name);
-    void  addUnlockDifficultyReward(std::string internal_name, std::string user_name);
-    void  addUnlockKartReward(std::string internal_name, std::string user_name);
+    void  addUnlockTrackReward(const std::string &track_name);
+    void  addUnlockModeReward(const std::string &internal_mode_name, 
+                              const std::string &user_mode_name);
+    void  addUnlockGPReward(const std::string &gp_name);
+    void  addUnlockDifficultyReward(const std::string &internal_name, 
+                                    const std::string &user_name);
+    void  addUnlockKartReward(const std::string &internal_name,
+                              const std::string &user_name);
     
     const std::string getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&

@@ -17,11 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "grand_prix_manager.hpp"
+
 #include <set>
 
-#include "string_utils.hpp"
 #include "file_manager.hpp"
-#include "grand_prix_manager.hpp"
+#include "utils/string_utils.hpp"
 
 GrandPrixManager *grand_prix_manager = NULL;
 

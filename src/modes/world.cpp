@@ -24,20 +24,18 @@
 #include <ctime>
 
 #include "file_manager.hpp"
-#include "track.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
-#include "constants.hpp"
 #include "translation.hpp"
-#include "unlock_manager.hpp"
 #include "highscore_manager.hpp"
-#include "scene.hpp"
 #include "camera.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -48,7 +46,9 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "robots/default_robot.hpp"
+#include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/constants.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf

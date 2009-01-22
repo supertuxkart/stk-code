@@ -21,7 +21,6 @@
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "material_manager.hpp"
-#include "unlock_manager.hpp"
 #include "translation.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

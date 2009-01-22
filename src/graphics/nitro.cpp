@@ -18,9 +18,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/nitro.hpp"
-#include "constants.hpp"
+
 #include "material_manager.hpp"
 #include "karts/kart.hpp"
+#include "utils/constants.hpp"
 
 Nitro::Nitro(Kart* kart)
         : ParticleSystem(200, 0.0f, true, 0.5f),

@@ -55,11 +55,14 @@ supertuxkart_SOURCES = \
  audio/sfx_openal.hpp \
  audio/sound_manager.cpp \
  audio/sound_manager.hpp \
+ utils/constants.hpp \
  utils/coord.hpp \
  utils/random_generator.hpp \
  utils/random_generator.cpp \
  utils/ssg_help.cpp \
  utils/ssg_help.hpp \
+ utils/string_utils.cpp \
+ utils/string_utils.hpp \
  utils/vec3.cpp \
  utils/vec3.hpp \
  material_manager.cpp \
@@ -70,6 +73,10 @@ supertuxkart_SOURCES = \
  graphics/nitro.hpp \
  graphics/particle_system.cpp \
  graphics/particle_system.hpp \
+ graphics/scene.hpp \
+ graphics/scene.cpp \
+ graphics/shadow.cpp \
+ graphics/shadow.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
  graphics/smoke.cpp \
@@ -78,6 +85,8 @@ supertuxkart_SOURCES = \
  items/attachment.hpp \
  items/attachment_manager.cpp \
  items/attachment_manager.hpp \
+ items/flyable.cpp \
+ items/flyable.hpp \
  items/powerup.cpp \
  items/powerup.hpp \
  items/powerup_manager.cpp \
@@ -115,8 +124,6 @@ supertuxkart_SOURCES = \
  input.hpp \
  isect.cpp \
  isect.hpp \
- track.cpp \
- track.hpp \
  explosion.cpp \
  explosion.hpp \
  user_config.cpp \
@@ -137,15 +144,11 @@ supertuxkart_SOURCES = \
  loader.hpp \
  race_manager.cpp \
  race_manager.hpp \
- string_utils.cpp \
- string_utils.hpp \
  callback.hpp \
  moving_texture.hpp \
  moving_texture.cpp \
  callback_manager.cpp \
  callback_manager.hpp \
- shadow.cpp \
- shadow.hpp \
  main_loop.cpp \
  main_loop.hpp \
  camera.cpp \
@@ -157,14 +160,9 @@ supertuxkart_SOURCES = \
  terrain_info.hpp \
  triangle_mesh.cpp \
  triangle_mesh.hpp \
- flyable.cpp \
- flyable.hpp \
  history.cpp \
  history.hpp \
- scene.hpp \
- scene.cpp \
  no_copy.hpp \
- constants.hpp \
  translation.cpp \
  translation.hpp \
  player.hpp \
@@ -265,6 +263,8 @@ supertuxkart_SOURCES = \
  robots/default_robot.hpp \
  robots/track_info.cpp \
  robots/track_info.hpp \
+ tracks/track.cpp \
+ tracks/track.hpp \
  tracks/track_manager.cpp \
  tracks/track_manager.hpp \
  replay/replay_buffer_tpl.hpp \

@@ -22,15 +22,14 @@
 
 #include "input.hpp"
 #include "sdldrv.hpp"
-
 #include "user_config.hpp"
-#include "constants.hpp"
 #include "history.hpp"
-#include "track.hpp"
+#include "race_manager.hpp"
 #include "material_manager.hpp"
 #include "menu_manager.hpp"
 #include "audio/sound_manager.hpp"
-#include "race_manager.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 #undef USE_WIDGET_MANAGER
 #ifdef USE_WIDGET_MANAGER

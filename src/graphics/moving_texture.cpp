@@ -17,11 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "constants.hpp"
-#include "moving_texture.hpp"
-#include "string_utils.hpp"
+#include "graphics/moving_texture.hpp"
+
 #include "translation.hpp"
 #include "modes/world.hpp"
+#include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 MovingTexture::MovingTexture(char *data, ssgBranch *branch)
 {

@@ -21,7 +21,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include "file_manager.hpp"
-#include "string_utils.hpp"
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "stk_config.hpp"

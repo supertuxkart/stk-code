@@ -22,8 +22,8 @@
 #include "user_config.hpp"
 #include "network/race_state.hpp"
 #include "physics/btUprightConstraint.hpp"
+#include "tracks/track.hpp"
 #include "utils/ssg_help.hpp"
-#include "track.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.

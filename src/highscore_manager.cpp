@@ -17,18 +17,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <stdexcept>
 #include "highscore_manager.hpp"
-#include "race_manager.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
-#include "translation.hpp"
-#include "string_utils.hpp"
-#include "file_manager.hpp"
-#include "user_config.hpp"
+
+#include <stdexcept>
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
+
+#include "race_manager.hpp"
+#include "translation.hpp"
+#include "file_manager.hpp"
+#include "user_config.hpp"
+#include "lisp/parser.hpp"
+#include "lisp/writer.hpp"
+#include "utils/string_utils.hpp"
+
 HighscoreManager* highscore_manager=0;
 
 HighscoreManager::HighscoreManager()

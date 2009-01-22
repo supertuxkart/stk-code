@@ -17,12 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "terrain_info.hpp"
+
 #include <math.h>
 
-#include "terrain_info.hpp"
 #include "race_manager.hpp"
-#include "constants.hpp"
-#include "track.hpp"
+#include "tracks/track.hpp"
+#include "utils/constants.hpp"
 
 TerrainInfo::TerrainInfo(int frequency)
 {
