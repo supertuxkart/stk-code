@@ -257,8 +257,6 @@ supertuxkart_SOURCES = \
  physics/btUprightConstraint.cpp \
  physics/btUprightConstraint.hpp \
  physics/moving_physics.hpp \
- physics/moving_physics.hpp \
- physics/moving_physics.cpp \
  physics/moving_physics.cpp \
  physics/physics.cpp \
  physics/physics.hpp \

@@ -18,7 +18,7 @@
 #include "BulletDynamics/ConstraintSolver/btJacobianEntry.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 #include "BulletDynamics/Vehicle/btVehicleRaycaster.h"
-#include "bulletDynamics/Vehicle/btWheelInfo.h"
+#include "BulletDynamics/Vehicle/btWheelInfo.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
 struct btWheelContactPoint;
