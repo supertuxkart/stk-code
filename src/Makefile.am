@@ -156,8 +156,6 @@ supertuxkart_SOURCES = \
  sdldrv.cpp \
  sdldrv.hpp \
  user_pointer.hpp \
- triangle_mesh.cpp \
- triangle_mesh.hpp \
  history.cpp \
  history.hpp \
  no_copy.hpp \
@@ -257,6 +255,8 @@ supertuxkart_SOURCES = \
  physics/physics.cpp \
  physics/physics.hpp \
  physics/kart_motion_state.hpp \
+ physics/triangle_mesh.cpp \
+ physics/triangle_mesh.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
  robots/track_info.cpp \
