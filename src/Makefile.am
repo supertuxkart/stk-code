@@ -71,6 +71,8 @@ supertuxkart_SOURCES = \
  grand_prix_manager.hpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
+ graphics/moving_texture.hpp \
+ graphics/moving_texture.cpp \
  graphics/particle_system.cpp \
  graphics/particle_system.hpp \
  graphics/scene.hpp \
@@ -136,8 +138,6 @@ supertuxkart_SOURCES = \
  highscores.hpp \
  highscore_manager.cpp \
  highscore_manager.hpp \
- unlock_manager.cpp \
- unlock_manager.hpp \
  file_manager.cpp \
  file_manager.hpp \
  loader.cpp \
@@ -145,8 +145,6 @@ supertuxkart_SOURCES = \
  race_manager.cpp \
  race_manager.hpp \
  callback.hpp \
- moving_texture.hpp \
- moving_texture.cpp \
  callback_manager.cpp \
  callback_manager.hpp \
  main_loop.cpp \
@@ -170,6 +168,8 @@ supertuxkart_SOURCES = \
  challenges/challenge.cpp \
  challenges/challenge_data.hpp \
  challenges/challenge_data.cpp \
+ challenges/unlock_manager.cpp \
+ challanges/unlock_manager.hpp \
  lisp/lisp.cpp \
  lisp/lisp.hpp \
  lisp/lexer.cpp \
