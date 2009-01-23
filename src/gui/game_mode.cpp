@@ -18,14 +18,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "game_mode.hpp"
-#include "widget_manager.hpp"
+
 #include "race_manager.hpp"
 #include "material_manager.hpp"
-#include "menu_manager.hpp"
-#include "translation.hpp"
 #include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "network/network_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

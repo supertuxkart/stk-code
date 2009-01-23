@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BASEGUI_H
-#define HEADER_BASEGUI_H
+#ifndef HEADER_BASE_GUI_HPP
+#define HEADER_BASE_GUI_HPP
 
 #include <SDL/SDL.h>
 #include "input.hpp"

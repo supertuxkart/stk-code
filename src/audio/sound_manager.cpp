@@ -22,11 +22,6 @@
 
 #include <assert.h>
 #include <fstream>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define strcasecmp _strcmpi
-#  define snprintf _snprintf
-#endif
-
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #  include <OpenAL/alc.h>
@@ -37,7 +32,6 @@
 
 #include "user_config.hpp"
 #include "file_manager.hpp"
-#include "translation.hpp"
 #include "audio/music_ogg.hpp"
 #include "audio/sfx_openal.hpp"
 #include "utils/string_utils.hpp"

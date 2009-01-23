@@ -21,13 +21,10 @@
 
 #include <stdexcept>
 #include <stdio.h>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include <sstream>
 
 #include "file_manager.hpp"
 #include "lisp/parser.hpp"
-#include "translation.hpp"
 #include "audio/music_information.hpp"
 
 STKConfig* stk_config=0;
@@ -51,9 +48,9 @@ void STKConfig::load(const std::string &filename)
         const lisp::Lisp* const LISP = root->getLisp("config");
         if(!LISP)
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "No 'config' node found.");
-            throw std::runtime_error(msg);
+            std::ostringstream msg;
+            msg<<"No 'config' node found in '"<<filename<<"'.";
+            throw std::runtime_error(msg.str());
         }
         getAllData(LISP);
     }

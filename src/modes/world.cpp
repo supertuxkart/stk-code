@@ -28,13 +28,12 @@
 #include "user_config.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
-#include "translation.hpp"
 #include "highscore_manager.hpp"
-#include "camera.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "items/item_manager.hpp"
@@ -49,6 +48,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/translation.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf  _snprintf
@@ -80,10 +80,9 @@ void World::init()
     }
     catch(std::runtime_error)
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), 
-                 "Track '%s' not found.\n",race_manager->getTrackName().c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "Track '" << race_manager->getTrackName() << "' not found.\n";
+        throw std::runtime_error(msg.str());
     }
 
     // Create the physics

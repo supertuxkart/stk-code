@@ -17,14 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>
-#include <fstream>
+#include "audio/sound_manager.hpp"
+
+#include <sstream>
 #include <stdexcept>
 #include <algorithm>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define strcasecmp _strcmpi
-#  define snprintf _snprintf
-#endif
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -34,11 +31,9 @@
 #  include <AL/alc.h>
 #endif
 
-#include "audio/sound_manager.hpp"
 #include "audio/sfx_openal.hpp"
 #include "user_config.hpp"
 #include "file_manager.hpp"
-#include "translation.hpp"
 #include "race_manager.hpp"
 
 SFXManager* sfx_manager= NULL;
@@ -97,18 +92,16 @@ void SFXManager::loadSfx()
     catch(std::exception& e)
     {
         (void)e;  // avoid warning about unreferenced local variable
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), 
-                     "Sfx config file '%s' does not exist - aborting.\n",
-                     sfx_config_name.c_str());
-            throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "Sfx config file '" << sfx_config_name 
+            << "' does not exist - aborting.\n";
+        throw std::runtime_error(msg.str());
     }
 
     const lisp::Lisp* lisp = root->getLisp("sfx-config");
     if(!lisp) 
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "No sfx-config node");
+        std::string msg="No sfx-config node";
         throw std::runtime_error(msg);
     }
     loadSingleSfx(lisp, "ugh",           SOUND_UGH            );

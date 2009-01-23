@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "race_gui.hpp"
+#include "gui/race_gui.hpp"
 
 #include "input.hpp"
 #include "sdldrv.hpp"
@@ -26,18 +26,18 @@
 #include "history.hpp"
 #include "race_manager.hpp"
 #include "material_manager.hpp"
-#include "menu_manager.hpp"
 #include "audio/sound_manager.hpp"
+#include "gui/font.hpp"
+#include "gui/menu_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/translation.hpp"
 
 #undef USE_WIDGET_MANAGER
 #ifdef USE_WIDGET_MANAGER
-#include "widget_manager.hpp"
+#include "gui/widget_manager.hpp"
 #endif
 
-#include "translation.hpp"
-#include "font.hpp"
 
 #ifdef USE_WIDGET_MANAGER
 //MAX_TOP_POS is the maximum number of racers to be shown in the bar to the
@@ -757,7 +757,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
  **/
-void RaceGUI::addMessage(const char *msg, const Kart *kart, float time, 
+void RaceGUI::addMessage(const std::string &msg, const Kart *kart, float time, 
                          int font_size, int red, int green, int blue)
 {
     m_messages.push_back(TimedMessage(msg, kart, time, font_size, red, green, blue));

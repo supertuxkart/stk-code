@@ -17,17 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <SDL/SDL.h>
+#include "gui/player_controls.hpp"
 
-#include "widget_manager.hpp"
-#include "player_controls.hpp"
-#include "user_config.hpp"
-#include "menu_manager.hpp"
-#include "translation.hpp"
-#include "sdldrv.hpp"
+#include <SDL/SDL.h>
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif
+
+#include "sdldrv.hpp"
+#include "user_config.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {
@@ -81,6 +82,8 @@ PlayerControls::PlayerControls(int whichPlayer):
     m_player_index(whichPlayer),
     m_grab_input(false)
 {
+    // This is quite difficult to convert to using ustringstream, since the
+    // position of %s in the string might vary from language to language.
     char heading[MAX_MESSAGE_LENGTH];
     snprintf(heading, sizeof(heading), _("Choose your controls, %s"),
             user_config->m_player[m_player_index].getName().c_str() );

@@ -17,9 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MATERIALMANAGER_H
-#define HEADER_MATERIALMANAGER_H
+#ifndef HEADER_MATERIAL_MANAGER_HP
+#define HEADER_MATERIAL_MANAGER_HPP
 
+#define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include <string>
 #include <vector>

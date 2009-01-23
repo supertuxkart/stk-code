@@ -25,15 +25,10 @@
 
 #include "file_manager.hpp"
 #include "stk_config.hpp"
-#include "translation.hpp"
 #include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/string_utils.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 KartPropertiesManager *kart_properties_manager=0;
 
@@ -129,10 +124,9 @@ const int KartPropertiesManager::getKartId(const std::string &ident) const
             return i-m_karts_properties.begin();
     }
 
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), "KartPropertiesManager: Couldn't find kart: '%s'",
-             ident.c_str());
-    throw std::runtime_error(msg);
+    std::ostringstream msg;
+    msg << "KartPropertiesManager: Couldn't find kart: '" << ident << "'";
+    throw std::runtime_error(msg.str());
 }   // getKartId
 
 //-----------------------------------------------------------------------------

@@ -17,14 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "translation.hpp"
 #include "challenges/challenge.hpp"
+
 #include "race_manager.hpp"
 #include "grand_prix_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/translation.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf

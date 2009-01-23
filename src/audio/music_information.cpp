@@ -20,8 +20,8 @@
 #include "audio/music_information.hpp"
 
 #include <stdexcept>
+#include <sstream>
 
-#include "translation.hpp"
 #include "user_config.hpp"
 #include "audio/music_ogg.hpp"
 #include "lisp/lisp.hpp"
@@ -29,10 +29,6 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 MusicInformation::MusicInformation(const std::string& filename)
 {
@@ -68,11 +64,10 @@ MusicInformation::MusicInformation(const std::string& filename)
     if(!LISP)
     {
         delete ROOT;
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), 
-                 "Couldn't load music information '%s': no music-information node.",
-                 filename.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "Couldn't load music information '" << filename 
+            << "': no music-information node.";
+        throw std::runtime_error(msg.str());
     }
     LISP->get      ("title",       m_title          );
     LISP->get      ("composer",    m_composer       );

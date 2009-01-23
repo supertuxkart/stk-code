@@ -676,10 +676,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\camera.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\explosion.cpp"
 				>
 			</File>
@@ -745,18 +741,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\stk_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\terrain_info.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\translation.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\triangle_mesh.cpp"
 				>
 			</File>
 			<File
@@ -951,6 +935,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\translation.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\vec3.cpp"
 					>
 				</File>
@@ -1082,6 +1070,10 @@
 					RelativePath="..\..\physics\physics.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\physics\triangle_mesh.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="karts"
@@ -1114,6 +1106,10 @@
 			<Filter
 				Name="graphics"
 				>
+				<File
+					RelativePath="..\..\graphics\camera.cpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\graphics\moving_texture.cpp"
 					>
@@ -1187,6 +1183,10 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\terrain_info.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\track.cpp"
 					>
 				</File>
@@ -1227,10 +1227,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\callback_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\camera.hpp"
 				>
 			</File>
 			<File
@@ -1331,18 +1327,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\stk_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\terrain_info.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\translation.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\triangle_mesh.hpp"
 				>
 			</File>
 			<File
@@ -1633,6 +1617,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\utils\translation.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\vec3.hpp"
 					>
 				</File>
@@ -1772,6 +1760,10 @@
 					RelativePath="..\..\physics\physics.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\physics\triangle_mesh.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="karts"
@@ -1813,6 +1805,10 @@
 				Name="graphics"
 				>
 				<File
+					RelativePath="..\..\graphics\camera.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\moving_texture.hpp"
 					>
 				</File>
@@ -1844,6 +1840,10 @@
 			<Filter
 				Name="tracks"
 				>
+				<File
+					RelativePath="..\..\tracks\terrain_info.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\tracks\track.hpp"
 					>

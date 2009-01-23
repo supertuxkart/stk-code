@@ -20,14 +20,10 @@
 #include "material_manager.hpp"
 
 #include <stdexcept>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#  define strdup _strdup
-#endif
+#include <sstream>
 
 #include "file_manager.hpp"
 #include "material.hpp"
-#include "translation.hpp"
 #include "utils/string_utils.hpp"
 
 ssgState *fuzzy_gst;
@@ -90,15 +86,15 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
     // material index later, so that these materials are not popped
     if(filename=="")
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "FATAL: File '%s' not found\n", filename.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg<<"FATAL: File '"<<filename<<"' not found\n";
+        throw std::runtime_error(msg.str());
     }
     if(!pushTempMaterial(filename))
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "FATAL: Parsing error in '%s'\n", filename.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg <<"FATAL: Parsing error in '"<<filename<<"'\n";
+        throw std::runtime_error(msg.str());
     }
     m_shared_material_index = (int)m_materials.size();
 }   // addSharedMaterial

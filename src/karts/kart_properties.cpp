@@ -26,17 +26,12 @@
 #include "loader.hpp"
 #include "file_manager.hpp"
 #include "stk_config.hpp"
-#include "translation.hpp"
 #include "user_config.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 float KartProperties::UNDEFINED = -99.9f;
 
@@ -112,9 +107,9 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         const lisp::Lisp* const LISP = root->getLisp(node);
         if(!LISP)
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "No '%s' node found.", node.c_str());
-            throw std::runtime_error(msg);
+            std::ostringstream msg;
+            msg <<  "No '" << node << "' node found.";
+            throw std::runtime_error(msg.str());
         }
         getAllData(LISP);
     }

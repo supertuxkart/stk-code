@@ -22,9 +22,6 @@
 
 #include <math.h>
 #include <iostream>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf  _snprintf
-#endif
 
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
@@ -34,7 +31,6 @@
 #include "items/item_manager.hpp"
 #include "file_manager.hpp"
 #include "user_config.hpp"
-#include "translation.hpp"
 #include "material_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"

@@ -20,10 +20,10 @@
 #ifndef HEADER_FLYABLE_HPP
 #define HEADER_FLYABLE_HPP
 
-#include "terrain_info.hpp"
 #include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
+#include "tracks/terrain_info.hpp"
 
 class FlyableInfo;
 class Kart;

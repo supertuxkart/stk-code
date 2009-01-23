@@ -17,12 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "config_sound.hpp"
-#include "widget_manager.hpp"
 #include "user_config.hpp"
-#include "menu_manager.hpp"
-#include "translation.hpp"
+#include "gui/config_sound.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "audio/sound_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

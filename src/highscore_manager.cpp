@@ -25,12 +25,12 @@
 #endif
 
 #include "race_manager.hpp"
-#include "translation.hpp"
 #include "file_manager.hpp"
 #include "user_config.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 HighscoreManager* highscore_manager=0;
 

@@ -28,7 +28,6 @@
 #include "file_manager.hpp"
 #include "loader.hpp"
 #include "stk_config.hpp"
-#include "translation.hpp"
 #include "material_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
@@ -40,13 +39,10 @@
 #include "lisp/parser.hpp"
 #include "modes/world.hpp"
 #include "physics/moving_physics.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "race_manager.hpp"
 #include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 const float Track::NOHIT           = -99999.9f;
 const int   Track::QUAD_TRI_NONE   = -1;
@@ -860,11 +856,9 @@ void Track::loadTrack(std::string filename_)
     if(!LISP)
     {
         delete ROOT;
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), 
-                 "Couldn't load map '%s': no tuxkart-track node.",
-                 m_filename.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg <<"Couldn't load map '"<<m_filename<<"': no tuxkart-track node.";
+        throw std::runtime_error(msg.str());
     }
 
     LISP->get      ("name",                  m_name);
@@ -1027,9 +1021,9 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
 
     if ( fd == NULL )
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf (msg, sizeof(msg), "Can't open '%s' for reading.\n", path.c_str() ) ;
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg<<"Can't open '"<<path<<"' for reading.\n";
+        throw std::runtime_error(msg.str());
     }
 
     int prev_sector = UNKNOWN_SECTOR;
@@ -1050,9 +1044,9 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
 
         if (sscanf ( s, "%f,%f,%f", &x, &y, &z ) != 3 )
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf (msg, sizeof(msg), "Syntax error in '%s'\n", path.c_str() ) ;
-            throw std::runtime_error(msg);
+            std::ostringstream msg;
+            msg<<"Syntax error in '"<<path<<"'\n";
+            throw std::runtime_error(msg.str());
         }
 
         Vec3 point(x,y,z);
@@ -1195,10 +1189,9 @@ void Track::loadTrackModel()
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg),"Can't open track location file '%s'.\n",
-                 path.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg<<"Can't open track location file '"<<path<<"'.";
+        throw std::runtime_error(msg.str());
     }
 
     // Start building the scene graph
@@ -1358,10 +1351,9 @@ void Track::loadTrackModel()
             else
             {
                 fclose(fd);
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
-                         path.c_str(), s);
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg<< "Syntax error in '"<<path<<"': "<<s;
+                throw std::runtime_error(msg.str());
             }
 
             if ( need_hat )
@@ -1390,11 +1382,11 @@ void Track::loadTrackModel()
             if(!obj)
             {
                 fclose(fd);
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), "Can't open track model '%s'",fname);
+                std::ostringstream msg;
+                msg<<"Can't open track model '"<<fname<<"'.";
                 file_manager->popTextureSearchPath();
                 file_manager->popModelSearchPath  ();
-                throw std::runtime_error(msg);
+                throw std::runtime_error(msg.str());
             }
             SSGHelp::createDisplayLists(obj);
             ssgRangeSelector *lod   = new ssgRangeSelector ;
@@ -1412,12 +1404,8 @@ void Track::loadTrackModel()
         }
         else
         {
-//            fclose(fd);
-//            char msg[MAX_ERROR_MESSAGE_LENGTH];
-//            snprintf(msg, sizeof(msg), "Syntax error in '%s': %s",
             fprintf(stderr, "Warning: Syntax error in '%s': %s",
                      path.c_str(), s);
-//            throw std::runtime_error(msg);
         }
     }   // while fgets
 

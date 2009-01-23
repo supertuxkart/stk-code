@@ -17,14 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "file_manager.hpp"
+
 #include <stdio.h>
 #include <stdexcept>
 #include <algorithm>
-#include "file_manager.hpp"
+#include <sstream>
+
 #include "track_manager.hpp"
 #include "track.hpp"
 #include "stk_config.hpp"
-#include "translation.hpp"
 #include "audio/sound_manager.hpp"
 
 TrackManager* track_manager = 0;
@@ -55,9 +57,9 @@ Track* TrackManager::getTrack(const std::string& ident) const
             return *i;
     }
 
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
-    sprintf(msg, "TrackManager: Couldn't find track: '%s'", ident.c_str() );
-    throw std::runtime_error(msg);
+    std::ostringstream msg;
+    msg<<"TrackManager: Couldn't find track: '"<<ident<<"'";
+    throw std::runtime_error(msg.str());
 }   // getTrack
 
 //-----------------------------------------------------------------------------

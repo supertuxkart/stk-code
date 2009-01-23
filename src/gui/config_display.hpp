@@ -17,14 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CONFIGDISPLAY_H
-#define HEADER_CONFIGDISPLAY_H
+#ifndef HEADER_CONFIG_DISPLAY_HPP
+#define HEADER_CONFIG_DISPLAY_HPP
 
 #include <vector>
 
-#include "base_gui.hpp"
-#include "translation.hpp"
-#include "display_res_confirm.hpp"
+#include "gui/base_gui.hpp"
+#include "gui/display_res_confirm.hpp"
+#include "utils/translation.hpp"
 
 class ConfigDisplay: public BaseGUI
 {

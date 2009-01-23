@@ -18,18 +18,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <sstream>
+#include "gui/network_gui.hpp"
 
+#include <sstream>
 #include <SDL/SDL.h>
 
-#include "widget_manager.hpp"
-#include "network_gui.hpp"
-#include "menu_manager.hpp"
-#include "translation.hpp"
 #include "sdldrv.hpp"
 #include "user_config.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "network/network_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

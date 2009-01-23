@@ -19,15 +19,15 @@
 
 #include <set>
 #include "grand_prix_select.hpp"
-#include "widget_manager.hpp"
-#include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "material_manager.hpp"
-#include "translation.hpp"
 #include "grand_prix_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

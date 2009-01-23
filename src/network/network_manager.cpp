@@ -22,7 +22,6 @@
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "translation.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/char_sel.hpp"
 #include "gui/race_results_gui.hpp"

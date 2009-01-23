@@ -18,19 +18,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config_display.hpp"
+#include <algorithm>
+
+#if defined(WIN32) && !defined(__CYGWIN__)
+#  define snprintf _snprintf
+#endif
 
 #include "main_loop.hpp"
 #include "widget_manager.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
 #include "sdldrv.hpp"
-#include "translation.hpp"
+#include "utils/translation.hpp"
 
-#include <algorithm>
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 enum WidgetTokens
 {

@@ -16,18 +16,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
  
-#include "translation.hpp"
+#include <sstream>
+
 #include "audio/sound_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/translation.hpp"
 
 //-----------------------------------------------------------------------------
 LinearWorld::LinearWorld() : World()
@@ -291,10 +289,9 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
                     char s[20];
                     m->TimeToString(time_per_lap, s);
                     
-                    char m_fastest_lap_message[255];
-                    snprintf(m_fastest_lap_message, sizeof(m_fastest_lap_message),
-                             "%s: %s",s, kart->getName().c_str());
-                    m->addMessage(m_fastest_lap_message, NULL, 
+                    std::ostringstream m_fastest_lap_message;
+                    m_fastest_lap_message << s << ": " << kart->getName();
+                    m->addMessage(m_fastest_lap_message.str(), NULL, 
                                   2.0f, 40, 100, 210, 100);
                 }   // if m
             } // end if new fastest lap

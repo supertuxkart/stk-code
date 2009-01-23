@@ -25,7 +25,6 @@
 #include <plib/sg.h>
 #include "btBulletDynamicsCommon.h"
 
-#include "terrain_info.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/moveable.hpp"
@@ -33,6 +32,7 @@
 #include "karts/kart_control.hpp"
 #include "karts/kart_model.hpp"
 #include "physics/btKart.hpp"
+#include "tracks/terrain_info.hpp"
 
 class SkidMarks;
 class Item;

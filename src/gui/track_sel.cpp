@@ -17,19 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "track_sel.hpp"
-#include "widget_manager.hpp"
+#include "gui/track_sel.hpp"
+
+#include <sstream>
+
 #include "race_manager.hpp"
-#include "menu_manager.hpp"
 #include "user_config.hpp"
-#include "translation.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {
@@ -245,10 +244,9 @@ void TrackSel::displayImages(int selected_track)
         }
         else
         {
-            char designedby[MAX_MESSAGE_LENGTH];
-            snprintf(designedby, MAX_MESSAGE_LENGTH, 
-                "Designed by %s", TRACK->getDesigner().c_str());
-            widget_manager->setWgtText( WTOK_AUTHOR, designedby );
+            std::ostringstream designedby;
+            designedby<<"Designed by "<<TRACK->getDesigner();
+            widget_manager->setWgtText( WTOK_AUTHOR, designedby.str() );
         }
         const std::string& screenshot = TRACK->getScreenshotFile();
         const std::string& topview    = TRACK->getTopviewFile();

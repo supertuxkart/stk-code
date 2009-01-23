@@ -21,11 +21,8 @@
 #include <stdexcept>
 #include <cstring>
 
-#include "lexer.hpp"
-#include "translation.hpp"
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "lisp/lexer.hpp"
+
 namespace lisp
 {
 
@@ -149,11 +146,10 @@ namespace lisp
                     }
                     catch(EOFException& )
                     {
-                        char msg[MAX_ERROR_MESSAGE_LENGTH];
-                        snprintf(msg, sizeof(msg),
-                                 "Parse error in line %d: EOF while parsing string.",
-                                 STARTLINE);
-                        throw std::runtime_error(msg);
+                        std::ostringstream msg;
+                        msg << "Parse error in line " << STARTLINE
+                            << ": EOF while parsing string.";
+                        throw std::runtime_error(msg.str());
                     }
                     nextChar();
                     return TOKEN_STRING;
@@ -173,11 +169,10 @@ namespace lisp
                 }
                 catch(EOFException& )
                 {
-                    char msg[MAX_ERROR_MESSAGE_LENGTH];
-                    snprintf(msg, sizeof(msg), 
-                             "Parse Error in line %d: EOF while parsing constant.",
-                             m_line_number);
-                    throw std::runtime_error(msg);
+                    std::ostringstream msg;
+                    msg << "Parse Error in line " << m_line_number
+                        << ": EOF while parsing constant.";
+                    throw std::runtime_error(msg.str());
                 }
 
                 if(strcmp(m_token_string, "t") == 0)
@@ -189,11 +184,10 @@ namespace lisp
                 // constants
 
                 {
-                    char msg[MAX_ERROR_MESSAGE_LENGTH];
-                    snprintf(msg, sizeof(msg), 
-                             "Parse Error in line %d: Unknown constant '%s'.",
-                             m_line_number, m_token_string);
-                    throw std::runtime_error(msg);
+                    std::ostringstream msg;
+                    msg << "Parse Error in line " << m_line_number 
+                        << ": Unknown constant '" << m_token_string<<"'.";
+                    throw std::runtime_error(msg.str());
                 }
 
             case '_': // can be begin translation

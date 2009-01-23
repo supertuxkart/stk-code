@@ -19,8 +19,8 @@
 #include "challenges/challenge_data.hpp"
 
 #include <stdexcept>
+#include <sstream>
 
-#include "translation.hpp"
 #include "grand_prix_data.hpp"
 #include "grand_prix_manager.hpp"
 #include "karts/kart.hpp"
@@ -29,10 +29,6 @@
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 ChallengeData::ChallengeData(const std::string& filename)
 {
@@ -55,11 +51,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     if(!lisp)
     {
         delete ROOT;
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), 
-                 "Couldn't load challenge '%s': no challenge node.",
-                 filename.c_str());
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "Couldn't load challenge '" << filename << "': no challenge node.";
+        throw std::runtime_error(msg.str());
     }
 
     std::string mode;
@@ -137,10 +131,10 @@ ChallengeData::ChallengeData(const std::string& filename)
 // ----------------------------------------------------------------------------
 void ChallengeData::error(const char *id) const
 {
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
-    snprintf(msg, sizeof(msg), "Undefined or incorrect value for '%s' in challenge file '%s'.",
-             id, m_filename.c_str());
-    throw std::runtime_error(msg);
+    std::ostringstream msg;
+    msg << "Undefined or incorrect value for '" << id 
+        << "' in challenge file '" << m_filename << "'.";
+    throw std::runtime_error(msg.str());
 }   // error
 // ----------------------------------------------------------------------------
 /** Checks if this challenge is valid, i.e. contains a valid track or a valid

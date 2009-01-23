@@ -63,7 +63,7 @@ class RaceGUI: public BaseGUI
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
-        TimedMessage(const char *message, 
+        TimedMessage(const std::string &message, 
                      const Kart *kart, float time, int size, 
                      int red, int green, int blue)
         {
@@ -92,7 +92,7 @@ public:
     void select() {}
     void handle(GameAction, int);
     void handleKartAction(KartAction ka, int value);
-    void addMessage(const char *message, const Kart *kart, float time, 
+    void addMessage(const std::string &m, const Kart *kart, float time, 
                     int fonst_size, int red=255, int green=0, int blue=255);
 
 private:

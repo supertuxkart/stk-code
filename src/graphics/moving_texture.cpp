@@ -19,7 +19,6 @@
 
 #include "graphics/moving_texture.hpp"
 
-#include "translation.hpp"
 #include "modes/world.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"

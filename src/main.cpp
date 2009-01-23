@@ -54,7 +54,6 @@
 #include "callback_manager.hpp"
 #include "history.hpp"
 #include "stk_config.hpp"
-#include "translation.hpp"
 #include "highscore_manager.hpp"
 #include "grand_prix_manager.hpp"
 #include "audio/sound_manager.hpp"
@@ -72,6 +71,7 @@
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/translation.hpp"
 
 // Only needed for bullet debug!
 #ifdef HAVE_GLUT

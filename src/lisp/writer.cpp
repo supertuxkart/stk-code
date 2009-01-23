@@ -22,11 +22,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "writer.hpp"
-#include "translation.hpp"
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "lisp/writer.hpp"
+#include "utils/translation.hpp"
 
 namespace lisp
 {
@@ -45,11 +42,10 @@ namespace lisp
 #endif
         if(!m_out->good())
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), 
-                     "LispWriter Error: Couldn't open file '%s' for writing.",
-                     filename.c_str());
-            throw std::runtime_error(msg);
+            std::ostringstream msg;
+            msg << "LispWriter Error: Couldn't open file '" << filename
+                << "' for writing.";
+            throw std::runtime_error(msg.str());
         }
     }
 

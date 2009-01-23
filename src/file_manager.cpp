@@ -44,7 +44,6 @@
 #include <plib/ul.h>
 #include "btBulletDynamicsCommon.h"
 
-#include "translation.hpp"
 #include "material_manager.hpp"
 #include "utils/string_utils.hpp"
 

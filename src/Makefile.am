@@ -63,12 +63,16 @@ supertuxkart_SOURCES = \
  utils/ssg_help.hpp \
  utils/string_utils.cpp \
  utils/string_utils.hpp \
+ utils/translation.cpp \
+ utils/translation.hpp \
  utils/vec3.cpp \
  utils/vec3.hpp \
  material_manager.cpp \
  material_manager.hpp \
  grand_prix_manager.cpp \
  grand_prix_manager.hpp \
+ graphics/camera.cpp \
+ graphics/camera.hpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
  graphics/moving_texture.hpp \
@@ -149,20 +153,14 @@ supertuxkart_SOURCES = \
  callback_manager.hpp \
  main_loop.cpp \
  main_loop.hpp \
- camera.cpp \
- camera.hpp \
  sdldrv.cpp \
  sdldrv.hpp \
  user_pointer.hpp \
- terrain_info.cpp \
- terrain_info.hpp \
  triangle_mesh.cpp \
  triangle_mesh.hpp \
  history.cpp \
  history.hpp \
  no_copy.hpp \
- translation.cpp \
- translation.hpp \
  player.hpp \
  challenges/challenge.hpp \
  challenges/challenge.cpp \
@@ -263,6 +261,8 @@ supertuxkart_SOURCES = \
  robots/default_robot.hpp \
  robots/track_info.cpp \
  robots/track_info.hpp \
+ tracks/terrain_info.cpp \
+ tracks/terrain_info.hpp \
  tracks/track.cpp \
  tracks/track.hpp \
  tracks/track_manager.cpp \

@@ -17,19 +17,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>
+#include "gui/race_results_gui.hpp"
+
 #include <SDL/SDL.h>
 
-#include "race_results_gui.hpp"
-#include "widget_manager.hpp"
-#include "menu_manager.hpp"
 #include "race_manager.hpp"
 #include "highscore_manager.hpp"
-#include "translation.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_manager.hpp"
+#include "utils/translation.hpp"
 
 RaceResultsGUI::RaceResultsGUI()
 {

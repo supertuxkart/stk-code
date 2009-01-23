@@ -321,7 +321,7 @@ bool MusicOggStream::check()
 
     if(error != AL_NO_ERROR)
     {
-	fprintf(stderr, "OpenAL error: %d\n", error);
+        fprintf(stderr, "OpenAL error: %d\n", error);
         return false;
     }
 

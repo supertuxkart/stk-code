@@ -19,10 +19,10 @@
 
 #include "widget_manager.hpp"
 #include "menu_manager.hpp"
-#include "translation.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "gui/challenges_menu.hpp"
 #include "network/network_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

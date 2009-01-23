@@ -15,13 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <SDL/SDL.h>
-
 #include "start_race_feedback.hpp"
-#include "widget_manager.hpp"
+
 #include "race_manager.hpp"
-#include "translation.hpp"
+#include "gui/widget_manager.hpp"
 #include "network/network_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

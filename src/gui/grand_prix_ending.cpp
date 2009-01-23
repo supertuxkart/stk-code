@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "grand_prix_ending.hpp"
+#include "gui/grand_prix_ending.hpp"
 
 #include <sstream>
 #include <string>
@@ -28,19 +28,19 @@
 #include <SDL/SDL.h>
 
 #include "loader.hpp"
-#include "widget_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
-#include "menu_manager.hpp"
-#include "translation.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/scene.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "utils/translation.hpp"
 
 enum WidgetTokens
 {

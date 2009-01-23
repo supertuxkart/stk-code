@@ -26,16 +26,12 @@
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
-#include "translation.hpp"
 #include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
 #include "utils/string_utils.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 /** Simple shadow class, only used here for default items. */
 class Shadow
 {
@@ -169,15 +165,14 @@ void ItemManager::setDefaultItemStyle()
     DEFAULT_NAMES[ITEM_BUBBLEGUM]   = "bubblegum";
 
     bool bError=0;
-    char msg[MAX_ERROR_MESSAGE_LENGTH];
+    std::ostringstream msg;
     for(int i=ITEM_FIRST+1; i<ITEM_LAST; i++)
     {
         m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
         if(!m_item_model[i])
         {
-            snprintf(msg, sizeof(msg), 
-                     "Item model '%s' is missing (see item_manager)!\n",
-                     DEFAULT_NAMES[i].c_str());
+            msg << "Item model '" << DEFAULT_NAMES[i] 
+                << "' is missing (see item_manager)!\n";
             bError=1;
             break;
         }   // if !m_item_model
@@ -201,7 +196,7 @@ void ItemManager::setDefaultItemStyle()
                 }
             }  // if i->second
         }
-        throw std::runtime_error(msg);
+        throw std::runtime_error(msg.str());
         exit(-1);
     }   // if bError
 
@@ -391,11 +386,10 @@ void ItemManager::loadItemStyle(const std::string filename)
     const lisp::Lisp* item_node = root->getLisp("item");
     if(!item_node)
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), "Couldn't load map '%s': no item node.",
-                 filename.c_str());
-	delete root;
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "Couldn't load map '" << filename << "': no item node.";
+        delete root;
+        throw std::runtime_error(msg.str());
         delete root;
     }
     setItem(item_node, "red",   ITEM_BONUS_BOX   );

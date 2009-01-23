@@ -21,9 +21,10 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "parser.hpp"
-#include "lisp.hpp"
-#include "translation.hpp"
+#include "lisp/parser.hpp"
+#include "lisp/lisp.hpp"
+#include "utils/translation.hpp"
+
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  define snprintf _snprintf
 #endif

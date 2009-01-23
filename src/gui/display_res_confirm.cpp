@@ -20,12 +20,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "display_res_confirm.hpp"
-#include "menu_manager.hpp"
-#include "widget_manager.hpp"
-#include "translation.hpp"
 #include "user_config.hpp"
 #include "sdldrv.hpp"
+#include "gui/display_res_confirm.hpp"
+#include "gui/menu_manager.hpp"
+#include "gui/widget_manager.hpp"
+#include "utils/translation.hpp"
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)

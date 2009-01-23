@@ -19,7 +19,6 @@
 
 #include "items/plunger.hpp"
 
-#include "camera.hpp"
 #include "race_manager.hpp"
 #include "graphics/scene.hpp"
 #include "items/rubber_band.hpp"

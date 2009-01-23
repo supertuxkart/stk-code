@@ -17,21 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/powerup_manager.hpp"
+
 #include <iostream>
 #include <stdexcept>
-#include "items/powerup_manager.hpp"
+#include <sstream>
+
 #include "file_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
-#include "translation.hpp"
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "loader.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 typedef struct
 {
@@ -97,11 +96,10 @@ void PowerupManager::Load(int collectType, const char* filename)
     const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
     if(!lisp)
     {
-        char msg[MAX_ERROR_MESSAGE_LENGTH];
-        snprintf(msg, sizeof(msg), 
-                 "No 'tuxkart-collectable' node found while parsing '%s'.",
-                 filename);
-        throw std::runtime_error(msg);
+        std::ostringstream msg;
+        msg << "No 'tuxkart-collectable' node found while parsing '" 
+            << filename << "'.";
+        throw std::runtime_error(msg.str());
     }
     LoadNode(lisp, collectType);
 
