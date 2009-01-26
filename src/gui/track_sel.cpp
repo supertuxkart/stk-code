@@ -89,8 +89,10 @@ TrackSel::TrackSel()
     m_offset        = 0;
     switchGroup();
     m_current_track = -1;
+    printf("checking for previous track : %c\n" , user_config->m_last_track.c_str() );
     for(unsigned int i=0; i<m_index_avail_tracks.size(); i++)
     {
+        assert(i < m_index_avail_tracks.size());
         if(track_manager->getTrack(m_index_avail_tracks[i])->getIdent()==
             user_config->m_last_track)
         {
