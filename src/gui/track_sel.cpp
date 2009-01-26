@@ -89,9 +89,11 @@ TrackSel::TrackSel()
     m_offset        = 0;
     switchGroup();
     m_current_track = -1;
-    printf("checking for previous track : %c (%i chars)\n" , user_config->m_last_track.c_str(), user_config->m_last_track.size() );
+    printf("checking for previous track : %s (%i chars)\n" , user_config->m_last_track.c_str(), user_config->m_last_track.size() );
     for(unsigned int i=0; i<m_index_avail_tracks.size(); i++)
     {
+        printf("testing against track %i : %i\n",i,m_index_avail_tracks[i]);
+        printf("name=%s\n", track_manager->getTrack(m_index_avail_tracks[i])->getIdent().c_str());
         assert(i < m_index_avail_tracks.size());
         if(user_config->m_last_track.size() > 0 &&
            track_manager->getTrack(m_index_avail_tracks[i])->getIdent()==
