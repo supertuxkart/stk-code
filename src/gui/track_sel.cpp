@@ -92,7 +92,11 @@ TrackSel::TrackSel()
     for(unsigned int i=0; i<m_index_avail_tracks.size(); i++)
     {
         assert(i < m_index_avail_tracks.size());
-        assert( m_index_avail_tracks[i] >= 0);
+        //assert( m_index_avail_tracks[i] >= 0);
+        // FIXME - someone had a crash because m_index_avail_tracks[i] was set to a negative number, e.g. -2
+        // I have no clue what causes this issue, consider this as a temporary fix
+        if(m_index_avail_tracks[i] < 0) continue;
+        
         if(track_manager->getTrack(m_index_avail_tracks[i])->getIdent()==
             user_config->m_last_track)
         {
@@ -172,7 +176,6 @@ void TrackSel::switchGroup()
     {
         if(!unlock_manager->isLocked(track_manager->getTrack(tracks[i])->getIdent()))
         {
-            printf("Adding track %i, id %i\n", i ,tracks[i]);
             m_index_avail_tracks.push_back(tracks[i]);
         }
     }
