@@ -52,7 +52,7 @@ public:
     const std::string& getDescription ()        const { return m_description;   }
     const std::string& getItemStyle   ()        const { return m_item_style; }
     const std::string& getFilename    ()        const { return m_filename;      }
-    const std::string& getTrack(size_t track_index) const { assert(track_index < m_tracks.size()); 
+    const std::string& getTrack(size_t track_index) const { assert(track_index >= 0); assert(track_index < m_tracks.size()); 
                                                        return m_tracks[track_index]; }
     const std::vector<std::string>& getTracks()  const {return m_tracks;        }
     const std::vector<int>&         getLaps()    const {return m_laps;          }
