@@ -21,6 +21,7 @@
 #include "smoke.hpp"
 #include "material_manager.hpp"
 #include "karts/kart.hpp"
+#include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 
 Smoke::Smoke(Kart* kart)

@@ -45,6 +45,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/race_state.hpp"
 #include "network/network_manager.hpp"
+#include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"

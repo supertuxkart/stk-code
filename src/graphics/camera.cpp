@@ -18,14 +18,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/camera.hpp"
+
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
-#include "modes/world.hpp"
-#include "camera.hpp"
 #include "user_config.hpp"
-#include "race_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "karts/player_kart.hpp"
+#include "modes/world.hpp"
+#include "race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"

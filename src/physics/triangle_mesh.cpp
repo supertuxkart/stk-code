@@ -33,8 +33,8 @@ TriangleMesh::~TriangleMesh()
 }   // ~TriangleMesh
 
 // -----------------------------------------------------------------------------
-void TriangleMesh::addTriangle(btVector3 t1, btVector3 t2, btVector3 t3,
-                               const Material* m)
+void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2, 
+                               const btVector3 &t3, const Material* m)
 {
     m_triangleIndex2Material.push_back(m);
     m_mesh.addTriangle(t1, t2, t3);

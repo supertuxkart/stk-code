@@ -91,12 +91,8 @@ TrackSel::TrackSel()
     m_current_track = -1;
     for(unsigned int i=0; i<m_index_avail_tracks.size(); i++)
     {
-        assert(i < m_index_avail_tracks.size());
-        //assert( m_index_avail_tracks[i] >= 0);
-        // FIXME - someone had a crash because m_index_avail_tracks[i] was set to a negative number, e.g. -2
-        // I have no clue what causes this issue, consider this as a temporary fix
-        if(m_index_avail_tracks[i] < 0) continue;
-        
+        // Ignore track groups (which are negative)
+        if(m_index_avail_tracks[i]<0) continue;
         if(track_manager->getTrack(m_index_avail_tracks[i])->getIdent()==
             user_config->m_last_track)
         {

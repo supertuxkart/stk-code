@@ -69,9 +69,10 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     scene->add(m);
 }   // Flyable
 // ----------------------------------------------------------------------------
-void Flyable::createPhysics(float y_offset, const btVector3 velocity,
+void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
                             btCollisionShape *shape, const float gravity,
-                            const bool rotates, const bool turn_around, const btTransform* customDirection)
+                            const bool rotates, const bool turn_around, 
+                            const btTransform* customDirection)
 {
     // Get Kart heading direction
     btTransform trans = ( customDirection == NULL ? m_owner->getKartHeading() : *customDirection );

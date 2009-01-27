@@ -31,7 +31,6 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_control.hpp"
 #include "karts/kart_model.hpp"
-#include "physics/btKart.hpp"
 #include "tracks/terrain_info.hpp"
 
 class SkidMarks;
@@ -40,6 +39,8 @@ class Smoke;
 class Nitro;
 class SFXBase;
 class btUprightConstraint;
+class btKart;
+class btRaycastVehicle::btVehicleTuning;
 
 class Kart : public TerrainInfo, public Moveable
 {
@@ -68,7 +69,8 @@ protected:
                                         *  is disabled to allow the karts to bounce back*/
 
     // physics parameters, storing it saves time
-    btKart::btVehicleTuning *m_tuning;
+    btRaycastVehicle::btVehicleTuning 
+                            *m_tuning;
     btCompoundShape          m_kart_chassis;
     btVehicleRaycaster      *m_vehicle_raycaster;
     btKart                  *m_vehicle;

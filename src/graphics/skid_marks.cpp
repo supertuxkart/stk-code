@@ -21,6 +21,7 @@
 
 #include "scene.hpp"
 #include "karts/kart.hpp"
+#include "physics/btKart.hpp"
 #include "utils/coord.hpp"
 
 float SkidMarks::m_avoid_z_fighting  = 0.0f;

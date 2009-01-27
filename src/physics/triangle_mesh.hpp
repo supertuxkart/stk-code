@@ -41,8 +41,8 @@ private:
 public:
     TriangleMesh() : m_mesh() {};
         ~TriangleMesh();
-    void addTriangle(btVector3 t1, btVector3 t2, btVector3 t3,
-                     const Material* m);
+    void addTriangle(const btVector3 &t1, const btVector3 &t2, 
+                     const btVector3 &t3, const Material* m);
     void createBody(btCollisionObject::CollisionFlags flags=
                          (btCollisionObject::CollisionFlags)0);
     const Material* getMaterial(int n) const {return m_triangleIndex2Material[n];}
