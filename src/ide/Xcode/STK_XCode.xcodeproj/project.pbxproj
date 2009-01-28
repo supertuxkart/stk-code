@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		953EAAAC0F30A4060000D57D /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAB0F30A4060000D57D /* camera.cpp */; };
+		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
+		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
+		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
 		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
 		95C2B1FB0F296546000D3E5D /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		95C2B1FC0F296546000D3E5D /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
@@ -114,7 +118,6 @@
 		95C2B2D00F296546000D3E5D /* btGeometryUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE010F296541000D3E5D /* btGeometryUtil.cpp */; };
 		95C2B2D10F296546000D3E5D /* btQuickprof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE0D0F296541000D3E5D /* btQuickprof.cpp */; };
 		95C2B2D50F296546000D3E5D /* callback_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE1D0F296541000D3E5D /* callback_manager.cpp */; };
-		95C2B2D70F296546000D3E5D /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE200F296541000D3E5D /* camera.cpp */; };
 		95C2B2DB0F296546000D3E5D /* challenge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE260F296541000D3E5D /* challenge.cpp */; };
 		95C2B2DC0F296546000D3E5D /* challenge_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE280F296541000D3E5D /* challenge_data.cpp */; };
 		95C2B2DD0F296546000D3E5D /* unlock_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE2A0F296541000D3E5D /* unlock_manager.cpp */; };
@@ -228,11 +231,8 @@
 		95C2B57B0F296547000D3E5D /* sdldrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1B30F296545000D3E5D /* sdldrv.cpp */; };
 		95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1BF0F296545000D3E5D /* static_ssg.cpp */; };
 		95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1C10F296545000D3E5D /* stk_config.cpp */; };
-		95C2B58A0F296547000D3E5D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1C60F296545000D3E5D /* terrain_info.cpp */; };
 		95C2B5910F296547000D3E5D /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1CF0F296545000D3E5D /* track.cpp */; };
 		95C2B5920F296547000D3E5D /* track_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D10F296545000D3E5D /* track_manager.cpp */; };
-		95C2B5940F296547000D3E5D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D40F296545000D3E5D /* translation.cpp */; };
-		95C2B5960F296547000D3E5D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D70F296545000D3E5D /* triangle_mesh.cpp */; };
 		95C2B5990F296547000D3E5D /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1DB0F296546000D3E5D /* user_config.cpp */; };
 		95C2B59B0F296547000D3E5D /* random_generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E20F296546000D3E5D /* random_generator.cpp */; };
 		95C2B59C0F296547000D3E5D /* ssg_help.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E40F296546000D3E5D /* ssg_help.cpp */; };
@@ -260,6 +260,14 @@
 
 /* Begin PBXFileReference section */
 		951F96810F29670C00E1AC66 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
+		953EAAAA0F30A4060000D57D /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = games/supertuxkart/src/graphics/camera.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAAB0F30A4060000D57D /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = games/supertuxkart/src/graphics/camera.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = games/supertuxkart/src/tracks/terrain_info.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = games/supertuxkart/src/tracks/terrain_info.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = games/supertuxkart/src/physics/triangle_mesh.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = games/supertuxkart/src/physics/triangle_mesh.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = games/supertuxkart/src/utils/translation.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = games/supertuxkart/src/utils/translation.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AC210F296540000D3E5D /* actionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actionmap.cpp; path = games/supertuxkart/src/actionmap.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AC220F296540000D3E5D /* actionmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = actionmap.hpp; path = games/supertuxkart/src/actionmap.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = games/supertuxkart/src/audio/music.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
@@ -522,8 +530,6 @@
 		95C2AE1C0F296541000D3E5D /* callback.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = callback.hpp; path = games/supertuxkart/src/callback.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AE1D0F296541000D3E5D /* callback_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = callback_manager.cpp; path = games/supertuxkart/src/callback_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AE1E0F296541000D3E5D /* callback_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = callback_manager.hpp; path = games/supertuxkart/src/callback_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2AE200F296541000D3E5D /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = games/supertuxkart/src/camera.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2AE210F296541000D3E5D /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = games/supertuxkart/src/camera.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AE260F296541000D3E5D /* challenge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenge.cpp; path = games/supertuxkart/src/challenges/challenge.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AE270F296541000D3E5D /* challenge.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenge.hpp; path = games/supertuxkart/src/challenges/challenge.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AE280F296541000D3E5D /* challenge_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenge_data.cpp; path = games/supertuxkart/src/challenges/challenge_data.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
@@ -766,16 +772,10 @@
 		95C2B1C00F296545000D3E5D /* static_ssg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = static_ssg.hpp; path = games/supertuxkart/src/static_ssg.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1C10F296545000D3E5D /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = games/supertuxkart/src/stk_config.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1C20F296545000D3E5D /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = games/supertuxkart/src/stk_config.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1C60F296545000D3E5D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = games/supertuxkart/src/terrain_info.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1C70F296545000D3E5D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = games/supertuxkart/src/terrain_info.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1CF0F296545000D3E5D /* track.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track.cpp; path = games/supertuxkart/src/tracks/track.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1D00F296545000D3E5D /* track.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track.hpp; path = games/supertuxkart/src/tracks/track.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1D10F296545000D3E5D /* track_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_manager.cpp; path = games/supertuxkart/src/tracks/track_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1D20F296545000D3E5D /* track_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_manager.hpp; path = games/supertuxkart/src/tracks/track_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1D40F296545000D3E5D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = games/supertuxkart/src/translation.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1D50F296545000D3E5D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = games/supertuxkart/src/translation.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1D70F296545000D3E5D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = games/supertuxkart/src/triangle_mesh.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95C2B1D80F296545000D3E5D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = games/supertuxkart/src/triangle_mesh.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1DB0F296546000D3E5D /* user_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = user_config.cpp; path = games/supertuxkart/src/user_config.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1DC0F296546000D3E5D /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = games/supertuxkart/src/user_config.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2B1DE0F296546000D3E5D /* user_pointer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_pointer.hpp; path = games/supertuxkart/src/user_pointer.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
@@ -1094,8 +1094,6 @@
 				95C2AE1C0F296541000D3E5D /* callback.hpp */,
 				95C2AE1D0F296541000D3E5D /* callback_manager.cpp */,
 				95C2AE1E0F296541000D3E5D /* callback_manager.hpp */,
-				95C2AE200F296541000D3E5D /* camera.cpp */,
-				95C2AE210F296541000D3E5D /* camera.hpp */,
 				95C2AE740F296542000D3E5D /* explosion.cpp */,
 				95C2AE750F296542000D3E5D /* explosion.hpp */,
 				95C2AE780F296542000D3E5D /* file_manager.cpp */,
@@ -1132,12 +1130,6 @@
 				95C2B1C00F296545000D3E5D /* static_ssg.hpp */,
 				95C2B1C10F296545000D3E5D /* stk_config.cpp */,
 				95C2B1C20F296545000D3E5D /* stk_config.hpp */,
-				95C2B1C60F296545000D3E5D /* terrain_info.cpp */,
-				95C2B1C70F296545000D3E5D /* terrain_info.hpp */,
-				95C2B1D40F296545000D3E5D /* translation.cpp */,
-				95C2B1D50F296545000D3E5D /* translation.hpp */,
-				95C2B1D70F296545000D3E5D /* triangle_mesh.cpp */,
-				95C2B1D80F296545000D3E5D /* triangle_mesh.hpp */,
 				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
 				95C2B1DC0F296546000D3E5D /* user_config.hpp */,
 				95C2B1DE0F296546000D3E5D /* user_pointer.hpp */,
@@ -1571,9 +1563,7 @@
 		95C2AE370F296541000D3E5D /* enet */ = {
 			isa = PBXGroup;
 			children = (
-				95C2AE380F296541000D3E5D /* .deps */,
 				95C2AE420F296541000D3E5D /* callbacks.c */,
-				95C2AE490F296541000D3E5D /* docs */,
 				95C2AE520F296541000D3E5D /* host.c */,
 				95C2AE540F296541000D3E5D /* include */,
 				95C2AE620F296542000D3E5D /* list.c */,
@@ -1585,22 +1575,6 @@
 			);
 			name = enet;
 			path = games/supertuxkart/src/enet;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
-		};
-		95C2AE380F296541000D3E5D /* .deps */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = .deps;
-			path = games/supertuxkart/src/enet/.deps;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
-		};
-		95C2AE490F296541000D3E5D /* docs */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = docs;
-			path = games/supertuxkart/src/enet/docs;
 			sourceTree = SYSTEM_DEVELOPER_DIR;
 		};
 		95C2AE540F296541000D3E5D /* include */ = {
@@ -1631,6 +1605,8 @@
 		95C2AE870F296542000D3E5D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				953EAAAA0F30A4060000D57D /* camera.hpp */,
+				953EAAAB0F30A4060000D57D /* camera.cpp */,
 				95C2AE880F296542000D3E5D /* moving_texture.cpp */,
 				95C2AE890F296542000D3E5D /* moving_texture.hpp */,
 				95C2AE8A0F296542000D3E5D /* nitro.cpp */,
@@ -1858,6 +1834,8 @@
 				95C2B1860F296545000D3E5D /* moving_physics.hpp */,
 				95C2B1870F296545000D3E5D /* physics.cpp */,
 				95C2B1880F296545000D3E5D /* physics.hpp */,
+				953EAAB00F30A4410000D57D /* triangle_mesh.hpp */,
+				953EAAB10F30A4410000D57D /* triangle_mesh.cpp */,
 			);
 			name = physics;
 			path = games/supertuxkart/src/physics;
@@ -1895,6 +1873,8 @@
 		95C2B1CE0F296545000D3E5D /* tracks */ = {
 			isa = PBXGroup;
 			children = (
+				953EAAAD0F30A4220000D57D /* terrain_info.hpp */,
+				953EAAAE0F30A4220000D57D /* terrain_info.cpp */,
 				95C2B1CF0F296545000D3E5D /* track.cpp */,
 				95C2B1D00F296545000D3E5D /* track.hpp */,
 				95C2B1D10F296545000D3E5D /* track_manager.cpp */,
@@ -1907,6 +1887,8 @@
 		95C2B1DF0F296546000D3E5D /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				953EAAB40F30A4650000D57D /* translation.hpp */,
+				953EAAB50F30A4650000D57D /* translation.cpp */,
 				95C2B1E00F296546000D3E5D /* constants.hpp */,
 				95C2B1E10F296546000D3E5D /* coord.hpp */,
 				95C2B1E20F296546000D3E5D /* random_generator.cpp */,
@@ -2400,7 +2382,6 @@
 				95C2B2D00F296546000D3E5D /* btGeometryUtil.cpp in Sources */,
 				95C2B2D10F296546000D3E5D /* btQuickprof.cpp in Sources */,
 				95C2B2D50F296546000D3E5D /* callback_manager.cpp in Sources */,
-				95C2B2D70F296546000D3E5D /* camera.cpp in Sources */,
 				95C2B2DB0F296546000D3E5D /* challenge.cpp in Sources */,
 				95C2B2DC0F296546000D3E5D /* challenge_data.cpp in Sources */,
 				95C2B2DD0F296546000D3E5D /* unlock_manager.cpp in Sources */,
@@ -2514,16 +2495,17 @@
 				95C2B57B0F296547000D3E5D /* sdldrv.cpp in Sources */,
 				95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */,
 				95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */,
-				95C2B58A0F296547000D3E5D /* terrain_info.cpp in Sources */,
 				95C2B5910F296547000D3E5D /* track.cpp in Sources */,
 				95C2B5920F296547000D3E5D /* track_manager.cpp in Sources */,
-				95C2B5940F296547000D3E5D /* translation.cpp in Sources */,
-				95C2B5960F296547000D3E5D /* triangle_mesh.cpp in Sources */,
 				95C2B5990F296547000D3E5D /* user_config.cpp in Sources */,
 				95C2B59B0F296547000D3E5D /* random_generator.cpp in Sources */,
 				95C2B59C0F296547000D3E5D /* ssg_help.cpp in Sources */,
 				95C2B59D0F296547000D3E5D /* string_utils.cpp in Sources */,
 				95C2B59E0F296547000D3E5D /* vec3.cpp in Sources */,
+				953EAAAC0F30A4060000D57D /* camera.cpp in Sources */,
+				953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */,
+				953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */,
+				953EAAB60F30A4650000D57D /* translation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
