@@ -76,9 +76,9 @@ void HighscoreEntry::Read(const lisp::Lisp* const node)
         std::ostringstream s;
         s << "time-" << i;
         node->get(s.str(),m_time[i]                  );
-        s << "name-" << i;
+        s.str(""); s << "name-" << i;
         node->get(s.str(),m_name[i]                  );
-        s << "kartname-" << i;
+        s.str(""); s << "kartname-" << i;
         node->get(s.str(), m_kart_name[i]            );
     }
 }   // Read
@@ -96,9 +96,9 @@ void HighscoreEntry::Write(lisp::Writer *writer)
         std::ostringstream s;
         s << "time-" << j << "\t\t";
         writer->write(s.str(), m_time[j]                 );
-        s << "name-" << j << "\t\t";
+        s.str(""); s << "name-" << j << "\t\t";
         writer->write(s.str(), m_name[j]                 );
-        s << "kartname-" << j << "\t\t";
+        s.str(""); s << "kartname-" << j << "\t\t";
         writer->write(s.str(), m_kart_name[j]            );
     }   // for j
     
