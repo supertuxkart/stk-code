@@ -72,23 +72,65 @@ namespace StringUtils
     std::string upcase (const std::string&);
     std::string downcase (const std::string&);
     std::vector<std::string> split(const std::string& s, char c);
+
     // ------------------------------------------------------------------------
-    /** Replaces all '%s' or '%d' in the first string with the 2nd string. So 
-     *  this is basically a simplified s(n)printf replacement, which doesn't 
-     *  rely on s(n)printf (which is not that portable).
-     *  \param s String in which all %s or %dare replaced.
-     *  \param a Value to replace all %s or %d with.
+    /** Overloaded insert_values taking one value, see below for
+     *  full docs.
+     *  \param s String in which all %s or %d are replaced.
+     *  \param v1 Value to replace.
      */
-    template <class T>
-    std::string insert_string(const std::string &s, const T &a)
+    template <class T1>
+    std::string insert_values(const std::string &s, const T1 &v1)
     {
+        return insert_values(s, v1, "", "");
+    }
+    // ------------------------------------------------------------------------
+    /** Overloaded insert_values taking two values, see below for
+     *  full docs.
+     *  \param s String in which all %s or %d are replaced.
+     *  \param v1,v2 Value(s) to replace all %s or %d with.
+     */
+    template <class T1, class T2>
+    std::string insert_values(const std::string &s, const T1 &v1,
+                              const T2 &v2=0)
+    {
+        return insert_values(s, v1, v2, "");
+    }
+    // ------------------------------------------------------------------------
+    /** Replaces the first %s or %d in the string with the first value 
+     *  converted to a string), the 2nd %s or %d with the second value etc.
+     *  So this is basically a simplified s(n)printf replacement, but doesn't
+     *  do any fancy formatting (and no type checks either - so you can print
+     *  a string into a %d field). This is basically a replacement for
+     *  sprintf (and similar functions), mostly meant for strings that are
+     *  translated (otherwise just use ostringstream) - since e.g. a 
+     *  translated string like _("Player %s - chose your kart") would 
+     *  be broken into two strings:
+     *  << _("Player ") << name << _(" - chose your kart")
+     *  and this is in the best case very confusing for translators (which get
+     *  to see two strings instead of one sentence, see xgettext manual 
+     *  for why this is a bad idea)
+     *  \param s String in which all %s or %d are replaced.
+     *  \param v1,v2,v3 Value(s) to replace all %s or %d with.
+     */
+    template <class T1, class T2, class T3>
+    std::string insert_values(const std::string &s, const T1 &v1,
+                              const T2 &v2=0, const T3 &v3=0)
+    {
+        std::vector<std::string> all_vals;
+        std::ostringstream dummy;
+        dummy<<v1; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy<<v2; all_vals.push_back(dummy.str()); dummy.str("");
+        dummy<<v3; all_vals.push_back(dummy.str());
+
         std::vector<std::string> sv = StringUtils::split(s, '%');
         std::string new_string="";
         for(unsigned int i=0; i<sv.size(); i++)
         {
             if(sv[i][0]=='s' || sv[i][0]=='d')
             {
-                new_string+=a+sv[i].substr(1);
+                new_string+=all_vals[0]+sv[i].substr(1);
+                all_vals.erase(all_vals.begin());
             }
             else
                 new_string+=sv[i];

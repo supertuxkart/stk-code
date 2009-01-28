@@ -32,9 +32,6 @@
 #else
 #  include <direct.h>
 #endif
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 #include <SDL/SDL.h>
 #define _WINSOCKAPI_
@@ -49,6 +46,7 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 UserConfig *user_config;
 
@@ -918,7 +916,6 @@ void UserConfig::writeInput(lisp::Writer *writer, const Input &input)
 // -----------------------------------------------------------------------------
 std::string UserConfig::getInputAsString(const Input &input)
 {
-    char msg[MAX_MESSAGE_LENGTH];
     std::string s;
 
     switch (input.type)
@@ -930,26 +927,27 @@ std::string UserConfig::getInputAsString(const Input &input)
         s = SDL_GetKeyName((SDLKey) input.id0);
         break;
     case Input::IT_STICKMOTION:
-        snprintf(msg, sizeof(msg), _("joy %d axis %d  %c"),
-                 input.id0, input.id1, 
-                 (input.id2 == Input::AD_NEGATIVE) ? '-' : '+');
-        s = msg;
+        s = StringUtils::insert_values( _("joy %d axis %d  %s"), input.id0, 
+                                         input.id1, 
+                                         (input.id2 == Input::AD_NEGATIVE) 
+                                         ? '-' : '+'                        );
         break;
     case Input::IT_STICKBUTTON:
-        snprintf(msg, sizeof(msg), _("joy %d btn %d"), input.id0, input.id1);
-        s = msg;
+        s = StringUtils::insert_values( _("joy %d btn %d"), 
+                                        input.id0, input.id1);
         break;
     case Input::IT_STICKHAT:
-        snprintf(msg, sizeof(msg), _("joy %d hat %d"), input.id0, input.id1);
-        s = msg;
+        s = StringUtils::insert_values( _("joy %d hat %d"),
+                                        input.id0, input.id1);
         break;
     case Input::IT_MOUSEBUTTON:
-        snprintf(msg, sizeof(msg), _("mouse btn %d"), input.id0);
-        s = msg;
+        s = StringUtils::insert_values( _("mouse btn %d"), input.id0);
         break;
     case Input::IT_MOUSEMOTION:
-        snprintf(msg, sizeof(msg), _("mouse axis %d %c"),
-                 input.id0, ((input.id1 == Input::AD_NEGATIVE) ? '-' : '+'));
+        s = StringUtils::insert_values( _("mouse axis %d %s"),
+                                        input.id0, 
+                                        (input.id1 == Input::AD_NEGATIVE) 
+                                        ? '-': '+'                        );
         break;
     default:
         s = _("Invalid");
