@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DISPLAY_RES_CONFIRM_H
-#define HEADER_DISPLAY_RES_CONFIRM_H
+#ifndef HEADER_DISPLAY_RES_CONFIRM_HPP
+#define HEADER_DISPLAY_RES_CONFIRM_HPP
 
 #include "base_gui.hpp"
 
@@ -35,9 +35,9 @@ public:
     void handle(GameAction ga, int value);
     
 private:
-    char m_count[60];
-    int m_counter;
-    const bool FROM_WINDOW;
+    std::string  m_count;
+    int          m_counter;
+    const bool   FROM_WINDOW;
 
     SDL_TimerID m_timer;
 };

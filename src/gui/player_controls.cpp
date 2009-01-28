@@ -20,15 +20,13 @@
 #include "gui/player_controls.hpp"
 
 #include <SDL/SDL.h>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 #include "sdldrv.hpp"
 #include "user_config.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {
@@ -81,14 +79,11 @@ const char *sKartAction2String[KA_LAST+1] =
 PlayerControls::PlayerControls(int whichPlayer):
     m_player_index(whichPlayer),
     m_grab_input(false)
-{
-    // This is quite difficult to convert to using ustringstream, since the
-    // position of %s in the string might vary from language to language.
-    char heading[MAX_MESSAGE_LENGTH];
-    snprintf(heading, sizeof(heading), _("Choose your controls, %s"),
-            user_config->m_player[m_player_index].getName().c_str() );
+{   
+    std::string s = StringUtils::insert_values( _("Choose your controls, %s"),
+                            user_config->m_player[m_player_index].getName());
 
-    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, heading );
+    widget_manager->addTitleWgt( WTOK_TITLE, 60, 7, s);
     widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->breakLine();
 

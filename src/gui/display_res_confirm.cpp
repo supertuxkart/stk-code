@@ -26,11 +26,7 @@
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
 #include "utils/translation.hpp"
-
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {
@@ -107,7 +103,8 @@ void DisplayResConfirm::countdown()
     if (m_counter > 1)
     {
         m_counter--;
-        snprintf(m_count, MAX_MESSAGE_LENGTH, _("Confirm Resolution Within %d Seconds"), m_counter);
+        m_count = StringUtils::insert_values(_("Confirm Resolution Within %d Seconds"),
+                                              m_counter);
         widget_manager->setWgtText( WTOK_TITLE, m_count );
     }
     else

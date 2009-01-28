@@ -21,9 +21,6 @@
 
 #include <sstream>
 #include <string>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 #include <SDL/SDL.h>
 
@@ -41,7 +38,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/translation.hpp"
-#include "graphics/scene.hpp"
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {
@@ -80,9 +77,8 @@ GrandPrixEnd::GrandPrixEnd()
         }
     }
     
-    static char output[MAX_MESSAGE_LENGTH];
-    snprintf(output, sizeof(output),
-        _("The winner is %s!"),race_manager->getKartName(winner_kart_id).c_str()); // FIXME - uses inner-name and not user name
+    std::string output = StringUtils::insert_values(_("The winner is %s!"),
+                                     race_manager->getKartName(winner_kart_id));
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);

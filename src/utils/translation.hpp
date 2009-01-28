@@ -35,11 +35,6 @@
 #  define N_(String) String
 #endif
 
-// This length is used for all translated error messages.
-#define MAX_ERROR_MESSAGE_LENGTH 160
-
-// This length is used for all normal messages
-#define MAX_MESSAGE_LENGTH        80
 class Translations
 {
 public:

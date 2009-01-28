@@ -30,7 +30,6 @@
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
      //   Some portabilty defines
-#    define snprintf       _snprintf
 #    define access         _access
 #    define                F_OK  04
 #  endif

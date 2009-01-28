@@ -26,10 +26,8 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockTrackReward(const std::string &track_name)
@@ -93,7 +91,7 @@ const std::string Challenge::getUnlockedMessage() const
         // add line break if we are showing multiple messages
         if(n>0) unlocked_message+='\n';
 
-        char message[128];
+        std::string message;
 
         // write message depending on feature type
         switch(m_feature[n].type)
@@ -101,24 +99,34 @@ const std::string Challenge::getUnlockedMessage() const
             case UNLOCK_TRACK:
                 {    // {} avoids compiler warning
                     Track* track = track_manager->getTrack( m_feature[n].name );
-                    snprintf(message, 127, _("New track '%s'\nnow available"), _(track->getName()) );
+                    message = StringUtils::insert_values(
+                        _("New track '%s'\nnow available"), 
+                        _(track->getName()) );
                     break;
                 }
             case UNLOCK_MODE:
-                snprintf(message, 127, _("New game mode\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
+                message = StringUtils::insert_values( 
+                    _("New game mode\n'%s'\nnow available"), 
+                    m_feature[n].user_name);
                 break;
             case UNLOCK_GP:
             {
                 std::string gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
-                snprintf(message, 127, _("New Grand Prix '%s'\nnow available"), gp_user_name.c_str() );
+                message = StringUtils::insert_values(
+                    _("New Grand Prix '%s'\nnow available"),
+                    gp_user_name);
                 break;
             }
             case UNLOCK_DIFFICULTY:
-                snprintf(message, 127, _("New difficulty\n'%s'\nnow available"), m_feature[n].user_name.c_str() );
+                message = StringUtils::insert_values(
+                    _("New difficulty\n'%s'\nnow available"), 
+                    m_feature[n].user_name);
                 break;
             case UNLOCK_KART:
                 const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
-                snprintf(message, 127, _("New kart\n'%s'\nnow available"), kp->getName().c_str());
+                message = StringUtils::insert_values(
+                    _("New kart\n'%s'\nnow available"),
+                    kp->getName());
                 break;
         }   // switch
         unlocked_message += message;

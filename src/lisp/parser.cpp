@@ -25,10 +25,6 @@
 #include "lisp/lisp.hpp"
 #include "utils/translation.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
-
 namespace lisp
 {
 
@@ -51,11 +47,9 @@ namespace lisp
         std::ifstream in(filename.c_str());
         if(!in.good())
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), 
-                     "Couldn't open file '%s'.",
-                     filename.c_str());
-            throw std::runtime_error(msg);
+            std::ostringstream msg;
+            msg << "Couldn't open file '" << filename << "'.";
+            throw std::runtime_error(msg.str());
         }
         return parse(in);
     }
@@ -89,19 +83,17 @@ namespace lisp
         {
         case Lexer::TOKEN_EOF:
             {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), 
-                         "Parse Error at line %d: Unexpected EOF.",
-                         m_lexer->getLineNumber());
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg << "Parse Error at line " << m_lexer->getLineNumber()
+                    << ": Unexpected EOF.";
+                throw std::runtime_error(msg.str());
             }
         case Lexer::TOKEN_CLOSE_PAREN:
             {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), 
-                         "Parse Error at line %d: Unexpected ')'.",
-                         m_lexer->getLineNumber());
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg << "Parse Error at line " << m_lexer->getLineNumber()
+                    << ": Unexpected ')'.";
+                throw std::runtime_error(msg.str());
             }
         case Lexer::TOKEN_TRANSLATION:
            {
@@ -110,11 +102,10 @@ namespace lisp
                 Lisp* next=read();
                 if(next->getType()!=Lisp::TYPE_STRING)
                 {
-                    char msg[MAX_ERROR_MESSAGE_LENGTH];
-                    snprintf(msg, sizeof(msg), 
-                        "Parse Error at line %d: No string inside translation.",
-                        m_lexer->getLineNumber());
-                    throw std::runtime_error(msg);
+                    std::ostringstream msg;
+                    msg << "Parse Error at line " << m_lexer->getLineNumber()
+                        << ": No string inside translation.";
+                    throw std::runtime_error(msg.str());
                 }
                 const char* trans=_(next->m_v.m_string);
                 const size_t LEN = strlen(trans) + 1;
@@ -133,11 +124,10 @@ namespace lisp
 
             if(m_token != Lexer::TOKEN_CLOSE_PAREN)
             {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), 
-                         "Parse Error at line %d: Expected ')'.",
-                         m_lexer->getLineNumber());
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg << "Parse Error at line " << m_lexer->getLineNumber()
+                    << ": Expected ')'.";
+                throw std::runtime_error(msg.str());
             }
             break;
         case Lexer::TOKEN_SYMBOL:

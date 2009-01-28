@@ -18,11 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config_display.hpp"
-#include <algorithm>
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include <algorithm>
 
 #include "main_loop.hpp"
 #include "widget_manager.hpp"
@@ -30,7 +27,7 @@
 #include "menu_manager.hpp"
 #include "sdldrv.hpp"
 #include "utils/translation.hpp"
-
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {
@@ -84,9 +81,9 @@ ConfigDisplay::ConfigDisplay()
     widget_manager->addTextButtonWgt(WTOK_NEXT_BACKGROUND, 60, 7, _("Next background"));
     widget_manager->addEmptyWgt( WidgetManager::WGT_NONE, 60, 2 );
 
-    char msg [MAX_MESSAGE_LENGTH];
     //I18N: displays current resolution
-    snprintf( msg, MAX_MESSAGE_LENGTH, _("Current: %dx%d"), m_curr_width, m_curr_height );
+    std::string msg = StringUtils::insert_values(_("Current: %dx%d"),
+                                                 m_curr_width, m_curr_height);
     widget_manager->addTextWgt( WTOK_CURRENT_RES, 60, 7, msg);
     widget_manager->hideWgtRect(WTOK_CURRENT_RES);
 
@@ -176,10 +173,11 @@ void ConfigDisplay::select()
             }
             else
             {
-                char msg [MAX_MESSAGE_LENGTH];
-                snprintf (msg, MAX_MESSAGE_LENGTH, "Current: %dx%d",
-                user_config->m_width, user_config->m_height);
-                widget_manager->setWgtText(WTOK_CURRENT_RES, msg);
+                //I18N: displays current resolution
+                std::string s = StringUtils::insert_values(_("Current: %dx%d"),
+                                                           user_config->m_width,
+                                                           user_config->m_height);
+                widget_manager->setWgtText(WTOK_CURRENT_RES, s);
 
                 if ( isBlacklisted( user_config->m_width,
                     user_config->m_height ))
@@ -357,9 +355,9 @@ void ConfigDisplay::getScreenModes()
 void ConfigDisplay::changeApplyButton()
 {
     // change Apply button text
-    char msg [MAX_MESSAGE_LENGTH];
-    snprintf(msg, MAX_MESSAGE_LENGTH, _("Apply %dx%d"),
-      m_sizes[m_curr_res].first,m_sizes[m_curr_res].second);
+    std::string msg = StringUtils::insert_values(_("Apply %dx%d"),
+                                                 m_sizes[m_curr_res].first,
+                                                  m_sizes[m_curr_res].second);
     widget_manager->setWgtText(WTOK_APPLY_RES, msg);
     widget_manager->activateWgt(WTOK_APPLY_RES);
 
@@ -391,9 +389,9 @@ bool ConfigDisplay::isBlacklisted(int width, int height)
 void ConfigDisplay::showBlacklistButtons()
 {
     //change Apply button to Blacklisted button
-    char msg [MAX_MESSAGE_LENGTH];
-    snprintf(msg, MAX_MESSAGE_LENGTH, _("%dx%d Blacklisted"),
-      m_sizes[m_curr_res].first,m_sizes[m_curr_res].second);
+    std::string msg = StringUtils::insert_values(_("%dx%d Blacklisted"),
+                                                 m_sizes[m_curr_res].first,
+                                                 m_sizes[m_curr_res].second);
     widget_manager->setWgtText(WTOK_APPLY_RES, msg);
     widget_manager->deactivateWgt(WTOK_APPLY_RES);
 

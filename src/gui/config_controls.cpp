@@ -19,10 +19,6 @@
 
 #include "config_controls.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
-
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
 #include "utils/translation.hpp"

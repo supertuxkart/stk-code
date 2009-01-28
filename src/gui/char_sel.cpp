@@ -33,10 +33,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "utils/translation.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include "utils/string_utils.hpp"
 
 enum WidgetTokens
 {
@@ -108,9 +105,8 @@ CharSel::CharSel(int whichPlayer)
     if (m_player_index < (int)kart_properties_manager->getNumSelectedKarts())
         kart_properties_manager->removeLastSelectedKart();
 
-    char heading[MAX_MESSAGE_LENGTH];
-    snprintf(heading, sizeof(heading), _("Player %d, choose a driver"),
-             m_player_index + 1);
+    std::string heading = StringUtils::insert_values( _("Player %d, choose a driver"),
+                                                      m_player_index + 1);
     widget_manager->addTitleWgt( WTOK_TITLE, 100, 10, heading );
     widget_manager->hideWgtRect(WTOK_TITLE);
     widget_manager->breakLine();
