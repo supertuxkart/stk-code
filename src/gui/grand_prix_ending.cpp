@@ -41,6 +41,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/translation.hpp"
+#include "graphics/scene.hpp"
 
 enum WidgetTokens
 {
