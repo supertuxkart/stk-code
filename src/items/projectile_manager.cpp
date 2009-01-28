@@ -73,7 +73,7 @@ void ProjectileManager::cleanup()
     for(Explosions::iterator i  = m_active_explosions.begin();
         i != m_active_explosions.end(); ++i)
     {
-        scene->remove((ssgTransform*)*i);
+        stk_scene->remove((ssgTransform*)*i);
         ssgDeRefDelete(*i);
     }
     m_active_explosions.clear();

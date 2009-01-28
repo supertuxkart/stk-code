@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCENE_H
-#define HEADER_SCENE_H
+#ifndef HEADER_SCENE_HPP
+#define HEADER_SCENE_HPP
 
 //FIXME: make the camera a pointer to vector so it can be forward declared.
 #include <vector>
@@ -48,6 +48,6 @@ public:
     Camera *createCamera(int playerId, const Kart* kart);
 };
 
-extern Scene *scene;
+extern Scene *stk_scene;
 
 #endif

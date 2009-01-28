@@ -20,9 +20,7 @@
 #include "highscore_manager.hpp"
 
 #include <stdexcept>
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include <sstream>
 
 #include "race_manager.hpp"
 #include "file_manager.hpp"
@@ -98,9 +96,7 @@ void HighscoreManager::Load()
         const lisp::Lisp* const node = root->getLisp("highscores");
         if(!node)
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "No 'highscore' node found.");
-            throw std::runtime_error(msg);
+            throw std::runtime_error("No 'highscore' node found.");
         }
         
         // check file version
@@ -121,23 +117,21 @@ void HighscoreManager::Load()
         int n;
         if (!node->get("number-entries",n))
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "No 'number-entries' node found.");
-            throw std::runtime_error(msg);
+            throw std::runtime_error("No 'number-entries' node found.");
         }
 
         // read all entries one by one and store them in 'm_allScores'
         for(int i=0; i<n; i++)
         {
-            char record_name[255];
-            snprintf(record_name, sizeof(record_name), "record-%d", i);
-            const lisp::Lisp* const node_record=node->getLisp(record_name);
+            std::ostringstream record_name;
+            record_name << "record-" << i;
+            const lisp::Lisp* const node_record=node->getLisp(record_name.str());
             if(!node_record) 
             {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg),"Can't find record '%d' in '%s'",
-                         i,m_filename.c_str());
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg << "Can't find record '" << i << "' in '" 
+                    << m_filename << "'";
+                throw std::runtime_error(msg.str());
             }
             HighscoreEntry *highscores = new HighscoreEntry(node_record);
             m_allScores.push_back(highscores);
@@ -174,12 +168,12 @@ void HighscoreManager::Save()
         for(type_all_scores::iterator i  = m_allScores.begin(); 
             i != m_allScores.end();  i++)
         {
-            char record_name[255];
-            snprintf(record_name, sizeof(record_name),"record-%d\t",record_number);
+            std::ostringstream record_name;
+            record_name << "record-" << record_number << "\t";
             record_number++;
-            writer.beginList(record_name);
+            writer.beginList(record_name.str());
             (*i)->Write(&writer);
-            writer.endList(record_name);
+            writer.endList(record_name.str());
         } // next score
         writer.endList("highscores");
         m_can_write=true;

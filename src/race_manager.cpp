@@ -275,7 +275,7 @@ void RaceManager::next()
             network_manager->beginReadySetGoBarrier();
         else
             network_manager->setState(NetworkManager::NS_WAIT_FOR_RACE_DATA);
-        scene->clear();
+        stk_scene->clear();
         startNextRace();
     }
     else
@@ -370,7 +370,7 @@ void RaceManager::exit_race()
     {
         menu_manager->switchToMainMenu();
     }
-    scene->clear();
+    stk_scene->clear();
     delete world;
     world          = 0;
     m_track_number = 0;

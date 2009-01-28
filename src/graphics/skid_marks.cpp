@@ -55,8 +55,8 @@ void SkidMarks::reset()
 {
     for(unsigned int i=0; i<m_left.size(); i++)
     {
-        scene->remove(m_left[i]);
-        scene->remove(m_right[i]);
+        stk_scene->remove(m_left[i]);
+        stk_scene->remove(m_right[i]);
     }
     m_left.clear();
     m_right.clear();
@@ -152,7 +152,7 @@ void SkidMarks::update(float dt)
     SkidMarkQuads *smq_left = new SkidMarkQuads(raycast_left.m_contactPointWS,
                                          raycast_left.m_contactPointWS + delta,
                                          m_skid_state, m_avoid_z_fighting);
-    scene->add(smq_left);
+    stk_scene->add(smq_left);
 
     m_avoid_z_fighting += 0.001f;
     if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
@@ -161,7 +161,7 @@ void SkidMarks::update(float dt)
                                                   raycast_right.m_contactPointWS,
                                                   m_skid_state,
                                                   m_avoid_z_fighting);
-    scene->add(smq_right);
+    stk_scene->add(smq_right);
     m_current++;
     if(m_current>=stk_config->m_max_skidmarks)
         m_current = 0;
@@ -172,8 +172,8 @@ void SkidMarks::update(float dt)
     }
     else
     {
-        scene->remove(m_left [m_current]);
-        scene->remove(m_right[m_current]);
+        stk_scene->remove(m_left [m_current]);
+        stk_scene->remove(m_right[m_current]);
         m_left [m_current] = smq_left;
         m_right[m_current] = smq_right;
     }

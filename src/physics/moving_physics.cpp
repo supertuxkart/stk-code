@@ -86,7 +86,7 @@ MovingPhysics::~MovingPhysics()
     delete m_body;
     delete m_motion_state;
     delete m_shape;
-    scene->remove(this);
+    stk_scene->remove(this);
 }  // ~MovingPhysics
 
 // -----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void MovingPhysics::init()
     }
     ssgBranch *parent = getParent(0);
 
-    scene->add(this);
+    stk_scene->add(this);
     parent->removeKid(this);
 
     // 2. Determine the original position of the object

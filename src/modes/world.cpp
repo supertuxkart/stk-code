@@ -49,10 +49,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf  _snprintf
-#endif
+#include "utils/string_utils.hpp"
 
 //-----------------------------------------------------------------------------
 World::World() : TimedRace()
@@ -114,7 +111,7 @@ void World::init()
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
             {
-                scene->createCamera(local_player_id, newkart);
+                stk_scene->createCamera(local_player_id, newkart);
                 m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
             }
         }
@@ -147,7 +144,7 @@ void World::init()
 
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
-        scene->add ( newkart -> getModelTransform() ) ;
+        stk_scene->add ( newkart -> getModelTransform() ) ;
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
     }  // for i
@@ -413,10 +410,9 @@ void World::removeKart(int kart_number)
             }
             else
             {
-                char s[MAX_MESSAGE_LENGTH];
-                snprintf(s, MAX_MESSAGE_LENGTH,_("'%s' has\nbeen eliminated."),
-                         kart->getName().c_str());
-                m->addMessage( s, *i, 2.0f, 60);
+                std::string s = _("'%s' has\nbeen eliminated.");
+                m->addMessage( StringUtils::insert_string(s, kart->getName()),
+                                *i, 2.0f, 60);
             }
         }   // for i in kart
     }   // if raceMenu exist
@@ -514,7 +510,7 @@ void World::restartRace()
     callback_manager->reset();
 
     // Resets the cameras in case that they are pointing too steep up or down
-    scene->reset();
+    stk_scene->reset();
 }   // restartRace
 
 //-----------------------------------------------------------------------------

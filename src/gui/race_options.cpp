@@ -17,16 +17,14 @@
 
 #include "gui/race_options.hpp"
 
+#include <sstream>
+
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
 #include "utils/translation.hpp"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
 
 enum WidgetTokens
 {
@@ -102,9 +100,9 @@ RaceOptions::RaceOptions()
         widget_manager->setWgtTextSize(WTOK_KARTS_TITLE, WGT_FNT_LRG);
         widget_manager->addTextButtonWgt( WTOK_KARTS_DOWN, 3, 7, " < " );
         
-        char string_num_karts[MAX_MESSAGE_LENGTH];
-        snprintf(string_num_karts, MAX_MESSAGE_LENGTH, "%d", m_num_karts);
-        widget_manager->addTextWgt( WTOK_KARTS, ITEM_WIDTH, 7, string_num_karts );
+        std::ostringstream string_num_karts;
+        string_num_karts <<  m_num_karts;
+        widget_manager->addTextWgt( WTOK_KARTS, ITEM_WIDTH, 7, string_num_karts.str() );
         widget_manager->setWgtBorderPercentage( WTOK_KARTS, 10 );
         widget_manager->showWgtBorder( WTOK_KARTS );
         widget_manager->hideWgtRect( WTOK_KARTS );
@@ -124,9 +122,9 @@ RaceOptions::RaceOptions()
         widget_manager->setWgtTextSize(WTOK_LAPS_TITLE, WGT_FNT_LRG);
         widget_manager->addTextButtonWgt( WTOK_LAPS_DOWN, 3, 7, " < " );
 
-        char string_num_laps[MAX_MESSAGE_LENGTH];
-        snprintf(string_num_laps, MAX_MESSAGE_LENGTH, "%d", m_num_laps);
-        widget_manager->addTextWgt( WTOK_LAPS, ITEM_WIDTH, 7, string_num_laps );
+        std::ostringstream string_num_laps;
+        string_num_laps << m_num_laps;
+        widget_manager->addTextWgt( WTOK_LAPS, ITEM_WIDTH, 7, string_num_laps.str() );
         widget_manager->setWgtBorderPercentage( WTOK_LAPS, 10 );
         widget_manager->showWgtBorder( WTOK_LAPS );
         widget_manager->hideWgtRect( WTOK_LAPS );
@@ -191,7 +189,7 @@ void RaceOptions::select()
             {
                 m_difficulty = RaceManager::RD_MEDIUM;
             }
-            widget_manager->setWgtText( WTOK_DIFFICULTY, getDifficultyString(m_difficulty) );
+            widget_manager->setWgtText(WTOK_DIFFICULTY, getDifficultyString(m_difficulty) );
             break;
 
         case WTOK_DIFFICULTY_DOWN:
@@ -207,20 +205,19 @@ void RaceOptions::select()
             {
                 m_difficulty = RaceManager::RD_HARD;
             } 
-            widget_manager->setWgtText( WTOK_DIFFICULTY, 
-                                        getDifficultyString(m_difficulty) );
+            widget_manager->setWgtText(WTOK_DIFFICULTY, 
+                                       getDifficultyString(m_difficulty) );
 
             break;
 
         case WTOK_KARTS_UP:
             {
-	        m_num_karts = m_num_karts==stk_config->m_max_karts 
+                m_num_karts = m_num_karts==stk_config->m_max_karts 
                             ? m_min_karts : m_num_karts + 1;
 
-                char label[ MAX_MESSAGE_LENGTH ];
-                snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_karts );
-
-                widget_manager->setWgtText( WTOK_KARTS, label );
+                std::ostringstream label;
+                label << m_num_karts;
+                widget_manager->setWgtText(WTOK_KARTS, label.str() );
             }
             break;
 
@@ -228,10 +225,9 @@ void RaceOptions::select()
             {
                 m_num_karts = m_num_karts==m_min_karts 
                             ? stk_config->m_max_karts : m_num_karts-1;
-                char label[ MAX_MESSAGE_LENGTH ];
-                snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_karts );
-
-                widget_manager->setWgtText( WTOK_KARTS, label );
+                std::ostringstream label;
+                label << m_num_karts;
+                widget_manager->setWgtText(WTOK_KARTS, label.str() );
             }
             break;
 
@@ -240,10 +236,9 @@ void RaceOptions::select()
                 m_num_laps++;
                 if(m_num_laps>10) m_num_laps=1;
 
-                char label[ MAX_MESSAGE_LENGTH ];
-                snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );
-
-                widget_manager->setWgtText( WTOK_LAPS, label);
+                std::ostringstream label;
+                label << m_num_laps;
+                widget_manager->setWgtText(WTOK_LAPS, label.str());
             }
             break;
 
@@ -252,10 +247,9 @@ void RaceOptions::select()
                 m_num_laps--;
                 if(m_num_laps<1) m_num_laps=10;
 
-                char label[ MAX_MESSAGE_LENGTH ];
-                snprintf( label, MAX_MESSAGE_LENGTH, "%d", m_num_laps );
-
-                widget_manager->setWgtText( WTOK_LAPS, label);
+                std::ostringstream label;
+                label << m_num_laps;
+                widget_manager->setWgtText(WTOK_LAPS, label.str());
             }
             break;
 

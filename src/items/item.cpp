@@ -41,13 +41,13 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_root->ref();
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
-    scene->add(m_root);
+    stk_scene->add(m_root);
 }   // Item
 
 //-----------------------------------------------------------------------------
 Item::~Item()
 {
-    scene->remove(m_root);
+    stk_scene->remove(m_root);
     ssgDeRefDelete(m_root);
 }   // ~Item
 

@@ -66,7 +66,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     // Add the graphical model
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
-    scene->add(m);
+    stk_scene->add(m);
 }   // Flyable
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
@@ -259,7 +259,7 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
     // Now remove this projectile from the graph:
     ssgTransform *m = getModelTransform();
     m->removeAllKids();
-    scene->remove(m);
+    stk_scene->remove(m);
 
     // The explosion is a bit higher in the air
     Vec3 pos_explosion=getXYZ();

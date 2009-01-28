@@ -69,7 +69,7 @@ ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
   }
 
   m_num_active = 0 ;
-  scene->add(this);
+  stk_scene->add(this);
 }   // ParticleSystem
 
 //-----------------------------------------------------------------------------

@@ -124,7 +124,7 @@ void MainLoop::run()
             if(user_config->m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
-            scene->draw(RaceManager::getWorld()->getPhase()==SETUP_PHASE ? 0.0f : dt);
+            stk_scene->draw(RaceManager::getWorld()->getPhase()==SETUP_PHASE ? 0.0f : dt);
 
             // Again, only receive updates if the race isn't over - once the
             // race results are displayed (i.e. game is in finish phase) 

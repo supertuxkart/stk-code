@@ -504,7 +504,7 @@ void CleanTuxKart()
     if(loader)                  delete loader;
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
-    if(scene)                   delete scene;
+    if(stk_scene)               delete stk_scene;
 }
 
 //=============================================================================
@@ -555,7 +555,7 @@ int main(int argc, char *argv[] )
         powerup_manager         -> loadPowerups    ();
         item_manager            -> loadDefaultItems();
         attachment_manager      -> loadModels      ();
-        scene = new Scene();
+        stk_scene = new Scene();
 
         //For some reason, calling this before the material loading screws
         //the background picture.

@@ -40,7 +40,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *playe
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = scene->createCamera(player_index, this);
+    m_camera       = stk_scene->createCamera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );

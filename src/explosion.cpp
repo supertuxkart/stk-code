@@ -56,7 +56,7 @@ void Explosion::init(const Vec3& coord)
     c.hpr[0]=0; c.hpr[1]=0; c.hpr[2]=0;
     setTransform(&c);
     m_step = -1;
-    scene->add(this);
+    stk_scene->add(this);
     m_has_ended = false;
 }
 
@@ -70,7 +70,7 @@ void Explosion::update(float dt)
         if(m_explode_sound->getStatus() != SFXManager::SFX_PLAYING)
         {
             //fprintf(stderr, "Sound finished. Removing.\n");
-            scene->remove((ssgTransform*)this);
+            stk_scene->remove((ssgTransform*)this);
             projectile_manager->FinishedExplosion();
             m_has_ended = true;
             return;

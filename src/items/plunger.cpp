@@ -124,7 +124,7 @@ void Plunger::update(float dt)
             projectile_manager->notifyRemove();
             ssgTransform *m = getModelTransform();
             m->removeAllKids();
-            scene->remove(m);
+            stk_scene->remove(m);
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
         return;

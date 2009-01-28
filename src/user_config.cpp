@@ -352,9 +352,7 @@ void UserConfig::loadConfig(const std::string& filename)
         const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
         if(!lisp) 
         {
-            char msg[MAX_ERROR_MESSAGE_LENGTH];
-            snprintf(msg, sizeof(msg), "No tuxkart-config node");
-            throw std::runtime_error(msg);
+            throw std::runtime_error("No tuxkart-config node");
         }
         int configFileVersion = 0;
         lisp->get("configFileVersion", configFileVersion);
@@ -457,9 +455,9 @@ void UserConfig::loadConfig(const std::string& filename)
             const lisp::Lisp* reader = lisp->getLisp(temp);
             if(!reader)
             {
-                char msg[MAX_ERROR_MESSAGE_LENGTH];
-                snprintf(msg, sizeof(msg), "No '%s' node", temp.c_str());
-                throw std::runtime_error(msg);
+                std::ostringstream msg;
+                msg << "No '" << temp << "' node";
+                throw std::runtime_error(msg.str());
             }
             std::string name;
             reader->get("name", name);
@@ -467,12 +465,12 @@ void UserConfig::loadConfig(const std::string& filename)
             {
                 // For older config files, replace the default player
                 // names "Player %d" with the user name
-                char sDefaultName[10];
-                snprintf(sDefaultName, sizeof(sDefaultName),
-                         "Player %d",i+1);
+                std::ostringstream sDefaultName;
+
+                sDefaultName << "Player " << i+1;
                 // If the config file does not contain a name or the old
                 // default name, set the default username as player name.
-                if(name.size()==0 || name==sDefaultName) name=m_username;
+                if(name.size()==0 || name==sDefaultName.str()) name=m_username;
             }
             m_player[i].setName(name);
 
@@ -921,41 +919,43 @@ void UserConfig::writeInput(lisp::Writer *writer, const Input &input)
 std::string UserConfig::getInputAsString(const Input &input)
 {
     char msg[MAX_MESSAGE_LENGTH];
-    std::ostringstream stm;
+    std::string s;
 
     switch (input.type)
     {
     case Input::IT_NONE:
-        snprintf(msg, sizeof(msg), _("not set"));
+        s = _("not set");
         break;
     case Input::IT_KEYBOARD:
-        snprintf(msg, sizeof(msg), "%s", SDL_GetKeyName((SDLKey) input.id0));
+        s = SDL_GetKeyName((SDLKey) input.id0);
         break;
     case Input::IT_STICKMOTION:
         snprintf(msg, sizeof(msg), _("joy %d axis %d  %c"),
                  input.id0, input.id1, 
                  (input.id2 == Input::AD_NEGATIVE) ? '-' : '+');
+        s = msg;
         break;
     case Input::IT_STICKBUTTON:
         snprintf(msg, sizeof(msg), _("joy %d btn %d"), input.id0, input.id1);
+        s = msg;
         break;
     case Input::IT_STICKHAT:
         snprintf(msg, sizeof(msg), _("joy %d hat %d"), input.id0, input.id1);
+        s = msg;
         break;
     case Input::IT_MOUSEBUTTON:
         snprintf(msg, sizeof(msg), _("mouse btn %d"), input.id0);
+        s = msg;
         break;
     case Input::IT_MOUSEMOTION:
         snprintf(msg, sizeof(msg), _("mouse axis %d %c"),
                  input.id0, ((input.id1 == Input::AD_NEGATIVE) ? '-' : '+'));
         break;
     default:
-        snprintf(msg, sizeof(msg), _("Invalid"));
+        s = _("Invalid");
     }
 
-    stm << msg;
-
-    return stm.str();
+    return s;
 }   // GetKeyAsString
 
 // -----------------------------------------------------------------------------

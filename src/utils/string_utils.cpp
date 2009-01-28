@@ -127,7 +127,6 @@ namespace StringUtils
         }
         return result;
     }
-
 } // namespace StringUtils
 
 /* EOF */

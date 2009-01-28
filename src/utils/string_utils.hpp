@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_STRING_UTILS_H
-#define HEADER_STRING_UTILS_H
+#ifndef HEADER_STRING_UTILS_HPP
+#define HEADER_STRING_UTILS_HPP
 
 #include <string>
 #include <vector>
@@ -72,6 +72,29 @@ namespace StringUtils
     std::string upcase (const std::string&);
     std::string downcase (const std::string&);
     std::vector<std::string> split(const std::string& s, char c);
+    // ------------------------------------------------------------------------
+    /** Replaces all '%s' or '%d' in the first string with the 2nd string. So 
+     *  this is basically a simplified s(n)printf replacement, which doesn't 
+     *  rely on s(n)printf (which is not that portable).
+     *  \param s String in which all %s or %dare replaced.
+     *  \param a Value to replace all %s or %d with.
+     */
+    template <class T>
+    std::string insert_string(const std::string &s, const T &a)
+    {
+        std::vector<std::string> sv = StringUtils::split(s, '%');
+        std::string new_string="";
+        for(unsigned int i=0; i<sv.size(); i++)
+        {
+            if(sv[i][0]=='s' || sv[i][0]=='d')
+            {
+                new_string+=a+sv[i].substr(1);
+            }
+            else
+                new_string+=sv[i];
+        }
+        return new_string;
+    }
 
 } // namespace StringUtils
 

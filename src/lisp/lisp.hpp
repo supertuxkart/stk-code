@@ -103,6 +103,12 @@ namespace lisp
                     return false;
                 return lisp->get(val);
             }
+        template<class T>
+        bool get(std::string &name, T& val) const
+        {
+            return get(name.c_str(), val);
+        }
+
         bool get(const char* name, sgVec4& val) const
             {
                 const Lisp* lisp = getLisp(name);

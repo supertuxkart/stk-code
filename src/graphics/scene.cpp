@@ -36,7 +36,7 @@
 
 #include "scene.hpp"
 
-Scene *scene = 0;
+Scene *stk_scene = 0;
 
 Scene::Scene() : m_scenegraph(new ssgRoot)
 {

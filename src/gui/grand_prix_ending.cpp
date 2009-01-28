@@ -151,7 +151,7 @@ GrandPrixEnd::GrandPrixEnd()
 
     //FIXME: this is taken from RaceMode::exit_race,
     //this should be organized better.
-    scene->clear();
+    stk_scene->clear();
     RaceManager::setWorld(NULL);
     race_manager->m_active_race = false;
 

@@ -526,7 +526,7 @@ void Track::addDebugToScene(int type) const
                 colour[2] = 0;
             }
             sphere->setColour(colour);
-            scene->add(sphere);
+            stk_scene->add(sphere);
         }   // for i
     }  /// type ==1
     // 2: drivelines, 4: driveline with tolerance
@@ -561,7 +561,7 @@ void Track::addDebugToScene(int type) const
                                          (ssgNormalArray*)NULL,
                                          (ssgTexCoordArray*)NULL,
                                          c_array);
-        scene->add(l);
+        stk_scene->add(l);
     }
 }   // addDebugToScene
 
@@ -1196,7 +1196,7 @@ void Track::loadTrackModel()
 
     // Start building the scene graph
     m_model = new ssgBranch ;
-    scene->add(m_model);
+    stk_scene->add(m_model);
 
     char s [ 1024 ] ;
 

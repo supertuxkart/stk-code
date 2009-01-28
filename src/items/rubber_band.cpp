@@ -67,7 +67,7 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart)
     setState(m_state);
     //setState(material_manager->getMaterial("chrome.rgb")->getState());
 
-    scene->add(this);
+    stk_scene->add(this);
 }   // RubberBand
 
 // ----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart)
  */
 void RubberBand::removeFromScene()
 {
-    scene->remove(this);
+    stk_scene->remove(this);
 }   // removeFromScene
 
 // ----------------------------------------------------------------------------

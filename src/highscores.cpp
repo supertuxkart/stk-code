@@ -17,13 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <stdexcept>
 #include "highscores.hpp"
-#include "race_manager.hpp"
 
-#if defined(WIN32) && !defined(__CYGWIN__)
-#  define snprintf _snprintf
-#endif
+#include <stdexcept>
+#include <sstream>
+
+#include "race_manager.hpp"
 
 // -----------------------------------------------------------------------------
 HighscoreEntry::HighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
@@ -74,13 +73,13 @@ void HighscoreEntry::Read(const lisp::Lisp* const node)
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
-        char s[128];
-        snprintf(s, sizeof(s), "time-%d",     i);
-        node->get(s,m_time[i]                  );
-        snprintf(s, sizeof(s), "name-%d",     i);
-        node->get(s,m_name[i]                  );
-        snprintf(s, sizeof(s), "kartname-%d", i);
-        node->get(s, m_kart_name[i]            );
+        std::ostringstream s;
+        s << "time-" << i;
+        node->get(s.str(),m_time[i]                  );
+        s << "name-" << i;
+        node->get(s.str(),m_name[i]                  );
+        s << "kartname-" << i;
+        node->get(s.str(), m_kart_name[i]            );
     }
 }   // Read
 
@@ -90,17 +89,17 @@ void HighscoreEntry::Write(lisp::Writer *writer)
     writer->write("track-name\t",     m_track            );
     writer->write("number-karts\t",   m_number_of_karts  );
     writer->write("difficulty\t\t",   m_difficulty       );
-    writer->write("hscore-type\t\t",    m_highscore_type   );
+    writer->write("hscore-type\t\t",  m_highscore_type   );
     writer->write("number-of-laps\t", m_number_of_laps   );
     for(int j=0; j<HIGHSCORE_LEN; j++) 
     {
-        char s[128];
-        snprintf(s, sizeof(s), "time-%d\t\t",     j);
-        writer->write(s, m_time[j]                 );
-        snprintf(s, sizeof(s), "name-%d\t\t",     j);
-        writer->write(s, m_name[j]                 );
-        snprintf(s, sizeof(s), "kartname-%d\t\t", j);
-        writer->write(s, m_kart_name[j]            );
+        std::ostringstream s;
+        s << "time-" << j << "\t\t";
+        writer->write(s.str(), m_time[j]                 );
+        s << "name-" << j << "\t\t";
+        writer->write(s.str(), m_name[j]                 );
+        s << "kartname-" << j << "\t\t";
+        writer->write(s.str(), m_kart_name[j]            );
     }   // for j
     
 }   // Write
