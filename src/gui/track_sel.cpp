@@ -230,8 +230,6 @@ void TrackSel::switchGroup()
 //-----------------------------------------------------------------------------
 void TrackSel::displayImages(int selected_track)
 {
-    if(m_current_track==-1)
-        printf("current %d new %d\n", m_current_track, selected_track);
     if( m_current_track == selected_track) return;
     m_current_track = selected_track;
     if(selected_track<0)
