@@ -487,8 +487,6 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
-    if(m_body->getAngularVelocity().getZ()>1.9f)
-        dt=1.0f*dt;
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
     
