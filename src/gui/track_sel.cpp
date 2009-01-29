@@ -142,8 +142,12 @@ void TrackSel::updateScrollPosition()
         widget_manager->showWgtText(WTOK_TRACK0+i);
         
         int i_with_scrolling = i+m_offset;
-        if(i_with_scrolling < 0) i_with_scrolling += m_index_avail_tracks.size();
-        int indx = m_index_avail_tracks[ i_with_scrolling%m_index_avail_tracks.size() ];
+        while(i_with_scrolling < 0) i_with_scrolling += m_index_avail_tracks.size();
+        while(i_with_scrolling >=(int)m_index_avail_tracks.size() )
+            i_with_scrolling -= m_index_avail_tracks.size();
+        // We can't use simply % here, since e.g. 4 % 2 = 2 (probably because of
+        // the unsigned involved).
+        int indx = m_index_avail_tracks[ i_with_scrolling];
         if(indx>=0)
         {
             const Track *track = track_manager->getTrack(indx);
@@ -337,9 +341,11 @@ void TrackSel::update(float dt)
 
     indx = m_offset + indx;
     // Don't use modulo here, otherwise (one extreme short lists, e.g. 1 track,
-    // 1 group, the track is selected when hovering over invisible menu entries
-    if(indx< 0                               ) indx += m_index_avail_tracks.size();
-    if(indx>=(int)m_index_avail_tracks.size()) indx -= m_index_avail_tracks.size();
+    // 1 group, the track is selected when hovering over invisible menu entries.
+    // While is necessary, e.g. with two tracks index can be 4, i.e. the
+    // subtraction must be done more than once.
+    while(indx< 0                               ) indx += m_index_avail_tracks.size();
+    while(indx>=(int)m_index_avail_tracks.size()) indx -= m_index_avail_tracks.size();
     if(indx<0 || indx >= (int)m_index_avail_tracks.size()) 
     {
         widget_manager->update(dt);
