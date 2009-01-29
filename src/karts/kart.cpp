@@ -317,6 +317,7 @@ void Kart::reset()
         RaceManager::getWorld()->getPhysics()->addKart(this);
     }
 
+    m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
     m_powerup.reset();
 
