@@ -1,3 +1,8 @@
+SuperTuxKart 0.6.1 (February 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Fixed bug in track selection screen that could cause a crash
+  when track groups were used.
+
 SuperTuxKart 0.6 (January 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * New improved physics and kart handling
