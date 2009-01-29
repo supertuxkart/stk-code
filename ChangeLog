@@ -2,6 +2,8 @@ SuperTuxKart 0.6.1 (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Fixed bug in track selection screen that could cause a crash
   when track groups were used.
+* Improved track selection screen to not display empty track
+  groups.
 * Fixed incorrect rescues in Fort Magma.
 
 SuperTuxKart 0.6 (January 2009)

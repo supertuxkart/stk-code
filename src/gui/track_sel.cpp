@@ -183,7 +183,25 @@ void TrackSel::switchGroup()
     for(int i =0; i<group_size; i++)
     {
         // Only add groups other than the current one
-        if(groups[i]!=user_config->m_track_group) m_index_avail_tracks.push_back(-i-1);
+        if(groups[i]==user_config->m_track_group) continue;
+
+        // Check if there are any tracks available in this group - i.e. not only locked
+        // tracks, and not only non-arena if arena mode (and vice versa).
+        const std::vector<int> &tracks_in_group = track_manager->getTracksInGroup(groups[i]);
+        bool ignore_group=true;
+        for(unsigned int j=0; j<tracks_in_group.size(); j++)
+        {
+            const Track *track = track_manager->getTrack(tracks_in_group[j]);
+            // Locked tracks are not available
+            if(unlock_manager->isLocked(track->getIdent())) continue;
+            // Tracks of a different type are not available
+            ignore_group = RaceManager::isBattleMode(race_manager->getMinorMode()) !=
+                           track->isArena();
+            if(!ignore_group) break;
+        }
+
+        if(!ignore_group) 
+            m_index_avail_tracks.push_back(-i-1);
     }
     if(m_index_avail_tracks.size()>=m_max_entries) 
     {
