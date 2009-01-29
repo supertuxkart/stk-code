@@ -1,3 +1,15 @@
+SuperTuxKart SVN
+~~~~~~~~~~~~~~~~
+* Irrlicht
+  - Renamed global scene object to stk_scene (to avoid a name clash with
+    irrlicht's namespace 'scene').
+* Bugfixes:
+  - Fixed several bugs related to track and character group selection.
+  - Plunger would stay in face after a restart of a race
+  - Prevented incorrect rescues in Fort magma.
+* Code cleanup:
+  - Removed all snprintfs and constants defining a maximum message size.
+
 SuperTuxKart 0.6 (January 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * New improved physics and kart handling
