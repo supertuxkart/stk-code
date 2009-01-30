@@ -127,9 +127,20 @@ void ConfigDisplay::select()
         }
         else
         {
+#if defined(WIN32) ||defined(__CYGWIN__)
+            // Problem: on windows the textures etc. are deleted
+            // so we have to reload this object again (since all display
+            // lists in the widget were deleted). So we force to re-create
+            // this object by first pushing it from the menu stack, and
+            // then adding it again.
+            menu_manager->popMenu();
+            menu_manager->pushMenu(MENUID_CONFIG_DISPLAY);
+            return;
+#else
             //FIXME: maybe instead of 'Fullscreen mode' something like
             //'Switch to fullscreen mode' would be more user friendly?
             widget_manager->setWgtText(WTOK_FULLSCREEN, _("Fullscreen mode"));
+#endif
         }
         changeApplyButton();
         break;
