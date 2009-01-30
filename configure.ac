@@ -98,6 +98,7 @@ case "${host}" in
 
     opengl_LIBS="-lglut32 -lglu32 -lopengl32 -luser32 -lgdi32 -lm -lwinmm"
     joystick_LIBS="$joystick_LIBS -lwinmm"
+    LDFLAGS="$LDFLAGS -mwindows"
 
     echo "Will link apps with $LIBS"
     ;;
