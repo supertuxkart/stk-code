@@ -74,29 +74,6 @@ namespace StringUtils
     std::vector<std::string> split(const std::string& s, char c);
 
     // ------------------------------------------------------------------------
-    /** Overloaded insert_values taking one value, see below for
-     *  full docs.
-     *  \param s String in which all %s or %d are replaced.
-     *  \param v1 Value to replace.
-     */
-    template <class T1>
-    std::string insert_values(const std::string &s, const T1 &v1)
-    {
-        return insert_values(s, v1, "", "");
-    }
-    // ------------------------------------------------------------------------
-    /** Overloaded insert_values taking two values, see below for
-     *  full docs.
-     *  \param s String in which all %s or %d are replaced.
-     *  \param v1,v2 Value(s) to replace all %s or %d with.
-     */
-    template <class T1, class T2>
-    std::string insert_values(const std::string &s, const T1 &v1,
-                              const T2 &v2=0)
-    {
-        return insert_values(s, v1, v2, "");
-    }
-    // ------------------------------------------------------------------------
     /** Replaces the first %s or %d in the string with the first value 
      *  converted to a string), the 2nd %s or %d with the second value etc.
      *  So this is basically a simplified s(n)printf replacement, but doesn't
@@ -115,7 +92,7 @@ namespace StringUtils
      */
     template <class T1, class T2, class T3>
     std::string insert_values(const std::string &s, const T1 &v1,
-                              const T2 &v2=0, const T3 &v3=0)
+                              const T2 &v2, const T3 &v3)
     {
         std::vector<std::string> all_vals;
         std::ostringstream dummy;
@@ -138,6 +115,31 @@ namespace StringUtils
         return new_string;
     }
 
+    // ------------------------------------------------------------------------
+    // Note: the order in which the templates are specified is important, since
+    // otherwise some compilers will not find the right template to use.
+    /** Overloaded insert_values taking two values, see below for
+     *  full docs.
+     *  \param s String in which all %s or %d are replaced.
+     *  \param v1,v2 Value(s) to replace all %s or %d with.
+     */
+    template <class T1, class T2>
+    std::string insert_values(const std::string &s, const T1 &v1,
+                              const T2 &v2)
+    {
+        return insert_values(s, v1, v2, "");
+    }
+    // ------------------------------------------------------------------------
+    /** Overloaded insert_values taking one value, see below for
+     *  full docs.
+     *  \param s String in which all %s or %d are replaced.
+     *  \param v1 Value to replace.
+     */
+    template <class T1>
+    std::string insert_values(const std::string &s, const T1 &v1)
+    {
+        return insert_values(s, v1, "", "");
+    }
 } // namespace StringUtils
 
 #endif
