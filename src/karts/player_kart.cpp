@@ -76,6 +76,20 @@ void PlayerKart::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** Resets the state of control keys. This is used after the in-game menu to
+ *  avoid that any keys pressed at the time the menu is opened are still 
+ *  considered to be pressed.
+ */
+void PlayerKart::resetInputState()
+{
+    m_steer_val_l  = 0;
+    m_steer_val_r  = 0;
+    m_steer_val    = 0;
+    m_prev_brake   = 0;
+    m_prev_accel   = 0;
+}   // resetKeyState
+
+// ----------------------------------------------------------------------------
 /** This function interprets a kart action and value, and set the corresponding
  *  entries in the kart control data structure. This function handles esp. 
  *  cases like 'press left, press right, release right' - in this case after
