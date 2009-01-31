@@ -549,6 +549,8 @@ void  World::unpause()
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
     TimedRace::unpause();
+    for(unsigned int i=0; i<m_player_karts.size(); i++)
+        m_player_karts[i]->resetInputState();
 }
 
 /* EOF */
