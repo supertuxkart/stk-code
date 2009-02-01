@@ -260,7 +260,8 @@ void World::resetAllKarts()
     // so that the karts can visualise the suspension.
     for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
         (*i)->setSuspensionLength();
-
+    for(unsigned int i=0; i<m_player_karts.size(); i++)
+        m_player_karts[i]->getCamera()->setInitialTransform();
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------

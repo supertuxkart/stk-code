@@ -88,11 +88,11 @@ void Scene::remove(ssgEntity *kid)
 //-----------------------------------------------------------------------------
 void Scene::reset()
 {
-    for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
-    {
-        (*i)->reset();
-    }
+    /** Note: the cameras are reset in player_kart. This is necessary since
+     *  the camera needs the correct starting position and rotation of the
+     *  kart (to avoid that the camera jumps in the first frame).    */
 }   // reset
+
 //-----------------------------------------------------------------------------
 void Scene::draw(float dt)
 {

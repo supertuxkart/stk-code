@@ -149,11 +149,24 @@ Camera::Mode Camera::getMode()
 void Camera::reset()
 {
     setMode(CM_NORMAL);
-    m_last_pitch = 0.0f;
-    m_xyz        = m_kart->getXYZ();
-    m_hpr        = Vec3(0,0,0);
-    sound_manager->positionListener(m_xyz, m_xyz);
+    // m_xyz etc are set when the worlds has computed the right starting
+    // position of all karts and calls setInitialTransform for each camera.
+
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Saves the current kart position as initial starting position for the
+ *  camera. 
+ */
+void Camera::setInitialTransform()
+{
+    btTransform t = m_kart->getBody()->getCenterOfMassTransform();
+    m_xyz         = t.getOrigin();
+    Coord c(t);
+    m_hpr         = c.getHPR();
+    m_last_pitch  = m_hpr.getPitch();
+    sound_manager->positionListener(m_xyz, m_xyz);
+}   // updateKartPosition
 
 //-----------------------------------------------------------------------------
 void Camera::update (float dt)
@@ -202,7 +215,6 @@ void Camera::update (float dt)
     // Set the camera rotation
     // -----------------------
     float sign = reverse ? 1.0f : -1.0f;
-    //const int num_players = race_manager->getNumLocalPlayers();
     float pitch;
     if(m_mode!=CM_CLOSEUP)
         pitch = race_manager->getNumLocalPlayers()>1 ? sign * DEGREE_TO_RAD(10.0f)
