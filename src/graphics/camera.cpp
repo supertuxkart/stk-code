@@ -202,7 +202,7 @@ void Camera::update (float dt)
     // Set the camera rotation
     // -----------------------
     float sign = reverse ? 1.0f : -1.0f;
-    const int num_players = race_manager->getNumLocalPlayers();
+    //const int num_players = race_manager->getNumLocalPlayers();
     float pitch;
     if(m_mode!=CM_CLOSEUP)
         pitch = race_manager->getNumLocalPlayers()>1 ? sign * DEGREE_TO_RAD(10.0f)
