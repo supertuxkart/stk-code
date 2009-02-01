@@ -19,8 +19,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CAMERA_H
-#define HEADER_CAMERA_H
+#ifndef HEADER_CAMERA_HPP
+#define HEADER_CAMERA_HPP
 
 #include "utils/vec3.hpp"
 
@@ -54,16 +54,17 @@ protected:
     float       m_final_time;           // time when final camera mode started
 
 private:
-    void finalCamera      (float dt);   // handle the final camera
+    void finalCamera       (float dt);   // handle the final camera
 public:
-         Camera           (int camera_index, const Kart* kart);
-        ~Camera           ();
-    void setMode          (Mode mode_);    /** Set the camera to the given mode */
+         Camera            (int camera_index, const Kart* kart);
+        ~Camera            ();
+    void setMode           (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
-    void setScreenPosition(int pos);
-    void reset            ();
-    void update           (float dt);
-    void apply            ();
+    void setScreenPosition (int pos);
+    void reset             ();
+    void setInitialTransform();
+    void update            (float dt);
+    void apply             ();
 } ;
 
 #endif
