@@ -304,10 +304,15 @@ void RaceOptions::setAllValues()
     // if there is no AI, there's no point asking the player for the amount of karts.
     // It will always be the same as the number of human players
     if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
+    {
         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+        // Don't change the default number of karts in user_config
+    }
     else
+    {
         race_manager->setNumKarts(m_num_karts);
-    user_config->setDefaultNumKarts(race_manager->getNumKarts());
+        user_config->setDefaultNumKarts(race_manager->getNumKarts());
+    }
 
     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
         RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
