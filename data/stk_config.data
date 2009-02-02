@@ -95,7 +95,7 @@
    (skid-visual          0.16)   ;; Additional graphical rotation of kart.
 
    ;; Bullet physics attributes
-   (brake-factor              2.75 )
+   (brake-factor             11.0 )
    ;; Defines the smallest turn radius at lowest speed (4.64 m at
    ;; speed 0) and at high speed (13.5 m at speed 12 m/s). Maximum
    ;; steering angles for speeds in between will be interpolated. This 
@@ -122,7 +122,7 @@
    (wheel-width               0.3  )
    (chassis-linear-damping    0.2  )
    (chassis-angular-damping  30.2  )
-   (max-speed-reverse-ratio   0.4  ) ;; percentage of max speed for reverse gear
+   (max-speed-reverse-ratio   0.3  ) ;; percentage of max speed for reverse gear
    (suspension-rest           0.2  )
    (suspension-travel-cm     19    )
 

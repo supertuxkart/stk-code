@@ -796,21 +796,31 @@ void Kart::updatePhysics (float dt)
                 m_vehicle->applyEngineForce(0.f, 3);
 
                 //apply the brakes
-                for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor() * 4.0f, i);
+                for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor(), i);
                 m_skidding*= 1.08f;//skid a little when the brakes are hit (just enough to make the skiding sound)
                 if(m_skidding>m_kart_properties->getMaxSkid())
                     m_skidding=m_kart_properties->getMaxSkid();
             }
-            else
+            else   // m_speed < 0
             {
                 resetBrakes();
                 // going backward, apply reverse gear ratio (unless he goes too fast backwards)
-                if ( fabs(m_speed) <  getMaxSpeedOnTerrain()*m_max_speed_reverse_ratio )
+                if ( -m_speed <  getMaxSpeedOnTerrain()*m_max_speed_reverse_ratio )
                 {
-                    // the backwards acceleration is artificially increased to allow
-                    // players to get "unstuck" quicker if they hit e.g. a wall
-                    m_vehicle->applyEngineForce(-engine_power*2.5f, 2);
-                    m_vehicle->applyEngineForce(-engine_power*2.5f, 3);
+                    // The backwards acceleration is artificially increased to
+                    // allow players to get "unstuck" quicker if they hit e.g.
+                    // a wall. At the same time we have to prevent that driving
+                    // backards gives an advantage (see m_max_speed_reverse_ratio),
+                    // and that a potential slowdown due to the terrain the 
+                    // kart is driving on feels right. The speedup factor on 
+                    // normal terrain (power_reduction/slowdown_factor should 
+                    // be 2.5 (which was experimentally determined to feel 
+                    // right).
+                    float f = 2.5f - 3.8f*(1-m_power_reduction/stk_config->m_slowdown_factor);
+                    // Avoid that a kart gets really stuck:
+                    if(f<0.1f) f=0.1f;
+                    m_vehicle->applyEngineForce(-engine_power*f, 2);
+                    m_vehicle->applyEngineForce(-engine_power*f, 3);
                 }
                 else
                 {
