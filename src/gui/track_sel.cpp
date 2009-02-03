@@ -166,6 +166,12 @@ void TrackSel::updateScrollPosition()
 void TrackSel::switchGroup()
 {
     m_index_avail_tracks.clear();
+    bool group_available = 
+        (RaceManager::isBattleMode( race_manager->getMinorMode() ) 
+         ? track_manager->getArenasInGroup(user_config->m_track_group) 
+         : track_manager->getTracksInGroup(user_config->m_track_group)).size()>0;
+    if(!group_available)
+        user_config->m_track_group = "standard";
 
     const std::vector<int> &tracks = 
         RaceManager::isBattleMode( race_manager->getMinorMode() ) ?

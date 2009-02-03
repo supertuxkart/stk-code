@@ -223,6 +223,7 @@ bool KartPropertiesManager::testAndSetKart(int kartid)
  */
 bool KartPropertiesManager::kartAvailable(int kartid)
 {
+    if(kartid<0 || kartid>=(int)m_kart_available.size()) return false;
     if(!m_kart_available[kartid]) return false;
     std::vector<int>::iterator it;
     for (it = m_selected_karts.begin(); it < m_selected_karts.end(); it++)

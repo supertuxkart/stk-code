@@ -247,8 +247,13 @@ void CharSel::updateScrollPosition()
 void CharSel::switchGroup()
 {
     m_index_avail_karts.clear();
-    const std::vector<int> &karts =
+    bool group_exist = 
+        kart_properties_manager->getKartsInGroup(user_config->m_kart_group).size()>0;
+    if(!group_exist) user_config->m_kart_group = "standard";
+
+    const std::vector<int> &karts = 
         kart_properties_manager->getKartsInGroup(user_config->m_kart_group);
+
     for(unsigned int i=0; i<karts.size(); i++)
     {   
         if(kart_properties_manager->kartAvailable(karts[i]))
