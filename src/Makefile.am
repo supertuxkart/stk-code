@@ -73,8 +73,8 @@ supertuxkart_SOURCES = \
  grand_prix_manager.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
- graphics/irr_device.cpp \
- graphics/irr_device.cpp \
+ graphics/irr_driver.cpp \
+ graphics/irr_driver.cpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
  graphics/moving_texture.hpp \
