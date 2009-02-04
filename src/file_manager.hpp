@@ -17,17 +17,29 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_FILE_MANAGER_H
-#define HEADER_FILE_MANAGER_H
-
+#ifndef HEADER_FILE_MANAGER_HPP
+#define HEADER_FILE_MANAGER_HPP
 #include <string>
 #include <vector>
 #include <set>
-#include "callback_manager.hpp"
+
+#ifdef HAVE_IRRLICHT
+#  include "irrlicht.h"
+   using namespace irr;
+#endif
 
 class FileManager 
 {
 private:
+#ifdef HAVE_IRRLICHT
+    /** Handle to irrlicht's file systems. */
+    io::IFileSystem            *m_file_system;
+    /** Pointer to the irrlicht device. This is necessary before reInit is 
+     *  called to store the NULL device initially created. See Constructor
+     *  for details. */
+    IrrlichtDevice             *m_device;
+
+#endif
     bool                        m_is_full_path;
     std::string                 m_root_dir;
     std::vector<std::string>    m_texture_search_path,
@@ -35,10 +47,17 @@ private:
                                 m_music_search_path;
     bool findFile               (std::string& full_path,
                                  const std::string& fname, 
-                                 const std::vector<std::string>& search_path) const;
+                                 const std::vector<std::string>& search_path) 
+                                 const;
+    void makePath               (std::string& path, const std::string& dir,
+                                 const std::string& fname) const;
+
 public:
-    FileManager();
-    ~FileManager();
+                FileManager();
+               ~FileManager();
+#ifdef HAVE_IRRLICHT
+    void        reInit();
+#endif
 
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;
@@ -59,10 +78,10 @@ public:
     std::string getSFXFile       (const std::string& fname) const;
     std::string getFontFile      (const std::string& fname) const;
     std::string getModelFile     (const std::string& fname) const;
-
-    void listFiles(std::set<std::string>& result, const std::string& dir,
-                   bool is_full_path=false, bool make_full_path=false)
-        const;
+    void        listFiles        (std::set<std::string>& result, 
+                                  const std::string& dir,
+                                  bool is_full_path=false, 
+                                  bool make_full_path=false) const;
 
     void       pushTextureSearchPath(const std::string& path) 
                                     { m_texture_search_path.push_back(path);}
@@ -73,13 +92,8 @@ public:
     void       popTextureSearchPath () {m_texture_search_path.pop_back();   }
     void       popModelSearchPath   () {m_model_search_path.pop_back();     }
     void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
-    void       initConfigDir();
-private:
-    void         makePath     (std::string& path, const std::string& dir, 
-                               const std::string& fname) const;
 };
 
 extern FileManager* file_manager;
 
 #endif
-

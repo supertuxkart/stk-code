@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;C:\cygwin\home\joerg\irrlicht-1.5\include&quot;"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;$(IRR_INCLUDE)&quot;"
 				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
@@ -68,7 +68,7 @@
 				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib Irrlicht.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_irr_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;C:\cygwin\home\joerg\irrlicht-1.5\lib\Win32-visualstudio&quot;"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;$(IRR_LIB)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
@@ -722,6 +722,10 @@
 				>
 				<File
 					RelativePath="..\..\graphics\camera.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\irr_driver.cpp"
 					>
 				</File>
 				<File
@@ -1420,6 +1424,10 @@
 				>
 				<File
 					RelativePath="..\..\graphics\camera.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\irr_driver.hpp"
 					>
 				</File>
 				<File

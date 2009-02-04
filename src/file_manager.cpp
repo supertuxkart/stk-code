@@ -37,12 +37,18 @@
 #else
 #  define CONFIGDIR       ".supertuxkart"
 #endif
+
+#ifdef HAVE_IRRLICHT
+#  include "irrlicht.h"
+#endif
 // ul.h includes windows.h, so this define is necessary
 #define _WINSOCKAPI_
-
 #include <plib/ul.h>
 #include "btBulletDynamicsCommon.h"
 
+#ifdef HAVE_IRRLICHT
+#  include "graphics/irr_driver.hpp"
+#endif
 #include "material_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -81,8 +87,21 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 
 FileManager* file_manager = 0;
 
+/** With irrlicht the constructor creates a NULL device. This is necessary to
+ *  handle the Chicken/egg problem with irrlicht: access to the file system
+ *  is given from the device, but we can't create the device before reading
+ *  the user_config file (for resolution, fullscreen). So we create a dummy
+ *  device here to begin with, which is then later (once the real device 
+ *  exists) changed in reInit().
+ *  
+ */
 FileManager::FileManager()
 {
+#ifdef HAVE_IRRLICHT
+    // 
+    m_device       = createDevice(video::EDT_NULL);
+    m_file_system  = m_device->getFileSystem();
+#endif
     m_is_full_path = false;
     
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
@@ -90,9 +109,17 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
+#ifdef HAVE_IRRLICHT
+    else if(m_file_system->existFile("data/stk_config.data"))
+#else
     else if ( access ( "data/stk_config.data", F_OK ) == 0 )
+#endif
         m_root_dir = "." ;
+#ifdef HAVE_IRRLICHT
+    else if(m_file_system->existFile("../data/stk_config.data"))
+#else
     else if ( access ( "../data/stk_config.data", F_OK ) == 0 )
+#endif
         m_root_dir = ".." ;
     else
 #ifdef SUPERTUXKART_DATADIR
@@ -150,11 +177,31 @@ FileManager::FileManager()
 }  // FileManager
 
 //-----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+/** This function is used to re-initialise the file-manager after reading in
+ *  the user configuration data.
+*/
+void FileManager::reInit()
+{
+    // Drop the NULL device
+    m_device->drop();
+    m_device = irr_driver->getDevice();
+    m_device->grab();  // To make sure that the device still exists while
+                       // file_manager has a pointer to the file system.
+    m_file_system  = m_device->getFileSystem();
+}   // reInit
+#endif
+//-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
+#ifdef HAVE_IRRLICHT
+    // m_file_system is ref-counted, so no delete/drop necessary.
+    m_file_system = NULL;
+    m_device->drop();
+#endif
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
@@ -162,14 +209,20 @@ bool FileManager::findFile(std::string& full_path,
                       const std::string& fname, 
                       const std::vector<std::string>& search_path) const
 {
+#ifndef HAVE_IRRLICHT
     struct stat mystat;
+#endif
     
     for(std::vector<std::string>::const_iterator i = search_path.begin();
         i != search_path.end(); ++i)
     {
         //full_path=m_root_dir + "/" + *i + "/" + fname;
         full_path = *i + "/" + fname;
+#ifdef HAVE_IRRLICHT
+        if(m_file_system->existFile(full_path.c_str())) return true;
+#else
         if(stat(full_path.c_str(), &mystat) >= 0) return true;
+#endif
     }
     full_path="";
     return false;
@@ -308,23 +361,6 @@ std::string FileManager::getHighscoreFile(const std::string& fname) const
 {
     return getHomeDir()+"/"+fname;
 }   // getHighscoreFile
-//-----------------------------------------------------------------------------
-void FileManager::initConfigDir()
-{
-#ifdef WIN32
-    /*nothing*/
-#else
-    /*if HOME environment variable exists
-    create directory $HOME/.supertuxkart*/
-    if(getenv("HOME")!=NULL)
-    {
-        std::string pathname;
-        pathname = getenv("HOME");
-        pathname += "/.supertuxkart";
-        mkdir(pathname.c_str(), 0755);
-    }
-#endif
-}   // initConfigDir
 
 //-----------------------------------------------------------------------------
 void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,

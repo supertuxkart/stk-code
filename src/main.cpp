@@ -59,6 +59,9 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#ifdef HAVE_IRRLICHT
+#  include "graphics/irr_driver.hpp"
+#endif
 #include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/menu_manager.hpp"
@@ -433,11 +436,16 @@ void InitTuxkart()
 {
     file_manager            = new FileManager();
     translations            = new Translations();
-    loader                  = new Loader();
-    loader->setCreateStateCallback(getAppState);
     // unlock manager is needed when reading the config file
     unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
+#ifdef HAVE_IRRLICHT
+    irr_driver              = new IrrDriver();
+    // Re-init file manager to use the new device.
+    file_manager->reInit();
+#endif
+    loader                  = new Loader();
+    loader->setCreateStateCallback(getAppState);
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -505,6 +513,9 @@ void CleanTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(stk_scene)               delete stk_scene;
+#ifdef HAVE_IRRLICHT
+    if(irr_driver)              delete irr_driver;
+#endif
 }
 
 //=============================================================================

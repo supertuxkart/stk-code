@@ -355,7 +355,10 @@ SDLDriver::~SDLDriver()
     // FIXME LEAK: delete m_action_map if defined
     SDL_FreeSurface(m_main_surface);
 
+#ifndef HAVE_IRRLICHT
+    // Irrlicht calls SDL_Quit otherwise
     SDL_Quit();
+#endif
 }   // ~SDLDriver
 
 //-----------------------------------------------------------------------------
