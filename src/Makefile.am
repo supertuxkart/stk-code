@@ -57,8 +57,6 @@ supertuxkart_SOURCES = \
  audio/sound_manager.hpp \
  utils/constants.hpp \
  utils/coord.hpp \
- utils/mesh_tools.hpp \
- utils/mesh_tools.cpp \
  utils/random_generator.hpp \
  utils/random_generator.cpp \
  utils/ssg_help.cpp \
@@ -77,6 +75,8 @@ supertuxkart_SOURCES = \
  graphics/camera.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.cpp \
+ graphics/mesh_tools.hpp \
+ graphics/mesh_tools.cpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
  graphics/moving_texture.hpp \
