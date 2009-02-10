@@ -40,6 +40,7 @@ public:
     IrrlichtDevice       *getDevice()       const { return m_device;        }
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
+    scene::IMesh         *getMesh(const std::string &name);
     bool                  OnEvent(const irr::SEvent &event);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);

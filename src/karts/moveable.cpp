@@ -57,6 +57,9 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     sgCoord c=Coord(xyz, hpr).toSgCoord();
 #ifdef HAVE_IRRLICHT
     m_root->setPosition(xyz.toIrrVector());
+    hpr*=180.0f/3.14159f;
+    core::vector3df f(hpr.getZ(), -hpr.getX(), hpr.getY());
+    m_root->setRotation(f);
 #else
     m_model_transform->setTransform(&c);
 #endif

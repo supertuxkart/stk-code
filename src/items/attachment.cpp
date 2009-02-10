@@ -53,7 +53,9 @@ Attachment::Attachment(Kart* _kart)
 //-----------------------------------------------------------------------------
 Attachment::~Attachment()
 {
+#ifndef HAVE_IRRLICHT
     ssgDeRefDelete(m_holder);
+#endif
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------

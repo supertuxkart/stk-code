@@ -81,6 +81,17 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 }   // getAnimatedMesh
 
 // ----------------------------------------------------------------------------
+/** Loads a non-animated mesh and returns a pointer to it.
+ *  \param filename  File to load.
+ */
+scene::IMesh *IrrDriver::getMesh(const std::string &filename)
+{
+    scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
+    if(!m) return NULL;
+    return m->getMesh(0);
+}   // getMesh
+
+// ----------------------------------------------------------------------------
 /** Adds a mesh that will be optimised using an oct tree.
  *  \param mesh Mesh to add.
  */

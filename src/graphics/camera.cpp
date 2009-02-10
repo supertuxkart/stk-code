@@ -195,7 +195,7 @@ void Camera::setInitialTransform()
 }   // updateKartPosition
 
 //-----------------------------------------------------------------------------
-void Camera::update (float dt)
+void Camera::update(float dt)
 {
     if(m_mode==CM_FINAL) return finalCamera(dt);
 
@@ -262,7 +262,7 @@ void Camera::update (float dt)
     m_hpr = c.getHPR();
 #ifdef HAVE_IRRLICHT
     m_camera->setPosition(m_xyz.toIrrVector());
-    //m_camera->setTarget(kart_xyz.toIrrVector());
+    m_camera->setTarget(kart_xyz.toIrrVector());
 #else
     m_context -> setCamera(&c.toSgCoord());
 #endif

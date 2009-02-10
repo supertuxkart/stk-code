@@ -58,7 +58,10 @@ private:
 
 #ifdef HAVE_IRRLICHT
     /** The four wheel models. */
-    scene::IMesh *m_wheel_model[4];
+    scene::IMesh      *m_wheel_model[4];
+
+    /** The four scene nodes the wheels are attached to */
+    scene::ISceneNode *m_wheel_node[4];
 #else
     /** The four wheel models. */
     ssgEntity    *m_wheel_model[4];

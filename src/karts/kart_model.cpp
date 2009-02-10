@@ -94,15 +94,18 @@ KartModel::~KartModel()
 /** Attach the kart model and wheels to the scene node.
  *  \param node Node to attach the models to.
  */
+#ifdef HAVE_IRRLICHT
 void KartModel::attachModel(scene::ISceneNode **node)
 {
     *node = irr_driver->addMesh(m_mesh);
     for(unsigned int i=0; i<4; i++)
     {
-     //   *node->addChild(m_wh
+        m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
+        m_wheel_node[i]->setPosition(m_wheel_graphics_position[i].toIrrVector());
+        (*node)->addChild(m_wheel_node[i]);
     }
 }   // attachModel
-
+#endif
 // ----------------------------------------------------------------------------
 
 /** Loads the 3d model and all wheels.
@@ -111,7 +114,7 @@ void KartModel::loadModels(const std::string &kart_ident)
 {
 #ifdef HAVE_IRRLICHT
     std::string  full_path = file_manager->getKartFile(m_model_filename);
-    m_mesh                 = irr_driver->getAnimatedMesh(full_path)->getMesh(0);
+    m_mesh                 = irr_driver->getMesh(full_path);
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 size = max-min;
@@ -170,7 +173,7 @@ void KartModel::loadModels(const std::string &kart_ident)
 #ifdef HAVE_IRRLICHT
         std::string full_wheel = file_manager->getKartFile(m_wheel_filename[i],
                                                            kart_ident);
-        m_wheel_model[i] = irr_driver->getAnimatedMesh(full_wheel)->getMesh(0);
+        m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // FIXME: wheel handling still missing.
 #else
         m_wheel_model[i] = loader->load(m_wheel_filename[i], CB_KART);
@@ -273,7 +276,44 @@ void KartModel::adjustWheels(float rotation, float steer,
                              const float suspension[4])
 {
 #ifdef HAVE_IRRLICHT
-    // FIXME: missing
+    float clamped_suspension[4];
+    // Clamp suspension to minimum and maximum suspension length, so that
+    // the graphical wheel models don't look too wrong.
+    for(unsigned int i=0; i<4; i++)
+    {
+        const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
+        
+        // limit amplitude between set limits, first dividing it by a
+        // somewhat arbitrary constant to reduce visible wheel movement
+        clamped_suspension[i] = std::min(std::max(suspension[i]/m_dampen_suspension_amplitude[i],
+                                                  m_min_suspension[i]),
+                                                  m_max_suspension[i]);
+        float ratio = clamped_suspension[i] / suspension_length;
+        const int sign = ratio < 0 ? -1 : 1;
+        ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
+        clamped_suspension[i] = ratio*suspension_length;
+    }   // for i<4
+    
+    core::vector3df wheel_rot  (RAD_TO_DEGREE(-rotation), 0, 0);
+    //core::vector3df wheel_steer(0, wheel_steer, 0);
+    //core::vector3df wheel_front = wheel_rot+wheel_steer;
+#ifdef FIXME
+    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
+    wheel_front[3][2] += clamped_suspension[0];
+    m_wheel_transform[0]->setTransform(wheel_front);
+
+    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[1].toFloat());
+    wheel_front[3][2] += clamped_suspension[1];
+    m_wheel_transform[1]->setTransform(wheel_front);
+
+    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[2].toFloat());
+    wheel_rot[3][2] += clamped_suspension[2];
+    m_wheel_transform[2]->setTransform(wheel_rot);
+
+    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[3].toFloat());
+    wheel_rot[3][2] += clamped_suspension[3];
+    m_wheel_transform[3]->setTransform(wheel_rot);
+#endif
 #else
     sgMat4 wheel_front;
     sgMat4 wheel_steer;
