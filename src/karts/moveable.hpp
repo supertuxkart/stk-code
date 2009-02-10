@@ -22,8 +22,14 @@
 #define HEADER_MOVEABLE_HPP
 
 #define _WINSOCKAPI_
-#include <plib/ssg.h>
+#ifdef HAVE_IRRLICHT
+#  include "irrlicht.h"
+   using namespace irr;
+#else
+#  include <plib/ssg.h>
+#endif
 #include "btBulletDynamicsCommon.h"
+
 #include "user_pointer.hpp"
 #include "physics/kart_motion_state.hpp"
 #include "utils/vec3.hpp"
@@ -45,7 +51,13 @@ private:
 
 protected:
     UserPointer      m_user_pointer;
+#ifdef HAVE_IRRLICHT
+    scene::IAnimatedMesh  *m_animated_mesh;
+    scene::IMesh          *m_mesh;
+    scene::ISceneNode     *m_root;
+#else
     ssgTransform    *m_model_transform; /**<The transform the model is attached to. */
+#endif
     int              m_first_time ;
     btRigidBody     *m_body;
     KartMotionState *m_motion_state;
@@ -53,9 +65,14 @@ protected:
 public:
                   Moveable();
     virtual      ~Moveable();
-    ssgTransform *getModelTransform()          {return m_model_transform;          }
+#ifdef HAVE_IRRLICHT
+    scene::ISceneNode
+        *getRoot()                               {return m_root;              }
+#else
+    ssgTransform *getModelTransform()            {return m_model_transform;   }
+#endif
     virtual const btVector3 
-                 &getVelocity()   const          {return m_body->getLinearVelocity();}
+                 &getVelocity()   const        {return m_body->getLinearVelocity();}
     const btVector3
                  &getVelocityLC() const        {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }

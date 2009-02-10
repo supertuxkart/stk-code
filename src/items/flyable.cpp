@@ -64,9 +64,12 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 	m_max_lifespan = -1;
 	
     // Add the graphical model
+#ifdef HAVE_IRRLICHT
+#else
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
     stk_scene->add(m);
+#endif
 }   // Flyable
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
@@ -128,8 +131,10 @@ void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model,
 
     // Store the size of the model
     Vec3 min, max;
-    
+#ifdef HAVE_IRRLICHT
+#else
     SSGHelp::MinMax(model, &min, &max);
+#endif
     m_st_extend[type] = btVector3(max-min);
     m_st_model[type]  = model;
 }   // init
@@ -257,9 +262,12 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
     projectile_manager->notifyRemove();
 
     // Now remove this projectile from the graph:
+#ifdef HAVE_IRRLICHT
+#else
     ssgTransform *m = getModelTransform();
     m->removeAllKids();
     stk_scene->remove(m);
+#endif
 
     // The explosion is a bit higher in the air
     Vec3 pos_explosion=getXYZ();

@@ -24,6 +24,7 @@
 #include <plib/ssg.h>
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race_manager.hpp"
@@ -35,7 +36,11 @@ Camera::Camera(int camera_index, const Kart* kart)
 {
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
+#ifdef HAVE_IRRLICHT
+    m_camera   = irr_driver->addCamera();
+#else
     m_context  = new ssgContext ;
+#endif
     m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
     m_xyz      = kart->getXYZ();
@@ -43,11 +48,13 @@ Camera::Camera(int camera_index, const Kart* kart)
 
     // FIXME: clipping should be configurable for slower machines
     const Track* track  = RaceManager::getTrack();
+#ifdef HAVE_IRRLICHT
+#else
     if (track->useFog())
         m_context -> setNearFar ( 0.05f, track->getFogEnd() ) ;
     else
         m_context -> setNearFar ( 0.05f, 1000.0f ) ;
-
+#endif
     setScreenPosition(camera_index);
 }   // Camera
 
@@ -55,7 +62,10 @@ Camera::Camera(int camera_index, const Kart* kart)
 Camera::~Camera()
 {
     reset();
+#ifdef HAVE_IRRLICHT
+#else
     if(m_context) delete m_context;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -66,12 +76,18 @@ void Camera::setScreenPosition(int camera_index)
 
     if (num_players == 1)
     {
+#ifdef HAVE_IRRLICHT
+#else
         m_context -> setFOV ( 75.0f, 0.0f ) ;
+#endif
         m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 1.0f ;
     }
     else if (num_players == 2)
     {
+#ifdef HAVE_IRRLICHT
+#else
         m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ) ;
+#endif
         switch ( camera_index )
         {
         case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 1.0f; m_h = 0.5f; break;
@@ -80,18 +96,28 @@ void Camera::setScreenPosition(int camera_index)
     }
     else if (num_players == 3)
     {
+#ifdef HAVE_IRRLICHT
+#else
         m_context -> setFOV ( 50.0f, 0.0f );
+#endif
         switch ( camera_index )
         {
         case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
         case 1 : m_x = 0.5f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
         case 2 : m_x = 0.0f; m_y = 0.0f; m_w = 1.0f; m_h = 0.5f;
-                 m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ); break;
+#ifdef HAVE_IRRLICHT
+#else
+                 m_context -> setFOV ( 85.0f, 85.0f*3.0f/8.0f ); 
+#endif
+                                                                 break;
         }
     }
     else if (num_players == 4)
     {
+#ifdef HAVE_IRRLICHT
+#else
         m_context -> setFOV ( 50.0f, 0.0f );
+#endif
         switch ( camera_index )
         {
         case 0 : m_x = 0.0f; m_y = 0.5f; m_w = 0.5f; m_h = 0.5f; break;
@@ -234,7 +260,12 @@ void Camera::update (float dt)
     Coord c(result);
     m_xyz = c.getXYZ();
     m_hpr = c.getHPR();
+#ifdef HAVE_IRRLICHT
+    m_camera->setPosition(m_xyz.toIrrVector());
+    //m_camera->setTarget(kart_xyz.toIrrVector());
+#else
     m_context -> setCamera(&c.toSgCoord());
+#endif
     if(race_manager->getNumLocalPlayers() < 2)
         sound_manager->positionListener(m_xyz, kart_xyz - m_xyz);
 }   // update
@@ -249,7 +280,10 @@ void Camera::finalCamera(float dt)
         m_xyz += m_velocity*dt;
         m_hpr += m_angular_velocity*dt;
         Coord coord(m_xyz, m_hpr);
+#ifdef HAVE_IRRLICHT
+#else
         m_context->setCamera(&coord.toSgCoord());
+#endif
     }
 #undef TEST_END_CAMERA_POSITION
 #ifdef TEST_END_CAMERA_POSITION
@@ -281,7 +315,9 @@ void Camera::apply ()
                  (int)((float)height * m_y),
                  (int)((float)width  * m_w),
                  (int)((float)height * m_h) ) ;
-
+#ifdef HAVE_IRRLICHT
+#else
     m_context -> makeCurrent () ;
+#endif
 }   // apply
 

@@ -134,7 +134,10 @@ void ChallengeData::error(const char *id) const
     std::ostringstream msg;
     msg << "Undefined or incorrect value for '" << id 
         << "' in challenge file '" << m_filename << "'.";
+#ifndef HAVE_IRRLICHT
+    // FIXME: disable this till all tracks are converted
     throw std::runtime_error(msg.str());
+#endif
 }   // error
 // ----------------------------------------------------------------------------
 /** Checks if this challenge is valid, i.e. contains a valid track or a valid

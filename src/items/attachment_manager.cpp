@@ -68,8 +68,11 @@ void AttachmentManager::loadModels()
     {
         // FIXME LEAK: these models are not removed (unimportant, since they
         // have to be in memory till the end of the game.
+#ifdef HAVE_IRRLICHT
+#else
         m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
         m_attachments[iat[i].attachment]->ref();
+#endif
     }   // for
 }   // reInit
 

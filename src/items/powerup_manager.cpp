@@ -123,12 +123,15 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     if(sModel!="")
     {
-        // FIXME LEAK: not freed (uniportant, since the models have to exist
+#ifdef HAVE_IRRLICHT
+#else
+        // FIXME LEAK: not freed (unimportant, since the models have to exist
         // for the whole game anyway).
         ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();
         e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
+#endif
     }
     else
     {

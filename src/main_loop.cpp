@@ -21,15 +21,16 @@
 
 #include <SDL/SDL.h>
 #include <assert.h>
+#include "history.hpp"
 #include "sdldrv.hpp"
 #include "material_manager.hpp"
 #include "race_manager.hpp"
-#include "modes/world.hpp"
-#include "user_config.hpp"
-#include "history.hpp"
 #include "audio/sound_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
+#include "modes/world.hpp"
+#include "user_config.hpp"
 #include "network/network_manager.hpp"
 
 MainLoop* main_loop = 0;
@@ -204,8 +205,12 @@ void MainLoop::run()
         menu_manager->update();
         sound_manager->update(dt);
 
+#ifdef HAVE_IRRLICHT
+        irr_driver->update(dt);
+#else
         glFlush();
         SDL_GL_SwapBuffers();
+#endif
     }  // while !m_exit
 }   // run
 

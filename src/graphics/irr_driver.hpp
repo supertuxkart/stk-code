@@ -1,4 +1,4 @@
-//  $Id: sdldrv.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: irr_driver.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -22,6 +22,8 @@
 #ifndef HEADER_IRR_DRIVER_HPP
 #define HEADER_IRR_DRIVER_HPP
 
+#include <string>
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -30,12 +32,21 @@ class IrrDriver : public IEventReceiver
 private:
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
+    scene::ISceneManager       *m_scene_manager;
 
 public:
-                    IrrDriver();
-                   ~IrrDriver();
-    IrrlichtDevice *getDevice() const { return m_device; }
-    bool            OnEvent(const irr::SEvent &event);
+                          IrrDriver();
+                         ~IrrDriver();
+    IrrlichtDevice       *getDevice()       const { return m_device;        }
+    scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
+    scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
+    bool                  OnEvent(const irr::SEvent &event);
+    scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
+    scene::ISceneNode    *addMesh(scene::IMesh *mesh);
+    scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);
+    scene::ICameraSceneNode 
+                         *addCamera();
+    void                  update(float dt);  
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

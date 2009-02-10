@@ -59,7 +59,11 @@ SDLDriver::SDLDriver()
     : m_sensed_input(0), m_action_map(0), m_main_surface(0), m_flags(0), m_stick_infos(0),
     m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
+#ifdef HAVE_IRRLICHT
+    if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
+#else
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
+#endif
     {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         exit(1);
@@ -105,8 +109,9 @@ SDLDriver::SDLDriver()
     SDL_JoystickEventState(SDL_ENABLE);
 
     initStickInfos();
-    
+#ifndef HAVE_IRRLICHT
     SDL_WM_SetCaption("SuperTuxKart", NULL);
+#endif
 
     // Get into menu mode initially.
     setMode(MENU);
@@ -255,6 +260,7 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
  */
 void SDLDriver::setVideoMode(bool resetTextures)
 {
+#ifndef HAVE_IRRLICHT
     //Is SDL_FreeSurface necessary? SDL wiki says not??
     SDL_FreeSurface(m_main_surface);
  
@@ -299,7 +305,7 @@ void SDLDriver::setVideoMode(bool resetTextures)
             }
         }   // !m_main_surface
     }   // !m_main_surface
-
+#endif
 #if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
     {

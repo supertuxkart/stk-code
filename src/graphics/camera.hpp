@@ -23,8 +23,12 @@
 #define HEADER_CAMERA_HPP
 
 #include "utils/vec3.hpp"
-
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#else
 class ssgContext;
+#endif
 class Kart;
 
 class Camera
@@ -39,7 +43,12 @@ public:
         CM_SIMPLE_REPLAY
     };
 protected:
+#ifdef HAVE_IRRLICHT
+    scene::ICameraSceneNode 
+               *m_camera;
+#else
     ssgContext *m_context;
+#endif
     Vec3        m_xyz;                  // current position of camera
     Vec3        m_hpr;                  // heading, pitch, roll of camera
     const Kart *m_kart;                 // the kart the camera is attached to
@@ -54,7 +63,8 @@ protected:
     float       m_final_time;           // time when final camera mode started
 
 private:
-    void finalCamera       (float dt);   // handle the final camera
+    void  finalCamera     (float dt);   // handle the final camera
+    
 public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();

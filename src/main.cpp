@@ -230,7 +230,8 @@ int handleCmdLine(int argc, char **argv)
                 fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
                 fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
                 return 0;
-            }    
+            }
+            i++;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
@@ -441,8 +442,6 @@ void InitTuxkart()
     user_config             = new UserConfig();
 #ifdef HAVE_IRRLICHT
     irr_driver              = new IrrDriver();
-    // Re-init file manager to use the new device.
-    file_manager->reInit();
 #endif
     loader                  = new Loader();
     loader->setCreateStateCallback(getAppState);
@@ -552,7 +551,9 @@ int main(int argc, char *argv[] )
         
         //FIXME: this needs a better organization
         inputDriver = new SDLDriver ();
-        ssgInit () ;
+#ifndef HAVE_IRRLICHT
+        ssgInit();
+#endif
         
         main_loop = new MainLoop();
         // loadMaterials needs ssgLoadTextures (internally), which can

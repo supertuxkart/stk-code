@@ -142,7 +142,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         // Only load the model if the .kart file has the appropriate version,
         // otherwise warnings are printed.
         if(m_version>=1)
-            m_kart_model.loadModels();
+            m_kart_model.loadModels(m_ident);
         if(m_gravity_center_shift.getX()==UNDEFINED)
         {
             m_gravity_center_shift.setX(0);

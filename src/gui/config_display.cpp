@@ -22,10 +22,10 @@
 #include <algorithm>
 
 #include "main_loop.hpp"
-#include "widget_manager.hpp"
+#include "sdldrv.hpp"
 #include "user_config.hpp"
 #include "menu_manager.hpp"
-#include "sdldrv.hpp"
+#include "gui/widget_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 

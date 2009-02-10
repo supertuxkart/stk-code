@@ -45,17 +45,22 @@ int delete_fonts()
 // =============================================================================
 Font::Font(const char *fontname)
 {
+#ifndef HAVE_IRRLICHT
     m_fnt      = new fntTexFont(file_manager->getFontFile(fontname).c_str(),
                                 GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
     m_text_out = new fntRenderer();
     m_text_out->setFont(m_fnt);
+#endif
 }   // Font
 
 // -----------------------------------------------------------------------------
 Font::~Font()
 {
+#ifdef HAVE_IRRLICHT
+#else
     delete m_text_out;
     delete m_fnt;
+#endif
 }   // ~Font
 
 // -----------------------------------------------------------------------------
@@ -66,7 +71,8 @@ void Font::Print(const char *text, int size,
                  float scale_x, float scale_y,
                  int left, int right, int top, int bottom, bool doShadow)
 {
-    
+#ifdef HAVE_IRRLICHT
+#else
     // Only scale for lower resolution
     float fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) 
                                                  : 1.0f;
@@ -92,7 +98,6 @@ void Font::Print(const char *text, int size,
         int height = top-bottom+1;
         y = (height - H)/2 + bottom;
     }
-
     m_text_out->begin();
     m_text_out->setPointSize((float)sz);
     if(doShadow)
@@ -113,7 +118,7 @@ void Font::Print(const char *text, int size,
     }
     m_text_out->puts(text);
     m_text_out->end();
-
+#endif
 }   // Print
 // -----------------------------------------------------------------------------
 
@@ -147,7 +152,7 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
         y = (height - H)/2 + bottom;
     }
 
-
+#ifndef HAVE_IRRLICHT
     m_text_out->begin();
     m_text_out->setPointSize((float)sz);
 
@@ -184,13 +189,14 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
         m_text_out->puts(text.c_str());
     }
     m_text_out->end();
-
+#endif
 }   // PrintBold
 
 // ----------------------------------------------------------------------------
 void Font::getBBox(const std::string &text, int size, bool italic,
                   float *left, float *right, float *bot, float *top)
 {
+#ifndef HAVE_IRRLICHT
     m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
     if(user_config->m_width<800) {
         float fract=(float)user_config->m_width/800.0f;
@@ -199,7 +205,7 @@ void Font::getBBox(const std::string &text, int size, bool italic,
         if(bot) *bot   *= fract;
         if(top) *top   *= fract;
     }
-
+#endif
 }
 // ----------------------------------------------------------------------------
 
@@ -209,6 +215,7 @@ void Font::getBBoxMultiLine(const std::string &text, int size, bool italic,
     // Plib does not handle multi-lines strings as expected. So as a work
     // around we split strings into lines, and compute the size for each
     // line, and take the maximum size at the end.
+#ifndef HAVE_IRRLICHT
     std::vector<std::string> s=StringUtils::split(text,'\n');
     m_fnt->getBBox(s[0].c_str(), (float)size, italic, left, right, bot, top);
     for(unsigned int i=1; i<s.size(); i++)
@@ -227,5 +234,5 @@ void Font::getBBoxMultiLine(const std::string &text, int size, bool italic,
         if(bot) *bot   *= fract;
         if(top) *top   *= fract;
     }
-
+#endif
 }

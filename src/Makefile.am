@@ -57,6 +57,8 @@ supertuxkart_SOURCES = \
  audio/sound_manager.hpp \
  utils/constants.hpp \
  utils/coord.hpp \
+ utils/mesh_tools.hpp \
+ utils/mesh_tools.cpp \
  utils/random_generator.hpp \
  utils/random_generator.cpp \
  utils/ssg_help.cpp \

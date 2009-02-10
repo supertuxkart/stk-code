@@ -23,6 +23,7 @@
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/player_kart.hpp"
 #include "utils/coord.hpp"
 
@@ -31,9 +32,12 @@ Moveable::Moveable()
     m_body            = 0;
     m_motion_state    = 0;
     m_first_time      = true ;
+#ifdef HAVE_IRRLICHT
+    m_mesh = 0;
+#else
     m_model_transform = new ssgTransform();
-
     m_model_transform->ref();
+#endif
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -51,8 +55,11 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
     sgCoord c=Coord(xyz, hpr).toSgCoord();
-
+#ifdef HAVE_IRRLICHT
+    m_root->setPosition(xyz.toIrrVector());
+#else
     m_model_transform->setTransform(&c);
+#endif
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-//  $Id: sdldrv.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: irr_driver.cpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -22,11 +22,13 @@
 using namespace core;
 
 #include "user_config.hpp"
+#include "file_manager.hpp"
 
 IrrDriver *irr_driver = NULL;
 
 IrrDriver::IrrDriver()
 {
+    file_manager->dropFileSystem();
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {
@@ -56,7 +58,10 @@ IrrDriver::IrrDriver()
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
-
+    // Stores the new file system pointer.
+    file_manager->setDevice(m_device);
+    m_device->setWindowCaption(L"SuperTuxKart");
+    m_scene_manager = m_device->getSceneManager();
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -64,6 +69,64 @@ IrrDriver::~IrrDriver()
 {
     m_device->drop();
 }   // ~IrrDriver
+
+
+// ----------------------------------------------------------------------------
+/** Loads an animated mesh and returns a pointer to it.
+ *  \param filename File to load.
+ */
+scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
+{
+    return m_scene_manager->getMesh(filename.c_str());
+}   // getAnimatedMesh
+
+// ----------------------------------------------------------------------------
+/** Adds a mesh that will be optimised using an oct tree.
+ *  \param mesh Mesh to add.
+ */
+scene::ISceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
+{
+    return m_scene_manager->addOctTreeSceneNode(mesh);
+}   // addOctTree
+
+// ----------------------------------------------------------------------------
+/** Adds a static mesh to scene. This should be used for smaller objects,
+ *  since the node is not optimised.
+ *  \param mesh The mesh to add.
+ */
+scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
+{
+    return m_scene_manager->addMeshSceneNode(mesh);
+}   // addMesh
+
+// ----------------------------------------------------------------------------
+/** Adds an animated mesh to the scene.
+ *  \param mesh The animated mesh to add.
+ */
+scene::ISceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
+{
+    return m_scene_manager->addAnimatedMeshSceneNode(mesh);
+}   // addAnimatedMesh
+
+// ----------------------------------------------------------------------------
+/** Adds a camera to the scene.
+ */
+scene::ICameraSceneNode *IrrDriver::addCamera()
+ {
+     return m_scene_manager->addCameraSceneNode();
+ }   // addCamera
+
+// ----------------------------------------------------------------------------
+/** Update, called once per frame.
+ *  \param dt Time since last update
+ */
+void IrrDriver::update(float dt)
+{
+
+    m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+    m_scene_manager->drawAll();
+    m_device->getVideoDriver()->endScene();
+}   // update
 
 // ----------------------------------------------------------------------------
 // Irrlicht Event handler.

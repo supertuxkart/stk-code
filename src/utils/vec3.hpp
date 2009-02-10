@@ -14,9 +14,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_VEC3_H
-#define HEADER_VEC3_H
+#ifndef HEADER_VEC3_HPP
+#define HEADER_VEC3_HPP
 
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #define _WINSOCKAPI_
 #include <plib/sg.h>
 
@@ -28,8 +32,11 @@
 class Vec3 : public btVector3
 {
 private:
+#ifdef HAVE_IRRLICHT
+    core::vector3df m_irr_vector;
+#endif
     inline float clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
-    void setPitchRoll(const Vec3 &normal);
+    void         setPitchRoll(const Vec3 &normal);
 
 public:
     inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
@@ -54,6 +61,14 @@ public:
     inline const void     setPitch(float f)        {m_y = f;}
     inline const void     setRoll(float f)         {m_z = f;}
     float*                toFloat() const          {return (float*)this;     }
+#ifdef HAVE_IRRLICHT
+    /** Converts a Vec3 to an irrlicht 3d floating point vector. */
+    const core::vector3df &toIrrVector()
+    {
+        m_irr_vector.set(m_x, m_z, m_y);
+        return m_irr_vector;
+    }
+#endif
     void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}

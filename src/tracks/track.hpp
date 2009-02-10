@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRACK_H
-#define HEADER_TRACK_H
+#ifndef HEADER_TRACK_HPP
+#define HEADER_TRACK_HPP
 
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
@@ -29,6 +29,10 @@
 #endif
 #include <plib/sg.h>
 #include <plib/ssg.h>
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #include <string>
 #include <vector>
 #include "LinearMath/btTransform.h"
@@ -52,7 +56,12 @@ private:
     std::string              m_designer;
     std::string              m_filename;
     std::vector<std::string> m_groups;
-    ssgBranch*               m_model;
+#ifdef HAVE_IRRLICHT
+    std::vector<scene::ISceneNode*> m_all_nodes;
+    std::vector<scene::IMesh*>      m_all_meshes;
+#else
+    ssgBranch               *m_model;
+#endif
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
     bool                     m_has_final_camera;
@@ -154,7 +163,10 @@ public:
     bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
+#ifdef HAVE_IRRLICHT
+#else
     ssgBranch*         getModel          () const {return m_model;              }
+#endif
     float              getGravity        () const {return m_gravity;            }
     /** Returns the version of the .track file. */
     int                getVersion        () const {return m_version;            }
@@ -196,13 +208,16 @@ public:
     }
 
 private:
-    void  loadTrack                      (std::string filename);
+    void  loadTrack                      (const std::string &filename);
     void  itemCommand                    (sgVec3 *xyz, int item_type, int bNeedHeight);
     void  loadDriveline                  ();
     void  readDrivelineFromFile          (std::vector<Vec3>& line,
                                          const std::string& file_ext);
+#ifdef HAVE_IRRLICHT
+    void  convertTrackToBullet           ();
+#else
     void  convertTrackToBullet           (ssgEntity *track, sgMat4 m);
-
+#endif
     float pointSideToLine(const Vec3& L1, const Vec3& L2,
                           const Vec3& P ) const;
     int   pointInQuad(const Vec3& A, const Vec3& B,

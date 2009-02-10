@@ -37,11 +37,14 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_type             = type;
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
+#ifdef HAVE_IRRLICHT
+#else
     m_root             = new ssgTransform();
     m_root->ref();
     m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
     m_root->addKid(model);
     stk_scene->add(m_root);
+#endif
 }   // Item
 
 //-----------------------------------------------------------------------------
@@ -94,9 +97,12 @@ void Item::update(float delta)
         
         if(!m_rotate) return;
         // have it rotate
+#ifdef HAVE_IRRLICHT
+#else
         Vec3 rotation(delta*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
+#endif
     }
 }   // update
 

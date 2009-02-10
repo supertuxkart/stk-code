@@ -56,7 +56,8 @@ public:
                 FileManager();
                ~FileManager();
 #ifdef HAVE_IRRLICHT
-    void        reInit();
+    void        setDevice(IrrlichtDevice *device);
+    void        dropFileSystem();
 #endif
 
     std::string getHomeDir       () const;
@@ -83,10 +84,8 @@ public:
                                   bool is_full_path=false, 
                                   bool make_full_path=false) const;
 
-    void       pushTextureSearchPath(const std::string& path) 
-                                    { m_texture_search_path.push_back(path);}
-    void       pushModelSearchPath  (const std::string& path)
-                                    { m_model_search_path.push_back(path);  }
+    void       pushTextureSearchPath(const std::string& path);
+    void       pushModelSearchPath  (const std::string& path);
     void       pushMusicSearchPath  (const std::string& path)
                                     { m_music_search_path.push_back(path);  }
     void       popTextureSearchPath () {m_texture_search_path.pop_back();   }

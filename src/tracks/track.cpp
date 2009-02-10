@@ -24,7 +24,9 @@
 #include <sstream>
 #define _WINSOCKAPI_
 #include <plib/ssgAux.h>
-
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+#endif
 #include "file_manager.hpp"
 #include "loader.hpp"
 #include "stk_config.hpp"
@@ -32,6 +34,8 @@
 #include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
@@ -63,6 +67,10 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_screenshot       = "";
     m_top_view         = "";
     m_version          = 0;
+#ifdef HAVE_IRRLICHT
+    m_all_nodes.clear();
+    m_all_meshes.clear();
+#endif
     m_has_final_camera = false;
     m_is_arena         = false;
     loadTrack(m_filename);
@@ -827,9 +835,9 @@ void Track::draw2Dview (float x_offset, float y_offset) const
 }   // draw2Dview
 
 //-----------------------------------------------------------------------------
-void Track::loadTrack(std::string filename_)
+void Track::loadTrack(const std::string &filename)
 {
-    m_filename      = filename_;
+    m_filename      = filename;
 
     m_ident = StringUtils::basename(StringUtils::without_extension(m_filename));
     std::string path = StringUtils::without_extension(m_filename);
@@ -1085,22 +1093,80 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
 //* Convert the ssg track tree into its physics equivalents.
 void Track::createPhysicsModel()
 {
+#ifndef HAVE_IRRLICHT
     if(!m_model) return;
+#endif
 
     m_track_mesh         = new TriangleMesh();
     m_non_collision_mesh = new TriangleMesh();
     
+#ifdef HAVE_IRRLICHT
+    convertTrackToBullet();
+#else
     // Collect all triangles in the track_mesh
     sgMat4 mat;
     sgMakeIdentMat4(mat);
     convertTrackToBullet(m_model, mat);
     m_track_mesh->createBody();
+#endif
     m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
 //* Convert the ssg track tree into its physics equivalents.
+#ifdef HAVE_IRRLICHT
+void Track::convertTrackToBullet()
+{
+    // 0: start line
+    // 1: left/right drivelines or so
+    // 2: road
+    // 3: zipper or collectables??
+    // 4: barriers
+    // 5: plane
+    for(unsigned int i=0; i<m_all_meshes.size(); i++)
+    {
+        const scene::IMesh *track = m_all_meshes[i];
+        for(unsigned int i=0; i<track->getMeshBufferCount(); i++) {
+            scene::IMeshBuffer *mb = track->getMeshBuffer(i);
+            // FIXME: take translation/rotation into accou
+            if(mb->getVertexType()!=video::EVT_STANDARD) {
+                fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
+                        mb->getVertexType());
+                continue;
+            }
+            video::SMaterial irrMaterial=mb->getMaterial();
+            video::ITexture* t=irrMaterial.getTexture(0);
+            // FIXME: if no material is given, perhaps define a default?
+            const Material* material=0;
+            if(t) {
+                //material=g_MaterialManager->getMaterial(t->getName());
+                printf("%s\n",t->getName());
+            } 
+
+            u16 *mbIndices = mb->getIndices();
+            btVector3 vertices[3];
+            irr::video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
+            for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
+                for(unsigned int k=0; k<3; k++) {
+                    int indx=mbIndices[j+k];
+                    // FIXME: notice: irrlicht's and STK's axis are different
+                    // (STK: Z up, irrlicht: Y up). We might want to change
+                    // this as well, makes it easier to work with bullet and
+                    // irrlicht together, without having to swap indices.
+                    vertices[k] = btVector3( mbVertices[indx].Pos.X,
+                        mbVertices[indx].Pos.Z,
+                        mbVertices[indx].Pos.Y );
+                }   // for k
+                m_track_mesh->addTriangle(vertices[0], vertices[1], vertices[2], material);
+            }   // for j
+        }   // for i<getMeshBufferCount
+    }   // for obj in children
+    m_track_mesh->createBody();
+
+}   // convertTrackToBullet
+
+#else
 void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 {
     if(!track) return;
@@ -1166,7 +1232,7 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
         assert(!"Unkown ssg type in convertTrackToBullet");
     }
 }   // convertTrackToBullet
-
+#endif
 // ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
@@ -1184,7 +1250,11 @@ void Track::loadTrackModel()
         // no temporary materials.dat file, ignore
         (void)e;
     }
+#ifdef HAVE_IRRLICHT
+    std::string path = file_manager->getTrackFile(getIdent()+".irrloc");
+#else
     std::string path = file_manager->getTrackFile(getIdent()+".loc");
+#endif
 
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
@@ -1195,8 +1265,11 @@ void Track::loadTrackModel()
     }
 
     // Start building the scene graph
+#ifdef HAVE_IRRLICHT
+#else
     m_model = new ssgBranch ;
     stk_scene->add(m_model);
+#endif
 
     char s [ 1024 ] ;
 
@@ -1359,10 +1432,11 @@ void Track::loadTrackModel()
             if ( need_hat )
             {
                 sgVec3 nrm ;
-
+#ifdef HAVE_IRRLICHT
+#else
                 loc.xyz[2] = 1000.0f ;
                 loc.xyz[2] = getHeightAndNormal ( m_model, loc.xyz, nrm ) ;
-
+#endif
                 if ( fit_skin )
                 {
                     float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
@@ -1375,10 +1449,16 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
+#ifdef HAVE_IRRLICHT
+            std::string full_path = file_manager->getTrackFile(fname, getIdent());
+            scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
+            m_all_meshes.push_back(obj->getMesh(0));
+#else
             ssgEntity        *obj   = loader->load(file_manager->getModelFile(fname),
                                                    CB_TRACK,
                                                    /* optimise   */  true,
                                                    /*is_full_path*/  true);
+#endif
             if(!obj)
             {
                 fclose(fd);
@@ -1388,6 +1468,13 @@ void Track::loadTrackModel()
                 file_manager->popModelSearchPath  ();
                 throw std::runtime_error(msg.str());
             }
+#ifdef HAVE_IRRLICHT
+            // FIXME: for now only static objects
+            scene::ISceneNode *node = irr_driver->addOctTree(obj->getMesh(0));
+            m_all_nodes.push_back(node);
+            node->setMaterialFlag(video::EMF_LIGHTING, false);
+
+#else
             SSGHelp::createDisplayLists(obj);
             ssgRangeSelector *lod   = new ssgRangeSelector ;
             ssgTransform     *trans = new ssgTransform ( & loc ) ;
@@ -1398,6 +1485,7 @@ void Track::loadTrackModel()
             trans  -> addKid(lod   );
             m_model-> addKid(trans );
             lod    -> setRanges(r, 2);
+#endif
             if(user_config->m_track_debug)
                 addDebugToScene(user_config->m_track_debug);
 
@@ -1414,7 +1502,12 @@ void Track::loadTrackModel()
     file_manager->popModelSearchPath  ();
 
     Vec3 min, max;
+#ifdef HAVE_IRRLICHT
+    // FIXME: for now assume that mesh 0 is the actual track.
+    MeshTools::minMax3D(m_all_meshes[0], &min, &max);
+#else
     SSGHelp::MinMax(m_model, &min, &max);
+#endif
     RaceManager::getWorld()->getPhysics()->init(min, max);
     createPhysicsModel();
 }   // loadTrack
@@ -1427,7 +1520,10 @@ void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
     if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
     // Even if 3d data are given, make sure that the item is on the ground
+#ifdef HAVE_IRRLICHT
+#else
     (*xyz)[2] = getHeight( m_model, *xyz ) + 0.06f;
+#endif
 
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 

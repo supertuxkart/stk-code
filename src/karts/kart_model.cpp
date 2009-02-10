@@ -19,9 +19,12 @@
 
 #include "karts/kart_model.hpp"
 
+#include "file_manager.hpp"
 #include "loader.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "utils/constants.hpp"
 #include "utils/ssg_help.hpp"
 
@@ -43,12 +46,20 @@ KartModel::KartModel()
         m_max_suspension[i] = 1.3f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
+#ifdef HAVE_IRRLICHT
+    m_wheel_filename[0] = "wheel-front-right.3ds";
+    m_wheel_filename[1] = "wheel-front-left.3ds";
+    m_wheel_filename[2] = "wheel-rear-right.3ds";
+    m_wheel_filename[3] = "wheel-rear-left.a3ds";
+    m_mesh              = NULL;
+#else
     m_wheel_filename[0] = "wheel-front-right.ac";
     m_wheel_filename[1] = "wheel-front-left.ac";
     m_wheel_filename[2] = "wheel-rear-right.ac";
     m_wheel_filename[3] = "wheel-rear-left.ac";
+    m_root              = NULL;
+#endif
 
-    m_root = NULL;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -72,15 +83,48 @@ KartModel::~KartModel()
     // This automatically frees the wheels and the kart model.
     // m_root can be zero in case of STKConfig, which has a kart_properties
     // attribute (for the default values) as well.
+#ifdef HAVE_IRRLICHT
+#else
     if(m_root) m_root->removeAllKids();
     ssgDeRefDelete(m_root);
+#endif
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
+/** Attach the kart model and wheels to the scene node.
+ *  \param node Node to attach the models to.
+ */
+void KartModel::attachModel(scene::ISceneNode **node)
+{
+    *node = irr_driver->addMesh(m_mesh);
+    for(unsigned int i=0; i<4; i++)
+    {
+     //   *node->addChild(m_wh
+    }
+}   // attachModel
+
+// ----------------------------------------------------------------------------
+
 /** Loads the 3d model and all wheels.
  */
-void KartModel::loadModels()
+void KartModel::loadModels(const std::string &kart_ident)
 {
+#ifdef HAVE_IRRLICHT
+    std::string  full_path = file_manager->getKartFile(m_model_filename);
+    m_mesh                 = irr_driver->getAnimatedMesh(full_path)->getMesh(0);
+    Vec3 min, max;
+    MeshTools::minMax3D(m_mesh, &min, &max);
+    Vec3 size = max-min;
+    m_z_offset    = min.getZ();
+    m_kart_width  = size.getX();
+    m_kart_height = size.getY();
+    m_kart_length = size.getZ();
+    // FIXME: How do we handle this? it's a mesh only, so we can't
+    // simply move it in a transform (unless we turn it into a scene 
+    // node). m_z_offset should probably be made available to kart.
+    // Vec3 move_kart_to_0_z(0, 0, m_z_offset);
+    // m_root->setTransform(move_kart_to_0_z);
+#else
     ssgEntity *obj = loader->load(m_model_filename, CB_KART);
     if(!obj)
     {
@@ -100,6 +144,7 @@ void KartModel::loadModels()
     sgVec3 move_kart_to_0_z;
     sgSetVec3(move_kart_to_0_z, 0, 0, m_z_offset);
     m_root->setTransform(move_kart_to_0_z);
+#endif
 
     // Now set default some default parameters (if not defined) that 
     // depend on the size of the kart model (wheel position, center
@@ -122,6 +167,12 @@ void KartModel::loadModels()
     // depend on the size of the model.
     for(unsigned int i=0; i<4; i++)
     {
+#ifdef HAVE_IRRLICHT
+        std::string full_wheel = file_manager->getKartFile(m_wheel_filename[i],
+                                                           kart_ident);
+        m_wheel_model[i] = irr_driver->getAnimatedMesh(full_wheel)->getMesh(0);
+        // FIXME: wheel handling still missing.
+#else
         m_wheel_model[i] = loader->load(m_wheel_filename[i], CB_KART);
         m_wheel_transform[i]= new ssgTransform();
 #ifdef DEBUG
@@ -142,6 +193,7 @@ void KartModel::loadModels()
                             hpr);        
             m_wheel_transform[i]->setTransform(wheel_loc);
         }   // if m_wheel_model[i]
+#endif
     }   // for i<4
     if(!m_wheel_model[0])
     {
@@ -220,6 +272,9 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 void KartModel::adjustWheels(float rotation, float steer,
                              const float suspension[4])
 {
+#ifdef HAVE_IRRLICHT
+    // FIXME: missing
+#else
     sgMat4 wheel_front;
     sgMat4 wheel_steer;
     sgMat4 wheel_rot;
@@ -261,7 +316,7 @@ void KartModel::adjustWheels(float rotation, float steer,
     sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[3].toFloat());
     wheel_rot[3][2] += clamped_suspension[3];
     m_wheel_transform[3]->setTransform(wheel_rot);
-
+#endif
 }   // adjustWheels
 
 // ----------------------------------------------------------------------------

@@ -374,7 +374,10 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         }
         //The material of the icons should not have a non-zero alpha_ref value,
         //because if so the next call can make the text look aliased.
+#ifdef HAVE_IRRLICHT
+#else
         players_gst -> apply ();
+#endif
         last_players_gst = players_gst;
         glBegin ( GL_QUADS ) ;
         glColor4f    ( 1, 1, 1, 1 ) ;
@@ -612,6 +615,8 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     offset_x += (int)((user_config->m_width-10)*ratio_x) - width;
     offset_y += (int)(10*ratio_y);
 
+#ifdef HAVE_IRRLICHT
+#else
     glMatrixMode(GL_MODELVIEW);
     m_speed_back_icon->getState()->force();
     // If the colour isn't set, the speedometer is blended with the last
@@ -661,7 +666,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 
         glEnd () ;
     }   // speed<0
-
+#endif
 } // drawSpeed
 
 //-----------------------------------------------------------------------------

@@ -729,6 +729,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\mesh_tools.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\moving_texture.cpp"
 					>
 				</File>
@@ -1428,6 +1432,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\irr_driver.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\mesh_tools.hpp"
 					>
 				</File>
 				<File

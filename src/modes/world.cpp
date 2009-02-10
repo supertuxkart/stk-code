@@ -141,10 +141,12 @@ void World::init()
                 break;
             }
         }   // if !user_config->m_profile
-
+#ifdef HAVE_IRRLICHT
+#else
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
 
         stk_scene->add ( newkart -> getModelTransform() ) ;
+#endif
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
     }  // for i

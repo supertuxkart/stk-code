@@ -331,8 +331,10 @@ void CharSel::switchCharacter(int n)
         m_kart = new ssgTransform;
         m_kart->ref();
         KartModel* kartentity = kp->getKartModel();
-
+#ifdef HAVE_IRRLICHT
+#else
         m_kart->addKid(kartentity->getRoot());
+#endif
     }
 }   // switchCharacter
 

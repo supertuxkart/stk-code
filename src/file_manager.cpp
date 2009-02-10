@@ -135,6 +135,9 @@ FileManager::FileManager()
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/data/models"  );
     pushMusicSearchPath  (m_root_dir+"/data/music"   );
+#ifdef HAVE_IRRLICHT
+    m_file_system->addFolderFileArchive("data/models");
+#endif
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
     {
@@ -177,15 +180,23 @@ FileManager::FileManager()
 }  // FileManager
 
 //-----------------------------------------------------------------------------
+/** Remove the dummy file system (which is called from IrrDriver before 
+ *  creating the actual device.
+ */
+#ifdef HAVE_IRRLICHT
+void FileManager::dropFileSystem()
+{
+    m_device->drop();
+}   // dropFileSystem
+#endif
+//-----------------------------------------------------------------------------
 #ifdef HAVE_IRRLICHT
 /** This function is used to re-initialise the file-manager after reading in
  *  the user configuration data.
 */
-void FileManager::reInit()
+void FileManager::setDevice(IrrlichtDevice *device)
 {
-    // Drop the NULL device
-    m_device->drop();
-    m_device = irr_driver->getDevice();
+    m_device = device;
     m_device->grab();  // To make sure that the device still exists while
                        // file_manager has a pointer to the file system.
     m_file_system  = m_device->getFileSystem();
@@ -205,6 +216,26 @@ FileManager::~FileManager()
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
+void FileManager::pushModelSearchPath(const std::string& path)
+{
+    m_model_search_path.push_back(path);  
+#ifdef HAVE_IRRLICHT
+    m_file_system->addFolderFileArchive(path.c_str());
+#endif
+}   // pushModelSearchPath
+
+//-----------------------------------------------------------------------------
+void FileManager::pushTextureSearchPath(const std::string& path)
+{
+    m_texture_search_path.push_back(path);
+#ifdef HAVE_IRRLICHT
+    m_file_system->addFolderFileArchive(path.c_str());
+#endif
+}   // pushTextureSearchPath
+
+//-----------------------------------------------------------------------------
+
+
 bool FileManager::findFile(std::string& full_path,
                       const std::string& fname, 
                       const std::vector<std::string>& search_path) const
@@ -212,7 +243,8 @@ bool FileManager::findFile(std::string& full_path,
 #ifndef HAVE_IRRLICHT
     struct stat mystat;
 #endif
-    
+
+    // FIXME: this should become a reverse iterator.
     for(std::vector<std::string>::const_iterator i = search_path.begin();
         i != search_path.end(); ++i)
     {

@@ -122,9 +122,12 @@ void Plunger::update(float dt)
         {
             setHasHit();
             projectile_manager->notifyRemove();
+#ifdef HAVE_IRRLICHT
+#else
             ssgTransform *m = getModelTransform();
             m->removeAllKids();
             stk_scene->remove(m);
+#endif
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
         return;
@@ -171,7 +174,10 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
         Vec3 hell(0, 0, -10000);
+#ifdef HAVE_IRRLICHT
+#else
         getModelTransform()->setTransform(hell.toFloat());
+#endif
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
@@ -182,7 +188,10 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
         Vec3 hell(0, 0, -10000);
+#ifdef HAVE_IRRLICHT
+#else
         getModelTransform()->setTransform(hell.toFloat());
+#endif
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
         
         if(kart)

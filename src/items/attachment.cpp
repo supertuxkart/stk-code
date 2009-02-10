@@ -35,8 +35,10 @@ Attachment::Attachment(Kart* _kart)
     m_type           = ATTACH_NOTHING;
     m_time_left      = 0.0;
     m_kart           = _kart;
-    m_holder         = new ssgSelector();
     m_previous_owner = NULL;
+#ifdef HAVE_IRRLICHT
+#else
+    m_holder         = new ssgSelector();
     m_kart->getModelTransform()->addKid(m_holder);
 
     for(int i=ATTACH_FIRST; i<ATTACH_MAX; i++)
@@ -45,6 +47,7 @@ Attachment::Attachment(Kart* _kart)
         m_holder->addKid(p);
     }
     m_holder->select(0);
+#endif
 }   // Attachment
 
 //-----------------------------------------------------------------------------
@@ -80,7 +83,10 @@ void Attachment::clear()
 {
     m_type=ATTACH_NOTHING; 
     m_time_left=0.0;
+#ifdef HAVE_IRRLICHT
+#else
     m_holder->select(0);
+#endif
 
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to

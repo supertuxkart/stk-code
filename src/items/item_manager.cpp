@@ -108,6 +108,8 @@ void ItemManager::removeTextures()
 //-----------------------------------------------------------------------------
 ItemManager::~ItemManager()
 {
+#ifdef HAVE_IRRLICHT
+#else
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
         // We can't use ssgDeRefDelete here, since then the object would be
@@ -115,6 +117,7 @@ ItemManager::~ItemManager()
         // accesses.
         i->second->deRef();
     }
+#endif
     m_all_models.clear();
 }   // ~ItemManager
 
@@ -131,6 +134,8 @@ void ItemManager::loadDefaultItems()
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
+#ifdef HAVE_IRRLICHT
+#else
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
             ssgEntity*  h         = loader->load(*i, CB_ITEM, 
                                                  /*optimise*/true, 
@@ -139,6 +144,7 @@ void ItemManager::loadDefaultItems()
             h->ref();
             h->setName(shortName.c_str());
             m_all_models[shortName] = h;
+#endif
         }   // for i
 
 
@@ -196,8 +202,11 @@ void ItemManager::setDefaultItemStyle()
                 }
             }  // if i->second
         }
+#ifndef HAVE_IRRLICHT
+        // For now disable this, irrlicht does not yet load any items.
         throw std::runtime_error(msg.str());
         exit(-1);
+#endif
     }   // if bError
 
 }   // setDefaultItemStyle
