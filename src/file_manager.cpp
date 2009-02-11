@@ -244,11 +244,9 @@ bool FileManager::findFile(std::string& full_path,
     struct stat mystat;
 #endif
 
-    // FIXME: this should become a reverse iterator.
-    for(std::vector<std::string>::const_iterator i = search_path.begin();
-        i != search_path.end(); ++i)
+    for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
+        i != search_path.rend(); ++i)
     {
-        //full_path=m_root_dir + "/" + *i + "/" + fname;
         full_path = *i + "/" + fname;
 #ifdef HAVE_IRRLICHT
         if(m_file_system->existFile(full_path.c_str())) return true;
