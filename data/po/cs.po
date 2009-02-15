@@ -1,0 +1,967 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SuperTuxKart 0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-02-09 20:38-0500\n"
+"PO-Revision-Date: 2009-02-20 20:38+0500\n"
+"Last-Translator: Ondrej Hruska <ondra@ondrovo.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 16bit\n"
+
+#: src/gui/config_display.cpp:385
+#, c-format
+msgid "%dx%d Blacklisted"
+msgstr "%dx%d je na cerné listine"
+
+#: src/world.cpp:622
+#, c-format
+msgid ""
+"'%s' has\n"
+"been eliminated."
+msgstr ""
+"'%s' byl\n"
+"odstranen."
+
+#: src/gui/player_controls.cpp:64
+msgid "Accelerate"
+msgstr "Zrychlit"
+
+#: src/gui/challenges_menu.cpp:36
+msgid "Active Challenges"
+msgstr "Aktivní úkoly"
+
+#: data/all.cup:4
+msgid "All tracks"
+msgstr "Vsechny trate"
+
+#: data/all.cup:5
+msgid "All tracks included in SuperTuxKart"
+msgstr "Vsechny trate obsazené v SuperTuxKart"
+
+#: data/tracks/jungle/jungle.track:4
+msgid "Amazonian Journey"
+msgstr "Vŭprava do Amazonie"
+
+#: src/gui/help_page_two.cpp:108
+msgid "Anvil - slows down greatly the kart in the first position"
+msgstr "Kovadlina - zpomalí nejrychlejsí auto"
+
+#: src/gui/config_display.cpp:92
+msgid "Apply "
+msgstr "Pouzít "
+
+#: src/gui/config_display.cpp:351
+#, c-format
+msgid "Apply %dx%d"
+msgstr "Pouzít %dx%d"
+
+#: data/tracks/lighthouse/lighthouse.track:4
+msgid "Around the Lighthouse"
+msgstr "Kolem majáku"
+
+#: src/gui/help_page_one.cpp:112
+msgid ""
+"At high speeds wheelies drive you faster, but you can't steer. If you\n"
+"get stuck or fall too far, use the rescue button to get back on track."
+msgstr ""
+"Pri vysokŭch rychlostech muzes jet po zadních kolech, ale bez rízení.\n"
+"Pokud sjedes z cesty nebo spadnes moc hluboko, pouzij záchrani."
+
+#: data/gp4.cup:4
+msgid "At world's end"
+msgstr "Na konci sveta"
+
+#: src/gui/help_page_one.cpp:78
+msgid "Avoid bananas"
+msgstr "Vyhŭbej se banánum"
+
+#: src/gui/grand_prix_ending.cpp:148
+#: src/gui/leader_result.cpp:152
+#: src/gui/race_results_gui.cpp:144
+msgid "Back to the main menu"
+msgstr "Zpet do hlavního menu"
+
+#: src/gui/help_page_two.cpp:122
+msgid "Back to the menu"
+msgstr "Zoet do menu"
+
+#: src/gui/player_controls.cpp:65
+msgid "Brake"
+msgstr "Brzda"
+
+#: data/tracks/canyon/canyon.track:4
+msgid "Canyon"
+msgstr "Kanon"
+
+#: src/gui/main_menu.cpp:52
+msgid "Challenges"
+msgstr "Úkoly"
+
+#: src/gui/help_page_one.cpp:117
+msgid "Check the current key bindings for the first player"
+msgstr "Zkontrolovat soucasné nastavení kláves hráce 1."
+
+#: src/gui/grand_prix_select.cpp:50
+msgid "Choose a Grand Prix"
+msgstr "Vybrat Velkou Soutez"
+
+#: src/gui/game_mode.cpp:45
+msgid "Choose a Race Mode"
+msgstr "Vyber si herní rezim"
+
+#: src/gui/track_sel.cpp:49
+msgid "Choose a track"
+msgstr "Vyber si trat"
+
+#: src/gui/player_controls.cpp:74
+#, c-format
+msgid "Choose your controls, %s"
+msgstr "Nastav si ovládání, %s"
+
+#: data/tracks/city/city.track:4
+msgid "City"
+msgstr "Mesto"
+
+#: src/gui/config_display.cpp:97
+msgid "Clear from Blacklist"
+msgstr "Vymazat z cerné listiny"
+
+#: src/challenges/energy_math_class.cpp:26
+msgid "Collect Coins in Math Class"
+msgstr "Sbírej mince v Ucebne matematiky"
+
+#: src/challenges/energy_math_class.cpp:28
+msgid ""
+"Collect at least 6 coins\n"
+"on three laps of\n"
+"Oliver's Math Class\n"
+"in under 1 minute."
+msgstr ""
+"Za jednu minutu\n"
+"ve trech kolech\n"
+"v Ucebne matematiky\n"
+"pozbírej nejméne 6 mincí."
+
+#: src/challenges/energy_shifting_sands.cpp:27
+msgid ""
+"Collect at least 9 coins\n"
+"on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Pozbírej nejméne 6 mincí\n"
+"ve trech kolech Tekutŭch písku\n"
+"v case pod 2:20."
+
+#: src/challenges/energy_shifting_sands.cpp:25
+msgid "Collect the Pharaohs Treasure"
+msgstr "Pozbírej faraónuv poklad"
+
+#: src/challenges/worlds_end_gp.cpp:27
+msgid ""
+"Come first in the At World's End\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Zacnete Velkou Soutezí v úrovni\n"
+"'Na konci sveta' proti 3 autum\n"
+"na úrovni 'závodník' ovládanŭm pocítacem."
+
+#: src/gui/display_res_confirm.cpp:55
+msgid "Confirm Resolution"
+msgstr "Potvrdit rozlisení"
+
+#: src/gui/display_res_confirm.cpp:109
+#, c-format
+msgid "Confirm Resolution Within %d Seconds"
+msgstr "Potvrdte rozlisení behem %d s."
+
+#: src/gui/display_res_confirm.cpp:51
+msgid "Confirm Resolution Within 5 Seconds"
+msgstr "Potvrdte rozlisení do 5 sekund"
+
+#: src/gui/feature_unlocked.cpp:47
+#: src/gui/grand_prix_ending.cpp:144
+#: src/gui/leader_result.cpp:148
+#: src/gui/race_results_gui.cpp:135
+msgid "Continue"
+msgstr "Pokracovat"
+
+#: src/gui/race_results_gui.cpp:140
+msgid "Continue Grand Prix"
+msgstr "Pokracovat ve Velké Soutezi"
+
+#: data/tracks/beach/beach.track:5
+#: data/tracks/lighthouse/lighthouse.track:5
+msgid ""
+"Created by Ingo Ruhnke,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Vytvoril Ingo Ruhnke,\n"
+"upravil M. Gagnon"
+
+#: data/tracks/fortmagma/fortmagma.track:5
+msgid ""
+"Created by Oliver & Steve Baker\n"
+"modified by Marianne Gagnon"
+msgstr ""
+"Vytvorili Oliver a Steve Bakerovi\n"
+"upravil Marianne Gagnon"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+msgid ""
+"Created by Oliver & Steve Baker,\n"
+" modified by M. Gagnon"
+msgstr ""
+"Vytvorili Oliver a Steve Bakerovi,\n"
+" upravil M. Gagnon"
+
+#: data/tracks/sandtrack/sandtrack.track:5
+msgid ""
+"Created by Oliver & Steve Baker,\n"
+"modified by M. Gagnon"
+msgstr ""
+"Vytvorili Oliver a Steve Bakerovi,\n"
+"upravil M. Gagnon"
+
+#: src/gui/main_menu.cpp:63
+msgid "Credits"
+msgstr "O autorech"
+
+#: src/gui/config_display.cpp:83
+#, c-format
+msgid "Current: %dx%d"
+msgstr "Soucasné: %dx%d"
+
+#: src/gui/config_display.cpp:89
+msgid "Decrease Resolution"
+msgstr "Zmensit rozlisení"
+
+#: src/gui/race_options.cpp:62
+msgid "Difficulty"
+msgstr "Obtíznost"
+
+#: src/gui/options.cpp:49
+msgid "Display"
+msgstr "Obrazovka"
+
+#: src/gui/config_display.cpp:55
+msgid "Display Settings"
+msgstr "Nastavení obrazovky"
+
+#: src/gui/race_options.cpp:282
+msgid "Driver"
+msgstr "Ridic"
+
+#: src/gui/config_controls.cpp:43
+msgid "Edit controls for who?"
+msgstr "Komu nastavit ovládání?"
+
+#: src/gui/race_menu.cpp:60
+msgid "Exit Race"
+msgstr "Odejít ze závodu"
+
+#: src/challenges/race_track_time.cpp:28
+msgid ""
+"Finish 3 laps in the Race track\n"
+"with 3 AI karts\n"
+"in under 1:15 minutes."
+msgstr ""
+"Dokonci 3 kola závodu proti trem autum\n"
+"ovládanŭm pocítacem pod 1:15."
+
+#: src/challenges/city_time.cpp:27
+msgid ""
+"Finish 3 laps on the City track\n"
+"with 3 AI karts\n"
+"in under 5:20 minutes."
+msgstr ""
+"Dokonci 3 kola na dráze 'Mesto'\n"
+"proti trem autum ovládanŭm pocítacem\n"
+"de 5:20."
+
+#: src/challenges/tollway_time.cpp:27
+msgid ""
+"Finish 3 laps on the Tux Tollway\n"
+"track with 3 AI karts\n"
+"in under 3:00 minutes."
+msgstr ""
+"Dokonci 3 kola na dálnici\n"
+"proti trem autum pocítace\n"
+"pod 3:00."
+
+#: src/challenges/race_track_time.cpp:26
+msgid "Finish Race track in 1:15"
+msgstr "Dokonci Závodní trat pod 1:15"
+
+#: src/challenges/tollway_time.cpp:25
+msgid "Finish Tux Tollway track in 3:00"
+msgstr "Dokonci závod po Dálnici pod 3:00"
+
+#: src/challenges/city_time.cpp:25
+msgid "Finish the City track in 5:20"
+msgstr "Dokonci závod ve Meste pod 5:20"
+
+#: src/gui/race_gui.cpp:800
+#, c-format
+msgid "Finished"
+msgstr "Cíl"
+
+#: src/gui/player_controls.cpp:66
+msgid "Fire"
+msgstr "Odpálit"
+
+#: data/gp1.cup:5
+msgid "First grand prix, easy to get started"
+msgstr "První Velká Soutez, pro zacátek lehká"
+
+#: src/challenges/penguin_playground_gp.cpp:28
+#: src/gui/game_mode.cpp:74
+msgid "Follow the Leader"
+msgstr "Následuj vudce"
+
+#: src/challenges/jungle_follow.cpp:25
+msgid "Follow the Leader in the Jungle"
+msgstr "Následuj vudce v Dzungli"
+
+#: src/challenges/island_follow.cpp:25
+msgid ""
+"Follow the Leader on a\n"
+"Desert Island"
+msgstr ""
+"Následuj vudce\n"
+"na pustém ostrove"
+
+#: src/gui/help_page_three.cpp:74
+msgid ""
+"Follow the leader: Stay behind the leader kart.\n"
+"When the countdown reaches zero, a kart ahead\n"
+"of the leader or the last kart is eliminated."
+msgstr ""
+"Následuj vudce: zustan za vedoucím autem.\n"
+"Pokud odpocítávání dosáhne nuly,\n"
+"auto za vudcem nebo poslední auto\n"
+"zmizí."
+
+#: src/gui/help_page_one.cpp:73
+msgid "Force your rivals bite *your* dust!"
+msgstr "Sejmi své protivníky svŭm prachem!"
+
+#: data/tracks/fortmagma/fortmagma.track:4
+msgid "Fort Magma"
+msgstr "Pevnost Magma"
+
+#: src/gui/num_players.cpp:40
+msgid "Four Players"
+msgstr "Ctyri hráci"
+
+#: src/gui/config_display.cpp:76
+#: src/gui/config_display.cpp:128
+#: src/gui/config_display.cpp:183
+msgid "Fullscreen mode"
+msgstr "Celá obrazovka"
+
+#: src/gui/help_page_two.cpp:84
+msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
+msgstr "Zákerná vŭbusná kapka - velmi pomalá, ale odrází se od sten"
+
+#: src/gui/game_mode.cpp:79
+msgid "Game mode help"
+msgstr "Nápoveda: herní rezimy"
+
+#: src/gui/help_page_three.cpp:47
+msgid "Game modes"
+msgstr "Herní rezimy"
+
+#: src/gui/challenges_menu.cpp:51
+#: src/gui/credits_menu.cpp:76
+msgid "Go back to the main menu"
+msgstr "Jít zpet do hlavního menu"
+
+#: src/gui/help_page_one.cpp:148
+#: src/gui/help_page_three.cpp:87
+msgid "Go back to the menu"
+msgstr "Zpet do menu"
+
+#: src/gui/race_gui.cpp:948
+msgid "Go!"
+msgstr "Start!"
+
+#: src/gui/help_page_one.cpp:77
+msgid "Grab blue boxes and coins"
+msgstr "Zbírej modré krabice a mince"
+
+#: src/challenges/energy_math_class.cpp:29
+#: src/gui/game_mode.cpp:55
+msgid "Grand Prix"
+msgstr "Velká Soutez"
+
+#: src/gui/help_page_three.cpp:54
+msgid ""
+"Grand Prix: Win victory points \n"
+"by racing through a group of tracks,  \n"
+"most points wins (shortest time in case of a tie!)          "
+msgstr ""
+"Velká Soutez: Získej body závodem \n"
+"na skupine tratí. Kdo má nejvíce bodu,  \n"
+"ten vyhrává. (Pri remíze ten nejrychlejsí!)         "
+
+#: src/gui/main_menu.cpp:60
+#: src/gui/race_menu.cpp:51
+msgid "Help"
+msgstr "Nápoveda"
+
+#: src/gui/race_results_gui.cpp:55
+msgid "Highscores"
+msgstr "Nejvyssí skóre"
+
+#: src/gui/help_page_two.cpp:76
+msgid "Homing missile - follows rivals, but is slower than the missile"
+msgstr "Navádená strela - následuje neprítele, ale je pomalejsí nez normální strela."
+
+#: src/gui/config_display.cpp:87
+msgid "Increase Resolution"
+msgstr "Zvetsit rozlisení"
+
+#: src/user_config.cpp:861
+#, c-format
+msgid "Invalid"
+msgstr "Neplatné"
+
+#: src/kart.cpp:634
+msgid "Invalid short-cut!!"
+msgstr "Neplatná zkratka!"
+
+#: src/gui/player_controls.cpp:65
+msgid "Jump"
+msgstr "Skok"
+
+#: src/gui/race_gui.cpp:805
+msgid "Lap"
+msgstr "Kolo"
+
+#: data/gp4.cup:5
+msgid "Last grand prix, longer and harder"
+msgstr "Poslední Velká Soutez, delsí a tezsí"
+
+#: src/gui/race_gui.cpp:409
+msgid "Leader"
+msgstr "Vudce"
+
+#: src/gui/player_controls.cpp:64
+msgid "Left"
+msgstr "Vlevo"
+
+#: data/tracks/littlevolcano/littlevolcano.track:4
+msgid "Little Volcano"
+msgstr "Malá sopka"
+
+#: src/gui/start_race_feedback.cpp:35
+msgid "Loading race..."
+msgstr "Pripravuji dráhu..."
+
+#: src/gui/player_controls.cpp:66
+msgid "Look back"
+msgstr "Ohlédnout se"
+
+#: src/gui/help_page_two.cpp:68
+msgid "Missile - fast stopper in a straight line"
+msgstr "Raketa - rychlé zastavení neprítele, letí prímo"
+
+#: src/gui/main_menu.cpp:47
+msgid "Multiplayer"
+msgstr "Více hrácu"
+
+#: src/gui/feature_unlocked.cpp:37
+msgid "New Feature Unlocked"
+msgstr "Byla odemcena nová cást"
+
+#: src/challenges/challenge.cpp:121
+#, c-format
+msgid ""
+"New Grand Prix '%s'\n"
+"now available"
+msgstr ""
+"Nová Velká Soutez '%s'\n"
+"je nyní dostupná"
+
+#: src/challenges/challenge.cpp:124
+#, c-format
+msgid ""
+"New difficulty\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Nová obtíznost\n"
+"'%s'\n"
+"je nyní dostupná"
+
+#: src/kart.cpp:400
+msgid "New fastest lap"
+msgstr "Novŭ nejlepsí cas"
+
+#: src/challenges/challenge.cpp:118
+#, c-format
+msgid ""
+"New game mode\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Novŭ herní rezim\n"
+"'%s'\n"
+"je nyní dostupnŭ"
+
+#: src/challenges/challenge.cpp:114
+#, c-format
+msgid ""
+"New track '%s'\n"
+"now available"
+msgstr ""
+"Nová trat '%s'\n"
+"je nyní dostupná"
+
+#: src/gui/help_page_one.cpp:144
+#: src/gui/help_page_two.cpp:118
+msgid "Next help screen"
+msgstr "Dalsí stránka nápovedy"
+
+#: src/gui/grand_prix_select.cpp:71
+#: src/gui/grand_prix_select.cpp:76
+msgid "No Grand Prix selected"
+msgstr "Zádná Velká Soutez nebyla vybrána"
+
+#: src/gui/track_sel.cpp:86
+msgid "No track selected"
+msgstr "Nebyla vybrána zádná trat"
+
+#: src/gui/race_options.cpp:281
+#: src/gui/race_options.cpp:285
+msgid "Novice"
+msgstr "Zacátecník"
+
+#: src/gui/race_options.cpp:80
+msgid "Number of karts"
+msgstr "Pocet aut"
+
+#: src/gui/race_options.cpp:106
+msgid "Number of laps"
+msgstr "Pocet kol závodu"
+
+#: src/user_config.cpp:488
+msgid "Old config file found, check your key bindings!"
+msgstr "Byl nalezen starŭ konfiguracní soubor, zkontroluj si nastavení kláves!"
+
+#: data/tracks/olivermath/olivermath.track:4
+msgid "Oliver's Math Class"
+msgstr "Ucebna matematiky"
+
+#: data/tracks/beach/beach.track:4
+msgid "On the Beach"
+msgstr "Na plázi"
+
+#: src/gui/main_menu.cpp:55
+#: src/gui/options.cpp:40
+#: src/gui/race_menu.cpp:50
+msgid "Options"
+msgstr "Nastavení"
+
+#: src/gui/help_page_two.cpp:100
+msgid "Parachute - slows down all karts in a better position!"
+msgstr "Padák - zpomalí nejrychlejsí vozidlo!"
+
+#: src/gui/race_menu.cpp:47
+msgid "Paused"
+msgstr "Pozastaveno"
+
+#: src/gui/race_gui.cpp:974
+msgid "Penalty time!!"
+msgstr "Trestnŭ cas!!"
+
+#: data/gp1.cup:4
+msgid "Penguin Playground"
+msgstr "Hriste tucnáku"
+
+#: src/gui/player_controls.cpp:251
+msgid "Player "
+msgstr "Hrác"
+
+#: src/gui/char_sel.cpp:68
+#, c-format
+msgid "Player %d, choose a driver"
+msgstr "Hráci %d, nastav si ridice!"
+
+#: src/gui/config_controls.cpp:45
+msgid "Player 1"
+msgstr "Hrác 1"
+
+#: src/gui/config_controls.cpp:46
+msgid "Player 2"
+msgstr "Hrác 2"
+
+#: src/gui/config_controls.cpp:47
+msgid "Player 3"
+msgstr "Hrác 3"
+
+#: src/gui/config_controls.cpp:48
+msgid "Player 4"
+msgstr "Hrác 4"
+
+#: src/gui/options.cpp:41
+msgid "Player Config"
+msgstr "Nastavení hráce"
+
+#: src/gui/player_controls.cpp:80
+msgid "Player name"
+msgstr "Jméno hráce"
+
+#: src/gui/display_res_confirm.cpp:59
+msgid "Press <ESC> to Cancel"
+msgstr "Stiskni <ESC> pro zrusení"
+
+#: src/gui/config_controls.cpp:52
+#: src/gui/config_display.cpp:101
+#: src/gui/config_sound.cpp:63
+#: src/gui/game_mode.cpp:84
+#: src/gui/grand_prix_select.cpp:87
+#: src/gui/num_players.cpp:45
+#: src/gui/options.cpp:57
+#: src/gui/player_controls.cpp:112
+#: src/gui/race_options.cpp:134
+msgid "Press <ESC> to go back"
+msgstr "Stiskni <ESC> pro návrat"
+
+#: src/gui/player_controls.cpp:156
+msgid "Press key"
+msgstr "Stiskni nejakou klávesu"
+
+#: src/gui/help_page_three.cpp:83
+msgid "Previous help screen"
+msgstr "Predchozí stránka nápovedy"
+
+#: src/gui/help_page_two.cpp:114
+msgid "Previous screen"
+msgstr "Predchozí stránka"
+
+#: src/gui/game_mode.cpp:58
+msgid "Quick Race"
+msgstr "Závod na rychlost"
+
+#: src/gui/help_page_three.cpp:62
+msgid "Quick race: Pick a single track, shortest time wins.         "
+msgstr "Závod na rychlost: Závod na jedné trati, vítezí nejrychlejsí."
+
+#: src/gui/main_menu.cpp:56
+msgid "Quit"
+msgstr "Konec"
+
+#: src/gui/race_gui.cpp:746
+msgid "REV"
+msgstr ""
+
+#: data/tracks/race/race.track:4
+msgid "Race Track"
+msgstr "Závodní dráha"
+
+#: src/gui/race_results_gui.cpp:148
+msgid "Race in this track again"
+msgstr "Opakovat trat"
+
+#: src/gui/race_results_gui.cpp:54
+msgid "Race results"
+msgstr "Vŭsledky závodu"
+
+#: src/gui/race_options.cpp:283
+msgid "Racer"
+msgstr "Závodník"
+
+#: src/gui/race_gui.cpp:930
+msgid "Ready!"
+msgstr "Pripravit!"
+
+#: src/gui/player_controls.cpp:66
+msgid "Rescue"
+msgstr "Záchrana"
+
+#: src/gui/race_menu.cpp:52
+msgid "Restart Race"
+msgstr "Restartovat závod"
+
+#: src/gui/race_results_gui.cpp:48
+msgid "Result"
+msgstr "Vŭsledek"
+
+#: src/gui/race_menu.cpp:49
+msgid "Return To Race"
+msgstr "Návrat do závodu"
+
+#: src/gui/player_controls.cpp:64
+msgid "Right"
+msgstr "Vpravo"
+
+#: data/gp2.cup:5
+msgid "Second grand prix"
+msgstr "Druhá Velká Soutez"
+
+#: src/gui/race_gui.cpp:939
+msgid "Set!"
+msgstr "Pozor!"
+
+#: src/gui/race_menu.cpp:57
+#: src/gui/race_results_gui.cpp:153
+msgid "Setup New Race"
+msgstr "Nastavit novŭ závod"
+
+#: data/tracks/sandtrack/sandtrack.track:4
+msgid "Shifting Sands"
+msgstr "Tekuté písky"
+
+#: src/gui/main_menu.cpp:46
+msgid "Single Player"
+msgstr "Jeden hrác"
+
+#: src/gui/race_options.cpp:284
+msgid "Skidding Preview"
+msgstr ""
+
+#: data/gp3.cup:4
+msgid "Snag Drive"
+msgstr "Prekázková trat"
+
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
+msgid "SnowTux Peak"
+msgstr "Tucnákova hora"
+
+#: src/gui/options.cpp:52
+msgid "Sound"
+msgstr "Zvuk"
+
+#: src/gui/config_sound.cpp:40
+msgid "Sound Settings"
+msgstr "Nastavení zvuku"
+
+#: data/tracks/startrack/startrack.track:4
+msgid "Star Track"
+msgstr "Mlécná dráha"
+
+#: src/gui/race_options.cpp:129
+msgid "Start race"
+msgstr "Start"
+
+#: data/tracks/subseatrack/subseatrack.track:4
+msgid "Sub Sea"
+msgstr "Pod morem"
+
+#: data/tracks/islandtrack/islandtrack.track:4
+msgid "The Island"
+msgstr "Ostrov"
+
+#: src/gui/grand_prix_ending.cpp:107
+#: src/gui/leader_result.cpp:109
+#, c-format
+msgid "The winner is %s!"
+msgstr "Vítezem je %s!"
+
+#: data/gp3.cup:5
+msgid "Third grand prix"
+msgstr "Tretí Velká Soutez"
+
+#: src/gui/num_players.cpp:39
+msgid "Three Players"
+msgstr "Tri hráci"
+
+#: src/gui/game_mode.cpp:62
+msgid "Time Trial"
+msgstr "Zkusební závod na cas"
+
+#: src/gui/help_page_three.cpp:67
+msgid "Time Trial: As quick race, but no items.                       "
+msgstr "Zkusební závod na cas: jako normální, ale bez predmetu."
+
+#: src/gui/help_page_two.cpp:61
+msgid "To help you win, there are certain collectables you can grab:"
+msgstr "Pro snadnejsí vŭhru muzes sbírat tyto veci:"
+
+#: data/gp2.cup:4
+msgid "To the Moon and Back"
+msgstr "Na Mesíc a zpet"
+
+#: src/gui/config_sound.cpp:45
+#: src/gui/config_sound.cpp:90
+msgid "Turn off music"
+msgstr "Vypnout hudbu"
+
+#: src/gui/config_sound.cpp:54
+#: src/gui/config_sound.cpp:103
+msgid "Turn off sound effects"
+msgstr "Vypnout zvukové efekty"
+
+#: src/gui/config_sound.cpp:49
+#: src/gui/config_sound.cpp:84
+msgid "Turn on music"
+msgstr "Zapnout hudbu"
+
+#: src/gui/config_sound.cpp:58
+#: src/gui/config_sound.cpp:98
+msgid "Turn on sound effects"
+msgstr "Zapnout zvukové efekty"
+
+#: data/tracks/tuxtrack/tuxtrack.track:4
+msgid "Tux Tollway"
+msgstr "Dálnice"
+
+#: src/gui/num_players.cpp:38
+msgid "Two Players"
+msgstr "Dva hráci"
+
+#: data/tracks/volcano/volcano.track:4
+msgid "Volcano"
+msgstr "Sopka"
+
+#: src/player_kart.cpp:264
+msgid "WRONG WAY!"
+msgstr "SPATNŬ SMER!"
+
+#: src/gui/player_controls.cpp:65
+msgid "Wheelie"
+msgstr "Po dvou kolech"
+
+#: src/challenges/penguin_playground_gp.cpp:25
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix"
+msgstr ""
+"Vyhraj Velkou Soutez na\n"
+"Hristi tucnáku"
+
+#: src/challenges/penguin_playground_gp.cpp:27
+msgid ""
+"Win Penguin Playground Grand\n"
+"Prix with 3 'Racer' Level AI karts."
+msgstr ""
+"Vyhraj Velkou Soutez na\n"
+"Hristi tucnáku proti trem autum\n"
+"na úrovni 'závodník' ovládanŭm pocítacem"
+
+#: src/challenges/moon_and_back_gp.cpp:25
+msgid ""
+"Win To the Moon and Back\n"
+"Grand Prix"
+msgstr ""
+"Vyhraj Velkou Soutez\n"
+"Na mesíc a Zpet"
+
+#: src/challenges/tollway_head2head.cpp:27
+msgid ""
+"Win a 1 lap Head to Head\n"
+"on Tux Tollway against 1 'Racer'\n"
+"level AI kart."
+msgstr ""
+"Vyhraj jeden duel na Dálnici\n"
+"proti jednomu auto na úrovni 'závodník'\n"
+"ovládanému pocítacem"
+
+#: src/challenges/jungle_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"in the Amazonian Jungle."
+msgstr ""
+"Vyhraj závod 'Následuj vudce'\n"
+"proti trem autum ovládanŭm\n"
+"pocítacem."
+
+#: src/challenges/island_follow.cpp:27
+msgid ""
+"Win a Follow the Leader race\n"
+"with 3 AI karts\n"
+"on a Desert Island."
+msgstr ""
+"Vyhraj 'Následuj vudce' se tremi\n"
+"auty pocítace na Opusteném ostrove."
+
+#: src/challenges/tollway_head2head.cpp:25
+msgid ""
+"Win a Head to Head on\n"
+"Tux Tollway"
+msgstr ""
+"Vyhraj duel\n"
+"na dálnici"
+
+#: src/challenges/worlds_end_gp.cpp:25
+msgid ""
+"Win the At World's End\n"
+"Grand Prix"
+msgstr ""
+"vyhraj Velkou Soutez\n"
+"'Na konci sveta'"
+
+#: src/challenges/moon_and_back_gp.cpp:27
+msgid ""
+"Win the To the Moon and Back\n"
+"Grand Prix with 3 'Racer'\n"
+"Level AI karts."
+msgstr ""
+"Vyhraj Velkou Soutez 'Na mesíc a zpet'\n"
+"proti trem autum na úrovni 'závodník'\n"
+"ovládanŭm pocítacem."
+
+#: src/gui/config_display.cpp:71
+msgid "Window mode"
+msgstr "Okenní rezim"
+
+#: src/world.cpp:538
+msgid "You finished"
+msgstr "Skoncil jsi"
+
+#: src/world.cpp:617
+msgid ""
+"You have been\n"
+"eliminated!"
+msgstr ""
+"Byl jsi\n"
+"odstranen!"
+
+#: src/world.cpp:537
+msgid "You won"
+msgstr "Vyhrál jsi"
+
+#: src/gui/help_page_two.cpp:92
+msgid "Zipper - speed boost"
+msgstr "Turbo - zvysuje rychlost"
+
+#: src/user_config.cpp:844
+#, c-format
+msgid "joy %d axis %d  %c"
+msgstr "joy %d osa %d  %c"
+
+#: src/user_config.cpp:848
+#, c-format
+msgid "joy %d btn %d"
+msgstr "joy %d tlacítko %d"
+
+#: src/user_config.cpp:851
+#, c-format
+msgid "joy %d hat %d"
+msgstr "joy %d hat %d"
+
+#: src/user_config.cpp:857
+#, c-format
+msgid "mouse axis %d %c"
+msgstr "osa mysi %d %c"
+
+#: src/user_config.cpp:854
+#, c-format
+msgid "mouse btn %d"
+msgstr "tlacítko mysi %d"
+
+#: src/user_config.cpp:838
+#: src/user_config.cpp:883
+#, c-format
+msgid "not set"
+msgstr "není nastaveno"
+
+#: src/world.cpp:540
+msgid "the race!"
+msgstr "závod!"
+
