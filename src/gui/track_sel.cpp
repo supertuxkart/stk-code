@@ -398,7 +398,9 @@ void TrackSel::select()
     }
 
     const Track* TRACK = track_manager->getTrack(m_index_avail_tracks[track_number]);
-    user_config->m_last_track = TRACK->getIdent();
+    // Only save the last track if it's not in battle mode.
+    if(!RaceManager::isBattleMode(race_manager->getMinorMode()))
+        user_config->m_last_track = TRACK->getIdent();
     bool isAvailable = !unlock_manager->isLocked(TRACK->getIdent());
 
     if( isAvailable )
