@@ -1,18 +1,27 @@
 SuperTuxKart SVN
 ~~~~~~~~~~~~~~~~
-* Irrlicht
+* Irrlicht:
   - Renamed global scene object to stk_scene (to avoid a name clash with
     irrlicht's namespace 'scene').
+* New art:
 * Bugfixes:
-  - Fixed several bugs related to track and character group selection.
-  - Plunger would stay in face after a restart of a race
-  - Prevented incorrect rescues in Fort magma.
-  - Added slowdown for karts driving backwards
-  - Fixed crash if the user_config contained an invalid last used
-    kart id (e.g. too big because it's from a previous installation
-    with more karts), kart or track group.
 * Code cleanup:
   - Removed all snprintfs and constants defining a maximum message size.
+
+SuperTuxKart 0.6.1 (February 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added new kart ("Puffy"), new battle map ("Cave"), and new music
+  for Snow Mountain.
+* Fixed bug in track selection screen that could cause a crash
+  when track groups were used.
+* Fixed crash in character selection that could happen if an
+  old user config file existed.
+* Fixed incorrect rescues in Fort Magma.
+* Improved track selection screen to not display empty track
+  groups.
+* A plunger in the face is now removed when restarting.
+* Added slow-down for karts driving backwards.
+* Somewhat reduced 'shaking' of AI driven karts.
 
 SuperTuxKart 0.6 (January 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
