@@ -227,7 +227,8 @@ int handleCmdLine(int argc, char **argv)
                 fprintf(stdout, "Track %s has not been unlocked yet. \n", argv[i+1]);
                 fprintf(stdout, "Use --list-tracks to list available tracks.\n\n");
                 return 0;
-            }    
+            }
+            i++;
         }
         else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
         {
