@@ -165,7 +165,7 @@ supertuxkart_SOURCES = \
  challenges/challenge_data.hpp \
  challenges/challenge_data.cpp \
  challenges/unlock_manager.cpp \
- challanges/unlock_manager.hpp \
+ challenges/unlock_manager.hpp \
  lisp/lisp.cpp \
  lisp/lisp.hpp \
  lisp/lexer.cpp \
