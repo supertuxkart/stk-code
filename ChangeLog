@@ -1,11 +1,14 @@
 SuperTuxKart 0.6.1 (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Added new kart ("Puffy"), new battle map ("Cave"), and new music
+  for Snow Mountain.
 * Fixed bug in track selection screen that could cause a crash
   when track groups were used.
 * Fixed crash in character selection that could happen if an
   old user config file existed.
 * Improved track selection screen to not display empty track
   groups.
+* Reduced 'shaking' of AI driven karts.
 * Fixed incorrect rescues in Fort Magma.
 
 SuperTuxKart 0.6 (January 2009)
