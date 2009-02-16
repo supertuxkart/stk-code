@@ -6,10 +6,12 @@ SuperTuxKart 0.6.1 (February 2009)
   when track groups were used.
 * Fixed crash in character selection that could happen if an
   old user config file existed.
+* Fixed incorrect rescues in Fort Magma.
 * Improved track selection screen to not display empty track
   groups.
-* Reduced 'shaking' of AI driven karts.
-* Fixed incorrect rescues in Fort Magma.
+* A plunger in the face is now removed when restarting.
+* Added slow-down for karts driving backwards.
+* Somewhat reduced 'shaking' of AI driven karts.
 
 SuperTuxKart 0.6 (January 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
