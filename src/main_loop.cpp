@@ -206,7 +206,8 @@ void MainLoop::run()
         sound_manager->update(dt);
 
 #ifdef HAVE_IRRLICHT
-        irr_driver->update(dt);
+        if(!user_config->m_bullet_debug)
+            irr_driver->update(dt);
 #else
         glFlush();
         SDL_GL_SwapBuffers();

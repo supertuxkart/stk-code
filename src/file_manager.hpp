@@ -26,6 +26,7 @@
 #ifdef HAVE_IRRLICHT
 #  include "irrlicht.h"
    using namespace irr;
+#include "io/xml_reader.hpp"
 #endif
 
 class FileManager 
@@ -53,11 +54,15 @@ private:
                                  const std::string& fname) const;
 
 public:
-                FileManager();
-               ~FileManager();
+                    FileManager();
+                   ~FileManager();
 #ifdef HAVE_IRRLICHT
-    void        setDevice(IrrlichtDevice *device);
-    void        dropFileSystem();
+    void            setDevice(IrrlichtDevice *device);
+    void            dropFileSystem();
+    XMLReader      *getXMLReader(const std::string &f);
+//    io::IXMLWriter *getXMLWriter(const std::string &f) 
+                           //{ return m_file_system->createXMLWriter(f.c_str());}
+
 #endif
 
     std::string getHomeDir       () const;
@@ -91,6 +96,7 @@ public:
     void       popTextureSearchPath () {m_texture_search_path.pop_back();   }
     void       popModelSearchPath   () {m_model_search_path.pop_back();     }
     void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
+
 };
 
 extern FileManager* file_manager;

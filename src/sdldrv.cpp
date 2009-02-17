@@ -498,7 +498,20 @@ void SDLDriver::input()
                                     ev.key.keysym.unicode);
             }
             input(Input::IT_KEYBOARD, ev.key.keysym.sym,
-                  ev.key.keysym.unicode, 0, 32768);
+#ifdef HAVE_IRRLICHT
+                  // FIXME: not sure why this happens: with plib the unicode
+                  // value is 0. Since all values defined in user_config 
+                  // assume that the unicode value is 0, it does not work 
+                  // with irrlicht, which has proper unicode values defined
+                  // (keydown is not recognised, but keyup is). So for now
+                  // (till user_config is migrated to ful lirrlicht support)
+                  // we pass the 0 here artifically so that keyboard handling
+                  // works.
+                  0,
+#else
+                  ev.key.keysym.unicode, 
+#endif
+                  0, 32768);
 
             break;
 
@@ -510,8 +523,10 @@ void SDLDriver::input()
             if (!m_mode)
             {
                 BaseGUI* menu = menu_manager->getCurrentMenu();
+#ifndef HAVE_IRRLICHT
                 if (menu != NULL)
                     menu->inputPointer(ev.motion.x, m_main_surface->h - ev.motion.y);
+#endif
             }
             // If sensing input mouse movements are made less sensitive in order
             // to avoid it being detected unwantedly.

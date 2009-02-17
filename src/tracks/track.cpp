@@ -37,6 +37,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
+#include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
 #include "lisp/lisp.hpp"
@@ -58,7 +59,7 @@ const int   Track::UNKNOWN_SECTOR  = -1;
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
     m_filename         = filename_;
-    m_item_style    = "";
+    m_item_style       = "";
     m_track_2d_width   = w;
     m_track_2d_height  = h;
     m_do_stretch       = stretch;
@@ -837,26 +838,71 @@ void Track::draw2Dview (float x_offset, float y_offset) const
 //-----------------------------------------------------------------------------
 void Track::loadTrack(const std::string &filename)
 {
-    m_filename      = filename;
+    m_filename       = filename;
 
     m_ident = StringUtils::basename(StringUtils::without_extension(m_filename));
     std::string path = StringUtils::without_extension(m_filename);
 
     // Default values
-    m_use_fog = false;
-    sgSetVec4 ( m_fog_color  , 0.3f, 0.7f, 0.9f, 1.0f ) ;
-    m_fog_density               = 1.0f/100.0f;
-    m_fog_start                 = 0.0f;
-    m_fog_end                   = 1000.0f;
-    m_gravity                   = 9.80665f;
+    m_use_fog        = false;
+    m_fog_density    = 1.0f/100.0f;
+    m_fog_start      = 0.0f;
+    m_fog_end        = 1000.0f;
+    m_gravity        = 9.80665f;
+#ifdef HAVE_IRRLICHT
+    m_sun_position   = core::vector3df(0.4f, 0.4f, 0.4f);
+    m_sky_color      = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
+    m_fog_color      = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
+    m_ambient_color  = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
+    m_specular_color = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_diffuse_color  = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
+    XMLReader *xml   = file_manager->getXMLReader(m_filename);
+    XMLNode   *node  = xml->getNode("track");
 
+    node->get("name",                  &m_name);
+    node->get("description",           &m_description);
+    node->get("designer",              &m_designer);
+    node->get("version",               &m_version);
+    std::vector<std::string> filenames;
+    node->get("music",                 &filenames);
+    getMusicInformation(filenames, m_music);
+    node->get("item",                  &m_item_style);
+    node->get("screenshot",            &m_screenshot);
+    node->get("topview",               &m_top_view);
+    node->get("item",                  &m_item_style);
+    node->get("screenshot",            &m_screenshot);
+    node->get("topview",               &m_top_view);
+    node->get("sky-color",             &m_sky_color);
+    node->get("start-x",               &m_start_x);
+    node->get("start-y",               &m_start_y);
+    node->get("start-z",               &m_start_z);
+    node->get("start-heading",         &m_start_heading);
+    node->get("use-fog",               &m_use_fog);
+    node->get("fog-color",             &m_fog_color);
+    node->get("fog-density",           &m_fog_density);
+    node->get("fog-start",             &m_fog_start);
+    node->get("fog-end",               &m_fog_end);
+    node->get("sun-position",          &m_sun_position);
+    node->get("sun-ambient",           &m_ambient_color);
+    node->get("sun-specular",          &m_specular_color);
+    node->get("sun-diffuse",           &m_diffuse_color);
+    node->get("gravity",               &m_gravity);
+    node->get("arena",                 &m_is_arena);
+    node->get("groups",                &m_groups);
+    if(m_groups.size()==0)
+        m_groups.push_back("standard");
+    // if both camera position and rotation are defined,
+    // set the flag that the track has final camera position
+    m_has_final_camera  = node->get("camera-final-position", &m_camera_final_position);
+    m_has_final_camera &= node->get("camera-final-hpr",      &m_camera_final_hpr);
+    m_camera_final_hpr.degreeToRad();
+#else
     sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
     sgSetVec4 ( m_sky_color,     0.3f, 0.7f, 0.9f, 1.0f );
     sgSetVec4 ( m_fog_color,     0.3f, 0.7f, 0.9f, 1.0f );
     sgSetVec4 ( m_ambient_col,   0.5f, 0.5f, 0.5f, 1.0f );
     sgSetVec4 ( m_specular_col,  1.0f, 1.0f, 1.0f, 1.0f );
     sgSetVec4 ( m_diffuse_col,   1.0f, 1.0f, 1.0f, 1.0f );
-
     lisp::Parser parser;
     const lisp::Lisp* const ROOT = parser.parse(m_filename);
 
@@ -903,12 +949,12 @@ void Track::loadTrack(const std::string &filename)
     m_has_final_camera  = LISP->get("camera-final-position", m_camera_final_position);
     m_has_final_camera &= LISP->get("camera-final-hpr",      m_camera_final_hpr);
     m_camera_final_hpr.degreeToRad();
+    delete ROOT;
+#endif
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
     m_top_view   = file_manager->getTrackFile(m_top_view,   getIdent());
-    
-    delete ROOT;
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
@@ -1146,7 +1192,7 @@ void Track::convertTrackToBullet()
 
             u16 *mbIndices = mb->getIndices();
             btVector3 vertices[3];
-            irr::video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
+            irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
             for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
                 for(unsigned int k=0; k<3; k++) {
                     int indx=mbIndices[j+k];
@@ -1154,11 +1200,12 @@ void Track::convertTrackToBullet()
                     // (STK: Z up, irrlicht: Y up). We might want to change
                     // this as well, makes it easier to work with bullet and
                     // irrlicht together, without having to swap indices.
-                    vertices[k] = btVector3( mbVertices[indx].Pos.X,
-                        mbVertices[indx].Pos.Z,
-                        mbVertices[indx].Pos.Y );
+                    vertices[k] = btVector3(mbVertices[indx].Pos.X,
+                                            mbVertices[indx].Pos.Z,
+                                            mbVertices[indx].Pos.Y );
                 }   // for k
-                m_track_mesh->addTriangle(vertices[0], vertices[1], vertices[2], material);
+                m_track_mesh->addTriangle(vertices[0], vertices[1], 
+                                          vertices[2], material     );
             }   // for j
         }   // for i<getMeshBufferCount
     }   // for obj in children
@@ -1505,6 +1552,11 @@ void Track::loadTrackModel()
 #ifdef HAVE_IRRLICHT
     // FIXME: for now assume that mesh 0 is the actual track.
     MeshTools::minMax3D(m_all_meshes[0], &min, &max);
+    const core::vector3df &sun_pos = getSunPos();
+    m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
+    video::SLight light;
+    m_light->setLightData(light);
+    
 #else
     SSGHelp::MinMax(m_model, &min, &max);
 #endif

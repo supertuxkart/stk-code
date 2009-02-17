@@ -275,7 +275,7 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 void KartModel::adjustWheels(float rotation, float steer,
                              const float suspension[4])
 {
-#ifdef HAVE_IRRLICHT
+
     float clamped_suspension[4];
     // Clamp suspension to minimum and maximum suspension length, so that
     // the graphical wheel models don't look too wrong.
@@ -293,10 +293,23 @@ void KartModel::adjustWheels(float rotation, float steer,
         ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
-    
-    core::vector3df wheel_rot  (RAD_TO_DEGREE(-rotation), 0, 0);
-    //core::vector3df wheel_steer(0, wheel_steer, 0);
-    //core::vector3df wheel_front = wheel_rot+wheel_steer;
+
+#ifdef HAVE_IRRLICHT
+    core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
+    core::vector3df wheel_steer(0, RAD_TO_DEGREE(steer), 0);
+    core::vector3df wheel_front = wheel_rear+wheel_steer;
+    for(unsigned int i=0; i<4; i++)
+    {
+        core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
+        pos.Z += clamped_suspension[i];
+        m_wheel_node[i]->setPosition(pos);
+    }
+    m_wheel_node[0]->setRotation(wheel_front);
+    m_wheel_node[1]->setRotation(wheel_front);
+    m_wheel_node[2]->setRotation(wheel_rear );
+    m_wheel_node[3]->setRotation(wheel_rear );
+
+
 #ifdef FIXME
     sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
     wheel_front[3][2] += clamped_suspension[0];
@@ -318,24 +331,6 @@ void KartModel::adjustWheels(float rotation, float steer,
     sgMat4 wheel_front;
     sgMat4 wheel_steer;
     sgMat4 wheel_rot;
-
-    float clamped_suspension[4];
-    // Clamp suspension to minimum and maximum suspension length, so that
-    // the graphical wheel models don't look too wrong.
-    for(unsigned int i=0; i<4; i++)
-    {
-        const float suspension_length = (m_max_suspension[i]-m_min_suspension[i])/2;
-        
-        // limit amplitude between set limits, first dividing it by a
-        // somewhat arbitrary constant to reduce visible wheel movement
-        clamped_suspension[i] = std::min(std::max(suspension[i]/m_dampen_suspension_amplitude[i],
-                                                  m_min_suspension[i]),
-                                                  m_max_suspension[i]);
-        float ratio = clamped_suspension[i] / suspension_length;
-        const int sign = ratio < 0 ? -1 : 1;
-        ratio = sign * fabsf(ratio*(2-ratio)); // expanded form of 1 - (1 - x)^2, i.e. making suspension display quadratic and not linear
-        clamped_suspension[i] = ratio*suspension_length;
-    }   // for i<4
 
     sgMakeRotMat4( wheel_rot,   0,      RAD_TO_DEGREE(-rotation), 0);
     sgMakeRotMat4( wheel_steer, steer , 0,                        0);

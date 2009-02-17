@@ -32,12 +32,12 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
             continue;
         }
         u16 *mbIndices = mb->getIndices();
-        irr::video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
+        video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
         for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
             int indx=mbIndices[j];
             Vec3 c(mbVertices[indx].Pos.X,
-                   mbVertices[indx].Pos.Y,
-                   mbVertices[indx].Pos.Z  );
+                   mbVertices[indx].Pos.Z,
+                   mbVertices[indx].Pos.Y  );
             min->min(c);
             max->max(c);
         }   // for j

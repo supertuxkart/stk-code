@@ -102,3 +102,25 @@ void Vec3::setPitchRoll(const Vec3 &normal)
     m_y = acosf(pitch) - NINETY_DEGREE_RAD;
     m_z = acosf(roll)  - NINETY_DEGREE_RAD;
 }   // setPitchRoll
+
+// ----------------------------------------------------------------------------
+/** Converts a bullet HPR value into an irrlicht HPR value.
+ *  FIXME: this function should be inlined, but while debugging it's
+ *  easier (compile-time wise) to modify it here :)
+ */
+#ifdef HAVE_IRRLICHT
+const core::vector3df Vec3::toIrrHPR() const
+{
+    core::vector3df r(RAD_TO_DEGREE( getZ()),
+                      RAD_TO_DEGREE(-getX()),
+                      RAD_TO_DEGREE( getY()) );
+    return r;
+
+}  // toIrrHPR
+// ----------------------------------------------------------------------------
+const core::vector3df Vec3::toIrrVector() const
+{
+    core::vector3df v(m_x, m_z, m_y);
+    return v;
+}   // toIrrVector
+#endif

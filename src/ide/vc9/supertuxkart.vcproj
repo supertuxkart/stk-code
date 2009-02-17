@@ -837,6 +837,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath="..\..\io\xml_node.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\io\xml_reader.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1504,6 +1516,18 @@
 				</File>
 				<File
 					RelativePath="..\..\replay\replay_recorder.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath="..\..\io\xml_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\io\xml_reader.hpp"
 					>
 				</File>
 			</Filter>

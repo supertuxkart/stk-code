@@ -24,6 +24,9 @@
 #include <vector>
 #define _WINSOCKAPI_
 #include <plib/sg.h>
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+#endif
 #include "utils/vec3.hpp"
 
 namespace lisp
@@ -147,6 +150,32 @@ namespace lisp
                 }
                 return true;
             }
+#ifdef HAVE_IRRLICHT
+        bool get(const char* name, core::vector3df& val) const
+            {
+                const Lisp* lisp = getLisp(name);
+                if(!lisp)
+                    return false;
+
+                lisp = lisp->getCdr();
+                if(!lisp) return false;
+
+                const Lisp* m_car = lisp->getCar();
+                if(!m_car) return false;
+                m_car->get(val.X);
+                lisp = lisp->getCdr();
+                m_car = lisp->getCar();
+                if(!m_car) return false;
+                m_car->get(val.Y);
+                lisp = lisp->getCdr();
+                m_car = lisp->getCar();
+                if(!m_car) return false;
+                m_car->get(val.Z);
+                lisp = lisp->getCdr();
+
+                return true;
+            }
+#endif
         bool get(const char* name, Vec3& val) const
             {
                 const Lisp* lisp = getLisp(name);

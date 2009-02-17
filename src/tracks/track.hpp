@@ -59,6 +59,7 @@ private:
 #ifdef HAVE_IRRLICHT
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
+    scene::ILightSceneNode  *m_light;
 #else
     ssgBranch               *m_model;
 #endif
@@ -93,17 +94,26 @@ public:
         ) : segment(_segment), triangle(_triangle) {};
     };
 
-    std::string m_name;
-    sgVec4      m_sky_color;
-    bool        m_use_fog;
-    sgVec4      m_fog_color;
-    float       m_fog_density;
-    float       m_fog_start;
-    float       m_fog_end;
-    sgVec3      m_sun_position;   /** Position of the sun */
-    sgVec4      m_ambient_col;
-    sgVec4      m_specular_col;
-    sgVec4      m_diffuse_col;
+    std::string     m_name;
+    bool            m_use_fog;
+    float           m_fog_density;
+    float           m_fog_start;
+    float           m_fog_end;
+#ifdef HAVE_IRRLICHT
+    core::vector3df m_sun_position;
+    video::SColorf  m_ambient_color;
+    video::SColorf  m_specular_color;
+    video::SColorf  m_diffuse_color;
+    video::SColorf  m_sky_color;
+    video::SColorf  m_fog_color;
+#else
+    sgVec4          m_sky_color;
+    sgVec4          m_fog_color;
+    sgVec3          m_sun_position;   /** Position of the sun */
+    sgVec4          m_ambient_col;
+    sgVec4          m_specular_col;
+    sgVec4          m_diffuse_col;
+#endif
 
     //FIXME: Maybe the next 4 vectors should be inside an struct and be used
     //from a vector of structs?
@@ -177,16 +187,25 @@ public:
                        getGroups         () const {return m_groups;             }
     void               startMusic        () const;
     const std::string& getFilename       () const {return m_filename;           }
+#ifdef HAVE_IRRLICHT
+    const core::vector3df& getSunPos     () const {return m_sun_position;       }
+    const video::SColorf& getAmbientCol  () const {return m_ambient_color;      }
+    const video::SColorf& getDiffuseCol  () const {return m_diffuse_color;      }
+    const video::SColorf& getSpecularCol () const {return m_specular_color;     }
+    const video::SColorf& getFogColor    () const {return m_fog_color;          }
+    const video::SColorf& getSkyColor    () const {return m_sky_color;          }
+#else
     const sgVec3& getSunPos              () const {return m_sun_position;       }
     const sgVec4& getAmbientCol          () const {return m_ambient_col;        }
     const sgVec4& getDiffuseCol          () const {return m_diffuse_col;        }
     const sgVec4& getSpecularCol         () const {return m_specular_col;       }
-    const bool&   useFog                 () const {return m_use_fog;            }
     const sgVec4& getFogColor            () const {return m_fog_color;          }
+    const sgVec4& getSkyColor            () const {return m_sky_color;          }
+#endif
+    const bool&   useFog                 () const {return m_use_fog;            }
     const float&  getFogDensity          () const {return m_fog_density;        }
     const float&  getFogStart            () const {return m_fog_start;          }
     const float&  getFogEnd              () const {return m_fog_end;            }
-    const sgVec4& getSkyColor            () const {return m_sky_color;          }
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     const std::string& getTopviewFile    () const {return m_top_view;           }

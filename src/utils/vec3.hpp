@@ -32,9 +32,6 @@ using namespace irr;
 class Vec3 : public btVector3
 {
 private:
-#ifdef HAVE_IRRLICHT
-    core::vector3df m_irr_vector;
-#endif
     inline float clampToUnity(float f) {return f<-1?f:(f>1?1:f);}
     void         setPitchRoll(const Vec3 &normal);
 
@@ -63,11 +60,8 @@ public:
     float*                toFloat() const          {return (float*)this;     }
 #ifdef HAVE_IRRLICHT
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
-    const core::vector3df &toIrrVector()
-    {
-        m_irr_vector.set(m_x, m_z, m_y);
-        return m_irr_vector;
-    }
+    const core::vector3df toIrrVector() const;
+    const core::vector3df toIrrHPR()    const;
 #endif
     void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}

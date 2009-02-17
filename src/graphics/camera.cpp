@@ -20,8 +20,10 @@
 
 #include "graphics/camera.hpp"
 
+#ifndef HAVE_IRRLICHT
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
+#endif
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -236,7 +238,11 @@ void Camera::update(float dt)
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
     bool reverse = m_kart->getControls().m_look_back || m_mode==CM_LEADER_MODE;
+#ifdef HAVE_IRRLICHT
     Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
+#else
+    Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
+#endif
 
     // Set the camera rotation
     // -----------------------

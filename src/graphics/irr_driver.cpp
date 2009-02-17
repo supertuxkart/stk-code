@@ -133,7 +133,6 @@ scene::ICameraSceneNode *IrrDriver::addCamera()
  */
 void IrrDriver::update(float dt)
 {
-
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
     m_device->getVideoDriver()->endScene();
@@ -143,6 +142,30 @@ void IrrDriver::update(float dt)
 // Irrlicht Event handler.
 bool IrrDriver::OnEvent(const irr::SEvent &event)
 {
+    switch (event.EventType) 
+    {
+    case   irr::EET_KEY_INPUT_EVENT: {
+        printf("key input event\n");
+               break;
+           }  // keyboard
+      case irr::EET_GUI_EVENT:         {
+               return false;           }
+      case irr::EET_MOUSE_INPUT_EVENT: {
+               return false;           }
+      case irr::EET_LOG_TEXT_EVENT:
+          {
+              // Ignore 'normal' messages
+              if(event.LogEvent.Level>=0)
+              {
+                  printf("Level %d: %s\n", 
+                         event.LogEvent.Level,event.LogEvent.Text);
+              }
+              return true;
+           }
+      default:
+          printf("Event: %d -> ",event.EventType);
+          return false;
+    }   // switch
     return false;
 }   // OnEvent
 

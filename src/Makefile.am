@@ -91,6 +91,10 @@ supertuxkart_SOURCES = \
  graphics/skid_marks.hpp \
  graphics/smoke.cpp \
  graphics/smoke.hpp \
+ io/xml_node.cpp \
+ io/xml_node.hpp \
+ io/xml_reader.cpp \
+ io/xml_reader.hpp\`
  items/attachment.cpp \
  items/attachment.hpp \
  items/attachment_manager.cpp \

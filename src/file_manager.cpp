@@ -216,6 +216,14 @@ FileManager::~FileManager()
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+XMLReader *FileManager::getXMLReader(const std::string &f) 
+{
+    io::IXMLReader *r = m_file_system->createXMLReader(f.c_str());
+    return new XMLReader(r);
+}   // getXMLReader
+#endif
+//-----------------------------------------------------------------------------
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);  

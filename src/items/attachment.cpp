@@ -62,7 +62,9 @@ Attachment::~Attachment()
 void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
+#ifndef HAVE_IRRLICHT
     m_holder->selectStep(type);
+#endif
     m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;

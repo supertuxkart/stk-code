@@ -99,12 +99,11 @@ void Scene::draw(float dt)
     glEnable ( GL_DEPTH_TEST ) ;
 
     const Track* TRACK = RaceManager::getTrack();
-
+#ifndef HAVE_IRRLICHT
     ssgGetLight ( 0 ) -> setPosition ( TRACK->getSunPos() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , TRACK->getAmbientCol()  ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , TRACK->getDiffuseCol() ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, TRACK->getSpecularCol() ) ;
-
     if (TRACK->useFog())
     {
         glEnable ( GL_FOG ) ;
@@ -130,6 +129,7 @@ void Scene::draw(float dt)
                       TRACK->getSkyColor()[2],
                       TRACK->getSkyColor()[3]);
     }
+#endif
 
     glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
 
