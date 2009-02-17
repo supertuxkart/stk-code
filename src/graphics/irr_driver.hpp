@@ -55,3 +55,4 @@ extern IrrDriver *irr_driver;
 #endif   // HEADER_IRR_DRIVER_HPP
 
 #endif   // HAVE_IRRLICHT
+
