@@ -144,7 +144,7 @@ void HighscoreManager::Load()
     {
         fprintf(stderr, "Error while parsing highscore file '%s':\n", 
                 m_filename.c_str());
-        fprintf(stderr, err.what());
+        fprintf(stderr, "%s", err.what());
         fprintf(stderr, "\n");
         fprintf(stderr, "No old highscores will be available.\n");
     }
@@ -182,8 +182,7 @@ void HighscoreManager::Save()
     {
         printf("Problems saving highscores in '%s'\n",
                m_filename.c_str());
-        printf(e.what());
-        printf("\n");
+        puts(e.what());
         m_can_write=false;
     }
 }   // Save

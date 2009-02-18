@@ -117,8 +117,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     {
         fprintf(stderr, "Error while parsing KartProperties '%s':\n", 
                 filename.c_str());
-        fprintf(stderr, err.what());
-        fprintf(stderr, "\n");
+        fprintf(stderr, "%s\n", err.what());
     }
     delete root;
 

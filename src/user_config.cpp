@@ -510,7 +510,7 @@ void UserConfig::loadConfig(const std::string& filename)
     catch(std::exception& e)
     {
         fprintf(stderr, "Error while parsing config '%s':\n", filename.c_str());
-        fprintf(stderr,  e.what());
+        fprintf(stderr, "%s", e.what());
         fprintf(stderr, "\n");
     }
 
@@ -782,7 +782,7 @@ void UserConfig::saveConfig(const std::string& filename)
     catch(std::exception& e)
     {
         fprintf(stderr, "Couldn't write config: ");
-        fprintf(stderr, e.what());
+        fprintf(stderr, "%s",e.what());
         fprintf(stderr, "\n");
     }
 

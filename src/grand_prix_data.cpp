@@ -52,7 +52,7 @@ GrandPrixData::GrandPrixData(const std::string filename)
     catch(std::exception& err)
     {
         fprintf(stderr, "Error while reading grandprix file '%s'\n", filename.c_str());
-        fprintf(stderr, err.what());
+        fprintf(stderr, "%s", err.what());
         fprintf(stderr, "\n");
     }
 
