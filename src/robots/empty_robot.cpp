@@ -10,6 +10,8 @@
  * You should also delete these intructions. Oh, and if you use this template
  * as a robot, it does nothing.
  */
+ 
+#if 0
 
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
@@ -65,3 +67,5 @@ void EmptyRobot::reset()
     /*General kart stuff*/
     AutoKart::reset();
 }
+
+#endif
