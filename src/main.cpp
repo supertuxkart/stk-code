@@ -622,7 +622,7 @@ int main(int argc, char *argv[] )
     }  // try
     catch (std::exception &e)
     {
-        fprintf(stderr,e.what());
+        fprintf(stderr,"%s",e.what());
         fprintf(stderr,"\nAborting SuperTuxKart\n");
     }
 
