@@ -166,17 +166,16 @@ void TrackSel::updateScrollPosition()
 void TrackSel::switchGroup()
 {
     m_index_avail_tracks.clear();
-    bool group_available = 
-        (RaceManager::isBattleMode( race_manager->getMinorMode() ) 
-         ? track_manager->getArenasInGroup(user_config->m_track_group) 
-         : track_manager->getTracksInGroup(user_config->m_track_group)).size()>0;
+    bool is_battle_mode = RaceManager::isBattleMode(race_manager->getMinorMode());
+    bool group_available = is_battle_mode
+         ? track_manager->getArenasInGroup(user_config->m_track_group).size()>0 
+         : track_manager->getTracksInGroup(user_config->m_track_group).size()>0;
     if(!group_available)
         user_config->m_track_group = "standard";
 
-    const std::vector<int> &tracks = 
-        RaceManager::isBattleMode( race_manager->getMinorMode() ) ?
-                            track_manager->getArenasInGroup(user_config->m_track_group) :
-                            track_manager->getTracksInGroup(user_config->m_track_group);
+    const std::vector<int> &tracks = is_battle_mode
+        ? track_manager->getArenasInGroup(user_config->m_track_group) 
+        : track_manager->getTracksInGroup(user_config->m_track_group);
 
     for(unsigned int i=0; i<tracks.size(); i++)
     {
@@ -197,7 +196,9 @@ void TrackSel::switchGroup()
 
         // Check if there are any tracks available in this group - i.e. not only locked
         // tracks, and not only non-arena if arena mode (and vice versa).
-        const std::vector<int> &tracks_in_group = track_manager->getTracksInGroup(groups[i]);
+        const std::vector<int> &tracks_in_group = is_battle_mode
+            ? track_manager->getArenasInGroup(groups[i])
+            : track_manager->getTracksInGroup(groups[i]);
         bool ignore_group=true;
         for(unsigned int j=0; j<tracks_in_group.size(); j++)
         {
@@ -205,8 +206,7 @@ void TrackSel::switchGroup()
             // Locked tracks are not available
             if(unlock_manager->isLocked(track->getIdent())) continue;
             // Tracks of a different type are not available
-            ignore_group = RaceManager::isBattleMode(race_manager->getMinorMode()) !=
-                           track->isArena();
+            ignore_group = is_battle_mode != track->isArena();
             if(!ignore_group) break;
         }
 
