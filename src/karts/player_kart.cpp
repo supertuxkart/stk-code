@@ -161,7 +161,6 @@ void PlayerKart::action(KartAction action, int value)
         m_controls.m_look_back = (value!=0);
         break;
     case KA_DRIFT:
-        printf("Drifting: value %d\n",value);
         m_controls.m_drift = (value!=0);
         break;
     }
