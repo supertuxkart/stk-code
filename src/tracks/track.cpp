@@ -838,27 +838,29 @@ void Track::draw2Dview (float x_offset, float y_offset) const
 //-----------------------------------------------------------------------------
 void Track::loadTrack(const std::string &filename)
 {
-    m_filename       = filename;
-
-    m_ident = StringUtils::basename(StringUtils::without_extension(m_filename));
-    std::string path = StringUtils::without_extension(m_filename);
+    m_filename          = filename;
+    m_ident             = StringUtils::basename(
+                                StringUtils::without_extension(m_filename));
+    std::string path    = StringUtils::without_extension(m_filename);
 
     // Default values
-    m_use_fog        = false;
-    m_fog_density    = 1.0f/100.0f;
-    m_fog_start      = 0.0f;
-    m_fog_end        = 1000.0f;
-    m_gravity        = 9.80665f;
+    m_use_fog           = false;
+    m_fog_density       = 1.0f/100.0f;
+    m_fog_start         = 0.0f;
+    m_fog_end           = 1000.0f;
+    m_gravity           = 9.80665f;
 #ifdef HAVE_IRRLICHT
-    m_sun_position   = core::vector3df(0.4f, 0.4f, 0.4f);
-    m_sky_color      = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
-    m_fog_color      = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
-    m_ambient_color  = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
-    m_specular_color = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_diffuse_color  = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
-    XMLReader *xml   = file_manager->getXMLReader(m_filename);
-    XMLNode   *node  = xml->getNode("track");
-
+    m_sun_position      = core::vector3df(0.4f, 0.4f, 0.4f);
+    m_sky_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
+    m_fog_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
+    m_ambient_color     = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
+    m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
+    XMLReader *xml      = file_manager->getXMLReader(m_filename);
+    const XMLNode *node = xml->getNode("track");
+    if(!node)
+    {
+    }
     node->get("name",                  &m_name);
     node->get("description",           &m_description);
     node->get("designer",              &m_designer);
@@ -893,8 +895,10 @@ void Track::loadTrack(const std::string &filename)
         m_groups.push_back("standard");
     // if both camera position and rotation are defined,
     // set the flag that the track has final camera position
-    m_has_final_camera  = node->get("camera-final-position", &m_camera_final_position);
-    m_has_final_camera &= node->get("camera-final-hpr",      &m_camera_final_hpr);
+    m_has_final_camera  = node->get("camera-final-position", 
+                                    &m_camera_final_position)!=1;
+    m_has_final_camera &= node->get("camera-final-hpr",
+                                    &m_camera_final_hpr)     !=1;
     m_camera_final_hpr.degreeToRad();
 #else
     sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
@@ -1153,8 +1157,8 @@ void Track::createPhysicsModel()
     sgMat4 mat;
     sgMakeIdentMat4(mat);
     convertTrackToBullet(m_model, mat);
-    m_track_mesh->createBody();
 #endif
+    m_track_mesh->createBody();
     m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
 }   // createPhysicsModel
@@ -1209,7 +1213,6 @@ void Track::convertTrackToBullet()
             }   // for j
         }   // for i<getMeshBufferCount
     }   // for obj in children
-    m_track_mesh->createBody();
 
 }   // convertTrackToBullet
 
@@ -1297,11 +1300,87 @@ void Track::loadTrackModel()
         // no temporary materials.dat file, ignore
         (void)e;
     }
+
+    // Start building the scene graph
 #ifdef HAVE_IRRLICHT
     std::string path = file_manager->getTrackFile(getIdent()+".irrloc");
+    XMLReader *xml = file_manager->getXMLReader(path);
+
+    // Make sure that we have a track (which is used for raycasts to 
+    // place other objects).
+    const XMLNode *node = xml->getNode(0);
+    if(!node || node->getName()!="track")
+    {
+        std::ostringstream msg;
+        msg<< "No track model defined in '"<<path
+           <<"' (it must be the first element).";
+        throw std::runtime_error(msg.str());
+    }
+    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    {
+        const XMLNode *node = xml->getNode(i);
+        const std::string name = node->getName();
+        if(name=="track" || name=="object")
+        {
+            std::string model_name;
+            node->get("model", &model_name);
+            std::string full_path = file_manager->getTrackFile(model_name, 
+                                                               getIdent());
+            scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
+            if(!obj)
+            {
+                fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
+                        node->getName().c_str(), model_name.c_str());
+                continue;
+            }
+            scene::IMesh *mesh = obj->getMesh(0);
+            m_all_meshes.push_back(mesh);
+            scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+            core::vector3df xyz(0,0,0);
+            int result = node->get(&xyz);
+            if(!XMLNode::hasZ(result))   // needs height
+            {
+            }
+            core::vector3df hpr(0,0,0);
+            result = node->get(&hpr);
+            if(!XMLNode::hasP(result) ||
+               !XMLNode::hasR(result))   // Needs perhaps pitch and roll
+            {
+            }
+            scene_node->setPosition(xyz);
+            scene_node->setRotation(hpr);
+            m_all_nodes.push_back(scene_node);
+            scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
+        }
+        else if(name=="banana"      || name=="item" || 
+                name=="small-nitro" || name=="big-nitro")
+        {
+            Item::ItemType type=Item::ITEM_BANANA;
+            if     (name=="banana"     ) type = Item::ITEM_BANANA;
+            else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
+            else if(name=="small-nitro") type = Item::ITEM_SILVER_COIN;
+            else                         type = Item::ITEM_GOLD_COIN;
+            core::vector3df xyz;
+            int bits = node->get(&xyz);
+            // Height is needed if bit 2 (for z) is not set
+            itemCommand(&xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
+        }
+        else if(name=="item")
+        {
+        }
+        else if(name=="small-nitro" || node->getName()=="big-nitro")
+        {
+        }
+        else
+        {
+            fprintf(stderr, "Warning: element '%s' not found.\n",
+                    node->getName().c_str());
+        }
+
+    }
+
 #else
     std::string path = file_manager->getTrackFile(getIdent()+".loc");
-#endif
 
     FILE *fd = fopen (path.c_str(), "r" );
     if ( fd == NULL )
@@ -1310,13 +1389,8 @@ void Track::loadTrackModel()
         msg<<"Can't open track location file '"<<path<<"'.";
         throw std::runtime_error(msg.str());
     }
-
-    // Start building the scene graph
-#ifdef HAVE_IRRLICHT
-#else
     m_model = new ssgBranch ;
     stk_scene->add(m_model);
-#endif
 
     char s [ 1024 ] ;
 
@@ -1338,67 +1412,67 @@ void Track::loadTrackModel()
         if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
                       &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
         {
-            ItemType type=ITEM_BANANA;
-            if ( htype=='Y' || htype=='y' ) { type = ITEM_GOLD_COIN   ;}
-            if ( htype=='G' || htype=='g' ) { type = ITEM_BANANA  ;}
-            if ( htype=='R' || htype=='r' ) { type = ITEM_BONUS_BOX    ;}
-            if ( htype=='S' || htype=='s' ) { type = ITEM_SILVER_COIN ;}
+            Item::ItemType type=Item::ITEM_BANANA;
+            if ( htype=='Y' || htype=='y' ) { type = Item::ITEM_GOLD_COIN   ;}
+            if ( htype=='G' || htype=='g' ) { type = Item::ITEM_BANANA  ;}
+            if ( htype=='R' || htype=='r' ) { type = Item::ITEM_BONUS_BOX    ;}
+            if ( htype=='S' || htype=='s' ) { type = Item::ITEM_SILVER_COIN ;}
             itemCommand(&loc.xyz, type, false) ;
         }
         else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
         {
-            ItemType type=ITEM_BANANA;
-            if ( htype=='Y' || htype=='y' ) { type = ITEM_GOLD_COIN   ;}
-            if ( htype=='G' || htype=='g' ) { type = ITEM_BANANA  ;}
-            if ( htype=='R' || htype=='r' ) { type = ITEM_BONUS_BOX    ;}
-            if ( htype=='S' || htype=='s' ) { type = ITEM_SILVER_COIN ;}
+            Item::ItemType type=Item::ITEM_BANANA;
+            if ( htype=='Y' || htype=='y' ) { type = Item::ITEM_GOLD_COIN   ;}
+            if ( htype=='G' || htype=='g' ) { type = Item::ITEM_BANANA  ;}
+            if ( htype=='R' || htype=='r' ) { type = Item::ITEM_BONUS_BOX    ;}
+            if ( htype=='S' || htype=='s' ) { type = Item::ITEM_SILVER_COIN ;}
             itemCommand (&loc.xyz, type, true) ;
         }
         /* and now the new names */
         else if ( sscanf ( s, "BBOX,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            itemCommand(&loc.xyz, ITEM_BONUS_BOX, false);
+            itemCommand(&loc.xyz, Item::ITEM_BONUS_BOX, false);
         }
         else if ( sscanf ( s, "BBOX,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            itemCommand(&loc.xyz, ITEM_BONUS_BOX, true);
+            itemCommand(&loc.xyz, Item::ITEM_BONUS_BOX, true);
         }
         
         else if ( sscanf ( s, "BANA,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            itemCommand(&loc.xyz, ITEM_BANANA, false);
+            itemCommand(&loc.xyz, Item::ITEM_BANANA, false);
         }
         
         else if ( sscanf ( s, "BANA,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            itemCommand(&loc.xyz, ITEM_BANANA, true);
+            itemCommand(&loc.xyz, Item::ITEM_BANANA, true);
         }
         
         else if ( sscanf ( s, "COIN,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            itemCommand(&loc.xyz, ITEM_SILVER_COIN, false);
+            itemCommand(&loc.xyz, Item::ITEM_SILVER_COIN, false);
         }
         else if ( sscanf ( s, "COIN,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            itemCommand(&loc.xyz, ITEM_SILVER_COIN, true);
+            itemCommand(&loc.xyz, Item::ITEM_SILVER_COIN, true);
         }
         
         else if ( sscanf ( s, "GOLD,%f,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
         {
-            itemCommand(&loc.xyz, ITEM_GOLD_COIN, false);
+            itemCommand(&loc.xyz, Item::ITEM_GOLD_COIN, false);
         }
         else if ( sscanf ( s, "GOLD,%f,%f",
                            &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
         {
-            itemCommand(&loc.xyz, ITEM_GOLD_COIN, true);
+            itemCommand(&loc.xyz, Item::ITEM_GOLD_COIN, true);
         }
         
         else if ( sscanf ( s, "START,%f,%f,%f",
@@ -1479,11 +1553,8 @@ void Track::loadTrackModel()
             if ( need_hat )
             {
                 sgVec3 nrm ;
-#ifdef HAVE_IRRLICHT
-#else
                 loc.xyz[2] = 1000.0f ;
                 loc.xyz[2] = getHeightAndNormal ( m_model, loc.xyz, nrm ) ;
-#endif
                 if ( fit_skin )
                 {
                     float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
@@ -1496,16 +1567,10 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
-#ifdef HAVE_IRRLICHT
-            std::string full_path = file_manager->getTrackFile(fname, getIdent());
-            scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
-            m_all_meshes.push_back(obj->getMesh(0));
-#else
             ssgEntity        *obj   = loader->load(file_manager->getModelFile(fname),
                                                    CB_TRACK,
                                                    /* optimise   */  true,
                                                    /*is_full_path*/  true);
-#endif
             if(!obj)
             {
                 fclose(fd);
@@ -1515,13 +1580,6 @@ void Track::loadTrackModel()
                 file_manager->popModelSearchPath  ();
                 throw std::runtime_error(msg.str());
             }
-#ifdef HAVE_IRRLICHT
-            // FIXME: for now only static objects
-            scene::ISceneNode *node = irr_driver->addOctTree(obj->getMesh(0));
-            m_all_nodes.push_back(node);
-            node->setMaterialFlag(video::EMF_LIGHTING, false);
-
-#else
             SSGHelp::createDisplayLists(obj);
             ssgRangeSelector *lod   = new ssgRangeSelector ;
             ssgTransform     *trans = new ssgTransform ( & loc ) ;
@@ -1532,7 +1590,6 @@ void Track::loadTrackModel()
             trans  -> addKid(lod   );
             m_model-> addKid(trans );
             lod    -> setRanges(r, 2);
-#endif
             if(user_config->m_track_debug)
                 addDebugToScene(user_config->m_track_debug);
 
@@ -1545,6 +1602,8 @@ void Track::loadTrackModel()
     }   // while fgets
 
     fclose ( fd ) ;
+#endif
+
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
@@ -1565,6 +1624,30 @@ void Track::loadTrackModel()
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+void Track::itemCommand(core::vector3df *xyz, Item::ItemType type, 
+                        int bNeedHeight)
+{
+    // Some modes (e.g. time trial) don't have any bonus boxes
+    if(type==Item::ITEM_BONUS_BOX && 
+       !RaceManager::getWorld()->enableBonusBoxes()) 
+        return;
+
+    // if only 2d coordinates are given, let the item fall from very high
+    if(bNeedHeight) xyz->Z = 1000000.0f;
+
+    // Even if 3d data are given, make sure that the item is on the ground
+    //xyz->Z = irr_dirver->getHeight( m_model, *xyz ) + 0.06f;
+
+    Vec3 loc(*xyz);
+
+    // Don't tilt the items, since otherwise the rotation will look odd,
+    // i.e. the items will not rotate around the normal, but 'wobble'
+    // around.
+    Vec3 normal(0, 0, 0.0f);
+    item_manager->newItem(type, loc, normal);
+}   // itemCommand
+#else
 void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
 {
 
@@ -1572,13 +1655,10 @@ void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
     if(bNeedHeight) (*xyz)[2] = 1000000.0f;
 
     // Even if 3d data are given, make sure that the item is on the ground
-#ifdef HAVE_IRRLICHT
-#else
     (*xyz)[2] = getHeight( m_model, *xyz ) + 0.06f;
-#endif
 
     // Some modes (e.g. time trial) don't have any bonus boxes
-    if(type==ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 
+    if(type==Item::ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 
         return;
     Vec3 loc((*xyz));
 
@@ -1586,8 +1666,9 @@ void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
     // i.e. the items will not rotate around the normal, but 'wobble'
     // around.
     Vec3 normal(0, 0, 0.0f);
-    item_manager->newItem((ItemType)type, loc, normal);
+    item_manager->newItem((Item::ItemType)type, loc, normal);
 }   // itemCommand
+#endif
 
 // ----------------------------------------------------------------------------
 void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 

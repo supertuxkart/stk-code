@@ -356,16 +356,16 @@ void PlayerKart::collectedItem(const Item &item, int add_info)
     {
         switch(item.getType())
         {
-            case ITEM_BANANA:
-                m_ugh_sound->play();
-                break;
-            case ITEM_BUBBLEGUM:
-                //The skid sound is played by the kart class. Do nothing here.
-                //See Kart::collectedItem()
-                break;
-            default:
-                m_grab_sound->play();
-                break; 
+        case Item::ITEM_BANANA:
+            m_ugh_sound->play();
+            break;
+        case Item::ITEM_BUBBLEGUM:
+            //The skid sound is played by the kart class. Do nothing here.
+            //See Kart::collectedItem()
+            break;
+        default:
+            m_grab_sound->play();
+            break; 
         }           
     }
 }   // collectedItem

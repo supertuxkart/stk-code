@@ -32,19 +32,31 @@ class Vec3;
 class XMLNode
 {
 private:
+    /** Name of this element. */
+    std::string                         m_name;
+    /** List of all attributes. */
     std::map<std::string, core::stringw> m_attributes;
 public:
-         XMLNode(io::IXMLReader *xml);
-    bool get(const std::string &attribute, std::string *value);
-    bool get(const std::string &attribute, core::vector3df *value);
-    bool get(const std::string &attribute, Vec3 *value);
-    bool get(const std::string &attribute, video::SColorf *value);
-    bool get(const std::string &attribute, std::vector<std::string> *value);
-    bool get(const std::string &attribute, std::vector<float> *value);
-    bool get(const std::string &attribute, std::vector<int> *value);
-    bool get(const std::string &attribute, int *value);
-    bool get(const std::string &attribute, float *value);
-    bool get(const std::string &attribute, bool *value);
+         XMLNode(const std::string &name, io::IXMLReader *xml);
+    const std::string &getName() const {return m_name; }
+    int get(const std::string &attribute, std::string *value) const;
+    int get(const std::string &attribute, int *value) const;
+    int get(const std::string &attribute, float *value) const;
+    int get(const std::string &attribute, bool *value) const;
+    int get(const std::string &attribute, Vec3 *value) const;
+    int get(const std::string &attribute, core::vector3df *value) const;
+    int get(const std::string &attribute, video::SColorf *value) const;
+    int get(const std::string &attribute, std::vector<std::string> *value) const;
+    int get(const std::string &attribute, std::vector<float> *value) const;
+    int get(const std::string &attribute, std::vector<int> *value) const;
+    int get(core::vector3df *value) const;
+    /** Handy functions to test the bit pattern returned by get(vector3df*).*/
+    static bool hasX(int b) { return (b&1)==1; }
+    static bool hasY(int b) { return (b&2)==2; }
+    static bool hasZ(int b) { return (b&4)==4; }
+    static bool hasH(int b) { return (b&1)==1; }
+    static bool hasP(int b) { return (b&2)==2; }
+    static bool hasR(int b) { return (b&4)==4; }
 };   // XMLNode
 
 #endif

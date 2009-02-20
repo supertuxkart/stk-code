@@ -79,11 +79,19 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
 
 //=============================================================================
 ItemManager* item_manager;
+#ifdef HAVE_IRRLICHT
+typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
+#else
 typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
+#endif
 
 ItemManager::ItemManager()
 {
+#ifdef HAVE_IRRLICHT
+    m_all_meshes.clear();
+#else
     m_all_models.clear();
+#endif
     // The actual loading is done in loadDefaultItems
 }   // ItemManager
 
@@ -97,11 +105,19 @@ void ItemManager::removeTextures()
     }
     m_all_items.clear();
 
+#ifdef HAVE_IRRLICHT
+    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+    {
+        i->second->drop();
+    }
+    m_all_meshes.clear();
+#else
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
         i->second->deRef();
     }
     m_all_models.clear();
+#endif
     callback_manager->clear(CB_ITEM);
 }   // removeTextures
 
@@ -109,6 +125,15 @@ void ItemManager::removeTextures()
 ItemManager::~ItemManager()
 {
 #ifdef HAVE_IRRLICHT
+    for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+    {
+        // FIXME: What about this plib comment:
+        // We can't use ssgDeRefDelete here, since then the object would be
+        // freed, and when m_all_models is deleted, we have invalid memory
+        // accesses.
+        i->second->drop();
+    }
+    m_all_meshes.clear();
 #else
     for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
     {
@@ -117,8 +142,8 @@ ItemManager::~ItemManager()
         // accesses.
         i->second->deRef();
     }
-#endif
     m_all_models.clear();
+#endif
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
@@ -147,15 +172,6 @@ void ItemManager::loadDefaultItems()
 #endif
         }   // for i
 
-
-    // FIXME LEAK: these can be deleted
-    // Load the old, internal only models
-    // ----------------------------------
-    sgVec3 yellow = { 1.0f, 1.0f, 0.4f }; createDefaultItem(yellow, "OLD_GOLD"  );
-    sgVec3 cyan   = { 0.4f, 1.0f, 1.0f }; createDefaultItem(cyan  , "OLD_SILVER");
-    sgVec3 red    = { 0.8f, 0.0f, 0.0f }; createDefaultItem(red   , "OLD_RED"   );
-    sgVec3 green  = { 0.0f, 0.8f, 0.0f }; createDefaultItem(green , "OLD_GREEN" );
-
     setDefaultItemStyle();
 }   // loadDefaultItems
 
@@ -163,19 +179,24 @@ void ItemManager::loadDefaultItems()
 void ItemManager::setDefaultItemStyle()
 {
     // FIXME - This should go in an internal, system wide configuration file
-    std::string DEFAULT_NAMES[ITEM_LAST - ITEM_FIRST - 1];
-    DEFAULT_NAMES[ITEM_BONUS_BOX]   = "gift-box";
-    DEFAULT_NAMES[ITEM_BANANA]      = "banana";
-    DEFAULT_NAMES[ITEM_GOLD_COIN]   = "nitrotank-big";
-    DEFAULT_NAMES[ITEM_SILVER_COIN] = "nitrotank-small";
-    DEFAULT_NAMES[ITEM_BUBBLEGUM]   = "bubblegum";
+    std::string DEFAULT_NAMES[Item::ITEM_LAST - Item::ITEM_FIRST - 1];
+    DEFAULT_NAMES[Item::ITEM_BONUS_BOX]   = "gift-box";
+    DEFAULT_NAMES[Item::ITEM_BANANA]      = "banana";
+    DEFAULT_NAMES[Item::ITEM_GOLD_COIN]   = "nitrotank-big";
+    DEFAULT_NAMES[Item::ITEM_SILVER_COIN] = "nitrotank-small";
+    DEFAULT_NAMES[Item::ITEM_BUBBLEGUM]   = "bubblegum";
 
     bool bError=0;
     std::ostringstream msg;
-    for(int i=ITEM_FIRST+1; i<ITEM_LAST; i++)
+    for(int i=Item::ITEM_FIRST+1; i<Item::ITEM_LAST; i++)
     {
+#ifdef HAVE_IRRLICHT
+        m_item_mesh[i] = m_all_meshes[DEFAULT_NAMES[i]];
+        if(!m_item_mesh[i])
+#else
         m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
         if(!m_item_model[i])
+#endif
         {
             msg << "Item model '" << DEFAULT_NAMES[i] 
                 << "' is missing (see item_manager)!\n";
@@ -186,20 +207,17 @@ void ItemManager::setDefaultItemStyle()
     if(bError)
     {
         fprintf(stderr, "The following models are available:\n");
+#ifdef HAVE_IRRLICHT
+        for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
+#else
         for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
+#endif
         {
             if(i->second)
             {
-                if(i->first.substr(0,3)=="OLD")
-                {
-                    fprintf(stderr,"   %s internally only.\n",i->first.c_str());
-                }
-                else
-                {
-                    fprintf(stderr, "   %s in %s.ac.\n",
-                            i->first.c_str(),
-                            i->first.c_str());
-                }
+                fprintf(stderr, "   %s in %s.ac.\n",
+                    i->first.c_str(),
+                    i->first.c_str());
             }  // if i->second
         }
 #ifndef HAVE_IRRLICHT
@@ -212,17 +230,25 @@ void ItemManager::setDefaultItemStyle()
 }   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
-Item* ItemManager::newItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
-                           Kart* parent)
+Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
+                           const Vec3 &normal, Kart *parent)
 {
     Item* h;
-    if(type == ITEM_BUBBLEGUM)
+#ifdef HAVE_IRRLICHT
+    if(type == Item::ITEM_BUBBLEGUM)
+        h = new BubbleGumItem(type, xyz, normal, m_item_mesh[type], 
+                              m_all_items.size());
+    else
+        h = new Item(type, xyz, normal, m_item_mesh[type],
+                     m_all_items.size());
+#else
+    if(type == Item::ITEM_BUBBLEGUM)
         h = new BubbleGumItem(type, xyz, normal, m_item_model[type], 
                               m_all_items.size());
     else
         h = new Item(type, xyz, normal, m_item_model[type],
                      m_all_items.size());
-    
+#endif
     if(parent != NULL) h->setParent(parent);
     
     m_all_items.push_back(h);
@@ -317,7 +343,7 @@ void ItemManager::reset()
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
-        if((*i)->getType()==ITEM_BUBBLEGUM)
+        if((*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
             BubbleGumItem *b=static_cast<BubbleGumItem*>(*i);
             AllItemTypes::iterator i_next = m_all_items.erase(i); 
@@ -343,49 +369,6 @@ void ItemManager::update(float delta)
 }   // delta
 
 //-----------------------------------------------------------------------------
-void ItemManager::createDefaultItem(sgVec3 colour, std::string name)
-{
-    ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-    ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-    ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-    ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
-
-    sgSetVec3(v, -0.5f, 0.0f, 0.0f ) ; va->add(v) ;
-    sgSetVec3(v,  0.5f, 0.0f, 0.0f ) ; va->add(v) ;
-    sgSetVec3(v, -0.5f, 0.0f, 0.5f ) ; va->add(v) ;
-    sgSetVec3(v,  0.5f, 0.0f, 0.5f ) ; va->add(v) ;
-    sgSetVec3(v, -0.5f, 0.0f, 0.0f ) ; va->add(v) ;
-    sgSetVec3(v,  0.5f, 0.0f, 0.0f ) ; va->add(v) ;
-
-    sgSetVec3(n,  0.0f,  1.0f,  0.0f ) ; na->add(n) ;
-
-    sgCopyVec3 ( c, colour ) ; c[ 3 ] = 1.0f ; ca->add(c) ;
-
-    sgSetVec2(t, 0.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2(t, 1.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2(t, 0.0f, 1.0f ) ; ta->add(t) ;
-    sgSetVec2(t, 1.0f, 1.0f ) ; ta->add(t) ;
-    sgSetVec2(t, 0.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2(t, 1.0f, 0.0f ) ; ta->add(t) ;
-
-
-    ssgLeaf *gset = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
-
-    // FIXME - this method seems outdated
-    //gset->setState(material_manager->getMaterial("herring.rgb")->getState()) ;
-
-    Shadow* sh = new Shadow ( -0.5f, 0.5f, -0.25f, 0.25f ) ;
-
-    ssgTransform* tr = new ssgTransform () ;
-
-    tr -> addKid ( sh -> getRoot () ) ;
-    tr -> addKid ( gset ) ;
-    tr -> ref () ; /* Make sure it doesn't get deleted by mistake */
-    m_all_models[name] = tr;
-
-}   // createDefaultItem
-
-//-----------------------------------------------------------------------------
 void ItemManager::loadItemStyle(const std::string filename)
 {
     if(filename.length()==0) return;
@@ -403,21 +386,25 @@ void ItemManager::loadItemStyle(const std::string filename)
         throw std::runtime_error(msg.str());
         delete root;
     }
-    setItem(item_node, "red",   ITEM_BONUS_BOX   );
-    setItem(item_node, "green", ITEM_BANANA );
-    setItem(item_node, "gold"  ,ITEM_GOLD_COIN  );
-    setItem(item_node, "silver",ITEM_SILVER_COIN);
+    setItem(item_node, "red",   Item::ITEM_BONUS_BOX   );
+    setItem(item_node, "green", Item::ITEM_BANANA );
+    setItem(item_node, "gold"  ,Item::ITEM_GOLD_COIN  );
+    setItem(item_node, "silver",Item::ITEM_SILVER_COIN);
     delete root;
 }   // loadItemStyle
 
 //-----------------------------------------------------------------------------
 void ItemManager::setItem(const lisp::Lisp *item_node,
-                                const char *colour, ItemType type)
+                          const char *colour, Item::ItemType type)
 {
     std::string name;
     item_node->get(colour, name);
     if(name.size()>0)
     {
+#ifdef HAVE_IRRLICHT
+        m_item_mesh[type]=m_all_meshes[name];
+#else
         m_item_model[type]=m_all_models[name];
+#endif
     }
 }   // setItem

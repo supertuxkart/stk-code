@@ -22,7 +22,7 @@
 #define HEADER_XML_READER_HPP
 
 #include <string>
-#include <map>
+#include <vector>
 
 #include "irrlicht.h"
 using namespace irr;
@@ -33,11 +33,12 @@ class XMLReader
 {
 private:
      io::IXMLReader *m_reader;
-     std::map<std::string, XMLNode *> m_all_nodes;
+     std::vector<const XMLNode *> m_all_nodes;
 public:
-       XMLReader(io::IXMLReader *r);
-
-       XMLNode *getNode(const std::string &node_name);
+                   XMLReader(io::IXMLReader *r);
+    unsigned int   getNumNodes() const;
+    const XMLNode *getNode(const std::string &node_name) const;
+    const XMLNode *getNode(unsigned int n) const;
 };   // XMLReader
 #endif
 #endif

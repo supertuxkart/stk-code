@@ -377,14 +377,14 @@ void Kart::raceFinished(float time)
 //-----------------------------------------------------------------------------
 void Kart::collectedItem(const Item &item, int add_info)
 {
-    const ItemType type = item.getType();
+    const Item::ItemType type = item.getType();
 
     switch (type)
     {
-    case ITEM_BANANA      : m_attachment.hitBanana(item, add_info); break;
-    case ITEM_SILVER_COIN : m_collected_energy++ ;                  break;
-    case ITEM_GOLD_COIN   : m_collected_energy += 3 ;               break;
-    case ITEM_BONUS_BOX   : 
+    case Item::ITEM_BANANA     : m_attachment.hitBanana(item, add_info); break;
+    case Item::ITEM_SILVER_COIN: m_collected_energy++ ;                  break;
+    case Item::ITEM_GOLD_COIN  : m_collected_energy += 3 ;               break;
+    case Item::ITEM_BONUS_BOX  : 
         { 
             // In wheelie style, karts get more items depending on energy,
             // in nitro mode it's only one item.
@@ -392,7 +392,7 @@ void Kart::collectedItem(const Item &item, int add_info)
             m_powerup.hitBonusBox(n, item,add_info);   
             break;
         }
-    case ITEM_BUBBLEGUM:
+    case Item::ITEM_BUBBLEGUM:
         // slow down
         m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
         m_goo_sound->position(getXYZ());
@@ -405,7 +405,7 @@ void Kart::collectedItem(const Item &item, int add_info)
     // functions (hit{Red,Green}Item), so only coins need to be
     // stored here.
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
-        (type==ITEM_SILVER_COIN || type==ITEM_GOLD_COIN)                       )
+        (type==Item::ITEM_SILVER_COIN || type==Item::ITEM_GOLD_COIN)                       )
     {
         race_state->itemCollected(getWorldKartId(), item.getItemId());
     }

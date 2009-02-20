@@ -17,41 +17,49 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_ITEM_H
-#define HEADER_ITEM_H
+#ifndef HEADER_ITEM_HPP
+#define HEADER_ITEM_HPP
 
-// num_players triggers  'already defined' messages without the WINSOCKAPI define. Don't ask me :(
 #define _WINSOCKAPI_
 #include <plib/sg.h>
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
-
-class ssgTransform;
+#ifndef HAVE_IRRLICHT
+class ssgtransform;
 class ssgEntity;
-
-enum ItemType
-{
-    ITEM_FIRST = -1,
-    
-    ITEM_BONUS_BOX = 0,
-    ITEM_BANANA,
-    ITEM_GOLD_COIN,
-    ITEM_SILVER_COIN,
-    ITEM_BUBBLEGUM,
-    
-    ITEM_LAST
-};
+#endif
 
 // -----------------------------------------------------------------------------
 class Item
 {
+public:
+    enum ItemType
+    {
+        ITEM_FIRST = -1,
+
+        ITEM_BONUS_BOX = 0,
+        ITEM_BANANA,
+        ITEM_GOLD_COIN,
+        ITEM_SILVER_COIN,
+        ITEM_BUBBLEGUM,
+
+        ITEM_LAST
+    };
+
 private:
     ItemType      m_type;         // Item type
     bool          m_collected;        // true if item was collected & is not displayed
     float         m_time_till_return;  // time till a collected item reappears
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // collected items reappear.
+#ifdef HAVE_IRRLICHT
+#else
     ssgTransform* m_root;         // The actual root of the item
+#endif
     unsigned int  m_item_id;      // index in item_manager field
 
     bool          m_rotate;       // set to false if item should not rotate
@@ -64,9 +72,15 @@ private:
     float         m_deactive_time;
     
 public:
+#ifdef HAVE_IRRLICHT
+                  Item (ItemType type, const Vec3& xyz, const Vec3& normal,
+                        scene::IMesh* mesh, unsigned int item_id,
+                        bool rotate=true);
+#else
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
                         ssgEntity* model, unsigned int item_id,
                         bool rotate=true);
+#endif
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  isCollected(float t=2.0f);
@@ -91,7 +105,10 @@ public:
     void          deactivate(float t)  { m_deactive_time=t; }
     // ------------------------------------------------------------------------
     unsigned int  getItemId()    const { return m_item_id;  }
+#ifdef HAVE_IRRLICHT
+#else
     ssgTransform* getRoot()      const { return m_root;     }
+#endif
     ItemType      getType()      const { return m_type;     }
     bool          wasCollected() const { return m_collected;}    
     void          setParent(Kart* parent);

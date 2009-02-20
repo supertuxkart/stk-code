@@ -41,6 +41,15 @@ void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
 }   // addTriangle
 
 // -----------------------------------------------------------------------------
+/** Creates the physics body for this triangle mesh. If the body already
+ *  exists (because it was created by a previous call to createBody)
+ *  it is first removed from the world. This is used by loading the track
+ *  where a physics body is used to determine the height of terrain. To have
+ *  an optimised rigid body including all static objects, the track is then
+ *  removed and all objects together with the track is converted again into
+ *  a single rigid body. This avoids using irrlicht (or the graphics engine)
+ *  for height of terrain detection).
+ */
 void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
 {
     if(m_triangleIndex2Material.size()==0)

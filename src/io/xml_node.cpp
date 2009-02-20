@@ -21,8 +21,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/vec3.hpp"
 
-XMLNode::XMLNode(io::IXMLReader *xml)
+XMLNode::XMLNode(const std::string &name, io::IXMLReader *xml)
 {
+    m_name = name;
     for(unsigned int i=0; i<xml->getAttributeCount(); i++)
     {
         std::string   name  = core::stringc(xml->getAttributeName(i)).c_str();
@@ -33,105 +34,119 @@ XMLNode::XMLNode(io::IXMLReader *xml)
 
 // ----------------------------------------------------------------------------
 /** If 'attribute' was defined, set 'value' to the value of the
-*  attribute and return true, otherwise return false and do not
-*  change value.
+*   attribute and return 1, otherwise return 0 and do not change value.
 *  \param attribute Name of the attribute.
 *  \param value Value of the attribute.
 */
-bool XMLNode::get(const std::string &attribute, std::string *value)
+int XMLNode::get(const std::string &attribute, std::string *value) const
 {
-    std::map<std::string, core::stringw>::iterator o;
+    if(m_attributes.size()==0) return 0;
+    std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
-    if(o==m_attributes.end()) return false;
+    if(o==m_attributes.end()) return 0;
     *value=core::stringc(o->second).c_str();
-    return true;
+    return 1;
 }   // get
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, core::vector3df *value)
+int XMLNode::get(const std::string &attribute, core::vector3df *value) const
 {
     std::string s = "";
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=3) return false;
+    if(v.size()!=3) return 0;
     value->X = (float)atof(v[0].c_str());
     value->Y = (float)atof(v[1].c_str());
     value->Z = (float)atof(v[2].c_str());
-    return true;
+    return 1;
 }   // get(vector3df)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, Vec3 *value)
+int XMLNode::get(const std::string &attribute, Vec3 *value) const
 {
     std::string s = "";
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=3) return false;
+    if(v.size()!=3) return 0;
     value->setX((float)atof(v[0].c_str()));
     value->setY((float)atof(v[1].c_str()));
     value->setZ((float)atof(v[2].c_str()));
-    return true;
+    return 1;
 }   // get(Vec3)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, video::SColorf *color)
+int XMLNode::get(const std::string &attribute, video::SColorf *color) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=4) return false;
+    if(v.size()!=4) return 0;
     color->set((float)atof(v[0].c_str()),
                (float)atof(v[1].c_str()),
                (float)atof(v[2].c_str()),
                (float)atof(v[3].c_str()));
-    return true;
+    return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, int *value)
+int XMLNode::get(const std::string &attribute, int *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
     *value = atoi(s.c_str());
-    return true;
+    return 1;
 }   // get(int)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, float *value)
+int XMLNode::get(const std::string &attribute, float *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
     *value = (float)atof(s.c_str());
-    return true;
+    return 1;
 }   // get(int)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, bool *value)
+int XMLNode::get(const std::string &attribute, bool *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
     *value = s==""     || s[0]=='T' || s[0]=='t' ||
              s=="true" || s=="TRUE" || s=="#t"   || s=="#T";
-    return true;
+    return 1;
 }   // get(bool)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, std::vector<std::string> *value)
+/** If 'attribute' was defined, split the value of the attribute by spaces,
+ *  set value to this vector array and return the number of elements. Otherwise
+ *  return 0 and do not change value.
+ *  \param attribute Name of the attribute.
+ *  \param value Value of the attribute.
+ */
+int XMLNode::get(const std::string &attribute, 
+                 std::vector<std::string> *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     *value = StringUtils::split(s,' ');
-    return true;
+    return value->size();
 }   // get(vector<string>)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, std::vector<float> *value)
+/** If 'attribute' was defined, split the value of the attribute by spaces,
+ *  set value to this vector array and return the number of elements. Otherwise
+ *  return 0 and do not change value.
+ *  \param attribute Name of the attribute.
+ *  \param value Value of the attribute.
+ */
+int XMLNode::get(const std::string &attribute, 
+                 std::vector<float> *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
@@ -139,14 +154,20 @@ bool XMLNode::get(const std::string &attribute, std::vector<float> *value)
     {
         value->push_back((float)atof(v[i].c_str()));
     }
-    return true;
+    return value->size();
 }   // get(vector<float>)
 
 // ----------------------------------------------------------------------------
-bool XMLNode::get(const std::string &attribute, std::vector<int> *value)
+/** If 'attribute' was defined, split the value of the attribute by spaces,
+ *  set value to this vector array and return the number of elements. Otherwise
+ *  return 0 and do not change value.
+ *  \param attribute Name of the attribute.
+ *  \param value Value of the attribute.
+ */
+int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
 {
     std::string s;
-    if(!get(attribute, &s)) return false;
+    if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
@@ -154,9 +175,29 @@ bool XMLNode::get(const std::string &attribute, std::vector<int> *value)
     {
         value->push_back(atoi(v[i].c_str()));
     }
-    return true;
+    return value->size();
 }   // get(vector<int>)
 
 // ----------------------------------------------------------------------------
-
+/** Interprets the attributes 'x', 'y', 'z'  or 'h', 'p', 'r' as a 3d vector
+ *  and set the corresponding elements of value. Not all values need to be
+ *  defined as attributes (and the correspnding elements of the vector will
+ *  not be changed). It returns a bit field for each defined value, i.e. if x 
+ *  and y are defined, 3 is returned.
+ *  \param value Vector to return the values in.
+ */
+int XMLNode::get(core::vector3df *value) const
+{
+    float f;
+    int bits=0;
+    core::vector3df result = *value;
+    if(get("x", &f)) { value->X = f; bits |= 1; }
+    if(get("h", &f)) { value->X = f; bits |= 1; }
+    if(get("y", &f)) { value->Y = f; bits |= 2; }
+    if(get("p", &f)) { value->Y = f; bits |= 2; }
+    if(get("z", &f)) { value->Z = f; bits |= 4; }
+    if(get("r", &f)) { value->Z = f; bits |= 4; }
+    return bits;
+}
+// ----------------------------------------------------------------------------
 #endif

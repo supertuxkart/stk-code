@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BUBBLEGUMITEM_H
-#define HEADER_BUBBLEGUMITEM_H
+#ifndef HEADER_BUBBLEGUMITEM_HPP
+#define HEADER_BUBBLEGUMITEM_HPP
 
 #include "items/item.hpp"
 
@@ -26,9 +26,15 @@
 class BubbleGumItem : public Item
 {
 public:
+#ifdef HAVE_IRRLICHT
+                 BubbleGumItem(ItemType type, const Vec3& xyz, 
+                               const Vec3 &normal, scene::IMesh* mesh,
+                               unsigned int item_id);
+#else
                  BubbleGumItem(ItemType type, const Vec3& xyz, 
                                const Vec3 &normal, ssgEntity* model,
                                unsigned int item_id);
+#endif
                 ~BubbleGumItem ();
     virtual void isCollected(float t);
 }

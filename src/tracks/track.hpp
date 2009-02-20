@@ -38,6 +38,7 @@ using namespace irr;
 #include "LinearMath/btTransform.h"
 #include "material.hpp"
 #include "audio/music_information.hpp"
+#include "items/item.hpp"
 #include "utils/vec3.hpp"
 
 class TriangleMesh;
@@ -227,15 +228,20 @@ public:
     }
 
 private:
-    void  loadTrack                      (const std::string &filename);
-    void  itemCommand                    (sgVec3 *xyz, int item_type, int bNeedHeight);
-    void  loadDriveline                  ();
-    void  readDrivelineFromFile          (std::vector<Vec3>& line,
-                                         const std::string& file_ext);
+    void  loadTrack(const std::string &filename);
 #ifdef HAVE_IRRLICHT
-    void  convertTrackToBullet           ();
+    void  itemCommand(core::vector3df *xyz, Item::ItemType item_type, 
+                      int bNeedHeight);
 #else
-    void  convertTrackToBullet           (ssgEntity *track, sgMat4 m);
+    void  itemCommand(sgVec3 *xyz, int item_type, int bNeedHeight);
+#endif
+    void  loadDriveline();
+    void  readDrivelineFromFile(std::vector<Vec3>& line,
+                                const std::string& file_ext);
+#ifdef HAVE_IRRLICHT
+    void  convertTrackToBullet();
+#else
+    void  convertTrackToBullet(ssgEntity *track, sgMat4 m);
 #endif
     float pointSideToLine(const Vec3& L1, const Vec3& L2,
                           const Vec3& P ) const;

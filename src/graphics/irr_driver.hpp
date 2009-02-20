@@ -47,7 +47,7 @@ public:
     scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
                          *addCamera();
-    void                  update(float dt);  
+    void                  update(float dt);
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

@@ -33,8 +33,8 @@ XMLReader::XMLReader(io::IXMLReader *xml)
                 // FIXME: is there an easier way to convert 
                 // stringw to std::string?
                 std::string s = core::stringc(xml->getNodeName()).c_str();
-                XMLNode *node = new XMLNode(xml);
-                m_all_nodes[s] = node;
+                const XMLNode *node = new XMLNode(s, xml);
+                m_all_nodes.push_back(node);
                 break;
             }
         case io::EXN_ELEMENT_END:  // Ignore all other types
@@ -46,12 +46,24 @@ XMLReader::XMLReader(io::IXMLReader *xml)
 }   // XMLReader
 
 // ----------------------------------------------------------------------------
-XMLNode *XMLReader::getNode(const std::string &node_name)
+unsigned int XMLReader::getNumNodes() const
 {
-    std::map<std::string, XMLNode *>::iterator node;
-    node = m_all_nodes.find(node_name);
-    if(node==m_all_nodes.end()) return NULL;
+    return m_all_nodes.size();
+}   // getNumNodes
 
-    return node->second;
+// ----------------------------------------------------------------------------
+const XMLNode *XMLReader::getNode(unsigned int n) const
+{
+    return m_all_nodes[n];
+}   // getNode
+
+// ----------------------------------------------------------------------------
+const XMLNode *XMLReader::getNode(const std::string &node_name) const
+{
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        if(m_all_nodes[i]->getName()==node_name) return m_all_nodes[i];
+    }
+    return NULL;
 }   // getNode
 #endif
