@@ -25,9 +25,6 @@ Additional Programming
 Stephen Dunn
 - Work on Audio
 
-Canarix
-- Original user interface
-
 Damien
 - Ogg vorbis support
 
@@ -53,6 +50,12 @@ Robert Schuster
 
 Visual art
 ----------
+
+Minibjorn
+- Powerups and baddies : Bowling Ball, Cake, Plunger, Bubblegum, Bomb, Gift-box, Nitro-tank (models + icons)
+- Fire and smoke particles
+- Puffy kart
+- Various textures
 
 Benjamin Arnaudet
 - GNU Kart
@@ -94,11 +97,6 @@ Thomas Oppl
 
 Christian Framing 
 - Updated EvilTux kart
-
-Minibjorn
-- Powerups and baddies : Bowling Ball, Cake, Plunger, Bubblegum, Bomb, Gift-box, Nitro-tank (models + icons)
-- Fire and smoke particles
-- Puffy kart
 
 Ivar ten Cate (Varivar)
 - Old mine track
@@ -246,23 +244,22 @@ Eduardo Hernandez Munoz (Coz) (former Co-admin)
 Maik Semder (Ikework)
 - Bug fixes
 
+Canarix
+- Original user interface
 
-
-Game of the Month, STK version 0.0.0
-------------------------------------------
-See http://happypenguin.org/forums/viewforum.php?f=21
-
-Caleb Sawtell
-Craig Keogh
-Ingo Ruhnke
-Jacob Persson
-James Gregory
-Matthias Braun
-Oliver Jeeves
-Pascal Giard
-Paul Carley
-Ricardo Cruz
-Willian Padovani Germano
+Game of the Month, STK version 0.0.0 :
+    See http://happypenguin.org/forums/viewforum.php?f=21
+    Caleb Sawtell
+    Craig Keogh
+    Ingo Ruhnke
+    Jacob Persson
+    James Gregory
+    Matthias Braun
+    Oliver Jeeves
+    Pascal Giard
+    Paul Carley
+    Ricardo Cruz
+    Willian Padovani Germano
 
 Original Tuxkart
 ------------------
