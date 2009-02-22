@@ -459,16 +459,22 @@ bool Kart::isNearGround() const
 //-----------------------------------------------------------------------------
 void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 {
+    int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
     if(direct_hit) 
     {
-        btVector3 diff((float)(rand()%16/16), (float)(rand()%16/16), 2.0f);
+        float sign_a = (sign_bits & (0x1 <<  8)) ? 1.0f : -1.0f;
+        float sign_b = (sign_bits & (0x1 <<  9)) ? 1.0f : -1.0f;
+        float sign_c = (sign_bits & (0x1 << 10)) ? 1.0f : -1.0f;
+        float sign_d = (sign_bits & (0x1 << 11)) ? 1.0f : -1.0f;
+        float sign_e = (sign_bits & (0x1 << 12)) ? 1.0f : -1.0f;
+        btVector3 diff(sign_a * (float)(rand()%16/16), sign_b * (float)(rand()%16/16), 2.0f);
         diff.normalize();
         diff*=stk_config->m_explosion_impulse/5.0f;
         m_uprightConstraint->setDisableTime(10.0f);
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(float(rand()%32*5),
-                                                                   float(rand()%32*5),
-                                                                   float(rand()%32*5)));
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(sign_c * float(rand()%32*5),
+                                                                   sign_d * float(rand()%32*5),
+                                                                   sign_e * float(rand()%32*5)));
     }
     else  // only affected by a distant explosion
     {
@@ -478,7 +484,7 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         if(diff.getZ()<0) diff.setZ(0.0f);
         float len2=diff.length2();
 
-        // The correct formhale would be to first normalise diff,
+        // The correct formulae would be to first normalise diff,
         // then apply the impulse (which decreases 1/r^2 depending
         // on the distance r), so:
         // diff/len(diff) * impulseSize/len(diff)^2
@@ -487,6 +493,9 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         // somewhat larger, which is actually more fun :)
         diff *= stk_config->m_explosion_impulse/len2;
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
+        // Even if just pushed, give some random rotation to simulate the lost of control by the shake
+        float sign_a = (sign_bits & (0x1 << 8)) ? 1.0f : -1.0f;
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, 0, sign_a * float(rand()%32*5)));
     }
 }   // handleExplosion
 
