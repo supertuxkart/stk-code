@@ -40,7 +40,8 @@ XMLReader::XMLReader(io::IXMLReader *xml)
         case io::EXN_ELEMENT_END:  // Ignore all other types
         case io::EXN_UNKNOWN:     
         case io::EXN_COMMENT:
-        case io::EXN_TEXT:         break;
+        case io::EXN_TEXT:
+        default:        break;
         }   // switch
     }   // while
 }   // XMLReader

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		953EAAAC0F30A4060000D57D /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAB0F30A4060000D57D /* camera.cpp */; };
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
@@ -133,13 +132,6 @@
 		95C2B2FD0F296546000D3E5D /* file_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE780F296542000D3E5D /* file_manager.cpp */; };
 		95C2B3030F296546000D3E5D /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */; };
 		95C2B3060F296546000D3E5D /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */; };
-		95C2B3090F296546000D3E5D /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE880F296542000D3E5D /* moving_texture.cpp */; };
-		95C2B30A0F296546000D3E5D /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE8A0F296542000D3E5D /* nitro.cpp */; };
-		95C2B30B0F296546000D3E5D /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE8C0F296542000D3E5D /* particle_system.cpp */; };
-		95C2B30C0F296546000D3E5D /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE8E0F296542000D3E5D /* scene.cpp */; };
-		95C2B30D0F296546000D3E5D /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE900F296542000D3E5D /* shadow.cpp */; };
-		95C2B30E0F296546000D3E5D /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE920F296542000D3E5D /* skid_marks.cpp */; };
-		95C2B30F0F296546000D3E5D /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE940F296542000D3E5D /* smoke.cpp */; };
 		95C2B3100F296546000D3E5D /* base_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE970F296542000D3E5D /* base_gui.cpp */; };
 		95C2B3110F296546000D3E5D /* challenges_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE990F296542000D3E5D /* challenges_menu.cpp */; };
 		95C2B3120F296546000D3E5D /* char_sel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE9B0F296542000D3E5D /* char_sel.cpp */; };
@@ -238,6 +230,18 @@
 		95C2B59C0F296547000D3E5D /* ssg_help.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E40F296546000D3E5D /* ssg_help.cpp */; };
 		95C2B59D0F296547000D3E5D /* string_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E60F296546000D3E5D /* string_utils.cpp */; };
 		95C2B59E0F296547000D3E5D /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E80F296546000D3E5D /* vec3.cpp */; };
+		95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D760F532F7D00BE7BA7 /* xml_node.cpp */; };
+		95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */; };
+		95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D980F532FD400BE7BA7 /* camera.cpp */; };
+		95C65DA30F532FD400BE7BA7 /* irr_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D990F532FD400BE7BA7 /* irr_driver.cpp */; };
+		95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */; };
+		95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */; };
+		95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */; };
+		95C65DA70F532FD400BE7BA7 /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */; };
+		95C65DA80F532FD400BE7BA7 /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9E0F532FD400BE7BA7 /* smoke.cpp */; };
+		95C65DA90F532FD400BE7BA7 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9F0F532FD400BE7BA7 /* scene.cpp */; };
+		95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA00F532FD400BE7BA7 /* shadow.cpp */; };
+		95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -260,8 +264,6 @@
 
 /* Begin PBXFileReference section */
 		951F96810F29670C00E1AC66 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
-		953EAAAA0F30A4060000D57D /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = ../../graphics/camera.hpp; sourceTree = SOURCE_ROOT; };
-		953EAAAB0F30A4060000D57D /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = ../../graphics/camera.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = ../../physics/triangle_mesh.hpp; sourceTree = SOURCE_ROOT; };
@@ -560,20 +562,6 @@
 		95C2AE800F296542000D3E5D /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AE840F296542000D3E5D /* grand_prix_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_manager.hpp; path = ../../grand_prix_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE880F296542000D3E5D /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = ../../graphics/moving_texture.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE890F296542000D3E5D /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = ../../graphics/moving_texture.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8A0F296542000D3E5D /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8B0F296542000D3E5D /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = ../../graphics/nitro.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8C0F296542000D3E5D /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = ../../graphics/particle_system.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8D0F296542000D3E5D /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = ../../graphics/particle_system.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8E0F296542000D3E5D /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE8F0F296542000D3E5D /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scene.hpp; path = ../../graphics/scene.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE900F296542000D3E5D /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE910F296542000D3E5D /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE920F296542000D3E5D /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE930F296542000D3E5D /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE940F296542000D3E5D /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../graphics/smoke.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE950F296542000D3E5D /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../graphics/smoke.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE970F296542000D3E5D /* base_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = base_gui.cpp; path = ../../gui/base_gui.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AE980F296542000D3E5D /* base_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = base_gui.hpp; path = ../../gui/base_gui.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE990F296542000D3E5D /* challenges_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges_menu.cpp; path = ../../gui/challenges_menu.cpp; sourceTree = SOURCE_ROOT; };
@@ -789,6 +777,30 @@
 		95C2B1E70F296546000D3E5D /* string_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = string_utils.hpp; path = ../../utils/string_utils.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E80F296546000D3E5D /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = ../../utils/vec3.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E90F296546000D3E5D /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../utils/vec3.hpp; sourceTree = SOURCE_ROOT; };
+		95C65D760F532F7D00BE7BA7 /* xml_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_node.cpp; path = games/supertuxkart/src/io/xml_node.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D770F532F7D00BE7BA7 /* xml_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_node.hpp; path = games/supertuxkart/src/io/xml_node.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_reader.cpp; path = games/supertuxkart/src/io/xml_reader.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D7A0F532F7D00BE7BA7 /* xml_reader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_reader.hpp; path = games/supertuxkart/src/io/xml_reader.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = games/supertuxkart/src/graphics/moving_texture.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = games/supertuxkart/src/graphics/shadow.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D900F532FCE00BE7BA7 /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = games/supertuxkart/src/graphics/skid_marks.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D910F532FCE00BE7BA7 /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = games/supertuxkart/src/graphics/particle_system.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D920F532FCE00BE7BA7 /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = games/supertuxkart/src/graphics/nitro.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D930F532FCE00BE7BA7 /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scene.hpp; path = games/supertuxkart/src/graphics/scene.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D940F532FCE00BE7BA7 /* irr_driver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_driver.hpp; path = games/supertuxkart/src/graphics/irr_driver.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D950F532FCE00BE7BA7 /* mesh_tools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mesh_tools.hpp; path = games/supertuxkart/src/graphics/mesh_tools.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D960F532FCE00BE7BA7 /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = games/supertuxkart/src/graphics/camera.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D970F532FD400BE7BA7 /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = games/supertuxkart/src/graphics/smoke.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D980F532FD400BE7BA7 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = games/supertuxkart/src/graphics/camera.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D990F532FD400BE7BA7 /* irr_driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_driver.cpp; path = games/supertuxkart/src/graphics/irr_driver.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh_tools.cpp; path = games/supertuxkart/src/graphics/mesh_tools.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = games/supertuxkart/src/graphics/moving_texture.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = games/supertuxkart/src/graphics/particle_system.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = games/supertuxkart/src/graphics/skid_marks.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9E0F532FD400BE7BA7 /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = games/supertuxkart/src/graphics/smoke.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = games/supertuxkart/src/graphics/scene.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65DA00F532FD400BE7BA7 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = games/supertuxkart/src/graphics/shadow.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = games/supertuxkart/src/graphics/nitro.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -1079,6 +1091,7 @@
 				95C2AE370F296541000D3E5D /* enet */,
 				95C2AE870F296542000D3E5D /* graphics */,
 				95C2AE960F296542000D3E5D /* gui */,
+				95C65D750F532F7D00BE7BA7 /* io */,
 				95C2B0F50F296545000D3E5D /* items */,
 				95C2B1160F296545000D3E5D /* karts */,
 				95C2B1290F296545000D3E5D /* lisp */,
@@ -1605,22 +1618,26 @@
 		95C2AE870F296542000D3E5D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				953EAAAA0F30A4060000D57D /* camera.hpp */,
-				953EAAAB0F30A4060000D57D /* camera.cpp */,
-				95C2AE880F296542000D3E5D /* moving_texture.cpp */,
-				95C2AE890F296542000D3E5D /* moving_texture.hpp */,
-				95C2AE8A0F296542000D3E5D /* nitro.cpp */,
-				95C2AE8B0F296542000D3E5D /* nitro.hpp */,
-				95C2AE8C0F296542000D3E5D /* particle_system.cpp */,
-				95C2AE8D0F296542000D3E5D /* particle_system.hpp */,
-				95C2AE8E0F296542000D3E5D /* scene.cpp */,
-				95C2AE8F0F296542000D3E5D /* scene.hpp */,
-				95C2AE900F296542000D3E5D /* shadow.cpp */,
-				95C2AE910F296542000D3E5D /* shadow.hpp */,
-				95C2AE920F296542000D3E5D /* skid_marks.cpp */,
-				95C2AE930F296542000D3E5D /* skid_marks.hpp */,
-				95C2AE940F296542000D3E5D /* smoke.cpp */,
-				95C2AE950F296542000D3E5D /* smoke.hpp */,
+				95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */,
+				95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */,
+				95C65D900F532FCE00BE7BA7 /* skid_marks.hpp */,
+				95C65D910F532FCE00BE7BA7 /* particle_system.hpp */,
+				95C65D920F532FCE00BE7BA7 /* nitro.hpp */,
+				95C65D930F532FCE00BE7BA7 /* scene.hpp */,
+				95C65D940F532FCE00BE7BA7 /* irr_driver.hpp */,
+				95C65D950F532FCE00BE7BA7 /* mesh_tools.hpp */,
+				95C65D970F532FD400BE7BA7 /* smoke.hpp */,
+				95C65D980F532FD400BE7BA7 /* camera.cpp */,
+				95C65D990F532FD400BE7BA7 /* irr_driver.cpp */,
+				95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */,
+				95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */,
+				95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */,
+				95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */,
+				95C65D9E0F532FD400BE7BA7 /* smoke.cpp */,
+				95C65D9F0F532FD400BE7BA7 /* scene.cpp */,
+				95C65DA00F532FD400BE7BA7 /* shadow.cpp */,
+				95C65DA10F532FD400BE7BA7 /* nitro.cpp */,
+				95C65D960F532FCE00BE7BA7 /* camera.hpp */,
 			);
 			name = graphics;
 			path = ../../graphics;
@@ -1903,6 +1920,18 @@
 			name = utils;
 			path = ../../utils;
 			sourceTree = SOURCE_ROOT;
+		};
+		95C65D750F532F7D00BE7BA7 /* io */ = {
+			isa = PBXGroup;
+			children = (
+				95C65D760F532F7D00BE7BA7 /* xml_node.cpp */,
+				95C65D770F532F7D00BE7BA7 /* xml_node.hpp */,
+				95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */,
+				95C65D7A0F532F7D00BE7BA7 /* xml_reader.hpp */,
+			);
+			name = io;
+			path = games/supertuxkart/src/io;
+			sourceTree = SYSTEM_DEVELOPER_DIR;
 		};
 		95E104FE0E28F65D00503124 /* bullet */ = {
 			isa = PBXGroup;
@@ -2397,13 +2426,6 @@
 				95C2B2FD0F296546000D3E5D /* file_manager.cpp in Sources */,
 				95C2B3030F296546000D3E5D /* grand_prix_data.cpp in Sources */,
 				95C2B3060F296546000D3E5D /* grand_prix_manager.cpp in Sources */,
-				95C2B3090F296546000D3E5D /* moving_texture.cpp in Sources */,
-				95C2B30A0F296546000D3E5D /* nitro.cpp in Sources */,
-				95C2B30B0F296546000D3E5D /* particle_system.cpp in Sources */,
-				95C2B30C0F296546000D3E5D /* scene.cpp in Sources */,
-				95C2B30D0F296546000D3E5D /* shadow.cpp in Sources */,
-				95C2B30E0F296546000D3E5D /* skid_marks.cpp in Sources */,
-				95C2B30F0F296546000D3E5D /* smoke.cpp in Sources */,
 				95C2B3100F296546000D3E5D /* base_gui.cpp in Sources */,
 				95C2B3110F296546000D3E5D /* challenges_menu.cpp in Sources */,
 				95C2B3120F296546000D3E5D /* char_sel.cpp in Sources */,
@@ -2502,10 +2524,21 @@
 				95C2B59C0F296547000D3E5D /* ssg_help.cpp in Sources */,
 				95C2B59D0F296547000D3E5D /* string_utils.cpp in Sources */,
 				95C2B59E0F296547000D3E5D /* vec3.cpp in Sources */,
-				953EAAAC0F30A4060000D57D /* camera.cpp in Sources */,
 				953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */,
 				953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */,
 				953EAAB60F30A4650000D57D /* translation.cpp in Sources */,
+				95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */,
+				95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */,
+				95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */,
+				95C65DA30F532FD400BE7BA7 /* irr_driver.cpp in Sources */,
+				95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */,
+				95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */,
+				95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */,
+				95C65DA70F532FD400BE7BA7 /* skid_marks.cpp in Sources */,
+				95C65DA80F532FD400BE7BA7 /* smoke.cpp in Sources */,
+				95C65DA90F532FD400BE7BA7 /* scene.cpp in Sources */,
+				95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */,
+				95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2523,6 +2556,12 @@
 				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
+					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
+					/usr/local/include/irrlicht/,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2570,16 +2609,10 @@
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 					"-DHAVE_GLUT=1",
+					"-DHAVE_IRRLICHT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
-					"-L/usr/local/lib",
-					"-lSDL",
-					"-lSDLmain",
-					"-lopenal",
-					"-lvorbisfile",
-					"-lvorbis",
-					"-logg",
 					"-lplibjs",
 					"-lplibsl",
 					"-lplibssg",
@@ -2588,6 +2621,14 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
+					"-lirrlicht",
+					"-L/usr/local/lib",
+					"-lSDL",
+					"-lSDLmain",
+					"-lopenal",
+					"-lvorbisfile",
+					"-lvorbis",
+					"-logg",
 					"-lintl",
 				);
 				PRODUCT_NAME = SuperTuxKart;
@@ -2605,6 +2646,12 @@
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
+					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
+					/usr/local/include/irrlicht/,
+				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2652,16 +2699,10 @@
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 					"-DHAVE_GLUT=1",
+					"-DHAVE_IRRLICHT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
-					"-L/usr/local/lib",
-					"-lSDL",
-					"-lSDLmain",
-					"-lopenal",
-					"-lvorbisfile",
-					"-lvorbis",
-					"-logg",
 					"-lplibjs",
 					"-lplibsl",
 					"-lplibssg",
@@ -2670,6 +2711,14 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
+					"-lirrlicht",
+					"-L/usr/local/lib",
+					"-lSDL",
+					"-lSDLmain",
+					"-lopenal",
+					"-lvorbisfile",
+					"-lvorbis",
+					"-logg",
 					"-lintl",
 				);
 				PRODUCT_NAME = SuperTuxKart;
