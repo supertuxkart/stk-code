@@ -26,6 +26,7 @@
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
+#include "graphics/irr_driver.hpp"
 #include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
@@ -160,6 +161,13 @@ void ItemManager::loadDefaultItems()
             i != files.end();  ++i)
         {
 #ifdef HAVE_IRRLICHT
+            // FIXME: We should try to check the extension, 
+            // i.e. load only .3ds files
+            scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
+            if(!mesh) continue;
+            std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
+            m_all_meshes[shortName] = mesh;
+            mesh->grab();
 #else
             if(!StringUtils::has_suffix(*i, ".ac")) continue;
             ssgEntity*  h         = loader->load(*i, CB_ITEM, 
@@ -179,7 +187,7 @@ void ItemManager::loadDefaultItems()
 void ItemManager::setDefaultItemStyle()
 {
     // FIXME - This should go in an internal, system wide configuration file
-    std::string DEFAULT_NAMES[Item::ITEM_LAST - Item::ITEM_FIRST - 1];
+    std::string DEFAULT_NAMES[Item::ITEM_LAST - Item::ITEM_FIRST +1];
     DEFAULT_NAMES[Item::ITEM_BONUS_BOX]   = "gift-box";
     DEFAULT_NAMES[Item::ITEM_BANANA]      = "banana";
     DEFAULT_NAMES[Item::ITEM_GOLD_COIN]   = "nitrotank-big";
@@ -188,7 +196,7 @@ void ItemManager::setDefaultItemStyle()
 
     bool bError=0;
     std::ostringstream msg;
-    for(int i=Item::ITEM_FIRST+1; i<Item::ITEM_LAST; i++)
+    for(int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
 #ifdef HAVE_IRRLICHT
         m_item_mesh[i] = m_all_meshes[DEFAULT_NAMES[i]];

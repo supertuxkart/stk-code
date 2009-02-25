@@ -39,15 +39,13 @@ class Item
 public:
     enum ItemType
     {
-        ITEM_FIRST = -1,
-
-        ITEM_BONUS_BOX = 0,
+        ITEM_FIRST,
+        ITEM_BONUS_BOX = ITEM_FIRST,
         ITEM_BANANA,
         ITEM_GOLD_COIN,
         ITEM_SILVER_COIN,
         ITEM_BUBBLEGUM,
-
-        ITEM_LAST
+        ITEM_LAST = ITEM_BUBBLEGUM
     };
 
 private:
@@ -57,6 +55,8 @@ private:
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // collected items reappear.
 #ifdef HAVE_IRRLICHT
+    /** Scene node of this item. */
+    scene::ISceneNode *m_root;
 #else
     ssgTransform* m_root;         // The actual root of the item
 #endif

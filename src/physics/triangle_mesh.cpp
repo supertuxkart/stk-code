@@ -76,3 +76,16 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
 }   // createBody
 
 // -----------------------------------------------------------------------------
+/** Removes the created body from the physics world. This is used when creating
+ *  a temporary rigid body of the main track to get bullet raycasts. Then the
+ *  main track is removed, and the track (main track including all additional
+ *  objects which were loaded later) is converted again.
+ */
+void TriangleMesh::removeBody()
+{
+    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+    delete m_body;
+    m_body = 0;
+}   // removeBody
+
+// -----------------------------------------------------------------------------

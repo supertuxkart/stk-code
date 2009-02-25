@@ -42,6 +42,7 @@ using namespace irr;
 #include "utils/vec3.hpp"
 
 class TriangleMesh;
+class XMLNode;
 
 class Track
 {
@@ -71,7 +72,9 @@ private:
     Vec3                     m_camera_final_hpr;
     bool                     m_is_arena;
     int                      m_version;
-    
+#ifdef HAVE_IRRLICHT
+    bool                     loadMainTrack(const XMLNode &node);
+#endif
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -239,7 +242,7 @@ private:
     void  readDrivelineFromFile(std::vector<Vec3>& line,
                                 const std::string& file_ext);
 #ifdef HAVE_IRRLICHT
-    void  convertTrackToBullet();
+    void  convertTrackToBullet(const scene::IMesh *mesh);
 #else
     void  convertTrackToBullet(ssgEntity *track, sgMat4 m);
 #endif

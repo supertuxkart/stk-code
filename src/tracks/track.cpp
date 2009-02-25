@@ -58,16 +58,18 @@ const int   Track::UNKNOWN_SECTOR  = -1;
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
 {
-    m_filename         = filename_;
-    m_item_style       = "";
-    m_track_2d_width   = w;
-    m_track_2d_height  = h;
-    m_do_stretch       = stretch;
-    m_description      = "";
-    m_designer         = "";
-    m_screenshot       = "";
-    m_top_view         = "";
-    m_version          = 0;
+    m_filename           = filename_;
+    m_item_style         = "";
+    m_track_2d_width     = w;
+    m_track_2d_height    = h;
+    m_do_stretch         = stretch;
+    m_description        = "";
+    m_designer           = "";
+    m_screenshot         = "";
+    m_top_view           = "";
+    m_version            = 0;
+    m_track_mesh         = new TriangleMesh();
+    m_non_collision_mesh = new TriangleMesh();
 #ifdef HAVE_IRRLICHT
     m_all_nodes.clear();
     m_all_meshes.clear();
@@ -1147,11 +1149,20 @@ void Track::createPhysicsModel()
     if(!m_model) return;
 #endif
 
-    m_track_mesh         = new TriangleMesh();
-    m_non_collision_mesh = new TriangleMesh();
     
 #ifdef HAVE_IRRLICHT
-    convertTrackToBullet();
+    // Remove the temporary track rigid body, and then convert all objects
+    // (i.e. the track and all additional objects) into a new rigid body
+    // and convert this again. So this way we have an optimised track
+    // rigid body which includes all track objects.
+    // Note that removing the rigid body does not remove the already collected
+    // triangle information, so there is no need to convert the actual track
+    // (first element in m_track_mesh) again!
+    m_track_mesh->removeBody();
+    for(unsigned int i=1; i<m_all_meshes.size(); i++)
+    {
+        convertTrackToBullet(m_all_meshes[i]);
+    }
 #else
     // Collect all triangles in the track_mesh
     sgMat4 mat;
@@ -1166,19 +1177,10 @@ void Track::createPhysicsModel()
 // -----------------------------------------------------------------------------
 //* Convert the ssg track tree into its physics equivalents.
 #ifdef HAVE_IRRLICHT
-void Track::convertTrackToBullet()
+void Track::convertTrackToBullet(const scene::IMesh *mesh)
 {
-    // 0: start line
-    // 1: left/right drivelines or so
-    // 2: road
-    // 3: zipper or collectables??
-    // 4: barriers
-    // 5: plane
-    for(unsigned int i=0; i<m_all_meshes.size(); i++)
-    {
-        const scene::IMesh *track = m_all_meshes[i];
-        for(unsigned int i=0; i<track->getMeshBufferCount(); i++) {
-            scene::IMeshBuffer *mb = track->getMeshBuffer(i);
+        for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
+            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
             // FIXME: take translation/rotation into accou
             if(mb->getVertexType()!=video::EVT_STANDARD) {
                 fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
@@ -1195,7 +1197,7 @@ void Track::convertTrackToBullet()
             } 
 
             u16 *mbIndices = mb->getIndices();
-            btVector3 vertices[3];
+            Vec3 vertices[3];
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
             for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
                 for(unsigned int k=0; k<3; k++) {
@@ -1204,15 +1206,14 @@ void Track::convertTrackToBullet()
                     // (STK: Z up, irrlicht: Y up). We might want to change
                     // this as well, makes it easier to work with bullet and
                     // irrlicht together, without having to swap indices.
-                    vertices[k] = btVector3(mbVertices[indx].Pos.X,
-                                            mbVertices[indx].Pos.Z,
-                                            mbVertices[indx].Pos.Y );
+                    vertices[k] = Vec3(mbVertices[indx].Pos.X,
+                                       mbVertices[indx].Pos.Z,
+                                       mbVertices[indx].Pos.Y );
                 }   // for k
                 m_track_mesh->addTriangle(vertices[0], vertices[1], 
                                           vertices[2], material     );
             }   // for j
         }   // for i<getMeshBufferCount
-    }   // for obj in children
 
 }   // convertTrackToBullet
 
@@ -1284,6 +1285,46 @@ void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
 }   // convertTrackToBullet
 #endif
 // ----------------------------------------------------------------------------
+/** Loads the main track model (i.e. all other objects contained in the
+ *  scene might use raycast on this track model to determine the actual
+ *  height of the terrain.
+ */
+#ifdef HAVE_IRRLICHT
+bool Track::loadMainTrack(const XMLNode &node)
+{
+    std::string model_name;
+    node.get("model", &model_name);
+    std::string full_path = file_manager->getTrackFile(model_name, 
+                                                       getIdent());
+    scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+    if(!mesh)
+    {
+        fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
+                node.getName().c_str(), model_name.c_str());
+        exit(-1);
+    }
+    m_all_meshes.push_back(mesh);
+    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+    core::vector3df xyz(0,0,0);
+    node.getXYZ(&xyz);
+    core::vector3df hpr(0,0,0);
+    node.getHPR(&hpr);
+    scene_node->setPosition(xyz);
+    scene_node->setRotation(hpr);
+    m_all_nodes.push_back(scene_node);
+    scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
+
+    Vec3 min, max;
+    MeshTools::minMax3D(mesh, &min, &max);
+    RaceManager::getWorld()->getPhysics()->init(min, max);
+
+    // This will (at this stage) only convert the main track model.
+    convertTrackToBullet(mesh);
+    m_track_mesh->createBody();
+    return true;
+}   // loadMainTrack
+#endif
+// ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
     // Add the track directory to the texture search path
@@ -1308,19 +1349,22 @@ void Track::loadTrackModel()
 
     // Make sure that we have a track (which is used for raycasts to 
     // place other objects).
-    const XMLNode *node = xml->getNode(0);
-    if(!node || node->getName()!="track")
+    const XMLNode *node = xml->getNode("track");
+    if(!node)
     {
         std::ostringstream msg;
         msg<< "No track model defined in '"<<path
-           <<"' (it must be the first element).";
+           <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+    loadMainTrack(*node);
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
         const std::string name = node->getName();
-        if(name=="track" || name=="object")
+        // The track object was already converted before the loop
+        if(name=="track") continue;
+        if(name=="object")
         {
             std::string model_name;
             node->get("model", &model_name);
@@ -1607,19 +1651,17 @@ void Track::loadTrackModel()
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
-    Vec3 min, max;
 #ifdef HAVE_IRRLICHT
-    // FIXME: for now assume that mesh 0 is the actual track.
-    MeshTools::minMax3D(m_all_meshes[0], &min, &max);
     const core::vector3df &sun_pos = getSunPos();
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
     m_light->setLightData(light);
-    
+    // Note: the physics world for irrlicht is created in loadMainTrack
 #else
+    Vec3 min, max;
     SSGHelp::MinMax(m_model, &min, &max);
-#endif
     RaceManager::getWorld()->getPhysics()->init(min, max);
+#endif
     createPhysicsModel();
 }   // loadTrack
 
@@ -1634,7 +1676,16 @@ void Track::itemCommand(core::vector3df *xyz, Item::ItemType type,
         return;
 
     // if only 2d coordinates are given, let the item fall from very high
-    if(bNeedHeight) xyz->Z = 1000000.0f;
+    if(bNeedHeight)
+    {
+        Vec3 pos(*xyz);
+        float m_HoT;
+        Vec3 m_normal;
+        const Material *material;
+        pos.setZ(1000);
+        getTerrainInfo(pos, &m_HoT, &m_normal, &material);
+        xyz->Z = m_HoT;
+    }
 
     // Even if 3d data are given, make sure that the item is on the ground
     //xyz->Z = irr_dirver->getHeight( m_model, *xyz ) + 0.06f;

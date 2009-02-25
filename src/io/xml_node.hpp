@@ -50,6 +50,8 @@ public:
     int get(const std::string &attribute, std::vector<float> *value) const;
     int get(const std::string &attribute, std::vector<int> *value) const;
     int get(core::vector3df *value) const;
+    int getXYZ(core::vector3df *value) const;
+    int getHPR(core::vector3df *value) const;
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
     static bool hasX(int b) { return (b&1)==1; }
     static bool hasY(int b) { return (b&2)==2; }

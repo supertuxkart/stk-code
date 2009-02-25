@@ -40,7 +40,7 @@ private:
     // This stores all item models
 #ifdef HAVE_IRRLICHT
     // FIXME: why ITEM_SILVER_COINT+1 in plib??
-    scene::IMesh *m_item_mesh[Item::ITEM_LAST];
+    scene::IMesh *m_item_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
     std::map<std::string,scene::IMesh*> m_all_meshes;
 #else
     ssgEntity *m_item_model[Item::ITEM_SILVER_COIN+1];

@@ -435,6 +435,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
     int y1 = (int)(user_config->m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
+#ifndef HAVE_IRRLICHT
     powerup->getIcon()->apply();
 
     int n  = player_kart->getNumPowerup() ;
@@ -453,7 +454,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
         glTexCoord2f(0, 1); glVertex2i( i*30 + x1      , y1+nSize);
     }   // for i
     glEnd () ;
-
+#endif
 }   // drawPowerupIcons
 
 //-----------------------------------------------------------------------------

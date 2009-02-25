@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRIANGLE_MESH_H
-#define HEADER_TRIANGLE_MESH_H
+#ifndef HEADER_TRIANGLE_MESH_HPP
+#define HEADER_TRIANGLE_MESH_HPP
 
 #include <vector>
 #include "user_pointer.hpp"
@@ -45,6 +45,7 @@ public:
                      const btVector3 &t3, const Material* m);
     void createBody(btCollisionObject::CollisionFlags flags=
                          (btCollisionObject::CollisionFlags)0);
+    void removeBody();
     const Material* getMaterial(int n) const {return m_triangleIndex2Material[n];}
 };
 #endif

@@ -19,6 +19,7 @@
 
 #include "items/item.hpp"
 
+#include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
@@ -43,6 +44,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
 #ifdef HAVE_IRRLICHT
+    m_root             = irr_driver->addMesh(mesh);
+    m_root->setPosition(xyz.toIrrVector());
+    m_root->grab();
 #else
     m_root             = new ssgTransform();
     m_root->ref();
@@ -56,6 +60,8 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 Item::~Item()
 {
 #ifdef HAVE_IRRLICHT
+
+    m_root->drop();
 #else
     stk_scene->remove(m_root);
     ssgDeRefDelete(m_root);
@@ -94,14 +100,18 @@ void Item::update(float delta)
 
             hell.setZ( (m_time_till_return>1.0f) ? -1000000.0f 
 		       : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
-#ifndef HAVE_IRRLICHT
+#ifdef HAVE_IRRLICHT
+            m_root->setPosition(hell.toIrrVector());
+#else
             m_root->setTransform(hell.toFloat());
 #endif
         }
         else
         {
             m_collected    = false;
-#ifndef HAVE_IRRLICHT
+#ifdef HAVE_IRRLICHT
+
+#else
             m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 #endif
         }   // T>0
@@ -112,10 +122,12 @@ void Item::update(float delta)
         
         if(!m_rotate) return;
         // have it rotate
-#ifdef HAVE_IRRLICHT
-#else
         Vec3 rotation(delta*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
+#ifdef HAVE_IRRLICHT
+        m_root->setRotation(m_coord.getHPR().toIrrHPR());
+        m_root->setPosition(m_coord.getXYZ().toIrrVector());
+#else
         m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
 #endif
     }
