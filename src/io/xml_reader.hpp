@@ -42,3 +42,4 @@ public:
 };   // XMLReader
 #endif
 #endif
+

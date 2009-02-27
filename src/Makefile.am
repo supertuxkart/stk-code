@@ -74,7 +74,7 @@ supertuxkart_SOURCES = \
  graphics/camera.cpp \
  graphics/camera.hpp \
  graphics/irr_driver.cpp \
- graphics/irr_driver.cpp \
+ graphics/irr_driver.hpp \
  graphics/mesh_tools.hpp \
  graphics/mesh_tools.cpp \
  graphics/nitro.cpp \
