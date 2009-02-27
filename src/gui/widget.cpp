@@ -328,7 +328,9 @@ void Widget::setFont( const WidgetFont FONT )
 void Widget::setTexture( const std::string& FILENAME, bool is_full_path )
 {
     Material *m = material_manager->getMaterial( FILENAME, is_full_path );
+#ifndef HAVE_IRRLICHT
     m_texture = m->getState()->getTextureHandle();
+#endif
 }
 
 /** Initialize a display list containing a rectangle that can have rounded

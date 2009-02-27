@@ -120,8 +120,8 @@ void KartModel::loadModels(const std::string &kart_ident)
     Vec3 size = max-min;
     m_z_offset    = min.getZ();
     m_kart_width  = size.getX();
-    m_kart_height = size.getY();
-    m_kart_length = size.getZ();
+    m_kart_height = size.getZ();
+    m_kart_length = size.getY();
     // FIXME: How do we handle this? it's a mesh only, so we can't
     // simply move it in a transform (unless we turn it into a scene 
     // node). m_z_offset should probably be made available to kart.

@@ -131,8 +131,9 @@ void GrandPrixSelect::update(float dt)
             }
 
             mat = material_manager->getMaterial( img_filename, true );
-
+#ifndef HAVE_IRRLICHT
             m_track_imgs.push_back(mat->getState()->getTextureHandle());
+#endif
         }
 
         if( !m_track_imgs.empty() )

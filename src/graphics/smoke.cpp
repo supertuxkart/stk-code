@@ -36,7 +36,9 @@ Smoke::Smoke(Kart* kart)
     dirtyBSphere();
 
     m_smokepuff = new ssgSimpleState ();
+#ifndef HAVE_IRRLICHT
     m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
+#endif
     m_smokepuff -> setTranslucent    () ;
     m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
     m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;

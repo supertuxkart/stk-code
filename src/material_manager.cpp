@@ -24,6 +24,7 @@
 
 #include "file_manager.hpp"
 #include "material.hpp"
+#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
 ssgState *fuzzy_gst;
@@ -65,16 +66,21 @@ void MaterialManager::reInit()
 void MaterialManager::loadMaterial()
 {
     // Create the default/empty material.
-    m_materials.push_back(new Material((int)m_materials.size()));
+    m_materials.push_back(new Material(m_materials.size()));
 
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
+#ifdef HAVE_IRRLICHT
+    const std::string fname     = "materials.xml";
+#else
     const std::string fname     = "materials.dat";
+#endif
     std::string       full_name = file_manager->getTextureFile(fname);
     addSharedMaterial(full_name);
-
+#ifndef HAVE_IRRLICHT
     ssgSetAppStateCallback(getAppState);
     fuzzy_gst        = getMaterial("fuzzy.rgb")->getState();
+#endif
     // Save index of shared textures
     m_shared_material_index = (int)m_materials.size();
 }   // MaterialManager
@@ -102,6 +108,29 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
 //-----------------------------------------------------------------------------
 bool MaterialManager::pushTempMaterial(const std::string& filename)
 {
+#ifdef HAVE_IRRLICHT
+    XMLReader *xml = file_manager->getXMLReader(filename);
+    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    {
+        const XMLNode *node = xml->getNode(i);
+        if(!node)
+        {
+            // We don't have access to the filename at this stage anymore :(
+            fprintf(stderr, "Unknown node in material.dat file\n");
+            exit(-1);
+        }
+        try
+        {
+            m_materials.push_back(new Material(node, m_materials.size() ));
+        }
+        catch(std::exception& e)
+        {
+            // The message contains a '%s' for the filename
+            fprintf(stderr, e.what(), filename.c_str());
+        }
+    }   // for i<xml->getNumNodes)(
+    return true;
+#else
     FILE *fd = fopen(filename.c_str(), "r" );
 
     if ( fd == NULL ) return false;
@@ -111,6 +140,7 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
 
     fclose ( fd ) ;
     return true;
+#endif
 }   // pushTempMaterial
 
 //-----------------------------------------------------------------------------
@@ -124,6 +154,7 @@ void MaterialManager::popTempMaterial()
 }   // popTempMaterial
 
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 char* MaterialManager::parseFileName(char **str)
 {
     char *p = *str ;
@@ -158,8 +189,9 @@ char* MaterialManager::parseFileName(char **str)
 
     return f ;
 }   // parseFilename
-
+#endif
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 int MaterialManager::parseMaterial ( FILE *fd )
 {
     char str [ 1024 ] ;
@@ -177,13 +209,14 @@ int MaterialManager::parseMaterial ( FILE *fd )
 
         if ( f != NULL )
         {
-            m_materials.push_back(new Material (f, s, (int)m_materials.size() ));
+            m_materials.push_back(new Material (f, s, m_materials.size() ));
             return true ;
         }
     }
 
     return false ;
 }   // parseMaterial
+#endif
 
 //-----------------------------------------------------------------------------
 Material *MaterialManager::getMaterial ( ssgLeaf *l )
@@ -229,16 +262,22 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     // Add the new material
-    Material* m=new Material(fname,"", (int)m_materials.size(), is_full_path);
+#ifdef HAVE_IRRLICHT
+    Material* m=new Material(fname, m_materials.size(), is_full_path);
+#else
+    Material* m=new Material(fname, "", m_materials.size(), is_full_path);
+#endif
     m_materials.push_back(m);
     if(make_permanent) m_shared_material_index = (int)m_materials.size();
     return m ;
 }   // getMaterial
 
 //=============================================================================
+#ifndef HAVE_IRRLICHT
 ssgState *getAppState ( char *fname )
 {
     Material *m = material_manager->getMaterial ( fname ) ;
     return ( m == NULL ) ? NULL : m -> getState () ;
 }   // getAppState
+#endif
 

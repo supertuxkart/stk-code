@@ -109,11 +109,6 @@ void Item::update(float delta)
         else
         {
             m_collected    = false;
-#ifdef HAVE_IRRLICHT
-
-#else
-            m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
-#endif
         }   // T>0
 
     }

@@ -66,11 +66,13 @@ PowerupManager::PowerupManager()
 //-----------------------------------------------------------------------------
 void PowerupManager::removeTextures()
 {
+#ifndef HAVE_IRRLICHT
     for(int i=0; i<POWERUP_MAX; i++)
     {
         if(m_all_icons [i]) ssgDeRefDelete(m_all_icons [i]->getState());
         if(m_all_models[i]) ssgDeRefDelete(m_all_models[i]            );
     }   // for
+#endif
     callback_manager->clear(CB_COLLECTABLE);
 
 }   // removeTextures
@@ -115,6 +117,8 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
     lisp->get("model",           sModel                             );
     lisp->get("icon",            sIconFile                          );
  
+#ifdef HAVE_IRRLICHT
+#else
     // load material
     m_all_icons[collectType] = material_manager->getMaterial(sIconFile,
                                                      /* full_path */    false,
@@ -123,21 +127,19 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 
     if(sModel!="")
     {
-#ifdef HAVE_IRRLICHT
-#else
         // FIXME LEAK: not freed (unimportant, since the models have to exist
         // for the whole game anyway).
         ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
         m_all_models[collectType] = e;
         e->ref();
         e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
-#endif
     }
     else
     {
         m_all_models[collectType] = 0;
         m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
     }
+#endif
 
     // Load special attributes for certain powerups
     switch (collectType) {

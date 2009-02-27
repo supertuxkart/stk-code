@@ -48,13 +48,14 @@ ssgTransform* createShadow( const std::string& name,
 
     result -> setName ( "Shadow" ) ;
 
+#ifndef HAVE_IRRLICHT
     ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
     // FIXME LEAK: va, na, ta, and ca are most likely leaked, since plib
     // will mark them as 'not owned' and therefore not free them!
     gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
     gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
-
     result -> addKid ( gs ) ;
+#endif
 
     return result;
 }

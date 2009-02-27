@@ -59,44 +59,50 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     // ------ bubble gum -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt( WTOK_IMG1, 10, 12,
         powerup_manager->getIcon(POWERUP_BUBBLEGUM)->getState()->getTextureHandle());
-
+#endif
     widget_manager->addTextWgt( WTOK_TXT1, 90, 12,
         _("BubbleGum - leave a sticky pink puddle behind you"));
     widget_manager->setWgtRoundCorners( WTOK_TXT1, WGT_AREA_RGT );
     widget_manager->breakLine();
 
     // ------ cakes -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG2, 10, 12,
         powerup_manager->getIcon(POWERUP_CAKE)->getState()->getTextureHandle());
-
+#endif
     widget_manager->addTextWgt(WTOK_TXT2, 90, 12,
         _("Cake - thrown at the closest rival,\nbest on short ranges and long straights"));
     widget_manager->setWgtRoundCorners( WTOK_TXT2, WGT_AREA_RGT );
     widget_manager->breakLine();
     
     // ------ bowling balls -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG3, 10, 12,
         powerup_manager->getIcon(POWERUP_BOWLING)->getState()->getTextureHandle());
-
+#endif
     widget_manager->addTextWgt(WTOK_TXT3, 90, 12,
         _("Bowling Ball - bounces off walls. If you are looking back,\nit will be thrown backwards."));
     widget_manager->setWgtRoundCorners( WTOK_TXT3, WGT_AREA_RGT );
     widget_manager->breakLine();
 
     // ------ zipper -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG4, 10, 12,
         powerup_manager->getIcon(POWERUP_ZIPPER)->getState()->getTextureHandle());
-
+#endif
     widget_manager->addTextWgt(WTOK_TXT4, 90, 12,
         _("Zipper - speed boost"));
     widget_manager->setWgtRoundCorners(WTOK_TXT4, WGT_AREA_RGT);
     widget_manager->breakLine();
 
     // ------ parachute -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG5, 10, 12,
         powerup_manager->getIcon(POWERUP_PARACHUTE)->getState()->getTextureHandle());
+#endif
 
     widget_manager->addTextWgt(WTOK_TXT5, 90, 12,
         _("Parachute - slows down all karts in a better position!"));
@@ -104,8 +110,10 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     // ------ anvil -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG6, 10, 12,
         powerup_manager->getIcon(POWERUP_ANVIL)->getState()->getTextureHandle());
+#endif
 
     widget_manager->addTextWgt(WTOK_TXT6, 90, 12,
         _("Anvil - slows down greatly the kart in the first position"));
@@ -113,9 +121,10 @@ HelpPageTwo::HelpPageTwo()
     widget_manager->breakLine();
 
     // ------ plunger -----
+#ifndef HAVE_IRRLICHT
     widget_manager->addImgWgt(WTOK_IMG7, 10, 12,
                               powerup_manager->getIcon(POWERUP_PLUNGER)->getState()->getTextureHandle());
-    
+#endif
     widget_manager->addTextWgt(WTOK_TXT7, 90, 12,
                                _("Plunger - throw straight to pull an opponent back,\nor throw while looking back to make one lose sight!"));
     widget_manager->setWgtRoundCorners( WTOK_TXT7, WGT_AREA_RGT );

@@ -24,13 +24,18 @@
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 
+class XMLNode;
+
 class Material
 {
 private:
+#ifdef HAVE_IRRLICHT
+#else
     ssgSimpleState *m_state;
     ssgCallback     m_predraw;
     ssgCallback     m_postdraw;
-    int             m_index;
+#endif
+    unsigned int    m_index;
     std::string     m_texname;
     bool            m_collideable;
     bool            m_zipper;
@@ -46,26 +51,32 @@ private:
     float           m_slowdown;
     /** Maximum speed at which no more slow down occurs. */
     float           m_max_speed_fraction;
-
+#ifndef HAVE_IRRLICHT
     bool  parseBool  ( char **p );
     int   parseInt   ( char **p );
     float parseFloat ( char **p );
-
-    void init    (int index);
+#endif
+    void init    (unsigned int index);
     void install (bool is_full_path=false);
 
 public:
 
-    Material(int index);
+    Material(unsigned int index);
+#ifdef HAVE_IRRLICHT
+    Material(const XMLNode *node, int index);
+    Material(const std::string& fname, int index, bool is_full_path=false);
+#else
     Material(const std::string& fname, char *description, int index,
              bool is_full_path=false);
+#endif
 
     ~Material ();
 
     int matches ( char *tx ) ;
-
+#ifndef HAVE_IRRLICHT
     ssgSimpleState 
          *getState           () const { return m_state ;             }
+#endif
     bool  isIgnore           () const { return m_ignore;             }
     bool  isZipper           () const { return m_zipper;             }
     bool  isSphereMap        () const { return m_sphere_map;         }
@@ -80,10 +91,11 @@ public:
     /** Returns the slowdown that happens if a kart is
      *  faster than the maximum speed. */
     float getSlowDown        () const { return m_slowdown;           }
+#ifndef HAVE_IRRLICHT
     void  apply              ()       { m_state ->apply();           }
     void  force              ()       { m_state ->force();           }
-
-    void applyToLeaf ( ssgLeaf *l ) ;
+    void  applyToLeaf ( ssgLeaf *l ) ;
+#endif
 
 } ;
 

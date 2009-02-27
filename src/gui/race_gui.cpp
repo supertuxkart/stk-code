@@ -97,6 +97,7 @@ RaceGUI::RaceGUI()
     m_pos_string[9] = "9th";
     m_pos_string[10] = "10th";
 
+#ifndef HAVE_IRRLICHT
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
     m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");
@@ -104,6 +105,7 @@ RaceGUI::RaceGUI()
     
     m_plunger_face = material_manager->getMaterial("plungerface.rgb");
     m_plunger_face->getState()->disable(GL_CULL_FACE);
+#endif
     
     m_fps_counter = 0;
     m_fps_string[0]=0;
@@ -370,7 +372,9 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         // the same icon is displayed more than once in a row.
         if(last_players_gst==players_gst)
         {
+#ifndef HAVE_IRRLICHT
             players_gst->getState()->force();
+#endif
         }
         //The material of the icons should not have a non-zero alpha_ref value,
         //because if so the next call can make the text look aliased.
@@ -942,7 +946,9 @@ void RaceGUI::drawStatusText(const float dt)
                 if (numPlayers == 3 && pla > 1)
                     plunger_x = offset_x + user_config->m_width/2 - plunger_size/2;
                         
+#ifndef HAVE_IRRLICHT
                 m_plunger_face->getState()->force();
+#endif
                 glBegin ( GL_QUADS ) ;
                 glTexCoord2f(1, 0); glVertex2i(plunger_x+plunger_size,    offset_y);
                 glTexCoord2f(0, 0); glVertex2i(plunger_x,                 offset_y);

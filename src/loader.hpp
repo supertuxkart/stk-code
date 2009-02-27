@@ -52,9 +52,11 @@ private:
 
     void         makePath     (std::string& path, const std::string& dir, 
                                const std::string& fname) const;
+#ifndef HAVE_IRRLICHT
     ssgBranch   *createBranch (char *data) const;
     void         preProcessObj( ssgEntity *n, bool mirror );
     ssgBranch   *animInit     (char *data) const;
+#endif
 };
 
 extern Loader* loader;

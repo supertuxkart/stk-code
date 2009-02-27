@@ -444,7 +444,9 @@ void InitTuxkart()
     irr_driver              = new IrrDriver();
 #endif
     loader                  = new Loader();
+#ifndef HAVE_IRRLICHT
     loader->setCreateStateCallback(getAppState);
+#endif
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs

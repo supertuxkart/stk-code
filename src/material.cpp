@@ -19,8 +19,11 @@
 
 #include "material.hpp"
 
+#include <stdexcept>
+
 #include "file_manager.hpp"
 #include "stk_config.hpp"
+#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
 #define UCLAMP   1
@@ -44,6 +47,7 @@ int setSpheremap ( ssgEntity * )
 }   // setSpheremap
 
 //=============================================================================
+#ifndef HAVE_IRRLICHT
 bool Material::parseBool ( char **p )
 {
     /* Skip leading spaces */
@@ -76,18 +80,66 @@ float Material::parseFloat ( char **p )
 
     return (float)strtod ( *p, p ) ;
 }   // parseFloat 
-
+#endif
 //-----------------------------------------------------------------------------
-Material::Material(int index)
+Material::Material(unsigned int index)
 {
     m_texname = "";
+#ifndef HAVE_IRRLICHT
     m_predraw  = m_postdraw = NULL ;
+#endif
 
     init   (index);
     install();
 }   // Material
 
 //-----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+/** Create a new material using the parameters specified in the xml file.
+ *  \param node Node containing the parameters for this material.
+ *  \param index Index in material_manager.
+ */
+Material::Material(const XMLNode *node, int index)
+{
+    node->get("name", &m_texname);
+    if(m_texname=="")
+    {
+        throw std::runtime_error("No texture name specified in %s file\n");
+    }
+    init(index);
+    bool b=false;
+    node->get("clampU", &b);  if(b) m_clamp_tex +=UCLAMP;
+    b=false;
+    node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
+    node->get("transparency", &m_transparency      );
+    node->get("alpha",        &m_alpha_ref         );
+    node->get("light",        &m_lighting          );
+    node->get("sphere",       &m_sphere_map        );
+    node->get("friction",     &m_friction          );
+    node->get("ignore",       &m_ignore            );
+    node->get("zipper",       &m_zipper            );
+    node->get("reset",        &m_resetter          );
+    node->get("collide",      &m_collideable       );
+    node->get("maxSpeed",     &m_max_speed_fraction);
+    node->get("slowdownTime", &m_slowdown          );
+
+    install(/*is_full_path*/false);
+}   // Material
+
+//-----------------------------------------------------------------------------
+/** Create a standard material using the default settings for materials.
+ *  \param fname Name of the texture file.
+ *  \param index Unique index in material_manager.
+ *  \param is_full_path If the fname contains the full path.
+ */
+Material::Material(const std::string& fname, int index, bool is_full_path)
+{
+    m_texname = fname;
+    init(index);
+    install(is_full_path);
+}   // Material
+
+#else
 Material::Material(const std::string& fname, char *description, 
                    int index, bool is_full_path)
 {
@@ -120,15 +172,18 @@ Material::Material(const std::string& fname, char *description,
     }
     install(is_full_path);
 }   // Material
+#endif
 
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
+#ifndef HAVE_IRRLICHT
     ssgDeRefDelete(m_state);
+#endif
 }   // ~Material
 
 //-----------------------------------------------------------------------------
-void Material::init(int index)
+void Material::init(unsigned int index)
 {
     m_index              = index ;
     m_clamp_tex          = 0     ;
@@ -146,15 +201,18 @@ void Material::init(int index)
 }
 
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 void Material::applyToLeaf(ssgLeaf *l)
 {
     if ( m_predraw  ) l -> setCallback ( SSG_CALLBACK_PREDRAW , m_predraw  ) ;
     if ( m_postdraw ) l -> setCallback ( SSG_CALLBACK_POSTDRAW, m_postdraw ) ;
 }   // applyToLeaf
-
+#endif
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {
+#ifdef HAVE_IRRLICHT
+#else
     if ( isSphereMap () )
     {
         m_predraw  =   setSpheremap ;
@@ -206,6 +264,7 @@ void Material::install(bool is_full_path)
         m_state -> setOpaque () ;
         m_state -> disable   ( GL_BLEND ) ;
     }
+#endif
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::basename(m_texname);

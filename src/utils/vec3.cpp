@@ -111,9 +111,9 @@ void Vec3::setPitchRoll(const Vec3 &normal)
 #ifdef HAVE_IRRLICHT
 const core::vector3df Vec3::toIrrHPR() const
 {
-    core::vector3df r(RAD_TO_DEGREE( getZ()),
+    core::vector3df r(RAD_TO_DEGREE( getY()),
                       RAD_TO_DEGREE(-getX()),
-                      RAD_TO_DEGREE( getY()) );
+                      RAD_TO_DEGREE(-getZ()) );
     return r;
 
 }  // toIrrHPR

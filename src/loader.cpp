@@ -87,13 +87,19 @@ ssgEntity *Loader::load(const std::string& filename, CallbackType t,
 {
     m_current_callback_type   = t;
     m_is_full_path            = is_full_path;
+#ifdef HAVE_IRRLICHT
+    // FIXME: for now
+    return NULL;
+#else
     ssgEntity *obj            = optimise ? ssgLoad  (filename.c_str(), this) 
                                          : ssgLoadAC(filename.c_str(), this);
     preProcessObj(obj, false);
     return obj;
+#endif
 }   // load
 
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 void Loader::preProcessObj ( ssgEntity *n, bool mirror )
 {
     if ( n == NULL ) return ;
@@ -127,8 +133,9 @@ void Loader::preProcessObj ( ssgEntity *n, bool mirror )
     for ( int i = 0 ; i < b -> getNumKids () ; i++ )
         preProcessObj ( b -> getKid ( i ), mirror ) ;
 }
-
+#endif
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 ssgBranch *Loader::animInit (char *data ) const
 {
     while ( ! isdigit ( *data ) && *data != '\0' )
@@ -155,8 +162,9 @@ ssgBranch *Loader::animInit (char *data ) const
     return br;
 }   // animInit
 
-
+#endif
 //-----------------------------------------------------------------------------
+#ifndef HAVE_IRRLICHT
 /** Handle userdata that is stored in the model files. Mostly the userdata
  *  indicates that a special branch is to be created (e.g. a ssgCutout instead
  * of the standard branch). But some userdata indicate that callbacks need
@@ -220,4 +228,4 @@ ssgBranch *Loader::createBranch(char *data) const
     fprintf(stderr, "Warning: Ignoring userdata '%s'\n", data);
     return NULL ;
 }   // createBranch
-
+#endif
