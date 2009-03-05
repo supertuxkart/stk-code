@@ -73,7 +73,7 @@ AC_ARG_ENABLE(irrlicht, [AS_HELP_STRING(--enable-irrlicht,
                                      [enable irrlicht compilation (still early pre-alpha)])],,
               enable_irrlicht=false)
 if test x$enable_irrlicht = xyes; then
-    AC_DEFINE([HAVE_IRRLICHT], [],  [enable irrlicht compilation])
+    AC_DEFINE([HAVE_IRRLICHT], [1],  [enable irrlicht compilation])
     SUMMARY="$SUMMARY\nCompiling for irrlicht - be warned, pre-alpha!!"
 fi
 
@@ -277,7 +277,7 @@ if test x$enable_irrlicht = xyes; then
    AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
                                    [specify the prefix path to irrlicht])])
    if test "x$with_irrlicht" != "x" ; then
-      CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include"
+      CPPFLAGS="${CPPFLAGS} -I$with_irrlicht/include/irrlicht"
    fi
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
    dnl how to use irr namespace here?? g++:   'irr' has not been declared
@@ -289,6 +289,12 @@ if test x$enable_irrlicht = xyes; then
    case "${host}" in
    *-*-linux* )
    irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
+   ;;
+   esac
+
+   case "${host}" in
+   *darwin*|*macosx*)
+   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
    ;;
    esac
 
