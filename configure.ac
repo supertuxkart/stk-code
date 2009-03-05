@@ -69,6 +69,15 @@ else
     SUMMARY="$SUMMARY\nDisabled compiler optimizations."
 fi
 
+AC_ARG_ENABLE(irrlicht, [AS_HELP_STRING(--enable-irrlicht,
+                                     [enable irrlicht compilation (still early pre-alpha)])],,
+              enable_irrlicht=false)
+if test x$enable_irrlicht = xyes; then
+    AC_DEFINE([HAVE_IRRLICHT], [],  [enable irrlicht compilation])
+    SUMMARY="$SUMMARY\nCompiling for irrlicht - be warned, pre-alpha!!"
+fi
+
+
 dnl ===================
 dnl Checks for programs.
 dnl ===================
@@ -261,6 +270,30 @@ case "${host}" in
 esac
 
 
+dnl ===============================
+dnl Check for irrlicht (if enabled)
+dnl ===============================
+if test x$enable_irrlicht = xyes; then
+   AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
+                                   [specify the prefix path to irrlicht])])
+   if test "x$with_irrlicht" != "x" ; then
+      CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include"
+   fi
+   AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+   dnl how to use irr namespace here?? g++:   'irr' has not been declared
+   dnl AC_SEARCH_LIBS(createDevice, irrlicht, have_SDL_lib=yes)
+   
+   if test x$have_irrlicht_hdr != xyes; then
+      AC_MSG_ERROR([Can't find irrlicht installation, use --with-irrlicht...])
+   fi
+   case "${host}" in
+   *-*-linux* )
+   irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
+   ;;
+   esac
+
+fi
+
 dnl ======================================================
 dnl Try to supply the SVN revision number for the compiler
 dnl ======================================================
@@ -387,6 +420,7 @@ esac
 # =========================
 # subst bars in Makefile.am
 # =========================
+AC_SUBST(irrlicht_LIBS)
 AC_SUBST(bullet_LIBS)
 AC_SUBST(enet_LIBS)
 AC_SUBST(opengl_LIBS)
