@@ -31,3 +31,4 @@ Makefile = svn:eol-style=native;svn:keywords=Author Date Id Revision
 *.pdf = svn:mime-type=application/pdf
 SConstruct = svn:eol-style=native;svn:keywords=Author Date Id Revision
 *.xml = svn:eol-style=native;svn:mime-type=text/xml
+*.py = svn:eol-style=native;svn:executable;svn:keywords=Author Date Id Revision
