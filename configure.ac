@@ -277,12 +277,9 @@ if test x$enable_irrlicht = xyes; then
    AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
                                    [specify the prefix path to irrlicht])])
    if test "x$with_irrlicht" != "x" ; then
-      CPPFLAGS="${CPPFLAGS} -I$with_irrlicht/include/irrlicht"
+      CPPFLAGS="${CPPFLAGS} -I$with_irrlicht/include"
    fi
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
-   dnl how to use irr namespace here?? g++:   'irr' has not been declared
-   dnl AC_SEARCH_LIBS(createDevice, irrlicht, have_SDL_lib=yes)
-   
    if test x$have_irrlicht_hdr != xyes; then
       AC_MSG_ERROR([Can't find irrlicht installation, use --with-irrlicht...])
    fi
@@ -290,13 +287,29 @@ if test x$enable_irrlicht = xyes; then
    *-*-linux* )
    irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
    ;;
-   esac
-
-   case "${host}" in
    *darwin*|*macosx*)
    irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
    ;;
    esac
+
+   dnl Test if we need Xxf86vm. For now assume that if any problems
+   dnl occur with this simple program, it must be caused by this
+   dnl missing library. FIXME: better tests should be done here!!
+   dnl FIXME: this program when run prints out two lines (version numbers) to stdout
+   echo "checking for irrlicht libraries."
+   save_LIBS=$LIBS
+   LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
+   AC_TRY_RUN([
+      #  include "irrlicht.h"
+      int main() {
+      irr::createDevice(irr::video::EDT_NULL);
+      return 0;
+      }
+     ],
+        ,
+	irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+    )
+   LIBS=$save_LIBS
 
 fi
 
