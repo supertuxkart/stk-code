@@ -354,7 +354,14 @@ std::string FileManager::getHomeDir() const
 #ifdef WIN32
     // For now the old windows config way is used: store a config file
     // in the current directory (in other OS a special subdirectory is created)
-    DIRNAME=".";
+    std::ostringstream s;
+    if(getenv("APPDATA")!=NULL)
+    {
+        s<<getenv("APPDATA")<<"/supertuxkart/";
+        DIRNAME=s.str();
+    }
+    else DIRNAME=".";
+
 #else
     if(getenv("HOME")!=NULL)
     {
