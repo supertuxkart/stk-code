@@ -18,8 +18,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACEGUI_H
-#define HEADER_RACEGUI_H
+#ifndef HEADER_RACEGUI_HPP
+#define HEADER_RACEGUI_HPP
+
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 
 #include <string>
 #include <vector>
@@ -51,7 +56,7 @@ struct KartIconDisplayInfo
 
 class RaceGUI: public BaseGUI
 {
-
+private:
     class TimedMessage
     {
      public:
@@ -84,18 +89,12 @@ class RaceGUI: public BaseGUI
             return m_remaining_time < 0;
         }
     };
-public:
-
-    RaceGUI();
-    ~RaceGUI();
-    void update(float dt);
-    void select() {}
-    void handle(GameAction, int);
-    void handleKartAction(KartAction ka, int value);
-    void addMessage(const std::string &m, const Kart *kart, float time, 
-                    int fonst_size, int red=255, int green=0, int blue=255);
 
 private:
+#ifdef HAVE_IRRLICHT
+    gui::IGUIStaticText *m_time;
+    gui::IGUIImage      **m_icons;
+#endif
     ulClock        m_fps_timer;
     int            m_fps_counter;
     char           m_fps_string[10];
@@ -128,6 +127,16 @@ private:
                                    float ratio_x, float ratio_y           );
     void drawLap                  (const KartIconDisplayInfo* info, Kart* kart, int offset_x,
                                    int offset_y, float ratio_x, float ratio_y  );
+public:
+
+    RaceGUI();
+    ~RaceGUI();
+    void update(float dt);
+    void select() {}
+    void handle(GameAction, int);
+    void handleKartAction(KartAction ka, int value);
+    void addMessage(const std::string &m, const Kart *kart, float time, 
+                    int fonst_size, int red=255, int green=0, int blue=255);
 };
 
 #endif

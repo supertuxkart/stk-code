@@ -32,7 +32,12 @@ class IrrDriver : public IEventReceiver
 private:
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
+    /** Irrlicht scene manager. */
     scene::ISceneManager       *m_scene_manager;
+    /** Irrlicht gui environment. */
+    gui::IGUIEnvironment       *m_gui_env;
+    /** Irrlicht race font. */
+    irr::gui::IGUIFont         *m_race_font;
 
 public:
                           IrrDriver();
@@ -41,9 +46,15 @@ public:
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
+    /** Returns the gui environment, used to add widgets to a screen. */
+    gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
+    irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     bool                  OnEvent(const irr::SEvent &event);
+    video::ITexture      *getTexture(const std::string &filename);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
+    void                  removeNode(scene::ISceneNode *node);
+    void                  removeMesh(scene::IMesh *mesh);
     scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
                          *addCamera();

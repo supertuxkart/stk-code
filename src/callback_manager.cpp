@@ -41,7 +41,9 @@ CallbackManager::~CallbackManager()
             MovingPhysics *mp = dynamic_cast<MovingPhysics*>(*c);
             if(mp)
             {
+#ifndef HAVE_IRRLICHT
                 ssgDeRefDelete(mp);
+#endif
             }
             else
             {
@@ -56,11 +58,13 @@ CallbackManager::~CallbackManager()
 void CallbackManager::addCallback(Callback *c, CallbackType t) 
 {
     m_allCallbacks[t].push_back(c);
-        MovingPhysics *mp = dynamic_cast<MovingPhysics*>(c);
-        if(mp)
-        {
-            mp->ref();
-        }
+    MovingPhysics *mp = dynamic_cast<MovingPhysics*>(c);
+    if(mp)
+    {
+#ifndef HAVE_IRRLICHT
+        mp->ref();
+#endif
+    }
 }   // addCallback
 
 //-----------------------------------------------------------------------------
@@ -74,7 +78,9 @@ void CallbackManager::clear(CallbackType cbType)
         MovingPhysics *mp = dynamic_cast<MovingPhysics*>(*c);
         if(mp)
         {
+#ifndef HAVE_IRRLICHT
             ssgDeRefDelete(mp);
+#endif
         }
         else
         {

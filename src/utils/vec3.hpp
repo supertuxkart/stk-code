@@ -37,7 +37,15 @@ private:
 
 public:
 #ifdef HAVE_IRRLICHT
-    inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Y, v.Z) {}
+    /** Convert an irrlicht vector3df into the internal (bullet) format.
+     *  Irrlicht's and STK's axis are different (STK: Z up, irrlicht: Y up).
+     *  We might want to change this as well, makes it easier to work with 
+     *  bullet and irrlicht together, without having to swap indices (bullet
+     *  can handle any axis ordering). Note that toIrrVector swaps the 
+     *  axis as well (so a vector3df can be stored in and restored from
+     *  a vec3).
+     */
+    inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Z, v.Y) {}
 #endif
     inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}

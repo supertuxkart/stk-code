@@ -91,6 +91,16 @@ Track::~Track()
  */
 void Track::cleanup()
 {
+#ifdef HAVE_IRRLICHT
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        irr_driver->removeNode(m_all_nodes[i]);
+    }
+    for(unsigned int i=0; i<m_all_meshes.size(); i++)
+    {
+        irr_driver->removeMesh(m_all_meshes[i]);
+    }
+#endif
     delete m_non_collision_mesh;
     delete m_track_mesh;
 
@@ -1179,41 +1189,36 @@ void Track::createPhysicsModel()
 #ifdef HAVE_IRRLICHT
 void Track::convertTrackToBullet(const scene::IMesh *mesh)
 {
-        for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            // FIXME: take translation/rotation into accou
-            if(mb->getVertexType()!=video::EVT_STANDARD) {
-                fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
-                        mb->getVertexType());
-                continue;
-            }
-            video::SMaterial irrMaterial=mb->getMaterial();
-            video::ITexture* t=irrMaterial.getTexture(0);
-            // FIXME: if no material is given, perhaps define a default?
-            const Material* material=0;
-            if(t) {
-                //material=g_MaterialManager->getMaterial(t->getName());
-                printf("%s\n",t->getName());
-            } 
+    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        // FIXME: take translation/rotation into accou
+        if(mb->getVertexType()!=video::EVT_STANDARD) {
+            fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
+                mb->getVertexType());
+            continue;
+        }
+        video::SMaterial irrMaterial=mb->getMaterial();
+        video::ITexture* t=irrMaterial.getTexture(0);
+        // FIXME: if no material is given, perhaps define a default?
+        const Material* material=0;
+        TriangleMesh *tmesh = m_track_mesh;
+        if(t) {
+            material=material_manager->getMaterial(std::string(t->getName().c_str()));
+            if(material->isZipper()) tmesh = m_non_collision_mesh;
+        } 
 
-            u16 *mbIndices = mb->getIndices();
-            Vec3 vertices[3];
-            irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-            for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
-                for(unsigned int k=0; k<3; k++) {
-                    int indx=mbIndices[j+k];
-                    // FIXME: notice: irrlicht's and STK's axis are different
-                    // (STK: Z up, irrlicht: Y up). We might want to change
-                    // this as well, makes it easier to work with bullet and
-                    // irrlicht together, without having to swap indices.
-                    vertices[k] = Vec3(mbVertices[indx].Pos.X,
-                                       mbVertices[indx].Pos.Z,
-                                       mbVertices[indx].Pos.Y );
-                }   // for k
-                m_track_mesh->addTriangle(vertices[0], vertices[1], 
-                                          vertices[2], material     );
-            }   // for j
-        }   // for i<getMeshBufferCount
+        u16 *mbIndices = mb->getIndices();
+        Vec3 vertices[3];
+        irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
+        for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
+            for(unsigned int k=0; k<3; k++) {
+                int indx=mbIndices[j+k];
+                vertices[k] = Vec3(mbVertices[indx].Pos);
+            }   // for k
+            if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
+                                         vertices[2], material     );
+        }   // for j
+    }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
 
@@ -1366,35 +1371,8 @@ void Track::loadTrackModel()
         if(name=="track") continue;
         if(name=="object")
         {
-            std::string model_name;
-            node->get("model", &model_name);
-            std::string full_path = file_manager->getTrackFile(model_name, 
-                                                               getIdent());
-            scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
-            if(!obj)
-            {
-                fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
-                        node->getName().c_str(), model_name.c_str());
-                continue;
-            }
-            scene::IMesh *mesh = obj->getMesh(0);
-            m_all_meshes.push_back(mesh);
-            scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
-            core::vector3df xyz(0,0,0);
-            int result = node->get(&xyz);
-            if(!XMLNode::hasZ(result))   // needs height
-            {
-            }
-            core::vector3df hpr(0,0,0);
-            result = node->get(&hpr);
-            if(!XMLNode::hasP(result) ||
-               !XMLNode::hasR(result))   // Needs perhaps pitch and roll
-            {
-            }
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            m_all_nodes.push_back(scene_node);
-            scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
+            MovingPhysics *mp = new MovingPhysics(node);
+            callback_manager->addCallback(mp, CB_TRACK);
         }
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
@@ -1404,16 +1382,10 @@ void Track::loadTrackModel()
             else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
             else if(name=="small-nitro") type = Item::ITEM_SILVER_COIN;
             else                         type = Item::ITEM_GOLD_COIN;
-            core::vector3df xyz;
-            int bits = node->get(&xyz);
+            Vec3 xyz;
+            int bits = node->getXYZ(&xyz);
             // Height is needed if bit 2 (for z) is not set
-            itemCommand(&xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
-        }
-        else if(name=="item")
-        {
-        }
-        else if(name=="small-nitro" || node->getName()=="big-nitro")
-        {
+            itemCommand(xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
         }
         else
         {
@@ -1667,7 +1639,7 @@ void Track::loadTrackModel()
 
 //-----------------------------------------------------------------------------
 #ifdef HAVE_IRRLICHT
-void Track::itemCommand(core::vector3df *xyz, Item::ItemType type, 
+void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
                         int bNeedHeight)
 {
     // Some modes (e.g. time trial) don't have any bonus boxes
@@ -1675,22 +1647,13 @@ void Track::itemCommand(core::vector3df *xyz, Item::ItemType type,
        !RaceManager::getWorld()->enableBonusBoxes()) 
         return;
 
+    Vec3 loc(xyz);
     // if only 2d coordinates are given, let the item fall from very high
     if(bNeedHeight)
     {
-        Vec3 pos(*xyz);
-        float m_HoT;
-        Vec3 m_normal;
-        const Material *material;
-        pos.setZ(1000);
-        getTerrainInfo(pos, &m_HoT, &m_normal, &material);
-        xyz->Z = m_HoT;
+        loc.setZ(1000);
+        loc.setZ(getTerrainHeight(loc));
     }
-
-    // Even if 3d data are given, make sure that the item is on the ground
-    //xyz->Z = irr_dirver->getHeight( m_model, *xyz ) + 0.06f;
-
-    Vec3 loc(*xyz);
 
     // Don't tilt the items, since otherwise the rotation will look odd,
     // i.e. the items will not rotate around the normal, but 'wobble'
@@ -1698,6 +1661,7 @@ void Track::itemCommand(core::vector3df *xyz, Item::ItemType type,
     Vec3 normal(0, 0, 0.0f);
     item_manager->newItem(type, loc, normal);
 }   // itemCommand
+// ----------------------------------------------------------------------------
 #else
 void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
 {
@@ -1719,9 +1683,9 @@ void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
     Vec3 normal(0, 0, 0.0f);
     item_manager->newItem((Item::ItemType)type, loc, normal);
 }   // itemCommand
+// ----------------------------------------------------------------------------
 #endif
 
-// ----------------------------------------------------------------------------
 void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 
                             const Material **material) const
 {
@@ -1772,3 +1736,18 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
     // assume two karts falling down, one over the other. Bullet does not
     // have any triangle/material information in this case!
 }   // getTerrainInfo
+
+// ----------------------------------------------------------------------------
+/** Simplified version to determine only the height of the terrain.
+ *  \param pos Position at which to determine the height (x,y coordinates
+ *             are only used).
+ *  \return The height at the x,y coordinates.
+ */
+float Track::getTerrainHeight(const Vec3 &pos) const
+{
+    float hot;
+    Vec3  normal;
+    const Material *m;
+    getTerrainInfo(pos, &hot, &normal, &m);
+    return hot;
+}   // getTerrainHeight

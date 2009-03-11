@@ -23,12 +23,14 @@
 
 #include "file_manager.hpp"
 #include "stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
 #define UCLAMP   1
 #define VCLAMP   2
 
+#ifndef HAVE_IRRLICHT
 int clearSpheremap ( ssgEntity * )
 {
     glDisable   ( GL_TEXTURE_GEN_S ) ;
@@ -45,6 +47,7 @@ int setSpheremap ( ssgEntity * )
     glEnable    ( GL_TEXTURE_GEN_T ) ;
     return true ;
 }   // setSpheremap
+#endif
 
 //=============================================================================
 #ifndef HAVE_IRRLICHT
@@ -212,6 +215,7 @@ void Material::applyToLeaf(ssgLeaf *l)
 void Material::install(bool is_full_path)
 {
 #ifdef HAVE_IRRLICHT
+    m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
 #else
     if ( isSphereMap () )
     {

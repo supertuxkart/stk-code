@@ -220,9 +220,10 @@ public:
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}
     const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }
     btTransform        getStartTransform (unsigned int pos) const;
-    void  getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal, 
-                         const Material **material) const;
-    void createPhysicsModel              ();
+    void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
+                                      const Material **material) const;
+    float              getTerrainHeight(const Vec3 &pos) const;
+    void               createPhysicsModel();
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(
@@ -233,7 +234,7 @@ public:
 private:
     void  loadTrack(const std::string &filename);
 #ifdef HAVE_IRRLICHT
-    void  itemCommand(core::vector3df *xyz, Item::ItemType item_type, 
+    void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                       int bNeedHeight);
 #else
     void  itemCommand(sgVec3 *xyz, int item_type, int bNeedHeight);

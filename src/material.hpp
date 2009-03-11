@@ -17,12 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MATERIAL_H
-#define HEADER_MATERIAL_H
+#ifndef HEADER_MATERIAL_HPP
+#define HEADER_MATERIAL_HPP
 
 #include <string>
 #define _WINSOCKAPI_
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#else
 #include <plib/ssg.h>
+#endif
 
 class XMLNode;
 
@@ -30,27 +35,28 @@ class Material
 {
 private:
 #ifdef HAVE_IRRLICHT
+    video::ITexture *m_texture;
 #else
-    ssgSimpleState *m_state;
-    ssgCallback     m_predraw;
-    ssgCallback     m_postdraw;
+    ssgSimpleState  *m_state;
+    ssgCallback      m_predraw;
+    ssgCallback      m_postdraw;
 #endif
-    unsigned int    m_index;
-    std::string     m_texname;
-    bool            m_collideable;
-    bool            m_zipper;
-    bool            m_resetter;
-    bool            m_ignore;
-    int             m_clamp_tex;
-    bool            m_lighting;
-    bool            m_sphere_map;
-    bool            m_transparency;
-    float           m_alpha_ref;
-    float           m_friction;
+    unsigned int     m_index;
+    std::string      m_texname;
+    bool             m_collideable;
+    bool             m_zipper;
+    bool             m_resetter;
+    bool             m_ignore;
+    int              m_clamp_tex;
+    bool             m_lighting;
+    bool             m_sphere_map;
+    bool             m_transparency;
+    float            m_alpha_ref;
+    float            m_friction;
     /** How much the top speed is reduced per second. */
-    float           m_slowdown;
+    float            m_slowdown;
     /** Maximum speed at which no more slow down occurs. */
-    float           m_max_speed_fraction;
+    float            m_max_speed_fraction;
 #ifndef HAVE_IRRLICHT
     bool  parseBool  ( char **p );
     int   parseInt   ( char **p );
@@ -73,7 +79,10 @@ public:
     ~Material ();
 
     int matches ( char *tx ) ;
-#ifndef HAVE_IRRLICHT
+#ifdef HAVE_IRRLICHT
+    /** Returns the ITexture associated with this material. */
+    video::ITexture *getTexture() const { return m_texture; }
+#else
     ssgSimpleState 
          *getState           () const { return m_state ;             }
 #endif

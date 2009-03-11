@@ -121,7 +121,7 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
         }
         try
         {
-            m_materials.push_back(new Material(node, m_materials.size() ));
+            m_materials.push_back(new Material(node, m_materials.size()));
         }
         catch(std::exception& e)
         {

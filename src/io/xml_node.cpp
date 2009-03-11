@@ -217,7 +217,26 @@ int XMLNode::getXYZ(core::vector3df *value) const
     if(get("y", &f)) { value->Y = f; bits |= 2; }
     if(get("z", &f)) { value->Z = f; bits |= 4; }
     return bits;
-}   // getXYZ
+}   // getXYZ vector3df
+
+// ----------------------------------------------------------------------------
+/** Interprets the attributes 'x', 'y', 'z' as a 3d vector and set the 
+ *  corresponding elements of value. Not all values need to be defined as 
+ *  attributes (and the correspnding elements of the vector will not be 
+ *  changed). It returns a bit field for each defined value, i.e. if x 
+ *  and y are defined, 3 is returned.
+ *  \param value Vector to return the values in.
+ */
+int XMLNode::getXYZ(Vec3 *value) const
+{
+    float f;
+    int bits=0;
+    Vec3 result = *value;
+    if(get("x", &f)) { value->setX(f); bits |= 1; }
+    if(get("y", &f)) { value->setY(f); bits |= 2; }
+    if(get("z", &f)) { value->setZ(f); bits |= 4; }
+    return bits;
+}   // getXYZ Vec3
 
 // ----------------------------------------------------------------------------
 /** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the 
@@ -236,7 +255,26 @@ int XMLNode::getHPR(core::vector3df *value) const
     if(get("p", &f)) { value->Y = f; bits |= 2; }
     if(get("r", &f)) { value->Z = f; bits |= 4; }
     return bits;
-}   // getHPR
+}   // getHPR vector3df
+
+// ----------------------------------------------------------------------------
+/** Interprets the attributes 'h', 'p', 'r' as a 3d vector and set the 
+ *  corresponding elements of value. Not all values need to be defined as 
+ *  attributes (and the correspnding elements of the vector will not be 
+ *  changed). It returns a bit field for each defined value, i.e. if x and y 
+ *  are defined, 3 is returned.
+ *  \param value Vector to return the values in.
+ */
+int XMLNode::getHPR(Vec3 *value) const
+{
+    float f;
+    int bits=0;
+    Vec3 result = *value;
+    if(get("h", &f)) { value->setX(f); bits |= 1; }
+    if(get("p", &f)) { value->setY(f); bits |= 2; }
+    if(get("r", &f)) { value->setZ(f); bits |= 4; }
+    return bits;
+}   // getHPR Vec3
 
 // ----------------------------------------------------------------------------
 #endif

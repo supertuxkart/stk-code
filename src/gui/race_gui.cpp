@@ -27,60 +27,13 @@
 #include "race_manager.hpp"
 #include "material_manager.hpp"
 #include "audio/sound_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "gui/font.hpp"
 #include "gui/menu_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
-#undef USE_WIDGET_MANAGER
-#ifdef USE_WIDGET_MANAGER
-#include "gui/widget_manager.hpp"
-#endif
-
-
-#ifdef USE_WIDGET_MANAGER
-//MAX_TOP_POS is the maximum number of racers to be shown in the bar to the
-//left where the positions are drawn.
-static const int MAX_TOP_POS = 10;
-
-static const int MAX_HUMANS = 4;
-
-enum WidgetTokens
-{
-    WTOK_FPS,
-    WTOK_EMPTY1,
-    WTOK_CLOCK,
-
-    WTOK_EMPTY2,
-
-    WTOK_FIRST_TOP_IMG,
-    WTOK_LAST_TOP_IMG = WTOK_FIRST_TOP_IMG + MAX_TOP_POS,
-
-    WTOK_FIRST_TOP_TEXT,
-    WTOK_LAST_TOP_TEXT = WTOK_FIRST_TOP_TEXT + MAX_TOP_POS,
-
-    WTOK_FIRST_MESSAGE,
-    WTOK_LAST_MESSAGE = WTOK_FIRST_MESSAGE + MAX_HUMANS,
-
-    WTOK_FIRST_POWERBAR,
-    WTOK_LAST_POWERBAR = WTOK_FIRST_POWERBAR + MAX_HUMANS,
-
-    WTOK_FIRST_POSITION,
-    WTOK_LAST_POSITION = WTOK_FIRST_POSITION + MAX_HUMANS,
-
-    WTOK_MAP,
-
-    WTOK_FIRST_LAP,
-    WTOK_LAST_LAP = WTOK_FIRST_LAP + MAX_HUMANS,
-
-    WTOK_FIRST_WHEEL,
-    WTOK_LAST_WHEEL = WTOK_FIRST_WHEEL + MAX_HUMANS,
-
-    WTOK_FIRST_SPEED,
-    WTOK_LAST_SPEED = WTOK_FIRST_SPEED + MAX_HUMANS
-};
-#endif
 
 RaceGUI::RaceGUI()
 {
@@ -97,7 +50,32 @@ RaceGUI::RaceGUI()
     m_pos_string[9] = "9th";
     m_pos_string[10] = "10th";
 
-#ifndef HAVE_IRRLICHT
+#ifdef HAVE_IRRLICHT
+    gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
+    core::rect<s32> pos(user_config->m_width-60, 10, 
+                        user_config->m_width,    50);
+    m_time = gui_env->addStaticText(L"", pos);
+    m_time->setOverrideFont(irr_driver->getRaceFont());
+
+    int icon_width=40;
+    int icon_player_width=50;
+    if(user_config->m_height<600)
+    {
+        icon_width        = 27;
+        icon_player_width = 35;
+    }
+#ifdef NOT_READY_YET
+    m_icons = new gui::IGUIImage*[race_manager->getNumKarts()];
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    {
+        core::position2d<s32> p(0, i*20);
+        Kart *kart  = race_manager->getKart(i);
+        Material *m = kart->getKartProperties()->getIconMaterial();
+        m = material_manager->getMaterial("track.png");
+        m_icons[i]  = irr_driver->getGUI()->addImage(m->getTexture(), p);
+    }
+#endif
+#else
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
     m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");
@@ -113,27 +91,11 @@ RaceGUI::RaceGUI()
     m_fps_timer.update();
     m_fps_timer.setMaxDelta(1000);
 
-#ifdef USE_WIDGET_MANAGER
-    const bool HIDE_TEXT = false;
-    widget_manager->setInitialTextState(HIDE_TEXT, "", WGT_FNT_LRG,
-        WGT_FONT_RACE, WGT_WHITE );
-
-    widget_manager->addWgt( WTOK_FPS, 30, 10 );
-    widget_manager->addWgt( WTOK_EMPTY1, 40, 10 );
-    widget_manager->addWgt( WTOK_CLOCK, 30, 10 );
-    widget_manager->breakLine();
-
-    widget_manager->layout( WGT_AREA_TOP );
-#endif
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
-#ifdef USE_WIDGET_MANAGER
-    widget_manager->reset();
-#endif
-
     //FIXME: does all that material stuff need freeing somehow?
 }   // ~Racegui
 
@@ -197,13 +159,6 @@ RaceGUI::handle(GameAction ga, int value)
 				m_fps_timer.reset();
 				m_fps_timer.setMaxDelta(1000);
 				m_fps_counter=0;
-#ifdef USE_WIDGET_MANAGER
-                widget_manager->showWgtText( WTOK_FPS );
-			}
-            else
-            {
-                widget_manager->hideWgtText( WTOK_FPS );
-#endif
             }
 			break;
 		case GA_DEBUG_TOGGLE_WIREFRAME:
@@ -251,14 +206,12 @@ void RaceGUI::drawFPS ()
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-#ifdef USE_WIDGET_MANAGER
-    widget_manager->setWgtText( WTOK_FPS, m_fps_string );
-#else
     font_race->PrintShadow(m_fps_string,48, 0, user_config->m_height-50);
-#endif
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
+/** Displays the racing time on the screen.
+ */
 void RaceGUI::drawTimer ()
 {
     assert(RaceManager::getWorld() != NULL);
@@ -267,12 +220,11 @@ void RaceGUI::drawTimer ()
     char str[256];
     
     TimeToString(RaceManager::getWorld()->getTime(), str);
-#ifdef USE_WIDGET_MANAGER
-    widget_manager->showWgtText( WTOK_CLOCK );
-    widget_manager->setWgtText( WTOK_CLOCK, str );
+#ifdef HAVE_IRRLICHT
+    m_time->setText(core::stringw(str).c_str());
 #else
     font_race->PrintShadow(str, 60, user_config->m_width-260,
-        user_config->m_height-64);
+                           user_config->m_height-64);
 #endif
 }   // drawTimer
 

@@ -62,6 +62,9 @@ IrrDriver::IrrDriver()
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
     m_scene_manager = m_device->getSceneManager();
+    m_gui_env       = m_device->getGUIEnvironment();
+    const std::string &font = file_manager->getFontFile("fonthaettenschweiler.bmp");
+    m_race_font     = m_gui_env->getFont(font.c_str());
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -111,6 +114,24 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
+/** Removes a scene node from the scene.
+ *  \param node The scene node to remove.
+ */
+void IrrDriver::removeNode(scene::ISceneNode *node)
+{
+    node->remove();
+}   // removeMesh
+
+// ----------------------------------------------------------------------------
+/** Removes a mesh from the mesh cache, freeing the memory.
+ *  \param mesh The mesh to remove.
+ */
+void IrrDriver::removeMesh(scene::IMesh *mesh)
+{
+    m_scene_manager->getMeshCache()->removeMesh(mesh);
+}   // removeMesh
+
+// ----------------------------------------------------------------------------
 /** Adds an animated mesh to the scene.
  *  \param mesh The animated mesh to add.
  */
@@ -128,6 +149,15 @@ scene::ICameraSceneNode *IrrDriver::addCamera()
  }   // addCamera
 
 // ----------------------------------------------------------------------------
+/** Loads a texture from a file and returns the texture object.
+ *  \param filename File name of the texture to load.
+ */
+video::ITexture *IrrDriver::getTexture(const std::string &filename)
+{
+    return m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
+}   // getTexture
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  */
@@ -135,6 +165,7 @@ void IrrDriver::update(float dt)
 {
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
+    m_device->getGUIEnvironment()->drawAll();
     m_device->getVideoDriver()->endScene();
 }   // update
 
@@ -155,7 +186,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
       case irr::EET_LOG_TEXT_EVENT:
           {
               // Ignore 'normal' messages
-              if(event.LogEvent.Level>=0)
+              if(event.LogEvent.Level>0)
               {
                   printf("Level %d: %s\n", 
                          event.LogEvent.Level,event.LogEvent.Text);

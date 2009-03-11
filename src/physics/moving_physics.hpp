@@ -17,9 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MOVING_PHYSICS_H
-#define HEADER_MOVING_PHYSICS_H
+#ifndef HEADER_MOVING_PHYSICS_HPP
+#define HEADER_MOVING_PHYSICS_HPP
 #include <string>
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #define _WINSOCKAPI_
 #include <plib/ssg.h>
 #include "btBulletDynamicsCommon.h"
@@ -27,8 +31,16 @@
 #include "user_pointer.hpp"
 
 class Vec3;
+#ifdef HAVE_IRRLICHT
+class scene::IAnimatedMesh;
+class XMLNode;
+#endif
 
+#ifdef HAVE_IRRLICHT
+class MovingPhysics : public Callback
+#else
 class MovingPhysics : public ssgTransform, public Callback
+#endif
 {
 public:
     enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
@@ -42,8 +54,16 @@ protected:
     float                 m_mass;
     UserPointer           m_user_pointer;
     btTransform           m_init_pos;
+#ifdef HAVE_IRRLICHT
+    scene::IMesh         *m_mesh;
+    scene::ISceneNode    *m_node;
+#endif
 public:
+#ifdef HAVE_IRRLICHT
+    MovingPhysics           (const XMLNode *node);
+#else
     MovingPhysics           (const std::string data);
+#endif
     ~MovingPhysics          (); 
     void update             (float dt);
     void         init       ();

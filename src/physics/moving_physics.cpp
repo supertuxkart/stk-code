@@ -21,16 +21,81 @@
 
 #include <string>
 #include <vector>
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #define _WINSOCKAPI_
 #include <plib/sg.h>
 
+#include "file_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
+#include "io/xml_node.hpp"
 #include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/coord.hpp"
 #include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+MovingPhysics::MovingPhysics(const XMLNode *xml_node)
+{
+    std::string model_name;
+    const Track *track=RaceManager::getTrack();
+    xml_node->get("model", &model_name);
+    std::string full_path = file_manager->getTrackFile(model_name, 
+                                                       track->getIdent());
+    scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
+    if(!obj)
+    {
+        // If the model isn't found in the track directory, look 
+        // in STK's model directory.
+        full_path = file_manager->getModelFile(model_name);
+        obj = irr_driver->getAnimatedMesh(full_path);
+        if(!obj)
+        {
+            fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
+                    xml_node->getName().c_str(), model_name.c_str());
+        }   // if(!obj)
+    }
+    m_mesh = obj->getMesh(0);
+    m_node = irr_driver->addMesh(m_mesh);
+    Vec3 xyz(0,0,0);
+    int result = xml_node->getXYZ(&xyz);
+    if(!XMLNode::hasZ(result))   // needs height
+    {
+        xyz.setZ(RaceManager::getTrack()->getTerrainHeight(xyz));
+    }
+    Vec3 hpr(0,0,0);
+    result = xml_node->getHPR(&hpr);
+    if(!XMLNode::hasP(result) ||
+       !XMLNode::hasR(result))   // Needs perhaps pitch and roll
+    {
+    }
+    m_node->setPosition(xyz.toIrrVector());
+    m_node->setRotation(hpr.toIrrHPR());
+    m_init_pos.setIdentity();
+    m_init_pos.setOrigin(xyz);
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+
+    m_shape        = NULL;
+    m_body         = NULL;
+    m_motion_state = NULL;
+    m_mass         = 1;
+
+    std::string shape;
+    xml_node->get("shape", &shape);
+    xml_node->get("mass",  &m_mass);
+
+    m_body_type = MP_NONE;
+    if     (shape=="cone"   ) m_body_type = MP_CONE;
+    else if(shape=="box"    ) m_body_type = MP_BOX;
+    else if(shape=="sphere" ) m_body_type = MP_SPHERE;
+}   // MovingPhysics
+#else
 MovingPhysics::MovingPhysics(const std::string data)
              : ssgTransform(), Callback()
 {
@@ -78,6 +143,7 @@ MovingPhysics::MovingPhysics(const std::string data)
         parameters.erase(parameters.begin());
     }
 }   // MovingPhysics
+#endif
 
 // -----------------------------------------------------------------------------
 MovingPhysics::~MovingPhysics()
@@ -86,7 +152,10 @@ MovingPhysics::~MovingPhysics()
     delete m_body;
     delete m_motion_state;
     delete m_shape;
+#ifdef HAVE_IRRLICHT
+#else
     stk_scene->remove(this);
+#endif
 }  // ~MovingPhysics
 
 // -----------------------------------------------------------------------------
@@ -102,7 +171,8 @@ MovingPhysics::~MovingPhysics()
    recomputed by going up in the scene graph and multiplying the transforms.  */
 void MovingPhysics::init()
 {
-
+#ifdef HAVE_IRRLICHT
+#else
     // 1. Remove the object from the graph and attach it to the root
     // -------------------------------------------------------------
     if(getNumParents()>1) 
@@ -152,11 +222,16 @@ void MovingPhysics::init()
             p=p->getParent(0);
         }
     }   // while
+#endif
 
     // 3. Determine size of the object
     // -------------------------------
     Vec3 min, max;
+#ifdef HAVE_IRRLICHT
+    MeshTools::minMax3D(m_mesh, &min, &max);
+#else
     SSGHelp::MinMax(this, &min, &max);
+#endif
     Vec3 extend = max-min;
     m_half_height = 0.5f*(extend.getZ());
     switch (m_body_type)
@@ -164,17 +239,25 @@ void MovingPhysics::init()
     case MP_CONE:   {
                     float radius = 0.5f*std::max(extend.getX(), extend.getY());
                     m_shape = new btConeShapeZ(radius, extend.getZ());
+#ifdef HAVE_IRRLICHT
+                    
+#else
                     setName("cone");
+#endif
                     break;
                     }
     case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
+#ifndef HAVE_IRRLICHT
                     setName("box");
+#endif
                     break;
     case MP_SPHERE: {
                     float radius = std::max(extend.getX(), extend.getY());
                     radius = 0.5f*std::max(radius, extend.getZ());
                     m_shape = new btSphereShape(radius);
+#ifndef HAVE_IRRLICHT
                     setName("sphere");
+#endif
                     break;
                     }
     case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
@@ -183,9 +266,14 @@ void MovingPhysics::init()
 
     // 4. Create the rigid object
     // --------------------------
-    
+#ifdef HAVE_IRRLICHT
+    Vec3 pos = m_init_pos.getOrigin();
+    pos.setZ(m_init_pos.getOrigin().getZ()+m_half_height);
+    m_init_pos.setOrigin(pos);
+#else
     m_init_pos.setIdentity();
     m_init_pos.setOrigin(btVector3(pos[3][0],pos[3][1],pos[3][2]+m_half_height));
+#endif
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
@@ -208,10 +296,14 @@ void MovingPhysics::update(float dt)
     if(c.getXYZ().getZ()<-100)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
-	c.setXYZ(m_init_pos.getOrigin());
+        c.setXYZ(m_init_pos.getOrigin());
     }
-
+#ifdef HAVE_IRRLICHT
+    m_node->setPosition(c.getXYZ().toIrrVector());
+    m_node->setRotation(c.getHPR().toIrrHPR());
+#else
     setTransform(const_cast<sgCoord*>(&c.toSgCoord()));
+#endif
 
 }   // update
 // -----------------------------------------------------------------------------

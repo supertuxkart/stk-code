@@ -24,7 +24,6 @@
 
 #include "gui/base_gui.hpp"
 #include "gui/display_res_confirm.hpp"
-#include "utils/translation.hpp"
 
 class ConfigDisplay: public BaseGUI
 {
