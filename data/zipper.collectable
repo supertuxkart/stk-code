@@ -3,6 +3,7 @@
 (tuxkart-collectable
  (name  "zipper")
  (model "zipper.ac")
+ (mesh  "zipper.b3d")
  (icon  "zipper_collect.rgb")
 )
 

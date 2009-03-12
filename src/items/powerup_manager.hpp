@@ -17,15 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_POWERUPMANAGER_H
-#define HEADER_POWERUPMANAGER_H
+#ifndef HEADER_POWERUPMANAGER_HPP
+#define HEADER_POWERUPMANAGER_HPP
 
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+#endif
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "btBulletDynamicsCommon.h"
 
 class Material;
+#ifndef HAVE_IRRLICHT
 class ssgEntity;
+#endif
 
 // The anvil and parachute must be at the end of the enum, and the
 // zipper just before them (see Powerup::hitBonusBox).
@@ -38,24 +43,34 @@ enum PowerupType {POWERUP_NOTHING,
 class PowerupManager
 {
 protected:
-    Material*    m_all_icons [POWERUP_MAX];
-    float        m_all_max_distance[POWERUP_MAX];    // if a target is closer than this
-    float        m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
+    Material*     m_all_icons [POWERUP_MAX];
+    float         m_all_max_distance[POWERUP_MAX];    // if a target is closer than this
+    float         m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
                                                      // the target
-    float        m_all_max_turn_angle[POWERUP_MAX];  // maximum turn angle for homing
-    ssgEntity*   m_all_models[POWERUP_MAX];
-    btVector3    m_all_extends[POWERUP_MAX];
-    void         LoadNode       (const lisp::Lisp* lisp, int collectType);
+    float         m_all_max_turn_angle[POWERUP_MAX];  // maximum turn angle for homing
+#ifdef HAVE_IRRLICHT
+    scene::IMesh *m_all_meshes[POWERUP_MAX];
+#else
+    ssgEntity*    m_all_models[POWERUP_MAX];
+#endif
+    btVector3     m_all_extends[POWERUP_MAX];
+    void          LoadNode       (const lisp::Lisp* lisp, int collectType);
 public:
     PowerupManager           ();
-    void         loadPowerups();
-    void         removeTextures  ();
-    void         Load            (int collectType, const char* filename);
-    Material*    getIcon         (int type) const {return m_all_icons [type];      }
-    ssgEntity*   getModel        (int type) const {return m_all_models[type];      }
-    float        getForceToTarget(int type) const {return m_all_force_to_target[type]; }
-    float        getMaxDistance  (int type) const {return m_all_max_distance[type];}
-    float        getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
+    void          loadPowerups();
+    void          removeTextures  ();
+    void          Load            (int collectType, const char* filename);
+    Material*     getIcon         (int type) const {return m_all_icons [type];      }
+#ifdef HAVE_IRRLICHT
+    /** Returns the mesh for a certain powerup. 
+     *  \param type Mesh type for which the model is returned. */
+    scene::IMesh *getMesh         (int type) const {return m_all_meshes[type];      }
+#else
+    ssgEntity*    getModel        (int type) const {return m_all_models[type];      }
+#endif
+    float         getForceToTarget(int type) const {return m_all_force_to_target[type]; }
+    float         getMaxDistance  (int type) const {return m_all_max_distance[type];}
+    float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
     const btVector3& getExtend   (int type) const {return m_all_extends[type];     }
 };
 

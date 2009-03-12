@@ -93,7 +93,8 @@ private:
 private:
 #ifdef HAVE_IRRLICHT
     gui::IGUIStaticText *m_time;
-    gui::IGUIImage      **m_icons;
+    gui::IGUIImage     **m_icons;
+    gui::IGUIImage      *m_attachment_icon;
 #endif
     ulClock        m_fps_timer;
     int            m_fps_counter;

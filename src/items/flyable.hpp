@@ -20,6 +20,10 @@
 #ifndef HEADER_FLYABLE_HPP
 #define HEADER_FLYABLE_HPP
 
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
@@ -28,6 +32,9 @@
 class FlyableInfo;
 class Kart;
 class MovingPhysics;
+#ifndef HAVE_IRRLICHT
+class ssgEntity;
+#endif
 
 class Flyable : public Moveable, public TerrainInfo
 {
@@ -58,7 +65,11 @@ protected:
     // so we need arrays of these variables to have different values
     // for bowling balls, missiles, ...
     static float      m_st_speed[POWERUP_MAX];         // Speed of the projectile
+#ifdef HAVE_IRRLICHT
+    static scene::IMesh *m_st_model[POWERUP_MAX];         // 3d model
+#else
     static ssgEntity* m_st_model[POWERUP_MAX];         // 3d model
+#endif
     static float      m_st_min_height[POWERUP_MAX];    // min height above track
     static float      m_st_max_height[POWERUP_MAX];    // max height above track
     static float      m_st_force_updown[POWERUP_MAX];  // force pushing up/down 
@@ -98,8 +109,13 @@ public:
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
      *  but gravity will basically be disabled.                          */
     void         setAdjustZVelocity(bool f) { m_adjust_z_velocity = f; }
+#ifdef HAVE_IRRLICHT
+    static void  init        (const lisp::Lisp* lisp, scene::IMesh *model, 
+                              PowerupType type);
+#else
     static void  init        (const lisp::Lisp* lisp, ssgEntity *model, 
                               PowerupType type);
+#endif
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);
 

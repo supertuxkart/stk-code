@@ -17,8 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BOWLING_H
-#define HEADER_BOWLING_H
+#ifndef HEADER_BOWLING_HPP
+#define HEADER_BOWLING_HPP
+
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 
 #include "flyable.hpp"
 
@@ -31,7 +36,11 @@ private:
     
 public:
     Bowling(Kart* kart);
+#ifdef HAVE_IRRLICHT
+    static  void init(const lisp::Lisp* lisp, scene::IMesh *bowling);
+#else
     static  void init(const lisp::Lisp* lisp, ssgEntity* bowling);
+#endif
     virtual void update(float dt);
     
 	int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }

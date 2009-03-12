@@ -59,6 +59,7 @@ MovingPhysics::MovingPhysics(const XMLNode *xml_node)
         {
             fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
                     xml_node->getName().c_str(), model_name.c_str());
+            return;
         }   // if(!obj)
     }
     m_mesh = obj->getMesh(0);

@@ -64,17 +64,19 @@ RaceGUI::RaceGUI()
         icon_width        = 27;
         icon_player_width = 35;
     }
-#ifdef NOT_READY_YET
+
     m_icons = new gui::IGUIImage*[race_manager->getNumKarts()];
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         core::position2d<s32> p(0, i*20);
         Kart *kart  = race_manager->getKart(i);
         Material *m = kart->getKartProperties()->getIconMaterial();
-        m = material_manager->getMaterial("track.png");
+        // FIXME: The icons needs to be resized.
         m_icons[i]  = irr_driver->getGUI()->addImage(m->getTexture(), p);
     }
-#endif
+    core::rect<s32> p(user_config->m_width-10, 0, 
+                      user_config->m_width+10, 10);
+    m_attachment_icon = irr_driver->getGUI()->addImage(p);
 #else
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
@@ -391,7 +393,9 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
     int y1 = (int)(user_config->m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
-#ifndef HAVE_IRRLICHT
+#ifdef HAVE_IRRLICHT
+    m_attachment_icon->setImage(powerup->getIcon()->getTexture());
+#else
     powerup->getIcon()->apply();
 
     int n  = player_kart->getNumPowerup() ;

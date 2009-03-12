@@ -31,9 +31,9 @@ Moveable::Moveable()
 {
     m_body            = 0;
     m_motion_state    = 0;
-    m_first_time      = true ;
+    m_first_time      = true;
 #ifdef HAVE_IRRLICHT
-    m_mesh = 0;
+    m_mesh            = 0;
 #else
     m_model_transform = new ssgTransform();
     m_model_transform->ref();

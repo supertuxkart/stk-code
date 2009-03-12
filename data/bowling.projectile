@@ -3,6 +3,7 @@
 (tuxkart-collectable
  (name  "Bowling")
  (model "bowling.ac")
+ (mesh  "bowling.b3d")
  (icon  "bowling-icon.rgb")
  (speed 4.0)
  (min-height 0.2)      ; height above terrain below which a ball is 

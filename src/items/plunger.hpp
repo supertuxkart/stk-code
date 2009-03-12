@@ -17,9 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MISSILE_H
-#define HEADER_MISSILE_H
+#ifndef HEADER_MISSILE_HPP
+#define HEADER_MISSILE_HPP
 
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 #include "flyable.hpp"
 
 class RubberBand;
@@ -38,7 +42,11 @@ private:
 public:
                  Plunger(Kart *kart);
                 ~Plunger();
+#ifdef HAVE_IRRLICHT
+                static  void init(const lisp::Lisp* lisp, scene::IMesh* missile);
+#else
     static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
+#endif
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps. 
      */

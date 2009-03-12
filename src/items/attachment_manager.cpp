@@ -44,11 +44,19 @@ struct  initAttachmentType {attachmentType attachment; const char *file;};
 
 initAttachmentType iat[]=
 {
+#ifdef HAVE_IRRLICHT
+    {ATTACH_PARACHUTE,   "parachute.b3d"},
+    {ATTACH_BOMB,        "bomb.b3d"},
+    {ATTACH_ANVIL,       "anvil.b3d"},
+    {ATTACH_TINYTUX,     "tinytux_magnet.b3d"},
+    {ATTACH_MAX,         ""},
+#else
     {ATTACH_PARACHUTE,   "parachute.ac"},
     {ATTACH_BOMB,        "bomb.ac"},
     {ATTACH_ANVIL,       "anvil.ac"},
     {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
     {ATTACH_MAX,         ""},
+#endif
 };
 
 //-----------------------------------------------------------------------------

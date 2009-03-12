@@ -23,6 +23,8 @@
 
 #include "callback_manager.hpp"
 #include "race_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
@@ -35,7 +37,11 @@
 
 // static variables:
 float      Flyable::m_st_speed[POWERUP_MAX];
+#ifdef HAVE_IRRLICHT
+scene::IMesh* Flyable::m_st_model[POWERUP_MAX];
+#else
 ssgEntity* Flyable::m_st_model[POWERUP_MAX];
+#endif
 float      Flyable::m_st_min_height[POWERUP_MAX];
 float      Flyable::m_st_max_height[POWERUP_MAX];
 float      Flyable::m_st_force_updown[POWERUP_MAX];
@@ -65,6 +71,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 	
     // Add the graphical model
 #ifdef HAVE_IRRLICHT
+    setRoot(irr_driver->addMesh(m_st_model[type]));
 #else
     ssgTransform *m     = getModelTransform();
     m->addKid(m_st_model[type]);
@@ -117,8 +124,13 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
 
 }   // createPhysics
 // -----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+void Flyable::init(const lisp::Lisp* lisp, scene::IMesh *model, 
+                   PowerupType type)
+#else
 void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model, 
                    PowerupType type)
+#endif
 {
     m_st_speed[type]        = 25.0f;
     m_st_max_height[type]   = 1.0f;
@@ -132,6 +144,7 @@ void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model,
     // Store the size of the model
     Vec3 min, max;
 #ifdef HAVE_IRRLICHT
+    MeshTools::minMax3D(model, &min, &max);
 #else
     SSGHelp::MinMax(model, &min, &max);
 #endif

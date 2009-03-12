@@ -66,10 +66,11 @@ public:
                   Moveable();
     virtual      ~Moveable();
 #ifdef HAVE_IRRLICHT
-    scene::ISceneNode
-        *getRoot()                               {return m_root;              }
+    scene::ISceneNode 
+                 *getRoot()                    {return m_root;              }
+    void          setRoot(scene::ISceneNode *n){m_root = n;                 }
 #else
-    ssgTransform *getModelTransform()            {return m_model_transform;   }
+    ssgTransform *getModelTransform()          {return m_model_transform;   }
 #endif
     virtual const btVector3 
                  &getVelocity()   const        {return m_body->getLinearVelocity();}

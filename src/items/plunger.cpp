@@ -106,7 +106,11 @@ Plunger::~Plunger()
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------
+#ifdef HAVE_IRRLICHT
+void Plunger::init(const lisp::Lisp* lisp, scene::IMesh *plunger_model)
+#else
 void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
+#endif
 {
     Flyable::init(lisp, plunger_model, POWERUP_PLUNGER);
 }   // init

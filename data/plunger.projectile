@@ -3,6 +3,7 @@
 (tuxkart-collectable
  (name  "Plunger")
  (model "plunger.ac")
+ (mesh  "plunger.b3d")
  (icon  "plunger-icon.rgb")
  (speed 35.0)
  (min-height 0.2)      ; height above terrain below which a plunger is 

@@ -17,8 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CAKE_H
-#define HEADER_CAKE_H
+#ifndef HEADER_CAKE_HPP
+#define HEADER_CAKE_HPP
+
+#ifdef HAVE_IRRLICHT
+#include "irrlicht.h"
+using namespace irr;
+#endif
 
 #include "flyable.hpp"
 
@@ -35,7 +40,11 @@ private:
                                       // projectile (NULL if none)
 public:
     Cake (Kart *kart);
+#ifdef HAVE_IRRLICHT
+    static  void init     (const lisp::Lisp* lisp, scene::IMesh *cake_model);
+#else
     static  void init     (const lisp::Lisp* lisp, ssgEntity* cake_model);
+#endif
     virtual void update   (float dt);
     virtual void hitTrack ()                      { hit(NULL);               }
     // Kinematic objects are not allowed to have a velocity (assertion in 
