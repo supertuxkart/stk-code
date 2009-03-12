@@ -56,6 +56,7 @@ RaceGUI::RaceGUI()
                         user_config->m_width,    150);
     m_time = gui_env->addStaticText(L"", pos);
     m_time->setOverrideFont(irr_driver->getRaceFont());
+    m_time->setOverrideColor(video::SColor(255, 255, 255, 255));
 
     int icon_width=40;
     int icon_player_width=50;
