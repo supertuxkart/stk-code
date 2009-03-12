@@ -17,23 +17,30 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_EXPLOSION_H
-#define HEADER_EXPLOSION_H
-
-#include <plib/sg.h>
+#ifndef HEADER_EXPLOSION_HPP
+#define HEADER_EXPLOSION_HPP
 
 class Vec3;
 class SFXBase;
+namespace irr
+{
+    namespace scene
+    {
+        class IMesh;
+        class ISceneNode;
+    }
+}
 
-class Explosion : public ssgTransform
+class Explosion 
 {
 private:
-    SFXBase*    m_explode_sound;
-    bool        m_has_ended;
+    SFXBase*                m_explode_sound;
+    bool                    m_has_ended;
+    irr::scene::IMesh      *m_mesh;
+    irr::scene::ISceneNode *m_node;
 
 public:
     int m_step ;
-    ssgSelector  *m_seq ;
 
          Explosion(const Vec3& coord, const int explosion_sound);
         ~Explosion();

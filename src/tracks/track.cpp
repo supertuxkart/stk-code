@@ -1197,7 +1197,7 @@ void Track::loadTrackModel()
     // First read the temporary materials.dat file if it exists
     try
     {
-        std::string materials_file = file_manager->getTrackFile("materials.dat",getIdent());
+        std::string materials_file = file_manager->getTrackFile("materials.xml",getIdent());
         material_manager->pushTempMaterial(materials_file);
     }
     catch (std::exception& e)

@@ -30,74 +30,15 @@
 #define UCLAMP   1
 #define VCLAMP   2
 
-#ifndef HAVE_IRRLICHT
-int clearSpheremap ( ssgEntity * )
-{
-    glDisable   ( GL_TEXTURE_GEN_S ) ;
-    glDisable   ( GL_TEXTURE_GEN_T ) ;
-    return true ;
-}   // clearSpheremap
-
-//=============================================================================
-int setSpheremap ( ssgEntity * )
-{
-    glTexGeni   ( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP ) ;
-    glTexGeni   ( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP ) ;
-    glEnable    ( GL_TEXTURE_GEN_S ) ;
-    glEnable    ( GL_TEXTURE_GEN_T ) ;
-    return true ;
-}   // setSpheremap
-#endif
-
-//=============================================================================
-#ifndef HAVE_IRRLICHT
-bool Material::parseBool ( char **p )
-{
-    /* Skip leading spaces */
-
-    while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
-
-    const bool RES = ( ( **p == 'Y' ) || ( **p == 'y' ) ) ;
-
-    while ( **p > ' ' && **p != '\0' ) (*p)++ ;
-
-    return RES ;
-}   // parseBool
-
-//-----------------------------------------------------------------------------
-int Material::parseInt ( char **p )
-{
-    /* Skip leading spaces */
-
-    while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
-
-    return strtol ( *p, p, 0 ) ;
-}   // parseInt 
-
-//-----------------------------------------------------------------------------
-float Material::parseFloat ( char **p )
-{
-    /* Skip leading spaces */
-
-    while ( **p <= ' ' && **p != '\0' ) (*p)++ ;
-
-    return (float)strtod ( *p, p ) ;
-}   // parseFloat 
-#endif
 //-----------------------------------------------------------------------------
 Material::Material(unsigned int index)
 {
     m_texname = "";
-#ifndef HAVE_IRRLICHT
-    m_predraw  = m_postdraw = NULL ;
-#endif
-
     init   (index);
     install();
 }   // Material
 
 //-----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 /** Create a new material using the parameters specified in the xml file.
  *  \param node Node containing the parameters for this material.
  *  \param index Index in material_manager.
@@ -142,41 +83,6 @@ Material::Material(const std::string& fname, int index, bool is_full_path)
     install(is_full_path);
 }   // Material
 
-#else
-Material::Material(const std::string& fname, char *description, 
-                   int index, bool is_full_path)
-{
-    m_texname = fname;
-    m_predraw  = m_postdraw = NULL ;
-
-    init (index);
-
-    if(strlen(description)>0)
-    {
-        m_clamp_tex    = parseBool (&description) ? UCLAMP : 0 ;
-        m_clamp_tex   += parseBool (&description) ? VCLAMP : 0 ;
-        
-        m_transparency       = parseBool (&description);
-        m_alpha_ref          = parseFloat(&description);
-        m_lighting           = parseBool (&description);
-        m_sphere_map         = parseBool (&description);
-        m_friction           = parseFloat(&description);
-        m_ignore             = parseBool (&description);
-        m_zipper             = parseBool (&description);
-        m_resetter           = parseBool (&description);
-        m_collideable        = parseBool (&description);
-        m_max_speed_fraction = parseFloat(&description);
-        m_slowdown           = parseFloat(&description);
-        // Set the optional parameters.
-        if(m_max_speed_fraction <= 0.0f)
-            m_max_speed_fraction = 1.0f;
-        if(m_slowdown           <= 0.0f)
-            m_slowdown           = stk_config->m_slowdown_factor;
-    }
-    install(is_full_path);
-}   // Material
-#endif
-
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
@@ -203,14 +109,6 @@ void Material::init(unsigned int index)
     m_slowdown           = stk_config->m_slowdown_factor;
 }
 
-//-----------------------------------------------------------------------------
-#ifndef HAVE_IRRLICHT
-void Material::applyToLeaf(ssgLeaf *l)
-{
-    if ( m_predraw  ) l -> setCallback ( SSG_CALLBACK_PREDRAW , m_predraw  ) ;
-    if ( m_postdraw ) l -> setCallback ( SSG_CALLBACK_POSTDRAW, m_postdraw ) ;
-}   // applyToLeaf
-#endif
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {

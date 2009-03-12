@@ -196,6 +196,7 @@ FileManager::~FileManager()
 XMLReader *FileManager::getXMLReader(const std::string &f) 
 {
     io::IXMLReader *r = m_file_system->createXMLReader(f.c_str());
+    if(!r) return NULL;
     return new XMLReader(r);
 }   // getXMLReader
 

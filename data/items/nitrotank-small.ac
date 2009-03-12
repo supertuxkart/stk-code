@@ -9,7 +9,7 @@ OBJECT poly
 name "SmallTank_0"
 data 9
 SmallTank
-texture "nitro-tank.rgb"
+texture "nitro-tank.png"
 texrep 1 1
 crease 70.000000
 numvert 59
@@ -558,7 +558,7 @@ OBJECT poly
 name "SmallTank_1"
 data 9
 SmallTank
-texture "tank-cyan.rgb"
+texture "tank-cyan.png"
 texrep 1 1
 crease 70.000000
 numvert 46
@@ -1100,7 +1100,7 @@ OBJECT poly
 name "SmallTank_2"
 data 9
 SmallTank
-texture "tank-blue.rgb"
+texture "tank-blue.png"
 texrep 1 1
 crease 70.000000
 numvert 37

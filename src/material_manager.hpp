@@ -32,10 +32,6 @@ class MaterialManager
 {
 private:
 
-#ifndef HAVE_IRRLICHT
-    char   *parseFileName(char **str);
-    int     parseMaterial(FILE *fd);
-#endif
     void    parseMaterialFile(const std::string& filename);
     int     m_shared_material_index;
 
@@ -53,10 +49,6 @@ public:
     void      popTempMaterial  ();
 };
 
-extern ssgState *fuzzy_gst;//, *herringbones_gst;
-#ifndef HAVE_IRRLICHT
-ssgState *getAppState ( char *fname ) ;
-#endif
 extern MaterialManager *material_manager;
 
 #endif

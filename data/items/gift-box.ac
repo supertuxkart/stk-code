@@ -9,7 +9,7 @@ OBJECT poly
 name "GiftBox_0"
 data 7
 GiftBox
-texture "gift-loop.rgb"
+texture "gift-loop.png"
 texrep 1 1
 crease 70.000000
 numvert 158
@@ -1188,7 +1188,7 @@ OBJECT poly
 name "GiftBox_1"
 data 7
 GiftBox
-texture "gift-box.rgb"
+texture "gift-box.png"
 texrep 1 1
 crease 70.000000
 numvert 28

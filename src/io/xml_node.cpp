@@ -113,7 +113,7 @@ int XMLNode::get(const std::string &attribute, bool *value) const
 {
     std::string s;
     if(!get(attribute, &s)) return 0;
-    *value = s==""     || s[0]=='T' || s[0]=='t' ||
+    *value = s==""     || s[0]=='T' || s[0]=='t' || s[0]=='Y' || s[0]=='y' ||
              s=="true" || s=="TRUE" || s=="#t"   || s=="#T";
     return 1;
 }   // get(bool)

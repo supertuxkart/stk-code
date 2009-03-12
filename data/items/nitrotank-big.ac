@@ -9,7 +9,7 @@ OBJECT poly
 name "BigTank_0"
 data 7
 BigTank
-texture "tank-blue.rgb"
+texture "tank-blue.png"
 texrep 1 1
 crease 70.000000
 numvert 37
@@ -434,7 +434,7 @@ OBJECT poly
 name "BigTank_1"
 data 7
 BigTank
-texture "nitro-tank.rgb"
+texture "nitro-tank.png"
 texrep 1 1
 crease 70.000000
 numvert 67
@@ -999,7 +999,7 @@ OBJECT poly
 name "BigTank_2"
 data 7
 BigTank
-texture "tank-green.rgb"
+texture "tank-green.png"
 texrep 1 1
 crease 70.000000
 numvert 46

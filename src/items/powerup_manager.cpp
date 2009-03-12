@@ -42,7 +42,6 @@ initPowerupType;
 
 initPowerupType ict[]=
 {
-#ifdef HAVE_IRRLICHT
     {POWERUP_ZIPPER,    "zipper.collectable"       },
     {POWERUP_BOWLING,   "bowling.projectile"       },
     {POWERUP_BUBBLEGUM, "bubblegum.xml"            },
@@ -51,16 +50,6 @@ initPowerupType ict[]=
     {POWERUP_PARACHUTE, "parachute.collectable"    },
     {POWERUP_PLUNGER,   "plunger.projectile"       },
     {POWERUP_MAX,       ""                         },
-#else
-    {POWERUP_ZIPPER,    "zipper.collectable"       },
-    {POWERUP_BOWLING,   "bowling.projectile"       },
-    {POWERUP_BUBBLEGUM, "bubblegum.projectile"     },
-    {POWERUP_CAKE,      "cake.projectile"          },
-    {POWERUP_ANVIL,     "anvil.collectable"        },
-    {POWERUP_PARACHUTE, "parachute.collectable"    },
-    {POWERUP_PLUNGER,   "plunger.projectile"       },
-    {POWERUP_MAX,       ""                         },
-#endif
 };
 
 PowerupManager* powerup_manager=0;
@@ -70,11 +59,7 @@ PowerupManager::PowerupManager()
 {
     for(int i=0; i<POWERUP_MAX; i++)
     {
-#ifdef HAVE_IRRLICHT
         m_all_meshes[i] = NULL;
-#else
-        m_all_models[i] = (ssgEntity*)NULL;
-#endif
         m_all_icons[i]  = (Material*)NULL;
     }
 }   // PowerupManager
@@ -130,17 +115,12 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
 {
     std::string sName, sModel, sIconFile; 
     lisp->get("name",            sName                              );
-#ifdef HAVE_IRRLICHT
     lisp->get("mesh",            sModel                             );
-#else
-    lisp->get("model",           sModel                             );
-#endif
     lisp->get("icon",            sIconFile                          );
     // load material
     m_all_icons[collectType] = material_manager->getMaterial(sIconFile,
                                                      /* full_path */    false,
                                                      /*make_permanent */ true); 
-#ifdef HAVE_IRRLICHT
     if(sModel!="")
     {
         // FIXME LEAK: not freed (unimportant, since the models have to exist
@@ -153,27 +133,8 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
         m_all_meshes[collectType] = 0;
         m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
     }
-#else
-    m_all_icons[collectType]->getState()->ref();
-
-    if(sModel!="")
-    {
-        // FIXME LEAK: not freed (unimportant, since the models have to exist
-        // for the whole game anyway).
-        ssgEntity* e = loader->load(sModel, CB_COLLECTABLE);
-        m_all_models[collectType] = e;
-        e->ref();
-        e->clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
-    }
-    else
-    {
-        m_all_models[collectType] = 0;
-        m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
-    }
-#endif
 
     // Load special attributes for certain powerups
-#ifdef HAVE_IRRLICHT
     switch (collectType) {
         case POWERUP_BOWLING:          
              Bowling::init(lisp, m_all_meshes[collectType]); break;
@@ -183,16 +144,5 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
              Cake::init(lisp, m_all_meshes[collectType]); break;
         default:;
     }   // switch
-#else
-    switch (collectType) {
-        case POWERUP_BOWLING:          
-             Bowling::init  (lisp, m_all_models[collectType]); break;
-        case POWERUP_PLUNGER:          
-             Plunger::init  (lisp, m_all_models[collectType]); break;
-        case POWERUP_CAKE: 
-             Cake::init (lisp, m_all_models[collectType]); break;
-        default:;
-    }   // switch
-#endif
 }   // LoadNode
 

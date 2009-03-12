@@ -17,21 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/ssg.h>
 #include "explosion.hpp"
+
 #include "items/projectile_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "graphics/scene.hpp"
 #include "utils/vec3.hpp"
 
-Explosion::Explosion(const Vec3& coord, const int explosion_sound) : ssgTransform()
+Explosion::Explosion(const Vec3& coord, const int explosion_sound)
 {
-    this->ref();
-    ssgCutout *cut = new ssgCutout();
-    addKid(cut);  // derefing the explosion will free the cutout
-    m_seq   = projectile_manager->getExplosionModel();
-    cut->addKid(m_seq);
+    m_mesh   = projectile_manager->getExplosionModel();
     m_explode_sound = sfx_manager->newSFX( (SFXManager::SFXType)explosion_sound );
     init(coord);
 }   // Explosion
@@ -54,15 +50,16 @@ void Explosion::init(const Vec3& coord)
     sgCoord c;
     c.xyz[0]=coord[0];c.xyz[1]=coord[1];c.xyz[2]=coord[2];
     c.hpr[0]=0; c.hpr[1]=0; c.hpr[2]=0;
-    setTransform(&c);
+    //setTransform(&c);
     m_step = -1;
-    stk_scene->add(this);
+    //stk_scene->add(this);
     m_has_ended = false;
 }
 
 //-----------------------------------------------------------------------------
 void Explosion::update(float dt)
 {
+#ifndef HAVE_IRRLICHT
     //fprintf(stderr, "Explosion: update: ");
     if(++m_step >= m_seq->getNumKids())
     {
@@ -85,4 +82,5 @@ void Explosion::update(float dt)
         //fprintf(stderr, "Step.\n");
         m_seq->selectStep(m_step);
     }
+#endif
 }

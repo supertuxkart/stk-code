@@ -54,7 +54,7 @@ void ProjectileManager::loadData()
 void ProjectileManager::removeTextures()
 {
     cleanup();
-    ssgDeRefDelete(m_explosion_model);
+    //ssgDeRefDelete(m_explosion_model);
     // Only the explosion is here, all other models are actually managed
     // by powerup_manager.
     callback_manager->clear(CB_EXPLOSION);
@@ -78,7 +78,7 @@ void ProjectileManager::cleanup()
         i != m_active_explosions.end(); ++i)
     {
         stk_scene->remove((ssgTransform*)*i);
-        ssgDeRefDelete(*i);
+        //ssgDeRefDelete(*i);
     }
     m_active_explosions.clear();
 }   // cleanup
@@ -129,7 +129,7 @@ void ProjectileManager::update(float dt)
             if(!(*e)->hasEnded()) { e++; continue;}
             Explosion *exp=*e;
             Explosions::iterator eNext=m_active_explosions.erase(e);
-            ssgDeRefDelete(exp);  // reduce refcount and free object
+            //ssgDeRefDelete(exp);  // reduce refcount and free object
             e=eNext;
         }   // while e!=m_active_explosions.end()
     }   // if m_explosion_ended

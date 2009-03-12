@@ -59,11 +59,7 @@ SDLDriver::SDLDriver()
     : m_sensed_input(0), m_action_map(0), m_main_surface(0), m_flags(0), m_stick_infos(0),
     m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
-#ifdef HAVE_IRRLICHT
     if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
-#else
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
-#endif
     {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         exit(1);
@@ -109,9 +105,6 @@ SDLDriver::SDLDriver()
     SDL_JoystickEventState(SDL_ENABLE);
 
     initStickInfos();
-#ifndef HAVE_IRRLICHT
-    SDL_WM_SetCaption("SuperTuxKart", NULL);
-#endif
 
     // Get into menu mode initially.
     setMode(MENU);
@@ -260,52 +253,6 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
  */
 void SDLDriver::setVideoMode(bool resetTextures)
 {
-#ifndef HAVE_IRRLICHT
-    //Is SDL_FreeSurface necessary? SDL wiki says not??
-    SDL_FreeSurface(m_main_surface);
- 
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,     8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,   8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,    8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,   8);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,  24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
-
-    m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
-
-    if (!m_main_surface)
-    {
-        //ask for lower quality as a fallback
-        SDL_GL_SetAttribute(SDL_GL_RED_SIZE,    5);
-        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,  5);
-        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,   5);
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-
-        m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
-        if (m_main_surface)
-        {
-            fprintf(stderr, "Using fallback OpenGL settings\n");
-        }
-        else
-        {
-            //one last attempt: get rid of the alpha channel
-            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-
-            m_main_surface = SDL_SetVideoMode(user_config->m_width, user_config->m_height, 0, m_flags);
-            if (m_main_surface)
-            {
-                fprintf(stderr, "Using fallback OpenGL settings, without alpha channel\n");
-            }
-            else
-            {
-                fprintf(stderr, "SDL_SetVideoMode (%dx%d) failed: %s\n",
-                        user_config->m_width, user_config->m_height, SDL_GetError());
-                exit(1);
-            }
-        }   // !m_main_surface
-    }   // !m_main_surface
-#endif
 #if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
     {
@@ -361,10 +308,6 @@ SDLDriver::~SDLDriver()
     // FIXME LEAK: delete m_action_map if defined
     SDL_FreeSurface(m_main_surface);
 
-#ifndef HAVE_IRRLICHT
-    // Irrlicht calls SDL_Quit otherwise
-    SDL_Quit();
-#endif
 }   // ~SDLDriver
 
 //-----------------------------------------------------------------------------

@@ -73,26 +73,21 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
     ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
 
     gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
+#ifndef HAVE_IRRLICHT
     gs -> setState ( fuzzy_gst ) ;
+#endif
     sh -> addKid ( gs ) ;
     sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }   // Shadow
 
 //=============================================================================
 ItemManager* item_manager;
-#ifdef HAVE_IRRLICHT
+
 typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
-#else
-typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
-#endif
 
 ItemManager::ItemManager()
 {
-#ifdef HAVE_IRRLICHT
     m_all_meshes.clear();
-#else
-    m_all_models.clear();
-#endif
     // The actual loading is done in loadDefaultItems
 }   // ItemManager
 
@@ -106,26 +101,17 @@ void ItemManager::removeTextures()
     }
     m_all_items.clear();
 
-#ifdef HAVE_IRRLICHT
     for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
     {
         i->second->drop();
     }
     m_all_meshes.clear();
-#else
-    for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-    {
-        i->second->deRef();
-    }
-    m_all_models.clear();
-#endif
     callback_manager->clear(CB_ITEM);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
 ItemManager::~ItemManager()
 {
-#ifdef HAVE_IRRLICHT
     for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
     {
         // FIXME: What about this plib comment:
@@ -135,16 +121,6 @@ ItemManager::~ItemManager()
         i->second->drop();
     }
     m_all_meshes.clear();
-#else
-    for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-    {
-        // We can't use ssgDeRefDelete here, since then the object would be
-        // freed, and when m_all_models is deleted, we have invalid memory
-        // accesses.
-        i->second->deRef();
-    }
-    m_all_models.clear();
-#endif
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
@@ -160,7 +136,6 @@ void ItemManager::loadDefaultItems()
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
-#ifdef HAVE_IRRLICHT
             // FIXME: We should try to check the extension, 
             // i.e. load only .3ds files
             scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
@@ -168,16 +143,6 @@ void ItemManager::loadDefaultItems()
             std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
             m_all_meshes[shortName] = mesh;
             mesh->grab();
-#else
-            if(!StringUtils::has_suffix(*i, ".ac")) continue;
-            ssgEntity*  h         = loader->load(*i, CB_ITEM, 
-                                                 /*optimise*/true, 
-                                                 /*full_path*/true);
-            std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
-            h->ref();
-            h->setName(shortName.c_str());
-            m_all_models[shortName] = h;
-#endif
         }   // for i
 
     setDefaultItemStyle();
@@ -198,13 +163,8 @@ void ItemManager::setDefaultItemStyle()
     std::ostringstream msg;
     for(int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
-#ifdef HAVE_IRRLICHT
         m_item_mesh[i] = m_all_meshes[DEFAULT_NAMES[i]];
         if(!m_item_mesh[i])
-#else
-        m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
-        if(!m_item_model[i])
-#endif
         {
             msg << "Item model '" << DEFAULT_NAMES[i] 
                 << "' is missing (see item_manager)!\n";
@@ -215,11 +175,7 @@ void ItemManager::setDefaultItemStyle()
     if(bError)
     {
         fprintf(stderr, "The following models are available:\n");
-#ifdef HAVE_IRRLICHT
         for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
-#else
-        for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-#endif
         {
             if(i->second)
             {
@@ -242,21 +198,12 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
                            const Vec3 &normal, Kart *parent)
 {
     Item* h;
-#ifdef HAVE_IRRLICHT
     if(type == Item::ITEM_BUBBLEGUM)
         h = new BubbleGumItem(type, xyz, normal, m_item_mesh[type], 
                               m_all_items.size());
     else
         h = new Item(type, xyz, normal, m_item_mesh[type],
                      m_all_items.size());
-#else
-    if(type == Item::ITEM_BUBBLEGUM)
-        h = new BubbleGumItem(type, xyz, normal, m_item_model[type], 
-                              m_all_items.size());
-    else
-        h = new Item(type, xyz, normal, m_item_model[type],
-                     m_all_items.size());
-#endif
     if(parent != NULL) h->setParent(parent);
     
     m_all_items.push_back(h);
@@ -409,10 +356,6 @@ void ItemManager::setItem(const lisp::Lisp *item_node,
     item_node->get(colour, name);
     if(name.size()>0)
     {
-#ifdef HAVE_IRRLICHT
         m_item_mesh[type]=m_all_meshes[name];
-#else
-        m_item_model[type]=m_all_models[name];
-#endif
     }
 }   // setItem
