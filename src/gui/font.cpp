@@ -19,9 +19,9 @@
 
 #include <vector>
 
-#include "file_manager.hpp"
 #include "user_config.hpp"
 #include "gui/font.hpp"
+#include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
 Font* font_gui;

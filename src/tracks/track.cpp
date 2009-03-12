@@ -24,10 +24,8 @@
 #include <sstream>
 #define _WINSOCKAPI_
 #include <plib/ssgAux.h>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
-#endif
-#include "file_manager.hpp"
+
 #include "loader.hpp"
 #include "stk_config.hpp"
 #include "material_manager.hpp"
@@ -37,6 +35,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"

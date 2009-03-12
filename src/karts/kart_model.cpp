@@ -19,12 +19,12 @@
 
 #include "karts/kart_model.hpp"
 
-#include "file_manager.hpp"
 #include "loader.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/ssg_help.hpp"
 

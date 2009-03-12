@@ -23,16 +23,13 @@
 #include <vector>
 #include <set>
 
-#ifdef HAVE_IRRLICHT
-#  include "irrlicht.h"
-   using namespace irr;
+#include "irrlicht.h"
+using namespace irr;
 #include "io/xml_reader.hpp"
-#endif
 
 class FileManager 
 {
 private:
-#ifdef HAVE_IRRLICHT
     /** Handle to irrlicht's file systems. */
     io::IFileSystem            *m_file_system;
     /** Pointer to the irrlicht device. This is necessary before reInit is 
@@ -40,7 +37,6 @@ private:
      *  for details. */
     IrrlichtDevice             *m_device;
 
-#endif
     bool                        m_is_full_path;
     std::string                 m_root_dir;
     std::vector<std::string>    m_texture_search_path,
@@ -56,14 +52,9 @@ private:
 public:
                     FileManager();
                    ~FileManager();
-#ifdef HAVE_IRRLICHT
     void            setDevice(IrrlichtDevice *device);
     void            dropFileSystem();
     XMLReader      *getXMLReader(const std::string &f);
-//    io::IXMLWriter *getXMLWriter(const std::string &f) 
-                           //{ return m_file_system->createXMLWriter(f.c_str());}
-
-#endif
 
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;

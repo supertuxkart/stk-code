@@ -27,9 +27,8 @@
 #include <plib/ssg.h>
 
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
+
 #include "loader.hpp"
-#include "items/item_manager.hpp"
-#include "file_manager.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "audio/sound_manager.hpp"
@@ -41,6 +40,8 @@
 #include "graphics/smoke.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
+#include "io/file_manager.hpp"
+#include "items/item_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/race_state.hpp"

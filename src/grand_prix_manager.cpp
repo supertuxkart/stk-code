@@ -21,7 +21,7 @@
 
 #include <set>
 
-#include "file_manager.hpp"
+#include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
 GrandPrixManager *grand_prix_manager = NULL;

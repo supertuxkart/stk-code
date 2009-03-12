@@ -22,7 +22,7 @@
 using namespace core;
 
 #include "user_config.hpp"
-#include "file_manager.hpp"
+#include "io/file_manager.hpp"
 
 IrrDriver *irr_driver = NULL;
 

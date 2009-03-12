@@ -18,8 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "translation.hpp"
-#include "file_manager.hpp"
+#include "utils/translation.hpp"
+
+#include "io/file_manager.hpp"
 
 Translations* translations=NULL;
 

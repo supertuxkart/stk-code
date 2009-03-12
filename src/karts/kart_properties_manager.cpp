@@ -23,11 +23,11 @@
 #include <algorithm>
 #include <ctime>
 
-#include "file_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "callback_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/string_utils.hpp"
 

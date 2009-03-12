@@ -46,7 +46,6 @@
 
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "file_manager.hpp"
 #include "loader.hpp"
 #include "main_loop.hpp"
 #include "material_manager.hpp"
@@ -59,13 +58,12 @@
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#ifdef HAVE_IRRLICHT
-#  include "graphics/irr_driver.hpp"
-#endif
+#include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/menu_manager.hpp"
 #include "gui/widget_manager.hpp"
+#include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -440,13 +438,8 @@ void InitTuxkart()
     // unlock manager is needed when reading the config file
     unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
-#ifdef HAVE_IRRLICHT
     irr_driver              = new IrrDriver();
-#endif
     loader                  = new Loader();
-#ifndef HAVE_IRRLICHT
-    loader->setCreateStateCallback(getAppState);
-#endif
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -514,9 +507,7 @@ void CleanTuxKart()
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(stk_scene)               delete stk_scene;
-#ifdef HAVE_IRRLICHT
     if(irr_driver)              delete irr_driver;
-#endif
 }
 
 //=============================================================================
@@ -553,9 +544,6 @@ int main(int argc, char *argv[] )
         
         //FIXME: this needs a better organization
         inputDriver = new SDLDriver ();
-#ifndef HAVE_IRRLICHT
-        ssgInit();
-#endif
         
         main_loop = new MainLoop();
         // loadMaterials needs ssgLoadTextures (internally), which can

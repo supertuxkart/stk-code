@@ -24,10 +24,10 @@
 #include <plib/ssg.h>
 #include "material_manager.hpp"
 #include "loader.hpp"
-#include "file_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "karts/kart_model.hpp"
+#include "io/file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "utils/ssg_help.hpp"

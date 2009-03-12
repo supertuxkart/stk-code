@@ -22,8 +22,8 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "file_manager.hpp"
 #include "material.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 

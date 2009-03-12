@@ -21,9 +21,9 @@
 
 #include <stdexcept>
 
-#include "file_manager.hpp"
 #include "stk_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 

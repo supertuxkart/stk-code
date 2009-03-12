@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "file_manager.hpp"
+#include "io/file_manager.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -30,25 +30,19 @@
 #  ifndef __CYGWIN__
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
      //   Some portabilty defines
-#    define access         _access
-#    define                F_OK  04
 #  endif
 #  define CONFIGDIR       "."
 #else
 #  define CONFIGDIR       ".supertuxkart"
 #endif
 
-#ifdef HAVE_IRRLICHT
-#  include "irrlicht.h"
-#endif
+#include "irrlicht.h"
 // ul.h includes windows.h, so this define is necessary
 #define _WINSOCKAPI_
 #include <plib/ul.h>
 #include "btBulletDynamicsCommon.h"
 
-#ifdef HAVE_IRRLICHT
-#  include "graphics/irr_driver.hpp"
-#endif
+#include "graphics/irr_driver.hpp"
 #include "material_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -97,11 +91,8 @@ FileManager* file_manager = 0;
  */
 FileManager::FileManager()
 {
-#ifdef HAVE_IRRLICHT
-    // 
     m_device       = createDevice(video::EDT_NULL);
     m_file_system  = m_device->getFileSystem();
-#endif
     m_is_full_path = false;
     
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
@@ -109,17 +100,9 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
-#ifdef HAVE_IRRLICHT
     else if(m_file_system->existFile("data/stk_config.data"))
-#else
-    else if ( access ( "data/stk_config.data", F_OK ) == 0 )
-#endif
         m_root_dir = "." ;
-#ifdef HAVE_IRRLICHT
     else if(m_file_system->existFile("../data/stk_config.data"))
-#else
-    else if ( access ( "../data/stk_config.data", F_OK ) == 0 )
-#endif
         m_root_dir = ".." ;
     else
 #ifdef SUPERTUXKART_DATADIR
@@ -135,9 +118,7 @@ FileManager::FileManager()
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/data/models"  );
     pushMusicSearchPath  (m_root_dir+"/data/music"   );
-#ifdef HAVE_IRRLICHT
     m_file_system->addFolderFileArchive("data/models");
-#endif
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
     {
@@ -183,14 +164,12 @@ FileManager::FileManager()
 /** Remove the dummy file system (which is called from IrrDriver before 
  *  creating the actual device.
  */
-#ifdef HAVE_IRRLICHT
 void FileManager::dropFileSystem()
 {
     m_device->drop();
 }   // dropFileSystem
-#endif
+
 //-----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 /** This function is used to re-initialise the file-manager after reading in
  *  the user configuration data.
 */
@@ -201,66 +180,49 @@ void FileManager::setDevice(IrrlichtDevice *device)
                        // file_manager has a pointer to the file system.
     m_file_system  = m_device->getFileSystem();
 }   // reInit
-#endif
+
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();
-#ifdef HAVE_IRRLICHT
     // m_file_system is ref-counted, so no delete/drop necessary.
     m_file_system = NULL;
     m_device->drop();
-#endif
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 XMLReader *FileManager::getXMLReader(const std::string &f) 
 {
     io::IXMLReader *r = m_file_system->createXMLReader(f.c_str());
     return new XMLReader(r);
 }   // getXMLReader
-#endif
+
 //-----------------------------------------------------------------------------
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);  
-#ifdef HAVE_IRRLICHT
     m_file_system->addFolderFileArchive(path.c_str());
-#endif
 }   // pushModelSearchPath
 
 //-----------------------------------------------------------------------------
 void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
-#ifdef HAVE_IRRLICHT
     m_file_system->addFolderFileArchive(path.c_str());
-#endif
 }   // pushTextureSearchPath
 
 //-----------------------------------------------------------------------------
-
-
 bool FileManager::findFile(std::string& full_path,
                       const std::string& fname, 
                       const std::vector<std::string>& search_path) const
 {
-#ifndef HAVE_IRRLICHT
-    struct stat mystat;
-#endif
-
     for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
         i != search_path.rend(); ++i)
     {
         full_path = *i + "/" + fname;
-#ifdef HAVE_IRRLICHT
         if(m_file_system->existFile(full_path.c_str())) return true;
-#else
-        if(stat(full_path.c_str(), &mystat) >= 0) return true;
-#endif
     }
     full_path="";
     return false;

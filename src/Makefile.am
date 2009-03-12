@@ -91,6 +91,8 @@ supertuxkart_SOURCES = \
  graphics/skid_marks.hpp \
  graphics/smoke.cpp \
  graphics/smoke.hpp \
+ io/file_manager.cpp \
+ io/file_manager.hpp \
  io/xml_node.cpp \
  io/xml_node.hpp \
  io/xml_reader.cpp \
@@ -150,8 +152,6 @@ supertuxkart_SOURCES = \
  highscores.hpp \
  highscore_manager.cpp \
  highscore_manager.hpp \
- file_manager.cpp \
- file_manager.hpp \
  loader.cpp \
  loader.hpp \
  race_manager.cpp \

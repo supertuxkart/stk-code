@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <ctime>
 
-#include "file_manager.hpp"
 #include "race_manager.hpp"
 #include "user_config.hpp"
 #include "callback_manager.hpp"
@@ -36,6 +35,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
 #include "gui/menu_manager.hpp"
+#include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/auto_kart.hpp"

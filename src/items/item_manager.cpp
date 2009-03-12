@@ -22,11 +22,11 @@
 #include <sstream>
 
 #include "user_config.hpp"
-#include "file_manager.hpp"
 #include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"

@@ -18,8 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "items/attachment_manager.hpp"
-#include "file_manager.hpp"
+
 #include "loader.hpp"
+#include "io/file_manager.hpp"
 
 AttachmentManager *attachment_manager = 0;
 

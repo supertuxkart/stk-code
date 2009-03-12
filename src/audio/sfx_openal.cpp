@@ -34,8 +34,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_endian.h>
 
-#include "file_manager.hpp"
 #include "user_config.hpp"
+#include "io/file_manager.hpp"
 
 SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) : SFXBase()
 {

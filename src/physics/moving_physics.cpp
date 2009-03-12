@@ -28,10 +28,10 @@ using namespace irr;
 #define _WINSOCKAPI_
 #include <plib/sg.h>
 
-#include "file_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
