@@ -69,10 +69,8 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_version            = 0;
     m_track_mesh         = new TriangleMesh();
     m_non_collision_mesh = new TriangleMesh();
-#ifdef HAVE_IRRLICHT
     m_all_nodes.clear();
     m_all_meshes.clear();
-#endif
     m_has_final_camera = false;
     m_is_arena         = false;
     loadTrack(m_filename);
@@ -90,7 +88,6 @@ Track::~Track()
  */
 void Track::cleanup()
 {
-#ifdef HAVE_IRRLICHT
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         irr_driver->removeNode(m_all_nodes[i]);
@@ -99,7 +96,7 @@ void Track::cleanup()
     {
         irr_driver->removeMesh(m_all_meshes[i]);
     }
-#endif
+
     delete m_non_collision_mesh;
     delete m_track_mesh;
 
@@ -860,7 +857,6 @@ void Track::loadTrack(const std::string &filename)
     m_fog_start         = 0.0f;
     m_fog_end           = 1000.0f;
     m_gravity           = 9.80665f;
-#ifdef HAVE_IRRLICHT
     m_sun_position      = core::vector3df(0.4f, 0.4f, 0.4f);
     m_sky_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
     m_fog_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
@@ -911,61 +907,6 @@ void Track::loadTrack(const std::string &filename)
     m_has_final_camera &= node->get("camera-final-hpr",
                                     &m_camera_final_hpr)     !=1;
     m_camera_final_hpr.degreeToRad();
-#else
-    sgSetVec3 ( m_sun_position,  0.4f, 0.4f, 0.4f      );
-    sgSetVec4 ( m_sky_color,     0.3f, 0.7f, 0.9f, 1.0f );
-    sgSetVec4 ( m_fog_color,     0.3f, 0.7f, 0.9f, 1.0f );
-    sgSetVec4 ( m_ambient_col,   0.5f, 0.5f, 0.5f, 1.0f );
-    sgSetVec4 ( m_specular_col,  1.0f, 1.0f, 1.0f, 1.0f );
-    sgSetVec4 ( m_diffuse_col,   1.0f, 1.0f, 1.0f, 1.0f );
-    lisp::Parser parser;
-    const lisp::Lisp* const ROOT = parser.parse(m_filename);
-
-    const lisp::Lisp* const LISP = ROOT->getLisp("tuxkart-track");
-    if(!LISP)
-    {
-        delete ROOT;
-        std::ostringstream msg;
-        msg <<"Couldn't load map '"<<m_filename<<"': no tuxkart-track node.";
-        throw std::runtime_error(msg.str());
-    }
-
-    LISP->get      ("name",                  m_name);
-    LISP->get      ("description",           m_description);
-    LISP->get      ("designer",              m_designer);
-    LISP->get      ("version",               m_version);
-    std::vector<std::string> filenames;
-    LISP->getVector("music",                 filenames);
-    getMusicInformation(filenames, m_music);
-    LISP->get      ("item",                  m_item_style);
-    LISP->get      ("screenshot",            m_screenshot);
-    LISP->get      ("topview",               m_top_view);
-    LISP->get      ("sky-color",             m_sky_color);
-    LISP->getVector("start-x",               m_start_x);
-    LISP->getVector("start-y",               m_start_y);
-    LISP->getVector("start-z",               m_start_z);
-    LISP->getVector("start-heading",         m_start_heading);
-    LISP->get      ("use-fog",               m_use_fog);
-    LISP->get      ("fog-color",             m_fog_color);
-    LISP->get      ("fog-density",           m_fog_density);
-    LISP->get      ("fog-start",             m_fog_start);
-    LISP->get      ("fog-end",               m_fog_end);
-    LISP->get      ("sun-position",          m_sun_position);
-    LISP->get      ("sun-ambient",           m_ambient_col);
-    LISP->get      ("sun-specular",          m_specular_col);
-    LISP->get      ("sun-diffuse",           m_diffuse_col);
-    LISP->get      ("gravity",               m_gravity);
-    LISP->get      ("arena",                 m_is_arena);
-    LISP->getVector("groups",                m_groups);
-    if(m_groups.size()==0)
-        m_groups.push_back("standard");
-    // if both camera position and rotation are defined,
-    // set the flag that the track has final camera position
-    m_has_final_camera  = LISP->get("camera-final-position", m_camera_final_position);
-    m_has_final_camera &= LISP->get("camera-final-hpr",      m_camera_final_hpr);
-    m_camera_final_hpr.degreeToRad();
-    delete ROOT;
-#endif
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
@@ -1154,12 +1095,7 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
 //* Convert the ssg track tree into its physics equivalents.
 void Track::createPhysicsModel()
 {
-#ifndef HAVE_IRRLICHT
-    if(!m_model) return;
-#endif
-
     
-#ifdef HAVE_IRRLICHT
     // Remove the temporary track rigid body, and then convert all objects
     // (i.e. the track and all additional objects) into a new rigid body
     // and convert this again. So this way we have an optimised track
@@ -1172,12 +1108,6 @@ void Track::createPhysicsModel()
     {
         convertTrackToBullet(m_all_meshes[i]);
     }
-#else
-    // Collect all triangles in the track_mesh
-    sgMat4 mat;
-    sgMakeIdentMat4(mat);
-    convertTrackToBullet(m_model, mat);
-#endif
     m_track_mesh->createBody();
     m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
     
@@ -1185,7 +1115,6 @@ void Track::createPhysicsModel()
 
 // -----------------------------------------------------------------------------
 //* Convert the ssg track tree into its physics equivalents.
-#ifdef HAVE_IRRLICHT
 void Track::convertTrackToBullet(const scene::IMesh *mesh)
 {
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
@@ -1220,80 +1149,11 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
-
-#else
-void Track::convertTrackToBullet(ssgEntity *track, sgMat4 m)
-{
-    if(!track) return;
-    MovingPhysics *mp = dynamic_cast<MovingPhysics*>(track);
-    if(mp)
-    {
-        // If the track contains obect of type MovingPhysics,
-        // these objects will be real rigid body and are already
-        // part of the world. So these objects must not be converted
-        // to triangle meshes.
-    } 
-    else if(track->isAKindOf(ssgTypeLeaf()))
-    {
-        ssgLeaf  *leaf     = (ssgLeaf*)(track);
-        Material *material = material_manager->getMaterial(leaf);
-        // Don't convert triangles with material that is ignored (e.g. fuzzy_sand)
-        if(!material || material->isIgnore()) return;
-
-        for(int i=0; i<leaf->getNumTriangles(); i++) 
-        {
-            short v1,v2,v3;
-            sgVec3 vv1, vv2, vv3;
-            
-            leaf->getTriangle(i, &v1, &v2, &v3);
-            sgXformPnt3 ( vv1, leaf->getVertex(v1), m );
-            sgXformPnt3 ( vv2, leaf->getVertex(v2), m );
-            sgXformPnt3 ( vv3, leaf->getVertex(v3), m );
-            btVector3 vb1(vv1[0],vv1[1],vv1[2]);
-            btVector3 vb2(vv2[0],vv2[1],vv2[2]);
-            btVector3 vb3(vv3[0],vv3[1],vv3[2]);
-            if(material->isZipper()) 
-            {
-                m_non_collision_mesh->addTriangle(vb1, vb2, vb3, material);
-            }
-            else
-            {
-                m_track_mesh->addTriangle(vb1, vb2, vb3, material);
-            }
-        }
-        
-    }   // if(track isAKindOf leaf)
-    else if(track->isAKindOf(ssgTypeTransform()))
-    {
-        ssgBaseTransform *t = (ssgBaseTransform*)(track);
-        sgMat4 tmpT, tmpM;
-        t->getTransform(tmpT);
-        sgCopyMat4(tmpM, m);
-        sgPreMultMat4(tmpM,tmpT);
-        for(ssgEntity *e = t->getKid(0); e!=NULL; e=t->getNextKid())
-        {
-            convertTrackToBullet(e, tmpM);
-        }   // for i
-    }
-    else if (track->isAKindOf(ssgTypeBranch())) 
-    {
-        ssgBranch *b =(ssgBranch*)track;
-        for(ssgEntity* e=b->getKid(0); e!=NULL; e=b->getNextKid()) {
-            convertTrackToBullet(e, m);
-        }   // for i<getNumKids
-    }
-    else
-    {
-        assert(!"Unkown ssg type in convertTrackToBullet");
-    }
-}   // convertTrackToBullet
-#endif
 // ----------------------------------------------------------------------------
 /** Loads the main track model (i.e. all other objects contained in the
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
  */
-#ifdef HAVE_IRRLICHT
 bool Track::loadMainTrack(const XMLNode &node)
 {
     std::string model_name;
@@ -1327,7 +1187,7 @@ bool Track::loadMainTrack(const XMLNode &node)
     m_track_mesh->createBody();
     return true;
 }   // loadMainTrack
-#endif
+
 // ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
@@ -1348,7 +1208,7 @@ void Track::loadTrackModel()
 
     // Start building the scene graph
 #ifdef HAVE_IRRLICHT
-    std::string path = file_manager->getTrackFile(getIdent()+".irrloc");
+    std::string path = file_manager->getTrackFile(getIdent()+".scene");
     XMLReader *xml = file_manager->getXMLReader(path);
 
     // Make sure that we have a track (which is used for raycasts to 
@@ -1622,22 +1482,15 @@ void Track::loadTrackModel()
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
-#ifdef HAVE_IRRLICHT
     const core::vector3df &sun_pos = getSunPos();
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
     m_light->setLightData(light);
     // Note: the physics world for irrlicht is created in loadMainTrack
-#else
-    Vec3 min, max;
-    SSGHelp::MinMax(m_model, &min, &max);
-    RaceManager::getWorld()->getPhysics()->init(min, max);
-#endif
     createPhysicsModel();
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
                         int bNeedHeight)
 {
@@ -1660,31 +1513,8 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     Vec3 normal(0, 0, 0.0f);
     item_manager->newItem(type, loc, normal);
 }   // itemCommand
+
 // ----------------------------------------------------------------------------
-#else
-void Track::itemCommand (sgVec3 *xyz, int type, int bNeedHeight )
-{
-
-    // if only 2d coordinates are given, let the item fall from very high
-    if(bNeedHeight) (*xyz)[2] = 1000000.0f;
-
-    // Even if 3d data are given, make sure that the item is on the ground
-    (*xyz)[2] = getHeight( m_model, *xyz ) + 0.06f;
-
-    // Some modes (e.g. time trial) don't have any bonus boxes
-    if(type==Item::ITEM_BONUS_BOX && !RaceManager::getWorld()->enableBonusBoxes()) 
-        return;
-    Vec3 loc((*xyz));
-
-    // Don't tilt the items, since otherwise the rotation will look odd,
-    // i.e. the items will not rotate around the normal, but 'wobble'
-    // around.
-    Vec3 normal(0, 0, 0.0f);
-    item_manager->newItem((Item::ItemType)type, loc, normal);
-}   // itemCommand
-// ----------------------------------------------------------------------------
-#endif
-
 void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal, 
                             const Material **material) const
 {

@@ -16,10 +16,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#ifdef HAVE_IRRLICHT
 
 #include "graphics/irr_driver.hpp"
-using namespace core;
 
 #include "user_config.hpp"
 #include "io/file_manager.hpp"
@@ -41,7 +39,7 @@ IrrDriver::IrrDriver()
         for(int bits=32; bits>15; bits -=16) 
         {
             m_device = createDevice(type,
-                                    dimension2d<irr::s32>(user_config->m_width,
+                                   core::dimension2d<s32>(user_config->m_width,
                                                           user_config->m_height ),
                                     bits, //bits per pixel
                                     user_config->m_fullscreen,
@@ -63,7 +61,7 @@ IrrDriver::IrrDriver()
     m_device->setWindowCaption(L"SuperTuxKart");
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
-    const std::string &font = file_manager->getFontFile("fonthaettenschweiler.bmp");
+    const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     m_race_font     = m_gui_env->getFont(font.c_str());
 }   // IrrDriver
 
@@ -201,5 +199,3 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 }   // OnEvent
 
 // ----------------------------------------------------------------------------
-
-#endif // HAVE_IRRLICHT

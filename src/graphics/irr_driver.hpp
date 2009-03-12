@@ -17,8 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef HAVE_IRRLICHT
-
 #ifndef HEADER_IRR_DRIVER_HPP
 #define HEADER_IRR_DRIVER_HPP
 
@@ -64,6 +62,4 @@ public:
 extern IrrDriver *irr_driver;
 
 #endif   // HEADER_IRR_DRIVER_HPP
-
-#endif   // HAVE_IRRLICHT
 

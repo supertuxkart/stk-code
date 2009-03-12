@@ -29,10 +29,8 @@
 #endif
 #include <plib/sg.h>
 #include <plib/ssg.h>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
 #include <string>
 #include <vector>
 #include "LinearMath/btTransform.h"
@@ -58,13 +56,9 @@ private:
     std::string              m_designer;
     std::string              m_filename;
     std::vector<std::string> m_groups;
-#ifdef HAVE_IRRLICHT
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
     scene::ILightSceneNode  *m_light;
-#else
-    ssgBranch               *m_model;
-#endif
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
     bool                     m_has_final_camera;
@@ -72,9 +66,7 @@ private:
     Vec3                     m_camera_final_hpr;
     bool                     m_is_arena;
     int                      m_version;
-#ifdef HAVE_IRRLICHT
     bool                     loadMainTrack(const XMLNode &node);
-#endif
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -103,21 +95,12 @@ public:
     float           m_fog_density;
     float           m_fog_start;
     float           m_fog_end;
-#ifdef HAVE_IRRLICHT
     core::vector3df m_sun_position;
     video::SColorf  m_ambient_color;
     video::SColorf  m_specular_color;
     video::SColorf  m_diffuse_color;
     video::SColorf  m_sky_color;
     video::SColorf  m_fog_color;
-#else
-    sgVec4          m_sky_color;
-    sgVec4          m_fog_color;
-    sgVec3          m_sun_position;   /** Position of the sun */
-    sgVec4          m_ambient_col;
-    sgVec4          m_specular_col;
-    sgVec4          m_diffuse_col;
-#endif
 
     //FIXME: Maybe the next 4 vectors should be inside an struct and be used
     //from a vector of structs?
@@ -177,10 +160,6 @@ public:
     bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
-#ifdef HAVE_IRRLICHT
-#else
-    ssgBranch*         getModel          () const {return m_model;              }
-#endif
     float              getGravity        () const {return m_gravity;            }
     /** Returns the version of the .track file. */
     int                getVersion        () const {return m_version;            }
@@ -191,21 +170,12 @@ public:
                        getGroups         () const {return m_groups;             }
     void               startMusic        () const;
     const std::string& getFilename       () const {return m_filename;           }
-#ifdef HAVE_IRRLICHT
     const core::vector3df& getSunPos     () const {return m_sun_position;       }
     const video::SColorf& getAmbientCol  () const {return m_ambient_color;      }
     const video::SColorf& getDiffuseCol  () const {return m_diffuse_color;      }
     const video::SColorf& getSpecularCol () const {return m_specular_color;     }
     const video::SColorf& getFogColor    () const {return m_fog_color;          }
     const video::SColorf& getSkyColor    () const {return m_sky_color;          }
-#else
-    const sgVec3& getSunPos              () const {return m_sun_position;       }
-    const sgVec4& getAmbientCol          () const {return m_ambient_col;        }
-    const sgVec4& getDiffuseCol          () const {return m_diffuse_col;        }
-    const sgVec4& getSpecularCol         () const {return m_specular_col;       }
-    const sgVec4& getFogColor            () const {return m_fog_color;          }
-    const sgVec4& getSkyColor            () const {return m_sky_color;          }
-#endif
     const bool&   useFog                 () const {return m_use_fog;            }
     const float&  getFogDensity          () const {return m_fog_density;        }
     const float&  getFogStart            () const {return m_fog_start;          }
@@ -233,20 +203,12 @@ public:
 
 private:
     void  loadTrack(const std::string &filename);
-#ifdef HAVE_IRRLICHT
     void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                       int bNeedHeight);
-#else
-    void  itemCommand(sgVec3 *xyz, int item_type, int bNeedHeight);
-#endif
     void  loadDriveline();
     void  readDrivelineFromFile(std::vector<Vec3>& line,
                                 const std::string& file_ext);
-#ifdef HAVE_IRRLICHT
     void  convertTrackToBullet(const scene::IMesh *mesh);
-#else
-    void  convertTrackToBullet(ssgEntity *track, sgMat4 m);
-#endif
     float pointSideToLine(const Vec3& L1, const Vec3& L2,
                           const Vec3& P ) const;
     int   pointInQuad(const Vec3& A, const Vec3& B,

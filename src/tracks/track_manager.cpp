@@ -131,11 +131,8 @@ void TrackManager::loadTrackList ()
         try
         {
             // getTrackFile appends dir, so it's opening: *dir/*dir.track
-#ifdef HAVE_IRRLICHT
+            // FIXME: rename from .irrtrack to .track
             config_file = file_manager->getTrackFile((*dir)+".irrtrack");
-#else
-            config_file = file_manager->getTrackFile((*dir)+".track");
-#endif
         }
         catch (std::exception& e)
         {

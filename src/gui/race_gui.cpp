@@ -52,8 +52,8 @@ RaceGUI::RaceGUI()
 
 #ifdef HAVE_IRRLICHT
     gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
-    core::rect<s32> pos(user_config->m_width-60, 10, 
-                        user_config->m_width,    50);
+    core::rect<s32> pos(user_config->m_width-160, 10, 
+                        user_config->m_width,    150);
     m_time = gui_env->addStaticText(L"", pos);
     m_time->setOverrideFont(irr_driver->getRaceFont());
 
