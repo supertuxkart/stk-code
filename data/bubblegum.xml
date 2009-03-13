@@ -1,0 +1,13 @@
+;; -*- mode: lisp -*-
+
+(tuxkart-collectable
+ (name "Bubble Gum")
+ (model "../items/bubblegum.ac")
+ (icon  "bubblegum-icon.rgb")
+ (speed 50.0)
+ (min-height 0.3)
+ (max-height 1.0)
+ (force-updown 20)
+)
+
+;; EOF ;;
