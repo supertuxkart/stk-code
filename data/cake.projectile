@@ -2,7 +2,6 @@
 
 (tuxkart-collectable
  (name  "cake")
- (model "cake.ac")
  (mesh  "cake.b3d")
  (icon  "cake-icon.rgb")
  (speed          50.0)

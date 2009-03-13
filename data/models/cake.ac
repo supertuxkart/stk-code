@@ -6,7 +6,7 @@ OBJECT poly
 name "Cake"
 data 4
 Cake
-texture "cake.rgb"
+texture "cake.png"
 texrep 1 1
 crease 30.000000
 numvert 164

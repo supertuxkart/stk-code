@@ -2,8 +2,8 @@
 
 (tuxkart-collectable
  (name  "anvil")
- (model "anvil.ac")
- (icon  "anchor-icon.rgb")
+ (mesh  "anvil.b3d")
+ (icon  "anchor-icon.png")
 )
 
 ;; EOF ;;
