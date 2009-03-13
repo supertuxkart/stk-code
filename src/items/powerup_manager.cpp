@@ -133,7 +133,12 @@ void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
         m_all_meshes[collectType] = 0;
         m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
     }
-
+    if(!m_all_meshes[collectType])
+    {
+        std::ostringstream o;
+        o<<"Can't load model '"<<sModel<<"' for '"<<sName<<"', aborting.";
+        throw std::runtime_error(o.str());
+    }
     // Load special attributes for certain powerups
     switch (collectType) {
         case POWERUP_BOWLING:          
