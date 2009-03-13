@@ -1127,11 +1127,12 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
         }
         video::SMaterial irrMaterial=mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
-        // FIXME: if no material is given, perhaps define a default?
+
         const Material* material=0;
         TriangleMesh *tmesh = m_track_mesh;
         if(t) {
-            material=material_manager->getMaterial(std::string(t->getName().c_str()));
+            std::string image = std::string(t->getName().c_str());
+            material=material_manager->getMaterial(StringUtils::basename(image));
             if(material->isZipper()) tmesh = m_non_collision_mesh;
         } 
 

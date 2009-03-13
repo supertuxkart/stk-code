@@ -113,7 +113,11 @@ void Material::init(unsigned int index)
 void Material::install(bool is_full_path)
 {
 #ifdef HAVE_IRRLICHT
-    m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
+    if(m_texname!="")
+    {
+        // Avoid irrlicht warning about not being able to load texture.
+        m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
+    }
 #else
     if ( isSphereMap () )
     {

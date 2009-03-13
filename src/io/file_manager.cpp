@@ -233,6 +233,10 @@ bool FileManager::findFile(std::string& full_path,
 std::string FileManager::getTextureFile(const std::string& FNAME) const
 {
     std::string path;
+    // FIXME: work around when loading and converting tracks: FNAME
+    //        (which is based on an irrlicht return value) contains the 
+    //        full path
+    //if(m_file_system->existFile(FNAME.c_str())) return FNAME;
     findFile(path, FNAME, m_texture_search_path);
     return path;
 }   // makeTexturePath

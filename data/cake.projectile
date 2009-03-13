@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "cake")
  (mesh  "cake.b3d")
- (icon  "cake-icon.rgb")
+ (icon  "cake-icon.png")
  (speed          50.0)
  (min-height      0.2)
  (max-height      1.0)

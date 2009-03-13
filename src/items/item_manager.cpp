@@ -136,8 +136,7 @@ void ItemManager::loadDefaultItems()
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
         {
-            // FIXME: We should try to check the extension, 
-            // i.e. load only .3ds files
+            if(StringUtils::extension(*i)!="b3d") continue;
             scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
             if(!mesh) continue;
             std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
