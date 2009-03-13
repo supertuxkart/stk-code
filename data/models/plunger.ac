@@ -7,7 +7,7 @@ OBJECT poly
 name "Plunger"
 data 7
 Plunger
-texture "plunger.rgb"
+texture "plunger.png"
 texrep 1 1
 crease 30.000000
 numvert 110

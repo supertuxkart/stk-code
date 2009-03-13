@@ -6,7 +6,7 @@ OBJECT poly
 name "Anchor"
 data 6
 Anchor
-texture "anchor.rgb"
+texture "anchor.png"
 texrep 1 1
 crease 80.000000
 numvert 247

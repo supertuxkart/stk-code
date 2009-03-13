@@ -7,7 +7,7 @@ kids 1
 OBJECT poly
 name "zipper"
 loc -0.995352 -0.240295 -0.972435
-texture "../images/zipper.rgb"
+texture "zipper.png"
 texrep 1 -1
 numvert 6
 0.993393 0.296869 1.2567
