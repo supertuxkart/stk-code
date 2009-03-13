@@ -22,9 +22,6 @@
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/char_sel.hpp"
-#include "gui/race_results_gui.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/connect_message.hpp"
@@ -251,9 +248,12 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
 
             int kart_id = kart_properties_manager->getKartId(ki.getKartName());
             kart_properties_manager->testAndSetKart(kart_id);
+            // TODO - character selection screen in networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
                 menu->updateAvailableCharacters();
+             */
             
             // Broadcast the information about a selected kart to all clients
             CharacterConfirmMessage ccm(ki.getKartName(), hostid);
@@ -318,9 +318,12 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         {
             CharacterConfirmMessage m(event->packet);
             kart_properties_manager->selectKartName(m.getKartName());
+            // TODO - karts selection screen in networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
                 menu->updateAvailableCharacters();
+             */
             break;
         }
     case NS_WAIT_FOR_KART_CONFIRMATION:
@@ -330,9 +333,11 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
 
             // If the current menu is the character selection menu,
             // update the menu so that the newly taken character is removed.
+            // TODO - kart selection screen and networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
-                menu->updateAvailableCharacters();
+                menu->updateAvailableCharacters();*/
             // Check if we received a message about the kart we just selected.
             // If so, the menu needs to progress, otherwise a different kart
             // must be selected by the current player.
@@ -376,9 +381,11 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
     case NS_RACE_RESULT_BARRIER:
         {
             RaceResultAckMessage message(event->packet);
+            // TODO - race results menu in networking
+            /*
             RaceResultsGUI *menu = dynamic_cast<RaceResultsGUI*>(menu_manager->getCurrentMenu());
             if(menu)
-                menu->setSelectedWidget(message.getSelectedMenu());
+                menu->setSelectedWidget(message.getSelectedMenu());*/
             m_state = NS_RACE_RESULT_BARRIER_OVER;
             break;
         }

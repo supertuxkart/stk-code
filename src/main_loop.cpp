@@ -28,7 +28,7 @@
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
-#include "gui/menu_manager.hpp"
+#include "gui/engine.hpp"
 #include "modes/world.hpp"
 #include "user_config.hpp"
 #include "network/network_manager.hpp"
@@ -191,12 +191,12 @@ void MainLoop::run()
             
             
             //Draw the splash screen
-            
+            /*
             if(menu_manager->isMainMenuActive())
                 glBindTexture(GL_TEXTURE_2D, m_title_screen_texture);
             else 
                 glBindTexture(GL_TEXTURE_2D, m_bg_texture);
-            
+            */
             glBegin ( GL_QUADS ) ;
             glColor3f   (1, 1, 1 ) ;
             glTexCoord2f(0, 0); glVertex2i(-1, -1);
@@ -206,7 +206,9 @@ void MainLoop::run()
             glEnd () ;
         }
 
-        menu_manager->update();
+        // TODO - render menus if necessary
+        //GUIEngine::render();
+        //menu_manager->update();
         sound_manager->update(dt);
 
 #ifdef HAVE_IRRLICHT

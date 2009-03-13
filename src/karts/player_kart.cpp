@@ -27,7 +27,6 @@
 #include "audio/sfx_base.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
-#include "gui/menu_manager.hpp"
 #include "gui/race_gui.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
@@ -314,12 +313,15 @@ void PlayerKart::raceFinished(float time)
     // will most likely not be at the starting line at the end of the race
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         m_camera->setMode(Camera::CM_FINAL);
+    // TODO : race ending menu
+    /*
     RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
     if(m)
     {
         m->addMessage(getPosition()==1 ? _("You won the race!") : _("You finished the race!") ,
                       this, 2.0f, 60);
     }
+     */
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
@@ -376,7 +378,7 @@ void PlayerKart::collectedItem(const Item &item, int add_info)
  */
 void PlayerKart::doingShortcut()
 {
-    RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+    RaceGUI* m=(RaceGUI*)getRaceGUI();
     // Can happen if the option menu is called
     if(m)
         m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);

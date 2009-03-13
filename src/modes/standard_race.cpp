@@ -19,7 +19,6 @@
 
 #include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "gui/menu_manager.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()

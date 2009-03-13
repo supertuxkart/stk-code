@@ -12,9 +12,17 @@
 		950557580F6968860056E88C /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 950557570F6968860056E88C /* Carbon.framework */; };
 		950557600F6968A50056E88C /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9505575F0F6968A50056E88C /* QuickTime.framework */; };
 		950557650F6968BE0056E88C /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 950557640F6968BE0056E88C /* IOKit.framework */; };
+		950557860F696A900056E88C /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577A0F696A900056E88C /* engine.cpp */; };
+		950557870F696A900056E88C /* my_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577C0F696A900056E88C /* my_button.cpp */; };
+		950557880F696A900056E88C /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577F0F696A900056E88C /* screen.cpp */; };
+		950557890F696A900056E88C /* screen_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557810F696A900056E88C /* screen_loader.cpp */; };
+		9505578A0F696A900056E88C /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557820F696A900056E88C /* skin.cpp */; };
+		9505578B0F696A900056E88C /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557840F696A900056E88C /* widget.cpp */; };
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
+		95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
+		95C1E4000F699427005D33E6 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3FF0F699427005D33E6 /* font.cpp */; };
 		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
 		95C2B1FB0F296546000D3E5D /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		95C2B1FC0F296546000D3E5D /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
@@ -136,36 +144,6 @@
 		95C2B2FA0F296546000D3E5D /* explosion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE740F296542000D3E5D /* explosion.cpp */; };
 		95C2B3030F296546000D3E5D /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */; };
 		95C2B3060F296546000D3E5D /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */; };
-		95C2B3100F296546000D3E5D /* base_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE970F296542000D3E5D /* base_gui.cpp */; };
-		95C2B3110F296546000D3E5D /* challenges_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE990F296542000D3E5D /* challenges_menu.cpp */; };
-		95C2B3120F296546000D3E5D /* char_sel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE9B0F296542000D3E5D /* char_sel.cpp */; };
-		95C2B3130F296546000D3E5D /* config_controls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE9D0F296542000D3E5D /* config_controls.cpp */; };
-		95C2B3140F296546000D3E5D /* config_display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE9F0F296542000D3E5D /* config_display.cpp */; };
-		95C2B3150F296546000D3E5D /* config_sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEA10F296542000D3E5D /* config_sound.cpp */; };
-		95C2B3160F296546000D3E5D /* credits_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEA30F296542000D3E5D /* credits_menu.cpp */; };
-		95C2B3170F296546000D3E5D /* display_res_confirm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEA50F296542000D3E5D /* display_res_confirm.cpp */; };
-		95C2B3180F296546000D3E5D /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEA70F296542000D3E5D /* feature_unlocked.cpp */; };
-		95C2B3190F296546000D3E5D /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEA90F296542000D3E5D /* font.cpp */; };
-		95C2B31A0F296546000D3E5D /* game_mode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEAB0F296542000D3E5D /* game_mode.cpp */; };
-		95C2B31B0F296546000D3E5D /* grand_prix_ending.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEAD0F296542000D3E5D /* grand_prix_ending.cpp */; };
-		95C2B31C0F296546000D3E5D /* grand_prix_select.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEAF0F296542000D3E5D /* grand_prix_select.cpp */; };
-		95C2B31D0F296546000D3E5D /* help_page_one.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEB10F296542000D3E5D /* help_page_one.cpp */; };
-		95C2B31E0F296546000D3E5D /* help_page_three.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEB30F296542000D3E5D /* help_page_three.cpp */; };
-		95C2B31F0F296546000D3E5D /* help_page_two.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEB50F296542000D3E5D /* help_page_two.cpp */; };
-		95C2B3200F296546000D3E5D /* main_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEB70F296542000D3E5D /* main_menu.cpp */; };
-		95C2B3210F296546000D3E5D /* menu_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEB90F296542000D3E5D /* menu_manager.cpp */; };
-		95C2B3220F296546000D3E5D /* network_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEBB0F296542000D3E5D /* network_gui.cpp */; };
-		95C2B3230F296546000D3E5D /* num_players.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEBD0F296542000D3E5D /* num_players.cpp */; };
-		95C2B3240F296546000D3E5D /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEBF0F296542000D3E5D /* options.cpp */; };
-		95C2B3250F296546000D3E5D /* player_controls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEC10F296542000D3E5D /* player_controls.cpp */; };
-		95C2B3260F296546000D3E5D /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEC30F296542000D3E5D /* race_gui.cpp */; };
-		95C2B3270F296546000D3E5D /* race_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEC50F296542000D3E5D /* race_menu.cpp */; };
-		95C2B3280F296546000D3E5D /* race_options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEC70F296542000D3E5D /* race_options.cpp */; };
-		95C2B3290F296546000D3E5D /* race_results_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEC90F296542000D3E5D /* race_results_gui.cpp */; };
-		95C2B32A0F296546000D3E5D /* start_race_feedback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AECB0F296542000D3E5D /* start_race_feedback.cpp */; };
-		95C2B32B0F296546000D3E5D /* track_sel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AECD0F296542000D3E5D /* track_sel.cpp */; };
-		95C2B32C0F296546000D3E5D /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AECF0F296542000D3E5D /* widget.cpp */; };
-		95C2B32D0F296546000D3E5D /* widget_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AED10F296542000D3E5D /* widget_manager.cpp */; };
 		95C2B3310F296546000D3E5D /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AED60F296542000D3E5D /* highscore_manager.cpp */; };
 		95C2B3330F296546000D3E5D /* highscores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AED90F296542000D3E5D /* highscores.cpp */; };
 		95C2B3350F296546000D3E5D /* history.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEDC0F296542000D3E5D /* history.cpp */; };
@@ -270,6 +248,18 @@
 		950557570F6968860056E88C /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9505575F0F6968A50056E88C /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		950557640F6968BE0056E88C /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		9505577A0F696A900056E88C /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = games/supertuxkart/src/gui/engine.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9505577B0F696A900056E88C /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = engine.hpp; path = games/supertuxkart/src/gui/engine.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9505577C0F696A900056E88C /* my_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_button.cpp; path = games/supertuxkart/src/gui/my_button.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9505577D0F696A900056E88C /* my_button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = my_button.hpp; path = games/supertuxkart/src/gui/my_button.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9505577E0F696A900056E88C /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = games/supertuxkart/src/gui/ptr_vector.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9505577F0F696A900056E88C /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen.cpp; path = games/supertuxkart/src/gui/screen.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557800F696A900056E88C /* screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = screen.hpp; path = games/supertuxkart/src/gui/screen.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557810F696A900056E88C /* screen_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen_loader.cpp; path = games/supertuxkart/src/gui/screen_loader.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557820F696A900056E88C /* skin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skin.cpp; path = games/supertuxkart/src/gui/skin.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557830F696A900056E88C /* skin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skin.hpp; path = games/supertuxkart/src/gui/skin.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557840F696A900056E88C /* widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget.cpp; path = games/supertuxkart/src/gui/widget.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		950557850F696A900056E88C /* widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget.hpp; path = games/supertuxkart/src/gui/widget.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		951F96810F29670C00E1AC66 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
@@ -277,6 +267,10 @@
 		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = ../../physics/triangle_mesh.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = ../../utils/translation.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
+		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = games/supertuxkart/src/gui/race_gui.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = games/supertuxkart/src/gui/race_gui.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = games/supertuxkart/src/gui/font.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95C1E4020F69943D005D33E6 /* font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = font.hpp; path = games/supertuxkart/src/gui/font.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C2AC210F296540000D3E5D /* actionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actionmap.cpp; path = ../../actionmap.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC220F296540000D3E5D /* actionmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = actionmap.hpp; path = ../../actionmap.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
@@ -567,66 +561,6 @@
 		95C2AE800F296542000D3E5D /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AE840F296542000D3E5D /* grand_prix_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_manager.hpp; path = ../../grand_prix_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE970F296542000D3E5D /* base_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = base_gui.cpp; path = ../../gui/base_gui.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE980F296542000D3E5D /* base_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = base_gui.hpp; path = ../../gui/base_gui.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE990F296542000D3E5D /* challenges_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges_menu.cpp; path = ../../gui/challenges_menu.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9A0F296542000D3E5D /* challenges_menu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenges_menu.hpp; path = ../../gui/challenges_menu.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9B0F296542000D3E5D /* char_sel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = char_sel.cpp; path = ../../gui/char_sel.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9C0F296542000D3E5D /* char_sel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = char_sel.hpp; path = ../../gui/char_sel.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9D0F296542000D3E5D /* config_controls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = config_controls.cpp; path = ../../gui/config_controls.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9E0F296542000D3E5D /* config_controls.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = config_controls.hpp; path = ../../gui/config_controls.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE9F0F296542000D3E5D /* config_display.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = config_display.cpp; path = ../../gui/config_display.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA00F296542000D3E5D /* config_display.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = config_display.hpp; path = ../../gui/config_display.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA10F296542000D3E5D /* config_sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = config_sound.cpp; path = ../../gui/config_sound.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA20F296542000D3E5D /* config_sound.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = config_sound.hpp; path = ../../gui/config_sound.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA30F296542000D3E5D /* credits_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = credits_menu.cpp; path = ../../gui/credits_menu.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA40F296542000D3E5D /* credits_menu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = credits_menu.hpp; path = ../../gui/credits_menu.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA50F296542000D3E5D /* display_res_confirm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = display_res_confirm.cpp; path = ../../gui/display_res_confirm.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA60F296542000D3E5D /* display_res_confirm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = display_res_confirm.hpp; path = ../../gui/display_res_confirm.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA70F296542000D3E5D /* feature_unlocked.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = feature_unlocked.cpp; path = ../../gui/feature_unlocked.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA80F296542000D3E5D /* feature_unlocked.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = feature_unlocked.hpp; path = ../../gui/feature_unlocked.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEA90F296542000D3E5D /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../gui/font.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAA0F296542000D3E5D /* font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = font.hpp; path = ../../gui/font.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAB0F296542000D3E5D /* game_mode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = game_mode.cpp; path = ../../gui/game_mode.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAC0F296542000D3E5D /* game_mode.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = game_mode.hpp; path = ../../gui/game_mode.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAD0F296542000D3E5D /* grand_prix_ending.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_ending.cpp; path = ../../gui/grand_prix_ending.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAE0F296542000D3E5D /* grand_prix_ending.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_ending.hpp; path = ../../gui/grand_prix_ending.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEAF0F296542000D3E5D /* grand_prix_select.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_select.cpp; path = ../../gui/grand_prix_select.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB00F296542000D3E5D /* grand_prix_select.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_select.hpp; path = ../../gui/grand_prix_select.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB10F296542000D3E5D /* help_page_one.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = help_page_one.cpp; path = ../../gui/help_page_one.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB20F296542000D3E5D /* help_page_one.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = help_page_one.hpp; path = ../../gui/help_page_one.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB30F296542000D3E5D /* help_page_three.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = help_page_three.cpp; path = ../../gui/help_page_three.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB40F296542000D3E5D /* help_page_three.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = help_page_three.hpp; path = ../../gui/help_page_three.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB50F296542000D3E5D /* help_page_two.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = help_page_two.cpp; path = ../../gui/help_page_two.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB60F296542000D3E5D /* help_page_two.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = help_page_two.hpp; path = ../../gui/help_page_two.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB70F296542000D3E5D /* main_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main_menu.cpp; path = ../../gui/main_menu.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB80F296542000D3E5D /* main_menu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = main_menu.hpp; path = ../../gui/main_menu.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEB90F296542000D3E5D /* menu_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menu_manager.cpp; path = ../../gui/menu_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBA0F296542000D3E5D /* menu_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = menu_manager.hpp; path = ../../gui/menu_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBB0F296542000D3E5D /* network_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = network_gui.cpp; path = ../../gui/network_gui.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBC0F296542000D3E5D /* network_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network_gui.hpp; path = ../../gui/network_gui.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBD0F296542000D3E5D /* num_players.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = num_players.cpp; path = ../../gui/num_players.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBE0F296542000D3E5D /* num_players.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = num_players.hpp; path = ../../gui/num_players.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEBF0F296542000D3E5D /* options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = ../../gui/options.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC00F296542000D3E5D /* options.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options.hpp; path = ../../gui/options.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC10F296542000D3E5D /* player_controls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player_controls.cpp; path = ../../gui/player_controls.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC20F296542000D3E5D /* player_controls.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player_controls.hpp; path = ../../gui/player_controls.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC30F296542000D3E5D /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC40F296542000D3E5D /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC50F296542000D3E5D /* race_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_menu.cpp; path = ../../gui/race_menu.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC60F296542000D3E5D /* race_menu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_menu.hpp; path = ../../gui/race_menu.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC70F296542000D3E5D /* race_options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_options.cpp; path = ../../gui/race_options.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC80F296542000D3E5D /* race_options.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_options.hpp; path = ../../gui/race_options.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEC90F296542000D3E5D /* race_results_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_results_gui.cpp; path = ../../gui/race_results_gui.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AECA0F296542000D3E5D /* race_results_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_results_gui.hpp; path = ../../gui/race_results_gui.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AECB0F296542000D3E5D /* start_race_feedback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = start_race_feedback.cpp; path = ../../gui/start_race_feedback.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AECC0F296542000D3E5D /* start_race_feedback.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = start_race_feedback.hpp; path = ../../gui/start_race_feedback.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AECD0F296542000D3E5D /* track_sel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_sel.cpp; path = ../../gui/track_sel.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AECE0F296542000D3E5D /* track_sel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_sel.hpp; path = ../../gui/track_sel.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AECF0F296542000D3E5D /* widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget.cpp; path = ../../gui/widget.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AED00F296542000D3E5D /* widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget.hpp; path = ../../gui/widget.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AED10F296542000D3E5D /* widget_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget_manager.cpp; path = ../../gui/widget_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AED20F296542000D3E5D /* widget_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget_manager.hpp; path = ../../gui/widget_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AED60F296542000D3E5D /* highscore_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscore_manager.cpp; path = ../../highscore_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AED70F296542000D3E5D /* highscore_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscore_manager.hpp; path = ../../highscore_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AED90F296542000D3E5D /* highscores.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscores.cpp; path = ../../highscores.cpp; sourceTree = SOURCE_ROOT; };
@@ -806,6 +740,171 @@
 		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = games/supertuxkart/src/graphics/scene.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C65DA00F532FD400BE7BA7 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = games/supertuxkart/src/graphics/shadow.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = games/supertuxkart/src/graphics/nitro.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
+		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = /usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = "<absolute>"; };
+		95D538870F69D61C00B4062E /* CMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CMeshBuffer.h; path = /usr/local/include/irrlicht/CMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D538880F69D61C00B4062E /* coreutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coreutil.h; path = /usr/local/include/irrlicht/coreutil.h; sourceTree = "<absolute>"; };
+		95D538890F69D61C00B4062E /* CVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CVertexBuffer.h; path = /usr/local/include/irrlicht/CVertexBuffer.h; sourceTree = "<absolute>"; };
+		95D5388A0F69D61C00B4062E /* dimension2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dimension2d.h; path = /usr/local/include/irrlicht/dimension2d.h; sourceTree = "<absolute>"; };
+		95D5388B0F69D61C00B4062E /* ECullingTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ECullingTypes.h; path = /usr/local/include/irrlicht/ECullingTypes.h; sourceTree = "<absolute>"; };
+		95D5388C0F69D61C00B4062E /* EDebugSceneTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EDebugSceneTypes.h; path = /usr/local/include/irrlicht/EDebugSceneTypes.h; sourceTree = "<absolute>"; };
+		95D5388D0F69D61C00B4062E /* EDriverFeatures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EDriverFeatures.h; path = /usr/local/include/irrlicht/EDriverFeatures.h; sourceTree = "<absolute>"; };
+		95D5388E0F69D61C00B4062E /* EDriverTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EDriverTypes.h; path = /usr/local/include/irrlicht/EDriverTypes.h; sourceTree = "<absolute>"; };
+		95D5388F0F69D61C00B4062E /* EGUIAlignment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EGUIAlignment.h; path = /usr/local/include/irrlicht/EGUIAlignment.h; sourceTree = "<absolute>"; };
+		95D538900F69D61C00B4062E /* EGUIElementTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EGUIElementTypes.h; path = /usr/local/include/irrlicht/EGUIElementTypes.h; sourceTree = "<absolute>"; };
+		95D538910F69D61C00B4062E /* EHardwareBufferFlags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EHardwareBufferFlags.h; path = /usr/local/include/irrlicht/EHardwareBufferFlags.h; sourceTree = "<absolute>"; };
+		95D538920F69D61C00B4062E /* EMaterialFlags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EMaterialFlags.h; path = /usr/local/include/irrlicht/EMaterialFlags.h; sourceTree = "<absolute>"; };
+		95D538930F69D61C00B4062E /* EMaterialTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EMaterialTypes.h; path = /usr/local/include/irrlicht/EMaterialTypes.h; sourceTree = "<absolute>"; };
+		95D538940F69D61C00B4062E /* EMeshWriterEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EMeshWriterEnums.h; path = /usr/local/include/irrlicht/EMeshWriterEnums.h; sourceTree = "<absolute>"; };
+		95D538950F69D61C00B4062E /* EMessageBoxFlags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EMessageBoxFlags.h; path = /usr/local/include/irrlicht/EMessageBoxFlags.h; sourceTree = "<absolute>"; };
+		95D538960F69D61C00B4062E /* ESceneNodeAnimatorTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ESceneNodeAnimatorTypes.h; path = /usr/local/include/irrlicht/ESceneNodeAnimatorTypes.h; sourceTree = "<absolute>"; };
+		95D538970F69D61C00B4062E /* ESceneNodeTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ESceneNodeTypes.h; path = /usr/local/include/irrlicht/ESceneNodeTypes.h; sourceTree = "<absolute>"; };
+		95D538980F69D61C00B4062E /* ETerrainElements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ETerrainElements.h; path = /usr/local/include/irrlicht/ETerrainElements.h; sourceTree = "<absolute>"; };
+		95D538990F69D61C00B4062E /* fast_atof.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fast_atof.h; path = /usr/local/include/irrlicht/fast_atof.h; sourceTree = "<absolute>"; };
+		95D5389A0F69D61C00B4062E /* heapsort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = heapsort.h; path = /usr/local/include/irrlicht/heapsort.h; sourceTree = "<absolute>"; };
+		95D5389B0F69D61C00B4062E /* IAnimatedMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAnimatedMesh.h; path = /usr/local/include/irrlicht/IAnimatedMesh.h; sourceTree = "<absolute>"; };
+		95D5389C0F69D61C00B4062E /* IAnimatedMeshMD2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAnimatedMeshMD2.h; path = /usr/local/include/irrlicht/IAnimatedMeshMD2.h; sourceTree = "<absolute>"; };
+		95D5389D0F69D61C00B4062E /* IAnimatedMeshMD3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAnimatedMeshMD3.h; path = /usr/local/include/irrlicht/IAnimatedMeshMD3.h; sourceTree = "<absolute>"; };
+		95D5389E0F69D61C00B4062E /* IAnimatedMeshSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAnimatedMeshSceneNode.h; path = /usr/local/include/irrlicht/IAnimatedMeshSceneNode.h; sourceTree = "<absolute>"; };
+		95D5389F0F69D61C00B4062E /* IAttributeExchangingObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAttributeExchangingObject.h; path = /usr/local/include/irrlicht/IAttributeExchangingObject.h; sourceTree = "<absolute>"; };
+		95D538A00F69D61C00B4062E /* IAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IAttributes.h; path = /usr/local/include/irrlicht/IAttributes.h; sourceTree = "<absolute>"; };
+		95D538A10F69D61C00B4062E /* IBillboardSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IBillboardSceneNode.h; path = /usr/local/include/irrlicht/IBillboardSceneNode.h; sourceTree = "<absolute>"; };
+		95D538A20F69D61C00B4062E /* IBillboardTextSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IBillboardTextSceneNode.h; path = /usr/local/include/irrlicht/IBillboardTextSceneNode.h; sourceTree = "<absolute>"; };
+		95D538A30F69D61C00B4062E /* IBoneSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IBoneSceneNode.h; path = /usr/local/include/irrlicht/IBoneSceneNode.h; sourceTree = "<absolute>"; };
+		95D538A40F69D61C00B4062E /* ICameraSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ICameraSceneNode.h; path = /usr/local/include/irrlicht/ICameraSceneNode.h; sourceTree = "<absolute>"; };
+		95D538A50F69D61C00B4062E /* ICursorControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ICursorControl.h; path = /usr/local/include/irrlicht/ICursorControl.h; sourceTree = "<absolute>"; };
+		95D538A60F69D61C00B4062E /* IDummyTransformationSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDummyTransformationSceneNode.h; path = /usr/local/include/irrlicht/IDummyTransformationSceneNode.h; sourceTree = "<absolute>"; };
+		95D538A70F69D61C00B4062E /* IDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/IDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D538A80F69D61C00B4062E /* IEventReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IEventReceiver.h; path = /usr/local/include/irrlicht/IEventReceiver.h; sourceTree = "<absolute>"; };
+		95D538A90F69D61C00B4062E /* IFileList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IFileList.h; path = /usr/local/include/irrlicht/IFileList.h; sourceTree = "<absolute>"; };
+		95D538AA0F69D61C00B4062E /* IFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IFileSystem.h; path = /usr/local/include/irrlicht/IFileSystem.h; sourceTree = "<absolute>"; };
+		95D538AB0F69D61C00B4062E /* IGPUProgrammingServices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGPUProgrammingServices.h; path = /usr/local/include/irrlicht/IGPUProgrammingServices.h; sourceTree = "<absolute>"; };
+		95D538AC0F69D61C00B4062E /* IGUIButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIButton.h; path = /usr/local/include/irrlicht/IGUIButton.h; sourceTree = "<absolute>"; };
+		95D538AD0F69D61C00B4062E /* IGUICheckBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUICheckBox.h; path = /usr/local/include/irrlicht/IGUICheckBox.h; sourceTree = "<absolute>"; };
+		95D538AE0F69D61C00B4062E /* IGUIColorSelectDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIColorSelectDialog.h; path = /usr/local/include/irrlicht/IGUIColorSelectDialog.h; sourceTree = "<absolute>"; };
+		95D538AF0F69D61C00B4062E /* IGUIComboBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIComboBox.h; path = /usr/local/include/irrlicht/IGUIComboBox.h; sourceTree = "<absolute>"; };
+		95D538B00F69D61C00B4062E /* IGUIContextMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIContextMenu.h; path = /usr/local/include/irrlicht/IGUIContextMenu.h; sourceTree = "<absolute>"; };
+		95D538B10F69D61C00B4062E /* IGUIEditBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIEditBox.h; path = /usr/local/include/irrlicht/IGUIEditBox.h; sourceTree = "<absolute>"; };
+		95D538B20F69D61C00B4062E /* IGUIElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIElement.h; path = /usr/local/include/irrlicht/IGUIElement.h; sourceTree = "<absolute>"; };
+		95D538B30F69D61C00B4062E /* IGUIElementFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIElementFactory.h; path = /usr/local/include/irrlicht/IGUIElementFactory.h; sourceTree = "<absolute>"; };
+		95D538B40F69D61C00B4062E /* IGUIEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIEnvironment.h; path = /usr/local/include/irrlicht/IGUIEnvironment.h; sourceTree = "<absolute>"; };
+		95D538B50F69D61C00B4062E /* IGUIFileOpenDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIFileOpenDialog.h; path = /usr/local/include/irrlicht/IGUIFileOpenDialog.h; sourceTree = "<absolute>"; };
+		95D538B60F69D61C00B4062E /* IGUIFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIFont.h; path = /usr/local/include/irrlicht/IGUIFont.h; sourceTree = "<absolute>"; };
+		95D538B70F69D61C00B4062E /* IGUIFontBitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIFontBitmap.h; path = /usr/local/include/irrlicht/IGUIFontBitmap.h; sourceTree = "<absolute>"; };
+		95D538B80F69D61C00B4062E /* IGUIImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIImage.h; path = /usr/local/include/irrlicht/IGUIImage.h; sourceTree = "<absolute>"; };
+		95D538B90F69D61C00B4062E /* IGUIInOutFader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIInOutFader.h; path = /usr/local/include/irrlicht/IGUIInOutFader.h; sourceTree = "<absolute>"; };
+		95D538BA0F69D61C00B4062E /* IGUIListBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIListBox.h; path = /usr/local/include/irrlicht/IGUIListBox.h; sourceTree = "<absolute>"; };
+		95D538BB0F69D61C00B4062E /* IGUIMeshViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIMeshViewer.h; path = /usr/local/include/irrlicht/IGUIMeshViewer.h; sourceTree = "<absolute>"; };
+		95D538BC0F69D61C00B4062E /* IGUIScrollBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIScrollBar.h; path = /usr/local/include/irrlicht/IGUIScrollBar.h; sourceTree = "<absolute>"; };
+		95D538BD0F69D61C00B4062E /* IGUISkin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUISkin.h; path = /usr/local/include/irrlicht/IGUISkin.h; sourceTree = "<absolute>"; };
+		95D538BE0F69D61C00B4062E /* IGUISpinBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUISpinBox.h; path = /usr/local/include/irrlicht/IGUISpinBox.h; sourceTree = "<absolute>"; };
+		95D538BF0F69D61C00B4062E /* IGUISpriteBank.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUISpriteBank.h; path = /usr/local/include/irrlicht/IGUISpriteBank.h; sourceTree = "<absolute>"; };
+		95D538C00F69D61C00B4062E /* IGUIStaticText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIStaticText.h; path = /usr/local/include/irrlicht/IGUIStaticText.h; sourceTree = "<absolute>"; };
+		95D538C10F69D61C00B4062E /* IGUITabControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUITabControl.h; path = /usr/local/include/irrlicht/IGUITabControl.h; sourceTree = "<absolute>"; };
+		95D538C20F69D61C00B4062E /* IGUITable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUITable.h; path = /usr/local/include/irrlicht/IGUITable.h; sourceTree = "<absolute>"; };
+		95D538C30F69D61C00B4062E /* IGUIToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIToolbar.h; path = /usr/local/include/irrlicht/IGUIToolbar.h; sourceTree = "<absolute>"; };
+		95D538C40F69D61C00B4062E /* IGUIWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIWindow.h; path = /usr/local/include/irrlicht/IGUIWindow.h; sourceTree = "<absolute>"; };
+		95D538C50F69D61C00B4062E /* IImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IImage.h; path = /usr/local/include/irrlicht/IImage.h; sourceTree = "<absolute>"; };
+		95D538C60F69D61C00B4062E /* IImageLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IImageLoader.h; path = /usr/local/include/irrlicht/IImageLoader.h; sourceTree = "<absolute>"; };
+		95D538C70F69D61C00B4062E /* IImageWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IImageWriter.h; path = /usr/local/include/irrlicht/IImageWriter.h; sourceTree = "<absolute>"; };
+		95D538C80F69D61C00B4062E /* IIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IIndexBuffer.h; path = /usr/local/include/irrlicht/IIndexBuffer.h; sourceTree = "<absolute>"; };
+		95D538C90F69D61C00B4062E /* ILightSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ILightSceneNode.h; path = /usr/local/include/irrlicht/ILightSceneNode.h; sourceTree = "<absolute>"; };
+		95D538CA0F69D61C00B4062E /* ILogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ILogger.h; path = /usr/local/include/irrlicht/ILogger.h; sourceTree = "<absolute>"; };
+		95D538CB0F69D61C00B4062E /* IMaterialRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMaterialRenderer.h; path = /usr/local/include/irrlicht/IMaterialRenderer.h; sourceTree = "<absolute>"; };
+		95D538CC0F69D61C00B4062E /* IMaterialRendererServices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMaterialRendererServices.h; path = /usr/local/include/irrlicht/IMaterialRendererServices.h; sourceTree = "<absolute>"; };
+		95D538CD0F69D61C00B4062E /* IMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMesh.h; path = /usr/local/include/irrlicht/IMesh.h; sourceTree = "<absolute>"; };
+		95D538CE0F69D61C00B4062E /* IMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshBuffer.h; path = /usr/local/include/irrlicht/IMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D538CF0F69D61C00B4062E /* IMeshCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshCache.h; path = /usr/local/include/irrlicht/IMeshCache.h; sourceTree = "<absolute>"; };
+		95D538D00F69D61C00B4062E /* IMeshLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshLoader.h; path = /usr/local/include/irrlicht/IMeshLoader.h; sourceTree = "<absolute>"; };
+		95D538D10F69D61C00B4062E /* IMeshManipulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshManipulator.h; path = /usr/local/include/irrlicht/IMeshManipulator.h; sourceTree = "<absolute>"; };
+		95D538D20F69D61C00B4062E /* IMeshSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshSceneNode.h; path = /usr/local/include/irrlicht/IMeshSceneNode.h; sourceTree = "<absolute>"; };
+		95D538D30F69D61C00B4062E /* IMeshWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMeshWriter.h; path = /usr/local/include/irrlicht/IMeshWriter.h; sourceTree = "<absolute>"; };
+		95D538D40F69D61C00B4062E /* IMetaTriangleSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMetaTriangleSelector.h; path = /usr/local/include/irrlicht/IMetaTriangleSelector.h; sourceTree = "<absolute>"; };
+		95D538D50F69D61C00B4062E /* IOSOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IOSOperator.h; path = /usr/local/include/irrlicht/IOSOperator.h; sourceTree = "<absolute>"; };
+		95D538D60F69D61C00B4062E /* IParticleAffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleAffector.h; path = /usr/local/include/irrlicht/IParticleAffector.h; sourceTree = "<absolute>"; };
+		95D538D70F69D61C00B4062E /* IParticleAnimatedMeshSceneNodeEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleAnimatedMeshSceneNodeEmitter.h; path = /usr/local/include/irrlicht/IParticleAnimatedMeshSceneNodeEmitter.h; sourceTree = "<absolute>"; };
+		95D538D80F69D61C00B4062E /* IParticleAttractionAffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleAttractionAffector.h; path = /usr/local/include/irrlicht/IParticleAttractionAffector.h; sourceTree = "<absolute>"; };
+		95D538D90F69D61C00B4062E /* IParticleBoxEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleBoxEmitter.h; path = /usr/local/include/irrlicht/IParticleBoxEmitter.h; sourceTree = "<absolute>"; };
+		95D538DA0F69D61C00B4062E /* IParticleCylinderEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleCylinderEmitter.h; path = /usr/local/include/irrlicht/IParticleCylinderEmitter.h; sourceTree = "<absolute>"; };
+		95D538DB0F69D61C00B4062E /* IParticleEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleEmitter.h; path = /usr/local/include/irrlicht/IParticleEmitter.h; sourceTree = "<absolute>"; };
+		95D538DC0F69D61C00B4062E /* IParticleFadeOutAffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleFadeOutAffector.h; path = /usr/local/include/irrlicht/IParticleFadeOutAffector.h; sourceTree = "<absolute>"; };
+		95D538DD0F69D61C00B4062E /* IParticleGravityAffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleGravityAffector.h; path = /usr/local/include/irrlicht/IParticleGravityAffector.h; sourceTree = "<absolute>"; };
+		95D538DE0F69D61C00B4062E /* IParticleMeshEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleMeshEmitter.h; path = /usr/local/include/irrlicht/IParticleMeshEmitter.h; sourceTree = "<absolute>"; };
+		95D538DF0F69D61C00B4062E /* IParticleRingEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleRingEmitter.h; path = /usr/local/include/irrlicht/IParticleRingEmitter.h; sourceTree = "<absolute>"; };
+		95D538E00F69D61C00B4062E /* IParticleRotationAffector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleRotationAffector.h; path = /usr/local/include/irrlicht/IParticleRotationAffector.h; sourceTree = "<absolute>"; };
+		95D538E10F69D61C00B4062E /* IParticleSphereEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleSphereEmitter.h; path = /usr/local/include/irrlicht/IParticleSphereEmitter.h; sourceTree = "<absolute>"; };
+		95D538E20F69D61C00B4062E /* IParticleSystemSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IParticleSystemSceneNode.h; path = /usr/local/include/irrlicht/IParticleSystemSceneNode.h; sourceTree = "<absolute>"; };
+		95D538E30F69D61C00B4062E /* IQ3LevelMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQ3LevelMesh.h; path = /usr/local/include/irrlicht/IQ3LevelMesh.h; sourceTree = "<absolute>"; };
+		95D538E40F69D61C00B4062E /* IQ3Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQ3Shader.h; path = /usr/local/include/irrlicht/IQ3Shader.h; sourceTree = "<absolute>"; };
+		95D538E50F69D61C00B4062E /* IReadFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IReadFile.h; path = /usr/local/include/irrlicht/IReadFile.h; sourceTree = "<absolute>"; };
+		95D538E60F69D61C00B4062E /* IReferenceCounted.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IReferenceCounted.h; path = /usr/local/include/irrlicht/IReferenceCounted.h; sourceTree = "<absolute>"; };
+		95D538E70F69D61C00B4062E /* irrAllocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrAllocator.h; path = /usr/local/include/irrlicht/irrAllocator.h; sourceTree = "<absolute>"; };
+		95D538E80F69D61C00B4062E /* irrArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrArray.h; path = /usr/local/include/irrlicht/irrArray.h; sourceTree = "<absolute>"; };
+		95D538E90F69D61C00B4062E /* IrrCompileConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IrrCompileConfig.h; path = /usr/local/include/irrlicht/IrrCompileConfig.h; sourceTree = "<absolute>"; };
+		95D538EA0F69D61C00B4062E /* irrlicht.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrlicht.h; path = /usr/local/include/irrlicht/irrlicht.h; sourceTree = "<absolute>"; };
+		95D538EB0F69D61C00B4062E /* IrrlichtDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IrrlichtDevice.h; path = /usr/local/include/irrlicht/IrrlichtDevice.h; sourceTree = "<absolute>"; };
+		95D538EC0F69D61C00B4062E /* irrList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrList.h; path = /usr/local/include/irrlicht/irrList.h; sourceTree = "<absolute>"; };
+		95D538ED0F69D61C00B4062E /* irrMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrMap.h; path = /usr/local/include/irrlicht/irrMap.h; sourceTree = "<absolute>"; };
+		95D538EE0F69D61C00B4062E /* irrMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrMath.h; path = /usr/local/include/irrlicht/irrMath.h; sourceTree = "<absolute>"; };
+		95D538EF0F69D61C00B4062E /* irrString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrString.h; path = /usr/local/include/irrlicht/irrString.h; sourceTree = "<absolute>"; };
+		95D538F00F69D61C00B4062E /* irrTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrTypes.h; path = /usr/local/include/irrlicht/irrTypes.h; sourceTree = "<absolute>"; };
+		95D538F10F69D61C00B4062E /* irrXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = irrXML.h; path = /usr/local/include/irrlicht/irrXML.h; sourceTree = "<absolute>"; };
+		95D538F20F69D61C00B4062E /* ISceneCollisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneCollisionManager.h; path = /usr/local/include/irrlicht/ISceneCollisionManager.h; sourceTree = "<absolute>"; };
+		95D538F30F69D61C00B4062E /* ISceneManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneManager.h; path = /usr/local/include/irrlicht/ISceneManager.h; sourceTree = "<absolute>"; };
+		95D538F40F69D61C00B4062E /* ISceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNode.h; path = /usr/local/include/irrlicht/ISceneNode.h; sourceTree = "<absolute>"; };
+		95D538F50F69D61C00B4062E /* ISceneNodeAnimator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeAnimator.h; path = /usr/local/include/irrlicht/ISceneNodeAnimator.h; sourceTree = "<absolute>"; };
+		95D538F60F69D61C00B4062E /* ISceneNodeAnimatorCameraFPS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeAnimatorCameraFPS.h; path = /usr/local/include/irrlicht/ISceneNodeAnimatorCameraFPS.h; sourceTree = "<absolute>"; };
+		95D538F70F69D61C00B4062E /* ISceneNodeAnimatorCameraMaya.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeAnimatorCameraMaya.h; path = /usr/local/include/irrlicht/ISceneNodeAnimatorCameraMaya.h; sourceTree = "<absolute>"; };
+		95D538F80F69D61C00B4062E /* ISceneNodeAnimatorCollisionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeAnimatorCollisionResponse.h; path = /usr/local/include/irrlicht/ISceneNodeAnimatorCollisionResponse.h; sourceTree = "<absolute>"; };
+		95D538F90F69D61C00B4062E /* ISceneNodeAnimatorFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeAnimatorFactory.h; path = /usr/local/include/irrlicht/ISceneNodeAnimatorFactory.h; sourceTree = "<absolute>"; };
+		95D538FA0F69D61C00B4062E /* ISceneNodeFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneNodeFactory.h; path = /usr/local/include/irrlicht/ISceneNodeFactory.h; sourceTree = "<absolute>"; };
+		95D538FB0F69D61C00B4062E /* ISceneUserDataSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISceneUserDataSerializer.h; path = /usr/local/include/irrlicht/ISceneUserDataSerializer.h; sourceTree = "<absolute>"; };
+		95D538FC0F69D61C00B4062E /* IShaderConstantSetCallBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IShaderConstantSetCallBack.h; path = /usr/local/include/irrlicht/IShaderConstantSetCallBack.h; sourceTree = "<absolute>"; };
+		95D538FD0F69D61C00B4062E /* IShadowVolumeSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IShadowVolumeSceneNode.h; path = /usr/local/include/irrlicht/IShadowVolumeSceneNode.h; sourceTree = "<absolute>"; };
+		95D538FE0F69D61C00B4062E /* ISkinnedMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISkinnedMesh.h; path = /usr/local/include/irrlicht/ISkinnedMesh.h; sourceTree = "<absolute>"; };
+		95D538FF0F69D61C00B4062E /* ITerrainSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITerrainSceneNode.h; path = /usr/local/include/irrlicht/ITerrainSceneNode.h; sourceTree = "<absolute>"; };
+		95D539000F69D61C00B4062E /* ITextSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITextSceneNode.h; path = /usr/local/include/irrlicht/ITextSceneNode.h; sourceTree = "<absolute>"; };
+		95D539010F69D61C00B4062E /* ITexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITexture.h; path = /usr/local/include/irrlicht/ITexture.h; sourceTree = "<absolute>"; };
+		95D539020F69D61C00B4062E /* ITimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITimer.h; path = /usr/local/include/irrlicht/ITimer.h; sourceTree = "<absolute>"; };
+		95D539030F69D61C00B4062E /* ITriangleSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITriangleSelector.h; path = /usr/local/include/irrlicht/ITriangleSelector.h; sourceTree = "<absolute>"; };
+		95D539040F69D61C00B4062E /* IVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IVertexBuffer.h; path = /usr/local/include/irrlicht/IVertexBuffer.h; sourceTree = "<absolute>"; };
+		95D539050F69D61C00B4062E /* IVideoDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IVideoDriver.h; path = /usr/local/include/irrlicht/IVideoDriver.h; sourceTree = "<absolute>"; };
+		95D539060F69D61C00B4062E /* IVideoModeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IVideoModeList.h; path = /usr/local/include/irrlicht/IVideoModeList.h; sourceTree = "<absolute>"; };
+		95D539070F69D61C00B4062E /* IVolumeLightSceneNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IVolumeLightSceneNode.h; path = /usr/local/include/irrlicht/IVolumeLightSceneNode.h; sourceTree = "<absolute>"; };
+		95D539080F69D61C00B4062E /* IWriteFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IWriteFile.h; path = /usr/local/include/irrlicht/IWriteFile.h; sourceTree = "<absolute>"; };
+		95D539090F69D61C00B4062E /* IXMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IXMLReader.h; path = /usr/local/include/irrlicht/IXMLReader.h; sourceTree = "<absolute>"; };
+		95D5390A0F69D61C00B4062E /* IXMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IXMLWriter.h; path = /usr/local/include/irrlicht/IXMLWriter.h; sourceTree = "<absolute>"; };
+		95D5390B0F69D61C00B4062E /* Keycodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Keycodes.h; path = /usr/local/include/irrlicht/Keycodes.h; sourceTree = "<absolute>"; };
+		95D5390C0F69D61C00B4062E /* line2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = line2d.h; path = /usr/local/include/irrlicht/line2d.h; sourceTree = "<absolute>"; };
+		95D5390D0F69D61C00B4062E /* line3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = line3d.h; path = /usr/local/include/irrlicht/line3d.h; sourceTree = "<absolute>"; };
+		95D5390E0F69D61C00B4062E /* matrix4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix4.h; path = /usr/local/include/irrlicht/matrix4.h; sourceTree = "<absolute>"; };
+		95D5390F0F69D61C00B4062E /* plane3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plane3d.h; path = /usr/local/include/irrlicht/plane3d.h; sourceTree = "<absolute>"; };
+		95D539100F69D61C00B4062E /* position2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = position2d.h; path = /usr/local/include/irrlicht/position2d.h; sourceTree = "<absolute>"; };
+		95D539110F69D61C00B4062E /* quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quaternion.h; path = /usr/local/include/irrlicht/quaternion.h; sourceTree = "<absolute>"; };
+		95D539120F69D61C00B4062E /* rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rect.h; path = /usr/local/include/irrlicht/rect.h; sourceTree = "<absolute>"; };
+		95D539130F69D61C00B4062E /* S3DVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = S3DVertex.h; path = /usr/local/include/irrlicht/S3DVertex.h; sourceTree = "<absolute>"; };
+		95D539140F69D61C00B4062E /* SAnimatedMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAnimatedMesh.h; path = /usr/local/include/irrlicht/SAnimatedMesh.h; sourceTree = "<absolute>"; };
+		95D539150F69D61C00B4062E /* SceneParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SceneParameters.h; path = /usr/local/include/irrlicht/SceneParameters.h; sourceTree = "<absolute>"; };
+		95D539160F69D61C00B4062E /* SColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SColor.h; path = /usr/local/include/irrlicht/SColor.h; sourceTree = "<absolute>"; };
+		95D539170F69D61C00B4062E /* SExposedVideoData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SExposedVideoData.h; path = /usr/local/include/irrlicht/SExposedVideoData.h; sourceTree = "<absolute>"; };
+		95D539180F69D61C00B4062E /* SIrrCreationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SIrrCreationParameters.h; path = /usr/local/include/irrlicht/SIrrCreationParameters.h; sourceTree = "<absolute>"; };
+		95D539190F69D61C00B4062E /* SKeyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SKeyMap.h; path = /usr/local/include/irrlicht/SKeyMap.h; sourceTree = "<absolute>"; };
+		95D5391A0F69D61C00B4062E /* SLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLight.h; path = /usr/local/include/irrlicht/SLight.h; sourceTree = "<absolute>"; };
+		95D5391B0F69D61C00B4062E /* SMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMaterial.h; path = /usr/local/include/irrlicht/SMaterial.h; sourceTree = "<absolute>"; };
+		95D5391C0F69D61C00B4062E /* SMaterialLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMaterialLayer.h; path = /usr/local/include/irrlicht/SMaterialLayer.h; sourceTree = "<absolute>"; };
+		95D5391D0F69D61C00B4062E /* SMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMesh.h; path = /usr/local/include/irrlicht/SMesh.h; sourceTree = "<absolute>"; };
+		95D5391E0F69D61C00B4062E /* SMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMeshBuffer.h; path = /usr/local/include/irrlicht/SMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D5391F0F69D61C00B4062E /* SMeshBufferLightMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMeshBufferLightMap.h; path = /usr/local/include/irrlicht/SMeshBufferLightMap.h; sourceTree = "<absolute>"; };
+		95D539200F69D61C00B4062E /* SMeshBufferTangents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMeshBufferTangents.h; path = /usr/local/include/irrlicht/SMeshBufferTangents.h; sourceTree = "<absolute>"; };
+		95D539210F69D61C00B4062E /* SParticle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SParticle.h; path = /usr/local/include/irrlicht/SParticle.h; sourceTree = "<absolute>"; };
+		95D539220F69D61C00B4062E /* SSharedMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSharedMeshBuffer.h; path = /usr/local/include/irrlicht/SSharedMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D539230F69D61C00B4062E /* SSkinMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SSkinMeshBuffer.h; path = /usr/local/include/irrlicht/SSkinMeshBuffer.h; sourceTree = "<absolute>"; };
+		95D539240F69D61C00B4062E /* SVertexIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVertexIndex.h; path = /usr/local/include/irrlicht/SVertexIndex.h; sourceTree = "<absolute>"; };
+		95D539250F69D61C00B4062E /* SViewFrustum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SViewFrustum.h; path = /usr/local/include/irrlicht/SViewFrustum.h; sourceTree = "<absolute>"; };
+		95D539260F69D61C00B4062E /* triangle3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = triangle3d.h; path = /usr/local/include/irrlicht/triangle3d.h; sourceTree = "<absolute>"; };
+		95D539270F69D61C00B4062E /* vector2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector2d.h; path = /usr/local/include/irrlicht/vector2d.h; sourceTree = "<absolute>"; };
+		95D539280F69D61C00B4062E /* vector3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector3d.h; path = /usr/local/include/irrlicht/vector3d.h; sourceTree = "<absolute>"; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -1056,6 +1155,7 @@
 		08FB7794FE84155DC02AAC07 /* STK_XCode */ = {
 			isa = PBXGroup;
 			children = (
+				95D538830F69D61C00B4062E /* irrlicht */,
 				95C2ABA60F29653F000D3E5D /* src */,
 				9513B40E0F0EDE80005D29F6 /* Frameworks */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -1071,6 +1171,30 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		950557790F696A900056E88C /* gui */ = {
+			isa = PBXGroup;
+			children = (
+				9505577A0F696A900056E88C /* engine.cpp */,
+				9505577B0F696A900056E88C /* engine.hpp */,
+				9505577C0F696A900056E88C /* my_button.cpp */,
+				9505577D0F696A900056E88C /* my_button.hpp */,
+				95C1E3FF0F699427005D33E6 /* font.cpp */,
+				95C1E4020F69943D005D33E6 /* font.hpp */,
+				9505577E0F696A900056E88C /* ptr_vector.hpp */,
+				9505577F0F696A900056E88C /* screen.cpp */,
+				950557800F696A900056E88C /* screen.hpp */,
+				950557810F696A900056E88C /* screen_loader.cpp */,
+				950557820F696A900056E88C /* skin.cpp */,
+				950557830F696A900056E88C /* skin.hpp */,
+				950557840F696A900056E88C /* widget.cpp */,
+				950557850F696A900056E88C /* widget.hpp */,
+				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
+				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
+			);
+			name = gui;
+			path = games/supertuxkart/src/gui;
+			sourceTree = SYSTEM_DEVELOPER_DIR;
 		};
 		9513B40E0F0EDE80005D29F6 /* Frameworks */ = {
 			isa = PBXGroup;
@@ -1093,8 +1217,8 @@
 				95C2AC360F296540000D3E5D /* bullet */,
 				95C2AE250F296541000D3E5D /* challenges */,
 				95C2AE370F296541000D3E5D /* enet */,
+				950557790F696A900056E88C /* gui */,
 				95C2AE870F296542000D3E5D /* graphics */,
-				95C2AE960F296542000D3E5D /* gui */,
 				95C65D750F532F7D00BE7BA7 /* io */,
 				95C2B0F50F296545000D3E5D /* items */,
 				95C2B1160F296545000D3E5D /* karts */,
@@ -1645,74 +1769,6 @@
 			path = ../../graphics;
 			sourceTree = SOURCE_ROOT;
 		};
-		95C2AE960F296542000D3E5D /* gui */ = {
-			isa = PBXGroup;
-			children = (
-				95C2AE970F296542000D3E5D /* base_gui.cpp */,
-				95C2AE980F296542000D3E5D /* base_gui.hpp */,
-				95C2AE990F296542000D3E5D /* challenges_menu.cpp */,
-				95C2AE9A0F296542000D3E5D /* challenges_menu.hpp */,
-				95C2AE9B0F296542000D3E5D /* char_sel.cpp */,
-				95C2AE9C0F296542000D3E5D /* char_sel.hpp */,
-				95C2AE9D0F296542000D3E5D /* config_controls.cpp */,
-				95C2AE9E0F296542000D3E5D /* config_controls.hpp */,
-				95C2AE9F0F296542000D3E5D /* config_display.cpp */,
-				95C2AEA00F296542000D3E5D /* config_display.hpp */,
-				95C2AEA10F296542000D3E5D /* config_sound.cpp */,
-				95C2AEA20F296542000D3E5D /* config_sound.hpp */,
-				95C2AEA30F296542000D3E5D /* credits_menu.cpp */,
-				95C2AEA40F296542000D3E5D /* credits_menu.hpp */,
-				95C2AEA50F296542000D3E5D /* display_res_confirm.cpp */,
-				95C2AEA60F296542000D3E5D /* display_res_confirm.hpp */,
-				95C2AEA70F296542000D3E5D /* feature_unlocked.cpp */,
-				95C2AEA80F296542000D3E5D /* feature_unlocked.hpp */,
-				95C2AEA90F296542000D3E5D /* font.cpp */,
-				95C2AEAA0F296542000D3E5D /* font.hpp */,
-				95C2AEAB0F296542000D3E5D /* game_mode.cpp */,
-				95C2AEAC0F296542000D3E5D /* game_mode.hpp */,
-				95C2AEAD0F296542000D3E5D /* grand_prix_ending.cpp */,
-				95C2AEAE0F296542000D3E5D /* grand_prix_ending.hpp */,
-				95C2AEAF0F296542000D3E5D /* grand_prix_select.cpp */,
-				95C2AEB00F296542000D3E5D /* grand_prix_select.hpp */,
-				95C2AEB10F296542000D3E5D /* help_page_one.cpp */,
-				95C2AEB20F296542000D3E5D /* help_page_one.hpp */,
-				95C2AEB30F296542000D3E5D /* help_page_three.cpp */,
-				95C2AEB40F296542000D3E5D /* help_page_three.hpp */,
-				95C2AEB50F296542000D3E5D /* help_page_two.cpp */,
-				95C2AEB60F296542000D3E5D /* help_page_two.hpp */,
-				95C2AEB70F296542000D3E5D /* main_menu.cpp */,
-				95C2AEB80F296542000D3E5D /* main_menu.hpp */,
-				95C2AEB90F296542000D3E5D /* menu_manager.cpp */,
-				95C2AEBA0F296542000D3E5D /* menu_manager.hpp */,
-				95C2AEBB0F296542000D3E5D /* network_gui.cpp */,
-				95C2AEBC0F296542000D3E5D /* network_gui.hpp */,
-				95C2AEBD0F296542000D3E5D /* num_players.cpp */,
-				95C2AEBE0F296542000D3E5D /* num_players.hpp */,
-				95C2AEBF0F296542000D3E5D /* options.cpp */,
-				95C2AEC00F296542000D3E5D /* options.hpp */,
-				95C2AEC10F296542000D3E5D /* player_controls.cpp */,
-				95C2AEC20F296542000D3E5D /* player_controls.hpp */,
-				95C2AEC30F296542000D3E5D /* race_gui.cpp */,
-				95C2AEC40F296542000D3E5D /* race_gui.hpp */,
-				95C2AEC50F296542000D3E5D /* race_menu.cpp */,
-				95C2AEC60F296542000D3E5D /* race_menu.hpp */,
-				95C2AEC70F296542000D3E5D /* race_options.cpp */,
-				95C2AEC80F296542000D3E5D /* race_options.hpp */,
-				95C2AEC90F296542000D3E5D /* race_results_gui.cpp */,
-				95C2AECA0F296542000D3E5D /* race_results_gui.hpp */,
-				95C2AECB0F296542000D3E5D /* start_race_feedback.cpp */,
-				95C2AECC0F296542000D3E5D /* start_race_feedback.hpp */,
-				95C2AECD0F296542000D3E5D /* track_sel.cpp */,
-				95C2AECE0F296542000D3E5D /* track_sel.hpp */,
-				95C2AECF0F296542000D3E5D /* widget.cpp */,
-				95C2AED00F296542000D3E5D /* widget.hpp */,
-				95C2AED10F296542000D3E5D /* widget_manager.cpp */,
-				95C2AED20F296542000D3E5D /* widget_manager.hpp */,
-			);
-			name = gui;
-			path = ../../gui;
-			sourceTree = SOURCE_ROOT;
-		};
 		95C2B0F50F296545000D3E5D /* items */ = {
 			isa = PBXGroup;
 			children = (
@@ -1936,6 +1992,179 @@
 			name = io;
 			path = games/supertuxkart/src/io;
 			sourceTree = SYSTEM_DEVELOPER_DIR;
+		};
+		95D538830F69D61C00B4062E /* irrlicht */ = {
+			isa = PBXGroup;
+			children = (
+				95D538840F69D61C00B4062E /* aabbox3d.h */,
+				95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */,
+				95D538860F69D61C00B4062E /* CIndexBuffer.h */,
+				95D538870F69D61C00B4062E /* CMeshBuffer.h */,
+				95D538880F69D61C00B4062E /* coreutil.h */,
+				95D538890F69D61C00B4062E /* CVertexBuffer.h */,
+				95D5388A0F69D61C00B4062E /* dimension2d.h */,
+				95D5388B0F69D61C00B4062E /* ECullingTypes.h */,
+				95D5388C0F69D61C00B4062E /* EDebugSceneTypes.h */,
+				95D5388D0F69D61C00B4062E /* EDriverFeatures.h */,
+				95D5388E0F69D61C00B4062E /* EDriverTypes.h */,
+				95D5388F0F69D61C00B4062E /* EGUIAlignment.h */,
+				95D538900F69D61C00B4062E /* EGUIElementTypes.h */,
+				95D538910F69D61C00B4062E /* EHardwareBufferFlags.h */,
+				95D538920F69D61C00B4062E /* EMaterialFlags.h */,
+				95D538930F69D61C00B4062E /* EMaterialTypes.h */,
+				95D538940F69D61C00B4062E /* EMeshWriterEnums.h */,
+				95D538950F69D61C00B4062E /* EMessageBoxFlags.h */,
+				95D538960F69D61C00B4062E /* ESceneNodeAnimatorTypes.h */,
+				95D538970F69D61C00B4062E /* ESceneNodeTypes.h */,
+				95D538980F69D61C00B4062E /* ETerrainElements.h */,
+				95D538990F69D61C00B4062E /* fast_atof.h */,
+				95D5389A0F69D61C00B4062E /* heapsort.h */,
+				95D5389B0F69D61C00B4062E /* IAnimatedMesh.h */,
+				95D5389C0F69D61C00B4062E /* IAnimatedMeshMD2.h */,
+				95D5389D0F69D61C00B4062E /* IAnimatedMeshMD3.h */,
+				95D5389E0F69D61C00B4062E /* IAnimatedMeshSceneNode.h */,
+				95D5389F0F69D61C00B4062E /* IAttributeExchangingObject.h */,
+				95D538A00F69D61C00B4062E /* IAttributes.h */,
+				95D538A10F69D61C00B4062E /* IBillboardSceneNode.h */,
+				95D538A20F69D61C00B4062E /* IBillboardTextSceneNode.h */,
+				95D538A30F69D61C00B4062E /* IBoneSceneNode.h */,
+				95D538A40F69D61C00B4062E /* ICameraSceneNode.h */,
+				95D538A50F69D61C00B4062E /* ICursorControl.h */,
+				95D538A60F69D61C00B4062E /* IDummyTransformationSceneNode.h */,
+				95D538A70F69D61C00B4062E /* IDynamicMeshBuffer.h */,
+				95D538A80F69D61C00B4062E /* IEventReceiver.h */,
+				95D538A90F69D61C00B4062E /* IFileList.h */,
+				95D538AA0F69D61C00B4062E /* IFileSystem.h */,
+				95D538AB0F69D61C00B4062E /* IGPUProgrammingServices.h */,
+				95D538AC0F69D61C00B4062E /* IGUIButton.h */,
+				95D538AD0F69D61C00B4062E /* IGUICheckBox.h */,
+				95D538AE0F69D61C00B4062E /* IGUIColorSelectDialog.h */,
+				95D538AF0F69D61C00B4062E /* IGUIComboBox.h */,
+				95D538B00F69D61C00B4062E /* IGUIContextMenu.h */,
+				95D538B10F69D61C00B4062E /* IGUIEditBox.h */,
+				95D538B20F69D61C00B4062E /* IGUIElement.h */,
+				95D538B30F69D61C00B4062E /* IGUIElementFactory.h */,
+				95D538B40F69D61C00B4062E /* IGUIEnvironment.h */,
+				95D538B50F69D61C00B4062E /* IGUIFileOpenDialog.h */,
+				95D538B60F69D61C00B4062E /* IGUIFont.h */,
+				95D538B70F69D61C00B4062E /* IGUIFontBitmap.h */,
+				95D538B80F69D61C00B4062E /* IGUIImage.h */,
+				95D538B90F69D61C00B4062E /* IGUIInOutFader.h */,
+				95D538BA0F69D61C00B4062E /* IGUIListBox.h */,
+				95D538BB0F69D61C00B4062E /* IGUIMeshViewer.h */,
+				95D538BC0F69D61C00B4062E /* IGUIScrollBar.h */,
+				95D538BD0F69D61C00B4062E /* IGUISkin.h */,
+				95D538BE0F69D61C00B4062E /* IGUISpinBox.h */,
+				95D538BF0F69D61C00B4062E /* IGUISpriteBank.h */,
+				95D538C00F69D61C00B4062E /* IGUIStaticText.h */,
+				95D538C10F69D61C00B4062E /* IGUITabControl.h */,
+				95D538C20F69D61C00B4062E /* IGUITable.h */,
+				95D538C30F69D61C00B4062E /* IGUIToolbar.h */,
+				95D538C40F69D61C00B4062E /* IGUIWindow.h */,
+				95D538C50F69D61C00B4062E /* IImage.h */,
+				95D538C60F69D61C00B4062E /* IImageLoader.h */,
+				95D538C70F69D61C00B4062E /* IImageWriter.h */,
+				95D538C80F69D61C00B4062E /* IIndexBuffer.h */,
+				95D538C90F69D61C00B4062E /* ILightSceneNode.h */,
+				95D538CA0F69D61C00B4062E /* ILogger.h */,
+				95D538CB0F69D61C00B4062E /* IMaterialRenderer.h */,
+				95D538CC0F69D61C00B4062E /* IMaterialRendererServices.h */,
+				95D538CD0F69D61C00B4062E /* IMesh.h */,
+				95D538CE0F69D61C00B4062E /* IMeshBuffer.h */,
+				95D538CF0F69D61C00B4062E /* IMeshCache.h */,
+				95D538D00F69D61C00B4062E /* IMeshLoader.h */,
+				95D538D10F69D61C00B4062E /* IMeshManipulator.h */,
+				95D538D20F69D61C00B4062E /* IMeshSceneNode.h */,
+				95D538D30F69D61C00B4062E /* IMeshWriter.h */,
+				95D538D40F69D61C00B4062E /* IMetaTriangleSelector.h */,
+				95D538D50F69D61C00B4062E /* IOSOperator.h */,
+				95D538D60F69D61C00B4062E /* IParticleAffector.h */,
+				95D538D70F69D61C00B4062E /* IParticleAnimatedMeshSceneNodeEmitter.h */,
+				95D538D80F69D61C00B4062E /* IParticleAttractionAffector.h */,
+				95D538D90F69D61C00B4062E /* IParticleBoxEmitter.h */,
+				95D538DA0F69D61C00B4062E /* IParticleCylinderEmitter.h */,
+				95D538DB0F69D61C00B4062E /* IParticleEmitter.h */,
+				95D538DC0F69D61C00B4062E /* IParticleFadeOutAffector.h */,
+				95D538DD0F69D61C00B4062E /* IParticleGravityAffector.h */,
+				95D538DE0F69D61C00B4062E /* IParticleMeshEmitter.h */,
+				95D538DF0F69D61C00B4062E /* IParticleRingEmitter.h */,
+				95D538E00F69D61C00B4062E /* IParticleRotationAffector.h */,
+				95D538E10F69D61C00B4062E /* IParticleSphereEmitter.h */,
+				95D538E20F69D61C00B4062E /* IParticleSystemSceneNode.h */,
+				95D538E30F69D61C00B4062E /* IQ3LevelMesh.h */,
+				95D538E40F69D61C00B4062E /* IQ3Shader.h */,
+				95D538E50F69D61C00B4062E /* IReadFile.h */,
+				95D538E60F69D61C00B4062E /* IReferenceCounted.h */,
+				95D538E70F69D61C00B4062E /* irrAllocator.h */,
+				95D538E80F69D61C00B4062E /* irrArray.h */,
+				95D538E90F69D61C00B4062E /* IrrCompileConfig.h */,
+				95D538EA0F69D61C00B4062E /* irrlicht.h */,
+				95D538EB0F69D61C00B4062E /* IrrlichtDevice.h */,
+				95D538EC0F69D61C00B4062E /* irrList.h */,
+				95D538ED0F69D61C00B4062E /* irrMap.h */,
+				95D538EE0F69D61C00B4062E /* irrMath.h */,
+				95D538EF0F69D61C00B4062E /* irrString.h */,
+				95D538F00F69D61C00B4062E /* irrTypes.h */,
+				95D538F10F69D61C00B4062E /* irrXML.h */,
+				95D538F20F69D61C00B4062E /* ISceneCollisionManager.h */,
+				95D538F30F69D61C00B4062E /* ISceneManager.h */,
+				95D538F40F69D61C00B4062E /* ISceneNode.h */,
+				95D538F50F69D61C00B4062E /* ISceneNodeAnimator.h */,
+				95D538F60F69D61C00B4062E /* ISceneNodeAnimatorCameraFPS.h */,
+				95D538F70F69D61C00B4062E /* ISceneNodeAnimatorCameraMaya.h */,
+				95D538F80F69D61C00B4062E /* ISceneNodeAnimatorCollisionResponse.h */,
+				95D538F90F69D61C00B4062E /* ISceneNodeAnimatorFactory.h */,
+				95D538FA0F69D61C00B4062E /* ISceneNodeFactory.h */,
+				95D538FB0F69D61C00B4062E /* ISceneUserDataSerializer.h */,
+				95D538FC0F69D61C00B4062E /* IShaderConstantSetCallBack.h */,
+				95D538FD0F69D61C00B4062E /* IShadowVolumeSceneNode.h */,
+				95D538FE0F69D61C00B4062E /* ISkinnedMesh.h */,
+				95D538FF0F69D61C00B4062E /* ITerrainSceneNode.h */,
+				95D539000F69D61C00B4062E /* ITextSceneNode.h */,
+				95D539010F69D61C00B4062E /* ITexture.h */,
+				95D539020F69D61C00B4062E /* ITimer.h */,
+				95D539030F69D61C00B4062E /* ITriangleSelector.h */,
+				95D539040F69D61C00B4062E /* IVertexBuffer.h */,
+				95D539050F69D61C00B4062E /* IVideoDriver.h */,
+				95D539060F69D61C00B4062E /* IVideoModeList.h */,
+				95D539070F69D61C00B4062E /* IVolumeLightSceneNode.h */,
+				95D539080F69D61C00B4062E /* IWriteFile.h */,
+				95D539090F69D61C00B4062E /* IXMLReader.h */,
+				95D5390A0F69D61C00B4062E /* IXMLWriter.h */,
+				95D5390B0F69D61C00B4062E /* Keycodes.h */,
+				95D5390C0F69D61C00B4062E /* line2d.h */,
+				95D5390D0F69D61C00B4062E /* line3d.h */,
+				95D5390E0F69D61C00B4062E /* matrix4.h */,
+				95D5390F0F69D61C00B4062E /* plane3d.h */,
+				95D539100F69D61C00B4062E /* position2d.h */,
+				95D539110F69D61C00B4062E /* quaternion.h */,
+				95D539120F69D61C00B4062E /* rect.h */,
+				95D539130F69D61C00B4062E /* S3DVertex.h */,
+				95D539140F69D61C00B4062E /* SAnimatedMesh.h */,
+				95D539150F69D61C00B4062E /* SceneParameters.h */,
+				95D539160F69D61C00B4062E /* SColor.h */,
+				95D539170F69D61C00B4062E /* SExposedVideoData.h */,
+				95D539180F69D61C00B4062E /* SIrrCreationParameters.h */,
+				95D539190F69D61C00B4062E /* SKeyMap.h */,
+				95D5391A0F69D61C00B4062E /* SLight.h */,
+				95D5391B0F69D61C00B4062E /* SMaterial.h */,
+				95D5391C0F69D61C00B4062E /* SMaterialLayer.h */,
+				95D5391D0F69D61C00B4062E /* SMesh.h */,
+				95D5391E0F69D61C00B4062E /* SMeshBuffer.h */,
+				95D5391F0F69D61C00B4062E /* SMeshBufferLightMap.h */,
+				95D539200F69D61C00B4062E /* SMeshBufferTangents.h */,
+				95D539210F69D61C00B4062E /* SParticle.h */,
+				95D539220F69D61C00B4062E /* SSharedMeshBuffer.h */,
+				95D539230F69D61C00B4062E /* SSkinMeshBuffer.h */,
+				95D539240F69D61C00B4062E /* SVertexIndex.h */,
+				95D539250F69D61C00B4062E /* SViewFrustum.h */,
+				95D539260F69D61C00B4062E /* triangle3d.h */,
+				95D539270F69D61C00B4062E /* vector2d.h */,
+				95D539280F69D61C00B4062E /* vector3d.h */,
+			);
+			name = irrlicht;
+			path = /usr/local/include/irrlicht;
+			sourceTree = "<absolute>";
 		};
 		95E104FE0E28F65D00503124 /* bullet */ = {
 			isa = PBXGroup;
@@ -2429,36 +2658,6 @@
 				95C2B2FA0F296546000D3E5D /* explosion.cpp in Sources */,
 				95C2B3030F296546000D3E5D /* grand_prix_data.cpp in Sources */,
 				95C2B3060F296546000D3E5D /* grand_prix_manager.cpp in Sources */,
-				95C2B3100F296546000D3E5D /* base_gui.cpp in Sources */,
-				95C2B3110F296546000D3E5D /* challenges_menu.cpp in Sources */,
-				95C2B3120F296546000D3E5D /* char_sel.cpp in Sources */,
-				95C2B3130F296546000D3E5D /* config_controls.cpp in Sources */,
-				95C2B3140F296546000D3E5D /* config_display.cpp in Sources */,
-				95C2B3150F296546000D3E5D /* config_sound.cpp in Sources */,
-				95C2B3160F296546000D3E5D /* credits_menu.cpp in Sources */,
-				95C2B3170F296546000D3E5D /* display_res_confirm.cpp in Sources */,
-				95C2B3180F296546000D3E5D /* feature_unlocked.cpp in Sources */,
-				95C2B3190F296546000D3E5D /* font.cpp in Sources */,
-				95C2B31A0F296546000D3E5D /* game_mode.cpp in Sources */,
-				95C2B31B0F296546000D3E5D /* grand_prix_ending.cpp in Sources */,
-				95C2B31C0F296546000D3E5D /* grand_prix_select.cpp in Sources */,
-				95C2B31D0F296546000D3E5D /* help_page_one.cpp in Sources */,
-				95C2B31E0F296546000D3E5D /* help_page_three.cpp in Sources */,
-				95C2B31F0F296546000D3E5D /* help_page_two.cpp in Sources */,
-				95C2B3200F296546000D3E5D /* main_menu.cpp in Sources */,
-				95C2B3210F296546000D3E5D /* menu_manager.cpp in Sources */,
-				95C2B3220F296546000D3E5D /* network_gui.cpp in Sources */,
-				95C2B3230F296546000D3E5D /* num_players.cpp in Sources */,
-				95C2B3240F296546000D3E5D /* options.cpp in Sources */,
-				95C2B3250F296546000D3E5D /* player_controls.cpp in Sources */,
-				95C2B3260F296546000D3E5D /* race_gui.cpp in Sources */,
-				95C2B3270F296546000D3E5D /* race_menu.cpp in Sources */,
-				95C2B3280F296546000D3E5D /* race_options.cpp in Sources */,
-				95C2B3290F296546000D3E5D /* race_results_gui.cpp in Sources */,
-				95C2B32A0F296546000D3E5D /* start_race_feedback.cpp in Sources */,
-				95C2B32B0F296546000D3E5D /* track_sel.cpp in Sources */,
-				95C2B32C0F296546000D3E5D /* widget.cpp in Sources */,
-				95C2B32D0F296546000D3E5D /* widget_manager.cpp in Sources */,
 				95C2B3310F296546000D3E5D /* highscore_manager.cpp in Sources */,
 				95C2B3330F296546000D3E5D /* highscores.cpp in Sources */,
 				95C2B3350F296546000D3E5D /* history.cpp in Sources */,
@@ -2543,6 +2742,14 @@
 				95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */,
 				95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */,
 				950557140F6963790056E88C /* file_manager.cpp in Sources */,
+				950557860F696A900056E88C /* engine.cpp in Sources */,
+				950557870F696A900056E88C /* my_button.cpp in Sources */,
+				950557880F696A900056E88C /* screen.cpp in Sources */,
+				950557890F696A900056E88C /* screen_loader.cpp in Sources */,
+				9505578A0F696A900056E88C /* skin.cpp in Sources */,
+				9505578B0F696A900056E88C /* widget.cpp in Sources */,
+				95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */,
+				95C1E4000F699427005D33E6 /* font.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2631,8 +2838,6 @@
 					"-lplibssgaux",
 					"-lirrlicht",
 					"-L/usr/local/lib",
-					"-lSDL",
-					"-lSDLmain",
 					"-lopenal",
 					"-lvorbisfile",
 					"-lvorbis",

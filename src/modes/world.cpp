@@ -34,7 +34,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
-#include "gui/menu_manager.hpp"
+#include "gui/race_gui.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -158,7 +158,8 @@ void World::init()
 #endif
 
     callback_manager->initAll();
-    menu_manager->switchToRace();
+    // TODO - race GUI
+    //menu_manager->switchToRace();
 
     m_track->startMusic();
 
@@ -205,7 +206,8 @@ void World::terminateRace()
 {
     updateHighscores();
     TimedRace::pause();
-    menu_manager->pushMenu(MENUID_RACERESULT);
+    // TODO - race results GUI
+    //menu_manager->pushMenu(MENUID_RACERESULT);
     unlock_manager->raceFinished();
 }
 //-----------------------------------------------------------------------------
@@ -401,7 +403,7 @@ void World::removeKart(int kart_number)
 {
     Kart *kart = m_kart[kart_number];
     // Display a message about the eliminated kart in the race gui 
-    RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+    RaceGUI* m=getRaceGUI();
     if(m)
     {
         for (std::vector<PlayerKart*>::iterator i  = m_player_karts.begin();

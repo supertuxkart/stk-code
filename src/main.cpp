@@ -60,9 +60,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/widget_manager.hpp"
+#include "gui/font.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
@@ -472,7 +470,7 @@ void InitTuxkart()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
     race_manager->setDifficulty(RaceManager::RD_HARD);
 
-    menu_manager= new MenuManager();
+    //menu_manager= new MenuManager();
 
     // Consistency check for challenges, and enable all challenges
     // that have all prerequisites fulfilled
@@ -484,7 +482,7 @@ void CleanTuxKart()
 {
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
-    if(menu_manager)            delete menu_manager;
+    //if(menu_manager)            delete menu_manager;
     if(race_manager)            delete race_manager;
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
@@ -561,11 +559,12 @@ int main(int argc, char *argv[] )
 
         //For some reason, calling this before the material loading screws
         //the background picture.
-        fntInit();
+        //fntInit();
         init_fonts();
 
-        widget_manager   = new WidgetManager;
-        menu_manager->switchToMainMenu();
+        // TODO - show main menu here
+        //widget_manager   = new WidgetManager;
+        //menu_manager->switchToMainMenu();
 
         // Replay a race
         // =============
@@ -593,7 +592,8 @@ int main(int argc, char *argv[] )
         // On the server start with the network information page for now
         if(network_manager->getMode()==NetworkManager::NW_SERVER)
         {
-            menu_manager->pushMenu(MENUID_NETWORK_GUI);
+            // TODO - network menu
+            //menu_manager->pushMenu(MENUID_NETWORK_GUI);
         }
         // Not replaying
         // =============

@@ -1,4 +1,4 @@
-//  $Id: font.hpp 907 2007-02-04 01:38:54Z coz $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -19,9 +19,9 @@
 
 #include <vector>
 
+#include "file_manager.hpp"
 #include "user_config.hpp"
 #include "gui/font.hpp"
-#include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
 Font* font_gui;
@@ -67,7 +67,7 @@ Font::~Font()
 
 void Font::Print(const char *text, int size, 
                  int x, int y,
-                 const GLfloat* color,
+                 const float* color,
                  float scale_x, float scale_y,
                  int left, int right, int top, int bottom, bool doShadow)
 {
@@ -102,11 +102,11 @@ void Font::Print(const char *text, int size,
     m_text_out->setPointSize((float)sz);
     if(doShadow)
     {
-        m_text_out->start2f((GLfloat)x-2, (GLfloat)y-2);
+        m_text_out->start2f((float)x-2, (float)y-2);
         glColor4ub(0, 0, 0, 100);
         m_text_out->puts(text);
     }
-    m_text_out->start2f((GLfloat)x, (GLfloat)y);
+    m_text_out->start2f((float)x, (float)y);
 
     if( color == NULL )
     {
@@ -123,7 +123,7 @@ void Font::Print(const char *text, int size,
 // -----------------------------------------------------------------------------
 
 void Font::PrintBold(const std::string &text, int size, int x, int y,
-                     const GLfloat* color, float scale_x, float scale_y,
+                     const float* color, float scale_x, float scale_y,
                      int left, int right, int top, int bottom            )
 {
     // Only scale for lower resolution
@@ -159,8 +159,8 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     // print shadow
     // ------------
     glColor4f(0.0f,0.0f,0.0f,1.0f);
-    float xf=(GLfloat)x+2;
-    float yf=(GLfloat)y-2;
+    float xf=(float)x+2;
+    float yf=(float)y-2;
     for(float r=-1; r<=0; r+=0.5)
     {
         m_text_out->start2f(xf-r, yf-r);
@@ -175,8 +175,8 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     {
         glColor4fv(color);
     }
-    xf=(GLfloat)x;
-    yf=(GLfloat)y;
+    xf=(float)x;
+    yf=(float)y;
     for(float r=-1.0f; r<=0.0f; r+=0.5f)
     {
         // This kind of simulates an outline, but it's not too good
@@ -185,7 +185,7 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
         //else
         //    glColor4f(1.0f,1.0f,1.0f,1.0f);
 
-        m_text_out->start2f((GLfloat)x+r, (GLfloat)y+r);
+        m_text_out->start2f((float)x+r, (float)y+r);
         m_text_out->puts(text.c_str());
     }
     m_text_out->end();

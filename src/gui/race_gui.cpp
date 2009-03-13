@@ -29,10 +29,24 @@
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "gui/font.hpp"
-#include "gui/menu_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
+
+RaceGUI* instance = NULL;
+RaceGUI* getRaceGUI()
+{
+    if(instance == NULL) instance = new RaceGUI();
+    return instance;
+}
+
+void timeToString(const double TIME, char *s)
+{
+    int min     = (int) floor ( TIME / 60.0 ) ;
+    int sec     = (int) floor ( TIME - (double) ( 60 * min ) ) ;
+    int tenths  = (int) floor ( 10.0f * (TIME - (double)(sec + 60* min)));
+    sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
+}   // TimeToString
 
 
 RaceGUI::RaceGUI()
@@ -52,11 +66,10 @@ RaceGUI::RaceGUI()
 
 #ifdef HAVE_IRRLICHT
     gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
-    core::rect<s32> pos(user_config->m_width-160, 10, 
-                        user_config->m_width,    150);
+    core::rect<s32> pos(user_config->m_width-60, 10, 
+                        user_config->m_width,    50);
     m_time = gui_env->addStaticText(L"", pos);
     m_time->setOverrideFont(irr_driver->getRaceFont());
-    m_time->setOverrideColor(video::SColor(255, 255, 255, 255));
 
     int icon_width=40;
     int icon_player_width=50;
@@ -177,8 +190,11 @@ RaceGUI::handle(GameAction ga, int value)
 			// Fall through to put the game into pause mode.
 #endif
 		case GA_LEAVE_RACE:
+            // TODO - show race menu
+            /*
 			RaceManager::getWorld()->pause();
 			menu_manager->pushMenu(MENUID_RACEMENU);
+             */
 		break;
 		case GA_DEBUG_HISTORY:
 			history->Save();
@@ -195,7 +211,7 @@ void RaceGUI::update(float dt)
     drawStatusText(dt);
     cleanupMessages(dt);
 
-    BaseGUI::update( dt );
+    //BaseGUI::update( dt );
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -222,7 +238,7 @@ void RaceGUI::drawTimer ()
     if(!RaceManager::getWorld()->shouldDrawTimer()) return;
     char str[256];
     
-    TimeToString(RaceManager::getWorld()->getTime(), str);
+    timeToString(RaceManager::getWorld()->getTime(), str);
 #ifdef HAVE_IRRLICHT
     m_time->setText(core::stringw(str).c_str());
 #else

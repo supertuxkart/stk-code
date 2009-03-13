@@ -16,12 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
- 
+#include "gui/race_gui.hpp"
+
 #include <sstream>
 
 #include "audio/sound_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/race_gui.hpp"
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -281,13 +280,13 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
             if(time_per_lap < getFastestLapTime() && raceHasLaps())
             {
                 setFastestLap(kart, time_per_lap);
-                RaceGUI* m=(RaceGUI*)menu_manager->getRaceMenu();
+                RaceGUI* m=(RaceGUI*)getRaceGUI();
                 if(m)
                 {
                     m->addMessage(_("New fastest lap"), NULL, 
                                   2.0f, 40, 100, 210, 100);
                     char s[20];
-                    m->TimeToString(time_per_lap, s);
+                    timeToString(time_per_lap, s);
                     
                     std::ostringstream m_fastest_lap_message;
                     m_fastest_lap_message << s << ": " << kart->getName();
@@ -413,7 +412,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
             if(position==1)
             {
                 str[0]=' '; str[1]=0;
-                caller->TimeToString(getTimeAtLapForKart(kart->getWorldKartId()), str+1);
+                timeToString(getTimeAtLapForKart(kart->getWorldKartId()), str+1);
             }
             else
             {
@@ -423,7 +422,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
                                 : getTime())
                            - time_of_leader;
                 str[0]='+'; str[1]=0;
-                caller->TimeToString(timeBehind, str+1);
+                timeToString(timeBehind, str+1);
             }
             rank_info.time = str;
         }
@@ -633,7 +632,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     if(!m_kart[i]->isPlayerKart()) return;
     if(!m_kart_info[i].m_on_road) return;
 
-    RaceGUI* m=menu_manager->getRaceMenu();
+    RaceGUI* m = getRaceGUI();
     // This can happen if the option menu is called, since the
     // racegui gets deleted
     if(!m) return;
@@ -653,7 +652,6 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     {
         m->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
     }  // if angle is too big
-
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------

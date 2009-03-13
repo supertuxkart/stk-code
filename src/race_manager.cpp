@@ -26,7 +26,6 @@
 #include "stk_config.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/scene.hpp"
-#include "gui/menu_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "modes/standard_race.hpp"
@@ -364,11 +363,13 @@ void RaceManager::exit_race()
         delete []race_time;
         
         unlock_manager->grandPrixFinished();
-        menu_manager->switchToGrandPrixEnding();
+        // TODO - Grand Prix ending
+        // menu_manager->switchToGrandPrixEnding();
     }
     else
     {
-        menu_manager->switchToMainMenu();
+        // FIXME - back to main menu
+        // menu_manager->switchToMainMenu();
     }
     stk_scene->clear();
     delete world;

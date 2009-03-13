@@ -29,7 +29,6 @@ using namespace irr;
 #include <string>
 #include <vector>
 
-#include "base_gui.hpp"
 #include "material.hpp"
 #include "player.hpp"
 #include "race_manager.hpp"
@@ -54,7 +53,10 @@ struct KartIconDisplayInfo
     int lap;
 };
 
-class RaceGUI: public BaseGUI
+extern RaceGUI* getRaceGUI();
+void timeToString(const double TIME, char *s);
+
+class RaceGUI
 {
 private:
     class TimedMessage

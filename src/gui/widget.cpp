@@ -1,890 +1,946 @@
-//  $Id: widget_set.cpp 1094 2007-05-21 06:49:06Z hiker $
-//
-//  SuperTuxKart - a fun racing game with go-kart
-//  This code originally from Neverball copyright (C) 2003 Robert Kooima
-//
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 3
-//  of the License, or (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-#include "widget.hpp"
-
-#include <cmath>
+#include "gui/screen.hpp"
+#include "gui/engine.hpp"
+#include "gui/my_button.hpp"
+#include <irrlicht.h>
 #include <iostream>
+#include <sstream>
 
-//FIXME: this should be removed when the scrolling is cleaned
-#include "user_config.hpp"
+using namespace irr;
+using namespace core;
+using namespace scene;
+using namespace video;
+using namespace io;
+using namespace gui;
+using namespace GUIEngine;
 
-#include "material_manager.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
-#include "utils/constants.hpp"
+#include "gui/widget.hpp"
 
-const int Widget::MAX_SCROLL = 1000000;
+static unsigned int id_counter = 0;
+static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
 
-const float Widget::MAX_TEXT_SCALE = 1.2f;
-const float Widget::MIN_TEXT_SCALE = 1.0f;
-
-const GLfloat WGT_WHITE  [4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat WGT_GRAY   [4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-const GLfloat WGT_BLACK  [4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-const GLfloat WGT_YELLOW [4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-const GLfloat WGT_RED    [4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-const GLfloat WGT_GREEN  [4] = { 0.0f, 1.0f, 0.0f, 1.0f };
-const GLfloat WGT_BLUE   [4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-const GLfloat WGT_TRANS_WHITE  [4] = { 1.0f, 1.0f, 1.0f, 0.5f };
-const GLfloat WGT_TRANS_GRAY   [4] = { 0.5f, 0.5f, 0.5f, 0.5f };
-const GLfloat WGT_TRANS_BLACK  [4] = { 0.0f, 0.0f, 0.0f, 0.5f };
-const GLfloat WGT_TRANS_YELLOW [4] = { 1.0f, 1.0f, 0.0f, 0.5f };
-const GLfloat WGT_TRANS_RED    [4] = { 1.0f, 0.0f, 0.0f, 0.5f };
-const GLfloat WGT_TRANS_GREEN  [4] = { 0.0f, 1.0f, 0.0f, 0.5f };
-const GLfloat WGT_TRANS_BLUE   [4] = { 0.0f, 0.0f, 1.0f, 0.5f };
-
-//FIXME: I should change 'LIGHT' for 'LIT'.
-const GLfloat WGT_LIGHT_GRAY   [4] = {1.0f, 1.0f, 1.0f, 1.0f};
-const GLfloat WGT_LIGHT_BLACK  [4] = {0.5f, 0.5f, 0.5f, 1.0f};
-const GLfloat WGT_LIGHT_YELLOW [4] = {1.0f, 1.0f, 0.5f, 1.0f};
-const GLfloat WGT_LIGHT_RED    [4] = {1.0f, 0.5f, 0.5f, 1.0f};
-const GLfloat WGT_LIGHT_GREEN  [4] = {0.5f, 1.0f, 0.5f, 1.0f};
-const GLfloat WGT_LIGHT_BLUE   [4] = {0.5f, 0.5f, 1.0f, 1.0f};
-const GLfloat WGT_LIGHT_TRANS_GRAY   [4] = {1.0f, 1.0f, 1.0f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_BLACK  [4] = {0.5f, 0.5f, 0.5f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_YELLOW [4] = {1.0f, 1.0f, 0.5f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_RED    [4] = {1.0f, 0.5f, 0.5f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_GREEN  [4] = {0.5f, 1.0f, 0.5f, 0.8f};
-const GLfloat WGT_LIGHT_TRANS_BLUE   [4] = {0.5f, 0.5f, 1.0f, 0.8f};
-
-const GLfloat WGT_TRANSPARENT [4] = {1.0f, 1.0f, 1.0f, 0.0f};
-
-Widget::Widget
-(
-    const int X_,
-    const int Y_,
-    const int WIDTH_,
-    const int HEIGHT_
-) :
-//Switch features are not set here to sane defaults because the WidgetManager
-//handles that.
-    m_x(X_), m_y(Y_),
-    m_width(WIDTH_), m_height(HEIGHT_),
-    m_fixed_position(false),
-    m_rect_list(0),
-    m_round_corners(WGT_AREA_ALL),
-    m_border_list(0),
-    m_scroll_pos_x(0), m_scroll_pos_y(0),
-    m_text_scale(1.0f)
+// -----------------------------------------------------------------------------
+/** When switching to a new screen, this function will be called to reset ID counters
+ * (so we start again from ID 0, and don't grow to big numbers) */
+void Widget::resetIDCounters()
 {
+    id_counter = 0;
+    id_counter_2 = 1000;
 }
-
-//-----------------------------------------------------------------------------
-Widget::~Widget()
+// -----------------------------------------------------------------------------
+Widget::Widget()
 {
-    if(glIsList(m_rect_list))
-    {
-        glDeleteLists(m_rect_list, 1);
-    }
-
-    if(glIsList(m_border_list))
-    {
-        glDeleteLists(m_border_list, 1);
-    }
-
+    x = -1;
+    y = -1;
+    w = -1;
+    h = -1;
+    id = -1;
+    m_element = NULL;
+    m_type = WTYPE_NONE;
+    m_selected = false;
+    m_parent = NULL;
 }
-
-//-----------------------------------------------------------------------------
-void Widget::setPosition(WidgetDirection horizontal, float percentage_horizontal, 
-                         const Widget *w_hori,
-		                 WidgetDirection vertical,   float percentage_vertical,
-                         const Widget *w_verti)
-{
-	m_fixed_position    = true;
-    m_horizontal        = horizontal;
-    m_percentage_x      = percentage_horizontal;
-    m_widget_horizontal = w_hori;
-    // If the direction is left/right of a widget, but that widget is not defined
-    // use left/right (of screen). This simplifies programming, since the e.g. 
-    // left-most widget will be positioned relative to the side of the screen
-    if(!w_hori)
-    {
-        if(m_horizontal==WGT_DIR_LEFT_WIDGET ) m_horizontal = WGT_DIR_FROM_RIGHT;
-        if(m_horizontal==WGT_DIR_RIGHT_WIDGET) m_horizontal = WGT_DIR_FROM_LEFT;
-    }
-    m_vertical          = vertical;
-    m_percentage_y      = percentage_vertical;
-    m_widget_vertical   = w_verti;
-    if(!w_verti)
-    {
-        if(m_vertical==WGT_DIR_ABOVE_WIDGET) m_vertical = WGT_DIR_FROM_BOTTOM;
-        if(m_vertical==WGT_DIR_UNDER_WIDGET) m_vertical = WGT_DIR_FROM_TOP;
-    }
-
-}   // setPosition
-// ----------------------------------------------------------------------------
-void Widget::layout()
-{
-	if(!hasFixedPosition())
-	{
-        std::cerr << "Warning: layout called for widget without fixed position.\n";
-        return;
-	}
-    if( !createRect() ) return;
-
-    switch(m_horizontal)
-    {
-    case WGT_DIR_FROM_LEFT: 
-        m_x = (int)(user_config->m_width*m_percentage_x); break;
-    case WGT_DIR_FROM_RIGHT:
-        m_x = (int)(user_config->m_width*(1-m_percentage_x)-m_width); break;
-    case WGT_DIR_CENTER:
-        m_x = (int)((user_config->m_width-m_width)*0.5f); break;
-    case WGT_DIR_LEFT_WIDGET:
-        m_x = m_widget_horizontal->m_x - m_width; break;
-    case WGT_DIR_RIGHT_WIDGET:
-        m_x = m_widget_horizontal->m_x+m_widget_horizontal->m_width
-            + (int)(user_config->m_width*m_percentage_x); break;
-    default:
-        break;
-    }   // switch
-
-    switch(m_vertical)
-    {
-    case WGT_DIR_FROM_TOP: 
-        m_y = (int)(user_config->m_height*(1-m_percentage_y)-m_height); break;
-    case WGT_DIR_FROM_BOTTOM:
-        m_y = (int)(user_config->m_height*m_percentage_y); break;
-    case WGT_DIR_CENTER:
-        m_y = (int)((user_config->m_height-m_height)*0.5f); break;
-    case WGT_DIR_ABOVE_WIDGET:
-        m_y = m_widget_vertical->m_y + m_widget_vertical->m_height; break;
-    case WGT_DIR_UNDER_WIDGET:
-        m_y = m_widget_vertical->m_y-m_height-(int)(m_percentage_y*user_config->m_height); break;
-    default:
-        break;
-    }   // switch
-
-}   // layout
-
-//-----------------------------------------------------------------------------
-void Widget::update( const float DELTA )
-{
-    updateVariables( DELTA );
-    draw();
-}
-
-//-----------------------------------------------------------------------------
-void Widget::resizeToText()
-{
-    if( !m_text.empty() )
-    {
-        float left, right, bottom, top;
-        m_font->getBBoxMultiLine(m_text, m_text_size, false, &left, &right, &bottom, &top);
-
-        const int TEXT_WIDTH = (int)(right - left);
-        const int TEXT_HEIGHT = (int)(top - bottom);
-
-        if( TEXT_WIDTH > m_width ) m_width = TEXT_WIDTH;
-        if( TEXT_HEIGHT > m_height ) m_height = TEXT_HEIGHT;
-    }
-}
-
-//-----------------------------------------------------------------------------
-/* Please note that this function only lightens 'non-light' colors */
-void Widget::lightenColor()
-{
-    if(m_rect_color == WGT_GRAY)
-    {
-        m_rect_color = WGT_LIGHT_GRAY;
-    }
-    if(m_rect_color == WGT_BLACK)
-    {
-        m_rect_color = WGT_LIGHT_BLACK;
-    }
-    else if (m_rect_color == WGT_YELLOW)
-    {
-        m_rect_color = WGT_LIGHT_YELLOW;
-    }
-    else if (m_rect_color == WGT_RED)
-    {
-        m_rect_color = WGT_LIGHT_RED;
-    }
-    else if (m_rect_color == WGT_GREEN)
-    {
-        m_rect_color = WGT_LIGHT_GREEN;
-    }
-    else if (m_rect_color == WGT_BLUE)
-    {
-        m_rect_color = WGT_LIGHT_BLUE;
-    }
-    else if (m_rect_color == WGT_TRANS_GRAY)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_GRAY;
-    }
-    else if (m_rect_color == WGT_TRANS_BLACK)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_BLACK;
-    }
-    else if (m_rect_color == WGT_TRANS_YELLOW)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_YELLOW;
-    }
-    else if (m_rect_color == WGT_TRANS_RED)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_RED;
-    }
-    else if (m_rect_color == WGT_TRANS_GREEN)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_GREEN;
-    }
-    else if (m_rect_color == WGT_TRANS_BLUE)
-    {
-        m_rect_color = WGT_LIGHT_TRANS_BLUE;
-    }
-}
-
-//-----------------------------------------------------------------------------
-/* Please note that this function only darkens 'light' colors. */
-void Widget::darkenColor()
-{
-    if(m_rect_color == WGT_LIGHT_GRAY)
-    {
-        m_rect_color = WGT_GRAY;
-    }
-    if(m_rect_color == WGT_LIGHT_BLACK)
-    {
-        m_rect_color = WGT_BLACK;
-    }
-    else if (m_rect_color == WGT_LIGHT_YELLOW)
-    {
-        m_rect_color = WGT_YELLOW;
-    }
-    else if (m_rect_color == WGT_LIGHT_RED)
-    {
-        m_rect_color = WGT_RED;
-    }
-    else if (m_rect_color == WGT_LIGHT_GREEN)
-    {
-        m_rect_color = WGT_GREEN;
-    }
-    else if (m_rect_color == WGT_LIGHT_BLUE)
-    {
-        m_rect_color = WGT_BLUE;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_GRAY)
-    {
-        m_rect_color = WGT_TRANS_GRAY;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_BLACK)
-    {
-        m_rect_color = WGT_TRANS_BLACK;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_YELLOW)
-    {
-        m_rect_color = WGT_TRANS_YELLOW;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_RED)
-    {
-        m_rect_color = WGT_TRANS_RED;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_GREEN)
-    {
-        m_rect_color = WGT_TRANS_GREEN;
-    }
-    else if (m_rect_color == WGT_LIGHT_TRANS_BLUE)
-    {
-        m_rect_color = WGT_TRANS_BLUE;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void Widget::setFont( const WidgetFont FONT )
-{
-    switch( FONT )
-    {
-        case WGT_FONT_GUI:
-            m_font = font_gui;
-            break;
-
-        case WGT_FONT_RACE:
-            m_font = font_race;
-            break;
-    };
-
-    //TODO: the curr_widget_font variable exists only for a bug around; after
-    //some restructuration, it should be fine to remove this.
-    m_curr_widget_font = FONT;
-}
-
-//-----------------------------------------------------------------------------
-void Widget::setTexture( const std::string& FILENAME, bool is_full_path )
-{
-    Material *m = material_manager->getMaterial( FILENAME, is_full_path );
-#ifndef HAVE_IRRLICHT
-    m_texture = m->getState()->getTextureHandle();
-#endif
-}
-
-/** Initialize a display list containing a rectangle that can have rounded
- *  corners, with texture coordinates to properly apply a texture
- *  map to the rectangle as though the corners were not rounded . Returns
- *  false if the call to glGenLists failed, otherwise it returns true.
+// -----------------------------------------------------------------------------
+/** will write to either absolute or percentage, depending on the case.
+ * returns false if couldn't convert to either
  */
-bool Widget::createRect()
+bool Widget::convertToCoord(std::string& x, int* absolute, int* percentage)
 {
-
-    //TODO: show warning if text > rect
-    if(m_radius > m_width * 0.5)
-    {
-        std::cerr << "Warning: widget's radius > half width.\n";
-    }
-    if(m_radius > m_height * 0.5)
-    {
-        std::cerr << "Warning: widget's radius > half height.\n";
-    }
-    if(m_radius < 1)
-    {
-        std::cerr << "Warning: widget's radius < 1, setting to 1.\n";
-        m_radius = 1;
-    }
-
-    if(m_width == 0)
-    {
-        std::cerr << "Warning: creating widget rect with width 0, " <<
-            "setting to 1.\n";
-        m_width = 1;
-    }
-    if(m_height == 0)
-    {
-        std::cerr << "Warning: creating widget rect with height 0, " <<
-            "setting to 1.\n";
-        m_height = 1;
-    }
-
-    if(!glIsList(m_rect_list))
-    {
-        m_rect_list = glGenLists(1);
-        if(m_rect_list == 0)
-        {
-            std::cerr << "Error: could not create a widget's rect list.\n";
-            return false;
-        }
-    }
-
-    //Calculate the number of quads each side should have. The algorithm
-    //isn't based just on logic, since it went through visual testing to give
-    //the perception of roundness.
-    const int MIN_QUADS = 2;
-    const int NUM_QUADS = MIN_QUADS + m_radius;
-
+    bool is_number;
     int i;
-
-    const int SMALLER_SIDE_LENGTH = m_height < m_width ? m_height / 2 : m_width / 2;
-    const float BORDER_LENGTH = SMALLER_SIDE_LENGTH * m_border_percentage;
-
-    typedef std::vector<float> float3;
-    std::vector<float3> inner_vertex;
-    std::vector<float3> outer_vertex;
-
-    //NUM_QUADS + 1, because we have to add the union between the sides, and
-    //multiplied by 2, because there are two sides
-    inner_vertex.resize((NUM_QUADS + 1) * 2);
-    outer_vertex.resize((NUM_QUADS + 1) * 2);
-
-    const float HALF_WIDTH = m_width * 0.5f;
-    const float HALF_HEIGHT = m_height * 0.5f;
-
-    glNewList(m_rect_list, GL_COMPILE);
+    std::istringstream myStream(x);
+    is_number = (myStream >> i);
+    
+    if(!is_number) return false;
+    
+    if( x[x.size()-1] == '%' ) // percentage
     {
-        glBegin(GL_QUAD_STRIP);
-        {
-            //These are used to center the widget; without centering, the
-            //widget's 0,0 coordinates are at the lower left corner.
-            float angle;
-            float circle_x, circle_y;
-
-            //Draw the left side of the inside
-            for (i = 0; i <= NUM_QUADS; ++i)
-            {
-                //To find the position in the X and Y axis of each point of
-                //the quads, we use the property of the unit circle (a circle
-                //with radius = 1) that at any given angle, cos(angle) is the
-                //position of the unit circle at that angle in the X axis,
-                //and that sin(angle) is the position of the unit circle at
-                //that angle in the Y axis. Then the values from cos(angle)
-                //and sin(angle) are multiplied by the radius.
-                //
-                //First we find the angle: since 2 * pi is the number of
-                //radians in an entire circle, 0.5 * pi is a quarter of the
-                //circle, which is a corner of the rounded rectangle. Based
-                //on that, we just split the radians in a corner in NUM_QUADS
-                //+ 1 parts, and use the angles at those parts to find the
-                //X and Y position of the points.
-                angle = 0.5f * M_PI * (float)i / (float)NUM_QUADS;
-                circle_x = m_radius * cos(angle);
-                circle_y = m_radius * sin(angle);
-
-                //After we generate the positions in circle for the angles,
-                //we have to position each rounded corner properly depending
-                //on the position of the rectangle and the radius. The y
-                //position for the circle is dependant on rect; if a corner
-                //wasn't given, then the y position is computed as if it was
-                //for a rectangle without rounder corners.
-                //
-                //The value in the position 0 of these vectors is X, the
-                //second the Y for the top part of the widget and the third
-                //the Y for the lower part of the widget.
-                inner_vertex[i].resize(3);
-                outer_vertex[i].resize(3);
-                outer_vertex[i][0] = m_radius - circle_x;
-                inner_vertex[i][0] = outer_vertex[i][0] + BORDER_LENGTH;
-
-                if( m_round_corners & WGT_AREA_NW )
-                {
-                    outer_vertex[i][1] = m_height + circle_y - m_radius;
-                    inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
-                }
-                else
-                {
-                    outer_vertex[i][1] =(float) m_height;
-                    inner_vertex[i][1] = outer_vertex[i][1] - BORDER_LENGTH;
-                }
-
-                if( m_round_corners & WGT_AREA_SW )
-                {
-                    outer_vertex[i][2] = m_radius - circle_y;
-                    inner_vertex[i][2] = outer_vertex[i][2] + BORDER_LENGTH;
-                }
-                else
-                {
-                    outer_vertex[i][2] = 0;
-                    inner_vertex[i][2] = outer_vertex[i][2] + BORDER_LENGTH;
-                }
-
-                glTexCoord2f(inner_vertex[i][0] / (float)m_width, inner_vertex[i][1] / (float)m_height);
-                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][1] - HALF_HEIGHT);
-
-                glTexCoord2f(inner_vertex[i][0] / (float)m_width, inner_vertex[i][2] / (float)m_height);
-                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][2] - HALF_HEIGHT);
-            }
-
-            //Draw the right side of a rectangle
-            for (i = NUM_QUADS; i < NUM_QUADS * 2 + 1; ++i)
-            {
-                angle = 0.5f * M_PI * (float) (i - NUM_QUADS) / (float) NUM_QUADS;
-
-                //By inverting the use of sin and cos we get corners that are
-                //drawn from left to right instead of right to left
-                circle_x = m_radius * sin(angle);
-                circle_y = m_radius * cos(angle);
-
-                inner_vertex[i+1].resize(3);
-                outer_vertex[i+1].resize(3);
-                outer_vertex[i+1][0] = m_width - m_radius + circle_x;
-                inner_vertex[i+1][0] = outer_vertex[i+1][0] - BORDER_LENGTH;
-
-                if( m_round_corners & WGT_AREA_NE )
-                {
-                    outer_vertex[i+1][1] = m_height - m_radius + circle_y;
-                    inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
-                }
-                else
-                {
-                    outer_vertex[i+1][1] = (float)m_height;
-                    inner_vertex[i+1][1] = outer_vertex[i+1][1] - BORDER_LENGTH;
-                }
-
-                if( m_round_corners & WGT_AREA_SE )
-                {
-                    outer_vertex[i+1][2] = m_radius - circle_y;
-                    inner_vertex[i+1][2] = outer_vertex[i+1][2] + BORDER_LENGTH;
-                }
-                else
-                {
-                    outer_vertex[i+1][2] = 0;
-                    inner_vertex[i+1][2] = outer_vertex[i+1][2] + BORDER_LENGTH;
-                }
-
-                glTexCoord2f(inner_vertex[i+1][0] / (float)m_width, inner_vertex[i+1][1] / (float)m_height);
-                glVertex2f(inner_vertex[i+1][0] - HALF_WIDTH, inner_vertex[i+1][1] - HALF_HEIGHT);
-
-                glTexCoord2f(inner_vertex[i+1][0] / (float)m_width, inner_vertex[i+1][2] / (float)m_height);
-                glVertex2f(inner_vertex[i+1][0] - HALF_WIDTH, inner_vertex[i+1][2] - HALF_HEIGHT);
-            }
-        }
-        glEnd();
+        *percentage = i;
+        return true;
     }
-    glEndList();
-
-
-    if(!glIsList(m_border_list))
+    else // absolute number
     {
-        m_border_list = glGenLists(1);
-        if(m_border_list == 0)
+        *absolute = i;
+        return true;
+    }
+}
+// -----------------------------------------------------------------------------
+/**
+ * Finds its x, y, w and h coords from what is specified in the XML properties.
+ * Most notably, expands coords relative to parent and percentages.
+ */
+void Widget::readCoords(Widget* parent)
+{
+    // determine widget position and size if not already done by sizers
+    std::string x       = m_properties[PROP_X];
+    std::string y       = m_properties[PROP_Y];
+    std::string width   = m_properties[PROP_WIDTH];
+    std::string height  = m_properties[PROP_HEIGHT];
+    
+    unsigned int parent_w, parent_h, parent_x, parent_y;
+    if(parent == NULL)
+    {
+        core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        parent_w = frame_size.Width;
+        parent_h = frame_size.Height;
+        parent_x = 0;
+        parent_y = 0;
+    }
+    else
+    {
+        parent_w = parent->w;
+        parent_h = parent->h;
+        parent_x = parent->x;
+        parent_y = parent->y;
+    }
+    
+    // ---- try converting to number; if it works it means they're plain numbers so we can use them directly.
+    // x coord
+    {
+        int abs_x = -1, percent_x = -1;
+        if(convertToCoord(x, &abs_x, &percent_x ))
         {
-            std::cerr << "Error: could not create a widget's border list.\n";
-            return false;
+            if(abs_x > -1) this->x = parent_x + abs_x;
+            else if(percent_x > -1) this->x = parent_x + parent_w*percent_x/100;
         }
     }
-
-    glNewList(m_border_list, GL_COMPILE);
+    
+    // y coord
     {
-        glBegin(GL_QUAD_STRIP);
+        int abs_y = -1, percent_y = -1;
+        if(convertToCoord(y, &abs_y, &percent_y ))
         {
-            for (i = NUM_QUADS * 2 + 1; i >= 0 ; --i)
-            {
-                glVertex2f(outer_vertex[i][0] - HALF_WIDTH, outer_vertex[i][1] - HALF_HEIGHT);
-                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][1] - HALF_HEIGHT);
-            }
-
-            for (i = 0; i <= NUM_QUADS * 2 + 1; ++i)
-            {
-                glVertex2f(outer_vertex[i][0] - HALF_WIDTH, outer_vertex[i][2] - HALF_HEIGHT);
-                glVertex2f(inner_vertex[i][0] - HALF_WIDTH, inner_vertex[i][2] - HALF_HEIGHT);
-            }
-
-            //Close the border
-            glVertex2f(outer_vertex[NUM_QUADS * 2 + 1][0] - HALF_WIDTH, outer_vertex[NUM_QUADS * 2 + 1][1] - HALF_HEIGHT);
-            glVertex2f(inner_vertex[NUM_QUADS * 2 + 1][0] - HALF_WIDTH, inner_vertex[NUM_QUADS * 2 + 1][1] - HALF_HEIGHT);
+            if(abs_y > -1) this->y = parent_y + abs_y;
+            else if(percent_y > -1) this->y = parent_y + parent_h*percent_y/100;
         }
-        glEnd();
-
     }
-    glEndList();
+    
+    // if this widget has an icon, get icon size. this can helpful determine its optimal size
+    int texture_w = -1, texture_h = -1;
+    
+    if(m_properties[PROP_ICON].size() > 0)
+    {
+        ITexture* texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+        if(texture != NULL)
+        {
+            texture_w = texture->getSize().Width;
+            texture_h = texture->getSize().Height;
+        }
+    }
+    
+    // if this widget has a label, get text length. this can helpful determine its optimal size
+    int label_w = -1, label_h = -1;
+    if(m_properties[PROP_TEXT].size() > 0)
+    {
+        IGUIFont* font = GUIEngine::getFont();
+        core::dimension2d< s32 > dim = font->getDimension( stringw(m_properties[PROP_TEXT].c_str()).c_str() );
+        label_w = dim.Width;
+        // FIXME - won't work with multiline labels. thus, for now, when multiple
+        // lines are required, we need to specify a height explicitely
+        label_h = dim.Height;
+    }
+        
+    // width
+    {
+        int abs_w = -1, percent_w = -1;
+        if(convertToCoord(width, &abs_w, &percent_w ))
+        {
+            if(abs_w > -1) this->w = abs_w;
+            else if(percent_w > -1) this->w = (int)round(parent_w*percent_w/100.0);
+        }
+        else if(texture_w > -1) this->w = texture_w;
+        else if(label_w > -1) this->w = label_w;
+    }
+    
+    // height
+    {
+        int abs_h = -1, percent_h = -1;
+        if(convertToCoord(height, &abs_h, &percent_h ))
+        {
+            if(abs_h > -1) this->h = abs_h;
+            else if(percent_h > -1) this->h = parent_h*percent_h/100;
+        }
+        else if(texture_h > -1) this->h = texture_h;
+        else if(label_h > -1) this->h = label_h;
+    }
+     
+}
+// -----------------------------------------------------------------------------
+void ButtonWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    stringw  message = m_properties[PROP_TEXT].c_str();
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, message.c_str(), L"");
+    
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+}
+// -----------------------------------------------------------------------------
+void LabelWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
+    stringw  message = m_properties[PROP_TEXT].c_str();
+    
+    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
+    if(m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
+    else if(m_properties[PROP_TEXT_ALIGN] == "right") align = EGUIA_LOWERRIGHT;
+    EGUI_ALIGNMENT valign = EGUIA_CENTER ; // TODO - make confiurable through XML file?
+    
+    IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, NULL, -1);
+    m_element = irrwidget;
+    irrwidget->setTextAlignment( align, valign );
+    
+    id = m_element->getID();
+    //m_element->setTabOrder(id);
+    m_element->setTabStop(false);
+    m_element->setTabGroup(false);
+}
+// -----------------------------------------------------------------------------
+void CheckBoxWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    stringw message = m_properties[PROP_TEXT].c_str();
+    m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
+    
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+}
+// -----------------------------------------------------------------------------
+void GaugeWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    m_element = GUIEngine::getGUIEnv()->addScrollBar(true /* horizontal */, widget_size, NULL, ++id_counter);
+    
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+}
+// -----------------------------------------------------------------------------
+IconButtonWidget::IconButtonWidget(const bool clickable)
+{
+    IconButtonWidget::clickable = clickable;
+}
+// -----------------------------------------------------------------------------
+void IconButtonWidget::add()
+{
+    ITexture* texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+    //const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
+    /*
+    if(w < texture_w) ... ;
+    if(h < texture_h) ... ;
+     */
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    if(clickable)
+    {
+        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+        m_element = btn;
+        btn->setUseAlphaChannel(true);
+        btn->setImage(texture);
+        //btn->setDrawBorder(false);
+        btn->setTabStop(true);
+    }
+    else
+    {
+        IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, NULL, ++id_counter_2);
+        m_element = btn;
+        btn->setUseAlphaChannel(true);
+        btn->setImage(texture);
+        //btn->setDrawBorder(false);
+        btn->setTabStop(false);
+    }
+    stringw  message = m_properties[PROP_TEXT].c_str();
+    if(message.size() > 0)
+    {
+        widget_size += position2d<s32>(0, widget_size.getHeight());
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size);
+        label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
+        label->setTabStop(false);
+    }
+    
+    id = m_element->getID();
+    if(clickable) m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+    
+    /*
+     IGUISpriteBank* sprite_bank = GUIEngine::getGUIEnv()->getSkin()->getSpriteBank(); 
+     // GUIEngine::getDriver()->makeColorKeyTexture(GUIEngine::getDriver()->getTexture("irrlichtlogo2.png"), position2di(0,0)); 
+     sprite_bank->addTexture( GUIEngine::getDriver()->getTexture("irrlichtlogo2.png") );
+     
+     SGUISprite sprite;
+     sprite.frameTime = 3000;
+     SGUISpriteFrame frame;
+     core::array<core::rect<s32> >& rectangles = sprite_bank->getPositions(); 
+     rectangles.push_back(rect<s32>(0,0,128,128));
+     frame.rectNumber = rectangles.size()-1;
+     frame.textureNumber = sprite_bank->getTextureCount() - 1;
+     sprite.Frames.push_back(frame);
+     sprite_bank->getSprites().push_back(sprite); 
+     
+     button->setSpriteBank(sprite_bank);
+     button->setSprite(EGBS_BUTTON_UP, sprite_bank->getSprites().size()-1);
+     button->setSprite(EGBS_BUTTON_DOWN, sprite_bank->getSprites().size()-1);
+     */
+}
 
+#if 0
+#pragma mark -
+#pragma mark Ribbon
+#endif
+
+RibbonWidget::RibbonWidget(const RibbonType type)
+{
+    m_selection = 0;
+    m_ribbon_type = type;
+    updateSelection();
+}
+// -----------------------------------------------------------------------------
+bool RibbonWidget::rightPressed()
+{
+    m_selection++;
+    if(m_selection >= m_children.size())
+    {
+        if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
+        m_selection = m_children.size() - 1;
+    }
+    updateSelection();
+    
+    return m_ribbon_type != RIBBON_TOOLBAR;
+}
+// -----------------------------------------------------------------------------
+bool RibbonWidget::leftPressed()
+{
+    m_selection--;
+    if(m_selection < 0)
+    {
+        if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
+        m_selection = 0;
+    }
+    updateSelection();
+    
+    return m_ribbon_type != RIBBON_TOOLBAR;
+}
+// -----------------------------------------------------------------------------
+void RibbonWidget::focused()
+{
+    if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->updateLabel( this );
+}
+// -----------------------------------------------------------------------------
+bool RibbonWidget::mouseHovered(Widget* child)
+{
+    const int subbuttons_amount = m_children.size();
+    
+    for(int i=0; i<subbuttons_amount; i++)
+    {
+        if(m_children.get(i) == child)
+        {
+            m_selection = i;
+            break;
+        }
+    }
+    updateSelection();
+    return m_ribbon_type != RIBBON_TOOLBAR;
+}
+// -----------------------------------------------------------------------------
+void RibbonWidget::updateSelection()
+{
+    const int subbuttons_amount = m_children.size();
+    
+    for(int i=0; i<subbuttons_amount; i++)
+    {
+        m_children[i].m_selected = (i == m_selection);
+    }
+}
+// -----------------------------------------------------------------------------
+bool RibbonWidget::transmitEvent(Widget* w, std::string& originator)
+{
+    const int subbuttons_amount = m_children.size();
+    
+    for(int i=0; i<subbuttons_amount; i++)
+    {
+        if(m_children[i].m_properties[PROP_ID] == originator)
+        {
+            m_selection = i;
+            break;
+        }
+    }
+    updateSelection();
+    GUIEngine::getGUIEnv()->setFocus(m_element);
     return true;
 }
-
-//-----------------------------------------------------------------------------
-void Widget::updateVariables( const float DELTA )
+// -----------------------------------------------------------------------------
+void RibbonWidget::add()
 {
-    if( m_enable_rotation ) m_rotation_angle += m_rotation_speed * DELTA;
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
 
-    /*Handle delta time dependent features*/
-    if(m_text_scale > MIN_TEXT_SCALE)
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+    m_element = btn;
+    
+    const int subbuttons_amount = m_children.size();
+    
+    // ---- check how much space each child button will take and fit them within available space
+    int total_needed_space = 0;
+    for(int i=0; i<subbuttons_amount; i++)
     {
-        m_text_scale -= MIN_TEXT_SCALE * DELTA;
-        if(m_text_scale < MIN_TEXT_SCALE) m_text_scale = MIN_TEXT_SCALE;
-    }
-
-
-    //For multilines we have to do a *very* ugly workaround for a plib
-    //bug which causes multiline strings to move to the left, at least
-    //while centering, and also gives wrong values for the size of the
-    //text when there are multiple lines. Hopefully this work around will
-    //be removed when we move away from plib; the scrolling and the other
-    //text handling should be cleaned. Also, for some reason, different
-    //positions are needed if the text is centered, and on top of that,
-    //it's not 100% exact. Sorry for the mess.
-    size_t line_end = 0;
-    int lines = 0;
-
-    do
-    {
-        line_end = m_text.find_first_of('\n', line_end + 1);
-        ++lines;
-    } while( line_end != std::string::npos );
-
-
-    /* Handle preset scrolling positions */
-    // In the Y-axis, a scroll position of 0 leaves the text centered, and
-    // positive values lowers the text, and negatives (obviously) raise the
-    // text, in the X-axis, a position of 0 leaves the text aligned to the
-    // left; positive values move to the right and negative
-    // values to the left.
-
-    float left, right;
-    m_font->getBBoxMultiLine(m_text, m_text_size, false, &left, &right, NULL, NULL);
-    int text_width = (int)(right - left + 0.99);
-
-
-    const int Y_LIMIT = lines * m_text_size + m_height;
-
-    //A work around for yet another bug with multilines: we get the wrong
-    //width when using multilines.
-    if( text_width > m_width )
-    {
-        text_width = m_width;
-    }
-
-    //With the preset positions, we do comparations with the equal sign on
-    //floating point variables; however, no operations are done of the
-    //variables between the assignment of these integer values and the
-    //comparation and the values are small enough to fit in a few bytes,
-    //so no inaccuracies because of floating point rounding should happen.
-    //X-axis preset positions
-    if( m_scroll_pos_x == WGT_SCROLL_START_LEFT )
-    {
-        m_scroll_pos_x = 0;
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_START_RIGHT )
-    {
-        m_scroll_pos_x = (float)m_width;
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_CENTER )
-    {
-        m_scroll_pos_x = (float)( (m_width - text_width) / 2 );
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_END_LEFT )
-    {
-        m_scroll_pos_x = (float)(-text_width);
-    }
-    else if( m_scroll_pos_x == WGT_SCROLL_END_RIGHT )
-    {
-        m_scroll_pos_x = (float)(m_width - text_width);
-    }
-    else if( m_scroll_pos_x > MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position is too much to the right to " <<
-            "scroll!.\n";
-    }
-    else if( m_scroll_pos_x < -MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position is too much to the left to " <<
-            "to scroll!.\n";
-    }
-
-    //Y-axis preset positions
-    if( m_scroll_pos_y == WGT_SCROLL_START_TOP )
-    {
-        m_scroll_pos_y =(float)(Y_LIMIT / 2 - m_height);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_START_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_CENTER )
-    {
-        m_scroll_pos_y = 0;
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_TOP )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2);
-    }
-    else if( m_scroll_pos_y == WGT_SCROLL_END_BOTTOM )
-    {
-        m_scroll_pos_y = (float)(-Y_LIMIT / 2 + m_height);
-    }
-    else if( m_scroll_pos_y > MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too high to scroll!.\n";
-    }
-    else if( m_scroll_pos_y < -MAX_SCROLL )
-    {
-        std::cerr << "WARNING: text position too low to scroll!.\n";
-    }
-
-    if(m_enable_scroll)
-    {
-        //TODO: constrain speed to sane values
-        m_scroll_pos_x += m_scroll_speed_x * DELTA;
-        m_scroll_pos_y += m_scroll_speed_y * DELTA;
-
-        //Y-axis wrapping
-        if(m_scroll_pos_y * 2 > Y_LIMIT)
+        m_children[i].readCoords(this);
+        
+        if(m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {
-            m_scroll_pos_y = WGT_SCROLL_END_TOP;
+            std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children " << std::endl;
+            continue;
         }
-        else if(-m_scroll_pos_y * 2 > Y_LIMIT)
-        {
-            m_scroll_pos_y = WGT_SCROLL_START_BOTTOM;
-        }
+        total_needed_space += m_children[i].w;
+    }
+ 
+    int free_h_space = w - total_needed_space;
+    
+    int biggest_y = 0;
+    const int button_y = 10;
+    float global_zoom = 1;
+    
+    const int min_free_space = 50;
+    if(free_h_space < min_free_space) // buttons are too big to fit :( zoom out
+    {
+        global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
+        free_h_space = w - total_needed_space*global_zoom;
+    }
+    
+    const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
+     
+    // ---- add children   
+    for(int i=0; i<subbuttons_amount; i++)
+    {
 
-        //X-axis wrapping
-        if(m_scroll_pos_x > m_width )
+        const int widget_x = one_button_space*(i+1) - one_button_space/2;
+        
+        IGUIButton * subbtn;
+        
+        if(m_children[i].m_type == WTYPE_BUTTON)
         {
-            m_scroll_pos_x = WGT_SCROLL_END_LEFT;
+            rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0, 
+                                          widget_x + one_button_space/2-2,  h);
+            
+            stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
+            subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, ++id_counter, message.c_str(), L"");
+            m_children[i].m_element = subbtn;
         }
-        else if(m_scroll_pos_x < -text_width )
+        else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
-            m_scroll_pos_x = WGT_SCROLL_START_RIGHT;
+            const bool has_label = m_children[i].m_properties[PROP_TEXT].size() > 0;
+            
+            // how much space to keep for the label under the button
+            const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
+            // if button too high to fit, scale down
+            float zoom = global_zoom;
+            while(button_y + m_children[i].h*zoom + needed_space_under_button > h) zoom -= 0.01;
+            
+            // ---- add bitmap button part
+            const float image_w = m_children[i].w*zoom;
+            rect<s32> subsize = rect<s32>(widget_x - image_w/2.0, button_y, 
+                                          widget_x + image_w/2.0, button_y + m_children[i].h*zoom);
+            
+            subbtn = new MyGUIButton(GUIEngine::getGUIEnv(), btn, ++id_counter_2, subsize, true);
+            
+            m_children[i].m_element = subbtn;
+            subbtn->setUseAlphaChannel(true);
+            subbtn->setImage( GUIEngine::getDriver()->getTexture(m_children[i].m_properties[PROP_ICON].c_str()) );
+
+            // ---- label part
+            if(has_label)
+            {
+                subsize = rect<s32>(widget_x - one_button_space/2,
+                                    (button_y + m_children[i].h)*zoom + 5 /* leave 5 pixels between button and label */, 
+                                    widget_x + one_button_space/2, h);
+                
+                stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
+                IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), subsize, false, true, btn);
+                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+                label->setTabStop(false);
+                label->setNotClipped(true);
+                const int final_y = subsize.getHeight() + label->getTextHeight();
+                if(final_y > biggest_y) biggest_y = final_y;
+            }
+        }
+        else
+        {
+            std::cerr << "/!\\ Warning /!\\ : Unknown contents type in ribbon" << std::endl;
+        }
+        
+        subbtn->setTabStop(false);
+        subbtn->setTabGroup(false);
+        
+        m_children[i].id = subbtn->getID();
+        m_children[i].m_parent = this;
+    }// next sub-button
+    
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+    updateSelection();
+}
+
+#if 0
+#pragma mark -
+#pragma mark Spinner
+#endif
+
+void SpinnerWidget::add()
+{
+    // retrieve min and max values
+    std::string min_s = m_properties[PROP_MIN_VALUE];
+    std::string max_s = m_properties[PROP_MAX_VALUE];
+    
+    {
+        int i;
+        std::istringstream myStream(min_s);
+        bool is_number = (myStream >> i);
+        if(is_number) m_min = i;
+        else m_min = 0;
+    }
+    {
+        int i;
+        std::istringstream myStream(max_s);
+        bool is_number = (myStream >> i);
+        if(is_number) m_max = i;
+        else m_max = 10;
+    }    
+    
+    m_value = (m_min + m_max)/2;    
+    
+    // create sub-widgets if they don't already exist
+    if(m_children.size() == 0)
+    {
+        std::string& icon = m_properties[PROP_ICON];
+        m_graphical = icon.size()>0;
+        
+        m_children.push_back( new Widget() );
+        m_children.push_back( new Widget() );
+        m_children.push_back( new Widget() );
+    }
+    
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+    m_element = btn;
+    
+    // left arrow
+    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
+    IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, ++id_counter_2, L"<<");
+    m_children[0].m_element = left_arrow;
+    left_arrow->setTabStop(false);
+    m_children[0].m_parent = this;
+    m_children[0].m_properties[PROP_ID] = "left";
+    m_children[0].id = m_children[0].m_element->getID();
+    
+    // label
+    if(m_graphical)
+    {
+        char imagefile[128];
+        std::string& icon = m_properties[PROP_ICON];
+        snprintf(imagefile, 128, icon.c_str(), m_value);
+        ITexture* texture = GUIEngine::getDriver()->getTexture(imagefile);
+        const int texture_width = texture->getSize().Width;
+        const int free_h_space = w-h*2-texture_width; // to center image
+        
+        rect<s32> subsize_label = rect<s32>(h+free_h_space/2, 0, w-h+free_h_space/2, h);
+        //IGUIButton* subbtn = GUIEngine::getGUIEnv()->addButton(subsize_label, btn, ++id_counter_2, L"");
+        IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(subsize_label, btn, ++id_counter_2);
+        m_children[1].m_element = subbtn;
+        subbtn->setUseAlphaChannel(true);
+        
+        subbtn->setImage(texture);
+        //subbtn->setScaleImage(true);
+    }
+    else
+    {
+        rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label, false, true, btn);
+        m_children[1].m_element = label;
+        label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+        label->setTabStop(false);
+        label->setNotClipped(true);
+    }
+    
+    
+    // right arrow
+    rect<s32> subsize_right_arrow = rect<s32>(w-h, 0, w, h);
+    IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, ++id_counter_2, L">>");
+    right_arrow->setTabStop(false);
+    m_children[2].m_element = right_arrow;
+    m_children[2].m_parent = this;
+    m_children[2].m_properties[PROP_ID] = "right";
+    m_children[2].id = m_children[2].m_element->getID();
+}
+// -----------------------------------------------------------------------------
+bool SpinnerWidget::rightPressed()
+{
+    if(m_value+1 <= m_max) setValue(m_value+1);
+    return true;
+}
+// -----------------------------------------------------------------------------
+bool SpinnerWidget::leftPressed()
+{
+    if(m_value-1 >= m_min) setValue(m_value-1);
+    return true;
+}
+// -----------------------------------------------------------------------------
+bool SpinnerWidget::transmitEvent(Widget* w, std::string& originator)
+{
+    if(originator == "left") leftPressed();
+    else if(originator == "right") rightPressed();
+    
+    GUIEngine::getGUIEnv()->setFocus(m_element);
+    return true;
+}
+// -----------------------------------------------------------------------------
+void SpinnerWidget::addLabel(std::string label)
+{
+    m_labels.push_back(label);
+    m_min = 0;
+    m_max = m_labels.size()-1;
+    setValue(0);
+}
+// -----------------------------------------------------------------------------
+void SpinnerWidget::setValue(const int new_value)
+{
+    m_value = new_value;
+    
+    if(m_graphical)
+    {
+        char imagefile[128];
+        std::string& icon = m_properties[PROP_ICON];
+        snprintf(imagefile, 128, icon.c_str(), m_value);
+        //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
+        ((IGUIImage*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
+    }
+    else if(m_labels.size() > 0)
+        m_children[1].m_element->setText( stringw(m_labels[new_value].c_str()).c_str() );
+    else
+        m_children[1].m_element->setText( stringw(m_value).c_str() );
+}
+
+#if 0
+#pragma mark -
+#pragma mark Ribbon Grid Widget
+#endif
+
+RibbonGridWidget::RibbonGridWidget()
+{
+    m_scroll_offset = 0;
+    m_needed_cols = 0;
+    m_col_amount = 0;
+    m_has_label = false;
+    
+    m_left_widget = NULL;
+    m_right_widget = NULL;
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::add()
+{
+    m_has_label = m_properties[PROP_TEXT].size() > 0;
+    const int label_height = m_has_label ? 25 : 0;
+    
+    int child_width, child_height;
+    child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
+    child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
+    
+    if( child_width == 0 || child_height == 0 )
+    {
+        std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
+        child_width = 256;
+        child_height = 256;
+    }
+    
+    // decide how many rows and column we can show in the available space
+    int row_amount = (int)round((h-label_height) / (float)child_height);
+    //if(row_amount < 2) row_amount = 2;
+    //else if(row_amount > 5) row_amount = 5;
+    const float row_height = (float)(h - label_height)/(float)row_amount;
+    
+    // FIXME - that code seems to work but it's a bit obscure why
+    float ratio_zoom = (float)child_height / (float)row_height;
+    if(ratio_zoom > 1) ratio_zoom = 1 / ratio_zoom;
+    m_col_amount = (int)round( w / ratio_zoom / ( child_width + 20 ) );
+    if(m_col_amount < 5) m_col_amount = 5;
+    
+    // add rows
+    for(int n=0; n<row_amount; n++)
+    {
+        RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+        ribbon->x = x;
+        ribbon->y = y + n*row_height;
+        ribbon->w = w;
+        ribbon->h = row_height;
+        ribbon->m_type = WTYPE_RIBBON;
+        ribbon->m_properties[PROP_ID] = this->m_properties[PROP_ID];
+        ribbon->m_parent = this;
+        
+        // add columns
+        for(int i=0; i<m_col_amount; i++)
+        {
+            IconButtonWidget* icon = new IconButtonWidget();
+            icon->m_properties[PROP_ICON]="track?.png";
+            
+            // set size to get proper ratio (as most textures are saved sccaled down to 256x256)
+            icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
+            icon->m_properties[PROP_HEIGHT]= m_properties[PROP_CHILD_HEIGHT];
+            
+            icon->m_type = WTYPE_ICON_BUTTON;
+            ribbon->m_children.push_back( icon );
+        }
+        m_children.push_back( ribbon );
+        m_rows.push_back( ribbon );
+        ribbon->add();
+    }
+    
+    // add label at bottom
+    if(m_has_label)
+    {
+        rect<s32> label_size = rect<s32>(x, y + h - label_height, x+w, y+h);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(L"Selecte a track...", label_size, false, true /* word wrap */, NULL, -1);
+        m_label->setTextAlignment( EGUIA_CENTER, EGUIA_CENTER );
+    }
+    
+    // add arrow butotns on each side
+    // FIXME? these arrow buttons are outside of the widget's boundaries
+    // create sub-widgets if they don't already exist
+    if(m_left_widget == NULL)
+    {
+        m_left_widget = new Widget();
+        m_right_widget = new Widget();
+    }
+    
+    const int average_y = y + (h-label_height)/2;
+    const int button_w = 30, button_h = 50;
+    rect<s32> right_arrow_location = rect<s32>(x + w,
+                                               average_y - button_h/2,
+                                               x + w + button_w,
+                                               average_y + button_h/2);
+    stringw  rmessage = ">>";
+    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, ++id_counter_2, rmessage.c_str(), L"");
+    right_arrow->setTabStop(false);
+    m_right_widget->m_element = right_arrow;
+    m_right_widget->m_parent = this;
+    m_right_widget->m_properties[PROP_ID] = "right";
+    m_right_widget->id = right_arrow->getID();
+    m_children.push_back( m_right_widget );
+    
+    rect<s32> left_arrow_location = rect<s32>(x - button_w,
+                                               average_y - button_h/2,
+                                               x,
+                                               average_y + button_h/2);
+    stringw  lmessage = "<<";
+    IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, ++id_counter_2, lmessage.c_str(), L"");
+    left_arrow->setTabStop(false);
+    m_left_widget->m_element = left_arrow;
+    m_left_widget->m_parent = this;
+    m_left_widget->m_properties[PROP_ID] = "left";
+    m_left_widget->id = left_arrow->getID();
+    m_children.push_back( m_left_widget );
+}
+// -----------------------------------------------------------------------------
+bool RibbonGridWidget::rightPressed()
+{
+    RibbonWidget* w = getSelectedRibbon();
+    if(w != NULL)
+    {
+        w->rightPressed();
+    
+        updateLabel();
+        propagateSelection();
+    }
+    return false;
+}
+// -----------------------------------------------------------------------------
+bool RibbonGridWidget::leftPressed()
+{
+    RibbonWidget* w = getSelectedRibbon();
+    if(w != NULL)
+    {
+        w->leftPressed();
+    
+        updateLabel();
+        propagateSelection();
+    }
+    return false;
+}
+// -----------------------------------------------------------------------------
+bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
+{
+    if(originator=="left")
+    {
+        scroll(-1);
+        return false;
+    }
+    if(originator=="right")
+    {
+        scroll(1);
+        return false;
+    }
+    
+    // if it's something else, it might be a ribbon child with its own parent
+    if(w->m_parent != NULL && w->m_parent != this)
+        return w->m_parent->transmitEvent(w, originator);
+    
+    // if we got there, must be a ribbon itself. in this case we can just transmit the event directly
+    return true;
+}
+void RibbonGridWidget::scroll(const int x_delta)
+{
+    m_scroll_offset += x_delta;
+    
+    const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
+    
+    if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
+    else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
+    
+    updateItemDisplay();
+}
+// -----------------------------------------------------------------------------
+bool RibbonGridWidget::mouseHovered(Widget* child)
+{
+    updateLabel();
+    propagateSelection();
+    return false;
+}
+// -----------------------------------------------------------------------------
+/** RibbonGridWidget is made of several ribbons; each of them thus has
+ its own selection independently of each other. To keep a grid feeling
+ (i.e. you remain in the same column when pressing up/down), this method is
+ used to ensure that all children ribbons always select the same column */
+void RibbonGridWidget::propagateSelection()
+{
+    // find selection in current ribbon
+    RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon();
+    if(selected_ribbon == NULL) return;
+    const int i = selected_ribbon->m_selection;
+    
+    // set same selection in all ribbons
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
+    {
+        RibbonWidget* ribbon = m_rows.get(n);
+        if(ribbon != selected_ribbon)
+        {
+            ribbon->m_selection = i;
+            ribbon->updateSelection();
         }
     }
 }
-
-//-----------------------------------------------------------------------------
-void Widget::draw()
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::focused()
 {
-    glPushMatrix();
-
-    glClear( GL_STENCIL_BUFFER_BIT );
-
-    applyTransformations();
-
-    /*Start handling on/off features*/
-    if( m_enable_texture )
-    {
-        glEnable( GL_TEXTURE_2D );
-        if( glIsTexture ( m_texture ))
-        {
-            glBindTexture( GL_TEXTURE_2D, m_texture );
-        }
-        else
-        {
-            std::cerr << "Warning: widget tried to draw null texture.\n";
-            std::cerr << "(Did you set the texture?)\n";
-        }
-    }
-    else
-    {
-        //This ensures that a texture from another module doesn't affects the widget
-        glDisable ( GL_TEXTURE_2D );
-    }
-
-    if( glIsList ( m_rect_list ))
-    {
-        //m_enable_rect == false doesn't disables this chunk of code because
-        //we still need to draw the rect into OpenGL's selection buffer even
-        //if it's not visible
-
-        //FIXME: maybe there is some sort of stacking method to disable/enable
-        //color masking
-        if(!m_enable_rect)
-        {
-            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        }
-        else
-        {
-            glColor4fv(m_rect_color);
-        }
-
-        //FIXME: I should probably revert the values to the defaults within the widget manager
-        //(if glPushAttrib() doesn't), but right now this is the only thing using the
-        //stencil test anyways.
-        glStencilFunc(GL_ALWAYS, 0x1, 0x1);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glCallList(m_rect_list);
-
-        if(!m_enable_rect)
-        {
-            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        }
-    }
-    else
-    {
-        std::cerr << "Warning: widget tried to draw null rect list.\n";
-        std::cerr << "(Did you created the rect?)\n";
-    }
-
-    if(glIsList(m_border_list))
-    {
-        if( m_enable_border )
-        {
-            glDisable ( GL_TEXTURE_2D );
-            glColor4fv(m_border_color);
-
-            //FIXME: I should probably revert the values to the defaults within the widget manager
-            //(if glPushAttrib() doesn't)
-            glStencilFunc(GL_ALWAYS, 0x1, 0x1);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-            glCallList(m_border_list);
-        }
-    }
-    else
-    {
-        std::cerr << "Warning: widget tried to draw null border list.\n";
-        std::cerr << "(Did you created the border?)\n";
-    }
-
-    if( m_enable_track )
-    {
-        if( m_track_num > (int)(track_manager->getNumberOfTracks()) - 1)
-        {
-            std::cerr << "Warning: widget tried to draw a track with a " <<
-                "number bigger than the amount of tracks available.\n";
-        }
-
-        if( m_track_num != -1 )
-        {
-            track_manager->getTrack( m_track_num )->drawScaled2D( 0.0f, 
-                0.0f, (float)m_width, (float)m_height);
-        }
-        else
-        {
-            std::cerr << "Warning: widget tried to draw an unset track.\n";
-        }
-    }
-
-    if(m_enable_text)
-    {
-        //For multilines we have to do a *very* ugly workaround for a plib
-        //bug which causes multiline strings to move to the left, at least
-        //while centering, and also gives wrong values for the size of the
-        //text when there are multiple lines. Hopefully this work around will
-        //be removed when we move away from plib; the scrolling and the other
-        //text handling should be cleaned. Also, for some reason, different
-        //positions are needed if the text is centered, and on top of that,
-        //it's not 100% exact. Sorry for the mess.
-        size_t line_end = 0;
-        int lines = 0;
-
-        do
-        {
-            line_end = m_text.find_first_of('\n', line_end + 1);
-            ++lines;
-        } while( line_end != std::string::npos );
-
-
-        int x_pos = (int)(m_scroll_pos_x - m_width * 0.5f);
-        int y_pos = - (int)m_scroll_pos_y + (lines - 1 )* m_text_size / 2;
-
-        size_t line_start = 0;
-        bool draw;
-
-        glStencilFunc(GL_EQUAL,0x1,0x1);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        do
-        {
-            draw = true;
-            if(y_pos + m_text_size / 2 > m_height / 2 )
-            {
-                if(y_pos - m_text_size / 2 >  m_height / 2) draw = false;
-            }
-            else if(y_pos + (m_height - m_text_size) / 2 < 0)
-            {
-                if(y_pos + (m_height + m_text_size) / 2 < 0) draw = false;
-            }
-
-            line_end = m_text.find_first_of('\n', line_start);
-
-            if( draw )
-            {
-                glScalef(m_text_scale, m_text_scale, 1.0f);
-                m_font->PrintBold(m_text.substr(line_start, line_end - line_start).c_str(), 
-                    m_text_size,
-                    x_pos, y_pos - m_text_size / 2,
-                    m_text_color, 1.0f, 1.0f);
-                glScalef(1.0f/m_text_scale, 1.0f/m_text_scale, 1.0f);
-            }
-
-            y_pos -= m_text_size;
-            line_start = line_end + 1;
-
-        } while( line_end != std::string::npos );
-    }
-    glPopMatrix();
+    updateLabel();
 }
-
-//-----------------------------------------------------------------------------
-void Widget::applyTransformations()
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
-    /* OpenGL transformations are affected by the order of the calls; but the
-     * operations must be called in the inverse order that you want them to
-     * be applied, since the calls are stacked, and the one at the top is
-     * done first, till the one at the bottom.
-     */
-    glTranslatef ( (GLfloat)(m_x + m_width * 0.5f), (GLfloat)(m_y + m_height * 0.5f), 0);
-
-    if( m_enable_rotation )
+    if(!m_has_label) return;
+    
+    RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon();
+    if(row == NULL) return;
+    
+    
+    std::string selection_id = row->getSelectionName();
+    
+    const int amount = m_items.size();
+    for(int n=0; n<amount; n++)
     {
-        glRotatef( (GLfloat)m_rotation_angle, 0.0f, 0.0f, (GLfloat)1.0f );
+        if(m_items[n].m_code_name == selection_id)
+        {
+            m_label->setText( stringw(m_items[n].m_user_name.c_str()).c_str() );
+            return;
+        }
     }
+    
+    m_label->setText( L"Random" );
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
+{
+    ItemDescription desc;
+    desc.m_user_name = user_name;
+    desc.m_code_name = code_name;
+    desc.m_sshot_file = image_file;
+    
+    m_items.push_back(desc);
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::updateItemDisplay()
+{
+    int trackid = 0;
+    
+    const int row_amount = m_rows.size();
+    const int track_amount = m_items.size();
+    
+    m_needed_cols = (int)ceil( (float)track_amount / (float)row_amount );
+
+    for(int n=0; n<row_amount; n++)
+    {
+        Widget& row = m_rows[n];
+        
+        for(int i=0; i<m_col_amount; i++)
+        {
+            IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
+            assert(icon != NULL);
+            IGUIButton* button = dynamic_cast<IGUIButton*>(icon->m_element);
+            assert(button != NULL);
+            
+            trackid = ((i+m_scroll_offset)%m_col_amount)*row_amount + n%row_amount;
+            
+            if( trackid < track_amount )
+            {
+                button->setImage( GUIEngine::getDriver()->getTexture(  m_items[trackid].m_sshot_file.c_str()) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( m_items[trackid].m_sshot_file.c_str()) );
+                icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
+               // trackid++;
+            }
+            else
+            {
+                button->setImage( GUIEngine::getDriver()->getTexture("track?.png") );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture("track?.png") );
+                icon->m_properties[PROP_ID] = "track?.png";
+            }
+        } // next column
+    } // next row
+}
+// -----------------------------------------------------------------------------
+const std::string& RibbonGridWidget::getSelectionName()
+{
+    RibbonWidget* row = (RibbonWidget*)getSelectedRibbon();
+    if(row != NULL) return row->getSelectionName();
+    
+    static const std::string nothing = "";
+    return nothing;
+}
+// -----------------------------------------------------------------------------
+RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
+{
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
+    {
+        const RibbonWidget* row = &m_rows[n];
+        if(row != NULL)
+        {
+            if(m_children.contains( w ) ) return (RibbonWidget*)row;
+        }
+    }
+    
+    return NULL;
+}
+// -----------------------------------------------------------------------------
+RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
+{
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
+    {
+        const RibbonWidget* row = &m_rows[n];
+        if(row != NULL)
+        {
+            if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
+                m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
+        }
+    }
+    
+    return NULL;
 }

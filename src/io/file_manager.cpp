@@ -19,6 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "io/file_manager.hpp"
+#include <unistd.h>
 
 #include <stdexcept>
 #include <sstream>
@@ -91,16 +92,31 @@ FileManager* file_manager = 0;
  */
 FileManager::FileManager()
 {
-    m_device       = createDevice(video::EDT_NULL);
+#ifdef __APPLE__
+    // irrLicht's createDevice method has a nasty habit of messing the CWD.
+    // since the code above may rely on it, save it to be able to restore it after.
+    char buffer[256];
+    getcwd(buffer, 256);
+#endif
+    
+    m_device = createDevice(video::EDT_NULL);
+    
+#ifdef __APPLE__
+    chdir( buffer );
+#endif
+
     m_file_system  = m_device->getFileSystem();
     m_is_full_path = false;
-    
+
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
-    else if(m_file_system->existFile("data/stk_config.data"))
+   // else if(m_file_system->existFile("/Developer/games/supertuxkart/data/stk_config.data"))
+    //    m_root_dir = "/Developer/games/supertuxkart" ;
+    // FIXME - existFile() fails to detect the file, even though it exists, on my computer
+    else if(m_file_system->existFile("/data/stk_config.data"))
         m_root_dir = "." ;
     else if(m_file_system->existFile("../data/stk_config.data"))
         m_root_dir = ".." ;

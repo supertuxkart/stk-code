@@ -36,14 +36,12 @@
 #include "loader.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/widget_manager.hpp"
-#include "gui/font.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "gui/font.hpp"
 
 #define DEADZONE_MOUSE        150
 #define DEADZONE_MOUSE_SENSE  200
@@ -229,16 +227,20 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
     {
         m_flags |= SDL_FULLSCREEN;
 
+        // TODO - GUI and screen setup
+        /*
         if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-          showPointer();
+          showPointer();*/
           
         // Store settings in user config file in case new video mode
         // causes a crash
         user_config->m_crashed = true; //set flag. 
         user_config->saveConfig();
     }
+    // TODO - GUI and screen setup
+    /*
     else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-        hidePointer();
+        hidePointer();*/
             
     setVideoMode(resetTextures);
 }   // toggleFullscreen
@@ -289,7 +291,7 @@ void SDLDriver::setVideoMode(bool resetTextures)
 
         //TODO: this function probably will get deleted in the future; if
         //so, the widget_manager.hpp include has no other reason to be here.
-        widget_manager->reloadFonts();
+        //widget_manager->reloadFonts();
     }
 #endif
 }   // setVideoMode
@@ -326,6 +328,8 @@ SDLDriver::~SDLDriver()
 void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
                       int value)
 {
+    // TODO - menus handle SDL input
+    /*
     BaseGUI* menu = menu_manager->getCurrentMenu();
 
     GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
@@ -391,6 +395,7 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
             menu->handle(ga, value);
          }
     }   // menu!=NULL
+     */
 }   // input
 
 //-----------------------------------------------------------------------------
@@ -433,12 +438,14 @@ void SDLDriver::input()
         case SDL_KEYDOWN:
             if (m_mode == LOWLEVEL)
             {
+                // TODO - keyboard handling and GUI
+                /*
                 // Unicode translation in SDL is only done for keydown events.
                 // Therefore for lowlevel keyboard handling we provide no notion
                 // of whether a key was pressed or released.
                 menu_manager->getCurrentMenu()
                     ->inputKeyboard(ev.key.keysym.sym,
-                                    ev.key.keysym.unicode);
+                                    ev.key.keysym.unicode);*/
             }
             input(Input::IT_KEYBOARD, ev.key.keysym.sym,
 #ifdef HAVE_IRRLICHT
@@ -465,11 +472,14 @@ void SDLDriver::input()
             // axis value) while the pointer has two.
             if (!m_mode)
             {
+                // TODO - mouse motion handling and GUI
+                /*
                 BaseGUI* menu = menu_manager->getCurrentMenu();
 #ifndef HAVE_IRRLICHT
                 if (menu != NULL)
                     menu->inputPointer(ev.motion.x, m_main_surface->h - ev.motion.y);
 #endif
+                 */
             }
             // If sensing input mouse movements are made less sensitive in order
             // to avoid it being detected unwantedly.
@@ -582,8 +592,10 @@ void SDLDriver::input()
                    ev.jbutton.button, 0, 32768);
             break;
         case SDL_USEREVENT:
+                // TODO - GUI countdown
+                break;
         // used in display_res_confirm for the countdown timer
-        (menu_manager->getCurrentMenu())->countdown();
+        // (menu_manager->getCurrentMenu())->countdown();
         
         }  // switch
     }   // while (SDL_PollEvent())

@@ -34,9 +34,9 @@
 
 class SFXBase;
 struct KartIconDisplayInfo;
-class RaceGUI;
 class btRigidBody;
 class Track;
+class RaceGUI;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
