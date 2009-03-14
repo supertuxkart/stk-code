@@ -42,6 +42,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "gui/font.hpp"
+#include "gui/race_gui.hpp"
 
 #define DEADZONE_MOUSE        150
 #define DEADZONE_MOUSE_SENSE  200
@@ -329,8 +330,8 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                       int value)
 {
     // TODO - menus handle SDL input
-    /*
-    BaseGUI* menu = menu_manager->getCurrentMenu();
+    RaceGUI* menu = getRaceGUI(); // FIXME - input is handled in menu class??
+    //BaseGUI* menu = menu_manager->getCurrentMenu();
 
     GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 
@@ -388,14 +389,15 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 int x, y;
                 SDL_GetMouseState( &x, &y );
                 y = SDL_GetVideoSurface()->h - y;
-                menu->inputPointer( x, y );
+                //menu->inputPointer( x, y );
             }
 
+            std::cout << "--- passing event to menu\n";
+            
             // Lets the currently active menu handle the GameAction.
             menu->handle(ga, value);
          }
     }   // menu!=NULL
-     */
 }   // input
 
 //-----------------------------------------------------------------------------

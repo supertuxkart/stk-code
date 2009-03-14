@@ -128,8 +128,13 @@ RaceGUI::handle(GameAction ga, int value)
 	// Note that the kartaction enum value and their representatives in
 	// gameaction enum have the same order (Otherwise the stuff below would
 	// not work ...)!
+    
+    std::cout << "--- ga = " << ga << "\n";
+    
 	if (ga >= GA_FIRST_KARTACTION && ga <= GA_LAST_KARTACTION)
 	{
+        std::cout << "--- yay passing to kart\n";
+        
 		// 'Pulls down' the gameaction value to make them multiples of the
 		// kartaction values.
 		int ka = ga - GA_FIRST_KARTACTION;
