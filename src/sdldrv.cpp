@@ -392,8 +392,6 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 //menu->inputPointer( x, y );
             }
 
-            std::cout << "--- passing event to menu\n";
-            
             // Lets the currently active menu handle the GameAction.
             menu->handle(ga, value);
          }
