@@ -228,7 +228,7 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
     {
         m_flags |= SDL_FULLSCREEN;
 
-        // TODO - GUI and screen setup
+        // TODO - toggle fullscreen / hide/show mouse
         /*
         if(menu_manager->isSomewhereOnStack(MENUID_RACE))
           showPointer();*/
@@ -238,7 +238,7 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
         user_config->m_crashed = true; //set flag. 
         user_config->saveConfig();
     }
-    // TODO - GUI and screen setup
+    // TODO - toggle fullscreen / hide/show mouse
     /*
     else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
         hidePointer();*/

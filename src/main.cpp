@@ -566,6 +566,8 @@ int main(int argc, char *argv[] )
         //widget_manager   = new WidgetManager;
         //menu_manager->switchToMainMenu();
 
+        inputDriver->setMode(SDLDriver::INGAME);
+        
         // Replay a race
         // =============
         if(history->replayHistory())
