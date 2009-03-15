@@ -273,123 +273,39 @@
 				Name="gui"
 				>
 				<File
-					RelativePath="../../../src\gui\base_gui.cpp"
+					RelativePath="..\..\gui\engine.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\challenges_menu.cpp"
+					RelativePath="..\..\gui\font.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\char_sel.cpp"
+					RelativePath="..\..\gui\my_button.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_controls.cpp"
+					RelativePath="..\..\gui\race_gui.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_display.cpp"
+					RelativePath="..\..\gui\screen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_sound.cpp"
+					RelativePath="..\..\gui\screen_loader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\credits_menu.cpp"
+					RelativePath="..\..\gui\skin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\display_res_confirm.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\feature_unlocked.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\font.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\game_mode.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_ending.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_select.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_one.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_three.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_two.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\main_menu.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\menu_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\network_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_players.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\options.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\player_controls.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_menu.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\race_options.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_results_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\start_race_feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\track_sel.cpp"
+					RelativePath="..\..\gui\state_manager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\gui\widget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\widget_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -887,123 +803,35 @@
 				Name="gui"
 				>
 				<File
-					RelativePath="../../../src\gui\base_gui.hpp"
+					RelativePath="..\..\gui\font.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\challenges_menu.hpp"
+					RelativePath="..\..\gui\my_button.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\char_sel.hpp"
+					RelativePath="..\..\gui\ptr_vector.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_controls.hpp"
+					RelativePath="..\..\gui\race_gui.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_display.hpp"
+					RelativePath="..\..\gui\screen.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_sound.hpp"
+					RelativePath="..\..\gui\skin.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\credits_menu.hpp"
+					RelativePath="..\..\gui\state_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\display_res_confirm.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\feature_unlocked.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\font.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\game_mode.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_ending.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_select.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_one.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_three.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_two.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\main_menu.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\menu_manager.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\network_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_players.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\options.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\player_controls.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_menu.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\race_options.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_results_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\start_race_feedback.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\track_sel.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\widget.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\widget_manager.hpp"
+					RelativePath="..\..\gui\widget.hpp"
 					>
 				</File>
 			</Filter>

@@ -1,11 +1,13 @@
+#include <iostream>
+#include <sstream>
+#include <assert.h>
+
+#include "irrlicht.h"
+
 #include "gui/screen.hpp"
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
-#include "io/file_manager.hpp";
-#include <irrlicht.h>
-#include <iostream>
-#include <irrXML.h>
-#include <sstream>
+#include "io/file_manager.hpp"
 
 using namespace irr;
 
@@ -120,12 +122,12 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                     widgets[n].x = x;
                     widgets[n].y = y;
                     
-                    widgets[n].w = left_space*fraction;
+                    widgets[n].w = (int)(left_space*fraction);
                     x += widgets[n].w;
                 }
                 else
                 {    
-                    widgets[n].h = left_space*fraction;
+                    widgets[n].h = (int)(left_space*fraction);
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if(align.size() < 1 || align == "left") widgets[n].x = x;
@@ -280,6 +282,7 @@ bool Screen::OnEvent(const SEvent& event)
             }
         
             case KEY_RIGHT:
+            {
                 IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
                 if(el == NULL) break;
                 Widget* w = getWidget( el->getID() );
@@ -291,7 +294,7 @@ bool Screen::OnEvent(const SEvent& event)
                 if(widget_to_call->rightPressed())
                     transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
                 break;
-        
+            }
             case KEY_UP:
             {
                 IGUIElement *el, *first=NULL, *closest=NULL;
@@ -365,6 +368,7 @@ bool Screen::OnEvent(const SEvent& event)
             case EGET_BUTTON_CLICKED:
             case EGET_SCROLL_BAR_CHANGED:
             case EGET_CHECKBOX_CHANGED:
+            {
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
                 
@@ -378,7 +382,7 @@ bool Screen::OnEvent(const SEvent& event)
                 }
                 else transmitEvent(w, w->m_properties[PROP_ID]);
                 break;
-                
+            }    
             case EGET_ELEMENT_HOVERED:
             {
                 Widget* w = getWidget(id);

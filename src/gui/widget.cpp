@@ -6,6 +6,10 @@
 #include <iostream>
 #include <sstream>
 
+#ifndef round
+# define round(x)  (floor(x+0.5f))
+#endif
+
 using namespace irr;
 using namespace core;
 using namespace scene;

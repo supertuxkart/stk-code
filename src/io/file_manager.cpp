@@ -19,7 +19,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "io/file_manager.hpp"
-#include <unistd.h>
 
 #include <stdexcept>
 #include <sstream>
@@ -34,6 +33,7 @@
 #  endif
 #  define CONFIGDIR       "."
 #else
+#  include <unistd.h>
 #  define CONFIGDIR       ".supertuxkart"
 #endif
 

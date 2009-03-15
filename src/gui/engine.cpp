@@ -1,9 +1,11 @@
 #include "gui/engine.hpp"
+
+#include <iostream>
+#include <assert.h>
 #include "gui/screen.hpp"
 #include "gui/skin.hpp"
 #include "gui/widget.hpp"
 #include "io/file_manager.hpp"
-#include <iostream>
 
 namespace GUIEngine
 {

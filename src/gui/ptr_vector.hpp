@@ -24,7 +24,7 @@
 
 #include <vector>
 #include <iostream>
-
+#include <assert.h>
 
 enum VECTOR_TYPE
 {
