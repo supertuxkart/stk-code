@@ -686,7 +686,7 @@ void RibbonGridWidget::add()
         for(int i=0; i<m_col_amount; i++)
         {
             IconButtonWidget* icon = new IconButtonWidget();
-            icon->m_properties[PROP_ICON]="track?.png";
+            icon->m_properties[PROP_ICON]="track_random.png";
             
             // set size to get proper ratio (as most textures are saved sccaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
@@ -905,9 +905,9 @@ void RibbonGridWidget::updateItemDisplay()
             }
             else
             {
-                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track?.png").c_str() ) );
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track?.png").c_str() ) );
-                icon->m_properties[PROP_ID] = "track?.png";
+                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random").c_str() ) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random").c_str() ) );
+                icon->m_properties[PROP_ID] = "track_random";
             }
         } // next column
     } // next row

@@ -43,6 +43,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "gui/font.hpp"
 #include "gui/race_gui.hpp"
+#include "gui/engine.hpp"
 #include "gui/state_manager.hpp"
 
 #define DEADZONE_MOUSE        150
@@ -229,20 +230,16 @@ void SDLDriver::toggleFullscreen(bool resetTextures)
     {
         m_flags |= SDL_FULLSCREEN;
 
-        // TODO - toggle fullscreen / hide/show mouse
-        /*
-        if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-          showPointer();*/
+        if(StateManager::isGameState())
+          showPointer();
           
         // Store settings in user config file in case new video mode
         // causes a crash
         user_config->m_crashed = true; //set flag. 
         user_config->saveConfig();
     }
-    // TODO - toggle fullscreen / hide/show mouse
-    /*
-    else if(menu_manager->isSomewhereOnStack(MENUID_RACE))
-        hidePointer();*/
+    else if(StateManager::isGameState())
+        hidePointer();
             
     setVideoMode(resetTextures);
 }   // toggleFullscreen
@@ -327,20 +324,65 @@ SDLDriver::~SDLDriver()
   * Note: It is the obligation of the called menu to switch of the sense mode.
   *
   */
+#define MAX_VALUE 32768
+
+void postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
+{
+    irr::SEvent::SMouseInput evt;
+    
+    evt.Event = type;
+    evt.X = x;
+    evt.Y = y;
+    
+    irr::SEvent wrapper;
+    wrapper.MouseInput = evt;
+    wrapper.EventType = EET_MOUSE_INPUT_EVENT;
+    
+    GUIEngine::getDevice()->postEventFromUser(wrapper);
+}
+
 void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
                       int value)
 {
-    // TODO - menus handle SDL input
-    if(!StateManager::isGameState()) return;
-        
-    RaceGUI* menu = getRaceGUI(); // FIXME - input is handled in menu class??
-
-    //BaseGUI* menu = menu_manager->getCurrentMenu();
-
-    GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
-
-    if (menu != NULL)
+    if(!StateManager::isGameState())
     {
+        //http://irrlicht.sourceforge.net/docu/classirr_1_1_irrlicht_device.html#bf859e39f017b0403c6ed331e48e01df
+        if(type == Input::IT_KEYBOARD)
+        {
+            irr::SEvent::SKeyInput evt;
+            
+            if(id0 == 9)
+                evt.Key = irr::KEY_TAB;
+            else if(id0 == 13)
+                evt.Key = irr::KEY_RETURN;
+            else if(id0 == 273)
+                evt.Key = irr::KEY_UP;
+            else if(id0 == 274)
+                evt.Key = irr::KEY_DOWN;
+            else if(id0 == 275)
+                evt.Key = irr::KEY_RIGHT;            
+            else if(id0 == 276)
+                evt.Key = irr::KEY_LEFT;
+            else
+                evt.Key = (irr::EKEY_CODE) id0; // FIXME - probably won't work, need better input handling
+            
+            
+            evt.PressedDown = value > MAX_VALUE/2;
+            
+            irr::SEvent wrapper;
+            wrapper.KeyInput = evt;
+            wrapper.EventType = EET_KEY_INPUT_EVENT;
+            
+            GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }
+
+    }
+    else
+    {
+        RaceGUI* menu = getRaceGUI(); // FIXME - input is handled in menu class??
+        if(menu == NULL) return;
+        
+        GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
         // Act different in input sensing mode.
         if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
             m_mode <= INPUT_SENSE_PREFER_BUTTON)
@@ -361,13 +403,13 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 // The latter is necessary since some gamepads have analog
                 // buttons that can return two different events when pressed
                 bool store_new = abs(value) > m_max_sensed_input         ||
-                    m_max_sensed_type   == Input::IT_NONE                ||
-                    ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
-                      type              == Input::IT_STICKMOTION && 
-                      m_max_sensed_type != Input::IT_STICKMOTION      )  ||
-                    ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
-                      type              == Input::IT_STICKBUTTON && 
-                      m_max_sensed_type != Input::IT_STICKBUTTON      );
+                m_max_sensed_type   == Input::IT_NONE                ||
+                ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
+                 type              == Input::IT_STICKMOTION && 
+                 m_max_sensed_type != Input::IT_STICKMOTION      )  ||
+                ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
+                 type              == Input::IT_STICKBUTTON && 
+                 m_max_sensed_type != Input::IT_STICKBUTTON      );
                 if(store_new)
                 {
                     m_sensed_input->type = type;
@@ -395,11 +437,11 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 y = SDL_GetVideoSurface()->h - y;
                 //menu->inputPointer( x, y );
             }
-
+            
             // Lets the currently active menu handle the GameAction.
             menu->handle(ga, value);
-         }
-    }   // menu!=NULL
+        }
+    }
 }   // input
 
 //-----------------------------------------------------------------------------
@@ -440,18 +482,8 @@ void SDLDriver::input()
             input(Input::IT_KEYBOARD, ev.key.keysym.sym, 0, 0, 0);
             break;
         case SDL_KEYDOWN:
-            if (m_mode == LOWLEVEL)
-            {
-                // TODO - keyboard handling and GUI
-                /*
-                // Unicode translation in SDL is only done for keydown events.
-                // Therefore for lowlevel keyboard handling we provide no notion
-                // of whether a key was pressed or released.
-                menu_manager->getCurrentMenu()
-                    ->inputKeyboard(ev.key.keysym.sym,
-                                    ev.key.keysym.unicode);*/
-            }
-            input(Input::IT_KEYBOARD, ev.key.keysym.sym,
+           // if (m_mode == LOWLEVEL)
+                input(Input::IT_KEYBOARD, ev.key.keysym.sym,
 #ifdef HAVE_IRRLICHT
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config 
@@ -465,7 +497,7 @@ void SDLDriver::input()
 #else
                   ev.key.keysym.unicode, 
 #endif
-                  0, 32768);
+                  0, MAX_VALUE);
 
             break;
 
@@ -476,14 +508,7 @@ void SDLDriver::input()
             // axis value) while the pointer has two.
             if (!m_mode)
             {
-                // TODO - mouse motion handling and GUI
-                /*
-                BaseGUI* menu = menu_manager->getCurrentMenu();
-#ifndef HAVE_IRRLICHT
-                if (menu != NULL)
-                    menu->inputPointer(ev.motion.x, m_main_surface->h - ev.motion.y);
-#endif
-                 */
+                postIrrLichtMouseEvent(irr::EMIE_MOUSE_MOVED, ev.motion.x, ev.motion.y);
             }
             // If sensing input mouse movements are made less sensitive in order
             // to avoid it being detected unwantedly.
@@ -514,11 +539,13 @@ void SDLDriver::input()
             }
             break;
         case SDL_MOUSEBUTTONUP:
-            input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
+            postIrrLichtMouseEvent(irr::EMIE_LMOUSE_LEFT_UP, ev.motion.x, ev.motion.y);
+            //input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 0);
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 32768);
+                postIrrLichtMouseEvent(irr::EMIE_LMOUSE_PRESSED_DOWN, ev.motion.x, ev.motion.y);
+            //input(Input::IT_MOUSEBUTTON, ev.button.button, 0, 0, 32768);
             break;
 
         case SDL_JOYAXISMOTION:

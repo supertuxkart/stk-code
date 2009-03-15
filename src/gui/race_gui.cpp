@@ -116,8 +116,7 @@ RaceGUI::~RaceGUI()
 }   // ~Racegui
 
 //-----------------------------------------------------------------------------
-void
-RaceGUI::handle(GameAction ga, int value)
+void RaceGUI::handle(GameAction ga, int value)
 {
 	static int isWireframe = false;
 	
