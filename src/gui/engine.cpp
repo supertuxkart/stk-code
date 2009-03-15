@@ -2,16 +2,19 @@
 #include "gui/screen.hpp"
 #include "gui/skin.hpp"
 #include "gui/widget.hpp"
+#include "io/file_manager.hpp"
 #include <iostream>
 
 namespace GUIEngine
 {
-
-IGUIEnvironment* g_env;
-IGUISkin* g_skin;
-IGUIFont* g_font;
-IrrlichtDevice* g_device;
-irr::video::IVideoDriver* g_driver;
+    IGUIEnvironment* g_env;
+    IGUISkin* g_skin;
+    IGUIFont* g_font;
+    IrrlichtDevice* g_device;
+    irr::video::IVideoDriver* g_driver;
+    
+    std::vector<Screen*> g_loaded_screens;
+    Screen* g_current_screen = NULL;
 
 // -----------------------------------------------------------------------------
 IrrlichtDevice* getDevice()
@@ -33,10 +36,12 @@ IGUIEnvironment* getGUIEnv()
 {
     return g_env;
 }
-// -----------------------------------------------------------------------------
-
-std::vector<Screen*> g_loaded_screens;
-Screen* g_current_screen = NULL;
+// -----------------------------------------------------------------------------  
+void clear()
+{
+    g_env->clear();
+    g_current_screen = NULL;
+}
     
 void switchToScreen(const char* screen_name)
 {
@@ -90,7 +95,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback
     g_skin = new Skin(g_env->getSkin());
     g_env->setSkin(g_skin);
 	//g_skin = g_env->getSkin();
-	g_font = g_env->getFont("fonthaettenschweiler.bmp");
+	g_font = g_env->getFont( (file_manager->getGUIDir() + "/fonthaettenschweiler.bmp").c_str() );
 	if (g_font) g_skin->setFont(g_font);
     
 	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);

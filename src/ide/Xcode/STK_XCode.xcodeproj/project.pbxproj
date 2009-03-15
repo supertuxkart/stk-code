@@ -21,6 +21,7 @@
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
+		953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
 		95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
 		95C1E4000F699427005D33E6 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3FF0F699427005D33E6 /* font.cpp */; };
 		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
@@ -267,6 +268,8 @@
 		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = ../../physics/triangle_mesh.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = ../../utils/translation.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
+		953F038B0F6C880D00C77FE2 /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = games/supertuxkart/src/gui/state_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		953F038E0F6C8AD800C77FE2 /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = games/supertuxkart/src/gui/state_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = games/supertuxkart/src/gui/race_gui.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = games/supertuxkart/src/gui/race_gui.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = games/supertuxkart/src/gui/font.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
@@ -1191,6 +1194,8 @@
 				950557850F696A900056E88C /* widget.hpp */,
 				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
 				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
+				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
+				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
 			);
 			name = gui;
 			path = games/supertuxkart/src/gui;
@@ -2750,6 +2755,7 @@
 				9505578B0F696A900056E88C /* widget.cpp in Sources */,
 				95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */,
 				95C1E4000F699427005D33E6 /* font.cpp in Sources */,
+				953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

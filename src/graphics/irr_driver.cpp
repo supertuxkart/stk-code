@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/irr_driver.hpp"
+#include "gui/engine.hpp"
 
 #include "user_config.hpp"
 #include "io/file_manager.hpp"
@@ -163,7 +164,9 @@ void IrrDriver::update(float dt)
 {
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
-    m_device->getGUIEnvironment()->drawAll();
+
+    GUIEngine::render();
+    
     m_device->getVideoDriver()->endScene();
 }   // update
 

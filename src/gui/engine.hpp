@@ -24,6 +24,8 @@ namespace GUIEngine
 
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
     void switchToScreen(const char* );
+    void clear();
+    
     Screen* getCurrentScreen();
     
     void render();

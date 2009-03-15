@@ -71,6 +71,8 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
+#include "gui/engine.hpp"
+#include "gui/state_manager.hpp"
 
 // Only needed for bullet debug!
 #ifdef HAVE_GLUT
@@ -510,6 +512,11 @@ void CleanTuxKart()
 
 //=============================================================================
 
+// FIXME - temporary, move
+void eventCallback(GUIEngine::Widget* widget, std::string& name)
+{
+}
+
 int main(int argc, char *argv[] ) 
 {
     try {
@@ -562,12 +569,14 @@ int main(int argc, char *argv[] )
         //fntInit();
         init_fonts();
 
-        // TODO - show main menu here
-        //widget_manager   = new WidgetManager;
-        //menu_manager->switchToMainMenu();
-
-        inputDriver->setMode(SDLDriver::INGAME);
+        // prepare main menu
+        IrrlichtDevice* device = irr_driver->getDevice();
+        video::IVideoDriver* driver = device->getVideoDriver();
+        GUIEngine::init(device, driver, &eventCallback);
         
+        if(!user_config->m_no_start_screen) StateManager::pushMenu("main.stkgui");
+        else StateManager::enterGameState();
+
         // Replay a race
         // =============
         if(history->replayHistory())

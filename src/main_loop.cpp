@@ -32,6 +32,7 @@
 #include "modes/world.hpp"
 #include "user_config.hpp"
 #include "network/network_manager.hpp"
+#include "gui/state_manager.hpp"
 
 MainLoop* main_loop = 0;
 
@@ -206,9 +207,6 @@ void MainLoop::run()
             glEnd () ;
         }
 
-        // TODO - render menus if necessary
-        //GUIEngine::render();
-        //menu_manager->update();
         sound_manager->update(dt);
 
 #ifdef HAVE_IRRLICHT

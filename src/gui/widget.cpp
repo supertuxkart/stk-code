@@ -1,6 +1,7 @@
 #include "gui/screen.hpp"
 #include "gui/engine.hpp"
 #include "gui/my_button.hpp"
+#include "io/file_manager.hpp"
 #include <irrlicht.h>
 #include <iostream>
 #include <sstream>
@@ -119,7 +120,9 @@ void Widget::readCoords(Widget* parent)
     
     if(m_properties[PROP_ICON].size() > 0)
     {
-        ITexture* texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+        ITexture* texture = GUIEngine::getDriver()->getTexture(
+                                                               (file_manager->getGUIDir() + "/" + m_properties[PROP_ICON]).c_str()
+                                                                );
         if(texture != NULL)
         {
             texture_w = texture->getSize().Width;
@@ -225,7 +228,7 @@ IconButtonWidget::IconButtonWidget(const bool clickable)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
 {
-    ITexture* texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+    ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getGUIDir() + "/" +m_properties[PROP_ICON]).c_str());
     //const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
     /*
     if(w < texture_w) ... ;
@@ -444,7 +447,7 @@ void RibbonWidget::add()
             
             m_children[i].m_element = subbtn;
             subbtn->setUseAlphaChannel(true);
-            subbtn->setImage( GUIEngine::getDriver()->getTexture(m_children[i].m_properties[PROP_ICON].c_str()) );
+            subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getGUIDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
 
             // ---- label part
             if(has_label)
@@ -536,7 +539,7 @@ void SpinnerWidget::add()
     if(m_graphical)
     {
         char imagefile[128];
-        std::string& icon = m_properties[PROP_ICON];
+        std::string icon = file_manager->getGUIDir() + "/" + m_properties[PROP_ICON];
         snprintf(imagefile, 128, icon.c_str(), m_value);
         ITexture* texture = GUIEngine::getDriver()->getTexture(imagefile);
         const int texture_width = texture->getSize().Width;
@@ -608,7 +611,7 @@ void SpinnerWidget::setValue(const int new_value)
     if(m_graphical)
     {
         char imagefile[128];
-        std::string& icon = m_properties[PROP_ICON];
+        std::string icon = file_manager->getGUIDir() + "/" + m_properties[PROP_ICON];
         snprintf(imagefile, 128, icon.c_str(), m_value);
         //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
         ((IGUIImage*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
@@ -890,15 +893,16 @@ void RibbonGridWidget::updateItemDisplay()
             
             if( trackid < track_amount )
             {
-                button->setImage( GUIEngine::getDriver()->getTexture(  m_items[trackid].m_sshot_file.c_str()) );
+                std::string track_sshot = file_manager->getGUIDir() + "/" + m_items[trackid].m_sshot_file;
+                button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( m_items[trackid].m_sshot_file.c_str()) );
                 icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
                // trackid++;
             }
             else
             {
-                button->setImage( GUIEngine::getDriver()->getTexture("track?.png") );
-                button->setPressedImage( GUIEngine::getDriver()->getTexture("track?.png") );
+                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track?.png").c_str() ) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track?.png").c_str() ) );
                 icon->m_properties[PROP_ID] = "track?.png";
             }
         } // next column

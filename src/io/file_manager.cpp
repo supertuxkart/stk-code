@@ -270,7 +270,11 @@ std::string FileManager::getTrackDir() const
 {
     return m_root_dir+"/data/tracks";
 }   // getTrackDir
-
+//-----------------------------------------------------------------------------
+std::string FileManager::getGUIDir() const
+{
+    return m_root_dir+"/data/gui";
+}
 //-----------------------------------------------------------------------------
 std::string FileManager::getKartDir() const
 {

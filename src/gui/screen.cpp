@@ -1,6 +1,7 @@
 #include "gui/screen.hpp"
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
+#include "io/file_manager.hpp";
 #include <irrlicht.h>
 #include <iostream>
 #include <irrXML.h>
@@ -26,7 +27,8 @@ Screen::Screen(const char* file)
 // -----------------------------------------------------------------------------
 void Screen::loadFromFile()
 {
-    IrrXMLReader* xml = irr::io::createIrrXMLReader( m_filename.c_str() );
+    std::cout << "loading GUI screen from file " << (file_manager->getGUIDir() + "/" + m_filename).c_str() << std::endl;
+    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
     calculateLayout();

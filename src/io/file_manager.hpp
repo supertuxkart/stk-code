@@ -59,8 +59,9 @@ public:
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;
     std::string getKartDir       () const;
-    std::string getItemsDir    () const;
+    std::string getItemsDir      () const;
     std::string getTranslationDir() const;
+    std::string getGUIDir        () const;
     std::vector<std::string>getMusicDirs() const;
     std::string getTextureFile   (const std::string& fname) const;
     std::string getKartFile      (const std::string& fname,
