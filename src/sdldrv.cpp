@@ -769,8 +769,9 @@ void SDLDriver::setMode(InputDriverMode new_mode)
             
             break;
         default:
+                ;
             // Something is broken.
-            assert (false);
+            //assert (false);
         }
         
         break;

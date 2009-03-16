@@ -144,6 +144,7 @@ const KartProperties* KartPropertiesManager::getKart(const std::string &ident) c
             return *i;
     }
 
+    printf("Could not find a kart named %s\n", ident.c_str());
     return NULL;
 }   // getKart
 

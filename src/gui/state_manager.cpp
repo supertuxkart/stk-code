@@ -5,6 +5,8 @@
 #include "gui/screen.hpp"
 #include "sdldrv.hpp"
 #include "graphics/irr_driver.hpp"
+#include "race_manager.hpp"
+#include "network/network_manager.hpp"
 
 #include <vector>
 
@@ -73,7 +75,23 @@ namespace StateManager
         {
             GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
             if(w2 != NULL)
+            {
                 std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
+                
+                StateManager::enterGameState();
+                race_manager->setLocalKartInfo(0, "tux");
+                race_manager->setDifficulty(RaceManager::RD_HARD);
+                race_manager->setTrack("beach");
+                race_manager->setNumLaps( 3 );
+                race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
+                race_manager->setNumKarts( 1 );
+                race_manager->setNumPlayers( 1 );
+                race_manager->setNumLocalPlayers( 1 );
+                network_manager->setupPlayerKartInfo();
+                //race_manager->getKartType(1) = KT_PLAYER;
+                
+                race_manager->startNew();
+            }
         }
         if(name == "gps")
         {
@@ -81,6 +99,51 @@ namespace StateManager
             if(w != NULL)
                 std::cout << "Clicked on GrandPrix " << w->getSelectionName().c_str() << std::endl;
         }    
+        
+        /*
+         289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
+         290         user_config->setDefaultNumDifficulty(m_difficulty);
+         
+         // if there is no AI, there's no point asking the player for the amount of karts.
+         299     // It will always be the same as the number of human players
+         300     if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
+         301     {
+         302         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+         303         // Don't change the default number of karts in user_config
+         304     }
+         305     else
+         306     {
+         307         race_manager->setNumKarts(m_num_karts);
+         308         user_config->setDefaultNumKarts(race_manager->getNumKarts());
+         309     }
+         
+         311     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
+         312         RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
+         313     {
+         314         race_manager->setNumLaps( m_num_laps );
+         315         user_config->setDefaultNumLaps(m_num_laps);
+         316     }
+         317     // Might still be set from a previous challenge
+         318     race_manager->setCoinTarget(0);
+         
+         inputDriver->setMode(SDLDriver::INGAME);
+
+         race_manager->setLocalKartInfo(0, argv[i+1]);
+         
+         race_manager->setDifficulty(RaceManager::RD_EASY);
+         race_manager->setDifficulty(RaceManager::RD_HARD);
+         race_manager->setDifficulty(RaceManager::RD_HARD);
+         
+         race_manager->setTrack(argv[i+1]);
+
+         user_config->setDefaultNumKarts(stk_config->m_max_karts);
+         race_manager->setNumKarts(user_config->getDefaultNumKarts() );
+
+         user_config->getDefaultNumKarts()
+         
+         StateManager::enterGameState();
+         race_manager->startNew();
+         */
     }
     
     void initGUI()
@@ -95,6 +158,7 @@ namespace StateManager
     
     void pushMenu(std::string name)
     {
+        inputDriver->setMode(SDLDriver::MENU);
         g_menu_stack.push_back(name);
         g_game_mode = false;
         GUIEngine::switchToScreen(name.c_str());
@@ -109,6 +173,7 @@ namespace StateManager
     
     void resetAndGoToMenu(std::string name)
     {
+        inputDriver->setMode(SDLDriver::MENU);
         g_menu_stack.clear();
         g_menu_stack.push_back(name);
         g_game_mode = false;

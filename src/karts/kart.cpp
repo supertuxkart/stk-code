@@ -68,6 +68,7 @@ Kart::Kart (const std::string& kart_name, int position,
 #endif
 {
     m_kart_properties      = kart_properties_manager->getKart(kart_name);
+    assert(m_kart_properties != NULL);
     m_initial_position     = position;
     m_collected_energy     = 0;
     m_eliminated           = false;
