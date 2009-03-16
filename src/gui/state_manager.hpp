@@ -5,6 +5,8 @@
 
 namespace StateManager
 {
+    void initGUI();
+    
     void pushMenu(std::string name);
     void popMenu();
     void resetAndGoToMenu(std::string name);

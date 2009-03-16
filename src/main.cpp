@@ -567,9 +567,7 @@ int main(int argc, char *argv[] )
         init_fonts();
 
         // prepare main menu
-        IrrlichtDevice* device = irr_driver->getDevice();
-        video::IVideoDriver* driver = device->getVideoDriver();
-        GUIEngine::init(device, driver, &eventCallback);
+        StateManager::initGUI();
         
         if(!user_config->m_no_start_screen) StateManager::pushMenu("main.stkgui");
         else StateManager::enterGameState();

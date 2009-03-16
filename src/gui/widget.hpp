@@ -2,6 +2,7 @@
 #define HEADER_WIDGET_HPP
 
 #include <irrlicht.h>
+#include <map>
 #include "ptr_vector.hpp"
 
 using namespace irr;

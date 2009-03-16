@@ -899,15 +899,15 @@ void RibbonGridWidget::updateItemDisplay()
             {
                 std::string track_sshot = file_manager->getGUIDir() + "/" + m_items[trackid].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( m_items[trackid].m_sshot_file.c_str()) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
                 icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
                // trackid++;
             }
             else
             {
-                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random").c_str() ) );
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random").c_str() ) );
-                icon->m_properties[PROP_ID] = "track_random";
+                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
+                icon->m_properties[PROP_ID] = "track_random.png";
             }
         } // next column
     } // next row
