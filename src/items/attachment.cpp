@@ -36,19 +36,7 @@ Attachment::Attachment(Kart* _kart)
     m_kart           = _kart;
     m_previous_owner = NULL;
 
-    m_node = irr_driver->addMesh(NULL);
-#ifdef HAVE_IRRLICHT
-#else
-    m_holder         = new ssgSelector();
-    m_kart->getModelTransform()->addKid(m_holder);
-
-    for(int i=ATTACH_FIRST; i<ATTACH_MAX; i++)
-    {
-        ssgEntity *p=attachment_manager->getModel((attachmentType)i);
-        m_holder->addKid(p);
-    }
-    m_holder->select(0);
-#endif
+    m_node           = NULL;
 }   // Attachment
 
 //-----------------------------------------------------------------------------
@@ -61,10 +49,8 @@ Attachment::~Attachment()
 void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
-//    m_node->add
-#ifndef HAVE_IRRLICHT
-    m_holder->selectStep(type);
-#endif
+    m_node           = irr_driver->addMesh(attachment_manager->getMesh(type));
+    m_node->setParent(m_kart->getNode());
     m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;
@@ -87,10 +73,11 @@ void Attachment::clear()
 {
     m_type=ATTACH_NOTHING; 
     m_time_left=0.0;
-#ifdef HAVE_IRRLICHT
-#else
-    m_holder->select(0);
-#endif
+    if(m_node)
+    {
+        irr_driver->removeNode(m_node);
+        m_node = NULL;
+    }
 
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to

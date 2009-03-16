@@ -32,12 +32,8 @@ Moveable::Moveable()
     m_body            = 0;
     m_motion_state    = 0;
     m_first_time      = true;
-#ifdef HAVE_IRRLICHT
-    m_mesh            = 0;
-#else
-    m_model_transform = new ssgTransform();
-    m_model_transform->ref();
-#endif
+    m_mesh            = NULL;
+    m_node            = NULL;
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -55,12 +51,8 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
     sgCoord c=Coord(xyz, hpr).toSgCoord();
-#ifdef HAVE_IRRLICHT
-    m_root->setPosition(xyz.toIrrVector());
-    m_root->setRotation(hpr.toIrrHPR());
-#else
-    m_model_transform->setTransform(&c);
-#endif
+    m_node->setPosition(xyz.toIrrVector());
+    m_node->setRotation(hpr.toIrrHPR());
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

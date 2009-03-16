@@ -36,16 +36,12 @@
 #include "utils/ssg_help.hpp"
 
 // static variables:
-float      Flyable::m_st_speed[POWERUP_MAX];
-#ifdef HAVE_IRRLICHT
+float         Flyable::m_st_speed[POWERUP_MAX];
 scene::IMesh* Flyable::m_st_model[POWERUP_MAX];
-#else
-ssgEntity* Flyable::m_st_model[POWERUP_MAX];
-#endif
-float      Flyable::m_st_min_height[POWERUP_MAX];
-float      Flyable::m_st_max_height[POWERUP_MAX];
-float      Flyable::m_st_force_updown[POWERUP_MAX];
-btVector3  Flyable::m_st_extend[POWERUP_MAX];
+float         Flyable::m_st_min_height[POWERUP_MAX];
+float         Flyable::m_st_max_height[POWERUP_MAX];
+float         Flyable::m_st_force_updown[POWERUP_MAX];
+btVector3     Flyable::m_st_extend[POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
 Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
@@ -70,14 +66,9 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 	m_max_lifespan = -1;
 	
     // Add the graphical model
-#ifdef HAVE_IRRLICHT
-    setRoot(irr_driver->addMesh(m_st_model[type]));
-#else
-    ssgTransform *m     = getModelTransform();
-    m->addKid(m_st_model[type]);
-    stk_scene->add(m);
-#endif
+    setNode(irr_driver->addMesh(m_st_model[type]));
 }   // Flyable
+
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
                             btCollisionShape *shape, const float gravity,
@@ -124,13 +115,8 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
 
 }   // createPhysics
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Flyable::init(const lisp::Lisp* lisp, scene::IMesh *model, 
                    PowerupType type)
-#else
-void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model, 
-                   PowerupType type)
-#endif
 {
     m_st_speed[type]        = 25.0f;
     m_st_max_height[type]   = 1.0f;
@@ -143,11 +129,7 @@ void Flyable::init(const lisp::Lisp* lisp, ssgEntity *model,
 
     // Store the size of the model
     Vec3 min, max;
-#ifdef HAVE_IRRLICHT
     MeshTools::minMax3D(model, &min, &max);
-#else
-    SSGHelp::MinMax(model, &min, &max);
-#endif
     m_st_extend[type] = btVector3(max-min);
     m_st_model[type]  = model;
 }   // init
@@ -275,12 +257,7 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
     projectile_manager->notifyRemove();
 
     // Now remove this projectile from the graph:
-#ifdef HAVE_IRRLICHT
-#else
-    ssgTransform *m = getModelTransform();
-    m->removeAllKids();
-    stk_scene->remove(m);
-#endif
+    irr_driver->removeMesh(m_mesh);
 
     // The explosion is a bit higher in the air
     Vec3 pos_explosion=getXYZ();

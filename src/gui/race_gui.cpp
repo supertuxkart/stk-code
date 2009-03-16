@@ -116,6 +116,8 @@ RaceGUI::~RaceGUI()
 }   // ~Racegui
 
 //-----------------------------------------------------------------------------
+#include "items/attachment.hpp"
+
 void RaceGUI::handle(GameAction ga, int value)
 {
 	static int isWireframe = false;
@@ -151,11 +153,12 @@ void RaceGUI::handle(GameAction ga, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
-				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+//				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+                kart->attach(ATTACH_ANVIL, 5);
 			}
 			break;
 		case GA_DEBUG_ADD_MISSILE:
-//FIXME			if (race_manager->getNumPlayers() ==1 )
+            if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setPowerup(POWERUP_PLUNGER, 10000);

@@ -70,7 +70,8 @@ void AttachmentManager::loadModels()
     {
         // FIXME LEAK: these models are not removed (unimportant, since they
         // have to be in memory till the end of the game.
-        m_attachments[iat[i].attachment]=irr_driver->getMesh(iat[i].file);
+        std::string full_path = file_manager->getModelFile(iat[i].file);
+        m_attachments[iat[i].attachment]=irr_driver->getMesh(full_path);
     }   // for
 }   // reInit
 

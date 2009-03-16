@@ -271,11 +271,8 @@ void Kart::eliminate()
     RaceManager::getWorld()->getPhysics()->removeKart(this);
 
     // make the kart invisible by placing it way under the track
-    sgVec3 hell; hell[0]=0.0f; hell[1]=0.0f; hell[2] = -10000.0f;
-#ifdef HAVE_IRRLICHT
-#else
-    getModelTransform()->setTransform(hell);
-#endif
+    Vec3 hell(0, 0, -10000.0f);
+    getNode()->setPosition(hell.toIrrVector());
 }   // eliminate
 
 //-----------------------------------------------------------------------------
@@ -1004,23 +1001,9 @@ void Kart::loadData()
 {
     float r [ 2 ] = { -10.0f, 100.0f } ;
 
-#ifdef HAVE_IRRLICHT
-    m_kart_properties->getKartModel()->attachModel(&m_root);
-#else
-    ssgEntity *obj = m_kart_properties->getKartModel()->getRoot();
-#endif
+    m_kart_properties->getKartModel()->attachModel(&m_node);
     createPhysics();
 
-#ifdef HAVE_IRRLICHT
-#else
-    SSGHelp::createDisplayLists(obj);  // create all display lists
-    ssgRangeSelector *lod = new ssgRangeSelector ;
-
-    lod -> addKid ( obj ) ;
-    lod -> setRanges ( r, 2 ) ;
-
-    getModelTransform() -> addKid ( lod ) ;
-#endif
     // Attach Particle System
     m_smoke_system = new Smoke(this);
     m_smoke_system->ref();
