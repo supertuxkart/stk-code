@@ -28,7 +28,6 @@
 
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
-#include "loader.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "audio/sound_manager.hpp"

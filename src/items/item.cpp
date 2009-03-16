@@ -25,13 +25,8 @@
 #include "utils/coord.hpp"
 #include "utils/vec3.hpp"
 
-#ifdef HAVE_IRRLICHT
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, unsigned int item_id, bool rotate)
-#else
-Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           ssgEntity* model, unsigned int item_id, bool rotate)
-#endif
 {
     m_rotate           = rotate;
     m_parent           = NULL;
@@ -43,29 +38,15 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_type             = type;
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
-#ifdef HAVE_IRRLICHT
-    m_root             = irr_driver->addMesh(mesh);
-    m_root->setPosition(xyz.toIrrVector());
-    m_root->grab();
-#else
-    m_root             = new ssgTransform();
-    m_root->ref();
-    m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
-    m_root->addKid(model);
-    stk_scene->add(m_root);
-#endif
+    m_node             = irr_driver->addMesh(mesh);
+    m_node->setPosition(xyz.toIrrVector());
+    m_node->grab();
 }   // Item
 
 //-----------------------------------------------------------------------------
 Item::~Item()
 {
-#ifdef HAVE_IRRLICHT
-
-    m_root->drop();
-#else
-    stk_scene->remove(m_root);
-    ssgDeRefDelete(m_root);
-#endif
+    m_node->drop();
 }   // ~Item
 
 //-----------------------------------------------------------------------------
@@ -74,10 +55,6 @@ void Item::reset()
     m_collected        = false;
     m_time_till_return = 0.0f;
     m_deactive_time    = 0.0f;
-#ifdef HAVE_IRRLICHT
-#else
-    m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
-#endif
 }   // reset
 //-----------------------------------------------------------------------------
 void Item::setParent(Kart* parent)
@@ -100,11 +77,7 @@ void Item::update(float delta)
 
             hell.setZ( (m_time_till_return>1.0f) ? -1000000.0f 
 		       : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
-#ifdef HAVE_IRRLICHT
-            m_root->setPosition(hell.toIrrVector());
-#else
-            m_root->setTransform(hell.toFloat());
-#endif
+            m_node->setPosition(hell.toIrrVector());
         }
         else
         {
@@ -119,12 +92,8 @@ void Item::update(float delta)
         // have it rotate
         Vec3 rotation(delta*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
-#ifdef HAVE_IRRLICHT
-        m_root->setRotation(m_coord.getHPR().toIrrHPR());
-        m_root->setPosition(m_coord.getXYZ().toIrrVector());
-#else
-        m_root->setTransform(const_cast<sgCoord*>(&m_coord.toSgCoord()));
-#endif
+        m_node->setRotation(m_coord.getHPR().toIrrHPR());
+        m_node->setPosition(m_coord.getXYZ().toIrrVector());
     }
 }   // update
 

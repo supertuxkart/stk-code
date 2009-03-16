@@ -19,7 +19,6 @@
 
 #include "karts/kart_model.hpp"
 
-#include "loader.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -46,20 +45,11 @@ KartModel::KartModel()
         m_max_suspension[i] = 1.3f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
-#ifdef HAVE_IRRLICHT
     m_wheel_filename[0] = "wheel-front-right.3ds";
     m_wheel_filename[1] = "wheel-front-left.3ds";
     m_wheel_filename[2] = "wheel-rear-right.3ds";
     m_wheel_filename[3] = "wheel-rear-left.a3ds";
     m_mesh              = NULL;
-#else
-    m_wheel_filename[0] = "wheel-front-right.ac";
-    m_wheel_filename[1] = "wheel-front-left.ac";
-    m_wheel_filename[2] = "wheel-rear-right.ac";
-    m_wheel_filename[3] = "wheel-rear-left.ac";
-    m_root              = NULL;
-#endif
-
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -80,21 +70,12 @@ void KartModel::loadInfo(const lisp::Lisp* lisp)
  */
 KartModel::~KartModel()
 {
-    // This automatically frees the wheels and the kart model.
-    // m_root can be zero in case of STKConfig, which has a kart_properties
-    // attribute (for the default values) as well.
-#ifdef HAVE_IRRLICHT
-#else
-    if(m_root) m_root->removeAllKids();
-    ssgDeRefDelete(m_root);
-#endif
 }  // ~KartModel
 
 // ----------------------------------------------------------------------------
 /** Attach the kart model and wheels to the scene node.
  *  \param node Node to attach the models to.
  */
-#ifdef HAVE_IRRLICHT
 void KartModel::attachModel(scene::ISceneNode **node)
 {
     *node = irr_driver->addMesh(m_mesh);
@@ -105,14 +86,12 @@ void KartModel::attachModel(scene::ISceneNode **node)
         (*node)->addChild(m_wheel_node[i]);
     }
 }   // attachModel
-#endif
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
  */
 void KartModel::loadModels(const std::string &kart_ident)
 {
-#ifdef HAVE_IRRLICHT
     std::string  full_path = file_manager->getKartFile(m_model_filename);
     m_mesh                 = irr_driver->getMesh(full_path);
     Vec3 min, max;
@@ -127,27 +106,6 @@ void KartModel::loadModels(const std::string &kart_ident)
     // node). m_z_offset should probably be made available to kart.
     // Vec3 move_kart_to_0_z(0, 0, m_z_offset);
     // m_root->setTransform(move_kart_to_0_z);
-#else
-    ssgEntity *obj = loader->load(m_model_filename, CB_KART);
-    if(!obj)
-    {
-        fprintf(stderr, "Can't find kart model '%s'.\n",m_model_filename.c_str());
-        return;
-    }
-    m_root = new ssgTransform();
-    m_root->ref();
-    m_root->addKid(obj);
-    ssgStripify(obj);
-    Vec3 min, max;
-    SSGHelp::MinMax(obj, &min, &max);
-    m_z_offset    = min.getZ();
-    m_kart_width  = max.getX()-min.getX();
-    m_kart_length = max.getY()-min.getY();
-    m_kart_height = max.getZ()-min.getZ();
-    sgVec3 move_kart_to_0_z;
-    sgSetVec3(move_kart_to_0_z, 0, 0, m_z_offset);
-    m_root->setTransform(move_kart_to_0_z);
-#endif
 
     // Now set default some default parameters (if not defined) that 
     // depend on the size of the kart model (wheel position, center
@@ -170,33 +128,10 @@ void KartModel::loadModels(const std::string &kart_ident)
     // depend on the size of the model.
     for(unsigned int i=0; i<4; i++)
     {
-#ifdef HAVE_IRRLICHT
         std::string full_wheel = file_manager->getKartFile(m_wheel_filename[i],
                                                            kart_ident);
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // FIXME: wheel handling still missing.
-#else
-        m_wheel_model[i] = loader->load(m_wheel_filename[i], CB_KART);
-        m_wheel_transform[i]= new ssgTransform();
-#ifdef DEBUG
-        m_wheel_transform[i]->setName("wheeltransform");
-#endif
-        if(m_wheel_model[i]) 
-        {
-            m_wheel_transform[i]->addKid(m_wheel_model[i]);
-            m_root->addKid(m_wheel_transform[i]);
-
-            Vec3 min_wheel, max_wheel;
-            SSGHelp::MinMax(m_wheel_model[i], &min_wheel, &max_wheel);
-            m_wheel_graphics_radius[i] = (max_wheel.getZ()-min_wheel.getZ())*0.5f;
-            sgMat4 wheel_loc;
-            sgVec3 hpr;
-            sgZeroVec3(hpr);
-            sgMakeCoordMat4(wheel_loc, m_wheel_graphics_position[i].toFloat(),
-                            hpr);        
-            m_wheel_transform[i]->setTransform(wheel_loc);
-        }   // if m_wheel_model[i]
-#endif
     }   // for i<4
     if(!m_wheel_model[0])
     {
@@ -294,7 +229,6 @@ void KartModel::adjustWheels(float rotation, float steer,
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
-#ifdef HAVE_IRRLICHT
     core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
     core::vector3df wheel_steer(0, RAD_TO_DEGREE(steer), 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
@@ -311,31 +245,6 @@ void KartModel::adjustWheels(float rotation, float steer,
 
 
 #ifdef FIXME
-    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
-    wheel_front[3][2] += clamped_suspension[0];
-    m_wheel_transform[0]->setTransform(wheel_front);
-
-    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[1].toFloat());
-    wheel_front[3][2] += clamped_suspension[1];
-    m_wheel_transform[1]->setTransform(wheel_front);
-
-    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[2].toFloat());
-    wheel_rot[3][2] += clamped_suspension[2];
-    m_wheel_transform[2]->setTransform(wheel_rot);
-
-    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[3].toFloat());
-    wheel_rot[3][2] += clamped_suspension[3];
-    m_wheel_transform[3]->setTransform(wheel_rot);
-#endif
-#else
-    sgMat4 wheel_front;
-    sgMat4 wheel_steer;
-    sgMat4 wheel_rot;
-
-    sgMakeRotMat4( wheel_rot,   0,      RAD_TO_DEGREE(-rotation), 0);
-    sgMakeRotMat4( wheel_steer, steer , 0,                        0);
-    sgMultMat4(wheel_front, wheel_steer, wheel_rot);
-
     sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
     wheel_front[3][2] += clamped_suspension[0];
     m_wheel_transform[0]->setTransform(wheel_front);

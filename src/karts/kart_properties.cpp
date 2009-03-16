@@ -23,7 +23,6 @@
 #include <stdexcept>
 #include <plib/ssg.h>
 #include "material_manager.hpp"
-#include "loader.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
 #include "karts/kart_model.hpp"

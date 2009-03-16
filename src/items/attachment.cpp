@@ -17,12 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
+#include "items/attachment.hpp"
 
 #include "stk_config.hpp"
 #include "user_config.hpp"
-#include "items/attachment.hpp"
+#include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
@@ -36,6 +35,8 @@ Attachment::Attachment(Kart* _kart)
     m_time_left      = 0.0;
     m_kart           = _kart;
     m_previous_owner = NULL;
+
+    m_node = irr_driver->addMesh(NULL);
 #ifdef HAVE_IRRLICHT
 #else
     m_holder         = new ssgSelector();
@@ -53,15 +54,14 @@ Attachment::Attachment(Kart* _kart)
 //-----------------------------------------------------------------------------
 Attachment::~Attachment()
 {
-#ifndef HAVE_IRRLICHT
-    ssgDeRefDelete(m_holder);
-#endif
+    irr_driver->removeNode(m_node);
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
 void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
+//    m_node->add
 #ifndef HAVE_IRRLICHT
     m_holder->selectStep(type);
 #endif

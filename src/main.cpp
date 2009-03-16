@@ -46,7 +46,6 @@
 
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "loader.hpp"
 #include "main_loop.hpp"
 #include "material_manager.hpp"
 #include "sdldrv.hpp"
@@ -439,7 +438,6 @@ void InitTuxkart()
     unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
     irr_driver              = new IrrDriver();
-    loader                  = new Loader();
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -503,7 +501,6 @@ void CleanTuxKart()
     if(sound_manager)           delete sound_manager;
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
-    if(loader)                  delete loader;
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
     if(stk_scene)               delete stk_scene;

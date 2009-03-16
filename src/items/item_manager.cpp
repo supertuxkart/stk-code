@@ -21,8 +21,8 @@
 #include <string>
 #include <sstream>
 
+#include "callback_manager.hpp"
 #include "user_config.hpp"
-#include "loader.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "graphics/irr_driver.hpp"

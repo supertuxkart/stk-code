@@ -33,7 +33,6 @@
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "main_loop.hpp"
-#include "loader.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
 #include "items/item_manager.hpp"
@@ -257,9 +256,7 @@ void SDLDriver::setVideoMode(bool resetTextures)
 #if defined(WIN32) || defined(__APPLE__)
     if(resetTextures)
     {
-        // Clear plib internal texture cache
-        loader->endLoad();
-
+        // FIXME: clear texture cache here
         // Windows needs to reload all textures, display lists, ... which means
         // that all models have to be reloaded. So first, free all textures,
         // models, then reload the textures from materials.dat, then reload

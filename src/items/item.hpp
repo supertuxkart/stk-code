@@ -20,18 +20,11 @@
 #ifndef HEADER_ITEM_HPP
 #define HEADER_ITEM_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
+
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
-#ifndef HAVE_IRRLICHT
-class ssgtransform;
-class ssgEntity;
-#endif
 
 // -----------------------------------------------------------------------------
 class Item
@@ -54,12 +47,8 @@ private:
     float         m_time_till_return;  // time till a collected item reappears
     Coord         m_coord;        // Original coordinates, used mainly when
                                   // collected items reappear.
-#ifdef HAVE_IRRLICHT
     /** Scene node of this item. */
-    scene::ISceneNode *m_root;
-#else
-    ssgTransform* m_root;         // The actual root of the item
-#endif
+    scene::ISceneNode *m_node;
     unsigned int  m_item_id;      // index in item_manager field
 
     bool          m_rotate;       // set to false if item should not rotate
@@ -72,15 +61,9 @@ private:
     float         m_deactive_time;
     
 public:
-#ifdef HAVE_IRRLICHT
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
                         scene::IMesh* mesh, unsigned int item_id,
                         bool rotate=true);
-#else
-                  Item (ItemType type, const Vec3& xyz, const Vec3& normal,
-                        ssgEntity* model, unsigned int item_id,
-                        bool rotate=true);
-#endif
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  isCollected(float t=2.0f);
@@ -105,10 +88,6 @@ public:
     void          deactivate(float t)  { m_deactive_time=t; }
     // ------------------------------------------------------------------------
     unsigned int  getItemId()    const { return m_item_id;  }
-#ifdef HAVE_IRRLICHT
-#else
-    ssgTransform* getRoot()      const { return m_root;     }
-#endif
     ItemType      getType()      const { return m_type;     }
     bool          wasCollected() const { return m_collected;}    
     void          setParent(Kart* parent);

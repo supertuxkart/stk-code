@@ -26,9 +26,9 @@
 #include <plib/ssgAux.h>
 #include "irrlicht.h"
 
-#include "loader.hpp"
 #include "stk_config.hpp"
 #include "material_manager.hpp"
+#include "callback_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
@@ -1443,7 +1443,7 @@ void Track::loadTrackModel()
                 }
             }   // if need_hat
 
-            ssgEntity        *obj   = loader->load(file_manager->getModelFile(fname),
+            ssgEntity        *obj   = load(file_manager->getModelFile(fname),
                                                    CB_TRACK,
                                                    /* optimise   */  true,
                                                    /*is_full_path*/  true);
@@ -1487,6 +1487,7 @@ void Track::loadTrackModel()
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
     m_light->setLightData(light);
+    //irr_driver->getSceneManager()->setAmbientLight(video::SColorf(1.0f,1.0f,1.0f,1.0f));
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
 }   // loadTrack

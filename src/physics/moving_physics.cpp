@@ -21,12 +21,8 @@
 
 #include <string>
 #include <vector>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -40,7 +36,6 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 MovingPhysics::MovingPhysics(const XMLNode *xml_node)
 {
     std::string model_name;
@@ -96,55 +91,6 @@ MovingPhysics::MovingPhysics(const XMLNode *xml_node)
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
 }   // MovingPhysics
-#else
-MovingPhysics::MovingPhysics(const std::string data)
-             : ssgTransform(), Callback()
-{
-    m_shape        = NULL;
-    m_body         = NULL;
-    m_motion_state = NULL;
-    m_mass         = 1;
-    setUserData(new ssgBase());   // prevent tree optimisations to remove this node
-
-    std::vector<std::string> parameters = StringUtils::split(data, ' ');
-    if(parameters.size()<2)
-    {
-        fprintf(stderr, "Invalid physics specification: '%s'\n",data.c_str());
-    }
-    parameters.erase(parameters.begin());
-    std::string &shape=parameters[0];
-    m_body_type = MP_NONE;
-    if(shape=="cone"   ) m_body_type = MP_CONE;
-    else if(shape=="box"    ) m_body_type = MP_BOX;
-    else if(shape=="sphere" ) m_body_type = MP_SPHERE;
-    parameters.erase(parameters.begin());
-
-    // Scan for additional parameters, which are in the form of keyword=value
-    // (without any spaces). Currently only mass=... is supported.
-    while(parameters.size()>0)
-    {
-        // Split the parameter string by '=' to get the keyword and value
-        std::vector<std::string> p=StringUtils::split(parameters[0],'=');
-        if(p.size()!=2) 
-        {
-            fprintf(stderr, "Invalid physics parameter string: '%s'\n",data.c_str());
-            break;
-        } 
-        if(p[0]=="mass") 
-        {
-            StringUtils::from_string<float>(p[1], m_mass);
-        }
-        else
-        {
-            fprintf(stderr, "Invalid physics parameter string: '%s'\n",
-                    data.c_str());
-            break;
-        }
-
-        parameters.erase(parameters.begin());
-    }
-}   // MovingPhysics
-#endif
 
 // -----------------------------------------------------------------------------
 MovingPhysics::~MovingPhysics()
@@ -153,86 +99,17 @@ MovingPhysics::~MovingPhysics()
     delete m_body;
     delete m_motion_state;
     delete m_shape;
-#ifdef HAVE_IRRLICHT
-#else
-    stk_scene->remove(this);
-#endif
 }  // ~MovingPhysics
 
 // -----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
  */
-/* Main problem is that the loader (see world::loadTrack) adds a 
-   ssgTransform->ssgRangeSelector->MovingPhysics, and that this ssgTransform M
-   contains the actual position. So, if the physic position P would be set
-   immediately, the transform M causes the position the object is drawn to be
-   wrong (M*P is drawn instead of P). So, to correct this, the body has to be
-   attached to the root of the scene graph. The body is therefore removed from
-   its old place, and appended to the root. The original position has to be
-   recomputed by going up in the scene graph and multiplying the transforms.  */
 void MovingPhysics::init()
 {
-#ifdef HAVE_IRRLICHT
-#else
-    // 1. Remove the object from the graph and attach it to the root
-    // -------------------------------------------------------------
-    if(getNumParents()>1) 
-    {
-        fprintf(stderr, "WARNING: physical object with more than one parent!!\n");
-        return;
-    }
-    ssgBranch *parent = getParent(0);
-
-    stk_scene->add(this);
-    parent->removeKid(this);
-
-    // 2. Determine the original position of the object
-    // ------------------------------------------------
-
-    ssgEntity *p=parent;
-    sgMat4    pos;
-    sgMakeIdentMat4(pos);
-    while(p->getNumParents())
-    {
-        if(p->getNumParents()!=1)
-        {
-            // FIXME: Not sure if this is needed: if one object has more than
-            //        one parent (--> this object appears more than once in the
-            //        scene), we have to follow all possible ways up to the
-            //        root, and for each way add one instance to the root.
-            //        For now this is unsupported, and we abort here.
-            fprintf(stderr, "MovingPhysics: init: %d parents found, ignored.\n",
-                    p->getNumParents());
-            return;
-        }   // if numparents!=1
-        if(p->isAKindOf(ssgTypeTransform()))
-        {
-            ssgBaseTransform *trans=(ssgBaseTransform*)p;
-            sgMat4 change_position;
-            trans->getTransform(change_position);
-            sgPostMultMat4(pos, change_position);
-        }
-        if(p->getNumKids()==0)
-        {
-            ssgBranch *new_parent=p->getParent(0);
-            new_parent->removeKid(p);
-            p = new_parent;
-        }
-        else
-        {
-            p=p->getParent(0);
-        }
-    }   // while
-#endif
-
-    // 3. Determine size of the object
+    // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-#ifdef HAVE_IRRLICHT
     MeshTools::minMax3D(m_mesh, &min, &max);
-#else
-    SSGHelp::MinMax(this, &min, &max);
-#endif
     Vec3 extend = max-min;
     m_half_height = 0.5f*(extend.getZ());
     switch (m_body_type)
@@ -240,41 +117,25 @@ void MovingPhysics::init()
     case MP_CONE:   {
                     float radius = 0.5f*std::max(extend.getX(), extend.getY());
                     m_shape = new btConeShapeZ(radius, extend.getZ());
-#ifdef HAVE_IRRLICHT
-                    
-#else
-                    setName("cone");
-#endif
                     break;
                     }
     case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
-#ifndef HAVE_IRRLICHT
-                    setName("box");
-#endif
                     break;
     case MP_SPHERE: {
                     float radius = std::max(extend.getX(), extend.getY());
                     radius = 0.5f*std::max(radius, extend.getZ());
                     m_shape = new btSphereShape(radius);
-#ifndef HAVE_IRRLICHT
-                    setName("sphere");
-#endif
                     break;
                     }
     case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
-        break;
+                    break;
     }
 
-    // 4. Create the rigid object
+    // 2. Create the rigid object
     // --------------------------
-#ifdef HAVE_IRRLICHT
     Vec3 pos = m_init_pos.getOrigin();
     pos.setZ(m_init_pos.getOrigin().getZ()+m_half_height);
     m_init_pos.setOrigin(pos);
-#else
-    m_init_pos.setIdentity();
-    m_init_pos.setOrigin(btVector3(pos[3][0],pos[3][1],pos[3][2]+m_half_height));
-#endif
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
@@ -299,14 +160,10 @@ void MovingPhysics::update(float dt)
         m_body->setCenterOfMassTransform(m_init_pos);
         c.setXYZ(m_init_pos.getOrigin());
     }
-#ifdef HAVE_IRRLICHT
     m_node->setPosition(c.getXYZ().toIrrVector());
     m_node->setRotation(c.getHPR().toIrrHPR());
-#else
-    setTransform(const_cast<sgCoord*>(&c.toSgCoord()));
-#endif
-
 }   // update
+
 // -----------------------------------------------------------------------------
 void MovingPhysics::reset()
 {

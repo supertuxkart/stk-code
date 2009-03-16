@@ -53,7 +53,7 @@ bool Widget::convertToCoord(std::string& x, int* absolute, int* percentage)
     bool is_number;
     int i;
     std::istringstream myStream(x);
-    is_number = (myStream >> i);
+    is_number = (myStream >> i)!=0;
     
     if(!is_number) return false;
     
@@ -410,7 +410,7 @@ void RibbonWidget::add()
     if(free_h_space < min_free_space) // buttons are too big to fit :( zoom out
     {
         global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
-        free_h_space = w - total_needed_space*global_zoom;
+        free_h_space = (int)(w - total_needed_space*global_zoom);
     }
     
     const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
@@ -440,12 +440,12 @@ void RibbonWidget::add()
             const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
             // if button too high to fit, scale down
             float zoom = global_zoom;
-            while(button_y + m_children[i].h*zoom + needed_space_under_button > h) zoom -= 0.01;
+            while(button_y + m_children[i].h*zoom + needed_space_under_button > h) zoom -= 0.01f;
             
             // ---- add bitmap button part
             const float image_w = m_children[i].w*zoom;
-            rect<s32> subsize = rect<s32>(widget_x - image_w/2.0, button_y, 
-                                          widget_x + image_w/2.0, button_y + m_children[i].h*zoom);
+            rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y, 
+                                          widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
             
             subbtn = new MyGUIButton(GUIEngine::getGUIEnv(), btn, ++id_counter_2, subsize, true);
             
@@ -457,8 +457,8 @@ void RibbonWidget::add()
             if(has_label)
             {
                 subsize = rect<s32>(widget_x - one_button_space/2,
-                                    (button_y + m_children[i].h)*zoom + 5 /* leave 5 pixels between button and label */, 
-                                    widget_x + one_button_space/2, h);
+                                    (int)((button_y + m_children[i].h)*zoom) + 5 /* leave 5 pixels between button and label */, 
+                                    widget_x + (int)(one_button_space/2.0f), h);
                 
                 stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
                 IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), subsize, false, true, btn);
@@ -501,14 +501,14 @@ void SpinnerWidget::add()
     {
         int i;
         std::istringstream myStream(min_s);
-        bool is_number = (myStream >> i);
+        bool is_number = (myStream >> i)!=0;
         if(is_number) m_min = i;
         else m_min = 0;
     }
     {
         int i;
         std::istringstream myStream(max_s);
-        bool is_number = (myStream >> i);
+        bool is_number = (myStream >> i)!=0;
         if(is_number) m_max = i;
         else m_max = 10;
     }    
@@ -675,9 +675,9 @@ void RibbonGridWidget::add()
     {
         RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
         ribbon->x = x;
-        ribbon->y = y + n*row_height;
+        ribbon->y = y + (int)(n*row_height);
         ribbon->w = w;
-        ribbon->h = row_height;
+        ribbon->h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
         ribbon->m_properties[PROP_ID] = this->m_properties[PROP_ID];
         ribbon->m_parent = this;

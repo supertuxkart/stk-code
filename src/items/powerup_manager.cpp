@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "callback_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "graphics/irr_driver.hpp"
@@ -30,7 +31,6 @@
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
-#include "loader.hpp"
 
 
 typedef struct
@@ -75,7 +75,6 @@ void PowerupManager::removeTextures()
     }   // for
 #endif
     callback_manager->clear(CB_COLLECTABLE);
-
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
