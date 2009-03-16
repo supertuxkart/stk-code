@@ -157,6 +157,15 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename)
 }   // getTexture
 
 // ----------------------------------------------------------------------------
+/** Sets the ambient light.
+ *  \param light The colour of the light to set. 
+ */
+void IrrDriver::setAmbientLight(const video::SColor &light)
+{
+    m_scene_manager->setAmbientLight(light);
+}   // setAmbientLight
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  */

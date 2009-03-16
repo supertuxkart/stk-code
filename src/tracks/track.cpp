@@ -1487,7 +1487,7 @@ void Track::loadTrackModel()
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
     m_light->setLightData(light);
-    //irr_driver->getSceneManager()->setAmbientLight(video::SColorf(1.0f,1.0f,1.0f,1.0f));
+    irr_driver->setAmbientLight(video::SColor(255, 255, 255, 255));
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
 }   // loadTrack

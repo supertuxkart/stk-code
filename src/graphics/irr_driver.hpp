@@ -48,6 +48,7 @@ public:
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     bool                  OnEvent(const irr::SEvent &event);
+    void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
