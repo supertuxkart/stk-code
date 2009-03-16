@@ -256,7 +256,6 @@ public:
         const int answer = (id-1000)/100;
         return answer!=0;
     }
-
 };
 
 extern RaceManager *race_manager;

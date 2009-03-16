@@ -1000,7 +1000,7 @@ void Kart::endRescue()
 
 void Kart::loadData()
 {
-    float r [ 2 ] = { -10.0f, 100.0f } ;
+    //float r [ 2 ] = { -10.0f, 100.0f } ;
 
     m_kart_properties->getKartModel()->attachModel(&m_node);
     createPhysics();

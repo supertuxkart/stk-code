@@ -44,6 +44,7 @@
 #include "gui/race_gui.hpp"
 #include "gui/engine.hpp"
 #include "gui/state_manager.hpp"
+#include "history.hpp"
 
 #define DEADZONE_MOUSE        150
 #define DEADZONE_MOUSE_SENSE  200
@@ -338,6 +339,96 @@ void postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int
     GUIEngine::getDevice()->postEventFromUser(wrapper);
 }
 
+
+void handleGameAction(GameAction ga, int value)
+{
+	static int isWireframe = false;
+	
+	// The next lines find out the player and kartaction that belongs
+	// to a certain gameaction value (GameAction -> Player number, Kartaction).
+	// Since the numbers are fixed this can be done through computation
+	// (instead of using e.g. a separate data structure).
+	// Note that the kartaction enum value and their representatives in
+	// gameaction enum have the same order (Otherwise the stuff below would
+	// not work ...)!
+    
+	if (ga >= GA_FIRST_KARTACTION && ga <= GA_LAST_KARTACTION)
+	{
+		// 'Pulls down' the gameaction value to make them multiples of the
+		// kartaction values.
+		int ka = ga - GA_FIRST_KARTACTION;
+		
+		int playerNo = ka / KC_COUNT;
+		ka = ka % KC_COUNT;
+		
+		RaceManager::getWorld()->getLocalPlayerKart(playerNo)->action((KartAction) ka, value);
+		
+		return;
+	}
+	
+	if (value)
+		return;
+	
+	switch (ga)
+	{
+		case GA_DEBUG_ADD_BOWLING:
+			if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
+                //				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+                kart->attach(ATTACH_ANVIL, 5);
+			}
+			break;
+		case GA_DEBUG_ADD_MISSILE:
+            if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getPlayerKart(0);
+				kart->setPowerup(POWERUP_PLUNGER, 10000);
+			}
+			break;
+		case GA_DEBUG_ADD_HOMING:
+			if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getPlayerKart(0);
+				kart->setPowerup(POWERUP_CAKE, 10000);
+			}
+			break;
+		case GA_DEBUG_TOGGLE_FPS:
+			user_config->m_display_fps = !user_config->m_display_fps;
+			if(user_config->m_display_fps)
+			{
+                getRaceGUI()->resetFPSCounter();
+            }
+			break;
+		case GA_DEBUG_TOGGLE_WIREFRAME:
+			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
+			isWireframe = ! isWireframe;
+			break;
+#ifndef WIN32
+            // For now disable F9 toggling fullscreen, since windows requires
+            // to reload all textures, display lists etc. Fullscreen can
+            // be toggled from the main menu (options->display).
+		case GA_TOGGLE_FULLSCREEN:
+			inputDriver->toggleFullscreen(false);   // 0: do not reset textures
+			// Fall through to put the game into pause mode.
+#endif
+		case GA_LEAVE_RACE:
+            // TODO - show race menu
+            /*
+             RaceManager::getWorld()->pause();
+             menu_manager->pushMenu(MENUID_RACEMENU);
+             */
+            break;
+		case GA_DEBUG_HISTORY:
+			history->Save();
+			break;
+		default:
+			break;
+	} // switch
+    
+}
+
+
 void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
                       int value)
 {
@@ -387,7 +478,7 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
             // Input sensing should be canceled.
             if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
             {
-                menu->handle(GA_SENSE_CANCEL, value);
+                handleGameAction(GA_SENSE_CANCEL, value);
             }
             // Stores the sensed input when the button/key/axes/<whatever> is
             // released only and is not used in a fixed mapping.
@@ -419,7 +510,7 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 // Notify the completion of the input sensing if the key/stick/
                 // ... is released.
                 if(value==0)
-                    menu->handle(GA_SENSE_COMPLETE, 0);
+                    handleGameAction(GA_SENSE_COMPLETE, 0);
             }
         }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
         else if (ga != GA_NULL)
@@ -435,8 +526,7 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 //menu->inputPointer( x, y );
             }
             
-            // Lets the currently active menu handle the GameAction.
-            menu->handle(ga, value);
+            handleGameAction(ga, value);
         }
     }
 }   // input
@@ -649,9 +739,6 @@ void SDLDriver::input()
 /** Retrieves the Input instance that has been prepared in the input sense
   * mode.
   *
-  * The Instance has valid values of the last input sensing operation *only*
-  * if called immediately after a BaseGUI::handle() implementation received
-  * GA_SENSE_COMPLETE.
   *
   * It is wrong to call it when not in input sensing mode anymore.
   */
@@ -683,14 +770,6 @@ bool SDLDriver::isInMode(InputDriverMode expMode)
   * of current and next input driver modes: From the menu mode you can switch
   * to any other mode and from any other mode only back to the menu mode.
   *
-  * In menu mode the pointer is visible (and reports absolute values through
-  * BaseGUI::inputKeyboard()) and the BaseGUI::handle() implementations can
-  * receive GameAction values from GA_FIRST_MENU to GA_LAST_MENU.
-  *
-  * In ingame mode the pointer is invisible (and reports relative values)
-  * and the BaseGUI::handle() implementations can receive GameAction values
-  * from GA_FIRST_INGAME to GA_LAST_INGAME.
-  *
   * In input sense mode the pointer is invisible (any movement reports are
   * suppressed). If an input happens it is stored internally and can be
   * retrieved through drv_getm_sensed_input() *after* GA_SENSE_COMPLETE has been
@@ -699,17 +778,6 @@ bool SDLDriver::isInMode(InputDriverMode expMode)
   * the user decided to cancel input sensing. No other game action values are
   * distributed in this mode.
   * 
-  * In lowlevel mode the pointer is invisible (and reports relative values - 
-  * this is just a side effect). BaseGUI::handle() can receive GameAction
-  * values from GA_FIRST_MENU to GA_LAST_MENU. Additionally each key press is
-  * distributed through BaseGUI::inputKeyboard(). This happens *before* the
-  * same keypress is processed to be distributed as a GameAction. This was done
-  * to make the effects of changing the input driver's mode from
-  * BaseGUI::handle() implementations less strange. The way it is implemented
-  * makes sure that such a change only affects the next keypress or keyrelease.
-  * The same is not true for mode changes from within a BaseGUI::inputKeyboard()
-  * implementation. It is therefore discouraged.
-  *
   * And there is the bootstrap mode. You cannot switch to it and only leave it
   * once per application instance. It is the state the input driver is first.
   *

@@ -127,7 +127,7 @@ void ProjectileManager::update(float dt)
         while(e!=m_active_explosions.end())
         {
             if(!(*e)->hasEnded()) { e++; continue;}
-            Explosion *exp=*e;
+            //Explosion *exp=*e;
             Explosions::iterator eNext=m_active_explosions.erase(e);
             //ssgDeRefDelete(exp);  // reduce refcount and free object
             e=eNext;

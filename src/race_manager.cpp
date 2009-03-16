@@ -258,7 +258,6 @@ void RaceManager::startNextRace()
     
     m_active_race = true;
 }   // startNextRace
-
 //-----------------------------------------------------------------------------
 /** If there are more races to do, it starts the next race, otherwise it
  *  calls exit_race to finish the race.
