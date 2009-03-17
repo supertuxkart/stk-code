@@ -466,10 +466,7 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
 
     }
     else
-    {
-        RaceGUI* menu = getRaceGUI(); // FIXME - input is handled in menu class??
-        if(menu == NULL) return;
-        
+    {        
         GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
         // Act different in input sensing mode.
         if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
