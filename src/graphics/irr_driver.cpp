@@ -103,6 +103,14 @@ scene::ISceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 }   // addOctTree
 
 // ----------------------------------------------------------------------------
+/** Adds a particle scene node.
+ */
+scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter)
+{
+    return m_scene_manager->addParticleSystemSceneNode(default_emitter);
+}   // addParticleNode
+
+// ----------------------------------------------------------------------------
 /** Adds a static mesh to scene. This should be used for smaller objects,
  *  since the node is not optimised.
  *  \param mesh The mesh to add.
@@ -138,6 +146,30 @@ scene::ISceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
 {
     return m_scene_manager->addAnimatedMeshSceneNode(mesh);
 }   // addAnimatedMesh
+
+// ----------------------------------------------------------------------------
+/** Adds a sky dome. Documentation from irrlicht:
+ *  A skydome is a large (half-) sphere with a panoramic texture on the inside
+ *  and is drawn around the camera position.
+ *  \param texture: Texture for the dome.
+ *  \param horiRes: Number of vertices of a horizontal layer of the sphere.
+ *  \param vertRes: Number of vertices of a vertical layer of the sphere.
+ *  \param texturePercentage: How much of the height of the texture is used. 
+ *         Should be between 0 and 1.
+ *  \param spherePercentage: How much of the sphere is drawn. Value should be 
+ *          between 0 and 2, where 1 is an exact half-sphere and 2 is a full 
+ *          sphere.
+ */
+scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name, 
+                                         int hori_res, int vert_res, 
+                                         float texture_percent, 
+                                         float sphere_percent)
+{
+    ITexture *texture = getTexture(texture_name);
+    return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
+                                                texture_percent, 
+                                                sphere_percent);
+}   // addSkyDome
 
 // ----------------------------------------------------------------------------
 /** Adds a camera to the scene.

@@ -65,7 +65,6 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_description        = "";
     m_designer           = "";
     m_screenshot         = "";
-    m_top_view           = "";
     m_version            = 0;
     m_track_mesh         = new TriangleMesh();
     m_non_collision_mesh = new TriangleMesh();
@@ -867,6 +866,9 @@ void Track::loadTrack(const std::string &filename)
     const XMLNode *node = xml->getNode("track");
     if(!node)
     {
+        std::ostringstream o;
+        o<<"Can't load track '"<<filename<<"', no track element.";
+        throw std::runtime_error(o.str());
     }
     node->get("name",                  &m_name);
     node->get("description",           &m_description);
@@ -877,10 +879,8 @@ void Track::loadTrack(const std::string &filename)
     getMusicInformation(filenames, m_music);
     node->get("item",                  &m_item_style);
     node->get("screenshot",            &m_screenshot);
-    node->get("topview",               &m_top_view);
     node->get("item",                  &m_item_style);
     node->get("screenshot",            &m_screenshot);
-    node->get("topview",               &m_top_view);
     node->get("sky-color",             &m_sky_color);
     node->get("start-x",               &m_start_x);
     node->get("start-y",               &m_start_y);
@@ -908,9 +908,34 @@ void Track::loadTrack(const std::string &filename)
                                     &m_camera_final_hpr)     !=1;
     m_camera_final_hpr.degreeToRad();
 
+    m_sky_type = SKY_NONE;
+    node = xml->getNode("sky-dome");
+    if(node)
+    {
+        m_sky_type            = SKY_DOME;
+        m_sky_vert_segments   = 16;
+        m_sky_hori_segments   = 16;
+        m_sky_sphere_percent  = 1.0f;
+        m_sky_texture_percent = 1.0f;
+        std::string s;
+        node->get("texture",          &s                    );
+        m_sky_textures.push_back(s);
+        node->get("vertical",        &m_sky_vert_segments  );
+        node->get("horizontal",      &m_sky_hori_segments  );
+        node->get("sphere-percent",  &m_sky_sphere_percent );
+        node->get("texture-percent", &m_sky_texture_percent);
+
+    }   // if sky-dome
+    node = xml->getNode("sky-box");
+    if(node)
+    {
+        m_sky_type = SKY_BOX;
+    }   // if sky-box
+
+
+
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
-    m_top_view   = file_manager->getTrackFile(m_top_view,   getIdent());
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
@@ -1480,6 +1505,15 @@ void Track::loadTrackModel()
     fclose ( fd ) ;
 #endif
 
+    if(m_sky_type==SKY_DOME)
+    {
+        irr_driver->addSkyDome(m_sky_textures[0],
+                               m_sky_hori_segments, m_sky_vert_segments, 
+                               m_sky_texture_percent, m_sky_sphere_percent);
+    }
+    else if(m_sky_type==SKY_BOX)
+    {
+    }
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 

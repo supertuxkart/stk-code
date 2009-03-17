@@ -52,6 +52,11 @@ public:
     video::ITexture      *getTexture(const std::string &filename);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
+    scene::IParticleSystemSceneNode
+                         *addParticleNode(bool default_emitter=true);
+    scene::ISceneNode    *addSkyDome(const std::string &texture, int hori_res,
+                                     int vert_res, float texture_percent, 
+                                     float sphere_percent);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMesh(scene::IMesh *mesh);
     scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);

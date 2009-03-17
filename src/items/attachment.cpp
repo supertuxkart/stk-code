@@ -42,7 +42,8 @@ Attachment::Attachment(Kart* _kart)
 //-----------------------------------------------------------------------------
 Attachment::~Attachment()
 {
-    irr_driver->removeNode(m_node);
+    if(m_node)
+        irr_driver->removeNode(m_node);
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------

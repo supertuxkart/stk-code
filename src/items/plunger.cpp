@@ -20,6 +20,7 @@
 #include "items/plunger.hpp"
 
 #include "race_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
@@ -106,11 +107,7 @@ Plunger::~Plunger()
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Plunger::init(const lisp::Lisp* lisp, scene::IMesh *plunger_model)
-#else
-void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
-#endif
 {
     Flyable::init(lisp, plunger_model, POWERUP_PLUNGER);
 }   // init
@@ -126,12 +123,6 @@ void Plunger::update(float dt)
         {
             setHasHit();
             projectile_manager->notifyRemove();
-#ifdef HAVE_IRRLICHT
-#else
-            ssgTransform *m = getModelTransform();
-            m->removeAllKids();
-            stk_scene->remove(m);
-#endif
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
         return;
@@ -178,10 +169,7 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
         Vec3 hell(0, 0, -10000);
-#ifdef HAVE_IRRLICHT
-#else
-        getModelTransform()->setTransform(hell.toFloat());
-#endif
+        getNode()->setPosition(hell.toIrrVector());
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
@@ -191,11 +179,12 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
-        Vec3 hell(0, 0, -10000);
-#ifdef HAVE_IRRLICHT
-#else
-        getModelTransform()->setTransform(hell.toFloat());
-#endif
+        scene::ISceneNode *node = getNode();
+        if(node)
+        {
+            Vec3 hell(0, 0, -10000);
+            getNode()->setPosition(hell.toIrrVector());
+        }
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
         
         if(kart)

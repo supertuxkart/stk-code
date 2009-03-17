@@ -48,7 +48,6 @@ private:
     float                    m_gravity;
     std::string              m_ident;
     std::string              m_screenshot;
-    std::string              m_top_view;
     std::vector<MusicInformation*> m_music;
     std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
     std::string              m_item_style;
@@ -67,6 +66,22 @@ private:
     bool                     m_is_arena;
     int                      m_version;
     bool                     loadMainTrack(const XMLNode &node);
+    /** The type of sky to be used for the track. */
+    enum {SKY_NONE, SKY_BOX, 
+          SKY_DOME}          m_sky_type;
+    /** A list of the textures for the sky to use. It contains one texture
+     *  in case of a dome, and 6 textures for a box. */
+    std::vector<std::string> m_sky_textures;
+    /** If a sky dome is used, the number of horizontal segments 
+     *  the sphere should be divided in. */
+    int                      m_sky_hori_segments;
+    /** If a sky dome is used, the number of vertical segments 
+     *  the sphere should be divided in. */
+    int                      m_sky_vert_segments;
+    /** If a sky dome is used, percentage of the sphere to be used. */
+    float                    m_sky_sphere_percent;
+    /** If a sky dome is used, percentage of the texture to be used. */
+    float                    m_sky_texture_percent;
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -182,7 +197,6 @@ public:
     const float&  getFogEnd              () const {return m_fog_end;            }
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
-    const std::string& getTopviewFile    () const {return m_top_view;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
     const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
     const std::string& getItemStyle   () const {return m_item_style;      }

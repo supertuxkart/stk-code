@@ -257,7 +257,7 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
     projectile_manager->notifyRemove();
 
     // Now remove this projectile from the graph:
-    irr_driver->removeMesh(m_mesh);
+    irr_driver->removeNode(getNode());
 
     // The explosion is a bit higher in the air
     Vec3 pos_explosion=getXYZ();
