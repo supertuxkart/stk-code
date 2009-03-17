@@ -116,7 +116,7 @@ FileManager::FileManager()
    // else if(m_file_system->existFile("/Developer/games/supertuxkart/data/stk_config.data"))
     //    m_root_dir = "/Developer/games/supertuxkart" ;
     // FIXME - existFile() fails to detect the file, even though it exists, on my computer
-    else if(m_file_system->existFile("/data/stk_config.data"))
+    else if(m_file_system->existFile("data/stk_config.data"))
         m_root_dir = "." ;
     else if(m_file_system->existFile("../data/stk_config.data"))
         m_root_dir = ".." ;
