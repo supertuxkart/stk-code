@@ -217,6 +217,7 @@ namespace StateManager
     {
         if(g_game_mode)
         {
+            resetAndGoToMenu("main.stkgui");
         }
         else
         {

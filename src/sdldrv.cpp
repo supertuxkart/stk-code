@@ -433,6 +433,7 @@ void handleGameAction(GameAction ga, int value)
 void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
                       int value)
 {
+    
     if(!StateManager::isGameState())
     {
         //http://irrlicht.sourceforge.net/docu/classirr_1_1_irrlicht_device.html#bf859e39f017b0403c6ed331e48e01df
@@ -454,8 +455,6 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_RIGHT;            
             else if(id0 == 276)
                 evt.Key = irr::KEY_LEFT;
-            else if(id0 == 27)
-                StateManager::escapePressed();
             else
                 evt.Key = (irr::EKEY_CODE) id0; // FIXME - probably won't work, need better input handling
             
@@ -571,7 +570,15 @@ void SDLDriver::input()
             input(Input::IT_KEYBOARD, ev.key.keysym.sym, 0, 0, 0);
             break;
         case SDL_KEYDOWN:
-           // if (m_mode == LOWLEVEL)
+
+                // escape is a little special
+                if(ev.key.keysym.sym == 27)
+                {
+                    StateManager::escapePressed();
+                    return;
+                }
+                
+                
                 input(Input::IT_KEYBOARD, ev.key.keysym.sym,
 #ifdef HAVE_IRRLICHT
                   // FIXME: not sure why this happens: with plib the unicode
