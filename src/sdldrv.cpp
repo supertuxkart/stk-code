@@ -309,19 +309,7 @@ SDLDriver::~SDLDriver()
 
 }   // ~SDLDriver
 
-//-----------------------------------------------------------------------------
-/** Handles the conversion from some input to a GameAction and its distribution
-  * to the currently active menu.
-  * It also handles whether the game is currently sensing input. It does so by
-  * suppressing the distribution of the input as a GameAction. Instead the
-  * input is stored in 'm_sensed_input' and GA_SENSE_COMPLETE is distributed. If
-  * however the input in question has resolved to GA_LEAVE this is treated as
-  * an attempt of the user to cancel the sensing. In that case GA_SENSE_CANCEL
-  * is distributed.
-  *
-  * Note: It is the obligation of the called menu to switch of the sense mode.
-  *
-  */
+
 #define MAX_VALUE 32768
 
 void postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
@@ -429,6 +417,19 @@ void handleGameAction(GameAction ga, int value)
 }
 
 
+//-----------------------------------------------------------------------------
+/** Handles the conversion from some input to a GameAction and its distribution
+ * to the currently active menu.
+ * It also handles whether the game is currently sensing input. It does so by
+ * suppressing the distribution of the input as a GameAction. Instead the
+ * input is stored in 'm_sensed_input' and GA_SENSE_COMPLETE is distributed. If
+ * however the input in question has resolved to GA_LEAVE this is treated as
+ * an attempt of the user to cancel the sensing. In that case GA_SENSE_CANCEL
+ * is distributed.
+ *
+ * Note: It is the obligation of the called menu to switch of the sense mode.
+ *
+ */
 void SDLDriver::input(Input::InputType type, int id0, int id1, int id2, 
                       int value)
 {
@@ -438,6 +439,8 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
         if(type == Input::IT_KEYBOARD)
         {
             irr::SEvent::SKeyInput evt;
+            
+            // std::cout << id0 << std::endl;
             
             if(id0 == 9)
                 evt.Key = irr::KEY_TAB;
@@ -451,6 +454,8 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_RIGHT;            
             else if(id0 == 276)
                 evt.Key = irr::KEY_LEFT;
+            else if(id0 == 27)
+                StateManager::escapePressed();
             else
                 evt.Key = (irr::EKEY_CODE) id0; // FIXME - probably won't work, need better input handling
             

@@ -7,6 +7,7 @@
 #include "graphics/irr_driver.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
+#include "main_loop.hpp"
 
 #include <vector>
 
@@ -63,6 +64,16 @@ namespace StateManager
                 w2->addLabel("MiniBjorn");
             }
         }
+        if(name == "menu_bottomrow")
+        {
+            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            if(selection == "quit")
+            {
+                main_loop->abort();
+                return;
+            }
+        }
+        
         if(name == "gamemode")
         {
             GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
@@ -71,6 +82,7 @@ namespace StateManager
                 showTrackSelectionScreen();
             }
         }
+
         if(name == "tracks")
         {
             GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
@@ -167,8 +179,15 @@ namespace StateManager
     void popMenu()
     {
         g_menu_stack.pop_back();
+        
+        if(g_menu_stack.size() == 0)
+        {
+            main_loop->abort();
+            return;
+        }
+        
         g_game_mode = g_menu_stack[g_menu_stack.size()-1] == "race";
-        GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str());
+        GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str()); 
     }
     
     void resetAndGoToMenu(std::string name)
@@ -192,6 +211,17 @@ namespace StateManager
     bool isGameState()
     {
         return g_game_mode;
+    }
+    
+    void escapePressed()
+    {
+        if(g_game_mode)
+        {
+        }
+        else
+        {
+            popMenu();
+        }
     }
     
 }
