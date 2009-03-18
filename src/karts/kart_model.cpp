@@ -229,9 +229,11 @@ void KartModel::adjustWheels(float rotation, float steer,
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
-    core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
-    core::vector3df wheel_steer(0, RAD_TO_DEGREE(steer), 0);
+//    core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
+    core::vector3df wheel_rear (-rotation, 0, 0);
+    core::vector3df wheel_steer(0, -steer, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
+
     for(unsigned int i=0; i<4; i++)
     {
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
