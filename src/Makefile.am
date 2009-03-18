@@ -182,66 +182,23 @@ supertuxkart_SOURCES = \
  lisp/parser.hpp \
  lisp/writer.cpp \
  lisp/writer.hpp \
- gui/widget_manager.cpp \
- gui/widget_manager.hpp \
  gui/widget.cpp \
  gui/widget.hpp \
- gui/menu_manager.cpp \
- gui/menu_manager.hpp \
- gui/base_gui.cpp \
- gui/base_gui.hpp \
  gui/race_gui.cpp \
  gui/race_gui.hpp \
- gui/race_results_gui.cpp \
- gui/race_results_gui.hpp \
- gui/grand_prix_ending.cpp \
- gui/grand_prix_ending.hpp \
- gui/race_menu.cpp \
- gui/race_menu.hpp \
- gui/num_players.cpp \
- gui/num_players.hpp \
- gui/track_sel.cpp \
- gui/track_sel.hpp \
- gui/player_controls.cpp \
- gui/player_controls.hpp \
- gui/config_display.cpp \
- gui/config_display.hpp \
- gui/display_res_confirm.cpp \
- gui/display_res_confirm.hpp \
- gui/config_sound.cpp \
- gui/config_sound.hpp \
- gui/config_controls.cpp \
- gui/config_controls.hpp \
- gui/options.cpp \
- gui/options.hpp \
- gui/game_mode.cpp \
- gui/game_mode.hpp \
- gui/race_options.cpp \
- gui/race_options.hpp \
- gui/char_sel.cpp \
- gui/char_sel.hpp \
- gui/start_race_feedback.cpp \
- gui/start_race_feedback.hpp \
- gui/network_gui.cpp \
- gui/network_gui.hpp \
- gui/main_menu.cpp \
- gui/main_menu.hpp \
- gui/help_page_one.cpp \
- gui/help_page_one.hpp \
- gui/help_page_two.cpp \
- gui/help_page_two.hpp \
- gui/help_page_three.cpp \
- gui/help_page_three.hpp \
- gui/credits_menu.cpp \
- gui/credits_menu.hpp \
- gui/grand_prix_select.cpp \
- gui/grand_prix_select.hpp \
- gui/challenges_menu.cpp \
- gui/challenges_menu.hpp \
- gui/feature_unlocked.cpp \
- gui/feature_unlocked.hpp \
  gui/font.hpp \
  gui/font.cpp \
+ gui/engine.cpp \
+ gui/engine.hpp \
+ gui/my_button.cpp \
+ gui/my_button.hpp \
+ gui/screen.cpp \
+ gui/screen.hpp \
+ gui/screen_loader.cpp \
+ gui/skin.cpp \
+ gui/skin.hpp \
+ gui/state_manager.cpp \
+ gui/state_manager.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/standard_race.cpp \
