@@ -443,17 +443,15 @@ void SDLDriver::input(Input::InputType type, int id0, int id1, int id2,
             
             // std::cout << id0 << std::endl;
             
-            if(id0 == 9)
-                evt.Key = irr::KEY_TAB;
-            else if(id0 == 13)
+            if(id0 == SDLK_RETURN)
                 evt.Key = irr::KEY_RETURN;
-            else if(id0 == 273)
+            else if(id0 == SDLK_UP)
                 evt.Key = irr::KEY_UP;
-            else if(id0 == 274)
+            else if(id0 == SDLK_DOWN)
                 evt.Key = irr::KEY_DOWN;
-            else if(id0 == 275)
+            else if(id0 == SDLK_RIGHT)
                 evt.Key = irr::KEY_RIGHT;            
-            else if(id0 == 276)
+            else if(id0 == SDLK_LEFT)
                 evt.Key = irr::KEY_LEFT;
             else
                 evt.Key = (irr::EKEY_CODE) id0; // FIXME - probably won't work, need better input handling
