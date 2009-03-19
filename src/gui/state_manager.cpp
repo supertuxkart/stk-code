@@ -75,7 +75,7 @@ namespace StateManager
                 IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
                 SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
                 test->addMesh(mesh);
-                test->setMaterialFlag(EMF_LIGHTING , false);
+                //test->setMaterialFlag(EMF_LIGHTING , false);
                 
                 w3->setModel(test);
             }

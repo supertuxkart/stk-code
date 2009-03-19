@@ -32,8 +32,6 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
             {
                 WidgetType type;
                 
-                std::cout << "node: " << xml->getNodeName() << std::endl;
-                
                 if (!strcmp("div", xml->getNodeName()))
                 {
                     type = WTYPE_DIV;
