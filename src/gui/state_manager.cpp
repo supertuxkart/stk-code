@@ -17,7 +17,7 @@ namespace StateManager
 {
     void showTrackSelectionScreen()
     {
-        GUIEngine::switchToScreen("tracks.stkgui");
+        pushMenu("tracks.stkgui");
         GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("tracks"));
         assert( w != NULL );
         
@@ -43,7 +43,7 @@ namespace StateManager
             std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
             if(selection == "new")
             {
-                GUIEngine::switchToScreen("karts.stkgui");
+                StateManager::pushMenu("karts.stkgui");
                 GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
                 assert( w != NULL );
                 
@@ -88,12 +88,16 @@ namespace StateManager
                 main_loop->abort();
                 return;
             }
+						else if (selection == "options")
+						{
+                pushMenu("options.stkgui");
+						}
         }
         
         // -- kart selection screen
         if(name == "karts")
         {
-            GUIEngine::switchToScreen("racesetup.stkgui");
+            StateManager::pushMenu("racesetup.stkgui");
         }
         
         // -- race setup screen
