@@ -792,6 +792,7 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
     // if we got there, must be a ribbon itself. in this case we can just transmit the event directly
     return true;
 }
+// -----------------------------------------------------------------------------
 void RibbonGridWidget::scroll(const int x_delta)
 {
     m_scroll_offset += x_delta;
@@ -951,4 +952,26 @@ RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
     }
     
     return NULL;
+}
+
+#if 0
+#pragma mark -
+#pragma mark Ribbon Grid Widget
+#endif
+
+// -----------------------------------------------------------------------------
+void ModelViewWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    stringw  message = m_properties[PROP_TEXT].c_str();
+    m_element = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter);
+    
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+}
+// -----------------------------------------------------------------------------
+void ModelViewWidget::setModel(SAnimatedMesh* mesh)
+{
+    ((IGUIMeshViewer*)m_element)->setMesh( mesh );
 }

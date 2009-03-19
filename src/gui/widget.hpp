@@ -21,10 +21,10 @@ namespace GUIEngine
         WTYPE_ICON_BUTTON,
         WTYPE_CHECKBOX,
         WTYPE_LABEL,
-        WTYPE_MODEL,
         WTYPE_SPACER,
         WTYPE_DIV,
-        WTYPE_RIBBON_GRID
+        WTYPE_RIBBON_GRID,
+        WTYPE_MODEL_VIEW
     };
     
     enum Property
@@ -284,5 +284,12 @@ namespace GUIEngine
         const std::string& getSelectionName();
     };
 
+    class ModelViewWidget : public Widget
+    {
+    public:
+        void add();
+        void setModel(SAnimatedMesh* mesh);
+    };
+    
 }
 #endif

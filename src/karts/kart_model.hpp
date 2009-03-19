@@ -117,6 +117,7 @@ public:
     void loadModels(const std::string &kart_ident);
 #ifdef HAVE_IRRLICHT
     void attachModel(scene::ISceneNode **node);
+    scene::IMesh* getModel() const { return m_mesh; }
 #else
     ssgTransform *getRoot() const { return m_root; }
 #endif

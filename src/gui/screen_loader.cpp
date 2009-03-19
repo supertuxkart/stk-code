@@ -32,6 +32,8 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
             {
                 WidgetType type;
                 
+                std::cout << "node: " << xml->getNodeName() << std::endl;
+                
                 if (!strcmp("div", xml->getNodeName()))
                 {
                     type = WTYPE_DIV;
@@ -87,11 +89,6 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     type = WTYPE_LABEL;
                     append_to.push_back(new LabelWidget());
                 }
-                else if (!strcmp("model", xml->getNodeName()))
-                {
-                    type = WTYPE_MODEL;
-                    append_to.push_back(new Widget()); // TODO
-                }
                 else if (!strcmp("spacer", xml->getNodeName()))
                 {
                     type = WTYPE_NONE;
@@ -101,6 +98,12 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 {
                     type = WTYPE_RIBBON_GRID;
                     append_to.push_back(new RibbonGridWidget());
+                }
+                else if (!strcmp("model", xml->getNodeName()))
+                {
+                    type = WTYPE_MODEL_VIEW;
+                    append_to.push_back(new ModelViewWidget());
+                    std::cout << "creating a ModelViewWidget\n";
                 }
                 else
                 {

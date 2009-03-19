@@ -8,6 +8,8 @@
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
 #include "main_loop.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "karts/kart.hpp"
 
 #include <vector>
 
@@ -35,11 +37,11 @@ namespace StateManager
     {
         std::cout << "event!! " << name.c_str() << std::endl;
         
+        // --- main menu
         if(name == "menu_toprow")
         {
             std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
-            if(selection == "new") GUIEngine::switchToScreen("racesetup.stkgui");
-            if(selection == "challenges")
+            if(selection == "new")
             {
                 GUIEngine::switchToScreen("karts.stkgui");
                 GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
@@ -56,12 +58,26 @@ namespace StateManager
                 w->addItem("Mozilla","k8","gnu.png");
                 w->updateItemDisplay();
                 
-                GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>(GUIEngine::getCurrentScreen()->getWidget("player"));
+                GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
+                                                (GUIEngine::getCurrentScreen()->getWidget("player"));
                 assert( w2 != NULL );
                 w2->addLabel("Hiker");
                 w2->addLabel("Auria");
                 w2->addLabel("Conso");
                 w2->addLabel("MiniBjorn");
+                
+                GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
+                                                    (GUIEngine::getCurrentScreen()->getWidget("modelview"));
+
+                assert( w3 != NULL );
+
+                // set kart model
+                IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
+                SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
+                test->addMesh(mesh);
+                test->setMaterialFlag(EMF_LIGHTING , false);
+                
+                w3->setModel(test);
             }
         }
         if(name == "menu_bottomrow")
@@ -74,6 +90,13 @@ namespace StateManager
             }
         }
         
+        // -- kart selection screen
+        if(name == "karts")
+        {
+            GUIEngine::switchToScreen("racesetup.stkgui");
+        }
+        
+        // -- race setup screen
         if(name == "gamemode")
         {
             GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
@@ -83,6 +106,7 @@ namespace StateManager
             }
         }
 
+        // -- track seelction screen
         if(name == "tracks")
         {
             GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
