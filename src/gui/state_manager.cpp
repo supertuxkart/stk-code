@@ -59,7 +59,7 @@ namespace StateManager
                 w->updateItemDisplay();
                 
                 GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
-                                                (GUIEngine::getCurrentScreen()->getWidget("player"));
+                (GUIEngine::getCurrentScreen()->getWidget("player"));
                 assert( w2 != NULL );
                 w2->addLabel("Hiker");
                 w2->addLabel("Auria");
@@ -67,10 +67,10 @@ namespace StateManager
                 w2->addLabel("MiniBjorn");
                 
                 GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
-                                                    (GUIEngine::getCurrentScreen()->getWidget("modelview"));
-
+                (GUIEngine::getCurrentScreen()->getWidget("modelview"));
+                
                 assert( w3 != NULL );
-
+                
                 // set kart model
                 IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
                 SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
@@ -88,10 +88,10 @@ namespace StateManager
                 main_loop->abort();
                 return;
             }
-						else if (selection == "options")
-						{
+            else if (selection == "options")
+            {
                 pushMenu("options.stkgui");
-						}
+            }
         }
         
         // -- kart selection screen
@@ -109,7 +109,7 @@ namespace StateManager
                 showTrackSelectionScreen();
             }
         }
-
+        
         // -- track seelction screen
         if(name == "tracks")
         {
@@ -167,7 +167,7 @@ namespace StateManager
          318     race_manager->setCoinTarget(0);
          
          inputDriver->setMode(SDLDriver::INGAME);
-
+         
          race_manager->setLocalKartInfo(0, argv[i+1]);
          
          race_manager->setDifficulty(RaceManager::RD_EASY);
@@ -175,10 +175,10 @@ namespace StateManager
          race_manager->setDifficulty(RaceManager::RD_HARD);
          
          race_manager->setTrack(argv[i+1]);
-
+         
          user_config->setDefaultNumKarts(stk_config->m_max_karts);
          race_manager->setNumKarts(user_config->getDefaultNumKarts() );
-
+         
          user_config->getDefaultNumKarts()
          
          StateManager::enterGameState();
