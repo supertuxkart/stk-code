@@ -237,7 +237,7 @@ void KartModel::adjustWheels(float rotation, float steer,
     for(unsigned int i=0; i<4; i++)
     {
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Z += clamped_suspension[i];
+        pos.Y += clamped_suspension[i];
         m_wheel_node[i]->setPosition(pos);
     }
     m_wheel_node[0]->setRotation(wheel_front);
