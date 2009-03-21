@@ -233,7 +233,6 @@
 		95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D760F532F7D00BE7BA7 /* xml_node.cpp */; };
 		95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */; };
 		95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D980F532FD400BE7BA7 /* camera.cpp */; };
-		95C65DA30F532FD400BE7BA7 /* irr_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D990F532FD400BE7BA7 /* irr_driver.cpp */; };
 		95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */; };
 		95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */; };
 		95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */; };
@@ -2530,7 +2529,6 @@
 				95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */,
 				95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */,
 				95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */,
-				95C65DA30F532FD400BE7BA7 /* irr_driver.cpp in Sources */,
 				95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */,
 				95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */,
 				95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */,
@@ -2564,7 +2562,6 @@
 					/usr/local/include,
 					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
-					/usr/local/include/irrlicht/,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -2613,7 +2610,6 @@
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 					"-DHAVE_GLUT=1",
-					"-DHAVE_IRRLICHT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
@@ -2625,7 +2621,6 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
-					"-lirrlicht",
 					"-L/usr/local/lib",
 					"-lSDL",
 					"-lSDLmain",
@@ -2654,7 +2649,6 @@
 					/usr/local/include,
 					"$(HEADER_SEARCH_PATHS_QUOTED_1)",
 					"$(HEADER_SEARCH_PATHS_QUOTED_2)",
-					/usr/local/include/irrlicht/,
 				);
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
@@ -2703,7 +2697,6 @@
 					"-DHAVE_GETTEXT=1",
 					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
 					"-DHAVE_GLUT=1",
-					"-DHAVE_IRRLICHT=1",
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
@@ -2715,7 +2708,6 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
-					"-lirrlicht",
 					"-L/usr/local/lib",
 					"-lSDL",
 					"-lSDLmain",
