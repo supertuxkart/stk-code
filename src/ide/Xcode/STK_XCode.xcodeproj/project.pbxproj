@@ -10,8 +10,6 @@
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
-		95BEA4CB0F767F7700F4C8FB /* xml_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4C80F767F7700F4C8FB /* xml_node.cpp */; };
-		95BEA4CC0F767F7700F4C8FB /* xml_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4CA0F767F7700F4C8FB /* xml_reader.cpp */; };
 		95BEA4E50F767FCB00F4C8FB /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D10F767FCB00F4C8FB /* shadow.cpp */; };
 		95BEA4E60F767FCB00F4C8FB /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D40F767FCB00F4C8FB /* smoke.cpp */; };
 		95BEA4E70F767FCB00F4C8FB /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D50F767FCB00F4C8FB /* nitro.cpp */; };
@@ -2527,8 +2525,6 @@
 				953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */,
 				953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */,
 				953EAAB60F30A4650000D57D /* translation.cpp in Sources */,
-				95BEA4CB0F767F7700F4C8FB /* xml_node.cpp in Sources */,
-				95BEA4CC0F767F7700F4C8FB /* xml_reader.cpp in Sources */,
 				95BEA4E50F767FCB00F4C8FB /* shadow.cpp in Sources */,
 				95BEA4E60F767FCB00F4C8FB /* smoke.cpp in Sources */,
 				95BEA4E70F767FCB00F4C8FB /* nitro.cpp in Sources */,
