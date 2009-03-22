@@ -10,6 +10,18 @@
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
+		95BEA4CB0F767F7700F4C8FB /* xml_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4C80F767F7700F4C8FB /* xml_node.cpp */; };
+		95BEA4CC0F767F7700F4C8FB /* xml_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4CA0F767F7700F4C8FB /* xml_reader.cpp */; };
+		95BEA4E50F767FCB00F4C8FB /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D10F767FCB00F4C8FB /* shadow.cpp */; };
+		95BEA4E60F767FCB00F4C8FB /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D40F767FCB00F4C8FB /* smoke.cpp */; };
+		95BEA4E70F767FCB00F4C8FB /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D50F767FCB00F4C8FB /* nitro.cpp */; };
+		95BEA4E80F767FCB00F4C8FB /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D70F767FCB00F4C8FB /* particle_system.cpp */; };
+		95BEA4E90F767FCB00F4C8FB /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4D90F767FCB00F4C8FB /* scene.cpp */; };
+		95BEA4EA0F767FCB00F4C8FB /* irr_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4DA0F767FCB00F4C8FB /* irr_driver.cpp */; };
+		95BEA4EB0F767FCB00F4C8FB /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4DC0F767FCB00F4C8FB /* mesh_tools.cpp */; };
+		95BEA4EC0F767FCB00F4C8FB /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4DD0F767FCB00F4C8FB /* camera.cpp */; };
+		95BEA4ED0F767FCB00F4C8FB /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4E20F767FCB00F4C8FB /* skid_marks.cpp */; };
+		95BEA4EE0F767FCB00F4C8FB /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95BEA4E40F767FCB00F4C8FB /* moving_texture.cpp */; };
 		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
 		95C2B1FB0F296546000D3E5D /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		95C2B1FC0F296546000D3E5D /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
@@ -230,17 +242,6 @@
 		95C2B59C0F296547000D3E5D /* ssg_help.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E40F296546000D3E5D /* ssg_help.cpp */; };
 		95C2B59D0F296547000D3E5D /* string_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E60F296546000D3E5D /* string_utils.cpp */; };
 		95C2B59E0F296547000D3E5D /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E80F296546000D3E5D /* vec3.cpp */; };
-		95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D760F532F7D00BE7BA7 /* xml_node.cpp */; };
-		95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */; };
-		95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D980F532FD400BE7BA7 /* camera.cpp */; };
-		95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */; };
-		95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */; };
-		95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */; };
-		95C65DA70F532FD400BE7BA7 /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */; };
-		95C65DA80F532FD400BE7BA7 /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9E0F532FD400BE7BA7 /* smoke.cpp */; };
-		95C65DA90F532FD400BE7BA7 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9F0F532FD400BE7BA7 /* scene.cpp */; };
-		95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA00F532FD400BE7BA7 /* shadow.cpp */; };
-		95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423300E26E58400692113 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4232F0E26E58400692113 /* Carbon.framework */; };
@@ -269,6 +270,30 @@
 		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = ../../physics/triangle_mesh.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = ../../utils/translation.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4C70F767F7700F4C8FB /* xml_reader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_reader.hpp; path = ../../io/xml_reader.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4C80F767F7700F4C8FB /* xml_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_node.cpp; path = ../../io/xml_node.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4C90F767F7700F4C8FB /* xml_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_node.hpp; path = ../../io/xml_node.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4CA0F767F7700F4C8FB /* xml_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_reader.cpp; path = ../../io/xml_reader.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D10F767FCB00F4C8FB /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D20F767FCB00F4C8FB /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = ../../graphics/camera.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D30F767FCB00F4C8FB /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scene.hpp; path = ../../graphics/scene.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D40F767FCB00F4C8FB /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../graphics/smoke.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D50F767FCB00F4C8FB /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D60F767FCB00F4C8FB /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = ../../graphics/particle_system.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D70F767FCB00F4C8FB /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = ../../graphics/particle_system.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D80F767FCB00F4C8FB /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4D90F767FCB00F4C8FB /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DA0F767FCB00F4C8FB /* irr_driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_driver.cpp; path = ../../graphics/irr_driver.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DB0F767FCB00F4C8FB /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../graphics/smoke.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DC0F767FCB00F4C8FB /* mesh_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh_tools.cpp; path = ../../graphics/mesh_tools.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DD0F767FCB00F4C8FB /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = ../../graphics/camera.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DE0F767FCB00F4C8FB /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = ../../graphics/nitro.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4DF0F767FCB00F4C8FB /* irr_driver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_driver.hpp; path = ../../graphics/irr_driver.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4E00F767FCB00F4C8FB /* mesh_tools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mesh_tools.hpp; path = ../../graphics/mesh_tools.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4E10F767FCB00F4C8FB /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = ../../graphics/moving_texture.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4E20F767FCB00F4C8FB /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
+		95BEA4E30F767FCB00F4C8FB /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
+		95BEA4E40F767FCB00F4C8FB /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = ../../graphics/moving_texture.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC210F296540000D3E5D /* actionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actionmap.cpp; path = ../../actionmap.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC220F296540000D3E5D /* actionmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = actionmap.hpp; path = ../../actionmap.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
@@ -776,30 +801,6 @@
 		95C2B1E70F296546000D3E5D /* string_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = string_utils.hpp; path = ../../utils/string_utils.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E80F296546000D3E5D /* vec3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vec3.cpp; path = ../../utils/vec3.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E90F296546000D3E5D /* vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = vec3.hpp; path = ../../utils/vec3.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D760F532F7D00BE7BA7 /* xml_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_node.cpp; path = ../../../../supertuxkart/src/io/xml_node.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D770F532F7D00BE7BA7 /* xml_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_node.hpp; path = ../../../../supertuxkart/src/io/xml_node.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = xml_reader.cpp; path = ../../../../supertuxkart/src/io/xml_reader.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D7A0F532F7D00BE7BA7 /* xml_reader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = xml_reader.hpp; path = ../../../../supertuxkart/src/io/xml_reader.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = ../../../../supertuxkart/src/graphics/moving_texture.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../../../supertuxkart/src/graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D900F532FCE00BE7BA7 /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../../../supertuxkart/src/graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D910F532FCE00BE7BA7 /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = ../../../../supertuxkart/src/graphics/particle_system.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D920F532FCE00BE7BA7 /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = ../../../../supertuxkart/src/graphics/nitro.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D930F532FCE00BE7BA7 /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scene.hpp; path = ../../../../supertuxkart/src/graphics/scene.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D940F532FCE00BE7BA7 /* irr_driver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_driver.hpp; path = ../../../../supertuxkart/src/graphics/irr_driver.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D950F532FCE00BE7BA7 /* mesh_tools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mesh_tools.hpp; path = ../../../../supertuxkart/src/graphics/mesh_tools.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D960F532FCE00BE7BA7 /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = camera.hpp; path = ../../../../supertuxkart/src/graphics/camera.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D970F532FD400BE7BA7 /* smoke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = smoke.hpp; path = ../../../../supertuxkart/src/graphics/smoke.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D980F532FD400BE7BA7 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera.cpp; path = ../../../../supertuxkart/src/graphics/camera.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D990F532FD400BE7BA7 /* irr_driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_driver.cpp; path = ../../../../supertuxkart/src/graphics/irr_driver.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh_tools.cpp; path = ../../../../supertuxkart/src/graphics/mesh_tools.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = ../../../../supertuxkart/src/graphics/moving_texture.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = ../../../../supertuxkart/src/graphics/particle_system.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../../../supertuxkart/src/graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9E0F532FD400BE7BA7 /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../../../supertuxkart/src/graphics/smoke.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../../../supertuxkart/src/graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
-		95C65DA00F532FD400BE7BA7 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../../../supertuxkart/src/graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
-		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../../../supertuxkart/src/graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
 		95E1059A0E28F65F00503124 /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95E1059B0E28F65F00503124 /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95E105F00E28F66000503124 /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -1617,26 +1618,26 @@
 		95C2AE870F296542000D3E5D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */,
-				95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */,
-				95C65D900F532FCE00BE7BA7 /* skid_marks.hpp */,
-				95C65D910F532FCE00BE7BA7 /* particle_system.hpp */,
-				95C65D920F532FCE00BE7BA7 /* nitro.hpp */,
-				95C65D930F532FCE00BE7BA7 /* scene.hpp */,
-				95C65D940F532FCE00BE7BA7 /* irr_driver.hpp */,
-				95C65D950F532FCE00BE7BA7 /* mesh_tools.hpp */,
-				95C65D970F532FD400BE7BA7 /* smoke.hpp */,
-				95C65D980F532FD400BE7BA7 /* camera.cpp */,
-				95C65D990F532FD400BE7BA7 /* irr_driver.cpp */,
-				95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */,
-				95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */,
-				95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */,
-				95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */,
-				95C65D9E0F532FD400BE7BA7 /* smoke.cpp */,
-				95C65D9F0F532FD400BE7BA7 /* scene.cpp */,
-				95C65DA00F532FD400BE7BA7 /* shadow.cpp */,
-				95C65DA10F532FD400BE7BA7 /* nitro.cpp */,
-				95C65D960F532FCE00BE7BA7 /* camera.hpp */,
+				95BEA4D10F767FCB00F4C8FB /* shadow.cpp */,
+				95BEA4D20F767FCB00F4C8FB /* camera.hpp */,
+				95BEA4D30F767FCB00F4C8FB /* scene.hpp */,
+				95BEA4D40F767FCB00F4C8FB /* smoke.cpp */,
+				95BEA4D50F767FCB00F4C8FB /* nitro.cpp */,
+				95BEA4D60F767FCB00F4C8FB /* particle_system.hpp */,
+				95BEA4D70F767FCB00F4C8FB /* particle_system.cpp */,
+				95BEA4D80F767FCB00F4C8FB /* shadow.hpp */,
+				95BEA4D90F767FCB00F4C8FB /* scene.cpp */,
+				95BEA4DA0F767FCB00F4C8FB /* irr_driver.cpp */,
+				95BEA4DB0F767FCB00F4C8FB /* smoke.hpp */,
+				95BEA4DC0F767FCB00F4C8FB /* mesh_tools.cpp */,
+				95BEA4DD0F767FCB00F4C8FB /* camera.cpp */,
+				95BEA4DE0F767FCB00F4C8FB /* nitro.hpp */,
+				95BEA4DF0F767FCB00F4C8FB /* irr_driver.hpp */,
+				95BEA4E00F767FCB00F4C8FB /* mesh_tools.hpp */,
+				95BEA4E10F767FCB00F4C8FB /* moving_texture.hpp */,
+				95BEA4E20F767FCB00F4C8FB /* skid_marks.cpp */,
+				95BEA4E30F767FCB00F4C8FB /* skid_marks.hpp */,
+				95BEA4E40F767FCB00F4C8FB /* moving_texture.cpp */,
 			);
 			name = graphics;
 			path = ../../graphics;
@@ -1923,10 +1924,10 @@
 		95C65D750F532F7D00BE7BA7 /* io */ = {
 			isa = PBXGroup;
 			children = (
-				95C65D760F532F7D00BE7BA7 /* xml_node.cpp */,
-				95C65D770F532F7D00BE7BA7 /* xml_node.hpp */,
-				95C65D790F532F7D00BE7BA7 /* xml_reader.cpp */,
-				95C65D7A0F532F7D00BE7BA7 /* xml_reader.hpp */,
+				95BEA4C70F767F7700F4C8FB /* xml_reader.hpp */,
+				95BEA4C80F767F7700F4C8FB /* xml_node.cpp */,
+				95BEA4C90F767F7700F4C8FB /* xml_node.hpp */,
+				95BEA4CA0F767F7700F4C8FB /* xml_reader.cpp */,
 			);
 			name = io;
 			path = games/supertuxkart/src/io;
@@ -2526,17 +2527,18 @@
 				953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */,
 				953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */,
 				953EAAB60F30A4650000D57D /* translation.cpp in Sources */,
-				95C65D7C0F532F7D00BE7BA7 /* xml_node.cpp in Sources */,
-				95C65D7E0F532F7D00BE7BA7 /* xml_reader.cpp in Sources */,
-				95C65DA20F532FD400BE7BA7 /* camera.cpp in Sources */,
-				95C65DA40F532FD400BE7BA7 /* mesh_tools.cpp in Sources */,
-				95C65DA50F532FD400BE7BA7 /* moving_texture.cpp in Sources */,
-				95C65DA60F532FD400BE7BA7 /* particle_system.cpp in Sources */,
-				95C65DA70F532FD400BE7BA7 /* skid_marks.cpp in Sources */,
-				95C65DA80F532FD400BE7BA7 /* smoke.cpp in Sources */,
-				95C65DA90F532FD400BE7BA7 /* scene.cpp in Sources */,
-				95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */,
-				95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */,
+				95BEA4CB0F767F7700F4C8FB /* xml_node.cpp in Sources */,
+				95BEA4CC0F767F7700F4C8FB /* xml_reader.cpp in Sources */,
+				95BEA4E50F767FCB00F4C8FB /* shadow.cpp in Sources */,
+				95BEA4E60F767FCB00F4C8FB /* smoke.cpp in Sources */,
+				95BEA4E70F767FCB00F4C8FB /* nitro.cpp in Sources */,
+				95BEA4E80F767FCB00F4C8FB /* particle_system.cpp in Sources */,
+				95BEA4E90F767FCB00F4C8FB /* scene.cpp in Sources */,
+				95BEA4EA0F767FCB00F4C8FB /* irr_driver.cpp in Sources */,
+				95BEA4EB0F767FCB00F4C8FB /* mesh_tools.cpp in Sources */,
+				95BEA4EC0F767FCB00F4C8FB /* camera.cpp in Sources */,
+				95BEA4ED0F767FCB00F4C8FB /* skid_marks.cpp in Sources */,
+				95BEA4EE0F767FCB00F4C8FB /* moving_texture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
