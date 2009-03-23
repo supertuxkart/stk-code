@@ -20,10 +20,6 @@
 
 #include "graphics/camera.hpp"
 
-#ifndef HAVE_IRRLICHT
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
-#endif
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -38,11 +34,7 @@ Camera::Camera(int camera_index, const Kart* kart)
 {
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
-#ifdef HAVE_IRRLICHT
     m_camera   = irr_driver->addCamera();
-#else
-    m_context  = new ssgContext ;
-#endif
     m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
     m_xyz      = kart->getXYZ();
@@ -238,11 +230,7 @@ void Camera::update(float dt)
     // The reverse mode and the cam used in follow the leader mode (when a
     // kart has been eliminated) are facing backwards:
     bool reverse = m_kart->getControls().m_look_back || m_mode==CM_LEADER_MODE;
-#ifdef HAVE_IRRLICHT
     Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
-#else
-    Vec3 cam_rel_pos(0.f, reverse ? m_distance : -m_distance, 1.5f);
-#endif
 
     // Set the camera rotation
     // -----------------------
@@ -254,7 +242,7 @@ void Camera::update(float dt)
     else
         pitch = sign * DEGREE_TO_RAD(25.0f);
       
-    btQuaternion cam_rot(0.0f, pitch, reverse ? M_PI : 0.0f);
+    btQuaternion cam_rot(0.0f, -pitch, reverse ? M_PI : 0.0f);
     // Camera position relative to the kart
     btTransform relative_to_kart(cam_rot, cam_rel_pos);
 
@@ -266,12 +254,8 @@ void Camera::update(float dt)
     Coord c(result);
     m_xyz = c.getXYZ();
     m_hpr = c.getHPR();
-#ifdef HAVE_IRRLICHT
     m_camera->setPosition(m_xyz.toIrrVector());
     m_camera->setTarget(kart_xyz.toIrrVector());
-#else
-    m_context -> setCamera(&c.toSgCoord());
-#endif
     if(race_manager->getNumLocalPlayers() < 2)
         sound_manager->positionListener(m_xyz, kart_xyz - m_xyz);
 }   // update
@@ -285,11 +269,9 @@ void Camera::finalCamera(float dt)
     {
         m_xyz += m_velocity*dt;
         m_hpr += m_angular_velocity*dt;
-        Coord coord(m_xyz, m_hpr);
-#ifdef HAVE_IRRLICHT
-#else
-        m_context->setCamera(&coord.toSgCoord());
-#endif
+        m_camera->setPosition(m_xyz.toIrrVector());
+        // FIXME: target position needs to be computed
+        // m_camera->setTarget(target_xyz.toIrrVector());
     }
 #undef TEST_END_CAMERA_POSITION
 #ifdef TEST_END_CAMERA_POSITION
@@ -317,12 +299,12 @@ void Camera::apply ()
     int width  = user_config->m_width ;
     int height = user_config->m_height;
 
+#ifdef HAVE_IRRLICHT
+#else
     glViewport ( (int)((float)width  * m_x),
                  (int)((float)height * m_y),
                  (int)((float)width  * m_w),
                  (int)((float)height * m_h) ) ;
-#ifdef HAVE_IRRLICHT
-#else
     m_context -> makeCurrent () ;
 #endif
 }   // apply

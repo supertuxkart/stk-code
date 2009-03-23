@@ -21,6 +21,7 @@
 #define HEADER_IRR_DRIVER_HPP
 
 #include <string>
+#include <vector>
 
 #include "irrlicht.h"
 using namespace irr;
@@ -50,6 +51,9 @@ public:
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
+    scene::IMesh         *createQuadMesh(const video::SColor &c=video::SColor(77, 179, 0, 0));
+    scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
+                                       float wave_speed, float wave_length);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
     scene::IParticleSystemSceneNode
@@ -57,6 +61,7 @@ public:
     scene::ISceneNode    *addSkyDome(const std::string &texture, int hori_res,
                                      int vert_res, float texture_percent, 
                                      float sphere_percent);
+    scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMesh(scene::IMesh *mesh);
     scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);

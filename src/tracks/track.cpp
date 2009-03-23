@@ -929,10 +929,21 @@ void Track::loadTrack(const std::string &filename)
     node = xml->getNode("sky-box");
     if(node)
     {
-        m_sky_type = SKY_BOX;
+        std::string s;
+        node->get("texture", &s);
+        m_sky_textures = StringUtils::split(s, ' ');
+        if(m_sky_textures.size()!=6)
+        {
+            fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
+                    m_sky_textures.size());
+            fprintf(stderr, "in '%s'.\n", filename.c_str());
+
+        }
+        else
+        {
+            m_sky_type = SKY_BOX;
+        }
     }   // if sky-box
-
-
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
@@ -1144,7 +1155,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
 {
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-        // FIXME: take translation/rotation into accou
+        // FIXME: take translation/rotation into account
         if(mb->getVertexType()!=video::EVT_STANDARD) {
             fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
                 mb->getVertexType());
@@ -1215,6 +1226,55 @@ bool Track::loadMainTrack(const XMLNode &node)
 }   // loadMainTrack
 
 // ----------------------------------------------------------------------------
+/** Creates a water node.
+ *  \param node The XML node containing the specifications for the water node.
+ */
+void Track::createWater(const XMLNode &node)
+{
+    std::string model_name;
+    node.get("model", &model_name);
+    std::string full_path = file_manager->getTrackFile(model_name, 
+                                                       getIdent());
+
+    //scene::IMesh *mesh = irr_driver->getMesh(full_path);
+    scene::IMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
+//    scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->addHillPlaneMesh("myHill",
+//                core::dimension2d<f32>(20,20),
+//                core::dimension2d<u32>(40,40), 0, 0,
+//                core::dimension2d<f32>(0,0),
+//                core::dimension2d<f32>(10,10));
+
+    scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
+    scene::SMeshBuffer* buffer = new scene::SMeshBuffer(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
+    
+    float wave_height  = 2.0f;
+    float wave_speed   = 300.0f;
+    float wave_length  = 10.0f;
+    node.get("height", &wave_height);
+    node.get("speed",  &wave_speed);
+    node.get("length", &wave_length);
+    scene::ISceneNode* scene_node = irr_driver->addWaterNode(mesh,
+                                                             wave_height, 
+                                                             wave_speed,
+                                                             wave_length);
+
+    if(!mesh || !scene_node)
+    {
+        fprintf(stderr, "Warning: Water model '%s' in '%s' not found, ignored.\n",
+                node.getName().c_str(), model_name.c_str());
+        return;
+    }
+    m_all_meshes.push_back(mesh);
+    core::vector3df xyz(0,0,0);
+    node.getXYZ(&xyz);
+    core::vector3df hpr(0,0,0);
+    node.getHPR(&hpr);
+    scene_node->setPosition(xyz);
+    scene_node->setRotation(hpr);
+    m_all_nodes.push_back(scene_node);
+}   // createWater
+
+// ----------------------------------------------------------------------------
 void Track::loadTrackModel()
 {
     // Add the track directory to the texture search path
@@ -1258,6 +1318,34 @@ void Track::loadTrackModel()
         {
             MovingPhysics *mp = new MovingPhysics(node);
             callback_manager->addCallback(mp, CB_TRACK);
+        }
+        else if(name=="water")
+        {
+            createWater(*node);
+        }
+        else if(name=="model")
+        {
+            std::string model_name;
+            node->get("model", &model_name);
+            std::string full_path = file_manager->getTrackFile(model_name, 
+                getIdent());
+            scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
+            if(!mesh)
+            {
+                fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
+                    node->getName().c_str(), model_name.c_str());
+                exit(-1);
+            }
+            m_all_meshes.push_back(mesh);
+            scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+            core::vector3df xyz(0,0,0);
+            node->getXYZ(&xyz);
+            core::vector3df hpr(0,0,0);
+            node->getHPR(&hpr);
+            scene_node->setPosition(xyz);
+            scene_node->setRotation(hpr);
+            m_all_nodes.push_back(scene_node);
+            scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
         }
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
@@ -1507,12 +1595,15 @@ void Track::loadTrackModel()
 
     if(m_sky_type==SKY_DOME)
     {
-        irr_driver->addSkyDome(m_sky_textures[0],
-                               m_sky_hori_segments, m_sky_vert_segments, 
-                               m_sky_texture_percent, m_sky_sphere_percent);
+        m_all_nodes.push_back(irr_driver->addSkyDome(m_sky_textures[0],
+                                                     m_sky_hori_segments, 
+                                                     m_sky_vert_segments, 
+                                                     m_sky_texture_percent, 
+                                                     m_sky_sphere_percent) );
     }
     else if(m_sky_type==SKY_BOX)
     {
+        m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
     }
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();

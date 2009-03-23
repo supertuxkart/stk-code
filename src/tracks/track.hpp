@@ -66,6 +66,7 @@ private:
     bool                     m_is_arena;
     int                      m_version;
     bool                     loadMainTrack(const XMLNode &node);
+    void                     createWater(const XMLNode &node);
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
           SKY_DOME}          m_sky_type;

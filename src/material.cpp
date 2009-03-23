@@ -112,65 +112,17 @@ void Material::init(unsigned int index)
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {
-#ifdef HAVE_IRRLICHT
     if(m_texname!="")
     {
         // Avoid irrlicht warning about not being able to load texture.
         m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
     }
-#else
-    if ( isSphereMap () )
-    {
-        m_predraw  =   setSpheremap ;
-        m_postdraw = clearSpheremap ;
-    }
-
-    m_state = new ssgSimpleState ;
-
-    m_state -> ref () ;
-    m_state -> setExternalPropertyIndex ( m_index ) ;
-    if ( m_texname.size()>0 )
-    {
-        std::string fn=is_full_path ? m_texname 
-                                    : file_manager->getTextureFile(m_texname);
-        if(fn=="")
-        {
-            fprintf(stderr, "WARNING: texture '%s' not found.\n", 
-                    m_texname.c_str());
-        }
-        m_state -> setTexture ( fn.c_str(), !(m_clamp_tex & UCLAMP),
-                              !(m_clamp_tex & VCLAMP) );
-        m_state -> enable  ( GL_TEXTURE_2D ) ;
-    }
-    else
-        m_state -> disable ( GL_TEXTURE_2D ) ;
-
-    if ( m_lighting )
-        m_state -> enable  ( GL_LIGHTING ) ;
-    else
-        m_state -> disable ( GL_LIGHTING ) ;
-
-    m_state -> setShadeModel ( GL_SMOOTH ) ;
-    m_state -> enable        ( GL_COLOR_MATERIAL ) ;
-    m_state -> enable        ( GL_CULL_FACE      ) ;
-    m_state -> setColourMaterial ( GL_AMBIENT_AND_DIFFUSE ) ;
-    m_state -> setMaterial   ( GL_EMISSION, 0, 0, 0, 1 ) ;
-    m_state -> setMaterial   ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_state -> setShininess  ( 0 ) ;
-
     if ( m_transparency )
     {
-        m_state -> setTranslucent () ;
-        m_state -> enable         ( GL_ALPHA_TEST ) ;
-        m_state -> setAlphaClamp  ( m_alpha_ref ) ;
-        m_state -> enable         ( GL_BLEND ) ;
+        //m_texture->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     }
-    else
-    {
-        m_state -> setOpaque () ;
-        m_state -> disable   ( GL_BLEND ) ;
-    }
-#endif
+
+    // FIXME: more parameters need to be set!
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::basename(m_texname);

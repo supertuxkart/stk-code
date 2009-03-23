@@ -94,6 +94,23 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 }   // getMesh
 
 // ----------------------------------------------------------------------------
+/** Converts the mesh into a water scene node.
+ *  \param mesh The mesh which is converted into a water scene node.
+ *  \param wave_height Height of the water waves.
+ *  \param wave_speed Speed of the water waves.
+ *  \param wave_length Lenght of a water wave.
+ */
+scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
+                                           float wave_height,
+                                           float wave_speed,
+                                           float wave_length)
+{
+    return m_scene_manager->addWaterSurfaceSceneNode(mesh,
+                                                     wave_height, wave_speed, 
+                                                     wave_length);
+}   // addWaterNode
+
+// ----------------------------------------------------------------------------
 /** Adds a mesh that will be optimised using an oct tree.
  *  \param mesh Mesh to add.
  */
@@ -119,6 +136,52 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 {
     return m_scene_manager->addMeshSceneNode(mesh);
 }   // addMesh
+
+// ----------------------------------------------------------------------------
+/** Creates a quad mesh buffer and adds it to the scene graph.
+ */
+scene::IMesh *IrrDriver::createQuadMesh(const video::SColor &color)
+{
+    scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
+    video::S3DVertex v;
+    v.Pos = core::vector3df(0,0,0);
+
+    // Add the vertices
+    // ----------------
+    buffer->Vertices.push_back(v);
+    buffer->Vertices.push_back(v);
+    buffer->Vertices.push_back(v);
+    buffer->Vertices.push_back(v);
+
+    // Define the indices for the triangles
+    // ------------------------------------
+    buffer->Indices.push_back(0);
+    buffer->Indices.push_back(1);
+    buffer->Indices.push_back(2);
+
+    buffer->Indices.push_back(0);
+    buffer->Indices.push_back(2);
+    buffer->Indices.push_back(3);
+
+    // Set the normals
+    // ---------------
+    core::vector3df n(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
+    buffer->Vertices[0].Normal = n;
+    buffer->Vertices[1].Normal = n;
+    buffer->Vertices[2].Normal = n;
+    buffer->Vertices[3].Normal = n;
+    video::SMaterial m;
+    m.AmbientColor    = color;
+    m.DiffuseColor    = color;
+    m.EmissiveColor   = color;
+    m.BackfaceCulling = false;
+    buffer->Material  = m;
+    SMesh *mesh       = new SMesh();
+    mesh->addMeshBuffer(buffer);
+    mesh->recalculateBoundingBox();
+    buffer->drop();
+    return mesh;
+}   // createQuadMesh
 
 // ----------------------------------------------------------------------------
 /** Removes a scene node from the scene.
@@ -170,6 +233,27 @@ scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name,
                                                 texture_percent, 
                                                 sphere_percent);
 }   // addSkyDome
+
+// ----------------------------------------------------------------------------
+/** Adds a skybox using. Irrlicht documentation:
+ *  A skybox is a big cube with 6 textures on it and is drawn around the camera 
+ *  position.
+ *  \param top: Texture for the top plane of the box.
+ *  \param bottom: Texture for the bottom plane of the box.
+ *  \param left: Texture for the left plane of the box.
+ *  \param right: Texture for the right plane of the box.
+ *  \param front: Texture for the front plane of the box.
+ *  \param back: Texture for the back plane of the box.
+ */
+scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<std::string> &texture_names)
+{
+    std::vector<video::ITexture*> t;
+    for(unsigned int i=0; i<texture_names.size(); i++)
+    {
+        t.push_back(getTexture(texture_names[i]));
+    }
+    return m_scene_manager->addSkyBoxSceneNode(t[0], t[1], t[2], t[3], t[4], t[5]);
+}   // addSkyBox
 
 // ----------------------------------------------------------------------------
 /** Adds a camera to the scene.

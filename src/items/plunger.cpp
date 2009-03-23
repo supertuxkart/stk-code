@@ -94,7 +94,6 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     else
     {
         m_rubber_band = new RubberBand(this, *kart);
-        m_rubber_band->ref();
     }
     m_keep_alive = -1;
 }   // Plunger
@@ -103,7 +102,6 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 Plunger::~Plunger()
 {
     m_rubber_band->removeFromScene();
-    ssgDeRefDelete(m_rubber_band);
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------
