@@ -157,6 +157,7 @@ enum StaticAction
 };
 
 
+
 /* Some constants to make future changes more easier to handle. If you use
  * any of the GameAction constants to mark the beginning or end of a range
  * or denote a count then something is wrong with your code. ;)

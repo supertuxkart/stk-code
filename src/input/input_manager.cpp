@@ -198,17 +198,17 @@ void InputManager::postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const in
     GUIEngine::getDevice()->postEventFromUser(wrapper);
 }
 
-
-void InputManager::handleStaticAction(StaticAction ga, int value)
+// TODO - make this do something
+void InputManager::handleStaticAction(int key, int value)
 {
-    if (value)
-		return;
+    //if (value) return;
 	
     static int isWireframe = false;
     
-	switch (ga)
+	switch (key)
 	{
-		case GA_DEBUG_ADD_BOWLING:
+#ifdef DEBUG
+		case SDLK_F1:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
@@ -216,28 +216,29 @@ void InputManager::handleStaticAction(StaticAction ga, int value)
                 kart->attach(ATTACH_ANVIL, 5);
 			}
 			break;
-		case GA_DEBUG_ADD_MISSILE:
+		case SDLK_F2:
             if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setPowerup(POWERUP_PLUNGER, 10000);
 			}
 			break;
-		case GA_DEBUG_ADD_HOMING:
+		case SDLK_F3:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setPowerup(POWERUP_CAKE, 10000);
 			}
 			break;
-		case GA_DEBUG_TOGGLE_FPS:
+#endif
+		case SDLK_F12:
 			user_config->m_display_fps = !user_config->m_display_fps;
 			if(user_config->m_display_fps)
 			{
                 getRaceGUI()->resetFPSCounter();
             }
 			break;
-		case GA_DEBUG_TOGGLE_WIREFRAME:
+		case SDLK_F11:
 			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
 			isWireframe = ! isWireframe;
 			break;
@@ -245,23 +246,22 @@ void InputManager::handleStaticAction(StaticAction ga, int value)
             // For now disable F9 toggling fullscreen, since windows requires
             // to reload all textures, display lists etc. Fullscreen can
             // be toggled from the main menu (options->display).
-		case GA_TOGGLE_FULLSCREEN:
+		case SDLK_F9:
             SDLManager::toggleFullscreen(false);   // 0: do not reset textures
 			// Fall through to put the game into pause mode.
 #endif
-		case GA_LEAVE_RACE:
+		case SDLK_ESCAPE:
             // TODO - show race menu
-            /*
-             RaceManager::getWorld()->pause();
-             menu_manager->pushMenu(MENUID_RACEMENU);
-             */
+            // RaceManager::getWorld()->pause();
+             //menu_manager->pushMenu(MENUID_RACEMENU);
             break;
-		case GA_DEBUG_HISTORY:
+		case SDLK_F10:
 			history->Save();
 			break;
 		default:
 			break;
 	} // switch
+
 }
 
 
@@ -303,8 +303,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             else if(id0 == SDLK_LEFT)
                 evt.Key = irr::KEY_LEFT;
             else
-                evt.Key = (irr::EKEY_CODE) id0; // FIXME - probably won't work, need better input handling
-            
+                return; // only those keys are accepted in menus for now.
             
             evt.PressedDown = value > MAX_VALUE/2;
             
@@ -370,10 +369,15 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
         }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
         else
 #endif
-            if (action_found)
-            {
-                RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, value);
-            }
+        if (action_found)
+        {
+            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, value);
+        }
+        else if(type == Input::IT_KEYBOARD)
+        {
+            // keyboard press not handled by device manager / bindings. Check static bindings...
+            handleStaticAction( id0, value );
+        }
     }
 }   // input
 
@@ -498,7 +502,8 @@ void InputManager::input()
 
                 if(ev.jaxis.value < 0)
                 {
-                    /* TODO - bring back those weird axis tricks
+                    /* TODO - bring back those weird axis tricks. would be cool if
+                     // they could happen inside the GamePadDevice class, for encapsulation
                     if (m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
                     {
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_POSITIVE, 0);
@@ -509,7 +514,8 @@ void InputManager::input()
                 }
                 else
                 {
-                    /* TODO - bring back those weird axis tricks
+                    /* TODO - bring back those weird axis tricks. would be cool if
+                     // they could happen inside the GamePadDevice class, for encapsulation
                     if (m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
                     {
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_NEGATIVE, 0);

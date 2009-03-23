@@ -65,7 +65,7 @@ private:
 	
     void   input(Input::InputType, int, int, int, int);
     void   postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y);
-    void   handleStaticAction(StaticAction ga, int value);
+    void   handleStaticAction(int id0, int value);
     void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
 public:
 	       InputManager();
