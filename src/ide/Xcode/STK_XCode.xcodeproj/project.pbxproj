@@ -22,6 +22,8 @@
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
 		953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
+		95A116BF0F77D3BB00B18B3D /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A116BD0F77D3BB00B18B3D /* input_manager.cpp */; };
+		95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A117330F77D7BE00B18B3D /* sdl_manager.cpp */; };
 		95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
 		95C1E4000F699427005D33E6 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3FF0F699427005D33E6 /* font.cpp */; };
 		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
@@ -203,7 +205,6 @@
 		95C2B5710F296547000D3E5D /* replay_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A40F296545000D3E5D /* replay_recorder.cpp */; };
 		95C2B5760F296547000D3E5D /* default_robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1AB0F296545000D3E5D /* default_robot.cpp */; };
 		95C2B5780F296547000D3E5D /* track_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1AF0F296545000D3E5D /* track_info.cpp */; };
-		95C2B57B0F296547000D3E5D /* sdldrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1B30F296545000D3E5D /* sdldrv.cpp */; };
 		95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1BF0F296545000D3E5D /* static_ssg.cpp */; };
 		95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1C10F296545000D3E5D /* stk_config.cpp */; };
 		95C2B5910F296547000D3E5D /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1CF0F296545000D3E5D /* track.cpp */; };
@@ -270,6 +271,10 @@
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
 		953F038B0F6C880D00C77FE2 /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = ../../gui/state_manager.cpp; sourceTree = SOURCE_ROOT; };
 		953F038E0F6C8AD800C77FE2 /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../gui/state_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95A116BD0F77D3BB00B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = games/supertuxkart/src/input_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95A116BE0F77D3BB00B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = games/supertuxkart/src/input_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95A117330F77D7BE00B18B3D /* sdl_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sdl_manager.cpp; path = games/supertuxkart/src/sdl_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95A117340F77D7BE00B18B3D /* sdl_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sdl_manager.hpp; path = games/supertuxkart/src/sdl_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
 		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../gui/font.cpp; sourceTree = SOURCE_ROOT; };
@@ -696,8 +701,6 @@
 		95C2B1AC0F296545000D3E5D /* default_robot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = default_robot.hpp; path = ../../robots/default_robot.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1AF0F296545000D3E5D /* track_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info.cpp; path = ../../robots/track_info.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1B00F296545000D3E5D /* track_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info.hpp; path = ../../robots/track_info.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1B30F296545000D3E5D /* sdldrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sdldrv.cpp; path = ../../sdldrv.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1B40F296545000D3E5D /* sdldrv.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sdldrv.hpp; path = ../../sdldrv.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1BF0F296545000D3E5D /* static_ssg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = static_ssg.cpp; path = ../../static_ssg.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1C00F296545000D3E5D /* static_ssg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = static_ssg.hpp; path = ../../static_ssg.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1C10F296545000D3E5D /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../stk_config.cpp; sourceTree = SOURCE_ROOT; };
@@ -1252,6 +1255,8 @@
 				95C2AEDA0F296542000D3E5D /* highscores.hpp */,
 				95C2AEDC0F296542000D3E5D /* history.cpp */,
 				95C2AEDD0F296542000D3E5D /* history.hpp */,
+				95A116BD0F77D3BB00B18B3D /* input_manager.cpp */,
+				95A116BE0F77D3BB00B18B3D /* input_manager.hpp */,
 				95C2B0EF0F296545000D3E5D /* input.hpp */,
 				95C2B0F00F296545000D3E5D /* isect.cpp */,
 				95C2B0F10F296545000D3E5D /* isect.hpp */,
@@ -1268,8 +1273,6 @@
 				95C2B18A0F296545000D3E5D /* player.hpp */,
 				95C2B1930F296545000D3E5D /* race_manager.cpp */,
 				95C2B1940F296545000D3E5D /* race_manager.hpp */,
-				95C2B1B30F296545000D3E5D /* sdldrv.cpp */,
-				95C2B1B40F296545000D3E5D /* sdldrv.hpp */,
 				95C2B1BF0F296545000D3E5D /* static_ssg.cpp */,
 				95C2B1C00F296545000D3E5D /* static_ssg.hpp */,
 				95C2B1C10F296545000D3E5D /* stk_config.cpp */,
@@ -1277,6 +1280,8 @@
 				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
 				95C2B1DC0F296546000D3E5D /* user_config.hpp */,
 				95C2B1DE0F296546000D3E5D /* user_pointer.hpp */,
+				95A117330F77D7BE00B18B3D /* sdl_manager.cpp */,
+				95A117340F77D7BE00B18B3D /* sdl_manager.hpp */,
 			);
 			name = src;
 			path = ../..;
@@ -2721,7 +2726,6 @@
 				95C2B5710F296547000D3E5D /* replay_recorder.cpp in Sources */,
 				95C2B5760F296547000D3E5D /* default_robot.cpp in Sources */,
 				95C2B5780F296547000D3E5D /* track_info.cpp in Sources */,
-				95C2B57B0F296547000D3E5D /* sdldrv.cpp in Sources */,
 				95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */,
 				95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */,
 				95C2B5910F296547000D3E5D /* track.cpp in Sources */,
@@ -2756,6 +2760,8 @@
 				95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */,
 				95C1E4000F699427005D33E6 /* font.cpp in Sources */,
 				953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */,
+				95A116BF0F77D3BB00B18B3D /* input_manager.cpp in Sources */,
+				95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

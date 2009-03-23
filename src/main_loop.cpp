@@ -22,7 +22,7 @@
 #include <SDL/SDL.h>
 #include <assert.h>
 #include "history.hpp"
-#include "sdldrv.hpp"
+#include "input_manager.hpp"
 #include "material_manager.hpp"
 #include "race_manager.hpp"
 #include "audio/sound_manager.hpp"
@@ -76,7 +76,7 @@ void MainLoop::run()
     float dt;
     while(!m_abort)
     {
-        inputDriver->input();
+        input_manager->input();
 
         m_prev_time = m_curr_time;
 

@@ -22,7 +22,7 @@
 
 #include "history.hpp"
 #include "player.hpp"
-#include "sdldrv.hpp"
+#include "input_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "graphics/camera.hpp"

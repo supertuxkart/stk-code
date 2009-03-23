@@ -3,7 +3,7 @@
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
 #include "gui/screen.hpp"
-#include "sdldrv.hpp"
+#include "input_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
@@ -166,7 +166,7 @@ namespace StateManager
          317     // Might still be set from a previous challenge
          318     race_manager->setCoinTarget(0);
          
-         inputDriver->setMode(SDLDriver::INGAME);
+         input_manager->setMode(InputManager::INGAME);
          
          race_manager->setLocalKartInfo(0, argv[i+1]);
          
@@ -198,7 +198,7 @@ namespace StateManager
     
     void pushMenu(std::string name)
     {
-        inputDriver->setMode(SDLDriver::MENU);
+        input_manager->setMode(InputManager::MENU);
         g_menu_stack.push_back(name);
         g_game_mode = false;
         GUIEngine::switchToScreen(name.c_str());
@@ -220,7 +220,7 @@ namespace StateManager
     
     void resetAndGoToMenu(std::string name)
     {
-        inputDriver->setMode(SDLDriver::MENU);
+        input_manager->setMode(InputManager::MENU);
         g_menu_stack.clear();
         g_menu_stack.push_back(name);
         g_game_mode = false;
@@ -233,7 +233,7 @@ namespace StateManager
         g_menu_stack.push_back("race");
         g_game_mode = true;
         GUIEngine::clear();
-        inputDriver->setMode(SDLDriver::INGAME);
+        input_manager->setMode(InputManager::INGAME);
     }
     
     bool isGameState()

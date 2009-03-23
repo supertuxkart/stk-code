@@ -44,11 +44,12 @@
 #include <sstream>
 #include <algorithm>
 
+#include "sdl_manager.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "main_loop.hpp"
 #include "material_manager.hpp"
-#include "sdldrv.hpp"
+#include "input_manager.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
 #include "stk_config.hpp"
@@ -543,7 +544,11 @@ int main(int argc, char *argv[] )
             }
         }
         
-        inputDriver = new SDLDriver ();
+        SDLManager::init();
+        input_manager = new InputManager ();
+        
+        // Get into menu mode initially.
+        input_manager->setMode(InputManager::MENU);  
         
         main_loop = new MainLoop();
         // loadMaterials needs ssgLoadTextures (internally), which can
@@ -639,7 +644,7 @@ int main(int argc, char *argv[] )
         if (user_config->m_crashed) user_config->m_crashed = false;
         user_config->saveConfig();
     }
-    if(inputDriver) delete inputDriver;  // if early crash avoid delete NULL
+    if(input_manager) delete input_manager;  // if early crash avoid delete NULL
     
     if (user_config && user_config->m_log_errors) //close logfiles
     {

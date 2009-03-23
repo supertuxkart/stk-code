@@ -1,4 +1,4 @@
-//  $Id: sdldrv.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: input_manager.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SDLDRV_H
-#define HEADER_SDLDRV_H
+#ifndef HEADER_INPUT_MANAGER_H
+#define HEADER_INPUT_MANAGER_H
 
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ class ActionMap;
 
 /** Class to handle SDL. 
  */
-class SDLDriver
+class InputManager
 {
 public:
     enum InputDriverMode {
@@ -61,8 +61,6 @@ private:
     int              m_max_sensed_input;
     Input::InputType m_max_sensed_type;
 	ActionMap       *m_action_map;
-	SDL_Surface     *m_main_surface;
-	long             m_flags;
 	StickInfo      **m_stick_infos;
 	InputDriverMode  m_mode;
 	
@@ -72,21 +70,17 @@ private:
 	*/
 	int    m_mouse_val_x, m_mouse_val_y;
 	
-	void   showPointer();
-	void   hidePointer();
     void   input(Input::InputType, int, int, int, int);
 public:
-	       SDLDriver();
-          ~SDLDriver();
+	       InputManager();
+          ~InputManager();
 	void   initStickInfos();
-	void   toggleFullscreen(bool resetTextures=1);
-	void   setVideoMode(bool resetTextures=1);
 	void   input();
 	void   setMode(InputDriverMode);		
 	bool   isInMode(InputDriverMode);
 	Input &getSensedInput();
 };
 
-extern SDLDriver *inputDriver;
+extern InputManager *input_manager;
 
 #endif
