@@ -10,8 +10,6 @@ AM_CPPFLAGS = -DSUPERTUXKART_DATADIR="\"$(datadir)/games/$(PACKAGE)/\""  \
 
 supertuxkart_SOURCES = \
  main.cpp \
- actionmap.cpp \
- actionmap.hpp \
  material.cpp \
  material.hpp \
  network/network_manager.cpp \
@@ -138,6 +136,15 @@ supertuxkart_SOURCES = \
  karts/player_kart.cpp \
  karts/player_kart.hpp \
  input.hpp \
+ input/device_manager.cpp \
+ input/device_manager.hpp \
+ input/input.hpp \
+ input/input_device.cpp \
+ input/input_device.hpp \
+ input/input_manager.cpp \
+ input/input_manager.hpp \
+ sdl_manager.cpp \
+ sdl_manager.hpp \
  isect.cpp \
  isect.hpp \
  explosion.cpp \
@@ -161,8 +168,6 @@ supertuxkart_SOURCES = \
  callback_manager.hpp \
  main_loop.cpp \
  main_loop.hpp \
- sdldrv.cpp \
- sdldrv.hpp \
  user_pointer.hpp \
  history.cpp \
  history.hpp \

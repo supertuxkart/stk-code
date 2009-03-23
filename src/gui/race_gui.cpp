@@ -20,8 +20,8 @@
 
 #include "gui/race_gui.hpp"
 
-#include "input.hpp"
-#include "input_manager.hpp"
+#include "input/input.hpp"
+#include "input/input_manager.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "material_manager.hpp"

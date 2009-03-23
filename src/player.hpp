@@ -21,7 +21,7 @@
 #define TUXKART_PLAYER_H
 
 #include <string>
-#include "input.hpp"
+#include "input/input.hpp"
 
 extern const char *sKartAction2String[PA_COUNT];
 
