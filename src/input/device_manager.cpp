@@ -21,7 +21,7 @@ void DeviceManager::add(GamePadDevice* d)
 }
 
 // TODO
-bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2,
+bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value,
                                               int* player /* out */, PlayerAction* action /* out */ )
 {
     // TODO - auto-detect player ID from device
@@ -45,6 +45,10 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     }
     else if(type == Input::IT_STICKMOTION)
     {
+        for(unsigned int n=0; n<m_gamepad_amount; n++)
+        {
+            if( m_gamepads[n].m_index == id0 && m_gamepads[n].hasBinding(id1 /* axis */, value, action) ) return true;
+        }
         return false;
     }
     else

@@ -48,6 +48,9 @@ public:
     int                   m_deadzone;
     int                   m_index;
     Input::AxisDirection *m_prevAxisDirections;
+        
+    /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
+    bool hasBinding(int axis, int value, PlayerAction* action /* out */);
     
     GamePadDevice(int sdlIndex);
     ~GamePadDevice();

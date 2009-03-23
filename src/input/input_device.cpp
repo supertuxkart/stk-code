@@ -68,6 +68,13 @@ GamePadDevice::GamePadDevice(int sdlIndex)
 }   // GamePadDevice
 
 // -----------------------------------------------------------------------------
+bool GamePadDevice::hasBinding(int axis, int value, PlayerAction* action /* out */)
+{
+    if(value > -m_deadzone && value < m_deadzone) return false; // within deadzone
+    
+    return false;
+}
+// -----------------------------------------------------------------------------
 /** Destructor for GamePadDevice.
  */
 GamePadDevice::~GamePadDevice()
