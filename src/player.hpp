@@ -23,14 +23,14 @@
 #include <string>
 #include "input.hpp"
 
-extern const char *sKartAction2String[KA_LAST+1];
+extern const char *sKartAction2String[PA_COUNT];
 
 /*class for managing player name and control configuration*/
 class Player
 {
 private:
     std::string m_name;
-    Input m_action_map[KA_LAST+1];
+    Input m_action_map[PA_COUNT];
     int m_last_kart_id;
 
 public:

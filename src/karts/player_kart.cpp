@@ -101,11 +101,11 @@ void PlayerKart::resetInputState()
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
  */
-void PlayerKart::action(KartAction action, int value)
+void PlayerKart::action(PlayerAction action, int value)
 {
     switch (action)
     {
-    case KA_LEFT:
+    case PA_LEFT:
         m_steer_val_l = -value;
         if (value)
           m_steer_val = -value;
@@ -113,7 +113,7 @@ void PlayerKart::action(KartAction action, int value)
           m_steer_val = m_steer_val_r;
 
         break;
-    case KA_RIGHT:
+    case PA_RIGHT:
         m_steer_val_r = value;
         if (value)
           m_steer_val = value;
@@ -121,7 +121,7 @@ void PlayerKart::action(KartAction action, int value)
           m_steer_val = m_steer_val_l;
 
         break;
-    case KA_ACCEL:
+    case PA_ACCEL:
         m_prev_accel = value;
         if(value)
         {
@@ -134,7 +134,7 @@ void PlayerKart::action(KartAction action, int value)
             m_controls.m_brake = m_prev_brake;
         }
         break;
-    case KA_BRAKE:
+    case PA_BRAKE:
         m_prev_brake = value!=0;
         if(value)
         {
@@ -147,21 +147,22 @@ void PlayerKart::action(KartAction action, int value)
             m_controls.m_accel = m_prev_accel/32768.0f;
         }
         break;
-    case KA_NITRO:
+    case PA_NITRO:
         m_controls.m_nitro = (value!=0);
         break;
-    case KA_RESCUE:
+    case PA_RESCUE:
         m_controls.m_rescue = (value!=0);
         break;
-    case KA_FIRE:
+    case PA_FIRE:
         m_controls.m_fire = (value!=0);
         break;
-    case KA_LOOK_BACK:
+    case PA_LOOK_BACK:
         m_controls.m_look_back = (value!=0);
         break;
-    case KA_DRIFT:
+    case PA_DRIFT:
         m_controls.m_drift = (value!=0);
         break;
+    default: assert(false);
     }
 
 }   // action

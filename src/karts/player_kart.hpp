@@ -57,7 +57,7 @@ public:
     int          earlyStartPenalty () {return m_penalty_time>0; }
     Player      *getPlayer         () {return m_player;        }
     void         update            (float);
-    void         action            (KartAction action, int value);
+    void         action            (PlayerAction action, int value);
     void         handleZipper      ();
     void         collectedItem     (const Item &item, int add_info=-1);
     virtual void crashed           (Kart *k);

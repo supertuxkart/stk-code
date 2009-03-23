@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <irrlicht.h>
 
 #include <SDL/SDL.h>
 
@@ -60,7 +61,7 @@ private:
      *  axis which was pushed the furthest when sensing input. */
     int              m_max_sensed_input;
     Input::InputType m_max_sensed_type;
-	ActionMap       *m_action_map;
+	//ActionMap       *m_action_map;
 	StickInfo      **m_stick_infos;
 	InputDriverMode  m_mode;
 	
@@ -71,6 +72,9 @@ private:
 	int    m_mouse_val_x, m_mouse_val_y;
 	
     void   input(Input::InputType, int, int, int, int);
+    void   postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y);
+    void   handleStaticAction(StaticAction ga, int value);
+    void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
 public:
 	       InputManager();
           ~InputManager();

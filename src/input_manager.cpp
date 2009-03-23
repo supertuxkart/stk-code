@@ -55,7 +55,7 @@ InputManager *input_manager;
 /** Initialise SDL.
  */
 InputManager::InputManager()
-    : m_sensed_input(0), m_action_map(0), m_stick_infos(0),
+    : m_sensed_input(0), m_stick_infos(0),
     m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
     initStickInfos();
@@ -169,7 +169,7 @@ InputManager::~InputManager()
 
 #define MAX_VALUE 32768
 
-void postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
+void InputManager::postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
 {
     irr::SEvent::SMouseInput evt;
     
@@ -185,7 +185,77 @@ void postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int
 }
 
 
-void handleGameAction(GameAction ga, int value)
+void InputManager::handleStaticAction(StaticAction ga, int value)
+{
+    if (value)
+		return;
+	
+    static int isWireframe = false;
+    
+	switch (ga)
+	{
+		case GA_DEBUG_ADD_BOWLING:
+			if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
+                //				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+                kart->attach(ATTACH_ANVIL, 5);
+			}
+			break;
+		case GA_DEBUG_ADD_MISSILE:
+            if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getPlayerKart(0);
+				kart->setPowerup(POWERUP_PLUNGER, 10000);
+			}
+			break;
+		case GA_DEBUG_ADD_HOMING:
+			if (race_manager->getNumPlayers() ==1 )
+			{
+				Kart* kart = RaceManager::getPlayerKart(0);
+				kart->setPowerup(POWERUP_CAKE, 10000);
+			}
+			break;
+		case GA_DEBUG_TOGGLE_FPS:
+			user_config->m_display_fps = !user_config->m_display_fps;
+			if(user_config->m_display_fps)
+			{
+                getRaceGUI()->resetFPSCounter();
+            }
+			break;
+		case GA_DEBUG_TOGGLE_WIREFRAME:
+			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
+			isWireframe = ! isWireframe;
+			break;
+#ifndef WIN32
+            // For now disable F9 toggling fullscreen, since windows requires
+            // to reload all textures, display lists etc. Fullscreen can
+            // be toggled from the main menu (options->display).
+		case GA_TOGGLE_FULLSCREEN:
+            SDLManager::toggleFullscreen(false);   // 0: do not reset textures
+			// Fall through to put the game into pause mode.
+#endif
+		case GA_LEAVE_RACE:
+            // TODO - show race menu
+            /*
+             RaceManager::getWorld()->pause();
+             menu_manager->pushMenu(MENUID_RACEMENU);
+             */
+            break;
+		case GA_DEBUG_HISTORY:
+			history->Save();
+			break;
+		default:
+			break;
+	} // switch
+}
+
+void InputManager::handlePlayerAction(PlayerAction pa, const int playerNo,  int value)
+{
+    RaceManager::getWorld()->getLocalPlayerKart(playerNo)->action(pa, value);
+}
+/*
+void InputManager::handleGameAction(GameAction ga, int value)
 {
 	static int isWireframe = false;
 	
@@ -259,10 +329,10 @@ void handleGameAction(GameAction ga, int value)
 #endif
 		case GA_LEAVE_RACE:
             // TODO - show race menu
-            /*
-             RaceManager::getWorld()->pause();
-             menu_manager->pushMenu(MENUID_RACEMENU);
-             */
+
+            // RaceManager::getWorld()->pause();
+            // menu_manager->pushMenu(MENUID_RACEMENU);
+
             break;
 		case GA_DEBUG_HISTORY:
 			history->Save();
@@ -272,7 +342,48 @@ void handleGameAction(GameAction ga, int value)
 	} // switch
     
 }
+*/
 
+
+// TODO
+bool mapToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int* player, PlayerAction* action )
+{
+    // TODO - auto-detect from device
+    *player = 0;
+    
+    if(type == Input::IT_KEYBOARD)
+    {
+        // TODO - make configurable. detect device. choose right configuration for device and player
+        if( id0 == SDLK_SPACE )       *action = PA_NITRO;
+        else if( id0 == SDLK_UP )     *action = PA_ACCEL;
+        else if( id0 == SDLK_DOWN )   *action = PA_BRAKE;
+        else if( id0 == SDLK_LEFT )   *action = PA_LEFT;
+        else if( id0 == SDLK_RIGHT )  *action = PA_RIGHT;
+        else if( id0 == SDLK_LSHIFT ) *action = PA_DRIFT;
+        else if( id0 == SDLK_ESCAPE ) *action = PA_RESCUE;
+        else if( id0 == SDLK_LALT )   *action = PA_FIRE;
+        else if( id0 == SDLK_b )      *action = PA_LOOK_BACK;
+        else return false;
+    }
+    else if(type == Input::IT_MOUSEBUTTON)
+    {
+        return false;
+    }
+    else if(type == Input::IT_STICKBUTTON)
+    {
+        return false;
+    }
+    else if(type == Input::IT_STICKMOTION)
+    {
+        return false;
+    }
+    else
+    {
+        return false;
+    }
+    
+    return true;
+}
 
 //-----------------------------------------------------------------------------
 /** Handles the conversion from some input to a GameAction and its distribution
@@ -291,6 +402,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                       int value)
 {
     
+    // menu navigation. TODO : enable navigation with gamepads
     if(!StateManager::isGameState())
     {
         //http://irrlicht.sourceforge.net/docu/classirr_1_1_irrlicht_device.html#bf859e39f017b0403c6ed331e48e01df
@@ -324,9 +436,16 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
         }
 
     }
+    // in-game event handling
     else
     {        
-        GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
+        int player;
+        PlayerAction action;
+        
+        const bool action_found = mapToPlayerAndAction( type, id0, id1, id2, &player, &action );
+        
+        //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
+#if 0 // TODO - input sensing
         // Act different in input sensing mode.
         if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
             m_mode <= INPUT_SENSE_PREFER_BUTTON)
@@ -369,20 +488,11 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                     handleGameAction(GA_SENSE_COMPLETE, 0);
             }
         }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
-        else if (ga != GA_NULL)
+        else
+#endif
+        if (action_found)
         {
-            if(type==Input::IT_MOUSEBUTTON)
-            {
-                // If a mouse button is pressed, make sure that the
-                // widget the mouse is on is actually highlighted (since
-                // the highlighted widget is selected!)
-                int x, y;
-                SDL_GetMouseState( &x, &y );
-                y = SDL_GetVideoSurface()->h - y;
-                //menu->inputPointer( x, y );
-            }
-            
-            handleGameAction(ga, value);
+            handlePlayerAction(action, player, value);
         }
     }
 }   // input
@@ -656,8 +766,8 @@ void InputManager::setMode(InputDriverMode new_mode)
         case INGAME:
             // Leaving ingame mode.
                 
-            if (m_action_map)
-                delete m_action_map;
+            //if (m_action_map)
+            //    delete m_action_map;
     
             // Reset the helper values for the relative mouse movement
             // supresses to the notification of them as an input.
@@ -670,7 +780,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             // Leaving boot strap mode.
                 
             // Installs the action map for the menu.
-            m_action_map = user_config->newMenuActionMap();
+           //  m_action_map = user_config->newMenuActionMap();
             
             m_mode = MENU;
 
@@ -711,11 +821,11 @@ void InputManager::setMode(InputDriverMode new_mode)
         // We must be in menu mode now in order to switch.
         assert (m_mode == MENU);
     
-        if (m_action_map)
-            delete m_action_map;
+        //if (m_action_map)
+         //   delete m_action_map;
 
         // Installs the action map for the ingame mode.
-        m_action_map = user_config->newIngameActionMap();
+        // m_action_map = user_config->newIngameActionMap();
 
         SDLManager::hidePointer();
 

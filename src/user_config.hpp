@@ -74,7 +74,7 @@ private:
     // device (i.e. keyboard, joystick, ...)
     struct InputConfiguration
     {
-        Input m_input[KC_COUNT];
+        Input m_input[PA_COUNT];
     };
     // The mapping of input device name to the last used configuration.
     // Note that std::map can not be used with Input[KC_COUNT] as 2nd
@@ -121,11 +121,14 @@ private:
     int         m_background_index;
 
     void readStickConfigs(const lisp::Lisp *);
-    void readLastInputConfigurations(const lisp::Lisp *);
 
     void writeStickConfigs(lisp::Writer *);
+#if 0  
+    // TODO - input I/O
+    
     void writeLastInputConfigurations(lisp::Writer *);
-
+    void readLastInputConfigurations(const lisp::Lisp *);
+    
     void readPlayerInput(const lisp::Lisp *,
                          const std::string& node,
                          KartAction ka,
@@ -148,25 +151,25 @@ private:
                         GameAction);
 
     void writeInput(lisp::Writer *writer, const Input &input);
-
+#endif
     /** Iterates through the input mapping and unsets all
      * where the given input occurs.
      *
      * This makes sure an input is not bound multiple times.
      */
-    void unsetDuplicates(GameAction, const Input &);
+    void unsetDuplicates(PlayerAction, const Input &);
 
     /** Creates an GameAction->Input mapping with one Input */
-    void set(GameAction, const Input &);
+    void setStaticAction(StaticAction, const Input &);
 
     /** Creates an GameAction->Input mapping with two Inputs */
-    void set(GameAction, const Input &, const Input &);
+    void setStaticAction(StaticAction, const Input &, const Input &);
 
     /** Creates an GameAction->Input mapping with three Inputs */
-    void set(GameAction, const Input &, const Input &, const Input &);
+    void setStaticAction(StaticAction, const Input &, const Input &, const Input &);
 
     /** Creates an GameAction->Input mapping with four Inputs */
-    void set(GameAction, const Input &, const Input &, const Input &, const Input &);
+    void setStaticAction(StaticAction, const Input &, const Input &, const Input &, const Input &);
 
     std::string getInputAsString(const Input &);
 
@@ -180,7 +183,7 @@ private:
      *
      * For use when reading from file.
      */
-    void setInput(GameAction, const Input &);
+    void setInput(PlayerAction, const Input &);
 
 public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
@@ -257,13 +260,15 @@ public:
     const std::vector<StickConfig *>
          *getStickConfigs() const         { return &m_stickconfigs;     }
 
-
+#if 0
+    // TODO - and does that really belong in user config?
     /** Retrieves a human readable string of the mapping for a GameAction */
-    std::string getMappingAsString(GameAction);
+    std::string getMappingAsString(StaticAction);
     /** Retrieves a human readable string of the mapping for the given
       * player and KartAction.
       */
-    std::string getMappingAsString(int, KartAction);
+    std::string getMappingAsString(int, StaticAction);
+
     
     /** Sets the Input for the given Player and KartAction. Includes a check
      * for duplicates and automatic removing of the other candidate(s).
@@ -273,19 +278,22 @@ public:
     void setInput(int player_number, KartAction ka, const Input &i0);
     const Input &getInput(int player_index, KartAction ka) const;
 
+    
     /** Clears the mapping for a given Player and KartAction. */
     void  clearInput(int, KartAction);
     bool  isFixedInput(Input::InputType, int, int, int);
+#endif
+    
     const std::string
          &getWarning()                     { return m_warning;  }
     void  resetWarning()                   { m_warning="";      }
     void  setWarning(std::string& warning) { m_warning=warning; }
     
     /** Creates ActionMap for use in menu mode. */
-    ActionMap *newMenuActionMap();
+   //ActionMap *newMenuActionMap();
 
     /** Creates ActionMap for use in ingame mode. */
-    ActionMap *newIngameActionMap();
+    //ActionMap *newIngameActionMap();
     
 };
 

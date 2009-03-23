@@ -88,21 +88,24 @@ struct Input
 //FIXME: KartAction and Gameaction should probably go in their own files.
 //When adding any action at the beginning or at the end, remember to update
 //the KA_FIRST and/or KA_LAST constants.
-enum KartAction {
-	KA_LEFT,
-	KA_RIGHT,
-	KA_ACCEL,
-	KA_BRAKE,
-	KA_NITRO,
-	KA_DRIFT,
-	KA_RESCUE,
-	KA_FIRE,
-	KA_LOOK_BACK
+enum PlayerAction
+{
+    PA_FIRST = -1,
+    
+	PA_LEFT = 0,
+	PA_RIGHT,
+	PA_ACCEL,
+	PA_BRAKE,
+	PA_NITRO,
+	PA_DRIFT,
+	PA_RESCUE,
+	PA_FIRE,
+	PA_LOOK_BACK,
+    
+    PA_COUNT
 };
-const int KA_FIRST = KA_LEFT;
-const int KA_LAST = KA_LOOK_BACK;
-const int KC_COUNT = (KA_LAST + 1);
-static std::string KartActionStrings[KC_COUNT] = {std::string("left"), 
+
+static std::string KartActionStrings[PA_COUNT] = {std::string("left"), 
                                                   std::string("right"),
                                                   std::string("accel"),
                                                   std::string("brake"),
@@ -112,7 +115,7 @@ static std::string KartActionStrings[KC_COUNT] = {std::string("left"),
                                                   std::string("fire"),
                                                   std::string("lookBack")};
 
-enum GameAction
+enum StaticAction
 {
 	// Below this are synthetic game actions which are never triggered through
 	// an input device.
@@ -138,47 +141,6 @@ enum GameAction
 	GA_CURSOR_LEFT,
 	GA_CURSOR_RIGHT,
 	
-	// The following game actions occur when in ingame mode (= within a race).
-
-	GA_P1_LEFT,
-	GA_P1_RIGHT,
-	GA_P1_ACCEL,
-	GA_P1_BRAKE,
-	GA_P1_NITRO,
-	GA_P1_DRIFT,
-	GA_P1_RESCUE,
-	GA_P1_FIRE,
-	GA_P1_LOOK_BACK,
-	
-	GA_P2_LEFT,
-	GA_P2_RIGHT,
-	GA_P2_ACCEL,
-	GA_P2_BRAKE,
-	GA_P2_NITRO,
-	GA_P2_DRIFT,
-	GA_P2_RESCUE,
-	GA_P2_FIRE,
-	GA_P2_LOOK_BACK,
-	
-	GA_P3_LEFT,
-	GA_P3_RIGHT,
-	GA_P3_ACCEL,
-	GA_P3_BRAKE,
-	GA_P3_NITRO,
-	GA_P3_DRIFT,
-	GA_P3_RESCUE,
-	GA_P3_FIRE,
-	GA_P3_LOOK_BACK,
-	
-	GA_P4_LEFT,
-	GA_P4_RIGHT,
-	GA_P4_ACCEL,
-	GA_P4_BRAKE,
-	GA_P4_NITRO,
-	GA_P4_DRIFT,
-	GA_P4_RESCUE,
-	GA_P4_FIRE,
-	GA_P4_LOOK_BACK,
 
 	GA_TOGGLE_FULLSCREEN,	// Switch between windowed/fullscreen mode
 	GA_LEAVE_RACE,			// Switch from race to menu.
@@ -191,6 +153,8 @@ enum GameAction
 	GA_DEBUG_HISTORY
 	
 };
+
+
 /* Some constants to make future changes more easier to handle. If you use
  * any of the GameAction constants to mark the beginning or end of a range
  * or denote a count then something is wrong with your code. ;)
@@ -208,9 +172,6 @@ const int GA_COUNT = (GA_DEBUG_HISTORY + 1);
 const int GA_FIRST_MENU = GA_ENTER;
 const int GA_LAST_MENU = GA_CURSOR_RIGHT;
 
-/* The range of GameAction constants that is used while in ingame (race) mode. */
-const int GA_FIRST_INGAME = GA_P1_LEFT;
-const int GA_LAST_INGAME = GA_DEBUG_HISTORY;
 
 /* The range of GameAction constants which are used ingame but are considered
  * fixed and their Inputs should not be used by the players.
@@ -218,13 +179,5 @@ const int GA_LAST_INGAME = GA_DEBUG_HISTORY;
 const int GA_FIRST_INGAME_FIXED = GA_TOGGLE_FULLSCREEN;
 const int GA_LAST_INGAME_FIXED = GA_DEBUG_HISTORY;
 
-/** The range of GameAction constants that defines the mapping
-	for the players kart actions. Besides that these are the actions
-	whose mappings are changeable by the user (via menu & config file).
-	When looking for conflicting mappings only the user changeable
-	GameAction constants are regarded.
-*/
-const int GA_FIRST_KARTACTION = GA_P1_LEFT;
-const int GA_LAST_KARTACTION = GA_P4_LOOK_BACK;
 
 #endif

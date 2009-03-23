@@ -23,19 +23,19 @@
 #include "actionmap.hpp"
 
 // ----------------------------------------------------------------------------
-void ActionMap::putEntry(Input input, GameAction ga)
+void ActionMap::addStaticEntry(Input input, StaticAction ga)
 {
 	inputMap[key(input)] = ga;
 }   // putEntry
 
 // ----------------------------------------------------------------------------
-GameAction ActionMap::getEntry(Input input)
+StaticAction ActionMap::getStaticEntry(Input input)
 {
 	return inputMap[key(input)];
 }   // getEntry
 
 // ----------------------------------------------------------------------------
-GameAction ActionMap::getEntry(Input::InputType type, int id0, int id1, int id2)
+StaticAction ActionMap::getStaticEntry(Input::InputType type, int id0, int id1, int id2)
 {
 	return inputMap[key(type, id0, id1, id2)];
 }   // getEntry

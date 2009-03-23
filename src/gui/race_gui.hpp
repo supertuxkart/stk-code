@@ -136,7 +136,7 @@ public:
     ~RaceGUI();
     void update(float dt);
     void select() {}
-    void handleKartAction(KartAction ka, int value);
+    void handleKartAction(PlayerAction ka, int value);
     void addMessage(const std::string &m, const Kart *kart, float time, 
                     int fonst_size, int red=255, int green=0, int blue=255);
     

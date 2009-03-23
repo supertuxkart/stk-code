@@ -34,16 +34,17 @@ class ActionMap
 
     void clear();
 
-    void putEntry(Input, GameAction);
-
-    GameAction getEntry(Input);
-    GameAction getEntry(Input::InputType, int, int, int);
+    void addStaticEntry(Input, StaticAction);
+    void addPlayerEntry(Input, PlayerAction);
+    
+    StaticAction getStaticEntry(Input);
+    StaticAction getStaticEntry(Input::InputType, int, int, int);
 
   private:
     inline Key key(Input);
     Key key(Input::InputType, int, int, int);
 
-    std::map<Key, GameAction> inputMap;
+    std::map<Key, StaticAction> inputMap;
 
 };
 
