@@ -57,6 +57,7 @@ InputManager::InputManager()
     
     m_device_manager = new DeviceManager();
     
+    // init keyboard. TODO - load key bindings from file
     KeyboardDevice* default_device = new KeyboardDevice();
     default_device->loadDefaults();
     m_device_manager->add( default_device );
@@ -70,12 +71,15 @@ InputManager::InputManager()
  */
 void InputManager::initGamePadDevices()
 {
-    int nextIndex = 0;
+    //int nextIndex = 0;
     
     // Prepare a list of connected joysticks.
     const int numSticks = SDL_NumJoysticks();
     
-    // TODO - init gamepad devices
+    for (int i = 0; i < numSticks; i++)
+        m_device_manager->add(new GamePadDevice(i));
+    
+    // TODO - init gamepad devices from config file
     /*
     m_stick_infos = new GamePadDevice *[numSticks];
     std::vector<GamePadDevice *> *si = new std::vector<GamePadDevice *>;
@@ -260,141 +264,8 @@ void InputManager::handleStaticAction(StaticAction ga, int value)
 	} // switch
 }
 
-void InputManager::handlePlayerAction(PlayerAction pa, const int playerNo,  int value)
-{
-    RaceManager::getWorld()->getLocalPlayerKart(playerNo)->action(pa, value);
-}
-/*
-void InputManager::handleGameAction(GameAction ga, int value)
-{
-	static int isWireframe = false;
-	
-	// The next lines find out the player and kartaction that belongs
-	// to a certain gameaction value (GameAction -> Player number, Kartaction).
-	// Since the numbers are fixed this can be done through computation
-	// (instead of using e.g. a separate data structure).
-	// Note that the kartaction enum value and their representatives in
-	// gameaction enum have the same order (Otherwise the stuff below would
-	// not work ...)!
-    
-	if (ga >= GA_FIRST_KARTACTION && ga <= GA_LAST_KARTACTION)
-	{
-		// 'Pulls down' the gameaction value to make them multiples of the
-		// kartaction values.
-		int ka = ga - GA_FIRST_KARTACTION;
-		
-		int playerNo = ka / KC_COUNT;
-		ka = ka % KC_COUNT;
-		
-		RaceManager::getWorld()->getLocalPlayerKart(playerNo)->action((KartAction) ka, value);
-		
-		return;
-	}
-	
-	if (value)
-		return;
-	
-	switch (ga)
-	{
-		case GA_DEBUG_ADD_BOWLING:
-			if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
-                //				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
-                kart->attach(ATTACH_ANVIL, 5);
-			}
-			break;
-		case GA_DEBUG_ADD_MISSILE:
-            if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setPowerup(POWERUP_PLUNGER, 10000);
-			}
-			break;
-		case GA_DEBUG_ADD_HOMING:
-			if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setPowerup(POWERUP_CAKE, 10000);
-			}
-			break;
-		case GA_DEBUG_TOGGLE_FPS:
-			user_config->m_display_fps = !user_config->m_display_fps;
-			if(user_config->m_display_fps)
-			{
-                getRaceGUI()->resetFPSCounter();
-            }
-			break;
-		case GA_DEBUG_TOGGLE_WIREFRAME:
-			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
-			isWireframe = ! isWireframe;
-			break;
-#ifndef WIN32
-            // For now disable F9 toggling fullscreen, since windows requires
-            // to reload all textures, display lists etc. Fullscreen can
-            // be toggled from the main menu (options->display).
-		case GA_TOGGLE_FULLSCREEN:
-            SDLManager::toggleFullscreen(false);   // 0: do not reset textures
-			// Fall through to put the game into pause mode.
-#endif
-		case GA_LEAVE_RACE:
-            // TODO - show race menu
 
-            // RaceManager::getWorld()->pause();
-            // menu_manager->pushMenu(MENUID_RACEMENU);
 
-            break;
-		case GA_DEBUG_HISTORY:
-			history->Save();
-			break;
-		default:
-			break;
-	} // switch
-    
-}
-*/
-
-/*
-// TODO
-bool mapToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int* player, PlayerAction* action )
-{
-    // TODO - auto-detect from device
-    *player = 0;
-    
-    if(type == Input::IT_KEYBOARD)
-    {
-        // TODO - make configurable. detect device. choose right configuration for device and player
-        if( id0 == SDLK_SPACE )       *action = PA_NITRO;
-        else if( id0 == SDLK_UP )     *action = PA_ACCEL;
-        else if( id0 == SDLK_DOWN )   *action = PA_BRAKE;
-        else if( id0 == SDLK_LEFT )   *action = PA_LEFT;
-        else if( id0 == SDLK_RIGHT )  *action = PA_RIGHT;
-        else if( id0 == SDLK_LSHIFT ) *action = PA_DRIFT;
-        else if( id0 == SDLK_ESCAPE ) *action = PA_RESCUE;
-        else if( id0 == SDLK_LALT )   *action = PA_FIRE;
-        else if( id0 == SDLK_b )      *action = PA_LOOK_BACK;
-        else return false;
-    }
-    else if(type == Input::IT_MOUSEBUTTON)
-    {
-        return false;
-    }
-    else if(type == Input::IT_STICKBUTTON)
-    {
-        return false;
-    }
-    else if(type == Input::IT_STICKMOTION)
-    {
-        return false;
-    }
-    else
-    {
-        return false;
-    }
-    
-    return true;
-}
-*/
 //-----------------------------------------------------------------------------
 /** Handles the conversion from some input to a GameAction and its distribution
  * to the currently active menu.
@@ -415,7 +286,6 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
     // menu navigation. TODO : enable navigation with gamepads
     if(!StateManager::isGameState())
     {
-        //http://irrlicht.sourceforge.net/docu/classirr_1_1_irrlicht_device.html#bf859e39f017b0403c6ed331e48e01df
         if(type == Input::IT_KEYBOARD)
         {
             irr::SEvent::SKeyInput evt;
@@ -502,7 +372,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
 #endif
         if (action_found)
         {
-            handlePlayerAction(action, player, value);
+            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, value);
         }
     }
 }   // input

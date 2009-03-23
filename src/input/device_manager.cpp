@@ -35,8 +35,22 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
         }
         return false;
     }
+    else if(type == Input::IT_MOUSEBUTTON)
+    {
+        return false;
+    }
+    else if(type == Input::IT_STICKBUTTON)
+    {
+        return false;
+    }
+    else if(type == Input::IT_STICKMOTION)
+    {
+        return false;
+    }
     else
     {
         return false;
     }
+    
+    return false;
 }
