@@ -45,7 +45,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "input.hpp"
+#include "input/input.hpp"
 #include "player.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"

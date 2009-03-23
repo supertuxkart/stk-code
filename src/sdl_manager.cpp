@@ -2,7 +2,7 @@
 #include "sdl_manager.hpp"
 #include <SDL/SDL.h>
 #include "user_config.hpp"
-#include "input_manager.hpp"
+#include "input/input_manager.hpp"
 #include "gui/state_manager.hpp"
 #include "history.hpp"
 #include "items/item_manager.hpp"

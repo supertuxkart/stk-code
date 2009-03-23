@@ -49,7 +49,7 @@
 #include "race_manager.hpp"
 #include "main_loop.hpp"
 #include "material_manager.hpp"
-#include "input_manager.hpp"
+#include "input/input_manager.hpp"
 #include "callback_manager.hpp"
 #include "history.hpp"
 #include "stk_config.hpp"

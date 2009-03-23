@@ -26,7 +26,7 @@
 
 #include <SDL/SDL.h>
 
-#include "input.hpp"
+#include "input/input.hpp"
 
 class ActionMap;
 

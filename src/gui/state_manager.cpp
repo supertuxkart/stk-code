@@ -3,7 +3,7 @@
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
 #include "gui/screen.hpp"
-#include "input_manager.hpp"
+#include "input/input_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"

@@ -22,11 +22,10 @@
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
 		953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
-		95A116BF0F77D3BB00B18B3D /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A116BD0F77D3BB00B18B3D /* input_manager.cpp */; };
 		95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A117330F77D7BE00B18B3D /* sdl_manager.cpp */; };
+		95A1182C0F77EA3100B18B3D /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1182A0F77EA3100B18B3D /* input_manager.cpp */; };
 		95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
 		95C1E4000F699427005D33E6 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3FF0F699427005D33E6 /* font.cpp */; };
-		95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC210F296540000D3E5D /* actionmap.cpp */; };
 		95C2B1FB0F296546000D3E5D /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		95C2B1FC0F296546000D3E5D /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
 		95C2B1FD0F296546000D3E5D /* sfx_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */; };
@@ -271,16 +270,15 @@
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
 		953F038B0F6C880D00C77FE2 /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = ../../gui/state_manager.cpp; sourceTree = SOURCE_ROOT; };
 		953F038E0F6C8AD800C77FE2 /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../gui/state_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95A116BD0F77D3BB00B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = games/supertuxkart/src/input_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A116BE0F77D3BB00B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = games/supertuxkart/src/input_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A117330F77D7BE00B18B3D /* sdl_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sdl_manager.cpp; path = games/supertuxkart/src/sdl_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A117340F77D7BE00B18B3D /* sdl_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sdl_manager.hpp; path = games/supertuxkart/src/sdl_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95A117330F77D7BE00B18B3D /* sdl_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sdl_manager.cpp; path = ../../sdl_manager.cpp; sourceTree = SOURCE_ROOT; };
+		95A117340F77D7BE00B18B3D /* sdl_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sdl_manager.hpp; path = ../../sdl_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
+		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
+		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
 		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../gui/font.cpp; sourceTree = SOURCE_ROOT; };
 		95C1E4020F69943D005D33E6 /* font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = font.hpp; path = ../../gui/font.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AC210F296540000D3E5D /* actionmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actionmap.cpp; path = ../../actionmap.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AC220F296540000D3E5D /* actionmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = actionmap.hpp; path = ../../actionmap.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC280F296540000D3E5D /* music_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_information.cpp; path = ../../audio/music_information.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC290F296540000D3E5D /* music_information.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_information.hpp; path = ../../audio/music_information.hpp; sourceTree = SOURCE_ROOT; };
@@ -575,7 +573,6 @@
 		95C2AEDA0F296542000D3E5D /* highscores.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscores.hpp; path = ../../highscores.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AEDC0F296542000D3E5D /* history.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = history.cpp; path = ../../history.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AEDD0F296542000D3E5D /* history.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = history.hpp; path = ../../history.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B0EF0F296545000D3E5D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F00F296545000D3E5D /* isect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = isect.cpp; path = ../../isect.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F10F296545000D3E5D /* isect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = isect.hpp; path = ../../isect.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F60F296545000D3E5D /* attachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attachment.cpp; path = ../../items/attachment.cpp; sourceTree = SOURCE_ROOT; };
@@ -1218,6 +1215,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		95A118280F77EA3100B18B3D /* input */ = {
+			isa = PBXGroup;
+			children = (
+				95A118290F77EA3100B18B3D /* input.hpp */,
+				95A1182A0F77EA3100B18B3D /* input_manager.cpp */,
+				95A1182B0F77EA3100B18B3D /* input_manager.hpp */,
+			);
+			name = input;
+			path = games/supertuxkart/src/input;
+			sourceTree = SYSTEM_DEVELOPER_DIR;
+		};
 		95C2ABA60F29653F000D3E5D /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -1229,6 +1237,7 @@
 				95C2AE870F296542000D3E5D /* graphics */,
 				95C65D750F532F7D00BE7BA7 /* io */,
 				95C2B0F50F296545000D3E5D /* items */,
+				95A118280F77EA3100B18B3D /* input */,
 				95C2B1160F296545000D3E5D /* karts */,
 				95C2B1290F296545000D3E5D /* lisp */,
 				95C2B1470F296545000D3E5D /* modes */,
@@ -1238,8 +1247,6 @@
 				95C2B1AA0F296545000D3E5D /* robots */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
 				95C2B1DF0F296546000D3E5D /* utils */,
-				95C2AC210F296540000D3E5D /* actionmap.cpp */,
-				95C2AC220F296540000D3E5D /* actionmap.hpp */,
 				95C2AE1C0F296541000D3E5D /* callback.hpp */,
 				95C2AE1D0F296541000D3E5D /* callback_manager.cpp */,
 				95C2AE1E0F296541000D3E5D /* callback_manager.hpp */,
@@ -1255,9 +1262,6 @@
 				95C2AEDA0F296542000D3E5D /* highscores.hpp */,
 				95C2AEDC0F296542000D3E5D /* history.cpp */,
 				95C2AEDD0F296542000D3E5D /* history.hpp */,
-				95A116BD0F77D3BB00B18B3D /* input_manager.cpp */,
-				95A116BE0F77D3BB00B18B3D /* input_manager.hpp */,
-				95C2B0EF0F296545000D3E5D /* input.hpp */,
 				95C2B0F00F296545000D3E5D /* isect.cpp */,
 				95C2B0F10F296545000D3E5D /* isect.hpp */,
 				95C2B1330F296545000D3E5D /* loader.cpp */,
@@ -2547,7 +2551,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				95C2B1F70F296546000D3E5D /* actionmap.cpp in Sources */,
 				95C2B1FB0F296546000D3E5D /* music_information.cpp in Sources */,
 				95C2B1FC0F296546000D3E5D /* music_ogg.cpp in Sources */,
 				95C2B1FD0F296546000D3E5D /* sfx_manager.cpp in Sources */,
@@ -2760,8 +2763,8 @@
 				95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */,
 				95C1E4000F699427005D33E6 /* font.cpp in Sources */,
 				953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */,
-				95A116BF0F77D3BB00B18B3D /* input_manager.cpp in Sources */,
 				95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */,
+				95A1182C0F77EA3100B18B3D /* input_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
