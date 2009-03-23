@@ -22,6 +22,11 @@
 
 #include <string>
 
+const int DEADZONE_MOUSE       =  150;
+const int DEADZONE_MOUSE_SENSE =  200;
+const int DEADZONE_JOYSTICK    = 2000;
+const int MULTIPLIER_MOUSE     =  750;
+
 struct Input
 {
     enum AxisDirection {
@@ -85,9 +90,6 @@ struct Input
 	}
 };
 
-//FIXME: KartAction and Gameaction should probably go in their own files.
-//When adding any action at the beginning or at the end, remember to update
-//the KA_FIRST and/or KA_LAST constants.
 enum PlayerAction
 {
     PA_FIRST = -1,

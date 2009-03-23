@@ -38,7 +38,7 @@
 #include <plib/ul.h>
 
 #include "stk_config.hpp"
-#include "actionmap.hpp"
+//#include "actionmap.hpp"
 #include "race_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
@@ -1157,7 +1157,7 @@ void UserConfig::clearInput(int playerIndex, KartAction ka)
     m_input_map[(GameAction) (GA_FIRST_KARTACTION + playerIndex * KC_COUNT + ka)]
     .count = 0;
 }   // clearInput
-#endif
+
 // -----------------------------------------------------------------------------
 ActionMap *UserConfig::newActionMap(const int from, const int to)
 {
@@ -1174,7 +1174,7 @@ ActionMap *UserConfig::newActionMap(const int from, const int to)
     
     return am;
 }   // newActionMap
-
+#endif
 // -----------------------------------------------------------------------------
 #if 0 // TODO
 ActionMap *UserConfig::newMenuActionMap()

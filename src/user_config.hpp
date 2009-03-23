@@ -51,7 +51,7 @@
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
 
-class ActionMap;
+//class ActionMap;
 struct Input;
 
 /** Class for managing general STK user configuration data. */
@@ -176,7 +176,7 @@ private:
     /** Creates an ActionMap for the GameAction values of the specified
      * range.
      */
-    ActionMap *newActionMap(const int, const int);
+   // ActionMap *newActionMap(const int, const int);
 
     /** Sets the Input for the given GameAction. Includes a check for
      * duplicates and automatic removing of the other candidate(s).

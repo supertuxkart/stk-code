@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 
 #include <map>
 #include <vector>
@@ -29,7 +30,7 @@
 #include <SDL/SDL.h>
 
 #include "input/input.hpp"
-#include "actionmap.hpp"
+//#include "actionmap.hpp"
 #include "user_config.hpp"
 
 #include "main_loop.hpp"
@@ -44,44 +45,49 @@
 #include "gui/race_gui.hpp"
 #include "sdl_manager.hpp"
 
-#define DEADZONE_MOUSE        150
-#define DEADZONE_MOUSE_SENSE  200
-#define DEADZONE_JOYSTICK    2000
-#define MULTIPLIER_MOUSE      750
-
 InputManager *input_manager;
 
 //-----------------------------------------------------------------------------
 /** Initialise SDL.
  */
 InputManager::InputManager()
-    : m_sensed_input(0), m_stick_infos(0),
+    : m_sensed_input(0),
     m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
-    initStickInfos();
+    
+    m_device_manager = new DeviceManager();
+    
+    KeyboardDevice* default_device = new KeyboardDevice();
+    default_device->loadDefaults();
+    m_device_manager->add( default_device );
+    
+    initGamePadDevices();
 }
 
 
 // -----------------------------------------------------------------------------
 /** Initialises joystick/gamepad info.
  */
-void InputManager::initStickInfos()
+void InputManager::initGamePadDevices()
 {
     int nextIndex = 0;
     
     // Prepare a list of connected joysticks.
     const int numSticks = SDL_NumJoysticks();
-    m_stick_infos = new StickInfo *[numSticks];
-    std::vector<StickInfo *> *si = new std::vector<StickInfo *>;
+    
+    // TODO - init gamepad devices
+    /*
+    m_stick_infos = new GamePadDevice *[numSticks];
+    std::vector<GamePadDevice *> *si = new std::vector<GamePadDevice *>;
     for (int i = 0; i < numSticks; i++)
-        si->push_back(m_stick_infos[i] = new StickInfo(i));
+        si->push_back(m_stick_infos[i] = new GamePadDevice(i));
         
     // Get the list of known configs and make a copy of it.
     std::vector<UserConfig::StickConfig *> *sc
         = new std::vector<UserConfig::StickConfig *>(*user_config->getStickConfigs());
     
     bool match;
-    std::vector<StickInfo *>::iterator si_ite = si->begin();
+    std::vector<GamePadDevice *>::iterator si_ite = si->begin();
 
     // FIXME: Visual Studio triggers an exception (in debug mode) when si 
     // becomes empty (incompatible iterators). This is apparently caused
@@ -149,18 +155,22 @@ void InputManager::initStickInfos()
     }
     
     delete si;
-}   // initStickInfos
+     */
+}   // initGamePadDevices
 
 //-----------------------------------------------------------------------------
 /** Destructor. Frees all data structures.
  */
 InputManager::~InputManager()
 {
-    const int NUM_STICKS = SDL_NumJoysticks();
-    for (int i = 0; i < NUM_STICKS; i++)
-        delete m_stick_infos[i];
     
-    delete [] m_stick_infos;
+    delete m_device_manager;
+    
+    //const int NUM_STICKS = SDL_NumJoysticks();
+    //for (int i = 0; i < NUM_STICKS; i++)
+    //    delete m_stick_infos[i];
+    
+    //delete [] m_stick_infos;
 
     // FIXME LEAK: delete m_action_map if defined
 
@@ -344,7 +354,7 @@ void InputManager::handleGameAction(GameAction ga, int value)
 }
 */
 
-
+/*
 // TODO
 bool mapToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int* player, PlayerAction* action )
 {
@@ -384,7 +394,7 @@ bool mapToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int
     
     return true;
 }
-
+*/
 //-----------------------------------------------------------------------------
 /** Handles the conversion from some input to a GameAction and its distribution
  * to the currently active menu.
@@ -442,7 +452,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
         int player;
         PlayerAction action;
         
-        const bool action_found = mapToPlayerAndAction( type, id0, id1, id2, &player, &action );
+        const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, &player, &action );
         
         //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 #if 0 // TODO - input sensing
@@ -615,6 +625,7 @@ void InputManager::input()
                 printf("axis motion: which %d axis %d value %d\n",
                     ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
             }
+                /* TODO - bring gamepad back in, with new InputDevice interface
             stickIndex = m_stick_infos[ev.jaxis.which]->m_index;
             // If the joystick axis exceeds the deadzone report the input.
             // In menu mode (mode = MENU = 0) the joystick number is reported
@@ -667,17 +678,21 @@ void InputManager::input()
                 m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
                     = Input::AD_NEUTRAL;
             }
-
+*/
             break;
         case SDL_JOYBUTTONUP:
+            /* TODO - bring gamepad back in, with new InputDevice interface
             stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
-                    
+             */       
+             
             // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
             input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
                   ev.jbutton.button, 0, 0);
             break;
         case SDL_JOYBUTTONDOWN:
+            /* TODO - bring gamepad back in, with new InputDevice interface
             stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
+             */
 
             // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
             input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
@@ -866,33 +881,3 @@ void InputManager::setMode(InputDriverMode new_mode)
     }
 }
 
-// -----------------------------------------------------------------------------
-/** Constructor for StickInfo.
- *  \param sdlIndex Index of stick.
- */
-InputManager::StickInfo::StickInfo(int sdlIndex)
-{
-    m_sdlJoystick = SDL_JoystickOpen(sdlIndex);
-    
-    m_id = SDL_JoystickName(sdlIndex);
-    
-    const int count = SDL_JoystickNumAxes(m_sdlJoystick);
-    m_prevAxisDirections = new Input::AxisDirection[count];
-    
-    for (int i = 0; i < count; i++)
-        m_prevAxisDirections[i] = Input::AD_NEUTRAL;
-    
-    m_deadzone = DEADZONE_JOYSTICK;
-    
-    m_index = -1;
-}   // StickInfo
-
-// -----------------------------------------------------------------------------
-/** Destructor for StickInfo.
- */
-InputManager::StickInfo::~StickInfo()
-{
-    delete m_prevAxisDirections;
-    
-    SDL_JoystickClose(m_sdlJoystick);
-}   // ~StickInfo
