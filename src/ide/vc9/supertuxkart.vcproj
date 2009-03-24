@@ -194,10 +194,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\actionmap.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\callback_manager.cpp"
 				>
 			</File>
@@ -254,7 +250,7 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\sdldrv.cpp"
+				RelativePath="..\..\sdl_manager.cpp"
 				>
 			</File>
 			<File
@@ -677,6 +673,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="input"
+				>
+				<File
+					RelativePath="..\..\input\device_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -732,10 +744,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\input.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\isect.hpp"
 				>
 			</File>
@@ -768,11 +776,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ptr_vector.hpp"
+				>
+			</File>
+			<File
 				RelativePath="../../../src\race_manager.hpp"
 				>
 			</File>
 			<File
-				RelativePath="../../../src\sdldrv.hpp"
+				RelativePath="..\..\sdl_manager.hpp"
 				>
 			</File>
 			<File
@@ -1268,6 +1280,26 @@
 				</File>
 				<File
 					RelativePath="..\..\io\xml_reader.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="input"
+				>
+				<File
+					RelativePath="..\..\input\device_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.hpp"
 					>
 				</File>
 			</Filter>
