@@ -33,12 +33,15 @@ class XMLNode
 {
 private:
     /** Name of this element. */
-    std::string                         m_name;
+    std::string                          m_name;
     /** List of all attributes. */
     std::map<std::string, core::stringw> m_attributes;
+    /** List of all sub nodes. */
+    std::vector<XMLNode *>               m_nodes;
 public:
          XMLNode(const std::string &name, io::IXMLReader *xml);
     const std::string &getName() const {return m_name; }
+    XMLNode *getNode(const std::string &name);
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, float *value) const;

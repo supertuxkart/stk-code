@@ -38,6 +38,8 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
 
+    void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
+
 public:
                           IrrDriver();
                          ~IrrDriver();

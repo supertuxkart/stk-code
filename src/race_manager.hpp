@@ -226,7 +226,7 @@ public:
     void startNew();         // start new race/GP/...
     void next();             // start the next race or go back to the start screen
     void rerunRace();        // Rerun the same race again
-    void exit_race();        // exit a race (and don't start the next one)
+    void exitRace();         // exit a race (and don't start the next one)
     
     /** get information about given mode (returns true if 'mode' is of linear races type)
         info is stored in its ID for conveniance, see the macros above for exact meaning

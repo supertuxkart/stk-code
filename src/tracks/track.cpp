@@ -81,6 +81,7 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
 Track::~Track()
 {
 }   // ~Track
+
 //-----------------------------------------------------------------------------
 /** Removes the physical body from the world.
  *  Called at the end of a race.
@@ -1161,7 +1162,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
                 mb->getVertexType());
             continue;
         }
-        video::SMaterial irrMaterial=mb->getMaterial();
+        video::SMaterial &irrMaterial=mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
 
         const Material* material=0;
@@ -1205,6 +1206,15 @@ bool Track::loadMainTrack(const XMLNode &node)
         exit(-1);
     }
     m_all_meshes.push_back(mesh);
+
+    Vec3 min, max;
+    MeshTools::minMax3D(mesh, &min, &max);
+    RaceManager::getWorld()->getPhysics()->init(min, max);
+    // This will (at this stage) only convert the main track model.
+    convertTrackToBullet(mesh);
+    m_track_mesh->createBody();
+
+
     scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
     core::vector3df xyz(0,0,0);
     node.getXYZ(&xyz);
@@ -1215,13 +1225,7 @@ bool Track::loadMainTrack(const XMLNode &node)
     m_all_nodes.push_back(scene_node);
     scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
 
-    Vec3 min, max;
-    MeshTools::minMax3D(mesh, &min, &max);
-    RaceManager::getWorld()->getPhysics()->init(min, max);
 
-    // This will (at this stage) only convert the main track model.
-    convertTrackToBullet(mesh);
-    m_track_mesh->createBody();
     return true;
 }   // loadMainTrack
 
@@ -1237,15 +1241,16 @@ void Track::createWater(const XMLNode &node)
                                                        getIdent());
 
     //scene::IMesh *mesh = irr_driver->getMesh(full_path);
-    scene::IMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
+    scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
+    irr_driver->getSceneManager()->addWaterSurfaceSceneNode(mesh->getMesh(0));
 //    scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->addHillPlaneMesh("myHill",
 //                core::dimension2d<f32>(20,20),
 //                core::dimension2d<u32>(40,40), 0, 0,
 //                core::dimension2d<f32>(0,0),
 //                core::dimension2d<f32>(10,10));
 
-    scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
-    scene::SMeshBuffer* buffer = new scene::SMeshBuffer(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
+    scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMesh(0)->getMeshBuffer(0)));
+    //scene::SMeshBuffer* buffer = new scene::SMeshBuffer(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
     
     float wave_height  = 2.0f;
     float wave_speed   = 300.0f;

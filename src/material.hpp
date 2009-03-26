@@ -51,16 +51,14 @@ private:
     void install (bool is_full_path=false);
 
 public:
+          Material(const XMLNode *node, int index);
+          Material(const std::string& fname, int index, 
+                   bool is_full_path=false);
+         ~Material ();
 
-    Material(unsigned int index);
-    Material(const XMLNode *node, int index);
-    Material(const std::string& fname, int index, bool is_full_path=false);
-
-    ~Material ();
-
-    int matches ( char *tx ) ;
+    void  setMaterialProperties(scene::IMeshBuffer *mb) const;
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const { return m_texture; }
+    video::ITexture *getTexture() const   { return m_texture;        }
     bool  isIgnore           () const { return m_ignore;             }
     bool  isZipper           () const { return m_zipper;             }
     bool  isSphereMap        () const { return m_sphere_map;         }

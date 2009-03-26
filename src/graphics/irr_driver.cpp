@@ -18,9 +18,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/irr_driver.hpp"
-#include "gui/engine.hpp"
 
+#include "material_manager.hpp"
 #include "user_config.hpp"
+#include "gui/engine.hpp"
 #include "io/file_manager.hpp"
 
 IrrDriver *irr_driver = NULL;
@@ -31,6 +32,8 @@ IrrDriver::IrrDriver()
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {
+        // FIXME: directX+SLD is not supported anyway - so we could
+        // remove support for this here anyway.
         video::E_DRIVER_TYPE type = driver_type==0 
                                   ? video::EDT_OPENGL 
                                   : (driver_type==1 
@@ -79,7 +82,9 @@ IrrDriver::~IrrDriver()
  */
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
-    return m_scene_manager->getMesh(filename.c_str());
+    scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
+    setAllMaterialFlags(m);
+    return m;
 }   // getAnimatedMesh
 
 // ----------------------------------------------------------------------------
@@ -90,8 +95,30 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 {
     scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
     if(!m) return NULL;
+    setAllMaterialFlags(m);
     return m->getMesh(0);
 }   // getMesh
+
+// ----------------------------------------------------------------------------
+/** Sets the material flags in this mesh depending on the settings in
+ *  material_manager.
+ *  \param mesh  The mesh to change the settings in.
+ */
+void IrrDriver::setAllMaterialFlags(scene::IAnimatedMesh *mesh) const
+{
+    unsigned int n=mesh->getMeshBufferCount();
+    for(unsigned int i=0; i<n; i++)
+    {
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        video::SMaterial &irr_material=mb->getMaterial();
+        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+        {
+            video::ITexture* t=irr_material.getTexture(j);
+            if(!t) continue;
+            material_manager->setAllMaterialFlags(t, mb);
+        }   // for j<MATERIAL_MAX_TEXTURES
+    }  // for i<getMeshBufferCount()
+}   // setAllMaterialFlags
 
 // ----------------------------------------------------------------------------
 /** Converts the mesh into a water scene node.

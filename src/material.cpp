@@ -31,14 +31,6 @@
 #define VCLAMP   2
 
 //-----------------------------------------------------------------------------
-Material::Material(unsigned int index)
-{
-    m_texname = "";
-    init   (index);
-    install();
-}   // Material
-
-//-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
  *  \param node Node containing the parameters for this material.
  *  \param index Index in material_manager.
@@ -112,19 +104,22 @@ void Material::init(unsigned int index)
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {
-    if(m_texname!="")
-    {
-        // Avoid irrlicht warning about not being able to load texture.
-        m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
-    }
-    if ( m_transparency )
-    {
-        //m_texture->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    }
-
-    // FIXME: more parameters need to be set!
+    // FIXME: do we actually still need the texture here? Irrlicht should
+    // cache them anyway.
+    // Avoid irrlicht warning about not being able to load texture.
+    m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::basename(m_texname);
-}
+}   // isntall
 
+//-----------------------------------------------------------------------------
+/** Sets the appropriate flags in an irrlicht SMaterial.
+ *  \param material The irrlicht SMaterial which gets the flags set.
+ */
+void  Material::setMaterialProperties(scene::IMeshBuffer *mb) const
+{
+    if(m_transparency)
+        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    // FIXME: more parameters need to be set!
+}   // setMaterialProperties

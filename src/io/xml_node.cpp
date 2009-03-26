@@ -30,6 +30,31 @@ XMLNode::XMLNode(const std::string &name, io::IXMLReader *xml)
         core::stringw value = xml->getAttributeValue(i);
         m_attributes[name] = value;
     }   // for i
+#ifdef TEST_ONLY
+    while(xml->read())
+    {
+        switch (xml->getNodeType()) 
+        {
+        case io::EXN_ELEMENT: break;
+        case io::EXN_ELEMENT_END:  
+            printf("found end\n");
+            break;// Ignore all other types
+        case io::EXN_UNKNOWN:
+            printf("found end\n");
+            break;
+        case io::EXN_COMMENT:
+            printf("found end\n");
+            break;
+        case io::EXN_TEXT:
+            printf("found end\n");
+            break;
+        default:
+            printf("found end\n");
+            break;
+        }   // switch
+
+    }   // while
+#endif
 }   // XMLNode
 
 // ----------------------------------------------------------------------------

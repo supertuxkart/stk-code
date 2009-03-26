@@ -77,11 +77,7 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
         std::string kart_file;
         try
         {
-#ifdef HAVE_IRRLICHT
             kart_file = file_manager->getKartFile((*i)+".irrkart");
-#else
-            kart_file = file_manager->getKartFile((*i)+".kart");
-#endif
         }
         catch (std::exception& e)
         {

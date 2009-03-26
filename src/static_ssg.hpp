@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifdef XX
 #ifndef _HEADER_STATICSSG_
 #define _HEADER_STATICSSG_
 
@@ -97,4 +98,5 @@ public:
     float hot(sgVec3 start, sgVec3 end, ssgLeaf** l, sgVec4** nrm);
     int collision(sgSphere *s, AllHits *allHits);
 };
+#endif
 #endif

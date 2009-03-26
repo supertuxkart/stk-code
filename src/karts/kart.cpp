@@ -256,13 +256,10 @@ Kart::~Kart()
     delete m_tuning;
     delete m_vehicle_raycaster;
     delete m_uprightConstraint;
-#ifdef HAVE_IRRLICHT
-#else
     for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
     {
         delete m_kart_chassis.getChildShape(i);
     }
-#endif
 }   // ~Kart
 
 //-----------------------------------------------------------------------------

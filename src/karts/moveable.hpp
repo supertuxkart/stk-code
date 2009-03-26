@@ -45,7 +45,7 @@ private:
     Vec3             m_hpr;
 
 protected:
-    UserPointer      m_user_pointer;
+    UserPointer            m_user_pointer;
     scene::IAnimatedMesh  *m_animated_mesh;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;

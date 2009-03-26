@@ -45,14 +45,6 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
     m_attached_state = RB_TO_PLUNGER;
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 
-    irr::video::S3DVertex* vertices=(video::S3DVertex*)m_buffer->getVertices();
-
-    video::SColor c(77, 179, 0, 0);
-    vertices[0].Color = c;
-    vertices[1].Color = c;
-    vertices[2].Color = c;
-    vertices[3].Color = c;
-
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh);
 }   // RubberBand

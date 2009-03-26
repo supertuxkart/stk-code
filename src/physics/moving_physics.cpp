@@ -59,6 +59,7 @@ MovingPhysics::MovingPhysics(const XMLNode *xml_node)
     }
     m_mesh = obj->getMesh(0);
     m_node = irr_driver->addMesh(m_mesh);
+    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
     Vec3 xyz(0,0,0);
     int result = xml_node->getXYZ(&xyz);
     if(!XMLNode::hasZ(result))   // needs height

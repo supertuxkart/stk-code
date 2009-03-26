@@ -92,7 +92,8 @@ void KartModel::attachModel(scene::ISceneNode **node)
  */
 void KartModel::loadModels(const std::string &kart_ident)
 {
-    std::string  full_path = file_manager->getKartFile(m_model_filename);
+    std::string  full_path = file_manager->getKartFile(m_model_filename, 
+                                                       kart_ident);
     m_mesh                 = irr_driver->getMesh(full_path);
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);

@@ -260,7 +260,7 @@ void RaceManager::startNextRace()
 }   // startNextRace
 //-----------------------------------------------------------------------------
 /** If there are more races to do, it starts the next race, otherwise it
- *  calls exit_race to finish the race.
+ *  calls exitRace to finish the race.
  */
 void RaceManager::next()
 {
@@ -284,14 +284,14 @@ void RaceManager::next()
             network_manager->setState(NetworkManager::NS_MAIN_MENU);
         else
             network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
-        exit_race();
+        exitRace();
     }
 }   // next
 
 //-----------------------------------------------------------------------------
 /** In GP displays the GP result screen, and then deletes the world.
  */
-void RaceManager::exit_race()
+void RaceManager::exitRace()
 {
     // Only display the grand prix result screen if all tracks 
     // were finished, and not when a race is aborted.
@@ -375,7 +375,7 @@ void RaceManager::exit_race()
     world          = 0;
     m_track_number = 0;
     m_active_race  = false;    
-}   // exit_Race
+}   // exitRace
 
 //-----------------------------------------------------------------------------
 /** A kart has finished the race at the specified time (which can be 

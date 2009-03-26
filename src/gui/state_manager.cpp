@@ -220,6 +220,7 @@ namespace StateManager
     
     void resetAndGoToMenu(std::string name)
     {
+        race_manager->exitRace();
         input_manager->setMode(InputManager::MENU);
         g_menu_stack.clear();
         g_menu_stack.push_back(name);

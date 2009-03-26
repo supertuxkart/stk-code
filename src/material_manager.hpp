@@ -17,11 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MATERIAL_MANAGER_HP
+#ifndef HEADER_MATERIAL_MANAGER_HPP
 #define HEADER_MATERIAL_MANAGER_HPP
 
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
+#include "irrlicht.h"
+using namespace irr;
+
 #include <string>
 #include <vector>
 
@@ -40,8 +41,9 @@ public:
     MaterialManager();
     void      loadMaterial     ();
     void      reInit           ();
+    void      setAllMaterialFlags(video::ITexture* t, 
+                                  scene::IMeshBuffer *mb) const;
     int       addEntity        (Material *m);
-    Material *getMaterial      (ssgLeaf *lf);
     Material *getMaterial      (const std::string& t, bool is_full_path=false,
                                 bool make_permanent=false);
     void      addSharedMaterial(const std::string& filename);

@@ -27,8 +27,6 @@
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
-ssgState *fuzzy_gst;
-
 MaterialManager *material_manager=0;
 
 MaterialManager::MaterialManager()
@@ -42,6 +40,24 @@ MaterialManager::MaterialManager()
     // Therefore, the code for loading the material had to
     // be moved into a separate function.
 }
+
+//-----------------------------------------------------------------------------
+/** Searches for the material in the given texture, and calls a function
+ *  in the material to set the irrlicht material flags.
+ *  \param t Pointer to the texture.
+ *  \param mb Pointer to the mesh buffer.
+*/
+void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
+                                          scene::IMeshBuffer *mb) const
+{
+    const std::string image = StringUtils::basename(t->getName().c_str());
+    // Search backward so that temporary (track) textures are found first
+    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    {
+        if(m_materials[i]->getTexFname()==image)
+            m_materials[i]->setMaterialProperties(mb);
+    }   // for i
+}   // setAllMaterialFlags
 
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)
@@ -65,9 +81,6 @@ void MaterialManager::reInit()
 //-----------------------------------------------------------------------------
 void MaterialManager::loadMaterial()
 {
-    // Create the default/empty material.
-    m_materials.push_back(new Material(m_materials.size()));
-
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
     const std::string fname     = "materials.xml";
@@ -133,12 +146,6 @@ void MaterialManager::popTempMaterial()
         m_materials.pop_back();
     }   // for i
 }   // popTempMaterial
-
-//-----------------------------------------------------------------------------
-Material *MaterialManager::getMaterial ( ssgLeaf *l )
-{
-    return m_materials[l -> getExternalPropertyIndex ()] ;
-}   // getMaterial
 
 //-----------------------------------------------------------------------------
 /** Returns the material of a given name, if it doesn't exist, it is loaded.

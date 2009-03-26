@@ -33,6 +33,7 @@ Moveable::Moveable()
     m_motion_state    = 0;
     m_first_time      = true;
     m_mesh            = NULL;
+    m_animated_mesh   = NULL;
     m_node            = NULL;
 }   // Moveable
 
@@ -42,6 +43,9 @@ Moveable::~Moveable()
     // The body is being removed from the world in kart/projectile
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
+    if(m_node) irr_driver->removeNode(m_node);
+    if(m_mesh) irr_driver->removeMesh(m_mesh);
+    if(m_animated_mesh) irr_driver->removeMesh(m_animated_mesh);
     // FIXME LEAK: what about model? ssgDeRefDelete(m_model_transform)
 }   // ~Moveable
 
