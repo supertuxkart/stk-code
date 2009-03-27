@@ -83,7 +83,7 @@ IrrDriver::~IrrDriver()
 scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 {
     scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
-    setAllMaterialFlags(m);
+    if(m) setAllMaterialFlags(m);
     return m;
 }   // getAnimatedMesh
 
