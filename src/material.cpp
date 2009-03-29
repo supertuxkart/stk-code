@@ -17,6 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "io/xml_node.hpp"
+#include "io/xml_reader.hpp"
+
 #include "material.hpp"
 
 #include <stdexcept>
@@ -24,8 +27,8 @@
 #include "stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
+
 
 #define UCLAMP   1
 #define VCLAMP   2

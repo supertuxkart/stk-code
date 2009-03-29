@@ -404,11 +404,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
 void InputManager::input()
 {
     SDL_Event ev;
-    /* Logical joystick index that is reported to the higher game APIs which
-     * may not be equal to SDL's joystick index.
-     */
-    int stickIndex;
-    
+
     while(SDL_PollEvent(&ev))
     {
         switch(ev.type)
@@ -496,8 +492,8 @@ void InputManager::input()
                 break;
                 
             case SDL_JOYAXISMOTION:
-                //const unsigned int value = ev.jaxis.value - 32768;
-                const int value = ev.jaxis.value;// - 32768*2;
+            {
+                const int value = ev.jaxis.value;
                 
                 //if(user_config->m_gamepad_debug)
                 {
@@ -585,6 +581,7 @@ void InputManager::input()
                     m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEUTRAL;
                 }
 #endif
+            }
                 break;
             case SDL_JOYBUTTONUP:
                 /* TODO - bring gamepad back in, with new InputDevice interface
