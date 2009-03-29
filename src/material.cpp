@@ -120,6 +120,13 @@ void Material::install(bool is_full_path)
 void  Material::setMaterialProperties(scene::IMeshBuffer *mb) const
 {
     if(m_transparency)
-        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
+        // scene_manager->getParameters()->setAttribute(
+        //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
+        // updates of the Z buffer of the material. Since the _REF 
+        // approach is faster (and looks better imho), this is used for now.
+        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+    if(m_sphere_map)
+        mb->getMaterial().MaterialType = video::EMT_SPHERE_MAP;
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
