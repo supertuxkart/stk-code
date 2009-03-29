@@ -49,6 +49,7 @@ public:
 
 class GamePadDevice : public InputDevice
 {
+    void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
 public:
     SDL_Joystick         *m_sdlJoystick;
     std::string           m_id;
@@ -57,7 +58,7 @@ public:
     Input::AxisDirection *m_prevAxisDirections;
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
-    bool hasBinding(const int axis, const int value, PlayerAction* action /* out */) const;
+    bool hasBinding(const int axis, const int value, const int player, PlayerAction* action /* out */);
     
     void loadDefaults();
     

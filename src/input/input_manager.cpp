@@ -579,8 +579,7 @@ void InputManager::input()
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
                               ev.jaxis.axis, Input::AD_POSITIVE, 0);
                     
-                    m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = Input::AD_NEUTRAL;
+                    m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEUTRAL;
                 }
 #endif
                 break;

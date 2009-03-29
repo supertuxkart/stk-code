@@ -1,5 +1,7 @@
 
 #include "input/input_device.hpp"
+#include "race_manager.hpp"
+#include "modes/world.hpp"
 
 InputDevice::InputDevice()
 {
@@ -127,10 +129,64 @@ void GamePadDevice::loadDefaults()
      */
 }
 // -----------------------------------------------------------------------------
-bool GamePadDevice::hasBinding(const int axis, const int value, PlayerAction* action /* out */) const
+void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)
 {
-    if(value > -m_deadzone && value < m_deadzone) return false; // within deadzone
+    for(int n=0; n<PA_COUNT; n++)
+    {
+        if(m_bindings[n].id == axis && m_bindings[n].dir == direction)
+        {
+            RaceManager::getWorld()->getLocalPlayerKart(player)->action((PlayerAction)n, 0);
+            return;
+        }
+    }
+}
+// -----------------------------------------------------------------------------
+bool GamePadDevice::hasBinding(const int axis, const int value, const int player, PlayerAction* action /* out */)
+{
+    // going to negative from positive
+    if (value < 0 && m_prevAxisDirections[axis] == Input::AD_POSITIVE)
+    {
+        //  set positive axis to 0
+        resetAxisDirection(axis, Input::AD_POSITIVE, player);
+
+        m_prevAxisDirections[axis] = Input::AD_NEGATIVE;
+    }
+    // going to positive from negative
+    else if (value > 0 && m_prevAxisDirections[axis] == Input::AD_NEGATIVE)
+    {
+        //  set negative axis to 0
+        resetAxisDirection(axis, Input::AD_NEGATIVE, player);
+        
+        m_prevAxisDirections[axis] = Input::AD_POSITIVE;
+    }
     
+    // check if within deadzone
+    if(value > -m_deadzone && value < m_deadzone)
+    {
+        // Axis stands still: This is reported once for digital axes and
+        // can be called multipled times for analog ones. Uses the
+        // previous direction in which the axis was triggered to
+        // determine which one has to be brought into the released
+        // state. This allows us to regard two directions of an axis
+        // as completely independent input variants (as if they where
+        // two buttons).
+        
+        if(m_prevAxisDirections[axis] == Input::AD_NEGATIVE)
+        {
+            // set negative axis to 0
+            resetAxisDirection(axis, Input::AD_NEGATIVE, player);
+        }
+        else if(m_prevAxisDirections[axis] == Input::AD_POSITIVE)
+        {
+            // set positive axis to 0
+            resetAxisDirection(axis, Input::AD_POSITIVE, player);
+        }
+        m_prevAxisDirections[axis] = Input::AD_NEUTRAL;
+        
+        return false; 
+    }
+    
+    // find corresponding action and return it
     for(int n=0; n<PA_COUNT; n++)
     {
         if(m_bindings[n].id == axis)
@@ -155,7 +211,7 @@ bool GamePadDevice::hasBinding(const int axis, const int value, PlayerAction* ac
  */
 GamePadDevice::~GamePadDevice()
 {
-    delete m_prevAxisDirections;
+    delete[] m_prevAxisDirections;
     
     SDL_JoystickClose(m_sdlJoystick);
 }   // ~GamePadDevice
