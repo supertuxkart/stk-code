@@ -20,7 +20,6 @@ void DeviceManager::add(GamePadDevice* d)
     m_gamepad_amount = m_gamepads.size();
 }
 
-// TODO
 bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value,
                                               int* player /* out */, PlayerAction* action /* out */ )
 {

@@ -84,14 +84,15 @@ GamePadDevice::GamePadDevice(int sdlIndex)
 void GamePadDevice::loadDefaults()
 {
     /*
-     TODO
+     TODO - joystic buttons
     m_bindings[PA_NITRO]
     m_bindings[PA_DRIFT]
     m_bindings[PA_RESCUE]
     m_bindings[PA_FIRE]
     m_bindings[PA_LOOK_BACK]
     */
-     
+    // m_bindings[PA_NITRO].type = Input::IT_STICKBUTTON;
+    
     m_bindings[PA_ACCEL].type = Input::IT_STICKMOTION;
     m_bindings[PA_ACCEL].id = 1;
     m_bindings[PA_ACCEL].dir = Input::AD_NEGATIVE;
@@ -118,6 +119,7 @@ void GamePadDevice::loadDefaults()
      Input(Input::IT_STICKMOTION, 0, 0, Input::AD_NEGATIVE));
      set(GA_CURSOR_RIGHT,
      Input(Input::IT_STICKMOTION, 0, 0, Input::AD_POSITIVE));
+     
      set(GA_CLEAR_MAPPING,
      Input(Input::IT_STICKBUTTON, 0, 2));
      set(GA_ENTER,
@@ -149,16 +151,16 @@ bool GamePadDevice::hasBinding(const int axis, const int value, const int player
         //  set positive axis to 0
         resetAxisDirection(axis, Input::AD_POSITIVE, player);
 
-        m_prevAxisDirections[axis] = Input::AD_NEGATIVE;
     }
     // going to positive from negative
     else if (value > 0 && m_prevAxisDirections[axis] == Input::AD_NEGATIVE)
     {
         //  set negative axis to 0
         resetAxisDirection(axis, Input::AD_NEGATIVE, player);
-        
-        m_prevAxisDirections[axis] = Input::AD_POSITIVE;
     }
+    
+    if(value > 0) m_prevAxisDirections[axis] = Input::AD_POSITIVE;
+    else if(value < 0) m_prevAxisDirections[axis] = Input::AD_NEGATIVE;
     
     // check if within deadzone
     if(value > -m_deadzone && value < m_deadzone)

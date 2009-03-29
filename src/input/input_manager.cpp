@@ -373,7 +373,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
 #endif
         if (action_found)
         {
-            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, value);
+            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
         }
         else if(type == Input::IT_KEYBOARD)
         {
@@ -496,13 +496,16 @@ void InputManager::input()
                 break;
                 
             case SDL_JOYAXISMOTION:
-                if(user_config->m_gamepad_debug)
+                //const unsigned int value = ev.jaxis.value - 32768;
+                const int value = ev.jaxis.value;// - 32768*2;
+                
+                //if(user_config->m_gamepad_debug)
                 {
                     printf("axis motion: which=%d axis=%d value=%d\n",
-                           ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
+                           ev.jaxis.which, ev.jaxis.axis, value);
                 }
-
-                if(ev.jaxis.value < 0)
+                
+                if(value < 0)
                 {
                     /* // TODO - bring back those weird axis tricks. would be cool if
                      // they could happen inside the GamePadDevice class, for encapsulation
@@ -511,7 +514,7 @@ void InputManager::input()
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_POSITIVE, 0);
                     }
                      */
-                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, -ev.jaxis.value);
+                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, value);
                     //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEGATIVE;
                 }
                 else
@@ -524,7 +527,7 @@ void InputManager::input()
                     }
                      */
                     // TODO - set stickIndex
-                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, ev.jaxis.value);
+                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, value);
                     //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_POSITIVE;
                 }
                 
@@ -589,7 +592,7 @@ void InputManager::input()
                  */       
                 
                 // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
-                input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
+                input(Input::IT_STICKBUTTON, ev.jbutton.which, 
                       ev.jbutton.button, 0, 0);
                 break;
             case SDL_JOYBUTTONDOWN:
@@ -598,7 +601,7 @@ void InputManager::input()
                  */
                 
                 // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
-                input(Input::IT_STICKBUTTON, !m_mode ? 0 : stickIndex, 
+                input(Input::IT_STICKBUTTON, ev.jbutton.which, 
                       ev.jbutton.button, 0, 32768);
                 break;
             case SDL_USEREVENT:
