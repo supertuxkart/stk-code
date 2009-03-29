@@ -1,6 +1,9 @@
 
-
 #include "input/device_manager.hpp"
+#include "io/file_manager.hpp"
+#include <iostream>
+#include <fstream>
+
 
 DeviceManager::DeviceManager()
 {
@@ -58,4 +61,30 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     }
     
     return false;
+}
+
+void DeviceManager::serialize()
+{
+    static std::string filepath = file_manager->getHomeDir() + "/input.config";
+    
+    std::ofstream configfile;
+    configfile.open (filepath.c_str());
+    
+    if(!configfile.is_open())
+    {
+        std::cerr << "Failed to open " << filepath.c_str() << " for writing, controls won't be saved\n";
+        return;
+    }
+    
+
+    for(unsigned int n=0; n<m_keyboard_amount; n++)
+    {
+        m_keyboards[n].serialize(configfile);
+    }
+    for(unsigned int n=0; n<m_gamepad_amount; n++)
+    {
+        m_gamepads[n].serialize(configfile);
+    }
+    
+    configfile.close();    
 }

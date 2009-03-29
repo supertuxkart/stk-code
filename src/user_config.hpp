@@ -123,35 +123,7 @@ private:
     void readStickConfigs(const lisp::Lisp *);
 
     void writeStickConfigs(lisp::Writer *);
-#if 0  
-    // TODO - input I/O
-    
-    void writeLastInputConfigurations(lisp::Writer *);
-    void readLastInputConfigurations(const lisp::Lisp *);
-    
-    void readPlayerInput(const lisp::Lisp *,
-                         const std::string& node,
-                         KartAction ka,
-                         int);
 
-    void writePlayerInput(lisp::Writer *,
-                          const std::string &node,
-                          KartAction,
-                          int);
-
-
-    void readInputNode(const lisp::Lisp *,
-                       const std::string &node,
-                       GameAction);
-
-    Input readInput(const lisp::Lisp* nodeReader);
-
-    void writeInputNode(lisp::Writer *,
-                        const std::string &node,
-                        GameAction);
-
-    void writeInput(lisp::Writer *writer, const Input &input);
-#endif
     /** Iterates through the input mapping and unsets all
      * where the given input occurs.
      *
@@ -260,40 +232,10 @@ public:
     const std::vector<StickConfig *>
          *getStickConfigs() const         { return &m_stickconfigs;     }
 
-#if 0
-    // TODO - and does that really belong in user config?
-    /** Retrieves a human readable string of the mapping for a GameAction */
-    std::string getMappingAsString(StaticAction);
-    /** Retrieves a human readable string of the mapping for the given
-      * player and KartAction.
-      */
-    std::string getMappingAsString(int, StaticAction);
-
-    
-    /** Sets the Input for the given Player and KartAction. Includes a check
-     * for duplicates and automatic removing of the other candidate(s).
-     *
-     * For use when sensing input.
-     */
-    void setInput(int player_number, KartAction ka, const Input &i0);
-    const Input &getInput(int player_index, KartAction ka) const;
-
-    
-    /** Clears the mapping for a given Player and KartAction. */
-    void  clearInput(int, KartAction);
-    bool  isFixedInput(Input::InputType, int, int, int);
-#endif
-    
     const std::string
          &getWarning()                     { return m_warning;  }
     void  resetWarning()                   { m_warning="";      }
     void  setWarning(std::string& warning) { m_warning=warning; }
-    
-    /** Creates ActionMap for use in menu mode. */
-   //ActionMap *newMenuActionMap();
-
-    /** Creates ActionMap for use in ingame mode. */
-    //ActionMap *newIngameActionMap();
     
 };
 

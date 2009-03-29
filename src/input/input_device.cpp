@@ -15,8 +15,34 @@ InputDevice::InputDevice()
     m_player = "default";
 }
 // -----------------------------------------------------------------------------
+void InputDevice::serialize(std::ofstream& stream)
+{
+    if (m_type == DT_KEYBOARD) stream << "<keyboard ";
+    else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name << "\" ";
+    else
+    {
+        std::cerr << "Warning, unknown input device type, skipping it\n";
+    }
+    
+    stream << "owner=\"" << m_player << "\">\n\n";
+    
+    for(int n=0; n<PA_COUNT; n++)
+    {
+        stream << "    <action name=\"" << KartActionStrings[n] <<  "\" id=\""
+            << m_bindings[n].id << "\" event=\"" << m_bindings[n].type << "\" ";
+        
+        if (m_type == DT_GAMEPAD) stream << "direction=\"" << m_bindings[n].dir << "\"";
+            
+        stream << "/>\n";
+    }
+
+    if (m_type == DT_KEYBOARD) stream << "\n</keyboard>\n\n\n";
+    else if (m_type == DT_GAMEPAD) stream << "\n</gamepad>\n\n\n";
+}
+// -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()
 {
+    m_type = DT_KEYBOARD;
 }
 // -----------------------------------------------------------------------------
 void KeyboardDevice::loadDefaults()
@@ -61,11 +87,11 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
 /** Constructor for GamePadDevice.
  *  \param sdlIndex Index of stick.
  */
-GamePadDevice::GamePadDevice(int sdlIndex)
+GamePadDevice::GamePadDevice(int sdlIndex, const char* name)
 {
     m_type = DT_GAMEPAD;
     m_sdlJoystick = SDL_JoystickOpen(sdlIndex);
-    
+    m_name = name;
     m_id = SDL_JoystickName(sdlIndex);
     
     const int count = SDL_JoystickNumAxes(m_sdlJoystick);

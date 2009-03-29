@@ -4,6 +4,8 @@
 #include <SDL/SDL.h>
 #include <string>
 #include "input/input.hpp"
+#include <iostream>
+#include <fstream>
 
 enum DeviceType
 {
@@ -25,7 +27,7 @@ class InputDevice
 {
 protected:
     DeviceType m_type;
-    
+    std::string m_name; // if device has a name; unused for keyboards since SDL can't tell keyboards apart
     KeyBinding m_bindings[PA_COUNT];
 
     std::string m_player;
@@ -34,6 +36,8 @@ public:
     InputDevice();
     
     DeviceType getType() const { return m_type; };
+    
+    void serialize(std::ofstream& stream);
 };
 
 class KeyboardDevice : public InputDevice
@@ -62,9 +66,9 @@ public:
     
     void loadDefaults();
     
-    GamePadDevice(int sdlIndex);
+    GamePadDevice(int sdlIndex, const char* name);
     ~GamePadDevice();
-};   // Stickinfo
+};
 
 
 #endif

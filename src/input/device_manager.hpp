@@ -22,6 +22,9 @@ public:
         maps this input to the corresponding player and game action. returns false if player/action could not be set */
     bool mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value,
                                    int* player /* out */, PlayerAction* action /* out */ );
+    
+    void serialize();
+
 };
 
 
