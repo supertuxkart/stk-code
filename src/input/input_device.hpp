@@ -13,7 +13,12 @@ enum DeviceType
 
 struct KeyBinding
 {
-    int id0, id1, id2;
+    Input::InputType type;
+    
+    // key for keyboards, axis for gamepads
+    int id;
+    
+    Input::AxisDirection dir; // for gamepads
 };
 
 class InputDevice
@@ -23,6 +28,8 @@ protected:
     
     KeyBinding m_bindings[PA_COUNT];
 
+    std::string m_player;
+    
 public:
     InputDevice();
     
@@ -35,7 +42,7 @@ public:
     KeyboardDevice();
     
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
-    bool hasBinding(int id0, int id1, int id2, PlayerAction* action /* out */);
+    bool hasBinding(const int key_id, PlayerAction* action /* out */) const;
     
     void loadDefaults();
 };
@@ -50,7 +57,9 @@ public:
     Input::AxisDirection *m_prevAxisDirections;
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
-    bool hasBinding(int axis, int value, PlayerAction* action /* out */);
+    bool hasBinding(const int axis, const int value, PlayerAction* action /* out */) const;
+    
+    void loadDefaults();
     
     GamePadDevice(int sdlIndex);
     ~GamePadDevice();

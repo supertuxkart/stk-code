@@ -76,6 +76,8 @@ void InputManager::initGamePadDevices()
     // Prepare a list of connected joysticks.
     const int numSticks = SDL_NumJoysticks();
     
+    std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
+    
     for (int i = 0; i < numSticks; i++)
         m_device_manager->add(new GamePadDevice(i));
     
@@ -496,20 +498,20 @@ void InputManager::input()
             case SDL_JOYAXISMOTION:
                 if(user_config->m_gamepad_debug)
                 {
-                    printf("axis motion: which %d axis %d value %d\n",
+                    printf("axis motion: which=%d axis=%d value=%d\n",
                            ev.jaxis.which, ev.jaxis.axis, ev.jaxis.value);
                 }
 
                 if(ev.jaxis.value < 0)
                 {
-                    /* TODO - bring back those weird axis tricks. would be cool if
+                    /* // TODO - bring back those weird axis tricks. would be cool if
                      // they could happen inside the GamePadDevice class, for encapsulation
                     if (m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
                     {
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_POSITIVE, 0);
                     }
                      */
-                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_NEGATIVE, -ev.jaxis.value);
+                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, -ev.jaxis.value);
                     //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEGATIVE;
                 }
                 else
@@ -521,7 +523,8 @@ void InputManager::input()
                         input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_NEGATIVE, 0);
                     }
                      */
-                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_POSITIVE, ev.jaxis.value);
+                    // TODO - set stickIndex
+                    input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, ev.jaxis.value);
                     //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_POSITIVE;
                 }
                 

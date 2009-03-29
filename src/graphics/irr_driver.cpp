@@ -60,6 +60,9 @@ IrrDriver::IrrDriver()
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
+    
+    m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
+    
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
@@ -88,6 +91,7 @@ scene::IAnimatedMesh *IrrDriver::getAnimatedMesh(const std::string &filename)
 }   // getAnimatedMesh
 
 // ----------------------------------------------------------------------------
+
 /** Loads a non-animated mesh and returns a pointer to it.
  *  \param filename  File to load.
  */

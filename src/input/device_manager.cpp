@@ -31,7 +31,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     {
         for(unsigned int n=0; n<m_keyboard_amount; n++)
         {
-            if( m_keyboards[n].hasBinding(id0, id1, id2, action) ) return true;
+            if( m_keyboards[n].hasBinding(id0, action) ) return true;
         }
         return false;
     }
@@ -45,9 +45,10 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     }
     else if(type == Input::IT_STICKMOTION)
     {
+        // std::cout << "stick motion, ID=" <<id0 << " axis=" << id1 << " value=" << value  << std::endl;
         for(unsigned int n=0; n<m_gamepad_amount; n++)
         {
-            if( m_gamepads[n].m_index == id0 && m_gamepads[n].hasBinding(id1 /* axis */, value, action) ) return true;
+            if( /*m_gamepads[n].m_index == id0 &&*/ m_gamepads[n].hasBinding(id1 /* axis */, value, action) ) return true;
         }
         return false;
     }

@@ -936,7 +936,7 @@ void Track::loadTrack(const std::string &filename)
         if(m_sky_textures.size()!=6)
         {
             fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
-                    m_sky_textures.size());
+                    (int)m_sky_textures.size());
             fprintf(stderr, "in '%s'.\n", filename.c_str());
 
         }
