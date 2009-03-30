@@ -510,85 +510,9 @@ void InputManager::input()
                 }
                 
                 if(value < 0)
-                {
-                    /* // TODO - bring back those weird axis tricks. would be cool if
-                     // they could happen inside the GamePadDevice class, for encapsulation
-                    if (m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
-                    {
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_POSITIVE, 0);
-                    }
-                     */
                     input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, value);
-                    //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEGATIVE;
-                }
                 else
-                {
-                    /* TODO - bring back those weird axis tricks. would be cool if
-                     // they could happen inside the GamePadDevice class, for encapsulation
-                    if (m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
-                    {
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex, ev.jaxis.axis, Input::AD_NEGATIVE, 0);
-                    }
-                     */
-                    // TODO - set stickIndex
                     input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, value);
-                    //m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_POSITIVE;
-                }
-                
-                /* TODO - bring gamepad back in, with new InputDevice interface
-                 stickIndex = m_stick_infos[ev.jaxis.which]->m_index;
-                 // If the joystick axis exceeds the deadzone report the input.
-                 // In menu mode (mode = MENU = 0) the joystick number is reported
-                 // to be zero in all cases. This has the neat effect that all
-                 // joysticks can be used to control the menu.*/
-#if 0
-                if(ev.jaxis.value <= -m_stick_infos[ev.jaxis.which]->m_deadzone)
-                {
-                    if (m_stick_infos[ev.jaxis.which]
-                        ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
-                    {
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                              ev.jaxis.axis, Input::AD_POSITIVE, 0);
-                    }
-                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                          ev.jaxis.axis, Input::AD_NEGATIVE, -ev.jaxis.value);
-                    m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = Input::AD_NEGATIVE;
-                }
-                else if(ev.jaxis.value >= m_stick_infos[ev.jaxis.which]->m_deadzone)
-                {
-                    if (m_stick_infos[ev.jaxis.which]
-                        ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
-                    {
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                              ev.jaxis.axis, Input::AD_NEGATIVE, 0);
-                    }
-                    input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                          ev.jaxis.axis, Input::AD_POSITIVE, ev.jaxis.value);
-                    m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis]
-                    = Input::AD_POSITIVE;
-                }
-                else
-                {
-                    // Axis stands still: This is reported once for digital axes and
-                    // can be called multipled times for analog ones. Uses the
-                    // previous direction in which the axis was triggered to
-                    // determine which one has to be brought into the released
-                    // state. This allows us to regard two directions of an axis
-                    // as completely independent input variants (as if they where
-                    // two buttons).
-                    if (m_stick_infos[ev.jaxis.which]
-                        ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_NEGATIVE)
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                              ev.jaxis.axis, Input::AD_NEGATIVE, 0);
-                    else if (m_stick_infos[ev.jaxis.which]
-                             ->m_prevAxisDirections[ev.jaxis.axis] == Input::AD_POSITIVE)
-                        input(Input::IT_STICKMOTION, !m_mode ? 0 : stickIndex,
-                              ev.jaxis.axis, Input::AD_POSITIVE, 0);
-                    
-                    m_stick_infos[ev.jaxis.which]->m_prevAxisDirections[ev.jaxis.axis] = Input::AD_NEUTRAL;
-                }
-#endif
             }
                 break;
             case SDL_JOYBUTTONUP:
