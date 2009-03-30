@@ -36,6 +36,11 @@
 
 MainLoop* main_loop = 0;
 
+// FIXME hacky hacky FPS info
+int minFPS  = 999;
+int lastFPS =  -1;
+int maxFPS  =   0;
+
 MainLoop::MainLoop() :
 m_abort(false),
 m_frame_count(0),
@@ -108,8 +113,8 @@ void MainLoop::run()
         if (!music_on && !race_manager->raceIsActive())
         {
             sound_manager->stopMusic();   // stop potential 'left over' music from race
-        	sound_manager->startMusic(stk_config->m_title_music);
-		    music_on = true;
+            sound_manager->startMusic(stk_config->m_title_music);
+            music_on = true;
         }
 
         network_manager->update(dt);
@@ -212,6 +217,26 @@ void MainLoop::run()
 #ifdef HAVE_IRRLICHT
         if(!user_config->m_bullet_debug)
             irr_driver->update(dt);
+// FIXME hacky hacky FPS reporting
+// it should be moved to the right place when on screen display is done
+#if 0
+        int fps = irr_driver->getDevice()->getVideoDriver()->getFPS();
+        bool printFPS = false;
+        if((fps < minFPS) && (fps > 1)) { // First report seems to be always 1, so not useful
+            minFPS = fps;
+            printFPS = true;
+        }
+        if(fps > maxFPS) {
+            maxFPS = fps;
+            printFPS = true;
+        }
+        if ((lastFPS+5 <= fps) || (lastFPS-5 >= fps)) {
+            lastFPS = fps;
+            printFPS = true;
+        }
+        // First print per run will be really silly, as in 999 1 1, just ignore it ;]
+        if (printFPS) printf("FPS %3d<%3d<%3d\n", minFPS, fps, maxFPS);
+#endif
 #else
         glFlush();
         SDL_GL_SwapBuffers();
