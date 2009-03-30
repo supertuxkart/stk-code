@@ -17,8 +17,10 @@ InputDevice::InputDevice()
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)
 {
+    std::cout << "writing a gamepad named " << m_name.c_str() << std::endl;
+    
     if (m_type == DT_KEYBOARD) stream << "<keyboard ";
-    else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name << "\" ";
+    else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name.c_str() << "\" ";
     else std::cerr << "Warning, unknown input device type, skipping it\n";
     
     stream << "owner=\"" << m_player << "\">\n\n";
@@ -167,10 +169,12 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 GamePadDevice::GamePadDevice(int sdlIndex)
 {
     m_type = DT_GAMEPAD;
-    m_name = SDL_JoystickName(sdlIndex);
     m_deadzone = DEADZONE_JOYSTICK;
     
     open(sdlIndex);
+    
+    m_name = SDL_JoystickName(sdlIndex);
+    std::cout << "creating a device named " <<  m_name.c_str() << "\n";
     
     loadDefaults();
 }   // GamePadDevice

@@ -67,17 +67,22 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
         m_device_manager->add( default_device );
         m_device_manager->serialize();
     }
-    
-    // Prepare a list of connected joysticks.
-    const int numSticks = SDL_NumJoysticks();
-    
-    std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
-    
-    // TODO - detect if device is currently known and has an entry in the config
-    // the constructor below should only be used if not
-    for (int i = 0; i < numSticks; i++)
+    else
     {
-        m_device_manager->checkForGamePad(i);
+        // Prepare a list of connected joysticks.
+        const int numSticks = SDL_NumJoysticks();
+        
+        std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
+        
+        // TODO - detect if device is currently known and has an entry in the config
+        // the constructor below should only be used if not
+        for (int i = 0; i < numSticks; i++)
+        {
+            m_device_manager->checkForGamePad(i);
+        }
+        
+        // FIXME - for testing purposes (immediately save any new device we might meet)
+        m_device_manager->serialize(); 
     }
     
 }

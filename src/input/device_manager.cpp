@@ -148,8 +148,12 @@ void DeviceManager::checkForGamePad(const int sdl_id)
 {
     std::string name = SDL_JoystickName(sdl_id);
     
+    std::cout << "trying to find gamepad " << name.c_str() << std::endl;
+    
     for(unsigned int n=0; n<m_gamepad_amount; n++)
     {
+        std::cout << "gamepad " << n << " is named " << m_gamepads[n].m_name.c_str() << std::endl;
+        
         if(m_gamepads[n].m_name == name)
         {
             m_gamepads[n].open(sdl_id);
@@ -157,6 +161,7 @@ void DeviceManager::checkForGamePad(const int sdl_id)
         }
     }
 
+    std::cout << "couldn't find" << std::endl;
     add(new GamePadDevice(sdl_id));
 
 }

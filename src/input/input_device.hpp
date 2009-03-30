@@ -29,12 +29,13 @@ class InputDevice
 {
 protected:
     DeviceType m_type;
-    std::string m_name; // if device has a name; unused for keyboards since SDL can't tell keyboards apart
     KeyBinding m_bindings[PA_COUNT];
 
     std::string m_player;
     
 public:
+    std::string m_name; // if device has a name; unused for keyboards since SDL can't tell keyboards apart
+    
     InputDevice();
     
     DeviceType getType() const { return m_type; };
@@ -60,7 +61,6 @@ class GamePadDevice : public InputDevice
     void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
 public:
     SDL_Joystick         *m_sdlJoystick;
-    std::string           m_name;
     int                   m_deadzone;
     int                   m_index;
     Input::AxisDirection *m_prevAxisDirections;
