@@ -59,7 +59,8 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     
     if(!m_device_manager->deserialize())
     {
-    
+        std::cerr << "Failed to read input config file, using defaults\n";
+        
         // could not read config file so use defaults
         KeyboardDevice* default_device = new KeyboardDevice();
         default_device->loadDefaults();
