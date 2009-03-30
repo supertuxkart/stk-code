@@ -25,6 +25,8 @@ public:
     
     void serialize();
     bool deserialize();
+    
+    void checkForGamePad(const int sdl_id);
 };
 
 

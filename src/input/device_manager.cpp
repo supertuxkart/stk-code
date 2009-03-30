@@ -92,19 +92,12 @@ bool DeviceManager::deserialize()
             {
                 if (strcmp("keyboard", xml->getNodeName()) == 0)
                 {
-                    keyboard_device = new KeyboardDevice();
-                    
-                    // TODO - read name and owner attributes
-                    
+                    keyboard_device = new KeyboardDevice(xml);
                     reading_now = KEYBOARD;
                 }
                 else if (strcmp("gamepad", xml->getNodeName()) == 0)
                 {
-                    // TODO
-                    //gamepad_device = new GamePadDevice();
-                    
-                    // TODO - read name and owner attributes
-                    
+                    gamepad_device = new GamePadDevice(xml);
                     reading_now = GAMEPAD;
                 }
                 else if (strcmp("action", xml->getNodeName()) == 0)
@@ -116,9 +109,8 @@ bool DeviceManager::deserialize()
                     }
                     else if(reading_now == GAMEPAD) 
                     {
-                        // TODO
-                        //if(!gamepad_device->deserializeAction(xml))
-                        //    std::cerr << "Ignoring an ill-formed action in input config\n";
+                        if(!gamepad_device->deserializeAction(xml))
+                            std::cerr << "Ignoring an ill-formed action in input config\n";
                     }
                     else std::cerr << "Warning: An action is placed in an unexpected area in the input config file\n";
                 }
@@ -134,8 +126,7 @@ bool DeviceManager::deserialize()
                 }
                 else if (strcmp("gamepad", xml->getNodeName()) == 0)
                 {
-                    // TODO
-                    // add(gamepad_device);
+                    add(gamepad_device);
                     reading_now = GAMEPAD;
                 }
             }
@@ -149,6 +140,27 @@ bool DeviceManager::deserialize()
     return true;
 }
 
+/**
+  * Check if we already have a config object for joystick 'sdl_id' as reported by SDL
+  * If yes, 'open' the gamepad instance. If no, create one.
+  */
+void DeviceManager::checkForGamePad(const int sdl_id)
+{
+    std::string name = SDL_JoystickName(sdl_id);
+    
+    for(unsigned int n=0; n<m_gamepad_amount; n++)
+    {
+        if(m_gamepads[n].m_name == name)
+        {
+            m_gamepads[n].open(sdl_id);
+            return;
+        }
+    }
+
+    add(new GamePadDevice(sdl_id));
+
+}
+    
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";

@@ -90,6 +90,15 @@ KeyboardDevice::KeyboardDevice()
     m_type = DT_KEYBOARD;
 }
 // -----------------------------------------------------------------------------
+KeyboardDevice::KeyboardDevice(irr::io::IrrXMLReader* xml)
+{
+    m_type = DT_KEYBOARD;
+    
+    const char* owner_string = xml->getAttributeValue("owner");
+    if(owner_string == NULL) m_player = "default";
+    else m_player = owner_string;
+}
+// -----------------------------------------------------------------------------
 void KeyboardDevice::loadDefaults()
 {
     m_bindings[PA_NITRO].id = SDLK_SPACE;
@@ -127,35 +136,60 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
     
     return false;
 }
-
 // -----------------------------------------------------------------------------
-/** Constructor for GamePadDevice.
- *  \param sdlIndex Index of stick.
+/**
+ * Creates a GamePade device from a config file. Note that this device will not yet be ready to be used,
+ * it must first be detected to be connected by SDL (hence m_sdlJoystick is NULL)
  */
-GamePadDevice::GamePadDevice(int sdlIndex, const char* name)
+GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 {
     m_type = DT_GAMEPAD;
-    m_sdlJoystick = SDL_JoystickOpen(sdlIndex);
-    m_name = name;
-    m_id = SDL_JoystickName(sdlIndex);
+    m_sdlJoystick = NULL;
+    m_prevAxisDirections = NULL;
+    m_deadzone = DEADZONE_JOYSTICK;
+    
+    const char* owner_string = xml->getAttributeValue("owner");
+    if(owner_string == NULL) m_player = "default";
+    else m_player = owner_string;
+    
+    const char* name_string = xml->getAttributeValue("name");
+    if(name_string == NULL)
+    {
+        std::cerr << "Warning, joystick without name in config file, making it undetectable\n";
+    }
+    else m_name = name_string;
+}
+// -----------------------------------------------------------------------------
+/** Constructor for GamePadDevice from a connected gamepad for which no configuration existed
+* (defaults will be used)
+ *  \param sdlIndex Index of stick.
+ */
+GamePadDevice::GamePadDevice(int sdlIndex)
+{
+    m_type = DT_GAMEPAD;
+    m_name = SDL_JoystickName(sdlIndex);
+    m_deadzone = DEADZONE_JOYSTICK;
+    
+    open(sdlIndex);
+    
+    loadDefaults();
+}   // GamePadDevice
+// -----------------------------------------------------------------------------
+void GamePadDevice::open(const int sdl_id)
+{
+    m_sdlJoystick = SDL_JoystickOpen(sdl_id);
     
     const int count = SDL_JoystickNumAxes(m_sdlJoystick);
     m_prevAxisDirections = new Input::AxisDirection[count];
     
     for (int i = 0; i < count; i++)
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
-    
-    m_deadzone = DEADZONE_JOYSTICK;
-    
-    //m_index = -1;
-    
-    loadDefaults();
-}   // GamePadDevice
+}
 // -----------------------------------------------------------------------------
 void GamePadDevice::loadDefaults()
 {
     /*
-     TODO - joystic buttons
+     TODO - default bindings for joystic buttons
     m_bindings[PA_NITRO]
     m_bindings[PA_DRIFT]
     m_bindings[PA_RESCUE]

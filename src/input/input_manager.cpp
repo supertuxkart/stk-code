@@ -67,7 +67,18 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
         m_device_manager->serialize();
     }
     
-    initGamePadDevices();
+    // Prepare a list of connected joysticks.
+    const int numSticks = SDL_NumJoysticks();
+    
+    std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
+    
+    // TODO - detect if device is currently known and has an entry in the config
+    // the constructor below should only be used if not
+    for (int i = 0; i < numSticks; i++)
+    {
+        m_device_manager->checkForGamePad(i);
+    }
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -75,16 +86,7 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
  */
 void InputManager::initGamePadDevices()
 {
-    // Prepare a list of connected joysticks.
-    const int numSticks = SDL_NumJoysticks();
-    
-    std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
-    
-    // TODO - detect if device is currently known and has an entry in the config
-    for (int i = 0; i < numSticks; i++)
-        m_device_manager->add(new GamePadDevice(i, SDL_JoystickName(i)));
-    
-    // TODO - init gamepad devices from config file
+
     /*
      m_stick_infos = new GamePadDevice *[numSticks];
      std::vector<GamePadDevice *> *si = new std::vector<GamePadDevice *>;

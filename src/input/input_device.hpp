@@ -47,6 +47,7 @@ class KeyboardDevice : public InputDevice
 {
 public:
     KeyboardDevice();
+    KeyboardDevice(irr::io::IrrXMLReader* xml);
     
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
     bool hasBinding(const int key_id, PlayerAction* action /* out */) const;
@@ -59,17 +60,22 @@ class GamePadDevice : public InputDevice
     void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
 public:
     SDL_Joystick         *m_sdlJoystick;
-    std::string           m_id;
+    std::string           m_name;
     int                   m_deadzone;
     int                   m_index;
     Input::AxisDirection *m_prevAxisDirections;
         
-    /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
+    /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
+     The 'player' id passed is simply to know where to send 'axis reset's when necessary*/
     bool hasBinding(const int axis, const int value, const int player, PlayerAction* action /* out */);
+    
+    void open(const int sdl_id);
     
     void loadDefaults();
     
-    GamePadDevice(int sdlIndex, const char* name);
+    GamePadDevice(int sdlIndex);
+    GamePadDevice(irr::io::IrrXMLReader* xml);
+    
     ~GamePadDevice();
 };
 
