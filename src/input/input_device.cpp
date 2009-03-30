@@ -174,7 +174,6 @@ GamePadDevice::GamePadDevice(int sdlIndex)
     open(sdlIndex);
     
     m_name = SDL_JoystickName(sdlIndex);
-    std::cout << "creating a device named " <<  m_name.c_str() << "\n";
     
     loadDefaults();
 }   // GamePadDevice
@@ -185,6 +184,8 @@ void GamePadDevice::open(const int sdl_id)
     
     const int count = SDL_JoystickNumAxes(m_sdlJoystick);
     m_prevAxisDirections = new Input::AxisDirection[count];
+    
+    std::cout << "(i) This gamepad has " << count << " axes\n";
     
     for (int i = 0; i < count; i++)
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
