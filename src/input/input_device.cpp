@@ -17,8 +17,6 @@ InputDevice::InputDevice()
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)
 {
-    std::cout << "writing a gamepad named " << m_name.c_str() << std::endl;
-    
     if (m_type == DT_KEYBOARD) stream << "<keyboard ";
     else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name.c_str() << "\" ";
     else std::cerr << "Warning, unknown input device type, skipping it\n";

@@ -57,6 +57,8 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     
     m_device_manager = new DeviceManager();
     
+    bool something_new_to_write = false;
+    
     if(!m_device_manager->deserialize())
     {
         std::cerr << "Failed to read input config file, using defaults\n";
@@ -65,6 +67,8 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
         KeyboardDevice* default_device = new KeyboardDevice();
         default_device->loadDefaults();
         m_device_manager->add( default_device );
+        
+        something_new_to_write = true;
     }
 
     // Prepare a list of connected joysticks.
@@ -76,11 +80,11 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     // the constructor below should only be used if not
     for (int i = 0; i < numSticks; i++)
     {
-        m_device_manager->checkForGamePad(i);
+        something_new_to_write = m_device_manager->checkForGamePad(i) || something_new_to_write;
     }
     
-    // immediately save any new device we might meet
-    m_device_manager->serialize(); 
+    // write config file if necessary
+    if(something_new_to_write) m_device_manager->serialize(); 
     
 }
 
@@ -509,6 +513,7 @@ void InputManager::input()
                            ev.jaxis.which, ev.jaxis.axis, value);
                 }
                 
+                // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
                 if(value < 0)
                     input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, value);
                 else

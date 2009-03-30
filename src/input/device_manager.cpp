@@ -142,9 +142,9 @@ bool DeviceManager::deserialize()
 
 /**
   * Check if we already have a config object for joystick 'sdl_id' as reported by SDL
-  * If yes, 'open' the gamepad instance. If no, create one.
+  * If yes, 'open' the gamepad instance and returns false. If no, create on and return true.
   */
-void DeviceManager::checkForGamePad(const int sdl_id)
+bool DeviceManager::checkForGamePad(const int sdl_id)
 {
     std::string name = SDL_JoystickName(sdl_id);
     
@@ -158,18 +158,20 @@ void DeviceManager::checkForGamePad(const int sdl_id)
         {
             std::cout << "--> that's the one\n";
             m_gamepads[n].open(sdl_id);
-            return;
+            return false;
         }
     }
 
     std::cout << "couldn't find this joystick, so creating a new one" << std::endl;
     add(new GamePadDevice(sdl_id));
+    return true;
 
 }
     
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
+    std::cout << "writing " << filepath.c_str() << std::endl;
     
     std::ofstream configfile;
     configfile.open (filepath.c_str());
