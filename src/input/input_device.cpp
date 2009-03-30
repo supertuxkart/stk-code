@@ -19,10 +19,7 @@ void InputDevice::serialize(std::ofstream& stream)
 {
     if (m_type == DT_KEYBOARD) stream << "<keyboard ";
     else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name << "\" ";
-    else
-    {
-        std::cerr << "Warning, unknown input device type, skipping it\n";
-    }
+    else std::cerr << "Warning, unknown input device type, skipping it\n";
     
     stream << "owner=\"" << m_player << "\">\n\n";
     
@@ -38,6 +35,54 @@ void InputDevice::serialize(std::ofstream& stream)
 
     if (m_type == DT_KEYBOARD) stream << "\n</keyboard>\n\n\n";
     else if (m_type == DT_GAMEPAD) stream << "\n</gamepad>\n\n\n";
+}
+// -----------------------------------------------------------------------------
+bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
+{
+    // ---- read name
+    const char* name_string = xml->getAttributeValue("name");
+    if(name_string == NULL) return false;
+
+    int binding_id = -1; 
+    
+    for(int n=0; n<PA_COUNT; n++)
+    {
+        if(strcmp(name_string,KartActionStrings[n].c_str()) == 0)
+        {
+            binding_id = n;
+            break;
+        }
+    }
+    if(binding_id == -1)
+    {
+        std::cerr << "Unknown action type : " << name_string << std::endl;
+        return false;
+    }
+    
+    // ---- read id
+    const char* id_string = xml->getAttributeValue("id");
+    if(id_string == NULL) return false;
+    const int id = atoi(id_string);
+    
+    // ---- read event type
+    const char* event_string = xml->getAttributeValue("event");
+    if(event_string == NULL) return false;
+    const int event_id = atoi(event_string);
+    
+    m_bindings[binding_id].id = id;
+    m_bindings[binding_id].type = (Input::InputType)event_id;
+    
+    
+    // ---- read axis direction
+    const char* dir_string = xml->getAttributeValue("direction");
+    if(dir_string != NULL)
+    {
+        const int dir = atoi(dir_string);
+        m_bindings[binding_id].dir = (Input::AxisDirection)dir;
+    }
+        
+    return true;
+
 }
 // -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()

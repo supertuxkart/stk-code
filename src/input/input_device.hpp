@@ -6,6 +6,8 @@
 #include "input/input.hpp"
 #include <iostream>
 #include <fstream>
+#include "io/xml_reader.hpp"
+#include "io/xml_node.hpp"
 
 enum DeviceType
 {
@@ -38,6 +40,7 @@ public:
     DeviceType getType() const { return m_type; };
     
     void serialize(std::ofstream& stream);
+    bool deserializeAction(irr::io::IrrXMLReader* xml);
 };
 
 class KeyboardDevice : public InputDevice

@@ -57,17 +57,18 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     
     m_device_manager = new DeviceManager();
     
-    // init keyboard. TODO - load key bindings from file
-    KeyboardDevice* default_device = new KeyboardDevice();
-    default_device->loadDefaults();
-    m_device_manager->add( default_device );
+    if(!m_device_manager->deserialize())
+    {
+    
+        // could not read config file so use defaults
+        KeyboardDevice* default_device = new KeyboardDevice();
+        default_device->loadDefaults();
+        m_device_manager->add( default_device );
+        m_device_manager->serialize();
+    }
     
     initGamePadDevices();
-    
-    // FIXME - for testing purposes only
-    m_device_manager->serialize();
 }
-
 
 // -----------------------------------------------------------------------------
 /** Initialises joystick/gamepad info.

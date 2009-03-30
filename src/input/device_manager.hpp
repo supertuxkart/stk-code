@@ -24,7 +24,7 @@ public:
                                    int* player /* out */, PlayerAction* action /* out */ );
     
     void serialize();
-
+    bool deserialize();
 };
 
 

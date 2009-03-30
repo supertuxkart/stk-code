@@ -28,7 +28,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
 {
     // TODO - auto-detect player ID from device
     *player = 0;
-
+    
     if(type == Input::IT_KEYBOARD)
     {
         for(unsigned int n=0; n<m_keyboard_amount; n++)
@@ -63,6 +63,92 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     return false;
 }
 
+bool DeviceManager::deserialize()
+{
+    static std::string filepath = file_manager->getHomeDir() + "/input.config";
+    
+    if(!file_manager->fileExists(filepath)) return false;
+    
+    irr::io::IrrXMLReader* xml = irr::io::createIrrXMLReader( filepath.c_str() );
+    
+    const int GAMEPAD = 1;
+    const int KEYBOARD = 2;
+    const int NOTHING = 3;
+    
+    int reading_now = NOTHING;
+    
+    KeyboardDevice* keyboard_device;
+    GamePadDevice* gamepad_device;
+    
+    // parse XML file
+    while(xml && xml->read())
+    {
+        switch(xml->getNodeType())
+        {
+            case irr::io::EXN_TEXT:
+                break;
+                
+            case irr::io::EXN_ELEMENT:
+            {
+                if (strcmp("keyboard", xml->getNodeName()) == 0)
+                {
+                    keyboard_device = new KeyboardDevice();
+                    
+                    // TODO - read name and owner attributes
+                    
+                    reading_now = KEYBOARD;
+                }
+                else if (strcmp("gamepad", xml->getNodeName()) == 0)
+                {
+                    // TODO
+                    //gamepad_device = new GamePadDevice();
+                    
+                    // TODO - read name and owner attributes
+                    
+                    reading_now = GAMEPAD;
+                }
+                else if (strcmp("action", xml->getNodeName()) == 0)
+                {
+                    if(reading_now == KEYBOARD) 
+                    {
+                        if(!keyboard_device->deserializeAction(xml))
+                            std::cerr << "Ignoring an ill-formed action in input config\n";
+                    }
+                    else if(reading_now == GAMEPAD) 
+                    {
+                        // TODO
+                        //if(!gamepad_device->deserializeAction(xml))
+                        //    std::cerr << "Ignoring an ill-formed action in input config\n";
+                    }
+                    else std::cerr << "Warning: An action is placed in an unexpected area in the input config file\n";
+                }
+            }
+            break;
+            // ---- section ending
+            case irr::io::EXN_ELEMENT_END:
+            {
+                if (strcmp("keyboard", xml->getNodeName()) == 0)
+                {
+                    add(keyboard_device);
+                    reading_now = NOTHING;
+                }
+                else if (strcmp("gamepad", xml->getNodeName()) == 0)
+                {
+                    // TODO
+                    // add(gamepad_device);
+                    reading_now = GAMEPAD;
+                }
+            }
+                break;
+                
+            default: break;
+                
+        } // end switch
+    } // end while
+    
+    return true;
+}
+
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
@@ -76,7 +162,7 @@ void DeviceManager::serialize()
         return;
     }
     
-
+    
     for(unsigned int n=0; n<m_keyboard_amount; n++)
     {
         m_keyboards[n].serialize(configfile);

@@ -81,6 +81,8 @@ public:
                                   bool is_full_path=false, 
                                   bool make_full_path=false) const;
 
+    bool       fileExists           (const std::string& path)   { return m_file_system->existFile(path.c_str()); }
+    
     void       pushTextureSearchPath(const std::string& path);
     void       pushModelSearchPath  (const std::string& path);
     void       pushMusicSearchPath  (const std::string& path)
