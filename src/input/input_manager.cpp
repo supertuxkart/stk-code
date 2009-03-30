@@ -503,7 +503,7 @@ void InputManager::input()
             {
                 const int value = ev.jaxis.value;
                 
-                //if(user_config->m_gamepad_debug)
+                if(user_config->m_gamepad_debug)
                 {
                     printf("axis motion: which=%d axis=%d value=%d\n",
                            ev.jaxis.which, ev.jaxis.axis, value);
