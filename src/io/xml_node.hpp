@@ -42,9 +42,9 @@ public:
          XMLNode(io::IXMLReader *xml);
          XMLNode(const std::string &filename);
     const std::string &getName() const {return m_name; }
-    XMLNode           *getNode(const std::string &name);
-    XMLNode           *getNode(unsigned int i);
-    unsigned int       getNumNodes() {return m_nodes.size(); }
+    const XMLNode     *getNode(const std::string &name) const;
+    const XMLNode     *getNode(unsigned int i) const;
+    unsigned int       getNumNodes() const {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, float *value) const;

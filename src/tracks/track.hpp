@@ -40,6 +40,7 @@ using namespace irr;
 #include "utils/vec3.hpp"
 
 class TriangleMesh;
+class MovingTexture;
 class XMLNode;
 
 class Track
@@ -73,6 +74,9 @@ private:
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
     std::vector<std::string> m_sky_textures;
+
+    /** The list of all animated textures. */
+    std::vector<MovingTexture*> m_animated_textures;
     /** If a sky dome is used, the number of horizontal segments 
      *  the sphere should be divided in. */
     int                      m_sky_hori_segments;
@@ -83,6 +87,9 @@ private:
     float                    m_sky_sphere_percent;
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
+
+    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
@@ -209,6 +216,7 @@ public:
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel();
+    void               update(float dt);
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(

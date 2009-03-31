@@ -104,7 +104,7 @@ void XMLNode::readXML(io::IXMLReader *xml)
 /** Returns the i.th node.
  *  \param i Number of node to return.
  */
-XMLNode *XMLNode::getNode(unsigned int i)
+const XMLNode *XMLNode::getNode(unsigned int i) const
 {
     return m_nodes[i];
 }   // getNode
@@ -112,7 +112,7 @@ XMLNode *XMLNode::getNode(unsigned int i)
 /** Returns the node with the given name.
  *  \param s Name of the node to return.
  */
-XMLNode *XMLNode::getNode(const std::string &s)
+const XMLNode *XMLNode::getNode(const std::string &s) const
 {
     for(unsigned int i=0; i<m_nodes.size(); i++)
     {

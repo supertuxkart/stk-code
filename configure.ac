@@ -322,21 +322,6 @@ if test x$have_svnversion != xno; then
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
-AC_MSG_CHECKING([for gcc -fno-regmove option ])
-
-dnl =========================
-dnl test regmove compiler bug
-dnl =========================
-dnl Test if -fno-regmove is supported, since -fregmove (which is part of -O2 on
-dnl g++) triggers an optimisation problem with static_ssg:
-ORIGCXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -fno-regmove"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-                  AC_MSG_RESULT(yes); NOREGMOVE=-fno-regmove,
-                  AC_MSG_RESULT(no);  NOREGMOVE="")
-CXXFLAGS="$ORIGCXXFLAGS"
-AC_SUBST(NOREGMOVE)
-
 dnl ==============================================
 dnl Glut (optional), used by bullet debugging only
 dnl ==============================================

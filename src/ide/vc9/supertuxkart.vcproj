@@ -254,10 +254,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\static_ssg.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\stk_config.cpp"
 				>
 			</File>
@@ -785,10 +781,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\ssg_help.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\static_ssg.hpp"
 				>
 			</File>
 			<File

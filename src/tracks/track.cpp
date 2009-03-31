@@ -34,6 +34,7 @@
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/moving_texture.hpp"
 #include "graphics/scene.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -88,6 +89,10 @@ Track::~Track()
  */
 void Track::cleanup()
 {
+    for(unsigned int i=0; i<m_animated_textures.size(); i++)
+    {
+        delete m_animated_textures[i];
+    }
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         irr_driver->removeNode(m_all_nodes[i]);
@@ -910,7 +915,7 @@ void Track::loadTrack(const std::string &filename)
     m_camera_final_hpr.degreeToRad();
 
     m_sky_type = SKY_NONE;
-    XMLNode *node = root->getNode("sky-dome");
+    const XMLNode *node = root->getNode("sky-dome");
     if(node)
     {
         m_sky_type            = SKY_DOME;
@@ -1205,6 +1210,7 @@ bool Track::loadMainTrack(const XMLNode &node)
                 node.getName().c_str(), model_name.c_str());
         exit(-1);
     }
+
     m_all_meshes.push_back(mesh);
 
     Vec3 min, max;
@@ -1222,13 +1228,62 @@ bool Track::loadMainTrack(const XMLNode &node)
     node.getHPR(&hpr);
     scene_node->setPosition(xyz);
     scene_node->setRotation(hpr);
+    handleAnimatedTextures(scene_node, node);
     m_all_nodes.push_back(scene_node);
     scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
-
 
     return true;
 }   // loadMainTrack
 
+// ----------------------------------------------------------------------------
+/** Handles animated textures.
+ *  \param node The node containing the data for the animated notion.
+ */
+void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
+{
+    for(unsigned int node_number = 0; node_number<xml.getNumNodes(); 
+        node_number++)
+    {
+        const XMLNode *texture_node = xml.getNode(node_number);
+        if(texture_node->getName()!="animated-texture") continue;
+        std::string name;
+        texture_node->get("name", &name);
+        if(name=="") 
+        {
+            fprintf(stderr, 
+                    "Animated texture: no texture name specified for track '%s'\n",
+                    getIdent());
+            continue;
+        }
+
+        for(unsigned int i=0; i<node->getMaterialCount(); i++)
+        {
+            video::SMaterial &irrMaterial=node->getMaterial(i);
+            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t=irrMaterial.getTexture(j);
+                if(!t) continue;
+                const std::string texture_name = 
+                    StringUtils::basename(t->getName().c_str());
+                if(texture_name!=name) continue;
+                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                m_animated_textures.push_back(new MovingTexture(m, *texture_node));
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }   // for i<getMaterialCount
+    }   // for node_number < xml->getNumNodes
+}   // handleAnimatedTextures
+
+// ----------------------------------------------------------------------------
+/** Update, called once per frame.
+ *  \param dt Timestep.
+ */
+void Track::update(float dt)
+{
+    for(unsigned int i=0; i<m_animated_textures.size(); i++)
+    {
+        m_animated_textures[i]->update(dt);
+    }
+}   // update
 // ----------------------------------------------------------------------------
 /** Creates a water node.
  *  \param node The XML node containing the specifications for the water node.
@@ -1311,7 +1366,7 @@ void Track::loadTrackModel()
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
-    XMLNode *node = root->getNode("track");
+    const XMLNode *node = root->getNode("track");
     loadMainTrack(*node);
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -1349,6 +1404,7 @@ void Track::loadTrackModel()
             node->getHPR(&hpr);
             scene_node->setPosition(xyz);
             scene_node->setRotation(hpr);
+            handleAnimatedTextures(scene_node, *node);
             m_all_nodes.push_back(scene_node);
             scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
         }

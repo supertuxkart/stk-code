@@ -276,6 +276,7 @@ void World::update(float dt)
     // Clear race state so that new information can be stored
     race_state->clear();
 
+    m_track->update(dt);
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
         !history->dontDoPhysics())
     {

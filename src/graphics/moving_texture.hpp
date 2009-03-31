@@ -21,30 +21,26 @@
 #define MOVING_TEXTURE_HPP
 
 #include <string>
-#define _WINSOCKAPI_
-#include <plib/sg.h>
-#include <plib/ssg.h>
+#include "irrlicht.h"
+using namespace irr;
+
 #include "callback.hpp"
+
+class XMLNode;
 
 class MovingTexture : public Callback
 {
 private:
-    // the ac model files assume MODE_FORWARD=1, so a MODE_NONE is added
-    enum allCallbackModesType { MODE_NONE, MODE_FORWARD, MODE_CYCLE, MODE_SHUTTLE,
-                                MODE_SINESHUTTLE};
-
-    sgCoord    m_delta;
-    sgCoord    m_now;
-    float      m_phase;
-    float      m_cycle;
-    int        m_mode;
-    ssgBranch *m_branch;
-
-    void       parseData(char *data);
+    /** Translation increment per second. */
+    float                m_dx, m_dy;
+    /** Current x,y position. */
+    float                m_x, m_y;
+    /** The texture matrix of this texture. */
+    core::matrix4       *m_matrix;
 
 public:
-    MovingTexture(char *data, ssgBranch *branch_);
-     ~MovingTexture();
+         MovingTexture(core::matrix4 *matrix, const XMLNode &node);
+        ~MovingTexture();
     void update  (float dt);
     void init    ()         {};
 }
