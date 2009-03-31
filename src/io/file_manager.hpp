@@ -19,13 +19,15 @@
 
 #ifndef HEADER_FILE_MANAGER_HPP
 #define HEADER_FILE_MANAGER_HPP
+
 #include <string>
 #include <vector>
 #include <set>
 
 #include "irrlicht.h"
 using namespace irr;
-#include "io/xml_reader.hpp"
+
+#include "io/xml_node.hpp"
 
 class FileManager 
 {
@@ -54,7 +56,8 @@ public:
                    ~FileManager();
     void            setDevice(IrrlichtDevice *device);
     void            dropFileSystem();
-    XMLReader      *getXMLReader(const std::string &f);
+    io::IXMLReader *getXMLReader(const std::string &filename);
+    XMLNode        *getXMLTree(const std::string &filename);
 
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;

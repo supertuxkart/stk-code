@@ -1,4 +1,4 @@
-//  $Id: xml_reader.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: xml_node.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -17,7 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef HAVE_IRRLICHT
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
@@ -38,10 +37,14 @@ private:
     std::map<std::string, core::stringw> m_attributes;
     /** List of all sub nodes. */
     std::vector<XMLNode *>               m_nodes;
+    void readXML(io::IXMLReader *xml);
 public:
-         XMLNode(const std::string &name, io::IXMLReader *xml);
+         XMLNode(io::IXMLReader *xml);
+         XMLNode(const std::string &filename);
     const std::string &getName() const {return m_name; }
-    XMLNode *getNode(const std::string &name);
+    XMLNode           *getNode(const std::string &name);
+    XMLNode           *getNode(unsigned int i);
+    unsigned int       getNumNodes() {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, int *value) const;
     int get(const std::string &attribute, float *value) const;
@@ -54,7 +57,7 @@ public:
     int get(const std::string &attribute, std::vector<int> *value) const;
     int get(core::vector3df *value) const;
     int getXYZ(core::vector3df *value) const;
-    int getXYZ(Vec3 *value) const;
+    int getXYZ(Vec3 *vaslue) const;
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
@@ -66,5 +69,4 @@ public:
     static bool hasR(int b) { return (b&4)==4; }
 };   // XMLNode
 
-#endif
 #endif

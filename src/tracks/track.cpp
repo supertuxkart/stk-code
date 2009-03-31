@@ -863,54 +863,54 @@ void Track::loadTrack(const std::string &filename)
     m_ambient_color     = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
     m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
-    XMLReader *xml      = file_manager->getXMLReader(m_filename);
-    const XMLNode *node = xml->getNode("track");
-    if(!node)
+    XMLNode *root       = file_manager->getXMLTree(m_filename);
+    
+    if(!root || root->getName()!="track")
     {
         std::ostringstream o;
         o<<"Can't load track '"<<filename<<"', no track element.";
         throw std::runtime_error(o.str());
     }
-    node->get("name",                  &m_name);
-    node->get("description",           &m_description);
-    node->get("designer",              &m_designer);
-    node->get("version",               &m_version);
+    root->get("name",                  &m_name);
+    root->get("description",           &m_description);
+    root->get("designer",              &m_designer);
+    root->get("version",               &m_version);
     std::vector<std::string> filenames;
-    node->get("music",                 &filenames);
+    root->get("music",                 &filenames);
     getMusicInformation(filenames, m_music);
-    node->get("item",                  &m_item_style);
-    node->get("screenshot",            &m_screenshot);
-    node->get("item",                  &m_item_style);
-    node->get("screenshot",            &m_screenshot);
-    node->get("sky-color",             &m_sky_color);
-    node->get("start-x",               &m_start_x);
-    node->get("start-y",               &m_start_y);
-    node->get("start-z",               &m_start_z);
-    node->get("start-heading",         &m_start_heading);
-    node->get("use-fog",               &m_use_fog);
-    node->get("fog-color",             &m_fog_color);
-    node->get("fog-density",           &m_fog_density);
-    node->get("fog-start",             &m_fog_start);
-    node->get("fog-end",               &m_fog_end);
-    node->get("sun-position",          &m_sun_position);
-    node->get("sun-ambient",           &m_ambient_color);
-    node->get("sun-specular",          &m_specular_color);
-    node->get("sun-diffuse",           &m_diffuse_color);
-    node->get("gravity",               &m_gravity);
-    node->get("arena",                 &m_is_arena);
-    node->get("groups",                &m_groups);
+    root->get("item",                  &m_item_style);
+    root->get("screenshot",            &m_screenshot);
+    root->get("item",                  &m_item_style);
+    root->get("screenshot",            &m_screenshot);
+    root->get("sky-color",             &m_sky_color);
+    root->get("start-x",               &m_start_x);
+    root->get("start-y",               &m_start_y);
+    root->get("start-z",               &m_start_z);
+    root->get("start-heading",         &m_start_heading);
+    root->get("use-fog",               &m_use_fog);
+    root->get("fog-color",             &m_fog_color);
+    root->get("fog-density",           &m_fog_density);
+    root->get("fog-start",             &m_fog_start);
+    root->get("fog-end",               &m_fog_end);
+    root->get("sun-position",          &m_sun_position);
+    root->get("sun-ambient",           &m_ambient_color);
+    root->get("sun-specular",          &m_specular_color);
+    root->get("sun-diffuse",           &m_diffuse_color);
+    root->get("gravity",               &m_gravity);
+    root->get("arena",                 &m_is_arena);
+    root->get("groups",                &m_groups);
     if(m_groups.size()==0)
         m_groups.push_back("standard");
     // if both camera position and rotation are defined,
     // set the flag that the track has final camera position
-    m_has_final_camera  = node->get("camera-final-position", 
+    m_has_final_camera  = root->get("camera-final-position", 
                                     &m_camera_final_position)!=1;
-    m_has_final_camera &= node->get("camera-final-hpr",
+    m_has_final_camera &= root->get("camera-final-hpr",
                                     &m_camera_final_hpr)     !=1;
     m_camera_final_hpr.degreeToRad();
 
     m_sky_type = SKY_NONE;
-    node = xml->getNode("sky-dome");
+    XMLNode *node = root->getNode("sky-dome");
     if(node)
     {
         m_sky_type            = SKY_DOME;
@@ -919,7 +919,7 @@ void Track::loadTrack(const std::string &filename)
         m_sky_sphere_percent  = 1.0f;
         m_sky_texture_percent = 1.0f;
         std::string s;
-        node->get("texture",          &s                    );
+        node->get("texture",          &s                   );
         m_sky_textures.push_back(s);
         node->get("vertical",        &m_sky_vert_segments  );
         node->get("horizontal",      &m_sky_hori_segments  );
@@ -927,7 +927,7 @@ void Track::loadTrack(const std::string &filename)
         node->get("texture-percent", &m_sky_texture_percent);
 
     }   // if sky-dome
-    node = xml->getNode("sky-box");
+    node = root->getNode("sky-box");
     if(node)
     {
         std::string s;
@@ -1300,22 +1300,22 @@ void Track::loadTrackModel()
     // Start building the scene graph
 #ifdef HAVE_IRRLICHT
     std::string path = file_manager->getTrackFile(getIdent()+".scene");
-    XMLReader *xml = file_manager->getXMLReader(path);
+    XMLNode *root    = file_manager->getXMLTree(path);
 
     // Make sure that we have a track (which is used for raycasts to 
     // place other objects).
-    const XMLNode *node = xml->getNode("track");
-    if(!node)
+    if(!root || root->getName()!="scene")
     {
         std::ostringstream msg;
         msg<< "No track model defined in '"<<path
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+    XMLNode *node = root->getNode("track");
     loadMainTrack(*node);
-    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
-        const XMLNode *node = xml->getNode(i);
+        const XMLNode *node = root->getNode(i);
         const std::string name = node->getName();
         // The track object was already converted before the loop
         if(name=="track") continue;

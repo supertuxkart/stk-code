@@ -1,4 +1,4 @@
-//  $Id: xml_reader.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: xml_node.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -16,46 +16,110 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#ifdef HAVE_IRRLICHT
+
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vec3.hpp"
 
-XMLNode::XMLNode(const std::string &name, io::IXMLReader *xml)
+XMLNode::XMLNode(io::IXMLReader *xml)
 {
-    m_name = name;
+    while(xml->getNodeType()!=io::EXN_ELEMENT && xml->read());
+    readXML(xml);
+}   // XMLNode
+
+// ----------------------------------------------------------------------------
+/** Reads a XML file and convert it intoa XMLNode tree.
+ *  \param filename Name of the XML file to read.
+ */
+XMLNode::XMLNode(const std::string &filename)
+{
+    io::IXMLReader *xml = file_manager->getXMLReader(filename);
+    bool is_first_element = true;
+    while(xml->read())
+    {
+        switch (xml->getNodeType()) 
+        {
+        case io::EXN_ELEMENT:
+            {
+                if(!is_first_element)
+                {
+                    fprintf(stderr, 
+                            "More than one root element in '%s' - ignored.\n",
+                            filename.c_str());
+                }
+                readXML(xml);
+                is_first_element = false;
+                break;
+            }
+        case io::EXN_ELEMENT_END:  break;   // Ignore all other types
+        case io::EXN_UNKNOWN:      break;
+        case io::EXN_COMMENT:      break;
+        case io::EXN_TEXT:         break;
+        default:                   break;
+        }   // switch
+    }   // while
+}   // XMLNode
+
+// ----------------------------------------------------------------------------
+/** Stores all attributes, and reads in all children.
+ *  \param xml The XML reader.
+ */
+void XMLNode::readXML(io::IXMLReader *xml)
+{
+    m_name = std::string(core::stringc(xml->getNodeName()).c_str());
+
     for(unsigned int i=0; i<xml->getAttributeCount(); i++)
     {
         std::string   name  = core::stringc(xml->getAttributeName(i)).c_str();
         core::stringw value = xml->getAttributeValue(i);
         m_attributes[name] = value;
     }   // for i
-#ifdef TEST_ONLY
+
+    // If no children, we are done
+    if(xml->isEmptyElement()) 
+        return;
+
+    /** Read all children elements. */
     while(xml->read())
     {
         switch (xml->getNodeType()) 
         {
-        case io::EXN_ELEMENT: break;
-        case io::EXN_ELEMENT_END:  
-            printf("found end\n");
-            break;// Ignore all other types
-        case io::EXN_UNKNOWN:
-            printf("found end\n");
+        case io::EXN_ELEMENT:
+            m_nodes.push_back(new XMLNode(xml));
             break;
-        case io::EXN_COMMENT:
-            printf("found end\n");
+        case io::EXN_ELEMENT_END:
+            // End of this element found.
+            return;
             break;
-        case io::EXN_TEXT:
-            printf("found end\n");
-            break;
-        default:
-            printf("found end\n");
-            break;
+        case io::EXN_UNKNOWN:            break;
+        case io::EXN_COMMENT:            break;
+        case io::EXN_TEXT:               break;
+        default:                         break;
         }   // switch
-
     }   // while
-#endif
-}   // XMLNode
+}   // readXML
+
+// ----------------------------------------------------------------------------
+/** Returns the i.th node.
+ *  \param i Number of node to return.
+ */
+XMLNode *XMLNode::getNode(unsigned int i)
+{
+    return m_nodes[i];
+}   // getNode
+// ----------------------------------------------------------------------------
+/** Returns the node with the given name.
+ *  \param s Name of the node to return.
+ */
+XMLNode *XMLNode::getNode(const std::string &s)
+{
+    for(unsigned int i=0; i<m_nodes.size(); i++)
+    {
+        if(m_nodes[i]->getName()==s) return m_nodes[i];
+    }
+    return NULL;
+}   // getNode
 
 // ----------------------------------------------------------------------------
 /** If 'attribute' was defined, set 'value' to the value of the
@@ -302,4 +366,3 @@ int XMLNode::getHPR(Vec3 *value) const
 }   // getHPR Vec3
 
 // ----------------------------------------------------------------------------
-#endif

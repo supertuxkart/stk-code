@@ -113,11 +113,11 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
 //-----------------------------------------------------------------------------
 bool MaterialManager::pushTempMaterial(const std::string& filename)
 {
-    XMLReader *xml = file_manager->getXMLReader(filename);
-    if(!xml) return true;
-    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    XMLNode *root = file_manager->getXMLTree(filename);
+    if(!root || root->getName()!="materials") return true;
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
-        const XMLNode *node = xml->getNode(i);
+        const XMLNode *node = root->getNode(i);
         if(!node)
         {
             // We don't have access to the filename at this stage anymore :(

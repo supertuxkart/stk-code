@@ -6,7 +6,6 @@
 #include "input/input.hpp"
 #include <iostream>
 #include <fstream>
-#include "io/xml_reader.hpp"
 #include "io/xml_node.hpp"
 
 enum DeviceType

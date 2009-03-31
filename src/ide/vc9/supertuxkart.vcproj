@@ -668,10 +668,6 @@
 					RelativePath="..\..\io\xml_node.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\io\xml_reader.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="input"
@@ -1276,10 +1272,6 @@
 				</File>
 				<File
 					RelativePath="..\..\io\xml_node.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\io\xml_reader.hpp"
 					>
 				</File>
 			</Filter>
