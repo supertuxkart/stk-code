@@ -183,6 +183,8 @@ void DeviceManager::serialize()
     }
     
     
+    configfile << "<input>\n\n";
+    
     for(unsigned int n=0; n<m_keyboard_amount; n++)
     {
         m_keyboards[n].serialize(configfile);
@@ -191,6 +193,8 @@ void DeviceManager::serialize()
     {
         m_gamepads[n].serialize(configfile);
     }
+    
+    configfile << "</input>\n";
     
     configfile.close();    
 }
