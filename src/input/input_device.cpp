@@ -267,6 +267,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 // -----------------------------------------------------------------------------
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
+    printf("Something's triggered in gamepad\n");
     if(type == Input::IT_STICKMOTION)
     {
         // going to negative from positive
@@ -332,6 +333,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     }
     else if(type == Input::IT_STICKBUTTON)
     {
+        printf(" It's a button press, #%i\n", id);
         // find corresponding action and return it
         for(int n=0; n<PA_COUNT; n++)
         {
