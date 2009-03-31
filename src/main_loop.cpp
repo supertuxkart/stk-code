@@ -222,19 +222,23 @@ void MainLoop::run()
 #if 0
         int fps = irr_driver->getDevice()->getVideoDriver()->getFPS();
         bool printFPS = false;
-        if((fps < minFPS) && (fps > 1)) { // First report seems to be always 1, so not useful
-            minFPS = fps;
-            printFPS = true;
-        }
-        if(fps > maxFPS) {
-            maxFPS = fps;
-            printFPS = true;
-        }
-        if ((lastFPS+5 <= fps) || (lastFPS-5 >= fps)) {
-            lastFPS = fps;
-            printFPS = true;
-        }
-        // First print per run will be really silly, as in 999 1 1, just ignore it ;]
+        // First reports seem to be always 1, so not useful
+        if (fps > 1) {
+            // More than +-5 range is interesting to report (otherwise noise)
+            if ((lastFPS+5 <= fps) || (lastFPS-5 >= fps)) {
+                lastFPS = fps;
+                printFPS = true;
+            }
+            // Min and max are worth updating any time they happen
+            if (fps < minFPS) {
+                minFPS = fps;
+                printFPS = true;
+            }
+            if (fps > maxFPS) {
+                maxFPS = fps;
+                printFPS = true;
+            }
+        } // no else, or you get over 50 'printf ("FPS below 1!\n")' easily
         if (printFPS) printf("FPS %3d<%3d<%3d\n", minFPS, fps, maxFPS);
 #endif
 #else
