@@ -66,7 +66,7 @@ public:
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
      The 'player' id passed is simply to know where to send 'axis reset's when necessary*/
-    bool hasBinding(const int axis, const int value, const int player, PlayerAction* action /* out */);
+    bool hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */);
     
     void open(const int sdl_id);
     

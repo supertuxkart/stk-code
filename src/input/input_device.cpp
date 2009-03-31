@@ -1,4 +1,5 @@
 
+#include "input/input.hpp"
 #include "input/input_device.hpp"
 #include "race_manager.hpp"
 #include "modes/world.hpp"
@@ -264,68 +265,83 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
     }
 }
 // -----------------------------------------------------------------------------
-bool GamePadDevice::hasBinding(const int axis, const int value, const int player, PlayerAction* action /* out */)
+bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
-    // going to negative from positive
-    if (value < 0 && m_prevAxisDirections[axis] == Input::AD_POSITIVE)
+    if(type == Input::IT_STICKMOTION)
     {
-        //  set positive axis to 0
-        resetAxisDirection(axis, Input::AD_POSITIVE, player);
-
-    }
-    // going to positive from negative
-    else if (value > 0 && m_prevAxisDirections[axis] == Input::AD_NEGATIVE)
-    {
-        //  set negative axis to 0
-        resetAxisDirection(axis, Input::AD_NEGATIVE, player);
-    }
-    
-    if(value > 0) m_prevAxisDirections[axis] = Input::AD_POSITIVE;
-    else if(value < 0) m_prevAxisDirections[axis] = Input::AD_NEGATIVE;
-    
-    // check if within deadzone
-    if(value > -m_deadzone && value < m_deadzone)
-    {
-        // Axis stands still: This is reported once for digital axes and
-        // can be called multipled times for analog ones. Uses the
-        // previous direction in which the axis was triggered to
-        // determine which one has to be brought into the released
-        // state. This allows us to regard two directions of an axis
-        // as completely independent input variants (as if they where
-        // two buttons).
-        
-        if(m_prevAxisDirections[axis] == Input::AD_NEGATIVE)
+        // going to negative from positive
+        if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
         {
-            // set negative axis to 0
-            resetAxisDirection(axis, Input::AD_NEGATIVE, player);
+            //  set positive id to 0
+            resetAxisDirection(id, Input::AD_POSITIVE, player);
+            
         }
-        else if(m_prevAxisDirections[axis] == Input::AD_POSITIVE)
+        // going to positive from negative
+        else if (value > 0 && m_prevAxisDirections[id] == Input::AD_NEGATIVE)
         {
-            // set positive axis to 0
-            resetAxisDirection(axis, Input::AD_POSITIVE, player);
+            //  set negative id to 0
+            resetAxisDirection(id, Input::AD_NEGATIVE, player);
         }
-        m_prevAxisDirections[axis] = Input::AD_NEUTRAL;
         
-        return false; 
-    }
-    
-    // find corresponding action and return it
-    for(int n=0; n<PA_COUNT; n++)
-    {
-        if(m_bindings[n].id == axis)
+        if(value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
+        else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
+        
+        // check if within deadzone
+        if(value > -m_deadzone && value < m_deadzone)
         {
-            if(m_bindings[n].dir == Input::AD_NEGATIVE && value < 0)
+            // Axis stands still: This is reported once for digital axes and
+            // can be called multipled times for analog ones. Uses the
+            // previous direction in which the id was triggered to
+            // determine which one has to be brought into the released
+            // state. This allows us to regard two directions of an id
+            // as completely independent input variants (as if they where
+            // two buttons).
+            
+            if(m_prevAxisDirections[id] == Input::AD_NEGATIVE)
+            {
+                // set negative id to 0
+                resetAxisDirection(id, Input::AD_NEGATIVE, player);
+            }
+            else if(m_prevAxisDirections[id] == Input::AD_POSITIVE)
+            {
+                // set positive id to 0
+                resetAxisDirection(id, Input::AD_POSITIVE, player);
+            }
+            m_prevAxisDirections[id] = Input::AD_NEUTRAL;
+            
+            return false; 
+        }
+        
+        // find corresponding action and return it
+        for(int n=0; n<PA_COUNT; n++)
+        {
+            if(m_bindings[n].type == type && m_bindings[n].id == id)
+            {
+                if(m_bindings[n].dir == Input::AD_NEGATIVE && value < 0)
+                {
+                    *action = (PlayerAction)n;
+                    return true;
+                }
+                else if(m_bindings[n].dir == Input::AD_POSITIVE && value > 0)
+                {
+                    *action = (PlayerAction)n;
+                    return true;
+                }
+            }
+        }// next device
+    }
+    else if(type == Input::IT_STICKBUTTON)
+    {
+        // find corresponding action and return it
+        for(int n=0; n<PA_COUNT; n++)
+        {
+            if(m_bindings[n].type == type && m_bindings[n].id == id)
             {
                 *action = (PlayerAction)n;
                 return true;
             }
-            else if(m_bindings[n].dir == Input::AD_POSITIVE && value > 0)
-            {
-                *action = (PlayerAction)n;
-                return true;
-            }
-        }
-    }// next device
+        }// next device
+    }
     
     return false;
 }

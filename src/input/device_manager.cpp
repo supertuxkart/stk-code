@@ -50,7 +50,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
         // std::cout << "stick motion, ID=" <<id0 << " axis=" << id1 << " value=" << value  << std::endl;
         for(unsigned int n=0; n<m_gamepad_amount; n++)
         {
-            if( /*m_gamepads[n].m_index == id0 &&*/ m_gamepads[n].hasBinding(id1 /* axis */, value, *player, action /* out */) )
+            if(m_gamepads[n].hasBinding(type, id1 /* axis or button */, value, *player, action /* out */) )
                 return true;
         }
         return false;
