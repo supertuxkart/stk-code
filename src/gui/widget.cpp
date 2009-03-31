@@ -956,7 +956,7 @@ RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
 
 #if 0
 #pragma mark -
-#pragma mark Ribbon Grid Widget
+#pragma mark Model View Widget
 #endif
 
 // -----------------------------------------------------------------------------

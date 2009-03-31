@@ -84,6 +84,12 @@ bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
     return true;
 
 }
+
+#if 0
+#pragma mark -
+#pragma mark Keyboard
+#endif
+
 // -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()
 {
@@ -137,6 +143,13 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
     return false;
 }
 // -----------------------------------------------------------------------------
+
+
+#if 0
+#pragma mark -
+#pragma mark gamepad
+#endif
+
 /**
  * Creates a GamePade device from a config file. Note that this device will not yet be ready to be used,
  * it must first be detected to be connected by SDL (hence m_sdlJoystick is NULL)
@@ -191,16 +204,23 @@ void GamePadDevice::open(const int sdl_id)
 // -----------------------------------------------------------------------------
 void GamePadDevice::loadDefaults()
 {
-    /*
-     TODO - default bindings for joystic buttons
-    m_bindings[PA_NITRO]
-    m_bindings[PA_DRIFT]
-    m_bindings[PA_RESCUE]
-    m_bindings[PA_FIRE]
-    m_bindings[PA_LOOK_BACK]
-    */
-    // m_bindings[PA_NITRO].type = Input::IT_STICKBUTTON;
+    // buttons
+    m_bindings[PA_FIRE].type = Input::IT_STICKBUTTON;
+    m_bindings[PA_FIRE].id = 0;
     
+    m_bindings[PA_NITRO].type = Input::IT_STICKBUTTON;
+    m_bindings[PA_NITRO].id = 1;   
+    
+    m_bindings[PA_DRIFT].type = Input::IT_STICKBUTTON;
+    m_bindings[PA_DRIFT].id = 2; 
+
+    m_bindings[PA_RESCUE].type = Input::IT_STICKBUTTON;
+    m_bindings[PA_RESCUE].id = 3; 
+    
+    m_bindings[PA_LOOK_BACK].type = Input::IT_STICKBUTTON;
+    m_bindings[PA_LOOK_BACK].id = 4; 
+    
+    // axes
     m_bindings[PA_ACCEL].type = Input::IT_STICKMOTION;
     m_bindings[PA_ACCEL].id = 1;
     m_bindings[PA_ACCEL].dir = Input::AD_NEGATIVE;
@@ -219,23 +239,16 @@ void GamePadDevice::loadDefaults()
     
     
     /*
-     set(GA_CURSOR_UP,
-     Input(Input::IT_STICKMOTION, 0, 1, Input::AD_NEGATIVE));
-     set(GA_CURSOR_DOWN,
-     Input(Input::IT_STICKMOTION, 0, 1, Input::AD_POSITIVE));
-     set(GA_CURSOR_LEFT,
-     Input(Input::IT_STICKMOTION, 0, 0, Input::AD_NEGATIVE));
-     set(GA_CURSOR_RIGHT,
-     Input(Input::IT_STICKMOTION, 0, 0, Input::AD_POSITIVE));
+     TODO - mappings for clear/enter/leave ?
      
      set(GA_CLEAR_MAPPING,
      Input(Input::IT_STICKBUTTON, 0, 2));
+     
      set(GA_ENTER,
      Input(Input::IT_STICKBUTTON, 0, 0),
+     
      set(GA_LEAVE,
      Input(Input::IT_STICKBUTTON, 0, 1),
-     
-     Input::IT_KEYBOARD
      */
 }
 // -----------------------------------------------------------------------------

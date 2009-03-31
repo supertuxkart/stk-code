@@ -101,7 +101,6 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 {
                     type = WTYPE_MODEL_VIEW;
                     append_to.push_back(new ModelViewWidget());
-                    std::cout << "creating a ModelViewWidget\n";
                 }
                 else
                 {
