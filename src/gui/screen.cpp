@@ -464,3 +464,4 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
     }
     return NULL;
 }
+

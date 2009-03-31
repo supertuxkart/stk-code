@@ -975,3 +975,4 @@ void ModelViewWidget::setModel(SAnimatedMesh* mesh)
 {
     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
 }
+
