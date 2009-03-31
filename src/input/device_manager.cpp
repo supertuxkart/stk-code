@@ -41,11 +41,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     {
         return false;
     }
-    else if(type == Input::IT_STICKBUTTON)
-    {
-        return false;
-    }
-    else if(type == Input::IT_STICKMOTION)
+    else if(type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
     {
         // std::cout << "stick motion, ID=" <<id0 << " axis=" << id1 << " value=" << value  << std::endl;
         for(unsigned int n=0; n<m_gamepad_amount; n++)

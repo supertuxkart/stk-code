@@ -520,23 +520,14 @@ void InputManager::input()
                     input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, value);
             }
                 break;
-            case SDL_JOYBUTTONUP:
-                /* TODO - bring gamepad back in, with new InputDevice interface
-                 stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
-                 */       
-                
+            case SDL_JOYBUTTONUP:                
                 // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
                 input(Input::IT_STICKBUTTON, ev.jbutton.which, 
                       ev.jbutton.button, 0, 0);
                 break;
             case SDL_JOYBUTTONDOWN:
-                /* TODO - bring gamepad back in, with new InputDevice interface
-                 stickIndex = m_stick_infos[ev.jbutton.which]->m_index;
-                 */
-                
                 // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
-                input(Input::IT_STICKBUTTON, ev.jbutton.which, 
-                      ev.jbutton.button, 0, 32768);
+                input(Input::IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, 32768);
                 break;
             case SDL_USEREVENT:
                 // TODO - GUI countdown
