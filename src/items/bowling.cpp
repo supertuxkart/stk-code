@@ -95,7 +95,7 @@ void Bowling::update(float dt)
     btVector3   direction;
     float       minDistance;
     getClosestKart(&kart, &minDistance, &direction);
-    if(minDistance<m_st_max_distance_squared)   // move bowling towards kart
+    if(kart && minDistance<m_st_max_distance_squared)   // move bowling towards kart
     {
         // limit angle, so that the bowling ball does not turn
         // around to hit a kart behind
