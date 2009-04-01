@@ -1180,17 +1180,17 @@
 				9505577D0F696A900056E88C /* my_button.hpp */,
 				95C1E3FF0F699427005D33E6 /* font.cpp */,
 				95C1E4020F69943D005D33E6 /* font.hpp */,
+				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
+				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
 				9505577F0F696A900056E88C /* screen.cpp */,
 				950557800F696A900056E88C /* screen.hpp */,
 				950557810F696A900056E88C /* screen_loader.cpp */,
+				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
+				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
 				950557820F696A900056E88C /* skin.cpp */,
 				950557830F696A900056E88C /* skin.hpp */,
 				950557840F696A900056E88C /* widget.cpp */,
 				950557850F696A900056E88C /* widget.hpp */,
-				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
-				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
-				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
-				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
 			);
 			name = gui;
 			path = games/supertuxkart/src/gui;

@@ -2,14 +2,14 @@
 
 <label align="center" text="SuperTuxKart Options"/>
 
-<spacer proportion="1" width="10"/>
-
-<buttonbar id="options_choice" proportion="1" width="75%" align="center">
+<ribbon id="options_choice" height="20%" width="75%" align="center">
     <icon-button id="audio_video" width="128" height="128" icon="options_audio_video.png" text="Audio/Video"/>
     <icon-button id="players" width="128" height="128" icon="options_players.png" text="Players"/>
     <icon-button id="controls" width="128" height="128" icon="options_input.png" text="Controls"/>
-</buttonbar>
+</ribbon>
 
 <spacer proportion="1" width="10" proportion="1"/>
+
+<list id="players" proportion="5" width="75%" align="center"/>
 
 </div>

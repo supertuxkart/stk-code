@@ -102,6 +102,11 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     type = WTYPE_MODEL_VIEW;
                     append_to.push_back(new ModelViewWidget());
                 }
+                else if (!strcmp("list", xml->getNodeName()))
+                {
+                    type = WTYPE_LIST;
+                    append_to.push_back(new ListWidget());
+                }
                 else
                 {
                     std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '" << xml->getNodeName()  << "'" << std::endl;

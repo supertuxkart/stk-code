@@ -94,7 +94,7 @@ namespace StateManager
             }
             else if (selection == "options")
             {
-                pushMenu("options.stkgui");
+                pushMenu("options_av.stkgui");
             }
         }
         
@@ -102,6 +102,24 @@ namespace StateManager
         if(name == "karts")
         {
             StateManager::pushMenu("racesetup.stkgui");
+        }
+        
+        // -- options
+        if(name == "options_choice")
+        {
+            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            
+            if(selection == "audio_video") replaceTopMostMenu("options_av.stkgui");
+            else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
+            else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
+            
+            // select the right tab - FIXME - add some kind of post-screen-activation callback to do this
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(GUIEngine::getCurrentScreen()->getWidget("options_choice"));
+            if(w != NULL)
+            {
+                w->select(selection);
+            }
+            
         }
         
         // -- race setup screen
@@ -204,6 +222,13 @@ namespace StateManager
     {
         input_manager->setMode(InputManager::MENU);
         g_menu_stack.push_back(name);
+        g_game_mode = false;
+        GUIEngine::switchToScreen(name.c_str());
+    }
+    void replaceTopMostMenu(std::string name)
+    {
+        input_manager->setMode(InputManager::MENU);
+        g_menu_stack[g_menu_stack.size()-1] = name;
         g_game_mode = false;
         GUIEngine::switchToScreen(name.c_str());
     }

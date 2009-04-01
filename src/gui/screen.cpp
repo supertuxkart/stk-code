@@ -44,7 +44,7 @@ void Screen::addWidgets()
     
     // And tell the device to use our custom event receiver.
     GUIEngine::getDevice()->setEventReceiver(this);
-    
+
     // select the first widget
     Widget* w = getFirstWidget();
     if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );

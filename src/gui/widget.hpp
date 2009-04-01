@@ -24,7 +24,8 @@ namespace GUIEngine
         WTYPE_SPACER,
         WTYPE_DIV,
         WTYPE_RIBBON_GRID,
-        WTYPE_MODEL_VIEW
+        WTYPE_MODEL_VIEW,
+        WTYPE_LIST
     };
     
     enum Property
@@ -226,6 +227,7 @@ namespace GUIEngine
         int getSelection() const { return m_selection; }
         RibbonType getRibbonType() const { return m_ribbon_type; }
         const std::string& getSelectionName() { return m_children[m_selection].m_properties[PROP_ID]; }
+        void select(std::string item);
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
     };
@@ -289,6 +291,12 @@ namespace GUIEngine
     public:
         void add();
         void setModel(SAnimatedMesh* mesh);
+    };
+    
+    class ListWidget : public Widget
+    {
+    public:
+        void add();
     };
     
 }

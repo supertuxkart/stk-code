@@ -303,6 +303,22 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     updateSelection();
 }
 // -----------------------------------------------------------------------------
+void RibbonWidget::select(std::string item)
+{
+    const int subbuttons_amount = m_children.size();
+    
+    for(int i=0; i<subbuttons_amount; i++)
+    {  
+        if(m_children[i].m_properties[PROP_ID] == item)
+        {
+            m_selection = i;
+            updateSelection();
+            return;
+        }
+    }
+
+}
+// -----------------------------------------------------------------------------
 bool RibbonWidget::rightPressed()
 {
     m_selection++;
@@ -976,3 +992,22 @@ void ModelViewWidget::setModel(SAnimatedMesh* mesh)
     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
 }
 
+#if 0
+#pragma mark -
+#pragma mark List Widget
+#endif
+
+
+// -----------------------------------------------------------------------------
+void ListWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+
+    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size);
+    list->addItem( L"Hiker" );
+    list->addItem( L"Conso" );
+    list->addItem( L"Auria" );
+    list->addItem( L"MiniBjorn" );
+    list->addItem( L"Arthur" );
+    //list->setSelected(0);
+}

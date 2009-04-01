@@ -1,0 +1,43 @@
+<div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+
+<label align="center" text="SuperTuxKart Options"/>
+
+<ribbon id="options_choice" height="20%" width="75%" align="center">
+    <icon-button id="audio_video" width="128" height="128" icon="options_audio_video.png" text="Audio/Video"/>
+    <icon-button id="players" width="128" height="128" icon="options_players.png" text="Players"/>
+    <icon-button id="controls" width="128" height="128" icon="options_input.png" text="Controls"/>
+</ribbon>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<label align="center" text="Audio/Video"/>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<div width="75%" height="30" layout="horizontal-row" >
+    <label proportion="100%" height="100%" text="Music"/>
+    <!-- TODO - add check box -->
+    <gauge id="music_volume" proportion="100%" height="100%"/>
+</div>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<div width="75%" height="30" layout="horizontal-row" >
+    <label proportion="100%" height="100%" text="Sound Effects"/>
+    <!-- TODO - add check box -->
+    <gauge id="sfx_volume" proportion="100%" height="100%"/>
+</div>
+
+
+<spacer proportion="2" width="10" proportion="1"/>
+
+<label align="center" text="Video"/>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<!-- TODO - add resolution choice -->
+<label align="center" text="TODO"/>
+
+<spacer proportion="2" width="10" proportion="1"/>
+
+</div>
