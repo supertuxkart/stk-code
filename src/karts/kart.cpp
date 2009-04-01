@@ -790,6 +790,9 @@ void Kart::updatePhysics (float dt)
         // Engine slow down due to terrain (see m_power_reduction is set in
         // update() depending on terrain type.
         engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
+        // Lose some traction when skidding, so it is not abused by player
+        if(m_controls.m_drift)
+            engine_power *= 0.75f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
         // Either all or no brake is set, so test only one to avoid
@@ -849,8 +852,16 @@ void Kart::updatePhysics (float dt)
             m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 3);
 
+#if 1
+            // If not giving power (forward or reverse gear), and speed is low
+            // we are "parking" the kart, so in battle mode we can ambush people, eg
+            if(abs(m_speed) < 5.0f) {
+                for(int i=0; i<4; i++) m_vehicle->setBrake(100.0f, i);
+            }
+#else
             if(!RaceManager::getWorld()->isStartPhase())
                 resetBrakes();
+#endif
         }
     }
 #ifdef ENABLE_JUMP
