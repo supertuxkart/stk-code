@@ -46,6 +46,8 @@ namespace GUIEngine
         void addWidgets();
         void calculateLayout();
         
+        const std::string& getName() const { return m_filename; }
+        
         virtual bool OnEvent(const SEvent& event);
     };
     

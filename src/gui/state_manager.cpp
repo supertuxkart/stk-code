@@ -32,97 +32,81 @@ namespace StateManager
         w->addItem("Track 8","t8","track8.png");
         w->updateItemDisplay();
     }
+  
     
-    void eventCallback(GUIEngine::Widget* widget, std::string& name)
+    void menuEventMain(GUIEngine::Widget* widget, std::string& name)
     {
-        std::cout << "event!! " << name.c_str() << std::endl;
+        GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+        if(ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
+        std::string selection = ribbon->getSelectionName().c_str();
         
-        // --- main menu
-        if(name == "menu_toprow")
-        {
-            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
-            if(selection == "new")
-            {
-                StateManager::pushMenu("karts.stkgui");
-                GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
-                assert( w != NULL );
-                
-                // FIXME - should be called only once, not on every show?
-                w->addItem("Gnu","k1","gnu.png");
-                w->addItem("Wilber","k2","gnu.png");
-                w->addItem("Tux","k3","gnu.png");
-                w->addItem("Puffy","k4","gnu.png");
-                w->addItem("Hexley","k5","gnu.png");
-                w->addItem("Sushi","k6","gnu.png");
-                w->addItem("Nolok","k7","gnu.png");
-                w->addItem("Mozilla","k8","gnu.png");
-                w->updateItemDisplay();
-                
-                GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("player"));
-                assert( w2 != NULL );
-                w2->addLabel("Hiker");
-                w2->addLabel("Auria");
-                w2->addLabel("Conso");
-                w2->addLabel("MiniBjorn");
-                
-                GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("modelview"));
-                
-                assert( w3 != NULL );
-                
-                // set kart model
-                IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
-                SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
-                test->addMesh(mesh);
-                //test->setMaterialFlag(EMF_LIGHTING , false);
-                
-                w3->setModel(test);
-            }
-            else if(selection == "options")
-            {
-                StateManager::pushMenu("options.stkgui");
-            }
-        }
-        if(name == "menu_bottomrow")
-        {
-            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
-            if(selection == "quit")
-            {
-                main_loop->abort();
-                return;
-            }
-            else if (selection == "options")
-            {
-                pushMenu("options_av.stkgui");
-            }
-        }
         
-        // -- kart selection screen
+        if(selection == "new")
+        {
+            StateManager::pushMenu("karts.stkgui");
+            GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
+            assert( w != NULL );
+            
+            // FIXME - should be called only once, not on every show?
+            // FIXME - move to a menu show-up callback
+            w->addItem("Gnu","k1","gnu.png");
+            w->addItem("Wilber","k2","gnu.png");
+            w->addItem("Tux","k3","gnu.png");
+            w->addItem("Puffy","k4","gnu.png");
+            w->addItem("Hexley","k5","gnu.png");
+            w->addItem("Sushi","k6","gnu.png");
+            w->addItem("Nolok","k7","gnu.png");
+            w->addItem("Mozilla","k8","gnu.png");
+            w->updateItemDisplay();
+            
+            GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
+            (GUIEngine::getCurrentScreen()->getWidget("player"));
+            assert( w2 != NULL );
+            w2->addLabel("Hiker");
+            w2->addLabel("Auria");
+            w2->addLabel("Conso");
+            w2->addLabel("MiniBjorn");
+            
+            GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
+            (GUIEngine::getCurrentScreen()->getWidget("modelview"));
+            
+            assert( w3 != NULL );
+            
+            // set kart model
+            IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
+            SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
+            test->addMesh(mesh);
+            //test->setMaterialFlag(EMF_LIGHTING , false);
+            
+            w3->setModel(test);
+        }
+        else if(selection == "options")
+        {
+            StateManager::pushMenu("options.stkgui");
+        }
+        else if(selection == "quit")
+        {
+            main_loop->abort();
+            return;
+        }
+        else if (selection == "options")
+        {
+            pushMenu("options_av.stkgui");
+        }
+    }
+    
+    void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
+    {
+        // TODO - actually check which kart was selected
         if(name == "karts")
         {
             StateManager::pushMenu("racesetup.stkgui");
         }
-        
-        // -- options
-        if(name == "options_choice")
-        {
-            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
-            
-            if(selection == "audio_video") replaceTopMostMenu("options_av.stkgui");
-            else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
-            else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
-            
-            // select the right tab - FIXME - add some kind of post-screen-activation callback to do this
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(GUIEngine::getCurrentScreen()->getWidget("options_choice"));
-            if(w != NULL)
-            {
-                w->select(selection);
-            }
-            
-        }
-        
-        // -- race setup screen
+    }
+    
+    void menuEventRaceSetup(GUIEngine::Widget* widget, std::string& name)
+    {
+        // TODO - detect difficulty, allow more game modes
         if(name == "gamemode")
         {
             GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
@@ -131,37 +115,6 @@ namespace StateManager
                 showTrackSelectionScreen();
             }
         }
-        
-        // -- track seelction screen
-        if(name == "tracks")
-        {
-            GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
-            if(w2 != NULL)
-            {
-                std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
-                
-                StateManager::enterGameState();
-                race_manager->setLocalKartInfo(0, "tux");
-                race_manager->setDifficulty(RaceManager::RD_HARD);
-                race_manager->setTrack("beach");
-                race_manager->setNumLaps( 3 );
-                race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-                race_manager->setNumKarts( 1 );
-                race_manager->setNumPlayers( 1 );
-                race_manager->setNumLocalPlayers( 1 );
-                network_manager->setupPlayerKartInfo();
-                //race_manager->getKartType(1) = KT_PLAYER;
-                
-                race_manager->startNew();
-            }
-        }
-        if(name == "gps")
-        {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
-            if(w != NULL)
-                std::cout << "Clicked on GrandPrix " << w->getSelectionName().c_str() << std::endl;
-        }    
-        
         /*
          289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
          290         user_config->setDefaultNumDifficulty(m_difficulty);
@@ -206,6 +159,85 @@ namespace StateManager
          StateManager::enterGameState();
          race_manager->startNew();
          */
+        
+    }
+    void menuEventTracks(GUIEngine::Widget* widget, std::string& name)
+    {
+        // -- track seelction screen
+        if(name == "tracks")
+        {
+            GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
+            if(w2 != NULL)
+            {
+                std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
+                
+                StateManager::enterGameState();
+                race_manager->setLocalKartInfo(0, "tux");
+                race_manager->setDifficulty(RaceManager::RD_HARD);
+                race_manager->setTrack("beach");
+                race_manager->setNumLaps( 3 );
+                race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
+                race_manager->setNumKarts( 1 );
+                race_manager->setNumPlayers( 1 );
+                race_manager->setNumLocalPlayers( 1 );
+                network_manager->setupPlayerKartInfo();
+                //race_manager->getKartType(1) = KT_PLAYER;
+                
+                race_manager->startNew();
+            }
+        }
+        else if(name == "gps")
+        {
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+            if(w != NULL)
+                std::cout << "Clicked on GrandPrix " << w->getSelectionName().c_str() << std::endl;
+        }    
+        
+    }
+    void menuEventOptions(GUIEngine::Widget* widget, std::string& name)
+    {
+        // -- options
+        if(name == "options_choice")
+        {
+            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            
+            if(selection == "audio_video") replaceTopMostMenu("options_av.stkgui");
+            else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
+            else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
+            
+            // select the right tab - FIXME - add some kind of post-screen-activation callback to do this
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(GUIEngine::getCurrentScreen()->getWidget("options_choice"));
+            if(w != NULL)
+            {
+                w->select(selection);
+            }
+            
+        }
+    }
+    
+    
+    void eventCallback(GUIEngine::Widget* widget, std::string& name)
+    {
+        std::cout << "event!! " << name.c_str() << std::endl;
+        
+        const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+        
+        if( screen_name == "main.stkgui" )
+            menuEventMain(widget, name);
+        else if( screen_name == "karts.stkgui" )
+            menuEventKarts(widget, name);
+        else if( screen_name == "racesetup.stkgui" )
+            menuEventRaceSetup(widget, name);
+        else if( screen_name == "tracks.stkgui" )
+            menuEventTracks(widget, name);
+        else if( screen_name == "options_av.stkgui" || screen_name == "options_input.stkgui" || screen_name == "options_players.stkgui")
+            menuEventOptions(widget, name);
+        else
+            std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
+        
+
+        
+        
     }
     
     void initGUI()
