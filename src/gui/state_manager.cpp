@@ -79,6 +79,10 @@ namespace StateManager
                 
                 w3->setModel(test);
             }
+            else if(selection == "options")
+            {
+                StateManager::pushMenu("options.stkgui");
+            }
         }
         if(name == "menu_bottomrow")
         {

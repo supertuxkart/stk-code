@@ -49,7 +49,7 @@ protected:
     scene::ISceneNode    *m_node;
 public:
                  PhysicalObject (const XMLNode *node);
-                ~PhysicalObject (); 
+    virtual     ~PhysicalObject (); 
     void         update         (float dt);
     void         init           ();
     virtual void reset          ();

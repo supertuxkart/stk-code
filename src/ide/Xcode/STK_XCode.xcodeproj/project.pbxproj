@@ -133,7 +133,6 @@
 		95C2B2CF0F296546000D3E5D /* btConvexHull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2ADFE0F296541000D3E5D /* btConvexHull.cpp */; };
 		95C2B2D00F296546000D3E5D /* btGeometryUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE010F296541000D3E5D /* btGeometryUtil.cpp */; };
 		95C2B2D10F296546000D3E5D /* btQuickprof.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE0D0F296541000D3E5D /* btQuickprof.cpp */; };
-		95C2B2D50F296546000D3E5D /* callback_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE1D0F296541000D3E5D /* callback_manager.cpp */; };
 		95C2B2DB0F296546000D3E5D /* challenge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE260F296541000D3E5D /* challenge.cpp */; };
 		95C2B2DC0F296546000D3E5D /* challenge_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE280F296541000D3E5D /* challenge_data.cpp */; };
 		95C2B2DD0F296546000D3E5D /* unlock_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE2A0F296541000D3E5D /* unlock_manager.cpp */; };
@@ -197,7 +196,6 @@
 		95C2B5500F296547000D3E5D /* race_state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1720F296545000D3E5D /* race_state.cpp */; };
 		95C2B5590F296547000D3E5D /* btKart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1800F296545000D3E5D /* btKart.cpp */; };
 		95C2B55A0F296547000D3E5D /* btUprightConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */; };
-		95C2B55B0F296547000D3E5D /* moving_physics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1850F296545000D3E5D /* moving_physics.cpp */; };
 		95C2B55C0F296547000D3E5D /* physics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1870F296545000D3E5D /* physics.cpp */; };
 		95C2B5660F296547000D3E5D /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1930F296545000D3E5D /* race_manager.cpp */; };
 		95C2B56E0F296547000D3E5D /* replay_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B19D0F296545000D3E5D /* replay_base.cpp */; };
@@ -206,7 +204,6 @@
 		95C2B5710F296547000D3E5D /* replay_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A40F296545000D3E5D /* replay_recorder.cpp */; };
 		95C2B5760F296547000D3E5D /* default_robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1AB0F296545000D3E5D /* default_robot.cpp */; };
 		95C2B5780F296547000D3E5D /* track_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1AF0F296545000D3E5D /* track_info.cpp */; };
-		95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1BF0F296545000D3E5D /* static_ssg.cpp */; };
 		95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1C10F296545000D3E5D /* stk_config.cpp */; };
 		95C2B5910F296547000D3E5D /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1CF0F296545000D3E5D /* track.cpp */; };
 		95C2B5920F296547000D3E5D /* track_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D10F296545000D3E5D /* track_manager.cpp */; };
@@ -226,6 +223,7 @@
 		95C65DA90F532FD400BE7BA7 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9F0F532FD400BE7BA7 /* scene.cpp */; };
 		95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA00F532FD400BE7BA7 /* shadow.cpp */; };
 		95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
+		95CA59F80F82FCB7003323DB /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CA59F70F82FCB7003323DB /* physical_object.cpp */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423410E26E65B00692113 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423400E26E65B00692113 /* GLUT.framework */; };
@@ -541,9 +539,6 @@
 		95C2AE130F296541000D3E5D /* btTransformUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTransformUtil.h; path = ../../bullet/src/LinearMath/btTransformUtil.h; sourceTree = SOURCE_ROOT; };
 		95C2AE140F296541000D3E5D /* btTypedUserInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btTypedUserInfo.h; path = ../../bullet/src/LinearMath/btTypedUserInfo.h; sourceTree = SOURCE_ROOT; };
 		95C2AE150F296541000D3E5D /* btVector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btVector3.h; path = ../../bullet/src/LinearMath/btVector3.h; sourceTree = SOURCE_ROOT; };
-		95C2AE1C0F296541000D3E5D /* callback.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = callback.hpp; path = ../../callback.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE1D0F296541000D3E5D /* callback_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = callback_manager.cpp; path = ../../callback_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE1E0F296541000D3E5D /* callback_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = callback_manager.hpp; path = ../../callback_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE260F296541000D3E5D /* challenge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenge.cpp; path = ../../challenges/challenge.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AE270F296541000D3E5D /* challenge.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenge.hpp; path = ../../challenges/challenge.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AE280F296541000D3E5D /* challenge_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenge_data.cpp; path = ../../challenges/challenge_data.cpp; sourceTree = SOURCE_ROOT; };
@@ -683,8 +678,6 @@
 		95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btUprightConstraint.cpp; path = ../../physics/btUprightConstraint.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1830F296545000D3E5D /* btUprightConstraint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = btUprightConstraint.hpp; path = ../../physics/btUprightConstraint.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1840F296545000D3E5D /* kart_motion_state.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_motion_state.hpp; path = ../../physics/kart_motion_state.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1850F296545000D3E5D /* moving_physics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_physics.cpp; path = ../../physics/moving_physics.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1860F296545000D3E5D /* moving_physics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_physics.hpp; path = ../../physics/moving_physics.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1870F296545000D3E5D /* physics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physics.cpp; path = ../../physics/physics.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1880F296545000D3E5D /* physics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physics.hpp; path = ../../physics/physics.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B18A0F296545000D3E5D /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../player.hpp; sourceTree = SOURCE_ROOT; };
@@ -703,8 +696,6 @@
 		95C2B1AC0F296545000D3E5D /* default_robot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = default_robot.hpp; path = ../../robots/default_robot.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1AF0F296545000D3E5D /* track_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info.cpp; path = ../../robots/track_info.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1B00F296545000D3E5D /* track_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info.hpp; path = ../../robots/track_info.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1BF0F296545000D3E5D /* static_ssg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = static_ssg.cpp; path = ../../static_ssg.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1C00F296545000D3E5D /* static_ssg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = static_ssg.hpp; path = ../../static_ssg.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1C10F296545000D3E5D /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../stk_config.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1C20F296545000D3E5D /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../stk_config.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1CF0F296545000D3E5D /* track.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track.cpp; path = ../../tracks/track.cpp; sourceTree = SOURCE_ROOT; };
@@ -746,6 +737,8 @@
 		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
 		95C65DA00F532FD400BE7BA7 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
+		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = games/supertuxkart/src/physics/physical_object.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = games/supertuxkart/src/physics/physical_object.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = ../../../../../../usr/local/include/irrlicht/aabbox3d.h; sourceTree = SOURCE_ROOT; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = ../../../../../../usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = SOURCE_ROOT; };
 		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = ../../../../../../usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = SOURCE_ROOT; };
@@ -1196,8 +1189,8 @@
 				950557850F696A900056E88C /* widget.hpp */,
 				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
 				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
-				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
 				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
+				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
 			);
 			name = gui;
 			path = games/supertuxkart/src/gui;
@@ -1253,9 +1246,6 @@
 				95C2B1AA0F296545000D3E5D /* robots */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
 				95C2B1DF0F296546000D3E5D /* utils */,
-				95C2AE1C0F296541000D3E5D /* callback.hpp */,
-				95C2AE1D0F296541000D3E5D /* callback_manager.cpp */,
-				95C2AE1E0F296541000D3E5D /* callback_manager.hpp */,
 				95C2AE740F296542000D3E5D /* explosion.cpp */,
 				95C2AE750F296542000D3E5D /* explosion.hpp */,
 				95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */,
@@ -1284,8 +1274,6 @@
 				95A1187D0F78033700B18B3D /* ptr_vector.hpp */,
 				95C2B1930F296545000D3E5D /* race_manager.cpp */,
 				95C2B1940F296545000D3E5D /* race_manager.hpp */,
-				95C2B1BF0F296545000D3E5D /* static_ssg.cpp */,
-				95C2B1C00F296545000D3E5D /* static_ssg.hpp */,
 				95C2B1C10F296545000D3E5D /* stk_config.cpp */,
 				95C2B1C20F296545000D3E5D /* stk_config.hpp */,
 				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
@@ -1926,8 +1914,8 @@
 				95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */,
 				95C2B1830F296545000D3E5D /* btUprightConstraint.hpp */,
 				95C2B1840F296545000D3E5D /* kart_motion_state.hpp */,
-				95C2B1850F296545000D3E5D /* moving_physics.cpp */,
-				95C2B1860F296545000D3E5D /* moving_physics.hpp */,
+				95CA59F60F82FCB7003323DB /* physical_object.hpp */,
+				95CA59F70F82FCB7003323DB /* physical_object.cpp */,
 				95C2B1870F296545000D3E5D /* physics.cpp */,
 				95C2B1880F296545000D3E5D /* physics.hpp */,
 				953EAAB00F30A4410000D57D /* triangle_mesh.hpp */,
@@ -2661,7 +2649,6 @@
 				95C2B2CF0F296546000D3E5D /* btConvexHull.cpp in Sources */,
 				95C2B2D00F296546000D3E5D /* btGeometryUtil.cpp in Sources */,
 				95C2B2D10F296546000D3E5D /* btQuickprof.cpp in Sources */,
-				95C2B2D50F296546000D3E5D /* callback_manager.cpp in Sources */,
 				95C2B2DB0F296546000D3E5D /* challenge.cpp in Sources */,
 				95C2B2DC0F296546000D3E5D /* challenge_data.cpp in Sources */,
 				95C2B2DD0F296546000D3E5D /* unlock_manager.cpp in Sources */,
@@ -2725,7 +2712,6 @@
 				95C2B5500F296547000D3E5D /* race_state.cpp in Sources */,
 				95C2B5590F296547000D3E5D /* btKart.cpp in Sources */,
 				95C2B55A0F296547000D3E5D /* btUprightConstraint.cpp in Sources */,
-				95C2B55B0F296547000D3E5D /* moving_physics.cpp in Sources */,
 				95C2B55C0F296547000D3E5D /* physics.cpp in Sources */,
 				95C2B5660F296547000D3E5D /* race_manager.cpp in Sources */,
 				95C2B56E0F296547000D3E5D /* replay_base.cpp in Sources */,
@@ -2734,7 +2720,6 @@
 				95C2B5710F296547000D3E5D /* replay_recorder.cpp in Sources */,
 				95C2B5760F296547000D3E5D /* default_robot.cpp in Sources */,
 				95C2B5780F296547000D3E5D /* track_info.cpp in Sources */,
-				95C2B5860F296547000D3E5D /* static_ssg.cpp in Sources */,
 				95C2B5870F296547000D3E5D /* stk_config.cpp in Sources */,
 				95C2B5910F296547000D3E5D /* track.cpp in Sources */,
 				95C2B5920F296547000D3E5D /* track_manager.cpp in Sources */,
@@ -2771,6 +2756,7 @@
 				95A1182C0F77EA3100B18B3D /* input_manager.cpp in Sources */,
 				95A1184B0F77FC3900B18B3D /* input_device.cpp in Sources */,
 				95A1187B0F78024E00B18B3D /* device_manager.cpp in Sources */,
+				95CA59F80F82FCB7003323DB /* physical_object.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
