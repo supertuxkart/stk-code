@@ -25,7 +25,6 @@
 
 #include "stk_config.hpp"
 #include "user_config.hpp"
-#include "callback_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
@@ -60,7 +59,6 @@ void KartPropertiesManager::removeTextures()
         delete *i;
     }
     m_karts_properties.clear();
-    callback_manager->clear(CB_KART);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------

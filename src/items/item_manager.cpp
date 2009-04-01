@@ -21,7 +21,6 @@
 #include <string>
 #include <sstream>
 
-#include "callback_manager.hpp"
 #include "user_config.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
@@ -106,7 +105,6 @@ void ItemManager::removeTextures()
         i->second->drop();
     }
     m_all_meshes.clear();
-    callback_manager->clear(CB_ITEM);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------

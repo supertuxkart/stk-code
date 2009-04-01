@@ -24,14 +24,13 @@
 using namespace irr;
 
 #include "btBulletDynamicsCommon.h"
-#include "callback.hpp"
 #include "user_pointer.hpp"
 
 class Vec3;
 class scene::IAnimatedMesh;
 class XMLNode;
 
-class MovingPhysics : public Callback
+class MovingPhysics
 {
 public:
     enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};

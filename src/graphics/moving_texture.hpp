@@ -24,11 +24,9 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "callback.hpp"
-
 class XMLNode;
 
-class MovingTexture : public Callback
+class MovingTexture
 {
 private:
     /** Translation increment per second. */

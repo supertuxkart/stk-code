@@ -21,7 +21,6 @@
 
 #include <math.h>
 
-#include "callback_manager.hpp"
 #include "race_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -285,7 +284,7 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
             }
         }
     }
-    callback_manager->handleExplosion(pos_explosion, moving_physics);
+    RaceManager::getTrack()->handleExplosion(pos_explosion, moving_physics);
 }   // hit
 
 /* EOF */

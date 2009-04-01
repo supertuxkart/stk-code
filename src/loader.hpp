@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 #include <set>
-#include "callback_manager.hpp"
 
 class Loader : public ssgLoaderOptions
 {
@@ -43,20 +42,12 @@ public:
     ~Loader();
 
     virtual void makeModelPath  (char* path, const char* fname) const;
-
-    ssgEntity *load(const std::string& filename, CallbackType t, bool optimise=true,
+    ssgEntity *load(const std::string& filename, bool optimise=true,
                     bool is_full_path=false);
-    void         setCallbackType(CallbackType t)   {m_current_callback_type=t;}
 private:
-    CallbackType m_current_callback_type;
 
     void         makePath     (std::string& path, const std::string& dir, 
                                const std::string& fname) const;
-#ifndef HAVE_IRRLICHT
-    ssgBranch   *createBranch (char *data) const;
-    void         preProcessObj( ssgEntity *n, bool mirror );
-    ssgBranch   *animInit     (char *data) const;
-#endif
 };
 
 extern Loader* loader;

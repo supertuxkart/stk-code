@@ -161,9 +161,6 @@ supertuxkart_SOURCES = \
  loader.hpp \
  race_manager.cpp \
  race_manager.hpp \
- callback.hpp \
- callback_manager.cpp \
- callback_manager.hpp \
  main_loop.cpp \
  main_loop.hpp \
  user_pointer.hpp \

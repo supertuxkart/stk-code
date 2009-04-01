@@ -226,7 +226,7 @@ void InputManager::handleStaticAction(int key, int value)
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
-                //				kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+                kart->setPowerup(POWERUP_BOWLING, 10000);
                 kart->attach(ATTACH_ANVIL, 5);
 			}
 			break;

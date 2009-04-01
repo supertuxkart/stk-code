@@ -23,7 +23,6 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "callback_manager.hpp"
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "graphics/irr_driver.hpp"
@@ -74,7 +73,7 @@ void PowerupManager::removeTextures()
         if(m_all_models[i]) ssgDeRefDelete(m_all_models[i]            );
     }   // for
 #endif
-    callback_manager->clear(CB_COLLECTABLE);
+
 }   // removeTextures
 
 //-----------------------------------------------------------------------------

@@ -19,7 +19,6 @@
 
 #include "items/attachment_manager.hpp"
 
-#include "callback_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 
@@ -60,7 +59,6 @@ void AttachmentManager::removeTextures()
     {
         // FIXME: free attachment textures
     }   // for
-    callback_manager->clear(CB_ATTACHMENT);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------

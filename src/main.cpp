@@ -50,7 +50,6 @@
 #include "main_loop.hpp"
 #include "material_manager.hpp"
 #include "input/input_manager.hpp"
-#include "callback_manager.hpp"
 #include "history.hpp"
 #include "stk_config.hpp"
 #include "highscore_manager.hpp"
@@ -448,9 +447,8 @@ void InitTuxkart()
     stk_config              = new STKConfig            ();
     kart_properties_manager = new KartPropertiesManager();
     projectile_manager      = new ProjectileManager    ();
-    powerup_manager         = new PowerupManager   ();
-    callback_manager        = new CallbackManager      ();
-    item_manager            = new ItemManager       ();
+    powerup_manager         = new PowerupManager       ();
+    item_manager            = new ItemManager          ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
     grand_prix_manager      = new GrandPrixManager     ();
@@ -489,7 +487,6 @@ void CleanTuxKart()
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
     if(item_manager)            delete item_manager;
-    if(callback_manager)        delete callback_manager;
     if(powerup_manager)         delete powerup_manager;   
     if(projectile_manager)      delete projectile_manager;
     if(kart_properties_manager) delete kart_properties_manager;

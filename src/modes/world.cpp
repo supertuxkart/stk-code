@@ -25,7 +25,6 @@
 
 #include "race_manager.hpp"
 #include "user_config.hpp"
-#include "callback_manager.hpp"
 #include "history.hpp"
 #include "highscore_manager.hpp"
 #include "audio/sound_manager.hpp"
@@ -157,7 +156,6 @@ void World::init()
     //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
 #endif
 
-    callback_manager->initAll();
     // TODO - race GUI
     //menu_manager->switchToRace();
 
@@ -175,8 +173,6 @@ World::~World()
     // In case that a race is aborted (e.g. track not found) m_track is 0.
     if(m_track)
         m_track->cleanup();
-    // Clear all callbacks
-    callback_manager->clear(CB_TRACK);
 
     for ( unsigned int i = 0 ; i < m_kart.size() ; i++ )
         delete m_kart[i];
@@ -293,9 +289,8 @@ void World::update(float dt)
     projectile_manager->update(dt);
     item_manager->update(dt);
 
-    /* Routine stuff we do even when paused */
-    callback_manager->update(dt);
-}
+}   // update
+
 // ----------------------------------------------------------------------------
 
 HighscoreEntry* World::getHighscores() const
@@ -513,7 +508,6 @@ void World::restartRace()
     item_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
-    callback_manager->reset();
 
     // Resets the cameras in case that they are pointing too steep up or down
     stk_scene->reset();

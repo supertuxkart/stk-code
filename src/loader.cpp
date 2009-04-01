@@ -43,7 +43,6 @@ Loader* loader = 0;
 
 Loader::Loader()
 {
-    m_current_callback_type = CB_COLLECTABLE;
 }  // Loader
 
 //-----------------------------------------------------------------------------
@@ -82,20 +81,12 @@ void Loader::makeModelPath(char* path, const char* FNAME) const
  *  \param optimise Default is true. If set to false, the model will not
  *                  be flattened.
  */
-ssgEntity *Loader::load(const std::string& filename, CallbackType t,
+ssgEntity *Loader::load(const std::string& filename,
                         bool optimise, bool is_full_path)
 {
-    m_current_callback_type   = t;
     m_is_full_path            = is_full_path;
-#ifdef HAVE_IRRLICHT
     // FIXME: for now
     return NULL;
-#else
-    ssgEntity *obj            = optimise ? ssgLoad  (filename.c_str(), this) 
-                                         : ssgLoadAC(filename.c_str(), this);
-    preProcessObj(obj, false);
-    return obj;
-#endif
 }   // load
 
 //-----------------------------------------------------------------------------

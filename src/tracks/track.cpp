@@ -28,7 +28,6 @@
 
 #include "stk_config.hpp"
 #include "material_manager.hpp"
-#include "callback_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
@@ -1283,7 +1282,28 @@ void Track::update(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
+    for(unsigned int i=0; i<m_physical_objects.size(); i++)
+    {
+        m_physical_objects[i]->update(dt);
+    }
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Handles an explosion, i.e. it makes sure that all physical objects are
+ *  affected accordingly.
+ *  \param pos  Position of the explosion.
+ *  \param mp   If the hit was a physical object, this object will be affected
+ *              more. Otherwise this is NULL.
+ */
+void Track::handleExplosion(const Vec3 &pos, const MovingPhysics *mp) const
+{
+    for(std::vector<MovingPhysics*>::const_iterator i=m_physical_objects.begin();
+        i!=m_physical_objects.end(); i++)
+    {
+        (*i)->handleExplosion(pos, mp==(*i));
+    }
+}   // handleExplosion
+
 // ----------------------------------------------------------------------------
 /** Creates a water node.
  *  \param node The XML node containing the specifications for the water node.
@@ -1376,8 +1396,7 @@ void Track::loadTrackModel()
         if(name=="track") continue;
         if(name=="object")
         {
-            MovingPhysics *mp = new MovingPhysics(node);
-            callback_manager->addCallback(mp, CB_TRACK);
+            m_physical_objects.push_back(new MovingPhysics(node));
         }
         else if(name=="water")
         {
@@ -1427,6 +1446,13 @@ void Track::loadTrackModel()
                     node->getName().c_str());
         }
 
+    }
+
+    // Init all physical objects
+    for(std::vector<MovingPhysics*>::const_iterator i=m_physical_objects.begin();
+        i!=m_physical_objects.end(); i++)
+    {
+        (*i)->init();
     }
 
 #else
