@@ -245,7 +245,7 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 }   // isOwnerImmunity
 
 // -----------------------------------------------------------------------------
-void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
+void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
 	// the owner of this flyable should not be hit by his own flyable
 	if(m_exploded || isOwnerImmunity(kart_hit)) return;
@@ -284,7 +284,7 @@ void Flyable::hit(Kart *kart_hit, MovingPhysics* moving_physics)
             }
         }
     }
-    RaceManager::getTrack()->handleExplosion(pos_explosion, moving_physics);
+    RaceManager::getTrack()->handleExplosion(pos_explosion, object);
 }   // hit
 
 /* EOF */

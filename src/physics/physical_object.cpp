@@ -1,4 +1,4 @@
-//  $Id: moving_physics.cpp 839 2006-10-24 00:01:56Z hiker $
+//  $Id: physical_object.cpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "physics/moving_physics.hpp"
+#include "physics/physical_object.hpp"
 
 #include <string>
 #include <vector>
@@ -36,7 +36,7 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
-MovingPhysics::MovingPhysics(const XMLNode *xml_node)
+PhysicalObject::PhysicalObject(const XMLNode *xml_node)
 {
     std::string model_name;
     const Track *track=RaceManager::getTrack();
@@ -91,21 +91,21 @@ MovingPhysics::MovingPhysics(const XMLNode *xml_node)
     if     (shape=="cone"   ) m_body_type = MP_CONE;
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
-}   // MovingPhysics
+}   // PhysicalObject
 
 // -----------------------------------------------------------------------------
-MovingPhysics::~MovingPhysics()
+PhysicalObject::~PhysicalObject()
 {
     RaceManager::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
     delete m_shape;
-}  // ~MovingPhysics
+}  // ~PhysicalObject
 
 // -----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
  */
-void MovingPhysics::init()
+void PhysicalObject::init()
 {
     // 1. Determine size of the object
     // -------------------------------
@@ -151,7 +151,7 @@ void MovingPhysics::init()
 }   // init
 
 // -----------------------------------------------------------------------------
-void MovingPhysics::update(float dt)
+void PhysicalObject::update(float dt)
 {
     btTransform t;
     m_motion_state->getWorldTransform(t);
@@ -166,7 +166,7 @@ void MovingPhysics::update(float dt)
 }   // update
 
 // -----------------------------------------------------------------------------
-void MovingPhysics::reset()
+void PhysicalObject::reset()
 {
     m_body->setCenterOfMassTransform(m_init_pos);
     m_body->setAngularVelocity(btVector3(0,0,0));
@@ -175,7 +175,7 @@ void MovingPhysics::reset()
 }   // reset 
 
 // -----------------------------------------------------------------------------
-void MovingPhysics::handleExplosion(const Vec3& pos, bool direct_hit) {
+void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit) {
     if(direct_hit) {
         btVector3 impulse(0.0f, 0.0f, stk_config->m_explosion_impulse_objects);
         m_body->applyCentralImpulse(impulse);

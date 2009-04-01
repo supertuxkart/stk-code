@@ -135,9 +135,9 @@ void Physics::update(float dt)
             {
                 p->a->getPointerFlyable()->hitTrack();
             }
-            else if(p->b->is(UserPointer::UP_MOVING_PHYSICS))
+            else if(p->b->is(UserPointer::UP_PHYSICAL_OBJECT))
             {
-                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerMovingPhysics());
+                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerPhysicalObject());
 
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
@@ -270,15 +270,15 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         // =========================
         else if(upA->is(UserPointer::UP_FLYABLE))
         {
-            if(upB->is(UserPointer::UP_TRACK         ) ||   // 3.1) projectile hits track
-               upB->is(UserPointer::UP_FLYABLE       ) ||   // 3.2) projectile hits projectile
-               upB->is(UserPointer::UP_MOVING_PHYSICS) ||   // 3.3) projectile hits projectile
-               upB->is(UserPointer::UP_KART          )   )  // 3.4) projectile hits kart
+            if(upB->is(UserPointer::UP_TRACK          ) ||   // 3.1) projectile hits track
+               upB->is(UserPointer::UP_FLYABLE        ) ||   // 3.2) projectile hits projectile
+               upB->is(UserPointer::UP_PHYSICAL_OBJECT) ||   // 3.3) projectile hits projectile
+               upB->is(UserPointer::UP_KART           )   )  // 3.4) projectile hits kart
             {
                 m_all_collisions.push_back(upA, upB);
             }
         } 
-        else if(upA->is(UserPointer::UP_MOVING_PHYSICS))
+        else if(upA->is(UserPointer::UP_PHYSICAL_OBJECT))
         {
             if(upB->is(UserPointer::UP_FLYABLE)) 
             {

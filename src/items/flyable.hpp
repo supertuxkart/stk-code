@@ -30,7 +30,7 @@ using namespace irr;
 
 class FlyableInfo;
 class Kart;
-class MovingPhysics;
+class PhysicalObject;
 
 class Flyable : public Moveable, public TerrainInfo
 {
@@ -107,7 +107,7 @@ public:
     void         updateFromServer(const FlyableInfo &f, float dt);
 
     virtual void hitTrack    () {};
-    virtual void hit         (Kart* kart, MovingPhysics* moving_physics=NULL);
+    virtual void hit         (Kart* kart, PhysicalObject* obj=NULL);
     bool         hasHit      () { return m_has_hit_something; }
     /** Indicates that something was hit and that this object must 
      *  be removed. */

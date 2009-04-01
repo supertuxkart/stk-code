@@ -37,7 +37,7 @@
 #include "material.hpp"
 #include "graphics/moving_texture.hpp"
 #include "io/file_manager.hpp"
-#include "physics/moving_physics.hpp"
+#include "physics/physical_object.hpp"
 
 Loader* loader = 0;
 

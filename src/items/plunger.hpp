@@ -26,7 +26,7 @@ using namespace irr;
 
 class RubberBand;
 class Kart;
-class MovingPhysics;
+class PhysicalObject;
 
 class Plunger : public Flyable
 {
@@ -47,7 +47,7 @@ public:
     void         setKeepAlive(float t) {m_keep_alive = t;}
     virtual void update   (float dt);
     virtual void hitTrack ();
-    virtual void hit      (Kart *kart, MovingPhysics *mp=NULL);
+    virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
 
     /** A plunger does not explode if it is removed. */
     virtual bool needsExplosion() const {return false;}

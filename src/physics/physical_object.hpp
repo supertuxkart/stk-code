@@ -1,4 +1,4 @@
-//  $Id: moving_physics.hpp 839 2006-10-24 00:01:56Z hiker $
+//  $Id: physical_object.hpp 839 2006-10-24 00:01:56Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2006 Joerg Henrichs
@@ -17,8 +17,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MOVING_PHYSICS_HPP
-#define HEADER_MOVING_PHYSICS_HPP
+#ifndef HEADER_PHYSICAL_OBJECT_HPP
+#define HEADER_PHYSICAL_OBJECT_HPP
+
 #include <string>
 #include "irrlicht.h"
 using namespace irr;
@@ -30,7 +31,7 @@ class Vec3;
 class scene::IAnimatedMesh;
 class XMLNode;
 
-class MovingPhysics
+class PhysicalObject
 {
 public:
     enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
@@ -47,15 +48,15 @@ protected:
     scene::IMesh         *m_mesh;
     scene::ISceneNode    *m_node;
 public:
-    MovingPhysics           (const XMLNode *node);
-    ~MovingPhysics          (); 
-    void update             (float dt);
-    void         init       ();
-    virtual void reset      ();
-    btRigidBody *getBody    ()          { return m_body;           }
-    const char  *getTypeName()          { return "moving physics"; }
+                 PhysicalObject (const XMLNode *node);
+                ~PhysicalObject (); 
+    void         update         (float dt);
+    void         init           ();
+    virtual void reset          ();
+    /** Returns the rigid body of this physical object. */
+    btRigidBody *getBody        ()          { return m_body; }
     virtual void handleExplosion(const Vec3& pos, bool directHit);
-};  // MovingPhysics
+};  // PhysicalObject
 
 #endif
 /* EOF */

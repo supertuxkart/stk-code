@@ -42,6 +42,7 @@ using namespace irr;
 class TriangleMesh;
 class MovingTexture;
 class XMLNode;
+class PhysicalObject;
 
 class Track
 {
@@ -79,7 +80,7 @@ private:
     std::vector<MovingTexture*> m_animated_textures;
 
     /** List of all physical objects. */
-    std::vector<MovingPhysics*> m_physical_objects;
+    std::vector<PhysicalObject*> m_physical_objects;
 
     /** If a sky dome is used, the number of horizontal segments 
      *  the sphere should be divided in. */
@@ -221,7 +222,7 @@ public:
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel();
     void               update(float dt);
-    void               handleExplosion(const Vec3 &pos, const MovingPhysics *mp) const;
+    void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(

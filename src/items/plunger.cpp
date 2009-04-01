@@ -26,7 +26,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
-#include "physics/moving_physics.hpp"
+#include "physics/physical_object.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -150,9 +150,9 @@ void Plunger::update(float dt)
  *  Instead it stays around (though not as a graphical or physical object)
  *  till the rubber band expires.
  *  \param kart Pointer to the kart hit (NULL if not a kart).
- *  \param mp  Pointer to MovingPhysics object if hit (NULL otherwise).
+ *  \param obj  Pointer to PhysicalObject object if hit (NULL otherwise).
  */
-void Plunger::hit(Kart *kart, MovingPhysics *mp)
+void Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return;
 
@@ -190,9 +190,9 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
             m_rubber_band->hit(kart);
             return;
         }
-        else if(mp)
+        else if(obj)
         {
-            Vec3 pos(mp->getBody()->getWorldTransform().getOrigin());
+            Vec3 pos(obj->getBody()->getWorldTransform().getOrigin());
             m_rubber_band->hit(NULL, &pos);
         }
         else

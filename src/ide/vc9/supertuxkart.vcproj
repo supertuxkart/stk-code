@@ -489,7 +489,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\physics\moving_physics.cpp"
+					RelativePath="..\..\physics\physical_object.cpp"
 					>
 				</File>
 				<File
@@ -1112,6 +1112,10 @@
 				</File>
 				<File
 					RelativePath="..\..\physics\kart_motion_state.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\physical_object.hpp"
 					>
 				</File>
 				<File

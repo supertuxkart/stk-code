@@ -42,7 +42,7 @@
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/world.hpp"
-#include "physics/moving_physics.hpp"
+#include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race_manager.hpp"
 #include "utils/ssg_help.hpp"
@@ -1292,15 +1292,15 @@ void Track::update(float dt)
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
  *  \param pos  Position of the explosion.
- *  \param mp   If the hit was a physical object, this object will be affected
+ *  \param obj  If the hit was a physical object, this object will be affected
  *              more. Otherwise this is NULL.
  */
-void Track::handleExplosion(const Vec3 &pos, const MovingPhysics *mp) const
+void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj) const
 {
-    for(std::vector<MovingPhysics*>::const_iterator i=m_physical_objects.begin();
+    for(std::vector<PhysicalObject*>::const_iterator i=m_physical_objects.begin();
         i!=m_physical_objects.end(); i++)
     {
-        (*i)->handleExplosion(pos, mp==(*i));
+        (*i)->handleExplosion(pos, obj==(*i));
     }
 }   // handleExplosion
 
@@ -1396,7 +1396,7 @@ void Track::loadTrackModel()
         if(name=="track") continue;
         if(name=="object")
         {
-            m_physical_objects.push_back(new MovingPhysics(node));
+            m_physical_objects.push_back(new PhysicalObject(node));
         }
         else if(name=="water")
         {
@@ -1449,7 +1449,7 @@ void Track::loadTrackModel()
     }
 
     // Init all physical objects
-    for(std::vector<MovingPhysics*>::const_iterator i=m_physical_objects.begin();
+    for(std::vector<PhysicalObject*>::const_iterator i=m_physical_objects.begin();
         i!=m_physical_objects.end(); i++)
     {
         (*i)->init();
