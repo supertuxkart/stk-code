@@ -40,11 +40,33 @@ namespace StateManager
         if(selection == "new")
         {
             StateManager::pushMenu("karts.stkgui");
+        }
+        else if(selection == "options")
+        {
+            StateManager::pushMenu("options_av.stkgui");
+        }
+        else if(selection == "quit")
+        {
+            main_loop->abort();
+            return;
+        }
+        else if (selection == "options")
+        {
+            pushMenu("options_av.stkgui");
+        }
+    }
+    
+    /**
+     * Callback handling events from the kart selection menu
+     */
+    void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
+    {
+        static bool karts_menu_inited = false;
+        if(name == "init" && !karts_menu_inited)
+        {
             GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
             assert( w != NULL );
             
-            // FIXME - should be called only once, not on every show?
-            // FIXME - move to a menu show-up callback
             w->addItem("Gnu","k1","gnu.png");
             w->addItem("Wilber","k2","gnu.png");
             w->addItem("Tux","k3","gnu.png");
@@ -68,36 +90,18 @@ namespace StateManager
             
             assert( w3 != NULL );
             
-            // set kart model
+            // set kart model - FIXME - doesn't work very much
             IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
             SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
             test->addMesh(mesh);
             //test->setMaterialFlag(EMF_LIGHTING , false);
             
-            w3->setModel(test);
+            w3->setModel(test);      
+            
+            karts_menu_inited = true;
         }
-        else if(selection == "options")
-        {
-            StateManager::pushMenu("options.stkgui");
-        }
-        else if(selection == "quit")
-        {
-            main_loop->abort();
-            return;
-        }
-        else if (selection == "options")
-        {
-            pushMenu("options_av.stkgui");
-        }
-    }
-    
-    /**
-     * Callback handling events from the kart selection menu
-     */
-    void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
-    {
         // TODO - actually check which kart was selected
-        if(name == "karts")
+        else if(name == "karts")
         {
             StateManager::pushMenu("racesetup.stkgui");
         }
@@ -225,22 +229,26 @@ namespace StateManager
      */
     void menuEventOptions(GUIEngine::Widget* widget, std::string& name)
     {
+        if(name == "init")
+        {
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
+                                            (GUIEngine::getCurrentScreen()->getWidget("options_choice"));
+            if(w != NULL)
+            {
+                const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+                if(screen_name == "options_av.stkgui") w->select( "audio_video" );
+                else if(screen_name == "options_players.stkgui") w->select( "players" );
+                else if(screen_name == "options_input.stkgui") w->select( "controls" );
+            }
+        }
         // -- options
-        if(name == "options_choice")
+        else if(name == "options_choice")
         {
             std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
             
             if(selection == "audio_video") replaceTopMostMenu("options_av.stkgui");
             else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
             else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
-            
-            // select the right tab - FIXME - add some kind of post-screen-activation callback to do this
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(GUIEngine::getCurrentScreen()->getWidget("options_choice"));
-            if(w != NULL)
-            {
-                w->select(selection);
-            }
-            
         }
     }
     
