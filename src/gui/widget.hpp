@@ -225,6 +225,8 @@ namespace GUIEngine
         virtual ~RibbonWidget() {}
         
         int getSelection() const { return m_selection; }
+        void setSelection(const int i) { m_selection = i; updateSelection(); }
+        
         RibbonType getRibbonType() const { return m_ribbon_type; }
         const std::string& getSelectionName() { return m_children[m_selection].m_properties[PROP_ID]; }
         void select(std::string item);

@@ -10,6 +10,7 @@
 #include "main_loop.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart.hpp"
+#include "user_config.hpp"
 
 #include <vector>
 
@@ -112,9 +113,30 @@ namespace StateManager
      */
     void menuEventRaceSetup(GUIEngine::Widget* widget, std::string& name)
     {
-        // TODO - detect difficulty, allow more game modes
-        if(name == "gamemode")
+        if(name == "init")
         {
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
+                                                (GUIEngine::getCurrentScreen()->getWidget("difficulty"));
+            assert( w != NULL );
+            w->setSelection(user_config->getDefaultDifficulty());
+            race_manager->setDifficulty( (RaceManager::Difficulty)user_config->getDefaultDifficulty() );
+        }
+        else if(name == "difficulty")
+        {
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+            assert(w != NULL);
+            const std::string& selection = w->getSelectionName();
+            
+            if(selection == "novice")
+                race_manager->setDifficulty(RaceManager::RD_EASY);
+            else if(selection == "intermediate")
+                race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+            else if(selection == "expert")
+                race_manager->setDifficulty(RaceManager::RD_HARD);
+        }
+        else if(name == "gamemode")
+        {
+            // TODO - detect more game modes
             GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
             if(w->getSelectionName() == "normal")
             {
@@ -202,7 +224,7 @@ namespace StateManager
                 
                 StateManager::enterGameState();
                 race_manager->setLocalKartInfo(0, "tux");
-                race_manager->setDifficulty(RaceManager::RD_HARD);
+                //race_manager->setDifficulty(RaceManager::RD_HARD);
                 race_manager->setTrack("beach");
                 race_manager->setNumLaps( 3 );
                 race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
