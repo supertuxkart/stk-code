@@ -13,27 +13,23 @@
 
 #include <vector>
 
+/**
+ * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
+ */
+std::vector<std::string> g_menu_stack;
+
+static bool g_game_mode = false;
+
+#if 0
+#pragma mark Callbacks
+#endif
+
 namespace StateManager
 {
-    void showTrackSelectionScreen()
-    {
-        pushMenu("tracks.stkgui");
-        GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("tracks"));
-        assert( w != NULL );
-        
-        // FIXME - should be called only once, not on every show?
-        w->addItem("Track 1","t1","track1.png");
-        w->addItem("Track 2","t2","track2.png");
-        w->addItem("Track 3","t3","track3.png");
-        w->addItem("Track 4","t4","track4.png");
-        w->addItem("Track 5","t5","track5.png");
-        w->addItem("Track 6","t6","track6.png");
-        w->addItem("Track 7","t7","track7.png");
-        w->addItem("Track 8","t8","track8.png");
-        w->updateItemDisplay();
-    }
-  
-    
+
+    /**
+     * Callback handling events from the main menu
+     */
     void menuEventMain(GUIEngine::Widget* widget, std::string& name)
     {
         GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
@@ -95,6 +91,9 @@ namespace StateManager
         }
     }
     
+    /**
+     * Callback handling events from the kart selection menu
+     */
     void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
     {
         // TODO - actually check which kart was selected
@@ -104,6 +103,9 @@ namespace StateManager
         }
     }
     
+    /**
+     * Callback handling events from the race setup menu
+     */
     void menuEventRaceSetup(GUIEngine::Widget* widget, std::string& name)
     {
         // TODO - detect difficulty, allow more game modes
@@ -112,7 +114,7 @@ namespace StateManager
             GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
             if(w->getSelectionName() == "normal")
             {
-                showTrackSelectionScreen();
+                StateManager::pushMenu("tracks.stkgui");
             }
         }
         /*
@@ -161,8 +163,31 @@ namespace StateManager
          */
         
     }
+    
+    /**
+     * Callback handling events from the track menu
+     */
     void menuEventTracks(GUIEngine::Widget* widget, std::string& name)
     {
+        static bool track_menu_inited = false;
+        if(name == "init" && !track_menu_inited)
+        {
+            GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>
+                                                (GUIEngine::getCurrentScreen()->getWidget("tracks"));
+            assert( w != NULL );
+            
+            w->addItem("Track 1","t1","track1.png");
+            w->addItem("Track 2","t2","track2.png");
+            w->addItem("Track 3","t3","track3.png");
+            w->addItem("Track 4","t4","track4.png");
+            w->addItem("Track 5","t5","track5.png");
+            w->addItem("Track 6","t6","track6.png");
+            w->addItem("Track 7","t7","track7.png");
+            w->addItem("Track 8","t8","track8.png");
+            w->updateItemDisplay();
+            
+            track_menu_inited = true;
+        }
         // -- track seelction screen
         if(name == "tracks")
         {
@@ -194,6 +219,10 @@ namespace StateManager
         }    
         
     }
+    
+    /**
+     * Callback handling events from the options menus
+     */
     void menuEventOptions(GUIEngine::Widget* widget, std::string& name)
     {
         // -- options
@@ -215,7 +244,13 @@ namespace StateManager
         }
     }
     
-    
+    /**
+     * All widget events will be dispatched to this function; arguments are
+     * a pointer to the widget from which the event originates, and its internal
+     * name. There is one exception : right after showing a new screen, an event with
+     * name 'init' and widget set to NULL will be fired, so the screen can be filled
+     * with the right values or so.
+     */
     void eventCallback(GUIEngine::Widget* widget, std::string& name)
     {
         std::cout << "event!! " << name.c_str() << std::endl;
@@ -234,61 +269,21 @@ namespace StateManager
             menuEventOptions(widget, name);
         else
             std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
-        
-
-        
-        
+   
     }
-    
+
+#if 0
+#pragma mark -
+#pragma mark Other
+#endif
+  
     void initGUI()
     {
         IrrlichtDevice* device = irr_driver->getDevice();
         video::IVideoDriver* driver = device->getVideoDriver();
         GUIEngine::init(device, driver, &eventCallback);
     }
-    
-    std::vector<std::string> g_menu_stack;
-    static bool g_game_mode = false;
-    
-    void pushMenu(std::string name)
-    {
-        input_manager->setMode(InputManager::MENU);
-        g_menu_stack.push_back(name);
-        g_game_mode = false;
-        GUIEngine::switchToScreen(name.c_str());
-    }
-    void replaceTopMostMenu(std::string name)
-    {
-        input_manager->setMode(InputManager::MENU);
-        g_menu_stack[g_menu_stack.size()-1] = name;
-        g_game_mode = false;
-        GUIEngine::switchToScreen(name.c_str());
-    }
-    
-    void popMenu()
-    {
-        g_menu_stack.pop_back();
-        
-        if(g_menu_stack.size() == 0)
-        {
-            main_loop->abort();
-            return;
-        }
-        
-        g_game_mode = g_menu_stack[g_menu_stack.size()-1] == "race";
-        GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str()); 
-    }
-    
-    void resetAndGoToMenu(std::string name)
-    {
-        race_manager->exitRace();
-        input_manager->setMode(InputManager::MENU);
-        g_menu_stack.clear();
-        g_menu_stack.push_back(name);
-        g_game_mode = false;
-        GUIEngine::switchToScreen(name.c_str());
-    }
-    
+  
     void enterGameState()
     {
         g_menu_stack.clear();
@@ -313,6 +308,60 @@ namespace StateManager
         {
             popMenu();
         }
+    }
+
+  
+#if 0
+#pragma mark -
+#pragma mark Push/pop menus
+#endif
+    
+    static std::string g_init_event = "init";
+    
+    void pushMenu(std::string name)
+    {
+        input_manager->setMode(InputManager::MENU);
+        g_menu_stack.push_back(name);
+        g_game_mode = false;
+        GUIEngine::switchToScreen(name.c_str());
+        
+        eventCallback(NULL, g_init_event);
+    }
+    void replaceTopMostMenu(std::string name)
+    {
+        input_manager->setMode(InputManager::MENU);
+        g_menu_stack[g_menu_stack.size()-1] = name;
+        g_game_mode = false;
+        GUIEngine::switchToScreen(name.c_str());
+        
+        eventCallback(NULL, g_init_event);
+    }
+    
+    void popMenu()
+    {
+        g_menu_stack.pop_back();
+        
+        if(g_menu_stack.size() == 0)
+        {
+            main_loop->abort();
+            return;
+        }
+        
+        g_game_mode = g_menu_stack[g_menu_stack.size()-1] == "race";
+        GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str()); 
+        
+        eventCallback(NULL, g_init_event);
+    }
+    
+    void resetAndGoToMenu(std::string name)
+    {
+        race_manager->exitRace();
+        input_manager->setMode(InputManager::MENU);
+        g_menu_stack.clear();
+        g_menu_stack.push_back(name);
+        g_game_mode = false;
+        GUIEngine::switchToScreen(name.c_str());
+        eventCallback(NULL, g_init_event);
     }
     
 }
