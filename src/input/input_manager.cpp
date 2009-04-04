@@ -360,7 +360,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             
             // minimum time between two gamepad events in menu
             m_timer_in_use = true;
-            m_timer = 500;
+            m_timer = 0.5;
         }
         
         // send event to irrLicht
