@@ -351,6 +351,8 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_RIGHT;            
             else if(action == PA_LEFT)
                 evt.Key = irr::KEY_LEFT;
+            else if(action == PA_RESCUE)
+                evt.Key = irr::KEY_ESCAPE;
             else
                 return; // only those bindings are accepted in menus for now.
             
