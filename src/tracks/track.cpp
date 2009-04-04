@@ -1251,7 +1251,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
         {
             fprintf(stderr, 
                     "Animated texture: no texture name specified for track '%s'\n",
-                    getIdent());
+                    m_ident.c_str());
             continue;
         }
 

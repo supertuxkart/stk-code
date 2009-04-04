@@ -23,8 +23,6 @@
 #include <string>
 #include "input/input.hpp"
 
-extern const char *sKartAction2String[PA_COUNT];
-
 /*class for managing player name and control configuration*/
 class Player
 {
