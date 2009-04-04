@@ -181,7 +181,6 @@ public:
     std::string m_last_track;      /**< name of the last track used. */
     std::string m_server_address;
     int         m_server_port;
-    bool        m_use_kph;
     int         m_width;
     int         m_height;
     int         m_prev_width;

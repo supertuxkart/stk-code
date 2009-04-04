@@ -105,7 +105,6 @@ void UserConfig::setDefaults()
     m_print_kart_sizes  = false;
     m_max_fps           = 120;
     m_sfx_volume        = 1.0f;
-    m_use_kph           = false;
     m_width             = 800;
     m_height            = 600;
     m_prev_width        = m_width;
@@ -297,7 +296,6 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("background-music", m_background_music);
         lisp->get("max-fps",          m_max_fps);
         lisp->get("sfx-volume",       m_sfx_volume);
-        lisp->get("useKPH",           m_use_kph);
 
         /*get resolution width/height*/
         lisp->get("width",            m_width);
@@ -474,8 +472,6 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("itemStyle\t", m_item_style);
         writer->writeComment("Background music file to use,");
         writer->write("background-music\t", m_background_music);
-        writer->writeComment("Use of kilometers per hours (km/h) instead of mph");
-        writer->write("useKPH\t", m_use_kph);
         writer->writeComment("maximum fps, should be at least 60");
         writer->write("max-fps\t", m_max_fps);
         writer->writeComment("Volume for sound effects, see openal AL_GAIN for interpretation");
