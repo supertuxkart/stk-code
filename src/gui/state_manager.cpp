@@ -92,7 +92,7 @@ namespace StateManager
             w2->addLabel("MiniBjorn");
             
             GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
-            (GUIEngine::getCurrentScreen()->getWidget("modelview"));
+                                            (GUIEngine::getCurrentScreen()->getWidget("modelview"));
             
             assert( w3 != NULL );
             
@@ -125,6 +125,9 @@ namespace StateManager
                                                 (GUIEngine::getCurrentScreen()->getWidget("difficulty"));
             assert( w != NULL );
             w->setSelection(user_config->getDefaultDifficulty());
+            
+            // TODO - if user arrived to this screen by pressing esc from teh enxt, the behaviour below might be incorrect
+            // it would be better to restore previously set settings.
             race_manager->setDifficulty( (RaceManager::Difficulty)user_config->getDefaultDifficulty() );
         }
         else if(name == "difficulty")

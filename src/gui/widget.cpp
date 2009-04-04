@@ -985,7 +985,10 @@ void ModelViewWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     stringw  message = m_properties[PROP_TEXT].c_str();
-    m_element = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter);
+    
+    
+    IGUIMeshViewer* mesh_view = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter);
+    m_element = mesh_view;
     
     id = m_element->getID();
     m_element->setTabOrder(id);
@@ -995,6 +998,12 @@ void ModelViewWidget::add()
 void ModelViewWidget::setModel(SAnimatedMesh* mesh)
 {
     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
+    
+    video::SMaterial mat = mesh->getMeshBuffer(0)->getMaterial(); //mesh_view->getMaterial();
+    mat.setFlag(EMF_LIGHTING , false);
+    //mat.setFlag(EMF_GOURAUD_SHADING, false);
+    //mat.setFlag(EMF_NORMALIZE_NORMALS, true);
+    ((IGUIMeshViewer*)m_element)->setMaterial(mat);
 }
 
 #if 0

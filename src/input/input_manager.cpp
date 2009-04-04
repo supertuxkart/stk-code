@@ -300,12 +300,10 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
     // menu navigation. TODO : enable navigation with gamepads
     if(!StateManager::isGameState())
     {
+        irr::SEvent::SKeyInput evt;
+        
         if(type == Input::IT_KEYBOARD)
         {
-            irr::SEvent::SKeyInput evt;
-            
-            // std::cout << id0 << std::endl;
-            
             if(id0 == SDLK_RETURN)
                 evt.Key = irr::KEY_RETURN;
             else if(id0 == SDLK_UP)
@@ -318,15 +316,37 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_LEFT;
             else
                 return; // only those keys are accepted in menus for now.
-            
-            evt.PressedDown = value > MAX_VALUE/2;
-            
-            irr::SEvent wrapper;
-            wrapper.KeyInput = evt;
-            wrapper.EventType = EET_KEY_INPUT_EVENT;
-            
-            GUIEngine::getDevice()->postEventFromUser(wrapper);
         }
+        else // allow menu navigation with gamepads and other devices too
+        {
+            int player;
+            PlayerAction action;
+            
+            const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
+            if(!action_found) return;
+            
+            if(action == PA_FIRE || action == PA_NITRO)
+                evt.Key = irr::KEY_RETURN;
+            else if(action == PA_ACCEL)
+                evt.Key = irr::KEY_UP;
+            else if(action == PA_BRAKE)
+                evt.Key = irr::KEY_DOWN;
+            else if(action == PA_RIGHT)
+                evt.Key = irr::KEY_RIGHT;            
+            else if(action == PA_LEFT)
+                evt.Key = irr::KEY_LEFT;
+            else
+                return; // only those bindings are accepted in menus for now.
+        }
+        
+        // send event to irrLicht
+        evt.PressedDown = value > MAX_VALUE/2;
+        
+        irr::SEvent wrapper;
+        wrapper.KeyInput = evt;
+        wrapper.EventType = EET_KEY_INPUT_EVENT;
+        
+        GUIEngine::getDevice()->postEventFromUser(wrapper);
         
     }
     // in-game event handling
