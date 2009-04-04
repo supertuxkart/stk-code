@@ -316,6 +316,8 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_LEFT;
             else
                 return; // only those keys are accepted in menus for now.
+            
+            evt.PressedDown = value > MAX_VALUE/2;
         }
         else // allow menu navigation with gamepads and other devices too
         {
@@ -337,11 +339,11 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 evt.Key = irr::KEY_LEFT;
             else
                 return; // only those bindings are accepted in menus for now.
+            
+            evt.PressedDown = abs(value) > MAX_VALUE/2;
         }
         
         // send event to irrLicht
-        evt.PressedDown = value > MAX_VALUE/2;
-        
         irr::SEvent wrapper;
         wrapper.KeyInput = evt;
         wrapper.EventType = EET_KEY_INPUT_EVENT;
