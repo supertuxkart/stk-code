@@ -3,6 +3,7 @@
 #include "input/input_device.hpp"
 #include "race_manager.hpp"
 #include "modes/world.hpp"
+#include "gui/state_manager.hpp"
 
 InputDevice::InputDevice()
 {
