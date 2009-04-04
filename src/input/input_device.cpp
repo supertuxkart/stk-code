@@ -255,6 +255,8 @@ void GamePadDevice::loadDefaults()
 // -----------------------------------------------------------------------------
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)
 {
+    if(!StateManager::isGameState()) return; // ignore this while in menus
+    
     for(int n=0; n<PA_COUNT; n++)
     {
         if(m_bindings[n].id == axis && m_bindings[n].dir == direction)
