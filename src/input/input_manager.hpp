@@ -44,6 +44,10 @@ public:
         BOOTSTRAP
     };
 
+    // to put a delay before a new gamepad axis move is considered in menu
+    bool m_timer_in_use;
+    float m_timer;
+    
 private:
 
 	Input          *m_sensed_input;
@@ -62,7 +66,7 @@ private:
   	* makes the mouse behave like an analog axis on a gamepad/joystick.
 	*/
 	int    m_mouse_val_x, m_mouse_val_y;
-	
+    
     void   input(Input::InputType, int, int, int, int);
     void   postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y);
     void   handleStaticAction(int id0, int value);
@@ -74,6 +78,9 @@ public:
 	void   input();
 	void   setMode(InputDriverMode);		
 	bool   isInMode(InputDriverMode);
+    
+    void   update(float dt);
+    
 	Input &getSensedInput();
 };
 

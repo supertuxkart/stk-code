@@ -57,6 +57,9 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     
     m_device_manager = new DeviceManager();
     
+    m_timer_in_use = false;
+    m_timer = 0;
+    
     bool something_new_to_write = false;
     
     if(!m_device_manager->deserialize())
@@ -86,6 +89,15 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     // write config file if necessary
     if(something_new_to_write) m_device_manager->serialize(); 
     
+}
+// -----------------------------------------------------------------------------
+void InputManager::update(float dt)
+{
+    if(m_timer_in_use)
+    {
+        m_timer -= dt;
+        if(m_timer < 0) m_timer_in_use = false;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -327,6 +339,8 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
             if(!action_found) return;
             
+            if(m_timer_in_use) return; // time between keys not elapsed yet
+            
             if(action == PA_FIRE || action == PA_NITRO)
                 evt.Key = irr::KEY_RETURN;
             else if(action == PA_ACCEL)
@@ -341,6 +355,10 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 return; // only those bindings are accepted in menus for now.
             
             evt.PressedDown = abs(value) > MAX_VALUE/2;
+            
+            // minimum time between two gamepad events in menu
+            m_timer_in_use = true;
+            m_timer = 500;
         }
         
         // send event to irrLicht

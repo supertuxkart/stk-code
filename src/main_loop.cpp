@@ -214,6 +214,8 @@ void MainLoop::run()
 
         sound_manager->update(dt);
 
+        input_manager->update(dt);
+        
 #ifdef HAVE_IRRLICHT
         if(!user_config->m_bullet_debug)
             irr_driver->update(dt);
