@@ -986,13 +986,12 @@ void ModelViewWidget::add()
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     stringw  message = m_properties[PROP_TEXT].c_str();
     
-    
-    IGUIMeshViewer* mesh_view = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter);
-    m_element = mesh_view;
+    m_element = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter_2);
     
     id = m_element->getID();
-    m_element->setTabOrder(id);
+    //m_element->setTabOrder(id);
     m_element->setTabGroup(false);
+    m_element->setTabStop(false);
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::setModel(SAnimatedMesh* mesh)
