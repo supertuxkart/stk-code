@@ -29,7 +29,7 @@ Screen::Screen(const char* file)
 // -----------------------------------------------------------------------------
 void Screen::loadFromFile()
 {
-    std::cout << "loading GUI screen from file " << (file_manager->getGUIDir() + "/" + m_filename).c_str() << std::endl;
+    std::cout << "*** loading GUI screen from file " << (file_manager->getGUIDir() + "/" + m_filename).c_str() << std::endl;
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
@@ -204,6 +204,28 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
     
 }
 // -----------------------------------------------------------------------------
+/**
+ * Called when screen is removed. This means all irrlicht widgets this screen has pointers
+ * to are now gone. Set all references to NULL to avoid problems.
+ */
+void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
+{
+    if(within_vector == NULL) within_vector = &m_widgets;
+    const unsigned short widgets_amount = within_vector->size();
+    
+    for(int n=0; n<widgets_amount; n++)
+    {
+        Widget& widget = (*within_vector)[n];
+        
+        widget.m_element = NULL;
+        
+        if(widget.m_children.size() > 0)
+        {
+            elementsWereDeleted( &(widget.m_children) );
+        }
+    }
+}
+// -----------------------------------------------------------------------------
 Widget* Screen::getWidget(const char* name)
 {
     return getWidget(name, &m_widgets);
@@ -244,6 +266,7 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
         
         if(widget.m_children.size() > 0)
         {
+            // std::cout << "widget = <" << widget.m_properties[PROP_ID].c_str() << ">  widget.m_children.size()=" << widget.m_children.size() << std::endl;
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }

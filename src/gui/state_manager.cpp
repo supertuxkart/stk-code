@@ -63,23 +63,28 @@ namespace StateManager
     void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
     {
         static bool karts_menu_inited = false;
-        if(name == "init" && !karts_menu_inited)
+        if(name == "init" /*&& !karts_menu_inited*/)
         {
+            std::cout << "filling kart menu..." << std::endl;
             GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
             assert( w != NULL );
             
-            w->addItem("Gnu","k1","gnu.png");
-            w->addItem("Wilber","k2","gnu.png");
-            w->addItem("Tux","k3","gnu.png");
-            w->addItem("Puffy","k4","gnu.png");
-            w->addItem("Hexley","k5","gnu.png");
-            w->addItem("Sushi","k6","gnu.png");
-            w->addItem("Nolok","k7","gnu.png");
-            w->addItem("Mozilla","k8","gnu.png");
+            if(!karts_menu_inited)
+            {
+                w->addItem("Gnu","k1","gnu.png");
+                w->addItem("Wilber","k2","gnu.png");
+                w->addItem("Tux","k3","gnu.png");
+                w->addItem("Puffy","k4","gnu.png");
+                w->addItem("Hexley","k5","gnu.png");
+                w->addItem("Sushi","k6","gnu.png");
+                w->addItem("Nolok","k7","gnu.png");
+                w->addItem("Mozilla","k8","gnu.png");
+                karts_menu_inited = true;
+            }
             w->updateItemDisplay();
             
             GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
-            (GUIEngine::getCurrentScreen()->getWidget("player"));
+                                            (GUIEngine::getCurrentScreen()->getWidget("player"));
             assert( w2 != NULL );
             w2->addLabel("Hiker");
             w2->addLabel("Auria");
@@ -99,7 +104,8 @@ namespace StateManager
             
             w3->setModel(test);      
             
-            karts_menu_inited = true;
+            //karts_menu_inited = true;
+            std::cout << "filled kart menu... done" << std::endl;
         }
         // TODO - actually check which kart was selected
         else if(name == "karts")
@@ -196,23 +202,26 @@ namespace StateManager
     void menuEventTracks(GUIEngine::Widget* widget, std::string& name)
     {
         static bool track_menu_inited = false;
-        if(name == "init" && !track_menu_inited)
+        if(name == "init")
         {
             GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>
                                                 (GUIEngine::getCurrentScreen()->getWidget("tracks"));
             assert( w != NULL );
             
-            w->addItem("Track 1","t1","track1.png");
-            w->addItem("Track 2","t2","track2.png");
-            w->addItem("Track 3","t3","track3.png");
-            w->addItem("Track 4","t4","track4.png");
-            w->addItem("Track 5","t5","track5.png");
-            w->addItem("Track 6","t6","track6.png");
-            w->addItem("Track 7","t7","track7.png");
-            w->addItem("Track 8","t8","track8.png");
+            if(!track_menu_inited)
+            {
+                w->addItem("Track 1","t1","track1.png");
+                w->addItem("Track 2","t2","track2.png");
+                w->addItem("Track 3","t3","track3.png");
+                w->addItem("Track 4","t4","track4.png");
+                w->addItem("Track 5","t5","track5.png");
+                w->addItem("Track 6","t6","track6.png");
+                w->addItem("Track 7","t7","track7.png");
+                w->addItem("Track 8","t8","track8.png");
+                track_menu_inited = true;
+            }
             w->updateItemDisplay();
-            
-            track_menu_inited = true;
+
         }
         // -- track seelction screen
         if(name == "tracks")
@@ -378,7 +387,10 @@ namespace StateManager
         }
         
         g_game_mode = g_menu_stack[g_menu_stack.size()-1] == "race";
+        
+        std::cout << "-- switching to screen " << g_menu_stack[g_menu_stack.size()-1].c_str() << std::endl;
         GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str()); 
+        std::cout << "-- switched to screen " << g_menu_stack[g_menu_stack.size()-1].c_str() << std::endl;
         
         eventCallback(NULL, g_init_event);
     }

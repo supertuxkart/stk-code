@@ -49,6 +49,7 @@ void switchToScreen(const char* screen_name)
 {
     // clean what was left by the previous screen
     g_env->clear();
+    if(g_current_screen != NULL) g_current_screen->elementsWereDeleted();
     g_current_screen = NULL;
     Widget::resetIDCounters();
     

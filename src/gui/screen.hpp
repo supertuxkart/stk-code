@@ -48,6 +48,8 @@ namespace GUIEngine
         
         const std::string& getName() const { return m_filename; }
         
+        void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
+        
         virtual bool OnEvent(const SEvent& event);
     };
     

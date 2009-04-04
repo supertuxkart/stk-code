@@ -59,6 +59,7 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
         const int id = element->getID();
         if(id != -1)
         {
+            //std::cout << "searching for a widget in screen " << GUIEngine::getCurrentScreen()->getName().c_str() << std::endl;
             Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
             
             if(widget != NULL)
@@ -92,7 +93,7 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
             }
         }
     }
-    
+
     if(!draw_border && !mark_selected) return;
     
     if(mark_selected)

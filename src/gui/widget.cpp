@@ -660,6 +660,10 @@ RibbonGridWidget::RibbonGridWidget()
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::add()
 {
+    // Work-around for FIXME below... first clear children to avoid duplicates since we're adding everything again everytime
+    m_children.clearAndDeleteAll();
+    m_rows.clearWithoutDeleting();
+    
     m_has_label = m_properties[PROP_TEXT].size() > 0;
     const int label_height = m_has_label ? 25 : 0;
     
@@ -689,6 +693,7 @@ void RibbonGridWidget::add()
     // add rows
     for(int n=0; n<row_amount; n++)
     {
+        // FIXME - only add the first time, not everytime
         RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
         ribbon->x = x;
         ribbon->y = y + (int)(n*row_height);
@@ -724,14 +729,14 @@ void RibbonGridWidget::add()
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_CENTER );
     }
     
-    // add arrow butotns on each side
+    // add arrow buttons on each side
     // FIXME? these arrow buttons are outside of the widget's boundaries
     // create sub-widgets if they don't already exist
-    if(m_left_widget == NULL)
-    {
+    //if(m_left_widget == NULL)
+    //{
         m_left_widget = new Widget();
         m_right_widget = new Widget();
-    }
+    //}
     
     const int average_y = y + (h-label_height)/2;
     const int button_w = 30, button_h = 50;
