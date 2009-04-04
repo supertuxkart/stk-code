@@ -41,7 +41,7 @@ private:
     bool             m_lighting;
     bool             m_sphere_map;
     bool             m_transparency;
-    float            m_alpha_ref;
+    bool             m_alpha_blending;
     float            m_friction;
     /** How much the top speed is reduced per second. */
     float            m_slowdown;

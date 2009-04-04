@@ -49,7 +49,7 @@ Material::Material(const XMLNode *node, int index)
     b=false;
     node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
     node->get("transparency", &m_transparency      );
-    node->get("alpha",        &m_alpha_ref         );
+    node->get("alpha",        &m_alpha_blending    );
     node->get("light",        &m_lighting          );
     node->get("sphere",       &m_sphere_map        );
     node->get("friction",     &m_friction          );
@@ -90,7 +90,7 @@ void Material::init(unsigned int index)
     m_index              = index ;
     m_clamp_tex          = 0     ;
     m_transparency       = false ;
-    m_alpha_ref          = 0.1f  ;
+    m_alpha_blending     = false ;
     m_lighting           = true  ;
     m_sphere_map         = false ;
     m_friction           = 1.0f  ;
@@ -127,7 +127,9 @@ void  Material::setMaterialProperties(scene::IMeshBuffer *mb) const
         // updates of the Z buffer of the material. Since the _REF 
         // approach is faster (and looks better imho), this is used for now.
         mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-    if(m_sphere_map)
+    else if(m_sphere_map)
         mb->getMaterial().MaterialType = video::EMT_SPHERE_MAP;
+    else if(m_alpha_blending)
+        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
