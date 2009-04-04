@@ -125,7 +125,7 @@ void Widget::readCoords(Widget* parent)
     if(m_properties[PROP_ICON].size() > 0)
     {
         ITexture* texture = GUIEngine::getDriver()->getTexture(
-                                                               (file_manager->getGUIDir() + "/" + m_properties[PROP_ICON]).c_str()
+                                                               (file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str()
                                                                 );
         if(texture != NULL)
         {
@@ -232,7 +232,7 @@ IconButtonWidget::IconButtonWidget(const bool clickable)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
 {
-    ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getGUIDir() + "/" +m_properties[PROP_ICON]).c_str());
+    ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
     //const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
     /*
     if(w < texture_w) ... ;
@@ -467,7 +467,7 @@ void RibbonWidget::add()
             
             m_children[i].m_element = subbtn;
             subbtn->setUseAlphaChannel(true);
-            subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getGUIDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+            subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
 
             // ---- label part
             if(has_label)
@@ -559,7 +559,7 @@ void SpinnerWidget::add()
     if(m_graphical)
     {
         char imagefile[128];
-        std::string icon = file_manager->getGUIDir() + "/" + m_properties[PROP_ICON];
+        std::string icon = file_manager->getDataDir() + "/" + m_properties[PROP_ICON];
         snprintf(imagefile, 128, icon.c_str(), m_value);
         ITexture* texture = GUIEngine::getDriver()->getTexture(imagefile);
         const int texture_width = texture->getSize().Width;
@@ -631,7 +631,7 @@ void SpinnerWidget::setValue(const int new_value)
     if(m_graphical)
     {
         char imagefile[128];
-        std::string icon = file_manager->getGUIDir() + "/" + m_properties[PROP_ICON];
+        std::string icon = file_manager->getDataDir() + "/" + m_properties[PROP_ICON];
         snprintf(imagefile, 128, icon.c_str(), m_value);
         //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
         ((IGUIImage*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
@@ -707,7 +707,7 @@ void RibbonGridWidget::add()
         for(int i=0; i<m_col_amount; i++)
         {
             IconButtonWidget* icon = new IconButtonWidget();
-            icon->m_properties[PROP_ICON]="track_random.png";
+            icon->m_properties[PROP_ICON]="gui/track_random.png";
             
             // set size to get proper ratio (as most textures are saved sccaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
@@ -919,7 +919,7 @@ void RibbonGridWidget::updateItemDisplay()
             
             if( trackid < track_amount )
             {
-                std::string track_sshot = file_manager->getGUIDir() + "/" + m_items[trackid].m_sshot_file;
+                std::string track_sshot = file_manager->getDataDir() + "/" + m_items[trackid].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
                 icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
@@ -929,7 +929,7 @@ void RibbonGridWidget::updateItemDisplay()
             {
                 button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
-                icon->m_properties[PROP_ID] = "track_random.png";
+                icon->m_properties[PROP_ID] = "gui/track_random.png";
             }
         } // next column
     } // next row

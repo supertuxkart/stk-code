@@ -1,22 +1,22 @@
 <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
 
-<icon id="logo" align="center" icon="logo.png"/>
+<icon id="logo" align="center" icon="gui/logo.png"/>
 
 <spacer proportion="1" width="10"/>
 
 <buttonbar id="menu_toprow" proportion="2" width="75%" align="center">
-    <icon-button id="new" width="128" height="128" icon="main_race.png" text="Race"/>
-    <icon-button id="network" width="128" height="128" icon="main_network.png" text="Networking"/>
-    <icon-button id="challenges" width="128" height="128" icon="main_challenges.png" text="Challenges"/>
+    <icon-button id="new" width="128" height="128" icon="gui/main_race.png" text="Race"/>
+    <icon-button id="network" width="128" height="128" icon="gui/main_network.png" text="Networking"/>
+    <icon-button id="challenges" width="128" height="128" icon="gui/main_challenges.png" text="Challenges"/>
 </buttonbar>
 
 <spacer proportion="1" width="10" proportion="1"/>
 
 <buttonbar id="menu_bottomrow" proportion="2" width="85%" align="center">
-    <icon-button id="options" width="128" height="128" icon="main_options.png" text="Options"/>
-    <icon-button id="help" width="128" height="128" icon="main_help.png" text="Help"/>
-    <icon-button id="about" width="128" height="128" icon="main_about.png" text="About"/>
-    <icon-button id="quit" width="128" height="128" icon="main_quit.png" text="Quit"/>
+    <icon-button id="options" width="128" height="128" icon="gui/main_options.png" text="Options"/>
+    <icon-button id="help" width="128" height="128" icon="gui/main_help.png" text="Help"/>
+    <icon-button id="about" width="128" height="128" icon="gui/main_about.png" text="About"/>
+    <icon-button id="quit" width="128" height="128" icon="gui/main_quit.png" text="Quit"/>
 </buttonbar>
 
 <spacer proportion="1" width="10" proportion="1"/>

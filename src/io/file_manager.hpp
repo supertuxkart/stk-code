@@ -62,6 +62,7 @@ public:
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;
     std::string getKartDir       () const;
+    std::string getDataDir       () const;
     std::string getItemsDir      () const;
     std::string getTranslationDir() const;
     std::string getGUIDir        () const;

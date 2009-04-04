@@ -279,6 +279,11 @@ std::string FileManager::getTrackDir() const
     return m_root_dir+"/data/tracks";
 }   // getTrackDir
 //-----------------------------------------------------------------------------
+std::string FileManager::getDataDir() const
+{
+    return m_root_dir+"/data/";
+}
+//-----------------------------------------------------------------------------
 std::string FileManager::getGUIDir() const
 {
     return m_root_dir+"/data/gui";

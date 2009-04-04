@@ -71,14 +71,14 @@ namespace StateManager
             
             if(!karts_menu_inited)
             {
-                w->addItem("Gnu","k1","gnu.png");
-                w->addItem("Wilber","k2","gnu.png");
-                w->addItem("Tux","k3","gnu.png");
-                w->addItem("Puffy","k4","gnu.png");
-                w->addItem("Hexley","k5","gnu.png");
-                w->addItem("Sushi","k6","gnu.png");
-                w->addItem("Nolok","k7","gnu.png");
-                w->addItem("Mozilla","k8","gnu.png");
+                w->addItem("Gnu","k1","gui/gnu.png");
+                w->addItem("Wilber","k2","gui/gnu.png");
+                w->addItem("Tux","k3","gui/gnu.png");
+                w->addItem("Puffy","k4","gui/gnu.png");
+                w->addItem("Hexley","k5","gui/gnu.png");
+                w->addItem("Sushi","k6","gui/gnu.png");
+                w->addItem("Nolok","k7","gui/gnu.png");
+                w->addItem("Mozilla","k8","gui/gnu.png");
                 karts_menu_inited = true;
             }
             w->updateItemDisplay();
@@ -213,14 +213,14 @@ namespace StateManager
             
             if(!track_menu_inited)
             {
-                w->addItem("Track 1","t1","track1.png");
-                w->addItem("Track 2","t2","track2.png");
-                w->addItem("Track 3","t3","track3.png");
-                w->addItem("Track 4","t4","track4.png");
-                w->addItem("Track 5","t5","track5.png");
-                w->addItem("Track 6","t6","track6.png");
-                w->addItem("Track 7","t7","track7.png");
-                w->addItem("Track 8","t8","track8.png");
+                w->addItem("Track 1","t1","gui/track1.png");
+                w->addItem("Track 2","t2","gui/track2.png");
+                w->addItem("Track 3","t3","gui/track3.png");
+                w->addItem("Track 4","t4","gui/track4.png");
+                w->addItem("Track 5","t5","gui/track5.png");
+                w->addItem("Track 6","t6","gui/track6.png");
+                w->addItem("Track 7","t7","gui/track7.png");
+                w->addItem("Track 8","t8","gui/track8.png");
                 track_menu_inited = true;
             }
             w->updateItemDisplay();
