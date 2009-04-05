@@ -225,7 +225,7 @@ void MainLoop::run()
         int fps = irr_driver->getDevice()->getVideoDriver()->getFPS();
         bool printFPS = false;
         // First reports seem to be always 1, so not useful
-        if (fps > 1) {
+        if ((race_manager->raceIsActive()) && (fps > 1)) {
             // More than +-5 range is interesting to report (otherwise noise)
             if ((lastFPS+5 <= fps) || (lastFPS-5 >= fps)) {
                 lastFPS = fps;
