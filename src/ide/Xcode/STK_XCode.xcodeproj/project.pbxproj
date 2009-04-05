@@ -174,7 +174,6 @@
 		95C2B52B0F296546000D3E5D /* lisp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B12C0F296545000D3E5D /* lisp.cpp */; };
 		95C2B52C0F296546000D3E5D /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B12E0F296545000D3E5D /* parser.cpp */; };
 		95C2B52D0F296546000D3E5D /* writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1300F296545000D3E5D /* writer.cpp */; };
-		95C2B52F0F296546000D3E5D /* loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1330F296545000D3E5D /* loader.cpp */; };
 		95C2B5310F296546000D3E5D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1360F296545000D3E5D /* main.cpp */; };
 		95C2B5330F296546000D3E5D /* main_loop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1380F296545000D3E5D /* main_loop.cpp */; };
 		95C2B5370F296546000D3E5D /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B13F0F296545000D3E5D /* material.cpp */; };
@@ -273,11 +272,11 @@
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95A1184A0F77FC3900B18B3D /* input_device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_device.cpp; path = games/supertuxkart/src/input/input_device.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = games/supertuxkart/src/input/input_device.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = games/supertuxkart/src/input/device_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = games/supertuxkart/src/input/device_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95A1187D0F78033700B18B3D /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = games/supertuxkart/src/ptr_vector.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95A1184A0F77FC3900B18B3D /* input_device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_device.cpp; path = ../../input/input_device.cpp; sourceTree = SOURCE_ROOT; };
+		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = ../../input/input_device.hpp; sourceTree = SOURCE_ROOT; };
+		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = ../../input/device_manager.cpp; sourceTree = SOURCE_ROOT; };
+		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
+		95A1187D0F78033700B18B3D /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
 		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../gui/font.cpp; sourceTree = SOURCE_ROOT; };
@@ -623,8 +622,6 @@
 		95C2B12F0F296545000D3E5D /* parser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = parser.hpp; path = ../../lisp/parser.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1300F296545000D3E5D /* writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = writer.cpp; path = ../../lisp/writer.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1310F296545000D3E5D /* writer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = writer.hpp; path = ../../lisp/writer.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1330F296545000D3E5D /* loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = loader.cpp; path = ../../loader.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1340F296545000D3E5D /* loader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = loader.hpp; path = ../../loader.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1360F296545000D3E5D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1380F296545000D3E5D /* main_loop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main_loop.cpp; path = ../../main_loop.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1390F296545000D3E5D /* main_loop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = main_loop.hpp; path = ../../main_loop.hpp; sourceTree = SOURCE_ROOT; };
@@ -737,8 +734,8 @@
 		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
 		95C65DA00F532FD400BE7BA7 /* shadow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shadow.cpp; path = ../../graphics/shadow.cpp; sourceTree = SOURCE_ROOT; };
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
-		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = games/supertuxkart/src/physics/physical_object.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = games/supertuxkart/src/physics/physical_object.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
+		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = ../../../../../../usr/local/include/irrlicht/aabbox3d.h; sourceTree = SOURCE_ROOT; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = ../../../../../../usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = SOURCE_ROOT; };
 		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = ../../../../../../usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = SOURCE_ROOT; };
@@ -1260,8 +1257,6 @@
 				95C2AEDD0F296542000D3E5D /* history.hpp */,
 				95C2B0F00F296545000D3E5D /* isect.cpp */,
 				95C2B0F10F296545000D3E5D /* isect.hpp */,
-				95C2B1330F296545000D3E5D /* loader.cpp */,
-				95C2B1340F296545000D3E5D /* loader.hpp */,
 				95C2B1360F296545000D3E5D /* main.cpp */,
 				95C2B1380F296545000D3E5D /* main_loop.cpp */,
 				95C2B1390F296545000D3E5D /* main_loop.hpp */,
@@ -2690,7 +2685,6 @@
 				95C2B52B0F296546000D3E5D /* lisp.cpp in Sources */,
 				95C2B52C0F296546000D3E5D /* parser.cpp in Sources */,
 				95C2B52D0F296546000D3E5D /* writer.cpp in Sources */,
-				95C2B52F0F296546000D3E5D /* loader.cpp in Sources */,
 				95C2B5310F296546000D3E5D /* main.cpp in Sources */,
 				95C2B5330F296546000D3E5D /* main_loop.cpp in Sources */,
 				95C2B5370F296546000D3E5D /* material.cpp in Sources */,
