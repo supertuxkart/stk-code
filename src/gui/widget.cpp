@@ -169,6 +169,25 @@ void Widget::readCoords(Widget* parent)
         else if(texture_h > -1) this->h = texture_h;
         else if(label_h > -1) this->h = label_h;
     }
+    
+    // can't make widget bigger than parent
+ 
+    if(this->h > (int)parent_h)
+    {
+        float ratio = (float)parent_h/this->h;
+        std::cout << "scaling down, ratio=" << ratio << " parent_h=" << parent_h << " this->h=" << this->h << std::endl;
+        
+        this->w *= ratio;
+        this->h *= ratio;
+    }
+    if(this->w > (int)parent_w)
+    {
+        float ratio = (float)parent_w/this->w;
+        std::cout << "scaling down, ratio=" << ratio << std::endl;
+        
+        this->w *= ratio;
+        this->h *= ratio;
+    }
      
 }
 // -----------------------------------------------------------------------------

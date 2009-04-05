@@ -51,9 +51,9 @@ namespace StateManager
             main_loop->abort();
             return;
         }
-        else if (selection == "options")
+        else if (selection == "help")
         {
-            pushMenu("options_av.stkgui");
+            pushMenu("help1.stkgui");
         }
     }
     

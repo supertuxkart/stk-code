@@ -1,0 +1,78 @@
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+<label align="center" text="SuperTuxKart Options"/>
+
+<ribbon id="options_choice" height="20%" width="75%" align="center">
+    <icon-button id="audio_video" width="128" height="128" icon="gui/track_random.png" text="General"/>
+    <icon-button id="players" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
+    <icon-button id="controls" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>
+</ribbon>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<label align="center" text="Make your rivals bite dust!"/>
+
+<spacer height="25" width="10"/>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="textures/bonusblock2.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="Collect blue boxes : they will give you weapons or other powerups"/>
+</div>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="textures/nitro-particle.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."/>
+</div>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="textures/gui_lock.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
+</div>
+
+<label align="left" word_wrap="true" width="100%" proportion="1" text="The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"/>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<label align="center" text="* Current key bindings can be seen/changed in menu Options"/>
+
+</div>
+
+<!--
+"Make your rivals bite dust!"
+"Grab blue boxes and nitro"
+"Avoid bananas"
+
+"The current key bindings can be seen/changed in the Options->Player Config menu."
+"Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."
+
+"If you see a button with a lock like the one to the right, you need to complete a challenge to unlock it."
+
+"The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"
+
+
+
+"To help you win, there are certain powerups you can grab:"
+
+"BubbleGum - leave a sticky pink puddle behind you"
+"Cake - thrown at the closest rival, best on short ranges and long straights"
+"Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight!"
+"Bowling Ball - bounces off walls. If you are looking back,\nit will be thrown backwards."
+"Zipper - speed boost"
+"Parachute - slows down all karts in a better position!"
+"Anchor - slows down greatly the kart in the first position"
+
+Game modes
+
+"Grand Prix: Win victory points by racing through a group of tracks, most points wins (shortest time in case of a tie!)          "
+"Quick race: Pick a single track, shortest time wins."
+"Time Trial: Contains no powerups, so only your driving skills matter!"
+"Follow the leader: run for second place, as the last kart\nwill be disqualified every time the counter hits zero.\n Beware : going in front of the leader will get you eliminated too!"
+"3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."
+
+    if(!unlock_manager->isLocked("followleader"))
+    
+    -->
+
