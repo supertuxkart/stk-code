@@ -77,8 +77,6 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
     sgCoord c=Coord(xyz, hpr).toSgCoord();
-    printf("x %f y %f  offx %f offy %f\n",
-        xyz.x(), xyz.y(), off_xyz.x(), off_xyz.y());
     if(m_node)
     {
         m_node->setPosition(xyz.toIrrVector());
