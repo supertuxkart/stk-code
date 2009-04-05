@@ -142,10 +142,6 @@ void Scene::draw(float dt)
         {
             // Use this for faster profiling by disabling drawing the scene graph
             //if(!user_config->m_profile)ssgCullAndDraw ( m_scenegraph );
-#ifdef HAVE_IRRLICHT
-#else
-            ssgCullAndDraw ( m_scenegraph );
-#endif
         }
 #ifdef HAVE_GLUT
         else
@@ -206,4 +202,3 @@ void Scene::draw(float dt)
 
     glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
 }
-

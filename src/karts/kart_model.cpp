@@ -76,9 +76,10 @@ KartModel::~KartModel()
 /** Attach the kart model and wheels to the scene node.
  *  \param node Node to attach the models to.
  */
-void KartModel::attachModel(scene::ISceneNode **node)
+void KartModel::attachModel(scene::IAnimatedMeshSceneNode **node)
 {
-    *node = irr_driver->addMesh(m_mesh);
+    *node = irr_driver->addAnimatedMesh(m_mesh);
+    
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
@@ -94,7 +95,7 @@ void KartModel::loadModels(const std::string &kart_ident)
 {
     std::string  full_path = file_manager->getKartFile(m_model_filename, 
                                                        kart_ident);
-    m_mesh                 = irr_driver->getMesh(full_path);
+    m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 size = max-min;

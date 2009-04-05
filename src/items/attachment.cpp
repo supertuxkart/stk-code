@@ -29,11 +29,11 @@
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
-Attachment::Attachment(Kart* _kart)
+Attachment::Attachment(Kart* kart)
 {
     m_type           = ATTACH_NOTHING;
     m_time_left      = 0.0;
-    m_kart           = _kart;
+    m_kart           = kart;
     m_previous_owner = NULL;
 
     m_node           = NULL;

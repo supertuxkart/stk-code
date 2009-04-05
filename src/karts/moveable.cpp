@@ -35,6 +35,7 @@ Moveable::Moveable()
     m_mesh            = NULL;
     m_animated_mesh   = NULL;
     m_node            = NULL;
+    m_animated_node   = NULL;
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -44,10 +45,31 @@ Moveable::~Moveable()
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
     if(m_node) irr_driver->removeNode(m_node);
+    if(m_animated_node) irr_driver->removeNode(m_animated_node);
     if(m_mesh) irr_driver->removeMesh(m_mesh);
     if(m_animated_mesh) irr_driver->removeMesh(m_animated_mesh);
     // FIXME LEAK: what about model? ssgDeRefDelete(m_model_transform)
 }   // ~Moveable
+
+//-----------------------------------------------------------------------------
+/** Sets this model to be non-animated.
+ *  \param n The scene node.
+ */
+void Moveable::setNode(scene::ISceneNode *n)
+{
+    m_node          = n; 
+    m_animated_node = NULL;
+}   // setNode
+
+//-----------------------------------------------------------------------------
+/** Sets this model to be animated.
+ *  \param n The animated scene node.
+ */
+void Moveable::setAnimatedNode(scene::IAnimatedMeshSceneNode *n)
+{
+    m_node          = NULL; 
+    m_animated_node = n;
+}   // setAnimatedNode
 
 //-----------------------------------------------------------------------------
 void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
@@ -55,8 +77,18 @@ void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
     sgCoord c=Coord(xyz, hpr).toSgCoord();
-    m_node->setPosition(xyz.toIrrVector());
-    m_node->setRotation(hpr.toIrrHPR());
+    printf("x %f y %f  offx %f offy %f\n",
+        xyz.x(), xyz.y(), off_xyz.x(), off_xyz.y());
+    if(m_node)
+    {
+        m_node->setPosition(xyz.toIrrVector());
+        m_node->setRotation(hpr.toIrrHPR());
+    }
+    else if(m_animated_node)
+    {
+        m_animated_node->setPosition(xyz.toIrrVector());
+        m_animated_node->setRotation(hpr.toIrrHPR());
+    }
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

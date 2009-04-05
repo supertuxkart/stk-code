@@ -22,13 +22,8 @@
 
 #include <string>
 
-#define _WINSOCKAPI_
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#else
-#include <plib/ssg.h>
-#endif
 
 #include "no_copy.hpp"
 #include "lisp/lisp.hpp"
@@ -42,13 +37,8 @@ using namespace irr;
 class KartModel
 {
 private:
-#ifdef HAVE_IRRLICHT
     /** The mesh of the model. */
-    scene::IMesh *m_mesh;
-#else
-    /** The transform node/root of the kart model. */
-    ssgTransform *m_root;
-#endif
+    scene::IAnimatedMesh *m_mesh;
 
     /** Value used to indicate undefined entries. */
     static float UNDEFINED;
@@ -56,16 +46,11 @@ private:
     /** Name of the 3d model file. */
     std::string   m_model_filename;
 
-#ifdef HAVE_IRRLICHT
     /** The four wheel models. */
     scene::IMesh      *m_wheel_model[4];
 
     /** The four scene nodes the wheels are attached to */
     scene::ISceneNode *m_wheel_node[4];
-#else
-    /** The four wheel models. */
-    ssgEntity    *m_wheel_model[4];
-#endif
 
     /** Filename of the wheel models. */
     std::string   m_wheel_filename[4];
@@ -92,14 +77,8 @@ private:
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
 
-#ifdef HAVE_IRRLICHT
     /** The transform for the wheels, used to rotate the wheels and display
      *  the suspension in the race.      */
-#else
-    /** The transform for the wheels, used to rotate the wheels and display
-     *  the suspension in the race.      */
-    ssgTransform *m_wheel_transform[4]; 
-#endif
 
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
@@ -115,12 +94,8 @@ public:
         ~KartModel();
     void loadInfo(const lisp::Lisp* lisp);
     void loadModels(const std::string &kart_ident);
-#ifdef HAVE_IRRLICHT
-    void attachModel(scene::ISceneNode **node);
-    scene::IMesh* getModel() const { return m_mesh; }
-#else
-    ssgTransform *getRoot() const { return m_root; }
-#endif
+    void attachModel(scene::IAnimatedMeshSceneNode **node);
+    scene::IAnimatedMesh* getModel() const { return m_mesh; }
 
     /** Returns the position of a wheel relative to the kart. 
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 

@@ -222,10 +222,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\loader.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\main.cpp"
 				>
 			</File>
@@ -725,10 +721,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\isect.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\loader.hpp"
 				>
 			</File>
 			<File

@@ -79,6 +79,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_smoke_system         = NULL;
     m_nitro                = NULL;
     m_skidmarks            = NULL;
+    m_animated_node        = NULL;
 
     m_view_blocked_by_plunger = 0;
     
@@ -1010,7 +1011,12 @@ void Kart::loadData()
 {
     //float r [ 2 ] = { -10.0f, 100.0f } ;
 
-    m_kart_properties->getKartModel()->attachModel(&m_node);
+    m_kart_properties->getKartModel()->attachModel(&m_animated_node);
+    //m_kart_properties->getKartModel()->attachModel(&m_node);
+    m_animated_node->setLoopMode(true);
+    m_animated_node->setFrameLoop(1,14);
+    m_animated_node->setAnimationSpeed(15);
+
     createPhysics();
 
     // Attach Particle System

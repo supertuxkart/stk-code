@@ -236,7 +236,7 @@ void IrrDriver::removeMesh(scene::IMesh *mesh)
 /** Adds an animated mesh to the scene.
  *  \param mesh The animated mesh to add.
  */
-scene::ISceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
+scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh)
 {
     return m_scene_manager->addAnimatedMeshSceneNode(mesh);
 }   // addAnimatedMesh
@@ -318,6 +318,14 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
  */
 void IrrDriver::update(float dt)
 {
+    // FIXME: the run() call interferes with the SDL event handling 
+    // currently implemented in STK (since run() converts all SDL events
+    // into irrlicht events). To avoid re-writing the STK event handling,
+    // instead of calling run(), we only update the irrlicht timer (which is 
+    // necessary to get animations to work) - that's the only other operation
+    // happening in run.
+    //if(!m_device->run()) return;
+    m_device->getTimer()->tick();
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
 

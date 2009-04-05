@@ -187,7 +187,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
 }   // getClosestKart
 
 //-----------------------------------------------------------------------------
-void Flyable::update (float dt)
+void Flyable::update(float dt)
 {
 	m_time_since_thrown += dt;
 	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);

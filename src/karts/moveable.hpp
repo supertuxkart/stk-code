@@ -49,6 +49,8 @@ protected:
     scene::IAnimatedMesh  *m_animated_mesh;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
+    scene::IAnimatedMeshSceneNode
+                          *m_animated_node;
     int                    m_first_time ;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
@@ -57,8 +59,9 @@ public:
                   Moveable();
     virtual      ~Moveable();
     scene::ISceneNode 
-                 *getNode()                    {return m_node;              }
-    void          setNode(scene::ISceneNode *n){m_node = n;                 }
+                 *getNode() { return m_node ? m_node : m_animated_node; }
+    void          setNode(scene::ISceneNode *n);
+    void          setAnimatedNode(scene::IAnimatedMeshSceneNode *n);
     virtual const btVector3 
                  &getVelocity()   const        {return m_body->getLinearVelocity();}
     const btVector3

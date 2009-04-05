@@ -66,7 +66,8 @@ public:
     scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMesh(scene::IMesh *mesh);
-    scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);
+    scene::IAnimatedMeshSceneNode
+                         *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
                          *addCamera();
     void                  update(float dt);

@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KART_H
-#define HEADER_KART_H
+#ifndef HEADER_KART_HPP
+#define HEADER_KART_HPP
 
 #define _WINSOCKAPI_
 #include <plib/sg.h>

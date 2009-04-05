@@ -17,17 +17,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
-#include "loader.hpp"
 #include "items/projectile_manager.hpp"
+
+#include "explosion.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
-#include "explosion.hpp"
-#include "graphics/scene.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
+#include "graphics/scene.hpp"
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 
 static ssgSelector *find_selector ( ssgBranch *b );
 

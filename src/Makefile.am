@@ -157,8 +157,6 @@ supertuxkart_SOURCES = \
  highscores.hpp \
  highscore_manager.cpp \
  highscore_manager.hpp \
- loader.cpp \
- loader.hpp \
  race_manager.cpp \
  race_manager.hpp \
  main_loop.cpp \
