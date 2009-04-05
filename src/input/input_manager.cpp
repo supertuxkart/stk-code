@@ -96,7 +96,12 @@ void InputManager::update(float dt)
     if(m_timer_in_use)
     {
         m_timer -= dt;
-        if(m_timer < 0) m_timer_in_use = false;
+        std::cout << dt << " seconds elpased, timer is now at " << m_timer << std::endl;
+        if(m_timer < 0)
+        {
+            std::cout << "timer over, next key ready to be read" << std::endl;
+            m_timer_in_use = false;
+        }
     }
 }
 
@@ -339,7 +344,11 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
             if(!action_found) return;
             
-            if(m_timer_in_use) return; // time between keys not elapsed yet
+            if(m_timer_in_use)
+            {
+                std::cout << "i'm ignoring an event, next is in " << m_timer << " seconds" << std::endl;
+                return; // time between keys not elapsed yet
+            }
             
             if(action == PA_FIRE || action == PA_NITRO)
                 evt.Key = irr::KEY_RETURN;
@@ -357,10 +366,14 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 return; // only those bindings are accepted in menus for now.
             
             evt.PressedDown = abs(value) > MAX_VALUE/2;
+            if(evt.PressedDown)
+            {
+                std::cout << "Detected an action of type " << action << std::endl;
             
-            // minimum time between two gamepad events in menu
-            m_timer_in_use = true;
-            m_timer = 0.5;
+                // minimum time between two gamepad events in menu
+                m_timer_in_use = true;
+                m_timer = 0.5;
+            }
         }
         
         // send event to irrLicht
