@@ -1,0 +1,48 @@
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+<label align="center" text="SuperTuxKart Options"/>
+
+<ribbon id="category" height="20%" width="75%" align="center">
+    <icon-button id="page1" width="128" height="128" icon="gui/track_random.png" text="General"/>
+    <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
+    <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>
+</ribbon>
+
+<spacer proportion="1" width="10" proportion="1"/>
+
+<label align="center" text="SuperTuxKart features several game modes (TO BE UPDATED FOR NEW GUI LAYOUT!!)"/>
+
+<spacer height="25" width="10"/>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="gui/mode_normal.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="Regular Race (TODO - find a better name :( ) - all blows allowed, so catch weapons and make clever use of them!"/>
+</div>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="gui/mode_tt.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="Time Trial: Contains no powerups, so only your driving skills matter!"/>
+</div>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="gui/mode_ftl.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="Follow the leader: run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"/>
+</div>
+
+<div width="100%" proportion="1" layout="horizontal-row">
+    <icon align="center" icon="gui/mode_3strikes.png"/>
+    <spacer width="25" height="25"/>
+    <label proportion="1" height="100%" align="left" word_wrap="true" text="3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."/>
+</div>
+
+
+
+   <label proportion="1" width="100%" align="left" word_wrap="true" text="* Most of these game modes can also be played in a Grand Prix fashion : instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
+
+
+</div>
+
+

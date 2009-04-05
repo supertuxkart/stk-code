@@ -175,22 +175,25 @@ void Widget::readCoords(Widget* parent)
     if(this->h > (int)parent_h)
     {
         float ratio = (float)parent_h/this->h;
-        std::cout << "scaling down, ratio=" << ratio << " parent_h=" << parent_h << " this->h=" << this->h << std::endl;
-        
+
         this->w *= ratio;
         this->h *= ratio;
     }
     if(this->w > (int)parent_w)
     {
         float ratio = (float)parent_w/this->w;
-        std::cout << "scaling down, ratio=" << ratio << std::endl;
-        
+
         this->w *= ratio;
         this->h *= ratio;
     }
      
 }
-// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Button Widget
+#endif
+
 void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -201,7 +204,12 @@ void ButtonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
-// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Label Widget
+#endif
+
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -222,7 +230,13 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
 }
-// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Check Box Widget
+#endif
+
+
 void CheckBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -233,6 +247,12 @@ void CheckBoxWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
+
+#if 0
+#pragma mark -
+#pragma mark Gauge Widget
+#endif
+
 // -----------------------------------------------------------------------------
 void GaugeWidget::add()
 {
@@ -243,6 +263,13 @@ void GaugeWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
+
+#if 0
+#pragma mark -
+#pragma mark Icon Button
+#endif
+
+
 // -----------------------------------------------------------------------------
 IconButtonWidget::IconButtonWidget(const bool clickable)
 {
@@ -275,6 +302,7 @@ void IconButtonWidget::add()
         btn->setImage(texture);
         //btn->setDrawBorder(false);
         btn->setTabStop(false);
+        btn->setScaleImage(true);
     }
     stringw  message = m_properties[PROP_TEXT].c_str();
     if(message.size() > 0)

@@ -285,6 +285,35 @@ namespace StateManager
             else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
         }
     }
+
+    /**
+     * Callback handling events from the options menus
+     */
+    void menuEventHelp(GUIEngine::Widget* widget, std::string& name)
+    {
+        if(name == "init")
+        {
+            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
+            (GUIEngine::getCurrentScreen()->getWidget("category"));
+            if(w != NULL)
+            {
+                const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+                if(screen_name == "help1.stkgui") w->select( "page1" );
+                else if(screen_name == "help2.stkgui") w->select( "page2" );
+                else if(screen_name == "help3.stkgui") w->select( "page3" );
+            }
+        }
+        // -- options
+        else if(name == "category")
+        {
+            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            
+            if(selection == "page1") replaceTopMostMenu("help1.stkgui");
+            else if(selection == "page2") replaceTopMostMenu("help2.stkgui");
+            else if(selection == "page3") replaceTopMostMenu("help3.stkgui");
+        }
+    }
+
     
     /**
      * All widget events will be dispatched to this function; arguments are
@@ -309,6 +338,8 @@ namespace StateManager
             menuEventTracks(widget, name);
         else if( screen_name == "options_av.stkgui" || screen_name == "options_input.stkgui" || screen_name == "options_players.stkgui")
             menuEventOptions(widget, name);
+        else if( screen_name == "help1.stkgui" || screen_name == "help2.stkgui" || screen_name == "help3.stkgui")
+            menuEventHelp(widget, name);
         else
             std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
    
