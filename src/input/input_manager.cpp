@@ -357,7 +357,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 return; // only those bindings are accepted in menus for now.
             
             evt.PressedDown = abs(value) > MAX_VALUE/2;
-            if(evt.PressedDown)
+            if(evt.PressedDown && type == Input::IT_STICKMOTION)
             {
                 // minimum time between two gamepad events in menu
                 m_timer_in_use = true;
