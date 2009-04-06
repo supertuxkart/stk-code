@@ -300,9 +300,7 @@ void IconButtonWidget::add()
         // irrlicht widgets don't support scaling while keeping aspect ratio
         // so, happily, let's implement it ourselves
         const int x_gap = (float)w - (float)texture_w * (float)h / texture_h;
-        
-        std::cout << "x_gap = " << x_gap << std::endl;
-        
+         
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
         
         IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, NULL, ++id_counter_2);

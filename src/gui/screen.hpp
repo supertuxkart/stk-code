@@ -42,6 +42,7 @@ namespace GUIEngine
         Widget* getWidget(const int id, ptr_vector<Widget>* within_vector=NULL);
         
         Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
+        Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
         
         void addWidgets();
         void calculateLayout();

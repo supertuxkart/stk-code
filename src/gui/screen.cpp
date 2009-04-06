@@ -322,15 +322,15 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 IGUIElement *el, *first=NULL, *closest=NULL;
                 el = GUIEngine::getGUIEnv()->getFocus();
-                if(el != NULL && el->getTabGroup() != NULL)
+                if(el != NULL && el->getTabGroup() != NULL &&
+                   el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
                 {
-                    if( el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest) )
                         GUIEngine::getGUIEnv()->setFocus(closest);
                 }
                 else
                 {
                     // select the first widget
-                    Widget* w = getFirstWidget();
+                    Widget* w = getLastWidget();
                     if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
                 }
                 return true;
@@ -487,4 +487,25 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
     }
     return NULL;
 }
-
+// -----------------------------------------------------------------------------
+Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
+{
+    if(within_vector == NULL) within_vector = &m_widgets;
+    
+    for(int i = within_vector->size()-1; i >= 0; i--)
+    {
+        // if container, also checks children
+        if(within_vector->get(i)->m_children.size() > 0 &&
+           within_vector->get(i)->m_type != WTYPE_RIBBON &&
+           within_vector->get(i)->m_type != WTYPE_SPINNER)
+        {
+            Widget* w = getLastWidget(&within_vector->get(i)->m_children);
+            if(w != NULL) return w;
+        }
+        
+        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
+        
+        return within_vector->get(i);
+    }
+    return NULL;
+}
