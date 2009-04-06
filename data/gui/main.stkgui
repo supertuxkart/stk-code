@@ -1,6 +1,6 @@
 <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
 
-<icon id="logo" align="center" icon="gui/logo.png"/>
+<icon id="logo" align="center" proportion="3" width="100%" icon="gui/logo.png"/>
 
 <spacer proportion="1" width="10"/>
 

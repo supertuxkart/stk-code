@@ -6,6 +6,7 @@
 #include "gui/skin.hpp"
 #include "gui/widget.hpp"
 #include "io/file_manager.hpp"
+#include "gui/state_manager.hpp"
 
 namespace GUIEngine
 {
@@ -112,6 +113,50 @@ void transmitEvent(Widget* widget, std::string& name)
 // -----------------------------------------------------------------------------    
 void render()
 {
+    // on one end, making these static is not too clean.
+    // on another end, these variables are really only used locally,
+    // and making them static avoids doing the same stupid computations every frame
+    // FIXME - not totally true, resolution switches need to be handled
+    static ITexture* bg_image = NULL;
+    
+    static core::rect<s32> dest;
+    static core::rect<s32> source_area;
+    
+    if(bg_image == NULL)
+    {
+        int texture_w, texture_h;
+        // TODO/FIXME? - user preferences still include a background image choice 
+        bg_image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/background.jpg").c_str() );
+        assert(bg_image != NULL);
+        texture_w = bg_image->getSize().Width;
+        texture_h = bg_image->getSize().Height;
+        
+        source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+        
+        core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        const int screen_w = frame_size.Width;
+        const int screen_h = frame_size.Height;
+        
+        // stretch image vertically to fit
+        float ratio = (float)screen_h / texture_h;
+        
+        // check that with the vertical stretching, it still fits horizontally
+        while(texture_w*ratio < screen_w) ratio += 0.1;
+        
+        texture_w *= ratio;
+        texture_h *= ratio;
+        
+        const int clipped_x_space = (texture_w - screen_w);
+        
+        dest = core::rect<s32>(-clipped_x_space/2, 0, screen_w+clipped_x_space/2, texture_h);
+    }
+
+    if(!StateManager::isGameState())
+        GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area,
+                                            0 /* no clipping */, 0, false /* alpha */);
+    
+    //GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+    
     g_env->drawAll();
 }
 

@@ -279,14 +279,15 @@ IconButtonWidget::IconButtonWidget(const bool clickable)
 void IconButtonWidget::add()
 {
     ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
-    //const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
+    const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
     /*
     if(w < texture_w) ... ;
     if(h < texture_h) ... ;
      */
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+    rect<s32> widget_size;
     if(clickable)
     {
+        widget_size = rect<s32>(x, y, x + w, y + h);
         IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
         m_element = btn;
         btn->setUseAlphaChannel(true);
@@ -296,6 +297,14 @@ void IconButtonWidget::add()
     }
     else
     {
+        // irrlicht widgets don't support scaling while keeping aspect ratio
+        // so, happily, let's implement it ourselves
+        const int x_gap = (float)w - (float)texture_w * (float)h / texture_h;
+        
+        std::cout << "x_gap = " << x_gap << std::endl;
+        
+        widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
+        
         IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, NULL, ++id_counter_2);
         m_element = btn;
         btn->setUseAlphaChannel(true);
