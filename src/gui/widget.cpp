@@ -380,8 +380,12 @@ bool RibbonWidget::rightPressed()
     m_selection++;
     if(m_selection >= m_children.size())
     {
-        if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
-        m_selection = m_children.size() - 1;
+        if(m_parent != NULL)
+        {
+            ((RibbonGridWidget*)m_parent)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
+            m_selection = m_children.size()-1;
+        }
+        else m_selection = 0;
     }
     updateSelection();
     
@@ -393,8 +397,12 @@ bool RibbonWidget::leftPressed()
     m_selection--;
     if(m_selection < 0)
     {
-        if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
-        m_selection = 0;
+        if(m_parent != NULL)
+        {
+            ((RibbonGridWidget*)m_parent)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
+            m_selection = 0;
+        }
+        else m_selection = m_children.size()-1;
     }
     updateSelection();
     
