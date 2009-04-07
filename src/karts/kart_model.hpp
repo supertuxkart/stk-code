@@ -37,8 +37,19 @@ using namespace irr;
 class KartModel
 {
 private:
+    /** The frames in which the animation points to the left, straight
+     *  ahead, and to the right. */
+    int m_af_left, m_af_straight, m_af_right;
+
+    /** Animation speed. */
+    float m_animation_speed;
+
     /** The mesh of the model. */
     scene::IAnimatedMesh *m_mesh;
+
+    /** This is a pointer to the scene node of the kart this model belongs
+     *  to. It is necessary to adjust animations. */
+    scene::IAnimatedMeshSceneNode *m_node;
 
     /** Value used to indicate undefined entries. */
     static float UNDEFINED;
@@ -76,9 +87,6 @@ private:
     /** value used to divide the visual movement of wheels (because the actual movement
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
-
-    /** The transform for the wheels, used to rotate the wheels and display
-     *  the suspension in the race.      */
 
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
@@ -122,8 +130,8 @@ public:
     /** Returns the amount a kart has to be moved down so that the bottom of
      *  the kart is at z=0. */
     float getZOffset                () const {return m_z_offset;                 }
-    void  adjustWheels(float rotation, float steer,
-                       const float suspension[4]);
+    void  update(float rotation, float visual_steer,
+                 float steer, const float suspension[4]);
     void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
 };   // KartModel

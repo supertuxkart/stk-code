@@ -884,8 +884,6 @@ void Track::loadTrack(const std::string &filename)
     getMusicInformation(filenames, m_music);
     root->get("item",                  &m_item_style);
     root->get("screenshot",            &m_screenshot);
-    root->get("item",                  &m_item_style);
-    root->get("screenshot",            &m_screenshot);
     root->get("sky-color",             &m_sky_color);
     root->get("start-x",               &m_start_x);
     root->get("start-y",               &m_start_y);

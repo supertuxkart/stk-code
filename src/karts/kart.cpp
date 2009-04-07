@@ -1009,14 +1009,7 @@ void Kart::endRescue()
 
 void Kart::loadData()
 {
-    //float r [ 2 ] = { -10.0f, 100.0f } ;
-
     m_kart_properties->getKartModel()->attachModel(&m_animated_node);
-    //m_kart_properties->getKartModel()->attachModel(&m_node);
-    m_animated_node->setLoopMode(true);
-    m_animated_node->setFrameLoop(1,14);
-    m_animated_node->setAnimationSpeed(15);
-
     createPhysics();
 
     // Attach Particle System
@@ -1070,8 +1063,8 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         auto_skid = m_controls.m_steer*30.0f*((AUTO_SKID_VISUAL - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
     else
         auto_skid = m_controls.m_steer*30.0f;
-    kart_model->adjustWheels(m_wheel_rotation, auto_skid,
-                             wheel_z_axis);
+    kart_model->update(m_wheel_rotation, auto_skid,
+                       getSteerPercent(), wheel_z_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
     float X = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getZ()

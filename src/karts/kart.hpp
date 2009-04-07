@@ -36,6 +36,7 @@
 class SkidMarks;
 class Item;
 class Smoke;
+class ssgTransform;
 class Nitro;
 class SFXBase;
 class btUprightConstraint;

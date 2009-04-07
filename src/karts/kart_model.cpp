@@ -50,6 +50,10 @@ KartModel::KartModel()
     m_wheel_filename[2] = "wheel-rear-right.3ds";
     m_wheel_filename[3] = "wheel-rear-left.a3ds";
     m_mesh              = NULL;
+    m_af_left           = -1;
+    m_af_straight       = -1;
+    m_af_right          = -1;
+    m_animation_speed   = 15;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -59,7 +63,12 @@ KartModel::KartModel()
  */
 void KartModel::loadInfo(const lisp::Lisp* lisp)
 {
-    lisp->get("model-file", m_model_filename);
+    lisp->get("model-file",         m_model_filename );
+    lisp->get("animation-left",     m_af_left        );
+    lisp->get("animation-straight", m_af_straight    );
+    lisp->get("animation-right",    m_af_right       );
+    lisp->get("animation-speed",    m_animation_speed);
+
     loadWheelInfo(lisp, "wheel-front-right", 0);
     loadWheelInfo(lisp, "wheel-front-left",  1);
     loadWheelInfo(lisp, "wheel-rear-right",  2);
@@ -78,8 +87,9 @@ KartModel::~KartModel()
  */
 void KartModel::attachModel(scene::IAnimatedMeshSceneNode **node)
 {
-    *node = irr_driver->addAnimatedMesh(m_mesh);
-    
+    m_node = *node = irr_driver->addAnimatedMesh(m_mesh);
+    m_node->setAnimationSpeed(1500);
+    m_node->setLoopMode(false);
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i]);
@@ -139,9 +149,8 @@ void KartModel::loadModels(const std::string &kart_ident)
     {
         m_z_offset = m_kart_height*0.5f;
     }
-
-
 }   // load
+
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model
  *  and the position of the wheel relative to the kart.
@@ -206,11 +215,12 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
  *  \param rotation How far the wheels should rotate.
- *  \param steer How much the front wheels are turned for steering.
+ *  \param visual_steer How much the front wheels are turned for steering.
+ *  \param steer The actual steer settings.
  *  \param suspension Suspension height for all four wheels.
  */
-void KartModel::adjustWheels(float rotation, float steer,
-                             const float suspension[4])
+void KartModel::update(float rotation, float visual_steer,
+                       float steer, const float suspension[4])
 {
 
     float clamped_suspension[4];
@@ -233,7 +243,7 @@ void KartModel::adjustWheels(float rotation, float steer,
 
 //    core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
     core::vector3df wheel_rear (-rotation, 0, 0);
-    core::vector3df wheel_steer(0, -steer, 0);
+    core::vector3df wheel_steer(0, -visual_steer, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
 
     for(unsigned int i=0; i<4; i++)
@@ -247,25 +257,37 @@ void KartModel::adjustWheels(float rotation, float steer,
     m_wheel_node[2]->setRotation(wheel_rear );
     m_wheel_node[3]->setRotation(wheel_rear );
 
+    if(m_af_left<0) return;   // no animations defined
 
-#ifdef FIXME
-    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[0].toFloat());
-    wheel_front[3][2] += clamped_suspension[0];
-    m_wheel_transform[0]->setTransform(wheel_front);
+    // Update animation if necessary
+    // -----------------------------
+    // FIXME: this implementation is currently very simple, it will always
+    // animate to the very left or right, even if actual steering is only
+    // (say) 50% of left or right.
+    int end;
+    static int last_end=-1;
+    if(steer<0.0f)       end = m_af_left;
+    else if(steer>0.0f)  end = m_af_right;
+    else                 end = m_af_straight;
 
-    sgCopyVec3(wheel_front[3], m_wheel_graphics_position[1].toFloat());
-    wheel_front[3][2] += clamped_suspension[1];
-    m_wheel_transform[1]->setTransform(wheel_front);
+    // No changes to current frame loop
+    if(end==last_end) return;
 
-    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[2].toFloat());
-    wheel_rot[3][2] += clamped_suspension[2];
-    m_wheel_transform[2]->setTransform(wheel_rot);
-
-    sgCopyVec3(wheel_rot[3], m_wheel_graphics_position[3].toFloat());
-    wheel_rot[3][2] += clamped_suspension[3];
-    m_wheel_transform[3]->setTransform(wheel_rot);
-#endif
-}   // adjustWheels
+    int begin = (int)m_node->getFrameNr();
+    last_end = end;
+    // Handle reverse animation, which are done by setting
+    // the animation speed to a negative number.
+    if(begin<end)
+    {
+        m_node->setFrameLoop(begin, end);
+        m_node->setAnimationSpeed(m_animation_speed);
+    }
+    else
+    {
+        m_node->setFrameLoop(begin, end);
+        m_node->setAnimationSpeed(-m_animation_speed);
+    }
+}   // update
 
 // ----------------------------------------------------------------------------
 /** Puts all wheels in the default position. Used when displaying the karts
@@ -273,9 +295,6 @@ void KartModel::adjustWheels(float rotation, float steer,
  */
 void KartModel::resetWheels()
 {
-    for(unsigned int i=0; i<4; i++)
-    {
-        const float suspension[4]={0,0,0,0};
-        adjustWheels(0, 0, suspension);
-    }
+    const float suspension[4]={0,0,0,0};
+    update(0, 0, 0.0f, suspension);
 }   // reset
