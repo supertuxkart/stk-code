@@ -26,98 +26,156 @@ Skin::~Skin()
  */ 
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip)
 {
-
+    
     // scrollbar backgound
     
     //printf("draw rectangle\n");
     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), pos );
 }
 
-void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
-    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
-    
     if(focused)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 100, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 100, 0), rect );
 }
-
-void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
-        //printf("draw 3D button pane\n");
-    bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+    bool draw_border = focused;
     
-    bool draw_border = true;
-    bool mark_selected = false;
-    
-    // buttons are used for other uses than plain clickable buttons because irrLicht
-    // does not have widgets for everything we need. so at render time, we just check
-    // which type this button represents and set render options accordingly
-    if(element->getType() == EGUIET_BUTTON)
+    // check if one of its children has focus (will happen when directly clicking on them)
+    const int amount = widget->m_children.size();
+    for(int n=0; n<amount; n++)
     {
-        const int id = element->getID();
-        if(id != -1)
+        if(GUIEngine::getGUIEnv()->hasFocus(widget->m_children[n].m_element))
         {
-            //std::cout << "searching for a widget in screen " << GUIEngine::getCurrentScreen()->getName().c_str() << std::endl;
-            Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
-            
-            if(widget != NULL)
-            {
-                // don't draw border around bitmaps
-                if(widget->m_type == WTYPE_ICON_BUTTON && !focused) draw_border = false;
-            
-                // draw border around ribbon only if focused.
-                if(widget->m_type == WTYPE_RIBBON && !focused) draw_border = false;
-                
-                // check if one of its children has focus (will happen when directly clicking on them)
-                if(widget->m_type == WTYPE_RIBBON)
-                {
-                    const int amount = widget->m_children.size();
-                    for(int n=0; n<amount; n++)
-                    {
-                        if(GUIEngine::getGUIEnv()->hasFocus(widget->m_children[n].m_element))
-                        {
-                            draw_border = true;
-                            focused = true;
-                            break;
-                        }
-                    }
-                }
-                
-                // for ribbon children
-                if(widget->isSelected()) mark_selected = true;
-                if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON && 
-                   ((RibbonWidget*)widget->m_parent)->getRibbonType() == RIBBON_TOOLBAR &&
-                   !GUIEngine::getGUIEnv()->hasFocus(widget->m_parent->m_element)) mark_selected = false;
-            }
+            draw_border = true;
+            focused = true;
+            break;
         }
     }
-
-    if(!draw_border && !mark_selected) return;
     
-    if(mark_selected)
+    if(!draw_border) return;
+
+    if(focused)
+        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+    else
+        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+}
+
+void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
+{
+    bool mark_selected = widget->isSelected();
+    
+    if(widget->m_type == WTYPE_BUTTON)
     {
-        const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5, rect.UpperLeftCorner.Y - 5,
-                                                           rect.UpperLeftCorner.X + rect.getWidth() + 5,
-                                                           rect.UpperLeftCorner.Y + rect.getHeight() + 5);
-        GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+        // ribbons containing buttons are actually tabs
+        if(mark_selected)
+            GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), rect );
+        else
+            GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     }
+    else
+    {
+        if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON && 
+           ((RibbonWidget*)widget->m_parent)->getRibbonType() == RIBBON_TOOLBAR &&
+           !GUIEngine::getGUIEnv()->hasFocus(widget->m_parent->m_element)) mark_selected = false;
+        
+        if(mark_selected)
+        {
+            const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5, rect.UpperLeftCorner.Y - 5,
+                                                               rect.UpperLeftCorner.X + rect.getWidth() + 5,
+                                                               rect.UpperLeftCorner.Y + rect.getHeight() + 5);
+            GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+        }
+    }
+    
+}
+
+void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, const bool focused)
+{
+    if(focused)
+        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
+    else
+        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+}
+
+void Skin::drawSpinnerChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
+{
+    if(pressed)
+        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
     else if(focused)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
 }
 
+void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
+{
+    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+    
+    const int id = element->getID();
+    
+    //std::cout << "searching for a widget in screen " << GUIEngine::getCurrentScreen()->getName().c_str() << std::endl;
+    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    
+    if(widget == NULL) return;
+    
+    const WidgetType type = widget->m_type;
+    
+
+    // buttons are used for other uses than plain clickable buttons because irrLicht
+    // does not have widgets for everything we need. so at render time, we just check
+    // which type this button represents and render accordingly
+    
+    if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON)
+    {
+        drawRibbonChild(rect, widget, pressed /* pressed */, true /* focused */);
+    }
+    else if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_SPINNER)
+    {
+        drawSpinnerChild(rect, widget, pressed /* pressed */, true /* focused */);
+    }
+    else if(type == WTYPE_ICON_BUTTON)
+    {
+        if(!focused) return; /* don't draw any border in this case */
+        else drawButton(rect, pressed /* pressed */, true /* focused */);
+    }
+    else if(type == WTYPE_BUTTON)
+    {
+        drawButton(rect, pressed, focused);
+    }
+    else if(type == WTYPE_RIBBON)
+    {
+        drawRibbon(rect, widget, pressed, focused);
+    }
+    else if(widget->m_type == WTYPE_SPINNER)
+    {
+        drawSpinnerBody(rect, widget, pressed, focused);
+    }
+
+}
+
+void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{
+    process3DPane(element, rect, true /* pressed */ );
+}
+
+void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{
+    process3DPane(element, rect, false /* pressed */ );
+}
+
 void Skin::draw3DMenuPane (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-        //printf("draw menu pane\n");
+    //printf("draw menu pane\n");
 }
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     // e.g. the checkbox square
-        //printf("draw sunken pane\n");
+    //printf("draw sunken pane\n");
     const bool focused = GUIEngine::getGUIEnv()->getFocus() == element;
     
     if(focused)
@@ -128,7 +186,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 
 void Skin::draw3DTabBody (IGUIElement *element, bool border, bool background, const core::rect< s32 > &rect, const core::rect< s32 > *clip, s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
 {
-        //printf("draw tab body\n");
+    //printf("draw tab body\n");
 }
 
 void Skin::draw3DTabButton (IGUIElement *element, bool active, const core::rect< s32 > &rect, const core::rect< s32 > *clip, gui::EGUI_ALIGNMENT alignment)

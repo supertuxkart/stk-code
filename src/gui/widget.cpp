@@ -612,6 +612,7 @@ void SpinnerWidget::add()
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
     IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, ++id_counter_2, L"<<");
     m_children[0].m_element = left_arrow;
+    m_children[0].m_type = WTYPE_BUTTON;
     left_arrow->setTabStop(false);
     m_children[0].m_parent = this;
     m_children[0].m_properties[PROP_ID] = "left";
@@ -631,6 +632,7 @@ void SpinnerWidget::add()
         //IGUIButton* subbtn = GUIEngine::getGUIEnv()->addButton(subsize_label, btn, ++id_counter_2, L"");
         IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(subsize_label, btn, ++id_counter_2);
         m_children[1].m_element = subbtn;
+        m_children[1].m_type = WTYPE_ICON_BUTTON;
         subbtn->setUseAlphaChannel(true);
         
         subbtn->setImage(texture);
@@ -641,6 +643,7 @@ void SpinnerWidget::add()
         rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
         IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label, false, true, btn);
         m_children[1].m_element = label;
+        m_children[1].m_type = WTYPE_LABEL;
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
@@ -652,6 +655,7 @@ void SpinnerWidget::add()
     IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, ++id_counter_2, L">>");
     right_arrow->setTabStop(false);
     m_children[2].m_element = right_arrow;
+    m_children[2].m_type = WTYPE_BUTTON;
     m_children[2].m_parent = this;
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
@@ -796,6 +800,7 @@ void RibbonGridWidget::add()
     // create sub-widgets if they don't already exist
     //if(m_left_widget == NULL)
     //{
+    // FIXME - memory leak, irrlicht will probably delete its own widget; I don't delete mine however.
         m_left_widget = new Widget();
         m_right_widget = new Widget();
     //}

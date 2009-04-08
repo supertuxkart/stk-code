@@ -424,7 +424,6 @@ namespace StateManager
         
         std::cout << "-- switching to screen " << g_menu_stack[g_menu_stack.size()-1].c_str() << std::endl;
         GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str()); 
-        std::cout << "-- switched to screen " << g_menu_stack[g_menu_stack.size()-1].c_str() << std::endl;
         
         eventCallback(NULL, g_init_event);
     }
