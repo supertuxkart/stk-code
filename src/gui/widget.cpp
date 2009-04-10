@@ -797,13 +797,14 @@ void RibbonGridWidget::add()
     
     // add arrow buttons on each side
     // FIXME? these arrow buttons are outside of the widget's boundaries
-    // create sub-widgets if they don't already exist
-    //if(m_left_widget == NULL)
-    //{
-    // FIXME - memory leak, irrlicht will probably delete its own widget; I don't delete mine however.
-        m_left_widget = new Widget();
-        m_right_widget = new Widget();
-    //}
+    if(m_left_widget != NULL)
+    {
+        // FIXME - do proper memory management, find why it crashes when i try to clean-up
+        //delete m_left_widget;
+        //delete m_right_widget;
+    }
+    m_left_widget = new Widget();
+    m_right_widget = new Widget();
     
     const int average_y = y + (h-label_height)/2;
     const int button_w = 30, button_h = 50;

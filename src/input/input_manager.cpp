@@ -339,7 +339,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
             if(!action_found) return;
             
-            if(m_timer_in_use) return; // time between keys not elapsed yet
+            evt.PressedDown = abs(value) > MAX_VALUE/2;
             
             if(action == PA_FIRE || action == PA_NITRO)
                 evt.Key = irr::KEY_RETURN;
@@ -352,26 +352,34 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             else if(action == PA_LEFT)
                 evt.Key = irr::KEY_LEFT;
             else if(action == PA_RESCUE)
-                evt.Key = irr::KEY_ESCAPE;
+            {
+                // escape (or 'rescue' on gamepad) is a little special
+                if(evt.PressedDown) StateManager::escapePressed();
+                return;
+            }
             else
                 return; // only those bindings are accepted in menus for now.
             
-            evt.PressedDown = abs(value) > MAX_VALUE/2;
-            if(evt.PressedDown && type == Input::IT_STICKMOTION)
+            if(type == Input::IT_STICKMOTION)
             {
-                // minimum time between two gamepad events in menu
-                m_timer_in_use = true;
-                m_timer = 0.25;
-            }
-        }
+                if(m_timer_in_use) return; // time between keys not elapsed yet
+            
+                if(evt.PressedDown)
+                {
+                    // minimum time between two gamepad events in menu
+                    m_timer_in_use = true;
+                    m_timer = 0.25;
+                }
+            } // end if (gamepad input type)
+        } // end if (keyboard vs gamepad)
         
         // send event to irrLicht
         irr::SEvent wrapper;
         wrapper.KeyInput = evt;
         wrapper.EventType = EET_KEY_INPUT_EVENT;
-        
+                
         GUIEngine::getDevice()->postEventFromUser(wrapper);
-        
+
     }
     // in-game event handling
     else
@@ -475,7 +483,7 @@ void InputManager::input()
             case SDL_KEYDOWN:
                 
                 // escape is a little special
-                if(ev.key.keysym.sym == 27)
+                if(ev.key.keysym.sym == SDLK_ESCAPE)
                 {
                     StateManager::escapePressed();
                     return;
