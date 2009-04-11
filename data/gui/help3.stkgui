@@ -1,3 +1,4 @@
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
 <label align="center" text="SuperTuxKart Options"/>
@@ -42,7 +43,7 @@
 
    <label proportion="1" width="100%" align="left" word_wrap="true" text="* Most of these game modes can also be played in a Grand Prix fashion : instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."/>
 
-
+<spacer width="50" height="45" />
 </div>
 
-
+<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>

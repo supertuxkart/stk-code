@@ -38,4 +38,8 @@
 
 <label align="center" text="* Current key bindings can be seen/changed in menu Options"/>
 
+<spacer width="50" height="45" />
 </div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+

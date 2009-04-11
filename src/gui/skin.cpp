@@ -2,6 +2,7 @@
 #include "gui/engine.hpp"
 #include "gui/screen.hpp"
 #include "gui/widget.hpp"
+#include "io/file_manager.hpp"
 #include <cassert>
 #include <iostream>
 
@@ -12,6 +13,17 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
     assert(fallback_skin != NULL);
+    
+    
+    m_tex_button = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton.png").c_str() );
+    m_tex_fbutton = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton_focused.png").c_str() );
+    m_tex_spinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner.png").c_str() );
+    m_tex_fspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_focus.png").c_str() );
+    m_tex_tab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab.png").c_str() );
+    m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
+    m_tex_iconhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight.png").c_str() );
+    m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
+    
 }
 
 Skin::~Skin()
@@ -33,12 +45,173 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), pos );
 }
 
+void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
+                                         const int left_border, const int right_border,
+                                         const int top_border, const int bottom_border)
+{
+    // FIXME? - lots of things here will be re-calculated every frame, which is useless since
+    // widgets won't move, so they'd only need to be calculated once.
+    const int texture_w = source->getSize().Width;
+    const int texture_h = source->getSize().Height;
+    
+    
+    /*
+     The source texture is split this way to allow for a stretchable center and borders that don't stretch :
+     
+     +----+--------------------+----+
+     |    |                    |    |
+     +----a--------------------b----+  <-- top_border
+     |    |                    |    |
+     |    |                    |    |     
+     |    |                    |    |     
+     +----c--------------------d----+ <-- height - bottom-border
+     |    |                    |    | 
+     +----+--------------------+----+
+     */
+    
+    const int ax = left_border;
+    const int ay = top_border;
+    const int bx = texture_w - right_border;
+    const int by = top_border;
+    const int cx = left_border;
+    const int cy = texture_h - bottom_border;
+    const int dx = texture_w - right_border;
+    const int dy = texture_h - bottom_border;
+    
+    core::rect<s32> source_area_left = core::rect<s32>(0, ay, cx, cy);
+    core::rect<s32> source_area_center = core::rect<s32>(ax, ay, dx, dy);
+    core::rect<s32> source_area_right = core::rect<s32>(bx, top_border, texture_w, dy);
+    
+    core::rect<s32> source_area_top = core::rect<s32>(ax, 0, bx, by);
+    core::rect<s32> source_area_bottom = core::rect<s32>(cx, cy, dx, texture_h);
+    
+    core::rect<s32> source_area_top_left = core::rect<s32>(0, 0, ax, ay);
+    core::rect<s32> source_area_top_right = core::rect<s32>(bx, 0, texture_w, top_border);
+    core::rect<s32> source_area_bottom_left = core::rect<s32>(0, cy, cx, texture_h);
+    core::rect<s32> source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);
+    
+    /*
+     The dest area is split this way. Borders will go a bit beyond the
+     given area so components inside don't go over the borders (by half their size)
+     
+     a----b--------------------c----+
+     |    |                    |    |
+     d----e--------------------f----g  <-- top_border
+     |    |                    |    |
+     |    |                    |    |     
+     |    |                    |    |     
+     h----i--------------------j----k  <-- height - bottom-border
+     |    |                    |    | 
+     +----l--------------------m----n
+     */
+    {
+        const int dest_x = dest.UpperLeftCorner.X;
+        const int dest_y = dest.UpperLeftCorner.Y;
+        const int dest_x2 = dest.LowerRightCorner.X;
+        const int dest_y2 = dest.LowerRightCorner.Y;
+        
+        const float scale = (float)(dest_y2-dest_y)/texture_h;
+        const int dest_left_border_half = left_border*scale*0.5f;
+        const int dest_right_border_half = right_border*scale*0.5f;
+        const int dest_top_border_half = top_border*scale*0.5f;
+        const int dest_bottom_border_half = bottom_border*scale*0.5f;
+        
+        const int ax = dest_x - dest_left_border_half;
+        const int ay = dest_y - dest_top_border_half;
+        
+        const int bx = dest_x + dest_left_border_half;
+        const int by = ay;
+        
+        const int cx = dest_x2 - dest_right_border_half;
+        const int cy = ay;
+        
+        const int dx = ax;
+        const int dy = dest_y + dest_top_border_half;
+        
+        const int ex = bx;
+        const int ey = dy;
+        
+        const int fx = cx;
+        const int fy = dy;
+        
+        const int gx = dest_x2 + dest_right_border_half;
+        const int gy = dy;
+        
+        const int hx = ax;
+        const int hy = dest_y2 - dest_bottom_border_half;
+        
+        const int ix = bx;
+        const int iy = hy;
+        
+        const int jx = cx;
+        const int jy = hy;
+        
+        const int kx = gx;
+        const int ky = hy;
+        
+        const int lx = bx;
+        const int ly = dest_y2 + dest_bottom_border_half; 
+        
+        const int mx = cx;
+        const int my = ly;
+        
+        const int nx = gx;
+        const int ny = ly;
+        
+        core::rect<s32> dest_area_left = core::rect<s32>(dx, dy, ix, iy);
+        core::rect<s32> dest_area_center = core::rect<s32>(ex, ey, jx, jy);
+        core::rect<s32> dest_area_right = core::rect<s32>(fx, fy, kx, ky);
+        
+        core::rect<s32> dest_area_top = core::rect<s32>(bx, by, fx, fy);
+        core::rect<s32> dest_area_bottom = core::rect<s32>(ix, iy, mx, my);
+        
+        core::rect<s32> dest_area_top_left = core::rect<s32>(ax, ay, ex, ey);
+        core::rect<s32> dest_area_top_right = core::rect<s32>(cx, cy, gx, gy);
+        core::rect<s32> dest_area_bottom_left = core::rect<s32>(hx, hy, lx, ly);
+        core::rect<s32> dest_area_bottom_right = core::rect<s32>(jx, jy, nx, ny);
+        
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
+                                            0 /* no clipping */, 0, true /* alpha */);
+        
+    }
+}
+
 void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
-    if(focused)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 100, 0, 0), rect );
-    else
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 100, 0), rect );
+    // FIXME - move these numbers to a config file
+    const int left_border = 80;
+    const int right_border = 80;
+    const int border_above = 0;
+    const int border_below = 36;
+    
+    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fbutton : m_tex_button),
+                                  left_border, right_border,
+                                  border_above, border_below);
+    
+    /* 
+     if(focused)
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 100, 0, 0), rect );
+     else
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 100, 0), rect );
+     */
 }
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
@@ -57,7 +230,7 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const
     }
     
     if(!draw_border) return;
-
+    
     if(focused)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     else
@@ -124,7 +297,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     
     const WidgetType type = widget->m_type;
     
-
+    
     // buttons are used for other uses than plain clickable buttons because irrLicht
     // does not have widgets for everything we need. so at render time, we just check
     // which type this button represents and render accordingly
@@ -154,7 +327,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawSpinnerBody(rect, widget, pressed, focused);
     }
-
+    
 }
 
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)

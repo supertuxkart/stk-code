@@ -17,6 +17,20 @@ namespace GUIEngine
 class Skin : public IGUISkin
 {
     IGUISkin* m_fallback_skin;
+    
+    ITexture* m_tex_button;
+    ITexture* m_tex_fbutton;
+    ITexture* m_tex_spinner;
+    ITexture* m_tex_fspinner;
+    ITexture* m_tex_tab;
+    ITexture* m_tex_ftab;
+    ITexture* m_tex_iconhighlight;
+    ITexture* m_tex_ficonhighlight;
+    
+    void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
+                                       const int left_border, const int right_border,
+                                       const int top_border, const int bottom_border);
+    
 public:
     Skin(IGUISkin* fallback_skin);
     ~Skin();

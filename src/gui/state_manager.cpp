@@ -312,6 +312,10 @@ namespace StateManager
             else if(selection == "page2") replaceTopMostMenu("help2.stkgui");
             else if(selection == "page3") replaceTopMostMenu("help3.stkgui");
         }
+        else if(name == "back")
+        {
+            StateManager::escapePressed();
+        }
     }
 
     

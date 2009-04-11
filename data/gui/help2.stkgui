@@ -50,5 +50,7 @@
     <label proportion="1" height="100%" align="left" word_wrap="true" text="Anchor - slows down greatly the kart in the first position"/>
 </div>
 
-
+<spacer width="50" height="45" />
 </div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>

@@ -105,6 +105,7 @@ void Widget::readCoords(Widget* parent)
         if(convertToCoord(x, &abs_x, &percent_x ))
         {
             if(abs_x > -1) this->x = parent_x + abs_x;
+            else if(abs_x < -1) this->x = parent_x + (parent_w + abs_x);
             else if(percent_x > -1) this->x = parent_x + parent_w*percent_x/100;
         }
     }
@@ -114,7 +115,13 @@ void Widget::readCoords(Widget* parent)
         int abs_y = -1, percent_y = -1;
         if(convertToCoord(y, &abs_y, &percent_y ))
         {
+            if(abs_y < -1)
+            {
+                std::cout << "abs_y = " << abs_y << ", y=" << (parent_y + (parent_h - abs_y)) << std::endl;
+            }
+            
             if(abs_y > -1) this->y = parent_y + abs_y;
+            else if(abs_y < -1) this->y = parent_y + (parent_h + abs_y);
             else if(percent_y > -1) this->y = parent_y + parent_h*percent_y/100;
         }
     }
