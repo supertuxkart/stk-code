@@ -381,15 +381,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-
-                //const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5,
-                //                                                    rect.UpperLeftCorner.Y - 5,
-                //                                                    rect.UpperLeftCorner.X + rect.getWidth() + 5,
-                //                                                    rect.UpperLeftCorner.Y + rect.getHeight() + 5);
-
-                //GUIEngine::getDriver()->draw2DImage(m_tex_squarefocus, rect2, source_area,
-                //                                    0 /* no clipping */, 0, true /* alpha */);
-                
                 drawBoxFromStretchableTexture(rect, m_tex_squarefocus,
                                               6 /* left border */, 6 /* rightborder */,
                                               6 /* top border */, 6 /* bottom border */, 1);
@@ -411,12 +402,6 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
     drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner),
                                   left_border, right_border,
                                   border_above, border_below, 0);
-    /*
-     if(focused)
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
-     else
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-     */
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
@@ -454,14 +439,6 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         
     }
     
-    /*
-     if(pressed)
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
-     else if(focused)
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-     else
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
-     */
 }
 
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
@@ -470,7 +447,6 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     
     const int id = element->getID();
     
-    //std::cout << "searching for a widget in screen " << GUIEngine::getCurrentScreen()->getName().c_str() << std::endl;
     Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
     
     if(widget == NULL) return;
