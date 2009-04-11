@@ -115,11 +115,6 @@ void Widget::readCoords(Widget* parent)
         int abs_y = -1, percent_y = -1;
         if(convertToCoord(y, &abs_y, &percent_y ))
         {
-            if(abs_y < -1)
-            {
-                std::cout << "abs_y = " << abs_y << ", y=" << (parent_y + (parent_h - abs_y)) << std::endl;
-            }
-            
             if(abs_y > -1) this->y = parent_y + abs_y;
             else if(abs_y < -1) this->y = parent_y + (parent_h + abs_y);
             else if(percent_y > -1) this->y = parent_y + parent_h*percent_y/100;
@@ -617,7 +612,7 @@ void SpinnerWidget::add()
     
     // left arrow
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
-    IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, ++id_counter_2, L"<<");
+    IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, ++id_counter_2, L" ");
     m_children[0].m_element = left_arrow;
     m_children[0].m_type = WTYPE_BUTTON;
     left_arrow->setTabStop(false);
@@ -659,7 +654,7 @@ void SpinnerWidget::add()
     
     // right arrow
     rect<s32> subsize_right_arrow = rect<s32>(w-h, 0, w, h);
-    IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, ++id_counter_2, L">>");
+    IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, ++id_counter_2, L"  ");
     right_arrow->setTabStop(false);
     m_children[2].m_element = right_arrow;
     m_children[2].m_type = WTYPE_BUTTON;

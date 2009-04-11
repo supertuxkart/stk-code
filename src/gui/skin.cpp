@@ -47,7 +47,8 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
 
 void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                          const int left_border, const int right_border,
-                                         const int top_border, const int bottom_border)
+                                         const int top_border, const int bottom_border,
+                                         const float border_out_portion)
 {
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
     // widgets won't move, so they'd only need to be calculated once.
@@ -91,8 +92,9 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
     core::rect<s32> source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);
     
     /*
-     The dest area is split this way. Borders will go a bit beyond the
-     given area so components inside don't go over the borders (by half their size)
+     The dest area is split this way. Borders can go a bit beyond the given area so
+     components inside don't go over the borders
+     (how much it exceeds horizontally is specified in 'border_out_portion'. vertically is always the totality)
      
      a----b--------------------c----+
      |    |                    |    |
@@ -111,22 +113,24 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int dest_y2 = dest.LowerRightCorner.Y;
         
         const float scale = (float)(dest_y2-dest_y)/texture_h;
-        const int dest_left_border_half = left_border*scale*0.5f;
-        const int dest_right_border_half = right_border*scale*0.5f;
-        const int dest_top_border_half = top_border*scale*0.5f;
-        const int dest_bottom_border_half = bottom_border*scale*0.5f;
+        const int dest_left_border = left_border*scale;
+        const int dest_right_border = right_border*scale;
+        const int dest_top_border = top_border*scale;
+        const int dest_bottom_border = bottom_border*scale;
         
-        const int ax = dest_x - dest_left_border_half;
-        const int ay = dest_y - dest_top_border_half;
+        const float border_in_portion = 1 - border_out_portion;
         
-        const int bx = dest_x + dest_left_border_half;
+        const int ax = dest_x - dest_left_border*border_out_portion;
+        const int ay = dest_y - dest_top_border;
+        
+        const int bx = dest_x + dest_left_border*border_in_portion;
         const int by = ay;
         
-        const int cx = dest_x2 - dest_right_border_half;
+        const int cx = dest_x2 - dest_right_border*border_in_portion;
         const int cy = ay;
         
         const int dx = ax;
-        const int dy = dest_y + dest_top_border_half;
+        const int dy = dest_y;
         
         const int ex = bx;
         const int ey = dy;
@@ -134,11 +138,11 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int fx = cx;
         const int fy = dy;
         
-        const int gx = dest_x2 + dest_right_border_half;
+        const int gx = dest_x2 + dest_right_border*border_out_portion;
         const int gy = dy;
         
         const int hx = ax;
-        const int hy = dest_y2 - dest_bottom_border_half;
+        const int hy = dest_y2;
         
         const int ix = bx;
         const int iy = hy;
@@ -150,7 +154,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int ky = hy;
         
         const int lx = bx;
-        const int ly = dest_y2 + dest_bottom_border_half; 
+        const int ly = dest_y2 + dest_bottom_border; 
         
         const int mx = cx;
         const int my = ly;
@@ -268,20 +272,33 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
 
 void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, const bool focused)
 {
+    // FIXME - move these numbers to a config file
+    const int left_border = 110;
+    const int right_border = 110;
+    const int border_above = 0;
+    const int border_below = 36;
+    
+    drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner),
+                                  left_border, right_border,
+                                  border_above, border_below, 0);
+    /*
     if(focused)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+     */
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
+    /*
     if(pressed)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
     else if(focused)
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+     */
 }
 
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
