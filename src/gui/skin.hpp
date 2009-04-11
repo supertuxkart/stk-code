@@ -32,6 +32,7 @@ class Skin : public IGUISkin
     ITexture* m_tex_dspinner;
     ITexture* m_tex_tab;
     ITexture* m_tex_ftab;
+    ITexture* m_tex_dtab;
     ITexture* m_tex_iconhighlight;
     ITexture* m_tex_ficonhighlight;
     

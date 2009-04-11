@@ -17,12 +17,15 @@ Skin::Skin(IGUISkin* fallback_skin)
     
     m_tex_button = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton.png").c_str() );
     m_tex_fbutton = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton_focused.png").c_str() );
+    
     m_tex_spinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner.png").c_str() );
     m_tex_fspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_focus.png").c_str() );
     m_tex_dspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_down.png").c_str() );
 
     m_tex_tab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab.png").c_str() );
     m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
+    m_tex_dtab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_down.png").c_str() );
+    
     m_tex_iconhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight.png").c_str() );
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
     
@@ -250,6 +253,9 @@ void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const b
 }
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
+    // only combo ribbons need a border
+    if ( ((RibbonWidget*)widget)->getRibbonType() != RIBBON_COMBO ) return;
+    
     bool draw_border = focused;
     
     // check if one of its children has focus (will happen when directly clicking on them)
@@ -276,13 +282,39 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
 {
     bool mark_selected = widget->isSelected();
     
+    const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_parent->m_element;
+    
     if(widget->m_type == WTYPE_BUTTON)
     {
         // ribbons containing buttons are actually tabs
+        
+        // FIXME - specify in file, don't hardcode
+        const int left_border = 75;
+        const int right_border = 75;
+        const int border_above = 0;
+        const int border_below = 0;
+        
+        if (mark_selected)
+        {
+            core::rect< s32 > rect2 = rect;
+            rect2.LowerRightCorner.Y += 10;
+            
+            drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab),
+                                          left_border, right_border,
+                                          border_above, border_below, 0.2);
+        }
+        else
+        {
+            drawBoxFromStretchableTexture(rect, m_tex_tab,
+                                          left_border, right_border,
+                                          border_above, border_below, 0);
+        }
+        /*
         if(mark_selected)
             GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), rect );
         else
             GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+         */
     }
     else
     {
@@ -385,11 +417,11 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     
     if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON)
     {
-        drawRibbonChild(rect, widget, pressed /* pressed */, true /* focused */);
+        drawRibbonChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }
     else if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_SPINNER)
     {
-        drawSpinnerChild(rect, widget, pressed /* pressed */, true /* focused */);
+        drawSpinnerChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }
     else if(type == WTYPE_ICON_BUTTON)
     {
