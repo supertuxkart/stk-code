@@ -22,13 +22,15 @@ namespace GUIEngine
     extern IVideoDriver* getDriver();
     extern IGUIFont* getFont();
 
+    float getLatestDt();
+    
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
     void switchToScreen(const char* );
     void clear();
     
     Screen* getCurrentScreen();
     
-    void render();
+    void render(float dt);
     void transmitEvent(Widget* widget, std::string& name);
      
 }

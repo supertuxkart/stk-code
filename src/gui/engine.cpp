@@ -19,6 +19,12 @@ namespace GUIEngine
     std::vector<Screen*> g_loaded_screens;
     Screen* g_current_screen = NULL;
 
+    float dt = 0;
+    
+    float getLatestDt()
+    {
+        return dt;
+    }
 // -----------------------------------------------------------------------------
 IrrlichtDevice* getDevice()
 {
@@ -111,8 +117,10 @@ void transmitEvent(Widget* widget, std::string& name)
     g_event_callback(widget, name);
 }
 // -----------------------------------------------------------------------------    
-void render()
+void render(float elapsed_time)
 {
+    GUIEngine::dt = elapsed_time;
+    
     // on one end, making these static is not too clean.
     // on another end, these variables are really only used locally,
     // and making them static avoids doing the same stupid computations every frame

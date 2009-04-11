@@ -253,6 +253,8 @@ void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const b
 }
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
+    return;
+    
     // only combo ribbons need a border
     if ( ((RibbonWidget*)widget)->getRibbonType() != RIBBON_COMBO ) return;
     
@@ -284,6 +286,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     
     const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_parent->m_element;
     
+    /* tab-bar ribbons */
     if(widget->m_type == WTYPE_BUTTON)
     {
         // ribbons containing buttons are actually tabs
@@ -309,13 +312,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                           left_border, right_border,
                                           border_above, border_below, 0);
         }
-        /*
-        if(mark_selected)
-            GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), rect );
-        else
-            GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-         */
+
     }
+    /* icon ribbons */
     else
     {
         if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON && 
@@ -324,10 +323,50 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
         
         if(mark_selected)
         {
-            const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5, rect.UpperLeftCorner.Y - 5,
-                                                               rect.UpperLeftCorner.X + rect.getWidth() + 5,
-                                                               rect.UpperLeftCorner.Y + rect.getHeight() + 5);
-            GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+            int grow = 45;
+            static float glow_effect = 0;
+            
+            if(focused || parent_focused)
+            {
+                const float dt = GUIEngine::getLatestDt();
+                glow_effect += dt*3;
+                if (glow_effect > 6.2832 /* 2*PI */) glow_effect -= 6.2832;
+                grow = 45 + 10*sin(glow_effect);
+            }
+            
+            /*
+            const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5 - grow,
+                                                               rect.UpperLeftCorner.Y - 5 - grow,
+                                                               rect.UpperLeftCorner.X + rect.getWidth() + 5 + grow,
+                                                               rect.UpperLeftCorner.Y + rect.getHeight() + 5 + grow);
+             */
+            
+            const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
+            const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
+            
+            const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                               glow_center_y - 25 - grow/2,
+                                                               glow_center_x + 45 + grow,
+                                                               glow_center_y + 25 + grow/2);
+            
+            // GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+            
+            const int texture_w = m_tex_ficonhighlight->getSize().Width;
+            const int texture_h = m_tex_ficonhighlight->getSize().Height;
+
+            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+
+            if(!focused && !parent_focused)
+            {
+                GUIEngine::getDriver()->draw2DImage(m_tex_iconhighlight, rect2, source_area,
+                                                    0 /* no clipping */, 0, true /* alpha */);
+            }
+            else
+            {
+                GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
+                                                    0 /* no clipping */, 0, true /* alpha */);
+            }
+            
         }
     }
     

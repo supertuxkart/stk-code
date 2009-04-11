@@ -329,7 +329,7 @@ void IrrDriver::update(float dt)
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
 
-    GUIEngine::render();
+    GUIEngine::render(dt);
     
     m_device->getVideoDriver()->endScene();
 }   // update
