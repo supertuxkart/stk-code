@@ -14,6 +14,13 @@ namespace GUIEngine
 
     class Widget;
     
+    // areas
+    const int BODY = 1;
+    const int LEFT = 2;
+    const int RIGHT = 4;
+    const int TOP = 8;
+    const int BOTTOM = 16;
+    
 class Skin : public IGUISkin
 {
     IGUISkin* m_fallback_skin;
@@ -22,6 +29,7 @@ class Skin : public IGUISkin
     ITexture* m_tex_fbutton;
     ITexture* m_tex_spinner;
     ITexture* m_tex_fspinner;
+    ITexture* m_tex_dspinner;
     ITexture* m_tex_tab;
     ITexture* m_tex_ftab;
     ITexture* m_tex_iconhighlight;
@@ -30,7 +38,8 @@ class Skin : public IGUISkin
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,
                                        const int top_border, const int bottom_border,
-                                       const float border_out_portion = 0.5);
+                                       const float border_out_portion = 0.5,
+                                       int areas = BODY | LEFT | RIGHT | TOP | BOTTOM);
     
 public:
     Skin(IGUISkin* fallback_skin);
@@ -41,7 +50,7 @@ public:
     void drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused);
     void drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
     void drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
-    void drawSpinnerChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
+    void drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
     void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, const bool focused);
 
     // irrlicht's callbacks

@@ -19,6 +19,8 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_tex_fbutton = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton_focused.png").c_str() );
     m_tex_spinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner.png").c_str() );
     m_tex_fspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_focus.png").c_str() );
+    m_tex_dspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_down.png").c_str() );
+
     m_tex_tab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab.png").c_str() );
     m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
     m_tex_iconhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight.png").c_str() );
@@ -48,7 +50,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
 void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                          const int left_border, const int right_border,
                                          const int top_border, const int bottom_border,
-                                         const float border_out_portion)
+                                         const float border_out_portion, int areas)
 {
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
     // widgets won't move, so they'd only need to be calculated once.
@@ -174,26 +176,55 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         core::rect<s32> dest_area_bottom_left = core::rect<s32>(hx, hy, lx, ly);
         core::rect<s32> dest_area_bottom_right = core::rect<s32>(jx, jy, nx, ny);
         
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        if((areas & LEFT) != 0)
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
         
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        if((areas & BODY) != 0)
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
         
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        if((areas & RIGHT) != 0)
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        
+        if((areas & TOP) != 0)
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        if((areas & BOTTOM) != 0)
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        
+        if( (areas & LEFT != 0) && (areas & TOP != 0) )
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        if( (areas & RIGHT != 0) && (areas & TOP != 0) )
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        if( (areas & LEFT != 0) && (areas & BOTTOM != 0) )
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        if( (areas & RIGHT != 0) && (areas & BOTTOM != 0) )
+        {
+            GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
         
     }
 }
@@ -282,22 +313,55 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
                                   left_border, right_border,
                                   border_above, border_below, 0);
     /*
-    if(focused)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
-    else
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+     if(focused)
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
+     else
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
      */
 }
 
-void Skin::drawSpinnerChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
+void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    /*
+    // FIXME - move these numbers to a config file
+    const int left_border = 110;
+    const int right_border = 110;
+    const int border_above = 0;
+    const int border_below = 36;
+    
     if(pressed)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
-    else if(focused)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-    else
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+    {
+        Widget* spinner = widget->m_parent;
+        int areas = 0;
+        
+        //std::cout << "drawing spinner child " << widget->m_properties[PROP_ID].c_str() << std::endl;
+        
+        if (widget->m_properties[PROP_ID] == "left") areas = LEFT;
+        else if (widget->m_properties[PROP_ID] == "right") areas = RIGHT;
+        else return;
+        
+        core::rect< s32 > rect2 = core::rect< s32 >( spinner->x, spinner->y,
+                                                    spinner->x + spinner->w,
+                                                    spinner->y + spinner->h  );
+        
+        //std::cout << "proceeding to render " << areas << std::endl;
+        
+        drawBoxFromStretchableTexture(rect2, m_tex_fspinner,
+                                      left_border, right_border,
+                                      border_above, border_below, 0, LEFT | RIGHT);
+ 
+        drawBoxFromStretchableTexture(rect2, m_tex_dspinner,
+                                      left_border, right_border,
+                                      border_above, border_below, 0, areas);
+        
+    }
+    
+    /*
+     if(pressed)
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255, 0, 0), rect );
+     else if(focused)
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+     else
+     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
      */
 }
 
