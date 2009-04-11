@@ -35,6 +35,7 @@ class Skin : public IGUISkin
     ITexture* m_tex_dtab;
     ITexture* m_tex_iconhighlight;
     ITexture* m_tex_ficonhighlight;
+    ITexture* m_tex_squarefocus;
     
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,

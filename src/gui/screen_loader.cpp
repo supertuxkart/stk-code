@@ -136,6 +136,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(text_align,     PROP_TEXT_ALIGN);
                 READ_PROPERTY(min_value,      PROP_MIN_VALUE);
                 READ_PROPERTY(max_value,      PROP_MAX_VALUE);
+                READ_PROPERTY(square_items,   PROP_SQUARE);
 #undef READ_PROPERTY
                 
                 //std::cout << "loaded widget " << id << std::endl;

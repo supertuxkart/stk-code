@@ -21,13 +21,14 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_tex_spinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner.png").c_str() );
     m_tex_fspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_focus.png").c_str() );
     m_tex_dspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_down.png").c_str() );
-
+    
     m_tex_tab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab.png").c_str() );
     m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
     m_tex_dtab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_down.png").c_str() );
     
     m_tex_iconhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight.png").c_str() );
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
+    m_tex_squarefocus = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_square_focused.png").c_str() );
     
 }
 
@@ -117,11 +118,13 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int dest_x2 = dest.LowerRightCorner.X;
         const int dest_y2 = dest.LowerRightCorner.Y;
         
-        const float scale = (float)(dest_y2-dest_y)/texture_h;
-        const int dest_left_border = left_border*scale;
-        const int dest_right_border = right_border*scale;
-        const int dest_top_border = top_border*scale;
-        const int dest_bottom_border = bottom_border*scale;
+        const float xscale = (float)(dest_x2-dest_x)/texture_w;
+        const float yscale = (float)(dest_y2-dest_y)/texture_h;
+
+        const int dest_left_border = left_border*std::min<float>(yscale, 1.0);
+        const int dest_right_border = right_border*std::min<float>(yscale, 1.0);
+        const int dest_top_border = top_border*std::min<float>(xscale, 1.0);
+        const int dest_bottom_border = bottom_border*std::min<float>(xscale, 1.0);
         
         const float border_in_portion = 1 - border_out_portion;
         
@@ -312,59 +315,84 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                           left_border, right_border,
                                           border_above, border_below, 0);
         }
-
+        
     }
     /* icon ribbons */
     else
     {
+        bool use_glow = true;
+
+        if (widget->m_parent != NULL && widget->m_parent->m_properties[PROP_SQUARE] == "true") use_glow = false;
+        if (widget->m_parent != NULL && widget->m_parent->m_parent != NULL &&
+            widget->m_parent->m_parent->m_properties[PROP_SQUARE] == "true") use_glow = false;
+        
+        
         if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON && 
            ((RibbonWidget*)widget->m_parent)->getRibbonType() == RIBBON_TOOLBAR &&
            !GUIEngine::getGUIEnv()->hasFocus(widget->m_parent->m_element)) mark_selected = false;
         
         if(mark_selected)
         {
-            int grow = 45;
-            static float glow_effect = 0;
-            
-            if(focused || parent_focused)
+            if (use_glow)
             {
-                const float dt = GUIEngine::getLatestDt();
-                glow_effect += dt*3;
-                if (glow_effect > 6.2832 /* 2*PI */) glow_effect -= 6.2832;
-                grow = 45 + 10*sin(glow_effect);
+                int grow = 45;
+                static float glow_effect = 0;
+                
+                if(focused || parent_focused)
+                {
+                    const float dt = GUIEngine::getLatestDt();
+                    glow_effect += dt*3;
+                    if (glow_effect > 6.2832 /* 2*PI */) glow_effect -= 6.2832;
+                    grow = 45 + 10*sin(glow_effect);
+                }
+                
+                
+                const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
+                const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
+                
+                const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                                   glow_center_y - 25 - grow/2,
+                                                                   glow_center_x + 45 + grow,
+                                                                   glow_center_y + 25 + grow/2);
+                
+                // GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+                
+                const int texture_w = m_tex_ficonhighlight->getSize().Width;
+                const int texture_h = m_tex_ficonhighlight->getSize().Height;
+                
+                core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+                
+                if(!focused && !parent_focused)
+                {
+                    GUIEngine::getDriver()->draw2DImage(m_tex_iconhighlight, rect2, source_area,
+                                                        0 /* no clipping */, 0, true /* alpha */);
+                }
+                else
+                {
+                    GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
+                                                        0 /* no clipping */, 0, true /* alpha */);
+                }
             }
-            
-            /*
-            const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5 - grow,
-                                                               rect.UpperLeftCorner.Y - 5 - grow,
-                                                               rect.UpperLeftCorner.X + rect.getWidth() + 5 + grow,
-                                                               rect.UpperLeftCorner.Y + rect.getHeight() + 5 + grow);
-             */
-            
-            const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
-            const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
-            
-            const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
-                                                               glow_center_y - 25 - grow/2,
-                                                               glow_center_x + 45 + grow,
-                                                               glow_center_y + 25 + grow/2);
-            
-            // GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
-            
-            const int texture_w = m_tex_ficonhighlight->getSize().Width;
-            const int texture_h = m_tex_ficonhighlight->getSize().Height;
-
-            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
-
-            if(!focused && !parent_focused)
-            {
-                GUIEngine::getDriver()->draw2DImage(m_tex_iconhighlight, rect2, source_area,
-                                                    0 /* no clipping */, 0, true /* alpha */);
-            }
+            /* if we're not using glow */
             else
             {
-                GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
-                                                    0 /* no clipping */, 0, true /* alpha */);
+                const int texture_w = m_tex_squarefocus->getSize().Width;
+                const int texture_h = m_tex_squarefocus->getSize().Height;
+                
+                core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+                
+
+                //const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X - 5,
+                //                                                    rect.UpperLeftCorner.Y - 5,
+                //                                                    rect.UpperLeftCorner.X + rect.getWidth() + 5,
+                //                                                    rect.UpperLeftCorner.Y + rect.getHeight() + 5);
+
+                //GUIEngine::getDriver()->draw2DImage(m_tex_squarefocus, rect2, source_area,
+                //                                    0 /* no clipping */, 0, true /* alpha */);
+                
+                drawBoxFromStretchableTexture(rect, m_tex_squarefocus,
+                                              6 /* left border */, 6 /* rightborder */,
+                                              6 /* top border */, 6 /* bottom border */, 1);
             }
             
         }
@@ -419,7 +447,7 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         drawBoxFromStretchableTexture(rect2, m_tex_fspinner,
                                       left_border, right_border,
                                       border_above, border_below, 0, LEFT | RIGHT);
- 
+        
         drawBoxFromStretchableTexture(rect2, m_tex_dspinner,
                                       left_border, right_border,
                                       border_above, border_below, 0, areas);

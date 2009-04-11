@@ -46,7 +46,8 @@ namespace GUIEngine
         PROP_ICON,
         PROP_TEXT_ALIGN,
         PROP_MIN_VALUE,
-        PROP_MAX_VALUE
+        PROP_MAX_VALUE,
+        PROP_SQUARE
     };
     
     class Widget
