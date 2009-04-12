@@ -178,15 +178,15 @@ void Widget::readCoords(Widget* parent)
     {
         float ratio = (float)parent_h/this->h;
 
-        this->w *= ratio;
-        this->h *= ratio;
+        this->w = (int)(this->w*ratio);
+        this->h = (int)(this->h*ratio);
     }
     if(this->w > (int)parent_w)
     {
         float ratio = (float)parent_w/this->w;
 
-        this->w *= ratio;
-        this->h *= ratio;
+        this->w = (int)(this->w*ratio);
+        this->h = (int)(this->h*ratio);
     }
      
 }
@@ -301,7 +301,7 @@ void IconButtonWidget::add()
     {
         // irrlicht widgets don't support scaling while keeping aspect ratio
         // so, happily, let's implement it ourselves
-        const int x_gap = (float)w - (float)texture_w * (float)h / texture_h;
+        const int x_gap = (int)((float)w - (float)texture_w * (float)h / texture_h);
          
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
         

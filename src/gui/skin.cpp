@@ -121,20 +121,20 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const float xscale = (float)(dest_x2-dest_x)/texture_w;
         const float yscale = (float)(dest_y2-dest_y)/texture_h;
 
-        const int dest_left_border = left_border*std::min<float>(yscale, 1.0);
-        const int dest_right_border = right_border*std::min<float>(yscale, 1.0);
-        const int dest_top_border = top_border*std::min<float>(xscale, 1.0);
-        const int dest_bottom_border = bottom_border*std::min<float>(xscale, 1.0);
+        const int dest_left_border   = (int)(left_border  *std::min<float>(yscale, 1.0));
+        const int dest_right_border  = (int)(right_border *std::min<float>(yscale, 1.0));
+        const int dest_top_border    = (int)(top_border   *std::min<float>(xscale, 1.0));
+        const int dest_bottom_border = (int)(bottom_border*std::min<float>(xscale, 1.0));
         
         const float border_in_portion = 1 - border_out_portion;
         
-        const int ax = dest_x - dest_left_border*border_out_portion;
+        const int ax = (int)(dest_x - dest_left_border*border_out_portion);
         const int ay = dest_y - dest_top_border;
         
-        const int bx = dest_x + dest_left_border*border_in_portion;
+        const int bx = (int)(dest_x + dest_left_border*border_in_portion);
         const int by = ay;
         
-        const int cx = dest_x2 - dest_right_border*border_in_portion;
+        const int cx = (int)(dest_x2 - dest_right_border*border_in_portion);
         const int cy = ay;
         
         const int dx = ax;
@@ -146,7 +146,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int fx = cx;
         const int fy = dy;
         
-        const int gx = dest_x2 + dest_right_border*border_out_portion;
+        const int gx = (int)(dest_x2 + dest_right_border*border_out_portion);
         const int gy = dy;
         
         const int hx = ax;
@@ -211,22 +211,22 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if( (areas & LEFT != 0) && (areas & TOP != 0) )
+        if( ((areas & LEFT) != 0) && ((areas & TOP) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( (areas & RIGHT != 0) && (areas & TOP != 0) )
+        if( ((areas & RIGHT) != 0) && ((areas & TOP) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( (areas & LEFT != 0) && (areas & BOTTOM != 0) )
+        if( ((areas & LEFT) != 0) && ((areas & BOTTOM) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( (areas & RIGHT != 0) && (areas & BOTTOM != 0) )
+        if( ((areas & RIGHT) != 0) && ((areas & BOTTOM) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
                                                 0 /* no clipping */, 0, true /* alpha */);
@@ -307,7 +307,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             
             drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab),
                                           left_border, right_border,
-                                          border_above, border_below, 0.2);
+                                          border_above, border_below, 0.2f);
         }
         else
         {
@@ -342,8 +342,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 {
                     const float dt = GUIEngine::getLatestDt();
                     glow_effect += dt*3;
-                    if (glow_effect > 6.2832 /* 2*PI */) glow_effect -= 6.2832;
-                    grow = 45 + 10*sin(glow_effect);
+                    if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+                    grow = (int)(45 + 10*sin(glow_effect));
                 }
                 
                 

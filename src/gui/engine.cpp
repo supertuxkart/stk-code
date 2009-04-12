@@ -149,10 +149,10 @@ void render(float elapsed_time)
         float ratio = (float)screen_h / texture_h;
         
         // check that with the vertical stretching, it still fits horizontally
-        while(texture_w*ratio < screen_w) ratio += 0.1;
+        while(texture_w*ratio < screen_w) ratio += 0.1f;
         
-        texture_w *= ratio;
-        texture_h *= ratio;
+        texture_w = (int)(texture_w*ratio);
+        texture_h = (int)(texture_h*ratio);
         
         const int clipped_x_space = (texture_w - screen_w);
         
