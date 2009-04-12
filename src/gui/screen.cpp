@@ -80,7 +80,11 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
             horizontal = true;
         else if(!strcmp("vertical-row", layout_name.c_str()))
             horizontal = false;
-        else break;
+        else
+        {
+            std::cerr << "Unknown layout name : " << layout_name.c_str() << std::endl;
+            break;
+        }
         
         const int w = parent->w, h = parent->h;
         

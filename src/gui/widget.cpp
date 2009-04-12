@@ -168,6 +168,7 @@ void Widget::readCoords(Widget* parent)
             if(abs_h > -1) this->h = abs_h;
             else if(percent_h > -1) this->h = parent_h*percent_h/100;
         }
+        else if(texture_h > -1 && label_h > -1) this->h = texture_h + label_h;
         else if(texture_h > -1) this->h = texture_h;
         else if(label_h > -1) this->h = label_h;
     }
@@ -777,7 +778,7 @@ void RibbonGridWidget::add()
             IconButtonWidget* icon = new IconButtonWidget();
             icon->m_properties[PROP_ICON]="gui/track_random.png";
             
-            // set size to get proper ratio (as most textures are saved sccaled down to 256x256)
+            // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT]= m_properties[PROP_CHILD_HEIGHT];
             
