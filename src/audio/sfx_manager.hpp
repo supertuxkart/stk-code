@@ -68,6 +68,7 @@ private:
     std::vector<float>        m_sfx_gain;
     std::vector<SFXBase*>     m_all_sfx;
     bool                      m_initialized;
+    float                     m_masterGain;
     void                      loadSfx();
     void                      loadSingleSfx(const lisp::Lisp *lisp, 
                                             const  char *name, 
@@ -80,6 +81,7 @@ public:
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();
+    void                     setMasterSFXVolume(float gain);
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
 };

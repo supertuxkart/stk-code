@@ -44,6 +44,7 @@ SFXManager::SFXManager()
 {
     // The sound manager initialises OpenAL
     m_initialized = sound_manager->initialized();
+    m_masterGain = 1.0f;
     m_sfx_buffers.resize(NUM_SOUNDS);
     m_sfx_positional.resize(NUM_SOUNDS);
     m_sfx_rolloff.resize(NUM_SOUNDS);
@@ -207,7 +208,8 @@ SFXBase *SFXManager::newSFX(SFXType id)
     if(race_manager->getNumLocalPlayers() < 2)
         positional = m_sfx_positional[id]!=0;
 
-    SFXBase *p=new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
+    SFXBase *p = new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
+    p->volume(m_masterGain);
     m_all_sfx.push_back(p);
     return p;
 }   // newSFX
@@ -261,7 +263,7 @@ void SFXManager::resumeAll()
     }   // for i in m_all_sfx
 }   // resumeAll
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool SFXManager::checkError(const std::string &context)
 {
     // Check (and clear) the error flag
@@ -275,6 +277,24 @@ bool SFXManager::checkError(const std::string &context)
     }
     return true;
 }   // checkError
+
+//-----------------------------------------------------------------------------
+void SFXManager::setMasterSFXVolume(float gain)
+{
+    if(gain > 1.0)
+        gain = 1.0f;
+    if(gain < 0.0f)
+        gain = 0.0f;
+
+    m_masterGain = gain;
+
+    for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
+        i!=m_all_sfx.end(); i++)
+    {
+        (*i)->volume(m_masterGain);
+    }   // for i in m_all_sfx
+
+}   // setMasterSFXVolume
 
 //-----------------------------------------------------------------------------
 const std::string SFXManager::getErrorString(int err)
