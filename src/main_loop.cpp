@@ -57,14 +57,12 @@ MainLoop::~MainLoop()
 //-----------------------------------------------------------------------------
 void MainLoop::loadBackgroundImages()
 {
+#ifndef HAVE_IRRLICHT
     int ind = user_config->getBackgroundIndex();
     const std::string &main = stk_config->getMainMenuPicture(ind);
-#ifndef HAVE_IRRLICHT
     m_title_screen_texture = material_manager->getMaterial(main)->getState()->getTextureHandle();
-#endif
     
     const std::string &background = stk_config->getBackgroundPicture(ind);
-#ifndef HAVE_IRRLICHT
     m_bg_texture = material_manager->getMaterial(background)->getState()->getTextureHandle();
 #endif
 }   // loadBackgroundImages
