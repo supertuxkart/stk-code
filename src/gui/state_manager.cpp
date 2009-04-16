@@ -1,4 +1,6 @@
 
+#include "audio/sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "gui/state_manager.hpp"
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
@@ -284,6 +286,25 @@ namespace StateManager
             else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
             else if(selection == "controls") replaceTopMostMenu("options_input.stkgui");
         }
+        else if(name == "music_volume")
+        {
+            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>
+                (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+            assert(w != NULL);
+            
+            // TODO - save value to file, load value from file, make the slider start at an actual value
+            sound_manager->setMasterMusicVolume( w->getValue() );
+        }
+        else if(name == "sfx_volume")
+        {
+            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>
+                (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+            assert(w != NULL);
+            
+            // TODO - save value to file, load value from file, make the slider start at an actual value
+            sfx_manager->setMasterSFXVolume( w->getValue() );
+        }
+
     }
 
     /**

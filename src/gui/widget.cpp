@@ -266,6 +266,13 @@ void GaugeWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
+// -----------------------------------------------------------------------------
+float GaugeWidget::getValue()
+{
+    IGUIScrollBar* sb = dynamic_cast<IGUIScrollBar*>(m_element);
+    assert(sb != NULL);
+    return (float)sb->getPos() / sb->getMax();
+}
 
 #if 0
 #pragma mark -
