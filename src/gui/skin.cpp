@@ -461,11 +461,11 @@ void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool foc
     GaugeWidget* w = dynamic_cast<GaugeWidget*>(widget);
     
     // the width of an handle is about 0.844 the height in the current skin. FIXME - don't hardcode.
-    const int handle_size = widget->h*0.844;
+    const int handle_size = (int)(widget->h*0.844f);
     
     // the 'rect' argument will be too small, because irrlicht has no suitable gauge component, so i used a scrollbar
     const core::rect< s32 > dest_area = core::rect< s32 >(widget->x+handle_size, widget->y,
-                                                      widget->x + handle_size + (widget->w - 2*handle_size)*w->getValue(),
+                                                      widget->x + handle_size + (int)((widget->w - 2*handle_size)*w->getValue()),
                                                       widget->y + widget->h);
     
     const int texture_w = m_tex_gaugefill->getSize().Width;
