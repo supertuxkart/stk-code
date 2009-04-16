@@ -265,6 +265,7 @@ namespace StateManager
      */
     void menuEventOptions(GUIEngine::Widget* widget, std::string& name)
     {
+        // -- init
         if(name == "init")
         {
             const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
@@ -278,17 +279,18 @@ namespace StateManager
                 else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
             
+            // audio-video sub-screen
             if(screen_name == "options_av.stkgui")
             {
                 GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+                    (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
                 assert(gauge != NULL);
                 
                 gauge->setValue( sfx_manager->getMasterSFXVolume() );
                 
                 
                 gauge = dynamic_cast<GUIEngine::GaugeWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+                    (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
                 assert(gauge != NULL);
                 gauge->setValue( sound_manager->getMasterMusicVolume() );
             }

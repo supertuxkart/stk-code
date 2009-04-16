@@ -65,7 +65,7 @@ public:
                                                     m_current_music->switchToFastMusic();}
     
     void                    setMasterMusicVolume(float gain);
-    int                     getMasterMusicVolume() const { return m_masterGain; }
+    float                   getMasterMusicVolume() const { return m_masterGain; }
     
     MusicInformation       *getCurrentMusic() {return m_current_music; }    
     MusicInformation       *getMusicInformation(const std::string& filename);
