@@ -30,6 +30,8 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
     m_tex_squarefocus = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_square_focused.png").c_str() );
     
+    m_tex_gaugefill = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasssgauge_fill.png").c_str() );
+
 }
 
 Skin::~Skin()
@@ -37,19 +39,6 @@ Skin::~Skin()
     m_fallback_skin->drop();
 }
 
-/*
- driver->draw2DImage(texture,
- core::rect<s32>(img_x1, img_y1, img_x2, img_y2),
- core::rect<s32>(0,0,texture_size.Width, texture_size.Height) );
- */ 
-void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip)
-{
-    
-    // scrollbar backgound
-    
-    //printf("draw rectangle\n");
-    GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), pos );
-}
 
 void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                          const int left_border, const int right_border,
@@ -455,6 +444,64 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
     
 }
 
+void Skin::drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused)
+{
+    // FIXME - move these numbers to a config file
+    const int left_border = 110;
+    const int right_border = 110;
+    const int border_above = 0;
+    const int border_below = 36;
+    
+    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner),
+                                  left_border, right_border,
+                                  border_above, border_below, 0);
+}
+void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused)
+{
+    GaugeWidget* w = dynamic_cast<GaugeWidget*>(widget);
+    
+    // the width of an handle is about 0.844 the height in the current skin. FIXME - don't hardcode.
+    const int handle_size = widget->h*0.844;
+    
+    // the 'rect' argument will be too small, because irrlicht has no suitable gauge component, so i used a scrollbar
+    const core::rect< s32 > dest_area = core::rect< s32 >(widget->x+handle_size, widget->y,
+                                                      widget->x + handle_size + (widget->w - 2*handle_size)*w->getValue(),
+                                                      widget->y + widget->h);
+    
+    const int texture_w = m_tex_gaugefill->getSize().Width;
+    const int texture_h = m_tex_gaugefill->getSize().Height;
+    
+    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+
+    
+    GUIEngine::getDriver()->draw2DImage(m_tex_gaugefill, dest_area, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
+}
+
+#if 0
+#pragma mark -
+#pragma mark irrlicht skin functions
+#endif
+
+void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{
+    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+    const int id = element->getID();
+    
+    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    if(widget == NULL) return;
+    
+    const WidgetType type = widget->m_type;
+    
+    
+    if(type == WTYPE_GAUGE)
+    {
+        drawGauge(rect, widget, focused);
+    }  
+    
+    //printf("draw rectangle\n");
+    // GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), pos );
+}
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
 {
     const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
@@ -496,8 +543,11 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_SPINNER)
     {
         drawSpinnerBody(rect, widget, pressed, focused);
-    }
-    
+    } 
+    else if(type == WTYPE_GAUGE)
+    {
+        drawGaugeFill(rect, widget, focused);
+    }  
 }
 
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
@@ -539,7 +589,6 @@ void Skin::draw3DTabButton (IGUIElement *element, bool active, const core::rect<
 
 void Skin::draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    //printf("draw toolbar\n");
 }
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
@@ -550,13 +599,11 @@ core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawT
 
 void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon, const core::position2di position, u32 starttime, u32 currenttime, bool loop, const core::rect< s32 > *clip)
 {
-    //printf("draw icon\n");
-    m_fallback_skin->drawIcon(element, icon, position, starttime, currenttime, loop, clip);
+    /* m_fallback_skin->drawIcon(element, icon, position, starttime, currenttime, loop, clip); */
 }
 
 video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const 
 {
-    //printf("getting color\n");
     /*
      EGDC_3D_DARK_SHADOW 	Dark shadow for three-dimensional display elements.
      EGDC_3D_SHADOW 	Shadow color for three-dimensional display elements (for edges facing away from the light source).
@@ -604,31 +651,28 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
 
 const wchar_t* 	Skin::getDefaultText (EGUI_DEFAULT_TEXT text) const 
 {
-    //printf("getting default text\n");
     return L"SuperTuxKart";
 }
 
 IGUIFont* Skin::getFont (EGUI_DEFAULT_FONT which) const 
 {
-    //printf("getting font\n");
     return GUIEngine::getFont();
 }
 
 u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const 
 {
-    //printf("getting icon\n");
-    return m_fallback_skin->getIcon(icon);
+    //return m_fallback_skin->getIcon(icon);
+   // return m_fallback_skin->getIcon(irr::gui::EGUI_DEFAULT_ICON);
+    return 0;
 }
 
 s32 Skin::getSize (EGUI_DEFAULT_SIZE size) const 
 {
-    //printf("getting size\n");
     return m_fallback_skin->getSize(size);
 }
 
 IGUISpriteBank* Skin::getSpriteBank () const 
 {
-    //printf("getting bank\n");
     return m_fallback_skin->getSpriteBank();
 }
 
@@ -637,25 +681,21 @@ IGUISpriteBank* Skin::getSpriteBank () const
 void Skin::setColor (EGUI_DEFAULT_COLOR which, video::SColor newColor)
 {
     m_fallback_skin->setColor(which, newColor);
-    //printf("setting color\n");
 }
 
 void Skin::setDefaultText (EGUI_DEFAULT_TEXT which, const wchar_t *newText)
 {
     m_fallback_skin->setDefaultText(which, newText);
-    //printf("setting default text\n");
 }
 
 void Skin::setFont (IGUIFont *font, EGUI_DEFAULT_FONT which)
 {
     m_fallback_skin->setFont(font, which);
-    //printf("setting font\n");
 }
 
 void Skin::setIcon (EGUI_DEFAULT_ICON icon, u32 index)
 {
     m_fallback_skin->setIcon(icon, index);
-    //printf("setting icon\n");
 }
 
 void Skin::setSize (EGUI_DEFAULT_SIZE which, s32 size)

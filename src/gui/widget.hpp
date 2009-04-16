@@ -172,6 +172,7 @@ namespace GUIEngine
     public:
         virtual ~GaugeWidget() {}
         float getValue();
+        void setValue(const float value);
     };
     
     class SpinnerWidget : public Widget

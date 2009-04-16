@@ -267,15 +267,27 @@ namespace StateManager
     {
         if(name == "init")
         {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
+            GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>
                                             (GUIEngine::getCurrentScreen()->getWidget("options_choice"));
-            if(w != NULL)
+            if(ribbon != NULL)
             {
                 const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
-                if(screen_name == "options_av.stkgui") w->select( "audio_video" );
-                else if(screen_name == "options_players.stkgui") w->select( "players" );
-                else if(screen_name == "options_input.stkgui") w->select( "controls" );
+                if(screen_name == "options_av.stkgui") ribbon->select( "audio_video" );
+                else if(screen_name == "options_players.stkgui") ribbon->select( "players" );
+                else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
+            
+            GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
+                (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+            assert(gauge != NULL);
+            
+            gauge->setValue( sfx_manager->getMasterSFXVolume() );
+
+            
+            gauge = dynamic_cast<GUIEngine::GaugeWidget*>
+            (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+            assert(gauge != NULL);
+            gauge->setValue( sound_manager->getMasterMusicVolume() );
         }
         // -- options
         else if(name == "options_choice")
@@ -292,7 +304,7 @@ namespace StateManager
                 (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
             assert(w != NULL);
             
-            // TODO - save value to file, load value from file, make the slider start at an actual value
+            // TODO - save value to file, load value from file, allow fully disabling music
             sound_manager->setMasterMusicVolume( w->getValue() );
         }
         else if(name == "sfx_volume")
@@ -301,7 +313,7 @@ namespace StateManager
                 (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
             assert(w != NULL);
             
-            // TODO - save value to file, load value from file, make the slider start at an actual value
+            // TODO - save value to file, load value from file, allow fully disabling sfx
             sfx_manager->setMasterSFXVolume( w->getValue() );
         }
 

@@ -81,7 +81,10 @@ public:
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();
+    
     void                     setMasterSFXVolume(float gain);
+    float                    getMasterSFXVolume() const { return m_masterGain; }
+    
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
 };

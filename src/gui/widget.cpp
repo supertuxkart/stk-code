@@ -273,6 +273,14 @@ float GaugeWidget::getValue()
     assert(sb != NULL);
     return (float)sb->getPos() / sb->getMax();
 }
+// -----------------------------------------------------------------------------
+void GaugeWidget::setValue(const float val)
+{
+    IGUIScrollBar* sb = dynamic_cast<IGUIScrollBar*>(m_element);
+    assert(sb != NULL);
+    
+    sb->setPos( (int)round(sb->getMax()*val) );
+}
 
 #if 0
 #pragma mark -

@@ -36,6 +36,7 @@ class Skin : public IGUISkin
     ITexture* m_tex_iconhighlight;
     ITexture* m_tex_ficonhighlight;
     ITexture* m_tex_squarefocus;
+    ITexture* m_tex_gaugefill;
     
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,
@@ -54,6 +55,8 @@ public:
     void drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
     void drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
     void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
+    void drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused);
+    void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused);
 
     // irrlicht's callbacks
     virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);
