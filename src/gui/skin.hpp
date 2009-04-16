@@ -53,7 +53,7 @@ public:
     void drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
     void drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
     void drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-    void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, const bool focused);
+    void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
 
     // irrlicht's callbacks
     virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);

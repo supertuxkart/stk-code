@@ -391,13 +391,41 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     
 }
 
-void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, const bool focused)
+void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
     // FIXME - move these numbers to a config file
     const int left_border = 110;
     const int right_border = 110;
     const int border_above = 0;
     const int border_below = 36;
+    
+    if(!focused)
+    {
+        IGUIElement* focused_widget = GUIEngine::getGUIEnv()->getFocus();
+        
+        //{
+        //Widget* widget = GUIEngine::getCurrentScreen()->getWidget(focused_widget->getID());
+        //if(focused_widget == NULL) std::cout << "no focus\n";
+        //else if(widget != NULL)
+        //{
+        //    std::cout << "focused : " << widget->m_properties[PROP_ID].c_str() << " (id " << focused_widget->getID() << ")" << std::endl;
+        //}
+        //}
+
+        //Widget* stupid_stl = (Widget*)widget;
+        //std::cout << "widget name : " << (stupid_stl->m_properties[PROP_ID].c_str()) << std::endl;
+        
+        if(focused_widget != NULL && widget->m_children.size()>2)
+        {
+            //std::cout << "checking against " << widget->m_children[0].id << " and " << widget->m_children[2].id << std::endl;
+            if(widget->m_children[0].id == focused_widget->getID() ||
+               widget->m_children[2].id == focused_widget->getID())
+            {
+                //std::cout << "focused = true;\n";
+                focused = true;
+            }
+        }
+    }
     
     drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner),
                                   left_border, right_border,
@@ -479,7 +507,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawRibbon(rect, widget, pressed, focused);
     }
-    else if(widget->m_type == WTYPE_SPINNER)
+    else if(type == WTYPE_SPINNER)
     {
         drawSpinnerBody(rect, widget, pressed, focused);
     }
