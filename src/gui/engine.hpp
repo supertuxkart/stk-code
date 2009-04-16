@@ -22,7 +22,8 @@ WTYPE_SPINNER           "spinner"
 A spinner component (lets you choose numbers). Sprecify PROP_MIN_VALUE and PROP_MAX_VALUE to have control
 over values (default will be from 0 to 10). You can specify an icon; then, include a sprintf format string
 like %i in the name, and at runtime the current number will be inserted into the given name to find the
-right file for each possible value the spinner can take.
+right file for each possible value the spinner can take. It may also display arbitrary text instead of
+numbers, though this cannot be achieve in the XML file; use the ->addLabel(...) method in code to do this.
 
 WTYPE_BUTTON            "button"
 A plain text buttons.

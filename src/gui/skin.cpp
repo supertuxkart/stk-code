@@ -403,25 +403,11 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
     {
         IGUIElement* focused_widget = GUIEngine::getGUIEnv()->getFocus();
         
-        //{
-        //Widget* widget = GUIEngine::getCurrentScreen()->getWidget(focused_widget->getID());
-        //if(focused_widget == NULL) std::cout << "no focus\n";
-        //else if(widget != NULL)
-        //{
-        //    std::cout << "focused : " << widget->m_properties[PROP_ID].c_str() << " (id " << focused_widget->getID() << ")" << std::endl;
-        //}
-        //}
-
-        //Widget* stupid_stl = (Widget*)widget;
-        //std::cout << "widget name : " << (stupid_stl->m_properties[PROP_ID].c_str()) << std::endl;
-        
         if(focused_widget != NULL && widget->m_children.size()>2)
         {
-            //std::cout << "checking against " << widget->m_children[0].id << " and " << widget->m_children[2].id << std::endl;
             if(widget->m_children[0].id == focused_widget->getID() ||
                widget->m_children[2].id == focused_widget->getID())
             {
-                //std::cout << "focused = true;\n";
                 focused = true;
             }
         }
