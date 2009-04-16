@@ -267,27 +267,31 @@ namespace StateManager
     {
         if(name == "init")
         {
+            const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+            
             GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>
                                             (GUIEngine::getCurrentScreen()->getWidget("options_choice"));
             if(ribbon != NULL)
             {
-                const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
                 if(screen_name == "options_av.stkgui") ribbon->select( "audio_video" );
                 else if(screen_name == "options_players.stkgui") ribbon->select( "players" );
                 else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
             
-            GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
+            if(screen_name == "options_av.stkgui")
+            {
+                GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
                 (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
-            assert(gauge != NULL);
-            
-            gauge->setValue( sfx_manager->getMasterSFXVolume() );
-
-            
-            gauge = dynamic_cast<GUIEngine::GaugeWidget*>
-            (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
-            assert(gauge != NULL);
-            gauge->setValue( sound_manager->getMasterMusicVolume() );
+                assert(gauge != NULL);
+                
+                gauge->setValue( sfx_manager->getMasterSFXVolume() );
+                
+                
+                gauge = dynamic_cast<GUIEngine::GaugeWidget*>
+                (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+                assert(gauge != NULL);
+                gauge->setValue( sound_manager->getMasterMusicVolume() );
+            }
         }
         // -- options
         else if(name == "options_choice")
