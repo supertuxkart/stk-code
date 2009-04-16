@@ -750,7 +750,7 @@ void RibbonGridWidget::add()
     // decide how many rows and column we can show in the available space
     int row_amount = (int)round((h-label_height) / (float)child_height);
     //if(row_amount < 2) row_amount = 2;
-    //else if(row_amount > 5) row_amount = 5;
+    if(row_amount > 4) row_amount = 4;
     const float row_height = (float)(h - label_height)/(float)row_amount;
     
     // FIXME - that code seems to work but it's a bit obscure why
