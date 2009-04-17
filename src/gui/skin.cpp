@@ -2,6 +2,7 @@
 #include "gui/engine.hpp"
 #include "gui/screen.hpp"
 #include "gui/widget.hpp"
+#include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include <cassert>
 #include <iostream>
@@ -485,6 +486,8 @@ void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool foc
 
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
+    if(StateManager::isGameState()) return; // ignore in game mode
+    
     const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();
     
