@@ -32,6 +32,7 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
             {
                 WidgetType type;
                 
+                /* find which type of widget is specified by the current tag, and instanciate it */
                 if (!strcmp("div", xml->getNodeName()))
                 {
                     type = WTYPE_DIV;
@@ -113,8 +114,11 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     continue;
                 }
                 
+                /* retrieve teh created widget */
                 Widget& widget = append_to[append_to.size()-1];
                 widget.m_type = type;
+                
+                /* read widget properties using macro magic */
                 
 #define READ_PROPERTY( prop_name, prop_flag ) const char* prop_name = xml->getAttributeValue( #prop_name ); \
 if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_properties[prop_flag] = ""
@@ -138,10 +142,8 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_value,      PROP_MAX_VALUE);
                 READ_PROPERTY(square_items,   PROP_SQUARE);
 #undef READ_PROPERTY
-                
-                //std::cout << "loaded widget " << id << std::endl;
-                
-                // new div, continue parsing with this new div as new parent
+
+                /* a new div starts here, continue parsing with this new div as new parent */
                 if( widget.m_type == WTYPE_DIV || widget.m_type == WTYPE_RIBBON)
                     parseScreenFileDiv( xml, append_to[append_to.size()-1].m_children );
             }// end case EXN_ELEMENT

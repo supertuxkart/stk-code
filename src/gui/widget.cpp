@@ -45,10 +45,15 @@ Widget::Widget()
     m_event_handler = NULL;
 }
 // -----------------------------------------------------------------------------
-/** will write to either absolute or percentage, depending on the case.
- * returns false if couldn't convert to either
+/** 
+ * Receives as string the raw property value retrieved from XML file.
+ * Will try to make sense of it, as an absolute value or a percentage.
+ *
+ * Return values :
+ *     Will write to either absolute or percentage, depending on the case.
+ *     Returns false if couldn't convert to either
  */
-bool Widget::convertToCoord(std::string& x, int* absolute, int* percentage)
+bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
 {
     bool is_number;
     int i;
@@ -75,12 +80,14 @@ bool Widget::convertToCoord(std::string& x, int* absolute, int* percentage)
  */
 void Widget::readCoords(Widget* parent)
 {
-    // determine widget position and size if not already done by sizers
+    /* determine widget position and size if not already done by sizers */
     std::string x       = m_properties[PROP_X];
     std::string y       = m_properties[PROP_Y];
     std::string width   = m_properties[PROP_WIDTH];
     std::string height  = m_properties[PROP_HEIGHT];
     
+    /* retrieve parent size (or screen size if none). Will be useful for layout
+       and especially for percentages. */
     unsigned int parent_w, parent_h, parent_x, parent_y;
     if(parent == NULL)
     {
@@ -98,7 +105,7 @@ void Widget::readCoords(Widget* parent)
         parent_y = parent->y;
     }
     
-    // ---- try converting to number; if it works it means they're plain numbers so we can use them directly.
+    // ---- try converting to number
     // x coord
     {
         int abs_x = -1, percent_x = -1;
@@ -121,7 +128,7 @@ void Widget::readCoords(Widget* parent)
         }
     }
     
-    // if this widget has an icon, get icon size. this can helpful determine its optimal size
+    // ---- if this widget has an icon, get icon size. this can helpful determine its optimal size
     int texture_w = -1, texture_h = -1;
     
     if(m_properties[PROP_ICON].size() > 0)
@@ -136,7 +143,7 @@ void Widget::readCoords(Widget* parent)
         }
     }
     
-    // if this widget has a label, get text length. this can helpful determine its optimal size
+    // ---- if this widget has a label, get text length. this can helpful determine its optimal size
     int label_w = -1, label_h = -1;
     if(m_properties[PROP_TEXT].size() > 0)
     {
@@ -148,6 +155,7 @@ void Widget::readCoords(Widget* parent)
         label_h = dim.Height;
     }
         
+    // ---- read dimension
     // width
     {
         int abs_w = -1, percent_w = -1;
@@ -173,8 +181,7 @@ void Widget::readCoords(Widget* parent)
         else if(label_h > -1) this->h = label_h;
     }
     
-    // can't make widget bigger than parent
- 
+    // ---- can't make widget bigger than parent
     if(this->h > (int)parent_h)
     {
         float ratio = (float)parent_h/this->h;

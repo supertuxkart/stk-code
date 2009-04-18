@@ -50,12 +50,18 @@ void Screen::addWidgets()
     if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
 }
 // -----------------------------------------------------------------------------
+/* small shortcut so this method can be called without arguments */
 void Screen::calculateLayout()
 {
     // build layout
     calculateLayout( m_widgets );
 }
 // -----------------------------------------------------------------------------
+/*
+ * Recursive call that lays out children widget within parent (or screen if none)
+ * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
+ * of the remaining children, as well as absolute sizes and locations.
+ */
 void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
 {
     const unsigned short widgets_amount = widgets.size();
@@ -402,8 +408,14 @@ bool Screen::OnEvent(const SEvent& event)
                 Widget* parent = w->m_event_handler;
                 if(w->m_event_handler != NULL)
                 {
-                    while(parent->m_event_handler != NULL && parent->m_event_handler != parent) parent = parent->m_event_handler; // Find topmost parent
+                    /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+                       in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+                       notified of clicks onto themselves so they can toggle their state. ) */
+                    while(parent->m_event_handler != NULL && parent->m_event_handler != parent)
+                        parent = parent->m_event_handler;
                     
+                    /* notify the found event event handler, and also notify the main callback if the
+                       parent event handler says so */
                     if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
                         transmitEvent(parent, parent->m_properties[PROP_ID]);
                 }
