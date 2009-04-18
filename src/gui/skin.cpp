@@ -282,7 +282,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
 {
     bool mark_selected = widget->isSelected();
     
-    const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_parent->m_element;
+    const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_event_handler->m_element;
     
     /* tab-bar ribbons */
     if(widget->m_type == WTYPE_BUTTON)
@@ -317,14 +317,14 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     {
         bool use_glow = true;
 
-        if (widget->m_parent != NULL && widget->m_parent->m_properties[PROP_SQUARE] == "true") use_glow = false;
-        if (widget->m_parent != NULL && widget->m_parent->m_parent != NULL &&
-            widget->m_parent->m_parent->m_properties[PROP_SQUARE] == "true") use_glow = false;
+        if (widget->m_event_handler != NULL && widget->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
+        if (widget->m_event_handler != NULL && widget->m_event_handler->m_event_handler != NULL &&
+            widget->m_event_handler->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
         
         
-        if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON && 
-           ((RibbonWidget*)widget->m_parent)->getRibbonType() == RIBBON_TOOLBAR &&
-           !GUIEngine::getGUIEnv()->hasFocus(widget->m_parent->m_element)) mark_selected = false;
+        if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON && 
+           ((RibbonWidget*)widget->m_event_handler)->getRibbonType() == RIBBON_TOOLBAR &&
+           !GUIEngine::getGUIEnv()->hasFocus(widget->m_event_handler->m_element)) mark_selected = false;
         
         if(mark_selected)
         {
@@ -424,7 +424,7 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
     
     if(pressed)
     {
-        Widget* spinner = widget->m_parent;
+        Widget* spinner = widget->m_event_handler;
         int areas = 0;
         
         //std::cout << "drawing spinner child " << widget->m_properties[PROP_ID].c_str() << std::endl;
@@ -551,11 +551,11 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     // does not have widgets for everything we need. so at render time, we just check
     // which type this button represents and render accordingly
     
-    if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_RIBBON)
+    if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
     {
         drawRibbonChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }
-    else if(widget->m_parent != NULL && widget->m_parent->m_type == WTYPE_SPINNER)
+    else if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_SPINNER)
     {
         drawSpinnerChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }

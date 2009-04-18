@@ -301,7 +301,7 @@ bool Screen::OnEvent(const SEvent& event)
                 if(w == NULL) break;
                 
                 Widget* widget_to_call = w;
-                while(widget_to_call->m_parent != NULL) widget_to_call = widget_to_call->m_parent; // Find topmost parent
+                while(widget_to_call->m_event_handler != NULL) widget_to_call = widget_to_call->m_event_handler; // Find topmost parent
 
                 if(widget_to_call->leftPressed())
                     transmitEvent(w, w->m_properties[PROP_ID]);
@@ -316,7 +316,7 @@ bool Screen::OnEvent(const SEvent& event)
                 if(w == NULL) break;
                 
                 Widget* widget_to_call = w;
-                while(widget_to_call->m_parent != NULL) widget_to_call = widget_to_call->m_parent; // Find topmost parent
+                while(widget_to_call->m_event_handler != NULL) widget_to_call = widget_to_call->m_event_handler; // Find topmost parent
                 
                 if(widget_to_call->rightPressed())
                     transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
@@ -399,10 +399,10 @@ bool Screen::OnEvent(const SEvent& event)
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
                 
-                Widget* parent = w->m_parent;
-                if(w->m_parent != NULL)
+                Widget* parent = w->m_event_handler;
+                if(w->m_event_handler != NULL)
                 {
-                    while(parent->m_parent != NULL) parent = parent->m_parent; // Find topmost parent
+                    while(parent->m_event_handler != NULL && parent->m_event_handler != parent) parent = parent->m_event_handler; // Find topmost parent
                     
                     if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
                         transmitEvent(parent, parent->m_properties[PROP_ID]);
@@ -416,13 +416,13 @@ bool Screen::OnEvent(const SEvent& event)
                 if(w == NULL) break;
 
                 // select ribbons on hover
-                if(w->m_parent != NULL && w->m_parent->m_type == WTYPE_RIBBON)
+                if(w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
                 {
-                    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_parent);
+                    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
                     if(ribbon == NULL) break;
                     if(ribbon->mouseHovered(w))
                         transmitEvent(ribbon, ribbon->m_properties[PROP_ID]);
-                    if(ribbon->m_parent != NULL) ribbon->m_parent->mouseHovered(w);
+                    if(ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
                     getGUIEnv()->setFocus(ribbon->m_element);
                 }
                 else

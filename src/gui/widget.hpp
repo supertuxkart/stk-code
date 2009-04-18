@@ -80,11 +80,11 @@ namespace GUIEngine
         virtual bool rightPressed() { return false; }
         virtual bool leftPressed() { return false; }
         
-        /** used when you set parents - see m_parent explainations below.
+        /** used when you set parents - see m_event_handler explainations below.
             returns whether main event callback should be notified or not */
         virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
         
-        /** used when you set eventSupervisors - see m_parent explainations below
+        /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
             Returns 'true' if main event handler should be notified of a change. */
         virtual bool mouseHovered(Widget* child) { return false; }
@@ -95,14 +95,14 @@ namespace GUIEngine
         void readCoords(Widget* parent=NULL);
         
         /**
-          * This is set to NULL by default; set to something else in a child to mean
-          * that events happening on the said child should not go straight into the
-          * event handler. Instead, they will first be passed to m_parent->transmitEvent,
+          * This is set to NULL by default; set to something else in a widget to mean
+          * that events happening on this widget should not go straight into the
+          * event handler. Instead, they will first be passed to m_event_handler->transmitEvent,
           * which is usually the parent analysing events from its children.
           * This is especially useful with logical widgets built with more than
           * one irrlicht widgets (e.g. Spinner, Ribbon)
           */
-        Widget* m_parent;
+        Widget* m_event_handler;
         
         static bool convertToCoord(std::string& x, int* absolute, int* percentage);
     public:
@@ -164,6 +164,7 @@ namespace GUIEngine
     {
         void add();
         bool m_state;
+        bool transmitEvent(Widget* w, std::string& originator);
     public:
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}

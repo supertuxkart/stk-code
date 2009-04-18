@@ -29,7 +29,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, unsigned int item_id, bool rotate)
 {
     m_rotate           = rotate;
-    m_parent           = NULL;
+    m_event_handler           = NULL;
     m_deactive_time    = 0;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
@@ -59,14 +59,14 @@ void Item::reset()
 //-----------------------------------------------------------------------------
 void Item::setParent(Kart* parent)
 {
-    m_parent        = parent;
+    m_event_handler        = parent;
     m_deactive_time = 1.5f;
 }
 
 //-----------------------------------------------------------------------------
 void Item::update(float delta)
 {
-    if(m_parent != NULL && m_deactive_time > 0) m_deactive_time -= delta;
+    if(m_event_handler != NULL && m_deactive_time > 0) m_deactive_time -= delta;
     
     if(m_collected)
     {

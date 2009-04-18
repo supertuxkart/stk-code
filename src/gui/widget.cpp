@@ -42,7 +42,7 @@ Widget::Widget()
     m_element = NULL;
     m_type = WTYPE_NONE;
     m_selected = false;
-    m_parent = NULL;
+    m_event_handler = NULL;
 }
 // -----------------------------------------------------------------------------
 /** will write to either absolute or percentage, depending on the case.
@@ -242,6 +242,7 @@ void LabelWidget::add()
 CheckBoxWidget::CheckBoxWidget()
 {
     m_state = true;
+    m_event_handler = this;
 }
 
 void CheckBoxWidget::add()
@@ -254,6 +255,15 @@ void CheckBoxWidget::add()
     id = m_element->getID();
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
+}
+
+bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator)
+{
+    /* toggle */
+    m_state = !m_state;
+    
+    /* notify main event handler */
+    return true;
 }
 
 #if 0
@@ -401,9 +411,9 @@ bool RibbonWidget::rightPressed()
     m_selection++;
     if(m_selection >= m_children.size())
     {
-        if(m_parent != NULL)
+        if(m_event_handler != NULL)
         {
-            ((RibbonGridWidget*)m_parent)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
+            ((RibbonGridWidget*)m_event_handler)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
             m_selection = m_children.size()-1;
         }
         else m_selection = 0;
@@ -418,9 +428,9 @@ bool RibbonWidget::leftPressed()
     m_selection--;
     if(m_selection < 0)
     {
-        if(m_parent != NULL)
+        if(m_event_handler != NULL)
         {
-            ((RibbonGridWidget*)m_parent)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
+            ((RibbonGridWidget*)m_event_handler)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
             m_selection = 0;
         }
         else m_selection = m_children.size()-1;
@@ -432,7 +442,7 @@ bool RibbonWidget::leftPressed()
 // -----------------------------------------------------------------------------
 void RibbonWidget::focused()
 {
-    if(m_parent != NULL) ((RibbonGridWidget*)m_parent)->updateLabel( this );
+    if(m_event_handler != NULL) ((RibbonGridWidget*)m_event_handler)->updateLabel( this );
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::mouseHovered(Widget* child)
@@ -579,7 +589,7 @@ void RibbonWidget::add()
         subbtn->setTabGroup(false);
         
         m_children[i].id = subbtn->getID();
-        m_children[i].m_parent = this;
+        m_children[i].m_event_handler = this;
     }// next sub-button
     
     id = m_element->getID();
@@ -637,7 +647,7 @@ void SpinnerWidget::add()
     m_children[0].m_element = left_arrow;
     m_children[0].m_type = WTYPE_BUTTON;
     left_arrow->setTabStop(false);
-    m_children[0].m_parent = this;
+    m_children[0].m_event_handler = this;
     m_children[0].m_properties[PROP_ID] = "left";
     m_children[0].id = m_children[0].m_element->getID();
     
@@ -683,7 +693,7 @@ void SpinnerWidget::add()
     right_arrow->setTabStop(false);
     m_children[2].m_element = right_arrow;
     m_children[2].m_type = WTYPE_BUTTON;
-    m_children[2].m_parent = this;
+    m_children[2].m_event_handler = this;
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
 }
@@ -794,7 +804,7 @@ void RibbonGridWidget::add()
         ribbon->h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
         ribbon->m_properties[PROP_ID] = this->m_properties[PROP_ID];
-        ribbon->m_parent = this;
+        ribbon->m_event_handler = this;
         
         // add columns
         for(int i=0; i<m_col_amount; i++)
@@ -843,7 +853,7 @@ void RibbonGridWidget::add()
     IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, ++id_counter_2, rmessage.c_str(), L"");
     right_arrow->setTabStop(false);
     m_right_widget->m_element = right_arrow;
-    m_right_widget->m_parent = this;
+    m_right_widget->m_event_handler = this;
     m_right_widget->m_properties[PROP_ID] = "right";
     m_right_widget->id = right_arrow->getID();
     m_children.push_back( m_right_widget );
@@ -856,7 +866,7 @@ void RibbonGridWidget::add()
     IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, ++id_counter_2, lmessage.c_str(), L"");
     left_arrow->setTabStop(false);
     m_left_widget->m_element = left_arrow;
-    m_left_widget->m_parent = this;
+    m_left_widget->m_event_handler = this;
     m_left_widget->m_properties[PROP_ID] = "left";
     m_left_widget->id = left_arrow->getID();
     m_children.push_back( m_left_widget );
@@ -902,8 +912,8 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
     }
     
     // if it's something else, it might be a ribbon child with its own parent
-    if(w->m_parent != NULL && w->m_parent != this)
-        return w->m_parent->transmitEvent(w, originator);
+    if(w->m_event_handler != NULL && w->m_event_handler != this)
+        return w->m_event_handler->transmitEvent(w, originator);
     
     // if we got there, must be a ribbon itself. in this case we can just transmit the event directly
     return true;

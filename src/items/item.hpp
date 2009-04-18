@@ -55,7 +55,7 @@ private:
     
     /** optionally, set this if this item was laid by a particular kart. in this case,
         the 'm_deactive_time' will also be set - see below. */ 
-    Kart*         m_parent;
+    Kart*         m_event_handler;
     /** optionally, if item was placed by a kart, a timer can be used to temporarly
        deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
