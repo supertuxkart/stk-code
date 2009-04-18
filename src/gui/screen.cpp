@@ -307,8 +307,13 @@ bool Screen::OnEvent(const SEvent& event)
                 if(w == NULL) break;
                 
                 Widget* widget_to_call = w;
-                while(widget_to_call->m_event_handler != NULL) widget_to_call = widget_to_call->m_event_handler; // Find topmost parent
-
+                
+                /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+                 in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+                 notified of clicks onto themselves so they can toggle their state. ) */
+                while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+                    widget_to_call = widget_to_call->m_event_handler;
+                
                 if(widget_to_call->leftPressed())
                     transmitEvent(w, w->m_properties[PROP_ID]);
                 break;
@@ -322,7 +327,11 @@ bool Screen::OnEvent(const SEvent& event)
                 if(w == NULL) break;
                 
                 Widget* widget_to_call = w;
-                while(widget_to_call->m_event_handler != NULL) widget_to_call = widget_to_call->m_event_handler; // Find topmost parent
+                /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+                 in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+                 notified of clicks onto themselves so they can toggle their state. ) */
+                while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+                    widget_to_call = widget_to_call->m_event_handler;
                 
                 if(widget_to_call->rightPressed())
                     transmitEvent(widget_to_call, w->m_properties[PROP_ID]);

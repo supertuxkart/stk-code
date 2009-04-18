@@ -293,6 +293,16 @@ namespace StateManager
                     (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
                 assert(gauge != NULL);
                 gauge->setValue( sound_manager->getMasterMusicVolume() );
+                
+                
+                GUIEngine::CheckBoxWidget* sfx = dynamic_cast<GUIEngine::CheckBoxWidget*>
+                    (GUIEngine::getCurrentScreen()->getWidget("sfx_enabled"));
+                
+                GUIEngine::CheckBoxWidget* music = dynamic_cast<GUIEngine::CheckBoxWidget*>
+                    (GUIEngine::getCurrentScreen()->getWidget("music_enabled"));
+                
+                sfx->setState( user_config->doSFX() );
+                music->setState( user_config->doMusic() );
             }
         }
         // -- options
@@ -306,8 +316,8 @@ namespace StateManager
         }
         else if(name == "music_volume")
         {
-            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
+            // GUIEngine::getCurrentScreen()->getWidget("music_volume")
             assert(w != NULL);
             
             // TODO - save value to file, load value from file, allow fully disabling music
@@ -315,12 +325,24 @@ namespace StateManager
         }
         else if(name == "sfx_volume")
         {
-            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
+            // GUIEngine::getCurrentScreen()->getWidget("sfx_volume")
             assert(w != NULL);
             
             // TODO - save value to file, load value from file, allow fully disabling sfx
             sfx_manager->setMasterSFXVolume( w->getValue() );
+        }
+        else if(name == "music_enabled")
+        {
+            GUIEngine::CheckBoxWidget* w = dynamic_cast<GUIEngine::CheckBoxWidget*>(widget);
+            
+            user_config->setMusic(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
+        }
+        else if(name == "sfx_enabled")
+        {
+            GUIEngine::CheckBoxWidget* w = dynamic_cast<GUIEngine::CheckBoxWidget*>(widget);
+
+            user_config->setSFX(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
         }
 
     }

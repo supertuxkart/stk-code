@@ -169,6 +169,7 @@ namespace GUIEngine
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
         bool getState() const { return m_state; }
+        void setState(const bool enabled)  { m_state = enabled; }
     };
     
 
