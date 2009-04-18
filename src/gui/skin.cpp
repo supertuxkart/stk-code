@@ -33,6 +33,11 @@ Skin::Skin(IGUISkin* fallback_skin)
     
     m_tex_gaugefill = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasssgauge_fill.png").c_str() );
 
+    
+    m_tex_checkbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox.png").c_str() );
+    m_tex_fcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_focus.png").c_str() );
+    m_tex_dcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked.png").c_str() );
+    m_tex_dfcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked_focus.png").c_str() );
 }
 
 Skin::~Skin()
@@ -479,6 +484,29 @@ void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool foc
                                             0 /* no clipping */, 0, true /* alpha */);
 }
 
+void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
+{ 
+    CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
+    
+    const int texture_w = m_tex_checkbox->getSize().Width;
+    const int texture_h = m_tex_checkbox->getSize().Height;
+    
+    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+    
+    
+    
+    if(w->getState() == true)
+    {
+        GUIEngine::getDriver()->draw2DImage( focused ? m_tex_dfcheckbox : m_tex_dcheckbox, rect, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
+    }
+    else
+    {
+        GUIEngine::getDriver()->draw2DImage( focused ? m_tex_fcheckbox : m_tex_checkbox, rect, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
+    }
+}
+
 #if 0
 #pragma mark -
 #pragma mark irrlicht skin functions
@@ -550,6 +578,10 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_GAUGE)
     {
         drawGaugeFill(rect, widget, focused);
+    }  
+    else if(type == WTYPE_CHECKBOX)
+    {
+        drawCheckBox(rect, widget, focused);
     }  
 }
 

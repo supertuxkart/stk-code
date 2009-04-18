@@ -25,6 +25,7 @@ class Skin : public IGUISkin
 {
     IGUISkin* m_fallback_skin;
     
+    /* f : focused; d : down state */
     ITexture* m_tex_button;
     ITexture* m_tex_fbutton;
     ITexture* m_tex_spinner;
@@ -37,6 +38,11 @@ class Skin : public IGUISkin
     ITexture* m_tex_ficonhighlight;
     ITexture* m_tex_squarefocus;
     ITexture* m_tex_gaugefill;
+    
+    ITexture* m_tex_checkbox;
+    ITexture* m_tex_fcheckbox;
+    ITexture* m_tex_dcheckbox;
+    ITexture* m_tex_dfcheckbox;
     
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,
@@ -57,6 +63,7 @@ public:
     void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
     void drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused);
     void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused);
+    void drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused);
 
     // irrlicht's callbacks
     virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);

@@ -161,8 +161,11 @@ namespace GUIEngine
     class CheckBoxWidget : public Widget
     {
         void add();
+        bool m_state;
     public:
+        CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
+        bool getState() const { return m_state; }
     };
     
 

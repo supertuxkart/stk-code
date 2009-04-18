@@ -239,13 +239,18 @@ void LabelWidget::add()
 #pragma mark Check Box Widget
 #endif
 
+CheckBoxWidget::CheckBoxWidget()
+{
+    m_state = true;
+}
 
 void CheckBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     stringw message = m_properties[PROP_TEXT].c_str();
-    m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
+    //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
     
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
     id = m_element->getID();
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
@@ -302,7 +307,7 @@ void IconButtonWidget::add()
     if(w < texture_w) ... ;
     if(h < texture_h) ... ;
      */
-    rect<s32> widget_size;
+    rect<s32> widget_size;    
     if(clickable)
     {
         widget_size = rect<s32>(x, y, x + w, y + h);
@@ -318,7 +323,7 @@ void IconButtonWidget::add()
         // irrlicht widgets don't support scaling while keeping aspect ratio
         // so, happily, let's implement it ourselves
         const int x_gap = (int)((float)w - (float)texture_w * (float)h / texture_h);
-         
+        
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
         
         IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, NULL, ++id_counter_2);
