@@ -279,7 +279,7 @@ namespace StateManager
                 else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
             
-            // audio-video sub-screen
+            // init audio-video sub-screen
             if(screen_name == "options_av.stkgui")
             {
                 GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
@@ -320,7 +320,7 @@ namespace StateManager
             // GUIEngine::getCurrentScreen()->getWidget("music_volume")
             assert(w != NULL);
             
-            // TODO - save value to file, load value from file, allow fully disabling music
+            // TODO - save value to file, load value from file
             sound_manager->setMasterMusicVolume( w->getValue() );
         }
         else if(name == "sfx_volume")
@@ -329,7 +329,7 @@ namespace StateManager
             // GUIEngine::getCurrentScreen()->getWidget("sfx_volume")
             assert(w != NULL);
             
-            // TODO - save value to file, load value from file, allow fully disabling sfx
+            // TODO - save value to file, load value from file
             sfx_manager->setMasterSFXVolume( w->getValue() );
         }
         else if(name == "music_enabled")
@@ -337,6 +337,11 @@ namespace StateManager
             GUIEngine::CheckBoxWidget* w = dynamic_cast<GUIEngine::CheckBoxWidget*>(widget);
             
             user_config->setMusic(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
+            
+            if(w->getState() == false)
+                sound_manager->stopMusic();
+            else
+                sound_manager->startMusic(sound_manager->getCurrentMusic());
         }
         else if(name == "sfx_enabled")
         {
