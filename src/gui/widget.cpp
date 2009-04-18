@@ -656,6 +656,7 @@ void SpinnerWidget::add()
         IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(subsize_label, btn, ++id_counter_2);
         m_children[1].m_element = subbtn;
         m_children[1].m_type = WTYPE_ICON_BUTTON;
+        m_children[1].id = subbtn->getID();
         subbtn->setUseAlphaChannel(true);
         
         subbtn->setImage(texture);
@@ -664,9 +665,12 @@ void SpinnerWidget::add()
     else
     {
         rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label, false, true, btn);
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
+                                                                      false /* border */, true /* word wrap */,
+                                                                      btn, ++id_counter_2);
         m_children[1].m_element = label;
         m_children[1].m_type = WTYPE_LABEL;
+        m_children[1].id = label->getID();
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);

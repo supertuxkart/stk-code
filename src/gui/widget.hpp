@@ -119,6 +119,8 @@ namespace GUIEngine
         /** Type of this widget */
         WidgetType m_type;
         
+        // FIXME... i forgot the m_ everywhere ... XD
+        
         /** coordinates of the widget */
         int x, y, w, h;
         

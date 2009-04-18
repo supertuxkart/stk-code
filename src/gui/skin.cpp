@@ -401,6 +401,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
         if(focused_widget != NULL && widget->m_children.size()>2)
         {
             if(widget->m_children[0].id == focused_widget->getID() ||
+               widget->m_children[1].id == focused_widget->getID() ||
                widget->m_children[2].id == focused_widget->getID())
             {
                 focused = true;
