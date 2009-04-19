@@ -49,6 +49,7 @@ Skin::~Skin()
 void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                          const int left_border, const int right_border,
                                          const int top_border, const int bottom_border,
+                                         const bool preserve_h_aspect_ratios,
                                          const float border_out_portion, int areas)
 {
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
@@ -62,10 +63,9 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
      
      +----+--------------------+----+
      |    |                    |    |
-     +----a--------------------b----+  <-- top_border
+     +----a--------------------b----+ <-- top_border
      |    |                    |    |
-     |    |                    |    |     
-     |    |                    |    |     
+     |    |                    |    |
      +----c--------------------d----+ <-- height - bottom-border
      |    |                    |    | 
      +----+--------------------+----+
@@ -113,14 +113,24 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int dest_x2 = dest.LowerRightCorner.X;
         const int dest_y2 = dest.LowerRightCorner.Y;
         
-        const float xscale = (float)(dest_x2-dest_x)/texture_w;
+        //const float xscale = (float)(dest_x2-dest_x)/texture_w;
         const float yscale = (float)(dest_y2-dest_y)/texture_h;
 
-        const int dest_left_border   = (int)(left_border  *std::min<float>(yscale, 1.0));
-        const int dest_right_border  = (int)(right_border *std::min<float>(yscale, 1.0));
-        const int dest_top_border    = (int)(top_border   *std::min<float>(xscale, 1.0));
-        const int dest_bottom_border = (int)(bottom_border*std::min<float>(xscale, 1.0));
+        int dest_left_border, dest_right_border;
         
+        // scale and keep aspect ratio
+        if(preserve_h_aspect_ratios)
+        {
+            dest_left_border   = (int)(left_border * (dest_y2-dest_y) / texture_h );
+            dest_right_border  = (int)(right_border * (dest_y2-dest_y) / texture_h);
+        }
+        else
+        {
+            dest_left_border   = (int)(left_border  *std::min<float>(yscale, 1.0));
+            dest_right_border  = (int)(right_border *std::min<float>(yscale, 1.0));
+        }
+        const int dest_top_border    = (int)(top_border   *std::min<float>(yscale, 1.0));
+        const int dest_bottom_border = (int)(bottom_border*std::min<float>(yscale, 1.0));
         const float border_in_portion = 1 - border_out_portion;
         
         const int ax = (int)(dest_x - dest_left_border*border_out_portion);
@@ -164,7 +174,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         
         const int nx = gx;
         const int ny = ly;
-        
+                
         core::rect<s32> dest_area_left = core::rect<s32>(dx, dy, ix, iy);
         core::rect<s32> dest_area_center = core::rect<s32>(ex, ey, jx, jy);
         core::rect<s32> dest_area_right = core::rect<s32>(fx, fy, kx, ky);
@@ -240,15 +250,9 @@ void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const b
     
     drawBoxFromStretchableTexture(rect, (focused ? m_tex_fbutton : m_tex_button),
                                   left_border, right_border,
-                                  border_above, border_below);
-    
-    /* 
-     if(focused)
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 100, 0, 0), rect );
-     else
-     GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 100, 0), rect );
-     */
+                                  border_above, border_below, true /* horizontal aspect ratio kept */);
 }
+
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
     return;
@@ -302,13 +306,13 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             
             drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab),
                                           left_border, right_border,
-                                          border_above, border_below, 0.2f);
+                                          border_above, border_below, false /* horizontal aspect ratio not kept */, 0.2f);
         }
         else
         {
             drawBoxFromStretchableTexture(rect, m_tex_tab,
                                           left_border, right_border,
-                                          border_above, border_below, 0);
+                                          border_above, border_below, false /* horizontal aspect ratio not kept */, 0.0f);
         }
         
     }
@@ -378,7 +382,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 drawBoxFromStretchableTexture(rect, m_tex_squarefocus,
                                               6 /* left border */, 6 /* rightborder */,
-                                              6 /* top border */, 6 /* bottom border */, 1);
+                                              6 /* top border */, 6 /* bottom border */,
+                                              false /* horizontal aspect ratio not kept */, 1);
             }
             
         }
@@ -411,7 +416,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
     
     drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner),
                                   left_border, right_border,
-                                  border_above, border_below, 0);
+                                  border_above, border_below, true /* horizontal aspect ratio kept */, 0);
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
@@ -438,14 +443,18 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
                                                     spinner->y + spinner->h  );
         
         //std::cout << "proceeding to render " << areas << std::endl;
-        
+#if 0
         drawBoxFromStretchableTexture(rect2, m_tex_fspinner,
                                       left_border, right_border,
-                                      border_above, border_below, 0, LEFT | RIGHT);
-        
+                                      border_above, border_below,
+                                      true /* horizontal aspect ratio kept */,
+                                      0, LEFT | RIGHT);
+#endif
         drawBoxFromStretchableTexture(rect2, m_tex_dspinner,
                                       left_border, right_border,
-                                      border_above, border_below, 0, areas);
+                                      border_above, border_below,
+                                      true /* horizontal aspect ratio kept */,
+                                      0, areas);
         
     }
     
@@ -461,7 +470,8 @@ void Skin::drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused
     
     drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner),
                                   left_border, right_border,
-                                  border_above, border_below, 0);
+                                  border_above, border_below,
+                                  true /* horizontal aspect ratio kept */, 0);
 }
 void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {

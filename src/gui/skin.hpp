@@ -47,6 +47,7 @@ class Skin : public IGUISkin
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,
                                        const int top_border, const int bottom_border,
+                                       const bool preserve_h_aspect_ratios=false,
                                        const float border_out_portion = 0.5,
                                        int areas = BODY | LEFT | RIGHT | TOP | BOTTOM);
     
