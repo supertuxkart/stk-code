@@ -303,6 +303,31 @@ namespace StateManager
                 
                 sfx->setState( user_config->doSFX() );
                 music->setState( user_config->doMusic() );
+                /*
+                {
+                    GUIEngine::RibbonGridWidget* res = dynamic_cast<GUIEngine::RibbonGridWidget*>
+                        (GUIEngine::getCurrentScreen()->getWidget("resolutions"));
+                    assert( res != NULL );
+                    
+                    static bool resolutions_inited = false;
+                    
+                    if(!resolutions_inited)
+                    {
+                        res->addItem("1280x1024","1280x1024","gui/screen54.png");
+                        res->addItem("800x600","800x600","gui/screen43.png");
+                        res->addItem("1024x768","1024x768","gui/screen43.png");
+                        res->addItem("1152x864","1152x864","gui/screen43.png");
+                        res->addItem("1280x960","1280x960","gui/screen43.png");
+                        res->addItem("1400x1050","1400x1050","gui/screen43.png");
+                        res->addItem("1280x800","1280x800","gui/screen1610.png");
+                        res->addItem("1440x900","1440x900","gui/screen1610.png");
+                        res->addItem("1680x1050","1680x1050","gui/screen1610.png");
+                        res->addItem("1920x1200","1920x1200","gui/screen1610.png");
+                        res->addItem("1280x768","1280x768","gui/screen53.png");
+                        resolutions_inited = true;
+                    }
+                    res->updateItemDisplay();
+                }*/
             }
         }
         // -- options

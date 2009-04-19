@@ -592,7 +592,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_CHECKBOX)
     {
         drawCheckBox(rect, widget, focused);
-    }  
+    }
 }
 
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)

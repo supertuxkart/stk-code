@@ -808,7 +808,6 @@ void RibbonGridWidget::add()
     // add rows
     for(int n=0; n<row_amount; n++)
     {
-        // FIXME - only add the first time, not everytime
         RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
         ribbon->x = x;
         ribbon->y = y + (int)(n*row_height);

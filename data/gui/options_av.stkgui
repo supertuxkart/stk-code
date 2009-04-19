@@ -45,9 +45,24 @@
 
 <spacer proportion="1" width="10" proportion="1"/>
 
-<!-- TODO - add resolution choice -->
-<label align="center" text="TODO"/>
+<!--
+<ribbon_grid id="resolutions" proportion="4" width="100%" square_items="false" align="center" child_width="128" child_height="128" />
+-->
 
-<spacer proportion="2" width="10" proportion="1"/>
+
+<ribbon id="resolutions" height="20%" width="100%" align="center">
+
+    <icon-button id="1280x1024" text="1280x1024" icon="gui/screen54.png"width="128" height="128" />
+    <icon-button id="800x600"   text="800x600" icon="gui/screen43.png"width="128" height="128" />
+    <icon-button id="1024x768"  text="1024x768" icon="gui/screen43.png"width="128" height="128" />
+    <icon-button id="1152x864"  text="1152x864" icon="gui/screen43.png"width="128" height="128" />
+    <icon-button id="1280x960"  text="1280x960" icon="gui/screen43.png"width="128" height="128" />
+    <icon-button id="1400x1050" text="1400x1050"  icon="gui/screen43.png"width="128" height="128" />
+    <icon-button id="1280x800"  text="1280x800" icon="gui/screen1610.png"width="128" height="128" />
+    <icon-button id="1440x900"  text="1440x900" icon="gui/screen1610.png"width="128" height="128" />
+    <icon-button id="1680x1050" text="1680x1050" icon="gui/screen1610.png"width="128" height="128" />
+    <icon-button id="1920x1200" text="1920x1200" icon="gui/screen1610.png"width="128" height="128" />
+    <icon-button id="1280x768"  text="1280x768" icon="gui/screen53.png"width="128" height="128" />
+</ribbon>
 
 </div>
