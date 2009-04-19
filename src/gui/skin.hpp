@@ -38,11 +38,14 @@ class Skin : public IGUISkin
     ITexture* m_tex_ficonhighlight;
     ITexture* m_tex_squarefocus;
     ITexture* m_tex_gaugefill;
+    ITexture* m_tex_gauge;
     
     ITexture* m_tex_checkbox;
     ITexture* m_tex_fcheckbox;
     ITexture* m_tex_dcheckbox;
     ITexture* m_tex_dfcheckbox;
+    
+    
     
     void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
                                        const int left_border, const int right_border,

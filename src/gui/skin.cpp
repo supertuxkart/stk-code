@@ -442,14 +442,6 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
                                                     spinner->x + spinner->w,
                                                     spinner->y + spinner->h  );
         
-        //std::cout << "proceeding to render " << areas << std::endl;
-#if 0
-        drawBoxFromStretchableTexture(rect2, m_tex_fspinner,
-                                      left_border, right_border,
-                                      border_above, border_below,
-                                      true /* horizontal aspect ratio kept */,
-                                      0, LEFT | RIGHT);
-#endif
         drawBoxFromStretchableTexture(rect2, m_tex_dspinner,
                                       left_border, right_border,
                                       border_above, border_below,
@@ -471,14 +463,21 @@ void Skin::drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused
     drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner),
                                   left_border, right_border,
                                   border_above, border_below,
-                                  true /* horizontal aspect ratio kept */, 0);
+                                  false /* horizontal aspect ratio kept */, -0.9);
 }
 void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
+    // FIXME - move these numbers to a config file
+    const int left_border = 110;
+    //const int right_border = 110;
+    //const int border_above = 0;
+    //const int border_below = 36;
+    
+    
     GaugeWidget* w = dynamic_cast<GaugeWidget*>(widget);
     
     // the width of an handle is about 0.844 the height in the current skin. FIXME - don't hardcode.
-    const int handle_size = (int)(widget->h*0.844f);
+    const int handle_size = (int)(widget->h*0.844f) + left_border*0.2;
     
     // the 'rect' argument will be too small, because irrlicht has no suitable gauge component, so i used a scrollbar
     const core::rect< s32 > dest_area = core::rect< s32 >(widget->x+handle_size, widget->y,

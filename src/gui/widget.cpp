@@ -282,7 +282,12 @@ bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator)
 void GaugeWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    m_element = GUIEngine::getGUIEnv()->addScrollBar(true /* horizontal */, widget_size, NULL, ++id_counter);
+    IGUIScrollBar* sb = GUIEngine::getGUIEnv()->addScrollBar(true /* horizontal */, widget_size, NULL, ++id_counter);
+    sb->setMax(100);
+    sb->setSmallStep(10);
+    sb->setLargeStep(10);
+    
+    m_element = sb;
     
     id = m_element->getID();
     m_element->setTabOrder(id);
