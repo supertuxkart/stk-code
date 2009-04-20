@@ -407,6 +407,19 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 IGUIElement *el, *first=NULL, *closest=NULL;
                 el = GUIEngine::getGUIEnv()->getFocus();
+                
+                Widget* w = getWidget( el->getID() );
+                
+                // list widgets are a bit special, because up/down keys are also used
+                // to navigate between various list items, not only to navigate between
+                // components
+                if(w->m_type == WTYPE_LIST)
+                {
+                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+                    assert(list != NULL);
+                    if(list->getSelected()>0) break;
+                }
+                
                 if(el != NULL && el->getTabGroup() != NULL &&
                    el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
                 {
@@ -425,6 +438,18 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 IGUIElement *el, *first = NULL, *closest = NULL;
                 el = GUIEngine::getGUIEnv()->getFocus();
+
+                Widget* w = getWidget( el->getID() );
+
+                // list widgets are a bit special, because up/down keys are also used
+                // to navigate between various list items, not only to navigate between
+                // components
+                if(w->m_type == WTYPE_LIST)
+                {
+                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+                    assert(list != NULL);
+                    if(list->getSelected() < (int)list->getItemCount()-1) break;
+                }
 
                 if(el != NULL && el->getTabGroup() != NULL &&
                    el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))

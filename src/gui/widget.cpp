@@ -1167,11 +1167,16 @@ void ListWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
 
-    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size);
+    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, NULL, ++id_counter);
+    
+    id = list->getID();
     list->addItem( L"Hiker" );
     list->addItem( L"Conso" );
     list->addItem( L"Auria" );
     list->addItem( L"MiniBjorn" );
     list->addItem( L"Arthur" );
+    
+    m_element = list;
+    
     //list->setSelected(0);
 }
