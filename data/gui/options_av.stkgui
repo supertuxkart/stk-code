@@ -47,6 +47,6 @@
 
 <ribbon_grid id="resolutions" proportion="4" text="all" width="100%" square_items="false" align="center" child_width="128" child_height="128" />
 
-<button id="apply_resolution" width="20%" height="30" text="Apply changes" />
+<button id="apply_resolution" width="20%" height="30" text="Apply video changes" />
 
 </div>

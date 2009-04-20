@@ -969,9 +969,6 @@ void RibbonGridWidget::scroll(const int x_delta)
     if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
     else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
     
-    std::cout << "m_needed_cols=" << m_needed_cols << " max_scroll=" << max_scroll << " m_scroll_offset=" << m_scroll_offset << std::endl;
-
-    
     updateItemDisplay();
 }
 // -----------------------------------------------------------------------------
