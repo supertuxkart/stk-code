@@ -67,7 +67,6 @@ namespace StateManager
         static bool karts_menu_inited = false;
         if(name == "init" /*&& !karts_menu_inited*/)
         {
-            std::cout << "filling kart menu..." << std::endl;
             GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
             assert( w != NULL );
             
@@ -105,9 +104,6 @@ namespace StateManager
             //test->setMaterialFlag(EMF_LIGHTING , false);
             
             w3->setModel(test);      
-            
-            //karts_menu_inited = true;
-            std::cout << "filled kart menu... done" << std::endl;
         }
         // TODO - actually check which kart was selected
         else if(name == "karts")
@@ -303,7 +299,7 @@ namespace StateManager
                 
                 sfx->setState( user_config->doSFX() );
                 music->setState( user_config->doMusic() );
-                /*
+                
                 {
                     GUIEngine::RibbonGridWidget* res = dynamic_cast<GUIEngine::RibbonGridWidget*>
                         (GUIEngine::getCurrentScreen()->getWidget("resolutions"));
@@ -327,7 +323,7 @@ namespace StateManager
                         resolutions_inited = true;
                     }
                     res->updateItemDisplay();
-                }*/
+                }
             }
         }
         // -- options

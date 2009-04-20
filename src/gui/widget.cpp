@@ -319,6 +319,7 @@ void GaugeWidget::setValue(const float val)
 IconButtonWidget::IconButtonWidget(const bool clickable)
 {
     IconButtonWidget::clickable = clickable;
+    label = NULL;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -360,7 +361,7 @@ void IconButtonWidget::add()
     if(message.size() > 0)
     {
         widget_size += position2d<s32>(0, widget_size.getHeight());
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size);
+        label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size);
         label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         label->setTabStop(false);
     }
@@ -388,6 +389,17 @@ void IconButtonWidget::add()
      button->setSprite(EGBS_BUTTON_UP, sprite_bank->getSprites().size()-1);
      button->setSprite(EGBS_BUTTON_DOWN, sprite_bank->getSprites().size()-1);
      */
+}
+
+void IconButtonWidget::setLabel(std::string new_label)
+{
+    std::cout << "trying to set label " << new_label.c_str() << std::endl;
+
+    if(label == NULL) return;
+    
+    std::cout << "set label " << new_label.c_str() << std::endl;
+    
+    label->setText( stringw(new_label.c_str()).c_str() );
 }
 
 #if 0
@@ -502,6 +514,9 @@ bool RibbonWidget::transmitEvent(Widget* w, std::string& originator)
 // -----------------------------------------------------------------------------
 void RibbonWidget::add()
 {
+    m_labels.clearWithoutDeleting();
+
+    
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
 
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
@@ -578,7 +593,7 @@ void RibbonWidget::add()
 
             // ---- label part
             if(has_label)
-            {
+            {                
                 subsize = rect<s32>(widget_x - one_button_space/2,
                                     (int)((button_y + m_children[i].h)*zoom) + 5 /* leave 5 pixels between button and label */, 
                                     widget_x + (int)(one_button_space/2.0f), h);
@@ -588,6 +603,9 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
+                
+                m_labels.push_back(label);
+                
                 const int final_y = subsize.getHeight() + label->getTextHeight();
                 if(final_y > biggest_y) biggest_y = final_y;
             }
@@ -608,6 +626,15 @@ void RibbonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     updateSelection();
+}
+
+void RibbonWidget::setLabel(const int id, std::string new_name)
+{
+    if(m_labels.size() == 0) return; // ignore this call for ribbons without labels
+    
+    assert(id >= 0);
+    assert(id < m_labels.size());
+    m_labels[id].setText( stringw(new_name.c_str()).c_str() );
 }
 
 #if 0
@@ -779,7 +806,7 @@ void RibbonGridWidget::add()
     m_children.clearAndDeleteAll();
     m_rows.clearWithoutDeleting();
     
-    m_has_label = m_properties[PROP_TEXT].size() > 0;
+    m_has_label = m_properties[PROP_TEXT] == "bottom";
     const int label_height = m_has_label ? 25 : 0;
     
     int child_width, child_height;
@@ -825,7 +852,10 @@ void RibbonGridWidget::add()
             
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
-            icon->m_properties[PROP_HEIGHT]= m_properties[PROP_CHILD_HEIGHT];
+            icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
+            if(m_properties[PROP_TEXT] == "all") icon->m_properties[PROP_TEXT] = "hello";
+            
+            // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
             
             icon->m_type = WTYPE_ICON_BUTTON;
             ribbon->m_children.push_back( icon );
@@ -1022,7 +1052,7 @@ void RibbonGridWidget::updateItemDisplay()
 
     for(int n=0; n<row_amount; n++)
     {
-        Widget& row = m_rows[n];
+        RibbonWidget& row = m_rows[n];
         
         for(int i=0; i<m_col_amount; i++)
         {
@@ -1039,7 +1069,7 @@ void RibbonGridWidget::updateItemDisplay()
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
                 icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
-               // trackid++;
+                row.setLabel(i, m_items[trackid].m_user_name);
             }
             else
             {

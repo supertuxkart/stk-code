@@ -8,11 +8,7 @@
     <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
 </ribbon>
 
-<spacer proportion="1" width="10" proportion="1"/>
-
-<label align="center" text="Audio/Video"/>
-
-<spacer proportion="1" width="10" proportion="1"/>
+<spacer height="25" width="10"/>
 
 <div width="75%" height="40" layout="horizontal-row" >
     <label proportion="2" height="100%" text="Music"/>
@@ -25,11 +21,11 @@
     <gauge id="music_volume" proportion="1" height="100%"/>
 </div>
 
-<spacer proportion="1" width="10" proportion="1"/>
+<spacer height="25" width="10"/>
 
 <div width="75%" height="40" layout="horizontal-row" >
     <label proportion="2" height="100%" text="Sound Effects"/>
-    <checkbox id="sfx_enabled" width="40" icon="gui/glasscheckbox.png" height="40"/>
+    <checkbox id="sfx_enabled" width="40" height="40"/>
     <spacer width="20" height="100%" />
     <label proportion="1" height="100%" text="Enabled"/>
 </div>
@@ -39,18 +35,20 @@
 </div>
 
 
-<spacer proportion="2" width="10" proportion="1"/>
+<spacer height="50" width="10"/>
 
-<label align="center" text="Video"/>
 
-<spacer proportion="1" width="10" proportion="1"/>
+<div width="75%" height="40" layout="horizontal-row" >
+    <label proportion="2" height="100%" text="Video"/>
+    <checkbox id="fullscreen" width="40" height="40"/>
+    <spacer width="20" height="100%" />
+    <label proportion="1" height="100%" text="Fullscreen"/>
+</div>
+
+<ribbon_grid id="resolutions" proportion="4" text="all" width="100%" square_items="false" align="center" child_width="128" child_height="128" />
 
 <!--
-<ribbon_grid id="resolutions" proportion="4" width="100%" square_items="false" align="center" child_width="128" child_height="128" />
--->
-
-
-<ribbon id="resolutions" height="20%" width="100%" align="center">
+<ribbon id="resolutions" proportion="2" width="100%" align="center">
 
     <icon-button id="1280x1024" text="1280x1024" icon="gui/screen54.png"width="128" height="128" />
     <icon-button id="800x600"   text="800x600" icon="gui/screen43.png"width="128" height="128" />
@@ -64,5 +62,6 @@
     <icon-button id="1920x1200" text="1920x1200" icon="gui/screen1610.png"width="128" height="128" />
     <icon-button id="1280x768"  text="1280x768" icon="gui/screen53.png"width="128" height="128" />
 </ribbon>
+-->
 
 </div>

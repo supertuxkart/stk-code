@@ -202,9 +202,11 @@ namespace GUIEngine
     {
         bool clickable;
         void add();
+        IGUIStaticText* label;
     public:
         virtual ~IconButtonWidget() {}
         IconButtonWidget(const bool clickable=true);
+        void setLabel(std::string new_label);
     };
     
     enum RibbonType
@@ -231,6 +233,8 @@ namespace GUIEngine
         void updateSelection();
         bool transmitEvent(Widget* w, std::string& originator);
         void focused();
+        
+        ptr_vector<IGUIStaticText, REF> m_labels;
     public:
         virtual ~RibbonWidget() {}
         
@@ -240,6 +244,7 @@ namespace GUIEngine
         RibbonType getRibbonType() const { return m_ribbon_type; }
         const std::string& getSelectionName() { return m_children[m_selection].m_properties[PROP_ID]; }
         void select(std::string item);
+        void setLabel(const int id, std::string new_name);
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
     };

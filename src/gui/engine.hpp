@@ -55,7 +55,9 @@ affect the type of highlighting used). Supports an optional label at the bottom 
 PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added isk nown)
 An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to show textures to any aspect ratio
 you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it in 4:3 ratio).
-
+Gives a special meaning to the text parameter. A value of "bottom" means to display the name of the selected icon at the bottom.
+A value of "all" means that each icon shall have its name under it.
+ 
 WTYPE_MODEL_VIEW        "model"
 Displays a model. Currently incomplete. Contents must be set programmatically.
 
@@ -76,7 +78,8 @@ used in events callbacks to determine what action occurred. Can be omitted
 on components that do not trigger events (e.g. labels)
 
 PROP_TEXT               "text"
-gives text (a label) to the widget where supported.
+gives text (a label) to the widget where supported. Ribbon-grids give a special meaning
+to this parameter, see ribbon-grid docs above.
 
 PROP_ICON               "icon"
 give an icon to the widget. Property contents is the path to the file, relative
