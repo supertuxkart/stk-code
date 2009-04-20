@@ -963,11 +963,14 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
 void RibbonGridWidget::scroll(const int x_delta)
 {
     m_scroll_offset += x_delta;
-    
+        
     const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
     
     if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
     else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
+    
+    std::cout << "m_needed_cols=" << m_needed_cols << " max_scroll=" << max_scroll << " m_scroll_offset=" << m_scroll_offset << std::endl;
+
     
     updateItemDisplay();
 }
@@ -1043,13 +1046,15 @@ void RibbonGridWidget::addItem( std::string user_name, std::string code_name, st
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateItemDisplay()
 {
-    int trackid = 0;
+    int icon_id = 0;
     
     const int row_amount = m_rows.size();
-    const int track_amount = m_items.size();
+    const int item_amount = m_items.size();
     
-    m_needed_cols = (int)ceil( (float)track_amount / (float)row_amount );
+    m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
 
+    const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
+    
     for(int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
@@ -1061,15 +1066,18 @@ void RibbonGridWidget::updateItemDisplay()
             IGUIButton* button = dynamic_cast<IGUIButton*>(icon->m_element);
             assert(button != NULL);
             
-            trackid = ((i+m_scroll_offset)%m_col_amount)*row_amount + n%row_amount;
+            int col_scroll = i + m_scroll_offset;
+            while(col_scroll > max_scroll) col_scroll -= max_scroll+1;
             
-            if( trackid < track_amount )
+            icon_id = (col_scroll)*row_amount + n;
+
+            if( icon_id < item_amount )
             {
-                std::string track_sshot = file_manager->getDataDir() + "/" + m_items[trackid].m_sshot_file;
+                std::string track_sshot = file_manager->getDataDir() + "/" + m_items[icon_id].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
-                icon->m_properties[PROP_ID] = m_items[trackid].m_code_name;
-                row.setLabel(i, m_items[trackid].m_user_name);
+                icon->m_properties[PROP_ID] = m_items[icon_id].m_code_name;
+                row.setLabel(i, m_items[icon_id].m_user_name);
             }
             else
             {
