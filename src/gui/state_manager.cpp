@@ -347,37 +347,21 @@ namespace StateManager
         }
         else if(name == "sfx_volume")
         {
+            static SFXBase* sample_sound = NULL;
+            
             GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
             // GUIEngine::getCurrentScreen()->getWidget("sfx_volume")
             assert(w != NULL);
             
-
-            /*
-             SFXBase      *m_engine_sound;
-             
-             m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
-             
-             
-             m_engine_sound->position ( getXYZ() );
-             
-             m_engine_sound->loop();
-             m_engine_sound->play();
-             
-             
-             m_engine_sound->stop();
-             sfx_manager->deleteSFX(m_engine_sound );
-             */
+            if(sample_sound == NULL)
+                sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
+            sample_sound->volume(1);
             
-            // TODO - save value to file, load value from file
             sfx_manager->setMasterSFXVolume( w->getValue() );
+            user_config->m_sfx_volume = w->getValue();
+            std::cout << "w->getValue()=" << w->getValue() << std::endl;
             
             // play a sample sound to show the user what this volume is like
-            static SFXBase* sample_sound = NULL;
-            
-            if(sample_sound == NULL)
-            {
-                sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
-            }
             sample_sound->position ( Vec3(0,0,0) );
             
             if(sample_sound->getStatus() != SFXManager::SFX_PLAYING)

@@ -50,7 +50,10 @@ SFXManager::SFXManager()
     m_sfx_rolloff.resize(NUM_SOUNDS);
     m_sfx_gain.resize(NUM_SOUNDS);
     if(!m_initialized) return;
+    
     loadSfx();
+    setMasterSFXVolume( user_config->m_sfx_volume );
+    
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
