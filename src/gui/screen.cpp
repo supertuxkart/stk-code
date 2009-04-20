@@ -26,6 +26,12 @@ Screen::Screen(const char* file)
     m_loaded = false;
     loadFromFile();
 }
+
+#if 0
+#pragma mark -
+#pragma mark Load/Init
+#endif
+
 // -----------------------------------------------------------------------------
 void Screen::loadFromFile()
 {
@@ -34,20 +40,6 @@ void Screen::loadFromFile()
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
     calculateLayout();
-}
-// -----------------------------------------------------------------------------
-void Screen::addWidgets()
-{
-    if(!m_loaded) loadFromFile();
-    
-    addWidgetsRecursively( m_widgets );
-    
-    // And tell the device to use our custom event receiver.
-    GUIEngine::getDevice()->setEventReceiver(this);
-
-    // select the first widget
-    Widget* w = getFirstWidget();
-    if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
 }
 // -----------------------------------------------------------------------------
 /* small shortcut so this method can be called without arguments */
@@ -175,7 +167,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                     y += widgets[n].h;
                 }
             } // end if property or absolute size
-             
+            
         } // next widget
         
     } while(false);
@@ -185,6 +177,26 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
     {
         if(widgets[n].m_type == WTYPE_DIV) calculateLayout(widgets[n].m_children, &widgets[n]);
     }
+}
+
+#if 0
+#pragma mark -
+#pragma mark Adding widgets
+#endif
+
+
+void Screen::addWidgets()
+{
+    if(!m_loaded) loadFromFile();
+    
+    addWidgetsRecursively( m_widgets );
+    
+    // And tell the device to use our custom event receiver.
+    GUIEngine::getDevice()->setEventReceiver(this);
+
+    // select the first widget
+    Widget* w = getFirstWidget();
+    if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
 }
 // -----------------------------------------------------------------------------
 void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
@@ -215,7 +227,7 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
 }
 // -----------------------------------------------------------------------------
 /**
- * Called when screen is removed. This means all irrlicht widgets this screen has pointers
+ * Called when screen is removed. This means all irrlicht widgets this object has pointers
  * to are now gone. Set all references to NULL to avoid problems.
  */
 void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
@@ -235,7 +247,12 @@ void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
         }
     }
 }
-// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Getting widgets
+#endif
+
 Widget* Screen::getWidget(const char* name)
 {
     return getWidget(name, &m_widgets);
@@ -285,6 +302,55 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
     return NULL;
 }
 // -----------------------------------------------------------------------------
+Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
+{
+    if(within_vector == NULL) within_vector = &m_widgets;
+    
+    for(int i = 0; i < within_vector->size(); i++)
+    {
+        // if container, also checks children
+        if(within_vector->get(i)->m_children.size() > 0 &&
+           within_vector->get(i)->m_type != WTYPE_RIBBON &&
+           within_vector->get(i)->m_type != WTYPE_SPINNER)
+        {
+            Widget* w = getFirstWidget(&within_vector->get(i)->m_children);
+            if(w != NULL) return w;
+        }
+        
+        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
+        
+        return within_vector->get(i);
+    }
+    return NULL;
+}
+// -----------------------------------------------------------------------------
+Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
+{
+    if(within_vector == NULL) within_vector = &m_widgets;
+    
+    for(int i = within_vector->size()-1; i >= 0; i--)
+    {
+        // if container, also checks children
+        if(within_vector->get(i)->m_children.size() > 0 &&
+           within_vector->get(i)->m_type != WTYPE_RIBBON &&
+           within_vector->get(i)->m_type != WTYPE_SPINNER)
+        {
+            Widget* w = getLastWidget(&within_vector->get(i)->m_children);
+            if(w != NULL) return w;
+        }
+        
+        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
+        
+        return within_vector->get(i);
+    }
+    return NULL;
+}
+
+#if 0
+#pragma mark -
+#pragma mark irrLicht events
+#endif
+
 bool Screen::OnEvent(const SEvent& event)
 {
     assert(transmitEvent != NULL);
@@ -489,48 +555,4 @@ bool Screen::OnEvent(const SEvent& event)
      EGET_ELEMENT_CLOSED,
      */
     return false;
-}
-// -----------------------------------------------------------------------------
-Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
-{
-    if(within_vector == NULL) within_vector = &m_widgets;
-    
-    for(int i = 0; i < within_vector->size(); i++)
-    {
-        // if container, also checks children
-        if(within_vector->get(i)->m_children.size() > 0 &&
-           within_vector->get(i)->m_type != WTYPE_RIBBON &&
-           within_vector->get(i)->m_type != WTYPE_SPINNER)
-        {
-            Widget* w = getFirstWidget(&within_vector->get(i)->m_children);
-            if(w != NULL) return w;
-        }
-        
-        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
-        
-        return within_vector->get(i);
-    }
-    return NULL;
-}
-// -----------------------------------------------------------------------------
-Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
-{
-    if(within_vector == NULL) within_vector = &m_widgets;
-    
-    for(int i = within_vector->size()-1; i >= 0; i--)
-    {
-        // if container, also checks children
-        if(within_vector->get(i)->m_children.size() > 0 &&
-           within_vector->get(i)->m_type != WTYPE_RIBBON &&
-           within_vector->get(i)->m_type != WTYPE_SPINNER)
-        {
-            Widget* w = getLastWidget(&within_vector->get(i)->m_children);
-            if(w != NULL) return w;
-        }
-        
-        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
-        
-        return within_vector->get(i);
-    }
-    return NULL;
 }
