@@ -380,11 +380,7 @@ namespace StateManager
             }
             sample_sound->position ( Vec3(0,0,0) );
             
-            if(sample_sound->getStatus() == SFXManager::SFX_PLAYING)
-            {
-                //sample_sound->volume(1.0);
-            }
-            else
+            if(sample_sound->getStatus() != SFXManager::SFX_PLAYING)
             {
                 sample_sound->play();
             }
