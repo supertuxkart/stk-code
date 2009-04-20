@@ -41,7 +41,7 @@ SoundManager* sound_manager= NULL;
 SoundManager::SoundManager()
 {
     m_current_music= NULL;
-    setMasterMusicVolume(0.7f);
+    setMasterMusicVolume(user_config->m_music_volume);
 
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
@@ -160,6 +160,8 @@ void SoundManager::setMasterMusicVolume(float gain)
 
     m_masterGain = gain;
     if(m_current_music) m_current_music->volumeMusic(m_masterGain);
+    
+    user_config->m_music_volume = m_masterGain;
 }
 
 //-----------------------------------------------------------------------------

@@ -172,6 +172,8 @@ public:
     bool        m_print_kart_sizes; // print all kart sizes
                                    // 0 if no profiling. Never saved in config file!
     float       m_sfx_volume;
+    float       m_music_volume;
+    
     int         m_max_fps;
     std::string m_item_style;
     std::string m_username;

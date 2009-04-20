@@ -105,6 +105,7 @@ void UserConfig::setDefaults()
     m_print_kart_sizes  = false;
     m_max_fps           = 120;
     m_sfx_volume        = 1.0f;
+    m_music_volume      = 0.7f;
     m_width             = 800;
     m_height            = 600;
     m_prev_width        = m_width;
@@ -296,7 +297,8 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("background-music", m_background_music);
         lisp->get("max-fps",          m_max_fps);
         lisp->get("sfx-volume",       m_sfx_volume);
-
+        lisp->get("music-volume",     m_music_volume);
+        
         /*get resolution width/height*/
         lisp->get("width",            m_width);
         lisp->get("height",           m_height);
@@ -476,7 +478,8 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("max-fps\t", m_max_fps);
         writer->writeComment("Volume for sound effects, see openal AL_GAIN for interpretation");
         writer->write("sfx-volume", m_sfx_volume);
-
+        writer->write("music-volume", m_music_volume);
+        
         writer->writeComment("screen resolution and windowing mode");
         writer->write("width\t",          m_width);
         writer->write("height\t",         m_height);

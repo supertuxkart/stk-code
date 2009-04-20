@@ -339,10 +339,8 @@ namespace StateManager
         else if(name == "music_volume")
         {
             GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
-            // GUIEngine::getCurrentScreen()->getWidget("music_volume")
             assert(w != NULL);
             
-            // TODO - save value to file, load value from file
             sound_manager->setMasterMusicVolume( w->getValue() );
         }
         else if(name == "sfx_volume")
@@ -359,7 +357,7 @@ namespace StateManager
             
             sfx_manager->setMasterSFXVolume( w->getValue() );
             user_config->m_sfx_volume = w->getValue();
-            std::cout << "w->getValue()=" << w->getValue() << std::endl;
+            // std::cout << "w->getValue()=" << w->getValue() << std::endl;
             
             // play a sample sound to show the user what this volume is like
             sample_sound->position ( Vec3(0,0,0) );
