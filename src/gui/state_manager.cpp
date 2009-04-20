@@ -1,6 +1,7 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "gui/state_manager.hpp"
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
@@ -350,8 +351,44 @@ namespace StateManager
             // GUIEngine::getCurrentScreen()->getWidget("sfx_volume")
             assert(w != NULL);
             
+
+            /*
+             SFXBase      *m_engine_sound;
+             
+             m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
+             
+             
+             m_engine_sound->position ( getXYZ() );
+             
+             m_engine_sound->loop();
+             m_engine_sound->play();
+             
+             
+             m_engine_sound->stop();
+             sfx_manager->deleteSFX(m_engine_sound );
+             */
+            
             // TODO - save value to file, load value from file
             sfx_manager->setMasterSFXVolume( w->getValue() );
+            
+            // play a sample sound to show the user what this volume is like
+            static SFXBase* sample_sound = NULL;
+            
+            if(sample_sound == NULL)
+            {
+                sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
+            }
+            sample_sound->position ( Vec3(0,0,0) );
+            
+            if(sample_sound->getStatus() == SFXManager::SFX_PLAYING)
+            {
+                //sample_sound->volume(1.0);
+            }
+            else
+            {
+                sample_sound->play();
+            }
+            
         }
         else if(name == "music_enabled")
         {
