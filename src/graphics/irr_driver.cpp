@@ -99,6 +99,14 @@ void IrrDriver::initDevice()
 
 void IrrDriver::changeResolution()
 {
+    // show black before resolution switch so we don't see OpenGL's buffer garbage during switch
+    m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+    m_device->getVideoDriver()->draw2DRectangle( SColor(255, 0, 0, 0),
+                                                core::rect<s32>(0, 0,
+                                                                user_config->m_prev_width,
+                                                                user_config->m_prev_height) );
+    m_device->getVideoDriver()->endScene();
+    
     // startScreen             -> removeTextures();
     attachment_manager      -> removeTextures();
     projectile_manager      -> removeTextures();

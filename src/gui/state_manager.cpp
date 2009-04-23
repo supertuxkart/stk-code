@@ -387,6 +387,9 @@ namespace StateManager
         }
         else if(name == "apply_resolution")
         {
+            user_config->m_prev_width = user_config->m_width;
+            user_config->m_prev_height = user_config->m_height;
+            
             user_config->m_width = 800;
             user_config->m_height = 480;
             irr_driver->changeResolution();
