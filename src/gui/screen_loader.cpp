@@ -98,6 +98,11 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     type = WTYPE_RIBBON_GRID;
                     append_to.push_back(new RibbonGridWidget());
                 }
+                else if (!strcmp("scrollable_ribbon", xml->getNodeName()))
+                {
+                    type = WTYPE_RIBBON_GRID;
+                    append_to.push_back(new RibbonGridWidget(1));
+                }
                 else if (!strcmp("model", xml->getNodeName()))
                 {
                     type = WTYPE_MODEL_VIEW;

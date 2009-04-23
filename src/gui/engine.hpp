@@ -48,7 +48,7 @@ WTYPE_DIV               "div"
 A container. Does not do much on itself, but is useful to lay out children automatically. Divs can be nested.
 Supports property PROP_LAYOUT. Of spawn type (<div>...</div>, place children within)
 
-WTYPE_RIBBON_GRID       "ribbon_grid"
+WTYPE_RIBBON_GRID       "ribbon_grid", "scrollable_ribbon"
 Shows a scrollable grid of icons. NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
 affect the type of highlighting used). Supports an optional label at the bottom if PROP_TEXT is set.
@@ -57,6 +57,8 @@ An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can 
 you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it in 4:3 ratio).
 Gives a special meaning to the text parameter. A value of "bottom" means to display the name of the selected icon at the bottom.
 A value of "all" means that each icon shall have its name under it.
+The "scrollable_ribbon" subtype is a single-line scrollable ribbon; it uses the ribbon-grid implementation since it already
+supports scrolling so no need to duplicated...
  
 WTYPE_MODEL_VIEW        "model"
 Displays a model. Currently incomplete. Contents must be set programmatically.

@@ -587,7 +587,8 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     } 
     else if(type == WTYPE_GAUGE)
     {
-        drawGaugeFill(rect, widget, focused);
+        if(!pressed)
+            drawGaugeFill(rect, widget, focused);
     }  
     else if(type == WTYPE_CHECKBOX)
     {

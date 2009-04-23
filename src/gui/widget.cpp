@@ -545,11 +545,11 @@ void RibbonWidget::add()
     float global_zoom = 1;
     
     const int min_free_space = 50;
-    if(free_h_space < min_free_space) // buttons are too big to fit :( zoom out
-    {
+    //if(free_h_space < min_free_space) // buttons are too big to fit :( zoom out
+    //{
         global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
         free_h_space = (int)(w - total_needed_space*global_zoom);
-    }
+    //}
     
     const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
      
@@ -789,12 +789,14 @@ void SpinnerWidget::setValue(const int new_value)
 #pragma mark Ribbon Grid Widget
 #endif
 
-RibbonGridWidget::RibbonGridWidget()
+RibbonGridWidget::RibbonGridWidget(const int max_rows)
 {
     m_scroll_offset = 0;
     m_needed_cols = 0;
     m_col_amount = 0;
     m_has_label = false;
+    
+    m_max_rows = max_rows;
     
     m_left_widget = NULL;
     m_right_widget = NULL;
@@ -823,19 +825,22 @@ void RibbonGridWidget::add()
     // decide how many rows and column we can show in the available space
     int row_amount = (int)round((h-label_height) / (float)child_height);
     //if(row_amount < 2) row_amount = 2;
-    if(row_amount > 4) row_amount = 4;
+    if(row_amount > m_max_rows) row_amount = m_max_rows;
+    
     const float row_height = (float)(h - label_height)/(float)row_amount;
     
-    // FIXME - that code seems to work but it's a bit obscure why
-    float ratio_zoom = (float)child_height / (float)row_height;
-    if(ratio_zoom > 1) ratio_zoom = 1 / ratio_zoom;
-    m_col_amount = (int)round( w / ratio_zoom / ( child_width + 20 ) );
-    if(m_col_amount < 5) m_col_amount = 5;
+    float ratio_zoom = (float)row_height / (float)(child_height - label_height);
+    m_col_amount = (int)round( w / ( child_width*ratio_zoom ) );
+    
+    // std::cout << "w=" << w << " child_width=" << child_width << " ratio_zoom="<< ratio_zoom << " m_col_amount=" << m_col_amount << std::endl;
+    
+    //if(m_col_amount < 5) m_col_amount = 5;
     
     // add rows
     for(int n=0; n<row_amount; n++)
     {
         RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+        // RibbonWidget* ribbon = new RibbonWidget(RIBBON_COMBO);
         ribbon->x = x;
         ribbon->y = y + (int)(n*row_height);
         ribbon->w = w;
