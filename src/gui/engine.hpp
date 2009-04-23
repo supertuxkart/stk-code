@@ -180,10 +180,12 @@ namespace GUIEngine
     float getLatestDt();
     
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
+    void free();
     void switchToScreen(const char* );
     void clear();
     
     Screen* getCurrentScreen();
+    void reshowCurrentScreen();
     
     void render(float dt);
     void transmitEvent(Widget* widget, std::string& name);

@@ -310,23 +310,23 @@ namespace StateManager
                     
                     if(!resolutions_inited)
                     {
-                        res->addItem("1280x1024","1280x1024","gui/screen54.png");
-                        res->addItem("800x600","800x600","gui/screen43.png");
-                        res->addItem("1024x768","1024x768","gui/screen43.png");
-                        res->addItem("1152x864","1152x864","gui/screen43.png");
-                        res->addItem("1280x960","1280x960","gui/screen43.png");
-                        res->addItem("1400x1050","1400x1050","gui/screen43.png");
-                        res->addItem("1280x800","1280x800","gui/screen1610.png");
-                        res->addItem("1440x900","1440x900","gui/screen1610.png");
-                        res->addItem("1680x1050","1680x1050","gui/screen1610.png");
-                        res->addItem("1920x1200","1920x1200","gui/screen1610.png");
-                        res->addItem("1280x768","1280x768","gui/screen53.png");
+                        res->addItem("1280x1024","1280x1024","gui/screen54.png");   // 0
+                        res->addItem("800x600","800x600","gui/screen43.png");       // 1
+                        res->addItem("1024x768","1024x768","gui/screen43.png");     // 2
+                        res->addItem("1152x864","1152x864","gui/screen43.png");     // 3
+                        res->addItem("1280x960","1280x960","gui/screen43.png");     // 4
+                        res->addItem("1400x1050","1400x1050","gui/screen43.png");   // 5
+                        res->addItem("1280x800","1280x800","gui/screen1610.png");   // 6
+                        res->addItem("1440x900","1440x900","gui/screen1610.png");   // 7
+                        res->addItem("1680x1050","1680x1050","gui/screen1610.png"); // 8
+                        res->addItem("1920x1200","1920x1200","gui/screen1610.png"); // 9
+                        res->addItem("1280x768","1280x768","gui/screen53.png");     // 10
                         resolutions_inited = true;
                     }
                     res->updateItemDisplay();
                 }
             }
-        }
+        } // end init
         // -- options
         else if(name == "options_choice")
         {
@@ -385,7 +385,12 @@ namespace StateManager
 
             user_config->setSFX(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
         }
-
+        else if(name == "apply_resolution")
+        {
+            user_config->m_width = 800;
+            user_config->m_height = 480;
+            irr_driver->changeResolution();
+        }
     }
 
     /**
@@ -513,6 +518,12 @@ namespace StateManager
         g_game_mode = false;
         GUIEngine::switchToScreen(name.c_str());
         
+        eventCallback(NULL, g_init_event);
+    }
+    
+    void reshowTopMostMenu()
+    {
+        GUIEngine::switchToScreen( g_menu_stack[g_menu_stack.size()-1].c_str() );
         eventCallback(NULL, g_init_event);
     }
     

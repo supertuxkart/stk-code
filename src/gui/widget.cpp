@@ -839,8 +839,11 @@ void RibbonGridWidget::add()
     // add rows
     for(int n=0; n<row_amount; n++)
     {
-        RibbonWidget* ribbon = new RibbonWidget(RIBBON_TOOLBAR);
-        // RibbonWidget* ribbon = new RibbonWidget(RIBBON_COMBO);
+        RibbonWidget* ribbon;
+        if(m_max_rows == 1) // cheap way to detect if it's a regular grid or a scrollable_ribbon. FIXME
+            ribbon = new RibbonWidget(RIBBON_COMBO);
+        else
+            ribbon = new RibbonWidget(RIBBON_TOOLBAR);
         ribbon->x = x;
         ribbon->y = y + (int)(n*row_height);
         ribbon->w = w;

@@ -11,14 +11,16 @@
 namespace GUIEngine
 {
     IGUIEnvironment* g_env;
-    IGUISkin* g_skin;
+    IGUISkin* g_skin = NULL;
     IGUIFont* g_font;
     IrrlichtDevice* g_device;
     irr::video::IVideoDriver* g_driver;
     
-    std::vector<Screen*> g_loaded_screens;
+    ptr_vector<Screen, HOLD> g_loaded_screens;
     Screen* g_current_screen = NULL;
 
+    ITexture* bg_image = NULL;
+    
     float dt = 0;
     
     float getLatestDt()
@@ -64,9 +66,9 @@ void switchToScreen(const char* screen_name)
     const int screen_amount = g_loaded_screens.size();
     for(int n=0; n<screen_amount; n++)
     {
-        if((*g_loaded_screens[n]) == screen_name)
+        if(g_loaded_screens[n].getName() == screen_name)
         {
-            g_current_screen = g_loaded_screens[n];
+            g_current_screen = g_loaded_screens.get(n);
             break;
         }
     }
@@ -82,10 +84,29 @@ void switchToScreen(const char* screen_name)
     g_current_screen->addWidgets();
 }
 // -----------------------------------------------------------------------------
+/** to be called after e.g. a resolution switch */
+void reshowCurrentScreen()
+{
+    StateManager::reshowTopMostMenu();
+    //g_current_screen->addWidgets();
+}
+// -----------------------------------------------------------------------------
 Screen* getCurrentScreen()
 {
     assert(g_current_screen != NULL);
     return g_current_screen;
+}
+// -----------------------------------------------------------------------------
+void free()
+{
+    if(g_skin != NULL) delete g_skin;
+    g_skin = NULL;
+    bg_image = NULL;
+    g_loaded_screens.clearAndDeleteAll();
+    
+    g_current_screen = NULL;
+    
+    // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
 }
 // -----------------------------------------------------------------------------
 void (*g_event_callback)(Widget* widget, std::string& name);
@@ -124,9 +145,6 @@ void render(float elapsed_time)
     // on one end, making these static is not too clean.
     // on another end, these variables are really only used locally,
     // and making them static avoids doing the same stupid computations every frame
-    // FIXME - not totally true, resolution switches need to be handled
-    static ITexture* bg_image = NULL;
-    
     static core::rect<s32> dest;
     static core::rect<s32> source_area;
     

@@ -13,6 +13,7 @@ namespace StateManager
     void resetAndGoToMenu(std::string name);
     void enterGameState();
     bool isGameState();
+    void reshowTopMostMenu();
     
     void escapePressed();
 }

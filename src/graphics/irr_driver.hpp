@@ -43,6 +43,8 @@ private:
 public:
                           IrrDriver();
                          ~IrrDriver();
+    void                 initDevice();
+    
     IrrlichtDevice       *getDevice()       const { return m_device;        }
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
@@ -71,6 +73,8 @@ public:
     scene::ICameraSceneNode 
                          *addCamera();
     void                  update(float dt);
+    
+    void                  changeResolution();
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

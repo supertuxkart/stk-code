@@ -22,29 +22,54 @@
 #include "material_manager.hpp"
 #include "user_config.hpp"
 #include "gui/engine.hpp"
+#include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
+
+#include "items/item_manager.hpp"
+#include "items/powerup_manager.hpp"
+#include "items/attachment_manager.hpp"
+#include "items/projectile_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "material_manager.hpp"
+#include "gui/font.hpp"
 
 IrrDriver *irr_driver = NULL;
 
 IrrDriver::IrrDriver()
 {
     file_manager->dropFileSystem();
+
+    initDevice();
+}   // IrrDriver
+
+// ----------------------------------------------------------------------------
+IrrDriver::~IrrDriver()
+{
+    m_device->drop();
+}   // ~IrrDriver
+// ----------------------------------------------------------------------------
+
+void IrrDriver::initDevice()
+{
+    std::cout << "initDevice ::> creating device, size = " << user_config->m_width << ", " << user_config->m_height << std::endl;
+
+    
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {
         // FIXME: directX+SLD is not supported anyway - so we could
         // remove support for this here anyway.
         video::E_DRIVER_TYPE type = driver_type==0 
-                                  ? video::EDT_OPENGL 
-                                  : (driver_type==1 
-                                     ? video::EDT_DIRECT3D9 
-                                     : video::EDT_DIRECT3D8);
+        ? video::EDT_OPENGL 
+        : (driver_type==1 
+           ? video::EDT_DIRECT3D9 
+           : video::EDT_DIRECT3D8);
         // Try 32 and 16 bit per pixels
         for(int bits=32; bits>15; bits -=16) 
         {
             m_device = createDevice(type,
-                                   core::dimension2d<s32>(user_config->m_width,
-                                                          user_config->m_height ),
+                                    core::dimension2d<s32>(user_config->m_width,
+                                                           user_config->m_height ),
                                     bits, //bits per pixel
                                     user_config->m_fullscreen,
                                     false,  // stencil buffers
@@ -62,7 +87,7 @@ IrrDriver::IrrDriver()
     }
     
     m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
-    
+ 
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
@@ -70,15 +95,43 @@ IrrDriver::IrrDriver()
     m_gui_env       = m_device->getGUIEnvironment();
     const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     m_race_font     = m_gui_env->getFont(font.c_str());
-}   // IrrDriver
+}
 
-// ----------------------------------------------------------------------------
-IrrDriver::~IrrDriver()
+void IrrDriver::changeResolution()
 {
+    // startScreen             -> removeTextures();
+    attachment_manager      -> removeTextures();
+    projectile_manager      -> removeTextures();
+    item_manager            -> removeTextures();
+    kart_properties_manager -> removeTextures();
+    powerup_manager         -> removeTextures();
+    GUIEngine::free();
+    
+    m_device->closeDevice();
     m_device->drop();
-}   // ~IrrDriver
-
-
+    initDevice();
+    
+    material_manager->reInit();
+    
+    powerup_manager         -> loadPowerups();
+    kart_properties_manager -> loadKartData();
+    item_manager            -> loadDefaultItems();
+    projectile_manager      -> loadData();
+    attachment_manager      -> loadModels();
+    
+    //FIXME: the font reinit funcs should be inside the font class
+    //Reinit fonts
+    delete_fonts();
+    init_fonts();
+    
+    //void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
+    //void free();
+    StateManager::initGUI();
+    //GUIEngine::init();
+    GUIEngine::reshowCurrentScreen();
+        //        startScreen             -> installMaterial();
+    
+}
 // ----------------------------------------------------------------------------
 /** Loads an animated mesh and returns a pointer to it.
  *  \param filename File to load.
