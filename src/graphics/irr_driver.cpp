@@ -51,8 +51,27 @@ IrrDriver::~IrrDriver()
 
 void IrrDriver::initDevice()
 {
-    std::cout << "initDevice ::> creating device, size = " << user_config->m_width << ", " << user_config->m_height << std::endl;
+    // -----------
+    // attempt to detect available video modes. fails miserably for the moment, please test on other platforms...
+    m_device = createDevice(EDT_NULL);
 
+    video::IVideoModeList* modes = m_device->getVideoModeList();
+    const int count = modes->getVideoModeCount();
+    std::cout << "--------------\n  allowed modes  \n--------------\n";
+    std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
+    std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
+
+    std::cout << "Found " << count << " valid modes\n";
+    for(int i=0; i<count; i++)
+    {
+        std::cout <<
+        "bits : " << modes->getVideoModeDepth(i) <<
+        " resolution=" << modes->getVideoModeResolution(i).Width <<
+        "x" << modes->getVideoModeResolution(i).Height << std::endl;
+    }
+    m_device->closeDevice();
+    
+    // ------------
     
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)

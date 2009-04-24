@@ -4,7 +4,7 @@
 namespace SDLManager
 {
     void init();
-    void setVideoMode(bool resetTextures);
+    // void setVideoMode(bool resetTextures);
     void toggleFullscreen(bool resetTextures);
     void showPointer();
     void hidePointer();

@@ -5,6 +5,7 @@
 #include "input/input_manager.hpp"
 #include "gui/state_manager.hpp"
 #include "history.hpp"
+/*
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -12,6 +13,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "material_manager.hpp"
 #include "gui/font.hpp"
+ */
 #include "gui/race_gui.hpp"
 #include "gui/engine.hpp"
 
@@ -65,7 +67,7 @@ namespace SDLManager
         if(user_config->m_fullscreen)
             m_flags |= SDL_FULLSCREEN;
         
-        setVideoMode(false);
+        // setVideoMode(false);
         
         SDL_JoystickEventState(SDL_ENABLE);
     }
@@ -110,7 +112,7 @@ namespace SDLManager
         else if(StateManager::isGameState())
             hidePointer();
         
-        setVideoMode(resetTextures);
+        // setVideoMode(resetTextures);
     }   // toggleFullscreen
     
     // -----------------------------------------------------------------------------
@@ -121,6 +123,7 @@ namespace SDLManager
      *                       resolution. Necessary with windows and Macs OpenGL 
      *                       versions.
      */
+    /*
     void setVideoMode(bool resetTextures)
     {
 #if defined(WIN32) || defined(__APPLE__)
@@ -161,7 +164,7 @@ namespace SDLManager
         }
 #endif
     }   // setVideoMode
-    
+    */
     // SDL_FreeSurface(m_main_surface); ?
     // the previous sdl driver declared m_main_surface but it was always set to NULL afaik
     
