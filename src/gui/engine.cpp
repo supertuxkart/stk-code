@@ -126,7 +126,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback
     g_skin = new Skin(g_env->getSkin());
     g_env->setSkin(g_skin);
 	//g_skin = g_env->getSkin();
-	g_font = g_env->getFont( (file_manager->getGUIDir() + "/fonthaettenschweiler.bmp").c_str() );
+	g_font = g_env->getFont( (file_manager->getGUIDir() + "/okolaks.xml").c_str() );
 	if (g_font) g_skin->setFont(g_font);
     
 	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
