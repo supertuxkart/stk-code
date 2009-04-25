@@ -361,6 +361,17 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
     switch(action)
     {
         case PA_LEFT:
+        if(type == Input::IT_STICKMOTION)
+        {
+            // simulate a key press
+            irr::SEvent::SKeyInput evt;
+            evt.PressedDown = true;
+            evt.Key = KEY_LEFT;
+            irr::SEvent wrapper;
+            wrapper.KeyInput = evt;
+            wrapper.EventType = EET_KEY_INPUT_EVENT;
+            GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }
         {
             IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
             if(el == NULL) break;
@@ -381,7 +392,17 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             break;
             
         case PA_RIGHT:
-
+        if(type == Input::IT_STICKMOTION)
+        {
+            // simulate a key press
+            irr::SEvent::SKeyInput evt;
+            evt.PressedDown = true;
+            evt.Key = KEY_RIGHT;
+            irr::SEvent wrapper;
+            wrapper.KeyInput = evt;
+            wrapper.EventType = EET_KEY_INPUT_EVENT;
+            GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }
         {
             IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
             if(el == NULL) break;
