@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include "ptr_vector.hpp"
-
+#include "input/input.hpp"
 #include <irrlicht.h>
 
 using namespace irr;
@@ -52,7 +52,7 @@ namespace GUIEngine
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
         
         virtual bool OnEvent(const SEvent& event);
-        void processAction(const int action, const unsigned int value);
+        void processAction(const int action, const unsigned int value, Input::InputType type);
 
     };
     

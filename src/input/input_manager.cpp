@@ -361,7 +361,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                     m_timer_in_use = true;
                     m_timer = 0.25;
                 }
-                GUIEngine::getCurrentScreen()->processAction(action, abs(value));
+                GUIEngine::getCurrentScreen()->processAction(action, abs(value), type);
             }
         }
     }
@@ -396,7 +396,7 @@ void InputManager::input(const SEvent& event)
         << " 3=" << event.JoystickEvent.IsButtonPressed(2)
         << " 4=" << event.JoystickEvent.IsButtonPressed(3) << std::endl;
         */
-        // Axes - FIXME, instead of checking all of them, ask the bindings which to poll
+        // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
         for(int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
         {
             int value = event.JoystickEvent.Axis[axis_id];
@@ -416,36 +416,13 @@ void InputManager::input(const SEvent& event)
             else
                 input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
-    
-        /*
-         case SDL_JOYAXISMOTION:
-         {
-         const int value = ev.jaxis.value;
-         
-         if(user_config->m_gamepad_debug)
-         {
-         printf("axis motion: which=%d axis=%d value=%d\n",
-         ev.jaxis.which, ev.jaxis.axis, value);
-         }
-         
-         // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
-         if(value < 0)
-         input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, value);
-         else
-         input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, value);
-         }
-         break;
-         case SDL_JOYBUTTONUP:                
-         // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
-         input(Input::IT_STICKBUTTON, ev.jbutton.which, 
-         ev.jbutton.button, 0, 0);
-         break;
-         case SDL_JOYBUTTONDOWN:
-         // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
-         input(Input::IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, 32768);
-         break;
-         */         
         
+        // Buttons - FIXME, instead of checking all of them, ask the bindings which ones to poll
+        for(int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
+        {
+            input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, event.JoystickEvent.IsButtonPressed(i) ? MAX_VALUE : 0);
+        }   
+
     }
     else if(event.EventType == EET_KEY_INPUT_EVENT)
     {

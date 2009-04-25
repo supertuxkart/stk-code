@@ -352,7 +352,7 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 
 #define MAX_VALUE 32768
 
-void Screen::processAction(const int action, const unsigned int value)
+void Screen::processAction(const int action, const unsigned int value, Input::InputType type)
 {
     const bool pressedDown = value > MAX_VALUE*2/3;
     
@@ -470,6 +470,20 @@ void Screen::processAction(const int action, const unsigned int value)
             break;
             
         case PA_FIRE:
+            if(type == Input::IT_STICKBUTTON)
+            {
+                // simulate a 'enter' key press
+                irr::SEvent::SKeyInput evt;
+                evt.PressedDown = true;
+                evt.Key = KEY_RETURN;
+                irr::SEvent wrapper;
+                wrapper.KeyInput = evt;
+                wrapper.EventType = EET_KEY_INPUT_EVENT;
+                GUIEngine::getDevice()->postEventFromUser(wrapper);
+                
+                std::cout << "posting event to simulate 'enter'\n";
+
+            }
             break;
         default:
             return;
