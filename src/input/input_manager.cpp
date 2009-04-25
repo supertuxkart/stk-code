@@ -187,27 +187,9 @@ InputManager::~InputManager()
 
 
 #define MAX_VALUE 32768
-/*
-void InputManager::postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
-{
-    irr::SEvent::SMouseInput evt;
-    
-    evt.Event = type;
-    evt.X = x;
-    evt.Y = y;
-    
-    irr::SEvent wrapper;
-    wrapper.MouseInput = evt;
-    wrapper.EventType = EET_MOUSE_INPUT_EVENT;
-    
-    GUIEngine::getDevice()->postEventFromUser(wrapper);
-}
-*/
-// TODO - make this do something
+
 void InputManager::handleStaticAction(int key, int value)
 {
-    //if (value) return;
-	
     static int isWireframe = false;
     
 	switch (key)
@@ -388,14 +370,6 @@ void InputManager::input(const SEvent& event)
 
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
-        /*
-        std::cout << "x=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X]
-        << " y=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] 
-        << " 1=" << event.JoystickEvent.IsButtonPressed(0)
-        << " 2=" << event.JoystickEvent.IsButtonPressed(1)
-        << " 3=" << event.JoystickEvent.IsButtonPressed(2)
-        << " 4=" << event.JoystickEvent.IsButtonPressed(3) << std::endl;
-        */
         // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
         for(int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
         {

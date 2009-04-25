@@ -436,7 +436,22 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             {
                 IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
                 assert(list != NULL);
-                if(list->getSelected()>0) break;
+                
+                const bool stay_within_list = list->getSelected()>0;
+                
+                if(type == Input::IT_STICKMOTION)
+                {
+                    // simulate a key press
+                    irr::SEvent::SKeyInput evt;
+                    evt.PressedDown = true;
+                    evt.Key = KEY_UP;
+                    irr::SEvent wrapper;
+                    wrapper.KeyInput = evt;
+                    wrapper.EventType = EET_KEY_INPUT_EVENT;
+                    GUIEngine::getDevice()->postEventFromUser(wrapper);
+                }
+                
+                if(stay_within_list) break;
             }
             
             if(el != NULL && el->getTabGroup() != NULL &&
@@ -468,7 +483,22 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             {
                 IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
                 assert(list != NULL);
-                if(list->getSelected() < (int)list->getItemCount()-1) break;
+                
+                const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
+                
+                if(type == Input::IT_STICKMOTION)
+                {
+                    // simulate a key press
+                    irr::SEvent::SKeyInput evt;
+                    evt.PressedDown = true;
+                    evt.Key = KEY_DOWN;
+                    irr::SEvent wrapper;
+                    wrapper.KeyInput = evt;
+                    wrapper.EventType = EET_KEY_INPUT_EVENT;
+                    GUIEngine::getDevice()->postEventFromUser(wrapper);
+                }
+
+                if(stay_within_list) break;
             }
             
             if(el != NULL && el->getTabGroup() != NULL &&
