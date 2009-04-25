@@ -401,8 +401,10 @@ void InputManager::input(const SEvent& event)
         {
             int value = event.JoystickEvent.Axis[axis_id];
             
+#ifdef __APPLE__
             // work around irrLicht bug. FIXME - get it fixed and remove this
             if(value == -32768) continue; // ignore bogus values given by irrlicht
+#endif
             
             if(user_config->m_gamepad_debug)
             {
