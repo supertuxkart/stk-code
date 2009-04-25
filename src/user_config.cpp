@@ -33,7 +33,7 @@
 #  include <direct.h>
 #endif
 
-#include <SDL/SDL.h>
+// #include <SDL/SDL.h>
 #define _WINSOCKAPI_
 #include <plib/ul.h>
 
@@ -588,7 +588,9 @@ std::string UserConfig::getInputAsString(const Input &input)
         s = _("not set");
         break;
     case Input::IT_KEYBOARD:
-        s = SDL_GetKeyName((SDLKey) input.id0);
+        // TODO - implement with non-SDL code
+        // s = SDL_GetKeyName((SDLKey) input.id0);
+            s = "some key";
         break;
     case Input::IT_STICKMOTION:
         s = StringUtils::insert_values( _("joy %d axis %d  %s"), input.id0, 

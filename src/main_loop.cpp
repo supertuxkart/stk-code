@@ -19,7 +19,7 @@
 
 #include "main_loop.hpp"
 
-#include <SDL/SDL.h>
+// #include <SDL/SDL.h>
 #include <assert.h>
 #include "history.hpp"
 #include "input/input_manager.hpp"
@@ -43,10 +43,10 @@ int maxFPS  =   0;
 
 MainLoop::MainLoop() :
 m_abort(false),
-m_frame_count(0),
-m_curr_time(m_prev_time),
-m_prev_time(SDL_GetTicks())
+m_frame_count(0)
 {
+    m_curr_time = 0;
+    m_prev_time = 0;
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -55,38 +55,25 @@ MainLoop::~MainLoop()
 }   // ~MainLoop
 
 //-----------------------------------------------------------------------------
-void MainLoop::loadBackgroundImages()
-{
-#ifndef HAVE_IRRLICHT
-    int ind = user_config->getBackgroundIndex();
-    const std::string &main = stk_config->getMainMenuPicture(ind);
-    m_title_screen_texture = material_manager->getMaterial(main)->getState()->getTextureHandle();
-    
-    const std::string &background = stk_config->getBackgroundPicture(ind);
-    m_bg_texture = material_manager->getMaterial(background)->getState()->getTextureHandle();
-#endif
-}   // loadBackgroundImages
-
-//-----------------------------------------------------------------------------
 /** Run the actual main loop.
  */
 void MainLoop::run()
 {
-    loadBackgroundImages();
+    IrrlichtDevice* device = GUIEngine::getDevice();
     
     bool music_on = false;
-    m_curr_time = SDL_GetTicks();
+    m_curr_time = device->getTimer()->getRealTime(); // SDL_GetTicks();
     float dt;
     while(!m_abort)
     {
-        input_manager->input();
+        // input_manager->input();
 
         m_prev_time = m_curr_time;
 
         while( 1 )
         {
-            m_curr_time = SDL_GetTicks();
-            dt =(float)(m_curr_time - m_prev_time);
+            m_curr_time = device->getTimer()->getRealTime();
+            dt = (float)(m_curr_time - m_prev_time);
             
             // don't allow the game to run slower than a certain amount.
             // when the computer can't keep it up, slow down the shown time instead
@@ -102,7 +89,8 @@ void MainLoop::run()
                 //it might limit the frames to even 55 frames. On some cases,
                 //SDL_Delay(1) will just cause the program to give up the
                 //rest of it's timeslice.
-                SDL_Delay(1);
+                // FIXME - implement with non-SDL code
+                // SDL_Delay(1);
             }
             else break;
         }
@@ -155,8 +143,8 @@ void MainLoop::run()
                         //FIXME: SDL_GetTicks() includes the loading time,
                         //so the FPS will be skewed for now.
                         printf("Number of frames: %d time %f, Average FPS: %f\n",
-                               m_frame_count, SDL_GetTicks() * 0.001,
-                               (float)m_frame_count/(SDL_GetTicks() * 0.001));
+                               m_frame_count, device->getTimer()->getRealTime()*0.001,
+                               (float)m_frame_count/(device->getTimer()->getRealTime()));
                         if(!history->replayHistory()) history->Save();
                         std::exit(-2);
                     }   // if profile finished

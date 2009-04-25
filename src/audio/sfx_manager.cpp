@@ -23,6 +23,9 @@
 #include <stdexcept>
 #include <algorithm>
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
+
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #  include <OpenAL/alc.h>

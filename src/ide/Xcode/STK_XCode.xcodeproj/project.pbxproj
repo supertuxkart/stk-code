@@ -223,6 +223,8 @@
 		95C65DAA0F532FD400BE7BA7 /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA00F532FD400BE7BA7 /* shadow.cpp */; };
 		95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
 		95CA59F80F82FCB7003323DB /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CA59F70F82FCB7003323DB /* physical_object.cpp */; };
+		95D464890FA37B1B00F50CA2 /* libIrrlicht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D464880FA37B1B00F50CA2 /* libIrrlicht.a */; };
+		95D464D30FA3801E00F50CA2 /* libSDL-1.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423410E26E65B00692113 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423400E26E65B00692113 /* GLUT.framework */; };
@@ -736,6 +738,8 @@
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
+		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
+		95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libSDL-1.2.0.dylib"; path = "/usr/local/lib/libSDL-1.2.0.dylib"; sourceTree = "<absolute>"; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
 		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = /usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = "<absolute>"; };
@@ -1142,6 +1146,8 @@
 				950557580F6968860056E88C /* Carbon.framework in Frameworks */,
 				950557600F6968A50056E88C /* QuickTime.framework in Frameworks */,
 				950557650F6968BE0056E88C /* IOKit.framework in Frameworks */,
+				95D464890FA37B1B00F50CA2 /* libIrrlicht.a in Frameworks */,
+				95D464D30FA3801E00F50CA2 /* libSDL-1.2.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1151,6 +1157,8 @@
 		08FB7794FE84155DC02AAC07 /* STK_XCode */ = {
 			isa = PBXGroup;
 			children = (
+				95D464880FA37B1B00F50CA2 /* libIrrlicht.a */,
+				95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */,
 				95D538830F69D61C00B4062E /* irrlicht */,
 				95C2ABA60F29653F000D3E5D /* src */,
 				9513B40E0F0EDE80005D29F6 /* Frameworks */,
@@ -2795,10 +2803,6 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/bullet/Demos/OpenGL\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/bullet/src\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src/enet\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4 = "\"$(DEVELOPER_DIR)/games/supertuxkart/src\"";
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-DHAVE_OGGVORBIS=1",
@@ -2838,7 +2842,6 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
-					"-lirrlicht",
 					"-L/usr/local/lib",
 					"-lopenal",
 					"-lvorbisfile",
@@ -2849,7 +2852,6 @@
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";
 				WARNING_CFLAGS = "";
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};

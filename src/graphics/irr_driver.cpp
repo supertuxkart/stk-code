@@ -404,8 +404,8 @@ void IrrDriver::update(float dt)
     // instead of calling run(), we only update the irrlicht timer (which is 
     // necessary to get animations to work) - that's the only other operation
     // happening in run.
-    //if(!m_device->run()) return;
-    m_device->getTimer()->tick();
+    if(!m_device->run()) return;
+    //m_device->getTimer()->tick();
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_scene_manager->drawAll();
 

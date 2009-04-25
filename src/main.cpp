@@ -18,12 +18,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef __APPLE__
-// Necessary for Macs when using SDL without Xwindows: this include
-// will rename main to SDLmain, and a new main program will be linked
-// in from the library, causing a correct framework to be set up
-#  include "SDL/SDL.h"
-#endif
 
 #ifdef WIN32
 #  ifdef __CYGWIN__
@@ -506,10 +500,6 @@ void CleanTuxKart()
 
 //=============================================================================
 
-// FIXME - temporary, move
-void eventCallback(GUIEngine::Widget* widget, std::string& name)
-{
-}
 
 int main(int argc, char *argv[] ) 
 {

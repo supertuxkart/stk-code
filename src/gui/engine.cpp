@@ -7,6 +7,7 @@
 #include "gui/widget.hpp"
 #include "io/file_manager.hpp"
 #include "gui/state_manager.hpp"
+#include "input/input_manager.hpp"
 
 namespace GUIEngine
 {
@@ -27,6 +28,29 @@ namespace GUIEngine
     {
         return dt;
     }
+    
+    class IrrlichtEventCore : public IEventReceiver
+    {
+    public:
+        IrrlichtEventCore()
+        {
+        }
+        ~IrrlichtEventCore()
+        {
+        }
+        bool OnEvent (const SEvent &event)
+        {
+            if(event.EventType == EET_GUI_EVENT || !StateManager::isGameState())
+            {
+                if(g_current_screen == NULL) return false;
+                g_current_screen->OnEvent(event);
+            }
+            else
+                input_manager->input(event);
+            return false;
+        }
+    };
+    IrrlichtEventCore* g_irrlicht_event_core = NULL;
 // -----------------------------------------------------------------------------
 IrrlichtDevice* getDevice()
 {
@@ -55,7 +79,7 @@ void clear()
 }
     
 void switchToScreen(const char* screen_name)
-{
+{    
     // clean what was left by the previous screen
     g_env->clear();
     if(g_current_screen != NULL) g_current_screen->elementsWereDeleted();
@@ -80,8 +104,16 @@ void switchToScreen(const char* screen_name)
         g_current_screen = new_screen;
     }
     
+
+    
     // show screen
     g_current_screen->addWidgets();
+    
+    // set event listener
+    if(g_irrlicht_event_core == NULL) g_irrlicht_event_core = new IrrlichtEventCore();
+    g_device->setEventReceiver(g_irrlicht_event_core);
+    //g_env->setUserEventReceiver(g_irrlicht_event_core);
+
 }
 // -----------------------------------------------------------------------------
 /** to be called after e.g. a resolution switch */

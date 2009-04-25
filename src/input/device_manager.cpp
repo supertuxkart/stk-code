@@ -142,6 +142,8 @@ bool DeviceManager::deserialize()
   */
 bool DeviceManager::checkForGamePad(const int sdl_id)
 {
+    // FIXME - replace with non-SDL code
+    /*
     std::string name = SDL_JoystickName(sdl_id);
     
     std::cout << "trying to find gamepad " << name.c_str() << std::endl;
@@ -161,7 +163,7 @@ bool DeviceManager::checkForGamePad(const int sdl_id)
     std::cout << "couldn't find this joystick, so creating a new one" << std::endl;
     add(new GamePadDevice(sdl_id));
     return true;
-
+*/
 }
     
 void DeviceManager::serialize()

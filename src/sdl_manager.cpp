@@ -1,6 +1,6 @@
 
 #include "sdl_manager.hpp"
-#include <SDL/SDL.h>
+// #include <SDL/SDL.h>
 #include "user_config.hpp"
 #include "input/input_manager.hpp"
 #include "gui/state_manager.hpp"
@@ -26,6 +26,7 @@ namespace SDLManager
     
     void init()
     {
+        /*
         if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER) < 0)
         {
             fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
@@ -70,6 +71,7 @@ namespace SDLManager
         // setVideoMode(false);
         
         SDL_JoystickEventState(SDL_ENABLE);
+         */
     }
     
     //-----------------------------------------------------------------------------
@@ -77,7 +79,8 @@ namespace SDLManager
      */
     void showPointer()
     {
-        SDL_ShowCursor(SDL_ENABLE);
+        GUIEngine::getDevice()->getCursorControl()->setVisible(true);
+        // SDL_ShowCursor(SDL_ENABLE);
     }   // showPointer
     
     //-----------------------------------------------------------------------------
@@ -85,7 +88,8 @@ namespace SDLManager
      */
     void hidePointer()
     {
-        SDL_ShowCursor(SDL_DISABLE);
+        GUIEngine::getDevice()->getCursorControl()->setVisible(true);
+        // SDL_ShowCursor(SDL_DISABLE);
     }   // hidePointer
     
     //-----------------------------------------------------------------------------
@@ -93,6 +97,8 @@ namespace SDLManager
      */
     void toggleFullscreen(bool resetTextures)
     {
+        // TODO
+        /*
         user_config->m_fullscreen = !user_config->m_fullscreen;
         
         m_flags = SDL_OPENGL | SDL_HWSURFACE;
@@ -113,6 +119,7 @@ namespace SDLManager
             hidePointer();
         
         // setVideoMode(resetTextures);
+         */
     }   // toggleFullscreen
     
     // -----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #include <vector>
 #include <irrlicht.h>
 
-#include <SDL/SDL.h>
+// #include <SDL/SDL.h>
 
 #include "input/input.hpp"
 
@@ -75,7 +75,10 @@ public:
 	       InputManager();
           ~InputManager();
 	void   initGamePadDevices();
-	void   input();
+    
+	//void   input();
+    void   input(const irr::SEvent& event);
+    
 	void   setMode(InputDriverMode);		
 	bool   isInMode(InputDriverMode);
     

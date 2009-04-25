@@ -7,6 +7,7 @@
 #include "gui/screen.hpp"
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
+#include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 
 using namespace irr;
@@ -190,9 +191,6 @@ void Screen::addWidgets()
     if(!m_loaded) loadFromFile();
     
     addWidgetsRecursively( m_widgets );
-    
-    // And tell the device to use our custom event receiver.
-    GUIEngine::getDevice()->setEventReceiver(this);
 
     // select the first widget
     Widget* w = getFirstWidget();
@@ -356,13 +354,16 @@ bool Screen::OnEvent(const SEvent& event)
     assert(transmitEvent != NULL);
     //if (event.EventType != EET_GUI_EVENT) return false;
     
-    
     if(event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
     {
         const int key = event.KeyInput.Key;
         
         switch(key)
         {
+            case KEY_ESCAPE :
+                StateManager::escapePressed();
+                break;
+                
             case KEY_SPACE :
                 break;
             case KEY_LEFT:
@@ -408,12 +409,12 @@ bool Screen::OnEvent(const SEvent& event)
                 IGUIElement *el, *first=NULL, *closest=NULL;
                 el = GUIEngine::getGUIEnv()->getFocus();
                 
-                Widget* w = getWidget( el->getID() );
+                Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
                 
                 // list widgets are a bit special, because up/down keys are also used
                 // to navigate between various list items, not only to navigate between
                 // components
-                if(w->m_type == WTYPE_LIST)
+                if(w != NULL && w->m_type == WTYPE_LIST)
                 {
                     IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
                     assert(list != NULL);
@@ -429,6 +430,7 @@ bool Screen::OnEvent(const SEvent& event)
                 {
                     // select the first widget
                     Widget* w = getLastWidget();
+                    
                     if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
                 }
                 return true;
@@ -438,13 +440,13 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 IGUIElement *el, *first = NULL, *closest = NULL;
                 el = GUIEngine::getGUIEnv()->getFocus();
-
-                Widget* w = getWidget( el->getID() );
+                
+                Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
 
                 // list widgets are a bit special, because up/down keys are also used
                 // to navigate between various list items, not only to navigate between
                 // components
-                if(w->m_type == WTYPE_LIST)
+                if(w != NULL && w->m_type == WTYPE_LIST)
                 {
                     IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
                     assert(list != NULL);
@@ -459,7 +461,7 @@ bool Screen::OnEvent(const SEvent& event)
                 else
                 {
                     // select the first widget
-                    Widget* w = getFirstWidget();
+                    Widget* w = getFirstWidget();                    
                     if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
                 }
                 return true;
@@ -494,7 +496,7 @@ bool Screen::OnEvent(const SEvent& event)
     }
     else if(event.EventType == EET_GUI_EVENT)
     {
-        s32 id = event.GUIEvent.Caller->getID();
+        const s32 id = event.GUIEvent.Caller->getID();
         
         switch(event.GUIEvent.EventType)
         {
@@ -558,7 +560,7 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 Widget* el = getWidget(id);
                 if(el == NULL) break;
-                
+
                 el->focused();
                 
                 break;

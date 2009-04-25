@@ -41,15 +41,15 @@ private:
     int      m_frame_count;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
-    GLuint   m_title_screen_texture;
-    GLuint   m_bg_texture;
+    // GLuint   m_title_screen_texture;
+    // GLuint   m_bg_texture;
 
 public:
          MainLoop();
         ~MainLoop();
     void run();
     void abort();
-    void loadBackgroundImages();
+    // void loadBackgroundImages();
 };   // MainLoop
 
 extern MainLoop* main_loop;

@@ -27,8 +27,6 @@
 #include <sstream>
 #include <algorithm>
 
-#include <SDL/SDL.h>
-
 #include "input/input.hpp"
 //#include "actionmap.hpp"
 #include "user_config.hpp"
@@ -48,7 +46,7 @@
 InputManager *input_manager;
 
 //-----------------------------------------------------------------------------
-/** Initialise SDL.
+/** Initialise input
  */
 InputManager::InputManager()
 : m_sensed_input(0),
@@ -75,9 +73,9 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
     }
 
     // Prepare a list of connected joysticks.
-    const int numSticks = SDL_NumJoysticks();
-    
-    std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
+    // FIXME - replace with non-SDL code
+    const int numSticks = 0; //SDL_NumJoysticks();
+    // std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
     
     // TODO - detect if device is currently known and has an entry in the config
     // the constructor below should only be used if not
@@ -195,13 +193,7 @@ InputManager::~InputManager()
 {
     
     delete m_device_manager;
-    
-    //const int NUM_STICKS = SDL_NumJoysticks();
-    //for (int i = 0; i < NUM_STICKS; i++)
-    //    delete m_stick_infos[i];
-    
-    //delete [] m_stick_infos;
-    
+
     // FIXME LEAK: delete m_action_map if defined
     
 }   // ~InputManager
@@ -234,7 +226,7 @@ void InputManager::handleStaticAction(int key, int value)
 	switch (key)
 	{
 #ifdef DEBUG
-		case SDLK_F1:
+		case KEY_F1:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
@@ -242,14 +234,14 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->attach(ATTACH_ANVIL, 5);
 			}
 			break;
-		case SDLK_F2:
+		case KEY_F2:
             if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
 				kart->setPowerup(POWERUP_PLUNGER, 10000);
 			}
 			break;
-		case SDLK_F3:
+		case KEY_F3:
 			if (race_manager->getNumPlayers() ==1 )
 			{
 				Kart* kart = RaceManager::getPlayerKart(0);
@@ -257,14 +249,14 @@ void InputManager::handleStaticAction(int key, int value)
 			}
 			break;
 #endif
-		case SDLK_F12:
+		case KEY_F12:
 			user_config->m_display_fps = !user_config->m_display_fps;
 			if(user_config->m_display_fps)
 			{
                 getRaceGUI()->resetFPSCounter();
             }
 			break;
-		case SDLK_F11:
+		case KEY_F11:
 			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
 			isWireframe = ! isWireframe;
 			break;
@@ -272,16 +264,16 @@ void InputManager::handleStaticAction(int key, int value)
             // For now disable F9 toggling fullscreen, since windows requires
             // to reload all textures, display lists etc. Fullscreen can
             // be toggled from the main menu (options->display).
-		case SDLK_F9:
+		case KEY_F9:
             SDLManager::toggleFullscreen(false);   // 0: do not reset textures
 			// Fall through to put the game into pause mode.
 #endif
-		case SDLK_ESCAPE:
+		case KEY_ESCAPE:
             // TODO - show race menu
             // RaceManager::getWorld()->pause();
              //menu_manager->pushMenu(MENUID_RACEMENU);
             break;
-		case SDLK_F10:
+		case KEY_F10:
 			history->Save();
 			break;
 		default:
@@ -308,142 +300,67 @@ void InputManager::handleStaticAction(int key, int value)
 void InputManager::input(Input::InputType type, int id0, int id1, int id2, 
                          int value)
 {
+    int player;
+    PlayerAction action;
     
-    // menu navigation. TODO : enable navigation with gamepads
-    if(!StateManager::isGameState())
-    {
-        irr::SEvent::SKeyInput evt;
-        
-        if(type == Input::IT_KEYBOARD)
-        {
-            if(id0 == SDLK_RETURN)
-                evt.Key = irr::KEY_RETURN;
-            else if(id0 == SDLK_UP)
-                evt.Key = irr::KEY_UP;
-            else if(id0 == SDLK_DOWN)
-                evt.Key = irr::KEY_DOWN;
-            else if(id0 == SDLK_RIGHT)
-                evt.Key = irr::KEY_RIGHT;            
-            else if(id0 == SDLK_LEFT)
-                evt.Key = irr::KEY_LEFT;
-            else
-                return; // only those keys are accepted in menus for now.
-            
-            evt.PressedDown = value > MAX_VALUE/2;
-        }
-        else // allow menu navigation with gamepads and other devices too
-        {
-            int player;
-            PlayerAction action;
-            
-            const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
-            if(!action_found) return;
-            
-            evt.PressedDown = abs(value) > MAX_VALUE/2;
-            
-            if(action == PA_FIRE || action == PA_NITRO)
-                evt.Key = irr::KEY_RETURN;
-            else if(action == PA_ACCEL)
-                evt.Key = irr::KEY_UP;
-            else if(action == PA_BRAKE)
-                evt.Key = irr::KEY_DOWN;
-            else if(action == PA_RIGHT)
-                evt.Key = irr::KEY_RIGHT;            
-            else if(action == PA_LEFT)
-                evt.Key = irr::KEY_LEFT;
-            else if(action == PA_RESCUE)
-            {
-                // escape (or 'rescue' on gamepad) is a little special
-                if(evt.PressedDown) StateManager::escapePressed();
-                return;
-            }
-            else
-                return; // only those bindings are accepted in menus for now.
-            
-            if(type == Input::IT_STICKMOTION)
-            {
-                if(m_timer_in_use) return; // time between keys not elapsed yet
-            
-                if(evt.PressedDown)
-                {
-                    // minimum time between two gamepad events in menu
-                    m_timer_in_use = true;
-                    m_timer = 0.25;
-                }
-            } // end if (gamepad input type)
-        } // end if (keyboard vs gamepad)
-        
-        // send event to irrLicht
-        irr::SEvent wrapper;
-        wrapper.KeyInput = evt;
-        wrapper.EventType = EET_KEY_INPUT_EVENT;
-                
-        GUIEngine::getDevice()->postEventFromUser(wrapper);
-
-    }
-    // in-game event handling
-    else
-    {        
-        int player;
-        PlayerAction action;
-        
-        const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
-        
-        //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
+    const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
+    
+    std::cout << "Input code=" << id0 << " found=" << action_found << std::endl;
+    
+    //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 #if 0 // TODO - input sensing
-        // Act different in input sensing mode.
-        if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
-            m_mode <= INPUT_SENSE_PREFER_BUTTON)
+    // Act different in input sensing mode.
+    if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
+        m_mode <= INPUT_SENSE_PREFER_BUTTON)
+    {
+        // Input sensing should be canceled.
+        if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
         {
-            // Input sensing should be canceled.
-            if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
+            handleGameAction(GA_SENSE_CANCEL, value);
+        }
+        // Stores the sensed input when the button/key/axes/<whatever> is
+        // released only and is not used in a fixed mapping.
+        else if (!user_config->isFixedInput(type, id0, id1, id2) )
+        {
+            // See if the new input should be stored. This happens if:
+            // 1) the value is larger
+            // 2) nothing has been saved yet
+            // 3) the new event has the preferred type
+            // The latter is necessary since some gamepads have analog
+            // buttons that can return two different events when pressed
+            bool store_new = abs(value) > m_max_sensed_input         ||
+            m_max_sensed_type   == Input::IT_NONE                ||
+            ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
+             type              == Input::IT_STICKMOTION && 
+             m_max_sensed_type != Input::IT_STICKMOTION      )  ||
+            ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
+             type              == Input::IT_STICKBUTTON && 
+             m_max_sensed_type != Input::IT_STICKBUTTON      );
+            if(store_new)
             {
-                handleGameAction(GA_SENSE_CANCEL, value);
+                m_sensed_input->type = type;
+                m_sensed_input->id0  = id0;
+                m_sensed_input->id1  = id1;
+                m_sensed_input->id2  = id2;
+                m_max_sensed_input   = abs(value);
+                m_max_sensed_type    = type;
             }
-            // Stores the sensed input when the button/key/axes/<whatever> is
-            // released only and is not used in a fixed mapping.
-            else if (!user_config->isFixedInput(type, id0, id1, id2) )
-            {
-                // See if the new input should be stored. This happens if:
-                // 1) the value is larger
-                // 2) nothing has been saved yet
-                // 3) the new event has the preferred type
-                // The latter is necessary since some gamepads have analog
-                // buttons that can return two different events when pressed
-                bool store_new = abs(value) > m_max_sensed_input         ||
-                m_max_sensed_type   == Input::IT_NONE                ||
-                ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
-                 type              == Input::IT_STICKMOTION && 
-                 m_max_sensed_type != Input::IT_STICKMOTION      )  ||
-                ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
-                 type              == Input::IT_STICKBUTTON && 
-                 m_max_sensed_type != Input::IT_STICKBUTTON      );
-                if(store_new)
-                {
-                    m_sensed_input->type = type;
-                    m_sensed_input->id0  = id0;
-                    m_sensed_input->id1  = id1;
-                    m_sensed_input->id2  = id2;
-                    m_max_sensed_input   = abs(value);
-                    m_max_sensed_type    = type;
-                }
-                // Notify the completion of the input sensing if the key/stick/
-                // ... is released.
-                if(value==0)
-                    handleGameAction(GA_SENSE_COMPLETE, 0);
-            }
-        }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
-        else
+            // Notify the completion of the input sensing if the key/stick/
+            // ... is released.
+            if(value==0)
+                handleGameAction(GA_SENSE_COMPLETE, 0);
+        }
+    }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
+    else
 #endif
-        if (action_found)
-        {
-            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
-        }
-        else if(type == Input::IT_KEYBOARD)
-        {
-            // keyboard press not handled by device manager / bindings. Check static bindings...
-            handleStaticAction( id0, value );
-        }
+    if (action_found)
+    {
+        RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
+    }
+    else if(type == Input::IT_KEYBOARD)
+    {
+        // keyboard press not handled by device manager / bindings. Check static bindings...
+        handleStaticAction( id0, value );
     }
 }   // input
 
@@ -465,6 +382,81 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
  * flexibility (= treat 4 directions as four buttons).
  *
  */
+void InputManager::input(const SEvent& event)
+{
+    std::cout << "input event\n";
+    
+    if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
+    {
+        std::cout << "x=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X]
+        << " y=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] 
+        << " 1=" << event.JoystickEvent.IsButtonPressed(0)
+        << " 2=" << event.JoystickEvent.IsButtonPressed(1)
+        << " 3=" << event.JoystickEvent.IsButtonPressed(2)
+        << " 4=" << event.JoystickEvent.IsButtonPressed(3) << std::endl;
+    }
+    else if(event.EventType == EET_KEY_INPUT_EVENT)
+    {
+        const int key = event.KeyInput.Key;
+        
+        if(event.KeyInput.PressedDown)
+        {
+            // escape is a little special
+            if(key == KEY_ESCAPE)
+            {
+                StateManager::escapePressed();
+                return;
+            }
+            
+            input(Input::IT_KEYBOARD, key,
+#ifdef HAVE_IRRLICHT
+                  // FIXME: not sure why this happens: with plib the unicode
+                  // value is 0. Since all values defined in user_config 
+                  // assume that the unicode value is 0, it does not work 
+                  // with irrlicht, which has proper unicode values defined
+                  // (keydown is not recognised, but keyup is). So for now
+                  // (till user_config is migrated to full irrlicht support)
+                  // we pass the 0 here artifically so that keyboard handling
+                  // works.
+                  0,
+#else
+                  ev.key.keysym.unicode, 
+#endif
+                  0, MAX_VALUE);
+            
+        }
+        else
+        {
+            input(Input::IT_KEYBOARD, key, 0, 0, 0);
+        }
+    }
+#if 0 // in case we ever use mouse in-game...
+    else if(event.EventType == EET_MOUSE_INPUT_EVENT)
+    {
+        const int type = event.MouseInput.Event;
+        
+        if(type == EMIE_MOUSE_MOVED)
+        {
+            // m_mouse_x = event.MouseInput.X;
+            // m_mouse_y = event.MouseInput.Y;
+            //const int wheel = event.MouseInput.Wheel;
+        }
+        
+        /*
+         EMIE_LMOUSE_PRESSED_DOWN 	Left mouse button was pressed down.
+         EMIE_RMOUSE_PRESSED_DOWN 	Right mouse button was pressed down.
+         EMIE_MMOUSE_PRESSED_DOWN 	Middle mouse button was pressed down.
+         EMIE_LMOUSE_LEFT_UP 	Left mouse button was left up.
+         EMIE_RMOUSE_LEFT_UP 	Right mouse button was left up.
+         EMIE_MMOUSE_LEFT_UP 	Middle mouse button was left up.
+         EMIE_MOUSE_MOVED 	The mouse cursor changed its position.
+         EMIE_MOUSE_WHEEL 	The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast. 
+         */
+    }
+#endif
+}
+
+/*
 void InputManager::input()
 {
     SDL_Event ev;
@@ -606,6 +598,7 @@ void InputManager::input()
         m_mouse_val_y = 0;
     
 }   // input
+*/
 
 //-----------------------------------------------------------------------------
 /** Retrieves the Input instance that has been prepared in the input sense
@@ -701,7 +694,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             case LOWLEVEL:
                 // Leaving lowlevel mode.
                 
-                SDL_EnableUNICODE(SDL_DISABLE);
+                // SDL_EnableUNICODE(SDL_DISABLE);
                 
                 SDLManager::showPointer();
                 
@@ -751,7 +744,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
             
-            SDL_EnableUNICODE(SDL_ENABLE);
+            // SDL_EnableUNICODE(SDL_ENABLE);
             
             SDLManager::hidePointer();
             

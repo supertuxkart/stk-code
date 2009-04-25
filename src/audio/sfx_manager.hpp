@@ -26,8 +26,6 @@
 #else
 #  include <AL/al.h>
 #endif
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
 
 #include "lisp/lisp.hpp"
 #include "utils/vec3.hpp"

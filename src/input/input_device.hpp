@@ -1,7 +1,6 @@
 #ifndef INPUT_DEVICE_HPP
 #define INPUT_DEVICE_HPP
 
-#include <SDL/SDL.h>
 #include <string>
 #include "input/input.hpp"
 #include <iostream>
@@ -59,7 +58,8 @@ class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
 public:
-    SDL_Joystick         *m_sdlJoystick;
+    // FIXME - replace with non-SDL code
+    // SDL_Joystick         *m_sdlJoystick;
     int                   m_deadzone;
     int                   m_index;
     Input::AxisDirection *m_prevAxisDirections;

@@ -109,6 +109,7 @@ KeyboardDevice::KeyboardDevice(irr::io::IrrXMLReader* xml)
 // -----------------------------------------------------------------------------
 void KeyboardDevice::loadDefaults()
 {
+    /*
     m_bindings[PA_NITRO].id = SDLK_SPACE;
     m_bindings[PA_ACCEL].id = SDLK_UP;
     m_bindings[PA_BRAKE].id = SDLK_DOWN;
@@ -118,6 +119,17 @@ void KeyboardDevice::loadDefaults()
     m_bindings[PA_RESCUE].id = SDLK_ESCAPE;
     m_bindings[PA_FIRE].id = SDLK_LALT;
     m_bindings[PA_LOOK_BACK].id = SDLK_b;
+*/
+    
+    m_bindings[PA_NITRO].id = KEY_KEY_N;
+    m_bindings[PA_ACCEL].id = KEY_UP;
+    m_bindings[PA_BRAKE].id = KEY_DOWN;
+    m_bindings[PA_LEFT].id = KEY_LEFT;
+    m_bindings[PA_RIGHT].id = KEY_RIGHT;
+    m_bindings[PA_DRIFT].id = KEY_KEY_V;
+    m_bindings[PA_RESCUE].id = KEY_ESCAPE;
+    m_bindings[PA_FIRE].id = KEY_SPACE;
+    m_bindings[PA_LOOK_BACK].id = KEY_KEY_B ;
 
     m_bindings[PA_NITRO].type = Input::IT_KEYBOARD;
     m_bindings[PA_ACCEL].type = Input::IT_KEYBOARD;
@@ -159,7 +171,8 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
 GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 {
     m_type = DT_GAMEPAD;
-    m_sdlJoystick = NULL;
+    // FIXME - replace with non-SDL code
+    // m_sdlJoystick = NULL;
     m_prevAxisDirections = NULL;
     m_deadzone = DEADZONE_JOYSTICK;
     
@@ -186,16 +199,17 @@ GamePadDevice::GamePadDevice(int sdlIndex)
     
     open(sdlIndex);
     
-    m_name = SDL_JoystickName(sdlIndex);
+    // FIXME - replace with non-SDL code
+    // m_name = SDL_JoystickName(sdlIndex);
     
     loadDefaults();
 }   // GamePadDevice
 // -----------------------------------------------------------------------------
 void GamePadDevice::open(const int sdl_id)
 {
-    m_sdlJoystick = SDL_JoystickOpen(sdl_id);
-    
-    const int count = SDL_JoystickNumAxes(m_sdlJoystick);
+    // FIXME - replace with non-SDL code
+    // m_sdlJoystick = SDL_JoystickOpen(sdl_id);
+    const int count = 1; // SDL_JoystickNumAxes(m_sdlJoystick);
     m_prevAxisDirections = new Input::AxisDirection[count];
     
     std::cout << "(i) This gamepad has " << count << " axes\n";
@@ -355,5 +369,6 @@ GamePadDevice::~GamePadDevice()
 {
     delete[] m_prevAxisDirections;
     
-    SDL_JoystickClose(m_sdlJoystick);
+    // FIXME - replace with non-SDL code
+    // SDL_JoystickClose(m_sdlJoystick);
 }   // ~GamePadDevice
