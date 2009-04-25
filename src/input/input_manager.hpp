@@ -68,7 +68,7 @@ private:
 	int    m_mouse_val_x, m_mouse_val_y;
     
     void   input(Input::InputType, int, int, int, int);
-    void   postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y);
+    //void   postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y);
     void   handleStaticAction(int id0, int value);
     void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
 public:

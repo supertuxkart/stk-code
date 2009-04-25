@@ -41,6 +41,7 @@
 #include "karts/kart.hpp"
 #include "history.hpp"
 #include "gui/race_gui.hpp"
+#include "gui/screen.hpp"
 #include "sdl_manager.hpp"
 
 InputManager *input_manager;
@@ -186,7 +187,7 @@ InputManager::~InputManager()
 
 
 #define MAX_VALUE 32768
-
+/*
 void InputManager::postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const int x, const int y)
 {
     irr::SEvent::SMouseInput evt;
@@ -201,7 +202,7 @@ void InputManager::postIrrLichtMouseEvent(irr::EMOUSE_INPUT_EVENT type, const in
     
     GUIEngine::getDevice()->postEventFromUser(wrapper);
 }
-
+*/
 // TODO - make this do something
 void InputManager::handleStaticAction(int key, int value)
 {
@@ -291,7 +292,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
     
     const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
     
-    std::cout << "Input code=" << id0 << " found=" << action_found << std::endl;
+    // std::cout << "Input code=" << id0 << " found=" << action_found << std::endl;
     
     //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 #if 0 // TODO - input sensing
@@ -341,7 +342,28 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
 #endif
     if (action_found)
     {
-        RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
+        if(StateManager::isGameState())
+            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
+        else
+        {  
+            // reset timer when released
+            if( abs(value) == 0 )
+            {
+                m_timer_in_use = false;
+                m_timer = 0;
+            }
+            
+            // menu input
+            if(!m_timer_in_use)
+            {
+                if(abs(value) > MAX_VALUE*2/3)
+                {
+                    m_timer_in_use = true;
+                    m_timer = 0.25;
+                }
+                GUIEngine::getCurrentScreen()->processAction(action, abs(value));
+            }
+        }
     }
     else if(type == Input::IT_KEYBOARD)
     {
@@ -351,17 +373,10 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
 }   // input
 
 //-----------------------------------------------------------------------------
-/** Reads the SDL event loop, does some tricks with certain values and calls
- * input() if appropriate.
- *
- * Digital inputs get the value of 32768 when pressed (key/button press,
- * digital axis) because this is what SDL provides. Relative mouse inputs
- * which do not fit into this scheme are converted to match. This is done to
- * relieve the KartAction implementor from the need to think about different
- * input devices and how SDL treats them. The same input gets the value of 0
- * when released.
- *
- * Analog axes can have any value from [0, 32768].
+/** 
+ * Called on keyboard events [indirectly] by irrLicht
+ * 
+ * Analog axes can have any value from [-32768, 32767].
  *
  * There are no negative values. Instead this is reported as an axis with a
  * negative direction. This simplifies input configuration and allows greater
@@ -370,16 +385,67 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
  */
 void InputManager::input(const SEvent& event)
 {
-    std::cout << "input event\n";
-    
+
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
+        /*
         std::cout << "x=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_X]
         << " y=" << event.JoystickEvent.Axis[SEvent::SJoystickEvent::AXIS_Y] 
         << " 1=" << event.JoystickEvent.IsButtonPressed(0)
         << " 2=" << event.JoystickEvent.IsButtonPressed(1)
         << " 3=" << event.JoystickEvent.IsButtonPressed(2)
         << " 4=" << event.JoystickEvent.IsButtonPressed(3) << std::endl;
+        */
+        // Axes - FIXME, instead of checking all of them, ask the bindings which to poll
+        for(int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
+        {
+            int value = event.JoystickEvent.Axis[axis_id];
+            
+            // work around irrLicht bug. FIXME - get it fixed and remove this
+            if(value == -32768) continue; // ignore bogus values given by irrlicht
+            
+            if(user_config->m_gamepad_debug)
+            {
+                printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
+                       event.JoystickEvent.Joystick, axis_id, value);
+            }
+            
+            // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
+            if(value < 0)
+                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value);
+            else
+                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
+        }
+    
+        /*
+         case SDL_JOYAXISMOTION:
+         {
+         const int value = ev.jaxis.value;
+         
+         if(user_config->m_gamepad_debug)
+         {
+         printf("axis motion: which=%d axis=%d value=%d\n",
+         ev.jaxis.which, ev.jaxis.axis, value);
+         }
+         
+         // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
+         if(value < 0)
+         input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_NEGATIVE, value);
+         else
+         input(Input::IT_STICKMOTION, ev.jaxis.which, ev.jaxis.axis, Input::AD_POSITIVE, value);
+         }
+         break;
+         case SDL_JOYBUTTONUP:                
+         // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
+         input(Input::IT_STICKBUTTON, ev.jbutton.which, 
+         ev.jbutton.button, 0, 0);
+         break;
+         case SDL_JOYBUTTONDOWN:
+         // See the SDL_JOYAXISMOTION case label because of !m_mode thingie.
+         input(Input::IT_STICKBUTTON, ev.jbutton.which, ev.jbutton.button, 0, 32768);
+         break;
+         */         
+        
     }
     else if(event.EventType == EET_KEY_INPUT_EVENT)
     {

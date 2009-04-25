@@ -40,7 +40,9 @@ namespace GUIEngine
         }
         bool OnEvent (const SEvent &event)
         {
-            if(event.EventType == EET_GUI_EVENT || !StateManager::isGameState())
+            if(event.EventType == EET_GUI_EVENT ||
+               (!StateManager::isGameState() && event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT)
+               )
             {
                 if(g_current_screen == NULL) return false;
                 g_current_screen->OnEvent(event);

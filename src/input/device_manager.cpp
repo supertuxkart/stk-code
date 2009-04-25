@@ -40,7 +40,7 @@ bool DeviceManager::initGamePadSupport()
 }
 // -----------------------------------------------------------------------------
 /**
- * Check if we already have a config object for joystick 'sdl_id' as reported by SDL
+ * Check if we already have a config object for joystick 'irr_id' as reported by irrLicht
  * If yes, 'open' the gamepad. If no, create one. Returns whether a new gamepad was created.
  */
 bool DeviceManager::checkForGamePad(const int irr_id)

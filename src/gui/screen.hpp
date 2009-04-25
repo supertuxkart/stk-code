@@ -52,6 +52,8 @@ namespace GUIEngine
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
         
         virtual bool OnEvent(const SEvent& event);
+        void processAction(const int action, const unsigned int value);
+
     };
     
 }

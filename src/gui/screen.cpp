@@ -9,6 +9,7 @@
 #include "gui/widget.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
+#include "input/input.hpp"
 
 using namespace irr;
 
@@ -349,11 +350,136 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 #pragma mark irrLicht events
 #endif
 
+#define MAX_VALUE 32768
+
+void Screen::processAction(const int action, const unsigned int value)
+{
+    const bool pressedDown = value > MAX_VALUE*2/3;
+    
+    if(!pressedDown) return;
+    
+    switch(action)
+    {
+        case PA_LEFT:
+        {
+            IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
+            if(el == NULL) break;
+            Widget* w = getWidget( el->getID() );
+            if(w == NULL) break;
+            
+            Widget* widget_to_call = w;
+            
+            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+             notified of clicks onto themselves so they can toggle their state. ) */
+            while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+                widget_to_call = widget_to_call->m_event_handler;
+            
+            if(widget_to_call->leftPressed())
+                transmitEvent(w, w->m_properties[PROP_ID]);
+        }
+            break;
+            
+        case PA_RIGHT:
+
+        {
+            IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
+            if(el == NULL) break;
+            Widget* w = getWidget( el->getID() );
+            if(w == NULL) break;
+            
+            Widget* widget_to_call = w;
+            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+             notified of clicks onto themselves so they can toggle their state. ) */
+            while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+                widget_to_call = widget_to_call->m_event_handler;
+            
+            if(widget_to_call->rightPressed())
+                transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
+        }
+            
+            break;
+            
+        case PA_ACCEL:
+        {
+            IGUIElement *el, *first=NULL, *closest=NULL;
+            el = GUIEngine::getGUIEnv()->getFocus();
+            
+            Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
+            
+            // list widgets are a bit special, because up/down keys are also used
+            // to navigate between various list items, not only to navigate between
+            // components
+            if(w != NULL && w->m_type == WTYPE_LIST)
+            {
+                IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+                assert(list != NULL);
+                if(list->getSelected()>0) break;
+            }
+            
+            if(el != NULL && el->getTabGroup() != NULL &&
+               el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
+            {
+                GUIEngine::getGUIEnv()->setFocus(closest);
+            }
+            else
+            {
+                // select the first widget
+                Widget* w = getLastWidget();
+                
+                if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
+            }
+        }
+            break;
+            
+        case PA_BRAKE:
+        {
+            IGUIElement *el, *first = NULL, *closest = NULL;
+            el = GUIEngine::getGUIEnv()->getFocus();
+            
+            Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
+            
+            // list widgets are a bit special, because up/down keys are also used
+            // to navigate between various list items, not only to navigate between
+            // components
+            if(w != NULL && w->m_type == WTYPE_LIST)
+            {
+                IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+                assert(list != NULL);
+                if(list->getSelected() < (int)list->getItemCount()-1) break;
+            }
+            
+            if(el != NULL && el->getTabGroup() != NULL &&
+               el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
+            {
+                GUIEngine::getGUIEnv()->setFocus(closest);
+            }
+            else
+            {
+                // select the first widget
+                Widget* w = getFirstWidget();                    
+                if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
+            }
+        }
+            
+            break;
+            
+        case PA_RESCUE:
+            StateManager::escapePressed();
+            break;
+            
+        case PA_FIRE:
+            break;
+        default:
+            return;
+    }
+}
+
 bool Screen::OnEvent(const SEvent& event)
 {
     assert(transmitEvent != NULL);
-    //if (event.EventType != EET_GUI_EVENT) return false;
-    
+
     if(event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
     {
         const int key = event.KeyInput.Key;
@@ -361,111 +487,21 @@ bool Screen::OnEvent(const SEvent& event)
         switch(key)
         {
             case KEY_ESCAPE :
-                StateManager::escapePressed();
                 break;
                 
             case KEY_SPACE :
                 break;
             case KEY_LEFT:
-            {
-                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-                if(el == NULL) break;
-                Widget* w = getWidget( el->getID() );
-                if(w == NULL) break;
-                
-                Widget* widget_to_call = w;
-                
-                /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-                 in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-                 notified of clicks onto themselves so they can toggle their state. ) */
-                while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
-                    widget_to_call = widget_to_call->m_event_handler;
-                
-                if(widget_to_call->leftPressed())
-                    transmitEvent(w, w->m_properties[PROP_ID]);
+            
                 break;
-            }
         
             case KEY_RIGHT:
-            {
-                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-                if(el == NULL) break;
-                Widget* w = getWidget( el->getID() );
-                if(w == NULL) break;
-                
-                Widget* widget_to_call = w;
-                /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-                 in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-                 notified of clicks onto themselves so they can toggle their state. ) */
-                while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
-                    widget_to_call = widget_to_call->m_event_handler;
-                
-                if(widget_to_call->rightPressed())
-                    transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
                 break;
-            }
             case KEY_UP:
-            {
-                IGUIElement *el, *first=NULL, *closest=NULL;
-                el = GUIEngine::getGUIEnv()->getFocus();
-                
-                Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
-                
-                // list widgets are a bit special, because up/down keys are also used
-                // to navigate between various list items, not only to navigate between
-                // components
-                if(w != NULL && w->m_type == WTYPE_LIST)
-                {
-                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
-                    assert(list != NULL);
-                    if(list->getSelected()>0) break;
-                }
-                
-                if(el != NULL && el->getTabGroup() != NULL &&
-                   el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
-                {
-                        GUIEngine::getGUIEnv()->setFocus(closest);
-                }
-                else
-                {
-                    // select the first widget
-                    Widget* w = getLastWidget();
-                    
-                    if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
-                }
-                return true;
-            }
+                break;
         
             case KEY_DOWN:
-            {
-                IGUIElement *el, *first = NULL, *closest = NULL;
-                el = GUIEngine::getGUIEnv()->getFocus();
-                
-                Widget* w = (el == NULL) ? NULL : getWidget( el->getID() );
-
-                // list widgets are a bit special, because up/down keys are also used
-                // to navigate between various list items, not only to navigate between
-                // components
-                if(w != NULL && w->m_type == WTYPE_LIST)
-                {
-                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
-                    assert(list != NULL);
-                    if(list->getSelected() < (int)list->getItemCount()-1) break;
-                }
-
-                if(el != NULL && el->getTabGroup() != NULL &&
-                   el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
-                {
-                    GUIEngine::getGUIEnv()->setFocus(closest);
-                }
-                else
-                {
-                    // select the first widget
-                    Widget* w = getFirstWidget();                    
-                    if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
-                }
-                return true;
-            }
+                break;
         }
         
         //std::cout << "key!" << std::endl;
