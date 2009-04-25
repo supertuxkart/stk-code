@@ -472,7 +472,8 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         case PA_FIRE:
             if(type == Input::IT_STICKBUTTON)
             {
-                // simulate a 'enter' key press
+                /*
+                // simulate a 'enter' key press. doesn't seem to work
                 irr::SEvent::SKeyInput evt;
                 evt.PressedDown = true;
                 evt.Key = KEY_RETURN;
@@ -480,8 +481,18 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 wrapper.KeyInput = evt;
                 wrapper.EventType = EET_KEY_INPUT_EVENT;
                 GUIEngine::getDevice()->postEventFromUser(wrapper);
+                */
                 
-                std::cout << "posting event to simulate 'enter'\n";
+                irr::SEvent::SGUIEvent evt;
+                evt.EventType = EGET_BUTTON_CLICKED;
+                evt.Element = GUIEngine::getGUIEnv()->getFocus();
+                evt.Caller = GUIEngine::getGUIEnv()->getFocus();
+                irr::SEvent wrapper;
+                wrapper.GUIEvent = evt;
+                wrapper.EventType = EET_GUI_EVENT;
+                // GUIEngine::getDevice()->postEventFromUser(wrapper);
+                this->OnEvent(wrapper);
+                // std::cout << "posting event to simulate 'enter'\n";
 
             }
             break;
@@ -494,57 +505,7 @@ bool Screen::OnEvent(const SEvent& event)
 {
     assert(transmitEvent != NULL);
 
-    if(event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
-    {
-        const int key = event.KeyInput.Key;
-        
-        switch(key)
-        {
-            case KEY_ESCAPE :
-                break;
-                
-            case KEY_SPACE :
-                break;
-            case KEY_LEFT:
-            
-                break;
-        
-            case KEY_RIGHT:
-                break;
-            case KEY_UP:
-                break;
-        
-            case KEY_DOWN:
-                break;
-        }
-        
-        //std::cout << "key!" << std::endl;
-    }
-    else if(event.EventType == EET_MOUSE_INPUT_EVENT)
-    {
-        const int type = event.MouseInput.Event;
-        
-        if(type == EMIE_MOUSE_MOVED)
-        {
-            m_mouse_x = event.MouseInput.X;
-            m_mouse_y = event.MouseInput.Y;
-            //const int wheel = event.MouseInput.Wheel;
-        }
-
-        //if(type == EMIE_LMOUSE_PRESSED_DOWN ) std::cout << "mouse button pressed!" << std::endl;
-        //if(type == EMIE_LMOUSE_LEFT_UP ) std::cout << "mouse button released!" << std::endl;
-        /*
-         EMIE_LMOUSE_PRESSED_DOWN 	Left mouse button was pressed down.
-         EMIE_RMOUSE_PRESSED_DOWN 	Right mouse button was pressed down.
-         EMIE_MMOUSE_PRESSED_DOWN 	Middle mouse button was pressed down.
-         EMIE_LMOUSE_LEFT_UP 	Left mouse button was left up.
-         EMIE_RMOUSE_LEFT_UP 	Right mouse button was left up.
-         EMIE_MMOUSE_LEFT_UP 	Middle mouse button was left up.
-         EMIE_MOUSE_MOVED 	The mouse cursor changed its position.
-         EMIE_MOUSE_WHEEL 	The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast. 
-         */
-    }
-    else if(event.EventType == EET_GUI_EVENT)
+    if(event.EventType == EET_GUI_EVENT)
     {
         const s32 id = event.GUIEvent.Caller->getID();
         
