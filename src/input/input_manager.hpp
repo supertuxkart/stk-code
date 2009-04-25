@@ -74,7 +74,7 @@ private:
 public:
 	       InputManager();
           ~InputManager();
-	void   initGamePadDevices();
+	// void   initGamePadDevices();
     
 	//void   input();
     void   input(const irr::SEvent& event);

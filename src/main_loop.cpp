@@ -59,7 +59,7 @@ MainLoop::~MainLoop()
  */
 void MainLoop::run()
 {
-    IrrlichtDevice* device = GUIEngine::getDevice();
+    IrrlichtDevice* device = irr_driver->getDevice();
     
     bool music_on = false;
     m_curr_time = device->getTimer()->getRealTime(); // SDL_GetTicks();

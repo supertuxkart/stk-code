@@ -9,6 +9,8 @@ class DeviceManager
     ptr_vector<KeyboardDevice, HOLD> m_keyboards;
     ptr_vector<GamePadDevice, HOLD> m_gamepads;
     
+    core::array<SJoystickInfo> m_irrlicht_gamepads;
+    
     unsigned int m_keyboard_amount;
     unsigned int m_gamepad_amount;
     
@@ -26,6 +28,9 @@ public:
     void serialize();
     bool deserialize();
     
+    /* returns whether a new gamepad was detected */
+    bool initGamePadSupport();
+
     bool checkForGamePad(const int sdl_id);
 };
 

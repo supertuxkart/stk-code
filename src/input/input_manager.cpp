@@ -52,7 +52,6 @@ InputManager::InputManager()
 : m_sensed_input(0),
 m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
-    
     m_device_manager = new DeviceManager();
     
     m_timer_in_use = false;
@@ -71,19 +70,12 @@ m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
         
         something_new_to_write = true;
     }
-
-    // Prepare a list of connected joysticks.
-    // FIXME - replace with non-SDL code
-    const int numSticks = 0; //SDL_NumJoysticks();
-    // std::cout << "SDL detects " << numSticks << " gamepads" << std::endl;
     
-    // TODO - detect if device is currently known and has an entry in the config
-    // the constructor below should only be used if not
-    for (int i = 0; i < numSticks; i++)
+    if(m_device_manager->initGamePadSupport() /* returns whether a new gamepad was detected */)
     {
-        something_new_to_write = m_device_manager->checkForGamePad(i) || something_new_to_write;
+        something_new_to_write = true;
     }
-    
+        
     // write config file if necessary
     if(something_new_to_write) m_device_manager->serialize(); 
     
@@ -99,10 +91,8 @@ void InputManager::update(float dt)
 }
 
 // -----------------------------------------------------------------------------
-/** Initialises joystick/gamepad info.
+/** Previous code to initialise joystick/gamepad info.
  */
-void InputManager::initGamePadDevices()
-{
 
     /*
      m_stick_infos = new GamePadDevice *[numSticks];
@@ -184,18 +174,14 @@ void InputManager::initGamePadDevices()
      
      delete si;
      */
-}   // initGamePadDevices
+
 
 //-----------------------------------------------------------------------------
 /** Destructor. Frees all data structures.
  */
 InputManager::~InputManager()
 {
-    
     delete m_device_manager;
-
-    // FIXME LEAK: delete m_action_map if defined
-    
 }   // ~InputManager
 
 

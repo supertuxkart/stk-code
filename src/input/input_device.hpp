@@ -68,11 +68,11 @@ public:
      The 'player' id passed is simply to know where to send 'axis reset's when necessary*/
     bool hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */);
     
-    void open(const int sdl_id);
+    void open(const int irrIndex, const std::string name, const int axis_count);
     
     void loadDefaults();
     
-    GamePadDevice(int sdlIndex);
+    GamePadDevice(const int irrIndex, const std::string name, const int axis_number);
     GamePadDevice(irr::io::IrrXMLReader* xml);
     
     ~GamePadDevice();

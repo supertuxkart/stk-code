@@ -15,7 +15,7 @@
 #include "gui/font.hpp"
  */
 #include "gui/race_gui.hpp"
-#include "gui/engine.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -79,7 +79,7 @@ namespace SDLManager
      */
     void showPointer()
     {
-        GUIEngine::getDevice()->getCursorControl()->setVisible(true);
+        irr_driver->getDevice()->getCursorControl()->setVisible(true);
         // SDL_ShowCursor(SDL_ENABLE);
     }   // showPointer
     
@@ -88,7 +88,7 @@ namespace SDLManager
      */
     void hidePointer()
     {
-        GUIEngine::getDevice()->getCursorControl()->setVisible(true);
+        irr_driver->getDevice()->getCursorControl()->setVisible(true);
         // SDL_ShowCursor(SDL_DISABLE);
     }   // hidePointer
     

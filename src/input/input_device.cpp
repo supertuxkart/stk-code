@@ -192,30 +192,27 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 * (defaults will be used)
  *  \param sdlIndex Index of stick.
  */
-GamePadDevice::GamePadDevice(int sdlIndex)
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count)
 {
     m_type = DT_GAMEPAD;
     m_deadzone = DEADZONE_JOYSTICK;
     
-    open(sdlIndex);
-    
-    // FIXME - replace with non-SDL code
-    // m_name = SDL_JoystickName(sdlIndex);
+    open(irrIndex, name, axis_count);
+    m_name = name;
     
     loadDefaults();
 }   // GamePadDevice
 // -----------------------------------------------------------------------------
-void GamePadDevice::open(const int sdl_id)
-{
-    // FIXME - replace with non-SDL code
-    // m_sdlJoystick = SDL_JoystickOpen(sdl_id);
-    const int count = 1; // SDL_JoystickNumAxes(m_sdlJoystick);
-    m_prevAxisDirections = new Input::AxisDirection[count];
+void GamePadDevice::open(const int irrIndex, const std::string name, const int axis_count)
+{    
+    m_prevAxisDirections = new Input::AxisDirection[axis_count];
     
-    std::cout << "(i) This gamepad has " << count << " axes\n";
+    std::cout << "(i) This gamepad has " << axis_count << " axes\n";
     
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < axis_count; i++)
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
+    
+    m_index = irrIndex;
 }
 // -----------------------------------------------------------------------------
 void GamePadDevice::loadDefaults()
