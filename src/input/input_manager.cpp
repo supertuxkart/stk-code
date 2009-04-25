@@ -347,7 +347,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
         else
         {  
             // reset timer when released
-            if( abs(value) == 0 )
+            if( abs(value) == 0 && type == Input::IT_KEYBOARD)
             {
                 m_timer_in_use = false;
                 m_timer = 0;
