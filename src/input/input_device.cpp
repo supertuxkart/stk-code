@@ -287,6 +287,8 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     {
         std::cout << "For jpenguin (a)\n";
         
+        std::cout << "id=" << id << ", m_prevAxisDirections[id]=" << m_prevAxisDirections[id] << std::endl;
+        
         // going to negative from positive
         if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
         {
