@@ -283,6 +283,8 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 // -----------------------------------------------------------------------------
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
+    if(m_prevAxisDirections == NULL) return false; // device not open
+    
     if(type == Input::IT_STICKMOTION)
     {
         std::cout << "For jpenguin (a)\n";
