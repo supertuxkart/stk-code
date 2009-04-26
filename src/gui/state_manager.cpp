@@ -7,6 +7,7 @@
 #include "gui/widget.hpp"
 #include "gui/screen.hpp"
 #include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "race_manager.hpp"
 #include "network/network_manager.hpp"
@@ -326,7 +327,33 @@ namespace StateManager
                     res->updateItemDisplay();
                 }
             }
+            else if(screen_name == "options_input.stkgui")
+            {
+                GUIEngine::RibbonGridWidget* devices = dynamic_cast<GUIEngine::RibbonGridWidget*>
+                (GUIEngine::getCurrentScreen()->getWidget("devices"));
+                assert( devices != NULL );
+                
+                static bool devices_inited = false;
+                if(!devices_inited)
+                {
+                    devices->addItem("Keyboard","keyboard","gui/keyboard.png");
+
+                    const int gamepad_count = input_manager->getDeviceList()->getGamePadAmount();
+                    
+                    for(int i=0; i<gamepad_count; i++)
+                    {
+                        std::string name = input_manager->getDeviceList()->getGamePad(i)->m_name;
+                        char internal_name[32];
+                        sprintf(internal_name, "gamepad%i", i);
+                        devices->addItem(name,internal_name,"gui/gamepad.png");
+                    }
+                    
+                    devices_inited = true;
+                }
+                devices->updateItemDisplay();
+            }
         } // end init
+        
         // -- options
         else if(name == "options_choice")
         {

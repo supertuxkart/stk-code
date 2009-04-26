@@ -79,6 +79,8 @@ public:
 	//void   input();
     void   input(const irr::SEvent& event);
     
+    DeviceManager* getDeviceList() { return m_device_manager; }
+    
 	void   setMode(InputDriverMode);		
 	bool   isInMode(InputDriverMode);
     
