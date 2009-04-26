@@ -288,14 +288,6 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     
     if(type == Input::IT_STICKMOTION)
     {
-        std::cout << "For jpenguin (a)\n";
-        
-        std::cout << "id=" << id << std::endl;
-        
-        assert(id < m_axis_count);
-        
-        std::cout << "m_prevAxisDirections[id]=" << m_prevAxisDirections[id] << std::endl;
-        
         // going to negative from positive
         if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
         {
@@ -310,12 +302,8 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
             resetAxisDirection(id, Input::AD_NEGATIVE, player);
         }
         
-        std::cout << "For jpenguin (b)\n";
-        
         if(value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
-        
-        std::cout << "For jpenguin (c)\n";
         
         // check if within deadzone
         if(value > -m_deadzone && value < m_deadzone)
@@ -342,9 +330,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
             
             return false; 
         }
-        
-        std::cout << "For jpenguin (d)\n";
-        
+
         // find corresponding action and return it
         for(int n=0; n<PA_COUNT; n++)
         {
