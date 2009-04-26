@@ -27,12 +27,12 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
     m_tex_dtab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_down.png").c_str() );
     
-    m_tex_iconhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight.png").c_str() );
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
     m_tex_squarefocus = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_square_focused.png").c_str() );
     
     m_tex_gaugefill = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasssgauge_fill.png").c_str() );
 
+    m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/bubble.png").c_str() );
     
     m_tex_checkbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox.png").c_str() );
     m_tex_fcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_focus.png").c_str() );
@@ -285,6 +285,7 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
     bool mark_selected = widget->isSelected();
+    bool always_show_selection = false;
     
     const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_event_handler->m_element;
     
@@ -324,12 +325,12 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
         if (widget->m_event_handler != NULL && widget->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
         if (widget->m_event_handler != NULL && widget->m_event_handler->m_event_handler != NULL &&
             widget->m_event_handler->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
-        
-        
+
+        /* in combo ribbons, always show selection */
         if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON && 
-           ((RibbonWidget*)widget->m_event_handler)->getRibbonType() == RIBBON_TOOLBAR &&
-           !GUIEngine::getGUIEnv()->hasFocus(widget->m_event_handler->m_element)) mark_selected = false;
+           ((RibbonWidget*)widget->m_event_handler)->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
         
+
         if(mark_selected)
         {
             if (use_glow)
@@ -348,26 +349,34 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
                 const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
-                
-                const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
-                                                                   glow_center_y - 25 - grow/2,
-                                                                   glow_center_x + 45 + grow,
-                                                                   glow_center_y + 25 + grow/2);
-                
-                // GUIEngine::getDriver()->draw2DRectangle( SColor(2555, 0, 175, 255), rect2 );
+
                 
                 const int texture_w = m_tex_ficonhighlight->getSize().Width;
                 const int texture_h = m_tex_ficonhighlight->getSize().Height;
                 
                 core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                if(!focused && !parent_focused)
+                const bool show_focus = focused || parent_focused;
+                
+                if(always_show_selection)
                 {
-                    GUIEngine::getDriver()->draw2DImage(m_tex_iconhighlight, rect2, source_area,
+                    core::rect< s32 > rect2 = rect;
+                    rect2.UpperLeftCorner.X -= rect.getWidth() / 5;
+                    rect2.UpperLeftCorner.Y -= rect.getHeight() / 5;
+                    rect2.LowerRightCorner.X += rect.getWidth() / 5;
+                    rect2.LowerRightCorner.Y += rect.getHeight() / 5;
+                    
+                    GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
                                                         0 /* no clipping */, 0, true /* alpha */);
                 }
-                else
+
+                if(show_focus)
                 {
+                    const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                                       glow_center_y - 25 - grow/2,
+                                                                       glow_center_x + 45 + grow,
+                                                                       glow_center_y + 25 + grow/2);
+                    
                     GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
                                                         0 /* no clipping */, 0, true /* alpha */);
                 }
@@ -375,6 +384,10 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             /* if we're not using glow */
             else
             {
+                const bool show_focus = focused || parent_focused;
+
+                if(!always_show_selection && !show_focus) return;
+                
                 const int texture_w = m_tex_squarefocus->getSize().Width;
                 const int texture_h = m_tex_squarefocus->getSize().Height;
                 
@@ -386,7 +399,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                               false /* horizontal aspect ratio not kept */, 1);
             }
             
-        }
+        } // end if mark_selected
     }
     
 }

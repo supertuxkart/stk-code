@@ -34,8 +34,8 @@ class Skin : public IGUISkin
     ITexture* m_tex_tab;
     ITexture* m_tex_ftab;
     ITexture* m_tex_dtab;
-    ITexture* m_tex_iconhighlight;
     ITexture* m_tex_ficonhighlight;
+    ITexture* m_tex_bubble;
     ITexture* m_tex_squarefocus;
     ITexture* m_tex_gaugefill;
     ITexture* m_tex_gauge;
