@@ -196,7 +196,8 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
 {
     m_type = DT_GAMEPAD;
     m_deadzone = DEADZONE_JOYSTICK;
-    
+    m_prevAxisDirections = NULL;
+
     open(irrIndex, name, axis_count);
     m_name = name;
     
@@ -204,7 +205,8 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
 }   // GamePadDevice
 // -----------------------------------------------------------------------------
 void GamePadDevice::open(const int irrIndex, const std::string name, const int axis_count)
-{    
+{
+    m_axis_count = axis_count;
     m_prevAxisDirections = new Input::AxisDirection[axis_count];
     
     std::cout << "(i) This gamepad has " << axis_count << " axes\n";
@@ -283,6 +285,8 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
 {
     if(type == Input::IT_STICKMOTION)
     {
+        std::cout << "For jpenguin (a)\n";
+        
         // going to negative from positive
         if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
         {
@@ -297,8 +301,12 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
             resetAxisDirection(id, Input::AD_NEGATIVE, player);
         }
         
+        std::cout << "For jpenguin (b)\n";
+        
         if(value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
+        
+        std::cout << "For jpenguin (c)\n";
         
         // check if within deadzone
         if(value > -m_deadzone && value < m_deadzone)
@@ -326,6 +334,8 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
             return false; 
         }
         
+        std::cout << "For jpenguin (d)\n";
+        
         // find corresponding action and return it
         for(int n=0; n<PA_COUNT; n++)
         {
@@ -343,6 +353,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
                 }
             }
         }// next device
+    
     }
     else if(type == Input::IT_STICKBUTTON)
     {

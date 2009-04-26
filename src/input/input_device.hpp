@@ -62,6 +62,7 @@ public:
     // SDL_Joystick         *m_sdlJoystick;
     int                   m_deadzone;
     int                   m_index;
+    int                   m_axis_count;
     Input::AxisDirection *m_prevAxisDirections;
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
