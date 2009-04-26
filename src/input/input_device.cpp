@@ -284,6 +284,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
     if(m_prevAxisDirections == NULL) return false; // device not open
+    if(id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
     
     if(type == Input::IT_STICKMOTION)
     {
