@@ -79,7 +79,14 @@ void clear()
     g_env->clear();
     g_current_screen = NULL;
 }
-    
+// -----------------------------------------------------------------------------  
+void cleanForGame()
+{
+    clear();
+    if(g_irrlicht_event_core == NULL) g_irrlicht_event_core = new IrrlichtEventCore();
+    g_device->setEventReceiver(g_irrlicht_event_core);
+}
+// -----------------------------------------------------------------------------  
 void switchToScreen(const char* screen_name)
 {    
     // clean what was left by the previous screen

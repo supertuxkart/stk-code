@@ -183,6 +183,7 @@ namespace GUIEngine
     void free();
     void switchToScreen(const char* );
     void clear();
+    void cleanForGame();
     
     Screen* getCurrentScreen();
     void reshowCurrentScreen();

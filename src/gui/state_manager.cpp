@@ -503,7 +503,7 @@ namespace StateManager
         g_menu_stack.clear();
         g_menu_stack.push_back("race");
         g_game_mode = true;
-        GUIEngine::clear();
+        GUIEngine::cleanForGame();
         input_manager->setMode(InputManager::INGAME);
     }
     
