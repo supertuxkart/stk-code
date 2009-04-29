@@ -295,8 +295,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
-    if(!user_config->m_bullet_debug) return;
-
     int num_objects = m_dynamics_world->getNumCollisionObjects();
     for(int i=0; i<num_objects; i++)
     {

@@ -19,17 +19,25 @@
 
 #include "graphics/irr_driver.hpp"
 
+#ifdef HAVE_GLUT
+#  ifdef __APPLE__
+#    include <GLUT/glut.h>
+#  else
+#    include <GL/glut.h>
+#  endif
+#endif
+
 #include "material_manager.hpp"
 #include "user_config.hpp"
 #include "gui/engine.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
-
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/world.hpp"
 #include "material_manager.hpp"
 #include "gui/font.hpp"
 
@@ -400,9 +408,62 @@ void IrrDriver::update(float dt)
 {
     if(!m_device->run()) return;
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
-    m_scene_manager->drawAll();
+#ifdef HAVE_GLUT
+    if(user_config->m_bullet_debug)
+    {
+        // Use bullets debug drawer
+        GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+        GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+        GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+        /*	light_position is NOT default value	*/
+        GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
+        GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
 
-    GUIEngine::render(dt);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+
+        glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+        glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glEnable(GL_LIGHT1);
+
+        glShadeModel(GL_SMOOTH);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
+        glClearColor(0.8f,0.8f,0.8f,0);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        float f=2.0f;
+        glFrustum(-f, f, -f, f, 1.0, 1000.0);
+
+        Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
+        gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
+            xyz.getX(), xyz.getY(),     xyz.getZ(),
+            0.0f, 0.0f, 1.0f);
+        glMatrixMode(GL_MODELVIEW);
+
+        for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+        {
+            Kart *kart=RaceManager::getKart((int)i);
+            if(!kart->isEliminated()) kart->draw();
+        }
+        RaceManager::getWorld()->getPhysics()->draw();
+
+    }
+    else
+#endif
+    {
+        m_scene_manager->drawAll();
+        GUIEngine::render(dt);
+    }
     
     m_device->getVideoDriver()->endScene();
 }   // update

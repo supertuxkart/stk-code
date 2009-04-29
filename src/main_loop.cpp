@@ -19,7 +19,6 @@
 
 #include "main_loop.hpp"
 
-// #include <SDL/SDL.h>
 #include <assert.h>
 #include "history.hpp"
 #include "input/input_manager.hpp"
@@ -202,9 +201,8 @@ void MainLoop::run()
 
         input_manager->update(dt);
         
-#ifdef HAVE_IRRLICHT
-        if(!user_config->m_bullet_debug)
-            irr_driver->update(dt);
+        irr_driver->update(dt);
+
 // FIXME hacky hacky FPS reporting
 // it should be moved to the right place when on screen display is done
 #if 0
@@ -228,10 +226,6 @@ void MainLoop::run()
             }
         } // no else, or you get over 50 'printf ("FPS below 1!\n")' easily
         if (printFPS) printf("FPS %3d<%3d<%3d\n", minFPS, fps, maxFPS);
-#endif
-#else
-        glFlush();
-        SDL_GL_SwapBuffers();
 #endif
     }  // while !m_exit
 }   // run
