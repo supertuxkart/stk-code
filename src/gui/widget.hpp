@@ -47,6 +47,8 @@ namespace GUIEngine
         PROP_TEXT_ALIGN,
         PROP_MIN_VALUE,
         PROP_MAX_VALUE,
+        PROP_MAX_WIDTH,
+        PROP_MAX_HEIGHT,
         PROP_SQUARE
     };
     

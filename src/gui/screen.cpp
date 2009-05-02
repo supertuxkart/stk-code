@@ -127,11 +127,23 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                     widgets[n].y = y;
                     
                     widgets[n].w = (int)(left_space*fraction);
+                    if(widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
+                    {
+                        const int max_width = atoi( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
+                        if(widgets[n].w > max_width) widgets[n].w = max_width;
+                    }
+                    
                     x += widgets[n].w;
                 }
                 else
                 {    
                     widgets[n].h = (int)(left_space*fraction);
+                    
+                    if(widgets[n].m_properties[PROP_MAX_HEIGHT].size() > 0)
+                    {
+                        const int max_height = atoi( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
+                        if(widgets[n].h > max_height) widgets[n].h = max_height;
+                    }
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     if(align.size() < 1 || align == "left") widgets[n].x = x;

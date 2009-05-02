@@ -119,7 +119,10 @@ for you (see PROP_LAYOUT). In addition, sizes are automatically calculated for w
 and/or text like labels and plain icons. Other widgets will also automativally manage the position and
 size of their children, for instance ribbons.
 
-
+PROP_MAX_WIDTH          "max_width"
+PROP_MAX_HEIGHT         "max_height"
+The maximum size a widget can take; especially useful when using percentages and proportions.
+ 
 PROP_CHILD_WIDTH        "child_width"
 PROP_CHILD_HEIGHT       "child_height"
 Used exclusively by the ribbon grid widget. See docs for this widget above.

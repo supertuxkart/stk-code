@@ -1,9 +1,8 @@
-
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
 <label align="center" text="SuperTuxKart Help"/>
 
-<tabs id="category" height="130" width="75%" align="center">
+<tabs id="category" height="15%" max_height="150" width="75%" align="center">
     <icon-button id="page1" width="128" height="128" icon="gui/track_random.png" text="General"/>
     <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
     <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>

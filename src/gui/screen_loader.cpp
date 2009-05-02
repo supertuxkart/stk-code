@@ -146,6 +146,9 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(min_value,      PROP_MIN_VALUE);
                 READ_PROPERTY(max_value,      PROP_MAX_VALUE);
                 READ_PROPERTY(square_items,   PROP_SQUARE);
+ 
+                READ_PROPERTY(max_width,      PROP_MAX_WIDTH);
+                READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
 #undef READ_PROPERTY
 
                 /* a new div starts here, continue parsing with this new div as new parent */

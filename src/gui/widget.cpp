@@ -196,6 +196,19 @@ void Widget::readCoords(Widget* parent)
         this->w = (int)(this->w*ratio);
         this->h = (int)(this->h*ratio);
     }
+    
+    // ------ check for given max size
+    if(m_properties[PROP_MAX_WIDTH].size() > 0)
+    {
+        const int max_width = atoi( this->m_properties[PROP_MAX_WIDTH].c_str() );
+        if(this->w > max_width) this->w = max_width;
+    }
+    
+    if(m_properties[PROP_MAX_HEIGHT].size() > 0)
+    {
+        const int max_height = atoi( this->m_properties[PROP_MAX_HEIGHT].c_str() );
+        if(this->h > max_height) this->h = max_height;
+    }
      
 }
 
