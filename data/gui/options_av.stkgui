@@ -2,7 +2,7 @@
 
 <label align="center" text="SuperTuxKart Options"/>
 
-<tabs id="options_choice" height="15%" max_height="150" width="75%" align="center">
+<tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
     <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
     <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
     <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>

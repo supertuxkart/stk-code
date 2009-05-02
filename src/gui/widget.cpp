@@ -559,11 +559,8 @@ void RibbonWidget::add()
     float global_zoom = 1;
     
     const int min_free_space = 50;
-    //if(free_h_space < min_free_space) // buttons are too big to fit :( zoom out
-    //{
-        global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
-        free_h_space = (int)(w - total_needed_space*global_zoom);
-    //}
+    global_zoom = (float)w / (float)( w - free_h_space + min_free_space );
+    free_h_space = (int)(w - total_needed_space*global_zoom);
     
     const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
      
@@ -575,13 +572,51 @@ void RibbonWidget::add()
         
         IGUIButton * subbtn;
         
-        if(m_children[i].m_type == WTYPE_BUTTON)
+        if(/*m_children[i].m_type == WTYPE_BUTTON*/ getRibbonType() == RIBBON_TABS)
         {
             rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0, 
                                           widget_x + one_button_space/2-2,  h);
             
             stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
-            subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, ++id_counter, message.c_str(), L"");
+            
+            if(m_children[i].m_type == WTYPE_BUTTON)
+            {
+                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, ++id_counter_2, message.c_str(), L"");
+                subbtn->setTabStop(false);
+                subbtn->setTabGroup(false);
+            }
+            else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
+            {
+                rect<s32> icon_part = rect<s32>(15,
+                                                0,
+                                                subsize.getHeight()+15,
+                                                subsize.getHeight());
+                rect<s32> label_part = rect<s32>(subsize.getHeight()+15,
+                                                 0,
+                                                 subsize.getWidth()-15,
+                                                 subsize.getHeight());                
+                
+                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, ++id_counter_2, L"", L"");
+                
+                MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, ++id_counter_2, icon_part, true);
+                icon->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+                icon->setUseAlphaChannel(true);
+                icon->setTabStop(false);
+                
+                IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), label_part,
+                                                                              false /* border */,
+                                                                              true /* word wrap */,
+                                                                              subbtn, ++id_counter_2);
+                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+                label->setTabStop(false);
+                label->setNotClipped(true);
+                m_labels.push_back(label);
+                
+                subbtn->setTabStop(false);
+                subbtn->setTabGroup(false);
+
+            }
+   
             m_children[i].m_element = subbtn;
         }
         else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
@@ -623,14 +658,15 @@ void RibbonWidget::add()
                 const int final_y = subsize.getHeight() + label->getTextHeight();
                 if(final_y > biggest_y) biggest_y = final_y;
             }
+            
+            subbtn->setTabStop(false);
+            subbtn->setTabGroup(false);
         }
         else
         {
-            std::cerr << "/!\\ Warning /!\\ : Unknown contents type in ribbon" << std::endl;
+            std::cerr << "/!\\ Warning /!\\ : Invalid contents type in ribbon" << std::endl;
         }
         
-        subbtn->setTabStop(false);
-        subbtn->setTabGroup(false);
         
         m_children[i].id = subbtn->getID();
         m_children[i].m_event_handler = this;

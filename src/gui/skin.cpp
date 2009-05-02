@@ -129,8 +129,17 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
             dest_left_border   = (int)(left_border  *std::min<float>(yscale, 1.0));
             dest_right_border  = (int)(right_border *std::min<float>(yscale, 1.0));
         }
-        const int dest_top_border    = (int)(top_border   *std::min<float>(yscale, 1.0));
-        const int dest_bottom_border = (int)(bottom_border*std::min<float>(yscale, 1.0));
+        int dest_top_border    = (int)(top_border   *std::min<float>(yscale, 1.0));
+        int dest_bottom_border = (int)(bottom_border*std::min<float>(yscale, 1.0));
+        
+        /*
+        if(vertical_flip)
+        {
+            int temp = dest_bottom_border;
+            dest_bottom_border = dest_top_border;
+            dest_top_border = temp;
+        }*/
+        
         const float border_in_portion = 1 - border_out_portion;
         
         const int ax = (int)(dest_x - dest_left_border*border_out_portion);
@@ -189,10 +198,10 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         
         if(vertical_flip)
         {
-#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - ay; \
-const int y2 = X.LowerRightCorner.Y - ay; \
-X.UpperLeftCorner.Y = ny - y2;\
-X.LowerRightCorner.Y = ny - y1;}
+#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - dest_y; \
+const int y2 = X.LowerRightCorner.Y - dest_y; \
+X.UpperLeftCorner.Y = dest_y + (dest_y2 - dest_y) - y2;\
+X.LowerRightCorner.Y = dest_y + (dest_y2 - dest_y) - y1;}
         
         FLIP_Y(dest_area_left)
         FLIP_Y(dest_area_center)
@@ -348,22 +357,15 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
         /* when not using plain buttons, it's probably icons, so we need more space */
         if(widget->m_type != WTYPE_BUTTON)
         {
-            portion_out = 0.9f;
-            border_below = 50;
+            //border_below = 40;
         }
         
         core::rect< s32 > rect2 = rect;
         
-        if(vertical_flip)
-        {
-            // move up a bit
-            rect2.LowerRightCorner.Y -= 10;
-            rect2.UpperLeftCorner.Y -= 10;
-        }
-        
         
         if (mark_selected)
         {
+            // selected tab should be slighlty bigger than others
             if(vertical_flip)
                 rect2.UpperLeftCorner.Y -= 10;
             else
@@ -373,6 +375,16 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                           left_border, right_border,
                                           border_above, border_below, false /* horizontal aspect ratio not kept */, portion_out,
                                           BODY | LEFT | RIGHT | TOP | BOTTOM, vertical_flip);
+            
+            /*
+            GUIEngine::getDriver()->draw2DLine( core::position2d< s32 >(rect2.UpperLeftCorner.X,rect2.LowerRightCorner.Y),
+                                                core::position2d< s32 >(rect2.LowerRightCorner.X,rect2.LowerRightCorner.Y),
+                                               SColor(255,255,0,0) );
+            GUIEngine::getDriver()->draw2DLine( core::position2d< s32 >(rect2.UpperLeftCorner.X,rect2.UpperLeftCorner.Y),
+                                               core::position2d< s32 >(rect2.LowerRightCorner.X,rect2.UpperLeftCorner.Y),
+                                               SColor(255,255,0,0) );
+             */
+
         }
         else
         {
