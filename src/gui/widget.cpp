@@ -477,6 +477,7 @@ bool RibbonWidget::mouseHovered(Widget* child)
     {
         if(m_children.get(i) == child)
         {
+            if(m_selection == i) return false; // was already selected, don't send another event
             m_selection = i;
             break;
         }
