@@ -17,5 +17,7 @@
         <button text="All"/>
     </tabs>
     
+    <spacer height="15" width="25"/>
+    
 </div>
 

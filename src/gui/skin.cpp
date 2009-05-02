@@ -50,7 +50,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
                                          const int left_border, const int right_border,
                                          const int top_border, const int bottom_border,
                                          const bool preserve_h_aspect_ratios,
-                                         const float border_out_portion, int areas)
+                                         const float border_out_portion, int areas, const bool vertical_flip)
 {
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
     // widgets won't move, so they'd only need to be calculated once.
@@ -187,6 +187,45 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         core::rect<s32> dest_area_bottom_left = core::rect<s32>(hx, hy, lx, ly);
         core::rect<s32> dest_area_bottom_right = core::rect<s32>(jx, jy, nx, ny);
         
+        if(vertical_flip)
+        {
+#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - ay; \
+const int y2 = X.LowerRightCorner.Y - ay; \
+X.UpperLeftCorner.Y = ny - y2;\
+X.LowerRightCorner.Y = ny - y1;}
+        
+        FLIP_Y(dest_area_left)
+        FLIP_Y(dest_area_center)
+        FLIP_Y(dest_area_right)
+        
+        FLIP_Y(dest_area_top)
+        FLIP_Y(dest_area_bottom)
+        
+        FLIP_Y(dest_area_top_left)
+        FLIP_Y(dest_area_top_right)
+        FLIP_Y(dest_area_bottom_left)
+        FLIP_Y(dest_area_bottom_right)
+
+#undef FLIP_Y
+#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y; \
+const int y2 = X.LowerRightCorner.Y; \
+X.UpperLeftCorner.Y =  y2;\
+X.LowerRightCorner.Y =  y1;}
+        
+        FLIP_Y(source_area_left)
+        FLIP_Y(source_area_center)
+        FLIP_Y(source_area_right)
+        
+        FLIP_Y(source_area_top)
+        FLIP_Y(source_area_bottom)
+        
+        FLIP_Y(source_area_top_left)
+        FLIP_Y(source_area_top_right)
+        FLIP_Y(source_area_bottom_left)
+        FLIP_Y(source_area_bottom_right)
+#undef FLIP_Y
+        }
+        
         if((areas & LEFT) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
@@ -255,8 +294,7 @@ void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const b
 
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
-    return;
-    
+/*
     // only combo ribbons need a border
     if ( ((RibbonWidget*)widget)->getRibbonType() != RIBBON_COMBO ) return;
     
@@ -280,6 +318,7 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+ */
 }
 
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
@@ -289,31 +328,58 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     
     const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_event_handler->m_element;
     
+    RibbonType type = ((RibbonWidget*)widget->m_event_handler)->getRibbonType();
+    
     /* tab-bar ribbons */
-    if(widget->m_type == WTYPE_BUTTON)
+    if(type == RIBBON_TABS)
     {
         // ribbons containing buttons are actually tabs
         
         // FIXME - specify in file, don't hardcode
-        const int left_border = 75;
-        const int right_border = 75;
-        const int border_above = 0;
-        const int border_below = 0;
+        int left_border = 75;
+        int right_border = 75;
+        int border_above = 0;
+        int border_below = 15;
+        
+        // automatically guess from position on-screen if tabs go up or down
+        const bool vertical_flip = rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
+        float portion_out = 0.2f;
+        
+        /* when not using plain buttons, it's probably icons, so we need more space */
+        if(widget->m_type != WTYPE_BUTTON)
+        {
+            portion_out = 0.9f;
+            border_below = 50;
+        }
+        
+        core::rect< s32 > rect2 = rect;
+        
+        if(vertical_flip)
+        {
+            // move up a bit
+            rect2.LowerRightCorner.Y -= 10;
+            rect2.UpperLeftCorner.Y -= 10;
+        }
+        
         
         if (mark_selected)
         {
-            core::rect< s32 > rect2 = rect;
-            rect2.LowerRightCorner.Y += 10;
-            
+            if(vertical_flip)
+                rect2.UpperLeftCorner.Y -= 10;
+            else
+                rect2.LowerRightCorner.Y += 10;
+
             drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab),
                                           left_border, right_border,
-                                          border_above, border_below, false /* horizontal aspect ratio not kept */, 0.2f);
+                                          border_above, border_below, false /* horizontal aspect ratio not kept */, portion_out,
+                                          BODY | LEFT | RIGHT | TOP | BOTTOM, vertical_flip);
         }
         else
         {
-            drawBoxFromStretchableTexture(rect, m_tex_tab,
+            drawBoxFromStretchableTexture(rect2, m_tex_tab,
                                           left_border, right_border,
-                                          border_above, border_below, false /* horizontal aspect ratio not kept */, 0.0f);
+                                          border_above, border_below, false /* horizontal aspect ratio not kept */, portion_out,
+                                          BODY | LEFT | RIGHT | TOP | BOTTOM, vertical_flip);
         }
         
     }

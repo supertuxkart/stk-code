@@ -14,6 +14,7 @@ the "buttonbar" subcategory treats children buttons as action buttons, which mea
 'selected' state, only focused or not (i.e. there is no selection that remains if you leave this area).
 events are triggered only on enter/fire.
 the "tabs" subcategory will show a tab bar. behaviour is same as normal ribbon, only looks are different.
+Orientation of tabs (up or down) is automatically inferred from on-screen position
 Ribbon widgets are of spawn type (<ribbon> ... </ribbon>) and may contain icon-buttons or buttons as children.
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
 affect the type of highlighting used)

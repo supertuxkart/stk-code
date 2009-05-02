@@ -52,7 +52,8 @@ class Skin : public IGUISkin
                                        const int top_border, const int bottom_border,
                                        const bool preserve_h_aspect_ratios=false,
                                        const float border_out_portion = 0.5,
-                                       int areas = BODY | LEFT | RIGHT | TOP | BOTTOM);
+                                       int areas = BODY | LEFT | RIGHT | TOP | BOTTOM,
+                                       const bool vertical_flip=false);
     
 public:
     Skin(IGUISkin* fallback_skin);
