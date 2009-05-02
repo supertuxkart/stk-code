@@ -582,6 +582,7 @@ namespace StateManager
         g_menu_stack.clear();
         g_menu_stack.push_back(name);
         g_game_mode = false;
+        sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
         GUIEngine::switchToScreen(name.c_str());
         eventCallback(NULL, g_init_event);
     }
