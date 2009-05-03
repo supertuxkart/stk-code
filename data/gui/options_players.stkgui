@@ -1,15 +1,19 @@
-<div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-<label align="center" text="SuperTuxKart Options"/>
+    <label align="center" text="SuperTuxKart Options"/>
+    
+    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
+        <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
+        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
+    </tabs>
 
-<tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-    <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
-    <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
-    <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
-</tabs>
+    <box proportion="1" width="100%" layout="vertical-row">
+         <spacer width="20" height="20"/>
+        <list id="players" proportion="5" width="75%" align="center"/>
+        <spacer width="20" height="20"/>
+    </box>
 
-<spacer proportion="1" width="10" proportion="1"/>
-
-<list id="players" proportion="5" width="75%" align="center"/>
+<spacer height="15" width="10"/>
 
 </div>

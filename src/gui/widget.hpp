@@ -108,7 +108,10 @@ namespace GUIEngine
         
         static bool convertToCoord(std::string& x, int* absolute, int* percentage);
     public:
+        Widget();
         virtual ~Widget() {}
+        
+        bool m_show_bounding_box;
         
         /**
           * If this widget has any children, they go here. Children can be either
@@ -139,9 +142,6 @@ namespace GUIEngine
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
         
-        
-        Widget();
-
         static void resetIDCounters();
         
         bool isSelected() const { return m_selected; }

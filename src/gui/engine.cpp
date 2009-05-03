@@ -12,7 +12,7 @@
 namespace GUIEngine
 {
     IGUIEnvironment* g_env;
-    IGUISkin* g_skin = NULL;
+    Skin* g_skin = NULL;
     IGUIFont* g_font;
     IrrlichtDevice* g_device;
     irr::video::IVideoDriver* g_driver;
@@ -173,16 +173,19 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback
 	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
 }
 // -----------------------------------------------------------------------------
+/** transmit event to user event callback (out of encapsulated GUI module) */
 void transmitEvent(Widget* widget, std::string& name)
 {
     assert(g_event_callback != NULL);
     g_event_callback(widget, name);
 }
+    
 // -----------------------------------------------------------------------------    
 void render(float elapsed_time)
 {
     GUIEngine::dt = elapsed_time;
     
+    // ---- background image
     // on one end, making these static is not too clean.
     // on another end, these variables are really only used locally,
     // and making them static avoids doing the same stupid computations every frame
@@ -224,6 +227,10 @@ void render(float elapsed_time)
     
     //GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
     
+    // ---- render sections (bounding boxes)
+    g_skin->renderSections();
+    
+    // ---- let irrLicht do the rest (the Skin object will be called for further render)
     g_env->drawAll();
 }
 

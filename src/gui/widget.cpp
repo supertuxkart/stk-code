@@ -43,6 +43,7 @@ Widget::Widget()
     m_type = WTYPE_NONE;
     m_selected = false;
     m_event_handler = NULL;
+    m_show_bounding_box = false;
 }
 // -----------------------------------------------------------------------------
 /** 

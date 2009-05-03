@@ -1,52 +1,59 @@
-<div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-<label align="center" text="SuperTuxKart Options"/>
-
-<tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-    <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
-    <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
-    <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
-</tabs>
-
-<spacer height="25" width="10"/>
-
-<div width="75%" height="40" layout="horizontal-row" >
-    <label proportion="2" height="100%" text="Music"/>
-    <checkbox id="music_enabled" width="40" icon="gui/glasscheckbox.png" height="40"/>
-    <spacer width="20" height="100%" />
-    <label proportion="1" height="100%" text="Enabled"/>
-</div>
-<div width="75%" height="30" layout="horizontal-row" >
-    <spacer proportion="1" height="100%"/>
-    <gauge id="music_volume" proportion="1" height="100%"/>
-</div>
-
-<spacer height="25" width="10"/>
-
-<div width="75%" height="40" layout="horizontal-row" >
-    <label proportion="2" height="100%" text="Sound Effects"/>
-    <checkbox id="sfx_enabled" width="40" height="40"/>
-    <spacer width="20" height="100%" />
-    <label proportion="1" height="100%" text="Enabled"/>
-</div>
-<div width="75%" height="30" layout="horizontal-row" >
-    <spacer proportion="1" height="100%"/>
-    <gauge id="sfx_volume" proportion="1" height="100%"/>
-</div>
-
-
-<spacer proportion="1" width="10"/>
-
-
-<div width="75%" height="40" layout="horizontal-row" >
-    <label proportion="2" height="100%" text="Video"/>
-    <checkbox id="fullscreen" width="40" height="40"/>
-    <spacer width="20" height="100%" />
-    <label proportion="1" height="100%" text="Fullscreen"/>
-</div>
-
-<scrollable_ribbon id="resolutions" proportion="2" text="all" width="100%" square_items="false" align="center" child_width="128" child_height="128" />
-
-<button id="apply_resolution" width="20%" height="30" text="Apply video changes" />
-
+    <label align="center" text="SuperTuxKart Options"/>
+    
+    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
+        <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
+        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
+    </tabs>
+    
+    <box proportion="1" width="100%" layout="vertical-row">
+        
+        <spacer height="15" width="10"/>
+        
+        <div width="75%" height="40" layout="horizontal-row" >
+            <label proportion="2" height="100%" text="Music"/>
+            <checkbox id="music_enabled" width="40" icon="gui/glasscheckbox.png" height="40"/>
+            <spacer width="20" height="100%" />
+            <label proportion="1" height="100%" text="Enabled"/>
+        </div>
+        <div width="75%" height="30" layout="horizontal-row" >
+            <spacer proportion="1" height="100%"/>
+            <gauge id="music_volume" proportion="1" height="100%"/>
+        </div>
+        
+        <spacer height="15" width="10"/>
+        
+        <div width="75%" height="40" layout="horizontal-row" >
+            <label proportion="2" height="100%" text="Sound Effects"/>
+            <checkbox id="sfx_enabled" width="40" height="40"/>
+            <spacer width="20" height="100%" />
+            <label proportion="1" height="100%" text="Enabled"/>
+        </div>
+        <div width="75%" height="30" layout="horizontal-row" >
+            <spacer proportion="1" height="100%"/>
+            <gauge id="sfx_volume" proportion="1" height="100%"/>
+        </div>
+        
+        
+        <spacer height="20" width="10"/>
+        
+        
+        <div width="75%" height="40" layout="horizontal-row" >
+            <label proportion="2" height="100%" text="Video"/>
+            <checkbox id="fullscreen" width="40" height="40"/>
+            <spacer width="20" height="100%" />
+            <label proportion="1" height="100%" text="Fullscreen"/>
+        </div>
+        
+        <scrollable_ribbon id="resolutions" proportion="2" text="all" width="100%" square_items="false"
+                           align="center" child_width="128" child_height="128" max_height="150" />
+        
+        <button id="apply_resolution" width="20%" height="30" text="Apply video changes" />
+        
+    </box>
+    
+    <spacer height="15" width="10"/>
+    
 </div>

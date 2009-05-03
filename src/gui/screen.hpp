@@ -23,6 +23,8 @@ namespace GUIEngine
     
     class Screen : public IEventReceiver
     {
+        friend class Skin;
+        
         bool m_loaded;
         std::string m_filename;
         ptr_vector<Widget, HOLD> m_widgets;

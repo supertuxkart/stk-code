@@ -38,6 +38,8 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_tex_fcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_focus.png").c_str() );
     m_tex_dcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked.png").c_str() );
     m_tex_dfcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked_focus.png").c_str() );
+    
+    m_tex_section = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_section.png").c_str() );
 }
 
 Skin::~Skin()
@@ -46,12 +48,35 @@ Skin::~Skin()
 }
 
 
-void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
-                                         const int left_border, const int right_border,
-                                         const int top_border, const int bottom_border,
-                                         const bool preserve_h_aspect_ratios,
-                                         const float border_out_portion, int areas, const bool vertical_flip)
+
+/** load default values */
+BoxRenderParams::BoxRenderParams()
 {
+    left_border = 0;
+    right_border = 0;
+    top_border = 0;
+    bottom_border = 0;
+    preserve_h_aspect_ratios = false;
+    
+    hborder_out_portion = 0.5;
+    vborder_out_portion = 1.0;
+    
+    areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
+    vertical_flip = false;
+}
+
+void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source, const BoxRenderParams& params)
+{
+    const int left_border = params.left_border;
+    const int right_border = params.right_border;
+    const int top_border = params.top_border;
+    const int bottom_border = params.bottom_border;
+    const bool preserve_h_aspect_ratios = params.preserve_h_aspect_ratios;
+    const float hborder_out_portion = params.hborder_out_portion;
+    const float vborder_out_portion = params.vborder_out_portion;
+    int areas = params.areas;
+    const bool vertical_flip = params.vertical_flip;
+    
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
     // widgets won't move, so they'd only need to be calculated once.
     const int texture_w = source->getSize().Width;
@@ -95,7 +120,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
     /*
      The dest area is split this way. Borders can go a bit beyond the given area so
      components inside don't go over the borders
-     (how much it exceeds horizontally is specified in 'border_out_portion'. vertically is always the totality)
+     (how much it exceeds horizontally is specified in 'hborder_out_portion'. vertically is always the totality)
      
      a----b--------------------c----+
      |    |                    |    |
@@ -131,28 +156,22 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         }
         int dest_top_border    = (int)(top_border   *std::min<float>(yscale, 1.0));
         int dest_bottom_border = (int)(bottom_border*std::min<float>(yscale, 1.0));
+
         
-        /*
-        if(vertical_flip)
-        {
-            int temp = dest_bottom_border;
-            dest_bottom_border = dest_top_border;
-            dest_top_border = temp;
-        }*/
+        const float hborder_in_portion = 1 - hborder_out_portion;
+        const float vborder_in_portion = 1 - vborder_out_portion;
         
-        const float border_in_portion = 1 - border_out_portion;
+        const int ax = (int)(dest_x - dest_left_border*hborder_out_portion);
+        const int ay = (int)(dest_y - dest_top_border*vborder_out_portion);
         
-        const int ax = (int)(dest_x - dest_left_border*border_out_portion);
-        const int ay = dest_y - dest_top_border;
-        
-        const int bx = (int)(dest_x + dest_left_border*border_in_portion);
+        const int bx = (int)(dest_x + dest_left_border*hborder_in_portion);
         const int by = ay;
         
-        const int cx = (int)(dest_x2 - dest_right_border*border_in_portion);
+        const int cx = (int)(dest_x2 - dest_right_border*hborder_in_portion);
         const int cy = ay;
         
         const int dx = ax;
-        const int dy = dest_y;
+        const int dy = (int)(dest_y + dest_top_border*vborder_in_portion);
         
         const int ex = bx;
         const int ey = dy;
@@ -160,11 +179,11 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int fx = cx;
         const int fy = dy;
         
-        const int gx = (int)(dest_x2 + dest_right_border*border_out_portion);
+        const int gx = (int)(dest_x2 + dest_right_border*hborder_out_portion);
         const int gy = dy;
         
         const int hx = ax;
-        const int hy = dest_y2;
+        const int hy = (int)(dest_y2 - dest_bottom_border*vborder_in_portion);
         
         const int ix = bx;
         const int iy = hy;
@@ -176,7 +195,7 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture
         const int ky = hy;
         
         const int lx = bx;
-        const int ly = dest_y2 + dest_bottom_border; 
+        const int ly = (int)(dest_y2 + dest_bottom_border*vborder_out_portion);
         
         const int mx = cx;
         const int my = ly;
@@ -235,51 +254,51 @@ X.LowerRightCorner.Y =  y1;}
 #undef FLIP_Y
         }
         
-        if((areas & LEFT) != 0)
+        if((areas & BoxRenderParams::LEFT) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if((areas & BODY) != 0)
+        if((areas & BoxRenderParams::BODY) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if((areas & RIGHT) != 0)
+        if((areas & BoxRenderParams::RIGHT) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if((areas & TOP) != 0)
+        if((areas & BoxRenderParams::TOP) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if((areas & BOTTOM) != 0)
+        if((areas & BoxRenderParams::BOTTOM) != 0)
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if( ((areas & LEFT) != 0) && ((areas & TOP) != 0) )
+        if( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( ((areas & RIGHT) != 0) && ((areas & TOP) != 0) )
+        if( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( ((areas & LEFT) != 0) && ((areas & BOTTOM) != 0) )
+        if( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
-        if( ((areas & RIGHT) != 0) && ((areas & BOTTOM) != 0) )
+        if( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
         {
             GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
                                                 0 /* no clipping */, 0, true /* alpha */);
@@ -290,15 +309,17 @@ X.LowerRightCorner.Y =  y1;}
 
 void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
-    // FIXME - move these numbers to a config file
-    const int left_border = 80;
-    const int right_border = 80;
-    const int border_above = 0;
-    const int border_below = 36;
+    static BoxRenderParams params;
     
-    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fbutton : m_tex_button),
-                                  left_border, right_border,
-                                  border_above, border_below, true /* horizontal aspect ratio kept */);
+    // FIXME - move these numbers to a config file
+    params.left_border = 80;
+    params.right_border = 80;
+    params.top_border = 0;
+    params.bottom_border = 36;
+    
+    params.preserve_h_aspect_ratios = true;
+    
+    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fbutton : m_tex_button), params);
 }
 
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
@@ -344,11 +365,12 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     {
         // ribbons containing buttons are actually tabs
         
+        static BoxRenderParams params;
         // FIXME - specify in file, don't hardcode
-        int left_border = 75;
-        int right_border = 75;
-        int border_above = 0;
-        int border_below = 15;
+        params.left_border = 75;
+        params.right_border = 75;
+        params.top_border = 0;
+        params.bottom_border = 15;
         
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip = rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
@@ -362,6 +384,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
         
         core::rect< s32 > rect2 = rect;
         
+        params.hborder_out_portion = portion_out;
+        params.vertical_flip = vertical_flip;
         
         if (mark_selected)
         {
@@ -371,10 +395,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             else
                 rect2.LowerRightCorner.Y += 10;
 
-            drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab),
-                                          left_border, right_border,
-                                          border_above, border_below, false /* horizontal aspect ratio not kept */, portion_out,
-                                          BODY | LEFT | RIGHT | TOP | BOTTOM, vertical_flip);
+            drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab), params);
             
             /*
             GUIEngine::getDriver()->draw2DLine( core::position2d< s32 >(rect2.UpperLeftCorner.X,rect2.LowerRightCorner.Y),
@@ -388,10 +409,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
         }
         else
         {
-            drawBoxFromStretchableTexture(rect2, m_tex_tab,
-                                          left_border, right_border,
-                                          border_above, border_below, false /* horizontal aspect ratio not kept */, portion_out,
-                                          BODY | LEFT | RIGHT | TOP | BOTTOM, vertical_flip);
+            drawBoxFromStretchableTexture(rect2, m_tex_tab, params);
         }
         
     }
@@ -471,10 +489,14 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                drawBoxFromStretchableTexture(rect, m_tex_squarefocus,
-                                              6 /* left border */, 6 /* rightborder */,
-                                              6 /* top border */, 6 /* bottom border */,
-                                              false /* horizontal aspect ratio not kept */, 1);
+                static BoxRenderParams params;
+                params.left_border = 6;
+                params.right_border = 6;
+                params.top_border = 6;
+                params.bottom_border = 6;
+                params.hborder_out_portion = 1.0;
+                
+                drawBoxFromStretchableTexture(rect, m_tex_squarefocus, params);
             }
             
         } // end if mark_selected
@@ -484,12 +506,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
 
 void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
-    // FIXME - move these numbers to a config file
-    const int left_border = 110;
-    const int right_border = 110;
-    const int border_above = 0;
-    const int border_below = 36;
-    
     if(!focused)
     {
         IGUIElement* focused_widget = GUIEngine::getGUIEnv()->getFocus();
@@ -505,18 +521,22 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
         }
     }
     
-    drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner),
-                                  left_border, right_border,
-                                  border_above, border_below, true /* horizontal aspect ratio kept */, 0);
+    static BoxRenderParams params;
+    // FIXME - move these numbers to a config file
+    params.left_border = 110;
+    params.right_border = 110;
+    params.top_border = 0;
+    params.bottom_border = 36;
+    
+    params.preserve_h_aspect_ratios = true;
+    params.hborder_out_portion = 0.0f;
+    
+    drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner), params);
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    // FIXME - move these numbers to a config file
-    const int left_border = 110;
-    const int right_border = 110;
-    const int border_above = 0;
-    const int border_below = 36;
+
     
     if(pressed)
     {
@@ -525,19 +545,26 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         
         //std::cout << "drawing spinner child " << widget->m_properties[PROP_ID].c_str() << std::endl;
         
-        if (widget->m_properties[PROP_ID] == "left") areas = LEFT;
-        else if (widget->m_properties[PROP_ID] == "right") areas = RIGHT;
+        if (widget->m_properties[PROP_ID] == "left") areas = BoxRenderParams::LEFT;
+        else if (widget->m_properties[PROP_ID] == "right") areas = BoxRenderParams::RIGHT;
         else return;
         
         core::rect< s32 > rect2 = core::rect< s32 >( spinner->x, spinner->y,
                                                     spinner->x + spinner->w,
                                                     spinner->y + spinner->h  );
         
-        drawBoxFromStretchableTexture(rect2, m_tex_dspinner,
-                                      left_border, right_border,
-                                      border_above, border_below,
-                                      true /* horizontal aspect ratio kept */,
-                                      0, areas);
+        static BoxRenderParams params;
+        // FIXME - move these numbers to a config file
+        params.left_border = 110;
+        params.right_border = 110;
+        params.top_border = 0;
+        params.bottom_border = 36;
+        
+        params.preserve_h_aspect_ratios = true;
+        params.hborder_out_portion = 0.0f;
+        params.areas = areas;
+        
+        drawBoxFromStretchableTexture(rect2, m_tex_dspinner, params);
         
     }
     
@@ -545,16 +572,16 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
 
 void Skin::drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
+    static BoxRenderParams params;
     // FIXME - move these numbers to a config file
-    const int left_border = 110;
-    const int right_border = 110;
-    const int border_above = 0;
-    const int border_below = 36;
+    params.left_border = 110;
+    params.right_border = 110;
+    params.top_border = 0;
+    params.bottom_border = 36;
     
-    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner),
-                                  left_border, right_border,
-                                  border_above, border_below,
-                                  false /* horizontal aspect ratio kept */, -0.9);
+    params.hborder_out_portion = -0.9;
+    
+    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner), params);
 }
 void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
@@ -607,6 +634,57 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
                                             0 /* no clipping */, 0, true /* alpha */);
     }
 }
+
+
+/** recusrive function to render all sections (recursion allows to easily travesre the tree of children and sub-children) */
+void Skin::renderSections(ptr_vector<Widget>* within_vector)
+{
+    if(within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
+    
+    const unsigned short widgets_amount = within_vector->size();
+    
+    for(int n=0; n<widgets_amount; n++)
+    {
+        Widget& widget = (*within_vector)[n];
+        
+        if(widget.m_type == WTYPE_DIV)
+        {
+            if(widget.m_show_bounding_box)
+            {
+                core::rect< s32 > rect = core::rect<s32>( widget.x, widget.y, widget.x + widget.w, widget.y + widget.h );
+                //getDriver()->draw2DImage(g_skin->m_tex_section, rect, source_area,
+                //                         0 /* no clipping */, 0, true /* alpha */);
+                
+                static BoxRenderParams params;
+                params.left_border = 15;
+                params.right_border = 15;
+                params.top_border = 15;
+                params.bottom_border = 15;
+                
+                params.hborder_out_portion = 1.0;
+                params.vborder_out_portion = 0.2;
+                
+                drawBoxFromStretchableTexture( rect, m_tex_section, params );
+                
+                /*
+                 void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
+                 const int left_border, const int right_border,
+                 const int top_border, const int bottom_border,
+                 const bool preserve_h_aspect_ratios=false,
+                 const float hborder_out_portion = 0.5,
+                 int areas = BODY | LEFT | RIGHT | TOP | BOTTOM,
+                 const bool vertical_flip=false);
+                 */
+            }
+            else
+            {
+                renderSections( &widget.m_children );
+            }
+        }
+    } // next
+    
+}
+
 
 #if 0
 #pragma mark -

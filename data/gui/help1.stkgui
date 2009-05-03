@@ -1,44 +1,48 @@
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-<label align="center" text="SuperTuxKart Help"/>
+    <label align="center" text="SuperTuxKart Help"/>
 
-<tabs id="category" height="10%" max_height="110" width="100%" align="center">
-    <icon-button id="page1" width="128" height="128" icon="gui/track_random.png" text="General"/>
-    <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
-    <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>
-</tabs>
+    <tabs id="category" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="page1" width="128" height="128" icon="gui/track_random.png" text="General"/>
+        <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
+        <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>
+    </tabs>
 
-<spacer proportion="1" width="10" proportion="1"/>
+    <box proportion="1" width="100%" layout="vertical-row">
+    
+        <label align="center" text="Make your rivals bite dust!"/>
 
-<label align="center" text="Make your rivals bite dust!"/>
+        <spacer height="25" width="10"/>
 
-<spacer height="25" width="10"/>
+        <div width="100%" proportion="1" layout="horizontal-row">
+            <icon align="center" icon="textures/bonusblock2.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="1" height="100%" align="left" word_wrap="true"
+                   text="Collect blue boxes : they will give you weapons or other powerups"/>
+        </div>
 
-<div width="100%" proportion="1" layout="horizontal-row">
-    <icon align="center" icon="textures/bonusblock2.png"/>
-    <spacer width="25" height="25"/>
-    <label proportion="1" height="100%" align="left" word_wrap="true" text="Collect blue boxes : they will give you weapons or other powerups"/>
-</div>
+        <div width="100%" proportion="1" layout="horizontal-row">
+            <icon align="center" icon="textures/nitro-particle.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="1" height="100%" align="left" word_wrap="true"
+                   text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."/>
+            </div>
 
-<div width="100%" proportion="1" layout="horizontal-row">
-    <icon align="center" icon="textures/nitro-particle.png"/>
-    <spacer width="25" height="25"/>
-    <label proportion="1" height="100%" align="left" word_wrap="true" text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."/>
-</div>
+        <div width="100%" proportion="1" layout="horizontal-row">
+            <icon align="center" icon="textures/gui_lock.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="1" height="100%" align="left" word_wrap="true"
+                   text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
+        </div>
 
-<div width="100%" proportion="1" layout="horizontal-row">
-    <icon align="center" icon="textures/gui_lock.png"/>
-    <spacer width="25" height="25"/>
-    <label proportion="1" height="100%" align="left" word_wrap="true" text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
-</div>
+        <label align="left" word_wrap="true" width="100%" proportion="1" text="The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"/>
 
-<label align="left" word_wrap="true" width="100%" proportion="1" text="The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"/>
+        <spacer proportion="1" width="10" proportion="1"/>
 
-<spacer proportion="1" width="10" proportion="1"/>
+        <label align="center" text="* Current key bindings can be seen/changed in menu Options"/>
 
-<label align="center" text="* Current key bindings can be seen/changed in menu Options"/>
-
-<spacer width="50" height="45" />
+    </box>
+    <spacer width="50" height="45" /> 
 </div>
 
 <button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
