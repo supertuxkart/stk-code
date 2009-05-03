@@ -29,7 +29,8 @@
 #  include <GL/gl.h>
 #endif
 
-#include <SDL/SDL_types.h>
+typedef unsigned long Uint32;
+
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */

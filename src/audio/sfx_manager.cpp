@@ -23,8 +23,11 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "vorbis/codec.h"
+#include <vorbis/vorbisfile.h>
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -136,6 +139,78 @@ void SFXManager::loadSfx()
     loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE   );
 }   // loadSfx
 //----------------------------------------------------------------------------
+
+#if defined(WORDS_BIGENDIAN)
+#define OGG_ENDIAN 1
+#else
+#define OGG_ENDIAN 0
+#endif
+
+// Load a vorbis file into an OpenAL buffer
+// based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
+bool loadVorbisBuffer(const char *name, ALuint buffer)
+{
+    bool success = FALSE;
+    FILE *file;
+    vorbis_info *info;
+    OggVorbis_File oggFile;
+    
+    if (alIsBuffer(buffer) == AL_FALSE)
+    {
+        printf("Error, bad OpenAL buffer");
+        return false;
+    }
+    
+    file = fopen(name, "rb");
+    
+    if (file)
+    {
+        if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) == 0)
+        {
+            info = ov_info(&oggFile, -1);
+            
+            long len = ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
+            
+            char *data = (char *) malloc(len);
+            
+            if (data)
+            {
+                int bs = -1;
+                long todo = len;
+                char *bufpt = data;
+                
+                while (todo)
+                {
+                    int read = ov_read(&oggFile, bufpt, todo, OGG_ENDIAN, 2, 1, &bs);
+                    todo -= read;
+                    bufpt += read;
+                }
+                
+                alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, data, len, info->rate);
+                success = TRUE;
+                
+                free(data);
+            }
+            else
+                printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
+            
+            ov_clear(&oggFile);
+        }
+        else
+        {
+            fclose(file);
+            printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
+        }
+    }
+    else
+        printf("LoadVorbisBuffer() - couldn't open file!");
+    
+    
+    return success;
+}
+
+
+
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
                                const char *name, SFXType item)
 {
@@ -156,49 +231,10 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
     alGenBuffers(1, &(m_sfx_buffers[item]));
     if (!checkError("generating a buffer")) return;
 
-    ALenum format = 0;
-    Uint32 size = 0;
-    Uint8* data = NULL;
-    SDL_AudioSpec spec;
-
-    if( SDL_LoadWAV( path.c_str(), &spec, &data, &size ) == NULL)
+    if(!loadVorbisBuffer(path.c_str(), m_sfx_buffers[item]))
     {
-        fprintf(stdout, "SDL_LoadWAV() failed to load %s\n", path.c_str());
-        return;
+        printf("Could not load sound effect %s\n", name);
     }
-
-    switch( spec.format )
-    {
-        case AUDIO_U8:
-        case AUDIO_S8:
-            format = ( spec.channels == 2 ) ? AL_FORMAT_STEREO8
-                                            : AL_FORMAT_MONO8;
-            break;
-        case AUDIO_U16LSB:
-        case AUDIO_S16LSB:
-        case AUDIO_U16MSB:
-        case AUDIO_S16MSB:
-            format = ( spec.channels == 2 ) ? AL_FORMAT_STEREO16
-                                            : AL_FORMAT_MONO16;
-            
-#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER==SDL_BIG_ENDIAN
-            // swap bytes around for big-endian systems
-            for(unsigned int n=0; n<size-1; n+=2)
-            {
-                Uint8 temp = data[n+1];
-                data[n+1] = data[n];
-                data[n] = temp;
-            }
-#endif
-            
-            break;
-    }   // switch( spec.format )
-
-    alBufferData(m_sfx_buffers[item], format, data, size, spec.freq);
-    if (!checkError("buffering data")) return;
-
-    SDL_FreeWAV(data);
-
 }   // loadSingleSfx
 
 //----------------------------------------------------------------------------

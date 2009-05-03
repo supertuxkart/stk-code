@@ -19,6 +19,7 @@
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <map>
 #include <vector>
@@ -42,7 +43,6 @@
 #include "history.hpp"
 #include "gui/race_gui.hpp"
 #include "gui/screen.hpp"
-#include "sdl_manager.hpp"
 
 InputManager *input_manager;
 
@@ -148,7 +148,8 @@ void InputManager::handleStaticAction(int key, int value)
             // to reload all textures, display lists etc. Fullscreen can
             // be toggled from the main menu (options->display).
 		case KEY_F9:
-            SDLManager::toggleFullscreen(false);   // 0: do not reset textures
+            // TODO
+            //irrDriver->toggleFullscreen(false);   // 0: do not reset textures
 			// Fall through to put the game into pause mode.
 #endif
 		case KEY_ESCAPE:
@@ -439,7 +440,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                 // supresses to the notification of them as an input.
                 m_mouse_val_x = m_mouse_val_y = 0;
                 
-                SDLManager::showPointer();
+                irr_driver->showPointer();
                 
                 // Fall through expected.
             case BOOTSTRAP:
@@ -455,7 +456,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             case INPUT_SENSE_PREFER_BUTTON:
                 // Leaving input sense mode.
                 
-                SDLManager::showPointer();
+                irr_driver->showPointer();
                 
                 // The order is deliberate just in case someone starts to make
                 // STK multithreaded: m_sensed_input must not be 0 when
@@ -468,10 +469,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                 break;
             case LOWLEVEL:
                 // Leaving lowlevel mode.
-                
-                // SDL_EnableUNICODE(SDL_DISABLE);
-                
-                SDLManager::showPointer();
+                irr_driver->showPointer();
                 
                 m_mode = MENU;
                 
@@ -493,7 +491,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             // Installs the action map for the ingame mode.
             // m_action_map = user_config->newIngameActionMap();
             
-            SDLManager::hidePointer();
+            irr_driver->hidePointer();
             
             m_mode = INGAME;
             
@@ -510,7 +508,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             m_max_sensed_type  = Input::IT_NONE;
             m_sensed_input     = new Input();
             
-            SDLManager::hidePointer();
+            irr_driver->hidePointer();
             
             m_mode = new_mode;
             
@@ -518,10 +516,8 @@ void InputManager::setMode(InputDriverMode new_mode)
         case LOWLEVEL:
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
-            
-            // SDL_EnableUNICODE(SDL_ENABLE);
-            
-            SDLManager::hidePointer();
+
+            irr_driver->hidePointer();
             
             m_mode = LOWLEVEL;
             

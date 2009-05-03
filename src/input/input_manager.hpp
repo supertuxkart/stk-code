@@ -24,8 +24,6 @@
 #include <vector>
 #include <irrlicht.h>
 
-// #include <SDL/SDL.h>
-
 #include "input/input.hpp"
 
 class DeviceManager;

@@ -75,6 +75,8 @@ public:
     void                  update(float dt);
     
     void                  changeResolution();
+    void showPointer();
+    void hidePointer();
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

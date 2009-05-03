@@ -33,7 +33,6 @@
 #  include <direct.h>
 #endif
 
-// #include <SDL/SDL.h>
 #define _WINSOCKAPI_
 #include <plib/ul.h>
 

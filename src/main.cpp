@@ -38,7 +38,6 @@
 #include <sstream>
 #include <algorithm>
 
-#include "sdl_manager.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
 #include "main_loop.hpp"
@@ -531,7 +530,6 @@ int main(int argc, char *argv[] )
             }
         }
         
-        SDLManager::init();
         input_manager = new InputManager ();
         
         // Get into menu mode initially.

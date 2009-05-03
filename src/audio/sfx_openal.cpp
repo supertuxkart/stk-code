@@ -31,9 +31,6 @@
 #  include <AL/al.h>
 #endif
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
-
 #include "user_config.hpp"
 #include "io/file_manager.hpp"
 

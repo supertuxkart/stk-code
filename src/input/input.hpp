@@ -66,7 +66,7 @@ struct Input
 	 * Meaning of the 3 integers for each InputType:
 	 * IT_NONE: This means nothing. In certain cases this is regarded as an
 	 * unset binding.
-	 * IT_KEYBOARD: id0 is an SDLKey value.
+	 * IT_KEYBOARD: id0 is a irrLicht value.
 	 * IT_STICKMOTION: id0 - stick index, id1 - axis index, id2 - axis direction
 	 * (negative, positive). You can assume that axis 0 is the X-Axis where the
      * negative direction is to the left and that axis 1 is the Y-Axis with the

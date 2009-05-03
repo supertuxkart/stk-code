@@ -22,7 +22,6 @@
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
 		953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
-		95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A117330F77D7BE00B18B3D /* sdl_manager.cpp */; };
 		95A1182C0F77EA3100B18B3D /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1182A0F77EA3100B18B3D /* input_manager.cpp */; };
 		95A1184B0F77FC3900B18B3D /* input_device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1184A0F77FC3900B18B3D /* input_device.cpp */; };
 		95A1187B0F78024E00B18B3D /* device_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1187A0F78024E00B18B3D /* device_manager.cpp */; };
@@ -224,7 +223,6 @@
 		95C65DAB0F532FD400BE7BA7 /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
 		95CA59F80F82FCB7003323DB /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CA59F70F82FCB7003323DB /* physical_object.cpp */; };
 		95D464890FA37B1B00F50CA2 /* libIrrlicht.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D464880FA37B1B00F50CA2 /* libIrrlicht.a */; };
-		95D464D30FA3801E00F50CA2 /* libSDL-1.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */; };
 		95F423130E26E3DC00692113 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		95F4231F0E26E44800692113 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		95F423410E26E65B00692113 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423400E26E65B00692113 /* GLUT.framework */; };
@@ -269,8 +267,6 @@
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
 		953F038B0F6C880D00C77FE2 /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = ../../gui/state_manager.cpp; sourceTree = SOURCE_ROOT; };
 		953F038E0F6C8AD800C77FE2 /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../gui/state_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95A117330F77D7BE00B18B3D /* sdl_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sdl_manager.cpp; path = ../../sdl_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95A117340F77D7BE00B18B3D /* sdl_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sdl_manager.hpp; path = ../../sdl_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -739,7 +735,6 @@
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
 		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
-		95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libSDL-1.2.0.dylib"; path = "/usr/local/lib/libSDL-1.2.0.dylib"; sourceTree = "<absolute>"; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
 		95D538860F69D61C00B4062E /* CIndexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CIndexBuffer.h; path = /usr/local/include/irrlicht/CIndexBuffer.h; sourceTree = "<absolute>"; };
@@ -1147,7 +1142,6 @@
 				950557600F6968A50056E88C /* QuickTime.framework in Frameworks */,
 				950557650F6968BE0056E88C /* IOKit.framework in Frameworks */,
 				95D464890FA37B1B00F50CA2 /* libIrrlicht.a in Frameworks */,
-				95D464D30FA3801E00F50CA2 /* libSDL-1.2.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1158,7 +1152,6 @@
 			isa = PBXGroup;
 			children = (
 				95D464880FA37B1B00F50CA2 /* libIrrlicht.a */,
-				95D464D20FA3801E00F50CA2 /* libSDL-1.2.0.dylib */,
 				95D538830F69D61C00B4062E /* irrlicht */,
 				95C2ABA60F29653F000D3E5D /* src */,
 				9513B40E0F0EDE80005D29F6 /* Frameworks */,
@@ -1282,8 +1275,6 @@
 				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
 				95C2B1DC0F296546000D3E5D /* user_config.hpp */,
 				95C2B1DE0F296546000D3E5D /* user_pointer.hpp */,
-				95A117330F77D7BE00B18B3D /* sdl_manager.cpp */,
-				95A117340F77D7BE00B18B3D /* sdl_manager.hpp */,
 			);
 			name = src;
 			path = ../..;
@@ -2754,7 +2745,6 @@
 				95C1E3F20F699079005D33E6 /* race_gui.cpp in Sources */,
 				95C1E4000F699427005D33E6 /* font.cpp in Sources */,
 				953F038C0F6C880D00C77FE2 /* state_manager.cpp in Sources */,
-				95A117350F77D7BE00B18B3D /* sdl_manager.cpp in Sources */,
 				95A1182C0F77EA3100B18B3D /* input_manager.cpp in Sources */,
 				95A1184B0F77FC3900B18B3D /* input_device.cpp in Sources */,
 				95A1187B0F78024E00B18B3D /* device_manager.cpp in Sources */,

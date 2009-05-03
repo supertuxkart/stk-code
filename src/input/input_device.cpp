@@ -109,18 +109,6 @@ KeyboardDevice::KeyboardDevice(irr::io::IrrXMLReader* xml)
 // -----------------------------------------------------------------------------
 void KeyboardDevice::loadDefaults()
 {
-    /*
-    m_bindings[PA_NITRO].id = SDLK_SPACE;
-    m_bindings[PA_ACCEL].id = SDLK_UP;
-    m_bindings[PA_BRAKE].id = SDLK_DOWN;
-    m_bindings[PA_LEFT].id = SDLK_LEFT;
-    m_bindings[PA_RIGHT].id = SDLK_RIGHT;
-    m_bindings[PA_DRIFT].id = SDLK_LSHIFT;
-    m_bindings[PA_RESCUE].id = SDLK_ESCAPE;
-    m_bindings[PA_FIRE].id = SDLK_LALT;
-    m_bindings[PA_LOOK_BACK].id = SDLK_b;
-*/
-    
     m_bindings[PA_NITRO].id = KEY_KEY_N;
     m_bindings[PA_ACCEL].id = KEY_UP;
     m_bindings[PA_BRAKE].id = KEY_DOWN;
@@ -166,13 +154,11 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
 
 /**
  * Creates a GamePade device from a config file. Note that this device will not yet be ready to be used,
- * it must first be detected to be connected by SDL (hence m_sdlJoystick is NULL)
+ * it must first be detected to be connected by irrLicht, to be properly initialized
  */
 GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 {
     m_type = DT_GAMEPAD;
-    // FIXME - replace with non-SDL code
-    // m_sdlJoystick = NULL;
     m_prevAxisDirections = NULL;
     m_deadzone = DEADZONE_JOYSTICK;
     
@@ -372,6 +358,5 @@ GamePadDevice::~GamePadDevice()
 {
     delete[] m_prevAxisDirections;
     
-    // FIXME - replace with non-SDL code
-    // SDL_JoystickClose(m_sdlJoystick);
+    // FIXME - any need to close devices?
 }   // ~GamePadDevice

@@ -32,7 +32,7 @@ protected:
     std::string m_player;
     
 public:
-    std::string m_name; // if device has a name; unused for keyboards since SDL can't tell keyboards apart
+    std::string m_name; // if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart
     
     InputDevice();
     
@@ -58,8 +58,6 @@ class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
 public:
-    // FIXME - replace with non-SDL code
-    // SDL_Joystick         *m_sdlJoystick;
     int                   m_deadzone;
     int                   m_index;
     int                   m_axis_count;

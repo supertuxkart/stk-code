@@ -61,7 +61,7 @@ void MainLoop::run()
     IrrlichtDevice* device = irr_driver->getDevice();
     
     bool music_on = false;
-    m_curr_time = device->getTimer()->getRealTime(); // SDL_GetTicks();
+    m_curr_time = device->getTimer()->getRealTime();
     float dt;
     while(!m_abort)
     {
