@@ -596,17 +596,21 @@ void RibbonWidget::add()
                                                  subsize.getWidth()-15,
                                                  subsize.getHeight());                
                 
-                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, ++id_counter_2, L"", L"");
+                // use the same ID for all subcomponents; since event handling is done per-ID, no matter
+                // which one your hover, this widget will get it
+                int same_id = ++id_counter_2;
+                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, same_id, L"", L"");
                 
-                MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, ++id_counter_2, icon_part, true);
+                MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, same_id, icon_part, true);
                 icon->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
                 icon->setUseAlphaChannel(true);
+                icon->setDrawBorder(false);
                 icon->setTabStop(false);
                 
                 IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), label_part,
                                                                               false /* border */,
                                                                               true /* word wrap */,
-                                                                              subbtn, ++id_counter_2);
+                                                                              subbtn, same_id);
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
