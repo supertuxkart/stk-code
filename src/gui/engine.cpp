@@ -221,14 +221,13 @@ void render(float elapsed_time)
         dest = core::rect<s32>(-clipped_x_space/2, 0, screen_w+clipped_x_space/2, texture_h);
     }
 
+    // ---- menu drawing
     if(!StateManager::isGameState())
+    {
         GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area,
                                             0 /* no clipping */, 0, false /* alpha */);
-    
-    //GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
-    
-    // ---- render sections (bounding boxes)
-    g_skin->renderSections();
+        g_skin->renderSections();
+    }
     
     // ---- let irrLicht do the rest (the Skin object will be called for further render)
     g_env->drawAll();
