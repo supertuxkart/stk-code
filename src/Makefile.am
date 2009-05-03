@@ -141,8 +141,6 @@ supertuxkart_SOURCES = \
  input/input_device.hpp \
  input/input_manager.cpp \
  input/input_manager.hpp \
- sdl_manager.cpp \
- sdl_manager.hpp \
  isect.cpp \
  isect.hpp \
  explosion.cpp \
@@ -244,7 +242,7 @@ supertuxkart_SOURCES = \
 supertuxkart_LDADD = \
         -lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
         -lplibul -lplibssgaux $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) $(glut_LIBS) \
-        $(opengl_LIBS) $(sdl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
+        $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
         $(INTLLIBS)
 
 EXTRA_DIST = robots/empty_robot.cpp robots/empty_robot.hpp
