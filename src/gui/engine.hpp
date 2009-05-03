@@ -45,9 +45,10 @@ A plain label. Supports properties PROP_WORD_WRAP and PROP_TEXT_ALIGN.
 WTYPE_SPACER            "spacer"
 Some blank space; not visible on screen.
 
-WTYPE_DIV               "div"
+WTYPE_DIV               "div", "box"
 A container. Does not do much on itself, but is useful to lay out children automatically. Divs can be nested.
 Supports property PROP_LAYOUT. Of spawn type (<div>...</div>, place children within)
+ "box" is a variant that acts exactly the same but is visible on-screen
 
 WTYPE_RIBBON_GRID       "ribbon_grid", "scrollable_ribbon"
 Shows a scrollable grid of icons. NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
