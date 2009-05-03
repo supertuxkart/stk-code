@@ -242,10 +242,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdl_manager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\stk_config.cpp"
 				>
 			</File>
@@ -753,10 +749,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\race_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\sdl_manager.hpp"
 				>
 			</File>
 			<File
