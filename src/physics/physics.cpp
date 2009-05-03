@@ -307,6 +307,11 @@ void Physics::draw()
         if(myMotion) 
         {
             myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
+            // Karts need culling GL_FRONT (not sure why), otherwise they appear to
+            // rotate incorrectly due to incorrect culling
+            UserPointer *up = (UserPointer*)body->getUserPointer();
+            if(up->is(UserPointer::UP_KART))
+                glCullFace(GL_FRONT);
             debugDraw(m, obj->getCollisionShape(), wireColor);
         }
     }  // for i

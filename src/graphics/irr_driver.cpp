@@ -502,7 +502,7 @@ void IrrDriver::update(float dt)
     if(!m_device->run()) return;
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug)
+    if(user_config->m_bullet_debug && race_manager->raceIsActive())
     {
         // Use bullets debug drawer
         GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -532,6 +532,7 @@ void IrrDriver::update(float dt)
 
         glClearColor(0.8f,0.8f,0.8f,0);
 
+        glCullFace(GL_BACK);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         float f=2.0f;
@@ -539,8 +540,8 @@ void IrrDriver::update(float dt)
 
         Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
         gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
-            xyz.getX(), xyz.getY(),     xyz.getZ(),
-            0.0f, 0.0f, 1.0f);
+                  xyz.getX(), xyz.getY(),     xyz.getZ(),
+                  0.0f, 0.0f, 1.0f);
         glMatrixMode(GL_MODELVIEW);
 
         for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)

@@ -705,7 +705,7 @@ void Kart::draw()
     btCylinderShapeX wheelShape( btVector3(0.1f,
                                         m_kart_properties->getWheelRadius(),
                                         m_kart_properties->getWheelRadius()));
-    btVector3 wheelColor(1,0,0);
+    btVector3 wheelColor(0,0,1);
     for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         m_vehicle->updateWheelTransform(i, true);
