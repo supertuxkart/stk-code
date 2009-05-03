@@ -1,6 +1,7 @@
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
     <label align="center" text="SuperTuxKart Options"/>
+    <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
         <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
