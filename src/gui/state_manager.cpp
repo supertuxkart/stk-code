@@ -277,31 +277,35 @@ namespace StateManager
                 else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
             
-            // init audio-video sub-screen
+            // ---- init audio-video sub-screen
             if(screen_name == "options_av.stkgui")
             {
-                GUIEngine::GaugeWidget* gauge = dynamic_cast<GUIEngine::GaugeWidget*>
-                    (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+                // ---- sfx volume
+                GUIEngine::SpinnerWidget* gauge = dynamic_cast<GUIEngine::SpinnerWidget*>
+                        (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
                 assert(gauge != NULL);
                 
-                gauge->setValue( sfx_manager->getMasterSFXVolume() );
+                gauge->setValue( sfx_manager->getMasterSFXVolume()*10.0f );
                 
                 
-                gauge = dynamic_cast<GUIEngine::GaugeWidget*>
-                    (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+                gauge = dynamic_cast<GUIEngine::SpinnerWidget*>
+                        (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
                 assert(gauge != NULL);
-                gauge->setValue( sound_manager->getMasterMusicVolume() );
+                gauge->setValue( sound_manager->getMasterMusicVolume()*10.f );
                 
                 
+                // ---- music volume
                 GUIEngine::CheckBoxWidget* sfx = dynamic_cast<GUIEngine::CheckBoxWidget*>
                     (GUIEngine::getCurrentScreen()->getWidget("sfx_enabled"));
                 
                 GUIEngine::CheckBoxWidget* music = dynamic_cast<GUIEngine::CheckBoxWidget*>
                     (GUIEngine::getCurrentScreen()->getWidget("music_enabled"));
                 
+                // ---- audio enables/disables
                 sfx->setState( user_config->doSFX() );
                 music->setState( user_config->doMusic() );
                 
+                // ---- resolutinos
                 {
                     GUIEngine::RibbonGridWidget* res = dynamic_cast<GUIEngine::RibbonGridWidget*>
                         (GUIEngine::getCurrentScreen()->getWidget("resolutions"));
@@ -365,25 +369,31 @@ namespace StateManager
         }
         else if(name == "music_volume")
         {
+            /*
             GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
             assert(w != NULL);
-            
+        
             sound_manager->setMasterMusicVolume( w->getValue() );
+             */
+            
+            GUIEngine::SpinnerWidget* w = dynamic_cast<GUIEngine::SpinnerWidget*>(widget);
+            assert(w != NULL);
+            
+            sound_manager->setMasterMusicVolume( w->getValue()/10.0f );
         }
         else if(name == "sfx_volume")
         {
             static SFXBase* sample_sound = NULL;
             
-            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
-            // GUIEngine::getCurrentScreen()->getWidget("sfx_volume")
+            GUIEngine::SpinnerWidget* w = dynamic_cast<GUIEngine::SpinnerWidget*>(widget);
             assert(w != NULL);
             
             if(sample_sound == NULL)
                 sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
             sample_sound->volume(1);
             
-            sfx_manager->setMasterSFXVolume( w->getValue() );
-            user_config->m_sfx_volume = w->getValue();
+            sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
+            user_config->m_sfx_volume = w->getValue()/10.0f;
             // std::cout << "w->getValue()=" << w->getValue() << std::endl;
             
             // play a sample sound to show the user what this volume is like

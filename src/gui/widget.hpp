@@ -17,7 +17,6 @@ namespace GUIEngine
         WTYPE_RIBBON,
         WTYPE_SPINNER,
         WTYPE_BUTTON,
-        WTYPE_GAUGE,
         WTYPE_ICON_BUTTON,
         WTYPE_CHECKBOX,
         WTYPE_LABEL,
@@ -174,30 +173,29 @@ namespace GUIEngine
         void setState(const bool enabled)  { m_state = enabled; }
     };
     
-
-    class GaugeWidget : public Widget
-    {
-        void add();
-    public:
-        virtual ~GaugeWidget() {}
-        float getValue();
-        void setValue(const float value);
-    };
     
     class SpinnerWidget : public Widget
     {
         int m_value, m_min, m_max;
         std::vector<std::string> m_labels;
         bool m_graphical;
+        bool m_gauge;
         
         bool transmitEvent(Widget* w, std::string& originator);
         bool rightPressed();
         bool leftPressed();
         void add();
     public:
+        
+        SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
         void setValue(const int new_value);
         void addLabel(std::string label);
+        
+        bool isGauge()  const { return m_gauge; }
+        int  getValue() const { return m_value; }
+        int  getMax()   const { return m_max;   }
+        int  getMin()   const { return m_min;   }
     };
     
     class IconButtonWidget : public Widget

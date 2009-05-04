@@ -289,42 +289,6 @@ bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator)
 
 #if 0
 #pragma mark -
-#pragma mark Gauge Widget
-#endif
-
-// -----------------------------------------------------------------------------
-void GaugeWidget::add()
-{
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    IGUIScrollBar* sb = GUIEngine::getGUIEnv()->addScrollBar(true /* horizontal */, widget_size, NULL, ++id_counter);
-    sb->setMax(100);
-    sb->setSmallStep(10);
-    sb->setLargeStep(10);
-    
-    m_element = sb;
-    
-    id = m_element->getID();
-    m_element->setTabOrder(id);
-    m_element->setTabGroup(false);
-}
-// -----------------------------------------------------------------------------
-float GaugeWidget::getValue()
-{
-    IGUIScrollBar* sb = dynamic_cast<IGUIScrollBar*>(m_element);
-    assert(sb != NULL);
-    return (float)sb->getPos() / sb->getMax();
-}
-// -----------------------------------------------------------------------------
-void GaugeWidget::setValue(const float val)
-{
-    IGUIScrollBar* sb = dynamic_cast<IGUIScrollBar*>(m_element);
-    assert(sb != NULL);
-    
-    sb->setPos( (int)round(sb->getMax()*val) );
-}
-
-#if 0
-#pragma mark -
 #pragma mark Icon Button
 #endif
 
@@ -696,6 +660,11 @@ void RibbonWidget::setLabel(const int id, std::string new_name)
 #pragma mark -
 #pragma mark Spinner
 #endif
+
+SpinnerWidget::SpinnerWidget(const bool gauge)
+{
+    m_gauge = gauge;
+}
 
 void SpinnerWidget::add()
 {

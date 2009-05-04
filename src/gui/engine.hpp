@@ -19,18 +19,16 @@ Ribbon widgets are of spawn type (<ribbon> ... </ribbon>) and may contain icon-b
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
 affect the type of highlighting used)
 
-WTYPE_SPINNER           "spinner"
+WTYPE_SPINNER           "spinner", "gauge"
 A spinner component (lets you choose numbers). Sprecify PROP_MIN_VALUE and PROP_MAX_VALUE to have control
 over values (default will be from 0 to 10). You can specify an icon; then, include a sprintf format string
 like %i in the name, and at runtime the current number will be inserted into the given name to find the
 right file for each possible value the spinner can take. It may also display arbitrary text instead of
 numbers, though this cannot be achieve in the XML file; use the ->addLabel(...) method in code to do this.
+The "gauge" variant behaves similarly, but a fill band shows how close to the max the value is.
 
 WTYPE_BUTTON            "button"
 A plain text buttons.
-
-WTYPE_GAUGE             "gauge"
-A control that lets users choose a value between a maximal and a minimal value, with a graphical filling bar.
 
 WTYPE_ICON_BUTTON       "icon-button", "icon"
 A component with an image, and optional text to go under it. The "icon" variant will have no border and will not

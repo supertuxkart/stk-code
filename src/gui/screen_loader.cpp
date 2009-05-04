@@ -72,8 +72,10 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 }
                 else if (!strcmp("gauge", xml->getNodeName()))
                 {
-                    type = WTYPE_GAUGE;
-                    append_to.push_back(new GaugeWidget());
+                    //type = WTYPE_GAUGE;
+                    //append_to.push_back(new GaugeWidget());
+                    type = WTYPE_SPINNER;
+                    append_to.push_back(new SpinnerWidget(true));
                 }
                 else if (!strcmp("icon-button", xml->getNodeName()))
                 {

@@ -532,12 +532,37 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
     params.hborder_out_portion = 0.0f;
     
     drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner), params);
+    
+    const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
+    if( w->isGauge() )
+    {
+        // the width of an handle is about 0.84 the height in the current skin. FIXME - don't hardcode.
+        const int handle_size = (int)( widget->h*0.84f );
+        
+
+        const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
+        
+
+        const core::rect< s32 > dest_area = core::rect< s32 >(widget->x + handle_size,
+                                                              widget->y,
+                                                              widget->x + handle_size + (int)((widget->w - 2*handle_size)*value),
+                                                              widget->y + widget->h);
+
+        const int texture_w = m_tex_gaugefill->getSize().Width;
+        const int texture_h = m_tex_gaugefill->getSize().Height;
+        
+        const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+        
+        
+        GUIEngine::getDriver()->draw2DImage(m_tex_gaugefill, dest_area, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
+
+    }
+    
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-
-    
     if(pressed)
     {
         Widget* spinner = widget->m_event_handler;
@@ -550,8 +575,8 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         else return;
         
         core::rect< s32 > rect2 = core::rect< s32 >( spinner->x, spinner->y,
-                                                    spinner->x + spinner->w,
-                                                    spinner->y + spinner->h  );
+                                                     spinner->x + spinner->w,
+                                                     spinner->y + spinner->h  );
         
         static BoxRenderParams params;
         // FIXME - move these numbers to a config file
@@ -568,48 +593,6 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         
     }
     
-}
-
-void Skin::drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused)
-{
-    static BoxRenderParams params;
-    // FIXME - move these numbers to a config file
-    params.left_border = 110;
-    params.right_border = 110;
-    params.top_border = 0;
-    params.bottom_border = 36;
-    
-    params.hborder_out_portion = -0.9;
-    
-    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fspinner : m_tex_spinner), params);
-}
-void Skin::drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused)
-{
-    // FIXME - move these numbers to a config file
-    const int left_border = 110;
-    //const int right_border = 110;
-    //const int border_above = 0;
-    //const int border_below = 36;
-    
-    
-    GaugeWidget* w = dynamic_cast<GaugeWidget*>(widget);
-    
-    // the width of an handle is about 0.844 the height in the current skin. FIXME - don't hardcode.
-    const int handle_size = (int)(widget->h*0.844f) + left_border*0.2;
-    
-    // the 'rect' argument will be too small, because irrlicht has no suitable gauge component, so i used a scrollbar
-    const core::rect< s32 > dest_area = core::rect< s32 >(widget->x+handle_size, widget->y,
-                                                      widget->x + handle_size + (int)((widget->w - 2*handle_size)*w->getValue()),
-                                                      widget->y + widget->h);
-    
-    const int texture_w = m_tex_gaugefill->getSize().Width;
-    const int texture_h = m_tex_gaugefill->getSize().Height;
-    
-    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
-
-    
-    GUIEngine::getDriver()->draw2DImage(m_tex_gaugefill, dest_area, source_area,
-                                            0 /* no clipping */, 0, true /* alpha */);
 }
 
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
@@ -695,22 +678,15 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
 {
     if(StateManager::isGameState()) return; // ignore in game mode
     
-    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+    //const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();
     
     Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
     if(widget == NULL) return;
     
-    const WidgetType type = widget->m_type;
+    // const WidgetType type = widget->m_type;
     
-    
-    if(type == WTYPE_GAUGE)
-    {
-        drawGauge(rect, widget, focused);
-    }  
-    
-    //printf("draw rectangle\n");
-    // GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 150), pos );
+
 }
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
 {
@@ -754,11 +730,6 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawSpinnerBody(rect, widget, pressed, focused);
     } 
-    else if(type == WTYPE_GAUGE)
-    {
-        if(!pressed)
-            drawGaugeFill(rect, widget, focused);
-    }  
     else if(type == WTYPE_CHECKBOX)
     {
         drawCheckBox(rect, widget, focused);

@@ -21,7 +21,7 @@
         </div>
         <div width="75%" height="30" layout="horizontal-row" >
             <spacer proportion="1" height="100%"/>
-            <gauge id="music_volume" proportion="1" height="100%"/>
+            <gauge id="music_volume" proportion="1" height="100%" min_value="0" max_value="10"/>
         </div>
         
         <spacer height="15" width="10"/>
@@ -34,7 +34,7 @@
         </div>
         <div width="75%" height="30" layout="horizontal-row" >
             <spacer proportion="1" height="100%"/>
-            <gauge id="sfx_volume" proportion="1" height="100%"/>
+            <gauge id="sfx_volume" proportion="1" height="100%" min_value="0" max_value="10"/>
         </div>
         
         
