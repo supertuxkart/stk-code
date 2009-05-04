@@ -645,7 +645,7 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
                 params.bottom_border = 15;
                 
                 params.hborder_out_portion = 1.0;
-                params.vborder_out_portion = 0.2;
+                params.vborder_out_portion = 0.2f;
                 
                 drawBoxFromStretchableTexture( rect, m_tex_section, params );
                 

@@ -689,10 +689,8 @@ void Kart::handleZipper()
     // (experimentally found valud).  It also avoids NAN problems (if v=0).
     if(current_speed>1.0f) m_body->setLinearVelocity(v*(speed/current_speed));
 }   // handleZipper
-//-----------------------------------------------------------------------------
-#define sgn(x) ((x<0)?-1.0f:((x>0)?1.0f:0.0f))
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void Kart::draw()
 {
     float m[16];

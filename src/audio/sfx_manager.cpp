@@ -169,7 +169,7 @@ bool loadVorbisBuffer(const char *name, ALuint buffer)
         {
             info = ov_info(&oggFile, -1);
             
-            long len = ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
+            long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
             
             char *data = (char *) malloc(len);
             
