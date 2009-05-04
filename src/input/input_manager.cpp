@@ -280,7 +280,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
  * flexibility (= treat 4 directions as four buttons).
  *
  */
-void InputManager::input(const SEvent& event)
+bool InputManager::input(const SEvent& event)
 {
 
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
@@ -315,6 +315,16 @@ void InputManager::input(const SEvent& event)
         }   
 
     }
+    else if(event.EventType == EET_LOG_TEXT_EVENT)
+    {
+        // Ignore 'normal' messages
+        if(event.LogEvent.Level>0)
+        {
+            printf("Level %d: %s\n", 
+                event.LogEvent.Level,event.LogEvent.Text);
+        }
+        return true;
+    }
     else if(event.EventType == EET_KEY_INPUT_EVENT)
     {
         const int key = event.KeyInput.Key;
@@ -325,7 +335,7 @@ void InputManager::input(const SEvent& event)
             if(key == KEY_ESCAPE)
             {
                 StateManager::escapePressed();
-                return;
+                return true;
             }
             
             input(Input::IT_KEYBOARD, key,
@@ -374,6 +384,9 @@ void InputManager::input(const SEvent& event)
          */
     }
 #endif
+    // FIXME: to restore the original behaviour (engine returns false in the
+    //        case the input_manager::input is called)
+    return false;
 }
 
 //-----------------------------------------------------------------------------

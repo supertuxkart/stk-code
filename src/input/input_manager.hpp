@@ -75,7 +75,7 @@ public:
 	// void   initGamePadDevices();
     
 	//void   input();
-    void   input(const irr::SEvent& event);
+    bool   input(const irr::SEvent& event);
     
     DeviceManager* getDeviceList() { return m_device_manager; }
     

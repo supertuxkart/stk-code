@@ -46,10 +46,10 @@ namespace GUIEngine
             {
                 if(g_current_screen == NULL) return false;
                 g_current_screen->OnEvent(event);
+                return false;
             }
             else
-                input_manager->input(event);
-            return false;
+                return input_manager->input(event);
         }
     };
     IrrlichtEventCore* g_irrlicht_event_core = NULL;
