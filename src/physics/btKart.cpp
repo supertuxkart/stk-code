@@ -425,6 +425,14 @@ void	btKart::updateFriction(btScalar	timeStep)
                     btScalar maxImpulse = wheelInfo.m_brake ? wheelInfo.m_brake : defaultRollingFrictionImpulse;
                     btWheelContactPoint contactPt(m_chassisBody,groundObject,wheelInfo.m_raycastInfo.m_contactPointWS,m_forwardWS[wheel],maxImpulse);
                     rollingFriction = calcRollingFriction(contactPt);
+                    // This is a work around for the problem that a kart shakes
+                    // if it is braking: we get a minor impulse forward, which 
+                    // bullet then tries to offset by applying a backward 
+                    // impulse - which is a bit too big, causing a impulse 
+                    // backwards, ... till the kart is shaking backwards and
+                    // forwards
+                    if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
+                        rollingFriction=0;
                 }
             }
 
