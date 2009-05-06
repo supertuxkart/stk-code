@@ -37,33 +37,35 @@ public:
     enum Mode {
         CM_NORMAL,        // Normal camera mode
         CM_CLOSEUP,       // Normal camera, closer to kart
-        CM_DRIFTING,      // FIXME: drifting behind when accelerating = not yet implemented
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
         CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY
     };
+
 protected:
 #ifdef HAVE_IRRLICHT
     scene::ICameraSceneNode 
                *m_camera;
-#else
-    ssgContext *m_context;
 #endif
-    Vec3        m_xyz;                  // current position of camera
-    Vec3        m_hpr;                  // heading, pitch, roll of camera
-    const Kart *m_kart;                 // the kart the camera is attached to
-    Mode        m_mode;                 // CM_ value, see above
-    int         m_index;                /**<Index of camera. */
-    float       m_x, m_y, m_w, m_h;     // window to us
-    float       m_current_speed;        // current speed of camera
-    float       m_last_pitch;           // for tiling the camera when going downhill
-    float       m_distance;             // distance between camera and kart
-    Vec3        m_velocity;             // camera velocity for final mode
-    Vec3        m_angular_velocity;     // camera angular velocity for final mode
-    float       m_final_time;           // time when final camera mode started
+    Mode        m_mode;             // Camera's mode
+    Vec3        m_position;         // The ultimate position which the camera wants to obtain
+    Vec3        m_temp_position;    // The position the camera currently has
+    Vec3        m_target;           // The ultimate target which the camera wants to obtain
+    Vec3        m_temp_target;      // The target the camera currently has
+
+    int         m_index;
+
+    float       m_distance;         // Distance between the camera and the kart
+    float       m_angle_up;         // Angle between the ground and the camera (with the kart as the vertex of the angle)
+    float       m_angle_around;     // Angle around the kart (should actually match the rotation of the kart)
+    float       m_position_speed;   // The speed at which the camera changes position
+    float       m_target_speed;     // The speed at which the camera changes targets
+
+    float       m_x, m_y, m_w, m_h; 
+
+    const Kart *m_kart;             // The kart that the camera follows
 
 private:
-    void  finalCamera     (float dt);   // handle the final camera
     
 public:
          Camera            (int camera_index, const Kart* kart);
