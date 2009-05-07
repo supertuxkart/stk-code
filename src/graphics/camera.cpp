@@ -35,7 +35,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
     m_camera   = irr_driver->addCamera();
-    m_distance = kart->getKartProperties()->getCameraDistance();
+    m_distance = kart->getKartProperties()->getCameraDistance() * 0.75f;
     m_kart     = kart;
     m_angle_up = 0.0f;
     m_angle_around = 0.0f;
@@ -145,9 +145,12 @@ void Camera::update(float dt)
     switch(m_mode)
     {
     case CM_NORMAL:
-        m_target       = m_kart->getXYZ();
-        m_angle_around = m_kart->getHPR().getX();
+        // This first line moves the camera around behind the kart, pointing it 
+        // towards where the kart is turning (but only at lower speeds).
+        m_angle_around = m_kart->getHPR().getX() + (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
         m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(30.0f);      
+
+        m_target = m_kart->getXYZ();
 
         m_position.setX( sin(m_angle_around));
         m_position.setY(-cos(m_angle_around));
@@ -157,23 +160,25 @@ void Camera::update(float dt)
 
         break;
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
-        m_target       = m_kart->getXYZ();
-        m_angle_around = m_kart->getHPR().getX();
+        m_angle_around = m_kart->getHPR().getX() + (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
         m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(20.0f);
         
+        m_target = m_kart->getXYZ();
+
         m_position.setX( sin(m_angle_around));
         m_position.setY(-cos(m_angle_around));
         m_position.setZ(-sin(m_angle_up));
-        m_position *= m_distance * 0.5f;
+        m_position *= m_distance * 0.75f;
         m_position += m_target;        
 
         break;
     case CM_LEADER_MODE: // Follows the leader kart, higher off of the ground, further from the kart,
                          // and turns in the opposite direction from the kart for a nice effect. :) 
-        m_target       = RaceManager::getKart(0)->getXYZ();
         m_angle_around = RaceManager::getKart(0)->getHPR().getX();
         m_angle_up     = RaceManager::getKart(0)->getHPR().getY() + DEGREE_TO_RAD(40.0f);
         
+        m_target = RaceManager::getKart(0)->getXYZ();
+
         m_position.setX(sin(m_angle_around));
         m_position.setY(cos(m_angle_around));
         m_position.setZ(sin(m_angle_up));
