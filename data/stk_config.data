@@ -158,7 +158,7 @@
    (rubber-band-duration       1)  ;; Duration a rubber band acts.
    (camera-max-accel          10)
    (camera-max-brake          10)
-   (camera-distance           3.5) 
+   (camera-distance           3.0) 
   )   ;; end kart-defaults
 )
 ;; EOF ;;

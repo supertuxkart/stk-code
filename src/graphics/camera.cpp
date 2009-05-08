@@ -41,8 +41,10 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_angle_around = 0.0f;
 
     // TODO: Put these values into a config file
+    //       Global or per split screen zone?
     m_position_speed = 8.0f;
-    m_target_speed   = 10.0;
+    m_target_speed   = 10.0f;
+    m_rotation_range = 1.0f;
 
     // TODO: Set fog distance and clipping planes
     setScreenPosition(camera_index);
@@ -127,7 +129,7 @@ void Camera::reset()
 
 //-----------------------------------------------------------------------------
 /** Saves the current kart position as initial starting position for the
- *  camera. 
+ *  camera.
  */
 void Camera::setInitialTransform()
 {
@@ -147,10 +149,11 @@ void Camera::update(float dt)
     case CM_NORMAL:
         // This first line moves the camera around behind the kart, pointing it 
         // towards where the kart is turning (but only at lower speeds).
-        m_angle_around = m_kart->getHPR().getX() + (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
-        m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(30.0f);      
+        m_angle_around = m_kart->getHPR().getX() + m_rotation_range * (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
+        m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(30.0f);
 
         m_target = m_kart->getXYZ();
+        m_target.setZ(m_target.getZ()+0.75f);
 
         m_position.setX( sin(m_angle_around));
         m_position.setY(-cos(m_angle_around));
@@ -160,30 +163,31 @@ void Camera::update(float dt)
 
         break;
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
-        m_angle_around = m_kart->getHPR().getX() + (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
+        m_angle_around = m_kart->getHPR().getX() + m_rotation_range * (m_kart->getSteerPercent() / (m_kart->getSpeed() * 0.1f + 1));
         m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(20.0f);
-        
+
         m_target = m_kart->getXYZ();
+        m_target.setZ(m_target.getZ()+0.75f);
 
         m_position.setX( sin(m_angle_around));
         m_position.setY(-cos(m_angle_around));
         m_position.setZ(-sin(m_angle_up));
         m_position *= m_distance * 0.75f;
-        m_position += m_target;        
+        m_position += m_target;
 
         break;
     case CM_LEADER_MODE: // Follows the leader kart, higher off of the ground, further from the kart,
-                         // and turns in the opposite direction from the kart for a nice effect. :) 
+                         // and turns in the opposite direction from the kart for a nice effect. :)
         m_angle_around = RaceManager::getKart(0)->getHPR().getX();
         m_angle_up     = RaceManager::getKart(0)->getHPR().getY() + DEGREE_TO_RAD(40.0f);
-        
+
         m_target = RaceManager::getKart(0)->getXYZ();
 
         m_position.setX(sin(m_angle_around));
         m_position.setY(cos(m_angle_around));
         m_position.setZ(sin(m_angle_up));
         m_position *= m_distance * 2.0f;
-        m_position += m_target;       
+        m_position += m_target;
 
         break;
     case CM_FINAL:

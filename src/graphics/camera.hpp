@@ -60,6 +60,7 @@ protected:
     float       m_angle_around;     // Angle around the kart (should actually match the rotation of the kart)
     float       m_position_speed;   // The speed at which the camera changes position
     float       m_target_speed;     // The speed at which the camera changes targets
+    float       m_rotation_range;   // Factor of the effects of steering in camera aim
 
     float       m_x, m_y, m_w, m_h; 
 
