@@ -204,6 +204,7 @@ public:
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
+    float          getSkidding      () const {return m_skidding;}
     float          getMaxSteerAngle () const
                        {return m_kart_properties->getMaxSteerAngle(getSpeed());}
     const Vec3&    getGravityCenterShift   () const
