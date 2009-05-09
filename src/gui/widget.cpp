@@ -1073,6 +1073,30 @@ void RibbonGridWidget::addItem( std::string user_name, std::string code_name, st
     m_items.push_back(desc);
 }
 // -----------------------------------------------------------------------------
+void RibbonGridWidget::setSelection(int item_id)
+{    
+    setSelection(m_items[item_id].m_code_name);
+}
+void RibbonGridWidget::setSelection(const std::string& code_name)
+{
+    if(m_rows.size() > 1)
+    {
+        std::cout << "/!\\ Warning, RibbonGridWidget::setSelection only makes sense on 1-row ribbons (since there can't logically be a selection with more than one row)\n";
+    }
+    
+
+    // select the said item (mostly to get its ID)
+    RibbonWidget* ribbon = m_rows.get(0);
+    ribbon->select(code_name);
+    
+    // scroll so selection is visible
+    m_scroll_offset = ribbon->m_selection;
+    updateItemDisplay();
+    
+    // set selection again, because scrolling made it wrong
+    ribbon->select(code_name);
+}
+// -----------------------------------------------------------------------------
 void RibbonGridWidget::updateItemDisplay()
 {
     int icon_id = 0;

@@ -313,22 +313,64 @@ namespace StateManager
                     
                     static bool resolutions_inited = false;
                     
+                    // --- get resolution list from irrlicht the first time
                     if(!resolutions_inited)
                     {
-                        res->addItem("1280x1024","1280x1024","gui/screen54.png");   // 0
-                        res->addItem("800x600","800x600","gui/screen43.png");       // 1
-                        res->addItem("1024x768","1024x768","gui/screen43.png");     // 2
-                        res->addItem("1152x864","1152x864","gui/screen43.png");     // 3
-                        res->addItem("1280x960","1280x960","gui/screen43.png");     // 4
-                        res->addItem("1400x1050","1400x1050","gui/screen43.png");   // 5
-                        res->addItem("1280x800","1280x800","gui/screen1610.png");   // 6
-                        res->addItem("1440x900","1440x900","gui/screen1610.png");   // 7
-                        res->addItem("1680x1050","1680x1050","gui/screen1610.png"); // 8
-                        res->addItem("1920x1200","1920x1200","gui/screen1610.png"); // 9
-                        res->addItem("1280x768","1280x768","gui/screen53.png");     // 10
+                        const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
+                        const int amount = modes.size();
+                        for(int n=0; n<amount; n++)
+                        {
+                            const int w = modes[n].width;
+                            const int h = modes[n].height;
+                            const float ratio = (float)w / h;
+                            
+                            char name[32];
+                            sprintf( name, "%ix%i", w, h );
+                            
+#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
+                            
+                            if( ABOUT_EQUAL( ratio, (5.0f/4.0f) ) )
+                               res->addItem(name,name,"gui/screen54.png");
+                            else if( ABOUT_EQUAL( ratio, (4.0f/3.0f) ) )
+                                res->addItem(name,name,"gui/screen43.png");
+                            else if( ABOUT_EQUAL( ratio, (16.0f/10.0f) ) )
+                                res->addItem(name,name,"gui/screen1610.png");
+                            else if( ABOUT_EQUAL( ratio, (5.0f/3.0f) ) )
+                                res->addItem(name,name,"gui/screen53.png");
+                            else if( ABOUT_EQUAL( ratio, (3.0f/2.0f) ) )
+                                res->addItem(name,name,"gui/screen32.png");
+                            else
+                            {
+                                 std::cout << "Unknown screen size ratio : " << ratio << std::endl;
+                                 res->addItem(name,name,"gui/screen1610.png");
+                            }
+#undef ABOUT_EQUAL
+                        } // next resolution
+                        
                         resolutions_inited = true;
-                    }
+                    } // end if not inited
+                    
                     res->updateItemDisplay();
+                    
+                    // ---- select curernt resolution every time
+                    const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
+                    const int amount = modes.size();
+                    for(int n=0; n<amount; n++)
+                    {
+                        const int w = modes[n].width;
+                        const int h = modes[n].height;
+
+                        char name[32];
+                        sprintf( name, "%ix%i", w, h );
+                        
+                        if(w == user_config->m_width && h == user_config->m_height)
+                        {
+                            // that's the current one
+                            res->setSelection(n);
+                            break;
+                        }
+                    }  // end for
+
                 }
             }
             else if(screen_name == "options_input.stkgui")

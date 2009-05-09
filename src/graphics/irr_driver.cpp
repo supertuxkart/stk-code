@@ -65,17 +65,26 @@ void IrrDriver::initDevice()
 
     video::IVideoModeList* modes = m_device->getVideoModeList();
     const int count = modes->getVideoModeCount();
-    std::cout << "--------------\n  allowed modes  \n--------------\n";
-    std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
-    std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
+    //std::cout << "--------------\n  allowed modes  \n--------------\n";
+    //std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
+    //std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
 
-    std::cout << "Found " << count << " valid modes\n";
+    //std::cout << "Found " << count << " valid modes\n";
     for(int i=0; i<count; i++)
     {
-        std::cout <<
-        "bits : " << modes->getVideoModeDepth(i) <<
-        " resolution=" << modes->getVideoModeResolution(i).Width <<
-        "x" << modes->getVideoModeResolution(i).Height << std::endl;
+        // only consider 32-bit resolutions for now
+        if(modes->getVideoModeDepth(i) == 32)
+        {
+            VideoMode mode;
+            mode.width = modes->getVideoModeResolution(i).Width;
+            mode.height = modes->getVideoModeResolution(i).Height;
+            m_modes.push_back( mode );
+        }
+           
+        //std::cout <<
+        //"bits : " << modes->getVideoModeDepth(i) <<
+        //" resolution=" << modes->getVideoModeResolution(i).Width <<
+        //"x" << modes->getVideoModeResolution(i).Height << std::endl;
     }
     m_device->closeDevice();
     
@@ -91,7 +100,7 @@ void IrrDriver::initDevice()
         : (driver_type==1 
            ? video::EDT_DIRECT3D9 
            : video::EDT_DIRECT3D8);
-        // Try 32 and 16 bit per pixels
+        // Try 32 and, upon failure, 16 bit per pixels
         for(int bits=32; bits>15; bits -=16) 
         {
             m_device = createDevice(type,

@@ -240,10 +240,10 @@ namespace GUIEngine
         
         int getSelection() const { return m_selection; }
         void setSelection(const int i) { m_selection = i; updateSelection(); }
+        void select(std::string item);
         
         RibbonType getRibbonType() const { return m_ribbon_type; }
         const std::string& getSelectionName() { return m_children[m_selection].m_properties[PROP_ID]; }
-        void select(std::string item);
         void setLabel(const int id, std::string new_name);
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
@@ -302,6 +302,8 @@ namespace GUIEngine
         bool mouseHovered(Widget* child);
         
         const std::string& getSelectionName();
+        void setSelection(int item_id);
+        void setSelection(const std::string& code_name);
     };
 
     class ModelViewWidget : public Widget

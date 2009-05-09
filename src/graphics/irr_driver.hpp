@@ -26,6 +26,11 @@
 #include "irrlicht.h"
 using namespace irr;
 
+struct VideoMode
+{
+    int width, height;
+};
+
 class IrrDriver : public IEventReceiver
 {
 private:
@@ -39,11 +44,14 @@ private:
     irr::gui::IGUIFont         *m_race_font;
 
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
+    std::vector<VideoMode> m_modes;
 
 public:
                           IrrDriver();
                          ~IrrDriver();
     void                 initDevice();
+    
+    const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     
     IrrlichtDevice       *getDevice()       const { return m_device;        }
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
