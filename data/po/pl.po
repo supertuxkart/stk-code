@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart 0.6_PL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-13 15:03+1100\n"
+"POT-Creation-Date: 2009-01-19 03:13+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Patryk Wychowaniec <patryk1303@gmail.com>\n"
 "Language-Team: LambdaSoft <patryk1303@gmail.com>\n"
@@ -17,7 +17,7 @@ msgstr ""
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d Zablokowany"
 
-#: src/modes/world.cpp:413
+#: src/modes/world.cpp:418
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -87,14 +87,14 @@ msgstr "Na końcu świata"
 msgid "Avoid bananas"
 msgstr "Unikaj bananów"
 
-#: src/gui/grand_prix_ending.cpp:138
 #: src/gui/race_results_gui.cpp:70
+#: src/gui/grand_prix_ending.cpp:138
 msgid "Back to the main menu"
 msgstr "Powrót do głównego menu"
 
-#: src/gui/help_page_one.cpp:153
 #: src/gui/help_page_three.cpp:87
 #: src/gui/help_page_two.cpp:131
+#: src/gui/help_page_one.cpp:153
 msgid "Back to the menu"
 msgstr "Powrót do menu"
 
@@ -201,8 +201,8 @@ msgid "Connected:"
 msgstr "Połączony:"
 
 #: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:134
 #: src/gui/race_results_gui.cpp:59
+#: src/gui/grand_prix_ending.cpp:134
 msgid "Continue"
 msgstr "Kontynuuj"
 
@@ -210,8 +210,8 @@ msgstr "Kontynuuj"
 msgid "Continue Grand Prix"
 msgstr "Kontynuuj grand prix"
 
-#: data/tracks/beach/beach.track:5
-#: data/tracks/lighthouse/lighthouse.track:5
+#: data/tracks/beach/beach.track:6
+#: data/tracks/lighthouse/lighthouse.track:6
 msgid ""
 "Created by Ingo Ruhnke,\n"
 "modified by M. Gagnon"
@@ -219,9 +219,9 @@ msgstr ""
 "Stworzone przez Ingo Ruhnke,\n"
 "zmodyfikowane przez M. Gagnona"
 
-#: data/tracks/fortmagma/fortmagma.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:6
+#: data/tracks/sandtrack/sandtrack.track:6
+#: data/tracks/fortmagma/fortmagma.track:6
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
@@ -259,7 +259,7 @@ msgstr "Wyświetlanie"
 msgid "Display Settings"
 msgstr "Ustawienia wyświetlania"
 
-#: src/gui/race_options.cpp:326
+#: src/gui/race_options.cpp:328
 msgid "Driver"
 msgstr "Pół-ekspert"
 
@@ -400,8 +400,8 @@ msgstr "Pomoc stylów gry"
 msgid "Game modes"
 msgstr "Style gry"
 
-#: src/gui/challenges_menu.cpp:55
 #: src/gui/credits_menu.cpp:79
+#: src/gui/challenges_menu.cpp:55
 msgid "Go back to the main menu"
 msgstr "Powrót de menu głównego"
 
@@ -428,8 +428,8 @@ msgstr ""
 "przez jazdę na kilku trasach.\n"
 "Gracz z największą ilością punktów wygrywa."
 
-#: src/gui/main_menu.cpp:75
 #: src/gui/race_menu.cpp:49
+#: src/gui/main_menu.cpp:75
 msgid "Help"
 msgstr "Pomoc"
 
@@ -447,14 +447,14 @@ msgstr ""
 
 #: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
-msgstr "Zmniejsz rozdzielczość"
+msgstr "Zwiększ rozdzielczość"
 
 #: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Zły"
 
-#: src/karts/player_kart.cpp:365
+#: src/karts/player_kart.cpp:368
 msgid "Invalid short-cut!!"
 msgstr "Zły skrót!!"
 
@@ -517,7 +517,7 @@ msgstr ""
 "'%s'\n"
 "już dostępny!"
 
-#: src/modes/linear_world.cpp:286
+#: src/modes/linear_world.cpp:290
 msgid "New fastest lap"
 msgstr "Najszybsze okrążenie!"
 
@@ -553,8 +553,8 @@ msgstr ""
 "'%s'\n"
 "już dostępna!"
 
-#: src/gui/help_page_one.cpp:156
 #: src/gui/help_page_two.cpp:134
+#: src/gui/help_page_one.cpp:156
 msgid "Next >"
 msgstr "Dalej >"
 
@@ -571,8 +571,8 @@ msgstr "Nitro"
 msgid "No Grand Prix selected"
 msgstr "Nie wybrano grand prix"
 
-#: src/gui/race_options.cpp:325
-#: src/gui/race_options.cpp:328
+#: src/gui/race_options.cpp:327
+#: src/gui/race_options.cpp:330
 msgid "Novice"
 msgstr "Nowicjusz"
 
@@ -601,9 +601,9 @@ msgstr "Klasa Matematyczna Olivera"
 msgid "On the Beach"
 msgstr "Na plaży"
 
-#: src/gui/main_menu.cpp:63
-#: src/gui/options.cpp:40
 #: src/gui/race_menu.cpp:48
+#: src/gui/options.cpp:40
+#: src/gui/main_menu.cpp:63
 msgid "Options"
 msgstr "Opcje"
 
@@ -673,16 +673,16 @@ msgstr "Prechistoryczna Wyspa"
 msgid "Press <ESC> to Cancel"
 msgstr "Naciśnij <ESC>, aby anulować"
 
-#: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:108
-#: src/gui/config_sound.cpp:64
-#: src/gui/game_mode.cpp:158
-#: src/gui/grand_prix_select.cpp:80
-#: src/gui/network_gui.cpp:79
 #: src/gui/num_players.cpp:46
-#: src/gui/options.cpp:58
 #: src/gui/player_controls.cpp:124
 #: src/gui/race_options.cpp:152
+#: src/gui/config_controls.cpp:53
+#: src/gui/config_display.cpp:108
+#: src/gui/options.cpp:58
+#: src/gui/grand_prix_select.cpp:80
+#: src/gui/network_gui.cpp:79
+#: src/gui/game_mode.cpp:158
+#: src/gui/config_sound.cpp:64
 msgid "Press <ESC> to go back"
 msgstr "Naciśnij <ESC>, aby powrócić"
 
@@ -715,13 +715,13 @@ msgstr "Powtórz wyścig"
 msgid "Race results"
 msgstr "Wyniki wyścigu"
 
-#: src/gui/race_options.cpp:327
+#: src/gui/race_options.cpp:329
 msgid "Racer"
 msgstr "Ekspert"
 
 #: data/tracks/racetrack/racetrack.track:4
 msgid "Racetrack"
-msgstr "Trawa wyścigowa"
+msgstr "Trasa wyścigowa"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/gui/race_gui.cpp:816
@@ -809,7 +809,7 @@ msgstr "Podzielony ekran"
 
 #: data/tracks/startrack/startrack.track:4
 msgid "Star Track"
-msgstr "Zacznij trasę"
+msgstr "Trasa gwiazd"
 
 #: src/gui/race_options.cpp:142
 msgid "Start race"
@@ -864,7 +864,7 @@ msgstr "Trzecie grand prix"
 
 #: src/gui/num_players.cpp:40
 msgid "Three Players"
-msgstr "Trzech graczy"
+msgstr "3 graczy"
 
 #: src/gui/game_mode.cpp:72
 #: src/gui/game_mode.cpp:110
@@ -909,11 +909,11 @@ msgstr "Autostrada Tuxa"
 
 #: src/gui/num_players.cpp:39
 msgid "Two Players"
-msgstr "Dwóch graczy"
+msgstr "2 graczy"
 
-#: src/modes/linear_world.cpp:654
+#: src/modes/linear_world.cpp:658
 msgid "WRONG WAY!"
-msgstr "!ZŁA DROGA!"
+msgstr "ZŁA DROGA!"
 
 #: src/gui/char_sel.cpp:126
 #: src/gui/network_gui.cpp:162
@@ -1013,17 +1013,17 @@ msgstr "Okno"
 msgid "XR591"
 msgstr "XR591"
 
-#: src/karts/player_kart.cpp:303
+#: src/karts/player_kart.cpp:306
 msgid "You finished the race!"
 msgstr "Ukończyłeś wyścig!"
 
-#: src/modes/world.cpp:408
+#: src/modes/world.cpp:413
 msgid ""
 "You have been\n"
 "eliminated!"
 msgstr "Zostałeś wyeliminowany!"
 
-#: src/karts/player_kart.cpp:303
+#: src/karts/player_kart.cpp:306
 msgid "You won the race!"
 msgstr "Wygrałeś wyścig!"
 

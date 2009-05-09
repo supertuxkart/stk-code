@@ -668,7 +668,6 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
     
 }
 
-
 #if 0
 #pragma mark -
 #pragma mark irrlicht skin functions
