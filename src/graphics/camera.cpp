@@ -145,6 +145,8 @@ void Camera::setInitialTransform()
 //-----------------------------------------------------------------------------
 void Camera::update(float dt)
 {
+    const Track* track=RaceManager::getTrack();
+
     // Each case should set m_target and m_position according to what is needed for that mode.
     // Yes, there is a lot of duplicate code but it is (IMHO) much easier to follow this way.
     switch(m_mode)
@@ -194,7 +196,17 @@ void Camera::update(float dt)
 
         break;
     case CM_FINAL:
-        // TODO: Implement
+        if(!track->hasFinalCamera())
+        {
+            m_mode = CM_NORMAL;
+            break;
+        }
+        m_position = track->getCameraPosition();
+        m_target.setX(-sin( track->getCameraHPR().getX() ) );
+        m_target.setY( cos( track->getCameraHPR().getX() ) );
+        m_target.setZ( sin( track->getCameraHPR().getY() ) );
+        m_target *= 10.0f;
+        m_target += m_position;
         break;
     case CM_SIMPLE_REPLAY:
         // TODO: Implement
