@@ -109,6 +109,13 @@ void Moveable::update(float dt)
     m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*getTrans().getBasis();
     m_hpr.setHPR(m_transform.getBasis());
+    // roll is not set correctly, I assume due to a different HPR order.
+    // So we compute the proper roll (by taking the angle between the up
+    // vector and the rotated up vector).
+    Vec3 up(0,0,1);
+    Vec3 roll_vec = m_transform.getBasis()*up;
+    float roll = atan2(roll_vec.getX(), roll_vec.getZ());
+    m_hpr.setRoll(roll);
 
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;
