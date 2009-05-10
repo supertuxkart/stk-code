@@ -65,43 +65,43 @@ void IrrDriver::initDevice()
 
     video::IVideoModeList* modes = m_device->getVideoModeList();
     const int count = modes->getVideoModeCount();
-    //std::cout << "--------------\n  allowed modes  \n--------------\n";
-    //std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
-    //std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
+    std::cout << "--------------\n  allowed modes  \n--------------\n";
+    std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
+    std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
 
-    //std::cout << "Found " << count << " valid modes\n";
+    std::cout << "Found " << count << " valid modes\n";
     for(int i=0; i<count; i++)
     {
         // only consider 32-bit resolutions for now
-        if(modes->getVideoModeDepth(i) == 32)
+        if(modes->getVideoModeDepth(i) >= 24)
         {
             VideoMode mode;
             mode.width = modes->getVideoModeResolution(i).Width;
             mode.height = modes->getVideoModeResolution(i).Height;
             m_modes.push_back( mode );
         }
-           
-        //std::cout <<
-        //"bits : " << modes->getVideoModeDepth(i) <<
-        //" resolution=" << modes->getVideoModeResolution(i).Width <<
-        //"x" << modes->getVideoModeResolution(i).Height << std::endl;
+
+        std::cout <<
+        "bits : " << modes->getVideoModeDepth(i) <<
+        " resolution=" << modes->getVideoModeResolution(i).Width <<
+        "x" << modes->getVideoModeResolution(i).Height << std::endl;
     }
     m_device->closeDevice();
-    
+
     // ------------
-    
+
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {
         // FIXME: directX+SLD is not supported anyway - so we could
         // remove support for this here anyway.
-        video::E_DRIVER_TYPE type = driver_type==0 
-        ? video::EDT_OPENGL 
-        : (driver_type==1 
-           ? video::EDT_DIRECT3D9 
+        video::E_DRIVER_TYPE type = driver_type==0
+        ? video::EDT_OPENGL
+        : (driver_type==1
+           ? video::EDT_DIRECT3D9
            : video::EDT_DIRECT3D8);
         // Try 32 and, upon failure, 16 bit per pixels
-        for(int bits=32; bits>15; bits -=16) 
+        for(int bits=32; bits>15; bits -=8)
         {
             m_device = createDevice(type,
                                     core::dimension2d<s32>(user_config->m_width,
@@ -121,9 +121,9 @@ void IrrDriver::initDevice()
         fprintf(stderr, "Couldn't initialise irrlicht device. Quitting.\n");
         exit(-1);
     }
-    
+
     m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
- 
+
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
@@ -144,18 +144,18 @@ void toggleFullscreen(bool resetTextures)
 
      if(user_config->m_fullscreen)
      {
-     
+
      if(StateManager::isGameState())
      showPointer();
-     
+
      // Store settings in user config file in case new video mode
      // causes a crash
-     user_config->m_crashed = true; //set flag. 
+     user_config->m_crashed = true; //set flag.
      user_config->saveConfig();
      }
      else if(StateManager::isGameState())
      hidePointer();
-     
+
      // setVideoMode(resetTextures);
 
 }   // toggleFullscreen
@@ -165,8 +165,8 @@ void toggleFullscreen(bool resetTextures)
 /** Sets the video mode. If 8 bit colours are not supported, 5 bits are used;
  *  and if this doesn't work, alpha is disabled, too - before giving up. So
  *  STK should now work with 16 bit windows.
- *  \param resetTextures Forces all textures to be reloaded after a change of 
- *                       resolution. Necessary with windows and Macs OpenGL 
+ *  \param resetTextures Forces all textures to be reloaded after a change of
+ *                       resolution. Necessary with windows and Macs OpenGL
  *                       versions.
  */
 /*
@@ -180,30 +180,30 @@ void toggleFullscreen(bool resetTextures)
  // that all models have to be reloaded. So first, free all textures,
  // models, then reload the textures from materials.dat, then reload
  // all models, textures etc.
- 
+
  // startScreen             -> removeTextures();
  attachment_manager      -> removeTextures();
  projectile_manager      -> removeTextures();
  item_manager            -> removeTextures();
  kart_properties_manager -> removeTextures();
  powerup_manager         -> removeTextures();
- 
+
  material_manager->reInit();
- 
- 
+
+
  powerup_manager         -> loadPowerups();
  kart_properties_manager -> loadKartData();
  item_manager            -> loadDefaultItems();
  projectile_manager      -> loadData();
  attachment_manager      -> loadModels();
- 
+
  //        startScreen             -> installMaterial();
- 
+
  //FIXME: the font reinit funcs should be inside the font class
  //Reinit fonts
  delete_fonts();
  init_fonts();
- 
+
  //TODO: this function probably will get deleted in the future; if
  //so, the widget_manager.hpp include has no other reason to be here.
  //widget_manager->reloadFonts();
@@ -235,7 +235,7 @@ void IrrDriver::changeResolution()
                                                                 user_config->m_prev_width,
                                                                 user_config->m_prev_height) );
     m_device->getVideoDriver()->endScene();
-    
+
     // startScreen             -> removeTextures();
     attachment_manager      -> removeTextures();
     projectile_manager      -> removeTextures();
@@ -243,31 +243,31 @@ void IrrDriver::changeResolution()
     kart_properties_manager -> removeTextures();
     powerup_manager         -> removeTextures();
     GUIEngine::free();
-    
+
     m_device->closeDevice();
     m_device->drop();
     initDevice();
-    
+
     material_manager->reInit();
-    
+
     powerup_manager         -> loadPowerups();
     kart_properties_manager -> loadKartData();
     item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();
     attachment_manager      -> loadModels();
-    
+
     //FIXME: the font reinit funcs should be inside the font class
     //Reinit fonts
     delete_fonts();
     init_fonts();
-    
+
     //void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
     //void free();
     StateManager::initGUI();
     //GUIEngine::init();
     GUIEngine::reshowCurrentScreen();
         //        startScreen             -> installMaterial();
-    
+
 }
 // ----------------------------------------------------------------------------
 /** Loads an animated mesh and returns a pointer to it.
@@ -327,7 +327,7 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
                                            float wave_length)
 {
     return m_scene_manager->addWaterSurfaceSceneNode(mesh,
-                                                     wave_height, wave_speed, 
+                                                     wave_height, wave_speed,
                                                      wave_length);
 }   // addWaterNode
 
@@ -438,26 +438,26 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
  *  \param texture: Texture for the dome.
  *  \param horiRes: Number of vertices of a horizontal layer of the sphere.
  *  \param vertRes: Number of vertices of a vertical layer of the sphere.
- *  \param texturePercentage: How much of the height of the texture is used. 
+ *  \param texturePercentage: How much of the height of the texture is used.
  *         Should be between 0 and 1.
- *  \param spherePercentage: How much of the sphere is drawn. Value should be 
- *          between 0 and 2, where 1 is an exact half-sphere and 2 is a full 
+ *  \param spherePercentage: How much of the sphere is drawn. Value should be
+ *          between 0 and 2, where 1 is an exact half-sphere and 2 is a full
  *          sphere.
  */
-scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name, 
-                                         int hori_res, int vert_res, 
-                                         float texture_percent, 
+scene::ISceneNode *IrrDriver::addSkyDome(const std::string &texture_name,
+                                         int hori_res, int vert_res,
+                                         float texture_percent,
                                          float sphere_percent)
 {
     ITexture *texture = getTexture(texture_name);
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
-                                                texture_percent, 
+                                                texture_percent,
                                                 sphere_percent);
 }   // addSkyDome
 
 // ----------------------------------------------------------------------------
 /** Adds a skybox using. Irrlicht documentation:
- *  A skybox is a big cube with 6 textures on it and is drawn around the camera 
+ *  A skybox is a big cube with 6 textures on it and is drawn around the camera
  *  position.
  *  \param top: Texture for the top plane of the box.
  *  \param bottom: Texture for the bottom plane of the box.
@@ -495,7 +495,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename)
 
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
- *  \param light The colour of the light to set. 
+ *  \param light The colour of the light to set.
  */
 void IrrDriver::setAmbientLight(const video::SColor &light)
 {
@@ -567,7 +567,7 @@ void IrrDriver::update(float dt)
         m_scene_manager->drawAll();
         GUIEngine::render(dt);
     }
-    
+
     m_device->getVideoDriver()->endScene();
 }   // update
 
@@ -575,7 +575,7 @@ void IrrDriver::update(float dt)
 // Irrlicht Event handler.
 bool IrrDriver::OnEvent(const irr::SEvent &event)
 {
-    switch (event.EventType) 
+    switch (event.EventType)
     {
     case   irr::EET_KEY_INPUT_EVENT: {
         printf("key input event\n");
@@ -590,7 +590,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
               // Ignore 'normal' messages
               if(event.LogEvent.Level>0)
               {
-                  printf("Level %d: %s\n", 
+                  printf("Level %d: %s\n",
                          event.LogEvent.Level,event.LogEvent.Text);
               }
               return true;
