@@ -59,37 +59,42 @@ IrrDriver::~IrrDriver()
 
 void IrrDriver::initDevice()
 {
-    // -----------
-    // attempt to detect available video modes. fails miserably for the moment, please test on other platforms...
-    m_device = createDevice(EDT_NULL);
+    static bool firstTime = true;
 
-    video::IVideoModeList* modes = m_device->getVideoModeList();
-    const int count = modes->getVideoModeCount();
-    std::cout << "--------------\n  allowed modes  \n--------------\n";
-    std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
-    std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
-
-    std::cout << "Found " << count << " valid modes\n";
-    for(int i=0; i<count; i++)
+    // ---- the first time, get a list of available video modes
+    if(firstTime)
     {
-        // only consider 32-bit resolutions for now
-        if(modes->getVideoModeDepth(i) >= 24)
+        m_device = createDevice(EDT_NULL);
+        
+        video::IVideoModeList* modes = m_device->getVideoModeList();
+        const int count = modes->getVideoModeCount();
+        std::cout << "--------------\n  allowed modes  \n--------------\n";
+        std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
+        std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
+        
+        std::cout << "Found " << count << " valid modes\n";
+        for(int i=0; i<count; i++)
         {
-            VideoMode mode;
-            mode.width = modes->getVideoModeResolution(i).Width;
-            mode.height = modes->getVideoModeResolution(i).Height;
-            m_modes.push_back( mode );
+            // only consider 32-bit resolutions for now
+            if(modes->getVideoModeDepth(i) >= 24)
+            {
+                VideoMode mode;
+                mode.width = modes->getVideoModeResolution(i).Width;
+                mode.height = modes->getVideoModeResolution(i).Height;
+                m_modes.push_back( mode );
+            }
+            
+            std::cout <<
+            "bits : " << modes->getVideoModeDepth(i) <<
+            " resolution=" << modes->getVideoModeResolution(i).Width <<
+            "x" << modes->getVideoModeResolution(i).Height << std::endl;
         }
-
-        std::cout <<
-        "bits : " << modes->getVideoModeDepth(i) <<
-        " resolution=" << modes->getVideoModeResolution(i).Width <<
-        "x" << modes->getVideoModeResolution(i).Height << std::endl;
-    }
-    m_device->closeDevice();
-
-    // ------------
-
+        m_device->closeDevice();
+        
+        firstTime = false;
+    } // end if firstTime
+    
+    // ---- open device
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {

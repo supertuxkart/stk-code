@@ -27,6 +27,7 @@ Screen::Screen(const char* file)
     this->m_filename = file;
     m_loaded = false;
     loadFromFile();
+    m_inited = false;
 }
 
 #if 0

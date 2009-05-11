@@ -70,13 +70,12 @@ namespace StateManager
      */
     void menuEventKarts(Widget* widget, std::string& name)
     {
-        static bool karts_menu_inited = false;
-        if(name == "init" /*&& !karts_menu_inited*/)
+        if(name == "init")
         {
             RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
             assert( w != NULL );
 
-            if(!karts_menu_inited)
+            if(!getCurrentScreen()->m_inited)
             {
                 w->addItem("Gnu","k1","gui/gnu.png");
                 w->addItem("Wilber","k2","gui/gnu.png");
@@ -86,7 +85,7 @@ namespace StateManager
                 w->addItem("Sushi","k6","gui/gnu.png");
                 w->addItem("Nolok","k7","gui/gnu.png");
                 w->addItem("Mozilla","k8","gui/gnu.png");
-                karts_menu_inited = true;
+                getCurrentScreen()->m_inited = true;
             }
             w->updateItemDisplay();
 
@@ -108,7 +107,9 @@ namespace StateManager
             //test->setMaterialFlag(EMF_LIGHTING , false);
 
             w3->setModel(test);
-        }
+            
+            getCurrentScreen()->m_inited = true;
+        } // end if init
         // TODO - actually check which kart was selected
         else if(name == "karts")
         {
@@ -207,13 +208,12 @@ namespace StateManager
      */
     void menuEventTracks(Widget* widget, std::string& name)
     {
-        static bool track_menu_inited = false;
         if(name == "init")
         {
             RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("tracks");
             assert( w != NULL );
 
-            if(!track_menu_inited)
+            if(!getCurrentScreen()->m_inited)
             {
                 w->addItem("Track 1","t1","gui/track1.png");
                 w->addItem("Track 2","t2","gui/track2.png");
@@ -223,7 +223,7 @@ namespace StateManager
                 w->addItem("Track 6","t6","gui/track6.png");
                 w->addItem("Track 7","t7","gui/track7.png");
                 w->addItem("Track 8","t8","gui/track8.png");
-                track_menu_inited = true;
+                getCurrentScreen()->m_inited = true;
             }
             w->updateItemDisplay();
 
@@ -270,7 +270,7 @@ namespace StateManager
         if(name == "init")
         {
             const std::string& screen_name = getCurrentScreen()->getName();
-
+            
             RibbonWidget* ribbon = getCurrentScreen()->getWidget<RibbonWidget>("options_choice");
             if(ribbon != NULL)
             {
@@ -293,7 +293,6 @@ namespace StateManager
                 assert(gauge != NULL);
                 gauge->setValue( sound_manager->getMasterMusicVolume()*10.f );
 
-
                 // ---- music volume
                 CheckBoxWidget* sfx = getCurrentScreen()->getWidget<CheckBoxWidget>("sfx_enabled");
 
@@ -313,10 +312,8 @@ namespace StateManager
                     assert( full != NULL );
                     full->setState( user_config->m_fullscreen );
 
-                    static bool resolutions_inited = false;
-
                     // --- get resolution list from irrlicht the first time
-                    if(!resolutions_inited)
+                    if(!getCurrentScreen()->m_inited)
                     {
                         const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
                         const int amount = modes.size();
@@ -344,12 +341,12 @@ namespace StateManager
                             else
                             {
                                  std::cout << "Unknown screen size ratio : " << ratio << std::endl;
+                                // FIXME - do something better than showing a random icon
                                  res->addItem(name,name,"gui/screen1610.png");
                             }
 #undef ABOUT_EQUAL
                         } // next resolution
 
-                        resolutions_inited = true;
                     } // end if not inited
 
                     res->updateItemDisplay();
@@ -382,8 +379,7 @@ namespace StateManager
                 RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
                 assert( devices != NULL );
 
-                static bool devices_inited = false;
-                if(!devices_inited)
+                if(!getCurrentScreen()->m_inited)
                 {
                     devices->addItem("Keyboard","keyboard","gui/keyboard.png");
 
@@ -397,10 +393,11 @@ namespace StateManager
                         devices->addItem(name,internal_name,"gui/gamepad.png");
                     }
 
-                    devices_inited = true;
                 }
                 devices->updateItemDisplay();
             }
+            
+            getCurrentScreen()->m_inited;
         } // end init
 
         // -- options

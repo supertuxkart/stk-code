@@ -36,11 +36,18 @@ namespace GUIEngine
         // current mouse position, read-only...
         int m_mouse_x, m_mouse_y;
         
+        /** this variable is not used by the Screen object itself; it's the routines creating
+          * screens that may use it to perform some operations only once. initialized to false.
+          */
+        bool m_inited;
+        
         Screen(const char* filename);
         bool operator ==(const char* filename) const { return m_filename == filename; }
         
+        /** returns an object by name, or NULL if not found */
         Widget* getWidget(const char* name);
         
+        /** returns an object by name, casted to specified type, or NULL if not found/wrong type */
         template <typename T> T* getWidget(const char* name)
         {
             return dynamic_cast<T*>( getWidget(name) );
