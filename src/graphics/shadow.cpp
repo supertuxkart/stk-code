@@ -18,11 +18,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/ssg.h>
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "shadow.hpp"
 
+#ifndef HAVE_IRRLICHT
 ssgTransform* createShadow( const std::string& name,
                             float x1, float x2, float y1, float y2 )
 {
@@ -49,16 +49,14 @@ ssgTransform* createShadow( const std::string& name,
 
     result -> setName ( "Shadow" ) ;
 
-#ifndef HAVE_IRRLICHT
     ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
     // FIXME LEAK: va, na, ta, and ca are most likely leaked, since plib
     // will mark them as 'not owned' and therefore not free them!
     gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
     gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
     result -> addKid ( gs ) ;
-#endif
 
     return result;
 }
-
+#endif
 /* EOF */

@@ -22,8 +22,6 @@
 
 #include <string>
 #include <vector>
-#define _WINSOCKAPI_
-#include "plib/ssg.h"
 
 #include "race_manager.hpp"
 #include "karts/kart_model.hpp"
@@ -90,14 +88,14 @@ private:
                                            kart length. */
           m_max_radius;               /**< Largest turn radius. */
 
-    ssgEntity  *m_wheel_model[4];      /**< The four wheel models.           */
+    //ssgEntity  *m_wheel_model[4];      /**< The four wheel models.           */
     std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */
                                        /**  Radius of the graphical wheels.  */
     float       m_wheel_graphics_radius[4];  
-    ssgTransform 
-               *m_wheel_transform[4];  /**< The transform for the wheels, used
-                                        *   to rotate the wheels and display
-                                        *   the suspension in the race.      */
+    //ssgTransform 
+    //           *m_wheel_transform[4];  /**< The transform for the wheels, used
+    //                                    *   to rotate the wheels and display
+    //                                    *   the suspension in the race.      */
     float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */

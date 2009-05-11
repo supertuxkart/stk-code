@@ -27,6 +27,8 @@ Nitro::Nitro(Kart* kart)
         : ParticleSystem(200, 0.0f, true, 0.5f),
         m_kart(kart)
 {
+#ifndef HAVE_IRRLICHT
+    
 #ifdef DEBUG
     setName("nitro");
 #endif
@@ -53,13 +55,13 @@ Nitro::Nitro(Kart* kart)
     m_nitro_fire->ref();
 
     setState(m_nitro_fire);
-
+#endif
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
 Nitro::~Nitro()
 {
-    ssgDeRefDelete(m_nitro_fire);
+    //ssgDeRefDelete(m_nitro_fire);
 }   // ~Nitro
 
 //-----------------------------------------------------------------------------
@@ -71,6 +73,7 @@ void Nitro::update(float t)
 //-----------------------------------------------------------------------------
 void Nitro::particle_create(int, Particle *p)
 {
+#ifndef HAVE_IRRLICHT
     sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
     sgSetVec3(p->m_vel, 0, 0, 0 );
     sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
@@ -84,14 +87,17 @@ void Nitro::particle_create(int, Particle *p)
     p->m_vel[0] += 2*cos(DEGREE_TO_RAD(rand()% 180));
     p->m_vel[1] += 2*sin(DEGREE_TO_RAD(rand()% 180));
     p->m_vel[2] = 0;
+#endif
 }   // particle_create
 
 //-----------------------------------------------------------------------------
 void Nitro::particle_update(float delta, int,
                             Particle * particle)
 {
+#ifndef HAVE_IRRLICHT
     particle->m_size    -= delta*.2f;
     particle->m_col[3]  -= delta * 2.0f;
+#endif
 }  // particle_update
 
 

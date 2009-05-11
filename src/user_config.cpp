@@ -25,6 +25,10 @@
 #include <sstream>
 #include <string>
 
+// ul.h includes windows.h, so this define is necessary
+#define _WINSOCKAPI_
+#include <plib/ul.h>
+
 // for mkdir:
 #if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
@@ -32,9 +36,6 @@
 #else
 #  include <direct.h>
 #endif
-
-#define _WINSOCKAPI_
-#include <plib/ul.h>
 
 #include "stk_config.hpp"
 //#include "actionmap.hpp"

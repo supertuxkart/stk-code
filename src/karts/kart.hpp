@@ -21,8 +21,6 @@
 #ifndef HEADER_KART_HPP
 #define HEADER_KART_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 #include "btBulletDynamicsCommon.h"
 
 #include "items/attachment.hpp"

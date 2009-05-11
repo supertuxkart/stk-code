@@ -29,7 +29,7 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 
-static ssgSelector *find_selector ( ssgBranch *b );
+//static ssgSelector *find_selector ( ssgBranch *b );
 
 ProjectileManager *projectile_manager=0;
 
@@ -77,7 +77,9 @@ void ProjectileManager::cleanup()
     for(Explosions::iterator i  = m_active_explosions.begin();
         i != m_active_explosions.end(); ++i)
     {
+#ifndef HAVE_IRRLICHT
         stk_scene->remove((ssgTransform*)*i);
+#endif
         //ssgDeRefDelete(*i);
     }
     m_active_explosions.clear();
@@ -216,6 +218,7 @@ Explosion* ProjectileManager::newExplosion(const Vec3& coord, const int explosio
 /** A general function which is only needed here, but
  *  it's not really a method, so I'll leave it here.
  */
+/*
 static ssgSelector *find_selector ( ssgBranch *b )
 {
     if ( b == NULL )
@@ -237,3 +240,4 @@ static ssgSelector *find_selector ( ssgBranch *b )
 
     return NULL ;
 }   // find_selector
+*/

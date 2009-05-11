@@ -21,8 +21,6 @@
 #define HEADER_WORLD_HPP
 
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 
 #include "highscores.hpp"
 #include "karts/kart.hpp"

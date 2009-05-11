@@ -22,8 +22,6 @@
 
 #include <set>
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"

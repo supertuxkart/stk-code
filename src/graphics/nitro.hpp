@@ -20,8 +20,6 @@
 #ifndef HEADER_NITRO_HPP
 #define HEADER_NITRO_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 #include "particle_system.hpp"
 
 class Kart;
@@ -32,7 +30,7 @@ private:
     /** The kart to which this smoke belongs. */
     Kart           *m_kart;
     /** The texture to use. */
-    ssgSimpleState *m_nitro_fire;
+    //ssgSimpleState *m_nitro_fire;
 
 public:
                  Nitro          (Kart* kart);

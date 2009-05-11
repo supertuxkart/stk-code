@@ -150,7 +150,7 @@ void SFXManager::loadSfx()
 // based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
 bool loadVorbisBuffer(const char *name, ALuint buffer)
 {
-    bool success = FALSE;
+    bool success = false;
     FILE *file;
     vorbis_info *info;
     OggVorbis_File oggFile;
@@ -187,7 +187,7 @@ bool loadVorbisBuffer(const char *name, ALuint buffer)
                 }
                 
                 alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, data, len, info->rate);
-                success = TRUE;
+                success = true;
                 
                 free(data);
             }

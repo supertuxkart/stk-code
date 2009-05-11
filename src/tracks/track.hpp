@@ -27,8 +27,7 @@
 #  endif
 #  include <GL/gl.h>
 #endif
-#include <plib/sg.h>
-#include <plib/ssg.h>
+
 #include "irrlicht.h"
 using namespace irr;
 #include <string>
@@ -138,9 +137,9 @@ public:
      *  to widen the road (to make shortcut detection less severe). */
     std::vector<Vec3>    m_dl_with_tolerance_left;
     std::vector<Vec3>    m_dl_with_tolerance_right;
-    std::vector<SGfloat> m_distance_from_start;
-    std::vector<SGfloat> m_path_width;
-    std::vector<SGfloat> m_angle;
+    std::vector<float>   m_distance_from_start;
+    std::vector<float>   m_path_width;
+    std::vector<float>   m_angle;
     
     /** Start positions for arenas (unused in linear races) */
     std::vector<Vec3>   m_start_positions;
@@ -211,7 +210,7 @@ public:
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
-    const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
+    const std::vector<float>& getWidth   () const {return m_path_width;         }
     const std::string& getItemStyle   () const {return m_item_style;      }
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}
@@ -223,12 +222,13 @@ public:
     void               createPhysicsModel();
     void               update(float dt);
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+    /*
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {
         glVertex2f(
             x_offset+(v[0]-m_driveline_min[0])*m_scale_x,
             y_offset+(v[1]-m_driveline_min[1])*m_scale_y);
-    }
+    }*/
 
 private:
     void  loadTrack(const std::string &filename);

@@ -98,7 +98,7 @@ private:
     gui::IGUIImage     **m_icons;
     gui::IGUIImage      *m_attachment_icon;
 #endif
-    ulClock        m_fps_timer;
+    //ulClock        m_fps_timer;
     int            m_fps_counter;
     char           m_fps_string[10];
     const char    *m_pos_string [11];

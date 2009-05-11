@@ -16,8 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 #include "material_manager.hpp"
 #include "material.hpp"
 #include "camera.hpp"
@@ -31,23 +29,23 @@
 
 Scene *stk_scene = 0;
 
-Scene::Scene() : m_scenegraph(new ssgRoot)
+Scene::Scene() //: m_scenegraph(new ssgRoot)
 {
 }
 
 //-----------------------------------------------------------------------------
 Scene::~Scene ()
 {
-    delete m_scenegraph;
+    // delete m_scenegraph;
 }
 
 //-----------------------------------------------------------------------------
 void Scene::clear ()
 {
-    if(m_scenegraph != 0)
-    {
-        m_scenegraph->removeAllKids();
-    }
+//    if(m_scenegraph != 0)
+//    {
+//        m_scenegraph->removeAllKids();
+//    }
 
     for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
         delete *i;
@@ -67,6 +65,7 @@ Camera *Scene::createCamera(int playerId, const Kart* kart)
 }
 
 //-----------------------------------------------------------------------------
+/*
 void Scene::add(ssgEntity *kid)
 {
     m_scenegraph->addKid( kid );
@@ -76,7 +75,7 @@ void Scene::add(ssgEntity *kid)
 void Scene::remove(ssgEntity *kid)
 {
     m_scenegraph->removeKid( kid );
-}
+}*/
 
 //-----------------------------------------------------------------------------
 void Scene::reset()

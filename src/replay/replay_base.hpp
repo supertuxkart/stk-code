@@ -24,7 +24,6 @@
 
 
 #include <string>
-#include <plib/sg.h>
 
 #include "replay_buffers.hpp"
 

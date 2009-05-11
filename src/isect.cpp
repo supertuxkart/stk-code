@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <plib/ssg.h>
+#if 0
 #include "isect.hpp"
 
 float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal)
@@ -58,4 +58,5 @@ float getHeightAndNormal(ssgBranch* branch, sgVec3 my_position, sgVec3 normal)
 
     return hot ;
 }
+#endif
 

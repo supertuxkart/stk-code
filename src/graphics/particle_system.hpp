@@ -21,8 +21,6 @@
 #ifndef PARTICLE_SYSTEM_HPP
 #define PARTICLE_SYSTEM_HPP
 
-#include <plib/ssg.h>
-
 /** This is basically the ssgaParticle, but this implementation supports
  *  methods to be used to create, update and delete the objects instead
  *  of function pointer as the original plib.
@@ -31,10 +29,10 @@ class Particle
 {
 public:
 
-    sgVec4 m_col ;
-    sgVec3 m_pos ;
-    sgVec3 m_vel ;
-    sgVec3 m_acc ;
+    //sgVec4 m_col ;
+    //sgVec3 m_pos ;
+    //sgVec3 m_vel ;
+    //sgVec3 m_acc ;
 
     float m_size ;
 
@@ -43,17 +41,17 @@ public:
 
     void update ( float dt )
     {
-        sgAddScaledVec3 ( m_vel, m_acc, dt ) ;
-        sgAddScaledVec3 ( m_pos, m_vel, dt ) ;
+        //sgAddScaledVec3 ( m_vel, m_acc, dt ) ;
+        //sgAddScaledVec3 ( m_pos, m_vel, dt ) ;
         m_time_to_live -= dt ;
     }
 
     Particle ()
     {
-        sgSetVec4 ( m_col, 1, 1, 1, 1 ) ;
-        sgZeroVec3 ( m_pos ) ;
-        sgZeroVec3 ( m_vel ) ;
-        sgZeroVec3 ( m_acc ) ;
+        //sgSetVec4 ( m_col, 1, 1, 1, 1 ) ;
+        //sgZeroVec3 ( m_pos ) ;
+        //sgZeroVec3 ( m_vel ) ;
+        //sgZeroVec3 ( m_acc ) ;
         m_time_to_live = 0 ;
         m_user_data = 0 ;
         m_size = 1.0f ;
@@ -67,7 +65,7 @@ public:
  *  of function pointer as the original plib.
  */
 
-class ParticleSystem : public ssgVtxTable
+class ParticleSystem //: public ssgVtxTable
 {
     int m_num_particles  ;
     int m_num_verts      ;

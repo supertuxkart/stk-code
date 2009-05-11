@@ -20,8 +20,6 @@
 #ifndef HEADER_SMOKE_H
 #define HEADER_SMOKE_H
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 #include "particle_system.hpp"
 
 class Kart;
@@ -32,7 +30,7 @@ private:
     /** The kart to which this smoke belongs. */
     Kart           *m_kart;
     /** The texture to use. */
-    ssgSimpleState *m_smokepuff;
+    //ssgSimpleState *m_smokepuff;
 public:
                  Smoke          (Kart* kart);
                 ~Smoke          ();

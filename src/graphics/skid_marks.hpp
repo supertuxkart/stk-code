@@ -21,8 +21,6 @@
 #define HEADER_SKID_MARK_HPP
 
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 
 #include "utils/vec3.hpp"
 
@@ -45,7 +43,7 @@ private:
                 /** Initial alpha value. */
     static const float m_start_alpha;
 
-    class SkidMarkQuads : public ssgVtxTable
+    class SkidMarkQuads //: public ssgVtxTable
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines
@@ -58,8 +56,10 @@ private:
          *  approximate this by maintaining an axis-aligned boundary box. */
         Vec3        m_aabb_min, m_aabb_max;
     public:
+        #ifndef HAVE_IRRLICHT
             SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
                            ssgSimpleState *state, float z_offset);
+#endif
         void recalcBSphere();
         void add          (const Vec3 &left,
                            const Vec3 &right);
@@ -69,7 +69,7 @@ private:
     /** Two skidmark objects for the left and right wheel. */
     std::vector <SkidMarkQuads *> m_left, m_right;
     /** The state for colour etc. */
-    ssgSimpleState               *m_skid_state;
+    //ssgSimpleState               *m_skid_state;
     static float m_avoid_z_fighting;
 public:
          SkidMarks(const Kart& kart, float width=0.2f);

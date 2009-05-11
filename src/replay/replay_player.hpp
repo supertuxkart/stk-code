@@ -23,8 +23,6 @@
 #ifdef HAVE_GHOST_REPLAY
 
 #include <vector>
-#include <plib/ssg.h>
-
 #include "replay_base.hpp"
 
 

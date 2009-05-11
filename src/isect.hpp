@@ -20,6 +20,7 @@
 #ifndef HEADER_ISECT_H
 #define HEADER_ISECT_H
 
+/*
 class ssgBranch;
 
 
@@ -29,7 +30,9 @@ inline float getHeight(ssgBranch* branch, sgVec3 my_position)
 {
     return getHeightAndNormal(branch, my_position, 0);
 }
+*/
 
 #endif
+
 
 /* EOF */

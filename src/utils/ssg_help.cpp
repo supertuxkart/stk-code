@@ -21,6 +21,9 @@
 #include "utils/ssg_help.hpp"
 
 #include <iostream>
+
+#if 0
+
 #include <plib/ssg.h>
 
 namespace SSGHelp
@@ -172,4 +175,5 @@ namespace SSGHelp
     }   // Minmax
 
 }   // namespace SSGHelp
+#endif
 /* EOF */

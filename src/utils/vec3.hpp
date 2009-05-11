@@ -21,8 +21,7 @@
 #include "irrlicht.h"
 using namespace irr;
 #endif
-#define _WINSOCKAPI_
-#include <plib/sg.h>
+
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
@@ -47,7 +46,7 @@ public:
      */
     inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Z, v.Y) {}
 #endif
-    inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
+    //inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     inline Vec3()                          : btVector3()                 {}
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}

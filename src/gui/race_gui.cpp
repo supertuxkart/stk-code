@@ -102,9 +102,9 @@ RaceGUI::RaceGUI()
     
     m_fps_counter = 0;
     m_fps_string[0]=0;
-    m_fps_timer.reset();
-    m_fps_timer.update();
-    m_fps_timer.setMaxDelta(1000);
+    //m_fps_timer.reset();
+    //m_fps_timer.update();
+    //m_fps_timer.setMaxDelta(1000);
 
 }   // RaceGUI
 
@@ -117,8 +117,9 @@ RaceGUI::~RaceGUI()
 //-----------------------------------------------------------------------------
 void RaceGUI::resetFPSCounter()
 {
-    m_fps_timer.reset();
-    m_fps_timer.setMaxDelta(1000);
+    // TODO - FPS
+    //m_fps_timer.reset();
+    //m_fps_timer.setMaxDelta(1000);
     m_fps_counter=0;
 }
 //-----------------------------------------------------------------------------
@@ -134,6 +135,8 @@ void RaceGUI::update(float dt)
 //-----------------------------------------------------------------------------
 void RaceGUI::drawFPS ()
 {
+    // TODO
+    /*
     if (++m_fps_counter>=50)
     {
         m_fps_timer.update();
@@ -143,6 +146,7 @@ void RaceGUI::drawFPS ()
         m_fps_timer.setMaxDelta(1000);
     }
     font_race->PrintShadow(m_fps_string,48, 0, user_config->m_height-50);
+     */
 }   // drawFPS
 
 //-----------------------------------------------------------------------------
@@ -189,6 +193,8 @@ void RaceGUI::drawMap ()
 	const Vec3& xyz = kart->getXYZ();
 
         /* If it's a player, draw a bigger sign */
+        // TODO
+        /*
         if (kart -> isPlayerKart ())
         {
             RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop+3);
@@ -203,6 +209,7 @@ void RaceGUI::drawMap ()
             RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop-1);
             RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop-1);
         }
+         */
     }
 
     glEnd () ;

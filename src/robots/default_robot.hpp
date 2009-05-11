@@ -20,6 +20,10 @@
 #define HEADER_DEFAULT_H
 
 #include "karts/auto_kart.hpp"
+#include "utils/vec3.hpp"
+
+/* third coord won't be used */
+typedef Vec3 Vec2;
 
 class Track;
 class LinearWorld;
@@ -102,7 +106,7 @@ private:
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
     int   m_future_sector;
-    sgVec2 m_future_location;
+    Vec2 m_future_location;
 
     float m_time_till_start; //Used to simulate a delay at the start of the
                              //race, since human players don't accelerate
@@ -163,10 +167,10 @@ private:
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const sgVec2 point, float dt);
+    float steerToPoint(const Vec2 point, float dt);
 
-    void  checkCrashes(const int STEPS, const Vec3& pos);
-    void  findNonCrashingPoint(sgVec2 result);
+    void  checkCrashes(const int STEPS, const Vec2& pos);
+    void  findNonCrashingPoint(Vec2 result);
 
     float normalizeAngle(float angle);
     int   calcSteps();

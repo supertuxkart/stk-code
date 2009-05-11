@@ -184,7 +184,7 @@ World::~World()
         delete m_physics;
 
     sound_manager -> stopMusic();
-
+/*
     sgVec3 sun_pos;
     sgVec4 ambient_col, specular_col, diffuse_col;
     sgSetVec3 ( sun_pos, 0.0f, 0.0f, 1.0f );
@@ -196,6 +196,7 @@ World::~World()
     ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffuse_col ) ;
     ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
+ */
 }   // ~World
 //-----------------------------------------------------------------------------
 void World::terminateRace()

@@ -2824,6 +2824,12 @@
 				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = (
+					"-L/usr/local/lib",
+					"-lopenal",
+					"-lvorbisfile",
+					"-lvorbis",
+					"-logg",
+					"-lintl",
 					"-lplibjs",
 					"-lplibsl",
 					"-lplibssg",
@@ -2832,12 +2838,6 @@
 					"-lplibsg",
 					"-lplibul",
 					"-lplibssgaux",
-					"-L/usr/local/lib",
-					"-lopenal",
-					"-lvorbisfile",
-					"-lvorbis",
-					"-logg",
-					"-lintl",
 				);
 				PRODUCT_NAME = SuperTuxKart;
 				SDKROOT = "";

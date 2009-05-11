@@ -27,24 +27,24 @@
 #include "utils/vec3.hpp"
 
 ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
-        : ssgVtxTable(GL_QUADS,
-                      new ssgVertexArray  (num*4, new sgVec3[num*4] ),
-                      new ssgNormalArray  (num*4, new sgVec3[num*4] ),
-                      new ssgTexCoordArray(num*4, new sgVec2[num*4] ),
-                      new ssgColourArray  (num*4, new sgVec4[num*4] )
-                     )
+      //  : ssgVtxTable(GL_QUADS,
+      //                new ssgVertexArray  (num*4, new sgVec3[num*4] ),
+      //                new ssgNormalArray  (num*4, new sgVec3[num*4] ),
+       //               new ssgTexCoordArray(num*4, new sgVec2[num*4] ),
+       //               new ssgColourArray  (num*4, new sgVec4[num*4] )
+        //             )
                      //FIXME LEAK: these arrays are never freed!
 {
 #ifdef DEBUG
-    setName("particle-system");
+    //setName("particle-system");
 #endif
     m_turn_to_face = ttf;
     m_create_error = 0 ;
     m_create_rate  = create_rate;
     m_size         = sz;
 
-    bsphere.setRadius(100);  // a better value is computed in update
-    bsphere.setCenter(0, 0, 0);
+    //bsphere.setRadius(100);  // a better value is computed in update
+    //bsphere.setCenter(0, 0, 0);
 
     m_num_particles = num ;
     m_num_verts     = num * 4 ;
@@ -55,21 +55,21 @@ ParticleSystem::ParticleSystem ( int num, float create_rate, int ttf, float sz)
 
     for ( i = 0 ; i < m_num_verts ; i++ )
     {
-        sgSetVec3 (getNormal(i), 0, -1, 0   );
-        sgSetVec4 (getColour(i), 1, 1, 1, 1 );
-        sgZeroVec3(getVertex(i)             );
+        //sgSetVec3 (getNormal(i), 0, -1, 0   );
+        //sgSetVec4 (getColour(i), 1, 1, 1, 1 );
+        //sgZeroVec3(getVertex(i)             );
   }
 
   for ( i = 0 ; i < m_num_particles ; i++ )
   {
-    sgSetVec2(getTexCoord(i*4+0), 0, 0 );
-    sgSetVec2(getTexCoord(i*4+1), 1, 0 );
-    sgSetVec2(getTexCoord(i*4+2), 1, 1 );
-    sgSetVec2(getTexCoord(i*4+3), 0, 1 );
+    //sgSetVec2(getTexCoord(i*4+0), 0, 0 );
+    //sgSetVec2(getTexCoord(i*4+1), 1, 0 );
+    //sgSetVec2(getTexCoord(i*4+2), 1, 1 );
+    //sgSetVec2(getTexCoord(i*4+3), 0, 1 );
   }
 
   m_num_active = 0 ;
-  stk_scene->add(this);
+  //stk_scene->add(this);
 }   // ParticleSystem
 
 //-----------------------------------------------------------------------------
@@ -87,13 +87,14 @@ void ParticleSystem::init(int initial_num)
  */
 void ParticleSystem::recalcBSphere()
 {
-    bsphere.setRadius( 1000.0f );
-    bsphere.setCenter( 0, 0, 0 );
+    //bsphere.setRadius( 1000.0f );
+    //bsphere.setCenter( 0, 0, 0 );
 }   // recalcBSphere
 
 //-----------------------------------------------------------------------------
 void ParticleSystem::draw_geometry ()
 {
+#ifndef HAVE_IRRLICHT
     sgVec3 nxny, xxny, xxyy, nxyy ;
 
     float SZ = m_size / 2.0f ;
@@ -159,6 +160,7 @@ void ParticleSystem::draw_geometry ()
         glDepthMask ( 1 ) ;
         glEnable ( GL_CULL_FACE ) ;
     }
+#endif
 }   // draw_geometry
 
 //-----------------------------------------------------------------------------
@@ -173,6 +175,7 @@ ParticleSystem::~ParticleSystem ()
 //-----------------------------------------------------------------------------
 void ParticleSystem::update ( float t )
 {
+#ifndef HAVE_IRRLICHT
     int i ;
 
     m_create_error += m_create_rate * t ;
@@ -233,6 +236,7 @@ void ParticleSystem::update ( float t )
     // add the size of the actual quad to the radius on both ends
     bsphere.setRadius((diameter*0.5f+2*m_size)*1.733f);   // 1.733 approx. sqrt(3)
     bsphere_is_invalid = 0;
+#endif
 }   // update
 
 /* EOF */

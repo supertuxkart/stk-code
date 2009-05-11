@@ -35,14 +35,15 @@
 /** Simple shadow class, only used here for default items. */
 class Shadow
 {
-    ssgBranch *sh ;
+    //ssgBranch *sh ;
 
 public:
-    Shadow ( float x1, float x2, float y1, float y2 ) ;
-    ssgEntity *getRoot () { return sh ; }
+    Shadow ( float x1, float x2, float y1, float y2 ) { /* TODO */ }
+   // ssgEntity *getRoot () { return sh ; }
 }
 ;   // Shadow
 
+#if 0
 //-----------------------------------------------------------------------------
 Shadow::Shadow ( float x1, float x2, float y1, float y2 )
 {
@@ -78,7 +79,7 @@ Shadow::Shadow ( float x1, float x2, float y1, float y2 )
     sh -> addKid ( gs ) ;
     sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
 }   // Shadow
-
+#endif
 //=============================================================================
 ItemManager* item_manager;
 

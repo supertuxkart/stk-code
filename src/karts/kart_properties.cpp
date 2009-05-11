@@ -21,7 +21,6 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <plib/ssg.h>
 #include "material_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
@@ -186,7 +185,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("shadow-file",                m_shadow_file);
     lisp->get("rgb",                        m_color);
 
-    lisp->get("engine-power",               m_engine_power);
+    lisp->get("engine-power",               m_engine_power, 3);
     lisp->get("time-full-steer",            m_time_full_steer);
     lisp->get("time-full-steer-ai",         m_time_full_steer_ai);
     lisp->get("brake-factor",               m_brake_factor);
@@ -240,7 +239,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
     lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
     lisp->get("max-speed-reverse-ratio",   m_max_speed_reverse_ratio  );
-    lisp->get("max-speed",                 m_max_speed                );
+    lisp->get("max-speed",                 m_max_speed, 3             );
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );

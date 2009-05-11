@@ -39,7 +39,7 @@ void Vec3::setHPR(const btMatrix3x3& m)
 
     setY(asin(CLAMPTO1(m.getRow(2).getY())));
 
-    SGfloat cp = cos(getY());
+    float cp = cos(getY());
 
     /* If pointing nearly vertically up - then heading is ill-defined */
 

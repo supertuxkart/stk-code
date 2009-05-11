@@ -29,8 +29,7 @@
 //won't be erased the next time the function is called.
 #define SHOW_NON_CRASHING_POINT //If defined, draws a green sphere where the
 //n farthest non-crashing point is.
-#define _WINSOCKAPI_
-#include <plib/ssgAux.h>
+
 #endif
 
 #include "default_robot.hpp"
@@ -192,7 +191,7 @@ void DefaultRobot::update(float dt)
                                     / (getSpeed()-m_kart_ahead->getSpeed());
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
-            float steer_angle = steerToPoint(m_kart_ahead->getXYZ().toFloat(), 
+            float steer_angle = steerToPoint(m_kart_ahead->getXYZ(), 
                                              dt);
             setSteering(steer_angle, dt);
             commands_set = true;
@@ -368,7 +367,7 @@ void DefaultRobot::handleSteering(float dt)
         {
         case FT_FAREST_POINT:
             {
-                sgVec2 straight_point;
+                Vec2 straight_point;
                 findNonCrashingPoint( straight_point );
                 steer_angle = steerToPoint(straight_point, dt);
             }
@@ -737,7 +736,7 @@ float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
  *  \param point Point to steer towards.
  *  \param dt    Time step.
  */
-float DefaultRobot::steerToPoint(const sgVec2 point, float dt)
+float DefaultRobot::steerToPoint(const Vec2 point, float dt)
 {
     // No sense steering if we are not driving.
     if(getSpeed()==0) return 0.0f;
@@ -876,8 +875,7 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
         scene->add( sphere );
 #endif
 
-        m_future_location[0] = step_coord[0]; 
-        m_future_location[1] = step_coord[1];
+        m_future_location = Vec3( step_coord[0], step_coord[1], 0 );
 
         if( m_sector == Track::UNKNOWN_SECTOR )
         {
@@ -901,7 +899,7 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
  *  the two edges of the track is closest to the next curve after wards,
  *  and return the position of that edge.
  */
-void DefaultRobot::findNonCrashingPoint( sgVec2 result )
+void DefaultRobot::findNonCrashingPoint( Vec2 result )
 {
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
     
@@ -948,7 +946,8 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f > m_track->getWidth()[sector] )
             {
-                sgCopyVec2( result, m_track->m_driveline[sector] );
+                result = m_track->m_driveline[sector];
+                //sgCopyVec2( result, m_track->m_driveline[sector] );
 
 #ifdef SHOW_NON_CRASHING_POINT
                 ssgaSphere *sphere = new ssgaSphere;
@@ -990,8 +989,7 @@ void DefaultRobot::reset()
     m_inner_curve                = 0;
     m_curve_target_speed         = getMaxSpeedOnTerrain();
     m_curve_angle                = 0.0;
-    m_future_location[0]         = 0.0;
-    m_future_location[1]         = 0.0;
+    m_future_location            = Vec3( 0.0, 0.0, 0.0 );
     m_future_sector              = 0;
     m_time_till_start            = -1.0f;
     m_crash_time                 = 0.0f;
@@ -1176,7 +1174,12 @@ void DefaultRobot::findCurve()
     for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
     {
         next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        total_dist += sgDistanceVec2(m_track->m_driveline[i], m_track->m_driveline[next_hint]);
+        
+        const int x_diff = m_track->m_driveline[i][0] - m_track->m_driveline[next_hint][0];
+        const int y_diff = m_track->m_driveline[i][1] - m_track->m_driveline[next_hint][1];
+        const float length_2d = sqrt( x_diff*x_diff + y_diff*y_diff );
+        
+        total_dist += length_2d;
     }
 
 

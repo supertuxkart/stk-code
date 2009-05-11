@@ -21,7 +21,7 @@
 #ifndef HEADER_SSG_HELP_H
 #define HEADER_SSG_HELP_H
 
-#include <plib/ssg.h>
+#if 0
 #include "vec3.hpp"
 
 namespace SSGHelp {
@@ -32,6 +32,7 @@ namespace SSGHelp {
     void          MinMax            (const ssgEntity *p,
                                      Vec3 *min, Vec3 *max);
 };   // namespace SSGHelp
+#endif
 #endif
 
 /* EOF */

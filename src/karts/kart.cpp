@@ -23,8 +23,6 @@
 #include <math.h>
 #include <iostream>
 
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
@@ -245,10 +243,10 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
     
-    if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
-    if(m_nitro)        ssgDeRefDelete(m_nitro);
+    //if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
+    //if(m_nitro)        ssgDeRefDelete(m_nitro);
 
-    ssgDeRefDelete(m_shadow);
+    //ssgDeRefDelete(m_shadow);
 
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -1012,9 +1010,9 @@ void Kart::loadData()
 
     // Attach Particle System
     m_smoke_system = new Smoke(this);
-    m_smoke_system->ref();
+    //m_smoke_system->ref();
     m_nitro = new Nitro(this);
-    m_nitro->ref();
+    //m_nitro->ref();
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);

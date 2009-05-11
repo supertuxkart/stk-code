@@ -23,14 +23,14 @@
 #include <vector>
 #include "LinearMath/btVector3.h"
 
-class ssgRoot;
-class ssgEntity;
+//class ssgRoot;
+//class ssgEntity;
 class Camera;
 class Kart;
 
 class Scene
 {
-    ssgRoot *m_scenegraph;
+   // ssgRoot *m_scenegraph;
     typedef std::vector<Camera*> Cameras;
     Cameras m_cameras;
 
@@ -41,8 +41,8 @@ public:
     ~Scene ();
     void reset();
 
-    void add(ssgEntity *kid);
-    void remove(ssgEntity *kid);
+    //void add(ssgEntity *kid);
+    //void remove(ssgEntity *kid);
     void draw(float dt);
 
     Camera *createCamera(int playerId, const Kart* kart);

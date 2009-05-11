@@ -28,6 +28,8 @@ Smoke::Smoke(Kart* kart)
         : ParticleSystem(200, 0.0f, true, 0.75f),
         m_kart(kart)
 {
+#ifndef HAVE_IRRLICHT
+    
 #ifdef DEBUG
     setName("smoke");
 #endif
@@ -54,13 +56,13 @@ Smoke::Smoke(Kart* kart)
     m_smokepuff->ref();
 
     setState(m_smokepuff);
-
+#endif
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
 Smoke::~Smoke()
 {
-    ssgDeRefDelete(m_smokepuff);
+    //ssgDeRefDelete(m_smokepuff);
 }   // ~Smoke
 //-----------------------------------------------------------------------------
 void Smoke::update(float t)
@@ -71,6 +73,7 @@ void Smoke::update(float t)
 //-----------------------------------------------------------------------------
 void Smoke::particle_create(int, Particle *p)
 {
+#ifndef HAVE_IRRLICHT
     sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
     sgSetVec3(p->m_vel, 0, 0, 0 );
     sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
@@ -88,13 +91,16 @@ void Smoke::particle_create(int, Particle *p)
     p->m_vel[2] += sin(DEGREE_TO_RAD(rand()%100));
 
     bsphere.setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
+#endif
 }   // particle_create
 
 //-----------------------------------------------------------------------------
 void Smoke::particle_update(float delta, int,
                             Particle * particle)
 {
+#ifndef HAVE_IRRLICHT
     particle->m_size    -= delta*.2f;
     particle->m_col[3]  -= delta * 2.0f;
+#endif
 }  // particle_update
 

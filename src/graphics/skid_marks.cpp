@@ -30,6 +30,7 @@ const float SkidMarks::m_start_alpha = 0.5f;
 /** Initialises empty skid marks. */
 SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 {
+#ifndef HAVE_IRRLICHT
     m_width        = width;
     m_skid_state   = new ssgSimpleState();
     m_skid_state->ref();
@@ -38,6 +39,7 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
     m_skid_state->setShininess(0.0f);
     m_skid_marking = false;
     m_current      = -1;
+#endif
 }   // SkidMark
 
 //-----------------------------------------------------------------------------
@@ -45,7 +47,7 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 SkidMarks::~SkidMarks()
 {
     reset();  // remove all skid marks
-    ssgDeRefDelete(m_skid_state);
+    //ssgDeRefDelete(m_skid_state);
 }   // ~SkidMarks
 
 //-----------------------------------------------------------------------------
@@ -55,8 +57,8 @@ void SkidMarks::reset()
 {
     for(unsigned int i=0; i<m_left.size(); i++)
     {
-        stk_scene->remove(m_left[i]);
-        stk_scene->remove(m_right[i]);
+        //stk_scene->remove(m_left[i]);
+        //stk_scene->remove(m_right[i]);
     }
     m_left.clear();
     m_right.clear();
@@ -71,6 +73,7 @@ void SkidMarks::reset()
  */
 void SkidMarks::update(float dt)
 {
+#ifndef HAVE_IRRLICHT
     float f = dt/stk_config->m_skid_fadeout_time;
     for(int i=0; i<m_current; i++)
     {
@@ -180,10 +183,11 @@ void SkidMarks::update(float dt)
 
 
     m_skid_marking = true;
-
+#endif
 }   // update
 
 //=============================================================================
+#ifndef HAVE_IRRLICHT
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
                                         ssgSimpleState *state, float z_offset)
         : ssgVtxTable(GL_QUAD_STRIP,
@@ -208,7 +212,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
     m_aabb_max = Vec3(-10000);
     add(left, right);
 }   // SkidMarkQuads
-
+#endif
 
 //-----------------------------------------------------------------------------
 /** Fades the current skid marks. 
@@ -216,31 +220,36 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
  */
 void SkidMarks::SkidMarkQuads::fade(float f)
 {
+#ifndef HAVE_IRRLICHT
     m_fade_out += f;
     // Only actually change the alpha value every 0.1. Otherwise we can't use
     // display lists, which makes skid marks too slow
     if(m_fade_out>0.1f)
     {
-        float *c=colours->get(0);
+        //float *c=colours->get(0);
         c[3] -= m_fade_out;
         if(c[3]<0.0f) c[3]=0.0f;
-        makeDList();
+        //makeDList();
         m_fade_out = 0.0f;
     }
+#endif
 }   // fade
 
 //-----------------------------------------------------------------------------
 void SkidMarks::SkidMarkQuads::recalcBSphere()
 {
+#ifndef HAVE_IRRLICHT
     Vec3 diff = m_aabb_max - m_aabb_min;
     bsphere.setRadius(diff.length()*0.5f);
     Vec3 center = (m_aabb_min + m_aabb_max)*0.5f;
     bsphere.setCenter(center.toFloat());
+#endif
 }   // recalcBSphere
 
 //-----------------------------------------------------------------------------
 void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
 {
+#ifndef HAVE_IRRLICHT
     // The skid marks must be raised slightly higher, otherwise it blends
     // too much with the track.
     sgVec3 l;
@@ -256,4 +265,5 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
     m_aabb_max.max(left);m_aabb_max.max(right);
 
     dirtyBSphere();
+#endif
 }   // add

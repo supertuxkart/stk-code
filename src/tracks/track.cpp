@@ -22,8 +22,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
-#define _WINSOCKAPI_
-#include <plib/ssgAux.h>
 #include "irrlicht.h"
 
 #include "stk_config.hpp"
@@ -47,6 +45,8 @@
 #include "race_manager.hpp"
 #include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
+
+#include <plib/ssg.h>
 
 const float Track::NOHIT           = -99999.9f;
 const int   Track::QUAD_TRI_NONE   = -1;
@@ -524,8 +524,9 @@ bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
 //-----------------------------------------------------------------------------
 void Track::addDebugToScene(int type) const
 {
-    if(type&1)
+    if(type & 1)
     {
+        /*
         ssgaSphere *sphere;
         sgVec3 center;
         sgVec4 colour;
@@ -549,10 +550,12 @@ void Track::addDebugToScene(int type) const
             sphere->setColour(colour);
             stk_scene->add(sphere);
         }   // for i
+         */
     }  /// type ==1
     // 2: drivelines, 4: driveline with tolerance
-    if(type&6)
+    if(type & 6)
     {
+        /*
         ssgVertexArray* v_array = new ssgVertexArray();
         ssgColourArray* c_array = new ssgColourArray();
         const std::vector<Vec3> &left  = type&2 ? m_left_driveline 
@@ -583,6 +586,7 @@ void Track::addDebugToScene(int type) const
                                          (ssgTexCoordArray*)NULL,
                                          c_array);
         stk_scene->add(l);
+         */
     }
 }   // addDebugToScene
 
