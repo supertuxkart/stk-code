@@ -40,6 +40,12 @@ namespace GUIEngine
         bool operator ==(const char* filename) const { return m_filename == filename; }
         
         Widget* getWidget(const char* name);
+        
+        template <typename T> T* getWidget(const char* name)
+        {
+            return dynamic_cast<T*>( getWidget(name) );
+        }
+        
         Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
         Widget* getWidget(const int id, ptr_vector<Widget>* within_vector=NULL);
         

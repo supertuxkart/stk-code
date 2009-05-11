@@ -93,14 +93,12 @@ void IrrDriver::initDevice()
     // Try different drivers: start with opengl, then DirectX
     for(int driver_type=0; driver_type<3; driver_type++)
     {
-        // FIXME: directX+SLD is not supported anyway - so we could
-        // remove support for this here anyway.
         video::E_DRIVER_TYPE type = driver_type==0
         ? video::EDT_OPENGL
         : (driver_type==1
            ? video::EDT_DIRECT3D9
            : video::EDT_DIRECT3D8);
-        // Try 32 and, upon failure, 16 bit per pixels
+        // Try 32 and, upon failure, 24 then 16 bit per pixels
         for(int bits=32; bits>15; bits -=8)
         {
             m_device = createDevice(type,
@@ -261,10 +259,7 @@ void IrrDriver::changeResolution()
     delete_fonts();
     init_fonts();
 
-    //void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
-    //void free();
     StateManager::initGUI();
-    //GUIEngine::init();
     GUIEngine::reshowCurrentScreen();
         //        startScreen             -> installMaterial();
 

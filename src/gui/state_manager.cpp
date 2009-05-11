@@ -18,6 +18,8 @@
 
 #include <vector>
 
+using namespace GUIEngine;
+
 /**
  * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
  */
@@ -32,12 +34,13 @@ static bool g_game_mode = false;
 namespace StateManager
 {
 
+    // -------------------------------------------------------------------------
     /**
      * Callback handling events from the main menu
      */
-    void menuEventMain(GUIEngine::Widget* widget, std::string& name)
+    void menuEventMain(Widget* widget, std::string& name)
     {
-        GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+        RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
         if(ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
         std::string selection = ribbon->getSelectionName().c_str();
 
@@ -61,15 +64,16 @@ namespace StateManager
         }
     }
 
+    // -------------------------------------------------------------------------
     /**
      * Callback handling events from the kart selection menu
      */
-    void menuEventKarts(GUIEngine::Widget* widget, std::string& name)
+    void menuEventKarts(Widget* widget, std::string& name)
     {
         static bool karts_menu_inited = false;
         if(name == "init" /*&& !karts_menu_inited*/)
         {
-            GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>(GUIEngine::getCurrentScreen()->getWidget("karts"));
+            RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
             assert( w != NULL );
 
             if(!karts_menu_inited)
@@ -86,16 +90,14 @@ namespace StateManager
             }
             w->updateItemDisplay();
 
-            GUIEngine::SpinnerWidget* w2 = dynamic_cast<GUIEngine::SpinnerWidget*>
-                                            (GUIEngine::getCurrentScreen()->getWidget("player"));
+            SpinnerWidget* w2 = getCurrentScreen()->getWidget<SpinnerWidget>("player");
             assert( w2 != NULL );
             w2->addLabel("Hiker");
             w2->addLabel("Auria");
             w2->addLabel("Conso");
             w2->addLabel("MiniBjorn");
 
-            GUIEngine::ModelViewWidget* w3 = dynamic_cast<GUIEngine::ModelViewWidget*>
-                                            (GUIEngine::getCurrentScreen()->getWidget("modelview"));
+            ModelViewWidget* w3 = getCurrentScreen()->getWidget<ModelViewWidget>("modelview");
 
             assert( w3 != NULL );
 
@@ -114,15 +116,15 @@ namespace StateManager
         }
     }
 
+    // -------------------------------------------------------------------------
     /**
      * Callback handling events from the race setup menu
      */
-    void menuEventRaceSetup(GUIEngine::Widget* widget, std::string& name)
+    void menuEventRaceSetup(Widget* widget, std::string& name)
     {
         if(name == "init")
         {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
-                                                (GUIEngine::getCurrentScreen()->getWidget("difficulty"));
+            RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("difficulty");
             assert( w != NULL );
             w->setSelection(user_config->getDefaultDifficulty());
 
@@ -132,7 +134,7 @@ namespace StateManager
         }
         else if(name == "difficulty")
         {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+            RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
             assert(w != NULL);
             const std::string& selection = w->getSelectionName();
 
@@ -146,7 +148,7 @@ namespace StateManager
         else if(name == "gamemode")
         {
             // TODO - detect more game modes
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+            RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
             if(w->getSelectionName() == "normal")
             {
                 StateManager::pushMenu("tracks.stkgui");
@@ -199,16 +201,16 @@ namespace StateManager
 
     }
 
+    // -------------------------------------------------------------------------
     /**
      * Callback handling events from the track menu
      */
-    void menuEventTracks(GUIEngine::Widget* widget, std::string& name)
+    void menuEventTracks(Widget* widget, std::string& name)
     {
         static bool track_menu_inited = false;
         if(name == "init")
         {
-            GUIEngine::RibbonGridWidget* w = dynamic_cast<GUIEngine::RibbonGridWidget*>
-                                                (GUIEngine::getCurrentScreen()->getWidget("tracks"));
+            RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("tracks");
             assert( w != NULL );
 
             if(!track_menu_inited)
@@ -229,7 +231,7 @@ namespace StateManager
         // -- track seelction screen
         if(name == "tracks")
         {
-            GUIEngine::RibbonGridWidget* w2 = dynamic_cast<GUIEngine::RibbonGridWidget*>(widget);
+            RibbonGridWidget* w2 = dynamic_cast<RibbonGridWidget*>(widget);
             if(w2 != NULL)
             {
                 std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
@@ -251,25 +253,25 @@ namespace StateManager
         }
         else if(name == "gps")
         {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>(widget);
+            RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
             if(w != NULL)
                 std::cout << "Clicked on GrandPrix " << w->getSelectionName().c_str() << std::endl;
         }
 
     }
 
+    // -------------------------------------------------------------------------
     /**
      * Callback handling events from the options menus
      */
-    void menuEventOptions(GUIEngine::Widget* widget, std::string& name)
+    void menuEventOptions(Widget* widget, std::string& name)
     {
         // -- init
         if(name == "init")
         {
-            const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+            const std::string& screen_name = getCurrentScreen()->getName();
 
-            GUIEngine::RibbonWidget* ribbon = dynamic_cast<GUIEngine::RibbonWidget*>
-                                            (GUIEngine::getCurrentScreen()->getWidget("options_choice"));
+            RibbonWidget* ribbon = getCurrentScreen()->getWidget<RibbonWidget>("options_choice");
             if(ribbon != NULL)
             {
                 if(screen_name == "options_av.stkgui") ribbon->select( "audio_video" );
@@ -281,35 +283,35 @@ namespace StateManager
             if(screen_name == "options_av.stkgui")
             {
                 // ---- sfx volume
-                GUIEngine::SpinnerWidget* gauge = dynamic_cast<GUIEngine::SpinnerWidget*>
-                        (GUIEngine::getCurrentScreen()->getWidget("sfx_volume"));
+                SpinnerWidget* gauge = getCurrentScreen()->getWidget<SpinnerWidget>("sfx_volume");
                 assert(gauge != NULL);
 
                 gauge->setValue( sfx_manager->getMasterSFXVolume()*10.0f );
 
 
-                gauge = dynamic_cast<GUIEngine::SpinnerWidget*>
-                        (GUIEngine::getCurrentScreen()->getWidget("music_volume"));
+                gauge = getCurrentScreen()->getWidget<SpinnerWidget>("music_volume");
                 assert(gauge != NULL);
                 gauge->setValue( sound_manager->getMasterMusicVolume()*10.f );
 
 
                 // ---- music volume
-                GUIEngine::CheckBoxWidget* sfx = dynamic_cast<GUIEngine::CheckBoxWidget*>
-                    (GUIEngine::getCurrentScreen()->getWidget("sfx_enabled"));
+                CheckBoxWidget* sfx = getCurrentScreen()->getWidget<CheckBoxWidget>("sfx_enabled");
 
-                GUIEngine::CheckBoxWidget* music = dynamic_cast<GUIEngine::CheckBoxWidget*>
-                    (GUIEngine::getCurrentScreen()->getWidget("music_enabled"));
+                CheckBoxWidget* music = getCurrentScreen()->getWidget<CheckBoxWidget>("music_enabled");
 
                 // ---- audio enables/disables
                 sfx->setState( user_config->doSFX() );
                 music->setState( user_config->doMusic() );
 
-                // ---- resolutinos
+                // ---- video modes
                 {
-                    GUIEngine::RibbonGridWidget* res = dynamic_cast<GUIEngine::RibbonGridWidget*>
-                        (GUIEngine::getCurrentScreen()->getWidget("resolutions"));
+                    RibbonGridWidget* res = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
                     assert( res != NULL );
+                    
+                    
+                    CheckBoxWidget* full = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
+                    assert( full != NULL );
+                    full->setState( user_config->m_fullscreen );
 
                     static bool resolutions_inited = false;
 
@@ -374,10 +376,10 @@ namespace StateManager
 
                 }
             }
+            // ---- init input options screen
             else if(screen_name == "options_input.stkgui")
             {
-                GUIEngine::RibbonGridWidget* devices = dynamic_cast<GUIEngine::RibbonGridWidget*>
-                (GUIEngine::getCurrentScreen()->getWidget("devices"));
+                RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
                 assert( devices != NULL );
 
                 static bool devices_inited = false;
@@ -404,7 +406,7 @@ namespace StateManager
         // -- options
         else if(name == "options_choice")
         {
-            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            std::string selection = ((RibbonWidget*)widget)->getSelectionName().c_str();
 
             if(selection == "audio_video") replaceTopMostMenu("options_av.stkgui");
             else if(selection == "players") replaceTopMostMenu("options_players.stkgui");
@@ -412,14 +414,7 @@ namespace StateManager
         }
         else if(name == "music_volume")
         {
-            /*
-            GUIEngine::GaugeWidget* w = dynamic_cast<GUIEngine::GaugeWidget*>(widget);
-            assert(w != NULL);
-
-            sound_manager->setMasterMusicVolume( w->getValue() );
-             */
-
-            GUIEngine::SpinnerWidget* w = dynamic_cast<GUIEngine::SpinnerWidget*>(widget);
+            SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
             assert(w != NULL);
 
             sound_manager->setMasterMusicVolume( w->getValue()/10.0f );
@@ -428,7 +423,7 @@ namespace StateManager
         {
             static SFXBase* sample_sound = NULL;
 
-            GUIEngine::SpinnerWidget* w = dynamic_cast<GUIEngine::SpinnerWidget*>(widget);
+            SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
             assert(w != NULL);
 
             if(sample_sound == NULL)
@@ -437,7 +432,6 @@ namespace StateManager
 
             sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
             user_config->m_sfx_volume = w->getValue()/10.0f;
-            // std::cout << "w->getValue()=" << w->getValue() << std::endl;
 
             // play a sample sound to show the user what this volume is like
             sample_sound->position ( Vec3(0,0,0) );
@@ -450,7 +444,7 @@ namespace StateManager
         }
         else if(name == "music_enabled")
         {
-            GUIEngine::CheckBoxWidget* w = dynamic_cast<GUIEngine::CheckBoxWidget*>(widget);
+            CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
             user_config->setMusic(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
 
@@ -461,33 +455,52 @@ namespace StateManager
         }
         else if(name == "sfx_enabled")
         {
-            GUIEngine::CheckBoxWidget* w = dynamic_cast<GUIEngine::CheckBoxWidget*>(widget);
+            CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
             user_config->setSFX(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
         }
         else if(name == "apply_resolution")
         {
+            using namespace GUIEngine;
+            
             user_config->m_prev_width = user_config->m_width;
             user_config->m_prev_height = user_config->m_height;
 
-            user_config->m_width = 800;
-            user_config->m_height = 480;
+            RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
+            assert(w1 != NULL);
+            
+            const std::string& res = w1->getSelectionName();
+            
+            int w = -1, h = -1;
+            if( sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1 )
+            {
+                std::cerr << "Failed to decode resolution : " << res.c_str() << std::endl;
+                return;
+            }
+            
+            CheckBoxWidget* w2 = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
+            assert(w2 != NULL);
+            
+            user_config->m_width = w;
+            user_config->m_height = h;
+            user_config->m_fullscreen = w2->getState();
             irr_driver->changeResolution();
         }
     }
 
+    // -----------------------------------------------------------------------------
     /**
      * Callback handling events from the options menus
      */
-    void menuEventHelp(GUIEngine::Widget* widget, std::string& name)
+    void menuEventHelp(Widget* widget, std::string& name)
     {
         if(name == "init")
         {
-            GUIEngine::RibbonWidget* w = dynamic_cast<GUIEngine::RibbonWidget*>
-            (GUIEngine::getCurrentScreen()->getWidget("category"));
+            RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("category");
+            
             if(w != NULL)
             {
-                const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+                const std::string& screen_name = getCurrentScreen()->getName();
                 if(screen_name == "help1.stkgui") w->select( "page1" );
                 else if(screen_name == "help2.stkgui") w->select( "page2" );
                 else if(screen_name == "help3.stkgui") w->select( "page3" );
@@ -496,7 +509,7 @@ namespace StateManager
         // -- options
         else if(name == "category")
         {
-            std::string selection = ((GUIEngine::RibbonWidget*)widget)->getSelectionName().c_str();
+            std::string selection = ((RibbonWidget*)widget)->getSelectionName().c_str();
 
             if(selection == "page1") replaceTopMostMenu("help1.stkgui");
             else if(selection == "page2") replaceTopMostMenu("help2.stkgui");
@@ -509,6 +522,7 @@ namespace StateManager
     }
 
 
+    // -------------------------------------------------------------------------
     /**
      * All widget events will be dispatched to this function; arguments are
      * a pointer to the widget from which the event originates, and its internal
@@ -516,11 +530,11 @@ namespace StateManager
      * name 'init' and widget set to NULL will be fired, so the screen can be filled
      * with the right values or so.
      */
-    void eventCallback(GUIEngine::Widget* widget, std::string& name)
+    void eventCallback(Widget* widget, std::string& name)
     {
         std::cout << "event!! " << name.c_str() << std::endl;
 
-        const std::string& screen_name = GUIEngine::getCurrentScreen()->getName();
+        const std::string& screen_name = getCurrentScreen()->getName();
 
         if( screen_name == "main.stkgui" )
             menuEventMain(widget, name);
@@ -548,7 +562,7 @@ namespace StateManager
     {
         IrrlichtDevice* device = irr_driver->getDevice();
         video::IVideoDriver* driver = device->getVideoDriver();
-        GUIEngine::init(device, driver, &eventCallback);
+        init(device, driver, &eventCallback);
     }
 
     void enterGameState()
@@ -556,7 +570,7 @@ namespace StateManager
         g_menu_stack.clear();
         g_menu_stack.push_back("race");
         g_game_mode = true;
-        GUIEngine::cleanForGame();
+        cleanForGame();
         input_manager->setMode(InputManager::INGAME);
     }
 
@@ -590,7 +604,7 @@ namespace StateManager
         input_manager->setMode(InputManager::MENU);
         g_menu_stack.push_back(name);
         g_game_mode = false;
-        GUIEngine::switchToScreen(name.c_str());
+        switchToScreen(name.c_str());
 
         eventCallback(NULL, g_init_event);
     }
@@ -599,14 +613,14 @@ namespace StateManager
         input_manager->setMode(InputManager::MENU);
         g_menu_stack[g_menu_stack.size()-1] = name;
         g_game_mode = false;
-        GUIEngine::switchToScreen(name.c_str());
+        switchToScreen(name.c_str());
 
         eventCallback(NULL, g_init_event);
     }
 
     void reshowTopMostMenu()
     {
-        GUIEngine::switchToScreen( g_menu_stack[g_menu_stack.size()-1].c_str() );
+        switchToScreen( g_menu_stack[g_menu_stack.size()-1].c_str() );
         eventCallback(NULL, g_init_event);
     }
 
@@ -623,7 +637,7 @@ namespace StateManager
         g_game_mode = g_menu_stack[g_menu_stack.size()-1] == "race";
 
         std::cout << "-- switching to screen " << g_menu_stack[g_menu_stack.size()-1].c_str() << std::endl;
-        GUIEngine::switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str());
+        switchToScreen(g_menu_stack[g_menu_stack.size()-1].c_str());
 
         eventCallback(NULL, g_init_event);
     }
@@ -636,7 +650,7 @@ namespace StateManager
         g_menu_stack.push_back(name);
         g_game_mode = false;
         sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
-        GUIEngine::switchToScreen(name.c_str());
+        switchToScreen(name.c_str());
         eventCallback(NULL, g_init_event);
     }
 

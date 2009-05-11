@@ -1141,7 +1141,8 @@ void RibbonGridWidget::updateItemDisplay()
 // -----------------------------------------------------------------------------
 const std::string& RibbonGridWidget::getSelectionName()
 {
-    RibbonWidget* row = (RibbonWidget*)getSelectedRibbon();
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+
     if(row != NULL) return row->getSelectionName();
 
     static const std::string nothing = "";
