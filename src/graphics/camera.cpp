@@ -167,6 +167,20 @@ void Camera::update(float dt)
         m_position += m_target;
 
         break;
+    case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
+        m_angle_around = m_kart->getHPR().getX() - m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
+        m_angle_up     = m_kart->getHPR().getY() + DEGREE_TO_RAD(30.0f);      
+
+        m_target = m_kart->getXYZ();
+        m_target.setZ(m_target.getZ()+0.75f);
+
+        m_position.setX(-sin(m_angle_around));
+        m_position.setY( cos(m_angle_around));
+        m_position.setZ( sin(m_angle_up));
+        m_position *= m_distance * 2.0f;
+        m_position += m_target;
+
+        break;
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
         m_angle_around = m_kart->getHPR().getX() + m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
         m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(20.0f);
@@ -177,7 +191,7 @@ void Camera::update(float dt)
         m_position.setX( sin(m_angle_around));
         m_position.setY(-cos(m_angle_around));
         m_position.setZ(-sin(m_angle_up));
-        m_position *= m_distance * 0.75f;
+        m_position *= m_distance * 0.5f;
         m_position += m_target;
 
         break;

@@ -36,7 +36,8 @@ class Camera
 public:
     enum Mode {
         CM_NORMAL,        // Normal camera mode
-        CM_CLOSEUP,       // Normal camera, closer to kart
+        CM_CLOSEUP,       // Closer to kart
+        CM_REVERSE,       // Looking backwards
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
         CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY

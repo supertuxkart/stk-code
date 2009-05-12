@@ -256,6 +256,15 @@ void PlayerKart::update(float dt)
             Kart::beep();
     }
 
+    if(m_controls.m_look_back)
+    {
+        m_camera->setMode(Camera::CM_REVERSE);
+    }
+    else
+    {
+        m_camera->setMode(Camera::CM_NORMAL);
+    }
+
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
