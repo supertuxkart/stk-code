@@ -286,12 +286,12 @@ namespace StateManager
                 SpinnerWidget* gauge = getCurrentScreen()->getWidget<SpinnerWidget>("sfx_volume");
                 assert(gauge != NULL);
 
-                gauge->setValue( sfx_manager->getMasterSFXVolume()*10.0f );
+                gauge->setValue( (int)(sfx_manager->getMasterSFXVolume()*10.0f) );
 
 
                 gauge = getCurrentScreen()->getWidget<SpinnerWidget>("music_volume");
                 assert(gauge != NULL);
-                gauge->setValue( sound_manager->getMasterMusicVolume()*10.f );
+                gauge->setValue( (int)(sound_manager->getMasterMusicVolume()*10.f) );
 
                 // ---- music volume
                 CheckBoxWidget* sfx = getCurrentScreen()->getWidget<CheckBoxWidget>("sfx_enabled");
