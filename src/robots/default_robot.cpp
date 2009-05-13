@@ -1174,12 +1174,15 @@ void DefaultRobot::findCurve()
     for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
     {
         next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        
-        const int x_diff = m_track->m_driveline[i][0] - m_track->m_driveline[next_hint][0];
-        const int y_diff = m_track->m_driveline[i][1] - m_track->m_driveline[next_hint][1];
-        const float length_2d = sqrt( x_diff*x_diff + y_diff*y_diff );
-        
-        total_dist += length_2d;
+        // Note that m_driveline[...].getZ() might be undefined and trigger
+        // an exception when used. So we can't just write 
+        // (m_driveline[i]-m_driveline[next_hint]).length_2d()
+        Vec3 v;
+        v.setX(m_track->m_driveline[i].getX() - m_track->m_driveline[next_hint].getX());
+        v.setY(m_track->m_driveline[i].getY() - m_track->m_driveline[next_hint].getY());
+        // length_2d only uses the X and Y component.
+        // FIXME: the values of v.length could be pre-computed and saved
+        total_dist += v.length_2d() + sqrt(i);
     }
 
 
