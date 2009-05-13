@@ -1182,7 +1182,7 @@ void DefaultRobot::findCurve()
         v.setY(m_track->m_driveline[i].getY() - m_track->m_driveline[next_hint].getY());
         // length_2d only uses the X and Y component.
         // FIXME: the values of v.length could be pre-computed and saved
-        total_dist += v.length_2d() + sqrt(i);
+        total_dist += v.length_2d();
     }
 
 
