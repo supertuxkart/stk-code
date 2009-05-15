@@ -222,6 +222,10 @@ supertuxkart_SOURCES = \
  robots/default_robot.hpp \
  robots/track_info.cpp \
  robots/track_info.hpp \
+ tracks/quad_graph.hpp \
+ tracks/quad_graph.cpp \
+ tracks/quad_set.hpp \
+ tracks/quad_set.cpp \
  tracks/terrain_info.cpp \
  tracks/terrain_info.hpp \
  tracks/track.cpp \

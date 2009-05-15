@@ -113,8 +113,12 @@ void MaterialManager::addSharedMaterial(const std::string& filename)
 //-----------------------------------------------------------------------------
 bool MaterialManager::pushTempMaterial(const std::string& filename)
 {
-    XMLNode *root = file_manager->getXMLTree(filename);
-    if(!root || root->getName()!="materials") return true;
+    XMLNode *root = file_manager->createXMLTree(filename);
+    if(!root || root->getName()!="materials")
+    {
+        if(root) delete root;
+        return true;
+    }
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -134,6 +138,7 @@ bool MaterialManager::pushTempMaterial(const std::string& filename)
             fprintf(stderr, e.what(), filename.c_str());
         }
     }   // for i<xml->getNumNodes)(
+    delete root;
     return true;
 }   // pushTempMaterial
 

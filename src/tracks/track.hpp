@@ -42,6 +42,8 @@ class TriangleMesh;
 class MovingTexture;
 class XMLNode;
 class PhysicalObject;
+class QuadSet;
+class QuadGraph;
 
 class Track
 {
@@ -68,6 +70,10 @@ private:
     int                      m_version;
     bool                     loadMainTrack(const XMLNode &node);
     void                     createWater(const XMLNode &node);
+    /** The set of all quads for this track. */
+    QuadSet                 *m_quads;
+    /** The graph used to connect the quads. */
+    QuadGraph               *m_quad_graph;
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
           SKY_DOME}          m_sky_type;

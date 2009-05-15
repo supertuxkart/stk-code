@@ -43,6 +43,8 @@
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race_manager.hpp"
+#include "tracks/quad_graph.hpp"
+#include "tracks/quad_set.hpp"
 #include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
 
@@ -70,16 +72,21 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_non_collision_mesh = new TriangleMesh();
     m_all_nodes.clear();
     m_all_meshes.clear();
-    m_has_final_camera = false;
-    m_is_arena         = false;
+    m_has_final_camera   = false;
+    m_is_arena           = false;
+    m_quads              = NULL;
+    m_quad_graph         = NULL;
     loadTrack(m_filename);
     loadDriveline();
 
 }   // Track
 
 //-----------------------------------------------------------------------------
+/** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
+    if(m_quads)      delete m_quads;
+    if(m_quad_graph) delete m_quad_graph;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -871,7 +878,7 @@ void Track::loadTrack(const std::string &filename)
     m_ambient_color     = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
     m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
-    XMLNode *root       = file_manager->getXMLTree(m_filename);
+    XMLNode *root       = file_manager->createXMLTree(m_filename);
     
     if(!root || root->getName()!="track")
     {
@@ -954,6 +961,8 @@ void Track::loadTrack(const std::string &filename)
 
     // Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
+    delete root;
+
 }   // loadTrack
 
 //-----------------------------------------------------------------------------
@@ -993,6 +1002,9 @@ void Track::startMusic() const
 //-----------------------------------------------------------------------------
 void Track::loadDriveline()
 {
+    m_quads      = new QuadSet  (file_manager->getTrackFile(m_ident+".quads"));
+    m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".graph"),
+                                  m_quads);
     readDrivelineFromFile(m_left_driveline, ".drvl");
 
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
@@ -1375,9 +1387,8 @@ void Track::loadTrackModel()
     }
 
     // Start building the scene graph
-#ifdef HAVE_IRRLICHT
     std::string path = file_manager->getTrackFile(getIdent()+".scene");
-    XMLNode *root    = file_manager->getXMLTree(path);
+    XMLNode *root    = file_manager->createXMLTree(path);
 
     // Make sure that we have a track (which is used for raycasts to 
     // place other objects).
@@ -1449,6 +1460,7 @@ void Track::loadTrackModel()
         }
 
     }
+    delete root;
 
     // Init all physical objects
     for(std::vector<PhysicalObject*>::const_iterator i=m_physical_objects.begin();
@@ -1457,7 +1469,7 @@ void Track::loadTrackModel()
         (*i)->init();
     }
 
-#else
+#ifndef HAVE_IRRLICHT
     std::string path = file_manager->getTrackFile(getIdent()+".loc");
 
     FILE *fd = fopen (path.c_str(), "r" );

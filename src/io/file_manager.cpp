@@ -209,7 +209,7 @@ FileManager::~FileManager()
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
-io::IXMLReader *FileManager::getXMLReader(const std::string &filename) 
+io::IXMLReader *FileManager::createXMLReader(const std::string &filename) 
 {
     return m_file_system->createXMLReader(filename.c_str());
 }   // getXMLReader
@@ -217,9 +217,9 @@ io::IXMLReader *FileManager::getXMLReader(const std::string &filename)
 /** Reads in a XML file and converts it into a XMLNode tree.
  *  \param filename Name of the XML file to read.
  */
-XMLNode *FileManager::getXMLTree(const std::string &filename)
+XMLNode *FileManager::createXMLTree(const std::string &filename)
 {
-    io::IXMLReader *xml_reader = getXMLReader(filename);
+    io::IXMLReader *xml_reader = createXMLReader(filename);
     if(!xml_reader) return NULL;
     return new XMLNode(xml_reader);
 }   // getXMLTree

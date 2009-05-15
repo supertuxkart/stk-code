@@ -34,7 +34,7 @@ XMLNode::XMLNode(io::IXMLReader *xml)
  */
 XMLNode::XMLNode(const std::string &filename)
 {
-    io::IXMLReader *xml = file_manager->getXMLReader(filename);
+    io::IXMLReader *xml = file_manager->createXMLReader(filename);
     bool is_first_element = true;
     while(xml->read())
     {
@@ -59,8 +59,14 @@ XMLNode::XMLNode(const std::string &filename)
         default:                   break;
         }   // switch
     }   // while
+    xml->drop();
 }   // XMLNode
 
+// ----------------------------------------------------------------------------
+/** Destructor. */
+XMLNode::~XMLNode()
+{
+}   // ~XMLNode
 // ----------------------------------------------------------------------------
 /** Stores all attributes, and reads in all children.
  *  \param xml The XML reader.

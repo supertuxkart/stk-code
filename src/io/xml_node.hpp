@@ -41,6 +41,7 @@ private:
 public:
          XMLNode(io::IXMLReader *xml);
          XMLNode(const std::string &filename);
+        ~XMLNode();
     const std::string &getName() const {return m_name; }
     const XMLNode     *getNode(const std::string &name) const;
     const XMLNode     *getNode(unsigned int i) const;

@@ -56,8 +56,8 @@ public:
                    ~FileManager();
     void            setDevice(IrrlichtDevice *device);
     void            dropFileSystem();
-    io::IXMLReader *getXMLReader(const std::string &filename);
-    XMLNode        *getXMLTree(const std::string &filename);
+    io::IXMLReader *createXMLReader(const std::string &filename);
+    XMLNode        *createXMLTree(const std::string &filename);
 
     std::string getHomeDir       () const;
     std::string getTrackDir      () const;
