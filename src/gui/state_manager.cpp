@@ -238,7 +238,8 @@ namespace StateManager
 
                 StateManager::enterGameState();
                 //race_manager->setLocalKartInfo(0, "tux");
-                race_manager->setLocalKartInfo(0, "nolok");
+                //race_manager->setLocalKartInfo(0, "nolok");
+                race_manager->setLocalKartInfo(0, "pidgin");
                 //race_manager->setDifficulty(RaceManager::RD_HARD);
                 race_manager->setTrack("beach");
                 race_manager->setNumLaps( 3 );
