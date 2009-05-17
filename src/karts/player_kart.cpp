@@ -381,15 +381,3 @@ void PlayerKart::collectedItem(const Item &item, int add_info)
         }           
     }
 }   // collectedItem
-
-//-----------------------------------------------------------------------------
-/** Called when the kart is doing a shortcut. The player kart will display
- *  a message for the user.
- */
-void PlayerKart::doingShortcut()
-{
-    RaceGUI* m=(RaceGUI*)getRaceGUI();
-    // Can happen if the option menu is called
-    if(m)
-        m->addMessage(_("Invalid short-cut!!"), this, 2.0f, 60);
-}   // doingShortcut

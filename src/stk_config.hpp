@@ -53,11 +53,6 @@ public:
     float m_zipper_force;            /**<Additional force added to the 
                                          acceleration.                       */
     float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
-    float m_shortcut_length;         /**<Skipping more than this distance
-                                         in segments triggers a shortcut.    */
-    float m_offroad_tolerance;       /**<Road width is extended by that 
-                                         fraction to make shortcut detection
-                                         more forgiving.                     */
     float m_final_camera_time;       /**<Time for the movement of the final
                                       *  camera.                             */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/

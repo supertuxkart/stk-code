@@ -19,6 +19,7 @@
 
 #include "robots/track_info.hpp"
 
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -36,7 +37,7 @@ void TrackInfo::setupSteerInfo()
     // First find the beginning of a new section, i.e. a place where the track
     // direction changes from either straight to curve or the other way round.
     int i = 0;
-    int num_drivelines  = m_track->m_driveline.size();
+    int num_drivelines  = m_track->getQuadGraph().getNumNodes();
     // not ready yet float current_angle = m_track->m_angle[i];
     while(i<num_drivelines)
     {

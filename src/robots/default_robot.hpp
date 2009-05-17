@@ -23,11 +23,11 @@
 #include "utils/vec3.hpp"
 
 /* third coord won't be used */
-typedef Vec3 Vec2;
 
 class Track;
 class LinearWorld;
 class TrackInfo;
+class QuadGraph;
 
 class DefaultRobot : public AutoKart
 {
@@ -106,7 +106,7 @@ private:
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
     int   m_future_sector;
-    Vec2 m_future_location;
+    Vec3 m_future_location;
 
     float m_time_till_start; //Used to simulate a delay at the start of the
                              //race, since human players don't accelerate
@@ -124,8 +124,16 @@ private:
     LinearWorld *m_world;
     /** Cache kart_info.m_track_sector. */
     int   m_track_sector;
-
+    /** The graph of qudas of this track. */
+    const QuadGraph *m_quad_graph;
     
+    /** Which of the successors of a node was selected by the AI. */
+    std::vector<int> m_successor_index;
+    /** For each node in the graph this list contained the chosen next node.
+     *  For normal lap track without branches we always have 
+     *  m_next_quad_index[i] = (i+1) % size;
+     *  but if a branch is possible, the AI will select one option here. */
+    std::vector<int> m_next_quad_index;
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -167,15 +175,14 @@ private:
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const Vec2 point, float dt);
+    float steerToPoint(const Vec3 &point, float dt);
 
-    void  checkCrashes(const int STEPS, const Vec2& pos);
-    void  findNonCrashingPoint(Vec2 result);
+    void  checkCrashes(const int STEPS, const Vec3& pos);
+    void  findNonCrashingPoint(Vec3 *result);
 
     float normalizeAngle(float angle);
     int   calcSteps();
     void  setSteering(float angle, float dt);
-    float getApproxRadius(const int START, const int END) const;
     void  findCurve();
 
 public:

@@ -74,7 +74,6 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_all_meshes.clear();
     m_has_final_camera   = false;
     m_is_arena           = false;
-    m_quads              = NULL;
     m_quad_graph         = NULL;
     loadTrack(m_filename);
     loadDriveline();
@@ -85,7 +84,6 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-    if(m_quads)      delete m_quads;
     if(m_quad_graph) delete m_quad_graph;
 }   // ~Track
 
@@ -169,34 +167,18 @@ int Track::pointInQuad
  *  \param XYZ Position for which the segment should be determined.
  *  \param sector Contains the previous sector (as a shortcut, since usually
  *         the sector is the same as the last one), and on return the result
- *  \param with_tolerance If true, the drivelines with tolerance are used.
- *         This reduces the impact of driving slightly off road.
  */
-void Track::findRoadSector(const Vec3& XYZ, int *sector, 
-                           bool with_tolerance )const
+void Track::findRoadSector(const Vec3& XYZ, int *sector)const
 {
     if(*sector!=UNKNOWN_SECTOR)
     {
         int next = (unsigned)(*sector) + 1 <  m_left_driveline.size() ? *sector + 1 : 0;
-        if(with_tolerance)
-        {
-            if(pointInQuad(m_dl_with_tolerance_left[*sector],
-                           m_dl_with_tolerance_right[*sector],
-                           m_dl_with_tolerance_right[next],
-                           m_dl_with_tolerance_left[next], 
-                           XYZ                                ) != QUAD_TRI_NONE)
-                // Still in the same sector, no changes
-                return;
-        }
-        else
-        {
-            if(pointInQuad(m_left_driveline[*sector],
-                           m_right_driveline[*sector],
-                           m_right_driveline[next],   
-                           m_left_driveline[next], XYZ ) != QUAD_TRI_NONE)
-                // Still in the same sector, no changes
-                return;
-        }
+        if(pointInQuad(m_left_driveline[*sector],
+                       m_right_driveline[*sector],
+                       m_right_driveline[next],   
+                       m_left_driveline[next], XYZ ) != QUAD_TRI_NONE)
+            // Still in the same sector, no changes
+            return;
     }
     /* To find in which 'sector' of the track the kart is, we use a
        'point in triangle' algorithm for each triangle in the quad
@@ -210,12 +192,7 @@ void Track::findRoadSector(const Vec3& XYZ, int *sector,
     for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
     {
         next = (unsigned int)i + 1 <  DRIVELINE_SIZE ? (int)i + 1 : 0;
-        triangle = with_tolerance 
-                ? pointInQuad(m_dl_with_tolerance_left[i], 
-                              m_dl_with_tolerance_right[i],
-                              m_dl_with_tolerance_right[next],
-                              m_dl_with_tolerance_left[next], XYZ )
-                 : pointInQuad(m_left_driveline[i], m_right_driveline[i],
+        triangle = pointInQuad(m_left_driveline[i], m_right_driveline[i],
                                m_right_driveline[next], m_left_driveline[next],
                                XYZ );
 
@@ -502,33 +479,6 @@ btTransform Track::getStartTransform(unsigned int pos) const
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
-/** Determines if a kart moving from sector OLDSEC to sector NEWSEC
- *  would be taking a shortcut, i.e. if the distance is larger
- *  than a certain delta
- */
-bool Track::isShortcut(const int OLDSEC, const int NEWSEC) const
-{
-    // If the kart was off the road, don't do any shortcuts
-    if(OLDSEC==UNKNOWN_SECTOR || NEWSEC==UNKNOWN_SECTOR) return false;
-    int next_sector = OLDSEC==(int)m_driveline.size()-1 ? 0 : OLDSEC+1;
-    if(next_sector==NEWSEC) 
-        return false;
-
-    int distance_sectors = (int)(m_distance_from_start[std::max(NEWSEC, OLDSEC)] -
-                                 m_distance_from_start[std::min(NEWSEC, OLDSEC)]  );
-    
-    // Handle 'warp around'
-    const int track_length = (int)m_distance_from_start[m_driveline.size()-1];
-    if( distance_sectors < 0 ) distance_sectors += track_length;
-    //else if( distance_sectors > track_length*3.0f/4.0f) distance_sectors -= track_length;
-    
-    if(std::max(NEWSEC, OLDSEC) > (int)RaceManager::getTrack()->m_distance_from_start.size()-6 &&
-       std::min(NEWSEC, OLDSEC) < 6) distance_sectors -= track_length; // crossed start line
-    
-    return (distance_sectors > stk_config->m_shortcut_length);
-}   // isShortcut
-
-//-----------------------------------------------------------------------------
 void Track::addDebugToScene(int type) const
 {
     if(type & 1)
@@ -559,16 +509,14 @@ void Track::addDebugToScene(int type) const
         }   // for i
          */
     }  /// type ==1
-    // 2: drivelines, 4: driveline with tolerance
-    if(type & 6)
+    // 2: drivelines
+    if(type & 2)
     {
         /*
         ssgVertexArray* v_array = new ssgVertexArray();
         ssgColourArray* c_array = new ssgColourArray();
-        const std::vector<Vec3> &left  = type&2 ? m_left_driveline 
-                                                : m_dl_with_tolerance_left;
-        const std::vector<Vec3> &right = type&2 ? m_right_driveline 
-                                               : m_dl_with_tolerance_right;
+        const std::vector<Vec3> &left  = m_left_driveline;
+        const std::vector<Vec3> &right = m_right_driveline;
         for(unsigned int i = 0; i < m_driveline.size(); i++)
         {
             int ip1 = i==m_driveline.size()-1 ? 0 : i+1;
@@ -1002,9 +950,8 @@ void Track::startMusic() const
 //-----------------------------------------------------------------------------
 void Track::loadDriveline()
 {
-    m_quads      = new QuadSet  (file_manager->getTrackFile(m_ident+".quads"));
-    m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".graph"),
-                                  m_quads);
+    m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".quads"), 
+                                 file_manager->getTrackFile(m_ident+".graph"));
     readDrivelineFromFile(m_left_driveline, ".drvl");
 
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
@@ -1017,8 +964,6 @@ void Track::loadDriveline()
         "and the left driveline is " << m_left_driveline.size()
         << " vertex long. Track is " << m_name << " ." << std::endl;
 
-    m_dl_with_tolerance_left.reserve(DRIVELINE_SIZE);
-    m_dl_with_tolerance_right.reserve(DRIVELINE_SIZE);
     m_driveline.reserve(DRIVELINE_SIZE);
     m_path_width.reserve(DRIVELINE_SIZE);
     m_angle.reserve(DRIVELINE_SIZE);
@@ -1029,13 +974,6 @@ void Track::loadDriveline()
 
         float width = ( m_right_driveline[i] - center_point ).length();
         m_path_width.push_back(width);
-
-        // Compute the drivelines with tolerance
-        Vec3 diff = (m_left_driveline[i] - m_right_driveline[i]) 
-                  * stk_config->m_offroad_tolerance;
-        m_dl_with_tolerance_left.push_back(m_left_driveline[i]+diff);
-        m_dl_with_tolerance_right.push_back(m_right_driveline[i]-diff);
-
     }
 
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)

@@ -149,23 +149,12 @@ void LinearWorld::update(float delta)
         
         // update sector variables
         int prev_sector = kart_info.m_track_sector;
-        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector,
-                                /*tolerance*/ true);
+        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
 
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
         kart_info.m_on_road = kart_info.m_track_sector != Track::UNKNOWN_SECTOR;
-        if(kart_info.m_on_road)
-        {
-            if(m_track->isShortcut(kart_info.m_last_valid_sector, kart_info.m_track_sector))
-            {
-                // bring karts back to where they left the track.
-                rescueKartAfterShortcut(kart, kart_info);
-            }                
-            kart_info.m_last_valid_sector = kart_info.m_track_sector;
-            kart_info.m_last_valid_race_lap = kart_info.m_race_lap;
-        }   // last_valid_sectpr!=UNKNOWN_SECTOR
-        else
+        if(!kart_info.m_on_road)
         {
             // Kart off road. Find the closest sector instead.
             kart_info.m_track_sector =
@@ -174,8 +163,6 @@ void LinearWorld::update(float delta)
                                                  ? Track::RS_RIGHT 
                                                  : Track::RS_LEFT,
                                              prev_sector );
-            if(m_track->isShortcut(prev_sector, kart_info.m_track_sector))
-                rescueKartAfterShortcut(kart, kart_info);
         }   
         
         // Update track coords (=progression)
@@ -500,23 +487,6 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     return getTime() + (full_distance - distance_covered)  / average_speed;
     
 }   // estimateFinishTime
-//-----------------------------------------------------------------------------
-/** Rescues a kart after a shortcut was detected. The kart is placed at the
- *  last valid position.
- */
-void LinearWorld::rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info)
-{
-    // Reset the kart to the segment where the shortcut started
-    
-    // add one because 'moveKartAfterRescue' removes 1
-    kart_info.m_track_sector   = kart_info.m_last_valid_sector+1;
-    if(kart_info.m_track_sector>=(int)m_track->m_driveline.size())
-        kart_info.m_track_sector = 0;
-    kart_info.m_race_lap =  kart_info.m_last_valid_race_lap;
-    
-    kart->doingShortcut();
-    kart->forceRescue();
-}   // rescueKartAfterShortcut
 
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart

@@ -37,7 +37,7 @@ private:
             computations at runtime. */
         Vec3 m_center;
         /** Constructor, takes 4 points. */
-        Quad(btVector3 p0, btVector3 p1, btVector3 p2, btVector3 p3)
+        Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3)
         {
             m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
             m_center = 0.25f*(p0+p1+p2+p3);
@@ -48,7 +48,7 @@ private:
         /** Returns the i-th. point of a quad. */
         const btVector3& operator[](int i) const {return m_p[i];    }
         /** Returns the center of a quad. */
-        const btVector3& getCenter ()      const {return m_center;  }
+        const Vec3& getCenter ()      const {return m_center;  }
     };   // class Quad
     // =======================================================================
     /** The 2d bounding box, used for hashing. */
@@ -78,7 +78,7 @@ public:
     /** Returns the number of quads. */
     unsigned int getSize() const {return (unsigned int)m_allQuads.size(); }
     /** Returns the center of quad n. */
-    const btVector3& getCenterOfQuad(int n) const 
+    const Vec3& getCenterOfQuad(int n) const 
                                  {return m_allQuads[n]->getCenter();       }
 };   // QuadSet
 #endif

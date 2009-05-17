@@ -101,7 +101,8 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 // -----------------------------------------------------------------------------
 Plunger::~Plunger()
 {
-    m_rubber_band->removeFromScene();
+    if(m_rubber_band)
+        m_rubber_band->removeFromScene();
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------

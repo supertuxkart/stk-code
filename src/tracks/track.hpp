@@ -42,7 +42,6 @@ class TriangleMesh;
 class MovingTexture;
 class XMLNode;
 class PhysicalObject;
-class QuadSet;
 class QuadGraph;
 
 class Track
@@ -70,8 +69,6 @@ private:
     int                      m_version;
     bool                     loadMainTrack(const XMLNode &node);
     void                     createWater(const XMLNode &node);
-    /** The set of all quads for this track. */
-    QuadSet                 *m_quads;
     /** The graph used to connect the quads. */
     QuadGraph               *m_quad_graph;
     /** The type of sky to be used for the track. */
@@ -138,11 +135,11 @@ public:
     //FIXME: Maybe the next 4 vectors should be inside an struct and be used
     //from a vector of structs?
     //FIXME: should the driveline be set as a sgVec2?
+private:
     std::vector<Vec3>    m_driveline;
+public:
     /** Same as drivelines, but with stk_config->m_offroad_tolerance applied
      *  to widen the road (to make shortcut detection less severe). */
-    std::vector<Vec3>    m_dl_with_tolerance_left;
-    std::vector<Vec3>    m_dl_with_tolerance_right;
     std::vector<float>   m_distance_from_start;
     std::vector<float>   m_path_width;
     std::vector<float>   m_angle;
@@ -179,8 +176,7 @@ public:
     void               drawScaled2D      (float x, float y, float w,
                                           float h                     ) const;
 
-    void               findRoadSector    (const Vec3& XYZ, int *sector,
-                                          bool with_tolerance=false) const;
+    void               findRoadSector    (const Vec3& XYZ, int *sector) const;
     int                findOutOfRoadSector(const Vec3& XYZ,
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR
@@ -190,7 +186,6 @@ public:
                                           const int SECTOR            ) const;
     const Vec3&        trackToSpatial    (const int SECTOR) const;
     void               loadTrackModel    ();
-    bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
     float              getGravity        () const {return m_gravity;            }
@@ -228,6 +223,9 @@ public:
     void               createPhysicsModel();
     void               update(float dt);
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+
+    /** Returns the graph of quads, mainly for the AI. */
+    const QuadGraph&   getQuadGraph() const { return *m_quad_graph; }
     /*
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {

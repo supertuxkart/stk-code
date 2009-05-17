@@ -43,6 +43,7 @@
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "robots/track_info.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -63,6 +64,21 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
     m_kart_length = m_kart_properties->getKartModel()->getLength();
     m_kart_width  = m_kart_properties->getKartModel()->getWidth();
     m_track = RaceManager::getTrack();
+    m_quad_graph  = &m_track->getQuadGraph();
+    m_next_quad_index.reserve(m_quad_graph->getNumNodes());
+    m_successor_index.reserve(m_quad_graph->getNumNodes());
+
+    // For now pick one part on random, which is not adjusted during the run
+    std::vector<unsigned int> next;
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        next.clear();
+        m_quad_graph->getSuccessors(i, next);
+        int indx = rand() % next.size();
+        m_successor_index.push_back(indx);
+        m_next_quad_index.push_back(next[indx]);
+    }
+        
     m_world = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
     assert(m_world != NULL);
     
@@ -304,9 +320,8 @@ void DefaultRobot::handleBraking()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handleSteering(float dt)
 {
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
-    const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE 
-                             ? m_track_sector + 1 : 0;
+    const int next = m_next_quad_index[m_track_sector];
+    
     float steer_angle = 0.0f;
 
     /*The AI responds based on the information we just gathered, using a
@@ -316,7 +331,7 @@ void DefaultRobot::handleSteering(float dt)
     if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5f >
         m_track->getWidth()[m_track_sector] )
     {
-        steer_angle = steerToPoint( m_track->m_driveline[NEXT_SECTOR], dt );
+        steer_angle = steerToPoint(m_quad_graph->getCenterOfQuad(next), dt );
 
 #ifdef AI_DEBUG
         std::cout << "- Outside of road: steer to center point." <<
@@ -330,12 +345,12 @@ void DefaultRobot::handleSteering(float dt)
         //-1 = left, 1 = right, 0 = no crash.
         if( m_start_kart_crash_direction == 1 )
         {
-            steer_angle = steerToAngle( NEXT_SECTOR, -M_PI*0.5f );
+            steer_angle = steerToAngle(next, -M_PI*0.5f );
             m_start_kart_crash_direction = 0;
         }
         else if(m_start_kart_crash_direction == -1)
         {
-            steer_angle = steerToAngle( NEXT_SECTOR, M_PI*0.5f);
+            steer_angle = steerToAngle(next, M_PI*0.5f);
             m_start_kart_crash_direction = 0;
         }
         else
@@ -343,12 +358,12 @@ void DefaultRobot::handleSteering(float dt)
             if(m_world->getDistanceToCenterForKart( getWorldKartId() ) >
                m_world->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
-                steer_angle = steerToAngle( NEXT_SECTOR, -M_PI*0.5f );
+                steer_angle = steerToAngle(next, -M_PI*0.5f );
                 m_start_kart_crash_direction = 1;
             }
             else
             {
-                steer_angle = steerToAngle( NEXT_SECTOR, M_PI*0.5f );
+                steer_angle = steerToAngle(next, M_PI*0.5f );
                 m_start_kart_crash_direction = -1;
             }
         }
@@ -367,20 +382,20 @@ void DefaultRobot::handleSteering(float dt)
         {
         case FT_FAREST_POINT:
             {
-                Vec2 straight_point;
-                findNonCrashingPoint( straight_point );
+                Vec3 straight_point;
+                findNonCrashingPoint(&straight_point);
                 steer_angle = steerToPoint(straight_point, dt);
             }
             break;
 
         case FT_PARALLEL:
-            steer_angle = steerToAngle( NEXT_SECTOR, 0.0f );
+            steer_angle = steerToAngle(next, 0.0f );
             break;
 
         case FT_AVOID_TRACK_CRASH:
             if( m_crashes.m_road )
             {
-                steer_angle = steerToAngle( m_track_sector, 0.0f );
+                steer_angle = steerToAngle(m_track_sector, 0.0f );
             }
             else steer_angle = 0.0f;
 
@@ -736,12 +751,12 @@ float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
  *  \param point Point to steer towards.
  *  \param dt    Time step.
  */
-float DefaultRobot::steerToPoint(const Vec2 point, float dt)
+float DefaultRobot::steerToPoint(const Vec3 &point, float dt)
 {
     // No sense steering if we are not driving.
     if(getSpeed()==0) return 0.0f;
-    const float dx        = point[0] - getXYZ().getX();
-    const float dy        = point[1] - getXYZ().getY();
+    const float dx        = point.getX() - getXYZ().getX();
+    const float dy        = point.getY() - getXYZ().getY();
     /** Angle from the kart position to the point in world coordinates. */
     float theta           = -atan2(dx, dy);
 
@@ -899,12 +914,9 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
  *  the two edges of the track is closest to the next curve after wards,
  *  and return the position of that edge.
  */
-void DefaultRobot::findNonCrashingPoint( Vec2 result )
-{
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
-    
-    unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE 
-                        ? m_track_sector + 1 : 0;
+void DefaultRobot::findNonCrashingPoint(Vec3 *result)
+{    
+    unsigned int sector = m_next_quad_index[m_track_sector];
     int target_sector;
 
     Vec3 direction;
@@ -917,10 +929,10 @@ void DefaultRobot::findNonCrashingPoint( Vec2 result )
     {
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_sector = sector + 1 < DRIVELINE_SIZE ? sector + 1 : 0;
+        target_sector = m_next_quad_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_track->m_driveline[target_sector] - getXYZ();
+        direction = m_quad_graph->getCenterOfQuad(target_sector) - getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_length );
@@ -946,8 +958,7 @@ void DefaultRobot::findNonCrashingPoint( Vec2 result )
             //If we are outside, the previous sector is what we are looking for
             if ( distance + m_kart_width * 0.5f > m_track->getWidth()[sector] )
             {
-                result = m_track->m_driveline[sector];
-                //sgCopyVec2( result, m_track->m_driveline[sector] );
+                *result = m_quad_graph->getCenterOfQuad(sector);
 
 #ifdef SHOW_NON_CRASHING_POINT
                 ssgaSphere *sphere = new ssgaSphere;
@@ -1081,83 +1092,6 @@ void DefaultRobot::setSteering(float angle, float dt)
 }   // setSteering
 
 //-----------------------------------------------------------------------------
-/** Finds the approximate radius of a track's curve. It needs two arguments,
- *  the number of the drivepoint that marks the beginning of the curve, and
- *  the number of the drivepoint that marks the ending of the curve.
- *
- *  Based on that you can construct any circle out of 3 points in it, we use
- *  the two arguments to use the drivelines as the first and last point; the
- *  middle sector is averaged.
- */
-float DefaultRobot::getApproxRadius(const int START, const int END) const
-{
-    const int MIDDLE = (START + END) / 2;
-
-    //If the START and END sectors are very close, their average will be one
-    //of them, and using twice the same point just generates a huge radius
-    //(too big to be of any use) but it also can generate a division by zero,
-    //so here is some special handling for that case.
-    if (MIDDLE == START || MIDDLE == END ) return 99999.0f;
-
-    float X1, Y1, X2, Y2, X3, Y3;
-
-    //The next line is just to avoid compiler warnings.
-    X1 = X2 = X3 = Y1 = Y2 = Y3 = 0.0;
-
-
-    if(m_inner_curve == -1)
-    {
-        X1 = m_track->m_left_driveline[START][0];
-        Y1 = m_track->m_left_driveline[START][1];
-
-        X2 = m_track->m_left_driveline[MIDDLE][0];
-        Y2 = m_track->m_left_driveline[MIDDLE][1];
-
-        X3 = m_track->m_left_driveline[END][0];
-        Y3 = m_track->m_left_driveline[END][1];
-    }
-    else if (m_inner_curve == 0)
-    {
-        X1 = m_track->m_driveline[START][0];
-        Y1 = m_track->m_driveline[START][1];
-
-        X2 = m_track->m_driveline[MIDDLE][0];
-        Y2 = m_track->m_driveline[MIDDLE][1];
-
-        X3 = m_track->m_driveline[END][0];
-        Y3 = m_track->m_driveline[END][1];
-    }
-    else if (m_inner_curve == 1)
-    {
-        X1 = m_track->m_right_driveline[START][0];
-        Y1 = m_track->m_right_driveline[START][1];
-
-        X2 = m_track->m_right_driveline[MIDDLE][0];
-        Y2 = m_track->m_right_driveline[MIDDLE][1];
-
-        X3 = m_track->m_right_driveline[END][0];
-        Y3 = m_track->m_right_driveline[END][1];
-    }
-
-    const float A = X2 - X1;
-    const float B = Y2 - Y1;
-    const float C = X3 - X1;
-    const float D = Y3 - Y1;
-
-    const float E = A * ( X1 + X2) + B * (Y1 + Y2);
-    const float F = C * ( X1 + X3) + D * (Y1 + Y3);
-
-    const float G = 2.0f * ( A*( Y3-Y2 ) - B*( X3 - X2 ) );
-
-    const float pX = ( D*E - B*F) / G;
-    const float pY = ( A*F - C*E) / G;
-
-    const float radius = sqrt( ( X1 - pX) * ( X1 - pX) + (Y1 - pY) * (Y1 - pY) );
-
-    return radius;
-}   // getApproxRadius
-
-//-----------------------------------------------------------------------------
 /**FindCurve() gathers info about the closest sectors ahead: the curve
  * angle, the direction of the next turn, and the optimal speed at which the
  * curve can be travelled at it's widest angle.
@@ -1166,23 +1100,12 @@ float DefaultRobot::getApproxRadius(const int START, const int END) const
  */
 void DefaultRobot::findCurve()
 {
-    const int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
     float total_dist = 0.0f;
-    int next_hint    = m_track_sector;
     int i;
-
-    for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
+    for(i = m_track_sector; total_dist < getVelocityLC().getY(); 
+        i = m_next_quad_index[i])
     {
-        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        // Note that m_driveline[...].getZ() might be undefined and trigger
-        // an exception when used. So we can't just write 
-        // (m_driveline[i]-m_driveline[next_hint]).length_2d()
-        Vec3 v;
-        v.setX(m_track->m_driveline[i].getX() - m_track->m_driveline[next_hint].getX());
-        v.setY(m_track->m_driveline[i].getY() - m_track->m_driveline[next_hint].getY());
-        // length_2d only uses the X and Y component.
-        // FIXME: the values of v.length could be pre-computed and saved
-        total_dist += v.length_2d();
+        total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);
     }
 
 
