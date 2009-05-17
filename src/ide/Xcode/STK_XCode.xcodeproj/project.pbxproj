@@ -18,6 +18,8 @@
 		950557890F696A900056E88C /* screen_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557810F696A900056E88C /* screen_loader.cpp */; };
 		9505578A0F696A900056E88C /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557820F696A900056E88C /* skin.cpp */; };
 		9505578B0F696A900056E88C /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557840F696A900056E88C /* widget.cpp */; };
+		951C35810FC05BF400A48379 /* quad_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C357E0FC05BF400A48379 /* quad_set.cpp */; };
+		951C35820FC05BF400A48379 /* quad_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C35800FC05BF400A48379 /* quad_graph.cpp */; };
 		953EAAAF0F30A4220000D57D /* terrain_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAAE0F30A4220000D57D /* terrain_info.cpp */; };
 		953EAAB20F30A4410000D57D /* triangle_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB10F30A4410000D57D /* triangle_mesh.cpp */; };
 		953EAAB60F30A4650000D57D /* translation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953EAAB50F30A4650000D57D /* translation.cpp */; };
@@ -258,6 +260,10 @@
 		950557830F696A900056E88C /* skin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skin.hpp; path = ../../gui/skin.hpp; sourceTree = SOURCE_ROOT; };
 		950557840F696A900056E88C /* widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget.cpp; path = ../../gui/widget.cpp; sourceTree = SOURCE_ROOT; };
 		950557850F696A900056E88C /* widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget.hpp; path = ../../gui/widget.hpp; sourceTree = SOURCE_ROOT; };
+		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = games/supertuxkart/src/tracks/quad_set.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		951C357E0FC05BF400A48379 /* quad_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_set.cpp; path = games/supertuxkart/src/tracks/quad_set.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		951C357F0FC05BF400A48379 /* quad_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_graph.hpp; path = ../../tracks/quad_graph.hpp; sourceTree = SOURCE_ROOT; };
+		951C35800FC05BF400A48379 /* quad_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_graph.cpp; path = games/supertuxkart/src/tracks/quad_graph.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		951F96810F29670C00E1AC66 /* SuperTuxKart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SuperTuxKart; sourceTree = BUILT_PRODUCTS_DIR; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
@@ -1951,6 +1957,10 @@
 		95C2B1CE0F296545000D3E5D /* tracks */ = {
 			isa = PBXGroup;
 			children = (
+				951C357D0FC05BF400A48379 /* quad_set.hpp */,
+				951C357E0FC05BF400A48379 /* quad_set.cpp */,
+				951C357F0FC05BF400A48379 /* quad_graph.hpp */,
+				951C35800FC05BF400A48379 /* quad_graph.cpp */,
 				953EAAAD0F30A4220000D57D /* terrain_info.hpp */,
 				953EAAAE0F30A4220000D57D /* terrain_info.cpp */,
 				95C2B1CF0F296545000D3E5D /* track.cpp */,
@@ -2749,6 +2759,8 @@
 				95A1184B0F77FC3900B18B3D /* input_device.cpp in Sources */,
 				95A1187B0F78024E00B18B3D /* device_manager.cpp in Sources */,
 				95CA59F80F82FCB7003323DB /* physical_object.cpp in Sources */,
+				951C35810FC05BF400A48379 /* quad_set.cpp in Sources */,
+				951C35820FC05BF400A48379 /* quad_graph.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

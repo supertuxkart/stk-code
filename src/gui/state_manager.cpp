@@ -74,17 +74,19 @@ namespace StateManager
         {
             RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
             assert( w != NULL );
-
+                    
             if(!getCurrentScreen()->m_inited)
             {
-                w->addItem("Gnu","k1","gui/gnu.png");
-                w->addItem("Wilber","k2","gui/gnu.png");
-                w->addItem("Tux","k3","gui/gnu.png");
-                w->addItem("Puffy","k4","gui/gnu.png");
-                w->addItem("Hexley","k5","gui/gnu.png");
-                w->addItem("Sushi","k6","gui/gnu.png");
-                w->addItem("Nolok","k7","gui/gnu.png");
-                w->addItem("Mozilla","k8","gui/gnu.png");
+                const int kart_amount = kart_properties_manager->getNumberOfKarts();
+                for(int n=0; n<kart_amount; n++)
+                {
+                    const KartProperties* prop = kart_properties_manager->getKartById(n);
+                    std::string icon_path = "karts/";
+                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
+                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                    
+                }
+                
                 getCurrentScreen()->m_inited = true;
             }
             w->updateItemDisplay();
@@ -110,9 +112,13 @@ namespace StateManager
             
             getCurrentScreen()->m_inited = true;
         } // end if init
-        // TODO - actually check which kart was selected
         else if(name == "karts")
         {
+            RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+            assert( w != NULL );
+            
+            race_manager->setLocalKartInfo(0, w->getSelectionName());
+            
             StateManager::pushMenu("racesetup.stkgui");
         }
     }
@@ -237,10 +243,6 @@ namespace StateManager
                 std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
 
                 StateManager::enterGameState();
-                //race_manager->setLocalKartInfo(0, "tux");
-                //race_manager->setLocalKartInfo(0, "nolok");
-                //race_manager->setLocalKartInfo(0, "mozilla");
-                race_manager->setLocalKartInfo(0, "adiumy");
                 //race_manager->setDifficulty(RaceManager::RD_HARD);
                 race_manager->setTrack("beach");
                 race_manager->setNumLaps( 3 );
