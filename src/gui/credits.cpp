@@ -204,13 +204,14 @@ namespace GUIEngine
             
             const int subamount = m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
             int suby = y+h/3;
+            const int inc = subamount == 0 ? h/8 : std::min(h/8, (h - h/3)/(subamount+1));
             for(int i=0; i<subamount; i++)
             {
                GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_subentries[i].c_str(),
                                           core::rect< s32 >( x + 32, suby + text_offset/(1+1), x+w+32, suby+h/8 + text_offset/(1+1) ),
                                           color,
                                           false/* center h */, true /* center v */ );
-               suby += h/8;
+                suby += inc;
             }
 
         }

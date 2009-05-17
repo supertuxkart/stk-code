@@ -34,15 +34,12 @@ Bug fixes & misc contributions
 - Paul Elms (scifly)
 
 
-
 = Visual art =
 
 Minibjorn
 - Powerups and baddies (models + icons)
-- (Bowling Ball, Cake, Plunger, Bubblegum,
-- Anchor, Bomb, Gift-box, Nitro-tank)
-
-Minibjorn
+-     (Bowling Ball, Cake, Plunger, Bubblegum,
+-     Anchor, Bomb, Gift-box, Nitro-tank)
 - Fire and smoke particles
 - Puffy kart
 - Various textures
@@ -57,37 +54,30 @@ Cheleb
 - Nolok kart
 - Pidgin kart
 
-The BurningWell image collection
-
 Tobias Beyrer
 - Wilber kart
 - elePHPant kart
-
-abejones
-- Adiumy kart
-
-Benjamin Arnaudet
-- GNU Kart
-
-MacIO
-- Cave X arena
 
 Ivar ten Cate (Varivar)
 - Old mine track
 - Tux Tollway track
 
-Misc contributions
-- Canarix, Andy (Needer)
-- Conso
+Other art contributions
+- Benjamin Arnaudet : GNU kart
+- MacIO : Cave X arena
+- abejones : Adiumy kart
+- Christian Framing (Updated EvilTux kart)
+- Andy (Needer)
 - Paul Elms (scifly)
+
+Robert Howie
+- Skyline Track  (with modifications by conso)
 
 Marianne Gagnon (Auria)
 - 'SnowTux peak' (Based on older 'Geeko peak')
 - 'Shifting sands' improvements
 - 'Around the Lighthouse' improvements
 - 'On the beach' improvements
-
-Marianne Gagnon (Auria)
 - 'Amazonian Journey' track
 - 'Fort Magma' (based on older 'BSOD castle')
 - 'Crescent Crossing' (Based on older 'little volcano')
@@ -101,72 +91,49 @@ Johannes Sjolund
 - 'The Island' track (with modifications
 - by Wayne Dennis (Pixel_2ACF3))
 
-Christian Framing 
-- Updated EvilTux kart
-
-Robert Howie
-- Skyline Track  (with modifications by conso)
-
 Canis Lupus
 - Snow Mountain track
 - XR591 track (with modifications by conso)
 
+Other media sources
+- BurningWell : public domain photos
+- Extreme Tux Racer
+- The Glest Jungle Set
+
 = Music =
-
-Weirwood
-- 'Kart grand prix' song
-
-Magne Djupvik
-- 'Penguin Party' song
-
-Paul Esra Martin (P@ule)
-- 'G4M fan track' song
-
-Marianne Gagnon (Auria)
-- Jungle song
-
-Matt Thomas
-- Boom-boom-boom song
-
-Lukas Siewert (Dr.Sternhagel)
-- 'Caribbean music' song
-
-Chris Leutwyler (kronobil)
-- Old mine song
-- Snowy track song
 
 The Dead Rocks
 - 'GreenSecretFromAmazonia'
 - 'EasyJob'
 - 'OneMillionDollar'
 
-Misc "Open" Artists
+Misc songs
+- Weirwood : 'Kart grand prix'
+- Magne Djupvik : 'Penguin Party'
+- Paul Esra Martin (P@ule) 'G4M fan track'
+- Marianne Gagnon (Auria) : 'Jungle song'
+- Matt Thomas : 'Boom-boom-boom song'
+- Lukas Siewert (Dr.Sternhagel) : 'Caribbean music'
+- Chris Leutwyler (kronobil) : 'Old mine'
+
+Misc songs
+- Chris Leutwyler (kronobil) : 'Snowy track'
 - Brad Sucks - 'Out of it'
 - ChillCarrier - 'Druckverlust'
 - Deff Syndicate - 'hip hop 1'
 - Alessandro Bottura - 'MayDay Mayhem'
-- Speedsound - 'Sky Vibe High Frequency'
+- Speedsound - 'Sky Vibe Hi Frequency'
 - Daniel Bautista - 'Symphony No. 5'
-
 
 = Sound Effects =
 
 Sound effects
-- Daveincamas
-- Radio Mall
-- BLASTWAVEFX 02344
-- smcameron
-- SmiertSpionem
-
-Sound effects
-- lonemonk
-- FreqMan
-- Pogotron
-- roscoetoon
-- han1
-
-Sound effects
+- Daveincamas, Radio Mall, BLASTWAVEFX 02344
+- smcameron, SmiertSpionem, lonemonk, han1
+- Pogotron, roscoetoon, FreqMan
 - Stephan Wiefling : Menu sounds
+
+Sound effects
 - Stephen Dunn & morgantj : engine sound
 - Stephen Dunn & Atheal Washington : skidding
 - Battle For Wesnoth
@@ -183,57 +150,35 @@ French
 - Marianne Gagnon (Auria)
 - Yann Leprince (sciyann)
 
-Dutch
-- Frans van Rijn (Asciimonster)
-
 Spanish
 - David Ballesteros Mayo (Dividio)
 - Samuel (netocp-1)
-
-Italian
-- Vincenzo (Gigugin)
-
-Swedish
-- Niklas Grahn (Respit)
-
-Romanian
-- Marina Muncescu
-
-Portugese
-- Flávio Zavan (nebososo)
-
-Irish
-- Aaron Kearns
-
-Finnish
-- Kristian Laakkonen
 
 Galician
 - Adrián Chaves Fernández
 - Proxecto Trasno
 
-Polish
-- Patryk Wychowaniec (patryk1303 / p98)
+More translations
+- Dutch : Frans van Rijn (Asciimonster)
+- Italian : Vincenzo (Gigugin)
+- Swedish : Niklas Grahn (Respit)
+- Romanian : Marina Muncescu
+- Portugese : Flávio Zavan (nebososo)
 
-Czech
-- Ondřej Hruška (Prasisko)
+More translations
+- Irish : Aaron Kearns
+- Finnish : Kristian Laakkonen
+- Polish : Patryk Wychowaniec (patryk1303 / p98)
+- Czech : Ondřej Hruška (Prasisko)
+- Catalan : Albert Juhé Lluveras (Aljullu)
 
-Catalan
-- Albert Juhé Lluveras (Aljullu)
+= Misc =
 
-
-= Website =
-
-Tom Jenkins
-- Website skin
-- New website layout
-
-Misc improvements
+Website
+- Tom Jenkins : skin and layout
 - Remy le Guen (Vivelefrat)
 - Sebastian Rode
 - Hiker, Auria, Conso
-
-= Misc =
 
 Testing
 - Canarix
@@ -250,17 +195,11 @@ Donations
 
 = Previous contributors =
 
-Former Admin
-- Eduardo Hernandez Munoz (Coz)
-
-Windows Installer
-- Sam Clarke
-
-Hans Dzaack (Hans the farmer)
-- Physics tuning
-
-Maik Semder (Ikework)
-- Bug fixes
+No more active
+- Eduardo Hernandez Munoz (Coz) : Former Admin
+- Sam Clarke : Windows Installer
+- Hans "the farmer" Dzaack : Physics tuning
+- Maik Semder (Ikework) : Bug fixes
 
 Game of the Month (STK version 0.0)
 - Craig Keogh, Ingo Ruhnke, Jacob Persson
@@ -278,8 +217,8 @@ Do not hesistate to contribute!
 - Give feedback
 - Participate on the community
 - Donate
-- Code
 - Make art
+- Code a feature
 -
 -
 -
