@@ -6,6 +6,7 @@
 #include "gui/engine.hpp"
 #include "gui/widget.hpp"
 #include "gui/screen.hpp"
+#include "gui/credits.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -57,6 +58,10 @@ namespace StateManager
         {
             main_loop->abort();
             return;
+        }
+        else if (selection == "about")
+        {
+            StateManager::pushMenu("credits.stkgui");
         }
         else if (selection == "help")
         {
@@ -550,6 +555,22 @@ namespace StateManager
             menuEventOptions(widget, name);
         else if( screen_name == "help1.stkgui" || screen_name == "help2.stkgui" || screen_name == "help3.stkgui")
             menuEventHelp(widget, name);
+        else if( screen_name == "credits.stkgui" )
+        {
+            if(name == "init")
+            {
+                Widget* w = getCurrentScreen()->getWidget<Widget>("animated_area");
+                assert(w != NULL);
+            
+                Credits* credits = Credits::getInstance();
+                credits->reset();
+                credits->setArea(w->x, w->y, w->w, w->h);
+            }
+            else if(name == "back")
+            {
+                StateManager::escapePressed();
+            }
+        }
         else
             std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
 

@@ -60,7 +60,6 @@ namespace StringUtils
         }
         return filename;
     }
-
 //-----------------------------------------------------------------------------
     std::string without_extension(const std::string& filename)
     {

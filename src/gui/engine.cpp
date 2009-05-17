@@ -5,6 +5,7 @@
 #include "gui/screen.hpp"
 #include "gui/skin.hpp"
 #include "gui/widget.hpp"
+#include "gui/credits.hpp"
 #include "io/file_manager.hpp"
 #include "gui/state_manager.hpp"
 #include "input/input_manager.hpp"
@@ -222,6 +223,7 @@ void render(float elapsed_time)
     }
 
     // ---- menu drawing
+    // draw background image and sections
     if(!StateManager::isGameState())
     {
         GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area,
@@ -229,8 +231,14 @@ void render(float elapsed_time)
         g_skin->renderSections();
     }
     
-    // ---- let irrLicht do the rest (the Skin object will be called for further render)
+    // let irrLicht do the rest (the Skin object will be called for further render)
     g_env->drawAll();
+    
+    // ---- additionnal drawing
+    if(getCurrentScreen()->getName() == "credits.stkgui")
+    {
+        Credits::getInstance()->render(elapsed_time);
+    }
 }
 
 }
