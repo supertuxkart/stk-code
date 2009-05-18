@@ -57,8 +57,6 @@ supertuxkart_SOURCES = \
  utils/coord.hpp \
  utils/random_generator.hpp \
  utils/random_generator.cpp \
- utils/ssg_help.cpp \
- utils/ssg_help.hpp \
  utils/string_utils.cpp \
  utils/string_utils.hpp \
  utils/translation.cpp \
