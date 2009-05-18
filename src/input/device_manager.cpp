@@ -4,7 +4,7 @@
 #include "io/file_manager.hpp"
 #include <iostream>
 #include <fstream>
-
+#include "user_config.hpp"
 
 DeviceManager::DeviceManager()
 {
@@ -200,6 +200,8 @@ bool DeviceManager::deserialize()
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
+    user_config->CheckAndCreateDir();
+    
     std::cout << "writing " << filepath.c_str() << std::endl;
     
     std::ofstream configfile;

@@ -104,7 +104,6 @@ private:
     InputMapEntry m_input_map[GA_COUNT];
 
     void        setFilename      ();
-    int         CheckAndCreateDir();
 
     // Attributes which have setter/getter
     int         m_sfx;
@@ -160,6 +159,8 @@ private:
 public:
     enum UC_Mode {UC_ENABLE, UC_DISABLE, UC_TEMPORARY_DISABLE};
 
+    int         CheckAndCreateDir();
+    
     // Attributes that are accessed directly.
     bool        m_gamepad_debug;
     int         m_track_debug;

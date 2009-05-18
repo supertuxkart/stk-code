@@ -170,33 +170,40 @@ void UserConfig::loadConfig()
 int UserConfig::CheckAndCreateDir()
 {
     // the standard C/C++ libraries don't include anything allowing to check
-    // for directory existance. I work around this by trying to write to it
-    // (no file will be created)
-    const std::string filename = file_manager->getHomeDir() + "/test";
+    // for directory existance. I work around this by checking if trying to 
+    // check for the config file (first reading, then writing)
     
-    std::ofstream test(filename.c_str(), std::ios::out);
+    const std::string filename = file_manager->getHomeDir() + "/config";
+    
+    std::ofstream test(filename.c_str(), std::ios::in);
+    
     if(test.fail() || !test.is_open())
     {
-        int bError;
+        std::ofstream test2(filename.c_str(), std::ios::out);
+        
+        if(test2.fail() || !test2.is_open())
+        {
+            int bError;
 #if defined(WIN32) && !defined(__CYGWIN__)
-        bError = _mkdir(file_manager->getHomeDir().c_str()      ) != 0;
+            bError = _mkdir(file_manager->getHomeDir().c_str()      ) != 0;
 #else
-        bError = mkdir(file_manager->getHomeDir().c_str(), 0755) != 0;
+            bError = mkdir(file_manager->getHomeDir().c_str(), 0755) != 0;
 #endif
-        if(bError)
-        {
-            fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
-                    file_manager->getHomeDir().c_str());
-            return 0;
+            if(bError)
+            {
+                fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
+                        file_manager->getHomeDir().c_str());
+                return 0;
+            }
+            else
+            {
+                printf("Config directory '%s' successfully created.\n", file_manager->getHomeDir().c_str());
+                return 2;
+            }
         }
-        else
-        {
-            printf("Config directory '%s' successfully created.\n", file_manager->getHomeDir().c_str());
-            return 2;
-        }
+        if(test2.is_open()) test2.close();
         
     }
-    
     if(test.is_open()) test.close();
     return 1;
     
