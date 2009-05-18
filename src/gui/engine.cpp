@@ -235,7 +235,7 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- additionnal drawing
-    if(getCurrentScreen()->getName() == "credits.stkgui")
+    if(!StateManager::isGameState() && getCurrentScreen()->getName() == "credits.stkgui")
     {
         Credits::getInstance()->render(elapsed_time);
     }
