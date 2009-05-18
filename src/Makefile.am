@@ -178,6 +178,8 @@ supertuxkart_SOURCES = \
  lisp/parser.hpp \
  lisp/writer.cpp \
  lisp/writer.hpp \
+ gui/credits.cpp \
+ gui/credits.hpp \
  gui/widget.cpp \
  gui/widget.hpp \
  gui/race_gui.cpp \
