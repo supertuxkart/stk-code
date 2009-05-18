@@ -45,7 +45,6 @@
 #include "race_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
-#include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
 
 #include <plib/ssg.h>

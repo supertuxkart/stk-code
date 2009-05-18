@@ -24,7 +24,6 @@
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "tracks/track.hpp"
-#include "utils/ssg_help.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.

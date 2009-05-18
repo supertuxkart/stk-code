@@ -25,7 +25,6 @@
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/ssg_help.hpp"
 
 float KartModel::UNDEFINED = -99.9f;
 

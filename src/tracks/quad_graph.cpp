@@ -68,7 +68,7 @@ void QuadGraph::load(const std::string &filename)
         const XMLNode *node = xml->getNode(i);
         if(node->getName()!="edge")
         {
-            fprintf(stderr, "Incorrect specification in '%s': '%' ignored\n",
+            fprintf(stderr, "Incorrect specification in '%s': '%s' ignored\n",
                     filename.c_str(), node->getName().c_str());
             continue;
         }
@@ -122,7 +122,7 @@ void QuadGraph::GraphNode::addSuccessor(int to, const QuadSet &quad_set)
     Vec3 next_xyz = quad_set.getCenterOfQuad(to);
     Vec3 diff     = next_xyz - this_xyz;
     m_distance_to_next.push_back(diff.length());
-
+    
     float theta = -atan2(diff.getX(), diff.getY());
     m_angle_to_next.push_back(theta);
 }   // addSuccessor

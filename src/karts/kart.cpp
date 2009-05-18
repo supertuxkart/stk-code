@@ -48,7 +48,6 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"
-#include "utils/ssg_help.hpp"
 #include "audio/sfx_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)

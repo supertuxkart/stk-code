@@ -69,7 +69,7 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     {
         printf("yes\n");
         // executable is inside an app bundle, use app bundle-relative paths
-        data_dir = contents + std::string("/Resources/data");
+        data_dir = contents + std::string("/Resources/");
         return true;
     }
     else

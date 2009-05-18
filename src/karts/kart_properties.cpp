@@ -28,7 +28,6 @@
 #include "io/file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
-#include "utils/ssg_help.hpp"
 #include "utils/string_utils.hpp"
 
 float KartProperties::UNDEFINED = -99.9f;

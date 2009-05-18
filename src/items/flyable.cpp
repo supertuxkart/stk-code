@@ -32,7 +32,6 @@
 #include "network/flyable_info.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/ssg_help.hpp"
 
 // static variables:
 float         Flyable::m_st_speed[POWERUP_MAX];

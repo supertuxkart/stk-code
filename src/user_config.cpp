@@ -25,10 +25,7 @@
 #include <sstream>
 #include <string>
 
-// ul.h includes windows.h, so this define is necessary
-#define _WINSOCKAPI_
-#include <plib/ul.h>
-
+#include <fstream>
 // for mkdir:
 #if !defined(WIN32) || defined(__CYGWIN__)
 #  include <sys/stat.h>
@@ -164,7 +161,7 @@ void UserConfig::loadConfig()
 
 // -----------------------------------------------------------------------------
 /**
- * Checks for existance of the tuxkart configuration directory. If the
+ * Checks for existance of the STK configuration directory. If the
  * directory does not exist, it will be created. Return values:
  * 1: config dir exists
  * 2: does not exist, but was created
@@ -172,6 +169,38 @@ void UserConfig::loadConfig()
  */
 int UserConfig::CheckAndCreateDir()
 {
+    // the standard C/C++ libraries don't include anything allowing to check
+    // for directory existance. I work around this by trying to write to it
+    // (no file will be created)
+    const std::string filename = file_manager->getHomeDir() + "/test";
+    
+    std::ofstream test(filename.c_str(), std::ios::out);
+    if(test.fail() || !test.is_open())
+    {
+        int bError;
+#if defined(WIN32) && !defined(__CYGWIN__)
+        bError = _mkdir(file_manager->getHomeDir().c_str()      ) != 0;
+#else
+        bError = mkdir(file_manager->getHomeDir().c_str(), 0755) != 0;
+#endif
+        if(bError)
+        {
+            fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
+                    file_manager->getHomeDir().c_str());
+            return 0;
+        }
+        else
+        {
+            printf("Config directory '%s' successfully created.\n", file_manager->getHomeDir().c_str());
+            return 2;
+        }
+        
+    }
+    
+    if(test.is_open()) test.close();
+    return 1;
+    
+    /*
     const std::string DIRNAME = file_manager->getHomeDir();
     ulDir*            u       = ulOpenDir(DIRNAME.c_str());
     if(u)
@@ -197,6 +226,8 @@ int UserConfig::CheckAndCreateDir()
         printf("Config directory '%s' successfully created.\n",DIRNAME.c_str());
         return 2;
     }
+     */
+
 }   // CheckAndCreateDir
 
 // -----------------------------------------------------------------------------
