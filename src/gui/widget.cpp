@@ -389,6 +389,7 @@ RibbonWidget::RibbonWidget(const RibbonType type)
 {
     m_selection = 0;
     m_ribbon_type = type;
+    m_focus = NULL;
     updateSelection();
 }
 // -----------------------------------------------------------------------------
@@ -421,6 +422,7 @@ bool RibbonWidget::rightPressed()
         else m_selection = 0;
     }
     updateSelection();
+     m_focus = m_children.get(m_selection);
 
     return m_ribbon_type != RIBBON_TOOLBAR;
 }
@@ -438,6 +440,7 @@ bool RibbonWidget::leftPressed()
         else m_selection = m_children.size()-1;
     }
     updateSelection();
+     m_focus = m_children.get(m_selection);
 
     return m_ribbon_type != RIBBON_TOOLBAR;
 }
@@ -445,18 +448,22 @@ bool RibbonWidget::leftPressed()
 void RibbonWidget::focused()
 {
     if(m_event_handler != NULL) ((RibbonGridWidget*)m_event_handler)->updateLabel( this );
+    
+    if(m_focus == NULL) m_focus = m_children.get(m_selection);
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::mouseHovered(Widget* child)
 {
     const int subbuttons_amount = m_children.size();
 
+    m_focus = child;
+    
     for(int i=0; i<subbuttons_amount; i++)
     {
         if(m_children.get(i) == child)
         {
             if(m_selection == i) return false; // was already selected, don't send another event
-            m_selection = i;
+            if(m_ribbon_type == RIBBON_TOOLBAR) m_selection = i; // don't change selection on hover for others
             break;
         }
     }
@@ -472,6 +479,8 @@ void RibbonWidget::updateSelection()
     {
         m_children[i].m_selected = (i == m_selection);
     }
+    
+    if(subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_focus = m_children.get(m_selection);
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::transmitEvent(Widget* w, std::string& originator)

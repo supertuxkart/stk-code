@@ -236,6 +236,8 @@ namespace GUIEngine
         
         ptr_vector<IGUIStaticText, REF> m_labels;
     public:
+        Widget* m_focus;
+        
         virtual ~RibbonWidget() {}
         
         int getSelection() const { return m_selection; }

@@ -423,25 +423,49 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             widget->m_event_handler->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
 
         /* in combo ribbons, always show selection */
-        if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON && 
-           ((RibbonWidget*)widget->m_event_handler)->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
+        RibbonWidget* w = NULL;
         
+        if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
+        {
+            w = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
+            if(w->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
+        }
 
-        if(mark_selected)
+        const bool mark_focused = focused || (parent_focused && w != NULL && w->m_focus == widget) ||
+                                  (mark_selected && !always_show_selection && parent_focused);
+        
+    
+        if(always_show_selection && mark_selected)
+        {
+            core::rect< s32 > rect2 = rect;
+            rect2.UpperLeftCorner.X -= rect.getWidth() / 5;
+            rect2.UpperLeftCorner.Y -= rect.getHeight() / 5;
+            rect2.LowerRightCorner.X += rect.getWidth() / 5;
+            rect2.LowerRightCorner.Y += rect.getHeight() / 5;
+            
+            const int texture_w = m_tex_bubble->getSize().Width;
+            const int texture_h = m_tex_bubble->getSize().Height;
+            
+            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+            
+            GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+
+        if(mark_focused)
         {
             if (use_glow)
             {
                 int grow = 45;
                 static float glow_effect = 0;
                 
-                if(focused || parent_focused)
-                {
-                    const float dt = GUIEngine::getLatestDt();
-                    glow_effect += dt*3;
-                    if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                    grow = (int)(45 + 10*sin(glow_effect));
-                }
-                
+
+                const float dt = GUIEngine::getLatestDt();
+                glow_effect += dt*3;
+                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+                grow = (int)(45 + 10*sin(glow_effect));
+
+            
                 
                 const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
                 const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
@@ -452,30 +476,14 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                const bool show_focus = focused || parent_focused;
-                
-                if(always_show_selection)
-                {
-                    core::rect< s32 > rect2 = rect;
-                    rect2.UpperLeftCorner.X -= rect.getWidth() / 5;
-                    rect2.UpperLeftCorner.Y -= rect.getHeight() / 5;
-                    rect2.LowerRightCorner.X += rect.getWidth() / 5;
-                    rect2.LowerRightCorner.Y += rect.getHeight() / 5;
-                    
-                    GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
-                                                        0 /* no clipping */, 0, true /* alpha */);
-                }
 
-                if(show_focus)
-                {
-                    const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
-                                                                       glow_center_y - 25 - grow/2,
-                                                                       glow_center_x + 45 + grow,
-                                                                       glow_center_y + 25 + grow/2);
-                    
-                    GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
-                                                        0 /* no clipping */, 0, true /* alpha */);
-                }
+                const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                                   glow_center_y - 25 - grow/2,
+                                                                   glow_center_x + 45 + grow,
+                                                                   glow_center_y + 25 + grow/2);
+                
+                GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
+                                                    0 /* no clipping */, 0, true /* alpha */);
             }
             /* if we're not using glow */
             else
@@ -498,8 +506,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 
                 drawBoxFromStretchableTexture(rect, m_tex_squarefocus, params);
             }
-            
-        } // end if mark_selected
+        } // end if mark_focused
+        
+        
     }
     
 }
