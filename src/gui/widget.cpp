@@ -468,7 +468,7 @@ bool RibbonWidget::mouseHovered(Widget* child)
         }
     }
     updateSelection();
-    return m_ribbon_type != RIBBON_TOOLBAR;
+    return false;
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::updateSelection()
@@ -523,6 +523,7 @@ void RibbonWidget::add()
             std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children " << std::endl;
             continue;
         }
+
         total_needed_space += m_children[i].w;
     }
 

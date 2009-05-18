@@ -18,6 +18,7 @@ Orientation of tabs (up or down) is automatically inferred from on-screen positi
 Ribbon widgets are of spawn type (<ribbon> ... </ribbon>) and may contain icon-buttons or buttons as children.
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
 affect the type of highlighting used)
+ * Note : all elements within a ribbon must have an 'ID' property
 
 WTYPE_SPINNER           "spinner", "gauge"
 A spinner component (lets you choose numbers). Sprecify PROP_MIN_VALUE and PROP_MAX_VALUE to have control

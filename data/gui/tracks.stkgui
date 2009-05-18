@@ -16,9 +16,9 @@
     </box>
 
     <tabs width="100%" height="25" id="trackgroups">
-        <button text="Standard"/>
-        <button text="Add-Ons"/>
-        <button text="All"/>
+        <button id="standard" text="Standard"/>
+        <button id="addons" text="Add-Ons"/>
+        <button id="all" text="All"/>
     </tabs>
 
     <spacer width="20" height="20" />
