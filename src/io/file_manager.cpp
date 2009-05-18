@@ -38,9 +38,6 @@
 #endif
 
 #include "irrlicht.h"
-// ul.h includes windows.h, so this define is necessary
-//#define _WINSOCKAPI_
-//#include <plib/ul.h>
 #include "btBulletDynamicsCommon.h"
 
 #include "graphics/irr_driver.hpp"

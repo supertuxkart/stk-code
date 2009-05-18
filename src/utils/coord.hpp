@@ -81,8 +81,6 @@ public:
         m_hpr = Vec3(0.0f);
     }
     // ------------------------------------------------------------------------
-    /** Returns the corresponding plib data structure. */
-    //const sgCoord& toSgCoord()  const     { return m_coord;            }
     /** Returns the translation. */
     const Vec3&    getXYZ()     const     { return m_xyz;              }
     /** Returns heading, pitch, rolll. */
