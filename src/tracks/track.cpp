@@ -954,7 +954,7 @@ void Track::loadDriveline()
     if(m_quad_graph->getNumNodes()==0)
     {
         fprintf(stderr, "No graph nodes defined for track '%s'\n",
-                m_filename);
+                m_filename.c_str());
         exit(-1);
     }
     readDrivelineFromFile(m_left_driveline, ".drvl");

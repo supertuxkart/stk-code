@@ -294,7 +294,7 @@
 		9507E94A0FC1C8C100BD2B92 /* GlutStuff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GlutStuff.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/GlutStuff.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../bullet/Demos/OpenGL/RenderTexture.cpp; sourceTree = SOURCE_ROOT; };
 		9507E9510FC1C8C200BD2B92 /* RenderTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTexture.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/RenderTexture.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = stk.icns; path = games/supertuxkart/src/ide/Xcode/stk.icns; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = stk.icns; sourceTree = SOURCE_ROOT; };
 		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = ../../tracks/quad_set.hpp; sourceTree = SOURCE_ROOT; };
 		951C357E0FC05BF400A48379 /* quad_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_set.cpp; path = ../../tracks/quad_set.cpp; sourceTree = SOURCE_ROOT; };
 		951C357F0FC05BF400A48379 /* quad_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_graph.hpp; path = ../../tracks/quad_graph.hpp; sourceTree = SOURCE_ROOT; };
@@ -314,8 +314,8 @@
 		9551C7FA0FC1B63C00DB481B /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
 		9551C7FB0FC1B63C00DB481B /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		9551C8210FC1B6FF00DB481B /* SuperTuxKart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SuperTuxKart.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9551C9F80FC1B87600DB481B /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Config.xcconfig; path = games/supertuxkart/src/ide/Xcode/Config.xcconfig; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "SuperTuxKart-Info.plist"; path = "games/supertuxkart/src/ide/Xcode/SuperTuxKart-Info.plist"; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		9551C9F80FC1B87600DB481B /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = SOURCE_ROOT; };
+		9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9551CBD90FC1BB9200DB481B /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
