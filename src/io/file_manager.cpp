@@ -60,7 +60,7 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
-    
+
     std::string contents = std::string(path) + std::string("/Contents");
     if(contents.find(".app") != std::string::npos)
     {
@@ -83,9 +83,9 @@ FileManager* file_manager = 0;
  *  handle the Chicken/egg problem with irrlicht: access to the file system
  *  is given from the device, but we can't create the device before reading
  *  the user_config file (for resolution, fullscreen). So we create a dummy
- *  device here to begin with, which is then later (once the real device 
+ *  device here to begin with, which is then later (once the real device
  *  exists) changed in reInit().
- *  
+ *
  */
 FileManager::FileManager()
 {
@@ -95,9 +95,9 @@ FileManager::FileManager()
     char buffer[256];
     getcwd(buffer, 256);
 #endif
-    
+
     m_device = createDevice(video::EDT_NULL);
-    
+
 #ifdef __APPLE__
     chdir( buffer );
 #endif
@@ -125,7 +125,7 @@ FileManager::FileManager()
 #endif
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
-    fprintf(stderr, "Data files will be fetched from: '%s'\n", 
+    fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
 
     pushTextureSearchPath(m_root_dir+"/data/textures");
@@ -163,7 +163,7 @@ FileManager::FileManager()
             }
             else
             {
-                dirs[i]+=":"+dirs[i+1]; // restore "d:/dir" back 
+                dirs[i]+=":"+dirs[i+1]; // restore "d:/dir" back
                 dirs.erase(dirs.begin()+i+1);
             }
         }
@@ -174,7 +174,7 @@ FileManager::FileManager()
 }  // FileManager
 
 //-----------------------------------------------------------------------------
-/** Remove the dummy file system (which is called from IrrDriver before 
+/** Remove the dummy file system (which is called from IrrDriver before
  *  creating the actual device.
  */
 void FileManager::dropFileSystem()
@@ -206,7 +206,7 @@ FileManager::~FileManager()
 }   // ~FileManager
 
 //-----------------------------------------------------------------------------
-io::IXMLReader *FileManager::createXMLReader(const std::string &filename) 
+io::IXMLReader *FileManager::createXMLReader(const std::string &filename)
 {
     return m_file_system->createXMLReader(filename.c_str());
 }   // getXMLReader
@@ -224,7 +224,7 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
 //-----------------------------------------------------------------------------
 void FileManager::pushModelSearchPath(const std::string& path)
 {
-    m_model_search_path.push_back(path);  
+    m_model_search_path.push_back(path);
     m_file_system->addFolderFileArchive(path.c_str());
 }   // pushModelSearchPath
 
@@ -237,7 +237,7 @@ void FileManager::pushTextureSearchPath(const std::string& path)
 
 //-----------------------------------------------------------------------------
 bool FileManager::findFile(std::string& full_path,
-                      const std::string& fname, 
+                      const std::string& fname,
                       const std::vector<std::string>& search_path) const
 {
     for(std::vector<std::string>::const_reverse_iterator i = search_path.rbegin();
@@ -255,7 +255,7 @@ std::string FileManager::getTextureFile(const std::string& FNAME) const
 {
     std::string path;
     // FIXME: work around when loading and converting tracks: FNAME
-    //        (which is based on an irrlicht return value) contains the 
+    //        (which is based on an irrlicht return value) contains the
     //        full path
     //if(m_file_system->existFile(FNAME.c_str())) return FNAME;
     findFile(path, FNAME, m_texture_search_path);
@@ -315,7 +315,7 @@ std::string FileManager::getTrackFile(const std::string& fname,
     // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
     // but if a track name is supplied use it (which is necessary
     // e.g. to load a model from a track directory
-    std::string basename = (track_name!="") ? track_name 
+    std::string basename = (track_name!="") ? track_name
                            : StringUtils::without_extension(fname);
     return getTrackDir()+"/"+basename+"/"+fname;
 }   // getTrackFile
@@ -327,7 +327,7 @@ std::string FileManager::getKartFile(const std::string& fname,
     // kart file are in data/karts/KARTNAME/KARTNAME.ext
     // but if a kart name is supplied use it (which is necessary
     // e.g. to load a model from a kart directory
-    std::string basename = (kart_name!="") ? kart_name 
+    std::string basename = (kart_name!="") ? kart_name
                            : StringUtils::without_extension(fname);
     return getKartDir()+"/"+basename+"/"+fname;
 }   // getKartFile
@@ -349,7 +349,7 @@ std::string FileManager::getHomeDir() const
 {
     std::string DIRNAME;
 #ifdef WIN32
-    // Try to use the APPDATA directory to store config files and highscore 
+    // Try to use the APPDATA directory to store config files and highscore
     // lists. If not defined, used the current directory.
     std::ostringstream s;
     if(getenv("APPDATA")!=NULL)
@@ -409,25 +409,31 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
                             bool is_full_path, bool make_full_path) const
 {
     result.clear();
-    
+
     std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
-    
+    //printf("******* Path : %s \n", path.c_str());
+
     struct stat mystat;
-    
+
     if(stat(path.c_str(), &mystat) < 0) return;
-    if(! S_ISDIR(mystat.st_mode))       return; 
-    
+    if(! S_ISDIR(mystat.st_mode))       return;
+
+    std::string previous_cwd = m_file_system->getWorkingDirectory();
+
     if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
     {
         printf("FileManager::listFiles : Could not change CWD!\n");
         return;
     }
     irr::io::IFileList* files = m_file_system->createFileList();
-    
+
     for(int n=0; n<(int)files->getFileCount(); n++)
     {
+        //printf("---- Entry : %s \n", (make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n)).c_str());
         result.insert(make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n));
     }
+
+    m_file_system->changeWorkingDirectoryTo( previous_cwd.c_str() );
 }   // listFiles
 
 //-----------------------------------------------------------------------------
