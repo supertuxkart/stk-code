@@ -39,8 +39,8 @@
 
 #include "irrlicht.h"
 // ul.h includes windows.h, so this define is necessary
-#define _WINSOCKAPI_
-#include <plib/ul.h>
+//#define _WINSOCKAPI_
+//#include <plib/ul.h>
 #include "btBulletDynamicsCommon.h"
 
 #include "graphics/irr_driver.hpp"
@@ -411,28 +411,26 @@ std::string FileManager::getHighscoreFile(const std::string& fname) const
 void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,
                             bool is_full_path, bool make_full_path) const
 {
-        struct stat mystat;
-
-        // don't list directories with a slash on the end, it'll fail on win32
-//        assert(dir[dir.size()-1] != '/');
-
-        result.clear();
-
-        std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
-
-        if(stat(path.c_str(), &mystat) < 0) return;
-        if(! S_ISDIR(mystat.st_mode))       return; 
-
-        ulDir* mydir = ulOpenDir(path.c_str());
-        if(!mydir) return;
-
-        ulDirEnt* mydirent;
-        while( (mydirent = ulReadDir(mydir)) != 0)
-        {
-            result.insert(make_full_path ? path+"/"+mydirent->d_name
-                                         :          mydirent->d_name);
-        }
-        ulCloseDir(mydir);
+    result.clear();
+    
+    std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
+    
+    struct stat mystat;
+    
+    if(stat(path.c_str(), &mystat) < 0) return;
+    if(! S_ISDIR(mystat.st_mode))       return; 
+    
+    if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
+    {
+        printf("FileManager::listFiles : Could not change CWD!\n");
+        return;
+    }
+    irr::io::IFileList* files = m_file_system->createFileList();
+    
+    for(int n=0; n<(int)files->getFileCount(); n++)
+    {
+        result.insert(make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n));
+    }
 }   // listFiles
 
 //-----------------------------------------------------------------------------
