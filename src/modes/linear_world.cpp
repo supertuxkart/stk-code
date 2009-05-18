@@ -227,9 +227,6 @@ void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
     bool newLap = kart_info.m_last_track_coords.getY() > track_length-delta && 
                   kart_info.m_curr_track_coords.getY() <  delta;
   
-    //    This fails if a kart skips a sector (or comes from the outside of the drivelines)
-    //const bool newLap = kart_info.m_last_valid_sector == (int)m_track->m_distance_from_start.size()-1 &&
-    //                    kart_info.m_track_sector == 0;
     if ( newLap )
     {
         // Only increase the lap counter and set the new time if the
@@ -520,7 +517,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
     
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         m_track->m_angle[info.m_track_sector] );
+                         m_track->getAngle(info.m_track_sector) );
     kart->setRotation(heading);
     
     // A certain epsilon is added here to the Z coordinate (0.1), in case
@@ -530,7 +527,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     btTransform pos;
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
     pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
-                    m_track->m_angle[info.m_track_sector]));
+                    m_track->getAngle(info.m_track_sector)));
 
     body->setCenterOfMassTransform(pos);
     
@@ -608,9 +605,15 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     if(!m) return;
 
     const Kart *kart=m_kart[i];
+    // If the kart can go in more than one directions from the current track
+    // don't do any reverse message handling, since it is likely that there
+    // will be one direction in which it isn't going backwards anyway.
+    if(m_track->getQuadGraph().getNumberOfSuccessors(m_kart_info[i].m_track_sector)>1)
+        return;
+    
     // check if the player is going in the wrong direction
     float angle_diff = kart->getHPR().getHeading() -
-                       m_track->m_angle[m_kart_info[i].m_track_sector];
+                       m_track->getAngle(m_kart_info[i].m_track_sector);
     if(angle_diff > M_PI) angle_diff -= 2*M_PI;
     else if (angle_diff < -M_PI) angle_diff += 2*M_PI;
     // Display a warning message if the kart is going back way (unless

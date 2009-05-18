@@ -42,24 +42,15 @@
 #include "graphics/scene.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
-#include "robots/track_info.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-
-const TrackInfo *DefaultRobot::m_track_info = NULL;
-int DefaultRobot::m_num_of_track_info_instances = 0;
 
 DefaultRobot::DefaultRobot(const std::string& kart_name,
                            int position, const btTransform& init_pos, 
                            const Track *track ) :
     AutoKart( kart_name, position, init_pos )
 {
-    if(m_num_of_track_info_instances==0)
-    {
-        m_track_info = new TrackInfo(track);
-        m_num_of_track_info_instances++;
-    }
     reset();
     m_kart_length = m_kart_properties->getKartModel()->getLength();
     m_kart_width  = m_kart_properties->getKartModel()->getWidth();
@@ -130,12 +121,6 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
  */
 DefaultRobot::~DefaultRobot()
 {
-    m_num_of_track_info_instances--;
-
-    if(m_num_of_track_info_instances==0)
-    {
-        delete m_track_info;
-    }
 }   // ~DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -267,8 +252,10 @@ void DefaultRobot::handleBraking()
     //limit.
     if ( m_crashes.m_road && kart_info.m_on_road && getVelocityLC().getY() > MIN_SPEED)
     {
-        float kart_ang_diff = m_track->m_angle[m_track_sector] -
-                              RAD_TO_DEGREE(getHPR().getHeading());
+        float kart_ang_diff = 
+            m_quad_graph->getAngleToNext(m_track_sector,
+                                         m_successor_index[m_track_sector])
+          - getHPR().getHeading();
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
@@ -729,7 +716,8 @@ void DefaultRobot::handleNitroAndZipper()
 //-----------------------------------------------------------------------------
 float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
 {
-    float angle = m_track->m_angle[SECTOR];
+    float angle = m_quad_graph->getAngleToNext(SECTOR,
+                                               m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - getHPR().getHeading();
@@ -1109,7 +1097,10 @@ void DefaultRobot::findCurve()
     }
 
 
-    m_curve_angle = normalizeAngle(m_track->m_angle[i] - m_track->m_angle[m_track_sector]);
+    m_curve_angle = 
+        normalizeAngle(m_quad_graph->getAngleToNext(i, m_successor_index[i])
+                      -m_quad_graph->getAngleToNext(m_track_sector, 
+                                                    m_successor_index[m_track_sector]) );
     m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
     
     m_curve_target_speed = getMaxSpeedOnTerrain();

@@ -36,13 +36,13 @@ using namespace irr;
 #include "material.hpp"
 #include "audio/music_information.hpp"
 #include "items/item.hpp"
+#include "tracks/quad_graph.hpp"
 #include "utils/vec3.hpp"
 
 class TriangleMesh;
 class MovingTexture;
 class XMLNode;
 class PhysicalObject;
-class QuadGraph;
 
 class Track
 {
@@ -137,20 +137,16 @@ public:
     //FIXME: should the driveline be set as a sgVec2?
 private:
     std::vector<Vec3>    m_driveline;
-public:
-    /** Same as drivelines, but with stk_config->m_offroad_tolerance applied
-     *  to widen the road (to make shortcut detection less severe). */
     std::vector<float>   m_distance_from_start;
     std::vector<float>   m_path_width;
-    std::vector<float>   m_angle;
+	//Left and Right drivelines for overhead map rendering.
+    std::vector<Vec3>    m_left_driveline;
+    std::vector<Vec3>    m_right_driveline;
+public:
     
     /** Start positions for arenas (unused in linear races) */
     std::vector<Vec3>   m_start_positions;
     
-	//Left and Right drivelines for overhead map rendering.
-	//(Should probably be private as they are only used internally right now)
-    std::vector<Vec3> m_left_driveline;
-    std::vector<Vec3> m_right_driveline;
 
     Vec3 m_driveline_min;
     Vec3 m_driveline_max;
@@ -226,6 +222,15 @@ public:
 
     /** Returns the graph of quads, mainly for the AI. */
     const QuadGraph&   getQuadGraph() const { return *m_quad_graph; }
+
+    /** Returns 'a' angle for quad n. This angle is used to position a kart
+     *  after a rescue, and to detect wrong directions. This function will
+     *  always return the angle towards the first successor, i.e. the angle
+     *  in the direction of the default way on the track.
+     *  \param n Number of the quad for which the angle is asked. 
+     */
+    float              getAngle(int n) const 
+                                   { return m_quad_graph->getAngleToNext(n, 0); }
     /*
     void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
     {

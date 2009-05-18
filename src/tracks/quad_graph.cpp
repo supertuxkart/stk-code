@@ -118,7 +118,11 @@ void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) 
 void QuadGraph::GraphNode::addSuccessor(int to, const QuadSet &quad_set)
 {
     m_vertices.push_back(to);
-    Vec3 diff = quad_set.getCenterOfQuad(to) 
-              - quad_set.getCenterOfQuad(m_index);
+    Vec3 this_xyz = quad_set.getCenterOfQuad(m_index);
+    Vec3 next_xyz = quad_set.getCenterOfQuad(to);
+    Vec3 diff     = next_xyz - this_xyz;
     m_distance_to_next.push_back(diff.length());
+
+    float theta = -atan2(diff.getX(), diff.getY());
+    m_angle_to_next.push_back(theta);
 }   // addSuccessor

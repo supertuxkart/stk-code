@@ -37,6 +37,8 @@ class QuadGraph {
         std::vector<int>   m_vertices;
         /** The distance to each of the successors. */
         std::vector<float> m_distance_to_next;
+        /** The angle of the line from this node to each neighbour. */
+        std::vector<float> m_angle_to_next;
     public:
         /** Constructor, stores the index. 
          *  \param index Index of this node in m_all_quads. */
@@ -50,6 +52,9 @@ class QuadGraph {
         /** Returns the distance to the j-th. successor. */
         float         getDistanceToSuccessor(int j) const
                                    { return m_distance_to_next[j];           }
+        /** Returns the angle from this node to the j-th. successor. */
+        float         getAngleToSuccessor(int j) const
+                                   { return m_angle_to_next[j];              }
     };
 
     // ========================================================================
@@ -78,7 +83,13 @@ public:
     /** Return the distance to the j-th successor of node n. */
     float          getDistanceToNext(int n, int j) const
                          { return m_all_nodes[n]->getDistanceToSuccessor(j);}
-
+    /** Returns the angle of the line between node n and its j-th. 
+     *  successor. */
+    float          getAngleToNext(int n, int j) const
+                         { return m_all_nodes[n]->getAngleToSuccessor(j);   }
+    /** Returns the number of successors of a node n. */
+    int            getNumberOfSuccessors(int n) const 
+                         { return m_all_nodes[n]->getNumberOfSuccessors();  }
 };   // QuadGraph
 
 #endif

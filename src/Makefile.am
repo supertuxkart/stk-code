@@ -222,8 +222,6 @@ supertuxkart_SOURCES = \
  physics/triangle_mesh.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
- robots/track_info.cpp \
- robots/track_info.hpp \
  tracks/quad_graph.hpp \
  tracks/quad_graph.cpp \
  tracks/quad_set.hpp \

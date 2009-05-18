@@ -253,6 +253,10 @@
 				Name="gui"
 				>
 				<File
+					RelativePath="..\..\gui\credits.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\engine.cpp"
 					>
 				</File>
@@ -314,10 +318,6 @@
 				>
 				<File
 					RelativePath="../../../src\robots\default_robot.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\robots\track_info.cpp"
 					>
 				</File>
 			</Filter>
@@ -783,6 +783,10 @@
 				Name="gui"
 				>
 				<File
+					RelativePath="..\..\gui\credits.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\font.hpp"
 					>
 				</File>
@@ -840,10 +844,6 @@
 				>
 				<File
 					RelativePath="../../../src\robots\default_robot.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\robots\track_info.hpp"
 					>
 				</File>
 			</Filter>

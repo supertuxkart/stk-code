@@ -952,6 +952,12 @@ void Track::loadDriveline()
 {
     m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".quads"), 
                                  file_manager->getTrackFile(m_ident+".graph"));
+    if(m_quad_graph->getNumNodes()==0)
+    {
+        fprintf(stderr, "No graph nodes defined for track '%s'\n",
+                m_filename);
+        exit(-1);
+    }
     readDrivelineFromFile(m_left_driveline, ".drvl");
 
     const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
@@ -966,7 +972,6 @@ void Track::loadDriveline()
 
     m_driveline.reserve(DRIVELINE_SIZE);
     m_path_width.reserve(DRIVELINE_SIZE);
-    m_angle.reserve(DRIVELINE_SIZE);
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
         Vec3 center_point = (m_left_driveline[i]+m_right_driveline[i])*0.5;
@@ -983,7 +988,6 @@ void Track::loadDriveline()
         float dy = m_driveline[next].getY() - m_driveline[i].getY();
 
         float theta = -atan2(dx, dy);
-        m_angle.push_back(theta);
     }
 
     m_driveline_min = Vec3( SG_MAX/2.0f);

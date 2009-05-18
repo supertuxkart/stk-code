@@ -26,7 +26,6 @@
 
 class Track;
 class LinearWorld;
-class TrackInfo;
 class QuadGraph;
 
 class DefaultRobot : public AutoKart
@@ -143,13 +142,6 @@ private:
 
     /** Cache width of kart. */
     float m_kart_width;
-    /** All AIs share the track info object, so that its information needs 
-     *  only to be computed once. */
-    static const TrackInfo *m_track_info;
-    /** This counts how many AIs have a pointer to the TrackInfo object. If
-     *  this number reaches zero, the shared TrackInfo object is 
-     *  deallocated. */
-    static int m_num_of_track_info_instances;
 
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
