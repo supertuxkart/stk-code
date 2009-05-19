@@ -410,7 +410,12 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 {
     result.clear();
 
+    std::string previous_cwd1 = m_file_system->getWorkingDirectory();
+#ifdef WIN32
+    std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
+#else
     std::string path = is_full_path ? dir + "/" : m_root_dir+"/"+dir + "/";
+#endif
     //printf("******* Path : %s \n", path.c_str());
 
     struct stat mystat;
