@@ -1657,6 +1657,9 @@ void Track::loadTrackModel()
     irr_driver->setAmbientLight(video::SColor(255, 255, 255, 255));
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
+    if(user_config->m_track_debug)
+        m_quad_graph->createDebugMesh();
+
 }   // loadTrack
 
 //-----------------------------------------------------------------------------

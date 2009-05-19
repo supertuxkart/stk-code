@@ -40,7 +40,13 @@
 RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
             m_plunger(plunger), m_owner(kart)   
 {
-    m_mesh           = irr_driver->createQuadMesh();
+    video::SColor color(77, 179, 0, 0);
+    video::SMaterial m;
+    m.AmbientColor    = color;
+    m.DiffuseColor    = color;
+    m.EmissiveColor   = color;
+    m.BackfaceCulling = false;
+    m_mesh           = irr_driver->createQuadMesh(&m);
     m_buffer         = m_mesh->getMeshBuffer(0);
     m_attached_state = RB_TO_PLUNGER;
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);

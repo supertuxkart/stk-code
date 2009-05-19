@@ -49,26 +49,36 @@ class QuadGraph {
         /** Returns the number of successors. */
         unsigned int  getNumberOfSuccessors() const 
                                    { return (unsigned int)m_vertices.size(); }
+        /** Returns the index in the quad_set of this node. */
+        int           getIndex() const { return m_index;                     }
         /** Returns the distance to the j-th. successor. */
         float         getDistanceToSuccessor(int j) const
                                    { return m_distance_to_next[j];           }
         /** Returns the angle from this node to the j-th. successor. */
         float         getAngleToSuccessor(int j) const
                                    { return m_angle_to_next[j];              }
-    };
+    };   // GraphNode
 
     // ========================================================================
 protected:
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
+    /** The set of all quads. */
     QuadSet                 *m_all_quads;
+    /** For debug mode only: the node of the debug mesh. */
+    scene::ISceneNode       *m_node;
+    /** For debug only: the mesh of the debug mesh. */
+    scene::IMesh            *m_mesh;
+    /** For debug only: the actual mesh buffer storing the quads. */
+    scene::IMeshBuffer      *m_mesh_buffer;
+
     void setDefaultSuccessors();
     void load         (const std::string &filename);
-    
 public:
                  QuadGraph     (const std::string &quad_file_name, 
                                 const std::string graph_file_name);
                 ~QuadGraph     ();
+    void         createDebugMesh();
     void         getSuccessors(int quadNumber, 
                                std::vector<unsigned int>& succ) const;
 

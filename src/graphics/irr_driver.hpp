@@ -63,7 +63,7 @@ public:
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
-    scene::IMesh         *createQuadMesh(const video::SColor &c=video::SColor(77, 179, 0, 0));
+    scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL);
     scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
                                        float wave_speed, float wave_length);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);

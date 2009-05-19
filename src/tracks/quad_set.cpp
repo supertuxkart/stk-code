@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
 /** Constructor, loads the quad set from a file.
@@ -48,7 +49,7 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
         std::vector<std::string> l = StringUtils::split(s, ':');
         int n=atoi(l[0].c_str());
         int p=atoi(l[1].c_str());
-        *result=(*m_allQuads[n])[p];
+        *result=(*m_all_quads[n])[p];
     } 
     else
     {
@@ -83,7 +84,7 @@ void QuadSet::load(const std::string &filename) {
         getPoint(xml_node, "p2", &p2);
         getPoint(xml_node, "p3", &p3);
         Quad* q=new Quad(p0,p1,p2,p3);
-        m_allQuads.push_back(q);
+        m_all_quads.push_back(q);
 
     }
     delete xml;
@@ -115,10 +116,11 @@ bool QuadSet::pointInQuad(const Quad& q, const btVector3& p) const {
     algorithm, used to get the initial quad position of a kart, but not for
     constantly updating it.
 */
-int QuadSet::getQuad(const Vec3 &pos) const {
-    for(unsigned int i=0; i<m_allQuads.size(); i++) {
-        if(pointInQuad(*(m_allQuads[i]), pos)) return i;
+int QuadSet::getQuadAtPos(const Vec3 &pos) const {
+    for(unsigned int i=0; i<m_all_quads.size(); i++) {
+        if(pointInQuad(*(m_all_quads[i]), pos)) return i;
     }
     return QUAD_NONE;
-}   // getQuad
+}   // getQuadAtPos
+
 // -----------------------------------------------------------------------------

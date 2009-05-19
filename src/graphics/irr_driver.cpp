@@ -361,12 +361,12 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 // ----------------------------------------------------------------------------
 /** Creates a quad mesh buffer and adds it to the scene graph.
  */
-scene::IMesh *IrrDriver::createQuadMesh(const video::SColor &color)
+scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material)
 {
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
     video::S3DVertex v;
     v.Pos = core::vector3df(0,0,0);
-
+    
     // Add the vertices
     // ----------------
     buffer->Vertices.push_back(v);
@@ -391,12 +391,8 @@ scene::IMesh *IrrDriver::createQuadMesh(const video::SColor &color)
     buffer->Vertices[1].Normal = n;
     buffer->Vertices[2].Normal = n;
     buffer->Vertices[3].Normal = n;
-    video::SMaterial m;
-    m.AmbientColor    = color;
-    m.DiffuseColor    = color;
-    m.EmissiveColor   = color;
-    m.BackfaceCulling = false;
-    buffer->Material  = m;
+    if(material)
+        buffer->Material = *material;
     SMesh *mesh       = new SMesh();
     mesh->addMeshBuffer(buffer);
     mesh->recalculateBoundingBox();

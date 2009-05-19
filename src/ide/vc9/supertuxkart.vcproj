@@ -609,6 +609,10 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\quad.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\quad_graph.cpp"
 					>
 				</File>
@@ -1202,6 +1206,10 @@
 			<Filter
 				Name="tracks"
 				>
+				<File
+					RelativePath="..\..\tracks\quad.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\tracks\quad_graph.hpp"
 					>

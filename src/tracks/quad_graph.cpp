@@ -19,6 +19,8 @@
 
 #include "tracks/quad_graph.hpp"
 
+#include "user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/quad_set.hpp"
@@ -31,9 +33,12 @@
 QuadGraph::QuadGraph(const std::string &quad_file_name, 
                      const std::string graph_file_name)
 {
+    m_node        = NULL;
+    m_mesh        = NULL;
+    m_mesh_buffer = NULL;
     m_all_quads = new QuadSet(quad_file_name);
     // First create all nodes
-    for(unsigned int i=0; i<m_all_quads->getSize(); i++) {
+    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++) {
         m_all_nodes.push_back(new GraphNode(i));
     }
     load(graph_file_name);
@@ -96,6 +101,59 @@ void QuadGraph::setDefaultSuccessors()
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors
+
+// -----------------------------------------------------------------------------
+/** Creates the debug mesh to display the quad graph on top of the track 
+ *  model. */
+void QuadGraph::createDebugMesh()
+{
+    if(m_all_nodes.size()<=0) return;  // no debug output if not graph
+
+    // The debug track will not be lighted or culled.
+    video::SMaterial m;
+    m.BackfaceCulling = false;
+    m.Lighting        = false;
+    m_mesh            = irr_driver->createQuadMesh(&m);
+    m_mesh_buffer     = m_mesh->getMeshBuffer(0);
+    assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
+
+    video::S3DVertex* v=(video::S3DVertex*)m_mesh_buffer->getVertices();
+    // The mesh buffer already contains one quad, so set the coordinates
+    // of the first quad in there.
+    video::SColor c(255, 255, 0, 0);
+    m_all_quads->getQuad(0).setVertices(v, c);
+    
+    unsigned int      n     = m_all_quads->getNumberOfQuads();
+    // Four vertices for each of the n-1 remaining quads
+    video::S3DVertex *new_v = new video::S3DVertex[(n-1)*4];
+    // Each quad consists of 2 triangles with 3 elements, so 
+    // we need 2*3 indices for each quad.
+    irr::u16         *ind   = new irr::u16[(n-1)*6];
+
+    // Now add all other quads
+    for(unsigned int i=1; i<n; i++)
+    {
+        // Swap the colours from red to blue and back
+        c.setRed (i%2 ? 255 : 0); 
+        c.setBlue(i%2 ? 0 : 255);
+        // Transfer the 4 points of the current quad to the list of vertices
+        m_all_quads->getQuad(i).setVertices(new_v+(4*i-4), c);
+
+        // Set up the indices for the triangles
+        // (note, afaik with opengl we could use quads directly, but the code 
+        // would not be portable to directx anymore).
+        ind[6*i-6] = 4*i-4;  // First triangle: vertex 0, 1, 2
+        ind[6*i-5] = 4*i-3;
+        ind[6*i-4] = 4*i-2;
+        ind[6*i-3] = 4*i-4;  // second triangle: vertex 0, 1, 3
+        ind[6*i-2] = 4*i-2;
+        ind[6*i-1] = 4*i-1;
+    }   // for i=1; i<m_all_quads
+    
+    m_mesh_buffer->append(new_v, (n-1)*4, ind, (n-1)*6);
+    m_node           = irr_driver->addMesh(m_mesh);
+
+}   // createDebugMesh
 
 // -----------------------------------------------------------------------------
 /** Returns the list of successors or a node.
