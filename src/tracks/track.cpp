@@ -53,7 +53,6 @@ const float Track::NOHIT           = -99999.9f;
 const int   Track::QUAD_TRI_NONE   = -1;
 const int   Track::QUAD_TRI_FIRST  =  1;
 const int   Track::QUAD_TRI_SECOND =  2;
-const int   Track::UNKNOWN_SECTOR  = -1;
 
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
@@ -157,118 +156,6 @@ int Track::pointInQuad
 }   // pointInQuad
 
 //-----------------------------------------------------------------------------
-/** findRoadSector returns in which sector on the road the position
- *  xyz is. If xyz is not on top of the road, it returns
- *  UNKNOWN_SECTOR.
- *
- *  The 'sector' could be defined as the number of the closest track
- *  segment to XYZ.
- *  \param XYZ Position for which the segment should be determined.
- *  \param sector Contains the previous sector (as a shortcut, since usually
- *         the sector is the same as the last one), and on return the result
- */
-void Track::findRoadSector(const Vec3& XYZ, int *sector)const
-{
-    if(*sector!=UNKNOWN_SECTOR)
-    {
-        int next = (unsigned)(*sector) + 1 <  m_left_driveline.size() ? *sector + 1 : 0;
-        if(pointInQuad(m_left_driveline[*sector],
-                       m_right_driveline[*sector],
-                       m_right_driveline[next],   
-                       m_left_driveline[next], XYZ ) != QUAD_TRI_NONE)
-            // Still in the same sector, no changes
-            return;
-    }
-    /* To find in which 'sector' of the track the kart is, we use a
-       'point in triangle' algorithm for each triangle in the quad
-       that forms each track segment.
-     */
-    std::vector <SegmentTriangle> possible_segment_tris;
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_left_driveline.size();
-    int triangle;
-    int next;
-
-    for( size_t i = 0; i < DRIVELINE_SIZE ; ++i )
-    {
-        next = (unsigned int)i + 1 <  DRIVELINE_SIZE ? (int)i + 1 : 0;
-        triangle = pointInQuad(m_left_driveline[i], m_right_driveline[i],
-                               m_right_driveline[next], m_left_driveline[next],
-                               XYZ );
-
-        if (triangle != QUAD_TRI_NONE && ((XYZ.getZ()-m_left_driveline[i].getZ()) < 1.0f))
-        {
-            possible_segment_tris.push_back(SegmentTriangle((int)i, triangle));
-        }
-    }
-
-    /* Since xyz can be on more than one 2D track segment, we have to
-       find on top of which one of the possible track segments it is.
-     */
-    const int POS_SEG_SIZE = (int)possible_segment_tris.size();
-    if( POS_SEG_SIZE == 0 )
-    {
-        //xyz is not on the road
-        *sector = UNKNOWN_SECTOR;
-        return;
-    }
-
-    //POS_SEG_SIZE > 1
-    /* To find on top of which track segment the variable xyz is,
-       we get which of the possible triangles that are under xyz
-       has the lower distance on the height(Y or Z) axis.
-    */
-    float dist;
-    float near_dist = 99999;
-    int nearest = QUAD_TRI_NONE;
-    size_t segment;
-    sgVec4 plane;
-    
-    for( int i = 0; i < POS_SEG_SIZE; ++i )
-    {
-        segment = possible_segment_tris[i].segment;
-        next = segment + 1 < DRIVELINE_SIZE ? (int)segment + 1 : 0;
-        
-        // Note: we can make the plane with the normal driveliens
-        // (not the one with tolerance), since the driveliens with
-        // tolerance lie in the same plane.
-        if( possible_segment_tris[i].triangle == QUAD_TRI_FIRST )
-        {
-            sgMakePlane( plane, m_left_driveline[segment].toFloat(),
-                                m_right_driveline[segment].toFloat(), 
-                                m_right_driveline[next].toFloat() );
-        }
-        else //possible_segment_tris[i].triangle == QUAD_TRI_SECOND
-        {
-            sgMakePlane( plane, m_right_driveline[next].toFloat(),
-                                m_left_driveline[next].toFloat(),
-                                m_left_driveline[segment].toFloat() );
-        }
-        
-        dist = sgHeightAbovePlaneVec3( plane, XYZ.toFloat() );
-        
-        /* sgHeightAbovePlaneVec3 gives a negative dist if the plane
-           is on top, so we have to rule it out.
-           
-           However, for some reason there are cases where we get
-           negative values for the track segment we should be on.
-        */
-        if( dist > -2.0 && dist < near_dist)
-        {
-            near_dist = dist;
-            nearest = i;
-        }
-    }
-    
-    if( nearest != QUAD_TRI_NONE )
-    {
-        *sector=possible_segment_tris[nearest].segment;
-        return;
-    }
-    *sector = UNKNOWN_SECTOR;
-    return;                         // This only happens if the position is
-                                    // under all the possible sectors
-}   // findRoadSector
-//-----------------------------------------------------------------------------
 /** findOutOfRoadSector finds the sector where XYZ is, but as it name
     implies, it is more accurate for the outside of the track than the
     inside, and for STK's needs the accuracy on top of the track is
@@ -303,7 +190,7 @@ int Track::findOutOfRoadSector
     const int CURR_SECTOR
 ) const
 {
-    int sector = UNKNOWN_SECTOR;
+    int sector = QuadGraph::UNKNOWN_SECTOR;
     float dist;
     //FIXME: it can happen that dist is bigger than nearest_dist for all the
     //the points we check (currently a limit of +/- 10), and if so, the
@@ -318,7 +205,7 @@ int Track::findOutOfRoadSector
 
     int begin_sector = 0;
     int count      = DRIVELINE_SIZE;
-    if(CURR_SECTOR != UNKNOWN_SECTOR )
+    if(CURR_SECTOR != QuadGraph::UNKNOWN_SECTOR )
     {
         const int LIMIT = 10; //The limit prevents shortcuts
         if( CURR_SECTOR - LIMIT < 0 )
@@ -361,75 +248,12 @@ int Track::findOutOfRoadSector
         begin_sector = next_sector;
     }   // for j
 
-    if(sector==UNKNOWN_SECTOR || sector >=DRIVELINE_SIZE)
+    if(sector==QuadGraph::UNKNOWN_SECTOR || sector >=DRIVELINE_SIZE)
     {
         printf("unknown sector found.\n");
     }
     return sector;
 }   // findOutOfRoadSector
-
-//-----------------------------------------------------------------------------
-/** spatialToTrack() takes absolute coordinates (coordinates in OpenGL
- *  space) and transforms them into coordinates based on the track. It is
- *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
- *  of the returned vector is how much of the track the point has gone
- *  through, the x-axis is on which side of the road it is, and the z-axis
- *  contains half the width of the track at this point. The return value
- *  is p1, i.e. the first of the two driveline points between which the
- *  kart is currently located.
- */
-int Track::spatialToTrack
-(
-    Vec3& dst, /* out */
-    const Vec3& POS,
-    const int SECTOR
-) const
-{
-    if( SECTOR == UNKNOWN_SECTOR )
-    {
-        std::cerr << "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n";
-        return -1;
-    }
-
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_driveline.size();
-    const size_t PREV = SECTOR == 0 ? DRIVELINE_SIZE - 1 : SECTOR - 1;
-    const size_t NEXT = (size_t)SECTOR+1 >= DRIVELINE_SIZE ? 0 : SECTOR + 1;
-
-    const float DIST_PREV = (m_driveline[PREV]-POS).length2_2d();
-    const float DIST_NEXT = (m_driveline[NEXT]-POS).length2_2d();
-
-    size_t p1, p2;
-    if ( DIST_NEXT < DIST_PREV )
-    {
-        p1 = SECTOR; p2 = NEXT;
-    }
-    else
-    {
-        p1 = PREV; p2 = SECTOR;
-    }
-
-    sgVec3 line_eqn;
-    sgVec2 tmp;
-
-    sgMake2DLine ( line_eqn, m_driveline[p1].toFloat(), m_driveline[p2].toFloat() );
-
-    dst.setX(sgDistToLineVec2 ( line_eqn, POS.toFloat() ) );
-
-    sgAddScaledVec2 ( tmp, POS.toFloat(), line_eqn, -dst.getX() );
-
-    float dist_from_driveline_p1 = sgDistanceVec2 ( tmp, m_driveline[p1].toFloat() );
-    dst.setY(dist_from_driveline_p1 + m_distance_from_start[p1]);
-    // Set z-axis to half the width (linear interpolation between the
-    // width at p1 and p2) - m_path_width is actually already half the width
-    // of the track. This is used to determine if a kart is too far
-    // away from the road and is therefore considered taking a shortcut.
-
-    float fraction = dist_from_driveline_p1
-                   / (m_distance_from_start[p2]-m_distance_from_start[p1]);
-    dst.setZ(m_path_width[p1]*(1-fraction)+fraction*m_path_width[p2]);
-
-    return (int)p1;
-}   // spatialToTrack
 
 //-----------------------------------------------------------------------------
 const Vec3& Track::trackToSpatial(const int SECTOR ) const
@@ -476,73 +300,6 @@ btTransform Track::getStartTransform(unsigned int pos) const
                                    : 0.0f ));
     return start;
 }   // getStartTransform
-
-//-----------------------------------------------------------------------------
-void Track::addDebugToScene(int type) const
-{
-    if(type & 1)
-    {
-        /*
-        ssgaSphere *sphere;
-        sgVec3 center;
-        sgVec4 colour;
-        for(unsigned int i = 0; i < m_driveline.size(); ++i)
-        {
-            sphere = new ssgaSphere;
-            sgCopyVec3(center, m_driveline[i].toFloat());
-            sphere->setCenter(center);
-            sphere->setSize(getWidth()[i] / 4.0f);
-        
-            if(i == 0)
-            {
-                colour[0] = colour[2] = colour[3] = 255;
-                colour[1] = 0;
-            }
-            else
-            {
-                colour[0] = colour[1] = colour[3] = 255;
-                colour[2] = 0;
-            }
-            sphere->setColour(colour);
-            stk_scene->add(sphere);
-        }   // for i
-         */
-    }  /// type ==1
-    // 2: drivelines
-    if(type & 2)
-    {
-        /*
-        ssgVertexArray* v_array = new ssgVertexArray();
-        ssgColourArray* c_array = new ssgColourArray();
-        const std::vector<Vec3> &left  = m_left_driveline;
-        const std::vector<Vec3> &right = m_right_driveline;
-        for(unsigned int i = 0; i < m_driveline.size(); i++)
-        {
-            int ip1 = i==m_driveline.size()-1 ? 0 : i+1;
-            // The segment display must be slightly higher than the
-            // track, otherwise it's not clearly visible.
-            sgVec3 v;
-            sgCopyVec3(v,left [i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,right[i  ].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,right[ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgCopyVec3(v,left [ip1].toFloat()); v[2]+=0.1f; v_array->add(v);
-            sgVec4 vc;
-            vc[0] = i%2==0 ? 1.0f : 0.0f;
-            vc[1] = 1.0f-v[0];
-            vc[2] = 0.0f;
-            vc[3] = 0.1f;
-            c_array->add(vc);c_array->add(vc);c_array->add(vc);c_array->add(vc);
-        }   // for i
-        // if GL_QUAD_STRIP is used, the colours are smoothed, so the changes
-        // from one segment to the next are not visible.
-        ssgVtxTable* l = new ssgVtxTable(GL_QUADS, v_array,
-                                         (ssgNormalArray*)NULL,
-                                         (ssgTexCoordArray*)NULL,
-                                         c_array);
-        stk_scene->add(l);
-         */
-    }
-}   // addDebugToScene
 
 //-----------------------------------------------------------------------------
 /** It's not the nicest solution to have two very similar version of a function,
@@ -870,8 +627,8 @@ void Track::loadTrack(const std::string &filename)
     m_camera_final_hpr.degreeToRad();
 
     m_sky_type = SKY_NONE;
-    const XMLNode *node = root->getNode("sky-dome");
-    if(node)
+    const XMLNode *xml_node = root->getNode("sky-dome");
+    if(xml_node)
     {
         m_sky_type            = SKY_DOME;
         m_sky_vert_segments   = 16;
@@ -879,19 +636,19 @@ void Track::loadTrack(const std::string &filename)
         m_sky_sphere_percent  = 1.0f;
         m_sky_texture_percent = 1.0f;
         std::string s;
-        node->get("texture",          &s                   );
+        xml_node->get("texture",          &s                   );
         m_sky_textures.push_back(s);
-        node->get("vertical",        &m_sky_vert_segments  );
-        node->get("horizontal",      &m_sky_hori_segments  );
-        node->get("sphere-percent",  &m_sky_sphere_percent );
-        node->get("texture-percent", &m_sky_texture_percent);
+        xml_node->get("vertical",        &m_sky_vert_segments  );
+        xml_node->get("horizontal",      &m_sky_hori_segments  );
+        xml_node->get("sphere-percent",  &m_sky_sphere_percent );
+        xml_node->get("texture-percent", &m_sky_texture_percent);
 
     }   // if sky-dome
-    node = root->getNode("sky-box");
-    if(node)
+    xml_node = root->getNode("sky-box");
+    if(xml_node)
     {
         std::string s;
-        node->get("texture", &s);
+        xml_node->get("texture", &s);
         m_sky_textures = StringUtils::split(s, ' ');
         if(m_sky_textures.size()!=6)
         {
@@ -970,14 +727,10 @@ void Track::loadDriveline()
         << " vertex long. Track is " << m_name << " ." << std::endl;
 
     m_driveline.reserve(DRIVELINE_SIZE);
-    m_path_width.reserve(DRIVELINE_SIZE);
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
     {
         Vec3 center_point = (m_left_driveline[i]+m_right_driveline[i])*0.5;
         m_driveline.push_back(center_point);
-
-        float width = ( m_right_driveline[i] - center_point ).length();
-        m_path_width.push_back(width);
     }
 
     for(unsigned int i = 0; i < DRIVELINE_SIZE; ++i)
@@ -1032,7 +785,7 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
         throw std::runtime_error(msg.str());
     }
 
-    int prev_sector = UNKNOWN_SECTOR;
+    int prev_sector = QuadGraph::UNKNOWN_SECTOR;
     SGfloat prev_distance = 1.51f;
     while(!feof(fd))
     {
@@ -1057,7 +810,7 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
 
         Vec3 point(x,y,z);
 
-        if(prev_sector != UNKNOWN_SECTOR) 
+        if(prev_sector != QuadGraph::UNKNOWN_SECTOR) 
             prev_distance = (point-line[prev_sector]).length2_2d();
 
         //1.5f was choosen because it's more or less the length of the tuxkart
@@ -1151,17 +904,17 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
  */
-bool Track::loadMainTrack(const XMLNode &node)
+bool Track::loadMainTrack(const XMLNode &xml_node)
 {
     std::string model_name;
-    node.get("model", &model_name);
+    xml_node.get("model", &model_name);
     std::string full_path = file_manager->getTrackFile(model_name, 
                                                        getIdent());
     scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
     if(!mesh)
     {
         fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
-                node.getName().c_str(), model_name.c_str());
+                xml_node.getName().c_str(), model_name.c_str());
         exit(-1);
     }
 
@@ -1177,12 +930,12 @@ bool Track::loadMainTrack(const XMLNode &node)
 
     scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
     core::vector3df xyz(0,0,0);
-    node.getXYZ(&xyz);
+    xml_node.getXYZ(&xyz);
     core::vector3df hpr(0,0,0);
-    node.getHPR(&hpr);
+    xml_node.getHPR(&hpr);
     scene_node->setPosition(xyz);
     scene_node->setRotation(hpr);
-    handleAnimatedTextures(scene_node, node);
+    handleAnimatedTextures(scene_node, xml_node);
     m_all_nodes.push_back(scene_node);
     scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
 
@@ -1621,8 +1374,6 @@ void Track::loadTrackModel()
             trans  -> addKid(lod   );
             m_model-> addKid(trans );
             lod    -> setRanges(r, 2);
-            if(user_config->m_track_debug)
-                addDebugToScene(user_config->m_track_debug);
 
         }
         else
@@ -1637,6 +1388,23 @@ void Track::loadTrackModel()
 
     if(m_sky_type==SKY_DOME)
     {
+        scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
+                                                         m_sky_hori_segments,
+                                                         m_sky_vert_segments, 
+                                                         m_sky_texture_percent, 
+                                                         m_sky_sphere_percent);
+        for(unsigned int i=0; i<node->getMaterialCount(); i++)
+        {
+            video::SMaterial &irrMaterial=node->getMaterial(i);
+            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+            {
+                video::ITexture* t=irrMaterial.getTexture(j);
+                if(!t) continue;
+                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                m_animated_textures.push_back(new MovingTexture(m, 0.5f, 0.5f));
+            }   // for j<MATERIAL_MAX_TEXTURES
+        }   // for i<getMaterialCount
+
         m_all_nodes.push_back(irr_driver->addSkyDome(m_sky_textures[0],
                                                      m_sky_hori_segments, 
                                                      m_sky_vert_segments, 

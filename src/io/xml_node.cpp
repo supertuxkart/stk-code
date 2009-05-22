@@ -195,6 +195,15 @@ int XMLNode::get(const std::string &attribute, int *value) const
 }   // get(int)
 
 // ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, unsigned int *value) const
+{
+    std::string s;
+    if(!get(attribute, &s)) return 0;
+    *value = atoi(s.c_str());
+    return 1;
+}   // get(unsigned int)
+
+// ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, float *value) const
 {
     std::string s;

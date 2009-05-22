@@ -610,7 +610,7 @@ void Kart::update(float dt)
     {
         // let kart fall a bit before rescuing
         if(fabs( getXYZ().getZ() 
-                -RaceManager::getTrack()->getQuadGraph().getCenterOfQuad(0).getZ() ) > 17)
+                -RaceManager::getTrack()->getQuadGraph().getQuad(0).getCenter().getZ() ) > 17)
             forceRescue();    
     } 
     else if(material)

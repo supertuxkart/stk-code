@@ -71,6 +71,8 @@ void QuadSet::load(const std::string &filename) {
     }
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
+        if(i==293)
+            printf("XX");
         const XMLNode *xml_node = xml->getNode(i);
         if(xml_node->getName()!="quad")
         {

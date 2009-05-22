@@ -26,6 +26,8 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3)
  {
      m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
      m_center = 0.25f*(p0+p1+p2+p3);
+     m_min_height = std::min ( std::min(p0.getZ(), p1.getZ()),
+                               std::min(p0.getZ(), p1.getZ())  );
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -62,6 +64,29 @@ void Quad::setVertices(video::S3DVertex *v, const video::SColor &color) const
     v[2].Color  = color;
     v[3].Color  = color;
 }   // setVertices
+
+// -----------------------------------------------------------------------------
+/** Returns wether a point is to the left or to the right of a line.
+ *  While all arguments are 3d, only the x and y coordinates are actually used.
+*/
+float Quad::sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const
+{
+    return (l2.getX()-l1.getX())*(p.getY()-l1.getY()) -
+           (l2.getY()-l1.getY())*(p.getX()-l1.getX());
+}   // sideOfLine
+
+// ----------------------------------------------------------------------------
+bool Quad::pointInQuad(const Vec3& p) const 
+{
+    if(sideOfLine2D(m_p[0], m_p[2], p)<0) {
+        return sideOfLine2D(m_p[0], m_p[1], p) >  0.0 &&
+               sideOfLine2D(m_p[1], m_p[2], p) >= 0.0;
+    } else {
+        return sideOfLine2D(m_p[2], m_p[3], p) >  0.0 &&
+               sideOfLine2D(m_p[3], m_p[0], p) >= 0.0;
+    }
+}   // pointInQuad
+
 
 #include "quad.hpp"
 

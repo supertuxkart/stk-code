@@ -26,19 +26,34 @@
 
 #include "utils/vec3.hpp"
 
-class Quad {
-public:
+class Quad 
+{
+private:
     /** The four points of a quad. */
     Vec3 m_p[4];
-    /** The center, which is used by the AI. This saves some 
-    computations at runtime. */
+
+    /** The center of all four points, which is used by the AI. 
+     *  This saves some computations at runtime. */
     Vec3 m_center;
-    
-    Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
-    /** Returns the i-th. point of a quad. */
-    const Vec3& operator[](int i) const {return m_p[i];    }
-    /** Returns the center of a quad. */
-    const Vec3& getCenter ()      const {return m_center;  }
+
+    /** The minimum height of the quad, used in case that several quads
+     *  are on top of each other when determining the sector a kart is on. */
+    float m_min_height;
+    float sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const;
+
+public:
+         Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
     void setVertices(video::S3DVertex *v, const video::SColor &color) const;
+    bool pointInQuad(const Vec3& p) const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the i-th. point of a quad. */
+    const Vec3& operator[](int i) const {return m_p[i];     }
+    // ------------------------------------------------------------------------
+    /** Returns the center of a quad. */
+    const Vec3& getCenter ()      const {return m_center;   }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum height of a quad. */
+    float       getMinHeight() const { return m_min_height; }
 };   // class Quad
 #endif

@@ -106,8 +106,6 @@ public:
     static const int QUAD_TRI_FIRST;
     static const int QUAD_TRI_SECOND;
 
-    static const int UNKNOWN_SECTOR;
-
     struct SegmentTriangle
     {
         int segment;
@@ -166,20 +164,15 @@ public:
                       ~Track             ();
     bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
-    void               addDebugToScene   (int type                    ) const;
     void               draw2Dview        (float x_offset,
                                           float y_offset              ) const;
     void               drawScaled2D      (float x, float y, float w,
                                           float h                     ) const;
 
-    void               findRoadSector    (const Vec3& XYZ, int *sector) const;
     int                findOutOfRoadSector(const Vec3& XYZ,
                                            const RoadSide SIDE,
                                            const int CURR_SECTOR
                                            ) const;
-    int                spatialToTrack    (Vec3& dst,
-                                          const Vec3& POS,
-                                          const int SECTOR            ) const;
     const Vec3&        trackToSpatial    (const int SECTOR) const;
     void               loadTrackModel    ();
     void               addMusic          (MusicInformation* mi)
@@ -207,8 +200,7 @@ public:
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
-    const std::vector<float>& getWidth   () const {return m_path_width;         }
-    const std::string& getItemStyle   () const {return m_item_style;      }
+    const std::string& getItemStyle      () const {return m_item_style;         }
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}
     const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }

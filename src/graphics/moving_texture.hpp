@@ -38,6 +38,7 @@ private:
 
 public:
          MovingTexture(core::matrix4 *matrix, const XMLNode &node);
+         MovingTexture(core::matrix4 *matrix, float dx, float dy);
         ~MovingTexture();
     void update  (float dt);
     void init    ()         {};

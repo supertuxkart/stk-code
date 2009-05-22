@@ -25,6 +25,8 @@
 #include "io/xml_node.hpp"
 #include "tracks/quad_set.hpp"
 
+const int QuadGraph::UNKNOWN_SECTOR  = -1;
+
 /** Constructor, loads the graph information for a given set of quads
  *  from a graph file.
  *  \param quad_file_name Name of the file of all quads
@@ -36,11 +38,9 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_node        = NULL;
     m_mesh        = NULL;
     m_mesh_buffer = NULL;
-    m_all_quads = new QuadSet(quad_file_name);
-    // First create all nodes
-    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++) {
-        m_all_nodes.push_back(new GraphNode(i));
-    }
+    m_all_quads   = new QuadSet(quad_file_name);
+    GraphNode::m_all_quads = m_all_quads;
+    GraphNode::m_all_nodes = this;
     load(graph_file_name);
 }   // QuadGraph
 
@@ -65,24 +65,71 @@ void QuadGraph::load(const std::string &filename)
     if(!xml) 
     {
         // No graph file exist, assume a default loop X -> X+1
+        // i.e. each quad is part of the graph exactly once.
+        // First create an empty graph node for each quad:
+        for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+            m_all_nodes.push_back(new GraphNode(i));
+        // Then set the default loop:
         setDefaultSuccessors();
         return;
     }
+
+    // The graph file exist, so read it in. The graph file must first contain
+    // the node definitions, before the edges can be set.
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
-        const XMLNode *node = xml->getNode(i);
-        if(node->getName()!="edge")
+        const XMLNode *xml_node = xml->getNode(i);
+        // First graph node definitions:
+        // -----------------------------
+        if(xml_node->getName()=="node-list")
+        {
+            // A list of quads is connected to a list of graph nodes:
+            unsigned int from, to;
+            xml_node->get("from-quad", &from);
+            xml_node->get("to-quad", &to);
+            for(unsigned int i=from; i<=to; i++)
+            {
+                m_all_nodes.push_back(new GraphNode(i));
+            }
+        }
+        else if(xml_node->getName()=="node")
+        {
+            // A single quad is connected to a single graph node.
+            unsigned int id;
+            xml_node->get("quad", &id);
+            m_all_nodes.push_back(new GraphNode(id));
+        }
+
+        // Then the definition of edges between the graph nodes:
+        // -----------------------------------------------------
+        else if(xml_node->getName()=="edge-loop")
+        {
+            // A closed loop:
+            unsigned int from, to;
+            xml_node->get("from", &from);
+            xml_node->get("to", &to);
+            for(unsigned int i=from; i<=to; i++)
+            {
+                assert(i!=to ? i+1 : from <m_all_nodes.size());
+                m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
+            }
+        }
+        else if(xml_node->getName()=="edge")
+        {
+            // Adds a single edge to the graph:
+            unsigned int from, to;
+            xml_node->get("from", &from);
+            xml_node->get("to", &to);
+            assert(to<m_all_nodes.size());
+            m_all_nodes[from]->addSuccessor(to);
+        }   // edge
+        else
         {
             fprintf(stderr, "Incorrect specification in '%s': '%s' ignored\n",
-                    filename.c_str(), node->getName().c_str());
+                    filename.c_str(), xml_node->getName().c_str());
             continue;
-        }
-        int from, to;
-        node->get("from", &from);
-        node->get("to", &to);
-        assert(from>=0 && from <(int)m_all_nodes.size());
-        m_all_nodes[from]->addSuccessor(to, *m_all_quads);
-    }   // from
+        }   // incorrect specification
+    }
     delete xml;
 
     setDefaultSuccessors();
@@ -96,8 +143,7 @@ void QuadGraph::setDefaultSuccessors()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
         if(m_all_nodes[i]->getNumberOfSuccessors()==0) {
-            m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1,
-                                         *m_all_quads);
+            m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors
@@ -163,24 +209,108 @@ void QuadGraph::createDebugMesh()
 void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) const {
     const GraphNode *v=m_all_nodes[node_number];
     for(unsigned int i=0; i<v->getNumberOfSuccessors(); i++) {
-        succ.push_back((*v)[i]);
+        succ.push_back(v->getSuccessor(i));
     }
 }   // getSuccessors
 
-// ============================================================================
-/** Adds a successor to a node. This function will also pre-compute certain
- *  values (like distance from this node to the successor, angle (in world)
- *  between this node and the successor.
- *  \param to The index of the successor.
+//-----------------------------------------------------------------------------
+/** This function takes absolute coordinates (coordinates in OpenGL
+ *  space) and transforms them into coordinates based on the track. It is
+ *  for 2D coordinates, thought it can be used on 3D vectors. The y-axis
+ *  of the returned vector is how much of the track the point has gone
+ *  through, the x-axis is on which side of the road it is. The Z axis
+ *  is not changed.
+ *  \param dst Returns the results in the X and Y coordinates.
+ *  \param xyz The position of the kart.
+ *  \param sector The graph node the position is on.
  */
-void QuadGraph::GraphNode::addSuccessor(int to, const QuadSet &quad_set)
+void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz, 
+                              const int sector) const
 {
-    m_vertices.push_back(to);
-    Vec3 this_xyz = quad_set.getCenterOfQuad(m_index);
-    Vec3 next_xyz = quad_set.getCenterOfQuad(to);
-    Vec3 diff     = next_xyz - this_xyz;
-    m_distance_to_next.push_back(diff.length());
+    if(sector == UNKNOWN_SECTOR )
+    {
+        std::cerr << "WARNING: UNKNOWN_SECTOR in spatialToTrack().\n";
+        return;
+    }
+
+    getNode(sector).getDistances(xyz, dst);
+
+}   // spatialToTrack
+
+//-----------------------------------------------------------------------------
+/** findRoadSector returns in which sector on the road the position
+ *  xyz is. If xyz is not on top of the road, it returns
+ *  UNKNOWN_SECTOR.
+ *
+ *  The 'sector' could be defined as the number of the closest track
+ *  segment to XYZ.
+ *  \param XYZ Position for which the segment should be determined.
+ *  \param sector Contains the previous sector (as a shortcut, since usually
+ *         the sector is the same as the last one), and on return the result
+ *  \param max_lookahead Maximum number of graph nodes that are to be searched
+ *         from the current sector number. This is used by the AI to make sure
+ *         the AI does not skip any parts of the track (e.g. if the graph has
+ *         a loop, the AI code skip the whole loop otherwise and continue
+ *         on the normal path). Only used ith sector is not UNKNOWN_SECTOR.
+ *         Defaults to -1, which indicates to use all graph nodes. The actual
+ *         value might depend on the track, the size of the drivelines etc.
+ */
+void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
+                               int max_lookahead) const
+{
+    if(*sector!=UNKNOWN_SECTOR)
+    {
+        // Most likely the kart will still be on the sector it was before,
+        // so this simple case is tested first.
+        if(getQuad(*sector).pointInQuad(xyz) )
+            return; 
+
+        // Then check all immediate neighbours. If it's any of them,
+        // immediately return without any further tests.
+        const GraphNode &node = *m_all_nodes[*sector];
+        for(unsigned int i=0; i<node.getNumberOfSuccessors(); i++)
+        {
+            int succ = node.getSuccessor(i);
+            if(getQuad(succ).pointInQuad(xyz))
+            {
+                *sector = succ;
+                return;
+            }   // if pointInQuad
+        }   // for i<node.getNumberOfSuccessors()
+
+    }   // if *sector!=UNKNOWN_SECTOR
+
+    // Now we search through all graph nodes, starting with
+    // the current one
+    int indx       = *sector;
+    float min_dist = 999999.9f;
+
+    // If a current sector is given, and max_lookahead is specify, only test
+    // the next max_lookahead graph nodes instead of testing the whole graph.
+    // This is necessary for the AI: if the track contains a loop, e.g.:
+    // -A--+---B---+----F--------
+    //     E       C
+    //     +---D---+
+    // and the track is supposed to be driven: ABCDEBF, the AI might find
+    // the node on F, and then keep on going straight ahead instead of
+    // using the loop at all.
+    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && max_lookahead>0) 
+                            ? max_lookahead
+                            : m_all_nodes.size();
+    *sector        = UNKNOWN_SECTOR;
+    for(unsigned int i=0; i<max_count; i++)
+    {
+        indx          = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
+        const Quad &q = getQuad(indx);
+        float dist    = xyz.getZ() - q.getMinHeight();
+        // While negative distances are unlikely, we allow some small netative
+        // numbers in case that the kart is partly in the track.
+        if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
+        {
+            min_dist = dist;
+            *sector  = indx;
+        }
+    }   // for i<m_all_nodes.size()
     
-    float theta = -atan2(diff.getX(), diff.getY());
-    m_angle_to_next.push_back(theta);
-}   // addSuccessor
+    return;
+}   // findRoadSector

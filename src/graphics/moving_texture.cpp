@@ -20,6 +20,11 @@
 #include "graphics/moving_texture.hpp"
 #include "io/xml_node.hpp"
 
+/** Constructor for an animated texture.
+ *  \param matrix The texture matrix to modify.
+ *  \param node An XML node containing dx and dy attributes to set the 
+ *         speed of the animation.
+ */
 MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
              : m_matrix(matrix)
 {
@@ -34,11 +39,33 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
+/** Constructor for an animated texture, specifying the speed of the animation
+ *  directly.
+ *  \param matrix The texture matrix to modify.
+ *  \param dx Speed of the animation in X direction.
+ *  \param dy Speed of the animation in Y direction.
+ */
+MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
+             : m_matrix(matrix)
+{
+    m_dx = dx;
+    m_dy = dy;
+    core::vector3df v = m_matrix->getTranslation();
+    m_x = v.X;
+    m_y = v.Y;
+}   // Moving Texture
+
+//-----------------------------------------------------------------------------
+/** Destructor for an animated texture.
+ */
 MovingTexture::~MovingTexture()
 {
 }   // ~MovingTexture
 
 //-----------------------------------------------------------------------------
+/** Updates the transform of an animated texture.
+ *  \param dt Time step size.
+ */
 void MovingTexture::update(float dt)
 {
     m_x = m_x + dt*m_dx;

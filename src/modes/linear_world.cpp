@@ -43,26 +43,27 @@ void LinearWorld::init()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo info;
-        info.m_track_sector         = Track::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
+        info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_race_lap  = -1;
         info.m_lap_start_time       = -1.0f;
-        m_track->findRoadSector(m_kart[n]->getXYZ(), &info.m_track_sector);
+        m_track->getQuadGraph().findRoadSector(m_kart[n]->getXYZ(), 
+                                               &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
-        info.m_on_road = info.m_track_sector != Track::UNKNOWN_SECTOR;
+        info.m_on_road = info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
         if (!info.m_on_road)
         {
             info.m_track_sector =
                 m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
                                              Track::RS_DONT_KNOW,
-                                             Track::UNKNOWN_SECTOR );
+                                             QuadGraph::UNKNOWN_SECTOR );
         }
         
-        m_track->spatialToTrack(info.m_curr_track_coords,
-                                m_kart[n]->getXYZ(),
-                                info.m_track_sector );
+        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
+                                               m_kart[n]->getXYZ(),
+                                               info.m_track_sector );
 
         // Init the last track coords so that no new lap (or undoing
         // a lap) is counted in the first doLapCounting call.
@@ -94,26 +95,26 @@ void LinearWorld::restartRace()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo& info = m_kart_info[n];
-        info.m_track_sector         = Track::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = Track::UNKNOWN_SECTOR;
+        info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
         info.m_lap_start_time       = -1.0f;
-        m_track->findRoadSector(m_kart[n]->getXYZ(), 
-                                &info.m_track_sector);
+        m_track->getQuadGraph().findRoadSector(m_kart[n]->getXYZ(), 
+                                               &info.m_track_sector);
         
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
         //the road, so we have to use another function to find the sector.
-        info.m_on_road = info.m_track_sector != Track::UNKNOWN_SECTOR;
+        info.m_on_road = info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
         if (!info.m_on_road)
         {
             info.m_track_sector =
                 m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
                                              Track::RS_DONT_KNOW,
-                                             Track::UNKNOWN_SECTOR );
+                                             QuadGraph::UNKNOWN_SECTOR );
         }
         
-        m_track->spatialToTrack(info.m_curr_track_coords,
-                                m_kart[n]->getXYZ(),
-                                info.m_track_sector );
+        m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
+                                               m_kart[n]->getXYZ(),
+                                               info.m_track_sector );
         // This assignmet is important, otherwise (depending on previous
         // value of m_last_track_coors) a lap could be counted as 'undone',
         // decreasing the number of laps to -2.
@@ -149,11 +150,12 @@ void LinearWorld::update(float delta)
         
         // update sector variables
         int prev_sector = kart_info.m_track_sector;
-        m_track->findRoadSector( kart->getXYZ(), &kart_info.m_track_sector);
+        m_track->getQuadGraph().findRoadSector(kart->getXYZ(), 
+                                               &kart_info.m_track_sector);
 
         // Check if the kart is taking a shortcut (if it's not already doing one):
         // -----------------------------------------------------------------------
-        kart_info.m_on_road = kart_info.m_track_sector != Track::UNKNOWN_SECTOR;
+        kart_info.m_on_road = kart_info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
         if(!kart_info.m_on_road)
         {
             // Kart off road. Find the closest sector instead.
@@ -167,9 +169,9 @@ void LinearWorld::update(float delta)
         
         // Update track coords (=progression)
         m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
-        m_track->spatialToTrack(kart_info.m_curr_track_coords, 
-                                kart->getXYZ(),
-                                kart_info.m_track_sector    );
+        m_track->getQuadGraph().spatialToTrack(&kart_info.m_curr_track_coords, 
+                                               kart->getXYZ(),
+                                               kart_info.m_track_sector    );
 
         // Lap counting, based on the new position, but only if the kart
         // hasn't finished the race (otherwise it would be counted more than
