@@ -137,7 +137,7 @@ void UserConfig::setDefaults()
     }
 
     // Clear every entry.
-    memset(m_input_map, 0, sizeof(m_input_map));
+    //memset(m_input_map, 0, sizeof(m_input_map));
 
 }   // setDefaults
 
@@ -361,7 +361,7 @@ void UserConfig::loadConfig(const std::string& filename)
         lisp->get("background",       m_background_index);
 
         // Handle loading the stick config in it own method.
-        readStickConfigs(lisp);
+        //readStickConfigs(lisp);
 
         // Address of server
         lisp->get("server-address",   m_server_address);
@@ -449,6 +449,7 @@ void UserConfig::loadConfig(const std::string& filename)
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
+/*
 void UserConfig::readStickConfigs(const lisp::Lisp *r)
 {
     std::string temp;
@@ -479,7 +480,7 @@ void UserConfig::readStickConfigs(const lisp::Lisp *r)
         }
     }
 }   // readStickConfigs
-
+*/
 // -----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig(const std::string& filename)
@@ -547,7 +548,7 @@ void UserConfig::saveConfig(const std::string& filename)
         writer->write("server-address",   m_server_address);
         writer->write("server-port",      m_server_port);
 
-        writeStickConfigs(writer);
+        //writeStickConfigs(writer);
 
         // Write unlock information back
         writer->beginList("unlock-info");
@@ -586,6 +587,7 @@ void UserConfig::saveConfig(const std::string& filename)
 }   // saveConfig
 
 // -----------------------------------------------------------------------------
+/*
 void UserConfig::writeStickConfigs(lisp::Writer *writer)
 {
     int count = 0;
@@ -614,7 +616,7 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
 
     writer->endList("stick-configs");
 }   // writeStickConfigs
-
+*/
 // -----------------------------------------------------------------------------
 std::string UserConfig::getInputAsString(const Input &input)
 {
@@ -709,6 +711,7 @@ void UserConfig::unsetDuplicates(GameAction ga, const Input &i)
 }   // unsetDuplicates
 #endif
 // -----------------------------------------------------------------------------
+/*
 void UserConfig::setStaticAction(StaticAction ga, const Input &i)
 {
     m_input_map[ga].count = 1;
@@ -739,7 +742,7 @@ void UserConfig::setStaticAction(StaticAction ga, const Input &i0, const Input &
     m_input_map[ga].inputs[2] = i2;
     m_input_map[ga].inputs[3] = i3;
 }   // set(4 inputs)
-
+*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

@@ -895,7 +895,7 @@ void RibbonGridWidget::add()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            if(m_properties[PROP_TEXT] == "all") icon->m_properties[PROP_TEXT] = "hello";
+            if(m_properties[PROP_TEXT] == "all") icon->m_properties[PROP_TEXT] = " ";
 
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
 

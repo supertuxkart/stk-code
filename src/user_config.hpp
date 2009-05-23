@@ -59,6 +59,7 @@ class UserConfig
 {
 public:
     /** Stores information about joystick and gamepads. */
+    /*
     class StickConfig
     {
     public:
@@ -67,29 +68,33 @@ public:
         int          m_deadzone;
         StickConfig(const std::string &id) : m_id(id) {}
     };
+     */
 
 private:
     // This class stores the last used input configuration (i.e. which action
     // is used for left, right, ..., look back) for a certain input
     // device (i.e. keyboard, joystick, ...)
+    /*
     struct InputConfiguration
     {
         Input m_input[PA_COUNT];
     };
+     */
     // The mapping of input device name to the last used configuration.
     // Note that std::map can not be used with Input[KC_COUNT] as 2nd
     // parameter
-    std::map<std::string, InputConfiguration> m_last_input_configuration;
+    // std::map<std::string, InputConfiguration> m_last_input_configuration;
 
-    std::string getInputDeviceName(int player_index) const;
+    //std::string getInputDeviceName(int player_index) const;
 
-    std::vector <StickConfig *> m_stickconfigs;
-
+    //std::vector <StickConfig *> m_stickconfigs;
+    /*
     typedef struct
     {
         int count;
         Input inputs[4];
     } InputMapEntry;
+     */
 
     /** Filename of the user config file. */
     std::string m_filename;
@@ -101,7 +106,7 @@ private:
      *
      * It is named after what is put in as values.
      */
-    InputMapEntry m_input_map[GA_COUNT];
+    //InputMapEntry m_input_map[GA_COUNT];
 
     void        setFilename      ();
 
@@ -119,9 +124,9 @@ private:
     /** Index of current background image. */
     int         m_background_index;
 
-    void readStickConfigs(const lisp::Lisp *);
+    //void readStickConfigs(const lisp::Lisp *);
 
-    void writeStickConfigs(lisp::Writer *);
+    //void writeStickConfigs(lisp::Writer *);
 
     /** Iterates through the input mapping and unsets all
      * where the given input occurs.
@@ -131,16 +136,16 @@ private:
     void unsetDuplicates(PlayerAction, const Input &);
 
     /** Creates an GameAction->Input mapping with one Input */
-    void setStaticAction(StaticAction, const Input &);
+    //void setStaticAction(StaticAction, const Input &);
 
     /** Creates an GameAction->Input mapping with two Inputs */
-    void setStaticAction(StaticAction, const Input &, const Input &);
+    //void setStaticAction(StaticAction, const Input &, const Input &);
 
     /** Creates an GameAction->Input mapping with three Inputs */
-    void setStaticAction(StaticAction, const Input &, const Input &, const Input &);
+    //void setStaticAction(StaticAction, const Input &, const Input &, const Input &);
 
     /** Creates an GameAction->Input mapping with four Inputs */
-    void setStaticAction(StaticAction, const Input &, const Input &, const Input &, const Input &);
+    //void setStaticAction(StaticAction, const Input &, const Input &, const Input &, const Input &);
 
     std::string getInputAsString(const Input &);
 
@@ -229,11 +234,12 @@ public:
     void  loadConfig(const std::string& filename);
     void  saveConfig()                    { saveConfig(m_filename);     }
     void  saveConfig(const std::string& filename);
+    /*
     void  addStickConfig(UserConfig::StickConfig *sc)
                                           {m_stickconfigs.push_back(sc);}
     const std::vector<StickConfig *>
          *getStickConfigs() const         { return &m_stickconfigs;     }
-
+     */
     const std::string
          &getWarning()                     { return m_warning;  }
     void  resetWarning()                   { m_warning="";      }
