@@ -146,6 +146,8 @@ void Camera::setInitialTransform()
 void Camera::update(float dt)
 {
     const Track* track=RaceManager::getTrack();
+    float steering;
+    float dampened_steer;
 
     // Each case should set m_target and m_position according to what is needed for that mode.
     // Yes, there is a lot of duplicate code but it is (IMHO) much easier to follow this way.
@@ -154,8 +156,8 @@ void Camera::update(float dt)
     case CM_NORMAL:
         // This first line moves the camera around behind the kart, pointing it 
         // towards where the kart is turning (and turning even more while skidding).
-        const float steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
-        const float dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
+        steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
+        dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
         m_angle_around = m_kart->getHPR().getX() + m_rotation_range * dampened_steer * 0.5f;
         m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(30.0f);      
 
