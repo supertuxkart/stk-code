@@ -22,6 +22,7 @@
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
+		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
 		9551C8270FC1B72500DB481B /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
 		9551C8290FC1B72500DB481B /* sfx_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */; };
@@ -304,6 +305,8 @@
 		951C35BE0FC066ED00A48379 /* credits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = credits.cpp; path = ../../gui/credits.cpp; sourceTree = SOURCE_ROOT; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
+		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
+		953789810FC7831400DD1F8E /* quad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad.cpp; path = ../../tracks/quad.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = ../../physics/triangle_mesh.hpp; sourceTree = SOURCE_ROOT; };
@@ -1739,6 +1742,8 @@
 		95C2B1CE0F296545000D3E5D /* tracks */ = {
 			isa = PBXGroup;
 			children = (
+				953789810FC7831400DD1F8E /* quad.cpp */,
+				953789800FC7831400DD1F8E /* quad.hpp */,
 				951C35800FC05BF400A48379 /* quad_graph.cpp */,
 				951C357F0FC05BF400A48379 /* quad_graph.hpp */,
 				953789720FC7829100DD1F8E /* graph_node.cpp */,
@@ -2244,6 +2249,7 @@
 				9507E96A0FC1C8C200BD2B92 /* GlutStuff.cpp in Sources */,
 				9507E9700FC1C8C200BD2B92 /* RenderTexture.cpp in Sources */,
 				953789730FC7829100DD1F8E /* graph_node.cpp in Sources */,
+				953789820FC7831400DD1F8E /* quad.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
