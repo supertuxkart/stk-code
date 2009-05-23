@@ -374,7 +374,7 @@ namespace StateManager
 
                         if(w == user_config->m_width && h == user_config->m_height)
                         {
-                            std::cout << "************* Detected right resolution!!! " << n << "\n";
+                            //std::cout << "************* Detected right resolution!!! " << n << "\n";
                             // that's the current one
                             res->setSelection(n);
                             break;
@@ -492,6 +492,10 @@ namespace StateManager
             user_config->m_height = h;
             user_config->m_fullscreen = w2->getState();
             irr_driver->changeResolution();
+        }
+        else if(name == "back")
+        {
+            StateManager::escapePressed();
         }
     }
 

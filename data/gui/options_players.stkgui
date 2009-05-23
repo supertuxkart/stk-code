@@ -15,6 +15,8 @@
         <spacer width="20" height="20"/>
     </box>
 
-<spacer height="15" width="10"/>
+<spacer width="50" height="40" /> 
 
 </div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
