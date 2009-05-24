@@ -269,6 +269,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\options_screen.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\race_gui.cpp"
 					>
 				</File>
@@ -677,6 +681,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\input\input.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\input\input_device.cpp"
 					>
 				</File>
@@ -800,6 +808,10 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\my_button.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\options_screen.hpp"
 					>
 				</File>
 				<File
