@@ -17,7 +17,8 @@
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Accelerate" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_up" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_up" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
@@ -25,56 +26,64 @@
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Brake" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_down" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_down" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Left" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_left" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_left" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Right" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_right" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_right" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Fire" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_fire" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_fire" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center" >
             <label proportion="2" height="100%" text="Nitro" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_nitro" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_nitro" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Sharp Turn" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_drift" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_drift" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Rescue" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_rescue" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_rescue" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" text="Look Back" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_look_back" proportion="2" height="100%" text="[none]"/>
+            <button id="binding_look_back" proportion="3" height="100%" text="[none]"/>
+            <spacer proportion="1" height="100%" />
         </div>
 
         <spacer width="50" height="10" /> 

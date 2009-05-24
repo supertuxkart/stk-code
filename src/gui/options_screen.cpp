@@ -274,8 +274,9 @@ namespace StateManager
     {
         if(name == "devices")
         {
-            RibbonGridWidget* devices = dynamic_cast<RibbonGridWidget*>(widget);
-
+            RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+            assert(devices != NULL);
+            
             const std::string& selection = devices->getSelectionName();
             if( selection.find("gamepad") != std::string::npos )
             {

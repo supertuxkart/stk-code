@@ -969,7 +969,7 @@ bool RibbonGridWidget::rightPressed()
         updateLabel();
         propagateSelection();
     }
-    return false;
+    return true;
 }
 // -----------------------------------------------------------------------------
 bool RibbonGridWidget::leftPressed()
@@ -982,7 +982,7 @@ bool RibbonGridWidget::leftPressed()
         updateLabel();
         propagateSelection();
     }
-    return false;
+    return true;
 }
 // -----------------------------------------------------------------------------
 bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
