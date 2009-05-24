@@ -238,6 +238,8 @@
 		9551CBD60FC1BB7600DB481B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
+		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
+		95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -765,6 +767,9 @@
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
+		95D1F5F60FC8C3E300FF6968 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../../input/input.cpp; sourceTree = SOURCE_ROOT; };
+		95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen.hpp; path = ../../gui/options_screen.hpp; sourceTree = SOURCE_ROOT; };
+		95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen.cpp; path = ../../gui/options_screen.cpp; sourceTree = SOURCE_ROOT; };
 		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
@@ -993,6 +998,8 @@
 				9505577D0F696A900056E88C /* my_button.hpp */,
 				95C1E3FF0F699427005D33E6 /* font.cpp */,
 				95C1E4020F69943D005D33E6 /* font.hpp */,
+				95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */,
+				95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */,
 				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
 				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
 				9505577F0F696A900056E88C /* screen.cpp */,
@@ -1060,6 +1067,7 @@
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
 			children = (
+				95D1F5F60FC8C3E300FF6968 /* input.cpp */,
 				95A118290F77EA3100B18B3D /* input.hpp */,
 				95A1182A0F77EA3100B18B3D /* input_manager.cpp */,
 				95A1182B0F77EA3100B18B3D /* input_manager.hpp */,
@@ -2250,6 +2258,8 @@
 				9507E9700FC1C8C200BD2B92 /* RenderTexture.cpp in Sources */,
 				953789730FC7829100DD1F8E /* graph_node.cpp in Sources */,
 				953789820FC7831400DD1F8E /* quad.cpp in Sources */,
+				95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */,
+				95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

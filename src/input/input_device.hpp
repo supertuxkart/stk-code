@@ -38,6 +38,11 @@ public:
     
     DeviceType getType() const { return m_type; };
     
+    /**
+      * returns a human-readable string for the key binded with the given action
+      */
+    std::string getBindingAsString(const PlayerAction action) const;
+
     void serialize(std::ofstream& stream);
     bool deserializeAction(irr::io::IrrXMLReader* xml);
 };

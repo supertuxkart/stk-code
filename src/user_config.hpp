@@ -147,7 +147,7 @@ private:
     /** Creates an GameAction->Input mapping with four Inputs */
     //void setStaticAction(StaticAction, const Input &, const Input &, const Input &, const Input &);
 
-    std::string getInputAsString(const Input &);
+    //std::string getInputAsString(const Input &);
 
     /** Creates an ActionMap for the GameAction values of the specified
      * range.

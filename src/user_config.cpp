@@ -617,50 +617,7 @@ void UserConfig::writeStickConfigs(lisp::Writer *writer)
     writer->endList("stick-configs");
 }   // writeStickConfigs
 */
-// -----------------------------------------------------------------------------
-std::string UserConfig::getInputAsString(const Input &input)
-{
-    std::string s;
 
-    switch (input.type)
-    {
-    case Input::IT_NONE:
-        s = _("not set");
-        break;
-    case Input::IT_KEYBOARD:
-        // TODO - implement with non-SDL code
-        // s = SDL_GetKeyName((SDLKey) input.id0);
-            s = "some key";
-        break;
-    case Input::IT_STICKMOTION:
-        s = StringUtils::insert_values( _("joy %d axis %d  %s"), input.id0, 
-                                         input.id1, 
-                                         (input.id2 == Input::AD_NEGATIVE) 
-                                         ? '-' : '+'                        );
-        break;
-    case Input::IT_STICKBUTTON:
-        s = StringUtils::insert_values( _("joy %d btn %d"), 
-                                        input.id0, input.id1);
-        break;
-    case Input::IT_STICKHAT:
-        s = StringUtils::insert_values( _("joy %d hat %d"),
-                                        input.id0, input.id1);
-        break;
-    case Input::IT_MOUSEBUTTON:
-        s = StringUtils::insert_values( _("mouse btn %d"), input.id0);
-        break;
-    case Input::IT_MOUSEMOTION:
-        s = StringUtils::insert_values( _("mouse axis %d %s"),
-                                        input.id0, 
-                                        (input.id1 == Input::AD_NEGATIVE) 
-                                        ? '-': '+'                        );
-        break;
-    default:
-        s = _("Invalid");
-    }
-
-    return s;
-}   // GetKeyAsString
 
 // -----------------------------------------------------------------------------
 #if 0
@@ -752,7 +709,7 @@ void UserConfig::setStaticAction(StaticAction ga, const Input &i0, const Input &
  *  something else).
  *  \param player_index Player index 0, ..., max
  */
-#if 0 // TODO
+#if 0
 std::string UserConfig::getInputDeviceName(int player_index) const
 {
     std::string config_name;

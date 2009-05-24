@@ -88,6 +88,9 @@ struct Input
 	{
 		// Nothing to do.
 	}
+    
+    static std::string getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir);
+
 };
 
 enum PlayerAction

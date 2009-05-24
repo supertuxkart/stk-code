@@ -135,6 +135,7 @@ supertuxkart_SOURCES = \
  input/device_manager.cpp \
  input/device_manager.hpp \
  input/input.hpp \
+ input/input.hpp \
  input/input_device.cpp \
  input/input_device.hpp \
  input/input_manager.cpp \
@@ -188,6 +189,8 @@ supertuxkart_SOURCES = \
  gui/engine.hpp \
  gui/my_button.cpp \
  gui/my_button.hpp \
+ gui/options_screen.cpp \
+ gui/options_screen.hpp \
  gui/screen.cpp \
  gui/screen.hpp \
  gui/screen_loader.cpp \

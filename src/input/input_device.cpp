@@ -86,6 +86,11 @@ bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
     return true;
 
 }
+// -----------------------------------------------------------------------------
+std::string InputDevice::getBindingAsString(const PlayerAction action) const
+{
+    return Input::getInputAsString(m_bindings[action].type, m_bindings[action].id, m_bindings[action].dir);
+}
 
 #if 0
 #pragma mark -
