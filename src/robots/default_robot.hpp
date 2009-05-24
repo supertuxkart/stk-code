@@ -133,6 +133,9 @@ private:
      *  m_next_quad_index[i] = (i+1) % size;
      *  but if a branch is possible, the AI will select one option here. */
     std::vector<int> m_next_quad_index;
+    /** For each graph node this list contains a list of the next X
+     *  graph nodes. */
+    std::vector<std::vector<int> > m_all_look_aheads;
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.

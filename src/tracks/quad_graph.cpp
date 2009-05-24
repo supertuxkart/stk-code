@@ -76,9 +76,9 @@ void QuadGraph::load(const std::string &filename)
 
     // The graph file exist, so read it in. The graph file must first contain
     // the node definitions, before the edges can be set.
-    for(unsigned int i=0; i<xml->getNumNodes(); i++)
+    for(unsigned int node_index=0; node_index<xml->getNumNodes(); node_index++)
     {
-        const XMLNode *xml_node = xml->getNode(i);
+        const XMLNode *xml_node = xml->getNode(node_index);
         // First graph node definitions:
         // -----------------------------
         if(xml_node->getName()=="node-list")
@@ -247,38 +247,20 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
  *  \param XYZ Position for which the segment should be determined.
  *  \param sector Contains the previous sector (as a shortcut, since usually
  *         the sector is the same as the last one), and on return the result
- *  \param max_lookahead Maximum number of graph nodes that are to be searched
- *         from the current sector number. This is used by the AI to make sure
- *         the AI does not skip any parts of the track (e.g. if the graph has
- *         a loop, the AI code skip the whole loop otherwise and continue
- *         on the normal path). Only used ith sector is not UNKNOWN_SECTOR.
- *         Defaults to -1, which indicates to use all graph nodes. The actual
- *         value might depend on the track, the size of the drivelines etc.
+ *  \param all_sectors If this is not NULL, it is a list of all sectors to 
+ *         test. This is used by the AI to make sure that it ends up on the
+ *         selected way in case of a branch, and also to make sure that it
+ *         doesn't skip e.g. a loop (see explanation below for details).
  */
 void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
-                               int max_lookahead) const
+                                std::vector<int> *all_sectors) const
 {
-    if(*sector!=UNKNOWN_SECTOR)
+    // Most likely the kart will still be on the sector it was before,
+    // so this simple case is tested first.
+    if(*sector!=UNKNOWN_SECTOR && getQuad(*sector).pointInQuad(xyz) )
     {
-        // Most likely the kart will still be on the sector it was before,
-        // so this simple case is tested first.
-        if(getQuad(*sector).pointInQuad(xyz) )
-            return; 
-
-        // Then check all immediate neighbours. If it's any of them,
-        // immediately return without any further tests.
-        const GraphNode &node = *m_all_nodes[*sector];
-        for(unsigned int i=0; i<node.getNumberOfSuccessors(); i++)
-        {
-            int succ = node.getSuccessor(i);
-            if(getQuad(succ).pointInQuad(xyz))
-            {
-                *sector = succ;
-                return;
-            }   // if pointInQuad
-        }   // for i<node.getNumberOfSuccessors()
-
-    }   // if *sector!=UNKNOWN_SECTOR
+        return; 
+    }   // if still on same quad
 
     // Now we search through all graph nodes, starting with
     // the current one
@@ -294,13 +276,16 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // and the track is supposed to be driven: ABCDEBF, the AI might find
     // the node on F, and then keep on going straight ahead instead of
     // using the loop at all.
-    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && max_lookahead>0) 
-                            ? max_lookahead
+    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL) 
+                            ? all_sectors->size()
                             : m_all_nodes.size();
     *sector        = UNKNOWN_SECTOR;
     for(unsigned int i=0; i<max_count; i++)
     {
-        indx          = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
+        if(all_sectors)
+            indx = (*all_sectors)[i];
+        else
+            indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad &q = getQuad(indx);
         float dist    = xyz.getZ() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small netative

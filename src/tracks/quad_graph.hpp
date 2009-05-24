@@ -55,7 +55,7 @@ public:
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz, 
                                 const int sector)               const;
     void         findRoadSector(const Vec3& XYZ, int *sector,
-                                int max_lookahead=-1)           const;
+                            std::vector<int> *all_sectors=NULL) const;
 
     /** Returns the number of nodes in the graph. */
     unsigned int   getNumNodes() const { return m_all_nodes.size();         } 

@@ -70,6 +70,26 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         m_successor_index.push_back(indx);
         m_next_quad_index.push_back(next[indx]);
     }
+    const int look_ahead=10;
+    // Now compute for each node in the graph the list of the next 'look_ahead'
+    // graph nodes. This is the list of node that is tested in checkCrashes.
+    // If the look_ahead is too big, the AI can skip loops (see 
+    // QuadGraph::findRoadSector for details), if it's too short the AI won't
+    // find too good a driveline. Note that in general this list should
+    // be computed recursively, but since the AI for now is using only 
+    // (randomly picked) path this is fine
+    m_all_look_aheads.reserve(m_quad_graph->getNumNodes());
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        std::vector<int> l;
+        int current = i;
+        for(unsigned int j=0; j<look_ahead; j++)
+        {
+            l.push_back(m_next_quad_index[current]);
+            current = m_next_quad_index[current];
+        }   // for j<look_ahead
+        m_all_look_aheads.push_back(l);
+    }
         
     m_world = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
     assert(m_world != NULL);
@@ -133,6 +153,8 @@ void DefaultRobot::update(float dt)
     m_controls.m_look_back = false;
     m_controls.m_nitro     = false;
     m_track_sector = m_world->m_kart_info[ getWorldKartId() ].m_track_sector;
+    if(m_successor_index[m_track_sector]!=0)
+        printf("XX");
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
     {
@@ -844,8 +866,12 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
         }
 
         /*Find if we crash with the drivelines*/
-        m_track->getQuadGraph().findRoadSector(step_coord, &m_sector, 
-                                               /* max look ahead */ 10);
+        if(m_sector!=QuadGraph::UNKNOWN_SECTOR)
+            m_track->getQuadGraph().findRoadSector(step_coord, &m_sector, 
+                            /* sectors to test*/ &m_all_look_aheads[m_sector]);
+        else
+            m_track->getQuadGraph().findRoadSector(step_coord, &m_sector);
+        
 
 #undef SHOW_FUTURE_PATH
 #ifdef SHOW_FUTURE_PATH

@@ -66,6 +66,8 @@ GraphNode::GraphNode(unsigned int index)
  */
 void GraphNode::addSuccessor(unsigned int to)
 {
+    if(m_index==4 || m_index==5)
+        printf("XX");
     m_vertices.push_back(to);
     // m_index is the quad index, so we use m_all_quads
     const Quad &this_quad = m_all_quads->getQuad(m_index);
