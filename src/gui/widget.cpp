@@ -228,6 +228,10 @@ void ButtonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
+void ButtonWidget::setLabel(const char* label)
+{
+    m_element->setText( stringw(label).c_str() );
+}
 
 #if 0
 #pragma mark -

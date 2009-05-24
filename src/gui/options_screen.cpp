@@ -9,6 +9,7 @@
 #include "input/device_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "gui/state_manager.hpp"
+#include <iostream>
 
 using namespace GUIEngine;
 
@@ -17,8 +18,11 @@ using namespace GUIEngine;
  */
 namespace StateManager
 {
+    void eventInput(Widget* widget, const std::string& name);
+    
+    
     // -----------------------------------------------------------------------------    
-    void initAudioVideo(Widget* widget, std::string& name)
+    void initAudioVideo(Widget* widget, const std::string& name)
     {
         // ---- sfx volume
         SpinnerWidget* gauge = getCurrentScreen()->getWidget<SpinnerWidget>("sfx_volume");
@@ -113,7 +117,7 @@ namespace StateManager
     }
     
     // -----------------------------------------------------------------------------    
-    void eventAudioVideo(Widget* widget, std::string& name)
+    void eventAudioVideo(Widget* widget, const std::string& name)
     {
         if(name == "music_volume")
         {
@@ -193,7 +197,50 @@ namespace StateManager
     }
     
     // -----------------------------------------------------------------------------    
-    void initInput(Widget* widget, std::string& name)
+    void updateInputButtons(const InputDevice* device)
+    {
+        
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_up");
+            btn->setLabel( device->getBindingAsString(PA_ACCEL).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_down");
+            btn->setLabel( device->getBindingAsString(PA_BRAKE).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_left");
+            btn->setLabel( device->getBindingAsString(PA_LEFT).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_right");
+            btn->setLabel( device->getBindingAsString(PA_RIGHT).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_fire");
+            btn->setLabel( device->getBindingAsString(PA_FIRE).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_nitro");
+            btn->setLabel( device->getBindingAsString(PA_NITRO).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_drift");
+            btn->setLabel( device->getBindingAsString(PA_DRIFT).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_rescue");
+            btn->setLabel( device->getBindingAsString(PA_RESCUE).c_str() );
+        }
+        {
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_look_back");
+            btn->setLabel( device->getBindingAsString(PA_LOOK_BACK).c_str() );
+        }
+
+    }
+    
+    // -----------------------------------------------------------------------------    
+    void initInput(Widget* widget, const std::string& name)
     {
         {
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
@@ -215,17 +262,48 @@ namespace StateManager
                 
             }
             devices->updateItemDisplay();
+            
+            // trigger displaying bindings for default selected device
+            const std::string name("devices");
+            eventInput(devices, name);
         }
     }
     
     // -----------------------------------------------------------------------------    
-    void eventInput(Widget* widget, std::string& name)
+    void eventInput(Widget* widget, const std::string& name)
     {
+        if(name == "devices")
+        {
+            RibbonGridWidget* devices = dynamic_cast<RibbonGridWidget*>(widget);
+
+            const std::string& selection = devices->getSelectionName();
+            if( selection.find("gamepad") != std::string::npos )
+            {
+                int i = -1, read = 0;
+                read = sscanf( selection.c_str(), "gamepad%i", &i );
+                if(read == 1 && i != -1)
+                {
+                    updateInputButtons( input_manager->getDeviceList()->getGamePad(i) );
+                }
+                else
+                {
+                    std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
+                }
+            }
+            else if(selection == "keyboard")
+            {
+                updateInputButtons( input_manager->getDeviceList()->getKeyboard(0) );
+            }
+            else
+            {
+                std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
+            }
+        }
     }
     
     // -----------------------------------------------------------------------------
     // main call (from StateManager); dispatches the call to a specialissed function as needed
-    void menuEventOptions(Widget* widget, std::string& name)
+    void menuEventOptions(Widget* widget, const std::string& name)
     {
         const std::string& screen_name = getCurrentScreen()->getName();
         

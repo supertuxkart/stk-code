@@ -11,7 +11,7 @@ namespace GUIEngine
 namespace StateManager
 {
 
-    void menuEventOptions(GUIEngine::Widget* widget, std::string& name);
+    void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
 
 }
 

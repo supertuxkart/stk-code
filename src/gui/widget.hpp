@@ -152,6 +152,7 @@ namespace GUIEngine
         void add();
     public:
         virtual ~ButtonWidget() {}
+        void setLabel(const char* label);
     };
     
     class LabelWidget : public Widget
