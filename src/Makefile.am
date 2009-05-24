@@ -134,7 +134,7 @@ supertuxkart_SOURCES = \
  input.hpp \
  input/device_manager.cpp \
  input/device_manager.hpp \
- input/input.hpp \
+ input/input.cpp \
  input/input.hpp \
  input/input_device.cpp \
  input/input_device.hpp \
