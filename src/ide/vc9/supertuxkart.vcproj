@@ -349,10 +349,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\utils\ssg_help.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\utils\string_utils.cpp"
 					>
 				</File>
@@ -976,10 +972,6 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\random_generator.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\utils\ssg_help.hpp"
 					>
 				</File>
 				<File
