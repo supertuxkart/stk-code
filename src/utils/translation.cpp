@@ -18,6 +18,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+// Note: the irrlicht include is only here (and esp. before including 
+//       translation.hpp, which contradicts our style rule) to avoid the 
+//        warning message  "  'swprintf' : macro redefinition"
+//       This happens if libintl.h is included before irrlicht.h (since
+//       both files redefine swprintf).
+#include "irrlicht.h"
+
 #include "utils/translation.hpp"
 
 #include "io/file_manager.hpp"

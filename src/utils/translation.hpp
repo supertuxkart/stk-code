@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TRANSLATION_H
-#define TRANSLATION_H
+#ifndef TRANSLATION_HPP
+#define TRANSLATION_HPP
 
 #if ENABLE_NLS
 #  include <libintl.h>
