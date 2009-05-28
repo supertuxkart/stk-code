@@ -184,7 +184,7 @@ namespace GUIEngine
     float getLatestDt();
     
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
-    void free();
+    void cleanUp();
     void switchToScreen(const char* );
     void clear();
     void cleanForGame();

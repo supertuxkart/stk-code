@@ -139,7 +139,7 @@ Screen* getCurrentScreen()
     return g_current_screen;
 }
 // -----------------------------------------------------------------------------
-void free()
+void cleanUp()
 {
     if(g_skin != NULL) delete g_skin;
     g_skin = NULL;
