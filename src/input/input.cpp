@@ -19,10 +19,13 @@
 
 
 #include "input/input.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
+
 #include <irrlicht.h>
 using namespace irr;
+
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+
 // -----------------------------------------------------------------------------
 
 std::string Input::getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir)
