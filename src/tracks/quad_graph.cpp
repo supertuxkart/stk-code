@@ -279,7 +279,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL) 
                             ? all_sectors->size()
                             : m_all_nodes.size();
-    *sector        = UNKNOWN_SECTOR;
+    *sector = UNKNOWN_SECTOR;
     for(unsigned int i=0; i<max_count; i++)
     {
         if(all_sectors)
@@ -299,3 +299,72 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     
     return;
 }   // findRoadSector
+
+//-----------------------------------------------------------------------------
+/** findOutOfRoadSector finds the sector where XYZ is, but as it name
+    implies, it is more accurate for the outside of the track than the
+    inside, and for STK's needs the accuracy on top of the track is
+    unacceptable; but if this was a 2D function, the accuracy for out
+    of road sectors would be perfect.
+
+    To find the sector we look for the closest line segment from the
+    right and left drivelines, and the number of that segment will be
+    the sector.
+
+    The SIDE argument is used to speed up the function only; if we know
+    that XYZ is on the left or right side of the track, we know that
+    the closest driveline must be the one that matches that condition.
+    In reality, the side used in STK is the one from the previous frame,
+    but in order to move from one side to another a point would go
+    through the middle, that is handled by findRoadSector() which doesn't
+    has speed ups based on the side.
+
+    NOTE: This method of finding the sector outside of the road is *not*
+    perfect: if two line segments have a similar altitude (but enough to
+    let a kart get through) and they are very close on a 2D system,
+    if a kart is on the air it could be closer to the top line segment
+    even if it is supposed to be on the sector of the lower line segment.
+    Probably the best solution would be to construct a quad that reaches
+    until the next higher overlapping line segment, and find the closest
+    one to XYZ.
+ */
+int QuadGraph::findOutOfRoadSector(const Vec3& xyz, 
+                                   const int curr_sector,
+                                   std::vector<int> *all_sectors) const
+{
+    int count = (all_sectors!=NULL) ? all_sectors->size() : getNumNodes();
+    int current_sector = 0;
+    if(curr_sector != UNKNOWN_SECTOR && !all_sectors)
+    {
+        const int LIMIT = 10; //The limit prevents shortcuts
+        count           = 2*LIMIT;
+        current_sector  = curr_sector - LIMIT;
+        if(current_sector<0) current_sector += getNumNodes();
+    }
+
+    int   min_sector = UNKNOWN_SECTOR;
+    float min_dist_2 = 999999.0f*999999.0f;
+    for(int j=0; j<count; j++)
+    {
+        int next_sector;
+        if(all_sectors) 
+            next_sector = (*all_sectors)[j];
+        else
+            next_sector  = current_sector+1 == getNumNodes() ? 0 : current_sector+1;
+
+        float dist_2 = xyz.distance2(getQuad(next_sector).getCenter()-xyz);
+        if(dist_2<min_dist_2)
+        {
+            min_dist_2 = dist_2;
+            min_sector = next_sector;
+        }
+        current_sector = next_sector;
+    }   // for j
+
+    if(min_sector==UNKNOWN_SECTOR )
+    {
+        printf("unknown sector found.\n");
+    }
+    return min_sector;
+}   // findOutOfRoadSector
+

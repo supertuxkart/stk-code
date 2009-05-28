@@ -50,8 +50,8 @@ GraphNode::GraphNode(unsigned int index)
     // The width is the average width at the beginning and at the end.
     m_width = (  (quad[1]-quad[0]).length() 
                + (quad[3]-quad[2]).length() ) * 0.5f;
-    Vec3 lower = (quad[m_index][0]+quad[m_index][1]) * 0.5f;
-    Vec3 upper = (quad[m_index][2]+quad[m_index][3]) * 0.5f;
+    Vec3 lower = (quad[0]+quad[1]) * 0.5f;
+    Vec3 upper = (quad[2]+quad[3]) * 0.5f;
     m_line     = core::line2df(lower.getX(), lower.getY(),
                                upper.getX(), upper.getY() );
     // Only this 2d point is needed later
@@ -66,8 +66,6 @@ GraphNode::GraphNode(unsigned int index)
  */
 void GraphNode::addSuccessor(unsigned int to)
 {
-    if(m_index==4 || m_index==5)
-        printf("XX");
     m_vertices.push_back(to);
     // m_index is the quad index, so we use m_all_quads
     const Quad &this_quad = m_all_quads->getQuad(m_index);
@@ -81,8 +79,8 @@ void GraphNode::addSuccessor(unsigned int to)
     m_angle_to_next.push_back(theta);
 
     // The length of this quad is the average of the left and right side
-    float distance_to_next = (   (this_quad[2]-this_quad[1]).length()
-                               + (this_quad[3]-this_quad[0]).length()  ) *0.5f;
+    float distance_to_next = (   this_quad[2].distance(this_quad[1])
+                               + this_quad[3].distance(this_quad[0]) ) *0.5f;
     // The distance from start for the successor node 
     m_all_nodes->getNode(to).m_distance_from_start =
         std::max(m_all_nodes->getNode(to).m_distance_from_start, 
@@ -101,6 +99,9 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
 {
     core::vector2df xyz2d(xyz.getX(), xyz.getY());
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
-    result->setX( (closest-xyz2d).getLength());
+    if(m_line.getPointOrientation(xyz2d)>0)
+        result->setX( (closest-xyz2d).getLength());   // to the right
+    else
+        result->setX(-(closest-xyz2d).getLength());   // to the left
     result->setY( (closest-m_lower_center).getLength());
-}   // getDistanceFromLine
+}   // getDistances

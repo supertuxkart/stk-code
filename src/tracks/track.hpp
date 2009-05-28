@@ -98,14 +98,6 @@ private:
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
 public:
-    enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
-
-    //An enum is not used for the QUAD_TRI_* constants because of limitations
-    //of the conversion between enums and ints.
-    static const int QUAD_TRI_NONE;
-    static const int QUAD_TRI_FIRST;
-    static const int QUAD_TRI_SECOND;
-
     struct SegmentTriangle
     {
         int segment;
@@ -169,10 +161,6 @@ public:
     void               drawScaled2D      (float x, float y, float w,
                                           float h                     ) const;
 
-    int                findOutOfRoadSector(const Vec3& XYZ,
-                                           const RoadSide SIDE,
-                                           const int CURR_SECTOR
-                                           ) const;
     const Vec3&        trackToSpatial    (const int SECTOR) const;
     void               loadTrackModel    ();
     void               addMusic          (MusicInformation* mi)
@@ -239,10 +227,6 @@ private:
     void  readDrivelineFromFile(std::vector<Vec3>& line,
                                 const std::string& file_ext);
     void  convertTrackToBullet(const scene::IMesh *mesh);
-    float pointSideToLine(const Vec3& L1, const Vec3& L2,
-                          const Vec3& P ) const;
-    int   pointInQuad(const Vec3& A, const Vec3& B,
-                      const Vec3& C, const Vec3& D, const Vec3& POINT ) const;
     void  getMusicInformation(std::vector<std::string>&             filenames, 
                               std::vector<MusicInformation*>& m_music   );
 }

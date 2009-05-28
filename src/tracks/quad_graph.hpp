@@ -56,6 +56,10 @@ public:
                                 const int sector)               const;
     void         findRoadSector(const Vec3& XYZ, int *sector,
                             std::vector<int> *all_sectors=NULL) const;
+    int          findOutOfRoadSector(const Vec3& xyz,
+                                     const int curr_sector=UNKNOWN_SECTOR,
+                                     std::vector<int> *all_sectors=NULL
+                                     ) const;
 
     /** Returns the number of nodes in the graph. */
     unsigned int   getNumNodes() const { return m_all_nodes.size();         } 

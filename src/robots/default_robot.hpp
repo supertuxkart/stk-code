@@ -104,15 +104,12 @@ private:
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-    int   m_future_sector;
-    Vec3 m_future_location;
 
     float m_time_till_start; //Used to simulate a delay at the start of the
                              //race, since human players don't accelerate
                              //at the same time and rarely repeat the a
                              //previous timing.
 
-    int m_inner_curve;//-1 left, 1 = right, 0 = center
     float m_curve_target_speed;
     float m_curve_angle;
 
@@ -121,21 +118,26 @@ private:
 
     /** Keep a pointer to world. */
     LinearWorld *m_world;
-    /** Cache kart_info.m_track_sector. */
-    int   m_track_sector;
+    /** The current node the kart is on. This can be different from the value
+     *  in LinearWorld, since it takes the chosen path of the AI into account
+     *  (e.g. the closest point in LinearWorld might be on a branch not
+     *  chosen by the AI). */
+    int   m_track_node;
     /** The graph of qudas of this track. */
     const QuadGraph *m_quad_graph;
     
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
-    /** For each node in the graph this list contained the chosen next node.
+    /** For each node in the graph this list contains the chosen next node.
      *  For normal lap track without branches we always have 
-     *  m_next_quad_index[i] = (i+1) % size;
-     *  but if a branch is possible, the AI will select one option here. */
-    std::vector<int> m_next_quad_index;
+     *  m_next_node_index[i] = (i+1) % size;
+     *  but if a branch is possible, the AI will select one option here. 
+     *  If the node is not used, m_next_node_index will be -1. */
+    std::vector<int> m_next_node_index;
     /** For each graph node this list contains a list of the next X
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
+
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -151,8 +153,6 @@ private:
      *  different AI levels.
      */
     float m_skidding_threshold;
-
-    int  m_sector;
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls

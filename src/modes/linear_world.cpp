@@ -56,9 +56,8 @@ void LinearWorld::init()
         if (!info.m_on_road)
         {
             info.m_track_sector =
-                m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
-                                             Track::RS_DONT_KNOW,
-                                             QuadGraph::UNKNOWN_SECTOR );
+                m_track->getQuadGraph().findOutOfRoadSector(m_kart[n]->getXYZ(),
+                                                            QuadGraph::UNKNOWN_SECTOR );
         }
         
         m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
@@ -107,9 +106,8 @@ void LinearWorld::restartRace()
         if (!info.m_on_road)
         {
             info.m_track_sector =
-                m_track->findOutOfRoadSector(m_kart[n]->getXYZ(),
-                                             Track::RS_DONT_KNOW,
-                                             QuadGraph::UNKNOWN_SECTOR );
+                m_track->getQuadGraph().findOutOfRoadSector(m_kart[n]->getXYZ(),
+                                              QuadGraph::UNKNOWN_SECTOR );
         }
         
         m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
@@ -153,18 +151,16 @@ void LinearWorld::update(float delta)
         m_track->getQuadGraph().findRoadSector(kart->getXYZ(), 
                                                &kart_info.m_track_sector);
 
-        // Check if the kart is taking a shortcut (if it's not already doing one):
-        // -----------------------------------------------------------------------
         kart_info.m_on_road = kart_info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
-        if(!kart_info.m_on_road)
+        if(kart_info.m_on_road)
+        {
+            kart_info.m_last_valid_sector = kart_info.m_track_sector;
+        }
+        else
         {
             // Kart off road. Find the closest sector instead.
             kart_info.m_track_sector =
-                m_track->findOutOfRoadSector(kart->getXYZ(), 
-                                             kart_info.m_curr_track_coords[0] > 0.0
-                                                 ? Track::RS_RIGHT 
-                                                 : Track::RS_LEFT,
-                                             prev_sector );
+                m_track->getQuadGraph().findOutOfRoadSector(kart->getXYZ(), prev_sector );
         }   
         
         // Update track coords (=progression)

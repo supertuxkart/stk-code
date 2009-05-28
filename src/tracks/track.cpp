@@ -50,9 +50,6 @@
 #include <plib/ssg.h>
 
 const float Track::NOHIT           = -99999.9f;
-const int   Track::QUAD_TRI_NONE   = -1;
-const int   Track::QUAD_TRI_FIRST  =  1;
-const int   Track::QUAD_TRI_SECOND =  2;
 
 // ----------------------------------------------------------------------------
 Track::Track( std::string filename_, float w, float h, bool stretch )
@@ -112,153 +109,9 @@ void Track::cleanup()
 }   // cleanup
 
 //-----------------------------------------------------------------------------
-/** Finds on which side of the line segment a given point is.
- */
-inline float Track::pointSideToLine( const Vec3& L1, const Vec3& L2,
-    const Vec3& P ) const
+const Vec3& Track::trackToSpatial(const int sector) const
 {
-    return ( L2.getX()-L1.getX() )*( P.getY()-L1.getY() )-( L2.getY()-L1.getY() )*( P.getX()-L1.getX() );
-}   // pointSideToLine
-
-//-----------------------------------------------------------------------------
-/** pointInQuad() works by checking if the given point is 'to the right'
- *  in clock-wise direction (which would be to look towards the inside of
- *  the quad) of each line segment that forms the quad. If it is to the
- *  left of all the segments, then the point is inside. This idea
- *  works for convex polygons, so we have to test it for the two
- *  triangles that compose the quad, in case that the quad is concave,
- *  not for the quad itself.
- */
-int Track::pointInQuad
-(
-    const Vec3& A,
-    const Vec3& B,
-    const Vec3& C,
-    const Vec3& D,
-    const Vec3& POINT
-) const
-{
-    if(pointSideToLine( C, A, POINT ) >= 0.0 )
-    {
-        //Test the first triangle
-        if( pointSideToLine( A, B, POINT ) >  0.0 &&
-            pointSideToLine( B, C, POINT ) >= 0.0    )
-            return QUAD_TRI_FIRST;
-        return QUAD_TRI_NONE;
-    }
-
-    //Test the second triangle
-    if( pointSideToLine( C, D, POINT ) > 0.0 &&
-        pointSideToLine( D, A, POINT ) > 0.0     )
-        return QUAD_TRI_SECOND;
-
-    return QUAD_TRI_NONE;
-}   // pointInQuad
-
-//-----------------------------------------------------------------------------
-/** findOutOfRoadSector finds the sector where XYZ is, but as it name
-    implies, it is more accurate for the outside of the track than the
-    inside, and for STK's needs the accuracy on top of the track is
-    unacceptable; but if this was a 2D function, the accuracy for out
-    of road sectors would be perfect.
-
-    To find the sector we look for the closest line segment from the
-    right and left drivelines, and the number of that segment will be
-    the sector.
-
-    The SIDE argument is used to speed up the function only; if we know
-    that XYZ is on the left or right side of the track, we know that
-    the closest driveline must be the one that matches that condition.
-    In reality, the side used in STK is the one from the previous frame,
-    but in order to move from one side to another a point would go
-    through the middle, that is handled by findRoadSector() which doesn't
-    has speed ups based on the side.
-
-    NOTE: This method of finding the sector outside of the road is *not*
-    perfect: if two line segments have a similar altitude (but enough to
-    let a kart get through) and they are very close on a 2D system,
-    if a kart is on the air it could be closer to the top line segment
-    even if it is supposed to be on the sector of the lower line segment.
-    Probably the best solution would be to construct a quad that reaches
-    until the next higher overlapping line segment, and find the closest
-    one to XYZ.
- */
-int Track::findOutOfRoadSector
-(
-    const Vec3& XYZ,
-    const RoadSide SIDE,
-    const int CURR_SECTOR
-) const
-{
-    int sector = QuadGraph::UNKNOWN_SECTOR;
-    float dist;
-    //FIXME: it can happen that dist is bigger than nearest_dist for all the
-    //the points we check (currently a limit of +/- 10), and if so, the
-    //function will return UNKNOWN_SECTOR, and if the AI get this, it will
-    //trigger an assertion. I increased the nearest_dist default value from
-    //99999 to 9999999, which is a lot more than the situation that caused
-    //the discovery of this problem, but the best way to solve this, is to
-    //find a better way of handling the shortcuts, and maybe a better way of
-    //calculating the distance.
-    float nearest_dist = 9999999;
-    const int DRIVELINE_SIZE = (int)m_left_driveline.size();
-
-    int begin_sector = 0;
-    int count      = DRIVELINE_SIZE;
-    if(CURR_SECTOR != QuadGraph::UNKNOWN_SECTOR )
-    {
-        const int LIMIT = 10; //The limit prevents shortcuts
-        if( CURR_SECTOR - LIMIT < 0 )
-        {
-            begin_sector = DRIVELINE_SIZE - 1 + CURR_SECTOR - LIMIT;
-        }
-        else begin_sector = CURR_SECTOR - LIMIT;
-        count = 2*LIMIT;
-    }
-
-    sgLineSegment3 line_seg;
-    int next_sector;
-    for(int j=0; j<count; j++)
-    {
-        next_sector  = begin_sector+1 == DRIVELINE_SIZE ? 0 : begin_sector+1;
-
-        if( SIDE != RS_RIGHT)
-        {
-            sgCopyVec3( line_seg.a, m_left_driveline[begin_sector].toFloat() );
-            sgCopyVec3( line_seg.b, m_left_driveline[next_sector].toFloat() );
-            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
-            if ( dist < nearest_dist )
-            {
-                nearest_dist = dist;
-                sector       = begin_sector;
-            }
-        }   // SIDE != RS_RIGHT
-
-        if( SIDE != RS_LEFT )
-        {
-            sgCopyVec3( line_seg.a, m_right_driveline[begin_sector].toFloat() );
-            sgCopyVec3( line_seg.b, m_right_driveline[next_sector].toFloat() );
-            dist = sgDistSquaredToLineSegmentVec3( line_seg, XYZ.toFloat() );
-            if ( dist < nearest_dist )
-            {
-                nearest_dist = dist;
-                sector       = begin_sector;
-            }
-        }   // SIDE != RS_LEFT
-        begin_sector = next_sector;
-    }   // for j
-
-    if(sector==QuadGraph::UNKNOWN_SECTOR || sector >=DRIVELINE_SIZE)
-    {
-        printf("unknown sector found.\n");
-    }
-    return sector;
-}   // findOutOfRoadSector
-
-//-----------------------------------------------------------------------------
-const Vec3& Track::trackToSpatial(const int SECTOR ) const
-{
-    return m_driveline[SECTOR];
+    return m_quad_graph->getQuad(sector).getCenter();
 }   // trackToSpatial
 
 //-----------------------------------------------------------------------------
