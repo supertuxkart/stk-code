@@ -47,8 +47,6 @@
 #include "tracks/quad_set.hpp"
 #include "utils/string_utils.hpp"
 
-#include <plib/ssg.h>
-
 const float Track::NOHIT           = -99999.9f;
 
 // ----------------------------------------------------------------------------
@@ -595,8 +593,8 @@ void Track::loadDriveline()
         float theta = -atan2(dx, dy);
     }
 
-    m_driveline_min = Vec3( SG_MAX/2.0f);
-    m_driveline_max = Vec3(-SG_MAX/2.0f);
+    m_driveline_min = Vec3( 9999999.9f);
+    m_driveline_max = Vec3(-9999999.9f);
 
 
     m_distance_from_start.reserve(DRIVELINE_SIZE);
@@ -639,7 +637,7 @@ Track::readDrivelineFromFile(std::vector<Vec3>& line, const std::string& file_ex
     }
 
     int prev_sector = QuadGraph::UNKNOWN_SECTOR;
-    SGfloat prev_distance = 1.51f;
+    float prev_distance = 1.51f;
     while(!feof(fd))
     {
         char s [ 1024 ] ;

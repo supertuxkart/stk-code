@@ -41,11 +41,6 @@ dnl Check for `configure' flags
 dnl ===========================
 SUMMARY="\nSummary of optional components:\n==============================="
 
-if test "x$with_plib" != "x" ; then
-   echo "plib prefix is $with_plib"
-   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
-fi
-
 AC_ARG_ENABLE(debug, [AS_HELP_STRING(--enable-debug,
                                      [enable debugging info])])
 if test x$enable_debug = xyes; then
@@ -192,42 +187,6 @@ LIBS=$save_LIBS
 # The following are C++ items that need to be tested for with the c++
 # compiler
 AC_LANG_PUSH(C++)
-
-
-# ==============================================
-# Check for "plib" without which we cannot go on
-# ==============================================
-# specify the plib location
-AC_ARG_WITH(plib, [AS_HELP_STRING(--with-plib=PREFIX,
-                                  [specify the prefix path to plib])])
-if test "x$with_plib" != "x" ; then
-   echo "plib prefix is $with_plib"
-   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
-fi
-
-AC_CHECK_HEADER(plib/ul.h)
-if test "x$ac_cv_header_plib_ul_h" != "xyes"; then
-    AC_MSG_ERROR([[cannot find useable plib installation. You need to install plib 1.8.4 or newer.]])
-fi
-
-AC_MSG_CHECKING([for plib 1.8.4 or newer])
-AC_TRY_RUN([
-#  include <plib/ul.h>
- 
-#  define MIN_PLIB_VERSION 184
-   int main() {
-   if ( PLIB_VERSION < MIN_PLIB_VERSION ) {
-      return -1;
-    }
-   return 0;
-   }
- ],
-  AC_MSG_RESULT(yes),
-  [ AC_MSG_RESULT(wrong version);
-    AC_MSG_ERROR([plib 1.8.4 or later is needed. Please intall it first.])],
-  AC_MSG_RESULT(yes)
-)
-
 
 
 dnl =======================

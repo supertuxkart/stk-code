@@ -7,10 +7,7 @@ Some short instruction on how to compile supertuxkart with cygwin:
    This is part of the cygwin packages, so just select this in
    the cygwin setup program.
 
-3) Compile and install plib
-   This should work straight out of the box.
-
-4) Install OpenAL
+3) Install OpenAL
    We have had some problems with this, so this might be the most difficult stage.
 
 4) Unpack superuxkart and run ./configure  and  make.
@@ -22,8 +19,6 @@ Comments:
 1) A -DNOMINMAX is added for cygwin compilations, since otherwise
    min and max are #defined, causing problems with all std::min and
    std::max constructs.
-2) The order in which plib/pu.h and plib/pw.h are included appears
-   to be important - pw should be included first.
 
 If you have any problems, please post on the mailing list - I am 
 not a regular windows user, so am probably not able to help you.

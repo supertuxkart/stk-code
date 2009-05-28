@@ -249,8 +249,7 @@ supertuxkart_SOURCES = \
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \
-        -lplibjs -lplibsl -lplibssg -lplibpu -lplibfnt -lplibsg \
-        -lplibul -lplibssgaux $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) $(glut_LIBS) \
+        $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) $(glut_LIBS) \
         $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
         $(INTLLIBS)
 
