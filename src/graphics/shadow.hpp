@@ -1,8 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2009  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,16 +17,35 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SHADOW_H
-#define HEADER_SHADOW_H
+#ifndef HEADER_SHADOW_HPP
+#define HEADER_SHADOW_HPP
 
 #include <string>
 
-class ssgTransform;
+#include "irrlicht.h"
+using namespace irr;
 
-ssgTransform* createShadow(const std::string& name,
-                           float x1, float x2, float y1, float y2 );
-
+/** This class is used to enable a shadow for a kart. For now it uses
+ *  a simple texture to simulate the shadow, real time shadows will be
+ *  added later.
+ */
+class Shadow
+{
+private:
+    /** The scene node for the shadow. */
+    scene::ISceneNode  *m_node;
+    /** The mesh of the shadow. */
+    scene::IMesh       *m_mesh;
+    /** The mesh buffer containing the actual vertices of the shadow. */
+    scene::IMeshBuffer *m_buffer;
+public:
+                       Shadow(const std::string &name);
+                      ~Shadow();
+    void               enableShadow();
+    void               disableShadow();
+    /** Returns the scene node of the shadow. */
+    scene::ISceneNode* getSceneNode() const {return m_node; }
+};   // Shadow
 #endif
 
 /* EOF */

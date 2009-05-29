@@ -32,9 +32,9 @@
 #include "tracks/terrain_info.hpp"
 
 class SkidMarks;
+class Shadow;
 class Item;
 class Smoke;
-class ssgTransform;
 class Nitro;
 class SFXBase;
 class btUprightConstraint;
@@ -78,7 +78,7 @@ protected:
 private:
                        /** The amount of energy collected by hitting coins. */
     float         m_collected_energy;
-    ssgTransform *m_shadow;  /**<The shadow of the kart. */
+    Shadow       *m_shadow;  /**<The shadow of the kart. */
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool          m_shadow_enabled;

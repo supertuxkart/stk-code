@@ -1,8 +1,7 @@
 //  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2009  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,45 +17,59 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "material_manager.hpp"
-#include "material.hpp"
 #include "shadow.hpp"
 
-#ifndef HAVE_IRRLICHT
-ssgTransform* createShadow( const std::string& name,
-                            float x1, float x2, float y1, float y2 )
+#include "irrlicht.h"
+
+#include "graphics/irr_driver.hpp"
+
+Shadow::Shadow(const std::string &name)
 {
-    ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-    ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-    ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-    ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
+    video::ITexture *texture = irr_driver->getTexture(name);
+    video::SMaterial m;
+    m.setTexture(0, texture);
+    m.BackfaceCulling = false;
+    m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m_mesh   = irr_driver->createQuadMesh(&m);
+    m_buffer = m_mesh->getMeshBuffer(0);
+    irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
+    v[0].Pos.X = -1.0f; v[0].Pos.Z = -1.0f; v[0].Pos.Y = 0.05f;
+    v[1].Pos.X =  1.0f; v[1].Pos.Z = -1.0f; v[1].Pos.Y = 0.05f;
+    v[2].Pos.X =  1.0f; v[2].Pos.Z =  1.0f; v[2].Pos.Y = 0.05f;
+    v[3].Pos.X = -1.0f; v[3].Pos.Z =  1.0f; v[3].Pos.Y = 0.05f;
+    v[0].TCoords = core::vector2df(0,0);
+    v[1].TCoords = core::vector2df(1,0);
+    v[2].TCoords = core::vector2df(1,1);
+    v[3].TCoords = core::vector2df(0,1);
+    core::vector3df normal(0, 0, 1.0f);
+    v[0].Normal  = normal;
+    v[1].Normal  = normal;
+    v[2].Normal  = normal;
+    v[3].Normal  = normal;
+    m_buffer->recalculateBoundingBox();
+    
+    m_node   = irr_driver->addMesh(m_mesh);
+    
+    m_node->setAutomaticCulling(scene::EAC_OFF);
+}   // Shadow
 
-    sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
-    sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
-
-    sgSetVec3 ( v, x1, y1, 0.05f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y1, 0.05f ) ; va->add(v) ;
-    sgSetVec3 ( v, x1, y2, 0.05f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y2, 0.05f ) ; va->add(v) ;
-
-    sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
-
-    ssgTransform* result = new ssgTransform ;
-    result -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-
-    result -> setName ( "Shadow" ) ;
-
-    ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
-    // FIXME LEAK: va, na, ta, and ca are most likely leaked, since plib
-    // will mark them as 'not owned' and therefore not free them!
-    gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-    gs -> setState ( material_manager->getMaterial ( name.c_str() ) -> getState () ) ;
-    result -> addKid ( gs ) ;
-
-    return result;
+// ----------------------------------------------------------------------------
+Shadow::~Shadow()
+{
+}   // ~Shadow
+// ----------------------------------------------------------------------------
+/** Removes the shadow, used for the simplified shadow when the kart is in
+ *  the air.
+ */
+void Shadow::disableShadow()
+{
+    m_node->setVisible(false);
 }
-#endif
-/* EOF */
+// ----------------------------------------------------------------------------
+/** Enables the shadow again, after it was disabled with disableShadow().
+ */
+void Shadow::enableShadow()
+{
+    m_node->setVisible(true);
+}
+// ----------------------------------------------------------------------------

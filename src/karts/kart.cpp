@@ -245,7 +245,8 @@ Kart::~Kart()
     //if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
     //if(m_nitro)        ssgDeRefDelete(m_nitro);
 
-    //ssgDeRefDelete(m_shadow);
+    m_animated_node->removeChild(m_shadow->getSceneNode());
+    delete m_shadow;
 
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -650,18 +651,12 @@ void Kart::update(float dt)
     if( (!isOnGround() || m_rescue) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
-#ifdef HAVE_IRRLICHT
-#else
-        m_model_transform->removeKid(m_shadow);
-#endif
+        m_shadow->disableShadow();
     }
     if(!m_shadow_enabled && isOnGround() && !m_rescue)
     {
+        m_shadow->enableShadow();
         m_shadow_enabled = true;
-#ifdef HAVE_IRRLICHT
-#else
-        m_model_transform->addKid(m_shadow);
-#endif
     }
 }   // update
 
@@ -1015,13 +1010,10 @@ void Kart::loadData()
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
-#ifdef HAVE_IRRLICHT
-#else
-    m_shadow = createShadow(m_kart_properties->getShadowFile(), -1, 1, -1, 1);
-    m_shadow->ref();
-    m_model_transform->addKid ( m_shadow );
-    m_shadow_enabled = true;
-#endif
+
+    m_shadow = new Shadow(file_manager->getKartFile(m_kart_properties->getShadowFile(),
+                                                    getIdent()                         ));
+    m_animated_node->addChild(m_shadow->getSceneNode());
 }   // loadData
 
 //-----------------------------------------------------------------------------
