@@ -127,8 +127,6 @@ public:
     //FIXME: should the driveline be set as a sgVec2?
 private:
     std::vector<Vec3>    m_driveline;
-    std::vector<float>   m_distance_from_start;
-    std::vector<float>   m_path_width;
 	//Left and Right drivelines for overhead map rendering.
     std::vector<Vec3>    m_left_driveline;
     std::vector<Vec3>    m_right_driveline;

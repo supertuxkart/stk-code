@@ -197,8 +197,12 @@ void QuadGraph::createDebugMesh()
     }   // for i=1; i<m_all_quads
     
     m_mesh_buffer->append(new_v, (n-1)*4, ind, (n-1)*6);
+    // Instead of setting the bounding boxes, we could just disable culling,
+    // since the debug track should always be drawn.
+    //m_node->setAutomaticCulling(scene::EAC_OFF);
+    m_mesh_buffer->recalculateBoundingBox();
+    m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
     m_node           = irr_driver->addMesh(m_mesh);
-
 }   // createDebugMesh
 
 // -----------------------------------------------------------------------------

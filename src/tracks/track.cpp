@@ -596,8 +596,6 @@ void Track::loadDriveline()
     m_driveline_min = Vec3( 9999999.9f);
     m_driveline_max = Vec3(-9999999.9f);
 
-
-    m_distance_from_start.reserve(DRIVELINE_SIZE);
     float d = 0.0f ;
     for ( size_t i = 0 ; i < DRIVELINE_SIZE ; ++i )
     {
@@ -609,7 +607,6 @@ void Track::loadDriveline()
         m_driveline_max.max(m_right_driveline[i]);
         m_driveline_max.max(m_left_driveline[i] );
 
-        m_distance_from_start.push_back(d);  // dfs[i] is not valid in windows here!
         d += (m_driveline[i]-m_driveline[ i==DRIVELINE_SIZE-1 ? 0 : i+1 ]).length();
     }
     m_total_distance = d;
