@@ -33,7 +33,7 @@
 MusicOggStream::MusicOggStream()
 {
     //m_oggStream= NULL;
-    m_soundBuffers[0]= m_soundBuffers[1]= 0;
+    m_soundBuffers[0] = m_soundBuffers[1]= 0;
     m_soundSource= 0;
     m_pausedMusic= true;
 }   // MusicOggStream

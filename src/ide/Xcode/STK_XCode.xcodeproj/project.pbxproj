@@ -2035,7 +2035,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\ncp -rf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\nfind ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/. -name \".svn\" -exec rm -rf '{}' > /dev/null \\; 2> /dev/null\n\nfi";
+			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\ncp -rf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
