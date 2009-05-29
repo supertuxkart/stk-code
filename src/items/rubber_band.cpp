@@ -96,6 +96,7 @@ void RubberBand::updatePosition()
     v[2].Pos.X = k.getX()+hh; v[2].Pos.Z=k.getY(); v[2].Pos.Y = k.getZ()+hh;
     v[3].Pos.X = k.getX()-hh; v[3].Pos.Z=k.getY(); v[3].Pos.Y = k.getZ()-hh;
     m_buffer->recalculateBoundingBox();
+    m_mesh->setBoundingBox(m_buffer->getBoundingBox());
 }   // updatePosition
 
 // ----------------------------------------------------------------------------
