@@ -350,7 +350,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
         if(all_sectors) 
             next_sector = (*all_sectors)[j];
         else
-            next_sector  = current_sector+1 == getNumNodes() ? 0 : current_sector+1;
+            next_sector  = current_sector+1 == (int)getNumNodes() ? 0 : current_sector+1;
 
         float dist_2 = xyz.distance2(getQuad(next_sector).getCenter()-xyz);
         if(dist_2<min_dist_2)

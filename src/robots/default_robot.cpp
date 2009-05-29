@@ -85,7 +85,7 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         }
     };
 
-    const int look_ahead=10;
+    const unsigned int look_ahead=10;
     // Now compute for each node in the graph the list of the next 'look_ahead'
     // graph nodes. This is the list of node that is tested in checkCrashes.
     // If the look_ahead is too big, the AI can skip loops (see 
