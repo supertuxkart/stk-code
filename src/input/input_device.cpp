@@ -120,7 +120,7 @@ void KeyboardDevice::loadDefaults()
     m_bindings[PA_LEFT].id = KEY_LEFT;
     m_bindings[PA_RIGHT].id = KEY_RIGHT;
     m_bindings[PA_DRIFT].id = KEY_KEY_V;
-    m_bindings[PA_RESCUE].id = KEY_ESCAPE;
+    m_bindings[PA_RESCUE].id = KEY_BACK;
     m_bindings[PA_FIRE].id = KEY_SPACE;
     m_bindings[PA_LOOK_BACK].id = KEY_KEY_B ;
 
