@@ -79,7 +79,7 @@ void DeviceManager::add(GamePadDevice* d)
     m_gamepad_amount = m_gamepads.size();
 }
 // -----------------------------------------------------------------------------
-bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value,
+bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int deviceID, int btnID, int axisDir, int value,
                                               int* player /* out */, PlayerAction* action /* out */ )
 {
     // TODO - auto-detect player ID from device
@@ -89,7 +89,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     {
         for(unsigned int n=0; n<m_keyboard_amount; n++)
         {
-            if( m_keyboards[n].hasBinding(id0, action) ) return true;
+            if( m_keyboards[n].hasBinding(btnID, action) ) return true;
         }
         return false;
     }
@@ -99,12 +99,11 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int id0, i
     }
     else if(type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
     {
-        // std::cout << "stick motion, ID=" <<id0 << " axis=" << id1 << " value=" << value  << std::endl;
         for(unsigned int n=0; n<m_gamepad_amount; n++)
         {
             //std::cout << "checking gamepad #" << n << " out of " << m_gamepad_amount << std::endl;
             
-            if(m_gamepads[n].hasBinding(type, id1 /* axis or button */, value, *player, action /* out */) )
+            if(m_gamepads[n].hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
             {
                 //std::cout << "that's the one.\n";
                 return true;

@@ -47,15 +47,12 @@ struct Input
     static const int IT_LAST = IT_MOUSEBUTTON;
 
     InputType type;
-    int id0; // FIXME : give meaningful names to these variables...
-    int id1;
-    int id2;
+    int deviceID;
+    int btnID; // or axis ID for gamepads axes
+    int axisDirection;
 
-	// Esoteric C++ feature alarm: structs are classes where the fields and
-	// methods are public by default. I just needed some convenient constructors
-	// for this struct.
 	Input()
-		: type(IT_NONE), id0(0), id1(0), id2(0)
+		: type(IT_NONE), deviceID(0), btnID(0), axisDirection(0)
 	{
 		// Nothing to do.
 	}
@@ -83,8 +80,8 @@ struct Input
 	 * index should be zero. The binding will react to all joysticks connected
 	 * to the system.
 	 */
-	Input(InputType ntype, int nid0 , int nid1 = 0, int nid2= 0) 
-		: type(ntype), id0(nid0), id1(nid1), id2(nid2)
+	Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0) 
+		: type(ntype), deviceID(deviceID), btnID(btnID), axisDirection(axisDirection)
 	{
 		// Nothing to do.
 	}

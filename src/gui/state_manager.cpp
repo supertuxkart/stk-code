@@ -394,15 +394,15 @@ namespace StateManager
         
         if(sensedInput->type == Input::IT_KEYBOARD)
         {
-            std::cout << "key " << Input::getInputAsString(Input::IT_KEYBOARD, sensedInput->id0) << std::endl;
+            std::cout << "key " << Input::getInputAsString(Input::IT_KEYBOARD, sensedInput->btnID) << std::endl;
         }
         else if(sensedInput->type == Input::IT_STICKMOTION)
         {
-            std::cout << "gamepad axis " << sensedInput->id0 << " " << sensedInput->id1 << " " << sensedInput->id2 << std::endl;
+            std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
         }
         else if(sensedInput->type == Input::IT_STICKBUTTON)
         {
-            std::cout << "gamepad button " << sensedInput->id0 << " " << sensedInput->id1 << " " << sensedInput->id2 << std::endl;
+            std::cout << "gamepad " << sensedInput->deviceID << " button " << sensedInput->btnID << std::endl;
         }
         
         getCurrentScreen()->dismissModalDialog();

@@ -180,17 +180,13 @@ void InputManager::handleStaticAction(int key, int value)
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::input(Input::InputType type, int id0, int id1, int id2, 
-                         int value)
+void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
 {
     int player;
     PlayerAction action;
     
-    const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, id0, id1, id2, value, &player, &action );
+    const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection, value, &player, &action );
     
-    // std::cout << "Input code=" << id0 << " found=" << action_found << std::endl;
-    
-    //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
 
     // Act different in input sensing mode.
     if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
@@ -223,9 +219,11 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             if(store_new)
             {
                 m_sensed_input->type = type;
-                m_sensed_input->id0  = id0;
-                m_sensed_input->id1  = id1;
-                m_sensed_input->id2  = id2;
+                
+                m_sensed_input->deviceID = deviceID;
+                m_sensed_input->btnID = btnID;
+                m_sensed_input->axisDirection = axisDirection;
+                
                 m_max_sensed_input   = abs(value);
                 m_max_sensed_type    = type;
             }
@@ -236,10 +234,8 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
                 StateManager::gotSensedInput(m_sensed_input);
             }
         }
-    }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
-    else
-
-    if (action_found)
+    } 
+    else if (action_found)
     {
         if(StateManager::isGameState())
             RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
@@ -267,7 +263,7 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
     else if(type == Input::IT_KEYBOARD)
     {
         // keyboard press not handled by device manager / bindings. Check static bindings...
-        handleStaticAction( id0, value );
+        handleStaticAction( btnID, value );
     }
 }   // input
 
@@ -340,7 +336,7 @@ bool InputManager::input(const SEvent& event)
                 return true;
             }
             
-            input(Input::IT_KEYBOARD, key,
+            input(Input::IT_KEYBOARD, 0, key,
 #ifdef HAVE_IRRLICHT
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config 
@@ -354,12 +350,12 @@ bool InputManager::input(const SEvent& event)
 #else
                   ev.key.keysym.unicode, 
 #endif
-                  0, MAX_VALUE);
+                  MAX_VALUE);
             
         }
         else
         {
-            input(Input::IT_KEYBOARD, key, 0, 0, 0);
+            input(Input::IT_KEYBOARD, 0, key, 0, 0);
         }
     }
 #if 0 // in case we ever use mouse in-game...
