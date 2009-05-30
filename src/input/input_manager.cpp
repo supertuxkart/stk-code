@@ -186,9 +186,27 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     int player;
     PlayerAction action;
     
-    const bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection, value, &player, &action );
+    bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection, value, &player, &action );
     
 
+    // in menus, some keyboard keys are standard
+    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU)
+    {
+        action = PA_FIRST;
+        
+        if(btnID == KEY_UP)         action = PA_ACCEL;
+        else if(btnID == KEY_DOWN)  action = PA_BRAKE;
+        else if(btnID == KEY_LEFT)  action = PA_LEFT;
+        else if(btnID == KEY_RIGHT) action = PA_RIGHT;
+        else if(btnID == KEY_SPACE) action = PA_FIRE;
+        
+        if(action != PA_FIRST)
+        {
+            action_found = true;
+            player = 0;
+        }
+    }
+    
     // Act different in input sensing mode.
     if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
         m_mode <= INPUT_SENSE_PREFER_BUTTON)
@@ -239,7 +257,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     else if (action_found)
     {
         if(StateManager::isGameState())
+        {
             RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
+        }
         else
         {  
             // reset timer when released
