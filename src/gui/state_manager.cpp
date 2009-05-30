@@ -378,8 +378,8 @@ namespace StateManager
 
     void escapePressed()
     {
-        if(input_manager->isInMode(InputManager::INPUT_SENSE_PREFER_AXIS) ||
-           input_manager->isInMode(InputManager::INPUT_SENSE_PREFER_BUTTON) )
+        if(input_manager->isInMode(InputManager::INPUT_SENSE_KEYBOARD) ||
+           input_manager->isInMode(InputManager::INPUT_SENSE_GAMEPAD) )
         {
             getCurrentScreen()->dismissModalDialog();
             input_manager->setMode(InputManager::MENU);

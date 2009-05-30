@@ -208,8 +208,8 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     }
     
     // Act different in input sensing mode.
-    if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
-        m_mode <= INPUT_SENSE_PREFER_BUTTON)
+    if (m_mode == INPUT_SENSE_KEYBOARD ||
+        m_mode == INPUT_SENSE_GAMEPAD)
     {
         // Input sensing should be canceled. (TODO)
         //if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
@@ -228,13 +228,12 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             // The latter is necessary since some gamepads have analog
             // buttons that can return two different events when pressed
             bool store_new = abs(value) > m_max_sensed_input         ||
-            m_max_sensed_type   == Input::IT_NONE                ||
-            ( m_mode            == INPUT_SENSE_PREFER_AXIS && 
-             type              == Input::IT_STICKMOTION && 
-             m_max_sensed_type != Input::IT_STICKMOTION      )  ||
-            ( m_mode            == INPUT_SENSE_PREFER_BUTTON && 
-             type              == Input::IT_STICKBUTTON && 
-             m_max_sensed_type != Input::IT_STICKBUTTON      );
+                             m_max_sensed_type   == Input::IT_NONE                ||
+                            ( m_mode  == INPUT_SENSE_GAMEPAD &&  type  == Input::IT_STICKMOTION && 
+                             m_max_sensed_type != Input::IT_STICKMOTION      );  /*||
+                            ( m_mode  == INPUT_SENSE_PREFER_BUTTON && 
+                              type              == Input::IT_STICKBUTTON && 
+                              m_max_sensed_type != Input::IT_STICKBUTTON      );*/
             if(store_new)
             {
                 m_sensed_input->type = type;
@@ -417,8 +416,8 @@ bool InputManager::input(const SEvent& event)
  */
 Input &InputManager::getSensedInput()
 {
-    assert (m_mode >= INPUT_SENSE_PREFER_AXIS &&
-            m_mode <= INPUT_SENSE_PREFER_BUTTON   );
+    assert (m_mode == INPUT_SENSE_KEYBOARD ||
+            m_mode == INPUT_SENSE_GAMEPAD   );
     
     // m_sensed_input should be available in input sense mode.
     assert (m_sensed_input);
@@ -484,8 +483,8 @@ void InputManager::setMode(InputDriverMode new_mode)
                 m_mode = MENU;
                 
                 break;
-            case INPUT_SENSE_PREFER_AXIS:
-            case INPUT_SENSE_PREFER_BUTTON:
+            case INPUT_SENSE_KEYBOARD:
+            case INPUT_SENSE_GAMEPAD:
                 // Leaving input sense mode.
                 
                 irr_driver->showPointer();
@@ -528,8 +527,8 @@ void InputManager::setMode(InputDriverMode new_mode)
             m_mode = INGAME;
             
             break;
-        case INPUT_SENSE_PREFER_AXIS:
-        case INPUT_SENSE_PREFER_BUTTON:
+        case INPUT_SENSE_KEYBOARD:
+        case INPUT_SENSE_GAMEPAD:
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
             

@@ -259,6 +259,8 @@ namespace StateManager
                     devices->addItem(name,internal_name,"gui/gamepad.png");
                 }
                 
+                getCurrentScreen()->m_inited = true;
+                
             }
             devices->updateItemDisplay();
             
@@ -350,7 +352,7 @@ namespace StateManager
             getCurrentScreen()->showModalDialog();
             //INPUT_SENSE_PREFER_AXIS,
             //INPUT_SENSE_PREFER_BUTTON,
-            input_manager->setMode(InputManager::INPUT_SENSE_PREFER_BUTTON);	
+            input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);	
             std::cout << "in sensing mode\n";
         }
     }

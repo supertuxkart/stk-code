@@ -36,8 +36,10 @@ public:
     enum InputDriverMode {
         MENU = 0,
         INGAME,
-        INPUT_SENSE_PREFER_AXIS,
-        INPUT_SENSE_PREFER_BUTTON,
+        INPUT_SENSE_KEYBOARD,
+        INPUT_SENSE_GAMEPAD,
+        //INPUT_SENSE_PREFER_AXIS,
+        //INPUT_SENSE_PREFER_BUTTON,
         LOWLEVEL,
         BOOTSTRAP
     };
