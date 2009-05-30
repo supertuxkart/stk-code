@@ -969,6 +969,9 @@ bool RibbonGridWidget::rightPressed()
         updateLabel();
         propagateSelection();
     }
+    
+    if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    
     return true;
 }
 // -----------------------------------------------------------------------------
@@ -982,6 +985,9 @@ bool RibbonGridWidget::leftPressed()
         updateLabel();
         propagateSelection();
     }
+    
+    if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    
     return true;
 }
 // -----------------------------------------------------------------------------
