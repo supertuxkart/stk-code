@@ -378,7 +378,13 @@ namespace StateManager
 
     void escapePressed()
     {
-        if(g_game_mode)
+        if(input_manager->isInMode(InputManager::INPUT_SENSE_PREFER_AXIS) ||
+           input_manager->isInMode(InputManager::INPUT_SENSE_PREFER_BUTTON) )
+        {
+            getCurrentScreen()->dismissModalDialog();
+            input_manager->setMode(InputManager::MENU);
+        }
+        else if(g_game_mode)
         {
             resetAndGoToMenu("main.stkgui");
         }
