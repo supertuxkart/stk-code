@@ -269,6 +269,7 @@ namespace StateManager
     
     // ----------------------------------------------------------------------------- 
     static PlayerAction binding_to_set;
+    static std::string binding_to_set_button;
     
     void eventInput(Widget* widget, const std::string& name)
     {
@@ -302,6 +303,8 @@ namespace StateManager
         }
         else if(name.find("binding_") != std::string::npos)
         {
+            binding_to_set_button = name;
+            
             if(name == "binding_up")
             {
                 binding_to_set = PA_ACCEL;
@@ -355,15 +358,21 @@ namespace StateManager
     // -----------------------------------------------------------------------------
     void gotSensedInput(Input* sensedInput)
     {
+        getCurrentScreen()->dismissModalDialog();
+        input_manager->setMode(InputManager::MENU);
+        
         if(sensedInput->type == Input::IT_KEYBOARD)
         {            
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
             keyboard->editBinding(binding_to_set, sensedInput->btnID);
             
-            // GUIEngine::getGUIEnv()->setFocus( btn->m_element );
-            
             // refresh display
             initInput(NULL, "init");
+            
+            // re-select the previous button
+            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
+            assert( btn != NULL );
+            GUIEngine::getGUIEnv()->setFocus( btn->m_element );
         }
         else if(sensedInput->type == Input::IT_STICKMOTION)
         {
@@ -373,9 +382,6 @@ namespace StateManager
         {
             std::cout << "gamepad " << sensedInput->deviceID << " button " << sensedInput->btnID << std::endl;
         }
-        
-        getCurrentScreen()->dismissModalDialog();
-        input_manager->setMode(InputManager::MENU);
         
         // save new binding to file
         input_manager->getDeviceList()->serialize(); 
