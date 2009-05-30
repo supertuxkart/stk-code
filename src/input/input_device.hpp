@@ -56,6 +56,8 @@ public:
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
     bool hasBinding(const int key_id, PlayerAction* action /* out */) const;
     
+    void editBinding(PlayerAction action, int key_id);
+    
     void loadDefaults();
 };
 

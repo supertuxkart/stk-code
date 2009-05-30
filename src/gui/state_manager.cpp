@@ -387,27 +387,6 @@ namespace StateManager
             popMenu();
         }
     }
-    
-    void gotSensedInput(Input* sensedInput)
-    {
-        std::cout << "got sensed input\n";
-        
-        if(sensedInput->type == Input::IT_KEYBOARD)
-        {
-            std::cout << "key " << Input::getInputAsString(Input::IT_KEYBOARD, sensedInput->btnID) << std::endl;
-        }
-        else if(sensedInput->type == Input::IT_STICKMOTION)
-        {
-            std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
-        }
-        else if(sensedInput->type == Input::IT_STICKBUTTON)
-        {
-            std::cout << "gamepad " << sensedInput->deviceID << " button " << sensedInput->btnID << std::endl;
-        }
-        
-        getCurrentScreen()->dismissModalDialog();
-        input_manager->setMode(InputManager::MENU);
-    }
 
 
 #if 0

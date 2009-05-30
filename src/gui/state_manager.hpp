@@ -17,8 +17,6 @@ namespace StateManager
     bool isGameState();
     void reshowTopMostMenu();
     
-    void gotSensedInput(Input* sensedInput);
-    
     void escapePressed();
 }
 

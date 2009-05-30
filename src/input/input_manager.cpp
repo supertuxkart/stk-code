@@ -34,6 +34,7 @@
 #include "main_loop.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
+#include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
 #include "gui/engine.hpp"
 #include "race_manager.hpp"

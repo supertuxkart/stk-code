@@ -135,6 +135,11 @@ void KeyboardDevice::loadDefaults()
     m_bindings[PA_LOOK_BACK].type = Input::IT_KEYBOARD;
 }
 // -----------------------------------------------------------------------------
+void KeyboardDevice::editBinding(PlayerAction action, int key_id)
+{
+    m_bindings[action].id = key_id;
+}
+// -----------------------------------------------------------------------------
 /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
 bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */) const
 {

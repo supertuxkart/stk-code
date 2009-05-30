@@ -242,7 +242,6 @@ namespace StateManager
     // -----------------------------------------------------------------------------    
     void initInput(Widget* widget, const std::string& name)
     {
-        {
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
             
@@ -264,12 +263,13 @@ namespace StateManager
             devices->updateItemDisplay();
             
             // trigger displaying bindings for default selected device
-            const std::string name("devices");
-            eventInput(devices, name);
-        }
+            const std::string name2("devices");
+            eventInput(devices, name2);
     }
     
-    // -----------------------------------------------------------------------------    
+    // ----------------------------------------------------------------------------- 
+    static PlayerAction binding_to_set;
+    
     void eventInput(Widget* widget, const std::string& name)
     {
         if(name == "devices")
@@ -302,12 +302,83 @@ namespace StateManager
         }
         else if(name.find("binding_") != std::string::npos)
         {
+            if(name == "binding_up")
+            {
+                binding_to_set = PA_ACCEL;
+            }
+            else if(name == "binding_down")
+            {
+                binding_to_set = PA_BRAKE;
+            }
+            else if(name == "binding_left")
+            {
+                binding_to_set = PA_LEFT;
+            }
+            else if(name == "binding_right")
+            {
+                binding_to_set = PA_RIGHT;
+            }
+            else if(name == "binding_fire")
+            {
+                binding_to_set = PA_FIRE;
+            }
+            else if(name == "binding_nitro")
+            {
+                binding_to_set = PA_NITRO;
+            }
+            else if(name == "binding_drift")
+            {
+                binding_to_set = PA_DRIFT;
+            }
+            else if(name == "binding_rescue")
+            {
+                binding_to_set = PA_RESCUE;
+            }
+            else if(name == "binding_look_back")
+            {
+                binding_to_set = PA_LOOK_BACK;
+            }
+            else
+            {
+                std::cerr << "Unknown binding name : " << name.c_str() << std::endl;
+                return;
+            }
+            
             getCurrentScreen()->showModalDialog();
             //INPUT_SENSE_PREFER_AXIS,
             //INPUT_SENSE_PREFER_BUTTON,
             input_manager->setMode(InputManager::INPUT_SENSE_PREFER_BUTTON);	
             std::cout << "in sensing mode\n";
         }
+    }
+    
+    // -----------------------------------------------------------------------------
+    void gotSensedInput(Input* sensedInput)
+    {
+        if(sensedInput->type == Input::IT_KEYBOARD)
+        {            
+            KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
+            keyboard->editBinding(binding_to_set, sensedInput->btnID);
+            
+            // GUIEngine::getGUIEnv()->setFocus( btn->m_element );
+            
+            // refresh display
+            initInput(NULL, "init");
+        }
+        else if(sensedInput->type == Input::IT_STICKMOTION)
+        {
+            std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
+        }
+        else if(sensedInput->type == Input::IT_STICKBUTTON)
+        {
+            std::cout << "gamepad " << sensedInput->deviceID << " button " << sensedInput->btnID << std::endl;
+        }
+        
+        getCurrentScreen()->dismissModalDialog();
+        input_manager->setMode(InputManager::MENU);
+        
+        // save new binding to file
+        input_manager->getDeviceList()->serialize(); 
     }
     
     // -----------------------------------------------------------------------------

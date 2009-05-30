@@ -8,10 +8,13 @@ namespace GUIEngine
     class Widget;
 }
 
+struct Input;
+
 namespace StateManager
 {
 
     void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
+    void gotSensedInput(Input* sensedInput);
 
 }
 
