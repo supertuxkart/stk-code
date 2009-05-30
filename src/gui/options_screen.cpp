@@ -300,6 +300,14 @@ namespace StateManager
                 std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
             }
         }
+        else if(name.find("binding_") != std::string::npos)
+        {
+            getCurrentScreen()->showModalDialog();
+            //INPUT_SENSE_PREFER_AXIS,
+            //INPUT_SENSE_PREFER_BUTTON,
+            input_manager->setMode(InputManager::INPUT_SENSE_PREFER_BUTTON);	
+            std::cout << "in sensing mode\n";
+        }
     }
     
     // -----------------------------------------------------------------------------

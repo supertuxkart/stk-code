@@ -3,6 +3,8 @@
 
 #include <string>
 
+class Input;
+
 namespace StateManager
 {
     void initGUI();
@@ -14,6 +16,8 @@ namespace StateManager
     void enterGameState();
     bool isGameState();
     void reshowTopMostMenu();
+    
+    void gotSensedInput(Input* sensedInput);
     
     void escapePressed();
 }

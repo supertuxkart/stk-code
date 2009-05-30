@@ -754,11 +754,6 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
     process3DPane(element, rect, false /* pressed */ );
 }
 
-void Skin::draw3DMenuPane (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{
-    //printf("draw menu pane\n");
-}
-
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     // e.g. the checkbox square
@@ -769,6 +764,34 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
     else
         GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+}
+
+core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{
+    // fade out background
+    GUIEngine::getDriver()->draw2DRectangle( SColor(150, 255, 255, 255),
+                                            core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+    
+    static BoxRenderParams params;
+    params.left_border = 15;
+    params.right_border = 15;
+    params.top_border = 15;
+    params.bottom_border = 15;
+    
+    params.hborder_out_portion = 1.0;
+    params.vborder_out_portion = 0.2f;
+    
+    // draw frame (since it's transluscent, draw many times to get opacity)
+    drawBoxFromStretchableTexture(rect, m_tex_section, params);
+    drawBoxFromStretchableTexture(rect, m_tex_section, params);
+
+    
+    return rect;
+}
+
+void Skin::draw3DMenuPane (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{
+    //printf("draw menu pane\n");
 }
 
 void Skin::draw3DTabBody (IGUIElement *element, bool border, bool background, const core::rect< s32 > &rect, const core::rect< s32 > *clip, s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
@@ -783,12 +806,6 @@ void Skin::draw3DTabButton (IGUIElement *element, bool active, const core::rect<
 
 void Skin::draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-}
-
-core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{
-    //printf("draw 3d window bg\n");
-    return rect;
 }
 
 void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon, const core::position2di position, u32 starttime, u32 currenttime, bool loop, const core::rect< s32 > *clip)

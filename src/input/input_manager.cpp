@@ -1,7 +1,6 @@
 //  $Id: plibdrv.cpp 757 2006-09-11 22:27:39Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -192,19 +191,20 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
     // std::cout << "Input code=" << id0 << " found=" << action_found << std::endl;
     
     //GameAction ga = m_action_map->getEntry(type, id0, id1, id2);
-#if 0 // TODO - input sensing
+
     // Act different in input sensing mode.
     if (m_mode >= INPUT_SENSE_PREFER_AXIS && 
         m_mode <= INPUT_SENSE_PREFER_BUTTON)
     {
-        // Input sensing should be canceled.
-        if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
-        {
-            handleGameAction(GA_SENSE_CANCEL, value);
-        }
+        // Input sensing should be canceled. (TODO)
+        //if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
+        //{
+        //   StateManager::gotSensedInput(NULL);
+        //}
         // Stores the sensed input when the button/key/axes/<whatever> is
         // released only and is not used in a fixed mapping.
-        else if (!user_config->isFixedInput(type, id0, id1, id2) )
+        //else
+        //if (!user_config->isFixedInput(type, id0, id1, id2) ) // ignore static actions (TODO)
         {
             // See if the new input should be stored. This happens if:
             // 1) the value is larger
@@ -232,11 +232,13 @@ void InputManager::input(Input::InputType type, int id0, int id1, int id2,
             // Notify the completion of the input sensing if the key/stick/
             // ... is released.
             if(value==0)
-                handleGameAction(GA_SENSE_COMPLETE, 0);
+            {
+                StateManager::gotSensedInput(m_sensed_input);
+            }
         }
     }   // if m_mode==INPUT_SENSE_PREFER_{AXIS,BUTTON}
     else
-#endif
+
     if (action_found)
     {
         if(StateManager::isGameState())

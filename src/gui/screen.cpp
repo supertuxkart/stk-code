@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "irrlicht.h"
+#include "utils/translation.hpp"
 
 #include "gui/screen.hpp"
 #include "gui/engine.hpp"
@@ -237,6 +238,29 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
     } // next widget
     
 }
+// -----------------------------------------------------------------------------
+//ok, global is not nice... but in the end there will only ever be maximum 1 dialog at a time
+static IGUIWindow* modalWindow = NULL;
+
+void Screen::showModalDialog()
+{
+    const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    const int w = frame_size.Width*0.4;
+    const int h = frame_size.Height*0.4;
+    core::rect< s32 > area( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
+                           dimension2d< s32 >(w, h) );
+    
+    modalWindow = GUIEngine::getGUIEnv()->addWindow  	( area, true /* modal */ );
+    
+    core::rect< s32 > area2(0, 0, w, h);
+    GUIEngine::getGUIEnv()->addButton( area2, modalWindow, -1, stringw(_("Press a key")).c_str() );
+}
+// -----------------------------------------------------------------------------
+void Screen::dismissModalDialog()
+{
+    modalWindow->remove();
+}
+
 // -----------------------------------------------------------------------------
 /**
  * Called when screen is removed. This means all irrlicht widgets this object has pointers

@@ -47,7 +47,7 @@ struct Input
     static const int IT_LAST = IT_MOUSEBUTTON;
 
     InputType type;
-    int id0;
+    int id0; // FIXME : give meaningful names to these variables...
     int id1;
     int id2;
 
@@ -89,7 +89,7 @@ struct Input
 		// Nothing to do.
 	}
     
-    static std::string getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir);
+    static std::string getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir=AD_NEUTRAL);
 
 };
 
