@@ -349,11 +349,25 @@ namespace StateManager
                 return;
             }
             
+            RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+            assert( devices != NULL );
+            std::cout << "-------\nentering sensing mode for " << devices->getSelectionName().c_str() << std::endl;
+            
             getCurrentScreen()->showModalDialog();
-            //INPUT_SENSE_PREFER_AXIS,
-            //INPUT_SENSE_PREFER_BUTTON,
-            input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);	
-            std::cout << "in sensing mode\n";
+
+            if(devices->getSelectionName() == "keyboard")
+            {
+                input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);	
+            }
+            else if(devices->getSelectionName().find("gamepad") != std::string::npos)
+            {
+                input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);	
+            }
+            else
+            {
+                std::cerr << "unknown selection device in options : " << devices->getSelectionName() << std::endl;
+            }
+
         }
     }
     
@@ -363,27 +377,56 @@ namespace StateManager
         getCurrentScreen()->dismissModalDialog();
         input_manager->setMode(InputManager::MENU);
         
-        if(sensedInput->type == Input::IT_KEYBOARD)
-        {            
+        RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+        assert( devices != NULL );
+        
+        if(sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionName() == "keyboard")
+        {         
+            std::cout << "received some keyboard input\n";
+            
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
             keyboard->editBinding(binding_to_set, sensedInput->btnID);
             
             // refresh display
             initInput(NULL, "init");
+        }
+        else if(sensedInput->type == Input::IT_STICKMOTION || sensedInput->type == Input::IT_STICKBUTTON
+                && devices->getSelectionName().find("gamepad") != std::string::npos)
+        {
+            std::cout << "received some gamepad input\n";
             
-            // re-select the previous button
-            ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-            assert( btn != NULL );
-            GUIEngine::getGUIEnv()->setFocus( btn->m_element );
+            int gamepadID = -1;
+            
+            if(sscanf( devices->getSelectionName().c_str(), "gamepad%i", &gamepadID ) != 1 ||
+               gamepadID >= input_manager->getDeviceList()->getGamePadAmount())
+            {
+                if(gamepadID >= input_manager->getDeviceList()->getGamePadAmount() || gamepadID == -1 )
+                {
+                    std::cerr << "gamepad ID does not exist (or failed to read it) : " << gamepadID << "\n";
+                    gamepadID = sensedInput->deviceID;
+                }
+                
+                if(input_manager->getDeviceList()->getGamePad(gamepadID)->m_index != sensedInput->deviceID)
+                {
+                    // should not happen, but let's try to be bulletproof...
+                    std::cerr << "The key that was pressed is not on the gamepad we're trying to configure! ID in list=" << gamepadID <<
+                    " which has irrID " << input_manager->getDeviceList()->getGamePad(gamepadID)->m_index <<
+                    " and we got input from " << sensedInput->deviceID << "\n";
+                }
+                
+            }
+            GamePadDevice* gamepad =  input_manager->getDeviceList()->getGamePad(gamepadID);
+            gamepad->editBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
+                                 (Input::AxisDirection)sensedInput->axisDirection);
+            
+            //std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
+            //void editBinding(const PlayerAction action, const InputType type, const int id, Input::AxisDirection direction=AD_NEUTRAL);
+            
         }
-        else if(sensedInput->type == Input::IT_STICKMOTION)
-        {
-            std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
-        }
-        else if(sensedInput->type == Input::IT_STICKBUTTON)
-        {
-            std::cout << "gamepad " << sensedInput->deviceID << " button " << sensedInput->btnID << std::endl;
-        }
+        
+        // re-select the previous button
+        ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
+        if(btn != NULL) GUIEngine::getGUIEnv()->setFocus( btn->m_element );
         
         // save new binding to file
         input_manager->getDeviceList()->serialize(); 

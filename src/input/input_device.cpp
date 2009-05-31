@@ -263,6 +263,13 @@ void GamePadDevice::loadDefaults()
      */
 }
 // -----------------------------------------------------------------------------
+void GamePadDevice::editBinding(const PlayerAction action, const Input::InputType type, const int id, Input::AxisDirection direction)
+{
+    m_bindings[action].type = type;
+    m_bindings[action].id = id;
+    m_bindings[PA_ACCEL].dir = direction;
+}
+// -----------------------------------------------------------------------------
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)
 {
     if(!StateManager::isGameState()) return; // ignore this while in menus

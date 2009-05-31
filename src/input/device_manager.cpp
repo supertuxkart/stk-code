@@ -39,6 +39,16 @@ bool DeviceManager::initGamePadSupport()
     return something_new_to_write;
 }
 // -----------------------------------------------------------------------------
+GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
+{
+    for(unsigned int i=0; i<m_gamepad_amount; i++)
+    {
+        if(m_gamepads[i].m_index == id)
+            return m_gamepads.get(i);
+    }
+    return NULL;
+}
+// -----------------------------------------------------------------------------
 /**
  * Check if we already have a config object for joystick 'irr_id' as reported by irrLicht
  * If yes, 'open' the gamepad. If no, create one. Returns whether a new gamepad was created.

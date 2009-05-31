@@ -20,11 +20,12 @@ public:
     void add(KeyboardDevice* d);
     void add(GamePadDevice* d);
     
-    int getGamePadAmount() const{ return m_gamepad_amount; }
-    GamePadDevice* getGamePad(const int i) { return m_gamepads.get(i); }
+    int getGamePadAmount() const                            { return m_gamepad_amount; }
+    GamePadDevice* getGamePad(const int i)                  { return m_gamepads.get(i); }
+    GamePadDevice* getGamePadFromIrrID(const int i);
     
-    int getKeyboardAmount() const{ return m_keyboard_amount; }
-    KeyboardDevice* getKeyboard(const int i) { return m_keyboards.get(i); }
+    int getKeyboardAmount() const                           { return m_keyboard_amount; }
+    KeyboardDevice* getKeyboard(const int i)                { return m_keyboards.get(i); }
         
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
         maps this input to the corresponding player and game action. returns false if player/action could not be set */
