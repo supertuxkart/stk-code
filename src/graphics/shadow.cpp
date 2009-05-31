@@ -33,10 +33,10 @@ Shadow::Shadow(const std::string &name)
     m_mesh   = irr_driver->createQuadMesh(&m);
     m_buffer = m_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
-    v[0].Pos.X = -1.0f; v[0].Pos.Z = -1.0f; v[0].Pos.Y = 0.05f;
-    v[1].Pos.X =  1.0f; v[1].Pos.Z = -1.0f; v[1].Pos.Y = 0.05f;
-    v[2].Pos.X =  1.0f; v[2].Pos.Z =  1.0f; v[2].Pos.Y = 0.05f;
-    v[3].Pos.X = -1.0f; v[3].Pos.Z =  1.0f; v[3].Pos.Y = 0.05f;
+    v[0].Pos.X = -1.0f; v[0].Pos.Z =  1.0f; v[0].Pos.Y = 0.01f;
+    v[1].Pos.X =  1.0f; v[1].Pos.Z =  1.0f; v[1].Pos.Y = 0.01f;
+    v[2].Pos.X =  1.0f; v[2].Pos.Z = -1.0f; v[2].Pos.Y = 0.01f;
+    v[3].Pos.X = -1.0f; v[3].Pos.Z = -1.0f; v[3].Pos.Y = 0.01f;
     v[0].TCoords = core::vector2df(0,0);
     v[1].TCoords = core::vector2df(1,0);
     v[2].TCoords = core::vector2df(1,1);
