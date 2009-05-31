@@ -393,7 +393,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
 {
     const bool pressedDown = value > MAX_VALUE*2/3;
     
-    if(!pressedDown) return;
+    if(!pressedDown && type == Input::IT_STICKMOTION) return;
     
     switch(action)
     {
@@ -402,7 +402,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         {
             // simulate a key press
             irr::SEvent::SKeyInput evt;
-            evt.PressedDown = true;
+            evt.PressedDown = pressedDown;
             evt.Key = KEY_LEFT;
             irr::SEvent wrapper;
             wrapper.KeyInput = evt;
@@ -433,7 +433,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         {
             // simulate a key press
             irr::SEvent::SKeyInput evt;
-            evt.PressedDown = true;
+            evt.PressedDown = pressedDown;
             evt.Key = KEY_RIGHT;
             irr::SEvent wrapper;
             wrapper.KeyInput = evt;
@@ -480,7 +480,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 {
                     // simulate a key press
                     irr::SEvent::SKeyInput evt;
-                    evt.PressedDown = true;
+                    evt.PressedDown = pressedDown;
                     evt.Key = KEY_UP;
                     irr::SEvent wrapper;
                     wrapper.KeyInput = evt;
@@ -527,7 +527,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 {
                     // simulate a key press
                     irr::SEvent::SKeyInput evt;
-                    evt.PressedDown = true;
+                    evt.PressedDown = pressedDown;
                     evt.Key = KEY_DOWN;
                     irr::SEvent wrapper;
                     wrapper.KeyInput = evt;
@@ -554,23 +554,25 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             break;
             
         case PA_RESCUE:
-            StateManager::escapePressed();
+            if(pressedDown)
+                StateManager::escapePressed();
             break;
             
         case PA_FIRE:
             if(type == Input::IT_STICKBUTTON)
             {
-                /*
+
+                std::cout << "sending event, pressedDown=" << pressedDown << "\n";
                 // simulate a 'enter' key press. doesn't seem to work
                 irr::SEvent::SKeyInput evt;
-                evt.PressedDown = true;
-                evt.Key = KEY_RETURN;
+                evt.PressedDown = pressedDown;
+                evt.Key = KEY_SPACE; // KEY_RETURN
                 irr::SEvent wrapper;
                 wrapper.KeyInput = evt;
                 wrapper.EventType = EET_KEY_INPUT_EVENT;
                 GUIEngine::getDevice()->postEventFromUser(wrapper);
-                */
                 
+                /*
                 irr::SEvent::SGUIEvent evt;
                 evt.EventType = EGET_BUTTON_CLICKED;
                 evt.Element = GUIEngine::getGUIEnv()->getFocus();
@@ -581,6 +583,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 // GUIEngine::getDevice()->postEventFromUser(wrapper);
                 this->OnEvent(wrapper);
                 // std::cout << "posting event to simulate 'enter'\n";
+                 */
 
             }
             break;

@@ -67,13 +67,13 @@ bool DeviceManager::checkForGamePad(const int irr_id)
         if(m_gamepads[n].m_name == name)
         {
             std::cout << "--> that's the one currently connected\n";
-            m_gamepads[n].open(irr_id, m_gamepads[n].m_name, m_irrlicht_gamepads[irr_id].Axes );
+            m_gamepads[n].open(irr_id, m_gamepads[n].m_name, m_irrlicht_gamepads[irr_id].Axes, m_irrlicht_gamepads[irr_id].Buttons);
             return false;
         }
     }
     
     std::cout << "couldn't find this joystick, so creating a new one" << std::endl;
-    add(new GamePadDevice(irr_id, m_irrlicht_gamepads[irr_id].Name.c_str(), m_irrlicht_gamepads[irr_id].Axes ));
+    add(new GamePadDevice(irr_id, m_irrlicht_gamepads[irr_id].Name.c_str(), m_irrlicht_gamepads[irr_id].Axes, m_irrlicht_gamepads[irr_id].Buttons ));
     return true;
 }
 // -----------------------------------------------------------------------------

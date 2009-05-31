@@ -182,30 +182,37 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
         std::cerr << "Warning, joystick without name in config file, making it undetectable\n";
     }
     else m_name = name_string;
+    
+    for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
+        m_buttonPressed[n] = false;
 }
 // -----------------------------------------------------------------------------
 /** Constructor for GamePadDevice from a connected gamepad for which no configuration existed
 * (defaults will be used)
  *  \param sdlIndex Index of stick.
  */
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count)
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount)
 {
     m_type = DT_GAMEPAD;
     m_deadzone = DEADZONE_JOYSTICK;
     m_prevAxisDirections = NULL;
 
-    open(irrIndex, name, axis_count);
+    open(irrIndex, name, axis_count, btnAmount);
     m_name = name;
 
     loadDefaults();
+    
+    for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
+        m_buttonPressed[n] = false;
 }   // GamePadDevice
 // -----------------------------------------------------------------------------
-void GamePadDevice::open(const int irrIndex, const std::string name, const int axis_count)
+void GamePadDevice::open(const int irrIndex, const std::string name, const int axis_count, const int btnCount)
 {
     m_axis_count = axis_count;
     m_prevAxisDirections = new Input::AxisDirection[axis_count];
-
-    std::cout << "(i) This gamepad has " << axis_count << " axes\n";
+    m_button_count = btnCount;
+    
+    std::cout << "(i) This gamepad has " << axis_count << " axes and " << m_button_count << " buttons\n";
 
     for (int i = 0; i < axis_count; i++)
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
@@ -261,6 +268,15 @@ void GamePadDevice::loadDefaults()
      set(GA_LEAVE,
      Input(Input::IT_STICKBUTTON, 0, 1),
      */
+}
+// -----------------------------------------------------------------------------
+bool GamePadDevice::isButtonPressed(const int i)
+{
+    return m_buttonPressed[i];
+}
+void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
+{
+    m_buttonPressed[i] = isButtonPressed;
 }
 // -----------------------------------------------------------------------------
 void GamePadDevice::editBinding(const PlayerAction action, const Input::InputType type, const int id, Input::AxisDirection direction)

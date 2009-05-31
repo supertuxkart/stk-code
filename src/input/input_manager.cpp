@@ -262,8 +262,11 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         else
         {  
             // reset timer when released
-            if( abs(value) == 0 && type == Input::IT_KEYBOARD)
+            if( abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON) )
             {
+                if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
+                else std::cout << "resetting for another reason\n";
+                
                 m_timer_in_use = false;
                 m_timer = 0;
             }
@@ -318,7 +321,7 @@ bool InputManager::input(const SEvent& event)
                 printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
                        event.JoystickEvent.Joystick, axis_id, value);
             }
-            
+
             // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
             if(value < 0)
                 input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value);
@@ -326,10 +329,16 @@ bool InputManager::input(const SEvent& event)
                 input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
         
+        GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
+        
         // Buttons - FIXME, instead of checking all of them, ask the bindings which ones to poll
-        for(int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
+        for(int i=0; i<gp->m_button_count; i++)
         {
-            input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, event.JoystickEvent.IsButtonPressed(i) ? MAX_VALUE : 0);
+            const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
+            
+            if(gp->isButtonPressed(i) || isButtonPressed)
+                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, isButtonPressed ? MAX_VALUE : 0);
+            gp->setButtonPressed(i, isButtonPressed);
         }   
 
     }

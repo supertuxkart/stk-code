@@ -64,10 +64,12 @@ public:
 class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
+    bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
 public:
     int                   m_deadzone;
     int                   m_index;
     int                   m_axis_count;
+    int                   m_button_count;
     Input::AxisDirection *m_prevAxisDirections;
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
@@ -77,12 +79,15 @@ public:
     void editBinding(const PlayerAction action, const Input::InputType type, const int id,
                      Input::AxisDirection direction=Input::AD_NEUTRAL);
     
-    void open(const int irrIndex, const std::string name, const int axis_count);
+    void open(const int irrIndex, const std::string name, const int axis_count, const int btnCount);
     
     void loadDefaults();
     
-    GamePadDevice(const int irrIndex, const std::string name, const int axis_number);
+    GamePadDevice(const int irrIndex, const std::string name, const int axis_number, const int btnAmount);
     GamePadDevice(irr::io::IrrXMLReader* xml);
+    
+    bool isButtonPressed(const int i);
+    void setButtonPressed(const int i, bool isButtonPressed);
     
     ~GamePadDevice();
 };

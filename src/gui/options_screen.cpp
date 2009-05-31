@@ -374,13 +374,19 @@ namespace StateManager
     // -----------------------------------------------------------------------------
     void gotSensedInput(Input* sensedInput)
     {
-        getCurrentScreen()->dismissModalDialog();
-        input_manager->setMode(InputManager::MENU);
-        
         RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
         assert( devices != NULL );
         
-        if(sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionName() == "keyboard")
+        const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionName() == "keyboard";
+        const bool gamepad =  sensedInput->type == (Input::IT_STICKMOTION || sensedInput->type == Input::IT_STICKBUTTON) &&
+                                                   devices->getSelectionName().find("gamepad") != std::string::npos;
+        
+        if(!keyboard && !gamepad) return;
+        
+        getCurrentScreen()->dismissModalDialog();
+        input_manager->setMode(InputManager::MENU);
+        
+        if(keyboard)
         {         
             std::cout << "received some keyboard input\n";
             
@@ -390,8 +396,7 @@ namespace StateManager
             // refresh display
             initInput(NULL, "init");
         }
-        else if(sensedInput->type == Input::IT_STICKMOTION || sensedInput->type == Input::IT_STICKBUTTON
-                && devices->getSelectionName().find("gamepad") != std::string::npos)
+        else if(gamepad)
         {
             std::cout << "received some gamepad input\n";
             
