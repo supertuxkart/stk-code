@@ -371,6 +371,8 @@ namespace StateManager
         }
     }
     
+    #define MAX_VALUE 32768
+    
     // -----------------------------------------------------------------------------
     void gotSensedInput(Input* sensedInput)
     {
@@ -378,7 +380,8 @@ namespace StateManager
         assert( devices != NULL );
         
         const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionName() == "keyboard";
-        const bool gamepad =  sensedInput->type == (Input::IT_STICKMOTION || sensedInput->type == Input::IT_STICKBUTTON) &&
+        const bool gamepad =  sensedInput->type == (sensedInput->type == Input::IT_STICKMOTION ||
+                                                    sensedInput->type == Input::IT_STICKBUTTON) &&
                                                    devices->getSelectionName().find("gamepad") != std::string::npos;
         
         if(!keyboard && !gamepad) return;
