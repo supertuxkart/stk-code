@@ -423,6 +423,10 @@ namespace StateManager
             //void editBinding(const PlayerAction action, const InputType type, const int id, Input::AxisDirection direction=AD_NEUTRAL);
             
         }
+        else
+        {
+            return;
+        }
         
         // re-select the previous button
         ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
