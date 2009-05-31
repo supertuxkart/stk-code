@@ -1068,7 +1068,7 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
     if(row == NULL) return;
 
 
-    std::string selection_id = row->getSelectionName();
+    std::string selection_id = row->getSelectionIDString();
 
     const int amount = m_items.size();
     for(int n=0; n<amount; n++)
@@ -1159,11 +1159,11 @@ void RibbonGridWidget::updateItemDisplay()
     } // next row
 }
 // -----------------------------------------------------------------------------
-const std::string& RibbonGridWidget::getSelectionName()
+const std::string& RibbonGridWidget::getSelectionIDString()
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
 
-    if(row != NULL) return row->getSelectionName();
+    if(row != NULL) return row->getSelectionIDString();
 
     static const std::string nothing = "";
     return nothing;

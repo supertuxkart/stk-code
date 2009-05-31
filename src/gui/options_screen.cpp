@@ -176,7 +176,7 @@ namespace StateManager
             RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
             assert(w1 != NULL);
             
-            const std::string& res = w1->getSelectionName();
+            const std::string& res = w1->getSelectionIDString();
             
             int w = -1, h = -1;
             if( sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1 )
@@ -280,7 +280,7 @@ namespace StateManager
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert(devices != NULL);
             
-            const std::string& selection = devices->getSelectionName();
+            const std::string& selection = devices->getSelectionIDString();
             if( selection.find("gamepad") != std::string::npos )
             {
                 int i = -1, read = 0;
@@ -351,21 +351,21 @@ namespace StateManager
             
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
-            std::cout << "-------\nentering sensing mode for " << devices->getSelectionName().c_str() << std::endl;
+            std::cout << "-------\nentering sensing mode for " << devices->getSelectionIDString().c_str() << std::endl;
             
             getCurrentScreen()->showModalDialog();
 
-            if(devices->getSelectionName() == "keyboard")
+            if(devices->getSelectionIDString() == "keyboard")
             {
                 input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);	
             }
-            else if(devices->getSelectionName().find("gamepad") != std::string::npos)
+            else if(devices->getSelectionIDString().find("gamepad") != std::string::npos)
             {
                 input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);	
             }
             else
             {
-                std::cerr << "unknown selection device in options : " << devices->getSelectionName() << std::endl;
+                std::cerr << "unknown selection device in options : " << devices->getSelectionIDString() << std::endl;
             }
 
         }
@@ -379,10 +379,10 @@ namespace StateManager
         RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
         assert( devices != NULL );
         
-        const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionName() == "keyboard";
-        const bool gamepad =  sensedInput->type == (sensedInput->type == Input::IT_STICKMOTION ||
-                                                    sensedInput->type == Input::IT_STICKBUTTON) &&
-                                                   devices->getSelectionName().find("gamepad") != std::string::npos;
+        const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionIDString() == "keyboard";
+        const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
+                               sensedInput->type == Input::IT_STICKBUTTON) &&
+                               devices->getSelectionIDString().find("gamepad") != std::string::npos;
         
         if(!keyboard && !gamepad) return;
         
@@ -402,10 +402,14 @@ namespace StateManager
         else if(gamepad)
         {
             std::cout << "received some gamepad input\n";
+            if(sensedInput->type == Input::IT_STICKMOTION)
+                std::cout << "axis\n";
+            if(sensedInput->type == Input::IT_STICKBUTTON)
+                std::cout << "button\n";
             
             int gamepadID = -1;
             
-            if(sscanf( devices->getSelectionName().c_str(), "gamepad%i", &gamepadID ) != 1 ||
+            if(sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &gamepadID ) != 1 ||
                gamepadID >= input_manager->getDeviceList()->getGamePadAmount())
             {
                 if(gamepadID >= input_manager->getDeviceList()->getGamePadAmount() || gamepadID == -1 )
@@ -427,9 +431,8 @@ namespace StateManager
             gamepad->editBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
                                  (Input::AxisDirection)sensedInput->axisDirection);
             
-            //std::cout << "gamepad " << sensedInput->deviceID << "axis  " << sensedInput->btnID << " direction=" << sensedInput->axisDirection << std::endl;
-            //void editBinding(const PlayerAction action, const InputType type, const int id, Input::AxisDirection direction=AD_NEUTRAL);
-            
+            // refresh display
+            initInput(NULL, "init");            
         }
         else
         {
@@ -469,7 +472,7 @@ namespace StateManager
         }
         else if(name == "options_choice")
         {
-            std::string selection = ((RibbonWidget*)widget)->getSelectionName().c_str();
+            std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
             
             if(selection == "audio_video") StateManager::replaceTopMostMenu("options_av.stkgui");
             else if(selection == "players") StateManager::replaceTopMostMenu("options_players.stkgui");

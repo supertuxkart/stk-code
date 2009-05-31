@@ -41,7 +41,7 @@ namespace StateManager
     {
         RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
         if(ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
-        std::string selection = ribbon->getSelectionName().c_str();
+        std::string selection = ribbon->getSelectionIDString().c_str();
 
 
         if(selection == "new")
@@ -120,7 +120,7 @@ namespace StateManager
             RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
             assert( w != NULL );
             
-            race_manager->setLocalKartInfo(0, w->getSelectionName());
+            race_manager->setLocalKartInfo(0, w->getSelectionIDString());
             
             StateManager::pushMenu("racesetup.stkgui");
         }
@@ -146,7 +146,7 @@ namespace StateManager
         {
             RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
             assert(w != NULL);
-            const std::string& selection = w->getSelectionName();
+            const std::string& selection = w->getSelectionIDString();
 
             if(selection == "novice")
                 race_manager->setDifficulty(RaceManager::RD_EASY);
@@ -159,7 +159,7 @@ namespace StateManager
         {
             // TODO - detect more game modes
             RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-            if(w->getSelectionName() == "normal")
+            if(w->getSelectionIDString() == "normal")
             {
                 StateManager::pushMenu("tracks.stkgui");
             }
@@ -243,7 +243,7 @@ namespace StateManager
             RibbonGridWidget* w2 = dynamic_cast<RibbonGridWidget*>(widget);
             if(w2 != NULL)
             {
-                std::cout << "Clicked on track " << w2->getSelectionName().c_str() << std::endl;
+                std::cout << "Clicked on track " << w2->getSelectionIDString().c_str() << std::endl;
 
                 StateManager::enterGameState();
                 //race_manager->setDifficulty(RaceManager::RD_HARD);
@@ -263,7 +263,7 @@ namespace StateManager
         {
             RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
             if(w != NULL)
-                std::cout << "Clicked on GrandPrix " << w->getSelectionName().c_str() << std::endl;
+                std::cout << "Clicked on GrandPrix " << w->getSelectionIDString().c_str() << std::endl;
         }
 
     }
@@ -290,7 +290,7 @@ namespace StateManager
         // -- options
         else if(name == "category")
         {
-            std::string selection = ((RibbonWidget*)widget)->getSelectionName().c_str();
+            std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
 
             if(selection == "page1") replaceTopMostMenu("help1.stkgui");
             else if(selection == "page2") replaceTopMostMenu("help2.stkgui");

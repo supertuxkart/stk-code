@@ -211,6 +211,12 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
     {
+        
+        if(type == Input::IT_STICKMOTION)
+            std::cout << "sensing input -- axis binding\n";
+        if(type == Input::IT_STICKBUTTON)
+            std::cout << "sensing input -- button binding\n";
+        
         // Input sensing should be canceled. (TODO)
         //if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
         //{
@@ -224,19 +230,30 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             // See if the new input should be stored. This happens if:
             // 1) the value is larger
             // 2) nothing has been saved yet
-            // 3) the new event has the preferred type
+            // 3) the new event has the preferred type : TODO - reimplement
             // The latter is necessary since some gamepads have analog
             // buttons that can return two different events when pressed
             bool store_new = abs(value) > m_max_sensed_input         ||
-                             m_max_sensed_type   == Input::IT_NONE                ||
-                            ( m_mode  == INPUT_SENSE_GAMEPAD &&  type  == Input::IT_STICKMOTION && 
-                             m_max_sensed_type != Input::IT_STICKMOTION      );  /*||
-                            ( m_mode  == INPUT_SENSE_PREFER_BUTTON && 
-                              type              == Input::IT_STICKBUTTON && 
-                              m_max_sensed_type != Input::IT_STICKBUTTON      );*/
+                             m_max_sensed_type  == Input::IT_NONE;
+            
+                        //    (m_mode  == INPUT_SENSE_GAMEPAD &&  (type == Input::IT_STICKMOTION ||
+                        //                                         type == Input::IT_STICKBUTTON) &&
+                        //    abs(value) > m_max_sensed_input);
+            
+            // don't store if we're trying to do something like bindings keyboard keys on a gamepad
+            if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
+            if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
+
+            // only store axes when they're pushed quite far
+            if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
+            
             if(store_new)
             {
                 m_sensed_input->type = type;
+                if(type == Input::IT_STICKMOTION)
+                    std::cout << "storing new axis binding\n";
+                if(type == Input::IT_STICKBUTTON)
+                    std::cout << "storing new button binding\n";
                 
                 m_sensed_input->deviceID = deviceID;
                 m_sensed_input->btnID = btnID;
@@ -245,6 +262,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                 m_max_sensed_input   = abs(value);
                 m_max_sensed_type    = type;
             }
+
             // Notify the completion of the input sensing if the key/stick/
             // ... is released.
             if(value==0)
@@ -331,7 +349,6 @@ bool InputManager::input(const SEvent& event)
         
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
         
-        // Buttons - FIXME, instead of checking all of them, ask the bindings which ones to poll
         for(int i=0; i<gp->m_button_count; i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
