@@ -3,7 +3,7 @@
 
 #include <string>
 
-class Input;
+struct Input;
 
 namespace StateManager
 {

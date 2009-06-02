@@ -245,8 +245,8 @@ static IGUIWindow* modalWindow = NULL;
 void Screen::showModalDialog()
 {
     const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    const int w = frame_size.Width*0.4;
-    const int h = frame_size.Height*0.4;
+    const int w = (int)(frame_size.Width*0.4f);
+    const int h = (int)(frame_size.Height*0.4f);
     core::rect< s32 > area( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
                            dimension2d< s32 >(w, h) );
     
