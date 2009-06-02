@@ -164,6 +164,12 @@ namespace StateManager
                 StateManager::pushMenu("tracks.stkgui");
             }
         }
+        else if(name == "aikartamount")
+        {
+            SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
+            
+            race_manager->setNumKarts( w->getValue() + 1 );
+        }
         /*
          289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
          290         user_config->setDefaultNumDifficulty(m_difficulty);
@@ -250,7 +256,7 @@ namespace StateManager
                 race_manager->setTrack("beach");
                 race_manager->setNumLaps( 3 );
                 race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-                race_manager->setNumKarts( 1 );
+                //race_manager->setNumKarts( 1 );
                 race_manager->setNumPlayers( 1 );
                 race_manager->setNumLocalPlayers( 1 );
                 network_manager->setupPlayerKartInfo();
