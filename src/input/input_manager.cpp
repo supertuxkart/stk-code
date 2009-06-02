@@ -17,8 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input/input_manager.hpp"
-#include "input/device_manager.hpp"
-#include "graphics/irr_driver.hpp"
 
 #include <map>
 #include <vector>
@@ -27,22 +25,23 @@
 #include <sstream>
 #include <algorithm>
 
-#include "input/input.hpp"
-//#include "actionmap.hpp"
-#include "user_config.hpp"
-
+#include "history.hpp"
 #include "main_loop.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
+#include "race_manager.hpp"
+
+#include "graphics/irr_driver.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
 #include "gui/engine.hpp"
-#include "race_manager.hpp"
-#include "modes/world.hpp"
-#include "karts/kart.hpp"
-#include "history.hpp"
 #include "gui/race_gui.hpp"
 #include "gui/screen.hpp"
+#include "input/device_manager.hpp"
+#include "input/input.hpp"
+#include "items/projectile_manager.hpp"
+#include "karts/kart.hpp"
+#include "modes/world.hpp"
 
 InputManager *input_manager;
 
@@ -114,7 +113,7 @@ void InputManager::handleStaticAction(int key, int value)
 			{
 				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BOWLING, 10000);
-                kart->attach(ATTACH_ANVIL, 5);
+                projectile_manager->newExplosion(Vec3(0, 8, 0.5));
 			}
 			break;
 		case KEY_F2:
