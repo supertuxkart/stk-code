@@ -118,7 +118,7 @@ void Material::install(bool is_full_path)
 /** Sets the appropriate flags in an irrlicht SMaterial.
  *  \param material The irrlicht SMaterial which gets the flags set.
  */
-void  Material::setMaterialProperties(scene::IMeshBuffer *mb) const
+void  Material::setMaterialProperties(video::SMaterial *m) const
 {
     if(m_transparency)
         // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
@@ -126,10 +126,10 @@ void  Material::setMaterialProperties(scene::IMeshBuffer *mb) const
         //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
         // updates of the Z buffer of the material. Since the _REF 
         // approach is faster (and looks better imho), this is used for now.
-        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
     else if(m_sphere_map)
-        mb->getMaterial().MaterialType = video::EMT_SPHERE_MAP;
+        m->MaterialType = video::EMT_SPHERE_MAP;
     else if(m_alpha_blending)
-        mb->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties

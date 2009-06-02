@@ -59,7 +59,7 @@ public:
                   Moveable();
     virtual      ~Moveable();
     scene::ISceneNode 
-                 *getNode() { return m_node ? m_node : m_animated_node; }
+                 *getNode() const { return m_node ? m_node : m_animated_node; }
     void          setNode(scene::ISceneNode *n);
     void          setAnimatedNode(scene::IAnimatedMeshSceneNode *n);
     virtual const btVector3 

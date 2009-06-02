@@ -30,7 +30,7 @@ class Explosion
 {
 private:
     SFXBase*       m_explode_sound;
-    bool           m_has_ended;
+    float          m_remaining_time;
     scene::IParticleSystemSceneNode 
                   *m_node;
 
@@ -40,7 +40,7 @@ public:
     void init     (const Vec3& coord);
     void update   (float delta_t);
     int  inUse    ();
-    bool hasEnded () { return  m_has_ended;  }
+    bool hasEnded () { return  m_remaining_time<0.0f;  }
 
 } ;
 

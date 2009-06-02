@@ -30,52 +30,32 @@
 
 Explosion::Explosion(const Vec3& coord, const int explosion_sound)
 {
+    m_remaining_time = 1.5f;
     m_node = irr_driver->addParticleNode();
-        scene::IParticleEmitter* em = m_node->createBoxEmitter(
-                core::aabbox3d<f32>(-7,0,-7,7,1,7), // emitter size
-                core::vector3df(0.0f,0.06f,0.0f),   // initial direction
-                80,100,                             // emit rate
-                video::SColor(0,255,255,255),       // darkest color
-                video::SColor(0,255,255,255),       // brightest color
-                800,2000,0,                         // min and max age, angle
-                core::dimension2df(10.f,10.f),         // min size
-                core::dimension2df(20.f,20.f));        // max size
+    m_node->setPosition(coord.toIrrVector());
+    Material *m = material_manager->getMaterial("explode.png");
+    m_node->setMaterialTexture(0, m->getTexture());
+    m->setMaterialProperties(&(m_node->getMaterial(0)));
+    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-        m_node->setEmitter(em); // this grabs the emitter
-        em->drop(); // so we can drop it here without deleting it
+    scene::IParticleEmitter* em = m_node->createPointEmitter();
+    em->setDirection(core::vector3df(0.0f,0.0006f,0.0f));  // velocity in m/ms(!!)
+    em->setMinParticlesPerSecond(1);
+    em->setMaxParticlesPerSecond(5);
+    em->setMinStartSize(core::dimension2df(0.1f, 0.1f));
+    em->setMaxStartSize(core::dimension2df(0.5f, 0.5f));
+    m_node->setEmitter(em); // this grabs the emitter
+    em->drop(); // so we can drop it here without deleting it
 
-        scene::IParticleAffector* paf = m_node->createFadeOutParticleAffector();
-
-        m_node->addAffector(paf); // same goes for the affector
-        paf->drop();
-
-
-
-
-    //scene::IParticleEmitter *em = 
-    //    m_node->createPointEmitter(Vec3(0, 0, 1).toIrrVector(),
-    //                               5, 10     // min and max particles per second
-    //                               );
-    //m_node->setEmitter(em);
-    //em->drop();
+    scene::IParticleAffector* paf = m_node->createFadeOutParticleAffector();
+    m_node->addAffector(paf); // same goes for the affector
+    paf->drop();
 
     //scene::IParticleAffector *paf = 
     //    m_node->createGravityAffector(Vec3(0, 0, -5).toIrrVector());
     //m_node->addAffector(paf);
     //paf->drop();
-    //paf = m_node->createFadeOutParticleAffector();
-    //m_node->addAffector(paf);
-    //paf->drop();
 
-
-    m_node->setPosition(coord.toIrrVector());
-    m_node->setPosition(core::vector3df(5, 5, 5));
-    m_node->setScale(core::vector3df(2,2,2));
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
-    m_node->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
-    Material *m = material_manager->getMaterial("lava.png");
-    m_node->setMaterialTexture(0, m->getTexture());
-    m_node->setMaterialType(video::EMT_TRANSPARENT_VERTEX_ALPHA);
 
     m_explode_sound = sfx_manager->newSFX( (SFXManager::SFXType)explosion_sound );
     init(coord);
@@ -95,35 +75,28 @@ void Explosion::init(const Vec3& coord)
 {
     m_explode_sound->position(coord);
     m_explode_sound->play();
-
-    m_has_ended = false;
-}
+}   // init
 
 //-----------------------------------------------------------------------------
 void Explosion::update(float dt)
 {
-#ifndef HAVE_IRRLICHT
-    //fprintf(stderr, "Explosion: update: ");
-    if(++m_step >= m_seq->getNumKids())
+    m_remaining_time -=dt;
+
+    // Do nothing more if the animation is still playing
+    if(m_remaining_time>0) return;
+
+    // Otherwise check that the sfx has finished, otherwise the
+    // sfx will get aborted 'in the middle' when this explosion
+    // object is removed.
+    if(m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
     {
-        //be sure that the sound is not prematurely stopped
-        if(m_explode_sound->getStatus() != SFXManager::SFX_PLAYING)
-        {
-            //fprintf(stderr, "Sound finished. Removing.\n");
-            stk_scene->remove((ssgTransform*)this);
-            projectile_manager->FinishedExplosion();
-            m_has_ended = true;
-            return;
-        }
-        else
-        {
-            //fprintf(stderr, "Waiting for sound to finish.\n");
-        }
+        m_remaining_time = 0;
     }
     else
     {
-        //fprintf(stderr, "Step.\n");
-        m_seq->selectStep(m_step);
+        // Sound and animation finished --> remove node
+        irr_driver->removeNode(m_node);
+        projectile_manager->FinishedExplosion();
+        return;
     }
-#endif
 }

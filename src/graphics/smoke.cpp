@@ -19,88 +19,56 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "smoke.hpp"
+
 #include "material_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart.hpp"
-#include "physics/btKart.hpp"
-#include "utils/constants.hpp"
 
-Smoke::Smoke(Kart* kart)
-        : ParticleSystem(200, 0.0f, true, 0.75f),
-        m_kart(kart)
-{
-#ifndef HAVE_IRRLICHT
-    
-#ifdef DEBUG
-    setName("smoke");
-#endif
-    bsphere.setCenter(0, 0, 0);
-    bsphere.setRadius(1000.0f);
-    dirtyBSphere();
+Smoke::Smoke(Kart* kart) : m_kart(kart)
+{    
+    m_node = irr_driver->addParticleNode();
+    m_node->setParent(m_kart->getNode());
+    m_node->setPosition(core::vector3df(0, 1, -1));
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    m_node->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
+    //const std::string s=file_manager->getTextureFile("smoke.png");
+    video::ITexture *tex = material_manager->getMaterial("smoke.png")->getTexture();
+    m_node->setMaterialTexture(0, tex);
+    //m_node->setMaterialType(video::EMT_TRANSPARENT_VERTEX_ALPHA);
+    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_smokepuff = new ssgSimpleState ();
-#ifndef HAVE_IRRLICHT
-    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
-#endif
-    m_smokepuff -> setTranslucent    () ;
-    m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
-    m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
-    m_smokepuff -> disable           ( GL_CULL_FACE ) ;
-    m_smokepuff -> enable            ( GL_BLEND ) ;
-    m_smokepuff -> disable           ( GL_ALPHA_TEST ) ;
-    m_smokepuff -> enable            ( GL_LIGHTING ) ;
-    m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
-    m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setShininess      (  0 ) ;
-    m_smokepuff->ref();
 
-    setState(m_smokepuff);
-#endif
+    m_emitter = m_node->createBoxEmitter(core::aabbox3df(0, 0, 0, 0.3f, 0.3f, 1.3f),
+                                         core::vector3df(0, 0, 0),
+                                         20,   // minParticlesPerSecond,
+                                         30  // maxParticlesPerSecond
+                                           );
+    m_node->setParticleSize(core::dimension2df(0.01f, 0.01f));
+    m_node->setEmitter(m_emitter); // this grabs the emitter
+
+    //scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
+    //m_node->addAffector(af);
+    //af->drop();
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
+/** Destructor, removes
+ */
 Smoke::~Smoke()
 {
-    //ssgDeRefDelete(m_smokepuff);
 }   // ~Smoke
+
 //-----------------------------------------------------------------------------
 void Smoke::update(float t)
 {
-    ParticleSystem::update(t);
+    Vec3 dir = m_kart->getTrans().getBasis()*Vec3(0,-.01f,0);
+    m_emitter->setDirection(dir.toIrrVector());
 }   // update
-
 //-----------------------------------------------------------------------------
-void Smoke::particle_create(int, Particle *p)
+void Smoke::setCreationRate(float f)
 {
-#ifndef HAVE_IRRLICHT
-    sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
-    sgSetVec3(p->m_vel, 0, 0, 0 );
-    sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
-    p->m_size         = 0.5f;
-    p->m_time_to_live = 0.4f;
-
-    // Change from left to right wheel and back for each new particle
-    static int wheel_number = 2;
-    wheel_number            = 5 - wheel_number;
-    Vec3 xyz=m_kart->getVehicle()->getWheelInfo(wheel_number).m_raycastInfo.m_contactPointWS;
-
-    sgCopyVec3 (p->m_pos, xyz.toFloat());
-    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[2] += sin(DEGREE_TO_RAD(rand()%100));
-
-    bsphere.setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
-#endif
-}   // particle_create
-
-//-----------------------------------------------------------------------------
-void Smoke::particle_update(float delta, int,
-                            Particle * particle)
-{
-#ifndef HAVE_IRRLICHT
-    particle->m_size    -= delta*.2f;
-    particle->m_col[3]  -= delta * 2.0f;
-#endif
-}  // particle_update
-
+    f=0;
+    m_emitter->setMaxParticlesPerSecond(int(f));
+    m_emitter->setMaxParticlesPerSecond(int(f));
+}   // setCreationRate

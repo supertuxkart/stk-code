@@ -48,7 +48,6 @@ Moveable::~Moveable()
     if(m_animated_node) irr_driver->removeNode(m_animated_node);
     if(m_mesh) irr_driver->removeMesh(m_mesh);
     if(m_animated_mesh) irr_driver->removeMesh(m_animated_mesh);
-    // FIXME LEAK: what about model? ssgDeRefDelete(m_model_transform)
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------

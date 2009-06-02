@@ -56,7 +56,7 @@ public:
                    bool is_full_path=false);
          ~Material ();
 
-    void  setMaterialProperties(scene::IMeshBuffer *mb) const;
+    void  setMaterialProperties(video::SMaterial *m) const;
     /** Returns the ITexture associated with this material. */
     video::ITexture *getTexture() const   { return m_texture;        }
     bool  isIgnore           () const { return m_ignore;             }

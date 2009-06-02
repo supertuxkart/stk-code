@@ -242,7 +242,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
     
-    //if(m_smoke_system) ssgDeRefDelete(m_smoke_system);
+    if(m_smoke_system) delete m_smoke_system;
     //if(m_nitro)        ssgDeRefDelete(m_nitro);
 
     m_animated_node->removeChild(m_shadow->getSceneNode());

@@ -17,26 +17,29 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SMOKE_H
-#define HEADER_SMOKE_H
+#ifndef HEADER_SMOKE_HPP
+#define HEADER_SMOKE_HPP
 
-#include "particle_system.hpp"
+#include "irrlicht.h"
+using namespace irr;
 
 class Kart;
 
-class Smoke : public ParticleSystem
+class Smoke
 {
 private:
     /** The kart to which this smoke belongs. */
-    Kart           *m_kart;
-    /** The texture to use. */
-    //ssgSimpleState *m_smokepuff;
+    const Kart                      *m_kart;
+    /** Irrlicht's particle system. */
+    scene::IParticleSystemSceneNode *m_node;
+    /** The emitter. Access to this is needed to adjust the number of
+     *  particles per second. */
+    scene::IParticleEmitter         *m_emitter;
 public:
                  Smoke          (Kart* kart);
                 ~Smoke          ();
-    virtual void update         (float t                                        );
-    virtual void particle_create(int index, Particle* p                         );
-    virtual void particle_update(float deltaTime, int index, Particle *p        );
+    virtual void update         (float t);
+    void         setCreationRate(float f);
 };
 #endif
 
