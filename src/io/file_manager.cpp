@@ -41,7 +41,7 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "graphics/irr_driver.hpp"
-#include "material_manager.hpp"
+#include "graphics/material_manager.hpp"
 #include "utils/string_utils.hpp"
 
 #ifdef __APPLE__

@@ -29,9 +29,9 @@ using namespace irr;
 #include <string>
 #include <vector>
 
-#include "material.hpp"
 #include "player.hpp"
 #include "race_manager.hpp"
+#include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"

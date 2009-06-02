@@ -19,13 +19,13 @@
 
 #include "items/projectile_manager.hpp"
 
-#include "explosion.hpp"
+#include "graphics/explosion.hpp"
+#include "graphics/scene.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
-#include "graphics/scene.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 

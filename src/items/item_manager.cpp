@@ -22,9 +22,9 @@
 #include <sstream>
 
 #include "user_config.hpp"
-#include "material_manager.hpp"
-#include "material.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"

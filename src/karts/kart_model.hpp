@@ -25,8 +25,8 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "no_copy.hpp"
 #include "lisp/lisp.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 /** This class stores a 3D kart model. It takes especially care of attaching

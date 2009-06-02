@@ -1,7 +1,7 @@
 #ifndef HEADER_CREDITS_HPP
 #define HEADER_CREDITS_HPP
 
-#include "ptr_vector.hpp"
+#include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {

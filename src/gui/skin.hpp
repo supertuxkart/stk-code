@@ -1,8 +1,8 @@
 #ifndef HEADER_SKIN_HPP
 #define HEADER_SKIN_HPP
 
-#include <irrlicht.h>
-#include "ptr_vector.hpp"
+#include "irrlicht.h"
+#include "utils/ptr_vector.hpp"
 
 using namespace irr;
 using namespace core;

@@ -20,10 +20,10 @@
 
 #include "karts/moveable.hpp"
 
-#include "material_manager.hpp"
-#include "material.hpp"
 #include "user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "utils/coord.hpp"
 

@@ -19,9 +19,9 @@
 
 #include "rubber_band.hpp"
 
-#include "material_manager.hpp"
 #include "race_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"

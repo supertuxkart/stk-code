@@ -21,11 +21,11 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "material_manager.hpp"
 #include "stk_config.hpp"
 #include "user_config.hpp"
-#include "karts/kart_model.hpp"
+#include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_model.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"
 #include "utils/string_utils.hpp"

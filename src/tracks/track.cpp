@@ -25,11 +25,11 @@
 #include "irrlicht.h"
 
 #include "stk_config.hpp"
-#include "material_manager.hpp"
 #include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
 #include "graphics/scene.hpp"

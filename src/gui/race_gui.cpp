@@ -20,14 +20,14 @@
 
 #include "gui/race_gui.hpp"
 
-#include "input/input.hpp"
-#include "input/input_manager.hpp"
 #include "user_config.hpp"
 #include "race_manager.hpp"
-#include "material_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "gui/font.hpp"
+#include "input/input.hpp"
+#include "input/input_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"

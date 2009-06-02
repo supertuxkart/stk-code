@@ -10,8 +10,6 @@ AM_CPPFLAGS = -DSUPERTUXKART_DATADIR="\"$(datadir)/games/$(PACKAGE)/\""  \
 
 supertuxkart_SOURCES = \
  main.cpp \
- material.cpp \
- material.hpp \
  network/network_manager.cpp \
  network/network_manager.hpp \
  network/network_kart.cpp \
@@ -55,6 +53,8 @@ supertuxkart_SOURCES = \
  audio/sound_manager.hpp \
  utils/constants.hpp \
  utils/coord.hpp \
+ utils/no_copy.hpp \
+ utils/ptr_vector.hpp \
  utils/random_generator.hpp \
  utils/random_generator.cpp \
  utils/string_utils.cpp \
@@ -63,14 +63,18 @@ supertuxkart_SOURCES = \
  utils/translation.hpp \
  utils/vec3.cpp \
  utils/vec3.hpp \
- material_manager.cpp \
- material_manager.hpp \
  grand_prix_manager.cpp \
  grand_prix_manager.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
+ graphics/explosion.cpp \
+ graphics/explosion.hpp \
  graphics/irr_driver.cpp \
  graphics/irr_driver.hpp \
+ graphics/material.cpp \
+ graphics/material.hpp \
+ graphics/material_manager.cpp \
+ graphics/material_manager.hpp \
  graphics/mesh_tools.hpp \
  graphics/mesh_tools.cpp \
  graphics/nitro.cpp \
@@ -142,8 +146,6 @@ supertuxkart_SOURCES = \
  input/input_manager.hpp \
  isect.cpp \
  isect.hpp \
- explosion.cpp \
- explosion.hpp \
  user_config.cpp \
  user_config.hpp \
  grand_prix_data.cpp \
@@ -161,7 +163,6 @@ supertuxkart_SOURCES = \
  user_pointer.hpp \
  history.cpp \
  history.hpp \
- no_copy.hpp \
  player.hpp \
  challenges/challenge.hpp \
  challenges/challenge.cpp \

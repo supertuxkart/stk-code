@@ -3,7 +3,8 @@
 
 #include <irrlicht.h>
 #include <map>
-#include "ptr_vector.hpp"
+
+#include "utils/ptr_vector.hpp"
 
 using namespace irr;
 using namespace gui;

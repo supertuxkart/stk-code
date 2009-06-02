@@ -23,9 +23,9 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "material_manager.hpp"
-#include "material.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"

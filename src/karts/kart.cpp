@@ -27,10 +27,10 @@
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
 #include "user_config.hpp"
-#include "material_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/nitro.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"

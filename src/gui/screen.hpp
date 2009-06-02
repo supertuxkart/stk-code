@@ -3,9 +3,11 @@
 
 #include <map>
 #include <string>
-#include "ptr_vector.hpp"
+
+#include "irrlicht.h"
+
 #include "input/input.hpp"
-#include <irrlicht.h>
+#include "utils/ptr_vector.hpp"
 
 using namespace irr;
 using namespace core;

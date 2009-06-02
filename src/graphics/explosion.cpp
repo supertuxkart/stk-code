@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "explosion.hpp"
+#include "graphics/explosion.hpp"
 
-#include "material.hpp"
-#include "material_manager.hpp"
-#include "graphics/irr_driver.hpp"
-#include "items/projectile_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
+#include "items/projectile_manager.hpp"
 #include "utils/vec3.hpp"
 
 Explosion::Explosion(const Vec3& coord, const int explosion_sound)

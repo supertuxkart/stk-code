@@ -28,13 +28,15 @@
 #  include <GL/gl.h>
 #endif
 
-#include "irrlicht.h"
-using namespace irr;
 #include <string>
 #include <vector>
+
+#include "irrlicht.h"
+using namespace irr;
+
 #include "LinearMath/btTransform.h"
-#include "material.hpp"
 #include "audio/music_information.hpp"
+#include "graphics/material.hpp"
 #include "items/item.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/vec3.hpp"

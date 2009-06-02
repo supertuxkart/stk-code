@@ -20,7 +20,7 @@
 #ifndef HEADER_TERRAIN_INFO_HPP
 #define HEADER_TERRAIN_INFO_HPP
 
-#include "material.hpp"
+#include "graphics/material.hpp"
 #include "utils/vec3.hpp"
 
 /** This class stores information about the triangle that's under an object, i.e.:

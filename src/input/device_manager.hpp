@@ -1,8 +1,8 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#include "ptr_vector.hpp"
 #include "input/input_device.hpp"
+#include "utils/ptr_vector.hpp"
 
 class DeviceManager
 {

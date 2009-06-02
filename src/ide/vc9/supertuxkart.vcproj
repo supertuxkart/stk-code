@@ -194,10 +194,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="../../../src\explosion.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\grand_prix_data.cpp"
 				>
 			</File>
@@ -227,14 +223,6 @@
 			</File>
 			<File
 				RelativePath="..\..\main_loop.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material_manager.cpp"
 				>
 			</File>
 			<File
@@ -529,7 +517,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\explosion.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material_manager.cpp"
 					>
 				</File>
 				<File
@@ -700,10 +700,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\explosion.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\grand_prix_data.hpp"
 				>
 			</File>
@@ -752,19 +748,11 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\no_copy.hpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\player.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\position.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ptr_vector.hpp"
 				>
 			</File>
 			<File
@@ -968,6 +956,14 @@
 				</File>
 				<File
 					RelativePath="..\..\utils\coord.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\no_copy.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\ptr_vector.hpp"
 					>
 				</File>
 				<File
@@ -1175,7 +1171,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\explosion.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material_manager.hpp"
 					>
 				</File>
 				<File
