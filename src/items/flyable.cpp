@@ -254,13 +254,6 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     // The manager will create the appropriate explosion object.
     projectile_manager->notifyRemove();
 
-    // Now remove this projectile from the graph:
-    irr_driver->removeNode(getNode());
-
-    // The explosion is a bit higher in the air
-    Vec3 pos_explosion=getXYZ();
-    pos_explosion.setZ(pos_explosion.getZ()+1.2f);
-    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
 	m_exploded=true;
 
     if(!needsExplosion()) return;
@@ -283,7 +276,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             }
         }
     }
-    RaceManager::getTrack()->handleExplosion(pos_explosion, object);
+    RaceManager::getTrack()->handleExplosion(getXYZ(), object);
 }   // hit
 
 /* EOF */
