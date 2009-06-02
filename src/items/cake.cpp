@@ -107,11 +107,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 }   // Cake
 
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Cake::init(const lisp::Lisp* lisp, scene::IMesh *cake_model)
-#else
-void Cake::init(const lisp::Lisp* lisp, ssgEntity *cake_model)
-#endif
 {
     Flyable::init(lisp, cake_model, POWERUP_CAKE);
     m_st_max_distance   = 80.0f;

@@ -20,10 +20,8 @@
 #ifndef HEADER_CAKE_HPP
 #define HEADER_CAKE_HPP
 
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
 
 #include "flyable.hpp"
 
@@ -34,17 +32,11 @@ private:
     static float m_st_max_distance_squared;
 
     btVector3    m_initial_velocity;
-    //float        steerTowards(btTransform& trans, btVector3& target);
-
     Kart*        m_target;            // which kart is targeted by this
                                       // projectile (NULL if none)
 public:
     Cake (Kart *kart);
-#ifdef HAVE_IRRLICHT
     static  void init     (const lisp::Lisp* lisp, scene::IMesh *cake_model);
-#else
-    static  void init     (const lisp::Lisp* lisp, ssgEntity* cake_model);
-#endif
     virtual void update   (float dt);
     virtual void hitTrack ()                      { hit(NULL);               }
     // Kinematic objects are not allowed to have a velocity (assertion in 
