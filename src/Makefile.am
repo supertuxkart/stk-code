@@ -144,8 +144,6 @@ supertuxkart_SOURCES = \
  input/input_device.hpp \
  input/input_manager.cpp \
  input/input_manager.hpp \
- isect.cpp \
- isect.hpp \
  user_config.cpp \
  user_config.hpp \
  grand_prix_data.cpp \

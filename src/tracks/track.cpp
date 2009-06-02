@@ -25,7 +25,6 @@
 #include "irrlicht.h"
 
 #include "stk_config.hpp"
-#include "isect.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"

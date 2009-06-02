@@ -214,10 +214,6 @@
 				>
 			</File>
 			<File
-				RelativePath="../../../src\isect.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\main.cpp"
 				>
 			</File>
@@ -729,10 +725,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\history.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\isect.hpp"
 				>
 			</File>
 			<File
