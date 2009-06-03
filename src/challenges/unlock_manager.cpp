@@ -23,10 +23,10 @@
 #include <string>
 #include <stdio.h>
 
-#include "race_manager.hpp"
 #include "user_config.hpp"
 #include "challenges/challenge_data.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
 UnlockManager* unlock_manager=0;

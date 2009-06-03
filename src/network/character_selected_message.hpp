@@ -21,8 +21,8 @@
 #define HEADER_CHARACTER_SELECTED_MESSAGE_H
 
 #include "network/message.hpp"
-#include "race_manager.hpp"
 #include "network/remote_kart_info.hpp"
+#include "race/race_manager.hpp"
 
 /** This message is send contains information about selected karts. It is send
  *  from the client to the server to indicate a selected kart, and from the

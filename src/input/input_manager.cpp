@@ -25,12 +25,9 @@
 #include <sstream>
 #include <algorithm>
 
-#include "history.hpp"
 #include "main_loop.hpp"
 #include "player.hpp"
 #include "user_config.hpp"
-#include "race_manager.hpp"
-
 #include "graphics/irr_driver.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
@@ -42,6 +39,8 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "race/history.hpp"
+#include "race/race_manager.hpp"
 
 InputManager *input_manager;
 

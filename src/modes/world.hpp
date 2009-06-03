@@ -22,12 +22,12 @@
 
 #include <vector>
 
-#include "highscores.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
-#include "physics/physics.hpp"
 #include "modes/clock.hpp"
 #include "network/network_kart.hpp"
+#include "physics/physics.hpp"
+#include "race/highscores.hpp"
 #include "utils/random_generator.hpp"
 
 class SFXBase;

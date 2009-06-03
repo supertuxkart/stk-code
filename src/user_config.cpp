@@ -35,13 +35,12 @@
 #endif
 
 #include "stk_config.hpp"
-//#include "actionmap.hpp"
-#include "race_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
+#include "race/race_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 

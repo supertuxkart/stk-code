@@ -20,7 +20,6 @@
 #include "items/powerup.hpp"
 
 #include "user_config.hpp"
-#include "race_manager.hpp"
 #include "stk_config.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -30,6 +29,7 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------

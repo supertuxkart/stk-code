@@ -19,10 +19,10 @@
 
 #include "challenges/challenge.hpp"
 
-#include "race_manager.hpp"
-#include "grand_prix_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"

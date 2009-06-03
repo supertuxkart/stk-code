@@ -30,11 +30,11 @@ using namespace irr;
 #include <vector>
 
 #include "player.hpp"
-#include "race_manager.hpp"
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 
 class InputMap;
 class RaceSetup;

@@ -194,35 +194,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\grand_prix_data.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscore_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscores.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\history.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\main.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\main_loop.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\race_manager.cpp"
 				>
 			</File>
 			<File
@@ -685,24 +661,40 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="race"
+				>
+				<File
+					RelativePath="..\..\race\grand_prix_data.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\grand_prix_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscore_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscores.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\history.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\race_manager.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="../../../src\constants.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_data.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_manager.hpp"
-				>
-			</File>
 			<File
 				RelativePath="..\..\gui\help_page_one.hpp"
 				>
@@ -713,18 +705,6 @@
 			</File>
 			<File
 				RelativePath="../../../src\herring_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscore_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscores.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\history.hpp"
 				>
 			</File>
 			<File
@@ -745,10 +725,6 @@
 			</File>
 			<File
 				RelativePath="..\..\position.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\race_manager.hpp"
 				>
 			</File>
 			<File
@@ -1296,6 +1272,34 @@
 				</File>
 				<File
 					RelativePath="..\..\input\input_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="race"
+				>
+				<File
+					RelativePath="..\..\race\grand_prix_data.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\grand_prix_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscore_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscores.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\history.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\race_manager.hpp"
 					>
 				</File>
 			</Filter>

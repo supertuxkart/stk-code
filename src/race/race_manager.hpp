@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RACEMANAGER_H
-#define HEADER_RACEMANAGER_H
+#ifndef HEADER_RACEMANAGER_HPP
+#define HEADER_RACEMANAGER_HPP
 
 #include <vector>
 #include <algorithm>
 #include <string>
 
-#include "grand_prix_data.hpp"
 #include "network/remote_kart_info.hpp"
+#include "race/grand_prix_data.hpp"
 
 class World;
 class Track;

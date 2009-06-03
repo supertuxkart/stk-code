@@ -19,7 +19,6 @@
 
 #include "items/plunger.hpp"
 
-#include "race_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/scene.hpp"
 #include "items/rubber_band.hpp"
@@ -27,6 +26,7 @@
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 

@@ -20,7 +20,6 @@
 
 #include "karts/player_kart.hpp"
 
-#include "history.hpp"
 #include "player.hpp"
 #include "input/input_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -30,6 +29,7 @@
 #include "gui/race_gui.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
+#include "race/history.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 

@@ -39,19 +39,17 @@
 #include <algorithm>
 
 #include "user_config.hpp"
-#include "race_manager.hpp"
 #include "main_loop.hpp"
-#include "history.hpp"
 #include "stk_config.hpp"
-#include "highscore_manager.hpp"
-#include "grand_prix_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
+#include "gui/engine.hpp"
 #include "gui/font.hpp"
+#include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -60,11 +58,13 @@
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "race/highscore_manager.hpp"
+#include "race/history.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
-#include "gui/engine.hpp"
-#include "gui/state_manager.hpp"
 
 // Only needed for bullet debug!
 #ifdef HAVE_GLUT

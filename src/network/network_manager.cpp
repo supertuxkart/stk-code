@@ -21,7 +21,6 @@
 
 #include "stk_config.hpp"
 #include "user_config.hpp"
-#include "race_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/connect_message.hpp"
@@ -35,6 +34,7 @@
 #include "network/character_confirm_message.hpp"
 #include "network/race_result_message.hpp"
 #include "network/race_result_ack_message.hpp"
+#include "race/race_manager.hpp"
 
 NetworkManager* network_manager = 0;
 

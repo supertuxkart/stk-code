@@ -17,20 +17,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 
 #include <iostream>
 
-#include "modes/world.hpp"
 #include "user_config.hpp"
 #include "stk_config.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/scene.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_manager.hpp"
-#include "modes/standard_race.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/standard_race.hpp"
+#include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "network/network_manager.hpp"
 #include "tracks/track_manager.hpp"
 
 RaceManager* race_manager= NULL;

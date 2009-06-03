@@ -17,12 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "highscores.hpp"
+#include "race/highscores.hpp"
 
 #include <stdexcept>
 #include <sstream>
 
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
 HighscoreEntry::HighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,

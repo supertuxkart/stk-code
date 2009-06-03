@@ -21,12 +21,12 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "grand_prix_data.hpp"
-#include "grand_prix_manager.hpp"
 #include "karts/kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 

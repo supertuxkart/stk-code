@@ -18,9 +18,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "race/grand_prix_data.hpp"
+
 #include <iostream>
 #include <stdexcept>
-#include "grand_prix_data.hpp"
+
 #include "io/file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/lisp.hpp"

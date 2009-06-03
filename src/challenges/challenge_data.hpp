@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include "challenges/challenge.hpp"
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 
 class ChallengeData : public Challenge
 {

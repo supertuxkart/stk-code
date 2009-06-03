@@ -41,7 +41,7 @@
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/string_utils.hpp"

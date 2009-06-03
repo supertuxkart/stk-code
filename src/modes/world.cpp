@@ -17,16 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "modes/world.hpp"
+
 #include <assert.h>
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
 #include <ctime>
 
-#include "race_manager.hpp"
 #include "user_config.hpp"
-#include "history.hpp"
-#include "highscore_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -40,9 +39,11 @@
 #include "karts/auto_kart.hpp"
 #include "karts/player_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "race/highscore_manager.hpp"
+#include "race/history.hpp"
+#include "race/race_manager.hpp"
 #include "robots/default_robot.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"

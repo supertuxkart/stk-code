@@ -17,16 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "highscore_manager.hpp"
+#include "race/highscore_manager.hpp"
 
 #include <stdexcept>
 #include <sstream>
 
-#include "race_manager.hpp"
 #include "user_config.hpp"
 #include "io/file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
+#include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 

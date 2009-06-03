@@ -10,35 +10,12 @@ AM_CPPFLAGS = -DSUPERTUXKART_DATADIR="\"$(datadir)/games/$(PACKAGE)/\""  \
 
 supertuxkart_SOURCES = \
  main.cpp \
- network/network_manager.cpp \
- network/network_manager.hpp \
- network/network_kart.cpp \
- network/network_kart.hpp \
- network/message.cpp \
- network/message.hpp \
- network/race_info_message.hpp \
- network/race_info_message.cpp \
- network/race_result_ack_message.hpp \
- network/remote_kart_info.hpp \
- network/character_selected_message.hpp \
- network/race_start_message.hpp \
- network/character_confirm_message.hpp \
- network/connect_message.hpp \
- network/connect_message.cpp \
- network/num_players_message.hpp \
- network/world_loaded_message.hpp \
- network/connect_message.hpp \
- network/character_info_message.hpp \
- network/kart_update_message.hpp \
- network/kart_update_message.cpp \
- network/kart_control_message.hpp \
- network/kart_control_message.cpp \
- network/flyable_info.hpp \
- network/item_info.hpp \
- network/race_state.hpp \
- network/race_state.cpp \
- network/race_result_message.hpp \
- network/race_result_message.cpp \
+ main_loop.cpp \
+ main_loop.hpp \
+ stk_config.cpp \
+ stk_config.hpp \
+ user_config.cpp \
+ user_config.hpp \
  audio/music.hpp \
  audio/music_information.cpp \
  audio/music_information.hpp \
@@ -51,20 +28,12 @@ supertuxkart_SOURCES = \
  audio/sfx_openal.hpp \
  audio/sound_manager.cpp \
  audio/sound_manager.hpp \
- utils/constants.hpp \
- utils/coord.hpp \
- utils/no_copy.hpp \
- utils/ptr_vector.hpp \
- utils/random_generator.hpp \
- utils/random_generator.cpp \
- utils/string_utils.cpp \
- utils/string_utils.hpp \
- utils/translation.cpp \
- utils/translation.hpp \
- utils/vec3.cpp \
- utils/vec3.hpp \
- grand_prix_manager.cpp \
- grand_prix_manager.hpp \
+ challenges/challenge.cpp \
+ challenges/challenge.hpp \
+ challenges/challenge_data.cpp \
+ challenges/challenge_data.hpp \
+ challenges/unlock_manager.cpp \
+ challenges/unlock_manager.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
  graphics/explosion.cpp \
@@ -75,22 +44,51 @@ supertuxkart_SOURCES = \
  graphics/material.hpp \
  graphics/material_manager.cpp \
  graphics/material_manager.hpp \
- graphics/mesh_tools.hpp \
  graphics/mesh_tools.cpp \
+ graphics/mesh_tools.hpp \
+ graphics/moving_texture.cpp \
+ graphics/moving_texture.hpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
- graphics/moving_texture.hpp \
- graphics/moving_texture.cpp \
  graphics/particle_system.cpp \
  graphics/particle_system.hpp \
- graphics/scene.hpp \
  graphics/scene.cpp \
+ graphics/scene.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
  graphics/smoke.cpp \
  graphics/smoke.hpp \
+ gui/credits.cpp \
+ gui/credits.hpp \
+ gui/engine.cpp \
+ gui/engine.hpp \
+ gui/font.cpp \
+ gui/font.hpp \
+ gui/my_button.cpp \
+ gui/my_button.hpp \
+ gui/options_screen.cpp \
+ gui/options_screen.hpp \
+ gui/race_gui.cpp \
+ gui/race_gui.hpp \
+ gui/screen.cpp \
+ gui/screen.hpp \
+ gui/screen_loader.cpp \
+ gui/skin.cpp \
+ gui/skin.hpp \
+ gui/state_manager.cpp \
+ gui/state_manager.hpp \
+ gui/widget.cpp \
+ gui/widget.hpp \
+ input/device_manager.cpp \
+ input/device_manager.hpp \
+ input/input.cpp \
+ input/input.hpp \
+ input/input_device.cpp \
+ input/input_device.hpp \
+ input/input_manager.cpp \
+ input/input_manager.hpp \
  io/file_manager.cpp \
  io/file_manager.hpp \
  io/xml_node.cpp \
@@ -99,32 +97,32 @@ supertuxkart_SOURCES = \
  items/attachment.hpp \
  items/attachment_manager.cpp \
  items/attachment_manager.hpp \
+ items/bowling.cpp \
+ items/bowling.hpp \
+ items/bubblegumitem.cpp \
+ items/bubblegumitem.hpp \
+ items/cake.cpp \
+ items/cake.hpp \
  items/flyable.cpp \
  items/flyable.hpp \
- items/powerup.cpp \
- items/powerup.hpp \
- items/powerup_manager.cpp \
- items/powerup_manager.hpp \
  items/item.cpp \
  items/item.hpp \
  items/item_manager.cpp \
  items/item_manager.hpp \
- items/projectile_manager.cpp \
- items/projectile_manager.hpp \
- items/bubblegumitem.cpp \
- items/bubblegumitem.hpp \
  items/plunger.cpp \
  items/plunger.hpp \
+ items/powerup.cpp \
+ items/powerup.hpp \
+ items/powerup_manager.cpp \
+ items/powerup_manager.hpp \
+ items/projectile_manager.cpp \
+ items/projectile_manager.hpp \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
- items/cake.cpp \
- items/cake.hpp \
- items/bowling.cpp \
- items/bowling.hpp \
  karts/auto_kart.hpp \
- karts/kart_control.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
+ karts/kart_control.hpp \
  karts/kart_model.cpp \
  karts/kart_model.hpp \
  karts/kart_properties.cpp \
@@ -135,116 +133,117 @@ supertuxkart_SOURCES = \
  karts/moveable.hpp \
  karts/player_kart.cpp \
  karts/player_kart.hpp \
- input.hpp \
- input/device_manager.cpp \
- input/device_manager.hpp \
- input/input.cpp \
- input/input.hpp \
- input/input_device.cpp \
- input/input_device.hpp \
- input/input_manager.cpp \
- input/input_manager.hpp \
- user_config.cpp \
- user_config.hpp \
- grand_prix_data.cpp \
- grand_prix_data.hpp \
- stk_config.cpp \
- stk_config.hpp \
- highscores.cpp \
- highscores.hpp \
- highscore_manager.cpp \
- highscore_manager.hpp \
- race_manager.cpp \
- race_manager.hpp \
- main_loop.cpp \
- main_loop.hpp \
- user_pointer.hpp \
- history.cpp \
- history.hpp \
- player.hpp \
- challenges/challenge.hpp \
- challenges/challenge.cpp \
- challenges/challenge_data.hpp \
- challenges/challenge_data.cpp \
- challenges/unlock_manager.cpp \
- challenges/unlock_manager.hpp \
- lisp/lisp.cpp \
- lisp/lisp.hpp \
  lisp/lexer.cpp \
  lisp/lexer.hpp \
+ lisp/lisp.cpp \
+ lisp/lisp.hpp \
  lisp/parser.cpp \
  lisp/parser.hpp \
  lisp/writer.cpp \
  lisp/writer.hpp \
- gui/credits.cpp \
- gui/credits.hpp \
- gui/widget.cpp \
- gui/widget.hpp \
- gui/race_gui.cpp \
- gui/race_gui.hpp \
- gui/font.hpp \
- gui/font.cpp \
- gui/engine.cpp \
- gui/engine.hpp \
- gui/my_button.cpp \
- gui/my_button.hpp \
- gui/options_screen.cpp \
- gui/options_screen.hpp \
- gui/screen.cpp \
- gui/screen.hpp \
- gui/screen_loader.cpp \
- gui/skin.cpp \
- gui/skin.hpp \
- gui/state_manager.cpp \
- gui/state_manager.hpp \
- modes/follow_the_leader.cpp \
- modes/follow_the_leader.hpp \
- modes/standard_race.cpp \
- modes/standard_race.hpp \
  modes/clock.cpp \
  modes/clock.hpp \
- modes/world.cpp \
- modes/world.hpp \
+ modes/follow_the_leader.cpp \
+ modes/follow_the_leader.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
+ modes/standard_race.cpp \
+ modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \
  modes/three_strikes_battle.hpp \
+ modes/world.cpp \
+ modes/world.hpp \
+ network/character_confirm_message.hpp \
+ network/character_info_message.hpp \
+ network/character_selected_message.hpp \
+ network/connect_message.cpp \
+ network/connect_message.hpp \
+ network/connect_message.hpp \
+ network/flyable_info.hpp \
+ network/item_info.hpp \
+ network/kart_control_message.cpp \
+ network/kart_control_message.hpp \
+ network/kart_update_message.cpp \
+ network/kart_update_message.hpp \
+ network/message.cpp \
+ network/message.hpp \
+ network/network_kart.cpp \
+ network/network_kart.hpp \
+ network/network_manager.cpp \
+ network/network_manager.hpp \
+ network/num_players_message.hpp \
+ network/race_info_message.cpp \
+ network/race_info_message.hpp \
+ network/race_result_ack_message.hpp \
+ network/race_result_message.cpp \
+ network/race_result_message.hpp \
+ network/race_start_message.hpp \
+ network/race_state.cpp \
+ network/race_state.hpp \
+ network/remote_kart_info.hpp \
+ network/world_loaded_message.hpp \
  physics/btKart.cpp \
  physics/btKart.hpp \
  physics/btUprightConstraint.cpp \
  physics/btUprightConstraint.hpp \
- physics/physical_object.hpp \
+ physics/kart_motion_state.hpp \
  physics/physical_object.cpp \
+ physics/physical_object.hpp \
  physics/physics.cpp \
  physics/physics.hpp \
- physics/kart_motion_state.hpp \
  physics/triangle_mesh.cpp \
  physics/triangle_mesh.hpp \
+ physics/user_pointer.hpp \
+ player.hpp \
+ race/grand_prix_data.cpp \
+ race/grand_prix_data.hpp \
+ race/grand_prix_manager.cpp \
+ race/grand_prix_manager.hpp \
+ race/highscore_manager.cpp \
+ race/highscore_manager.hpp \
+ race/highscores.cpp \
+ race/highscores.hpp \
+ race/history.cpp \
+ race/history.hpp \
+ race/race_manager.cpp \
+ race/race_manager.hpp \
+ replay/replay_base.cpp \
+ replay/replay_base.hpp \
+ replay/replay_buffer_tpl.hpp \
+ replay/replay_buffers.cpp \
+ replay/replay_buffers.hpp \
+ replay/replay_player.cpp \
+ replay/replay_player.hpp \
+ replay/replay_recorder.cpp \
+ replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
- tracks/graph_node.hpp\
  tracks/graph_node.cpp\
- tracks/quad.hpp \
+ tracks/graph_node.hpp\
  tracks/quad.cpp \
- tracks/quad_graph.hpp \
+ tracks/quad.hpp \
  tracks/quad_graph.cpp \
- tracks/quad_set.hpp \
+ tracks/quad_graph.hpp \
  tracks/quad_set.cpp \
+ tracks/quad_set.hpp \
  tracks/terrain_info.cpp \
  tracks/terrain_info.hpp \
  tracks/track.cpp \
  tracks/track.hpp \
  tracks/track_manager.cpp \
  tracks/track_manager.hpp \
- replay/replay_buffer_tpl.hpp \
- replay/replay_buffers.hpp \
- replay/replay_buffers.cpp \
- replay/replay_base.hpp \
- replay/replay_base.cpp \
- replay/replay_player.hpp \
- replay/replay_player.cpp \
- replay/replay_recorder.hpp \
- replay/replay_recorder.cpp
+ utils/constants.hpp \
+ utils/coord.hpp \
+ utils/no_copy.hpp \
+ utils/ptr_vector.hpp \
+ utils/random_generator.cpp \
+ utils/random_generator.hpp \
+ utils/string_utils.cpp \
+ utils/string_utils.hpp \
+ utils/translation.cpp \
+ utils/translation.hpp \
+ utils/vec3.cpp \
+ utils/vec3.hpp
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \

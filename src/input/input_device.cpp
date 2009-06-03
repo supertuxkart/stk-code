@@ -1,9 +1,9 @@
 
+#include "gui/state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
-#include "race_manager.hpp"
 #include "modes/world.hpp"
-#include "gui/state_manager.hpp"
+#include "race/race_manager.hpp"
 
 InputDevice::InputDevice()
 {

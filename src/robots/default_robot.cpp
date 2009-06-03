@@ -38,10 +38,10 @@
 #include <ctime>
 #include <cstdio>
 #include <iostream>
-#include "race_manager.hpp"
 #include "graphics/scene.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"

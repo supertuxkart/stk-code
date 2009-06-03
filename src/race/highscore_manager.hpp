@@ -17,14 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HIGHSCORE_MANAGER_H
-#define HEADER_HIGHSCORE_MANAGER_H
+#ifndef HEADER_HIGHSCORE_MANAGER_HPP
+#define HEADER_HIGHSCORE_MANAGER_HPP
 
 #include <string>
 #include <vector>
 #include <map>
 
-#include "highscores.hpp"
+#include "race/highscores.hpp"
 #include "lisp/lisp.hpp"
 
 const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;

@@ -25,7 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"

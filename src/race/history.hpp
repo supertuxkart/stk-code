@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "LinearMath/btQuaternion.h"
+
 #include "karts/kart_control.hpp"
 #include "utils/vec3.hpp"
 

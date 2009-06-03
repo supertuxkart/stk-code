@@ -21,7 +21,6 @@
 
 #include <math.h>
 
-#include "race_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/scene.hpp"
@@ -30,6 +29,7 @@
 #include "modes/world.hpp"
 #include "modes/linear_world.hpp"
 #include "network/flyable_info.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 

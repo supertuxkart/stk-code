@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_HIGHSCORES_H
-#define HEADER_HIGHSCORES_H
+#ifndef HEADER_HIGHSCORES_HPP
+#define HEADER_HIGHSCORES_HPP
 #include <string>
 #include <vector>
 #include <map>
 
 #include "lisp/lisp.hpp"
 #include "lisp/writer.hpp"
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 
 /**
   * Represents one highscore entry.

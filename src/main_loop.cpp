@@ -21,18 +21,18 @@
 
 #include <assert.h>
 
-#include "history.hpp"
-#include "race_manager.hpp"
 #include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
 #include "gui/engine.hpp"
+#include "gui/state_manager.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
-#include "gui/state_manager.hpp"
+#include "race/history.hpp"
+#include "race/race_manager.hpp"
 
 MainLoop* main_loop = 0;
 

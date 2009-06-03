@@ -22,7 +22,8 @@
 
 #include <vector>
 #include <string>
-#include "grand_prix_data.hpp"
+
+#include "race/grand_prix_data.hpp"
 
 class GrandPrixManager
 {

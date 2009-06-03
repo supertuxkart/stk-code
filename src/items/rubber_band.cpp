@@ -19,7 +19,6 @@
 
 #include "rubber_band.hpp"
 
-#include "race_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
@@ -28,6 +27,7 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "race/race_manager.hpp"
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
