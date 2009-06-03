@@ -20,36 +20,36 @@
 
 #include "smoke.hpp"
 
-#include "material_manager.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
+#include "utils/constants.hpp"
 
 Smoke::Smoke(Kart* kart) : m_kart(kart)
 {    
     m_node = irr_driver->addParticleNode();
     m_node->setParent(m_kart->getNode());
-    m_node->setPosition(core::vector3df(0, 1, -1));
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
-    m_node->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
-    //const std::string s=file_manager->getTextureFile("smoke.png");
-    video::ITexture *tex = material_manager->getMaterial("smoke.png")->getTexture();
-    m_node->setMaterialTexture(0, tex);
-    //m_node->setMaterialType(video::EMT_TRANSPARENT_VERTEX_ALPHA);
-    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+    const float particle_size = 0.5f;
+    m_node->setPosition(core::vector3df(0, particle_size*0.5f, -m_kart->getKartLength()*0.5f));
+    Material *m= material_manager->getMaterial("smoke.png");
+    m->setMaterialProperties(&(m_node->getMaterial(0)));
+    m_node->setMaterialTexture(0, m->getTexture());
 
-
-    m_emitter = m_node->createBoxEmitter(core::aabbox3df(0, 0, 0, 0.3f, 0.3f, 1.3f),
-                                         core::vector3df(0, 0, 0),
-                                         20,   // minParticlesPerSecond,
-                                         30  // maxParticlesPerSecond
+    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
+                                           5, 10,
+                                           video::SColor(255,0,0,0),
+                                           video::SColor(255,255,255,255),
+                                           400, 400,
+                                           20  // max angle
                                            );
-    m_node->setParticleSize(core::dimension2df(0.01f, 0.01f));
+    m_emitter->setMinStartSize(core::dimension2df(particle_size, particle_size));
+    m_emitter->setMaxStartSize(core::dimension2df(particle_size, particle_size));
     m_node->setEmitter(m_emitter); // this grabs the emitter
 
-    //scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
-    //m_node->addAffector(af);
-    //af->drop();
+    scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
+    m_node->addAffector(af);
+    af->drop();
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
@@ -57,18 +57,26 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
  */
 Smoke::~Smoke()
 {
+    irr_driver->removeNode(m_node);
 }   // ~Smoke
 
 //-----------------------------------------------------------------------------
 void Smoke::update(float t)
 {
-    Vec3 dir = m_kart->getTrans().getBasis()*Vec3(0,-.01f,0);
+    // No particles to emit, no need to change the speed
+    if(m_emitter->getMinParticlesPerSecond()==0)
+        return;
+    // There seems to be no way to randomise the velocity for particles,
+    // so we have to do this manually, by changing the default velocity.
+    // Irrlicht expects velocity (called 'direction') in m/ms!!
+    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD(rand()%100))*0.001f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 //-----------------------------------------------------------------------------
 void Smoke::setCreationRate(float f)
 {
-    f=0;
-    m_emitter->setMaxParticlesPerSecond(int(f));
+    m_emitter->setMinParticlesPerSecond(int(f));
     m_emitter->setMaxParticlesPerSecond(int(f));
 }   // setCreationRate

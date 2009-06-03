@@ -1004,8 +1004,7 @@ void Kart::loadData()
 
     // Attach Particle System
     m_smoke_system = new Smoke(this);
-    //m_smoke_system->ref();
-    m_nitro = new Nitro(this);
+    m_nitro        = new Nitro(this);
     //m_nitro->ref();
 
     if(m_kart_properties->hasSkidmarks())
