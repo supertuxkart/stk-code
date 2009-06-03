@@ -25,8 +25,8 @@
 using namespace irr;
 #include "btBulletDynamicsCommon.h"
 
-#include "user_pointer.hpp"
 #include "physics/kart_motion_state.hpp"
+#include "physics/user_pointer.hpp"
 #include "utils/vec3.hpp"
 
 class Material;

@@ -25,7 +25,7 @@
 using namespace irr;
 
 #include "btBulletDynamicsCommon.h"
-#include "user_pointer.hpp"
+#include "physics/user_pointer.hpp"
 
 class Vec3;
 class scene::IAnimatedMesh;

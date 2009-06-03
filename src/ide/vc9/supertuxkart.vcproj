@@ -764,10 +764,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\user_pointer.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\vec3.hpp"
 				>
 			</File>
@@ -1116,6 +1112,10 @@
 				</File>
 				<File
 					RelativePath="..\..\physics\triangle_mesh.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\user_pointer.hpp"
 					>
 				</File>
 			</Filter>

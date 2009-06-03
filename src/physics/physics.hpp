@@ -27,7 +27,7 @@
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
-#include "user_pointer.hpp"
+#include "physics/user_pointer.hpp"
 
 class Vec3;
 class Kart;
