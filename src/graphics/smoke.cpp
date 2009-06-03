@@ -32,7 +32,7 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
     // Left wheel
     m_node_l = irr_driver->addParticleNode();
     m_node_l->setParent(m_kart->getNode());
-    m_node_l->setPosition(core::vector3df(-m_kart->getKartWidth()*0.35f, particle_size*0.5f, -m_kart->getKartLength()*0.5f)); // Should use (behind) wheel pos
+    m_node_l->setPosition(core::vector3df(-m_kart->getKartWidth()*0.35f, particle_size*0.25f, -m_kart->getKartLength()*0.5f)); // Should use (behind) wheel pos
     Material *ml= material_manager->getMaterial("smoke.png");
     ml->setMaterialProperties(&(m_node_l->getMaterial(0)));
     m_node_l->setMaterialTexture(0, ml->getTexture());
@@ -44,8 +44,8 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
                                            400, 400,
                                            20  // max angle
                                            );
-    m_emitter_l->setMinStartSize(core::dimension2df(particle_size, particle_size));
-    m_emitter_l->setMaxStartSize(core::dimension2df(particle_size, particle_size));
+    m_emitter_l->setMinStartSize(core::dimension2df(particle_size/1.5f, particle_size/1.5f));
+    m_emitter_l->setMaxStartSize(core::dimension2df(particle_size*1.5f, particle_size*1.5f));
     m_node_l->setEmitter(m_emitter_l); // this grabs the emitter
 
     scene::IParticleAffector *afl = m_node_l->createFadeOutParticleAffector();
@@ -55,7 +55,7 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
     // Right wheel
     m_node_r = irr_driver->addParticleNode();
     m_node_r->setParent(m_kart->getNode());
-    m_node_r->setPosition(core::vector3df(m_kart->getKartWidth()*0.35f, particle_size*0.5f, -m_kart->getKartLength()*0.5f)); // Should use (behind) wheel pos
+    m_node_r->setPosition(core::vector3df(m_kart->getKartWidth()*0.35f, particle_size*0.25f, -m_kart->getKartLength()*0.5f)); // Should use (behind) wheel pos
     Material *mr= material_manager->getMaterial("smoke.png");
     mr->setMaterialProperties(&(m_node_r->getMaterial(0)));
     m_node_r->setMaterialTexture(0, mr->getTexture());
@@ -67,8 +67,8 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
                                            400, 400,
                                            20  // max angle
                                            );  
-    m_emitter_r->setMinStartSize(core::dimension2df(particle_size, particle_size));
-    m_emitter_r->setMaxStartSize(core::dimension2df(particle_size, particle_size));
+    m_emitter_r->setMinStartSize(core::dimension2df(particle_size/1.5f, particle_size/1.5f));
+    m_emitter_r->setMaxStartSize(core::dimension2df(particle_size*1.5f, particle_size*1.5f));
     m_node_r->setEmitter(m_emitter_r); // this grabs the emitter
 
     scene::IParticleAffector *afr = m_node_r->createFadeOutParticleAffector();
