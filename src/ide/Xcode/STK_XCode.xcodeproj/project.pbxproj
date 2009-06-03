@@ -2318,6 +2318,33 @@
 				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-Wall",
+					"-DHAVE_OGGVORBIS=1",
+					"-DHAS_SOCKLEN_T",
+					"-DSTDC_HEADERS=1",
+					"-DHAVE_SYS_TYPES_H=1",
+					"-DHAVE_SYS_STAT_H=1",
+					"-DHAVE_STDLIB_H=1",
+					"-DHAVE_STRING_H=1",
+					"-DHAVE_MEMORY_H=1",
+					"-DHAVE_STRINGS_H=1",
+					"-DHAVE_INTTYPES_H=1",
+					"-DHAVE_STDINT_H=1",
+					"-DHAVE_UNISTD_H=1",
+					"-DHAS_POLL=1",
+					"-DHAS_FCNTL=1",
+					"-DHAS_INET_PTON=1",
+					"-DHAS_INET_NTOP=1",
+					"-DHAS_MSGHDR_FLAGS=1",
+					"-DENABLE_NLS=1",
+					"-DHAVE_GETTEXT=1",
+					"-DHAVE_GLUT=1",
+					"-DHAVE_IRRLICHT=1",
+					"$(OTHER_CFLAGS_QUOTED_FOR_TARGET_1)",
+					"-DDEBUG=1",
+				);
+				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = "-lirrlicht";
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;

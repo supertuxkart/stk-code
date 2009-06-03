@@ -37,7 +37,7 @@ private:
     scene::IParticleEmitter         *m_emitter;
 public:
                  Smoke          (Kart* kart);
-                ~Smoke          ();
+    virtual     ~Smoke          ();
     virtual void update         (float t);
     void         setCreationRate(float f);
 };
