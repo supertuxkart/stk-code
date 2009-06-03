@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_AUTOKART_H
-#define HEADER_AUTOKART_H
+#ifndef HEADER_AUTOKART_HPP
+#define HEADER_AUTOKART_HPP
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"

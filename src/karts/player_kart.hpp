@@ -19,8 +19,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_PLAYERKART_H
-#define HEADER_PLAYERKART_H
+#ifndef HEADER_PLAYERKART_HPP
+#define HEADER_PLAYERKART_HPP
 
 #include "player.hpp"
 #include "karts/kart.hpp"

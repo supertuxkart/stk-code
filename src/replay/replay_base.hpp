@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REPLAYBASE_H
-#define HEADER_REPLAYBASE_H
+#ifndef HEADER_REPLAYBASE_HPP
+#define HEADER_REPLAYBASE_HPP
 
 #ifdef HAVE_GHOST_REPLAY
 
@@ -72,5 +72,5 @@ protected:
 
 #endif // HAVE_GHOST_REPLAY
 
-#endif // HEADER_REPLAYBASE_H
+#endif // HEADER_REPLAYBASE_HPP
 

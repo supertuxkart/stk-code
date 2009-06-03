@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SOUNDMANAGER_H
-#define HEADER_SOUNDMANAGER_H
+#ifndef HEADER_SOUNDMANAGER_HPP
+#define HEADER_SOUNDMANAGER_HPP
 
 #include <map>
 #include <vector>
@@ -76,5 +76,5 @@ public:
 
 extern SoundManager* sound_manager;
 
-#endif // HEADER_SOUNDMANAGER_H
+#endif // HEADER_SOUNDMANAGER_HPP
 

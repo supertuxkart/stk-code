@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_GRAND_PRIX_DATA_H
-#define HEADER_GRAND_PRIX_DATA_H
+#ifndef HEADER_GRAND_PRIX_DATA_HPP
+#define HEADER_GRAND_PRIX_DATA_HPP
 
 #include <string>
 #include <vector>

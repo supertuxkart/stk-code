@@ -38,5 +38,5 @@ public:
     virtual     ~Music       () {};
 };
 
-#endif // HEADER_MUSIC_H
+#endif // HEADER_MUSIC_HPP
 
