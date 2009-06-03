@@ -37,10 +37,10 @@
 #  include <AL/alc.h>
 #endif
 
-#include "race_manager.hpp"
 #include "user_config.hpp"
 #include "audio/sfx_openal.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
 SFXManager* sfx_manager= NULL;
 
