@@ -225,6 +225,9 @@ public:
     /** Returns the height of the kart. */
     float          getKartHeight    () const 
                    {return m_kart_properties->getKartModel()->getHeight();     }
+    /** Returns the width of the kart. */
+    float          getKartWidth    () const 
+                   {return m_kart_properties->getKartModel()->getWidth();      }
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           createPhysics    ();
