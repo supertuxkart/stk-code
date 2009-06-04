@@ -28,7 +28,7 @@
 
 Smoke::Smoke(Kart* kart) : m_kart(kart)
 {
-    const float particle_size = 0.5f;
+    const float particle_size = 0.33f;
     // Left wheel
     m_node_l = irr_driver->addParticleNode();
     m_node_l->setParent(m_kart->getNode());
@@ -41,14 +41,14 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
                                            5, 10,
                                            video::SColor(255,0,0,0),
                                            video::SColor(255,255,255,255),
-                                           400, 400,
+                                           300, 500,
                                            20  // max angle
                                            );
     m_emitter_l->setMinStartSize(core::dimension2df(particle_size/1.5f, particle_size/1.5f));
     m_emitter_l->setMaxStartSize(core::dimension2df(particle_size*1.5f, particle_size*1.5f));
     m_node_l->setEmitter(m_emitter_l); // this grabs the emitter
 
-    scene::IParticleAffector *afl = m_node_l->createFadeOutParticleAffector();
+    scene::IParticleFadeOutAffector *afl = m_node_l->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), 500);
     m_node_l->addAffector(afl);
     afl->drop();
 
@@ -61,17 +61,17 @@ Smoke::Smoke(Kart* kart) : m_kart(kart)
     m_node_r->setMaterialTexture(0, mr->getTexture());
 
     m_emitter_r = m_node_r->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
-                                           5, 10, 
+                                           5, 10,
                                            video::SColor(255,0,0,0),
                                            video::SColor(255,255,255,255),
-                                           400, 400,
+                                           300, 500,
                                            20  // max angle
-                                           );  
+                                           );
     m_emitter_r->setMinStartSize(core::dimension2df(particle_size/1.5f, particle_size/1.5f));
     m_emitter_r->setMaxStartSize(core::dimension2df(particle_size*1.5f, particle_size*1.5f));
     m_node_r->setEmitter(m_emitter_r); // this grabs the emitter
 
-    scene::IParticleAffector *afr = m_node_r->createFadeOutParticleAffector();
+    scene::IParticleFadeOutAffector *afr = m_node_r->createFadeOutParticleAffector(video::SColor(255, 255, 0, 0), 500);
     m_node_r->addAffector(afr);
     afr->drop();
 }   // KartParticleSystem

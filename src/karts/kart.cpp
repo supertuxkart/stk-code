@@ -1065,7 +1065,7 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 
     if(m_smoke_system)
     {
-        float f = fabsf(m_controls.m_steer) > 0.8 ? 50.0f : 0.0f;
+        float f = fabsf(m_controls.m_steer) > 0.8 ? 250.0f : 0.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
     }
     if(m_nitro)
