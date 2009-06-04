@@ -778,9 +778,13 @@ void Kart::updatePhysics (float dt)
         // wall, he needs to be able to start again quickly after going backwards)
         else if(m_speed < 0.0f)
             engine_power *= 5.0f;
+        
         // Engine slow down due to terrain (see m_power_reduction is set in
-        // update() depending on terrain type.
-        engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
+        // update() depending on terrain type. Don't apply this if kart is already
+        // going slowly, this would make it hard accelerating to get out of there
+        if(m_speed > 4.0)
+            engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
+        
         // Lose some traction when skidding, so it is not abused by player
         if(m_controls.m_drift)
             engine_power *= 0.5f;
