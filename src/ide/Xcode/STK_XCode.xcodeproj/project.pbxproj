@@ -21,6 +21,12 @@
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
+		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
+		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
+		95263DEE0FD7471900CF5F92 /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE40FD7471900CF5F92 /* highscore_manager.cpp */; };
+		95263DEF0FD7471900CF5F92 /* highscores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE60FD7471900CF5F92 /* highscores.cpp */; };
+		95263DF00FD7471900CF5F92 /* history.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE80FD7471900CF5F92 /* history.cpp */; };
+		95263DF10FD7471900CF5F92 /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DEA0FD7471900CF5F92 /* race_manager.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
 		9540E24F0FD5F8A8002985B8 /* explosion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E2490FD5F8A8002985B8 /* explosion.cpp */; };
@@ -133,11 +139,6 @@
 		9551C8980FC1B72500DB481B /* protocol.c in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE6C0F296542000D3E5D /* protocol.c */; };
 		9551C8990FC1B72500DB481B /* unix.c in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE700F296542000D3E5D /* unix.c */; };
 		9551C89A0FC1B72500DB481B /* win32.c in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE720F296542000D3E5D /* win32.c */; };
-		9551C89C0FC1B72500DB481B /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */; };
-		9551C89D0FC1B72500DB481B /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */; };
-		9551C89E0FC1B72500DB481B /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AED60F296542000D3E5D /* highscore_manager.cpp */; };
-		9551C89F0FC1B72500DB481B /* highscores.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AED90F296542000D3E5D /* highscores.cpp */; };
-		9551C8A00FC1B72500DB481B /* history.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AEDC0F296542000D3E5D /* history.cpp */; };
 		9551C8A20FC1B72500DB481B /* attachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0F60F296545000D3E5D /* attachment.cpp */; };
 		9551C8A30FC1B72500DB481B /* attachment_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0F80F296545000D3E5D /* attachment_manager.cpp */; };
 		9551C8A40FC1B72500DB481B /* bowling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0FA0F296545000D3E5D /* bowling.cpp */; };
@@ -181,7 +182,6 @@
 		9551C8CC0FC1B72500DB481B /* btKart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1800F296545000D3E5D /* btKart.cpp */; };
 		9551C8CD0FC1B72500DB481B /* btUprightConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */; };
 		9551C8CE0FC1B72500DB481B /* physics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1870F296545000D3E5D /* physics.cpp */; };
-		9551C8CF0FC1B72500DB481B /* race_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1930F296545000D3E5D /* race_manager.cpp */; };
 		9551C8D00FC1B72500DB481B /* replay_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B19D0F296545000D3E5D /* replay_base.cpp */; };
 		9551C8D10FC1B72500DB481B /* replay_buffers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A00F296545000D3E5D /* replay_buffers.cpp */; };
 		9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A20F296545000D3E5D /* replay_player.cpp */; };
@@ -304,6 +304,18 @@
 		951C35800FC05BF400A48379 /* quad_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_graph.cpp; path = ../../tracks/quad_graph.cpp; sourceTree = SOURCE_ROOT; };
 		951C35BD0FC066ED00A48379 /* credits.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = credits.hpp; path = ../../gui/credits.hpp; sourceTree = SOURCE_ROOT; };
 		951C35BE0FC066ED00A48379 /* credits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = credits.cpp; path = ../../gui/credits.cpp; sourceTree = SOURCE_ROOT; };
+		95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = games/supertuxkart/src/race/grand_prix_data.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE10FD7471900CF5F92 /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../race/grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
+		95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = games/supertuxkart/src/race/grand_prix_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE30FD7471900CF5F92 /* grand_prix_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_manager.hpp; path = games/supertuxkart/src/race/grand_prix_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE40FD7471900CF5F92 /* highscore_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscore_manager.cpp; path = games/supertuxkart/src/race/highscore_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE50FD7471900CF5F92 /* highscore_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscore_manager.hpp; path = games/supertuxkart/src/race/highscore_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE60FD7471900CF5F92 /* highscores.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscores.cpp; path = games/supertuxkart/src/race/highscores.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE70FD7471900CF5F92 /* highscores.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscores.hpp; path = games/supertuxkart/src/race/highscores.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE80FD7471900CF5F92 /* history.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = history.cpp; path = games/supertuxkart/src/race/history.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DE90FD7471900CF5F92 /* history.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = history.hpp; path = games/supertuxkart/src/race/history.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DEA0FD7471900CF5F92 /* race_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_manager.cpp; path = games/supertuxkart/src/race/race_manager.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95263DEB0FD7471900CF5F92 /* race_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_manager.hpp; path = games/supertuxkart/src/race/race_manager.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		953789710FC7829100DD1F8E /* graph_node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = graph_node.hpp; path = ../../tracks/graph_node.hpp; sourceTree = SOURCE_ROOT; };
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
@@ -601,16 +613,6 @@
 		95C2AE6C0F296542000D3E5D /* protocol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = protocol.c; path = ../../enet/protocol.c; sourceTree = SOURCE_ROOT; };
 		95C2AE700F296542000D3E5D /* unix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unix.c; path = ../../enet/unix.c; sourceTree = SOURCE_ROOT; };
 		95C2AE720F296542000D3E5D /* win32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = win32.c; path = ../../enet/win32.c; sourceTree = SOURCE_ROOT; };
-		95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = ../../grand_prix_data.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE800F296542000D3E5D /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AE840F296542000D3E5D /* grand_prix_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_manager.hpp; path = ../../grand_prix_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AED60F296542000D3E5D /* highscore_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscore_manager.cpp; path = ../../highscore_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AED70F296542000D3E5D /* highscore_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscore_manager.hpp; path = ../../highscore_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AED90F296542000D3E5D /* highscores.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = highscores.cpp; path = ../../highscores.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEDA0F296542000D3E5D /* highscores.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = highscores.hpp; path = ../../highscores.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AEDC0F296542000D3E5D /* history.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = history.cpp; path = ../../history.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AEDD0F296542000D3E5D /* history.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = history.hpp; path = ../../history.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F60F296545000D3E5D /* attachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attachment.cpp; path = ../../items/attachment.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F70F296545000D3E5D /* attachment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = attachment.hpp; path = ../../items/attachment.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0F80F296545000D3E5D /* attachment_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attachment_manager.cpp; path = ../../items/attachment_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -710,8 +712,6 @@
 		95C2B1870F296545000D3E5D /* physics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physics.cpp; path = ../../physics/physics.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1880F296545000D3E5D /* physics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physics.hpp; path = ../../physics/physics.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B18A0F296545000D3E5D /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../player.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1930F296545000D3E5D /* race_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_manager.cpp; path = ../../race_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1940F296545000D3E5D /* race_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_manager.hpp; path = ../../race_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B19D0F296545000D3E5D /* replay_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_base.cpp; path = ../../replay/replay_base.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B19E0F296545000D3E5D /* replay_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_base.hpp; path = ../../replay/replay_base.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B19F0F296545000D3E5D /* replay_buffer_tpl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_buffer_tpl.hpp; path = ../../replay/replay_buffer_tpl.hpp; sourceTree = SOURCE_ROOT; };
@@ -731,7 +731,6 @@
 		95C2B1D20F296545000D3E5D /* track_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_manager.hpp; path = ../../tracks/track_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1DB0F296546000D3E5D /* user_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = user_config.cpp; path = ../../user_config.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1DC0F296546000D3E5D /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../user_config.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1DE0F296546000D3E5D /* user_pointer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_pointer.hpp; path = ../../user_pointer.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E00F296546000D3E5D /* constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = constants.hpp; path = ../../utils/constants.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E10F296546000D3E5D /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = ../../utils/coord.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E20F296546000D3E5D /* random_generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_generator.cpp; path = ../../utils/random_generator.cpp; sourceTree = SOURCE_ROOT; };
@@ -1061,6 +1060,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		95263DDF0FD7471900CF5F92 /* race */ = {
+			isa = PBXGroup;
+			children = (
+				95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */,
+				95263DE10FD7471900CF5F92 /* grand_prix_data.hpp */,
+				95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */,
+				95263DE30FD7471900CF5F92 /* grand_prix_manager.hpp */,
+				95263DE40FD7471900CF5F92 /* highscore_manager.cpp */,
+				95263DE50FD7471900CF5F92 /* highscore_manager.hpp */,
+				95263DE60FD7471900CF5F92 /* highscores.cpp */,
+				95263DE70FD7471900CF5F92 /* highscores.hpp */,
+				95263DE80FD7471900CF5F92 /* history.cpp */,
+				95263DE90FD7471900CF5F92 /* history.hpp */,
+				95263DEA0FD7471900CF5F92 /* race_manager.cpp */,
+				95263DEB0FD7471900CF5F92 /* race_manager.hpp */,
+			);
+			name = race;
+			path = games/supertuxkart/src/race;
+			sourceTree = SYSTEM_DEVELOPER_DIR;
+		};
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
 			children = (
@@ -1094,31 +1113,19 @@
 				95C2B1470F296545000D3E5D /* modes */,
 				95C2B1590F296545000D3E5D /* network */,
 				95C2B17F0F296545000D3E5D /* physics */,
+				95263DDF0FD7471900CF5F92 /* race */,
 				95C2B19C0F296545000D3E5D /* replay */,
 				95C2B1AA0F296545000D3E5D /* robots */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
 				95C2B1DF0F296546000D3E5D /* utils */,
-				95C2AE7F0F296542000D3E5D /* grand_prix_data.cpp */,
-				95C2AE800F296542000D3E5D /* grand_prix_data.hpp */,
-				95C2AE830F296542000D3E5D /* grand_prix_manager.cpp */,
-				95C2AE840F296542000D3E5D /* grand_prix_manager.hpp */,
-				95C2AED60F296542000D3E5D /* highscore_manager.cpp */,
-				95C2AED70F296542000D3E5D /* highscore_manager.hpp */,
-				95C2AED90F296542000D3E5D /* highscores.cpp */,
-				95C2AEDA0F296542000D3E5D /* highscores.hpp */,
-				95C2AEDC0F296542000D3E5D /* history.cpp */,
-				95C2AEDD0F296542000D3E5D /* history.hpp */,
 				95C2B1360F296545000D3E5D /* main.cpp */,
 				95C2B1380F296545000D3E5D /* main_loop.cpp */,
 				95C2B1390F296545000D3E5D /* main_loop.hpp */,
 				95C2B18A0F296545000D3E5D /* player.hpp */,
-				95C2B1930F296545000D3E5D /* race_manager.cpp */,
-				95C2B1940F296545000D3E5D /* race_manager.hpp */,
 				95C2B1C10F296545000D3E5D /* stk_config.cpp */,
 				95C2B1C20F296545000D3E5D /* stk_config.hpp */,
 				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
 				95C2B1DC0F296546000D3E5D /* user_config.hpp */,
-				95C2B1DE0F296546000D3E5D /* user_pointer.hpp */,
 			);
 			name = src;
 			path = ../..;
@@ -2146,11 +2153,6 @@
 				9551C8980FC1B72500DB481B /* protocol.c in Sources */,
 				9551C8990FC1B72500DB481B /* unix.c in Sources */,
 				9551C89A0FC1B72500DB481B /* win32.c in Sources */,
-				9551C89C0FC1B72500DB481B /* grand_prix_data.cpp in Sources */,
-				9551C89D0FC1B72500DB481B /* grand_prix_manager.cpp in Sources */,
-				9551C89E0FC1B72500DB481B /* highscore_manager.cpp in Sources */,
-				9551C89F0FC1B72500DB481B /* highscores.cpp in Sources */,
-				9551C8A00FC1B72500DB481B /* history.cpp in Sources */,
 				9551C8A20FC1B72500DB481B /* attachment.cpp in Sources */,
 				9551C8A30FC1B72500DB481B /* attachment_manager.cpp in Sources */,
 				9551C8A40FC1B72500DB481B /* bowling.cpp in Sources */,
@@ -2194,7 +2196,6 @@
 				9551C8CC0FC1B72500DB481B /* btKart.cpp in Sources */,
 				9551C8CD0FC1B72500DB481B /* btUprightConstraint.cpp in Sources */,
 				9551C8CE0FC1B72500DB481B /* physics.cpp in Sources */,
-				9551C8CF0FC1B72500DB481B /* race_manager.cpp in Sources */,
 				9551C8D00FC1B72500DB481B /* replay_base.cpp in Sources */,
 				9551C8D10FC1B72500DB481B /* replay_buffers.cpp in Sources */,
 				9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */,
@@ -2254,6 +2255,12 @@
 				9540E24F0FD5F8A8002985B8 /* explosion.cpp in Sources */,
 				9540E2500FD5F8A8002985B8 /* material_manager.cpp in Sources */,
 				9540E2510FD5F8A8002985B8 /* material.cpp in Sources */,
+				95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */,
+				95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */,
+				95263DEE0FD7471900CF5F92 /* highscore_manager.cpp in Sources */,
+				95263DEF0FD7471900CF5F92 /* highscores.cpp in Sources */,
+				95263DF00FD7471900CF5F92 /* history.cpp in Sources */,
+				95263DF10FD7471900CF5F92 /* race_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
