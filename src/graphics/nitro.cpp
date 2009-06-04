@@ -19,85 +19,65 @@
 
 #include "graphics/nitro.hpp"
 
-#include "material_manager.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
-Nitro::Nitro(Kart* kart)
-        : ParticleSystem(200, 0.0f, true, 0.5f),
-        m_kart(kart)
+#include <cstdio>
+
+Nitro::Nitro(Kart* kart) : m_kart(kart)
 {
-#ifndef HAVE_IRRLICHT
-    
-#ifdef DEBUG
-    setName("nitro");
-#endif
-    bsphere.setCenter(0, 0, 0);
-    bsphere.setRadius(1000.0f);
-    dirtyBSphere();
+    const float particle_size = 0.5f;
+    m_node = irr_driver->addParticleNode();
+    m_node->setParent(m_kart->getNode());
+    m_node->setPosition(core::vector3df(0, particle_size*0.25f, -m_kart->getKartLength()*0.5f));
+    Material *m= material_manager->getMaterial("nitro-particle.png");
+    m->setMaterialProperties(&(m_node->getMaterial(0)));
+    m_node->setMaterialTexture(0, m->getTexture());
 
-    m_nitro_fire = new ssgSimpleState ();
-#ifndef HAVE_IRRLICHT
-    m_nitro_fire->setTexture(material_manager->getMaterial("nitro-particle.rgb")->getState()->getTexture());
-#endif
-    m_nitro_fire -> setTranslucent    () ;
-    m_nitro_fire -> enable            ( GL_TEXTURE_2D ) ;
-    m_nitro_fire -> setShadeModel     ( GL_SMOOTH ) ;
-    m_nitro_fire -> disable           ( GL_CULL_FACE ) ;
-    m_nitro_fire -> enable            ( GL_BLEND ) ;
-    m_nitro_fire -> disable           ( GL_ALPHA_TEST ) ;
-    m_nitro_fire -> enable            ( GL_LIGHTING ) ;
-    m_nitro_fire -> setColourMaterial ( GL_EMISSION ) ;
-    m_nitro_fire -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-    m_nitro_fire -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-    m_nitro_fire -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_nitro_fire -> setShininess      (  0 ) ;
-    m_nitro_fire->ref();
+    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
+                                           5, 10,
+                                           video::SColor(255,0,0,0),
+                                           video::SColor(255,255,255,255),
+                                           400, 400,
+                                           20  // max angle
+                                           );
+    m_emitter->setMinStartSize(core::dimension2df(particle_size/2.0f, particle_size/2.0f));
+    m_emitter->setMaxStartSize(core::dimension2df(particle_size*2.0f, particle_size*2.0f));
+    m_node->setEmitter(m_emitter); // this grabs the emitter
 
-    setState(m_nitro_fire);
-#endif
+    scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
+    m_node->addAffector(af);
+    af->drop();
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
 Nitro::~Nitro()
 {
-    //ssgDeRefDelete(m_nitro_fire);
+    irr_driver->removeNode(m_node);
 }   // ~Nitro
 
 //-----------------------------------------------------------------------------
 void Nitro::update(float t)
 {
-    ParticleSystem::update(t);
+    // No particles to emit, no need to change the speed
+    if(m_emitter->getMinParticlesPerSecond()==0)
+        return;
+    // There seems to be no way to randomise the velocity for particles,
+    // so we have to do this manually, by changing the default velocity.
+    // Irrlicht expects velocity (called 'direction') in m/ms!!
+    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.003f,
+             sin(DEGREE_TO_RAD(rand()%180))*0.003f,
+             sin(DEGREE_TO_RAD(rand()%100))*0.003f);
+    m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
 //-----------------------------------------------------------------------------
-void Nitro::particle_create(int, Particle *p)
+void Nitro::setCreationRate(float f)
 {
-#ifndef HAVE_IRRLICHT
-    sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
-    sgSetVec3(p->m_vel, 0, 0, 0 );
-    sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
-    p->m_size         = 1.0f;
-    p->m_time_to_live = 0.8f;
-
-    Vec3 xyz       = m_kart->getXYZ();
-    const Vec3 vel = -m_kart->getVelocity()*0.2f;
-    sgCopyVec3(p->m_vel, vel.toFloat());
-    sgCopyVec3(p->m_pos, xyz.toFloat());
-    p->m_vel[0] += 2*cos(DEGREE_TO_RAD(rand()% 180));
-    p->m_vel[1] += 2*sin(DEGREE_TO_RAD(rand()% 180));
-    p->m_vel[2] = 0;
-#endif
-}   // particle_create
-
-//-----------------------------------------------------------------------------
-void Nitro::particle_update(float delta, int,
-                            Particle * particle)
-{
-#ifndef HAVE_IRRLICHT
-    particle->m_size    -= delta*.2f;
-    particle->m_col[3]  -= delta * 2.0f;
-#endif
-}  // particle_update
-
+    m_emitter->setMinParticlesPerSecond(int(f));
+    m_emitter->setMaxParticlesPerSecond(int(f));
+}   // setCreationRate
 

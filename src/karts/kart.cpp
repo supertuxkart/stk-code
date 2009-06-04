@@ -243,7 +243,7 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_goo_sound    );
     
     if(m_smoke_system) delete m_smoke_system;
-    //if(m_nitro)        ssgDeRefDelete(m_nitro);
+    if(m_nitro)        delete m_nitro;
 
     m_animated_node->removeChild(m_shadow->getSceneNode());
     delete m_shadow;
@@ -783,7 +783,7 @@ void Kart::updatePhysics (float dt)
         engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
         // Lose some traction when skidding, so it is not abused by player
         if(m_controls.m_drift)
-            engine_power *= 0.75f;
+            engine_power *= 0.5f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
         // Either all or no brake is set, so test only one to avoid
@@ -847,7 +847,7 @@ void Kart::updatePhysics (float dt)
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people, eg
             if(abs(m_speed) < 5.0f) {
-                for(int i=0; i<4; i++) m_vehicle->setBrake(100.0f, i);
+                for(int i=0; i<4; i++) m_vehicle->setBrake(20.0f, i);
             }
 #else
             if(!RaceManager::getWorld()->isStartPhase())
@@ -1005,7 +1005,6 @@ void Kart::loadData()
     // Attach Particle System
     m_smoke_system = new Smoke(this);
     m_nitro        = new Nitro(this);
-    //m_nitro->ref();
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
