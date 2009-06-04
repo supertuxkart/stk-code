@@ -2006,7 +2006,7 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* STK_XCode */;
 			projectDirPath = "";
-			projectRoot = "";
+			projectRoot = ../../..;
 			targets = (
 				9551C8200FC1B6FF00DB481B /* SuperTuxKart */,
 			);
