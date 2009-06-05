@@ -142,6 +142,9 @@ namespace StateManager
             // TODO - if user arrived to this screen by pressing esc from teh enxt, the behaviour below might be incorrect
             // it would be better to restore previously set settings.
             race_manager->setDifficulty( (RaceManager::Difficulty)user_config->getDefaultDifficulty() );
+            
+            SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
+            race_manager->setNumKarts( kartamount->getValue() + 1 );
         }
         else if(name == "difficulty")
         {
