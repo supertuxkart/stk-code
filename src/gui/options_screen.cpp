@@ -19,41 +19,41 @@ using namespace GUIEngine;
 namespace StateManager
 {
     void eventInput(Widget* widget, const std::string& name);
-    
-    
-    // -----------------------------------------------------------------------------    
+
+
+    // -----------------------------------------------------------------------------
     void initAudioVideo(Widget* widget, const std::string& name)
     {
         // ---- sfx volume
         SpinnerWidget* gauge = getCurrentScreen()->getWidget<SpinnerWidget>("sfx_volume");
         assert(gauge != NULL);
-        
+
         gauge->setValue( (int)(sfx_manager->getMasterSFXVolume()*10.0f) );
-        
-        
+
+
         gauge = getCurrentScreen()->getWidget<SpinnerWidget>("music_volume");
         assert(gauge != NULL);
         gauge->setValue( (int)(sound_manager->getMasterMusicVolume()*10.f) );
-        
+
         // ---- music volume
         CheckBoxWidget* sfx = getCurrentScreen()->getWidget<CheckBoxWidget>("sfx_enabled");
-        
+
         CheckBoxWidget* music = getCurrentScreen()->getWidget<CheckBoxWidget>("music_enabled");
-        
+
         // ---- audio enables/disables
         sfx->setState( user_config->doSFX() );
         music->setState( user_config->doMusic() );
-        
+
         // ---- video modes
         {
             RibbonGridWidget* res = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
             assert( res != NULL );
-            
-            
+
+
             CheckBoxWidget* full = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
             assert( full != NULL );
             full->setState( user_config->m_fullscreen );
-            
+
             // --- get resolution list from irrlicht the first time
             if(!getCurrentScreen()->m_inited)
             {
@@ -64,12 +64,12 @@ namespace StateManager
                     const int w = modes[n].width;
                     const int h = modes[n].height;
                     const float ratio = (float)w / h;
-                    
+
                     char name[32];
                     sprintf( name, "%ix%i", w, h );
-                    
+
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-                    
+
                     if( ABOUT_EQUAL( ratio, (5.0f/4.0f) ) )
                         res->addItem(name,name,"gui/screen54.png");
                     else if( ABOUT_EQUAL( ratio, (4.0f/3.0f) ) )
@@ -88,11 +88,11 @@ namespace StateManager
                     }
 #undef ABOUT_EQUAL
                 } // next resolution
-                
+
             } // end if not inited
-            
+
             res->updateItemDisplay();
-            
+
             // ---- select curernt resolution every time
             const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
             const int amount = modes.size();
@@ -100,10 +100,10 @@ namespace StateManager
             {
                 const int w = modes[n].width;
                 const int h = modes[n].height;
-                
+
                 char name[32];
                 sprintf( name, "%ix%i", w, h );
-                
+
                 if(w == user_config->m_width && h == user_config->m_height)
                 {
                     //std::cout << "************* Detected right resolution!!! " << n << "\n";
@@ -112,49 +112,49 @@ namespace StateManager
                     break;
                 }
             }  // end for
-            
+
         }
     }
-    
-    // -----------------------------------------------------------------------------    
+
+    // -----------------------------------------------------------------------------
     void eventAudioVideo(Widget* widget, const std::string& name)
     {
         if(name == "music_volume")
         {
             SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
             assert(w != NULL);
-            
+
             sound_manager->setMasterMusicVolume( w->getValue()/10.0f );
         }
         else if(name == "sfx_volume")
         {
             static SFXBase* sample_sound = NULL;
-            
+
             SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
             assert(w != NULL);
-            
+
             if(sample_sound == NULL)
                 sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
             sample_sound->volume(1);
-            
+
             sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
             user_config->m_sfx_volume = w->getValue()/10.0f;
-            
+
             // play a sample sound to show the user what this volume is like
             sample_sound->position ( Vec3(0,0,0) );
-            
+
             if(sample_sound->getStatus() != SFXManager::SFX_PLAYING)
             {
                 sample_sound->play();
             }
-            
+
         }
         else if(name == "music_enabled")
         {
             CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
-            
+
             user_config->setMusic(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
-            
+
             if(w->getState() == false)
                 sound_manager->stopMusic();
             else
@@ -163,43 +163,43 @@ namespace StateManager
         else if(name == "sfx_enabled")
         {
             CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
-            
+
             user_config->setSFX(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
         }
         else if(name == "apply_resolution")
         {
             using namespace GUIEngine;
-            
+
             user_config->m_prev_width = user_config->m_width;
             user_config->m_prev_height = user_config->m_height;
-            
+
             RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
             assert(w1 != NULL);
-            
+
             const std::string& res = w1->getSelectionIDString();
-            
+
             int w = -1, h = -1;
             if( sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1 )
             {
                 std::cerr << "Failed to decode resolution : " << res.c_str() << std::endl;
                 return;
             }
-            
+
             CheckBoxWidget* w2 = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
             assert(w2 != NULL);
-            
+
             user_config->m_width = w;
             user_config->m_height = h;
             user_config->m_fullscreen = w2->getState();
             irr_driver->changeResolution();
         }
-        
+
     }
-    
-    // -----------------------------------------------------------------------------    
+
+    // -----------------------------------------------------------------------------
     void updateInputButtons(const InputDevice* device)
     {
-        
+
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_up");
             btn->setLabel( device->getBindingAsString(PA_ACCEL).c_str() );
@@ -238,19 +238,19 @@ namespace StateManager
         }
 
     }
-    
-    // -----------------------------------------------------------------------------    
+
+    // -----------------------------------------------------------------------------
     void initInput(Widget* widget, const std::string& name)
     {
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
-            
+
             if(!getCurrentScreen()->m_inited)
             {
                 devices->addItem("Keyboard","keyboard","gui/keyboard.png");
-                
+
                 const int gamepad_count = input_manager->getDeviceList()->getGamePadAmount();
-                
+
                 for(int i=0; i<gamepad_count; i++)
                 {
                     std::string name = input_manager->getDeviceList()->getGamePad(i)->m_name;
@@ -258,28 +258,28 @@ namespace StateManager
                     sprintf(internal_name, "gamepad%i", i);
                     devices->addItem(name,internal_name,"gui/gamepad.png");
                 }
-                
+
                 getCurrentScreen()->m_inited = true;
-                
+
             }
             devices->updateItemDisplay();
-            
+
             // trigger displaying bindings for default selected device
             const std::string name2("devices");
             eventInput(devices, name2);
     }
-    
-    // ----------------------------------------------------------------------------- 
+
+    // -----------------------------------------------------------------------------
     static PlayerAction binding_to_set;
     static std::string binding_to_set_button;
-    
+
     void eventInput(Widget* widget, const std::string& name)
     {
         if(name == "devices")
         {
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert(devices != NULL);
-            
+
             const std::string& selection = devices->getSelectionIDString();
             if( selection.find("gamepad") != std::string::npos )
             {
@@ -306,7 +306,7 @@ namespace StateManager
         else if(name.find("binding_") != std::string::npos)
         {
             binding_to_set_button = name;
-            
+
             if(name == "binding_up")
             {
                 binding_to_set = PA_ACCEL;
@@ -348,20 +348,20 @@ namespace StateManager
                 std::cerr << "Unknown binding name : " << name.c_str() << std::endl;
                 return;
             }
-            
+
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
             std::cout << "-------\nentering sensing mode for " << devices->getSelectionIDString().c_str() << std::endl;
-            
+
             getCurrentScreen()->showModalDialog();
 
             if(devices->getSelectionIDString() == "keyboard")
             {
-                input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);	
+                input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
             }
             else if(devices->getSelectionIDString().find("gamepad") != std::string::npos)
             {
-                input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);	
+                input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);
             }
             else
             {
@@ -370,45 +370,51 @@ namespace StateManager
 
         }
     }
-    
+
     #define MAX_VALUE 32768
-    
+
     // -----------------------------------------------------------------------------
     void gotSensedInput(Input* sensedInput)
     {
         RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
         assert( devices != NULL );
-        
+
         const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionIDString() == "keyboard";
         const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
                                sensedInput->type == Input::IT_STICKBUTTON) &&
                                devices->getSelectionIDString().find("gamepad") != std::string::npos;
-        
+
         if(!keyboard && !gamepad) return;
-        
-        getCurrentScreen()->dismissModalDialog();
-        input_manager->setMode(InputManager::MENU);
-        
+        if(gamepad)
+        {
+            if(sensedInput->type != Input::IT_STICKMOTION &&
+               sensedInput->type != Input::IT_STICKBUTTON)
+               return; // that kind of input does not interest us
+        }
+
+
         if(keyboard)
-        {         
+        {
             std::cout << "received some keyboard input\n";
-            
+
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
             keyboard->editBinding(binding_to_set, sensedInput->btnID);
-            
+
             // refresh display
             initInput(NULL, "init");
         }
         else if(gamepad)
         {
-            std::cout << "received some gamepad input\n";
+            std::cout << "received some gamepad input on device " << sensedInput->deviceID << " : ";
             if(sensedInput->type == Input::IT_STICKMOTION)
                 std::cout << "axis\n";
-            if(sensedInput->type == Input::IT_STICKBUTTON)
-                std::cout << "button\n";
-            
+            else if(sensedInput->type == Input::IT_STICKBUTTON)
+                std::cout << "button " << sensedInput->btnID << "\n";
+            else
+                std::cout << "WTF?\n";
+
             int gamepadID = -1;
-            
+
             if(sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &gamepadID ) != 1 ||
                gamepadID >= input_manager->getDeviceList()->getGamePadAmount())
             {
@@ -417,7 +423,7 @@ namespace StateManager
                     std::cerr << "gamepad ID does not exist (or failed to read it) : " << gamepadID << "\n";
                     gamepadID = sensedInput->deviceID;
                 }
-                
+
                 if(input_manager->getDeviceList()->getGamePad(gamepadID)->m_index != sensedInput->deviceID)
                 {
                     // should not happen, but let's try to be bulletproof...
@@ -425,38 +431,41 @@ namespace StateManager
                     " which has irrID " << input_manager->getDeviceList()->getGamePad(gamepadID)->m_index <<
                     " and we got input from " << sensedInput->deviceID << "\n";
                 }
-                
+
             }
             GamePadDevice* gamepad =  input_manager->getDeviceList()->getGamePad(gamepadID);
             gamepad->editBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
                                  (Input::AxisDirection)sensedInput->axisDirection);
-            
+
             // refresh display
-            initInput(NULL, "init");            
+            initInput(NULL, "init");
         }
         else
         {
             return;
         }
-        
+
+        getCurrentScreen()->dismissModalDialog();
+        input_manager->setMode(InputManager::MENU);
+
         // re-select the previous button
         ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
         if(btn != NULL) GUIEngine::getGUIEnv()->setFocus( btn->m_element );
-        
+
         // save new binding to file
-        input_manager->getDeviceList()->serialize(); 
+        input_manager->getDeviceList()->serialize();
     }
-    
+
     // -----------------------------------------------------------------------------
     // main call (from StateManager); dispatches the call to a specialissed function as needed
     void menuEventOptions(Widget* widget, const std::string& name)
     {
         const std::string& screen_name = getCurrentScreen()->getName();
-        
+
         if(name == "init")
         {
             const std::string& screen_name = getCurrentScreen()->getName();
-            
+
             RibbonWidget* ribbon = getCurrentScreen()->getWidget<RibbonWidget>("options_choice");
             if(ribbon != NULL)
             {
@@ -464,16 +473,16 @@ namespace StateManager
                 else if(screen_name == "options_players.stkgui") ribbon->select( "players" );
                 else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
             }
-            
+
             if(screen_name == "options_av.stkgui") initAudioVideo(widget, name);
             else if(screen_name == "options_input.stkgui") initInput(widget, name);
-            
+
             //getCurrentScreen()->m_inited;
         }
         else if(name == "options_choice")
         {
             std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
-            
+
             if(selection == "audio_video") StateManager::replaceTopMostMenu("options_av.stkgui");
             else if(selection == "players") StateManager::replaceTopMostMenu("options_players.stkgui");
             else if(selection == "controls") StateManager::replaceTopMostMenu("options_input.stkgui");
@@ -487,6 +496,6 @@ namespace StateManager
             if(screen_name == "options_av.stkgui") eventAudioVideo(widget, name);
             else if(screen_name == "options_input.stkgui") eventInput(widget, name);
         }
-        
+
     }
 }

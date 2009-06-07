@@ -52,32 +52,32 @@ InputManager::InputManager()
 m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
 {
     m_device_manager = new DeviceManager();
-    
+
     m_timer_in_use = false;
     m_timer = 0;
-    
+
     bool something_new_to_write = false;
-    
+
     if(!m_device_manager->deserialize())
     {
         std::cerr << "Failed to read input config file, using defaults\n";
-        
+
         // could not read config file so use defaults
         KeyboardDevice* default_device = new KeyboardDevice();
         default_device->loadDefaults();
         m_device_manager->add( default_device );
-        
+
         something_new_to_write = true;
     }
-    
+
     if(m_device_manager->initGamePadSupport() /* returns whether a new gamepad was detected */)
     {
         something_new_to_write = true;
     }
-        
+
     // write config file if necessary
-    if(something_new_to_write) m_device_manager->serialize(); 
-    
+    if(something_new_to_write) m_device_manager->serialize();
+
 }
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
@@ -103,7 +103,7 @@ InputManager::~InputManager()
 void InputManager::handleStaticAction(int key, int value)
 {
     static int isWireframe = false;
-    
+
 	switch (key)
 	{
 #ifdef DEBUG
@@ -183,38 +183,38 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 {
     int player;
     PlayerAction action;
-    
+
     bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection, value, &player, &action );
-    
+
 
     // in menus, some keyboard keys are standard
     if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU)
     {
         action = PA_FIRST;
-        
+
         if(btnID == KEY_UP)         action = PA_ACCEL;
         else if(btnID == KEY_DOWN)  action = PA_BRAKE;
         else if(btnID == KEY_LEFT)  action = PA_LEFT;
         else if(btnID == KEY_RIGHT) action = PA_RIGHT;
         else if(btnID == KEY_SPACE) action = PA_FIRE;
-        
+
         if(action != PA_FIRST)
         {
             action_found = true;
             player = 0;
         }
     }
-    
+
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
     {
-        
-        if(type == Input::IT_STICKMOTION)
-            std::cout << "sensing input -- axis binding\n";
-        if(type == Input::IT_STICKBUTTON)
-            std::cout << "sensing input -- button binding\n";
-        
+
+        //if(type == Input::IT_STICKMOTION)
+        //    std::cout << "sensing input detected an axis event\n";
+        //if(type == Input::IT_STICKBUTTON)
+        //    std::cout << "sensing input detected a button event\n";
+
         // Input sensing should be canceled. (TODO)
         //if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
         //{
@@ -233,30 +233,31 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             // buttons that can return two different events when pressed
             bool store_new = abs(value) > m_max_sensed_input         ||
                              m_max_sensed_type  == Input::IT_NONE;
-            
+
                         //    (m_mode  == INPUT_SENSE_GAMEPAD &&  (type == Input::IT_STICKMOTION ||
                         //                                         type == Input::IT_STICKBUTTON) &&
                         //    abs(value) > m_max_sensed_input);
-            
+
             // don't store if we're trying to do something like bindings keyboard keys on a gamepad
             if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
             if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
 
             // only store axes when they're pushed quite far
             if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
-            
+
             if(store_new)
             {
                 m_sensed_input->type = type;
                 if(type == Input::IT_STICKMOTION)
-                    std::cout << "storing new axis binding\n";
+                    std::cout << "storing new axis binding, value=" << value <<
+                                 " deviceID=" << deviceID << " btnID=" << btnID << "\n";
                 if(type == Input::IT_STICKBUTTON)
                     std::cout << "storing new button binding\n";
-                
+
                 m_sensed_input->deviceID = deviceID;
                 m_sensed_input->btnID = btnID;
                 m_sensed_input->axisDirection = axisDirection;
-                
+
                 m_max_sensed_input   = abs(value);
                 m_max_sensed_type    = type;
             }
@@ -268,7 +269,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                 StateManager::gotSensedInput(m_sensed_input);
             }
         }
-    } 
+    }
     else if (action_found)
     {
         if(StateManager::isGameState())
@@ -276,17 +277,17 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
         }
         else
-        {  
+        {
             // reset timer when released
             if( abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON) )
             {
                 if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
                 else std::cout << "resetting for another reason\n";
-                
+
                 m_timer_in_use = false;
                 m_timer = 0;
             }
-            
+
             // menu input
             if(!m_timer_in_use)
             {
@@ -307,9 +308,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 }   // input
 
 //-----------------------------------------------------------------------------
-/** 
+/**
  * Called on keyboard events [indirectly] by irrLicht
- * 
+ *
  * Analog axes can have any value from [-32768, 32767].
  *
  * There are no negative values. Instead this is reported as an axis with a
@@ -326,12 +327,12 @@ bool InputManager::input(const SEvent& event)
         for(int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
         {
             int value = event.JoystickEvent.Axis[axis_id];
-            
+
 #ifdef __APPLE__
             // work around irrLicht bug. FIXME - get it fixed and remove this
             if(value == -32768) continue; // ignore bogus values given by irrlicht
 #endif
-            
+
             if(user_config->m_gamepad_debug)
             {
                 printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
@@ -344,17 +345,17 @@ bool InputManager::input(const SEvent& event)
             else
                 input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
-        
+
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
-        
+
         for(int i=0; i<gp->m_button_count; i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
-            
+
             if(gp->isButtonPressed(i) || isButtonPressed)
                 input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, isButtonPressed ? MAX_VALUE : 0);
             gp->setButtonPressed(i, isButtonPressed);
-        }   
+        }
 
     }
     else if(event.EventType == EET_LOG_TEXT_EVENT)
@@ -362,7 +363,7 @@ bool InputManager::input(const SEvent& event)
         // Ignore 'normal' messages
         if(event.LogEvent.Level>0)
         {
-            printf("Level %d: %s\n", 
+            printf("Level %d: %s\n",
                 event.LogEvent.Level,event.LogEvent.Text);
         }
         return true;
@@ -370,7 +371,7 @@ bool InputManager::input(const SEvent& event)
     else if(event.EventType == EET_KEY_INPUT_EVENT)
     {
         const int key = event.KeyInput.Key;
-        
+
         if(event.KeyInput.PressedDown)
         {
             // escape is a little special
@@ -379,12 +380,12 @@ bool InputManager::input(const SEvent& event)
                 StateManager::escapePressed();
                 return true;
             }
-            
+
             input(Input::IT_KEYBOARD, 0, key,
 #ifdef HAVE_IRRLICHT
                   // FIXME: not sure why this happens: with plib the unicode
-                  // value is 0. Since all values defined in user_config 
-                  // assume that the unicode value is 0, it does not work 
+                  // value is 0. Since all values defined in user_config
+                  // assume that the unicode value is 0, it does not work
                   // with irrlicht, which has proper unicode values defined
                   // (keydown is not recognised, but keyup is). So for now
                   // (till user_config is migrated to full irrlicht support)
@@ -392,10 +393,10 @@ bool InputManager::input(const SEvent& event)
                   // works.
                   0,
 #else
-                  ev.key.keysym.unicode, 
+                  ev.key.keysym.unicode,
 #endif
                   MAX_VALUE);
-            
+
         }
         else
         {
@@ -406,14 +407,14 @@ bool InputManager::input(const SEvent& event)
     else if(event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         const int type = event.MouseInput.Event;
-        
+
         if(type == EMIE_MOUSE_MOVED)
         {
             // m_mouse_x = event.MouseInput.X;
             // m_mouse_y = event.MouseInput.Y;
             //const int wheel = event.MouseInput.Wheel;
         }
-        
+
         /*
          EMIE_LMOUSE_PRESSED_DOWN 	Left mouse button was pressed down.
          EMIE_RMOUSE_PRESSED_DOWN 	Right mouse button was pressed down.
@@ -422,7 +423,7 @@ bool InputManager::input(const SEvent& event)
          EMIE_RMOUSE_LEFT_UP 	Right mouse button was left up.
          EMIE_MMOUSE_LEFT_UP 	Middle mouse button was left up.
          EMIE_MOUSE_MOVED 	The mouse cursor changed its position.
-         EMIE_MOUSE_WHEEL 	The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast. 
+         EMIE_MOUSE_WHEEL 	The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast.
          */
     }
 #endif
@@ -442,10 +443,10 @@ Input &InputManager::getSensedInput()
 {
     assert (m_mode == INPUT_SENSE_KEYBOARD ||
             m_mode == INPUT_SENSE_GAMEPAD   );
-    
+
     // m_sensed_input should be available in input sense mode.
     assert (m_sensed_input);
-    
+
     return *m_sensed_input;
 }   // getSensedInput
 
@@ -459,7 +460,7 @@ bool InputManager::isInMode(InputDriverMode expMode)
 
 //-----------------------------------------------------------------------------
 /** Sets the mode of the input driver.
- * 
+ *
  * Switching of the input driver's modes is only needed for special menus
  * (those who need typing or input sensing) and the MenuManager (switch to
  * ingame/menu mode). Therefore there is a limited amount of legal combinations
@@ -473,7 +474,7 @@ bool InputManager::isInMode(InputDriverMode expMode)
  * will request the sensed input ...). If GA_SENSE_CANCEL is received instead
  * the user decided to cancel input sensing. No other game action values are
  * distributed in this mode.
- * 
+ *
  * And there is the bootstrap mode. You cannot switch to it and only leave it
  * once per application instance. It is the state the input driver is first.
  *
@@ -487,95 +488,95 @@ void InputManager::setMode(InputDriverMode new_mode)
         {
             case INGAME:
                 // Leaving ingame mode.
-                
+
                 //if (m_action_map)
                 //    delete m_action_map;
-                
+
                 // Reset the helper values for the relative mouse movement
                 // supresses to the notification of them as an input.
                 m_mouse_val_x = m_mouse_val_y = 0;
-                
+
                 irr_driver->showPointer();
-                
+
                 // Fall through expected.
             case BOOTSTRAP:
                 // Leaving boot strap mode.
-                
+
                 // Installs the action map for the menu.
                 //  m_action_map = user_config->newMenuActionMap();
-                
+
                 m_mode = MENU;
-                
+
                 break;
             case INPUT_SENSE_KEYBOARD:
             case INPUT_SENSE_GAMEPAD:
                 // Leaving input sense mode.
-                
+
                 irr_driver->showPointer();
-                
+
                 // The order is deliberate just in case someone starts to make
                 // STK multithreaded: m_sensed_input must not be 0 when
                 // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
                 m_mode = MENU;
-                
+
                 delete m_sensed_input;
                 m_sensed_input = 0;
-                
+
                 break;
             case LOWLEVEL:
                 // Leaving lowlevel mode.
                 irr_driver->showPointer();
-                
+
                 m_mode = MENU;
-                
+
                 break;
             default:
                 ;
                 // Something is broken.
                 //assert (false);
         }
-            
+
             break;
         case INGAME:
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
-            
+
             //if (m_action_map)
             //   delete m_action_map;
-            
+
             // Installs the action map for the ingame mode.
             // m_action_map = user_config->newIngameActionMap();
-            
+
             irr_driver->hidePointer();
-            
+
             m_mode = INGAME;
-            
+
             break;
         case INPUT_SENSE_KEYBOARD:
         case INPUT_SENSE_GAMEPAD:
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
-            
+
             // Reset the helper values for the relative mouse movement supresses to
             // the notification of them as an input.
             m_mouse_val_x      = m_mouse_val_y = 0;
             m_max_sensed_input = 0;
             m_max_sensed_type  = Input::IT_NONE;
             m_sensed_input     = new Input();
-            
+
             irr_driver->hidePointer();
-            
+
             m_mode = new_mode;
-            
+
             break;
         case LOWLEVEL:
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
             irr_driver->hidePointer();
-            
+
             m_mode = LOWLEVEL;
-            
+
             break;
         default:
             // Invalid mode.
