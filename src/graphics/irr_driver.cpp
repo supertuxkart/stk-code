@@ -68,11 +68,11 @@ void IrrDriver::initDevice()
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
         const int count = modes->getVideoModeCount();
-        std::cout << "--------------\n  allowed modes  \n--------------\n";
-        std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
-        std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
+        //std::cout << "--------------\n  allowed modes  \n--------------\n";
+        //std::cout << "Desktop depth : " << modes->getDesktopDepth()  << std::endl;
+        //std::cout << "Desktop resolution : " << modes->getDesktopResolution().Width << "," << modes->getDesktopResolution().Height << std::endl;
         
-        std::cout << "Found " << count << " valid modes\n";
+        //std::cout << "Found " << count << " valid modes\n";
         for(int i=0; i<count; i++)
         {
             // only consider 32-bit resolutions for now
@@ -84,10 +84,10 @@ void IrrDriver::initDevice()
                 m_modes.push_back( mode );
             }
             
-            std::cout <<
-            "bits : " << modes->getVideoModeDepth(i) <<
-            " resolution=" << modes->getVideoModeResolution(i).Width <<
-            "x" << modes->getVideoModeResolution(i).Height << std::endl;
+            //std::cout <<
+            //"bits : " << modes->getVideoModeDepth(i) <<
+            //" resolution=" << modes->getVideoModeResolution(i).Width <<
+            //"x" << modes->getVideoModeResolution(i).Height << std::endl;
         }
         m_device->closeDevice();
         

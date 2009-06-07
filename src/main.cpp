@@ -121,6 +121,85 @@ void cmdLineHelp (char* invocation)
 }   // cmdLineHelp
 
 //=============================================================================
+// for base options that don't need much to be inited (and, in some cases, that need to
+// be read before initing stuff)
+int handleCmdLinePreliminary(int argc, char **argv)
+{
+    for(int i=1; i<argc; i++)
+    {
+        if(argv[i][0] != '-') continue;
+        if ( !strcmp(argv[i], "--help"    ) ||
+            !strcmp(argv[i], "-help"     ) ||
+            !strcmp(argv[i], "--help" ) ||
+            !strcmp(argv[i], "-help" ) ||
+            !strcmp(argv[i], "-h")       )
+        {
+            cmdLineHelp(argv[0]);
+            exit(0);
+        }
+#if !defined(WIN32) && !defined(__CYGWIN)
+        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
+        {
+            // Check that current res is not blacklisted
+            std::ostringstream o;
+    		o << user_config->m_width << "x" << user_config->m_height;
+    		std::string res = o.str();
+            if (std::find(user_config->m_blacklist_res.begin(), 
+                          user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())         
+            	user_config->m_fullscreen = true;
+          	else 
+          		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+        }
+        else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
+        {
+            user_config->m_fullscreen = false;
+        }
+#endif
+        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
+        {
+            //Check if fullscreen and new res is blacklisted
+            int width, height;
+            if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
+            {
+            	std::ostringstream o;
+    			o << width << "x" << height;
+    			std::string res = o.str();
+                if (!user_config->m_fullscreen || std::find(user_config->m_blacklist_res.begin(), 
+                                                            user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())
+                {
+                	user_config->m_prev_width = user_config->m_width = width;
+               		user_config->m_prev_height = user_config->m_height = height;
+                	fprintf ( stdout, "You choose to be in %dx%d.\n", user_config->m_width,
+                             user_config->m_height );
+               	}
+               	else
+               		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+            }
+            else
+            {
+                fprintf(stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
+        {
+            printf("==============================\n");
+#ifdef VERSION
+            fprintf ( stdout, "SuperTuxKart, %s.\n", VERSION ) ;
+#endif
+#ifdef SVNVERSION
+            fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
+#endif
+#if !defined(VERSION) && !defined(SVNVERSION)
+            fprintf ( stdout, "SuperTuxKart, unknown version\n" ) ;
+#endif
+            printf("==============================\n");
+            exit(0);
+        }
+    }
+    return 0;
+}
+
 int handleCmdLine(int argc, char **argv)
 {
     int n;
@@ -128,16 +207,7 @@ int handleCmdLine(int argc, char **argv)
     for(int i=1; i<argc; i++)
     {
         if(argv[i][0] != '-') continue;
-        if ( !strcmp(argv[i], "--help"    ) ||
-             !strcmp(argv[i], "-help"     ) ||
-             !strcmp(argv[i], "--help" ) ||
-             !strcmp(argv[i], "-help" ) ||
-             !strcmp(argv[i], "-h")       )
-        {
-            cmdLineHelp(argv[0]);
-            return 0;
-        }
-        else if(!strcmp(argv[i], "--gamepad-debug"))
+        if(!strcmp(argv[i], "--gamepad-debug"))
         {
             user_config->m_gamepad_debug=true;
         }
@@ -314,60 +384,6 @@ int handleCmdLine(int argc, char **argv)
           fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
         }
         */
-#if !defined(WIN32) && !defined(__CYGWIN)
-        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
-        {
-            // Check that current res is not blacklisted
-            std::ostringstream o;
-    		o << user_config->m_width << "x" << user_config->m_height;
-    		std::string res = o.str();
-            if (std::find(user_config->m_blacklist_res.begin(), 
-              user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())         
-            	user_config->m_fullscreen = true;
-          	else 
-          		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
-        }
-        else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
-        {
-            user_config->m_fullscreen = false;
-        }
-#endif
-        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
-        {
-            //Check if fullscreen and new res is blacklisted
-            int width, height;
-            if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
-            {
-            	std::ostringstream o;
-    			o << width << "x" << height;
-    			std::string res = o.str();
-                if (!user_config->m_fullscreen || std::find(user_config->m_blacklist_res.begin(), 
-              	  user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())
-                {
-                	user_config->m_prev_width = user_config->m_width = width;
-               		user_config->m_prev_height = user_config->m_height = height;
-                	fprintf ( stdout, "You choose to be in %dx%d.\n", user_config->m_width,
-                    	 user_config->m_height );
-               	}
-               	else
-               		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
-            }
-            else
-            {
-                fprintf(stderr, "Error: --screensize argument must be given as WIDTHxHEIGHT\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-        else if( !strcmp(argv[i], "--version") ||  !strcmp(argv[i], "-v") )
-        {
-#ifdef VERSION
-            fprintf ( stdout, "SuperTuxKart, %s.\n", VERSION ) ;
-#endif
-#ifdef SVNVERSION
-            fprintf ( stdout, "SuperTuxKart, SVN revision number '%s'.\n", SVNVERSION ) ;
-#endif
-            return 0;
-        }
         else if( !strcmp(argv[i], "--log=terminal"))
         {
             user_config->m_log_errors=false;
@@ -405,6 +421,20 @@ int handleCmdLine(int argc, char **argv)
         {
             item_manager->setUserFilename(argv[i+1]);
         }
+        // these commands are already processed in handleCmdLinePreliminary, but repeat this
+        // just so that we don't get error messages about unknown commands
+        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
+        {
+        }
+        else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
+        {
+        }
+        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
+        {
+        }
+        else if ( !strcmp(argv[i], "--version") || !strcmp(argv[i], "-v") )
+        {
+        }
         else
         {
             fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
@@ -422,13 +452,16 @@ int handleCmdLine(int argc, char **argv)
 }   /* handleCmdLine */
 
 //=============================================================================
-void InitTuxkart()
+void initPreliminary()
 {
     file_manager            = new FileManager();
     translations            = new Translations();
     // unlock manager is needed when reading the config file
     unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
+}
+void initRest()
+{
     irr_driver              = new IrrDriver();
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
@@ -507,7 +540,11 @@ int main(int argc, char *argv[] )
         // only needed for bullet debugging.
         glutInit(&argc, argv);
 #endif
-        InitTuxkart();
+        
+        initPreliminary();
+        handleCmdLinePreliminary(argc, argv);
+        
+        initRest();
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
