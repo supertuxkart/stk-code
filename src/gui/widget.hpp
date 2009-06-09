@@ -287,6 +287,7 @@ namespace GUIEngine
         int m_needed_cols;
         int m_col_amount;
         int m_max_rows;
+        bool m_combo;
         
         bool m_has_label;
         
@@ -294,7 +295,7 @@ namespace GUIEngine
         Widget* m_left_widget;
         Widget* m_right_widget;
     public:
-        RibbonGridWidget(const int max_rows=4);
+        RibbonGridWidget(const bool combo=false, const int max_rows=4);
         
         void add();
         bool rightPressed();

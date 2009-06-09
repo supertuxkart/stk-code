@@ -15,6 +15,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
+#include "utils/translation.hpp"
 
 #include <vector>
 
@@ -97,7 +98,7 @@ namespace StateManager
 
             SpinnerWidget* w2 = getCurrentScreen()->getWidget<SpinnerWidget>("player");
             assert( w2 != NULL );
-            w2->addLabel("Hiker");
+            w2->addLabel("Hiker"); // TODO : don't hardcode
             w2->addLabel("Auria");
             w2->addLabel("Conso");
             w2->addLabel("MiniBjorn");
@@ -139,12 +140,32 @@ namespace StateManager
             assert( w != NULL );
             w->setSelection(user_config->getDefaultDifficulty());
 
-            // TODO - if user arrived to this screen by pressing esc from teh enxt, the behaviour below might be incorrect
-            // it would be better to restore previously set settings.
             race_manager->setDifficulty( (RaceManager::Difficulty)user_config->getDefaultDifficulty() );
             
             SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
             race_manager->setNumKarts( kartamount->getValue() + 1 );
+            
+            RibbonGridWidget* w2 = getCurrentScreen()->getWidget<RibbonGridWidget>("gamemode");
+            assert( w2 != NULL );
+            
+            if(!getCurrentScreen()->m_inited)
+            {
+                w2->addItem( _("Snaky Competition\nAll blows allowed, so catch weapons and make clever use of them!"),
+                            "normal",
+                            "gui/mode_normal.png");
+                w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
+                            "timetrial",
+                            "gui/mode_tt.png");
+                w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
+                            "ftl",
+                            "gui/mode_ftl.png");
+                w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
+                            "3strikes",
+                            "gui/mode_3strikes.png");
+                getCurrentScreen()->m_inited = true;
+            }
+            w2->updateItemDisplay();
+            
         }
         else if(name == "difficulty")
         {
@@ -162,7 +183,7 @@ namespace StateManager
         else if(name == "gamemode")
         {
             // TODO - detect more game modes
-            RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
+            RibbonGridWidget* w = dynamic_cast<RibbonGridWidget*>(widget);
             if(w->getSelectionIDString() == "normal")
             {
                 StateManager::pushMenu("tracks.stkgui");

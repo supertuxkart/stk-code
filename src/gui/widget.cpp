@@ -827,7 +827,7 @@ void SpinnerWidget::setValue(const int new_value)
 #pragma mark Ribbon Grid Widget
 #endif
 
-RibbonGridWidget::RibbonGridWidget(const int max_rows)
+RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
 {
     m_scroll_offset = 0;
     m_needed_cols = 0;
@@ -835,6 +835,7 @@ RibbonGridWidget::RibbonGridWidget(const int max_rows)
     m_has_label = false;
 
     m_max_rows = max_rows;
+    m_combo = combo;
 
     m_left_widget = NULL;
     m_right_widget = NULL;
@@ -878,7 +879,7 @@ void RibbonGridWidget::add()
     for(int n=0; n<row_amount; n++)
     {
         RibbonWidget* ribbon;
-        if(m_max_rows == 1) // cheap way to detect if it's a regular grid or a scrollable_ribbon. FIXME
+        if(m_combo)
             ribbon = new RibbonWidget(RIBBON_COMBO);
         else
             ribbon = new RibbonWidget(RIBBON_TOOLBAR);
@@ -911,12 +912,14 @@ void RibbonGridWidget::add()
         ribbon->add();
     }
 
-    // add label at bottom
+    // add dynamic label at bottom
     if(m_has_label)
     {
-        rect<s32> label_size = rect<s32>(x, y + h - label_height, x+w, y+h);
-        m_label = GUIEngine::getGUIEnv()->addStaticText(L"Selecte a track...", label_size, false, true /* word wrap */, NULL, -1);
-        m_label->setTextAlignment( EGUIA_CENTER, EGUIA_CENTER );
+        // leave room for many lines, just in case
+        rect<s32> label_size = rect<s32>(x, y + h - label_height, x+w, y+h+label_height*5);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
+        m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
+        m_label->setWordWrap(true);
     }
 
     // add arrow buttons on each side
