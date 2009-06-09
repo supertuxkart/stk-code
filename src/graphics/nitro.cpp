@@ -29,7 +29,7 @@
 
 Nitro::Nitro(Kart* kart) : m_kart(kart)
 {
-    const float particle_size = 0.5f;
+    const float particle_size = 0.25f;
     m_node = irr_driver->addParticleNode();
     m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, particle_size*0.25f, -m_kart->getKartLength()*0.5f));
@@ -37,13 +37,17 @@ Nitro::Nitro(Kart* kart) : m_kart(kart)
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, m->getTexture());
 
-    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
-                                           5, 10,
-                                           video::SColor(255,0,0,0),
-                                           video::SColor(255,255,255,255),
-                                           400, 400,
-                                           20  // max angle
-                                           );
+    m_emitter = m_node->createBoxEmitter(core::aabbox3df(-m_kart->getKartWidth()*0.3f, 0.1f,                                -m_kart->getKartLength()*0.1f,
+                                                          m_kart->getKartWidth()*0.3f, 0.1f + m_kart->getKartHeight()*0.5f, -m_kart->getKartLength()*0.3f),
+                                         core::vector3df(0.0f, 0.03f, 0.0f),
+                                         5, 10,
+                                         video::SColor(255,0,0,0),
+                                         video::SColor(255,255,255,255),
+                                         150, 250, // Min max life milisec
+                                         40, // Angle
+                                         core::dimension2df(particle_size/2.0f, particle_size/2.0f),
+                                         core::dimension2df(particle_size*2.0f, particle_size*2.0f)
+                                         );
     m_emitter->setMinStartSize(core::dimension2df(particle_size/2.0f, particle_size/2.0f));
     m_emitter->setMaxStartSize(core::dimension2df(particle_size*2.0f, particle_size*2.0f));
     m_node->setEmitter(m_emitter); // this grabs the emitter
@@ -68,9 +72,9 @@ void Nitro::update(float t)
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
-    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.003f,
-             sin(DEGREE_TO_RAD(rand()%180))*0.003f,
-             sin(DEGREE_TO_RAD(rand()%100))*0.003f);
+    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD(rand()%100))*0.001f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 

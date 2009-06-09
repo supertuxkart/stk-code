@@ -1070,7 +1070,7 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     }
     if(m_nitro)
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
-                                 ? getSpeed()*5.0f : 0);
+                                 ? (10.0f + getSpeed()*20.0f) : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
