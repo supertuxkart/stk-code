@@ -31,12 +31,12 @@ private:
     /** The kart to which this smoke belongs. */
     const Kart                      *m_kart;
     /** Irrlicht's particle systems. */
-    scene::IParticleSystemSceneNode *m_node_l; /* left wheel */
-    scene::IParticleSystemSceneNode *m_node_r; /* right wheel */
+    scene::IParticleSystemSceneNode *m_node; /* left wheel */
     /** The emitters. Access to these is needed to adjust the number of
      *  particles per second. */
-    scene::IParticleEmitter         *m_emitter_l;
-    scene::IParticleEmitter         *m_emitter_r;
+    scene::IParticleEmitter         *m_emitter;
+    /** Size of the particles. */
+    const float                      m_particle_size;
 public:
                  Smoke          (Kart* kart);
     virtual     ~Smoke          ();
