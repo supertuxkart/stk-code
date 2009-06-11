@@ -474,7 +474,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
                 assert(list != NULL);
                 
-                const bool stay_within_list = list->getSelected()>0;
+                const bool stay_within_list = list->getSelected() > 0;
                 
                 if(type == Input::IT_STICKMOTION)
                 {

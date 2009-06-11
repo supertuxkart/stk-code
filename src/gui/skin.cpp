@@ -628,6 +628,54 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
 }
 
 
+void Skin::drawList(const core::rect< s32 > &rect, Widget* widget, bool focused)
+{
+    static BoxRenderParams params;
+    params.left_border = 15;
+    params.right_border = 15;
+    params.top_border = 15;
+    params.bottom_border = 15;
+    
+    params.hborder_out_portion = 1.0;
+    params.vborder_out_portion = 1.0f;
+    
+    drawBoxFromStretchableTexture( rect, m_tex_section, params );    
+}
+void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused)
+{
+    // focused render params
+    static BoxRenderParams focusparams;
+    focusparams.left_border = 0;
+    focusparams.right_border = 0;
+    focusparams.top_border = 0;
+    focusparams.bottom_border = 0;
+    
+    focusparams.hborder_out_portion = 0.0f;
+    focusparams.vborder_out_portion = 0.0f;
+    
+    // non-focused render params
+    static BoxRenderParams params;
+    params.left_border = 80;
+    params.right_border = 80;
+    params.top_border = 0;
+    params.bottom_border = 36;
+    
+    params.preserve_h_aspect_ratios = true;
+    params.areas = BoxRenderParams::BODY;
+    params.hborder_out_portion = 1.0f;
+    params.vborder_out_portion = 1.0f;
+    
+    // adjust render area
+    core::rect< s32 > rect2 = rect;
+    rect2.UpperLeftCorner.X -= 10;
+    rect2.LowerRightCorner.X += 10;
+    
+    if(focused)
+        drawBoxFromStretchableTexture( rect2, m_tex_gaugefill, focusparams );
+    else
+        drawBoxFromStretchableTexture( rect2, m_tex_button, params );
+}
+
 /** recusrive function to render all sections (recursion allows to easily travesre the tree of children and sub-children) */
 void Skin::renderSections(ptr_vector<Widget>* within_vector)
 {
@@ -692,8 +740,14 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
     if(widget == NULL) return;
     
-    // const WidgetType type = widget->m_type;
-    
+    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+
+    const WidgetType type = widget->m_type;
+    if(type == WTYPE_LIST)
+    {
+        // list selection background
+        drawListSelection(rect, widget, focused);
+    }
 
 }
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
@@ -707,7 +761,6 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     if(widget == NULL) return;
     
     const WidgetType type = widget->m_type;
-    
     
     // buttons are used for other uses than plain clickable buttons because irrLicht
     // does not have widgets for everything we need. so at render time, we just check
@@ -756,14 +809,24 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    // e.g. the checkbox square
-    //printf("draw sunken pane\n");
+    const int id = element->getID();
+    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    
+    if(widget == NULL) return;
+    
+    const WidgetType type = widget->m_type;
+    
     const bool focused = GUIEngine::getGUIEnv()->getFocus() == element;
     
-    if(focused)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-    else
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
+    if(type == WTYPE_LIST)
+    {
+        drawList(rect, widget, focused);
+    }
+    
+    //if(focused)
+    //    GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
+    //else
+    //    GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
 }
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
@@ -839,6 +902,7 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
      EGDC_ICON_HIGH_LIGHT 	Selected icons in a list or tree. 
      */
     
+    // TODO : make configurable
     switch(color)
     {
         case EGDC_BUTTON_TEXT:
@@ -852,7 +916,8 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
         case EGDC_HIGH_LIGHT:
         case EGDC_ICON_HIGH_LIGHT:
         case EGDC_HIGH_LIGHT_TEXT:
-            return SColor(255, 0, 150, 0);
+            return SColor(255, 0, 0, 0);
+            //return SColor(255, 0, 150, 0);
             
         default:
             return SColor(255, 255, 255, 255);

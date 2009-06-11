@@ -62,12 +62,6 @@ namespace GUIEngine
         
         void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source, const BoxRenderParams& params);
         
-    public:
-        ITexture* m_tex_section;
-        
-        Skin(IGUISkin* fallback_skin);
-        ~Skin();
-        
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed);
         void drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused);
@@ -78,7 +72,15 @@ namespace GUIEngine
         void drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused);
         void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused);
         void drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused);
+        void drawList(const core::rect< s32 > &rect, Widget* widget, bool focused);
+        void drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused);
+
+    public:
+        ITexture* m_tex_section;
         
+        Skin(IGUISkin* fallback_skin);
+        ~Skin();
+
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
         
         // irrlicht's callbacks
