@@ -21,7 +21,7 @@
 #define __LISPPARSER_H__
 
 #include <string>
-#include "lexer.hpp"
+#include "lisp/lexer.hpp"
 
 namespace lisp
 {

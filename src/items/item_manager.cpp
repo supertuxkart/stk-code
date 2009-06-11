@@ -17,72 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/item_manager.hpp"
+
 #include <stdexcept>
 #include <string>
 #include <sstream>
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
-#include "items/item_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
 #include "utils/string_utils.hpp"
 
-/** Simple shadow class, only used here for default items. */
-class Shadow
-{
-    //ssgBranch *sh ;
-
-public:
-    Shadow ( float x1, float x2, float y1, float y2 ) { /* TODO */ }
-   // ssgEntity *getRoot () { return sh ; }
-}
-;   // Shadow
-
-#if 0
-//-----------------------------------------------------------------------------
-Shadow::Shadow ( float x1, float x2, float y1, float y2 )
-{
-    ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-    ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-    ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-    ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
-
-    sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
-    sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
-
-    sgSetVec3 ( v, x1, y1, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y1, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x1, y2, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y2, 0.10f ) ; va->add(v) ;
-
-    sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
-
-    sh = new ssgBranch ;
-    sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-
-    sh -> setName ( "Shadow" ) ;
-
-    ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
-
-    gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-#ifndef HAVE_IRRLICHT
-    gs -> setState ( fuzzy_gst ) ;
-#endif
-    sh -> addKid ( gs ) ;
-    sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
-}   // Shadow
-#endif
-//=============================================================================
 ItemManager* item_manager;
 
+//-----------------------------------------------------------------------------
 typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
 
 ItemManager::ItemManager()

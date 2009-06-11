@@ -17,16 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#include "user_config.hpp"
 #include "gui/credits.hpp"
-#include "gui/engine.hpp"
-#include "io/file_manager.hpp"
-#include <fstream>
-#include <irrString.h>
 
+#include <fstream>
+
+#include "irrString.h"
 using irr::core::stringw;
 using irr::core::stringc;
+
+#include "config/user_config.hpp"
+#include "gui/engine.hpp"
+#include "io/file_manager.hpp"
+
 
 namespace GUIEngine
 {

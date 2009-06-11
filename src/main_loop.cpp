@@ -21,8 +21,8 @@
 
 #include <assert.h>
 
-#include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"

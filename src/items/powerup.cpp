@@ -19,10 +19,10 @@
 
 #include "items/powerup.hpp"
 
-#include "user_config.hpp"
-#include "stk_config.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"

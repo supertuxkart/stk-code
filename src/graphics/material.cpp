@@ -21,7 +21,7 @@
 
 #include <stdexcept>
 
-#include "stk_config.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"

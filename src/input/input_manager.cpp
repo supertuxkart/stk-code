@@ -26,8 +26,8 @@
 #include <algorithm>
 
 #include "main_loop.hpp"
-#include "player.hpp"
-#include "user_config.hpp"
+#include "config/player.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
@@ -47,9 +47,8 @@ InputManager *input_manager;
 //-----------------------------------------------------------------------------
 /** Initialise input
  */
-InputManager::InputManager()
-: m_sensed_input(0),
-m_mode(BOOTSTRAP), m_mouse_val_x(0), m_mouse_val_y(0)
+InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
+                               m_mouse_val_x(0), m_mouse_val_y(0)
 {
     m_device_manager = new DeviceManager();
 

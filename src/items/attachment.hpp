@@ -20,7 +20,7 @@
 #ifndef HEADER_ATTACHMENT_HPP
 #define HEADER_ATTACHMENT_HPP
 
-#include "stk_config.hpp"
+#include "config/stk_config.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;

@@ -38,12 +38,12 @@
 #include <sstream>
 #include <algorithm>
 
-#include "user_config.hpp"
 #include "main_loop.hpp"
-#include "stk_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"

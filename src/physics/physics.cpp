@@ -19,7 +19,7 @@
 
 #include "physics/physics.hpp"
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"

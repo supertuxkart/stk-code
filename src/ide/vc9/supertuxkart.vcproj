@@ -201,14 +201,6 @@
 				RelativePath="..\..\main_loop.cpp"
 				>
 			</File>
-			<File
-				RelativePath="../../../src\stk_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\user_config.cpp"
-				>
-			</File>
 			<Filter
 				Name="gui"
 				>
@@ -517,10 +509,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\particle_system.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\graphics\scene.cpp"
 					>
 				</File>
@@ -693,6 +681,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="config"
+				>
+				<File
+					RelativePath="..\..\config\stk_config.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\user_config.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -700,51 +700,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\gui\help_page_one.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\gui\help_page_two.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\herring_manager.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\main_loop.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\player.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\position.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\ssg_help.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\stk_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\user_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\vec3.hpp"
 				>
 			</File>
 			<Filter
@@ -1171,10 +1127,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\particle_system.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\graphics\scene.hpp"
 					>
 				</File>
@@ -1308,6 +1260,22 @@
 				</File>
 				<File
 					RelativePath="..\..\race\race_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="config"
+				>
+				<File
+					RelativePath="..\..\config\player.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\stk_config.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\user_config.hpp"
 					>
 				</File>
 			</Filter>

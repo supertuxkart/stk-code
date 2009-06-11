@@ -25,7 +25,7 @@
 
 #include <cstdio>
 
-#include "replay_buffer_tpl.hpp"
+#include "replay/replay_buffer_tpl.hpp"
 
 struct ReplayKartState;
 struct ReplayFrame;

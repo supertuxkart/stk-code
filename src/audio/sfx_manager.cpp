@@ -37,8 +37,8 @@
 #  include <AL/alc.h>
 #endif
 
-#include "user_config.hpp"
 #include "audio/sfx_openal.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 

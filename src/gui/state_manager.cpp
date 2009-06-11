@@ -1,8 +1,10 @@
 #include "gui/state_manager.hpp"
 
+#include <vector>
+
 #include "main_loop.hpp"
-#include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "gui/credits.hpp"
 #include "gui/engine.hpp"
@@ -16,8 +18,6 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/translation.hpp"
-
-#include <vector>
 
 using namespace GUIEngine;
 

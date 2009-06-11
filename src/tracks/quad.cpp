@@ -87,6 +87,3 @@ bool Quad::pointInQuad(const Vec3& p) const
     }
 }   // pointInQuad
 
-
-#include "quad.hpp"
-

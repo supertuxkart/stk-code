@@ -26,7 +26,7 @@
 #  include <unistd.h>
 #endif
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 

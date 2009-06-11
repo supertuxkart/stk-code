@@ -20,7 +20,7 @@
 #ifndef HEADER_EMPTY_HPP
 #define HEADER_EMPTY_HPP
 
-#include "auto_kart.hpp"
+#include "karts/auto_kart.hpp"
 
 class EmptyRobot : public AutoKart
 {

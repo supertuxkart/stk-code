@@ -23,13 +23,12 @@
 #include <math.h>
 #include <iostream>
 
-
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
-#include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/user_config.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/nitro.hpp"
 #include "graphics/shadow.hpp"

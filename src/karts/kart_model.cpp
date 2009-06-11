@@ -19,8 +19,8 @@
 
 #include "karts/kart_model.hpp"
 
-#include "stk_config.hpp"
-#include "user_config.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"

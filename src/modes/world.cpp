@@ -25,11 +25,11 @@
 #include <algorithm>
 #include <ctime>
 
-#include "user_config.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
 #include "gui/race_gui.hpp"

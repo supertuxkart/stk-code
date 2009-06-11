@@ -22,7 +22,7 @@
 
 #include "irrlicht.h"
 using namespace irr;
-#include "flyable.hpp"
+#include "items/flyable.hpp"
 
 class RubberBand;
 class Kart;

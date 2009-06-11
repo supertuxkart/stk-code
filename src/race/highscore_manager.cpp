@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"

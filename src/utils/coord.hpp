@@ -23,7 +23,7 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "constants.hpp"
+#include "utils/constants.hpp"
 #include "utils/vec3.hpp"
 
 /** A class that stores a translation and rotation. It is used to convert

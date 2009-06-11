@@ -31,7 +31,7 @@
 #  include <AL/al.h>
 #endif
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 
 SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) : SFXBase()

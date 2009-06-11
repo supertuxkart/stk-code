@@ -23,7 +23,7 @@
 #ifdef HAVE_GHOST_REPLAY
 
 #include <vector>
-#include "replay_base.hpp"
+#include "replay/replay_base.hpp"
 
 
 class KartProperties;

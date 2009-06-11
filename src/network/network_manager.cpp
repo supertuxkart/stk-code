@@ -17,10 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
-#include "stk_config.hpp"
-#include "user_config.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/connect_message.hpp"

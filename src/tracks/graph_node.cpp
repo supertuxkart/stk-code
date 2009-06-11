@@ -19,7 +19,7 @@
 
 #include "tracks/quad_graph.hpp"
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"

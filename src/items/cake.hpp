@@ -23,7 +23,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "flyable.hpp"
+#include "items/flyable.hpp"
 
 class Cake : public Flyable
 {

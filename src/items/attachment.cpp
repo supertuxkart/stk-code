@@ -19,8 +19,8 @@
 
 #include "items/attachment.hpp"
 
-#include "stk_config.hpp"
-#include "user_config.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"

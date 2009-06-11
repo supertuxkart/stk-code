@@ -27,7 +27,7 @@
 #endif
 
 #include "network/message.hpp"
-#include "race_manager.hpp"
+#include "race/race_manager.hpp"
 
 class NumPlayersMessage : public Message
 {

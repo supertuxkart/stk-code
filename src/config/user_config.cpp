@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 
 #include <stdio.h>
 #include <stdexcept>
@@ -34,8 +34,8 @@
 #  include <direct.h>
 #endif
 
-#include "stk_config.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"

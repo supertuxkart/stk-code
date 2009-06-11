@@ -22,7 +22,7 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
-#include "replay_base.hpp"
+#include "replay/replay_base.hpp"
 
 
 // class managing:

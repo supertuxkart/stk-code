@@ -1,6 +1,9 @@
 #ifndef HEADER_CREDITS_HPP
 #define HEADER_CREDITS_HPP
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine

@@ -19,9 +19,10 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
+#include "replay/replay_recorder.hpp"
+
 #include <cassert>
 
-#include "replay_recorder.hpp"
 #include "modes/world.hpp"
 
 const float ReplayRecorder::REPLAY_TIME_STEP_MIN = 1.0f / (float)ReplayRecorder::REPLAY_FREQUENCY_MAX;

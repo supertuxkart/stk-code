@@ -24,8 +24,8 @@
 #include <algorithm>
 #include <sstream>
 
-#include "stk_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 

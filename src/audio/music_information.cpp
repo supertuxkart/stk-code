@@ -22,8 +22,8 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "user_config.hpp"
 #include "audio/music_ogg.hpp"
+#include "config/user_config.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "tracks/track.hpp"

@@ -18,7 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "utils/vec3.hpp"
-#include "constants.hpp"
+
+#include "utils/constants.hpp"
 
 void Vec3::setHPR(const btMatrix3x3& m)
 {

@@ -17,8 +17,8 @@
 
 #include "modes/standard_race.hpp"
 
-#include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()

@@ -21,9 +21,9 @@
 
 #include <iostream>
 
-#include "user_config.hpp"
-#include "stk_config.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/scene.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"

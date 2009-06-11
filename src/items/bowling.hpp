@@ -25,7 +25,7 @@
 using namespace irr;
 #endif
 
-#include "flyable.hpp"
+#include "items/flyable.hpp"
 
 class Bowling : public Flyable
 {

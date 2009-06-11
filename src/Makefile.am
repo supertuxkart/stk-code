@@ -12,10 +12,6 @@ supertuxkart_SOURCES = \
  main.cpp \
  main_loop.cpp \
  main_loop.hpp \
- stk_config.cpp \
- stk_config.hpp \
- user_config.cpp \
- user_config.hpp \
  audio/music.hpp \
  audio/music_information.cpp \
  audio/music_information.hpp \
@@ -34,6 +30,11 @@ supertuxkart_SOURCES = \
  challenges/challenge_data.hpp \
  challenges/unlock_manager.cpp \
  challenges/unlock_manager.hpp \
+ config/player.hpp \
+ config/stk_config.cpp \
+ config/stk_config.hpp \
+ config/user_config.cpp \
+ config/user_config.hpp \
  graphics/camera.cpp \
  graphics/camera.hpp \
  graphics/explosion.cpp \
@@ -50,8 +51,6 @@ supertuxkart_SOURCES = \
  graphics/moving_texture.hpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
- graphics/particle_system.cpp \
- graphics/particle_system.hpp \
  graphics/scene.cpp \
  graphics/scene.hpp \
  graphics/shadow.cpp \
@@ -196,7 +195,6 @@ supertuxkart_SOURCES = \
  physics/triangle_mesh.cpp \
  physics/triangle_mesh.hpp \
  physics/user_pointer.hpp \
- player.hpp \
  race/grand_prix_data.cpp \
  race/grand_prix_data.hpp \
  race/grand_prix_manager.cpp \

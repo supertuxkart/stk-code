@@ -34,7 +34,7 @@
 
 #include "modes/world.hpp"
 
-#include "empty_robot.hpp"
+#include "robot/empty_robot.hpp"
 
 EmptyRobot::EmptyRobot(const KartProperties *kart_properties, int position,
                    sgCoord init_pos) :

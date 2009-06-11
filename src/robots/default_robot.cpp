@@ -32,12 +32,13 @@
 
 #endif
 
-#include "default_robot.hpp"
+#include "robots/default_robot.hpp"
 
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
 #include <iostream>
+
 #include "graphics/scene.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"

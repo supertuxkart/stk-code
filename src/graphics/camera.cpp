@@ -20,8 +20,8 @@
 
 #include "graphics/camera.hpp"
 
-#include "user_config.hpp"
 #include "audio/sound_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"

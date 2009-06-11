@@ -28,7 +28,7 @@
 #  include <AL/al.h>
 #endif
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 
 MusicOggStream::MusicOggStream()
 {

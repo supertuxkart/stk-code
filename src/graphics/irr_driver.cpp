@@ -27,9 +27,10 @@
 #  endif
 #endif
 
-#include "material_manager.hpp"
-#include "user_config.hpp"
+#include "config/user_config.hpp"
+#include "graphics/material_manager.hpp"
 #include "gui/engine.hpp"
+#include "gui/font.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -38,8 +39,6 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
-#include "material_manager.hpp"
-#include "gui/font.hpp"
 
 IrrDriver *irr_driver = NULL;
 

@@ -23,9 +23,9 @@
 #include <algorithm>
 #include <ctime>
 
-#include "stk_config.hpp"
-#include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/string_utils.hpp"

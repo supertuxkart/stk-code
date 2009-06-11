@@ -1,10 +1,11 @@
-
-#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
-#include "io/file_manager.hpp"
+
 #include <iostream>
 #include <fstream>
-#include "user_config.hpp"
+
+#include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 
 DeviceManager::DeviceManager()
 {

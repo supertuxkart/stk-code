@@ -21,8 +21,8 @@
 #ifndef HEADER_SFX_HPP
 #define HEADER_SFX_HPP
 
-#include "user_config.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 
 class Vec3;
 

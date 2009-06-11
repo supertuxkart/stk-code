@@ -20,13 +20,13 @@
 
 #include "karts/player_kart.hpp"
 
-#include "player.hpp"
-#include "input/input_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
+#include "config/player.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
 #include "gui/race_gui.hpp"
+#include "input/input_manager.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"

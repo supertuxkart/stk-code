@@ -19,10 +19,11 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
-#include "kart_properties_manager.hpp"
-#include "kart_properties.hpp"
+#include "replay/replay_player.hpp"
 
-#include "replay_player.hpp"
+#include "graphics/scene.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "karts/kart_properties.hpp"
 
 
 ReplayKart::ReplayKart()
@@ -68,8 +69,6 @@ bool ReplayKart::init( const std::string &strKartIdent )
     return true;
 }
     
-#include "scene.hpp"
-
 ReplayPlayer::ReplayPlayer() 
 : ReplayBase(), m_current_frame_index(-1)
 {

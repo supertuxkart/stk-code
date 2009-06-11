@@ -19,7 +19,7 @@
 
 #include "graphics/skid_marks.hpp"
 
-#include "scene.hpp"
+#include "graphics/scene.hpp"
 #include "karts/kart.hpp"
 #include "physics/btKart.hpp"
 #include "utils/coord.hpp"

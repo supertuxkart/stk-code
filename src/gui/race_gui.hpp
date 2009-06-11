@@ -21,15 +21,14 @@
 #ifndef HEADER_RACEGUI_HPP
 #define HEADER_RACEGUI_HPP
 
-#ifdef HAVE_IRRLICHT
-#include "irrlicht.h"
-using namespace irr;
-#endif
-
 #include <string>
 #include <vector>
 
-#include "player.hpp"
+#include "irrlicht.h"
+using namespace irr;
+
+
+#include "config/player.hpp"
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
