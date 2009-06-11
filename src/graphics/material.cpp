@@ -48,18 +48,29 @@ Material::Material(const XMLNode *node, int index)
     node->get("clampU", &b);  if(b) m_clamp_tex +=UCLAMP;
     b=false;
     node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
-    node->get("transparency", &m_transparency      );
-    node->get("alpha",        &m_alpha_blending    );
-    node->get("light",        &m_lighting          );
-    node->get("sphere",       &m_sphere_map        );
-    node->get("friction",     &m_friction          );
-    node->get("ignore",       &m_ignore            );
-    node->get("zipper",       &m_zipper            );
-    node->get("reset",        &m_resetter          );
-    node->get("collide",      &m_collideable       );
-    node->get("maxSpeed",     &m_max_speed_fraction);
-    node->get("slowdownTime", &m_slowdown          );
-
+    node->get("transparency",     &m_transparency      );
+    node->get("alpha",            &m_alpha_blending    );
+    node->get("light",            &m_lighting          );
+    node->get("sphere",           &m_sphere_map        );
+    node->get("friction",         &m_friction          );
+    node->get("ignore",           &m_ignore            );
+    node->get("zipper",           &m_zipper            );
+    node->get("reset",            &m_resetter          );
+    node->get("collide",          &m_collideable       );
+    node->get("maxSpeed",         &m_max_speed_fraction);
+    node->get("slowdownTime",     &m_slowdown          );
+    std::string s("");
+    node->get("graphical-effect", &s                   );
+    if(s=="water")
+        m_graphical_effect = GE_WATER;
+    else if(s=="smoke")
+        m_graphical_effect = GE_SMOKE;
+    else if (s!="")
+        fprintf(stderr, 
+            "Invalid graphical effect specification: '%s' - ignored.\n", 
+            s.c_str());
+    else
+        m_graphical_effect = GE_NONE;
     install(/*is_full_path*/false);
 }   // Material
 
@@ -87,19 +98,20 @@ Material::~Material()
 //-----------------------------------------------------------------------------
 void Material::init(unsigned int index)
 {
-    m_index              = index ;
-    m_clamp_tex          = 0     ;
-    m_transparency       = false ;
-    m_alpha_blending     = false ;
-    m_lighting           = true  ;
-    m_sphere_map         = false ;
-    m_friction           = 1.0f  ;
-    m_ignore             = false ;
-    m_zipper             = false ;
-    m_resetter           = false ;
-    m_collideable        = true  ;
+    m_index              = index;
+    m_clamp_tex          = 0;
+    m_transparency       = false;
+    m_alpha_blending     = false;
+    m_lighting           = true;
+    m_sphere_map         = false;
+    m_friction           = 1.0f;
+    m_ignore             = false;
+    m_zipper             = false;
+    m_resetter           = false;
+    m_collideable        = true;
     m_max_speed_fraction = 1.0f;
     m_slowdown           = stk_config->m_slowdown_factor;
+    m_graphical_effect   = GE_NONE;
 }
 
 //-----------------------------------------------------------------------------

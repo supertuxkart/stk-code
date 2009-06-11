@@ -21,7 +21,7 @@
 #define HEADER_MATERIAL_HPP
 
 #include <string>
-#define _WINSOCKAPI_
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -29,10 +29,14 @@ class XMLNode;
 
 class Material
 {
+public:
+    enum GraphicalEffect {GE_NONE, GE_SMOKE, GE_WATER};
+
 private:
     video::ITexture *m_texture;
     unsigned int     m_index;
     std::string      m_texname;
+    GraphicalEffect  m_graphical_effect;
     bool             m_collideable;
     bool             m_zipper;
     bool             m_resetter;
@@ -73,6 +77,10 @@ public:
     /** Returns the slowdown that happens if a kart is
      *  faster than the maximum speed. */
     float getSlowDown        () const { return m_slowdown;           }
+    /** Returns true if this material should have smoke effect. */
+    bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
+    /** Returns true if this material should have water splashes. */
+    bool hasWaterSplash      () const { return m_graphical_effect==GE_WATER;}
 } ;
 
 

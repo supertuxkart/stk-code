@@ -536,6 +536,10 @@
 					RelativePath="..\..\graphics\smoke.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\graphics\water_splash.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="network"
@@ -1184,6 +1188,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\smoke.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\water_splash.hpp"
 					>
 				</File>
 			</Filter>

@@ -60,6 +60,8 @@ supertuxkart_SOURCES = \
  graphics/skid_marks.hpp \
  graphics/smoke.cpp \
  graphics/smoke.hpp \
+ graphics/water_splash.hpp \
+ graphics/water_splash.cpp \
  gui/credits.cpp \
  gui/credits.hpp \
  gui/engine.cpp \

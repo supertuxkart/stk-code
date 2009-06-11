@@ -35,6 +35,7 @@ class SkidMarks;
 class Shadow;
 class Item;
 class Smoke;
+class WaterSplash;
 class Nitro;
 class SFXBase;
 class btUprightConstraint;
@@ -82,7 +83,10 @@ private:
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool          m_shadow_enabled;
-    Smoke        *m_smoke_system;    /**<Smoke from skidding. */
+    /** Smoke from skidding. */
+    Smoke        *m_smoke_system;
+    /** Water splash when driving in water. */
+    WaterSplash  *m_water_splash_system;
 
     /** Fire when using a nitro. */
     Nitro        *m_nitro;

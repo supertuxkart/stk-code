@@ -35,6 +35,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/smoke.hpp"
+#include "graphics/water_splash.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -74,6 +75,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
+    m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_skidmarks            = NULL;
     m_animated_node        = NULL;
@@ -242,8 +244,9 @@ Kart::~Kart()
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
     
-    if(m_smoke_system) delete m_smoke_system;
-    if(m_nitro)        delete m_nitro;
+    if(m_smoke_system)        delete m_smoke_system;
+    if(m_water_splash_system) delete m_water_splash_system;
+    if(m_nitro)               delete m_nitro;
 
     m_animated_node->removeChild(m_shadow->getSceneNode());
     delete m_shadow;
@@ -556,6 +559,7 @@ void Kart::update(float dt)
     if ( user_config->m_graphical_effects )
     {
         m_smoke_system->update(dt);
+        m_water_splash_system->update(dt);
         m_nitro->update(dt);
     }  // user_config->m_graphical_effects
     updatePhysics(dt);
@@ -1007,8 +1011,9 @@ void Kart::loadData()
     createPhysics();
 
     // Attach Particle System
-    m_smoke_system = new Smoke(this);
-    m_nitro        = new Nitro(this);
+    m_smoke_system        = new Smoke(this);
+    m_water_splash_system = new WaterSplash(this);
+    m_nitro               = new Nitro(this);
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
@@ -1065,8 +1070,18 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 
     if(m_smoke_system)
     {
-        float f = fabsf(m_controls.m_steer) > 0.8 ? 250.0f : 0.0f;
+        float f=0.0f;
+        if(getMaterial()->hasSmoke() && fabsf(m_controls.m_steer) > 0.8 && 
+            isOnGround())
+            f=250.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
+    }
+    if(m_water_splash_system)
+    {
+        float f = getMaterial()->hasWaterSplash() &&isOnGround() 
+                ? sqrt(getSpeed())*40.0f 
+                : 0.0f;
+        m_water_splash_system->setCreationRate(f);
     }
     if(m_nitro)
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0

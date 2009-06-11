@@ -1,4 +1,4 @@
-//  $Id: smoke.cpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "smoke.hpp"
+#include "water_splash.hpp"
 
 #include "graphics/material_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -26,7 +26,7 @@
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 
-Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
+WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
 {
     m_node = irr_driver->addParticleNode();
     // Note: the smoke system is NOT child of the kart, since bullet
@@ -36,7 +36,7 @@ Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m_node->setPosition(core::vector3df(-m_kart->getKartWidth()*0.35f, 
                                         m_particle_size*0.25f, 
                                         -m_kart->getKartLength()*0.5f));
-    Material *m= material_manager->getMaterial("smoke.png");
+    Material *m= material_manager->getMaterial("water_light.png");
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, m->getTexture());
 
@@ -51,29 +51,39 @@ Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m_emitter->setMaxStartSize(core::dimension2df(m_particle_size*1.5f, m_particle_size*1.5f));
     m_node->setEmitter(m_emitter); // this grabs the emitter
 
-    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), 500);
-    m_node->addAffector(af);
-    af->drop();
+    scene::IParticleFadeOutAffector *fade_af = 
+        m_node->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), 500);
+    m_node->addAffector(fade_af);
+    fade_af->drop();
 
+    scene::IParticleGravityAffector *gaf = 
+        m_node->createGravityAffector();
+    m_node->addAffector(gaf);
+    gaf->drop();
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
 /** Destructor, removes
  */
-Smoke::~Smoke()
+WaterSplash::~WaterSplash()
 {
     irr_driver->removeNode(m_node);
-}   // ~Smoke
+}   // ~WaterSplash
 
 //-----------------------------------------------------------------------------
-void Smoke::update(float t)
+void WaterSplash::update(float t)
 {
     // No particles to emit, no need to change the speed
     if(m_emitter->getMinParticlesPerSecond()==0)
         return;
+
+    // Cycle through all four wheels
     static int left=1;
+    static int rear=1;
     left = 1-left;
-    const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(2+left);
+    if(left==0) rear = 1-rear;
+    
+    const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(rear*2+left);
     Vec3 c=wi.m_raycastInfo.m_contactPointWS;
 
     // FIXME: the X position is not yet always accurate.
@@ -84,14 +94,16 @@ void Smoke::update(float t)
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
-    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.002f,
-             sin(DEGREE_TO_RAD(rand()%180))*0.002f,
-             sin(DEGREE_TO_RAD(rand()%100))*0.002f);
+    float f=m_kart->getSpeed();
+    if(f<1) return;  // avoid problem with modulo 0
+    Vec3 dir((rand()%int(f))*(left?-1:1)*0.004f,
+             sin(DEGREE_TO_RAD(rand()%180))*0.004f,
+             sin(DEGREE_TO_RAD(rand()%100))*0.004f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
 //-----------------------------------------------------------------------------
-void Smoke::setCreationRate(float f)
+void WaterSplash::setCreationRate(float f)
 {
     m_emitter->setMinParticlesPerSecond(int(f));
     m_emitter->setMaxParticlesPerSecond(int(f));

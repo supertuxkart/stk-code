@@ -1,4 +1,4 @@
-//  $Id: dust_cloud.hpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id$
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SMOKE_HPP
-#define HEADER_SMOKE_HPP
+#ifndef HEADER_WATER_SPLASH_HPP
+#define HEADER_WATER_SPLASH_HPP
 
 #include "irrlicht.h"
 using namespace irr;
 
 class Kart;
 
-class Smoke
+class WaterSplash
 {
 private:
     /** The kart to which this smoke belongs. */
@@ -38,10 +38,10 @@ private:
     /** Size of the particles. */
     const float                      m_particle_size;
 public:
-                 Smoke          (Kart* kart);
-    virtual     ~Smoke          ();
+                 WaterSplash    (Kart* kart);
+    virtual     ~WaterSplash();
     virtual void update         (float t);
     void         setCreationRate(float f);
-};
+};   // WaterSplash
 #endif
 
