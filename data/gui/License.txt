@@ -2,6 +2,8 @@ All images in this directory come from the Tango icon project are Public Domain 
 
 Except :
 
+background : derivated from an OpenClipart public-domain image
+
 difficulty_*.png, released under Creative-Commons BY-SA 3, By Constantin Pelikan
 
 logo.png is released under GPL
@@ -11,9 +13,7 @@ main_race.png created by Andreas Bilng (c) 2008, with Tuxicon by Enrico Billing 
  
 mode_normal.png released under CC-BY-SA 3.0, based on work by MiniBjorn
 
-FIXME - background.jpg is NOT under an appropriate license, replace
-
-FIXME - fonthaettenschweiler.bmp, gnu.png, kart*.png?, track*.png are temporary and should be [re]moved
+FIXME - track*.png are temporary and should be [re]moved
 
 FIXME - mode_ftl.png has an unclear license, it combines a GPL kart and a CC kart. How does those licenses deal with this?
 
