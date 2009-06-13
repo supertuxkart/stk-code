@@ -39,7 +39,6 @@ Screen::Screen(const char* file)
 // -----------------------------------------------------------------------------
 void Screen::loadFromFile()
 {
-    std::cout << "*** loading GUI screen from file " << (file_manager->getGUIDir() + "/" + m_filename).c_str() << std::endl;
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;

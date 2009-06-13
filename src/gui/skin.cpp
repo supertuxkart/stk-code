@@ -56,7 +56,7 @@ namespace SkinConfig
             
             BoxRenderParams newParam;
             // TODO : look for images in a skin-specific directory
-            newParam.image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/" + image).c_str() );
+            newParam.image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() );
             newParam.left_border = leftborder;
             newParam.right_border = rightborder;
             newParam.top_border = topborder;
@@ -103,6 +103,11 @@ namespace SkinConfig
         static void loadFromFile(std::string file)
         {
             XMLNode* root = file_manager->createXMLTree(file);
+            if(!root)
+            {
+                std::cerr << "Could not read XML file " << file.c_str() << std::endl;
+            }
+            
             const int amount = root->getNumNodes();
             for(int i=0; i<amount; i++)
             {
@@ -127,15 +132,16 @@ namespace SkinConfig
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
-    SkinConfig::loadFromFile(file_manager->getGUIDir() + "/glass.stkskin" );
+    SkinConfig::loadFromFile( file_manager->getGUIDir() + "/skins/glass.stkskin" );
     bg_image = NULL;
     
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
     assert(fallback_skin != NULL);
 
-    m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
-    m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/bubble.png").c_str() );
+    // TODO : make those configurable in skin files
+    m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/glass/glass_iconhighlight_focus.png").c_str() );
+    m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/glass/bubble.png").c_str() );
     
 }
 
