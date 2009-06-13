@@ -45,7 +45,8 @@ namespace GUIEngine
 
         ITexture* m_tex_ficonhighlight;
         ITexture* m_tex_bubble;
-        ITexture* m_tex_gaugefill;
+        
+        ITexture* bg_image;
         
 
         void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params);
@@ -68,6 +69,7 @@ namespace GUIEngine
         ~Skin();
 
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
+        void drawBgImage();
         
         // irrlicht's callbacks
         virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);

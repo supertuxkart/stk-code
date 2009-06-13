@@ -56,6 +56,10 @@
 <element type="checkbox" state="focused+unchecked" image="glasscheckbox_focus.png"/>
 <element type="checkbox" state="focused+checked" image="glasscheckbox_checked_focus.png"/>
 
+<!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
+     Note: the body of a guage is the same as for for spinners. -->
+<element type="gaugefill" image="glasssgauge_fill.png" />
+
 <!-- Lists are always in neutral state for now -->
 <element type="list" image="glass_section.png"
     left_border="15" right_border="15" top_border="15" bottom_border="15"

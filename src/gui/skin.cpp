@@ -110,15 +110,13 @@ namespace SkinConfig
 Skin::Skin(IGUISkin* fallback_skin)
 {
     SkinConfig::loadFromFile(file_manager->getGUIDir() + "/glass.stkskin" );
+    bg_image = NULL;
     
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
     assert(fallback_skin != NULL);
 
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
-    
-    m_tex_gaugefill = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasssgauge_fill.png").c_str() );
-
     m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/bubble.png").c_str() );
     
 }
@@ -144,6 +142,49 @@ BoxRenderParams::BoxRenderParams()
     
     areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
     vertical_flip = false;
+}
+
+void Skin::drawBgImage()
+{
+    
+    // ---- background image
+    // on one end, making these static is not too clean.
+    // on another end, these variables are really only used locally,
+    // and making them static avoids doing the same stupid computations every frame
+    static core::rect<s32> dest;
+    static core::rect<s32> source_area;
+    
+    if(bg_image == NULL)
+    {
+        int texture_w, texture_h;
+        // TODO/FIXME? - user preferences still include a background image choice 
+        bg_image = SkinConfig::m_render_params["background::neutral"].image;
+        assert(bg_image != NULL);
+        texture_w = bg_image->getSize().Width;
+        texture_h = bg_image->getSize().Height;
+        
+        source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+        
+        core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        const int screen_w = frame_size.Width;
+        const int screen_h = frame_size.Height;
+        
+        // stretch image vertically to fit
+        float ratio = (float)screen_h / texture_h;
+        
+        // check that with the vertical stretching, it still fits horizontally
+        while(texture_w*ratio < screen_w) ratio += 0.1f;
+        
+        texture_w = (int)(texture_w*ratio);
+        texture_h = (int)(texture_h*ratio);
+        
+        const int clipped_x_space = (texture_w - screen_w);
+        
+        dest = core::rect<s32>(-clipped_x_space/2, 0, screen_w+clipped_x_space/2, texture_h);
+    }
+    
+
+    GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area, 0 /* no clipping */, 0, false /* alpha */);
 }
 
 void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params)
@@ -569,14 +610,14 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
                                                               widget->x + handle_size + (int)((widget->w - 2*handle_size)*value),
                                                               widget->y + widget->h);
 
-        const int texture_w = m_tex_gaugefill->getSize().Width;
-        const int texture_h = m_tex_gaugefill->getSize().Height;
+        ITexture* texture = SkinConfig::m_render_params["gaugefill::neutral"].image;
+        const int texture_w = texture->getSize().Width;
+        const int texture_h = texture->getSize().Height;
         
         const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
         
-        
-        // TODO : make configurable through skin config file
-        GUIEngine::getDriver()->draw2DImage(m_tex_gaugefill, dest_area, source_area,
+        GUIEngine::getDriver()->draw2DImage(texture,
+                                            dest_area, source_area,
                                             0 /* no clipping */, 0, true /* alpha */);
 
     }
@@ -786,6 +827,10 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
+    // fade out background
+    GUIEngine::getDriver()->draw2DRectangle( SColor(150, 255, 255, 255),
+                                              core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+    
     // draw frame (since it's transluscent, draw many times to get opacity)
     drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
     drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
