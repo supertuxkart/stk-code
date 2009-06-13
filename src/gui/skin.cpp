@@ -15,6 +15,7 @@ using namespace GUIEngine;
 namespace SkinConfig
     {
         static std::map<std::string, BoxRenderParams> m_render_params;
+        static std::map<std::string, SColor> m_colors;
 
         
         static void parseElement(const XMLNode* node)
@@ -79,7 +80,24 @@ namespace SkinConfig
         
         static void parseColor(const XMLNode* node)
         {
-            // TODO
+            std::string type;
+            std::string state = "neutral";
+            int r = 0, g = 0, b = 0;
+            
+            if(node->get("type", &type) == 0)
+            {
+                std::cerr << "Error in skin : All elements must have a type\n";
+                return;
+            }
+            node->get("state", &state);
+            
+            node->get("r", &r);
+            node->get("g", &g);
+            node->get("b", &b);
+            
+            SColor color = SColor(255, r, g, b);
+            
+            m_colors[type+"::"+state] = color;
         }
                 
         static void loadFromFile(std::string file)
@@ -891,22 +909,18 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
     // TODO : make configurable
     switch(color)
     {
-        case EGDC_BUTTON_TEXT:
-            return SColor(255, 0, 0, 0);
-            break;
-            
         case EGDC_GRAY_TEXT:
-            return SColor(255, 80, 80, 80);
-            break;
+            return SkinConfig::m_colors["text::neutral"];
             
         case EGDC_HIGH_LIGHT:
         case EGDC_ICON_HIGH_LIGHT:
         case EGDC_HIGH_LIGHT_TEXT:
-            return SColor(255, 0, 0, 0);
-            //return SColor(255, 0, 150, 0);
+            return SkinConfig::m_colors["text::focused"];
+
             
+        case EGDC_BUTTON_TEXT:
         default:
-            return SColor(255, 255, 255, 255);
+            return SkinConfig::m_colors["text::neutral"];
     }
     
 }
