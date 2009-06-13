@@ -9,37 +9,118 @@
 
 using namespace GUIEngine;
 
+/**
+  * Small utility to read config file info from a XML file.
+  */
+namespace SkinConfig
+    {
+        static std::map<std::string, BoxRenderParams> m_render_params;
+
+        
+        static void parseElement(const XMLNode* node)
+        {
+            std::string type;
+            std::string state = "neutral";
+            std::string image;
+            int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
+            float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
+            bool preserve_h_aspect_ratios = false;
+            std::string areas;
+            
+            if(node->get("type", &type) == 0)
+            {
+                std::cerr << "Error in skin : All elements must have a type\n";
+                return;
+            }
+            node->get("state", &state);
+ 
+            if(node->get("image", &image) == 0)
+            {
+                std::cerr << "Error in skin : All elements must have an image\n";
+                return;
+            }
+            
+            node->get("left_border", &leftborder);
+            node->get("right_border", &rightborder);
+            node->get("top_border", &topborder);
+            node->get("bottom_border", &bottomborder);
+
+            node->get("hborder_out_portion", &hborder_out_portion);
+            node->get("vborder_out_portion", &vborder_out_portion);
+            
+            node->get("preserve_h_aspect_ratios", &preserve_h_aspect_ratios);
+            
+            node->get("areas", &areas);
+            
+            
+            BoxRenderParams newParam;
+            // TODO : look for images in a skin-specific directory
+            newParam.image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/" + image).c_str() );
+            newParam.left_border = leftborder;
+            newParam.right_border = rightborder;
+            newParam.top_border = topborder;
+            newParam.bottom_border = bottomborder;
+            newParam.hborder_out_portion = hborder_out_portion;
+            newParam.vborder_out_portion = vborder_out_portion;
+            newParam.preserve_h_aspect_ratios = preserve_h_aspect_ratios;
+            
+            if(areas.size() > 0)
+            {
+                newParam.areas = 0;
+                if(areas.find("body") != std::string::npos) newParam.areas |= BoxRenderParams::BODY;
+                if(areas.find("top") != std::string::npos) newParam.areas |= BoxRenderParams::TOP;
+                if(areas.find("bottom") != std::string::npos) newParam.areas |= BoxRenderParams::BOTTOM;
+                if(areas.find("left") != std::string::npos) newParam.areas |= BoxRenderParams::LEFT;
+                if(areas.find("right") != std::string::npos) newParam.areas |= BoxRenderParams::RIGHT;
+            }
+            
+            m_render_params[type+"::"+state] = newParam;
+        }
+        
+        static void parseColor(const XMLNode* node)
+        {
+            // TODO
+        }
+                
+        static void loadFromFile(std::string file)
+        {
+            XMLNode* root = file_manager->createXMLTree(file);
+            const int amount = root->getNumNodes();
+            for(int i=0; i<amount; i++)
+            {
+                const XMLNode* node = root->getNode(i);
+                
+                if(node->getName() == "element")
+                {
+                    parseElement(node);
+                }
+                else if(node->getName() == "color")
+                {
+                    parseColor(node);
+                }
+                else
+                {
+                    std::cerr << "Unknown node in XML file : " << node->getName().c_str() << std::endl;
+                }
+            }// nend for
+        }
+    };
+
+
 Skin::Skin(IGUISkin* fallback_skin)
 {
+    SkinConfig::loadFromFile(file_manager->getGUIDir() + "/glass.stkskin" );
+    
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
     assert(fallback_skin != NULL);
-    
-    
-    m_tex_button = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton.png").c_str() );
-    m_tex_fbutton = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassbutton_focused.png").c_str() );
-    
-    m_tex_spinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner.png").c_str() );
-    m_tex_fspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_focus.png").c_str() );
-    m_tex_dspinner = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glassspinner_down.png").c_str() );
-    
-    m_tex_tab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab.png").c_str() );
-    m_tex_ftab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_focus.png").c_str() );
-    m_tex_dtab = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasstab_down.png").c_str() );
-    
+
     m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_iconhighlight_focus.png").c_str() );
-    m_tex_squarefocus = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_square_focused.png").c_str() );
     
     m_tex_gaugefill = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasssgauge_fill.png").c_str() );
 
     m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/bubble.png").c_str() );
     
-    m_tex_checkbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox.png").c_str() );
-    m_tex_fcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_focus.png").c_str() );
-    m_tex_dcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked.png").c_str() );
-    m_tex_dfcheckbox = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glasscheckbox_checked_focus.png").c_str() );
-    
-    m_tex_section = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/glass_section.png").c_str() );
 }
 
 Skin::~Skin()
@@ -65,8 +146,9 @@ BoxRenderParams::BoxRenderParams()
     vertical_flip = false;
 }
 
-void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source, const BoxRenderParams& params)
+void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params)
 {
+    ITexture* source = params.image;
     const int left_border = params.left_border;
     const int right_border = params.right_border;
     const int top_border = params.top_border;
@@ -309,46 +391,14 @@ X.LowerRightCorner.Y =  y1;}
 
 void Skin::drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
-    static BoxRenderParams params;
-    
-    // FIXME - move these numbers to a config file
-    params.left_border = 80;
-    params.right_border = 80;
-    params.top_border = 0;
-    params.bottom_border = 36;
-    
-    params.preserve_h_aspect_ratios = true;
-    
-    drawBoxFromStretchableTexture(rect, (focused ? m_tex_fbutton : m_tex_button), params);
+    if(focused)
+        drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["button::focused"]);
+    else
+        drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["button::neutral"]);
 }
 
 void Skin::drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
 {
-/*
-    // only combo ribbons need a border
-    if ( ((RibbonWidget*)widget)->getRibbonType() != RIBBON_COMBO ) return;
-    
-    bool draw_border = focused;
-    
-    // check if one of its children has focus (will happen when directly clicking on them)
-    const int amount = widget->m_children.size();
-    for(int n=0; n<amount; n++)
-    {
-        if(GUIEngine::getGUIEnv()->hasFocus(widget->m_children[n].m_element))
-        {
-            draw_border = true;
-            focused = true;
-            break;
-        }
-    }
-    
-    if(!draw_border) return;
-    
-    if(focused)
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 150, 0, 0), rect );
-    else
-        GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
- */
 }
 
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused)
@@ -363,30 +413,21 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
     /* tab-bar ribbons */
     if(type == RIBBON_TABS)
     {
-        // ribbons containing buttons are actually tabs
+        BoxRenderParams* params;
         
-        static BoxRenderParams params;
-        // FIXME - specify in file, don't hardcode
-        params.left_border = 75;
-        params.right_border = 75;
-        params.top_border = 0;
-        params.bottom_border = 15;
+        if(mark_selected && (focused || parent_focused))
+            params = &SkinConfig::m_render_params["tab::focused"];
+        else if(mark_selected)
+            params = &SkinConfig::m_render_params["tab::down"];
+        else
+            params = &SkinConfig::m_render_params["tab::neutral"];
+
         
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip = rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
-        float portion_out = 0.2f;
-        
-        /* when not using plain buttons, it's probably icons, so we need more space */
-        if(widget->m_type != WTYPE_BUTTON)
-        {
-            //border_below = 40;
-        }
+        params->vertical_flip = vertical_flip;
         
         core::rect< s32 > rect2 = rect;
-        
-        params.hborder_out_portion = portion_out;
-        params.vertical_flip = vertical_flip;
-        
         if (mark_selected)
         {
             // selected tab should be slighlty bigger than others
@@ -394,23 +435,10 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 rect2.UpperLeftCorner.Y -= 10;
             else
                 rect2.LowerRightCorner.Y += 10;
-
-            drawBoxFromStretchableTexture(rect2, (focused || parent_focused ? m_tex_ftab : m_tex_dtab), params);
-            
-            /*
-            GUIEngine::getDriver()->draw2DLine( core::position2d< s32 >(rect2.UpperLeftCorner.X,rect2.LowerRightCorner.Y),
-                                                core::position2d< s32 >(rect2.LowerRightCorner.X,rect2.LowerRightCorner.Y),
-                                               SColor(255,255,0,0) );
-            GUIEngine::getDriver()->draw2DLine( core::position2d< s32 >(rect2.UpperLeftCorner.X,rect2.UpperLeftCorner.Y),
-                                               core::position2d< s32 >(rect2.LowerRightCorner.X,rect2.UpperLeftCorner.Y),
-                                               SColor(255,255,0,0) );
-             */
-
         }
-        else
-        {
-            drawBoxFromStretchableTexture(rect2, m_tex_tab, params);
-        }
+
+        drawBoxFromStretchableTexture(rect2, *params);
+
         
     }
     /* icon ribbons */
@@ -448,6 +476,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             
             core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
             
+            // TODO : read from skin file
             GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
@@ -482,6 +511,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                                                    glow_center_x + 45 + grow,
                                                                    glow_center_y + 25 + grow/2);
                 
+                // TODO : read from skin file
                 GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
                                                     0 /* no clipping */, 0, true /* alpha */);
             }
@@ -492,19 +522,11 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
 
                 if(!always_show_selection && !show_focus) return;
                 
-                const int texture_w = m_tex_squarefocus->getSize().Width;
-                const int texture_h = m_tex_squarefocus->getSize().Height;
+                //const int texture_w = m_tex_squarefocus->getSize().Width;
+                //const int texture_h = m_tex_squarefocus->getSize().Height;
+                //core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
-                
-                static BoxRenderParams params;
-                params.left_border = 6;
-                params.right_border = 6;
-                params.top_border = 6;
-                params.bottom_border = 6;
-                params.hborder_out_portion = 1.0;
-                
-                drawBoxFromStretchableTexture(rect, m_tex_squarefocus, params);
+                drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["squareSelectionHalo::neutral"]);
             }
         } // end if mark_focused
         
@@ -530,25 +552,15 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
         }
     }
     
-    static BoxRenderParams params;
-    // FIXME - move these numbers to a config file
-    params.left_border = 110;
-    params.right_border = 110;
-    params.top_border = 0;
-    params.bottom_border = 36;
     
-    params.preserve_h_aspect_ratios = true;
-    params.hborder_out_portion = 0.0f;
-    
-    drawBoxFromStretchableTexture(rect, (focused || pressed ? m_tex_fspinner : m_tex_spinner), params);
-    
+    BoxRenderParams& params = (focused || pressed) ? SkinConfig::m_render_params["spinner::focused"] : 
+                                                     SkinConfig::m_render_params["spinner::neutral"];
+    drawBoxFromStretchableTexture(rect, params);
+
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     if( w->isGauge() )
     {
-        // the width of an handle is about 0.84 the height in the current skin. FIXME - don't hardcode.
-        const int handle_size = (int)( widget->h*0.84f );
-        
-
+        const int handle_size = (int)( widget->h*params.left_border/(float)params.image->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
         
 
@@ -563,6 +575,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
         const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
         
         
+        // TODO : make configurable through skin config file
         GUIEngine::getDriver()->draw2DImage(m_tex_gaugefill, dest_area, source_area,
                                             0 /* no clipping */, 0, true /* alpha */);
 
@@ -587,18 +600,10 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
                                                      spinner->x + spinner->w,
                                                      spinner->y + spinner->h  );
         
-        static BoxRenderParams params;
-        // FIXME - move these numbers to a config file
-        params.left_border = 110;
-        params.right_border = 110;
-        params.top_border = 0;
-        params.bottom_border = 36;
-        
-        params.preserve_h_aspect_ratios = true;
-        params.hborder_out_portion = 0.0f;
+        BoxRenderParams& params = SkinConfig::m_render_params["spinner::down"];
         params.areas = areas;
-        
-        drawBoxFromStretchableTexture(rect2, m_tex_dspinner, params);
+        drawBoxFromStretchableTexture(rect, params);
+
         
     }
     
@@ -608,72 +613,44 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
 { 
     CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
     
-    const int texture_w = m_tex_checkbox->getSize().Width;
-    const int texture_h = m_tex_checkbox->getSize().Height;
-    
-    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
-    
-    
+    ITexture* texture;
     
     if(w->getState() == true)
     {
-        GUIEngine::getDriver()->draw2DImage( focused ? m_tex_dfcheckbox : m_tex_dcheckbox, rect, source_area,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        if(focused)
+            texture = SkinConfig::m_render_params["checkbox::focused+checked"].image;
+        else
+            texture = SkinConfig::m_render_params["checkbox::neutral+checked"].image;
     }
     else
     {
-        GUIEngine::getDriver()->draw2DImage( focused ? m_tex_fcheckbox : m_tex_checkbox, rect, source_area,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        if(focused)
+            texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].image;
+        else
+            texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"].image;
     }
+
+    const int texture_w = texture->getSize().Width;
+    const int texture_h = texture->getSize().Height;
+    
+    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+    
+    GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
+                                        0 /* no clipping */, 0, true /* alpha */);
 }
 
 
 void Skin::drawList(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
-    static BoxRenderParams params;
-    params.left_border = 15;
-    params.right_border = 15;
-    params.top_border = 15;
-    params.bottom_border = 15;
-    
-    params.hborder_out_portion = 1.0;
-    params.vborder_out_portion = 1.0f;
-    
-    drawBoxFromStretchableTexture( rect, m_tex_section, params );    
+    drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["list::neutral"]);
+
 }
 void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
-    // focused render params
-    static BoxRenderParams focusparams;
-    focusparams.left_border = 0;
-    focusparams.right_border = 0;
-    focusparams.top_border = 0;
-    focusparams.bottom_border = 0;
-    
-    focusparams.hborder_out_portion = 0.0f;
-    focusparams.vborder_out_portion = 0.0f;
-    
-    // non-focused render params
-    static BoxRenderParams params;
-    params.left_border = 80;
-    params.right_border = 80;
-    params.top_border = 0;
-    params.bottom_border = 36;
-    
-    params.preserve_h_aspect_ratios = true;
-    params.areas = BoxRenderParams::BODY;
-    params.hborder_out_portion = 1.0f;
-    params.vborder_out_portion = 1.0f;
-    
-    // adjust render area
-    core::rect< s32 > rect2 = rect;
-    rect2.UpperLeftCorner.X -= 10;
-    rect2.LowerRightCorner.X += 10;
-    
     if(focused)
-        drawBoxFromStretchableTexture( rect2, m_tex_gaugefill, focusparams );
+        drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["listitem::focused"]);
     else
-        drawBoxFromStretchableTexture( rect2, m_tex_button, params );
+        drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["listitem::down"]);
 }
 
 /** recusrive function to render all sections (recursion allows to easily travesre the tree of children and sub-children) */
@@ -692,29 +669,7 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
             if(widget.m_show_bounding_box)
             {
                 core::rect< s32 > rect = core::rect<s32>( widget.x, widget.y, widget.x + widget.w, widget.y + widget.h );
-                //getDriver()->draw2DImage(g_skin->m_tex_section, rect, source_area,
-                //                         0 /* no clipping */, 0, true /* alpha */);
-                
-                static BoxRenderParams params;
-                params.left_border = 15;
-                params.right_border = 15;
-                params.top_border = 15;
-                params.bottom_border = 15;
-                
-                params.hborder_out_portion = 1.0;
-                params.vborder_out_portion = 0.2f;
-                
-                drawBoxFromStretchableTexture( rect, m_tex_section, params );
-                
-                /*
-                 void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source,
-                 const int left_border, const int right_border,
-                 const int top_border, const int bottom_border,
-                 const bool preserve_h_aspect_ratios=false,
-                 const float hborder_out_portion = 0.5,
-                 int areas = BODY | LEFT | RIGHT | TOP | BOTTOM,
-                 const bool vertical_flip=false);
-                 */
+                drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["section::neutral"]);
             }
             else
             {
@@ -831,23 +786,9 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    // fade out background
-    GUIEngine::getDriver()->draw2DRectangle( SColor(150, 255, 255, 255),
-                                            core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
-    
-    static BoxRenderParams params;
-    params.left_border = 15;
-    params.right_border = 15;
-    params.top_border = 15;
-    params.bottom_border = 15;
-    
-    params.hborder_out_portion = 1.0;
-    params.vborder_out_portion = 0.2f;
-    
     // draw frame (since it's transluscent, draw many times to get opacity)
-    drawBoxFromStretchableTexture(rect, m_tex_section, params);
-    drawBoxFromStretchableTexture(rect, m_tex_section, params);
-
+    drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
+    drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
     
     return rect;
 }

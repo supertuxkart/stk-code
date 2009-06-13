@@ -1,0 +1,88 @@
+<skin name="Glass" author="Marianne Gagnon  (Auria)">
+
+<!--  Stateless -->
+<element type="background" image="background.jpg" />
+
+<element type="button" state="focused" image="glassbutton_focused.png"
+      left_border="80" right_border="80" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" />
+
+<element type="button" state="neutral" image="glassbutton.png"
+      left_border="80" right_border="80" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" />
+
+<!-- TODO : buttons could support 'pressed' state -->
+
+
+<element type="tab" state="neutral" image="glasstab.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+      
+<element type="tab" state="focused" image="glasstab_focus.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+
+<element type="tab" state="down" image="glasstab_down.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+
+
+<!-- Stateless -->
+<element type="squareSelectionHalo" image="glass_square_focused.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+
+<!-- TODO : Allow elementning the selection bubble and focus halo too -->
+
+
+
+<element type="spinner" state="neutral" image="glassspinner.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<element type="spinner" state="focused" image="glassspinner_focus.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
+     on top of the spinner's background -->
+<element type="spinner" state="down" image="glassspinner_down.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- For checkboxes, no splitting into 9 areas is done; the image is just stretched -->
+<element type="checkbox" state="neutral+unchecked" image="glasscheckbox.png"/>
+<element type="checkbox" state="neutral+checked" image="glasscheckbox_checked.png"/>
+<element type="checkbox" state="focused+unchecked" image="glasscheckbox_focus.png"/>
+<element type="checkbox" state="focused+checked" image="glasscheckbox_checked_focus.png"/>
+
+<!-- Lists are always in neutral state for now -->
+<element type="list" image="glass_section.png"
+    left_border="15" right_border="15" top_border="15" bottom_border="15"
+    hborder_out_portion="0.5" vborder_out_portion="1.0f" />
+    
+<element type="listitem" state="focused" image="glasssgauge_fill.png"
+    left_border="0" right_border="0" top_border="0" bottom_border="0"
+    hborder_out_portion="0.0" vborder_out_portion="0.0f" />
+    
+<element type="listitem" state="down" image="glassbutton.png"
+    left_border="80" right_border="80" top_border="0" bottom_border="36"
+    hborder_out_portion="1.0" vborder_out_portion="1.0f"
+    areas="body" />
+
+<!-- Stateless -->
+<element type="section" image="glass_section.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="1.0" vborder_out_portion="0.2f" />
+  
+<!-- Stateless -->
+<element type="window" image="glass_section.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="1.0" vborder_out_portion="0.2f" />
+          
+<!--                   Colors                  -->
+<color type="text" state="neutral" r="0" g="0" b="0" />
+<color type="text" state="focused" r="0" g="0" b="0" />
+
+
+</skin>

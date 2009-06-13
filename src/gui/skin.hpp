@@ -20,6 +20,7 @@ namespace GUIEngine
     class BoxRenderParams
     {
     public:
+        ITexture* image;
         int left_border, right_border, top_border, bottom_border;
         bool preserve_h_aspect_ratios;
         float hborder_out_portion, vborder_out_portion;
@@ -41,26 +42,13 @@ namespace GUIEngine
     {
         IGUISkin* m_fallback_skin;
         
-        /* f : focused; d : down state */
-        ITexture* m_tex_button;
-        ITexture* m_tex_fbutton;
-        ITexture* m_tex_spinner;
-        ITexture* m_tex_fspinner;
-        ITexture* m_tex_dspinner;
-        ITexture* m_tex_tab;
-        ITexture* m_tex_ftab;
-        ITexture* m_tex_dtab;
+
         ITexture* m_tex_ficonhighlight;
         ITexture* m_tex_bubble;
-        ITexture* m_tex_squarefocus;
         ITexture* m_tex_gaugefill;
         
-        ITexture* m_tex_checkbox;
-        ITexture* m_tex_fcheckbox;
-        ITexture* m_tex_dcheckbox;
-        ITexture* m_tex_dfcheckbox;
-        
-        void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, ITexture* source, const BoxRenderParams& params);
+
+        void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params);
         
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed);
@@ -76,8 +64,6 @@ namespace GUIEngine
         void drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused);
 
     public:
-        ITexture* m_tex_section;
-        
         Skin(IGUISkin* fallback_skin);
         ~Skin();
 
