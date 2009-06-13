@@ -55,7 +55,6 @@ namespace SkinConfig
             
             
             BoxRenderParams newParam;
-            // TODO : look for images in a skin-specific directory
             newParam.image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() );
             newParam.left_border = leftborder;
             newParam.right_border = rightborder;
@@ -139,10 +138,8 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_fallback_skin->grab();
     assert(fallback_skin != NULL);
 
-    // TODO : make those configurable in skin files
-    m_tex_ficonhighlight = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/glass/glass_iconhighlight_focus.png").c_str() );
-    m_tex_bubble = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/glass/bubble.png").c_str() );
-    
+    m_tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].image;
+    m_tex_bubble = SkinConfig::m_render_params["selectionHalo::neutral"].image;    
 }
 
 Skin::~Skin()
@@ -541,7 +538,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             
             core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
             
-            // TODO : read from skin file
             GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
@@ -576,7 +572,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                                                    glow_center_x + 45 + grow,
                                                                    glow_center_y + 25 + grow/2);
                 
-                // TODO : read from skin file
                 GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
                                                     0 /* no clipping */, 0, true /* alpha */);
             }
@@ -591,7 +586,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 //const int texture_h = m_tex_squarefocus->getSize().Height;
                 //core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["squareSelectionHalo::neutral"]);
+                drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["squareFocusHalo::neutral"]);
             }
         } // end if mark_focused
         
@@ -912,7 +907,6 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
      EGDC_ICON_HIGH_LIGHT 	Selected icons in a list or tree. 
      */
     
-    // TODO : make configurable
     switch(color)
     {
         case EGDC_GRAY_TEXT:
