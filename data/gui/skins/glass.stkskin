@@ -17,7 +17,7 @@ You can thus give different looks for different states.  Not all widgets support
 see entries and comments below to know what's supported.
 Note that checkboxes are an exception and have the following styles :
     "neutral+unchecked"
-    ""neutral+checked"
+    "neutral+checked"
     "focused+unchecked"
     "focused+checked"
 

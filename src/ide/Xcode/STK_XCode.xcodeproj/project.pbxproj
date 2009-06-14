@@ -187,10 +187,8 @@
 		9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A20F296545000D3E5D /* replay_player.cpp */; };
 		9551C8D30FC1B72500DB481B /* replay_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1A40F296545000D3E5D /* replay_recorder.cpp */; };
 		9551C8D40FC1B72500DB481B /* default_robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1AB0F296545000D3E5D /* default_robot.cpp */; };
-		9551C8D60FC1B72500DB481B /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1C10F296545000D3E5D /* stk_config.cpp */; };
 		9551C8D70FC1B72500DB481B /* track.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1CF0F296545000D3E5D /* track.cpp */; };
 		9551C8D80FC1B72500DB481B /* track_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1D10F296545000D3E5D /* track_manager.cpp */; };
-		9551C8D90FC1B72500DB481B /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1DB0F296546000D3E5D /* user_config.cpp */; };
 		9551C8DA0FC1B72500DB481B /* random_generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E20F296546000D3E5D /* random_generator.cpp */; };
 		9551C8DC0FC1B72500DB481B /* string_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E60F296546000D3E5D /* string_utils.cpp */; };
 		9551C8DD0FC1B72500DB481B /* vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1E80F296546000D3E5D /* vec3.cpp */; };
@@ -202,7 +200,6 @@
 		9551C8E30FC1B72500DB481B /* irr_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D990F532FD400BE7BA7 /* irr_driver.cpp */; };
 		9551C8E40FC1B72500DB481B /* mesh_tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */; };
 		9551C8E50FC1B72500DB481B /* moving_texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */; };
-		9551C8E60FC1B72500DB481B /* particle_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */; };
 		9551C8E70FC1B72500DB481B /* skid_marks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */; };
 		9551C8E80FC1B72500DB481B /* smoke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9E0F532FD400BE7BA7 /* smoke.cpp */; };
 		9551C8E90FC1B72500DB481B /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65D9F0F532FD400BE7BA7 /* scene.cpp */; };
@@ -239,6 +236,9 @@
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
 		95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */; };
+		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
+		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
+		95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D80FE4741D002E10AD /* water_splash.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -711,7 +711,6 @@
 		95C2B1840F296545000D3E5D /* kart_motion_state.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_motion_state.hpp; path = ../../physics/kart_motion_state.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1870F296545000D3E5D /* physics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physics.cpp; path = ../../physics/physics.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1880F296545000D3E5D /* physics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physics.hpp; path = ../../physics/physics.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B18A0F296545000D3E5D /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../player.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B19D0F296545000D3E5D /* replay_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = replay_base.cpp; path = ../../replay/replay_base.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B19E0F296545000D3E5D /* replay_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_base.hpp; path = ../../replay/replay_base.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B19F0F296545000D3E5D /* replay_buffer_tpl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_buffer_tpl.hpp; path = ../../replay/replay_buffer_tpl.hpp; sourceTree = SOURCE_ROOT; };
@@ -723,14 +722,10 @@
 		95C2B1A50F296545000D3E5D /* replay_recorder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = replay_recorder.hpp; path = ../../replay/replay_recorder.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1AB0F296545000D3E5D /* default_robot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = default_robot.cpp; path = ../../robots/default_robot.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1AC0F296545000D3E5D /* default_robot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = default_robot.hpp; path = ../../robots/default_robot.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1C10F296545000D3E5D /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../stk_config.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1C20F296545000D3E5D /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../stk_config.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1CF0F296545000D3E5D /* track.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track.cpp; path = ../../tracks/track.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D00F296545000D3E5D /* track.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track.hpp; path = ../../tracks/track.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D10F296545000D3E5D /* track_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_manager.cpp; path = ../../tracks/track_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D20F296545000D3E5D /* track_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_manager.hpp; path = ../../tracks/track_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1DB0F296546000D3E5D /* user_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = user_config.cpp; path = ../../user_config.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1DC0F296546000D3E5D /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../user_config.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E00F296546000D3E5D /* constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = constants.hpp; path = ../../utils/constants.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E10F296546000D3E5D /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = ../../utils/coord.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E20F296546000D3E5D /* random_generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_generator.cpp; path = ../../utils/random_generator.cpp; sourceTree = SOURCE_ROOT; };
@@ -744,7 +739,6 @@
 		95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moving_texture.hpp; path = ../../graphics/moving_texture.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = shadow.hpp; path = ../../graphics/shadow.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D900F532FCE00BE7BA7 /* skid_marks.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skid_marks.hpp; path = ../../graphics/skid_marks.hpp; sourceTree = SOURCE_ROOT; };
-		95C65D910F532FCE00BE7BA7 /* particle_system.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = particle_system.hpp; path = ../../graphics/particle_system.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D920F532FCE00BE7BA7 /* nitro.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = nitro.hpp; path = ../../graphics/nitro.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D930F532FCE00BE7BA7 /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = scene.hpp; path = ../../graphics/scene.hpp; sourceTree = SOURCE_ROOT; };
 		95C65D940F532FCE00BE7BA7 /* irr_driver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_driver.hpp; path = ../../graphics/irr_driver.hpp; sourceTree = SOURCE_ROOT; };
@@ -755,7 +749,6 @@
 		95C65D990F532FD400BE7BA7 /* irr_driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_driver.cpp; path = ../../graphics/irr_driver.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D9A0F532FD400BE7BA7 /* mesh_tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh_tools.cpp; path = ../../graphics/mesh_tools.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D9B0F532FD400BE7BA7 /* moving_texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moving_texture.cpp; path = ../../graphics/moving_texture.cpp; sourceTree = SOURCE_ROOT; };
-		95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = particle_system.cpp; path = ../../graphics/particle_system.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skid_marks.cpp; path = ../../graphics/skid_marks.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D9E0F532FD400BE7BA7 /* smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smoke.cpp; path = ../../graphics/smoke.cpp; sourceTree = SOURCE_ROOT; };
 		95C65D9F0F532FD400BE7BA7 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scene.cpp; path = ../../graphics/scene.cpp; sourceTree = SOURCE_ROOT; };
@@ -932,6 +925,13 @@
 		95D539260F69D61C00B4062E /* triangle3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = triangle3d.h; path = /usr/local/include/irrlicht/triangle3d.h; sourceTree = "<absolute>"; };
 		95D539270F69D61C00B4062E /* vector2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector2d.h; path = /usr/local/include/irrlicht/vector2d.h; sourceTree = "<absolute>"; };
 		95D539280F69D61C00B4062E /* vector3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vector3d.h; path = /usr/local/include/irrlicht/vector3d.h; sourceTree = "<absolute>"; };
+		95D950CD0FE473CA002E10AD /* player.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player.hpp; path = ../../config/player.hpp; sourceTree = SOURCE_ROOT; };
+		95D950CE0FE473CA002E10AD /* stk_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stk_config.cpp; path = ../../config/stk_config.cpp; sourceTree = SOURCE_ROOT; };
+		95D950CF0FE473CA002E10AD /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../config/stk_config.hpp; sourceTree = SOURCE_ROOT; };
+		95D950D00FE473CA002E10AD /* user_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = user_config.cpp; path = ../../config/user_config.cpp; sourceTree = SOURCE_ROOT; };
+		95D950D10FE473CA002E10AD /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../config/user_config.hpp; sourceTree = SOURCE_ROOT; };
+		95D950D70FE4741D002E10AD /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
+		95D950D80FE4741D002E10AD /* water_splash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = water_splash.cpp; path = ../../graphics/water_splash.cpp; sourceTree = SOURCE_ROOT; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
@@ -1101,6 +1101,7 @@
 			children = (
 				95C2AC260F296540000D3E5D /* audio */,
 				95C2AC360F296540000D3E5D /* bullet */,
+				95D950CC0FE473CA002E10AD /* config */,
 				95C2AE250F296541000D3E5D /* challenges */,
 				95C2AE370F296541000D3E5D /* enet */,
 				950557790F696A900056E88C /* gui */,
@@ -1121,11 +1122,6 @@
 				95C2B1360F296545000D3E5D /* main.cpp */,
 				95C2B1380F296545000D3E5D /* main_loop.cpp */,
 				95C2B1390F296545000D3E5D /* main_loop.hpp */,
-				95C2B18A0F296545000D3E5D /* player.hpp */,
-				95C2B1C10F296545000D3E5D /* stk_config.cpp */,
-				95C2B1C20F296545000D3E5D /* stk_config.hpp */,
-				95C2B1DB0F296546000D3E5D /* user_config.cpp */,
-				95C2B1DC0F296546000D3E5D /* user_config.hpp */,
 			);
 			name = src;
 			path = ../..;
@@ -1542,6 +1538,8 @@
 		95C2AE870F296542000D3E5D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				95D950D70FE4741D002E10AD /* water_splash.hpp */,
+				95D950D80FE4741D002E10AD /* water_splash.cpp */,
 				95C65D980F532FD400BE7BA7 /* camera.cpp */,
 				95C65D960F532FCE00BE7BA7 /* camera.hpp */,
 				9540E2490FD5F8A8002985B8 /* explosion.cpp */,
@@ -1558,8 +1556,6 @@
 				95C65D8E0F532FCE00BE7BA7 /* moving_texture.hpp */,
 				95C65DA10F532FD400BE7BA7 /* nitro.cpp */,
 				95C65D920F532FCE00BE7BA7 /* nitro.hpp */,
-				95C65D9C0F532FD400BE7BA7 /* particle_system.cpp */,
-				95C65D910F532FCE00BE7BA7 /* particle_system.hpp */,
 				95C65D9F0F532FD400BE7BA7 /* scene.cpp */,
 				95C65D930F532FCE00BE7BA7 /* scene.hpp */,
 				95C65D9D0F532FD400BE7BA7 /* skid_marks.cpp */,
@@ -1974,6 +1970,19 @@
 			path = /usr/local/include/irrlicht;
 			sourceTree = "<absolute>";
 		};
+		95D950CC0FE473CA002E10AD /* config */ = {
+			isa = PBXGroup;
+			children = (
+				95D950CD0FE473CA002E10AD /* player.hpp */,
+				95D950CE0FE473CA002E10AD /* stk_config.cpp */,
+				95D950CF0FE473CA002E10AD /* stk_config.hpp */,
+				95D950D00FE473CA002E10AD /* user_config.cpp */,
+				95D950D10FE473CA002E10AD /* user_config.hpp */,
+			);
+			name = config;
+			path = ../../config;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2201,10 +2210,8 @@
 				9551C8D20FC1B72500DB481B /* replay_player.cpp in Sources */,
 				9551C8D30FC1B72500DB481B /* replay_recorder.cpp in Sources */,
 				9551C8D40FC1B72500DB481B /* default_robot.cpp in Sources */,
-				9551C8D60FC1B72500DB481B /* stk_config.cpp in Sources */,
 				9551C8D70FC1B72500DB481B /* track.cpp in Sources */,
 				9551C8D80FC1B72500DB481B /* track_manager.cpp in Sources */,
-				9551C8D90FC1B72500DB481B /* user_config.cpp in Sources */,
 				9551C8DA0FC1B72500DB481B /* random_generator.cpp in Sources */,
 				9551C8DC0FC1B72500DB481B /* string_utils.cpp in Sources */,
 				9551C8DD0FC1B72500DB481B /* vec3.cpp in Sources */,
@@ -2216,7 +2223,6 @@
 				9551C8E30FC1B72500DB481B /* irr_driver.cpp in Sources */,
 				9551C8E40FC1B72500DB481B /* mesh_tools.cpp in Sources */,
 				9551C8E50FC1B72500DB481B /* moving_texture.cpp in Sources */,
-				9551C8E60FC1B72500DB481B /* particle_system.cpp in Sources */,
 				9551C8E70FC1B72500DB481B /* skid_marks.cpp in Sources */,
 				9551C8E80FC1B72500DB481B /* smoke.cpp in Sources */,
 				9551C8E90FC1B72500DB481B /* scene.cpp in Sources */,
@@ -2261,6 +2267,9 @@
 				95263DEF0FD7471900CF5F92 /* highscores.cpp in Sources */,
 				95263DF00FD7471900CF5F92 /* history.cpp in Sources */,
 				95263DF10FD7471900CF5F92 /* race_manager.cpp in Sources */,
+				95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */,
+				95D950D30FE473CA002E10AD /* user_config.cpp in Sources */,
+				95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
