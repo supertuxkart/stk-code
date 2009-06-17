@@ -2,7 +2,7 @@ All images in this directory come from the Tango icon project are Public Domain 
 
 Except :
 
-background : derivated from an OpenClipart public-domain image
+background in glass skin : under CC-BY-SA by 'elisee'
 
 difficulty_*.png, released under Creative-Commons BY-SA 3, By Constantin Pelikan
 
