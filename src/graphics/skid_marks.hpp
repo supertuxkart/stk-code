@@ -22,6 +22,9 @@
 
 #include <vector>
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "utils/vec3.hpp"
 
 class Coord;
@@ -31,19 +34,21 @@ class Kart;
 class SkidMarks
 {
 private:
-                 /** Reference to the kart to which these skidmarks belong. */
-    const Kart  &m_kart;
-                 /** True if the kart was skidding in the previous frame. */
-    bool         m_skid_marking;
-                 /** Reduce effect of Z-fighting. */
-    float        m_width;
-                 /** Index of current (last added) skid mark quad. */
-    int          m_current;
+    /** Reference to the kart to which these skidmarks belong. */
+    const Kart        &m_kart;
+    /** True if the kart was skidding in the previous frame. */
+    bool               m_skid_marking;
+    /** Reduce effect of Z-fighting. */
+    float              m_width;
+    /** Index of current (last added) skid mark quad. */
+    int                m_current;
+    /** Initial alpha value. */
+    static const int   m_start_alpha;
 
-                /** Initial alpha value. */
-    static const float m_start_alpha;
+    /** Material to use for the skid marks. */
+    video::SMaterial  *m_material;
 
-    class SkidMarkQuads //: public ssgVtxTable
+    class SkidMarkQuads : public scene::SMeshBuffer
     {
         /** Used to move skid marks at the same location slightly on
          *  top of each other to avoid a 'wobbling' effect when sometines
@@ -54,23 +59,31 @@ private:
         float m_fade_out;
         /** For culling, we need the overall radius of the skid marks. We
          *  approximate this by maintaining an axis-aligned boundary box. */
-        Vec3        m_aabb_min, m_aabb_max;
+        core::aabbox3df m_aabb;
+        /** Material to use for the skid marks. */
+        video::SMaterial  *m_material;
     public:
-        #ifndef HAVE_IRRLICHT
             SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
-                           ssgSimpleState *state, float z_offset);
-#endif
-        void recalcBSphere();
+                           video::SMaterial *material, float z_offset);
         void add          (const Vec3 &left,
                            const Vec3 &right);
         void fade         (float f);
+        /** Returns the aabb of this skid mark quads. */
+        const core::aabbox3df &getAABB() { return m_aabb; }
     };  // SkidMarkQuads
 
     /** Two skidmark objects for the left and right wheel. */
-    std::vector <SkidMarkQuads *> m_left, m_right;
-    /** The state for colour etc. */
-    //ssgSimpleState               *m_skid_state;
-    static float m_avoid_z_fighting;
+    std::vector<SkidMarkQuads *>     m_left, m_right;
+
+    /** The meshes - each mesh containing two mesh buffers (left/right). */
+    std::vector<scene::IMesh *>      m_meshes;
+
+    /** The nodes where each left/right pair is attached to. */
+    std::vector<scene::ISceneNode *> m_nodes;
+
+    /** Shared static so that consecutive skidmarks are at a slightly
+     *  different height. */
+    static float                  m_avoid_z_fighting;
 public:
          SkidMarks(const Kart& kart, float width=0.2f);
         ~SkidMarks();
