@@ -35,6 +35,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <algorithm>
 
