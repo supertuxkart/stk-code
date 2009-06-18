@@ -60,8 +60,6 @@ private:
         /** For culling, we need the overall radius of the skid marks. We
          *  approximate this by maintaining an axis-aligned boundary box. */
         core::aabbox3df m_aabb;
-        /** Material to use for the skid marks. */
-        video::SMaterial  *m_material;
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right, 
                            video::SMaterial *material, float z_offset);

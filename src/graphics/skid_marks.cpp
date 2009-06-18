@@ -217,7 +217,6 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
 
-    m_material = material;
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
     add(left, right);
@@ -232,7 +231,7 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
     int n = Vertices.size();
 
     video::S3DVertex v;
-    v.Color = m_material->DiffuseColor;
+    v.Color = Material.DiffuseColor;
     v.Color.setAlpha(m_start_alpha);
     v.Pos = left.toIrrVector();
     v.Pos.Y += m_z_offset;
@@ -267,12 +266,14 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
  */
 void SkidMarks::SkidMarkQuads::fade(float f)
 {
-    m_fade_out += f*255;
-    if(m_fade_out>0.1f*255)
+    m_fade_out += f;
+    // Changing the alpha value is quite expensive, so it's only done
+    // about 10 times till 0 is reached. 
+    if(m_fade_out*10>SkidMarks::m_start_alpha)
     {
         video::SColor &c=Material.DiffuseColor;
         int a=c.getAlpha();
-        a -= a<m_fade_out ? a : m_fade_out;
+        a -= a<m_fade_out ? a : (int)m_fade_out;
         c.setAlpha(a);
         for(unsigned int i=0; i<Vertices.size(); i++)
         {
