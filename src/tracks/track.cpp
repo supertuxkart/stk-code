@@ -1270,6 +1270,8 @@ void Track::loadTrackModel()
     const core::vector3df &sun_pos = getSunPos();
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
+    // HACK & TEST: checking how ambient looks for some things, must be properly done once we reach an agreement
+    light.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
     m_light->setLightData(light);
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
