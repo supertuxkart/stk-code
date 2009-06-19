@@ -29,7 +29,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, unsigned int item_id, bool rotate)
 {
     m_rotate           = rotate;
-    m_event_handler           = NULL;
+    m_event_handler    = NULL;
     m_deactive_time    = 0;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
@@ -39,6 +39,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
     m_node             = irr_driver->addMesh(mesh);
+    // If lighting would be enabled certain items (esp. bananas)
+    // don't look smooth, so for now generally disable lighting
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
     m_node->setPosition(xyz.toIrrVector());
     m_node->grab();
 }   // Item
@@ -102,11 +105,11 @@ void Item::update(float delta)
  *  has been collected, and the time to return to the parameter. 
  *  \param t Time till the object reappears (defaults to 2 seconds).
  */
-void Item::isCollected(float t)
+void Item::collected(float t)
 {
     m_collected        = true;
     // Note if the time is negative, in update the m_collected flag will
     // be automatically set to false again.
     m_time_till_return = t;
-}
+}   // isCollected
 

@@ -66,7 +66,7 @@ public:
                         bool rotate=true);
     virtual       ~Item ();
     void          update  (float delta);
-    virtual void  isCollected(float t=2.0f);
+    virtual void  collected(float t=2.0f);
 	
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, and

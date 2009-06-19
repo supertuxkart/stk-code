@@ -44,10 +44,10 @@ BubbleGumItem::~BubbleGumItem()
  *  inactivates itself for 0.5 seconds, but disables the reappearing of
  *  the bubble gum.
  */
-void BubbleGumItem::isCollected(float t)
+void BubbleGumItem::collected(float t)
 {
     deactivate(0.5);
     // Set the time till reappear to -1 seconds --> the item will 
     // reappear immediately.
-    Item::isCollected(-1);
+    Item::collected(-1);
 }   // isCollected

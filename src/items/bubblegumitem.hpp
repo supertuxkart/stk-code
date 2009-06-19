@@ -36,7 +36,7 @@ public:
                                unsigned int item_id);
 #endif
                 ~BubbleGumItem ();
-    virtual void isCollected(float t);
+    virtual void collected(float t);
 }
 ;   // class Item
 
