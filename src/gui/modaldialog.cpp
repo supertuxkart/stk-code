@@ -56,7 +56,10 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
     core::rect< s32 > area2(0, 0, m_area.getWidth(), m_area.getHeight());
-    GUIEngine::getGUIEnv()->addButton( area2, m_irrlicht_window, -1, stringw(_("Press a key")).c_str() );
+    IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Press a key")).c_str(),
+                                          area2, false /* border */, true /* word wrap */,
+                                          m_irrlicht_window);
+    label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 }
 
 // ------------------------------------------------------------------------------------------------------
