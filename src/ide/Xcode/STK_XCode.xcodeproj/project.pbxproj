@@ -32,6 +32,7 @@
 		9540E24F0FD5F8A8002985B8 /* explosion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E2490FD5F8A8002985B8 /* explosion.cpp */; };
 		9540E2500FD5F8A8002985B8 /* material_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E24B0FD5F8A8002985B8 /* material_manager.cpp */; };
 		9540E2510FD5F8A8002985B8 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E24D0FD5F8A8002985B8 /* material.cpp */; };
+		954A57DC0FEC5AE40073C16C /* modaldialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954A57DB0FEC5AE40073C16C /* modaldialog.cpp */; };
 		9551C8270FC1B72500DB481B /* music_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC280F296540000D3E5D /* music_information.cpp */; };
 		9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
 		9551C8290FC1B72500DB481B /* sfx_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */; };
@@ -336,6 +337,8 @@
 		9540E24E0FD5F8A8002985B8 /* material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = material.hpp; path = ../../graphics/material.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../utils/ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
+		954A57DB0FEC5AE40073C16C /* modaldialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = modaldialog.cpp; path = games/supertuxkart/src/gui/modaldialog.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		954A57ED0FEC5BB00073C16C /* modaldialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = modaldialog.hpp; path = games/supertuxkart/src/gui/modaldialog.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9551C7F80FC1B63C00DB481B /* libintl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libintl.framework; path = /Library/Frameworks/libintl.framework; sourceTree = "<absolute>"; };
 		9551C7F90FC1B63C00DB481B /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = /Library/Frameworks/Ogg.framework; sourceTree = "<absolute>"; };
 		9551C7FA0FC1B63C00DB481B /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
@@ -990,10 +993,12 @@
 				951C35BD0FC066ED00A48379 /* credits.hpp */,
 				9505577A0F696A900056E88C /* engine.cpp */,
 				9505577B0F696A900056E88C /* engine.hpp */,
-				9505577C0F696A900056E88C /* my_button.cpp */,
-				9505577D0F696A900056E88C /* my_button.hpp */,
 				95C1E3FF0F699427005D33E6 /* font.cpp */,
 				95C1E4020F69943D005D33E6 /* font.hpp */,
+				954A57DB0FEC5AE40073C16C /* modaldialog.cpp */,
+				954A57ED0FEC5BB00073C16C /* modaldialog.hpp */,
+				9505577C0F696A900056E88C /* my_button.cpp */,
+				9505577D0F696A900056E88C /* my_button.hpp */,
 				95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */,
 				95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */,
 				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
@@ -2270,6 +2275,7 @@
 				95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */,
 				95D950D30FE473CA002E10AD /* user_config.cpp in Sources */,
 				95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */,
+				954A57DC0FEC5AE40073C16C /* modaldialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

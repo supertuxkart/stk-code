@@ -14,9 +14,9 @@
         <list id="players" proportion="5" width="75%" align="center"/>
         <spacer width="20" height="25"/>
         
-        <button id="addplayer" x="20" width="35%" height="30" text="Add Player" />
+        <button id="addplayer" x="20" width="35%" height="30" text="Add Player" align="center"/>
         <spacer width="50" height="10" /> 
-        <button id="rempayer" x="20" width="35%" height="30" text="Remove Player" />
+        <button id="rempayer" x="20" width="35%" height="30" text="Remove Player" align="center"/>
 
         <spacer width="20" height="15"/>
     </box>

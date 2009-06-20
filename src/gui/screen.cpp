@@ -1,16 +1,35 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2009 Marianne Gagnon
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
 #include <iostream>
 #include <sstream>
 #include <assert.h>
 
 #include "irrlicht.h"
-#include "utils/translation.hpp"
 
-#include "gui/screen.hpp"
-#include "gui/engine.hpp"
-#include "gui/widget.hpp"
-#include "gui/state_manager.hpp"
-#include "io/file_manager.hpp"
 #include "input/input.hpp"
+#include "io/file_manager.hpp"
+#include "gui/engine.hpp"
+#include "gui/modaldialog.hpp"
+#include "gui/screen.hpp"
+#include "gui/state_manager.hpp"
+#include "gui/widget.hpp"
+#include "utils/translation.hpp"
 
 using namespace irr;
 
@@ -260,28 +279,6 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
     } // next widget
     
 }
-// -----------------------------------------------------------------------------
-//ok, global is not nice... but in the end there will only ever be maximum 1 dialog at a time
-static IGUIWindow* modalWindow = NULL;
-
-void Screen::showModalDialog()
-{
-    const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    const int w = (int)(frame_size.Width*0.4f);
-    const int h = (int)(frame_size.Height*0.4f);
-    core::rect< s32 > area( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
-                           dimension2d< s32 >(w, h) );
-    
-    modalWindow = GUIEngine::getGUIEnv()->addWindow  	( area, true /* modal */ );
-    
-    core::rect< s32 > area2(0, 0, w, h);
-    GUIEngine::getGUIEnv()->addButton( area2, modalWindow, -1, stringw(_("Press a key")).c_str() );
-}
-// -----------------------------------------------------------------------------
-void Screen::dismissModalDialog()
-{
-    modalWindow->remove();
-}
 
 // -----------------------------------------------------------------------------
 /**
@@ -530,6 +527,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             
         case PA_BRAKE:
         {
+            std::cerr << "brake\n";
             IGUIElement *el, *first = NULL, *closest = NULL;
             el = GUIEngine::getGUIEnv()->getFocus();
             

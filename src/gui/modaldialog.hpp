@@ -1,0 +1,59 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2009 Marianne Gagnon
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "irrlicht.h"
+
+/**
+  * Base class, derive your own.
+  * Only once instance at a time (if you create a 2nd the first will be destroyed).
+  * You can call static function 'dismiss' to simply close current dialog (so you don't
+  * need to keep track of instances yourself)
+  */
+class ModalDialog
+{
+protected:
+    irr::gui::IGUIWindow* m_irrlicht_window;
+    core::rect< s32 > m_area;
+    
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    ModalDialog(const float percentWidth, const float percentHeight);
+    
+public:
+    virtual ~ModalDialog();
+    
+    static void dismiss();
+};
+
+class PressAKeyDialog : public ModalDialog
+{
+public:
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    PressAKeyDialog(const float percentWidth, const float percentHeight);
+};
+
+class EnterPlayerNameDialog : public ModalDialog
+{
+public:
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
+};
