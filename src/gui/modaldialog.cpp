@@ -67,6 +67,21 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    core::rect< s32 > area2(0, 0, m_area.getWidth(), m_area.getHeight());
-    GUIEngine::getGUIEnv()->addButton( area2, m_irrlicht_window, -1, stringw(_("Enter the new player's name")).c_str() );
+    core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
+    IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
+                                                                  area_top, false /* border */, true /* word wrap */,
+                                                                  m_irrlicht_window);
+    label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+  
+    IGUIFont* font = GUIEngine::getFont();
+    const int textHeight = font->getDimension(L"X").Height;
+    
+    const int bottomYFrom = m_area.getHeight()/2;
+    const int bottomYTo = m_area.getHeight();
+    const int bottomHeight = bottomYTo - bottomYFrom;
+    const int textAreaYFrom = bottomYFrom + bottomHeight/2 - textHeight/2;
+    
+    core::rect< s32 > area_bottom(50, textAreaYFrom - 10, m_area.getWidth()-50, textAreaYFrom + textHeight + 10);
+    IGUIEditBox* textCtrl = GUIEngine::getGUIEnv()->addEditBox (L"", area_bottom, true /* border */, m_irrlicht_window);
+    GUIEngine::getGUIEnv()->setFocus(textCtrl);
 }

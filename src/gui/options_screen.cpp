@@ -288,6 +288,11 @@ namespace StateManager
             eventInput(devices, name2);
     }
 
+    void eventPlayers(Widget* widget, const std::string& name)
+    {
+        new EnterPlayerNameDialog(0.5f, 0.4f);
+    }
+    
     // -----------------------------------------------------------------------------
     static PlayerAction binding_to_set;
     static std::string binding_to_set_button;
@@ -514,6 +519,7 @@ namespace StateManager
         {
             if(screen_name == "options_av.stkgui") eventAudioVideo(widget, name);
             else if(screen_name == "options_input.stkgui") eventInput(widget, name);
+            else if(screen_name == "options_players.stkgui") eventPlayers(widget, name);
         }
 
     }

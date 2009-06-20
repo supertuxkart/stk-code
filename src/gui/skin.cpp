@@ -842,6 +842,12 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
+    if(dynamic_cast<IGUIEditBox*>(element) != NULL)
+    {
+        GUIEngine::getDriver()->draw2DRectangle( SColor(100, 150, 150, 150), rect );
+        return;
+    }
+    
     const int id = element->getID();
     Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
     
