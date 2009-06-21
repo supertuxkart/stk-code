@@ -72,9 +72,14 @@ void IntUserConfigParam::write(std::ofstream& stream) const
 void IntUserConfigParam::read(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
-    if(child == NULL) return;
+    if(child == NULL)
+    {
+        //std::cout << "Couldn't find int parameter " << paramName << std::endl;
+        return;
+    }
     
     child->get( "value", &value );
+    //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
 
 StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName)
@@ -271,40 +276,11 @@ int UserConfig::CheckAndCreateDir()
     }
     if(test.is_open()) test.close();
     return 1;
-    
-    /*
-    const std::string DIRNAME = file_manager->getHomeDir();
-    ulDir*            u       = ulOpenDir(DIRNAME.c_str());
-    if(u)
-    {  // OK, directory exists
-        ulCloseDir(u);
-        return 1;
-    }
-    // The directory does not exist, try to create it
-    int bError;
-#if defined(WIN32) && !defined(__CYGWIN__)
-    bError = _mkdir(DIRNAME.c_str()      ) != 0;
-#else
-    bError = mkdir(DIRNAME.c_str(), 0755) != 0;
-#endif
-    if(bError)
-    {
-        fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
-                DIRNAME.c_str());
-        return 0;
-    }
-    else
-    {
-        printf("Config directory '%s' successfully created.\n",DIRNAME.c_str());
-        return 2;
-    }
-     */
-
+   
 }   // CheckAndCreateDir
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
-// TODO : implement
 void UserConfig::loadConfig(const std::string& filename)
 {
     
@@ -314,16 +290,7 @@ void UserConfig::loadConfig(const std::string& filename)
         std::cerr << "Could not read user config file file " << filename.c_str() << std::endl;
         return;
     }
-    
-    const XMLNode* node = root;
-    //const XMLNode* node = root->getNode("stkconfig");
-    //if(node == NULL)
-    //{
-    //    std::cerr << "Error, malformed user config file! Contains no <stkconfig> tag!\n";
-    //    return;
-    //}
-    
-    
+
     int configFileVersion = CURRENT_CONFIG_VERSION;
     if(!root->get("version", &configFileVersion) < 1)
     {
@@ -372,225 +339,19 @@ void UserConfig::loadConfig(const std::string& filename)
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
-        all_params[i]->read(node);
+        all_params[i]->read(root);
     }
     
-    
-#if 0
-    std::string temp;
-    const lisp::Lisp* root = 0;
-    int i = 0;
-    int dirExist = CheckAndCreateDir();
-    // Check if the config directory exists. If not, exit without an error
-    // message, an appropriate message was printed by CheckAndCreateDir
-    if (dirExist != 1) return;
-
-    try
-    {
-        lisp::Parser parser;
-        root = parser.parse(filename);
-    }
-    catch(std::exception& e)
-    {
-        (void)e;  // avoid warning about unreferenced local variable
-        printf("Config file '%s' does not exist, it will be created.\n",
-               filename.c_str());
-        // This will initialise the last input configuration with the
-        // default values from the current (=default) player input
-        // device configuration.
-        // TODO - input I/O
-        // readLastInputConfigurations(NULL);
-
-        delete root;
-        return;
-    }
-
-    // In older config files, nitro is still named 'wheelie', and drift is jump
-    std::string nitro_name="nitro";
-    std::string drift_name="drift";
-    try
-    {
-        const lisp::Lisp* lisp = root->getLisp("tuxkart-config");
-        if(!lisp) 
-        {
-            throw std::runtime_error("No tuxkart-config node");
-        }
-        int configFileVersion = 0;
-        lisp->get("configFileVersion", configFileVersion);
-        if (configFileVersion < CURRENT_CONFIG_VERSION)
-        {
-            // Give some feedback to the user about what was changed.
-            // Do NOT add a break after the case, so that all changes will be printed
-            printf("\nConfig file version '%d' is too old.\n"
-                     "The following changes have been applied in the current SuperTuxKart version:\n",
-                   configFileVersion);
-            int needToAbort=0;
-            switch(configFileVersion)
-            {
-            case 0:  printf("- Single window menu, old status display,new keyboard style settings were removed\n");
-                     needToAbort=std::max(needToAbort,0);
-            case 1:  printf("- Key bindings were changed, please check the settings. All existing values were discarded.\n");
-                     needToAbort=std::max(needToAbort,1);// old keybinds wouldn't make any sense
-            case 2:  printf("Added username, using: '%s'.\n", UserConfigParams::m_username.c_str());
-                     needToAbort=std::max(needToAbort,0);
-            case 3:  printf("Added username for all players.\n");
-                     needToAbort=std::max(needToAbort,0);
-            case 4:  printf("Added jumping, which invalidates all key bindings.\n");
-                     needToAbort=std::max(needToAbort,0);
-            case 6:  printf("Added nitro and drifting, removed jumping and wheelie.\n");
-                     nitro_name="wheelie";
-                     drift_name="jump";
-                     needToAbort=std::max(needToAbort,0);
-            case 99: break;
-            default: printf("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n", configFileVersion);
-                     needToAbort=1;
-                     break;
-            }
-            if(needToAbort)
-            {
-                printf("The old config file is deleted, a new one will be created.\n");
-                delete root;
-                return;
-            }
-            printf("This warning can be ignored, the config file will be automatically updated.\n");
-            // Keep on reading the config files as far as possible
-        }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
-
-        /*get toggles*/
-        lisp->get("fullscreen",       m_fullscreen);
-        bool doSFX=false;                                // avoid warning
-        lisp->get("sfx" ,             doSFX);
-        m_sfx = doSFX ? UC_ENABLE : UC_DISABLE;
-        lisp->get("nostartscreen",    m_no_start_screen);
-        bool doMusic=false;                              // avoid warning
-        lisp->get("music",            doMusic);
-        m_music = doMusic ? UC_ENABLE : UC_DISABLE;
-        lisp->get("graphical-effects",m_graphical_effects);
-        lisp->get("displayFPS",       m_display_fps);
-        lisp->get("itemStyle",        m_item_style);
-        lisp->get("background-music", m_background_music);
-        lisp->get("max-fps",          m_max_fps);
-        lisp->get("sfx-volume",       m_sfx_volume);
-        lisp->get("music-volume",     m_music_volume);
-        
-        /*get resolution width/height*/
-        lisp->get("width",            m_width);
-        lisp->get("height",           m_height);
-        lisp->get("prev_width",       m_prev_width);
-        lisp->get("prev_height",      m_prev_height);
-        lisp->get("prev_windowed",    m_prev_windowed);
-        //detect if resolution change previously crashed STK
-        lisp->get("crash_detected",   m_crashed);
-        // blacklisted resolutions
-        lisp->getVector("blacklisted_resolutions",
-                                      m_blacklist_res);
-        /*Get default number of karts, number of laps, and difficulty. */
-        lisp->get("karts",            m_num_karts);
-        lisp->get("laps",             m_num_laps);
-        lisp->get("difficulty",       m_difficulty);
-
-        lisp->get("kart-group",       m_kart_group);
-        lisp->get("track-group",      m_track_group);
-        lisp->get("last-track",       m_last_track);
-
-        // Get background image index.
-        lisp->get("background",       m_background_index);
-
-        // Handle loading the stick config in it own method.
-        //readStickConfigs(lisp);
-
-        // Address of server
-        lisp->get("server-address",   m_server_address);
-        lisp->get("server-port",      m_server_port);
-
-        // Unlock information:
-        const lisp::Lisp* unlock_info = lisp->getLisp("unlock-info");
-        if(unlock_info) unlock_manager->load(unlock_info);
-
-        /*get player configurations*/
-        // TODO : save/load players to/from file
-        /*
-        for(i=0; i<PLAYERS; ++i)
-        {
-            temp = "player-";
-            temp += i+'1';
-
-            const lisp::Lisp* reader = lisp->getLisp(temp);
-            if(!reader)
-            {
-                std::ostringstream msg;
-                msg << "No '" << temp << "' node";
-                throw std::runtime_error(msg.str());
-            }
-            std::string name;
-            reader->get("name", name);
-            if (configFileVersion <= 3)
-            {
-                // For older config files, replace the default player
-                // names "Player %d" with the user name
-                std::ostringstream sDefaultName;
-
-                sDefaultName << "Player " << i+1;
-                // If the config file does not contain a name or the old
-                // default name, set the default username as player name.
-                if(name.size()==0 || name==sDefaultName.str()) name=m_username;
-            }
-            m_player[i].setName(name);
-
-            int lastKartId = 0;
-            reader->get("lastKartId", lastKartId);
-            m_player[i].setLastKartId(lastKartId);
-
-            // Don't read the key bindings from a config file earlier than
-            // version 5. These config files contain (unused) keybindings for
-            // jumping, so it is possible that the same key is used for
-            // jumping for player 1 and something else for another player.
-            // In this case jumping for player one would be disabled (see
-            // unsetDuplicates). To be on the safe side, old key bindings
-            // are just discarded.
-            if (configFileVersion <= 4)
-            {
-                m_warning=_("Old config file found, check your key bindings!");
-            }  // configFileVersion <= 4
-
-            // Retrieves a player's INPUT configuration
-            // TODO - input config I/O
-            //for(int ka=PA_FIRST+1; ka<PA_COUNT; ka++)
-            //{
-            //   readPlayerInput(reader, KartActionStrings[ka],
-            //        (KartAction)ka, i);
-            //}
-
-            // Leave those in for backwards compatibility (i.e. config files
-            // with jump/wheelie). If jump/wheelie are not defined, nothing
-            // happens (the same input is read again).
-            //readPlayerInput(reader, nitro_name, KA_NITRO, i);
-            //readPlayerInput(reader, drift_name, KA_DRIFT, i);
-        }   // for i < PLAYERS
-         */
-
-        // Read the last input device configurations. It is important that this
-        // happens after reading the player config, since if no last config
-        // is given, the last config is initialised with the current player
-        // config.
-        // TODO - input I/O
-        // readLastInputConfigurations(lisp);
-    }
-    catch(std::exception& e)
-    {
-        fprintf(stderr, "Error while parsing config '%s':\n", filename.c_str());
-        fprintf(stderr, "%s", e.what());
-        fprintf(stderr, "\n");
-    }
-
     delete root;
-#endif
+    
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig(const std::string& filepath)
 {
+    // TODO : save challenges state
+    
     const int DIR_EXIST = CheckAndCreateDir();
     // Check if the config directory exists (again, since it was already checked
     // when reading the config file - this is done in case that the problem was
