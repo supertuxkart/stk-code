@@ -75,7 +75,7 @@ void Font::Print(const char *text, int size,
 #ifdef HAVE_IRRLICHT
 #else
     // Only scale for lower resolution
-    float fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) 
+    float fontScaling = UserConfigParams::m_width<800 ? ((float)UserConfigParams::m_width/800.0f) 
                                                  : 1.0f;
     int   sz          = (int)(size*std::max(scale_x,scale_y)*fontScaling);
 
@@ -87,14 +87,14 @@ void Font::Print(const char *text, int size,
     if(x==CENTER_OF_SCREEN)
     {
         if(left ==-1) left  = 0;
-        if(right==-1) right = user_config->m_width-1;
+        if(right==-1) right = UserConfigParams::m_width-1;
         int width = right-left+1;
         x         = (width - W)/2 + left;
     }
 
     if(y==CENTER_OF_SCREEN)
     {
-        if(top    == -1) top    = user_config->m_height-1;
+        if(top    == -1) top    = UserConfigParams::m_height-1;
         if(bottom == -1) bottom = 0;
         int height = top-bottom+1;
         y = (height - H)/2 + bottom;
@@ -128,7 +128,7 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
                      int left, int right, int top, int bottom            )
 {
     // Only scale for lower resolution
-    float fontScaling = user_config->m_width<800 ? ((float)user_config->m_width/800.0f) 
+    float fontScaling = UserConfigParams::m_width<800 ? ((float)UserConfigParams::m_width/800.0f) 
                                                  : 1.0f;
     int   sz          = (int)(size*std::max(scale_x,scale_y)*fontScaling);
 
@@ -140,14 +140,14 @@ void Font::PrintBold(const std::string &text, int size, int x, int y,
     if(x==CENTER_OF_SCREEN)
     {
         if(left ==-1) left  = 0;
-        if(right==-1) right = user_config->m_width-1;
+        if(right==-1) right = UserConfigParams::m_width-1;
         int width = right-left+1;
         x         = (width - W)/2 + left;
     }
 
     if(y==CENTER_OF_SCREEN)
     {
-        if(top    == -1) top    = user_config->m_height-1;
+        if(top    == -1) top    = UserConfigParams::m_height-1;
         if(bottom == -1) bottom = 0;
         int height = top-bottom+1;
         y = (height - H)/2 + bottom;
@@ -199,8 +199,8 @@ void Font::getBBox(const std::string &text, int size, bool italic,
 {
 #ifndef HAVE_IRRLICHT
     m_fnt->getBBox(text.c_str(), (float)size, italic, left, right, bot, top);
-    if(user_config->m_width<800) {
-        float fract=(float)user_config->m_width/800.0f;
+    if(UserConfigParams::m_width<800) {
+        float fract=(float)UserConfigParams::m_width/800.0f;
         *left  *= fract;
         *right *= fract;
         if(bot) *bot   *= fract;
@@ -228,8 +228,8 @@ void Font::getBBoxMultiLine(const std::string &text, int size, bool italic,
         if(right)*right = std::max(*right, r); 
         if(top)  *top   = std::max(*top,   t);
     }
-    if(user_config->m_width<800) {
-        float fract=(float)user_config->m_width/800.0f;
+    if(UserConfigParams::m_width<800) {
+        float fract=(float)UserConfigParams::m_width/800.0f;
         *left  *= fract;
         *right *= fract;
         if(bot) *bot   *= fract;

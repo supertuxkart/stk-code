@@ -89,7 +89,7 @@ void Attachment::clear()
 // -----------------------------------------------------------------------------
 void Attachment::hitBanana(const Item &item, int new_attachment)
 {
-    if(user_config->m_profile) return;
+    if(UserConfigParams::m_profile) return;
     float leftover_time   = 0.0f;
     
     switch(getType())   // If there already is an attachment, make it worse :)

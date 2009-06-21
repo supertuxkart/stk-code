@@ -217,13 +217,13 @@ void ItemManager::cleanup()
         // FIXME: This should go in a system-wide configuration file,
         //        and only one of this and the hard-coded settings in
         //        setDefaultItemStyle are necessary!!!
-        loadItemStyle(user_config->m_item_style);
+        loadItemStyle(UserConfigParams::m_item_style);
     }
     catch(std::runtime_error)
     {
         fprintf(stderr,"The item style '%s' in your configuration file does not exist.\nIt is ignored.\n",
-                user_config->m_item_style.c_str());
-        user_config->m_item_style="";
+                UserConfigParams::m_item_style.c_str());
+        UserConfigParams::m_item_style="";
     }
 
     try

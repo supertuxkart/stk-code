@@ -555,12 +555,12 @@ void Kart::update(float dt)
     m_attachment.update(dt);
 
     //smoke drawing control point
-    if ( user_config->m_graphical_effects )
+    if ( UserConfigParams::m_graphical_effects )
     {
         m_smoke_system->update(dt);
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
-    }  // user_config->m_graphical_effects
+    }  // UserConfigParams::m_graphical_effects
     updatePhysics(dt);
 
     //kart_info.m_last_track_coords = kart_info.m_curr_track_coords;

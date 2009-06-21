@@ -82,7 +82,7 @@ void MainLoop::run()
                                                
             // Throttle fps if more than maximum, which can reduce 
             // the noise the fan on a graphics card makes
-            if( dt*user_config->m_max_fps < 1000.0f)
+            if( dt*UserConfigParams::m_max_fps < 1000.0f)
             {
                 //SDL_Delay has a granularity of 10ms on most platforms, so
                 //most likely when frames go faster than 125 frames, at times
@@ -118,7 +118,7 @@ void MainLoop::run()
             if(!race_manager->getWorld()->isFinishPhase())
                 network_manager->sendUpdates();
             music_on = false; 
-            if(user_config->m_profile) dt=1.0f/60.0f;
+            if(UserConfigParams::m_profile) dt=1.0f/60.0f;
             // In the first call dt might be large (includes loading time),
             // which can cause the camera to significantly tilt
             stk_scene->draw(RaceManager::getWorld()->getPhase()==SETUP_PHASE ? 0.0f : dt);
@@ -135,10 +135,10 @@ void MainLoop::run()
                 history->update(dt);
                 RaceManager::getWorld()->update(dt);
 
-                if(user_config->m_profile>0)
+                if(UserConfigParams::m_profile>0)
                 {
                     m_frame_count++;
-                    if (RaceManager::getWorld()->getTime()>user_config->m_profile)
+                    if (RaceManager::getWorld()->getTime()>UserConfigParams::m_profile)
                     {
                         //FIXME: SDL_GetTicks() includes the loading time,
                         //so the FPS will be skewed for now.

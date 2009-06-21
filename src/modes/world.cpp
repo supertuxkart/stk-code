@@ -103,7 +103,7 @@ void World::init()
         const std::string& kart_name = race_manager->getKartName(i);
         int local_player_id          = race_manager->getKartLocalPlayerId(i);
         int global_player_id         = race_manager->getKartGlobalPlayerId(i);
-        if(user_config->m_profile)
+        if(UserConfigParams::m_profile)
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot(kart_name, position, init_pos, m_track);
@@ -121,7 +121,7 @@ void World::init()
             {
             case RaceManager::KT_PLAYER:
                 newkart = new PlayerKart(kart_name, position,
-                                         &(user_config->m_player[local_player_id]),
+                                         &(UserConfigParams::m_player[local_player_id]),
                                          init_pos, local_player_id);
                 m_player_karts[global_player_id] = (PlayerKart*)newkart;
                 m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
@@ -140,7 +140,7 @@ void World::init()
             case RaceManager::KT_LEADER: 
                 break;
             }
-        }   // if !user_config->m_profile
+        }   // if !UserConfigParams::m_profile
 #ifdef HAVE_IRRLICHT
 #else
         newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);

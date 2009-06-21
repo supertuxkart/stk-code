@@ -1275,7 +1275,7 @@ void Track::loadTrackModel()
     m_light->setLightData(light);
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
-    if(user_config->m_track_debug)
+    if(UserConfigParams::m_track_debug)
         m_quad_graph->createDebugMesh();
 
 }   // loadTrack

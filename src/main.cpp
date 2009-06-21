@@ -143,17 +143,17 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             // Check that current res is not blacklisted
             std::ostringstream o;
-    		o << user_config->m_width << "x" << user_config->m_height;
+    		o << UserConfigParams::m_width << "x" << UserConfigParams::m_height;
     		std::string res = o.str();
-            if (std::find(user_config->m_blacklist_res.begin(), 
-                          user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())         
-            	user_config->m_fullscreen = true;
+            if (std::find(UserConfigParams::m_blacklist_res.begin(), 
+                          UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())         
+            	UserConfigParams::m_fullscreen = true;
           	else 
           		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
-            user_config->m_fullscreen = false;
+            UserConfigParams::m_fullscreen = false;
         }
 #endif
         else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
@@ -165,13 +165,13 @@ int handleCmdLinePreliminary(int argc, char **argv)
             	std::ostringstream o;
     			o << width << "x" << height;
     			std::string res = o.str();
-                if (!user_config->m_fullscreen || std::find(user_config->m_blacklist_res.begin(), 
-                                                            user_config->m_blacklist_res.end(),res) == user_config->m_blacklist_res.end())
+                if (!UserConfigParams::m_fullscreen || std::find(UserConfigParams::m_blacklist_res.begin(), 
+                                                            UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())
                 {
-                	user_config->m_prev_width = user_config->m_width = width;
-               		user_config->m_prev_height = user_config->m_height = height;
-                	fprintf ( stdout, "You choose to be in %dx%d.\n", user_config->m_width,
-                             user_config->m_height );
+                	UserConfigParams::m_prev_width = UserConfigParams::m_width = width;
+               		UserConfigParams::m_prev_height = UserConfigParams::m_height = height;
+                	fprintf ( stdout, "You choose to be in %dx%d.\n", (int)UserConfigParams::m_width,
+                             (int)UserConfigParams::m_height );
                	}
                	else
                		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
@@ -210,30 +210,30 @@ int handleCmdLine(int argc, char **argv)
         if(argv[i][0] != '-') continue;
         if(!strcmp(argv[i], "--gamepad-debug"))
         {
-            user_config->m_gamepad_debug=true;
+            UserConfigParams::m_gamepad_debug=true;
         }
         else if(sscanf(argv[i], "--track-debug=%d",&n)==1)
         {
-            user_config->m_track_debug=n;
+            UserConfigParams::m_track_debug=n;
         }
         else if(!strcmp(argv[i], "--track-debug"))
         {
-            user_config->m_track_debug=1;
+            UserConfigParams::m_track_debug=1;
         }
 #ifdef HAVE_GLUT
         else if(!strcmp(argv[i], "--bullet-debug"))
         {
-            user_config->m_bullet_debug=1;
+            UserConfigParams::m_bullet_debug=1;
         }
 #endif
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
-            user_config->m_print_kart_sizes=true;
+            UserConfigParams::m_print_kart_sizes=true;
         }
         else if(sscanf(argv[i], "--server=%d",&n)==1)
         {
             network_manager->setMode(NetworkManager::NW_SERVER);
-            user_config->m_server_port = n;
+            UserConfigParams::m_server_port = n;
         }
         else if( !strcmp(argv[i], "--server") )
         {
@@ -241,12 +241,12 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( sscanf(argv[i], "--port=%d", &n) )
         {
-            user_config->m_server_port=n;
+            UserConfigParams::m_server_port=n;
         }
         else if( sscanf(argv[i], "--client=%s", s) )
         {
             network_manager->setMode(NetworkManager::NW_CLIENT);
-            user_config->m_server_address=s;
+            UserConfigParams::m_server_address=s;
         }
         else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
         {
@@ -301,15 +301,15 @@ int handleCmdLine(int argc, char **argv)
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
         {
-            user_config->setDefaultNumKarts(atoi(argv[i+1]));
-            if(user_config->getDefaultNumKarts()>stk_config->m_max_karts) {
+            UserConfigParams::m_num_karts = atoi(argv[i+1]);
+            if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
+            {
                 fprintf(stdout, "Number of karts reset to maximum number %d\n",
                                   stk_config->m_max_karts);
-                user_config->setDefaultNumKarts(stk_config->m_max_karts);
+                UserConfigParams::m_num_karts = stk_config->m_max_karts;
             }
-            race_manager->setNumKarts(user_config->getDefaultNumKarts() );
-            fprintf(stdout, "%d karts will be used.\n", 
-                     user_config->getDefaultNumKarts());
+            race_manager->setNumKarts( UserConfigParams::m_num_karts );
+            fprintf(stdout, "%d karts will be used.\n",  (int)UserConfigParams::m_num_karts);
             i++;
         }
         else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
@@ -351,7 +351,7 @@ int handleCmdLine(int argc, char **argv)
         else if (    !strcmp(argv[i], "--no-start-screen")
                      || !strcmp(argv[i], "-N")                )
         {
-            user_config->m_no_start_screen = true;
+            UserConfigParams::m_no_start_screen = true;
             //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
             //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
             //FIXME:raceSetup.reverse = 1;
@@ -387,14 +387,14 @@ int handleCmdLine(int argc, char **argv)
         */
         else if( !strcmp(argv[i], "--log=terminal"))
         {
-            user_config->m_log_errors=false;
+            UserConfigParams::m_log_errors=false;
         }
         else if( !strcmp(argv[i], "--log=file"))
         {
-            user_config->m_log_errors=true;
+            UserConfigParams::m_log_errors=true;
         } else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
-            user_config->m_profile=n;
+            UserConfigParams::m_profile=n;
 	    if(n<0) 
 	    {
                 fprintf(stdout,"Profiling %d laps\n",-n);
@@ -402,13 +402,13 @@ int handleCmdLine(int argc, char **argv)
 	    }
 	    else
             {
-	        printf("Profiling: %d seconds.\n",user_config->m_profile);
+	        printf("Profiling: %d seconds.\n", (int)UserConfigParams::m_profile);
                 race_manager->setNumLaps(999999); // profile end depends on time
             }
         }
         else if( !strcmp(argv[i], "--profile") )
         {
-            user_config->m_profile=20;
+            UserConfigParams::m_profile=20;
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
@@ -443,10 +443,10 @@ int handleCmdLine(int argc, char **argv)
             return 0;
         }
     }   // for i <argc
-    if(user_config->m_profile)
+    if(UserConfigParams::m_profile)
     {
-        user_config->setSFX(UserConfig::UC_DISABLE);  // Disable sound effects 
-        user_config->setMusic(UserConfig::UC_DISABLE);// and music when profiling
+        UserConfigParams::m_sfx = false;  // Disable sound effects 
+        UserConfigParams::m_music = false;// and music when profiling
     }
 
     return 1;
@@ -550,7 +550,7 @@ int main(int argc, char *argv[] )
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine(argc, argv)) exit(0);
         
-        if (user_config->m_log_errors) //Enable logging of stdout and stderr to logfile
+        if (UserConfigParams::m_log_errors) //Enable logging of stdout and stderr to logfile
         {
             std::string logoutfile = file_manager->getLogFile("stdout.log");
             std::string logerrfile = file_manager->getLogFile("stderr.log");
@@ -595,7 +595,7 @@ int main(int argc, char *argv[] )
         // prepare main menu
         StateManager::initGUI();
         
-        if(!user_config->m_no_start_screen) StateManager::pushMenu("main.stkgui");
+        if(!UserConfigParams::m_no_start_screen) StateManager::pushMenu("main.stkgui");
         else StateManager::enterGameState();
 
         // Replay a race
@@ -629,9 +629,9 @@ int main(int argc, char *argv[] )
         }
         // Not replaying
         // =============
-        if(!user_config->m_profile)
+        if(!UserConfigParams::m_profile)
         {
-            if(user_config->m_no_start_screen)
+            if(UserConfigParams::m_no_start_screen)
             {
                 // Quickstart (-N)
                 // ===============
@@ -664,12 +664,12 @@ int main(int argc, char *argv[] )
     if(user_config)
     {
         // In case that abort is triggered before user_config exists
-        if (user_config->m_crashed) user_config->m_crashed = false;
+        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
         user_config->saveConfig();
     }
     if(input_manager) delete input_manager;  // if early crash avoid delete NULL
     
-    if (user_config && user_config->m_log_errors) //close logfiles
+    if (user_config && UserConfigParams::m_log_errors) //close logfiles
     {
         fclose(stderr);
         fclose(stdout);

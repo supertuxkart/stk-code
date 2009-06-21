@@ -20,6 +20,7 @@
 #define __HEADER_OPTIONS_SCREEN_HPP__
 
 #include <string>
+#include "irrlicht.h"
 
 namespace GUIEngine
 {
@@ -33,6 +34,7 @@ namespace StateManager
 
     void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
     void gotSensedInput(Input* sensedInput);
+    void gotNewPlayerName(const irr::core::stringw& newName);
 
 }
 

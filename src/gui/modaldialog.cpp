@@ -17,6 +17,7 @@
 
 #include "gui/engine.hpp"
 #include "gui/modaldialog.hpp"
+#include "gui/options_screen.hpp"
 #include "utils/translation.hpp"
 
 using namespace irr;
@@ -35,6 +36,15 @@ void ModalDialog::dismiss()
 {
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = NULL;
+}
+
+void ModalDialog::onEnterPressed()
+{
+    if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
+}
+
+void ModalDialog::onEnterPressedInternal()
+{
 }
 
 ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
@@ -82,6 +92,13 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     const int textAreaYFrom = bottomYFrom + bottomHeight/2 - textHeight/2;
     
     core::rect< s32 > area_bottom(50, textAreaYFrom - 10, m_area.getWidth()-50, textAreaYFrom + textHeight + 10);
-    IGUIEditBox* textCtrl = GUIEngine::getGUIEnv()->addEditBox (L"", area_bottom, true /* border */, m_irrlicht_window);
+    textCtrl = GUIEngine::getGUIEnv()->addEditBox (L"", area_bottom, true /* border */, m_irrlicht_window);
     GUIEngine::getGUIEnv()->setFocus(textCtrl);
+}
+
+void EnterPlayerNameDialog::onEnterPressedInternal()
+{
+    stringw playerName = textCtrl->getText();
+    StateManager::gotNewPlayerName( playerName );
+    ModalDialog::dismiss();
 }

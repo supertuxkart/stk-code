@@ -130,8 +130,8 @@ void InputManager::handleStaticAction(int key, int value)
 			break;
 #endif
 		case KEY_F12:
-			user_config->m_display_fps = !user_config->m_display_fps;
-			if(user_config->m_display_fps)
+			UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
+			if(UserConfigParams::m_display_fps)
 			{
                 getRaceGUI()->resetFPSCounter();
             }
@@ -222,7 +222,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         // Stores the sensed input when the button/key/axes/<whatever> is
         // released only and is not used in a fixed mapping.
         //else
-        //if (!user_config->isFixedInput(type, id0, id1, id2) ) // ignore static actions (TODO)
+        //if (!UserConfigParams::isFixedInput(type, id0, id1, id2) ) // ignore static actions (TODO)
         {
             // See if the new input should be stored. This happens if:
             // 1) the value is larger
@@ -332,7 +332,7 @@ bool InputManager::input(const SEvent& event)
             if(value == -32768) continue; // ignore bogus values given by irrlicht
 #endif
 
-            if(user_config->m_gamepad_debug)
+            if(UserConfigParams::m_gamepad_debug)
             {
                 printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
                        event.JoystickEvent.Joystick, axis_id, value);
@@ -502,7 +502,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                 // Leaving boot strap mode.
 
                 // Installs the action map for the menu.
-                //  m_action_map = user_config->newMenuActionMap();
+                //  m_action_map = UserConfigParams::newMenuActionMap();
 
                 m_mode = MENU;
 
@@ -544,7 +544,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             //   delete m_action_map;
 
             // Installs the action map for the ingame mode.
-            // m_action_map = user_config->newIngameActionMap();
+            // m_action_map = UserConfigParams::newIngameActionMap();
 
             irr_driver->hidePointer();
 

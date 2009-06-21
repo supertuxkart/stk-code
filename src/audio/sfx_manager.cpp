@@ -58,7 +58,7 @@ SFXManager::SFXManager()
     if(!m_initialized) return;
     
     loadSfx();
-    setMasterSFXVolume( user_config->m_sfx_volume );
+    setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     
 }  // SoundManager
 
@@ -82,7 +82,7 @@ SFXManager::~SFXManager()
 //----------------------------------------------------------------------------
 bool SFXManager::sfxAllowed()
 {
-    if(!user_config->doSFX() || !m_initialized) 
+    if(!UserConfigParams::m_sfx || !m_initialized) 
         return false;
     else
         return true;

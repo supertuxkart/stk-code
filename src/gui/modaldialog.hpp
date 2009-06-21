@@ -34,10 +34,13 @@ protected:
      */
     ModalDialog(const float percentWidth, const float percentHeight);
     
+    virtual void onEnterPressedInternal();
+    
 public:
     virtual ~ModalDialog();
     
     static void dismiss();
+    static void onEnterPressed();
 };
 
 class PressAKeyDialog : public ModalDialog
@@ -51,9 +54,11 @@ public:
 
 class EnterPlayerNameDialog : public ModalDialog
 {
+    IGUIEditBox* textCtrl;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
     EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
+    void onEnterPressedInternal();
 };

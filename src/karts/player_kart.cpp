@@ -170,7 +170,7 @@ void PlayerKart::action(PlayerAction action, int value)
 //-----------------------------------------------------------------------------
 void PlayerKart::steer(float dt, int steer_val)
 {
-    if(user_config->m_gamepad_debug)
+    if(UserConfigParams::m_gamepad_debug)
     {
         printf("steering: steer_val %d ", steer_val);
     }
@@ -204,7 +204,7 @@ void PlayerKart::steer(float dt, int steer_val)
             if(m_controls.m_steer>0.0f) m_controls.m_steer=0.0f;
         }   // if m_controls.m_steer<=0.0f
     }   // no key is pressed
-    if(user_config->m_gamepad_debug)
+    if(UserConfigParams::m_gamepad_debug)
     {
         printf("  set to: %f\n", m_controls.m_steer);
     }

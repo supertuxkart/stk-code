@@ -274,7 +274,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
 
     // Add karts from the current group
     // --------------------------------
-    std::vector<int> karts = getKartsInGroup(user_config->m_kart_group);
+    std::vector<int> karts = getKartsInGroup(UserConfigParams::m_kart_group);
     std::vector<int>::iterator k;
     // Remove karts that are already used or generally not available
     // (i.e. locked or not available on all clients)

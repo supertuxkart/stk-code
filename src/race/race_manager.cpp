@@ -66,7 +66,7 @@ Kart* RaceManager::getKart(const unsigned int n)
  */
 RaceManager::RaceManager()
 {
-    m_num_karts          = user_config->getDefaultNumKarts();
+    m_num_karts          = UserConfigParams::m_num_karts;
     m_difficulty         = RD_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_QUICK_RACE;
@@ -115,7 +115,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
     assert(0<=player_id && player_id <m_local_kart_info.size());
 
     m_local_kart_info[player_id]=RemoteKartInfo(player_id, kart,
-                                                user_config->m_player[player_id].getName(),
+                                                UserConfigParams::m_player[player_id].getName(),
                                                 network_manager->getMyHostId());
 }   // setLocalKartInfo
 

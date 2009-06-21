@@ -60,8 +60,8 @@ namespace StateManager
         CheckBoxWidget* music = getCurrentScreen()->getWidget<CheckBoxWidget>("music_enabled");
 
         // ---- audio enables/disables
-        sfx->setState( user_config->doSFX() );
-        music->setState( user_config->doMusic() );
+        sfx->setState( UserConfigParams::m_sfx );
+        music->setState( UserConfigParams::m_music );
 
         // ---- video modes
         {
@@ -71,7 +71,7 @@ namespace StateManager
 
             CheckBoxWidget* full = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
             assert( full != NULL );
-            full->setState( user_config->m_fullscreen );
+            full->setState( UserConfigParams::m_fullscreen );
 
             // --- get resolution list from irrlicht the first time
             if(!getCurrentScreen()->m_inited)
@@ -123,7 +123,7 @@ namespace StateManager
                 char name[32];
                 sprintf( name, "%ix%i", w, h );
 
-                if(w == user_config->m_width && h == user_config->m_height)
+                if(w == UserConfigParams::m_width && h == UserConfigParams::m_height)
                 {
                     //std::cout << "************* Detected right resolution!!! " << n << "\n";
                     // that's the current one
@@ -157,7 +157,7 @@ namespace StateManager
             sample_sound->volume(1);
 
             sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
-            user_config->m_sfx_volume = w->getValue()/10.0f;
+            UserConfigParams::m_sfx_volume = w->getValue()/10.0f;
 
             // play a sample sound to show the user what this volume is like
             sample_sound->position ( Vec3(0,0,0) );
@@ -172,8 +172,9 @@ namespace StateManager
         {
             CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
-            user_config->setMusic(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
-
+            UserConfigParams::m_music = w->getState();
+            std::cout << "music state is now " << (bool)UserConfigParams::m_music << std::endl;
+            
             if(w->getState() == false)
                 sound_manager->stopMusic();
             else
@@ -183,14 +184,14 @@ namespace StateManager
         {
             CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
-            user_config->setSFX(w->getState() ? UserConfig::UC_ENABLE : UserConfig::UC_DISABLE);
+            UserConfigParams::m_sfx = w->getState();
         }
         else if(name == "apply_resolution")
         {
             using namespace GUIEngine;
 
-            user_config->m_prev_width = user_config->m_width;
-            user_config->m_prev_height = user_config->m_height;
+            UserConfigParams::m_prev_width = UserConfigParams::m_width;
+            UserConfigParams::m_prev_height = UserConfigParams::m_height;
 
             RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
             assert(w1 != NULL);
@@ -207,9 +208,9 @@ namespace StateManager
             CheckBoxWidget* w2 = getCurrentScreen()->getWidget<CheckBoxWidget>("fullscreen");
             assert(w2 != NULL);
 
-            user_config->m_width = w;
-            user_config->m_height = h;
-            user_config->m_fullscreen = w2->getState();
+            UserConfigParams::m_width = w;
+            UserConfigParams::m_height = h;
+            UserConfigParams::m_fullscreen = w2->getState();
             irr_driver->changeResolution();
         }
 
@@ -480,6 +481,12 @@ namespace StateManager
         input_manager->getDeviceList()->serialize();
     }
 
+    void gotNewPlayerName(const stringw& newName)
+    {
+        std::cout << "got player name : " << stringc( newName ).c_str() << std::endl;
+        // TODO
+    }
+    
     // -----------------------------------------------------------------------------
     // main call (from StateManager); dispatches the call to a specialissed function as needed
     void menuEventOptions(Widget* widget, const std::string& name)

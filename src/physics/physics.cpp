@@ -50,7 +50,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
                                            -RaceManager::getTrack()->getGravity()));
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug)
+    if(UserConfigParams::m_bullet_debug)
       {
         m_debug_drawer = new GLDebugDrawer();
         m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
@@ -63,7 +63,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 Physics::~Physics()
 {
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug) delete m_debug_drawer;
+    if(UserConfigParams::m_bullet_debug) delete m_debug_drawer;
 #endif
     delete m_dynamics_world;
     delete m_axis_sweep;

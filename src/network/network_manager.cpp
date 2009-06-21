@@ -78,7 +78,7 @@ bool NetworkManager::initServer()
 {
      ENetAddress address;
      address.host = ENET_HOST_ANY;
-     address.port = user_config->m_server_port;
+     address.port = UserConfigParams::m_server_port;
 
      m_host = enet_host_create (& address     /* the address to bind the server host to */, 
                                 stk_config->m_max_karts /* number of connections */,
@@ -121,8 +121,8 @@ bool NetworkManager::initClient()
     ENetEvent event;
     ENetPeer *peer;
 
-    enet_address_set_host (& address, user_config->m_server_address.c_str());
-    address.port = user_config->m_server_port;
+    enet_address_set_host (& address, UserConfigParams::m_server_address.c_str());
+    address.port = UserConfigParams::m_server_port;
 
     /* Initiate the connection, allocating the two channels 0 and 1. */
     peer = enet_host_connect (m_host, &address, 2);    
@@ -144,7 +144,7 @@ bool NetworkManager::initClient()
         enet_peer_reset (peer);
 
         fprintf(stderr, "Connection to '%s:%d' failed.\n",
-                user_config->m_server_address.c_str(), user_config->m_server_port);
+                UserConfigParams::m_server_address.c_str(), (int)UserConfigParams::m_server_port);
         return false;
     }
     m_server = peer;

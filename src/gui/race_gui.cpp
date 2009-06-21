@@ -65,14 +65,14 @@ RaceGUI::RaceGUI()
 
 #ifdef HAVE_IRRLICHT
     gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
-    core::rect<s32> pos(user_config->m_width-60, 10, 
-                        user_config->m_width,    50);
+    core::rect<s32> pos(UserConfigParams::m_width-60, 10, 
+                        UserConfigParams::m_width,    50);
     m_time = gui_env->addStaticText(L"", pos);
     m_time->setOverrideFont(irr_driver->getRaceFont());
 
     int icon_width=40;
     int icon_player_width=50;
-    if(user_config->m_height<600)
+    if(UserConfigParams::m_height<600)
     {
         icon_width        = 27;
         icon_player_width = 35;
@@ -87,8 +87,8 @@ RaceGUI::RaceGUI()
         // FIXME: The icons needs to be resized.
         m_icons[i]  = irr_driver->getGUI()->addImage(m->getTexture(), p);
     }
-    core::rect<s32> p(user_config->m_width-10, 0, 
-                      user_config->m_width+10, 10);
+    core::rect<s32> p(UserConfigParams::m_width-10, 0, 
+                      UserConfigParams::m_width+10, 10);
     m_attachment_icon = irr_driver->getGUI()->addImage(p);
 #else
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
@@ -145,7 +145,7 @@ void RaceGUI::drawFPS ()
         m_fps_counter = 0;
         m_fps_timer.setMaxDelta(1000);
     }
-    font_race->PrintShadow(m_fps_string,48, 0, user_config->m_height-50);
+    font_race->PrintShadow(m_fps_string,48, 0, UserConfigParams::m_height-50);
      */
 }   // drawFPS
 
@@ -163,8 +163,8 @@ void RaceGUI::drawTimer ()
 #ifdef HAVE_IRRLICHT
     m_time->setText(core::stringw(str).c_str());
 #else
-    font_race->PrintShadow(str, 60, user_config->m_width-260,
-                           user_config->m_height-64);
+    font_race->PrintShadow(str, 60, UserConfigParams::m_width-260,
+                           UserConfigParams::m_height-64);
 #endif
 }   // drawTimer
 
@@ -226,7 +226,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
     int y;
     int ICON_WIDTH=40;
     int ICON_PLAYER_WIDTH=50;
-    if(user_config->m_height<600)
+    if(UserConfigParams::m_height<600)
     {
         ICON_WIDTH        = 27;
         ICON_PLAYER_WIDTH = 35;
@@ -245,7 +245,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         if(kart->isEliminated()) continue;
         const int position = kart->getPosition();
 
-        y = user_config->m_height*7/8-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
+        y = UserConfigParams::m_height*7/8-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
 
         GLfloat COLOR[] = {info[i].r, info[i].g, info[i].b, 1.0f};
         font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDTH+x, y+5, COLOR);
@@ -330,8 +330,8 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
     if(powerup->getType() == POWERUP_NOTHING) return;
 
     // Originally the hardcoded sizes were 320-32 and 400
-    int x1 = (int)((user_config->m_width/2-32) * ratio_x) + offset_x ;
-    int y1 = (int)(user_config->m_height*5/6 * ratio_y)      + offset_y;
+    int x1 = (int)((UserConfigParams::m_width/2-32) * ratio_x) + offset_x ;
+    int y1 = (int)(UserConfigParams::m_height*5/6 * ratio_y)      + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
 #ifdef HAVE_IRRLICHT
@@ -375,10 +375,10 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 {
     float state = (float)(player_kart->getEnergy()) /
                   MAX_ITEMS_COLLECTED;
-    int x = (int)((user_config->m_width-24) * ratio_x) + offset_x;
+    int x = (int)((UserConfigParams::m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;
     int w = (int)(16 * ratio_x);
-    int h = (int)(user_config->m_height/4 * ratio_y);
+    int h = (int)(UserConfigParams::m_height/4 * ratio_y);
     int wl = (int)(ratio_x);
     if(wl < 1)
         wl = 1;
@@ -514,7 +514,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 #define SPEEDWIDTH 128
     int width  = (int)(SPEEDWIDTH*minRatio);
     int height = (int)(SPEEDWIDTH*minRatio);
-    offset_x += (int)((user_config->m_width-10)*ratio_x) - width;
+    offset_x += (int)((UserConfigParams::m_width-10)*ratio_x) - width;
     offset_y += (int)(10*ratio_y);
 
 #ifdef HAVE_IRRLICHT
@@ -634,7 +634,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
     int y;
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
-    y = (int)(ratio_y*(user_config->m_height -164)+offset_y);
+    y = (int)(ratio_y*(UserConfigParams::m_height -164)+offset_y);
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
@@ -651,7 +651,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
                           Font::CENTER_OF_SCREEN, y,
                           COLORS,
                           ratio_x, ratio_y,
-                          offset_x, offset_x+(int)(user_config->m_width*ratio_x));
+                          offset_x, offset_x+(int)(UserConfigParams::m_width*ratio_x));
         // Add 20% of font size as space between the lines
         y-=msg.m_font_size*12/10;
         
@@ -712,7 +712,7 @@ void RaceGUI::drawStatusText(const float dt)
     glAlphaFunc    ( GL_GREATER, 0.1f);
     glEnable       ( GL_BLEND        );
 
-    glOrtho        ( 0, user_config->m_width, 0, user_config->m_height, 0, 100 ) ;
+    glOrtho        ( 0, UserConfigParams::m_width, 0, UserConfigParams::m_height, 0, 100 ) ;
     switch (RaceManager::getWorld()->getPhase())
     {
     case READY_PHASE:
@@ -797,12 +797,12 @@ void RaceGUI::drawStatusText(const float dt)
 
             if(numPlayers == 2)
             {
-              if(pla == 0) offset_y = user_config->m_height/2;
+              if(pla == 0) offset_y = UserConfigParams::m_height/2;
             }
             else if (numPlayers == 3)
             {
               if (pla == 0  || pla == 1)
-                offset_y = user_config->m_height/2;
+                offset_y = UserConfigParams::m_height/2;
               else
               {
                 // Fixes width for player 3
@@ -810,16 +810,16 @@ void RaceGUI::drawStatusText(const float dt)
               }
 
               if (pla == 1)
-                offset_x = user_config->m_width/2;
+                offset_x = UserConfigParams::m_width/2;
 
             }
             else if(numPlayers == 4)
             {
               if(pla == 0  || pla == 1)
-                offset_y = user_config->m_height/2;
+                offset_y = UserConfigParams::m_height/2;
 
               if((pla == 1) || pla == 3)
-                offset_x = user_config->m_width/2;
+                offset_x = UserConfigParams::m_width/2;
             }
 
             Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
@@ -836,12 +836,12 @@ void RaceGUI::drawStatusText(const float dt)
             
             if(player_kart->hasViewBlockedByPlunger())
             {
-                const int screen_width = (numPlayers > 2) ? user_config->m_width/2 : user_config->m_width;
-                const int plunger_size = (numPlayers > 1) ? user_config->m_height/2 : user_config->m_height;
+                const int screen_width = (numPlayers > 2) ? UserConfigParams::m_width/2 : UserConfigParams::m_width;
+                const int plunger_size = (numPlayers > 1) ? UserConfigParams::m_height/2 : UserConfigParams::m_height;
                 int plunger_x = offset_x + screen_width/2 - plunger_size/2;
                 
                 if (numPlayers == 3 && pla > 1)
-                    plunger_x = offset_x + user_config->m_width/2 - plunger_size/2;
+                    plunger_x = offset_x + UserConfigParams::m_width/2 - plunger_size/2;
                         
 #ifndef HAVE_IRRLICHT
                 m_plunger_face->getState()->force();
@@ -865,7 +865,7 @@ void RaceGUI::drawStatusText(const float dt)
 
             
         drawMap();
-        if ( user_config->m_display_fps ) drawFPS();
+        if ( UserConfigParams::m_display_fps ) drawFPS();
         
         drawPlayerIcons(info);
         

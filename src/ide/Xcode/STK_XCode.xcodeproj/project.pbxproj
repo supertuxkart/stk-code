@@ -993,6 +993,7 @@
 				951C35BD0FC066ED00A48379 /* credits.hpp */,
 				9505577A0F696A900056E88C /* engine.cpp */,
 				9505577B0F696A900056E88C /* engine.hpp */,
+				95C2AE370F296541000D3E5D /* enet */,
 				95C1E3FF0F699427005D33E6 /* font.cpp */,
 				95C1E4020F69943D005D33E6 /* font.hpp */,
 				954A57DB0FEC5AE40073C16C /* modaldialog.cpp */,
@@ -1108,7 +1109,6 @@
 				95C2AC360F296540000D3E5D /* bullet */,
 				95D950CC0FE473CA002E10AD /* config */,
 				95C2AE250F296541000D3E5D /* challenges */,
-				95C2AE370F296541000D3E5D /* enet */,
 				950557790F696A900056E88C /* gui */,
 				95C2AE870F296542000D3E5D /* graphics */,
 				95C65D750F532F7D00BE7BA7 /* io */,
@@ -1512,8 +1512,8 @@
 				95C2AE720F296542000D3E5D /* win32.c */,
 			);
 			name = enet;
-			path = ../../enet;
-			sourceTree = SOURCE_ROOT;
+			path = games/supertuxkart/src/enet;
+			sourceTree = SYSTEM_DEVELOPER_DIR;
 		};
 		95C2AE540F296541000D3E5D /* include */ = {
 			isa = PBXGroup;

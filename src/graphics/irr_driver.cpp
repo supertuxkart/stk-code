@@ -106,10 +106,10 @@ void IrrDriver::initDevice()
         for(int bits=32; bits>15; bits -=8)
         {
             m_device = createDevice(type,
-                                    core::dimension2d<s32>(user_config->m_width,
-                                                           user_config->m_height ),
+                                    core::dimension2d<s32>(UserConfigParams::m_width,
+                                                           UserConfigParams::m_height ),
                                     bits, //bits per pixel
-                                    user_config->m_fullscreen,
+                                    UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
                                     false,  // vsync
                                     this    // event receiver
@@ -154,8 +154,8 @@ void IrrDriver::changeResolution()
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_device->getVideoDriver()->draw2DRectangle( SColor(255, 0, 0, 0),
                                                 core::rect<s32>(0, 0,
-                                                                user_config->m_prev_width,
-                                                                user_config->m_prev_height) );
+                                                                UserConfigParams::m_prev_width,
+                                                                UserConfigParams::m_prev_height) );
     m_device->getVideoDriver()->endScene();
 
     // startScreen             -> removeTextures();
@@ -426,7 +426,7 @@ void IrrDriver::update(float dt)
     if(!m_device->run()) return;
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug && race_manager->raceIsActive())
+    if(UserConfigParams::m_bullet_debug && race_manager->raceIsActive())
     {
         // Use bullets debug drawer
         GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };

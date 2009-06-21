@@ -32,7 +32,7 @@ TimedRace::TimedRace()
     m_previous_phase = SETUP_PHASE;  // initialise it just in case
     
     // for profiling AI
-    m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
+    m_phase = UserConfigParams::m_profile ? RACE_PHASE : SETUP_PHASE;
     
     // FIXME - is it a really good idea to reload and delete the sound every race??
     m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);

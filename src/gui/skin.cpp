@@ -143,6 +143,8 @@ namespace SkinConfig
                     std::cerr << "Unknown node in XML file : " << node->getName().c_str() << std::endl;
                 }
             }// nend for
+            
+            delete root;
         }
     };
 

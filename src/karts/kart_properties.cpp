@@ -161,7 +161,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
 
 
         // Useful when tweaking kart parameters
-        if(user_config->m_print_kart_sizes)
+        if(UserConfigParams::m_print_kart_sizes)
             printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(), 
             m_kart_model.getWidth(), m_kart_model.getLength(),
             m_kart_model.getHeight());

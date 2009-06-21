@@ -86,5 +86,5 @@ void Scene::draw(float dt)
         glDisable ( GL_FOG ) ;
     }
 
-    glViewport ( 0, 0, user_config->m_width, user_config->m_height ) ;
+    glViewport ( 0, 0, UserConfigParams::m_width, UserConfigParams::m_height ) ;
 }

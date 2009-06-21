@@ -157,9 +157,9 @@ namespace StateManager
         {
             RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("difficulty");
             assert( w != NULL );
-            w->setSelection(user_config->getDefaultDifficulty());
+            w->setSelection(UserConfigParams::m_difficulty);
 
-            race_manager->setDifficulty( (RaceManager::Difficulty)user_config->getDefaultDifficulty() );
+            race_manager->setDifficulty( (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty );
             
             SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
             race_manager->setNumKarts( kartamount->getValue() + 1 );
@@ -216,7 +216,7 @@ namespace StateManager
         }
         /*
          289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
-         290         user_config->setDefaultNumDifficulty(m_difficulty);
+         290         UserConfigParams::setDefaultNumDifficulty(m_difficulty);
 
          // if there is no AI, there's no point asking the player for the amount of karts.
          299     // It will always be the same as the number of human players
@@ -228,14 +228,14 @@ namespace StateManager
          305     else
          306     {
          307         race_manager->setNumKarts(m_num_karts);
-         308         user_config->setDefaultNumKarts(race_manager->getNumKarts());
+         308         UserConfigParams::setDefaultNumKarts(race_manager->getNumKarts());
          309     }
 
          311     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
          312         RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
          313     {
          314         race_manager->setNumLaps( m_num_laps );
-         315         user_config->setDefaultNumLaps(m_num_laps);
+         315         UserConfigParams::setDefaultNumLaps(m_num_laps);
          316     }
          317     // Might still be set from a previous challenge
          318     race_manager->setCoinTarget(0);
@@ -250,10 +250,10 @@ namespace StateManager
 
          race_manager->setTrack(argv[i+1]);
 
-         user_config->setDefaultNumKarts(stk_config->m_max_karts);
-         race_manager->setNumKarts(user_config->getDefaultNumKarts() );
+         UserConfigParams::setDefaultNumKarts(stk_config->m_max_karts);
+         race_manager->setNumKarts(UserConfigParams::getDefaultNumKarts() );
 
-         user_config->getDefaultNumKarts()
+         UserConfigParams::getDefaultNumKarts()
 
          StateManager::enterGameState();
          race_manager->startNew();

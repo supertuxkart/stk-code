@@ -687,6 +687,13 @@ bool Screen::OnEvent(const SEvent& event)
                 
                 break;
             }
+            case EGET_EDITBOX_ENTER:
+            {
+                // currently, enter pressed in text ctrl events can only happen in dialogs.
+                // FIXME : find a cleaner way to route the event to its proper location
+                ModalDialog::onEnterPressed();
+                break;
+            }
             default:
                 break;
         } // end switch

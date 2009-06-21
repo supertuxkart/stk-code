@@ -41,7 +41,7 @@ SoundManager* sound_manager= NULL;
 SoundManager::SoundManager()
 {
     m_current_music= NULL;
-    setMasterMusicVolume(user_config->m_music_volume);
+    setMasterMusicVolume(UserConfigParams::m_music_volume);
 
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
@@ -138,7 +138,7 @@ void SoundManager::startMusic(MusicInformation* mi)
     stopMusic();
     m_current_music = mi;
     
-    if(!mi || !user_config->doMusic() || !m_initialized) return;
+    if(!mi || !UserConfigParams::m_music || !m_initialized) return;
     
     mi->volumeMusic(m_masterGain);
     mi->startMusic();
@@ -161,7 +161,7 @@ void SoundManager::setMasterMusicVolume(float gain)
     m_masterGain = gain;
     if(m_current_music) m_current_music->volumeMusic(m_masterGain);
     
-    user_config->m_music_volume = m_masterGain;
+    UserConfigParams::m_music_volume = m_masterGain;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 //----------------------------------------------------------------------------
 void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
-    if(!user_config->doSFX() || !m_initialized) return;
+    if(!UserConfigParams::m_sfx || !m_initialized) return;
 
     //forward vector
     m_listenerVec[0] = front.getX(); 
