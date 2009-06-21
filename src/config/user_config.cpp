@@ -67,10 +67,20 @@ GroupUserConfigParam::GroupUserConfigParam(const char* groupName, const char* co
 }
 void GroupUserConfigParam::write(std::ofstream& stream) const
 {
-    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << "\n";
-    
     const int children_amount = m_children.size();
+    
+    // comments
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str();
+    for(int n=0; n<children_amount; n++)
+    {
+        if(m_children[n]->comment.size() > 0)
+            stream << "\n             " << m_children[n]->paramName << " : " << m_children[n]->comment.c_str();
+    }
+    
+    
+    stream << " -->\n    <" << paramName << "\n";
+    
+    // actual values
     for(int n=0; n<children_amount; n++)
     {
         stream << "        " << m_children[n]->paramName << "=\"" << m_children[n]->toString() << "\"\n";
@@ -306,6 +316,11 @@ std::string FloatUserConfigParam::toString() const
 // =====================================================================================
 // =====================================================================================
 
+#if 0
+#pragma mark -
+#pragma mark UserConfig
+#endif
+
 UserConfig *user_config;
 
 UserConfig::UserConfig()
@@ -527,7 +542,7 @@ void UserConfig::saveConfig(const std::string& filepath)
         return;
     }
     
-    configfile << "<stkconfig version=\"" << CURRENT_CONFIG_VERSION << "\" >\n";
+    configfile << "<stkconfig version=\"" << CURRENT_CONFIG_VERSION << "\" >\n\n";
 
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
