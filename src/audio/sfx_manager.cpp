@@ -92,6 +92,7 @@ bool SFXManager::sfxAllowed()
  */
 void SFXManager::loadSfx()
 {
+    // TODO : implement as XML
     const lisp::Lisp* root = 0;
     std::string sfx_config_name = file_manager->getSFXFile("sfx.config");
     try

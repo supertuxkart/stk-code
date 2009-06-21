@@ -57,11 +57,70 @@ static std::vector<UserConfigParam*> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
+// ---------------------------------------------------------------------------------------
+
+GroupUserConfigParam::GroupUserConfigParam(const char* groupName, const char* comment)
+{
+    this->paramName = groupName;
+    all_params.push_back(this);
+    if(comment != NULL) this->comment = comment;
+}
+void GroupUserConfigParam::write(std::ofstream& stream) const
+{
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
+    stream << "    <" << paramName << "\n";
+    
+    const int children_amount = m_children.size();
+    for(int n=0; n<children_amount; n++)
+    {
+        stream << "        " << m_children[n]->paramName << "=\"" << m_children[n]->toString() << "\"\n";
+    }
+    stream << "        />\n\n";
+}
+
+void GroupUserConfigParam::readAsNode(const XMLNode* node)
+{
+    const XMLNode* child = node->getNode( paramName );
+    if(child == NULL)
+    {
+        //std::cout << "Couldn't find parameter group " << paramName << std::endl;
+        return;
+    }
+    
+    const int children_amount = m_children.size();
+    for(int n=0; n<children_amount; n++)
+    {
+        m_children[n]->readAsProperty(child);
+    }
+    
+}
+void GroupUserConfigParam::readAsProperty(const XMLNode* node)
+{
+}
+std::string GroupUserConfigParam::toString() const
+{
+    return "";
+}
+void GroupUserConfigParam::addChild(UserConfigParam* child)
+{
+    m_children.push_back(child);
+}
+
+// ---------------------------------------------------------------------------------------
+
 IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
+    if(comment != NULL) this->comment = comment;
+}
+IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName,
+                                       GroupUserConfigParam* group, const char* comment)
+{
+    this->value = defaultValue;
+    this->paramName = paramName;
+    group->addChild(this);
     if(comment != NULL) this->comment = comment;
 }
 
@@ -71,7 +130,14 @@ void IntUserConfigParam::write(std::ofstream& stream) const
     stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
 
-void IntUserConfigParam::read(const XMLNode* node)
+std::string IntUserConfigParam::toString() const
+{
+    char buffer[16];
+    sprintf(buffer, "%i", value);
+    return buffer;
+}
+
+void IntUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL)
@@ -83,6 +149,10 @@ void IntUserConfigParam::read(const XMLNode* node)
     child->get( "value", &value );
     //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
+void IntUserConfigParam::readAsProperty(const XMLNode* node)
+{
+    node->get( paramName, &value );
+}
 
 // ---------------------------------------------------------------------------------------
 
@@ -93,17 +163,36 @@ StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const cha
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
 }
+StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName,
+                                             GroupUserConfigParam* group, const char* comment)
+{
+    this->value = defaultValue;
+    this->paramName = paramName;
+    group->addChild(this);
+    if(comment != NULL) this->comment = comment;
+}
+
+
 void StringUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
     stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
-void StringUserConfigParam::read(const XMLNode* node)
+void StringUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
     
     child->get( "value", &value );
+}
+void StringUserConfigParam::readAsProperty(const XMLNode* node)
+{
+    node->get( paramName, &value );
+}
+
+std::string StringUserConfigParam::toString() const
+{
+    return value;
 }
 
 // ---------------------------------------------------------------------------------------
@@ -115,12 +204,22 @@ BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramNam
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
 }
+BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramName,
+                                         GroupUserConfigParam* group, const char* comment)
+{
+    this->value = defaultValue;
+    this->paramName = paramName;
+    group->addChild(this);
+    if(comment != NULL) this->comment = comment;
+}
+
+
 void BoolUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
-    stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" )<< "\" />\n\n";
+    stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" ) << "\" />\n\n";
 }
-void BoolUserConfigParam::read(const XMLNode* node)
+void BoolUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
@@ -139,27 +238,69 @@ void BoolUserConfigParam::read(const XMLNode* node)
     else
         std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
 }
+void BoolUserConfigParam::readAsProperty(const XMLNode* node)
+{
+    std::string textValue = "";
+    node->get( paramName, &textValue );
+    
+    if(textValue == "true")
+    {
+        value = true;
+    }
+    else if(textValue == "false")
+    {
+        value = false;
+    }
+    else
+        std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
+}
+
+std::string BoolUserConfigParam::toString() const
+{
+    return (value ? "true" : "false" );
+}
+
 
 // ---------------------------------------------------------------------------------------
 
-FloatUserConfigParam::FloatUserConfigParam(bool defaultValue, const char* paramName, const char* comment)
+FloatUserConfigParam::FloatUserConfigParam(float defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
     if(comment != NULL) this->comment = comment;
 }
+FloatUserConfigParam::FloatUserConfigParam(float defaultValue, const char* paramName,
+                                           GroupUserConfigParam* group, const char* comment)
+{
+    this->value = defaultValue;
+    this->paramName = paramName;
+    group->addChild(this);
+    if(comment != NULL) this->comment = comment;
+}
+
 void FloatUserConfigParam::write(std::ofstream& stream) const
 {
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
     stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
-void FloatUserConfigParam::read(const XMLNode* node)
+void FloatUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
     
     child->get( "value", &value );
+}
+void FloatUserConfigParam::readAsProperty(const XMLNode* node)
+{
+    node->get( paramName, &value );
+}
+
+std::string FloatUserConfigParam::toString() const
+{
+    char buffer[16];
+    sprintf(buffer, "%f", value);
+    return buffer;
 }
 
 // =====================================================================================
@@ -302,6 +443,7 @@ void UserConfig::loadConfig(const std::string& filename)
         return;
     }
 
+    // ---- Read config file version
     int configFileVersion = CURRENT_CONFIG_VERSION;
     if(!root->get("version", &configFileVersion) < 1)
     {
@@ -347,10 +489,11 @@ void UserConfig::loadConfig(const std::string& filename)
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
     
     
+    // ---- Read all other parameters
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
-        all_params[i]->read(root);
+        all_params[i]->readAsNode(root);
     }
     
     delete root;
