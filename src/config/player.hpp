@@ -17,26 +17,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TUXKART_PLAYER_H
-#define TUXKART_PLAYER_H
+#ifndef HEADER_PLAYER_HPP
+#define HEADER_PLAYER_HPP
 
 #include <string>
-#include "input/input.hpp"
+#include "config/user_config.hpp"
 
-/*class for managing player name and control configuration*/
+/**
+  * class for managing player name and control configuration
+  */
 class Player
 {
 private:
-    std::string m_name;
-    Input m_action_map[PA_COUNT];
+    
+    // for saving to config file
+    GroupUserConfigParam  m_player_group;
+    
+    StringUserConfigParam m_name;
+    
     int m_last_kart_id;
 
 public:
-    Player(){}
-    Player(const std::string &name_):m_name(name_),m_last_kart_id(-1){}
+    Player(const char* name) : m_player_group("Player", "Represents one human player"),
+                                      m_name(name, "name", &m_player_group),
+                                      m_last_kart_id(-1) {}
+    
     void setName(const std::string &name_){m_name = name_;}
 
-    const std::string& getName() {return m_name;}
+    const char* getName() { return m_name.c_str(); }
 
     int getLastKartId(){ return m_last_kart_id; }
     void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }

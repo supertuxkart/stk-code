@@ -45,13 +45,14 @@ const int CURRENT_CONFIG_VERSION = 7;
 #include <vector>
 #include <fstream>
 
-#include "config/player.hpp"
 #include "input/input.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "lisp/writer.hpp"
+#include "utils/ptr_vector.hpp"
 
 class XMLNode;
+class Player;
 
 /**
   * The base of a set of small utilities to enable quickly adding/removing stuff to/from config painlessly.
@@ -62,7 +63,7 @@ class UserConfigParam
 protected:
     std::string paramName, comment;
 public:
-    virtual ~UserConfigParam() {}
+    virtual ~UserConfigParam();
     virtual void write(std::ofstream& stream) const = 0;
     virtual void readAsNode(const XMLNode* node) = 0;
     virtual void readAsProperty(const XMLNode* node) = 0;
@@ -262,8 +263,7 @@ namespace UserConfigParams
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
-    // TODO : implement saving to config file
-    PARAM_PREFIX std::vector<Player>        m_player;
+    PARAM_PREFIX ptr_vector<Player>         m_player;
     
 }
 #undef PARAM_PREFIX
@@ -277,7 +277,7 @@ private:
     /** Filename of the user config file. */
     std::string m_filename;
 
-    void        setFilename      ();
+    void        addDefaultPlayer ();
 
 public:
 
@@ -289,8 +289,8 @@ public:
         ~UserConfig();
     void setDefaults();
 
-    void  loadConfig();
-    void  loadConfig(const std::string& filename);
+    bool  loadConfig();
+    bool  loadConfig(const std::string& filename);
     void  saveConfig()                    { saveConfig(m_filename);     }
     void  saveConfig(const std::string& filename);
 

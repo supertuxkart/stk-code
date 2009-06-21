@@ -26,6 +26,8 @@
 #include <string>
 #include <stdlib.h>
 #include <fstream>
+#include <vector>
+#include "utils/ptr_vector.hpp"
 
 // for mkdir:
 #if !defined(WIN32) || defined(__CYGWIN__)
@@ -35,7 +37,17 @@
 #  include <direct.h>
 #endif
 
+class UserConfigParam;
+static ptr_vector<UserConfigParam, REF> all_params;
+
+
+// X-macros
+#define PARAM_PREFIX
+#define PARAM_DEFAULT(X) = X
+#include "config/user_config.hpp"
+
 #include "challenges/unlock_manager.hpp"
+#include "config/player.hpp"
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -47,17 +59,12 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-
-class UserConfigParam;
-static std::vector<UserConfigParam*> all_params;
-
-
-// X-macros
-#define PARAM_PREFIX
-#define PARAM_DEFAULT(X) = X
-#include "config/user_config.hpp"
-
 // ---------------------------------------------------------------------------------------
+
+UserConfigParam::~UserConfigParam()
+{
+    all_params.remove(this);
+}
 
 GroupUserConfigParam::GroupUserConfigParam(const char* groupName, const char* comment)
 {
@@ -326,14 +333,20 @@ UserConfig *user_config;
 UserConfig::UserConfig()
 {
     setDefaults();
-    loadConfig();
+    if(!loadConfig())
+    {
+        addDefaultPlayer();
+    }
 }   // UserConfig
 
 // -----------------------------------------------------------------------------
 UserConfig::UserConfig(const std::string& filename)
 {
     setDefaults();
-    loadConfig(filename);
+    if(!loadConfig(filename))
+    {
+        addDefaultPlayer();
+    }
 }   // UserConfig
 
 
@@ -343,28 +356,9 @@ UserConfig::~UserConfig()
 }   // ~UserConfig
 
 // -----------------------------------------------------------------------------
-/**
- * Set the config filename for each platform
- */
-void UserConfig::setFilename()
+void UserConfig::addDefaultPlayer()
 {
-#ifdef WIN32
-    m_filename = file_manager->getLogFile("supertuxkart.cfg");
-#else
-    m_filename = file_manager->getLogFile("config");
-#endif
-}   // setFilename
-
-// -----------------------------------------------------------------------------
-/**
- * Load default values for options
- */
-void UserConfig::setDefaults()
-{
-    setFilename();
-    m_warning           = "";
-    //m_blacklist_res.clear();
-
+    
     std::string username = "unnamed player";
     
     if(getenv("USERNAME")!=NULL)        // for windows
@@ -373,17 +367,26 @@ void UserConfig::setDefaults()
         username = getenv("USER");
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
-
-
-    std::cout << "creating Players with name " << username.c_str() << std::endl;
     
     // Set the name as the default name for all players.
-    // TODO : create only one by default and let users add more?
-    UserConfigParams::m_player.push_back( Player(username + " 1") );
-    UserConfigParams::m_player.push_back( Player(username + " 2") );
-    UserConfigParams::m_player.push_back( Player(username + " 3") );
-    UserConfigParams::m_player.push_back( Player(username + " 4") );
+    UserConfigParams::m_player.push_back( new Player(username.c_str()) );
     
+}
+
+// -----------------------------------------------------------------------------
+/**
+ * Load default values for options
+ */
+void UserConfig::setDefaults()
+{
+#ifdef WIN32
+    m_filename = file_manager->getLogFile("supertuxkart.cfg");
+#else
+    m_filename = file_manager->getLogFile("config");
+#endif
+    
+    m_warning           = "";
+    //m_blacklist_res.clear();    
 
 }   // setDefaults
  
@@ -391,9 +394,9 @@ void UserConfig::setDefaults()
 /**
  * load default configuration file for this platform
  */
-void UserConfig::loadConfig()
+bool UserConfig::loadConfig()
 {
-    loadConfig(m_filename);
+    return loadConfig(m_filename);
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
@@ -448,19 +451,19 @@ int UserConfig::CheckAndCreateDir()
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
-void UserConfig::loadConfig(const std::string& filename)
+bool UserConfig::loadConfig(const std::string& filename)
 {
     
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root)
     {
         std::cerr << "Could not read user config file file " << filename.c_str() << std::endl;
-        return;
+        return false;
     }
 
     // ---- Read config file version
     int configFileVersion = CURRENT_CONFIG_VERSION;
-    if(!root->get("version", &configFileVersion) < 1)
+    if(root->get("version", &configFileVersion) < 1)
     {
         std::cerr << "Warning, malformed user config file! Contains no version\n";
     }
@@ -497,21 +500,35 @@ void UserConfig::loadConfig(const std::string& filename)
         {
             printf("The old config file is deleted, a new one will be created.\n");
             delete root;
-            return;
+            return false;
         }
         printf("This warning can be ignored, the config file will be automatically updated.\n");
         // Keep on reading the config files as far as possible
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
-    
-    
+
     // ---- Read all other parameters
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
-        all_params[i]->readAsNode(root);
+        all_params[i].readAsNode(root);
+    }
+    
+    // ---- Read players
+    UserConfigParams::m_player.clearAndDeleteAll();
+    
+    std::vector<XMLNode*> players;
+    root->getNodes("Player", players);
+    const int amount = players.size();
+    for(int i=0; i<amount; i++)
+    {
+        std::string name;
+        players[i]->get("name", &name);
+        UserConfigParams::m_player.push_back( new Player(name.c_str()) );
+        std::cout << "----- player : " << name.c_str() << std::endl;
     }
     
     delete root;
+    return true;
     
 }   // loadConfig
 
@@ -542,13 +559,14 @@ void UserConfig::saveConfig(const std::string& filepath)
         return;
     }
     
+    configfile << "<?xml version=\"1.0\"?>\n";
     configfile << "<stkconfig version=\"" << CURRENT_CONFIG_VERSION << "\" >\n\n";
 
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
         //std::cout << "saving parameter " << i << " to file\n";
-        all_params[i]->write(configfile);
+        all_params[i].write(configfile);
     }
     configfile << "</stkconfig>\n";
     configfile.close();  

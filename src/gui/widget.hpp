@@ -340,6 +340,8 @@ namespace GUIEngine
     {
     public:
         void add();
+        void addItem(const char* item);
+
     };
     
 }

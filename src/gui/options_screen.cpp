@@ -15,19 +15,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#include "gui/options_screen.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/screen.hpp"
-#include "gui/widget.hpp"
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/player.hpp"
+#include "graphics/irr_driver.hpp"
+#include "gui/engine.hpp"
+#include "gui/modaldialog.hpp"
+#include "gui/options_screen.hpp"
+#include "gui/screen.hpp"
+#include "gui/state_manager.hpp"
+#include "gui/widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
-#include "graphics/irr_driver.hpp"
-#include "gui/state_manager.hpp"
+
 #include <iostream>
 
 using namespace GUIEngine;
@@ -288,7 +289,20 @@ namespace StateManager
             const std::string name2("devices");
             eventInput(devices, name2);
     }
-
+    
+    // -----------------------------------------------------------------------------
+    void initPlayers(Widget* widget, const std::string& name)
+    {
+        ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
+        assert(players != NULL);
+        
+        const int playerAmount = UserConfigParams::m_player.size();
+        for(int n=0; n<playerAmount; n++)
+        {
+            players->addItem( UserConfigParams::m_player[n].getName() );
+        }
+    }
+    
     void eventPlayers(Widget* widget, const std::string& name)
     {
         new EnterPlayerNameDialog(0.5f, 0.4f);
@@ -483,8 +497,13 @@ namespace StateManager
 
     void gotNewPlayerName(const stringw& newName)
     {
-        std::cout << "got player name : " << stringc( newName ).c_str() << std::endl;
-        // TODO
+        stringc newNameC( newName );
+   
+        UserConfigParams::m_player.push_back( new Player(newNameC.c_str()) );
+        
+        ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
+        if(players != NULL)
+            players->addItem( newNameC.c_str() );
     }
     
     // -----------------------------------------------------------------------------
@@ -507,8 +526,7 @@ namespace StateManager
 
             if(screen_name == "options_av.stkgui") initAudioVideo(widget, name);
             else if(screen_name == "options_input.stkgui") initInput(widget, name);
-
-            //getCurrentScreen()->m_inited;
+            else if(screen_name == "options_players.stkgui") initPlayers(widget, name);
         }
         else if(name == "options_choice")
         {

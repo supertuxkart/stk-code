@@ -126,6 +126,21 @@ const XMLNode *XMLNode::getNode(const std::string &s) const
     }
     return NULL;
 }   // getNode
+// ----------------------------------------------------------------------------
+/** Returns all nodes with the given name.
+ *  \param s Name of the nodes to return.
+ *  \param s Vector that will be filled with output values.
+ */
+const void XMLNode::getNodes(const std::string &s, std::vector<XMLNode*>& out) const
+{
+    for(unsigned int i=0; i<m_nodes.size(); i++)
+    {
+        if(m_nodes[i]->getName()==s)
+        {
+            out.push_back(m_nodes[i]);
+        }
+    }
+}   // getNode
 
 // ----------------------------------------------------------------------------
 /** If 'attribute' was defined, set 'value' to the value of the

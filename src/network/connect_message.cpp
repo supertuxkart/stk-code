@@ -27,6 +27,7 @@
 #endif
 
 #include "config/user_config.hpp"
+#include "config/player.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 
