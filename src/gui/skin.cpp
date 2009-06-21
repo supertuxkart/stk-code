@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#include "config/user_config.hpp"
 #include "gui/skin.hpp"
 #include "gui/engine.hpp"
 #include "gui/screen.hpp"
@@ -151,7 +152,11 @@ namespace SkinConfig
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
-    SkinConfig::loadFromFile( file_manager->getGUIDir() + "/skins/glass.stkskin" );
+    std::string skin_name = file_manager->getGUIDir();
+    skin_name += "/skins/";
+    skin_name += UserConfigParams::m_skin_file.c_str();
+    
+    SkinConfig::loadFromFile( skin_name );
     bg_image = NULL;
     
     m_fallback_skin = fallback_skin;

@@ -57,16 +57,18 @@ static std::vector<UserConfigParam*> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName)
+IntUserConfigParam::IntUserConfigParam(int defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
+    if(comment != NULL) this->comment = comment;
 }
 
 void IntUserConfigParam::write(std::ofstream& stream) const
 {
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n";
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
+    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
 
 void IntUserConfigParam::read(const XMLNode* node)
@@ -82,15 +84,19 @@ void IntUserConfigParam::read(const XMLNode* node)
     //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
 
-StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName)
+// ---------------------------------------------------------------------------------------
+
+StringUserConfigParam::StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
+    if(comment != NULL) this->comment = comment;
 }
 void StringUserConfigParam::write(std::ofstream& stream) const
 {
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n";
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
+    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
 void StringUserConfigParam::read(const XMLNode* node)
 {
@@ -100,16 +106,19 @@ void StringUserConfigParam::read(const XMLNode* node)
     child->get( "value", &value );
 }
 
-BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramName)
+// ---------------------------------------------------------------------------------------
+
+BoolUserConfigParam::BoolUserConfigParam(bool defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
-
+    if(comment != NULL) this->comment = comment;
 }
 void BoolUserConfigParam::write(std::ofstream& stream) const
 {
-    stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" )<< "\" />\n";
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
+    stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" )<< "\" />\n\n";
 }
 void BoolUserConfigParam::read(const XMLNode* node)
 {
@@ -131,17 +140,19 @@ void BoolUserConfigParam::read(const XMLNode* node)
         std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
 }
 
+// ---------------------------------------------------------------------------------------
 
-FloatUserConfigParam::FloatUserConfigParam(bool defaultValue, const char* paramName)
+FloatUserConfigParam::FloatUserConfigParam(bool defaultValue, const char* paramName, const char* comment)
 {
     this->value = defaultValue;
     this->paramName = paramName;
     all_params.push_back(this);
-
+    if(comment != NULL) this->comment = comment;
 }
 void FloatUserConfigParam::write(std::ofstream& stream) const
 {
-    stream << "    <" << paramName << " value=\"" << value << "\" />\n";
+    if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
+    stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
 void FloatUserConfigParam::read(const XMLNode* node)
 {

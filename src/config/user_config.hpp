@@ -59,7 +59,7 @@ class XMLNode;
 class UserConfigParam
 {
 protected:
-    std::string paramName;
+    std::string paramName, comment;
 public:
     virtual ~UserConfigParam() {}
     virtual void write(std::ofstream& stream) const = 0;
@@ -71,7 +71,7 @@ class IntUserConfigParam : public UserConfigParam
 {
     int value;
 public:
-    IntUserConfigParam(int defaultValue, const char* paramName);
+    IntUserConfigParam(int defaultValue, const char* paramName, const char* comment = NULL);
     void write(std::ofstream& stream) const;
     void read(const XMLNode* node);
     
@@ -83,7 +83,7 @@ class StringUserConfigParam : public UserConfigParam
 {
     std::string value;
 public:
-    StringUserConfigParam(const char* defaultValue, const char* paramName);
+    StringUserConfigParam(const char* defaultValue, const char* paramName, const char* comment = NULL);
     void write(std::ofstream& stream) const;
     void read(const XMLNode* node);
     
@@ -96,7 +96,7 @@ class BoolUserConfigParam : public UserConfigParam
 {
     bool value;
 public:
-    BoolUserConfigParam(bool defaultValue, const char* paramName);
+    BoolUserConfigParam(bool defaultValue, const char* paramName, const char* comment = NULL);
     void write(std::ofstream& stream) const;
     void read(const XMLNode* node);
     
@@ -108,7 +108,7 @@ class FloatUserConfigParam : public UserConfigParam
 {
     float value;
 public:
-    FloatUserConfigParam(bool defaultValue, const char* paramName);
+    FloatUserConfigParam(bool defaultValue, const char* paramName, const char* comment = NULL);
     void write(std::ofstream& stream) const;
     void read(const XMLNode* node);
     
@@ -133,62 +133,86 @@ public:
 
 namespace UserConfigParams
 {
-    PARAM_PREFIX BoolUserConfigParam         m_sfx              PARAM_DEFAULT( BoolUserConfigParam(true, "sfx_on") );
-    PARAM_PREFIX BoolUserConfigParam         m_music            PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on") );
+
+    // ---- Audio
+    PARAM_PREFIX BoolUserConfigParam         m_sfx
+            PARAM_DEFAULT( BoolUserConfigParam(true, "sfx_on", "Whether sound effects are enabled or not (true or false)") );
+    PARAM_PREFIX BoolUserConfigParam         m_music
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on", "Whether musics are enabled or not (true or false)") );
+    PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume", "Volume for sound effects, see openal AL_GAIN for interpretation") );
+    PARAM_PREFIX FloatUserConfigParam       m_music_volume
+            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume", "music volume from 0 to 1") );
     
-    /** Default number of karts. */
-    PARAM_PREFIX IntUserConfigParam          m_num_karts        PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts") );
+    // ---- Race setup
+    PARAM_PREFIX IntUserConfigParam          m_num_karts
+            PARAM_DEFAULT(  IntUserConfigParam(4, "numkarts", "Default number of karts. -1 means use all") );
+    PARAM_PREFIX IntUserConfigParam          m_num_laps
+            PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps", "Default number of laps.") );
+    PARAM_PREFIX IntUserConfigParam          m_difficulty
+            PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty", "Default race difficulty. 0=easy, 1=medium, 2=hard") );
     
-    /** Default number of laps. */
-    PARAM_PREFIX IntUserConfigParam          m_num_laps         PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps") );
-    
-    /** Default difficulty. */
-    PARAM_PREFIX IntUserConfigParam          m_difficulty       PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty") );
-    
-    /** Index of current background image. */ // TODO : make this a skin choice instead
-    PARAM_PREFIX IntUserConfigParam         m_background_index  PARAM_DEFAULT(  IntUserConfigParam(0, "background_index") );
-    
-    // Attributes that are accessed directly.
-    PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT(  BoolUserConfigParam(false, "gamepad_debug") );
-    PARAM_PREFIX BoolUserConfigParam        m_track_debug       PARAM_DEFAULT(  BoolUserConfigParam(false, "track_debug") );
-    PARAM_PREFIX BoolUserConfigParam        m_bullet_debug      PARAM_DEFAULT(  BoolUserConfigParam(false, "bullet_debug") );
-    PARAM_PREFIX BoolUserConfigParam        m_fullscreen        PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen") );
-    PARAM_PREFIX BoolUserConfigParam        m_no_start_screen   PARAM_DEFAULT(  BoolUserConfigParam(false, "no_start_screen") );
+    // ---- Video
+    PARAM_PREFIX IntUserConfigParam         m_width
+            PARAM_DEFAULT(  IntUserConfigParam(800, "width", "screen resolution width") );
+    PARAM_PREFIX IntUserConfigParam         m_height
+            PARAM_DEFAULT(  IntUserConfigParam(600, "height", "screen resolution height") );
+    PARAM_PREFIX BoolUserConfigParam        m_fullscreen
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen") );
+    PARAM_PREFIX IntUserConfigParam         m_prev_width
+            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width") );
+    PARAM_PREFIX IntUserConfigParam         m_prev_height
+            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height") );
+    PARAM_PREFIX BoolUserConfigParam        m_prev_windowed
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "prev_windowed") );
     
     // TODO : adapt to be more powerful with irrlicht
-    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx") );
+    PARAM_PREFIX BoolUserConfigParam        m_graphical_effects
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "gfx") );
     
-    PARAM_PREFIX BoolUserConfigParam        m_display_fps       PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps") );
+    PARAM_PREFIX BoolUserConfigParam        m_display_fps
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", "Display frame per seconds") );
+    PARAM_PREFIX IntUserConfigParam         m_max_fps
+            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", "maximum fps, should be at least 60") );
+
+    // ---- Debug
+    PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT( BoolUserConfigParam(false, "gamepad_debug") );
+    PARAM_PREFIX BoolUserConfigParam        m_track_debug       PARAM_DEFAULT( BoolUserConfigParam(false, "track_debug") );
+    PARAM_PREFIX bool                       m_bullet_debug      PARAM_DEFAULT( false );
+    PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
+
+    // Used to profile AI. Not saved to file.
+    // Positive: time in seconds; Negative: # laps; 0: no profiling.
+    PARAM_PREFIX int         m_profile                          PARAM_DEFAULT( 0 ); 
+
     
-    // Positive number: time in seconds, neg: # laps. (used to profile AI)
-    // 0 if no profiling. Never saved in config file!
-    PARAM_PREFIX IntUserConfigParam         m_profile           PARAM_DEFAULT(  IntUserConfigParam(0, "profile") ); 
+    // ---- Networking
+    PARAM_PREFIX StringUserConfigParam      m_server_address
+            PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress", "Information about last server used") );
+    PARAM_PREFIX IntUserConfigParam         m_server_port
+            PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", "Information about last server used") );
     
-    PARAM_PREFIX BoolUserConfigParam        m_print_kart_sizes  PARAM_DEFAULT(  BoolUserConfigParam(false, "print_kart_sizes") ); // print all kart sizes
+    // ---- Misc
+    PARAM_PREFIX BoolUserConfigParam        m_crashed
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); // TODO : is this used with new code? does it still work?
+    PARAM_PREFIX BoolUserConfigParam        m_log_errors
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors", "Enable logging of stdout and stderr to logfile") );
     
-    PARAM_PREFIX FloatUserConfigParam       m_sfx_volume        PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume") );
-    PARAM_PREFIX FloatUserConfigParam       m_music_volume      PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume") );
+    PARAM_PREFIX StringUserConfigParam      m_item_style
+            PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );
     
-    PARAM_PREFIX IntUserConfigParam         m_max_fps           PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps") );
+    PARAM_PREFIX StringUserConfigParam      m_kart_group
+            PARAM_DEFAULT(  StringUserConfigParam("standard", "kart_group", "Last selected kart group") );
+    PARAM_PREFIX StringUserConfigParam      m_track_group
+            PARAM_DEFAULT(  StringUserConfigParam("standard", "track_group", "Last selected track group") ); 
+    PARAM_PREFIX StringUserConfigParam      m_last_track
+            PARAM_DEFAULT(  StringUserConfigParam("jungle", "last_track", "Name of the last track used.") ); 
     
-    PARAM_PREFIX StringUserConfigParam      m_item_style        PARAM_DEFAULT(  StringUserConfigParam("items", "item_style") );
-    
-    PARAM_PREFIX StringUserConfigParam      m_kart_group        PARAM_DEFAULT(  StringUserConfigParam("standard", "kart_group") );      /**< Kart group used last.        */
-    PARAM_PREFIX StringUserConfigParam      m_track_group       PARAM_DEFAULT(  StringUserConfigParam("standard", "track_group") );     /**< Track group used last.       */
-    PARAM_PREFIX StringUserConfigParam      m_last_track        PARAM_DEFAULT(  StringUserConfigParam("jungle", "last_track") );      /**< name of the last track used. */
-    
-    PARAM_PREFIX StringUserConfigParam      m_server_address    PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress") );
-    PARAM_PREFIX IntUserConfigParam         m_server_port       PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port") );
-    
-    PARAM_PREFIX IntUserConfigParam         m_width             PARAM_DEFAULT(  IntUserConfigParam(800, "width") );
-    PARAM_PREFIX IntUserConfigParam         m_height            PARAM_DEFAULT(  IntUserConfigParam(600, "height") );
-    PARAM_PREFIX IntUserConfigParam         m_prev_width        PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width") );
-    PARAM_PREFIX IntUserConfigParam         m_prev_height       PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height") );
-    
-    PARAM_PREFIX BoolUserConfigParam        m_prev_windowed     PARAM_DEFAULT(  BoolUserConfigParam(true, "prev_windowed") );
-    PARAM_PREFIX BoolUserConfigParam        m_crashed           PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); // TODO : is this used with new code? does it still work?
-    PARAM_PREFIX BoolUserConfigParam        m_log_errors        PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors") );
-    
+    PARAM_PREFIX StringUserConfigParam      m_skin_file
+            PARAM_DEFAULT(  StringUserConfigParam("glass.stkskin", "skin_file", "Name of the skin to use") );
+
+    PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
+
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
