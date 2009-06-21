@@ -1167,7 +1167,10 @@ void RibbonGridWidget::updateItemDisplay()
                 std::string track_sshot = file_manager->getDataDir() + "/" + m_items[icon_id].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
-                icon->m_properties[PROP_ID] = m_items[icon_id].m_code_name;
+                
+                icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
+                icon->m_properties[PROP_TEXT] = m_items[icon_id].m_user_name;
+                
                 row.setLabel(i, m_items[icon_id].m_user_name);
             }
             else
@@ -1186,6 +1189,16 @@ const std::string& RibbonGridWidget::getSelectionIDString()
 
     if(row != NULL) return row->getSelectionIDString();
 
+    static const std::string nothing = "";
+    return nothing;
+}
+// -----------------------------------------------------------------------------
+const std::string& RibbonGridWidget::getSelectionText()
+{
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+    
+    if(row != NULL) return row->getSelectionText();
+    
     static const std::string nothing = "";
     return nothing;
 }

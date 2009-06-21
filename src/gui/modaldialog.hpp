@@ -41,6 +41,7 @@ public:
     
     static void dismiss();
     static void onEnterPressed();
+    static bool isADialogActive();
 };
 
 class PressAKeyDialog : public ModalDialog
@@ -54,7 +55,7 @@ public:
 
 class EnterPlayerNameDialog : public ModalDialog
 {
-    IGUIEditBox* textCtrl;
+    irr::gui::IGUIEditBox* textCtrl;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -62,3 +63,14 @@ public:
     EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
     void onEnterPressedInternal();
 };
+
+class TrackInfoDialog : public ModalDialog
+{
+public:
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);
+    void onEnterPressedInternal();
+};
+

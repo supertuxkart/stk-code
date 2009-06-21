@@ -31,6 +31,7 @@
 #include "graphics/irr_driver.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
+#include "gui/modaldialog.hpp"
 #include "gui/engine.hpp"
 #include "gui/race_gui.hpp"
 #include "gui/screen.hpp"
@@ -197,6 +198,8 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         else if(btnID == KEY_RIGHT) action = PA_RIGHT;
         else if(btnID == KEY_SPACE) action = PA_FIRE;
 
+        if(btnID == KEY_RETURN && ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
+        
         if(action != PA_FIRST)
         {
             action_found = true;

@@ -527,7 +527,6 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             
         case PA_BRAKE:
         {
-            std::cerr << "brake\n";
             IGUIElement *el, *first = NULL, *closest = NULL;
             el = GUIEngine::getGUIEnv()->getFocus();
             

@@ -266,6 +266,7 @@ namespace GUIEngine
         
         RibbonType getRibbonType() const { return m_ribbon_type; }
         const std::string& getSelectionIDString() { return m_children[m_selection].m_properties[PROP_ID]; }
+        const std::string& getSelectionText() { return m_children[m_selection].m_properties[PROP_TEXT]; }
         void setLabel(const int id, std::string new_name);
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
@@ -325,6 +326,8 @@ namespace GUIEngine
         bool mouseHovered(Widget* child);
         
         const std::string& getSelectionIDString();
+        const std::string& getSelectionText();
+
         void setSelection(int item_id);
         void setSelection(const std::string& code_name);
     };

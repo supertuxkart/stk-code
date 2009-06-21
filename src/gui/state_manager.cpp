@@ -32,6 +32,7 @@
 #include "gui/widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
@@ -294,19 +295,10 @@ namespace StateManager
             if(w2 != NULL)
             {
                 std::cout << "Clicked on track " << w2->getSelectionIDString().c_str() << std::endl;
-
-                StateManager::enterGameState();
-                //race_manager->setDifficulty(RaceManager::RD_HARD);
-                race_manager->setTrack("beach");
-                race_manager->setNumLaps( 3 );
-                race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
-                //race_manager->setNumKarts( 1 );
-                race_manager->setNumPlayers( 1 );
-                race_manager->setNumLocalPlayers( 1 );
-                network_manager->setupPlayerKartInfo();
-                //race_manager->getKartType(1) = KT_PLAYER;
-
-                race_manager->startNew();
+                
+                ITexture* screenshot = GUIEngine::getDriver()->getTexture( (file_manager->getDataDir() + "/gui/track1.png").c_str() );
+                
+                new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.75, 0.6);
             }
         }
         else if(name == "gps")
