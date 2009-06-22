@@ -67,9 +67,10 @@ supertuxkart_SOURCES = \
  gui/engine.hpp \
  gui/font.cpp \
  gui/font.hpp \
+ gui/modaldialog.cpp \
+ gui/modaldialog.hpp \
  gui/my_button.cpp \
  gui/my_button.hpp \
- gui/modaldialog.cpp \
  gui/options_screen.cpp \
  gui/options_screen.hpp \
  gui/race_gui.cpp \
