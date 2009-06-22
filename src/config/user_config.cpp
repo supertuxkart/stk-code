@@ -333,7 +333,7 @@ UserConfig *user_config;
 UserConfig::UserConfig()
 {
     setDefaults();
-    if(!loadConfig())
+    if(!loadConfig() || UserConfigParams::m_player.size() == 0)
     {
         addDefaultPlayer();
     }
@@ -343,7 +343,7 @@ UserConfig::UserConfig()
 UserConfig::UserConfig(const std::string& filename)
 {
     setDefaults();
-    if(!loadConfig(filename))
+    if(!loadConfig(filename) || UserConfigParams::m_player.size() == 0)
     {
         addDefaultPlayer();
     }
