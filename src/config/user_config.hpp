@@ -224,7 +224,7 @@ namespace UserConfigParams
 
     // ---- Debug
     PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT( BoolUserConfigParam(false, "gamepad_debug") );
-    PARAM_PREFIX BoolUserConfigParam        m_track_debug       PARAM_DEFAULT( BoolUserConfigParam(false, "track_debug") );
+    PARAM_PREFIX IntUserConfigParam         m_track_debug       PARAM_DEFAULT( IntUserConfigParam(false, "track_debug") );
     PARAM_PREFIX bool                       m_bullet_debug      PARAM_DEFAULT( false );
     PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
 

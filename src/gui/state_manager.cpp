@@ -298,7 +298,7 @@ namespace StateManager
                 
                 ITexture* screenshot = GUIEngine::getDriver()->getTexture( (file_manager->getDataDir() + "/gui/track1.png").c_str() );
                 
-                new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.75, 0.6);
+                new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.75f, 0.6f);
             }
         }
         else if(name == "gps")
