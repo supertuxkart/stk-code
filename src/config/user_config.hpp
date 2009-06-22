@@ -183,7 +183,7 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
             PARAM_DEFAULT(  FloatUserConfigParam(1.0, "sfx_volume", &m_audio_group, "Volume for sound effects, see openal AL_GAIN for interpretation") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume", &m_audio_group, "music volume from 0 to 1") );
+            PARAM_DEFAULT(  FloatUserConfigParam(0.7f, "music_volume", &m_audio_group, "Music volume from 0.0 to 1.0") );
     
     // ---- Race setup
     PARAM_PREFIX GroupUserConfigParam        m_race_setup_group
@@ -201,15 +201,15 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );
     
     PARAM_PREFIX IntUserConfigParam         m_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "width", &m_video_group, "screen resolution width") );
+            PARAM_DEFAULT(  IntUserConfigParam(800, "width", &m_video_group, "Screen/window width in pixels") );
     PARAM_PREFIX IntUserConfigParam         m_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "height", &m_video_group, "screen resolution height") );
+            PARAM_DEFAULT(  IntUserConfigParam(600, "height", &m_video_group, "Screen/window height in pixels") );
     PARAM_PREFIX BoolUserConfigParam        m_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen", &m_video_group) );
     PARAM_PREFIX IntUserConfigParam         m_prev_width
-            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", &m_video_group) );
+            PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", &m_video_group, "Previous screen/window width") );
     PARAM_PREFIX IntUserConfigParam         m_prev_height
-            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", &m_video_group) );
+            PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", &m_video_group,"Previous screen/window height") );
     PARAM_PREFIX BoolUserConfigParam        m_prev_windowed
             PARAM_DEFAULT(  BoolUserConfigParam(true, "prev_windowed", &m_video_group) );
     
@@ -220,7 +220,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps", &m_video_group, "Display frame per seconds") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps
-            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", &m_video_group, "maximum fps, should be at least 60") );
+            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", &m_video_group, "Maximum fps, should be at least 60") );
 
     // ---- Debug
     PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT( BoolUserConfigParam(false, "gamepad_debug") );
