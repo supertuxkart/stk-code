@@ -75,7 +75,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* groupName, const char* co
 void GroupUserConfigParam::write(std::ofstream& stream) const
 {
     const int children_amount = m_children.size();
-    
+
     // comments
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str();
     for(int n=0; n<children_amount; n++)
@@ -83,10 +83,10 @@ void GroupUserConfigParam::write(std::ofstream& stream) const
         if(m_children[n]->comment.size() > 0)
             stream << "\n             " << m_children[n]->paramName << " : " << m_children[n]->comment.c_str();
     }
-    
-    
+
+
     stream << " -->\n    <" << paramName << "\n";
-    
+
     // actual values
     for(int n=0; n<children_amount; n++)
     {
@@ -103,13 +103,13 @@ void GroupUserConfigParam::readAsNode(const XMLNode* node)
         //std::cout << "Couldn't find parameter group " << paramName << std::endl;
         return;
     }
-    
+
     const int children_amount = m_children.size();
     for(int n=0; n<children_amount; n++)
     {
         m_children[n]->readAsProperty(child);
     }
-    
+
 }
 void GroupUserConfigParam::readAsProperty(const XMLNode* node)
 {
@@ -162,7 +162,7 @@ void IntUserConfigParam::readAsNode(const XMLNode* node)
         //std::cout << "Couldn't find int parameter " << paramName << std::endl;
         return;
     }
-    
+
     child->get( "value", &value );
     //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
@@ -199,7 +199,7 @@ void StringUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
-    
+
     child->get( "value", &value );
 }
 void StringUserConfigParam::readAsProperty(const XMLNode* node)
@@ -240,10 +240,10 @@ void BoolUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
-    
+
     std::string textValue = "";
     child->get( "value", &textValue );
-    
+
     if(textValue == "true")
     {
         value = true;
@@ -259,7 +259,7 @@ void BoolUserConfigParam::readAsProperty(const XMLNode* node)
 {
     std::string textValue = "";
     node->get( paramName, &textValue );
-    
+
     if(textValue == "true")
     {
         value = true;
@@ -305,7 +305,7 @@ void FloatUserConfigParam::readAsNode(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
-    
+
     child->get( "value", &value );
 }
 void FloatUserConfigParam::readAsProperty(const XMLNode* node)
@@ -358,19 +358,19 @@ UserConfig::~UserConfig()
 // -----------------------------------------------------------------------------
 void UserConfig::addDefaultPlayer()
 {
-    
+
     std::string username = "unnamed player";
-    
+
     if(getenv("USERNAME")!=NULL)        // for windows
         username = getenv("USERNAME");
     else if(getenv("USER")!=NULL)       // Linux, Macs
         username = getenv("USER");
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
-    
+
     // Set the name as the default name for all players.
     UserConfigParams::m_player.push_back( new Player(username.c_str()) );
-    
+
 }
 
 // -----------------------------------------------------------------------------
@@ -384,12 +384,12 @@ void UserConfig::setDefaults()
 #else
     m_filename = file_manager->getLogFile("config");
 #endif
-    
+
     m_warning           = "";
-    //m_blacklist_res.clear();    
+    //m_blacklist_res.clear();
 
 }   // setDefaults
- 
+
 // -----------------------------------------------------------------------------
 /**
  * load default configuration file for this platform
@@ -410,17 +410,17 @@ bool UserConfig::loadConfig()
 int UserConfig::CheckAndCreateDir()
 {
     // the standard C/C++ libraries don't include anything allowing to check
-    // for directory existance. I work around this by checking if trying to 
+    // for directory existance. I work around this by checking if trying to
     // check for the config file (first reading, then writing)
-    
+
     const std::string filename = file_manager->getHomeDir() + "/config";
-    
+
     std::ofstream test(filename.c_str(), std::ios::in);
-    
+
     if(test.fail() || !test.is_open())
     {
         std::ofstream test2(filename.c_str(), std::ios::out);
-        
+
         if(test2.fail() || !test2.is_open())
         {
             int bError;
@@ -442,20 +442,20 @@ int UserConfig::CheckAndCreateDir()
             }
         }
         if(test2.is_open()) test2.close();
-        
+
     }
     if(test.is_open()) test.close();
     return 1;
-   
+
 }   // CheckAndCreateDir
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
 bool UserConfig::loadConfig(const std::string& filename)
 {
-    
+
     XMLNode* root = file_manager->createXMLTree(filename);
-    if(!root)
+    if(!root || root->getName() != "stkconfig")
     {
         std::cerr << "Could not read user config file file " << filename.c_str() << std::endl;
         return false;
@@ -512,10 +512,10 @@ bool UserConfig::loadConfig(const std::string& filename)
     {
         all_params[i].readAsNode(root);
     }
-    
+
     // ---- Read players
     UserConfigParams::m_player.clearAndDeleteAll();
-    
+
     std::vector<XMLNode*> players;
     root->getNodes("Player", players);
     const int amount = players.size();
@@ -526,10 +526,10 @@ bool UserConfig::loadConfig(const std::string& filename)
         UserConfigParams::m_player.push_back( new Player(name.c_str()) );
         std::cout << "----- player : " << name.c_str() << std::endl;
     }
-    
+
     delete root;
     return true;
-    
+
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
@@ -537,7 +537,7 @@ bool UserConfig::loadConfig(const std::string& filename)
 void UserConfig::saveConfig(const std::string& filepath)
 {
     // TODO : save challenges state
-    
+
     const int DIR_EXIST = CheckAndCreateDir();
     // Check if the config directory exists (again, since it was already checked
     // when reading the config file - this is done in case that the problem was
@@ -552,13 +552,13 @@ void UserConfig::saveConfig(const std::string& filepath)
 
     std::ofstream configfile;
     configfile.open (filepath.c_str());
-    
+
     if(!configfile.is_open())
     {
         std::cerr << "Failed to open " << filepath.c_str() << " for writing, user config won't be saved\n";
         return;
     }
-    
+
     configfile << "<?xml version=\"1.0\"?>\n";
     configfile << "<stkconfig version=\"" << CURRENT_CONFIG_VERSION << "\" >\n\n";
 
@@ -569,6 +569,6 @@ void UserConfig::saveConfig(const std::string& filepath)
         all_params[i].write(configfile);
     }
     configfile << "</stkconfig>\n";
-    configfile.close();  
-    
+    configfile.close();
+
 }   // saveConfig
