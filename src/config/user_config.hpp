@@ -98,6 +98,7 @@ public:
     
     operator int() const { return value; }
     int& operator=(const int& v) { value = v; return value; }
+    int& operator=(const IntUserConfigParam& v) { value = (int)v; return value; }
 };
 
 class StringUserConfigParam : public UserConfigParam
@@ -116,6 +117,8 @@ public:
     
     operator std::string() const { return value; }
     std::string& operator=(const std::string& v) { value = v; return value; }
+    std::string& operator=(const StringUserConfigParam& v) { value = (std::string)v; return value; }
+
     const char* c_str() const { return value.c_str(); }
 };
 
@@ -135,6 +138,7 @@ public:
     
     operator bool() const { return value; }
     bool& operator=(const bool& v) { value = v; return value; }
+    bool& operator=(const BoolUserConfigParam& v) { value = (bool)v; return value; }
 };
 
 class FloatUserConfigParam : public UserConfigParam
@@ -152,6 +156,7 @@ public:
     
     operator float() const { return value; }
     float& operator=(const float& v) { value = v; return value; }
+    float& operator=(const FloatUserConfigParam& v) { value = (float)v; return value; }
 };
 
 
