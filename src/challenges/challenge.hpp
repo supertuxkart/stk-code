@@ -22,10 +22,9 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
+class XMLNode;
 
 enum REWARD_TYPE
    {UNLOCK_TRACK,
@@ -86,13 +85,13 @@ public:
     void  setActive()                            {m_state = CH_ACTIVE;            }
     const std::vector<std::string>& 
           getPrerequisites() const               {return m_prerequisites;         }
-    void  load(const lisp::Lisp* config);
-    void  save(lisp::Writer* writer);
+    void  load(const XMLNode* config);
+    void  save(std::ofstream& writer);
 
     // These functions are meant for customisation, e.g. load/save
     // additional state information specific to the challenge
-    virtual void loadState(const lisp::Lisp* config) {};
-    virtual void saveState(lisp::Writer* writer)     {};
+    virtual void loadAdditionalInfo(const XMLNode* config) {};
+    virtual void saveAdditionalInfo(std::ofstream& writer)     {};
 
     // These functions are called when a race/gp is finished. It allows
     // the challenge to unlock features (when returning true), otherwise

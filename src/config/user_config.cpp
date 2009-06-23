@@ -527,6 +527,10 @@ bool UserConfig::loadConfig(const std::string& filename)
         std::cout << "----- player : " << name.c_str() << std::endl;
     }
 
+    // --- Read challenges
+    
+    unlock_manager->load(root);
+    
     delete root;
     return true;
 
@@ -536,8 +540,6 @@ bool UserConfig::loadConfig(const std::string& filename)
 /** Write settings to config file. */
 void UserConfig::saveConfig(const std::string& filepath)
 {
-    // TODO : save challenges state
-
     const int DIR_EXIST = CheckAndCreateDir();
     // Check if the config directory exists (again, since it was already checked
     // when reading the config file - this is done in case that the problem was
@@ -568,6 +570,9 @@ void UserConfig::saveConfig(const std::string& filepath)
         //std::cout << "saving parameter " << i << " to file\n";
         all_params[i].write(configfile);
     }
+    
+    unlock_manager->save(configfile);
+    
     configfile << "</stkconfig>\n";
     configfile.close();
 

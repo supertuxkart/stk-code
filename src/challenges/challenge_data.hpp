@@ -26,6 +26,7 @@
 
 #include "challenges/challenge.hpp"
 #include "race/race_manager.hpp"
+#include "lisp/lisp.hpp"
 
 class ChallengeData : public Challenge
 {

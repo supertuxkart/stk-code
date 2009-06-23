@@ -23,9 +23,9 @@
 #include <map>
 
 #include "challenges/challenge.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
+#include <fstream>
+
+class XMLNode;
 
 class UnlockManager
 {
@@ -40,8 +40,8 @@ public:
                UnlockManager    ();
     void       addChallenge     (Challenge *c);
     void       addChallenge     (const std::string& filename);
-    void       load             (const lisp::Lisp*);
-    void       save             (lisp::Writer* writer);
+    void       load             (const XMLNode*);
+    void       save             (std::ofstream& writer);
     std::vector<const Challenge*> 
                getActiveChallenges();
     const std::vector<const Challenge*> 

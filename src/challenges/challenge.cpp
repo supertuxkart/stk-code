@@ -19,6 +19,9 @@
 
 #include "challenges/challenge.hpp"
 
+#include <iostream>
+
+#include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -137,26 +140,34 @@ const std::string Challenge::getUnlockedMessage() const
 
 //-----------------------------------------------------------------------------
 /** Loads the state for a challenge object (esp. m_state), and calls the
- *  virtual function loadState for additional information
+ *  virtual function loadAdditionalInfo for additional information
  */
-void Challenge::load(const lisp::Lisp* config)
+void Challenge::load(const XMLNode* challengesNode)
 {
-    const lisp::Lisp* subnode= config->getLisp(getId());
-    if(!subnode) return;
-
+    const XMLNode* node = challengesNode->getNode( getId() );
+    if(node == NULL) return;
+    
     // See if the challenge is solved (it's activated later from the
     // unlock_manager).
-    bool finished=false;
-    subnode->get("solved", finished);
+    
+    std::string solvedString;
+    node->get("solved", &solvedString);
+    
+    bool finished = (solvedString == "true");
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
-    if(!finished) loadState(subnode);
+    
+    if(m_state == CH_SOLVED)
+    {
+        std::cout << "Solved challenge!! " << getId().c_str() << std::endl;
+    }
+    
+    if(!finished) loadAdditionalInfo(node);
 }   // load
 
 //-----------------------------------------------------------------------------
-void Challenge::save(lisp::Writer* writer)
+void Challenge::save(std::ofstream& writer)
 {
-    writer->beginList(getId());
-    writer->write("solved", isSolved());
-    if(!isSolved()) saveState(writer);
-    writer->endList(getId());
+    writer << "        <" << getId() << " solved=\"" << (isSolved() ? "true" : "false") << "\"";
+    if(!isSolved()) saveAdditionalInfo(writer);
+    writer << " />\n";
 }   // save

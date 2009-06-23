@@ -167,24 +167,32 @@ Challenge* UnlockManager::getChallenge(const std::string& id)
 //-----------------------------------------------------------------------------
 /** This is called from user_config when reading the config file
 */
-void UnlockManager::load(const lisp::Lisp* config)
+void UnlockManager::load(const XMLNode* configRoot)
 {
+    const XMLNode* challengesNode = configRoot->getNode("challenges");
+    if(challengesNode == NULL) return;
+    
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
     {
-        i->second->load(config);
+        i->second->load(challengesNode);
     }
     computeActive();
 }   // load
 
 //-----------------------------------------------------------------------------
-void UnlockManager::save(lisp::Writer* writer)
+void UnlockManager::save(std::ofstream& writer)
 {
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
+    writer << "    <challenges>\n";
+    
+    for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+                                    i!= m_all_challenges.end();  i++)
     {
         i->second->save(writer);
-    }   // for i in m_all_challenges
+    }
+    
+    writer << "    </challenges>\n\n";
+    
 }   // save
 
 //-----------------------------------------------------------------------------
