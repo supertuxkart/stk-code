@@ -72,6 +72,8 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
+    ~EnterPlayerNameDialog();
+
     void onEnterPressedInternal();
 };
 
@@ -81,7 +83,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);
+    TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
     void onEnterPressedInternal();
 };
 

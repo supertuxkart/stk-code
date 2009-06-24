@@ -34,6 +34,10 @@ static ModalDialog* modalWindow = NULL;
 
 ModalDialog::~ModalDialog()
 {
+    // irrLicht is to stupid to remove focus from deleted widgets
+    // so do it by hand
+    GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+    
     m_irrlicht_window->remove();
     
     if(modalWindow == this) modalWindow = NULL;
@@ -47,6 +51,7 @@ void ModalDialog::dismiss()
 
 void ModalDialog::onEnterPressed()
 {
+    std::cout << "onEnterPressed()\n";
     if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
 }
 
@@ -70,10 +75,11 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     const int h = (int)(frame_size.Height*percentHeight);
     m_area = core::rect< s32 >( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
                            dimension2d< s32 >(w, h) );
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );
-
+    
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = this;
+    
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -121,6 +127,8 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
+    std::cout << "EnterPlayerName()\n";
+
     //core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
     //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
     //                                                              area_top, false /* border */, true /* word wrap */,
@@ -163,6 +171,11 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
 
 }
+EnterPlayerNameDialog::~EnterPlayerNameDialog()
+{
+    std::cout << "Rmoving text control element\n";
+    textCtrl->m_element->remove();
+}
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -171,6 +184,12 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     stringw playerName = textCtrl->getText();
     if(playerName.size() > 0)
         StateManager::gotNewPlayerName( playerName );
+    
+    // irrLicht is to stupid to remove focus from deleted widgets
+    // so do it by hand
+    GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+    GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+
     ModalDialog::dismiss();
 }
 
