@@ -134,6 +134,7 @@ namespace StateManager
             //test->setMaterialFlag(EMF_LIGHTING , false);
 
             w3->setModel(test);
+            w3->update(0);
             
             getCurrentScreen()->m_inited = true;
         } // end if init

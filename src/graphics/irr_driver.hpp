@@ -85,6 +85,8 @@ public:
     void                  changeResolution();
     void showPointer();
     void hidePointer();
+    
+    void renderToTexture(scene::IMesh *mesh, irr::video::ITexture* target, float angle);
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

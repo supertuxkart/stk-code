@@ -1001,10 +1001,10 @@
 				9505577D0F696A900056E88C /* my_button.hpp */,
 				95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */,
 				95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */,
+				950557800F696A900056E88C /* screen.hpp */,
 				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
 				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
 				9505577F0F696A900056E88C /* screen.cpp */,
-				950557800F696A900056E88C /* screen.hpp */,
 				950557810F696A900056E88C /* screen_loader.cpp */,
 				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
 				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
@@ -1543,8 +1543,6 @@
 		95C2AE870F296542000D3E5D /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				95D950D70FE4741D002E10AD /* water_splash.hpp */,
-				95D950D80FE4741D002E10AD /* water_splash.cpp */,
 				95C65D980F532FD400BE7BA7 /* camera.cpp */,
 				95C65D960F532FCE00BE7BA7 /* camera.hpp */,
 				9540E2490FD5F8A8002985B8 /* explosion.cpp */,
@@ -1569,6 +1567,8 @@
 				95C65D970F532FD400BE7BA7 /* smoke.hpp */,
 				95C65DA00F532FD400BE7BA7 /* shadow.cpp */,
 				95C65D8F0F532FCE00BE7BA7 /* shadow.hpp */,
+				95D950D80FE4741D002E10AD /* water_splash.cpp */,
+				95D950D70FE4741D002E10AD /* water_splash.hpp */,
 			);
 			name = graphics;
 			path = ../../graphics;

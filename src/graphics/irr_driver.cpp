@@ -277,6 +277,41 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
     return m_scene_manager->addMeshSceneNode(mesh);
 }   // addMesh
 
+void IrrDriver::renderToTexture(scene::IMesh *mesh, ITexture* target, float angle)
+{        
+    scene::ISceneNode* node = addMesh(mesh);
+    node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
+    node->setPosition( core::vector3df(0,0,0) );
+    node->updateAbsolutePosition();
+
+    node->setRotation( core::vector3df(0, angle, 0) );
+    
+    const core::vector3df &sun_pos = core::vector3df( 500.0f, 500.0f, 500.0f );
+    scene::ILightSceneNode* light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
+    video::SLight lightColor;
+    lightColor.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
+    light->setLightData(lightColor);
+    
+    
+    ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
+    
+    camera->setPosition( core::vector3df(0.0, 25.0f, 70.0f) );
+    camera->setUpVector( core::vector3df(0.0, -1.0, 0.0) );
+    camera->setTarget( core::vector3df(0, 0 ,0) );
+    camera->updateAbsolutePosition();
+    
+    m_device->getVideoDriver()->setRenderTarget(target);
+    //m_device->getVideoDriver()->beginScene(true, true, video::SColor(0,0,0,0));
+    m_scene_manager->drawAll();
+    //m_device->getVideoDriver()->endScene();
+    
+    removeNode(node);
+    removeNode(camera);
+    removeNode(light);
+    
+    m_device->getVideoDriver()->setRenderTarget(0, false, false);
+}
+
 // ----------------------------------------------------------------------------
 /** Creates a quad mesh buffer and adds it to the scene graph.
  */
@@ -424,7 +459,22 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
 void IrrDriver::update(float dt)
 {
     if(!m_device->run()) return;
+    
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+    
+    // FIXME : flickers
+    if(!StateManager::isGameState())
+    {
+        // this code needs to go outside beginScene() / endScene() since
+        // the model view widget will do off-screen rendering there
+        const int updateAmount = GUIEngine::needsUpdate.size();
+        for(int n=0; n<updateAmount; n++)
+        {
+            GUIEngine::needsUpdate[n].update(dt);
+        }
+    }
+    
+    
 #ifdef HAVE_GLUT
     if(UserConfigParams::m_bullet_debug && race_manager->raceIsActive())
     {
@@ -484,6 +534,8 @@ void IrrDriver::update(float dt)
     }
 
     m_device->getVideoDriver()->endScene();
+    
+    
 }   // update
 
 // ----------------------------------------------------------------------------

@@ -38,6 +38,7 @@ namespace GUIEngine
     
     ptr_vector<Screen, HOLD> g_loaded_screens;
     Screen* g_current_screen = NULL;
+    ptr_vector<Widget, REF> needsUpdate;
 
     
     float dt = 0;
@@ -101,12 +102,15 @@ void clear()
 void cleanForGame()
 {
     clear();
+    needsUpdate.clearWithoutDeleting();
     if(g_irrlicht_event_core == NULL) g_irrlicht_event_core = new IrrlichtEventCore();
     g_device->setEventReceiver(g_irrlicht_event_core);
 }
 // -----------------------------------------------------------------------------  
 void switchToScreen(const char* screen_name)
 {    
+    needsUpdate.clearWithoutDeleting();
+    
     // clean what was left by the previous screen
     g_env->clear();
     if(g_current_screen != NULL) g_current_screen->elementsWereDeleted();
@@ -146,6 +150,7 @@ void switchToScreen(const char* screen_name)
 /** to be called after e.g. a resolution switch */
 void reshowCurrentScreen()
 {
+    needsUpdate.clearWithoutDeleting();
     StateManager::reshowTopMostMenu();
     //g_current_screen->addWidgets();
 }
@@ -163,7 +168,7 @@ void cleanUp()
     g_loaded_screens.clearAndDeleteAll();
     
     g_current_screen = NULL;
-    
+    needsUpdate.clearWithoutDeleting();
     // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
 }
 // -----------------------------------------------------------------------------
@@ -218,6 +223,7 @@ void render(float elapsed_time)
     {
         Credits::getInstance()->render(elapsed_time);
     }
+
 }
 
 }

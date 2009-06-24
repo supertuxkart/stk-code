@@ -128,6 +128,8 @@ namespace GUIEngine
         
         bool m_show_bounding_box;
         
+        virtual void update(float delta) { }
+        
         /**
          * Create and add the irrLicht widget(s) associated with this object.
          * Call after Widget was read from XML file and laid out.
@@ -342,9 +344,15 @@ namespace GUIEngine
 
     class ModelViewWidget : public Widget
     {
+        scene::IMesh* m_model;
+        video::ITexture* m_texture;
+        float angle;
     public:
+        ~ModelViewWidget();
+        
         void add();
-        void setModel(SAnimatedMesh* mesh);
+        void setModel(irr::scene::IMesh* mesh);
+        void update(float delta);
     };
     
     class ListWidget : public Widget
@@ -363,7 +371,7 @@ namespace GUIEngine
         void add();
         void addItem(const char* item);
         
-        stringw getText() const;
+        core::stringw getText() const;
     };
     
 }
