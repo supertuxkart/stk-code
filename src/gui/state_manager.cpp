@@ -420,16 +420,25 @@ namespace StateManager
 
     void escapePressed()
     {
+        // in input sensing mode
         if(input_manager->isInMode(InputManager::INPUT_SENSE_KEYBOARD) ||
            input_manager->isInMode(InputManager::INPUT_SENSE_GAMEPAD) )
         {
             ModalDialog::dismiss();
             input_manager->setMode(InputManager::MENU);
         }
+        // when another modal dialog is visible
+        else if(ModalDialog::isADialogActive())
+        {
+            ModalDialog::dismiss();
+        }
+        // In-game
         else if(g_game_mode)
         {
+            // TODO : show in-game menu
             resetAndGoToMenu("main.stkgui");
         }
+        // In menus
         else
         {
             popMenu();

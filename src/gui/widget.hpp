@@ -352,6 +352,8 @@ namespace GUIEngine
         void add();
         void addItem(const char* item);
 
+        int getSelection() const;
+        std::string getSelectionName() const;
     };
     
 }

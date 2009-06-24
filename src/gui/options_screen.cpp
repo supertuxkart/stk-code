@@ -305,7 +305,28 @@ namespace StateManager
     
     void eventPlayers(Widget* widget, const std::string& name)
     {
-        new EnterPlayerNameDialog(0.5f, 0.4f);
+        if(name == "addplayer")
+        {
+            new EnterPlayerNameDialog(0.5f, 0.4f);
+        }
+        else if(name == "players")
+        {
+            std::cout << "Event : players\n";
+            ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
+            assert(players != NULL);
+
+            std::string selectedPlayer = players->getSelectionName();
+            const int playerAmount = UserConfigParams::m_player.size();
+            for(int n=0; n<playerAmount; n++)
+            {
+                if(UserConfigParams::m_player[n].getName() == selectedPlayer)
+                {
+                    new PlayerInfoDialog( &UserConfigParams::m_player[n], 0.5f, 0.4f );
+                    return;
+                }
+            } // end for
+        }
+        
     }
     
     // -----------------------------------------------------------------------------

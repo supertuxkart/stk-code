@@ -646,6 +646,7 @@ bool Screen::OnEvent(const SEvent& event)
             case EGET_BUTTON_CLICKED:
             case EGET_SCROLL_BAR_CHANGED:
             case EGET_CHECKBOX_CHANGED:
+            case EGET_LISTBOX_SELECTED_AGAIN:
             {
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
@@ -712,7 +713,7 @@ bool Screen::OnEvent(const SEvent& event)
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
                 // FIXME : find a cleaner way to route the event to its proper location
-                ModalDialog::onEnterPressed();
+                if(ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
                 break;
             }
             default:

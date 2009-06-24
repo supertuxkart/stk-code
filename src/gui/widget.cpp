@@ -1286,3 +1286,16 @@ void ListWidget::addItem(const char* item)
     assert(list != NULL);
     list->addItem( stringw(item).c_str() );
 }
+
+int ListWidget::getSelection() const
+{
+    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    assert(list != NULL);
+    return list->getSelected();
+}
+std::string ListWidget::getSelectionName() const
+{
+    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    assert(list != NULL);
+    return stringc( list->getListItem( list->getSelected() ) ).c_str();
+}

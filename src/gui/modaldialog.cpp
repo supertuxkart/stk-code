@@ -246,19 +246,53 @@ void TrackInfoDialog::onEnterPressedInternal()
 
 
     
-PlayerInfoDialog::PlayerInfoDialog(Player* PlayerInfoDialog, const float w, const float h) : ModalDialog(w, h)
+PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h) : ModalDialog(w, h)
 {
+    const int y1 = m_area.getHeight()/4;
+    const int y2 = m_area.getHeight()*2/4;
+    const int y3 = m_area.getHeight()*3/4;
+    
+    IGUIFont* font = GUIEngine::getFont();
+    const int textHeight = font->getDimension(L"X").Height;
+    
+    const int buttonHeight = textHeight + 10;
+    
+    stringw playerName = player->getName();
+    
+    core::rect< s32 > area_bottom(50, y1 - textHeight/2, m_area.getWidth()-50, y1 + textHeight/2 + 10);
+    GUIEngine::getGUIEnv()->addEditBox(playerName.c_str(), area_bottom, true /* border */, m_irrlicht_window);
+    
+    {
+    ButtonWidget* widget = new ButtonWidget();
+    widget->m_type = WTYPE_BUTTON;
+    widget->m_properties[PROP_TEXT] = _("Rename");
+        
+    const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        
+    widget->x = m_area.getWidth()/2 - textWidth/2;
+    widget->y = y2;
+    widget->w = textWidth;
+    widget->h = buttonHeight;
+    widget->setParent(m_irrlicht_window);
+    m_children.push_back(widget);
+    widget->add();
+    }
+    
+    {
     ButtonWidget* widget = new ButtonWidget();
     widget->m_type = WTYPE_BUTTON;
     widget->m_properties[PROP_TEXT] = _("Remove");
-    widget->x = 0;
-    widget->y = 0;
-    widget->w = m_area.getWidth();
-    widget->h = m_area.getHeight();
-    widget->setParent(m_irrlicht_window);
+        
+    const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
     
+    widget->x = m_area.getWidth()/2 - textWidth/2;
+    widget->y = y3;
+    widget->w = textWidth;
+    widget->h = buttonHeight;
+    widget->setParent(m_irrlicht_window);
     m_children.push_back(widget);
     widget->add();
+    }
 }
 void PlayerInfoDialog::onEnterPressedInternal()
 {
