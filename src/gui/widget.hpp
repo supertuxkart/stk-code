@@ -43,7 +43,8 @@ namespace GUIEngine
         WTYPE_DIV,
         WTYPE_RIBBON_GRID,
         WTYPE_MODEL_VIEW,
-        WTYPE_LIST
+        WTYPE_LIST,
+        WTYPE_TEXTBOX
     };
     
     enum Property
@@ -354,6 +355,15 @@ namespace GUIEngine
 
         int getSelection() const;
         std::string getSelectionName() const;
+    };
+
+    class TextBoxWidget : public Widget
+    {
+    public:
+        void add();
+        void addItem(const char* item);
+        
+        stringw getText() const;
     };
     
 }

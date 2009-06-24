@@ -1277,7 +1277,7 @@ void ListWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
 
-    m_element = GUIEngine::getGUIEnv()->addListBox (widget_size, NULL, ++id_counter);
+    m_element = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, ++id_counter);
 }
 
 void ListWidget::addItem(const char* item)
@@ -1298,4 +1298,31 @@ std::string ListWidget::getSelectionName() const
     IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
     assert(list != NULL);
     return stringc( list->getListItem( list->getSelected() ) ).c_str();
+}
+
+#if 0
+#pragma mark -
+#pragma mark Text Box Widget
+#endif
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::add()
+{
+    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
+  
+    stringw text = m_properties[PROP_TEXT].c_str();
+    m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
+                                                   true /* border */, m_parent, ++id_counter);
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+}
+
+stringw TextBoxWidget::getText() const
+{
+    IGUIEditBox* textCtrl = dynamic_cast<IGUIEditBox*>(m_element);
+    assert(textCtrl != NULL);
+    
+    return stringw(textCtrl->getText());
 }

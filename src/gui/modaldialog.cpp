@@ -150,9 +150,18 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     const int bottomHeight = bottomYTo - bottomYFrom;
     const int textAreaYFrom = bottomYFrom + bottomHeight/2 - textHeight/2;
     
-    core::rect< s32 > area_bottom(50, textAreaYFrom - 10, m_area.getWidth()-50, textAreaYFrom + textHeight + 10);
-    textCtrl = GUIEngine::getGUIEnv()->addEditBox (L"", area_bottom, true /* border */, m_irrlicht_window);
-    GUIEngine::getGUIEnv()->setFocus(textCtrl);
+    textCtrl = new TextBoxWidget();
+    textCtrl->m_type = WTYPE_BUTTON;
+    textCtrl->m_properties[PROP_TEXT] = "";
+    textCtrl->x = 50;
+    textCtrl->y = textAreaYFrom - 10;
+    textCtrl->w = m_area.getWidth()-100;
+    textCtrl->h = textHeight + 5;
+    textCtrl->setParent(m_irrlicht_window);
+    m_children.push_back(textCtrl);
+    textCtrl->add();
+    GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -160,7 +169,8 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     stringw playerName = textCtrl->getText();
-    StateManager::gotNewPlayerName( playerName );
+    if(playerName.size() > 0)
+        StateManager::gotNewPlayerName( playerName );
     ModalDialog::dismiss();
 }
 
@@ -222,7 +232,6 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
 void TrackInfoDialog::onEnterPressedInternal()
 {
     IVideoDriver* driver = GUIEngine::getDriver();
-    IGUIFont* font = GUIEngine::getFont();
     
     // TODO : draw a loading screen
     driver->endScene();
@@ -254,18 +263,28 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = font->getDimension(L"X").Height;
-    
     const int buttonHeight = textHeight + 10;
     
-    stringw playerName = player->getName();
-    
-    core::rect< s32 > area_bottom(50, y1 - textHeight/2, m_area.getWidth()-50, y1 + textHeight/2 + 10);
-    GUIEngine::getGUIEnv()->addEditBox(playerName.c_str(), area_bottom, true /* border */, m_irrlicht_window);
+    {
+    TextBoxWidget* widget = new TextBoxWidget();
+    widget->m_type = WTYPE_BUTTON;
+    widget->m_properties[PROP_ID] = "renameplayer";
+    widget->m_properties[PROP_TEXT] = player->getName();
+    widget->x = 50;
+    widget->y = y1 - textHeight/2;
+    widget->w = m_area.getWidth()-100;
+    widget->h = textHeight + 5;
+    widget->setParent(m_irrlicht_window);
+    m_children.push_back(widget);
+    widget->add();
+    GUIEngine::getGUIEnv()->setFocus( widget->m_element );
+    }
     
     {
     ButtonWidget* widget = new ButtonWidget();
     widget->m_type = WTYPE_BUTTON;
-    widget->m_properties[PROP_TEXT] = _("Rename");
+    widget->m_properties[PROP_ID] = "renameplayer";
+    widget->m_properties[PROP_TEXT] = _("Rename"); // TODO : catch events
         
     const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
         
@@ -281,7 +300,8 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     {
     ButtonWidget* widget = new ButtonWidget();
     widget->m_type = WTYPE_BUTTON;
-    widget->m_properties[PROP_TEXT] = _("Remove");
+    widget->m_properties[PROP_ID] = "removeplayer";
+    widget->m_properties[PROP_TEXT] = _("Remove"); // TODO : catch events
         
     const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
     

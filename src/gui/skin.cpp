@@ -851,6 +851,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 {
     if(dynamic_cast<IGUIEditBox*>(element) != NULL)
     {
+        // TODO : make configurable in skin file
         GUIEngine::getDriver()->draw2DRectangle( SColor(100, 150, 150, 150), rect );
         return;
     }
@@ -878,10 +879,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     // fade out background
+    // TODO : make configurable in skin file
     GUIEngine::getDriver()->draw2DRectangle( SColor(150, 255, 255, 255),
                                               core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
     
     // draw frame (since it's transluscent, draw many times to get opacity)
+    // TODO : make configurable in skin file
     drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
     drawBoxFromStretchableTexture(rect, SkinConfig::m_render_params["window::neutral"]);
     

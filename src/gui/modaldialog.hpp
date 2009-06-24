@@ -23,6 +23,7 @@ class Player;
 namespace GUIEngine
 {
     class Widget;
+    class TextBoxWidget;
     
 /**
   * Base class, derive your own.
@@ -65,7 +66,7 @@ public:
 
 class EnterPlayerNameDialog : public ModalDialog
 {
-    irr::gui::IGUIEditBox* textCtrl;
+    TextBoxWidget* textCtrl;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
