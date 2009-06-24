@@ -16,7 +16,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "irrlicht.h"
+#include "utils/ptr_vector.hpp"
 
+class Player;
+
+namespace GUIEngine
+{
+    class Widget;
+    
 /**
   * Base class, derive your own.
   * Only once instance at a time (if you create a 2nd the first will be destroyed).
@@ -37,10 +44,13 @@ protected:
     virtual void onEnterPressedInternal();
     
 public:
+    ptr_vector<Widget> m_children;
+    
     virtual ~ModalDialog();
     
     static void dismiss();
     static void onEnterPressed();
+    static ModalDialog* getCurrent();
     static bool isADialogActive();
 };
 
@@ -74,3 +84,16 @@ public:
     void onEnterPressedInternal();
 };
 
+class PlayerInfoDialog : public ModalDialog
+{
+public:
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    PlayerInfoDialog(Player* PlayerInfoDialog,
+                     const float percentWidth, const float percentHeight);
+    void onEnterPressedInternal();
+};
+    
+    
+}

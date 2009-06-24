@@ -62,6 +62,7 @@ Widget::Widget()
     m_selected = false;
     m_event_handler = NULL;
     m_show_bounding_box = false;
+    m_parent = NULL;
 }
 // -----------------------------------------------------------------------------
 /**
@@ -231,6 +232,11 @@ void Widget::readCoords(Widget* parent)
 
 }
 
+void Widget::setParent(IGUIElement* parent)
+{
+    m_parent = parent;
+}
+
 #if 0
 #pragma mark -
 #pragma mark Button Widget
@@ -240,7 +246,7 @@ void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     stringw  message = m_properties[PROP_TEXT].c_str();
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, message.c_str(), L"");
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, message.c_str(), L"");
 
     id = m_element->getID();
     m_element->setTabOrder(id);
@@ -267,7 +273,7 @@ void LabelWidget::add()
     else if(m_properties[PROP_TEXT_ALIGN] == "right") align = EGUIA_LOWERRIGHT;
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; // TODO - make confiurable through XML file?
 
-    IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, NULL, -1);
+    IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, m_parent, -1);
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
 
@@ -294,7 +300,7 @@ void CheckBoxWidget::add()
     stringw message = m_properties[PROP_TEXT].c_str();
     //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
 
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, L"");
     id = m_element->getID();
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
@@ -334,7 +340,7 @@ void IconButtonWidget::add()
     if(clickable)
     {
         widget_size = rect<s32>(x, y, x + w, y + h);
-        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, L"");
         m_element = btn;
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
@@ -349,7 +355,7 @@ void IconButtonWidget::add()
 
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
 
-        IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, NULL, ++id_counter_2);
+        IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, m_parent, ++id_counter_2);
         m_element = btn;
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
@@ -361,7 +367,7 @@ void IconButtonWidget::add()
     if(message.size() > 0)
     {
         widget_size += position2d<s32>(0, widget_size.getHeight());
-        label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size);
+        label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
         label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         label->setTabStop(false);
     }
@@ -393,11 +399,7 @@ void IconButtonWidget::add()
 
 void IconButtonWidget::setLabel(std::string new_label)
 {
-    std::cout << "trying to set label " << new_label.c_str() << std::endl;
-
     if(label == NULL) return;
-
-    std::cout << "set label " << new_label.c_str() << std::endl;
 
     label->setText( stringw(new_label.c_str()).c_str() );
 }
@@ -529,7 +531,7 @@ void RibbonWidget::add()
 
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
 
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, L"");
     m_element = btn;
 
     const int subbuttons_amount = m_children.size();
@@ -733,7 +735,7 @@ void SpinnerWidget::add()
     }
 
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, ++id_counter, L"");
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, L"");
     m_element = btn;
 
     // left arrow

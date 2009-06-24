@@ -87,12 +87,6 @@ namespace GUIEngine
         bool m_selected;
         
         /**
-          * Create and add the irrLicht widget(s) associated with this object.
-          * Call after Widget was read from XML file and laid out.
-          */
-        virtual void add() {} 
-        
-        /**
           * called when left/right keys pressed and focus is on widget. 
           * Returns 'true' if main event handler should be notified of a change.
           * Override in children to be notified of left/right events.
@@ -124,12 +118,22 @@ namespace GUIEngine
           */
         Widget* m_event_handler;
         
+        IGUIElement* m_parent;
+        
         static bool convertToCoord(std::string& x, int* absolute, int* percentage);
     public:
         Widget();
         virtual ~Widget() {}
         
         bool m_show_bounding_box;
+        
+        /**
+         * Create and add the irrLicht widget(s) associated with this object.
+         * Call after Widget was read from XML file and laid out.
+         */
+        virtual void add() {} 
+        
+        void setParent(IGUIElement* parent);
         
         /**
           * If this widget has any children, they go here. Children can be either
@@ -168,27 +172,29 @@ namespace GUIEngine
     
     class ButtonWidget : public Widget
     {
-        void add();
     public:
+        void add();
         virtual ~ButtonWidget() {}
         void setLabel(const char* label);
     };
     
     class LabelWidget : public Widget
     {
-        void add();
     public:
+        void add();
         virtual ~LabelWidget() {}
     };
     
     class CheckBoxWidget : public Widget
     {
-        void add();
         bool m_state;
         bool transmitEvent(Widget* w, std::string& originator);
+        
     public:
         CheckBoxWidget();
         virtual ~CheckBoxWidget() {}
+        
+        void add();
         bool getState() const { return m_state; }
         void setState(const bool enabled)  { m_state = enabled; }
     };
@@ -204,14 +210,14 @@ namespace GUIEngine
         bool transmitEvent(Widget* w, std::string& originator);
         bool rightPressed();
         bool leftPressed();
-        void add();
     public:
         
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
+        
         void setValue(const int new_value);
         void addLabel(std::string label);
-        
+        void add();
         bool isGauge()  const { return m_gauge; }
         int  getValue() const { return m_value; }
         int  getMax()   const { return m_max;   }
@@ -221,11 +227,12 @@ namespace GUIEngine
     class IconButtonWidget : public Widget
     {
         bool clickable;
-        void add();
         IGUIStaticText* label;
     public:
-        virtual ~IconButtonWidget() {}
         IconButtonWidget(const bool clickable=true);
+        virtual ~IconButtonWidget() {}
+        
+        void add();
         void setLabel(std::string new_label);
     };
     

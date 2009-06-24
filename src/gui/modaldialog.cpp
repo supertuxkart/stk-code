@@ -15,16 +15,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/player.hpp"
 #include "gui/engine.hpp"
 #include "gui/modaldialog.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
+#include "gui/widget.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/translation.hpp"
 
 using namespace irr;
 
+namespace GUIEngine
+{
 // global instance of the current dialog if any
 static ModalDialog* modalWindow = NULL;
 
@@ -50,6 +54,10 @@ bool ModalDialog::isADialogActive()
 {
     return modalWindow != NULL;
 }
+ModalDialog* ModalDialog::getCurrent()
+{
+    return modalWindow;
+}
 
 void ModalDialog::onEnterPressedInternal()
 {
@@ -74,11 +82,37 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    core::rect< s32 > area2(0, 0, m_area.getWidth(), m_area.getHeight());
-    IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Press a key")).c_str(),
-                                          area2, false /* border */, true /* word wrap */,
-                                          m_irrlicht_window);
-    label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    //core::rect< s32 > area2(0, 0, m_area.getWidth(), m_area.getHeight());
+    //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Press a key")).c_str(),
+    //                                      area2, false /* border */, true /* word wrap */,
+    //                                      m_irrlicht_window);
+    //label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    
+    LabelWidget* widget = new LabelWidget();
+    widget->m_type = WTYPE_LABEL;
+    widget->m_properties[PROP_TEXT] = _("Press a key");
+    widget->m_properties[PROP_TEXT_ALIGN] = "center";
+    widget->x = 0;
+    widget->y = 0;
+    widget->w = m_area.getWidth();
+    widget->h = m_area.getHeight()/2;
+    widget->setParent(m_irrlicht_window);
+    
+    m_children.push_back(widget);
+    widget->add();
+    
+    
+    ButtonWidget* widget2 = new ButtonWidget();
+    widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
+    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel"); // TODO : pressing this button should cancel
+    widget2->x = 15;
+    widget2->y = m_area.getHeight() - 60;
+    widget2->w = m_area.getWidth() - 30;
+    widget2->h = 50;
+    widget2->setParent(m_irrlicht_window);
+    
+    m_children.push_back(widget2);
+    widget2->add();
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -87,12 +121,27 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
-    IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
-                                                                  area_top, false /* border */, true /* word wrap */,
-                                                                  m_irrlicht_window);
-    label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    //core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
+    //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
+    //                                                              area_top, false /* border */, true /* word wrap */,
+    //                                                              m_irrlicht_window);
+   // label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
   
+    LabelWidget* widget = new LabelWidget();
+    widget->m_type = WTYPE_LABEL;
+    widget->m_properties[PROP_TEXT] = _("Enter the new player's name");
+    widget->m_properties[PROP_TEXT_ALIGN] = "center";
+    widget->x = 0;
+    widget->y = 0;
+    widget->w = m_area.getWidth();
+    widget->h = m_area.getHeight()/2;
+    widget->setParent(m_irrlicht_window);
+    
+    m_children.push_back(widget);
+    widget->add();
+    
+    // ----
+    
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = font->getDimension(L"X").Height;
     
@@ -135,21 +184,37 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
                                                                   area_left, false /* border */, true /* word wrap */,
                                                                   m_irrlicht_window);
  
+    
     // TODO : preserve aspect ratio
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2);
     IGUIImage* screenshotWidget = GUIEngine::getGUIEnv()->addImage( area_right, m_irrlicht_window );
     screenshotWidget->setImage(screenshot);
     screenshotWidget->setScaleImage(true);
 
-    core::rect< s32 > area_bottom(0, y2, m_area.getWidth(), m_area.getHeight());
-    IGUIStaticText* d = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Number of laps")).c_str(),
-                                                              area_bottom, false /* border */, true /* word wrap */,
-                                                              m_irrlicht_window);
+    
+    SpinnerWidget* widget = new SpinnerWidget();
+    widget->m_type = WTYPE_SPINNER;
+    widget->x = 0;
+    widget->y = y2;
+    widget->w = m_area.getWidth();
+    widget->h = m_area.getHeight() - y2;
+    widget->setParent(m_irrlicht_window);
+    
+    widget->m_properties[PROP_MIN_VALUE] = "1";
+    widget->m_properties[PROP_MAX_VALUE] = "99";
+    
+    m_children.push_back(widget);
+    widget->add();
+    widget->setValue(3);
+    
+    //IGUIStaticText* d = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Number of laps")).c_str(),
+    //                                                          area_bottom, false /* border */, true /* word wrap */,
+    //                                                          m_irrlicht_window);
 
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    d->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    //d->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -179,3 +244,25 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->startNew();
 }
 
+
+    
+PlayerInfoDialog::PlayerInfoDialog(Player* PlayerInfoDialog, const float w, const float h) : ModalDialog(w, h)
+{
+    ButtonWidget* widget = new ButtonWidget();
+    widget->m_type = WTYPE_BUTTON;
+    widget->m_properties[PROP_TEXT] = _("Remove");
+    widget->x = 0;
+    widget->y = 0;
+    widget->w = m_area.getWidth();
+    widget->h = m_area.getHeight();
+    widget->setParent(m_irrlicht_window);
+    
+    m_children.push_back(widget);
+    widget->add();
+}
+void PlayerInfoDialog::onEnterPressedInternal()
+{
+}
+
+    
+}

@@ -198,7 +198,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         else if(btnID == KEY_RIGHT) action = PA_RIGHT;
         else if(btnID == KEY_SPACE) action = PA_FIRE;
 
-        if(btnID == KEY_RETURN && ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
+        if(btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive()) GUIEngine::ModalDialog::onEnterPressed();
         
         if(action != PA_FIRST)
         {
