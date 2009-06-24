@@ -44,6 +44,7 @@ using namespace irr;
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/bezier_curve.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/string_utils.hpp"
@@ -515,11 +516,33 @@ void Track::loadTrack(const std::string &filename)
         }
     }   // if sky-box
 
-    // Set the correct paths
+    xml_node = root->getNode("curves");
+	if(xml_node)
+		loadCurves(*xml_node);
+
+	// Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
     delete root;
 
 }   // loadTrack
+
+//-----------------------------------------------------------------------------
+void Track::loadCurves(const XMLNode &node)
+{
+	for(unsigned int i=0; i<node.getNumNodes(); i++)
+	{
+		const XMLNode *curve = node.getNode(i);
+		m_all_curves.push_back(new BezierCurve(*curve));
+		float t=0;
+		const BezierCurve &c=*m_all_curves[m_all_curves.size()-1];
+		while(t<=c.getNumPoints()-0.9998)  // allow for some rounding errors
+		{
+			Vec3 xyz = c.getXYZ(t);
+			printf("t %f xyz %f %f %f\n", t, xyz.getX(),xyz.getY(),xyz.getZ());
+			t=t+0.1f;
+		}
+	}   // for i<node.getNumNodes
+}   // loadCurves
 
 //-----------------------------------------------------------------------------
 void Track::getMusicInformation(std::vector<std::string>&       filenames, 

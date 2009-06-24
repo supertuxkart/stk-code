@@ -45,6 +45,7 @@ class TriangleMesh;
 class MovingTexture;
 class XMLNode;
 class PhysicalObject;
+class BezierCurve;
 
 class Track
 {
@@ -97,20 +98,13 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
+	/** List of all bezier curves in the track - for e.g. camera, ... */
+	std::vector<BezierCurve*> m_all_curves;
+
+	void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
 public:
-    struct SegmentTriangle
-    {
-        int segment;
-        int triangle;
-
-        SegmentTriangle
-        (
-            int _segment,
-            int _triangle
-        ) : segment(_segment), triangle(_triangle) {};
-    };
 
     std::string     m_name;
     bool            m_use_fog;

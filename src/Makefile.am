@@ -220,6 +220,8 @@ supertuxkart_SOURCES = \
  replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
+ tracks/bezier_curve.cpp \
+ tracks/bezier_curve.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
  tracks/quad.cpp \
