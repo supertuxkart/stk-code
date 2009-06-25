@@ -810,6 +810,7 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
     handleAnimatedTextures(scene_node, xml_node);
     m_all_nodes.push_back(scene_node);
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
+    scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
 
     return true;
 }   // loadMainTrack
@@ -1294,7 +1295,7 @@ void Track::loadTrackModel()
     
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f));
     m_light->setLightType(video::ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
-    m_light->setRotation( core::vector3df(45, 45, 45) );
+    m_light->setRotation( core::vector3df(180, 45, 45) );
    // m_light->getLightData().AmbientColor = irr::video::SColorf(0.6f, 0.6f, 0.6f, 1.0f);
     
     //m_light->getLightData().Attenuation = core::vector3df(0.01, 0.01, 0.01);
