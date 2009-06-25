@@ -286,12 +286,36 @@ void IrrDriver::renderToTexture(scene::IMesh *mesh, ITexture* target, float angl
 
     node->setRotation( core::vector3df(0, angle, 0) );
     
-    const core::vector3df &sun_pos = core::vector3df( 500.0f, 500.0f, 500.0f );
-    scene::ILightSceneNode* light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
-    video::SLight lightColor;
-    lightColor.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
-    light->setLightData(lightColor);
+    //vector3d< f32 > modelsize = mesh->getBoundingBox().getExtent();
+    //std::cout << "box size " << modelsize.X*50.0 << ", " << modelsize.Y*50.0 << ", " << modelsize.Z*50.0 << std::endl;
     
+    getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
+    
+    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
+    scene::ILightSceneNode* light = getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
+    //light->setLightType(ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
+    //light->getLightData().AmbientColor = irr::video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
+    //light->getLightData().Attenuation = core::vector3df(10, 10, 10);
+    light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+     
+    node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
+    node->setMaterialFlag(EMF_LIGHTING, true);
+   // node->setMaterialFlag(EMF_LIGHTING, true);
+    
+    const int materials = node->getMaterialCount();
+    for(int n=0; n<materials; n++)
+    {
+        node->getMaterial(n).setFlag(EMF_LIGHTING, true);
+
+        node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
+        node->getMaterial(n).SpecularColor.set(255,150,150,150); 
+        node->getMaterial(n).DiffuseColor.set(255,150,150,150);
+         
+        //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
+        node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
+        node->getMaterial(n).GouraudShading = true;
+    }
     
     ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
     
