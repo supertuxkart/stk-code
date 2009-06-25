@@ -809,7 +809,7 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
     scene_node->setRotation(hpr);
     handleAnimatedTextures(scene_node, xml_node);
     m_all_nodes.push_back(scene_node);
-    scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
 
     return true;
 }   // loadMainTrack
@@ -1004,7 +1004,7 @@ void Track::loadTrackModel()
             scene_node->setRotation(hpr);
             handleAnimatedTextures(scene_node, *node);
             m_all_nodes.push_back(scene_node);
-            scene_node->setMaterialFlag(video::EMF_LIGHTING, false);
+            scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
         }
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
@@ -1291,11 +1291,25 @@ void Track::loadTrackModel()
     file_manager->popModelSearchPath  ();
 
     const core::vector3df &sun_pos = getSunPos();
+    
+    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f));
+    m_light->setLightType(video::ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
+    m_light->setRotation( core::vector3df(45, 45, 45) );
+   // m_light->getLightData().AmbientColor = irr::video::SColorf(0.6f, 0.6f, 0.6f, 1.0f);
+    
+    //m_light->getLightData().Attenuation = core::vector3df(0.01, 0.01, 0.01);
+    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    
+    /*
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, sun_pos);
     video::SLight light;
     // HACK & TEST: checking how ambient looks for some things, must be properly done once we reach an agreement
     light.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
     m_light->setLightData(light);
+     */
+    
+    
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel();
     if(UserConfigParams::m_track_debug)
