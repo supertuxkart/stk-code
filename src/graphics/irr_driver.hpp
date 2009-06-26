@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+#include "utils/ptr_vector.hpp"
+#include "utils/vec3.hpp"
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -86,7 +89,7 @@ public:
     void showPointer();
     void hidePointer();
     
-    void renderToTexture(scene::IMesh *mesh, irr::video::ITexture* target, float angle);
+    void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector<Vec3>& mesh_location, video::ITexture* target, float angle);
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

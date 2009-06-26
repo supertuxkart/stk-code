@@ -277,14 +277,30 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
     return m_scene_manager->addMeshSceneNode(mesh);
 }   // addMesh
 
-void IrrDriver::renderToTexture(scene::IMesh *mesh, ITexture* target, float angle)
-{        
-    scene::ISceneNode* node = addMesh(mesh);
-    node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
-    node->setPosition( core::vector3df(0,0,0) );
-    node->updateAbsolutePosition();
+void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector<Vec3>& mesh_location, ITexture* target, float angle)
+{      
+    scene::ISceneNode* main_node = NULL;
+    
+    const int mesh_amount = mesh.size();
+    for(int n=0; n<mesh_amount; n++)
+    {
+        scene::ISceneNode* node = addMesh(mesh.get(n));
+        
+        if(main_node == NULL)
+        {
+            main_node = node;
+        }
+        else
+        {
+            node->setParent(main_node);
+        }
+        
+        node->setPosition( mesh_location[n].toIrrVector() );
+        node->updateAbsolutePosition();
+    }
 
-    node->setRotation( core::vector3df(0, angle, 0) );
+    main_node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
+    main_node->setRotation( core::vector3df(0, angle, 0) );
     
     //vector3d< f32 > modelsize = mesh->getBoundingBox().getExtent();
     //std::cout << "box size " << modelsize.X*50.0 << ", " << modelsize.Y*50.0 << ", " << modelsize.Z*50.0 << std::endl;
@@ -299,22 +315,22 @@ void IrrDriver::renderToTexture(scene::IMesh *mesh, ITexture* target, float angl
     light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
      
-    node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
-    node->setMaterialFlag(EMF_LIGHTING, true);
+    main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
+    main_node->setMaterialFlag(EMF_LIGHTING, true);
    // node->setMaterialFlag(EMF_LIGHTING, true);
     
-    const int materials = node->getMaterialCount();
+    const int materials = main_node->getMaterialCount();
     for(int n=0; n<materials; n++)
     {
-        node->getMaterial(n).setFlag(EMF_LIGHTING, true);
+        main_node->getMaterial(n).setFlag(EMF_LIGHTING, true);
 
-        node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
-        node->getMaterial(n).SpecularColor.set(255,150,150,150); 
-        node->getMaterial(n).DiffuseColor.set(255,150,150,150);
+        main_node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
+        main_node->getMaterial(n).SpecularColor.set(255,150,150,150); 
+        main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
          
         //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
-        node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
-        node->getMaterial(n).GouraudShading = true;
+        main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
+        main_node->getMaterial(n).GouraudShading = true;
     }
     
     ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
@@ -329,7 +345,7 @@ void IrrDriver::renderToTexture(scene::IMesh *mesh, ITexture* target, float angl
     m_scene_manager->drawAll();
     //m_device->getVideoDriver()->endScene();
     
-    removeNode(node);
+    removeNode(main_node);
     removeNode(camera);
     removeNode(light);
     

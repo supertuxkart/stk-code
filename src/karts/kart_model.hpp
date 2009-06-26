@@ -105,6 +105,8 @@ public:
     void attachModel(scene::IAnimatedMeshSceneNode **node);
     scene::IAnimatedMesh* getModel() const { return m_mesh; }
 
+    scene::IMesh* getWheelModel(const int wheelID) const { return m_wheel_model[wheelID]; }
+    
     /** Returns the position of a wheel relative to the kart. 
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
      *           right, 3 = rear left.  */

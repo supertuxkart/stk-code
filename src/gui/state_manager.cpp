@@ -128,12 +128,13 @@ namespace StateManager
             assert( w3 != NULL );
 
             // set kart model - FIXME - doesn't work very much
-            IMesh* mesh = kart_properties_manager->getKart("tux")->getKartModel()->getModel();
-            SAnimatedMesh* test = new SAnimatedMesh(); // FIXME - memory management
-            test->addMesh(mesh);
-            //test->setMaterialFlag(EMF_LIGHTING , false);
+            KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
 
-            w3->setModel(test);
+            w3->addModel( kartModel->getModel() );
+            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             w3->update(0);
             
             getCurrentScreen()->m_inited = true;

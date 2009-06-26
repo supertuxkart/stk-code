@@ -1273,9 +1273,10 @@ void ModelViewWidget::add()
     m_texture = GUIEngine::getDriver()->addTexture( core::dimension2d< s32 >(512, 512), name.c_str() );
 }
 // -----------------------------------------------------------------------------
-void ModelViewWidget::setModel(IMesh* mesh)
+void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
 {
-    m_model = mesh;
+    m_models.push_back(mesh);
+    m_model_location.push_back(location);
     
     /*
     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
@@ -1292,7 +1293,7 @@ void ModelViewWidget::update(float delta)
     angle += delta*10;
     if(angle > 360) angle -= 360;
     
-    irr_driver->renderToTexture(m_model, m_texture, angle);
+    irr_driver->renderToTexture(m_models, m_model_location, m_texture, angle);
     ((IGUIImage*)m_element)->setImage(m_texture);
 }
 

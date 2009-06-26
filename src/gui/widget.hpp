@@ -23,6 +23,7 @@
 #include <map>
 
 #include "utils/ptr_vector.hpp"
+#include "utils/vec3.hpp"
 
 using namespace irr;
 using namespace gui;
@@ -344,14 +345,17 @@ namespace GUIEngine
 
     class ModelViewWidget : public Widget
     {
-        scene::IMesh* m_model;
+        
+        ptr_vector<scene::IMesh, REF> m_models;
+        std::vector<Vec3> m_model_location;
+        
         video::ITexture* m_texture;
         float angle;
     public:
         ~ModelViewWidget();
         
         void add();
-        void setModel(irr::scene::IMesh* mesh);
+        void addModel(irr::scene::IMesh* mesh, const Vec3& location = Vec3(0,0,0));
         void update(float delta);
     };
     
