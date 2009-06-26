@@ -235,6 +235,7 @@
 		9551CBD60FC1BB7600DB481B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
+		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
 		95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
@@ -759,6 +760,8 @@
 		95C65DA10F532FD400BE7BA7 /* nitro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nitro.cpp; path = ../../graphics/nitro.cpp; sourceTree = SOURCE_ROOT; };
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
+		95CB476A0FF30EF400413BAE /* bezier_curve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bezier_curve.hpp; path = ../../tracks/bezier_curve.hpp; sourceTree = SOURCE_ROOT; };
+		95CB476B0FF30EF400413BAE /* bezier_curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bezier_curve.cpp; path = ../../tracks/bezier_curve.cpp; sourceTree = SOURCE_ROOT; };
 		95D1F5F60FC8C3E300FF6968 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../../input/input.cpp; sourceTree = SOURCE_ROOT; };
 		95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen.hpp; path = ../../gui/options_screen.hpp; sourceTree = SOURCE_ROOT; };
 		95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen.cpp; path = ../../gui/options_screen.cpp; sourceTree = SOURCE_ROOT; };
@@ -1751,6 +1754,8 @@
 		95C2B1CE0F296545000D3E5D /* tracks */ = {
 			isa = PBXGroup;
 			children = (
+				95CB476B0FF30EF400413BAE /* bezier_curve.cpp */,
+				95CB476A0FF30EF400413BAE /* bezier_curve.hpp */,
 				953789810FC7831400DD1F8E /* quad.cpp */,
 				953789800FC7831400DD1F8E /* quad.hpp */,
 				951C35800FC05BF400A48379 /* quad_graph.cpp */,
@@ -2276,6 +2281,7 @@
 				95D950D30FE473CA002E10AD /* user_config.cpp in Sources */,
 				95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */,
 				954A57DC0FEC5AE40073C16C /* modaldialog.cpp in Sources */,
+				95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

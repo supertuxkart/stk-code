@@ -21,7 +21,13 @@
 #define TRANSLATION_HPP
 
 #if ENABLE_NLS
+
+#ifdef __APPLE__
+#  include <libintl/libintl.h>
+#else
 #  include <libintl.h>
+#endif
+
 #  define _(String) gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) gettext_noop (String)
