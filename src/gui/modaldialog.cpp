@@ -248,15 +248,18 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
 
 // ------------------------------------------------------------------------------------------------------
 
-void TrackInfoDialog::onEnterPressedInternal()
+// FIXME : this probably doesn't belong here
+void startGame()
 {
+    ModalDialog::dismiss();
+    
     IVideoDriver* driver = GUIEngine::getDriver();
     
     // TODO : draw a loading screen
     driver->endScene();
     driver->beginScene(true, false);
     driver->endScene();
-
+    
     
     StateManager::enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
@@ -268,8 +271,13 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->setNumLocalPlayers( 1 );
     network_manager->setupPlayerKartInfo();
     //race_manager->getKartType(1) = KT_PLAYER;
-
+    
     race_manager->startNew();
+}
+    
+void TrackInfoDialog::onEnterPressedInternal()
+{
+    startGame();
 }
 
 
