@@ -26,6 +26,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include "animations/animation_manager.hpp"
 #include "audio/sound_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -70,6 +71,7 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_has_final_camera   = false;
     m_is_arena           = false;
     m_quad_graph         = NULL;
+	m_animation_manager  = NULL;
     loadTrack(m_filename);
     loadDriveline();
 
@@ -79,7 +81,8 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-    if(m_quad_graph) delete m_quad_graph;
+    if(m_quad_graph)        delete m_quad_graph;
+	if(m_animation_manager) delete m_animation_manager;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -520,6 +523,11 @@ void Track::loadTrack(const std::string &filename)
 	if(xml_node)
 		loadCurves(*xml_node);
 
+    xml_node = root->getNode("animations");
+	if(xml_node)
+	{
+		m_animation_manager = new AnimationManager(*xml_node);
+	}
 	// Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
     delete root;

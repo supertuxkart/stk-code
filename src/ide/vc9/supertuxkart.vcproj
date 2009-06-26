@@ -701,6 +701,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="animations"
+				>
+				<File
+					RelativePath="..\..\animations\animation_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\animation_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\billboard_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\three_d_animation.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -1292,6 +1312,26 @@
 				</File>
 				<File
 					RelativePath="..\..\config\user_config.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="animations"
+				>
+				<File
+					RelativePath="..\..\animations\animation_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\animation_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\billboard_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\three_d_animation.hpp"
 					>
 				</File>
 			</Filter>

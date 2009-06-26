@@ -46,6 +46,7 @@ class MovingTexture;
 class XMLNode;
 class PhysicalObject;
 class BezierCurve;
+class AnimationManager;
 
 class Track
 {
@@ -100,6 +101,9 @@ private:
 
 	/** List of all bezier curves in the track - for e.g. camera, ... */
 	std::vector<BezierCurve*> m_all_curves;
+
+	/** Animation manager. */
+	AnimationManager         *m_animation_manager;
 
 	void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);

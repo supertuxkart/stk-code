@@ -12,6 +12,14 @@ supertuxkart_SOURCES = \
  main.cpp \
  main_loop.cpp \
  main_loop.hpp \
+ animations/animation_base.hpp \
+ animations/animation_base.cpp \
+ animations/animation_manager.cpp \
+ animations/animation_manager.hpp \
+ animations/billboard_animation.cpp \
+ animations/billboard_animation.hpp \
+ animations/three_d_animation.cpp \
+ animations/three_d_animation.hpp \
  audio/music.hpp \
  audio/music_information.cpp \
  audio/music_information.hpp \
