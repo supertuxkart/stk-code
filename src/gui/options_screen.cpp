@@ -548,6 +548,24 @@ namespace StateManager
         // TODO : need to re-save user config here?
     }
     
+    void deletePlayer(Player* player)
+    {
+        UserConfigParams::m_player.erase(player);
+        
+        // refresh list display
+        ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
+        if(players == NULL) return;
+        players->clear();
+
+        const int playerAmount =  UserConfigParams::m_player.size();
+        for(int n=0; n<playerAmount; n++)
+        {
+            players->addItem(UserConfigParams::m_player[n].getName());
+        }
+
+        // TODO : need to re-save user config here?
+    }
+    
     // -----------------------------------------------------------------------------
     // main call (from StateManager); dispatches the call to a specialissed function as needed
     void menuEventOptions(Widget* widget, const std::string& name)

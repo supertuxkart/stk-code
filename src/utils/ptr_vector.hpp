@@ -191,6 +191,9 @@ void clearWithoutDeleting()
     contentsVector.clear();
 }
 
+/**
+  * Removes without deleting
+  */
 void remove(TYPE* obj)
 {
     for(unsigned int n=0; n<contentsVector.size(); n++)
@@ -204,7 +207,24 @@ void remove(TYPE* obj)
         }
     }
 
+}
 
+/**
+  * Removes and deletes
+  */
+void erase(TYPE* obj)
+{
+    for(unsigned int n=0; n<contentsVector.size(); n++)
+    {
+        TYPE * pointer = contentsVector[n];
+        if(pointer == obj)
+        {
+            contentsVector.erase(contentsVector.begin()+n);
+            delete pointer;
+            return;
+        }
+    }
+    
 }
 
 };

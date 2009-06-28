@@ -403,8 +403,15 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
     }
     if(eventSource == "removeplayer")
     {
-        // TODO
-        dismiss();
+        StateManager::deletePlayer( m_player );
+
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+        
+        ModalDialog::dismiss();
+        
         return;
     }
 }
