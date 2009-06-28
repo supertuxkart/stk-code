@@ -94,6 +94,8 @@ public:
 
 class PlayerInfoDialog : public ModalDialog
 {
+    TextBoxWidget* textCtrl;
+    Player* m_player;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -101,6 +103,7 @@ public:
     PlayerInfoDialog(Player* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
     void onEnterPressedInternal();
+    void processEvent(std::string& eventSource);
 };
     
     

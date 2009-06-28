@@ -1311,6 +1311,14 @@ void ListWidget::add()
     m_element = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, ++id_counter);
 }
 
+void ListWidget::clear()
+{
+    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    assert(list != NULL);
+
+    list->clear();
+}
+
 void ListWidget::addItem(const char* item)
 {
     IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);

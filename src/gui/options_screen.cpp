@@ -516,15 +516,36 @@ namespace StateManager
         input_manager->getDeviceList()->serialize();
     }
 
-    void gotNewPlayerName(const stringw& newName)
+    /**
+      * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
+      */
+    void gotNewPlayerName(const stringw& newName, Player* player)
     {
         stringc newNameC( newName );
-   
-        UserConfigParams::m_player.push_back( new Player(newNameC.c_str()) );
-        
         ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
-        if(players != NULL)
+        if(players == NULL) return;
+        
+        // ---- Add new player
+        if(player == NULL)
+        {
+            UserConfigParams::m_player.push_back( new Player(newNameC.c_str()) );
+            
             players->addItem( newNameC.c_str() );
+        }
+        else // ---- Rename existing player
+        {
+            player->setName( newNameC.c_str() );
+            
+            // refresh list display
+            players->clear();
+            const int playerAmount =  UserConfigParams::m_player.size();
+            for(int n=0; n<playerAmount; n++)
+            {
+                players->addItem(UserConfigParams::m_player[n].getName());
+            }
+
+        }
+        // TODO : need to re-save user config here?
     }
     
     // -----------------------------------------------------------------------------

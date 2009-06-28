@@ -367,6 +367,7 @@ namespace GUIEngine
 
         int getSelection() const;
         std::string getSelectionName() const;
+        void clear();
     };
 
     class TextBoxWidget : public Widget

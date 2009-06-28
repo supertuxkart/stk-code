@@ -200,7 +200,6 @@ void EnterPlayerNameDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
     {
-        input_manager->setMode(InputManager::MENU);
         dismiss();
         return;
     }
@@ -220,7 +219,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     if(playerName.size() > 0)
         StateManager::gotNewPlayerName( playerName );
     
-    // irrLicht is to stupid to remove focus from deleted widgets
+    // irrLicht is too stupid to remove focus from deleted widgets
     // so do it by hand
     GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
     GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
@@ -319,6 +318,8 @@ void TrackInfoDialog::onEnterPressedInternal()
     
 PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h) : ModalDialog(w, h)
 {
+    m_player = player;
+    
     const int y1 = m_area.getHeight()/4;
     const int y2 = m_area.getHeight()*2/4;
     const int y3 = m_area.getHeight()*3/4;
@@ -328,25 +329,25 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     const int buttonHeight = textHeight + 10;
     
     {
-    TextBoxWidget* widget = new TextBoxWidget();
-    widget->m_type = WTYPE_BUTTON;
-    widget->m_properties[PROP_ID] = "renameplayer";
-    widget->m_properties[PROP_TEXT] = player->getName();
-    widget->x = 50;
-    widget->y = y1 - textHeight/2;
-    widget->w = m_area.getWidth()-100;
-    widget->h = textHeight + 5;
-    widget->setParent(m_irrlicht_window);
-    m_children.push_back(widget);
-    widget->add();
-    GUIEngine::getGUIEnv()->setFocus( widget->m_element );
+    textCtrl = new TextBoxWidget();
+    textCtrl->m_type = WTYPE_BUTTON;
+    textCtrl->m_properties[PROP_ID] = "renameplayer";
+    textCtrl->m_properties[PROP_TEXT] = player->getName();
+    textCtrl->x = 50;
+    textCtrl->y = y1 - textHeight/2;
+    textCtrl->w = m_area.getWidth()-100;
+    textCtrl->h = textHeight + 5;
+    textCtrl->setParent(m_irrlicht_window);
+    m_children.push_back(textCtrl);
+    textCtrl->add();
+    GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
     }
     
     {
     ButtonWidget* widget = new ButtonWidget();
     widget->m_type = WTYPE_BUTTON;
     widget->m_properties[PROP_ID] = "renameplayer";
-    widget->m_properties[PROP_TEXT] = _("Rename"); // TODO : catch events
+    widget->m_properties[PROP_TEXT] = _("Rename");
         
     const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
         
@@ -363,7 +364,7 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     ButtonWidget* widget = new ButtonWidget();
     widget->m_type = WTYPE_BUTTON;
     widget->m_properties[PROP_ID] = "removeplayer";
-    widget->m_properties[PROP_TEXT] = _("Remove"); // TODO : catch events
+    widget->m_properties[PROP_TEXT] = _("Remove");
         
     const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
     
@@ -379,6 +380,33 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
 void PlayerInfoDialog::onEnterPressedInternal()
 {
 }
-
+void PlayerInfoDialog::processEvent(std::string& eventSource)
+{
+    if(eventSource == "renameplayer")
+    {
+        // accept entered name
+        stringw playerName = textCtrl->getText();
+        if(playerName.size() > 0)
+        {
+            StateManager::gotNewPlayerName( playerName, m_player );
+        }
+        
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+        
+        ModalDialog::dismiss();
+        
+        dismiss();
+        return;
+    }
+    if(eventSource == "removeplayer")
+    {
+        // TODO
+        dismiss();
+        return;
+    }
+}
     
 }
