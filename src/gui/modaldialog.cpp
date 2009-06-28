@@ -21,6 +21,7 @@
 #include "gui/options_screen.hpp"
 #include "gui/state_manager.hpp"
 #include "gui/widget.hpp"
+#include "input/input_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/translation.hpp"
@@ -108,19 +109,30 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     widget->add();
     
     
+    IGUIFont* font = GUIEngine::getFont();
+    const int textHeight = font->getDimension(L"X").Height;
+    
     ButtonWidget* widget2 = new ButtonWidget();
     widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
-    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel"); // TODO : pressing this button should cancel
+    widget2->m_properties[PROP_ID] = "cancel";
+    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel");
     widget2->x = 15;
-    widget2->y = m_area.getHeight() - 60;
+    widget2->y = m_area.getHeight() - textHeight - 12;
     widget2->w = m_area.getWidth() - 30;
-    widget2->h = 50;
+    widget2->h = textHeight + 6;
     widget2->setParent(m_irrlicht_window);
     
     m_children.push_back(widget2);
     widget2->add();
 }
-
+void PressAKeyDialog::processEvent(std::string& eventSource)
+{
+    if(eventSource == "cancel")
+    {
+        input_manager->setMode(InputManager::MENU);
+        dismiss();
+    }
+}
 // ------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------
 
@@ -142,7 +154,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     widget->x = 0;
     widget->y = 0;
     widget->w = m_area.getWidth();
-    widget->h = m_area.getHeight()/2;
+    widget->h = m_area.getHeight()/3;
     widget->setParent(m_irrlicht_window);
     
     m_children.push_back(widget);
@@ -153,10 +165,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = font->getDimension(L"X").Height;
     
-    const int bottomYFrom = m_area.getHeight()/2;
-    const int bottomYTo = m_area.getHeight();
-    const int bottomHeight = bottomYTo - bottomYFrom;
-    const int textAreaYFrom = bottomYFrom + bottomHeight/2 - textHeight/2;
+    const int textAreaYFrom = m_area.getHeight()/2 - textHeight/2;
     
     textCtrl = new TextBoxWidget();
     textCtrl->m_type = WTYPE_BUTTON;
@@ -169,14 +178,38 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     m_children.push_back(textCtrl);
     textCtrl->add();
     GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
+    
+    ButtonWidget* widget2 = new ButtonWidget();
+    widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
+    widget2->m_properties[PROP_ID] = "cancel";
+    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel");
+    widget2->x = 15;
+    widget2->y = m_area.getHeight() - textHeight - 12;
+    widget2->w = m_area.getWidth() - 30;
+    widget2->h = textHeight + 6;
+    widget2->setParent(m_irrlicht_window);
+    
+    m_children.push_back(widget2);
+    widget2->add();
+    
+    // don't allow navigating there with keyboard; pressing 'enter' will accept the current name
+    // no matter where focus is
+    widget2->m_element->setTabStop(false);
+    
 
 }
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
-    std::cout << "Rmoving text control element\n";
     textCtrl->m_element->remove();
 }
-
+void EnterPlayerNameDialog::processEvent(std::string& eventSource)
+{
+    if(eventSource == "cancel")
+    {
+        input_manager->setMode(InputManager::MENU);
+        dismiss();
+    }
+}
 // ------------------------------------------------------------------------------------------------------
 
 void EnterPlayerNameDialog::onEnterPressedInternal()

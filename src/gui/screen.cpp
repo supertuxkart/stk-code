@@ -651,6 +651,12 @@ bool Screen::OnEvent(const SEvent& event)
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
                 
+                if(ModalDialog::isADialogActive())
+                {
+                    ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
+                    return false;
+                }
+                
                 Widget* parent = w->m_event_handler;
                 if(w->m_event_handler != NULL)
                 {

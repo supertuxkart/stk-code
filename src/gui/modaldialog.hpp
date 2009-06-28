@@ -48,6 +48,7 @@ public:
     ptr_vector<Widget> m_children;
     
     virtual ~ModalDialog();
+    virtual void processEvent(std::string& eventSource){}
     
     static void dismiss();
     static void onEnterPressed();
@@ -62,6 +63,7 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     PressAKeyDialog(const float percentWidth, const float percentHeight);
+    void processEvent(std::string& eventSource);
 };
 
 class EnterPlayerNameDialog : public ModalDialog
@@ -75,6 +77,7 @@ public:
     ~EnterPlayerNameDialog();
 
     void onEnterPressedInternal();
+    void processEvent(std::string& eventSource);
 };
 
 class TrackInfoDialog : public ModalDialog
