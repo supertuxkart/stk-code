@@ -537,6 +537,19 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
             {
                 GUIEngine::getGUIEnv()->setFocus(closest);
+                
+                // when focusing a list by going up, select the last item of the list
+                Widget* w = getWidget( closest->getID() );
+                if(w != NULL && w->m_type == WTYPE_LIST)
+                {
+                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+                    assert(list != NULL);
+                    
+                    list->setSelected( list->getItemCount()-1 );
+                    return;
+                }
+
+                
             }
             else
             {

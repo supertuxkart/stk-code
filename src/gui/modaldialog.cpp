@@ -111,7 +111,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = font->getDimension(L"X").Height;
-    
+        
     ButtonWidget* widget2 = new ButtonWidget();
     widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
     widget2->m_properties[PROP_ID] = "cancel";
@@ -178,10 +178,12 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->add();
     GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
     
+    // TODO : add Ok button
+
     cancelButton = new ButtonWidget();
     cancelButton->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
     cancelButton->m_properties[PROP_ID] = "cancel";
-    cancelButton->m_properties[PROP_TEXT] = _("Press ESC to cancel");
+    cancelButton->m_properties[PROP_TEXT] = _("Cancel");
     cancelButton->x = 15;
     cancelButton->y = m_area.getHeight() - textHeight - 12;
     cancelButton->w = m_area.getWidth() - 30;
@@ -376,6 +378,8 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     m_children.push_back(widget);
     widget->add();
     }
+    
+    // TODO : add cancel button
 }
 void PlayerInfoDialog::onEnterPressedInternal()
 {
