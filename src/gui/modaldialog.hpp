@@ -24,6 +24,7 @@ namespace GUIEngine
 {
     class Widget;
     class TextBoxWidget;
+    class ButtonWidget;
     
 /**
   * Base class, derive your own.
@@ -69,6 +70,7 @@ public:
 class EnterPlayerNameDialog : public ModalDialog
 {
     TextBoxWidget* textCtrl;
+    ButtonWidget* cancelButton;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

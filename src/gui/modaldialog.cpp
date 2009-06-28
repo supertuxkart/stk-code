@@ -136,11 +136,10 @@ void PressAKeyDialog::processEvent(std::string& eventSource)
 // ------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------
 
+
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    std::cout << "EnterPlayerName()\n";
-
     //core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
     //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
     //                                                              area_top, false /* border */, true /* word wrap */,
@@ -179,23 +178,18 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->add();
     GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
     
-    ButtonWidget* widget2 = new ButtonWidget();
-    widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
-    widget2->m_properties[PROP_ID] = "cancel";
-    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel");
-    widget2->x = 15;
-    widget2->y = m_area.getHeight() - textHeight - 12;
-    widget2->w = m_area.getWidth() - 30;
-    widget2->h = textHeight + 6;
-    widget2->setParent(m_irrlicht_window);
+    cancelButton = new ButtonWidget();
+    cancelButton->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
+    cancelButton->m_properties[PROP_ID] = "cancel";
+    cancelButton->m_properties[PROP_TEXT] = _("Press ESC to cancel");
+    cancelButton->x = 15;
+    cancelButton->y = m_area.getHeight() - textHeight + 12;
+    cancelButton->w = m_area.getWidth() - 30;
+    cancelButton->h = textHeight + 6;
+    cancelButton->setParent(m_irrlicht_window);
     
-    m_children.push_back(widget2);
-    widget2->add();
-    
-    // don't allow navigating there with keyboard; pressing 'enter' will accept the current name
-    // no matter where focus is
-    widget2->m_element->setTabStop(false);
-    
+    m_children.push_back(cancelButton);
+    cancelButton->add();
 
 }
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
@@ -208,12 +202,20 @@ void EnterPlayerNameDialog::processEvent(std::string& eventSource)
     {
         input_manager->setMode(InputManager::MENU);
         dismiss();
+        return;
     }
 }
-// ------------------------------------------------------------------------------------------------------
-
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
+    // ---- Cancel button pressed
+    if( GUIEngine::getGUIEnv()->hasFocus(cancelButton->m_element) )
+    {
+        std::string fakeEvent = "cancel";
+        processEvent(fakeEvent);
+        return;
+    }
+        
+    // ---- Otherwise, accept entered name
     stringw playerName = textCtrl->getText();
     if(playerName.size() > 0)
         StateManager::gotNewPlayerName( playerName );
