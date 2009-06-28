@@ -530,6 +530,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 }
                 
                 if(stay_within_list) break;
+                else list->setSelected(-1);
             }
             
             if(el != NULL && el->getTabGroup() != NULL &&
@@ -577,6 +578,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 }
 
                 if(stay_within_list) break;
+                else list->setSelected(-1);
             }
             
             if(el != NULL && el->getTabGroup() != NULL &&
