@@ -183,7 +183,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     cancelButton->m_properties[PROP_ID] = "cancel";
     cancelButton->m_properties[PROP_TEXT] = _("Press ESC to cancel");
     cancelButton->x = 15;
-    cancelButton->y = m_area.getHeight() - textHeight + 12;
+    cancelButton->y = m_area.getHeight() - textHeight - 12;
     cancelButton->w = m_area.getWidth() - 30;
     cancelButton->h = textHeight + 6;
     cancelButton->setParent(m_irrlicht_window);
