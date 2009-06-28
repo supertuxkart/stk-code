@@ -283,7 +283,7 @@ void GamePadDevice::editBinding(const PlayerAction action, const Input::InputTyp
 {
     m_bindings[action].type = type;
     m_bindings[action].id = id;
-    m_bindings[PA_ACCEL].dir = direction;
+    m_bindings[action].dir = direction;
 }
 // -----------------------------------------------------------------------------
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)

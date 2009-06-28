@@ -411,7 +411,7 @@ namespace StateManager
 
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
-            std::cout << "-------\nentering sensing mode for " << devices->getSelectionIDString().c_str() << std::endl;
+            std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString().c_str() << std::endl;
 
             new PressAKeyDialog(0.4f, 0.4f);
 
@@ -455,7 +455,7 @@ namespace StateManager
 
         if(keyboard)
         {
-            std::cout << "received some keyboard input\n";
+            std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
 
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
             keyboard->editBinding(binding_to_set, sensedInput->btnID);
@@ -465,13 +465,18 @@ namespace StateManager
         }
         else if(gamepad)
         {
-            std::cout << "received some gamepad input on device " << sensedInput->deviceID << " : ";
+            std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to gamepad #" << sensedInput->deviceID << " : ";
             if(sensedInput->type == Input::IT_STICKMOTION)
-                std::cout << "axis\n";
+            {
+                std::cout << "axis " << sensedInput->btnID << " direction " <<
+                    (sensedInput->axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n\n";
+            }
             else if(sensedInput->type == Input::IT_STICKBUTTON)
-                std::cout << "button " << sensedInput->btnID << "\n";
+            {
+                std::cout << "button " << sensedInput->btnID << "\n\n";
+            }
             else
-                std::cout << "WTF?\n";
+                std::cout << "Sensed unknown gamepad event type??\n";
 
             int gamepadID = -1;
 

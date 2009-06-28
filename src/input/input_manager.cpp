@@ -164,7 +164,55 @@ void InputManager::handleStaticAction(int key, int value)
 
 }
 
-
+/**
+  *  Handles input when an input sensing mode (when configuring input)
+  */
+void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
+{
+    // See if the new input should be stored. This happens if:
+    // 1) the value is larger
+    // 2) nothing has been saved yet
+    // 3) the new event has the preferred type : TODO - reimplement
+    // The latter is necessary since some gamepads have analog
+    // buttons that can return two different events when pressed
+    bool store_new = abs(value) > m_max_sensed_input         ||
+    m_max_sensed_type  == Input::IT_NONE;
+    
+    // don't store if we're trying to do something like bindings keyboard keys on a gamepad
+    if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
+    if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
+    
+    // only store axes when they're pushed quite far
+    if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
+    
+    if(store_new)
+    {
+        m_sensed_input->type = type;
+        if(type == Input::IT_STICKMOTION)
+        {
+            std::cout << "%% storing new axis binding, value=" << value <<
+                    " deviceID=" << deviceID << " btnID=" << btnID << " axisDirection=" <<
+                    (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
+        }
+        else if(type == Input::IT_STICKBUTTON)
+        {
+            std::cout << "%% storing new gamepad button binding\n";
+        }
+        
+        m_sensed_input->deviceID = deviceID;
+        m_sensed_input->btnID = btnID;
+        m_sensed_input->axisDirection = axisDirection;
+        
+        m_max_sensed_input   = abs(value);
+        m_max_sensed_type    = type;
+    }
+    
+    // Notify the completion of the input sensing if the key/stick/... is released.
+    if(value==0)
+    {
+        StateManager::gotSensedInput(m_sensed_input);
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Handles the conversion from some input to a GameAction and its distribution
@@ -211,73 +259,17 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
     {
-
-        //if(type == Input::IT_STICKMOTION)
-        //    std::cout << "sensing input detected an axis event\n";
-        //if(type == Input::IT_STICKBUTTON)
-        //    std::cout << "sensing input detected a button event\n";
-
-        // Input sensing should be canceled. (TODO)
-        //if (ga == GA_LEAVE && m_sensed_input->type==Input::IT_KEYBOARD)
-        //{
-        //   StateManager::gotSensedInput(NULL);
-        //}
-        // Stores the sensed input when the button/key/axes/<whatever> is
-        // released only and is not used in a fixed mapping.
-        //else
-        //if (!UserConfigParams::isFixedInput(type, id0, id1, id2) ) // ignore static actions (TODO)
-        {
-            // See if the new input should be stored. This happens if:
-            // 1) the value is larger
-            // 2) nothing has been saved yet
-            // 3) the new event has the preferred type : TODO - reimplement
-            // The latter is necessary since some gamepads have analog
-            // buttons that can return two different events when pressed
-            bool store_new = abs(value) > m_max_sensed_input         ||
-                             m_max_sensed_type  == Input::IT_NONE;
-
-                        //    (m_mode  == INPUT_SENSE_GAMEPAD &&  (type == Input::IT_STICKMOTION ||
-                        //                                         type == Input::IT_STICKBUTTON) &&
-                        //    abs(value) > m_max_sensed_input);
-
-            // don't store if we're trying to do something like bindings keyboard keys on a gamepad
-            if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
-            if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
-
-            // only store axes when they're pushed quite far
-            if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
-
-            if(store_new)
-            {
-                m_sensed_input->type = type;
-                if(type == Input::IT_STICKMOTION)
-                    std::cout << "storing new axis binding, value=" << value <<
-                                 " deviceID=" << deviceID << " btnID=" << btnID << "\n";
-                if(type == Input::IT_STICKBUTTON)
-                    std::cout << "storing new button binding\n";
-
-                m_sensed_input->deviceID = deviceID;
-                m_sensed_input->btnID = btnID;
-                m_sensed_input->axisDirection = axisDirection;
-
-                m_max_sensed_input   = abs(value);
-                m_max_sensed_type    = type;
-            }
-
-            // Notify the completion of the input sensing if the key/stick/
-            // ... is released.
-            if(value==0)
-            {
-                StateManager::gotSensedInput(m_sensed_input);
-            }
-        }
+        inputSensing(type, deviceID, btnID, axisDirection,  value);
     }
+    // Otherwise, do something with the key if it matches a binding
     else if (action_found)
     {
+        // ... when in-game
         if(StateManager::isGameState())
         {
             RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
         }
+        // ... when in menus
         else
         {
             // reset timer when released
