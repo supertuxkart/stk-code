@@ -8,9 +8,14 @@
         <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
         <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
     </tabs>
-
+    
     <box proportion="1" width="100%" layout="vertical-row">
-        <spacer width="20" height="20"/>
+    
+        <spacer width="5" height="5"/>
+    
+        <label width="100%" text="Press enter or double-click on a player to edit him/her" text_align="center" />
+
+        <spacer width="5" height="20"/>
         <list id="players" proportion="5" width="75%" align="center"/>
         <spacer width="20" height="25"/>
         
