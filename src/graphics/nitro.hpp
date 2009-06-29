@@ -37,7 +37,7 @@ private:
     scene::IParticleEmitter         *m_emitter;
 public:
                  Nitro          (Kart* kart);
-                ~Nitro          ();
+    virtual     ~Nitro          ();
     virtual void update         (float t);
     void         setCreationRate(float f);
 };

@@ -43,6 +43,8 @@ private:
 
 public:
 	AnimationBase() {}
+    virtual ~AnimationBase(){}
+
 
 	virtual void update(float dt);
 

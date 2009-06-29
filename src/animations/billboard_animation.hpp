@@ -31,6 +31,8 @@ private:
 
 public:
 	BillboardAnimation(const XMLNode &node);
+    virtual ~BillboardAnimation(){}
+
 
 };   // BillboardAnimation
 

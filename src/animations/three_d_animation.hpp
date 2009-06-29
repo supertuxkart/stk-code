@@ -31,6 +31,7 @@ private:
 
 public:
 	ThreeDAnimation(const XMLNode &node);
+    virtual ~ThreeDAnimation(){}
 
 };   // ThreeDAnimation
 #endif
