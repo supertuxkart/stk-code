@@ -502,7 +502,6 @@ void IrrDriver::update(float dt)
     
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     
-    // FIXME : flickers
     if(!StateManager::isGameState())
     {
         // this code needs to go outside beginScene() / endScene() since
@@ -572,9 +571,27 @@ void IrrDriver::update(float dt)
         m_scene_manager->drawAll();
         GUIEngine::render(dt);
     }
-
-    m_device->getVideoDriver()->endScene();
     
+    // draw FPS if enabled
+    if ( UserConfigParams::m_display_fps )
+    {
+        // TODO : don't re-create string every frame
+        video::IVideoDriver* driver = irr_driver->getDevice()->getVideoDriver();
+        gui::IGUIFont* font = irr_driver->getRaceFont();
+        const int fps = driver->getFPS();
+        
+        static char buffer[32];
+        sprintf(buffer, "FPS : %i", fps);
+        
+        core::stringw fpsString = buffer;
+        
+        //std::cout << "===== Drawing FPS " << fpsString.c_str() << "=====\n";
+        
+        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+        font->draw( fpsString.c_str(), core::rect< s32 >(0,0,600,200), fpsColor, true );
+    }
+    
+    m_device->getVideoDriver()->endScene();
     
 }   // update
 

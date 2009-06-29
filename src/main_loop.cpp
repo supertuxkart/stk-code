@@ -81,16 +81,16 @@ void MainLoop::run()
             if(dt > max_elapsed_time) dt=max_elapsed_time;
                                                
             // Throttle fps if more than maximum, which can reduce 
-            // the noise the fan on a graphics card makes
-            if( dt*UserConfigParams::m_max_fps < 1000.0f)
+            // the noise the fan on a graphics card makes.
+            // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
+            const int max_fps = StateManager::isGameState() ? UserConfigParams::m_max_fps : 35;
+            const int current_fps = 1000/dt;
+            if( current_fps > max_fps )
             {
-                //SDL_Delay has a granularity of 10ms on most platforms, so
-                //most likely when frames go faster than 125 frames, at times
-                //it might limit the frames to even 55 frames. On some cases,
-                //SDL_Delay(1) will just cause the program to give up the
-                //rest of it's timeslice.
-                // FIXME - implement with non-SDL code
-                // SDL_Delay(1);
+                int wait_time = 1000/max_fps - 1000/current_fps;
+                if(wait_time < 1) wait_time = 1;
+                
+                irr_driver->getDevice()->sleep(wait_time);
             }
             else break;
         }

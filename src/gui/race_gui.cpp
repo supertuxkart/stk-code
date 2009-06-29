@@ -32,6 +32,9 @@
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
+#include "irrlicht.h"
+using namespace irr;
+
 RaceGUI* instance = NULL;
 RaceGUI* getRaceGUI()
 {
@@ -131,23 +134,6 @@ void RaceGUI::update(float dt)
 
     //BaseGUI::update( dt );
 }   // update
-
-//-----------------------------------------------------------------------------
-void RaceGUI::drawFPS ()
-{
-    // TODO
-    /*
-    if (++m_fps_counter>=50)
-    {
-        m_fps_timer.update();
-        sprintf(m_fps_string, "%d",
-                (int)(m_fps_counter/m_fps_timer.getDeltaTime()));
-        m_fps_counter = 0;
-        m_fps_timer.setMaxDelta(1000);
-    }
-    font_race->PrintShadow(m_fps_string,48, 0, UserConfigParams::m_height-50);
-     */
-}   // drawFPS
 
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.
@@ -865,7 +851,6 @@ void RaceGUI::drawStatusText(const float dt)
 
             
         drawMap();
-        if ( UserConfigParams::m_display_fps ) drawFPS();
         
         drawPlayerIcons(info);
         

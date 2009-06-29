@@ -122,7 +122,6 @@ private:
     void oldDrawPlayerIcons    ();
     void drawMap               ();
     void drawTimer             ();
-    void drawFPS               ();
     void drawMusicDescription  ();
     void cleanupMessages       (const float dt);
     void drawSpeed                (Kart* kart, int offset_x, int offset_y,
