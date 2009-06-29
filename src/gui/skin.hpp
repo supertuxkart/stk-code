@@ -37,11 +37,17 @@ namespace GUIEngine
     /** class containing render params for the 'drawBoxFromStretchableTexture' function */
     class BoxRenderParams
     {
-    public:
         ITexture* image;
+        bool y_flip_set;
+
+    public:
+        ITexture* getImage() { return image; }
+        
         int left_border, right_border, top_border, bottom_border;
         bool preserve_h_aspect_ratios;
         float hborder_out_portion, vborder_out_portion;
+        
+        // this parameter is a bit special since it's the only one that can change at runtime
         bool vertical_flip;
         
         /** bitmap containing which areas to render */
@@ -53,7 +59,35 @@ namespace GUIEngine
         static const int TOP = 8;
         static const int BOTTOM = 16;
         
+        core::rect<s32> source_area_left;
+        core::rect<s32> source_area_center;
+        core::rect<s32> source_area_right;
+        
+        core::rect<s32> source_area_top;
+        core::rect<s32> source_area_bottom;
+        
+        core::rect<s32> source_area_top_left;
+        core::rect<s32> source_area_top_right;
+        core::rect<s32> source_area_bottom_left;
+        core::rect<s32> source_area_bottom_right; 
+        
+        
+        // y-flipped coords
+        core::rect<s32> source_area_left_yflip;
+        core::rect<s32> source_area_center_yflip;
+        core::rect<s32> source_area_right_yflip;
+        
+        core::rect<s32> source_area_top_yflip;
+        core::rect<s32> source_area_bottom_yflip;
+        
+        core::rect<s32> source_area_top_left_yflip;
+        core::rect<s32> source_area_top_right_yflip;
+        core::rect<s32> source_area_bottom_left_yflip;
+        core::rect<s32> source_area_bottom_right_yflip; 
+        
         BoxRenderParams();
+        void setTexture(ITexture* image);
+        void calculateYFlipIfNeeded();
     };
     
     class Skin : public IGUISkin
@@ -61,13 +95,10 @@ namespace GUIEngine
         IGUISkin* m_fallback_skin;
         
 
-        ITexture* m_tex_ficonhighlight;
-        ITexture* m_tex_bubble;
-        
         ITexture* bg_image;
         
 
-        void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params);
+        void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, BoxRenderParams& params);
         
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed);

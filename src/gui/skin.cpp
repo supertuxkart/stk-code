@@ -74,7 +74,6 @@ namespace SkinConfig
             
             
             BoxRenderParams newParam;
-            newParam.image = GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() );
             newParam.left_border = leftborder;
             newParam.right_border = rightborder;
             newParam.top_border = topborder;
@@ -83,6 +82,9 @@ namespace SkinConfig
             newParam.vborder_out_portion = vborder_out_portion;
             newParam.preserve_h_aspect_ratios = preserve_h_aspect_ratios;
             
+            // call last since it calculates coords considering all other parameters
+            newParam.setTexture( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() ) );
+
             if(areas.size() > 0)
             {
                 newParam.areas = 0;
@@ -149,30 +151,9 @@ namespace SkinConfig
         }
     };
 
-
-Skin::Skin(IGUISkin* fallback_skin)
-{
-    std::string skin_name = file_manager->getGUIDir();
-    skin_name += "/skins/";
-    skin_name += UserConfigParams::m_skin_file.c_str();
-    
-    SkinConfig::loadFromFile( skin_name );
-    bg_image = NULL;
-    
-    m_fallback_skin = fallback_skin;
-    m_fallback_skin->grab();
-    assert(fallback_skin != NULL);
-
-    m_tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].image;
-    m_tex_bubble = SkinConfig::m_render_params["selectionHalo::neutral"].image;    
-}
-
-Skin::~Skin()
-{
-    m_fallback_skin->drop();
-}
-
-
+#if 0
+#pragma mark -
+#endif
 
 /** load default values */
 BoxRenderParams::BoxRenderParams()
@@ -188,6 +169,96 @@ BoxRenderParams::BoxRenderParams()
     
     areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
     vertical_flip = false;
+    y_flip_set = false;
+}
+void BoxRenderParams::setTexture(ITexture* image)
+{
+    this->image = image;
+    /*
+     The source texture is split this way to allow for a stretchable center and borders that don't stretch :
+     
+     +----+--------------------+----+
+     |    |                    |    |
+     +----a--------------------b----+ <-- top_border
+     |    |                    |    |
+     |    |                    |    |
+     +----c--------------------d----+ <-- height - bottom-border
+     |    |                    |    | 
+     +----+--------------------+----+
+     */
+    
+    const int texture_w = image->getSize().Width;
+    const int texture_h = image->getSize().Height;
+    
+    const int ax = left_border;
+    const int ay = top_border;
+    const int bx = texture_w - right_border;
+    const int by = top_border;
+    const int cx = left_border;
+    const int cy = texture_h - bottom_border;
+    const int dx = texture_w - right_border;
+    const int dy = texture_h - bottom_border;
+    
+    source_area_left = core::rect<s32>(0, ay, cx, cy);
+    source_area_center = core::rect<s32>(ax, ay, dx, dy);
+    source_area_right = core::rect<s32>(bx, top_border, texture_w, dy);
+    
+    source_area_top = core::rect<s32>(ax, 0, bx, by);
+    source_area_bottom = core::rect<s32>(cx, cy, dx, texture_h);
+    
+    source_area_top_left = core::rect<s32>(0, 0, ax, ay);
+    source_area_top_right = core::rect<s32>(bx, 0, texture_w, top_border);
+    source_area_bottom_left = core::rect<s32>(0, cy, cx, texture_h);
+    source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);    
+}
+void BoxRenderParams::calculateYFlipIfNeeded()
+{
+    if(y_flip_set) return;
+    
+#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y; \
+const int y2 = X.LowerRightCorner.Y; \
+X##_yflip = X; \
+X##_yflip.UpperLeftCorner.Y =  y2;\
+X##_yflip.LowerRightCorner.Y =  y1;}
+    
+    FLIP_Y(source_area_left)
+    FLIP_Y(source_area_center)
+    FLIP_Y(source_area_right)
+    
+    FLIP_Y(source_area_top)
+    FLIP_Y(source_area_bottom)
+    
+    FLIP_Y(source_area_top_left)
+    FLIP_Y(source_area_top_right)
+    FLIP_Y(source_area_bottom_left)
+    FLIP_Y(source_area_bottom_right)
+#undef FLIP_Y
+    
+    
+    y_flip_set = true;
+}
+
+#if 0
+#pragma mark -
+#endif
+
+Skin::Skin(IGUISkin* fallback_skin)
+{
+    std::string skin_name = file_manager->getGUIDir();
+    skin_name += "/skins/";
+    skin_name += UserConfigParams::m_skin_file.c_str();
+    
+    SkinConfig::loadFromFile( skin_name );
+    bg_image = NULL;
+    
+    m_fallback_skin = fallback_skin;
+    m_fallback_skin->grab();
+    assert(fallback_skin != NULL); 
+}
+
+Skin::~Skin()
+{
+    m_fallback_skin->drop();
 }
 
 void Skin::drawBgImage()
@@ -204,7 +275,7 @@ void Skin::drawBgImage()
     {
         int texture_w, texture_h;
         // TODO/FIXME? - user preferences still include a background image choice 
-        bg_image = SkinConfig::m_render_params["background::neutral"].image;
+        bg_image = SkinConfig::m_render_params["background::neutral"].getImage();
         assert(bg_image != NULL);
         texture_w = bg_image->getSize().Width;
         texture_h = bg_image->getSize().Height;
@@ -233,9 +304,9 @@ void Skin::drawBgImage()
     GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area, 0 /* no clipping */, 0, false /* alpha */);
 }
 
-void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const BoxRenderParams& params)
+void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, BoxRenderParams& params)
 {
-    ITexture* source = params.image;
+    const ITexture* source = params.getImage();
     const int left_border = params.left_border;
     const int right_border = params.right_border;
     const int top_border = params.top_border;
@@ -248,44 +319,10 @@ void Skin::drawBoxFromStretchableTexture(const core::rect< s32 > &dest, const Bo
     
     // FIXME? - lots of things here will be re-calculated every frame, which is useless since
     // widgets won't move, so they'd only need to be calculated once.
-    const int texture_w = source->getSize().Width;
+    //const int texture_w = source->getSize().Width;
     const int texture_h = source->getSize().Height;
     
-    
-    /*
-     The source texture is split this way to allow for a stretchable center and borders that don't stretch :
-     
-     +----+--------------------+----+
-     |    |                    |    |
-     +----a--------------------b----+ <-- top_border
-     |    |                    |    |
-     |    |                    |    |
-     +----c--------------------d----+ <-- height - bottom-border
-     |    |                    |    | 
-     +----+--------------------+----+
-     */
-    
-    const int ax = left_border;
-    const int ay = top_border;
-    const int bx = texture_w - right_border;
-    const int by = top_border;
-    const int cx = left_border;
-    const int cy = texture_h - bottom_border;
-    const int dx = texture_w - right_border;
-    const int dy = texture_h - bottom_border;
-    
-    core::rect<s32> source_area_left = core::rect<s32>(0, ay, cx, cy);
-    core::rect<s32> source_area_center = core::rect<s32>(ax, ay, dx, dy);
-    core::rect<s32> source_area_right = core::rect<s32>(bx, top_border, texture_w, dy);
-    
-    core::rect<s32> source_area_top = core::rect<s32>(ax, 0, bx, by);
-    core::rect<s32> source_area_bottom = core::rect<s32>(cx, cy, dx, texture_h);
-    
-    core::rect<s32> source_area_top_left = core::rect<s32>(0, 0, ax, ay);
-    core::rect<s32> source_area_top_right = core::rect<s32>(bx, 0, texture_w, top_border);
-    core::rect<s32> source_area_bottom_left = core::rect<s32>(0, cy, cx, texture_h);
-    core::rect<s32> source_area_bottom_right = core::rect<s32>(dx, dy, texture_w, texture_h);
-    
+
     /*
      The dest area is split this way. Borders can go a bit beyond the given area so
      components inside don't go over the borders
@@ -404,24 +441,23 @@ X.LowerRightCorner.Y = dest_y + (dest_y2 - dest_y) - y1;}
         FLIP_Y(dest_area_bottom_right)
 
 #undef FLIP_Y
-#define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y; \
-const int y2 = X.LowerRightCorner.Y; \
-X.UpperLeftCorner.Y =  y2;\
-X.LowerRightCorner.Y =  y1;}
-        
-        FLIP_Y(source_area_left)
-        FLIP_Y(source_area_center)
-        FLIP_Y(source_area_right)
-        
-        FLIP_Y(source_area_top)
-        FLIP_Y(source_area_bottom)
-        
-        FLIP_Y(source_area_top_left)
-        FLIP_Y(source_area_top_right)
-        FLIP_Y(source_area_bottom_left)
-        FLIP_Y(source_area_bottom_right)
-#undef FLIP_Y
+            
+        params.calculateYFlipIfNeeded();
         }
+        
+#define GET_AREA( X ) X = (vertical_flip ? params.X##_yflip : params.X)
+        core::rect<s32>& GET_AREA(source_area_left);
+        core::rect<s32>& GET_AREA(source_area_center);
+        core::rect<s32>& GET_AREA(source_area_right);
+        
+        core::rect<s32>& GET_AREA(source_area_top);
+        core::rect<s32>& GET_AREA(source_area_bottom);
+        
+        core::rect<s32>& GET_AREA(source_area_top_left);
+        core::rect<s32>& GET_AREA(source_area_top_right);
+        core::rect<s32>& GET_AREA(source_area_bottom_left);
+        core::rect<s32>& GET_AREA(source_area_bottom_right); 
+#undef GET_AREA
         
         if((areas & BoxRenderParams::LEFT) != 0)
         {
@@ -558,12 +594,14 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
             rect2.LowerRightCorner.X += rect.getWidth() / 5;
             rect2.LowerRightCorner.Y += rect.getHeight() / 5;
             
-            const int texture_w = m_tex_bubble->getSize().Width;
-            const int texture_h = m_tex_bubble->getSize().Height;
+            ITexture* tex_bubble = SkinConfig::m_render_params["selectionHalo::neutral"].getImage();   
+            
+            const int texture_w = tex_bubble->getSize().Width;
+            const int texture_h = tex_bubble->getSize().Height;
             
             core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
             
-            GUIEngine::getDriver()->draw2DImage(m_tex_bubble, rect2, source_area,
+            GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
 
@@ -585,9 +623,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                 const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
                 const int glow_center_y = rect.UpperLeftCorner.Y + rect.getHeight() - 5;
 
-                
-                const int texture_w = m_tex_ficonhighlight->getSize().Width;
-                const int texture_h = m_tex_ficonhighlight->getSize().Height;
+                ITexture* tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].getImage();
+                const int texture_w = tex_ficonhighlight->getSize().Width;
+                const int texture_h = tex_ficonhighlight->getSize().Height;
                 
                 core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
@@ -597,7 +635,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, 
                                                                    glow_center_x + 45 + grow,
                                                                    glow_center_y + 25 + grow/2);
                 
-                GUIEngine::getDriver()->draw2DImage(m_tex_ficonhighlight, rect2, source_area,
+                GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, source_area,
                                                     0 /* no clipping */, 0, true /* alpha */);
             }
             /* if we're not using glow */
@@ -645,7 +683,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     if( w->isGauge() )
     {
-        const int handle_size = (int)( widget->h*params.left_border/(float)params.image->getSize().Height );
+        const int handle_size = (int)( widget->h*params.left_border/(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
         
 
@@ -654,7 +692,7 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, 
                                                               widget->x + handle_size + (int)((widget->w - 2*handle_size)*value),
                                                               widget->y + widget->h);
 
-        ITexture* texture = SkinConfig::m_render_params["gaugefill::neutral"].image;
+        const ITexture* texture = SkinConfig::m_render_params["gaugefill::neutral"].getImage();
         const int texture_w = texture->getSize().Width;
         const int texture_h = texture->getSize().Height;
         
@@ -703,16 +741,16 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
     if(w->getState() == true)
     {
         if(focused)
-            texture = SkinConfig::m_render_params["checkbox::focused+checked"].image;
+            texture = SkinConfig::m_render_params["checkbox::focused+checked"].getImage();
         else
-            texture = SkinConfig::m_render_params["checkbox::neutral+checked"].image;
+            texture = SkinConfig::m_render_params["checkbox::neutral+checked"].getImage();
     }
     else
     {
         if(focused)
-            texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].image;
+            texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].getImage();
         else
-            texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"].image;
+            texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"].getImage();
     }
 
     const int texture_w = texture->getSize().Width;
