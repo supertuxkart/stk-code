@@ -164,6 +164,9 @@ void InputManager::handleStaticAction(int key, int value)
 
 }
 
+// TODO: move as class member
+std::map<int, int> m_sensed_input_on_all_axes;
+
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */
@@ -185,6 +188,10 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     // only store axes when they're pushed quite far
     if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
     
+    // for axis bindings, we request at least 2 different values bhefore accepting (ignore non-moving axes
+    // as some devices have special axes that are at max value at rest)
+    bool first_value = true;
+    
     if(store_new)
     {
         m_sensed_input->type = type;
@@ -203,12 +210,29 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         m_sensed_input->btnID = btnID;
         m_sensed_input->axisDirection = axisDirection;
         
+        if( type == Input::IT_STICKMOTION )
+        {
+            const int inputID = axisDirection*50 + btnID; // a unique ID for each
+            if(m_sensed_input_on_all_axes.find(inputID) != m_sensed_input_on_all_axes.end() &&
+                m_sensed_input_on_all_axes[inputID] != abs(value)) first_value = false;
+            
+            m_sensed_input_on_all_axes[inputID] = abs(value);
+        }
+        
         m_max_sensed_input   = abs(value);
         m_max_sensed_type    = type;
+        
+        // don't notify on first axis value (unless the axis is pushed to the maximum)
+        if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && first_value && abs(value) != MAX_VALUE)
+        {
+            std::cout << "not notifying on first value\n";
+            return;
+        }
     }
     
-    // Notify the completion of the input sensing if the key/stick/... is released.
-    if(value==0)
+    // Notify the completion of the input sensing when key is released
+    if( abs(value) < MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
+       m_sensed_input->btnID == btnID)
     {
         StateManager::gotSensedInput(m_sensed_input);
     }
@@ -507,6 +531,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                 // Leaving input sense mode.
 
                 irr_driver->showPointer();
+                m_sensed_input_on_all_axes.clear();
 
                 // The order is deliberate just in case someone starts to make
                 // STK multithreaded: m_sensed_input must not be 0 when
