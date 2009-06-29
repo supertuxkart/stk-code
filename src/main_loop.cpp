@@ -84,7 +84,7 @@ void MainLoop::run()
             // the noise the fan on a graphics card makes.
             // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
             const int max_fps = StateManager::isGameState() ? UserConfigParams::m_max_fps : 35;
-            const int current_fps = 1000/dt;
+            const int current_fps = (int)(1000.0f/dt);
             if( current_fps > max_fps )
             {
                 int wait_time = 1000/max_fps - 1000/current_fps;
