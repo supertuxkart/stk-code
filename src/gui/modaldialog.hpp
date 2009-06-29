@@ -17,6 +17,7 @@
 
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
+#include "gui/skin.hpp"
 
 class Player;
 
@@ -32,7 +33,7 @@ namespace GUIEngine
   * You can call static function 'dismiss' to simply close current dialog (so you don't
   * need to keep track of instances yourself)
   */
-class ModalDialog
+class ModalDialog : public SkinWidgetContainer
 {
 protected:
     irr::gui::IGUIWindow* m_irrlicht_window;

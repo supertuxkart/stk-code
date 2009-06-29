@@ -32,6 +32,57 @@ using namespace gui;
 namespace GUIEngine
 {
     
+    /**
+      * In order to avoid calculating render information every frame, it's stored in a
+      * SkinWidgetContainer for each widget (or each widget part if it requires many)
+      */
+    class SkinWidgetContainer
+    {
+    public:
+        int x, y, w, h;
+        
+        bool dest_areas_inited;
+        bool dest_areas_yflip_inited;
+        int dest_x, dest_y, dest_x2, dest_y2;
+        
+        // see comments in Skin::drawBoxFromStretchableTexture for explaination of
+        // what these are
+        core::rect<s32> dest_area_left;
+        core::rect<s32> dest_area_center;
+        core::rect<s32> dest_area_right;
+        
+        core::rect<s32> dest_area_top;
+        core::rect<s32> dest_area_bottom;
+        
+        core::rect<s32> dest_area_top_left;
+        core::rect<s32> dest_area_top_right;
+        core::rect<s32> dest_area_bottom_left;
+        core::rect<s32> dest_area_bottom_right;
+        
+        // y flip
+        core::rect<s32> dest_area_left_yflip;
+        core::rect<s32> dest_area_center_yflip;
+        core::rect<s32> dest_area_right_yflip;
+        
+        core::rect<s32> dest_area_top_yflip;
+        core::rect<s32> dest_area_bottom_yflip;
+        
+        core::rect<s32> dest_area_top_left_yflip;
+        core::rect<s32> dest_area_top_right_yflip;
+        core::rect<s32> dest_area_bottom_left_yflip;
+        core::rect<s32> dest_area_bottom_right_yflip;   
+        
+        SkinWidgetContainer()
+        {
+            dest_areas_inited = false;
+            dest_areas_yflip_inited = false;
+            x = -1;
+            y = -1;
+            w = -1;
+            h = -1;
+        }
+    };
+    
     class Widget;
     
     /** class containing render params for the 'drawBoxFromStretchableTexture' function */
@@ -98,15 +149,15 @@ namespace GUIEngine
         ITexture* bg_image;
         
 
-        void drawBoxFromStretchableTexture(const core::rect< s32 > &dest, BoxRenderParams& params);
+        void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest, BoxRenderParams& params);
         
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed);
-        void drawButton(const core::rect< s32 > &rect, const bool pressed, const bool focused);
-        void drawRibbon(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
-        void drawRibbonChild(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
+        void drawButton(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused);
+        void drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
+        void drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
         void drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-        void drawSpinnerBody(const core::rect< s32 > &rect, const Widget* widget, const bool pressed, bool focused);
+        void drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
         void drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused);
         void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused);
         void drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused);

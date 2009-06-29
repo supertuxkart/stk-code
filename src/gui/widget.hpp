@@ -22,6 +22,7 @@
 #include <irrlicht.h>
 #include <map>
 
+#include "gui/skin.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
@@ -72,7 +73,7 @@ namespace GUIEngine
         PROP_SQUARE
     };
     
-    class Widget
+    class Widget : public SkinWidgetContainer
     {
     protected:
         friend class RibbonWidget;
@@ -171,7 +172,6 @@ namespace GUIEngine
         static void resetIDCounters();
         
         bool isSelected() const { return m_selected; }
-
     };
     
     class ButtonWidget : public Widget
@@ -362,6 +362,8 @@ namespace GUIEngine
     class ListWidget : public Widget
     {
     public:
+        SkinWidgetContainer m_selection_skin_info;
+        
         void add();
         void addItem(const char* item);
 
