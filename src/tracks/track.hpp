@@ -196,6 +196,7 @@ public:
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel();
     void               update(float dt);
+	void               reset();
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
 
     /** Returns the graph of quads, mainly for the AI. */

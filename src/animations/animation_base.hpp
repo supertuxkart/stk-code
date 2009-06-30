@@ -20,8 +20,15 @@
 #ifndef HEADER_ANIMATION_BASE_HPP
 #define HEADER_ANIMATION_BASE_HPP
 
-/** A base class for all animations. */
+#include <vector>
 
+#include "irrlicht.h"
+using namespace irr;
+
+class XMLNode;
+class Ipo;
+
+/** A base class for all animations. */
 class AnimationBase
 {
 private:
@@ -41,12 +48,20 @@ private:
 	/** The current time in the cycle of a cyclic animation. */
 	float m_current_time;
 
+protected:
+	/** All IPOs for this animation. */
+	std::vector<Ipo*> m_all_ipos;
+
 public:
-	AnimationBase() {}
-    virtual ~AnimationBase(){}
-
-
-	virtual void update(float dt);
+                 AnimationBase(const XMLNode &node, float fps);
+    virtual     ~AnimationBase() {}
+	virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr);
+	/** This needs to be implemented by the inheriting classes. It is called
+	 *  once per frame from the track. */
+	virtual void update(float dt) = 0;
+	void         setInitialTransform(const core::vector3df &xyz, 
+		                             const core::vector3df &hpr);
+	void         reset();
 
 };   // AnimationBase
 

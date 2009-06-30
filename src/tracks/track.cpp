@@ -86,6 +86,13 @@ Track::~Track()
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+void Track::reset()
+{
+	if(m_animation_manager)
+		m_animation_manager->reset();
+}   // reset
+
+//-----------------------------------------------------------------------------
 /** Removes the physical body from the world.
  *  Called at the end of a race.
  */
@@ -523,11 +530,6 @@ void Track::loadTrack(const std::string &filename)
 	if(xml_node)
 		loadCurves(*xml_node);
 
-    xml_node = root->getNode("animations");
-	if(xml_node)
-	{
-		m_animation_manager = new AnimationManager(*xml_node);
-	}
 	// Set the correct paths
     m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
     delete root;
@@ -875,6 +877,8 @@ void Track::update(float dt)
     {
         m_physical_objects[i]->update(dt);
     }
+	if(m_animation_manager)
+		m_animation_manager->update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -1028,6 +1032,10 @@ void Track::loadTrackModel()
             // Height is needed if bit 2 (for z) is not set
             itemCommand(xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
         }
+		else if(name=="animations")
+		{
+			m_animation_manager = new AnimationManager(getIdent(), *node);
+		}
         else
         {
             fprintf(stderr, "Warning: element '%s' not found.\n",

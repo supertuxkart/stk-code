@@ -18,6 +18,8 @@ supertuxkart_SOURCES = \
  animations/animation_manager.hpp \
  animations/billboard_animation.cpp \
  animations/billboard_animation.hpp \
+ animations/ipo.cpp \
+ animations/ipo.hpp \
  animations/three_d_animation.cpp \
  animations/three_d_animation.hpp \
  audio/music.hpp \

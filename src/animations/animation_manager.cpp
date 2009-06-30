@@ -25,17 +25,18 @@
 #include "animations/three_d_animation.hpp"
 #include "io/xml_node.hpp"
 
-AnimationManager::AnimationManager(const XMLNode &node)
+AnimationManager::AnimationManager(const std::string &track_name, const XMLNode &node)
 {
 	for(unsigned int i=0; i<node.getNumNodes(); i++)
 	{
 		const XMLNode *anim_node = node.getNode(i);
-		std::string type;
-		anim_node->get("type", &type);
+		std::string type = anim_node->getName();
+		float fps=25;
+		anim_node->get("fps", &fps);
 		if(type=="anim_billboard")
-			m_all_animations.push_back(new BillboardAnimation(*anim_node));
-		else if(type=="animation_3d")
-			m_all_animations.push_back(new ThreeDAnimation(*anim_node));
+			m_all_animations.push_back(new BillboardAnimation(track_name, *anim_node, fps));
+		else if(type=="animations-IPO")
+			m_all_animations.push_back(new ThreeDAnimation(track_name, *anim_node, fps));
 		else
 			fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
 				    type.c_str());
@@ -43,5 +44,22 @@ AnimationManager::AnimationManager(const XMLNode &node)
 }   // AnimationManager
 
 // ----------------------------------------------------------------------------
+/** Resets all animations.
+ */
+void AnimationManager::reset()
+{
+	std::vector<AnimationBase*>::iterator i;
+	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+		(*i)->reset();
+}   // reset
 
-
+// ----------------------------------------------------------------------------
+/** Updates all animations. Called one per time step.
+ *  \param dt Time since last call.
+ */
+void AnimationManager::update(float dt)
+{
+	std::vector<AnimationBase*>::iterator i;
+	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+		(*i)->update(dt);
+}   // update

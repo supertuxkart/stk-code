@@ -20,18 +20,31 @@
 #ifndef HEADER_THREE_D_ANIMATION_HPP
 #define HEADER_THREE_D_ANIMATION_HPP
 
+#include <string>
+#include <vector>
+
+#include "irrlicht.h"
+using namespace irr;
+
 #include "animations/animation_base.hpp"
 
 class XMLNode;
+class BezierCurve;
 
 /** A virtual base class for all animations. */
 class ThreeDAnimation : public AnimationBase
 {
 private:
+	/** Mesh of this animation. */
+	scene::IAnimatedMesh *m_mesh;
 
+	/** The scene node for the model. */
+	scene::IAnimatedMeshSceneNode *m_animated_node;
 public:
-	ThreeDAnimation(const XMLNode &node);
-    virtual ~ThreeDAnimation(){}
+	             ThreeDAnimation(const std::string &track_name, 
+					            const XMLNode &node, float fps);
+    virtual     ~ThreeDAnimation(){}
+	virtual void update(float dt);
 
 };   // ThreeDAnimation
 #endif

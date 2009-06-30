@@ -489,6 +489,7 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 void World::restartRace()
 {
     TimedRace::reset();
+	m_track->reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;

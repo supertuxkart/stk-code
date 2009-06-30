@@ -20,6 +20,7 @@
 #ifndef HEADER_ANIMATION_MANAGER_HPP
 #define HEADER_ANIMATION_MANAGER_HPP
 
+#include <string>
 #include <vector>
 
 class AnimationBase;
@@ -32,8 +33,9 @@ private:
 	std::vector<AnimationBase*> m_all_animations;
 
 public:
-	AnimationManager(const XMLNode &node);
-
+	     AnimationManager(const std::string &track_name, const XMLNode &node);
+	void update(float dt);
+	void reset();
 };   // AnimationManager
 
 #endif

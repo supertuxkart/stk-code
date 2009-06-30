@@ -19,6 +19,62 @@
 
 #include "animations/animation_base.hpp"
 
-void AnimationBase::update(float dt)
+#include "animations/ipo.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
+
+AnimationBase::AnimationBase(const XMLNode &node, float fps)
 {
+	for(unsigned int i=0; i<node.getNumNodes(); i++)
+	{
+		Ipo *ipo = new Ipo(*node.getNode(i), fps);
+		m_all_ipos.push_back(ipo);
+	}   // for i<getNumNodes()
+	m_playing = true;
+
+}   // AnimationBase
+// ----------------------------------------------------------------------------
+/** Stores the initial transform (in the IPOs actually). This is necessary
+ *  for relative IPOs.
+ *  \param xyz Position of the object.
+ *  \param hpr Rotation of the object.
+ */
+void AnimationBase::setInitialTransform(const core::vector3df &xyz, 
+										const core::vector3df &hpr)
+{
+	std::vector<Ipo*>::iterator i;
+	for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+	{
+		(*i)->setInitialTransform(xyz, hpr);
+	}   // for i in m_all_ipos
+}   // setTransform
+
+// ----------------------------------------------------------------------------
+/** Resets all IPOs for this animation.
+ */
+void AnimationBase::reset()
+{
+	std::vector<Ipo*>::iterator i;
+	for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+	{
+		(*i)->reset();
+	}   // for i in m_all_ipos
+}   // reset
+
+// ----------------------------------------------------------------------------
+/** Updates the time, position and rotation. Called once per framce.
+ *  \param dt Time since last call.
+ *  \param xyz Position to be updated.
+ *  \param hpr Rotation to be updated.
+ */
+void AnimationBase::update(float dt, core::vector3df *xyz, 
+						   core::vector3df *hpr)
+{
+	std::vector<Ipo*>::iterator i;
+	for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+	{
+		(*i)->update(dt, xyz, hpr);
+	}   // for i in m_all_ipos
+
 }   // float dt

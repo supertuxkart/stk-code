@@ -20,6 +20,8 @@
 #ifndef HEADER_BILLBOARD_ANIMATION_HPP
 #define HEADER_BILLBOARD_ANIMATION_HPP
 
+#include <string>
+
 #include "animations/animation_base.hpp"
 
 class XMLNode;
@@ -30,9 +32,9 @@ class BillboardAnimation : public AnimationBase
 private:
 
 public:
-	BillboardAnimation(const XMLNode &node);
+	BillboardAnimation(const std::string &track, const XMLNode &node, float fps);
     virtual ~BillboardAnimation(){}
-
+	virtual void update(float dt);
 
 };   // BillboardAnimation
 
