@@ -21,8 +21,9 @@
 
 #include "io/xml_node.hpp"
 
-//static std::string Ipo::m_all_names[2] = {std::string("a"), std::string("b")};
-
+const std::string Ipo::m_all_channel_names[IPO_MAX] =
+                {std::string("LocX"), std::string("LocY"), std::string("LocZ"),
+                 std::string("RotX"), "RotY", "RotZ"};
 
 Ipo::Ipo(const XMLNode &curve, float fps)
 {
@@ -32,11 +33,21 @@ Ipo::Ipo(const XMLNode &curve, float fps)
 			curve.getName().c_str());
 		return;
 	}
-	std::string type;   curve.get("type",          &type  );
-	if(type=="RotX") m_channel=IPO_ROTX;
-	else if(type=="RotY") m_channel=IPO_ROTY;
-	else if(type=="RotZ") m_channel=IPO_ROTZ;
-	std::string interp; curve.get("interpolation", &interp);
+	std::string channel;
+	curve.get("channel", &channel);
+	m_channel=IPO_MAX;
+	for(unsigned int i=IPO_LOCX; i<IPO_MAX; i++)
+	{
+		if(m_all_channel_names[i]==channel) m_channel=(IpoChannelType)i;
+	}
+	if(m_channel==IPO_MAX)
+	{
+		fprintf(stderr, "Unknown animation channel: '%s' - aborting.\n", channel.c_str());
+		exit(-1);
+	}
+
+	std::string interp; 
+	curve.get("interpolation", &interp);
 	if     (interp=="const" ) m_interpolation = IP_CONST;
 	else if(interp=="linear") m_interpolation = IP_LINEAR;
 	else                      m_interpolation = IP_BEZIER;

@@ -35,7 +35,7 @@ public:
 	enum IpoChannelType {IPO_LOCX, IPO_LOCY, IPO_LOCZ, 
 		                 IPO_ROTX, IPO_ROTY, IPO_ROTZ,
 	                     IPO_MAX};
-	static std::string m_all_names[IPO_MAX];
+	static const std::string m_all_channel_names[IPO_MAX];
 private:
 	/** The type of this IPO. */
 	IpoChannelType m_channel;

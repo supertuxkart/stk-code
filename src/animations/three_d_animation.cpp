@@ -43,6 +43,9 @@ ThreeDAnimation::ThreeDAnimation(const std::string &track_name,
         exit(-1);
     }
 	m_animated_node = irr_driver->addAnimatedMesh(m_mesh);
+	core::vector3df xyz;
+	node.get("xyz", &xyz);
+	m_animated_node->setPosition(xyz);
 	setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
 }   // ThreeDAnimation
 
