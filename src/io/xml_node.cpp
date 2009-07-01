@@ -162,6 +162,19 @@ int XMLNode::get(const std::string &attribute, std::string *value) const
 }   // get
 
 // ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, core::vector2df *value) const
+{
+    std::string s = "";
+    if(!get(attribute, &s)) return 0;
+
+    std::vector<std::string> v = StringUtils::split(s,' ');
+    if(v.size()!=2) return 0;
+    value->X = (float)atof(v[0].c_str());
+    value->Y = (float)atof(v[1].c_str());
+    return 1;
+}   // get(vector2df)
+
+// ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::vector3df *value) const
 {
     std::string s = "";
@@ -188,21 +201,6 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
     value->setZ((float)atof(v[2].c_str()));
     return 1;
 }   // get(Vec3)
-
-// ----------------------------------------------------------------------------
-/** Only reads in a tuple and sets only x and y coordinates. Z is unchanges.
- *  This is used in reading blender's IPO data. */
-int XMLNode::get2(const std::string &attribute, Vec3 *value) const
-{
-    std::string s = "";
-    if(!get(attribute, &s)) return 0;
-
-    std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=2) return 0;
-    value->setX((float)atof(v[0].c_str()));
-    value->setY((float)atof(v[1].c_str()));
-    return 1;
-}   // get2(Vec3)
 
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, video::SColorf *color) const

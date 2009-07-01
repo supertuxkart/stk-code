@@ -57,22 +57,22 @@ Ipo::Ipo(const XMLNode &curve, float fps)
 	for(unsigned int i=0; i<curve.getNumNodes(); i++)
 	{
 		const XMLNode *node = curve.getNode(i);
-		Vec3 xy;  
-		node->get2("c", &xy);
+		core::vector2df xy;  
+		node->get("c", &xy);
 		// Convert blender's frame number (1 ...) into time (0 ...)
-		float t = (xy.getX()-1)/fps;
+		float t = (xy.X-1)/fps;
 		if(t<m_min_time) m_min_time = t;
 		if(t>m_max_time) m_max_time = t;
-		xy.setX(t);
+		xy.X = t;
 		m_points.push_back(xy);
 		if(m_interpolation==IP_BEZIER)
 		{
-			Vec3 handle; 
-			node->get2("h1", &handle); 
-			handle.setX((xy.getX()-1)/fps);
+			core::vector2df handle; 
+			node->get("h1", &handle); 
+			handle.X = (xy.X-1)/fps;
 			m_handle1.push_back(handle);
-			node->get2("h2", &handle); 
-			handle.setX((xy.getX()-1)/fps);
+			node->get("h2", &handle); 
+			handle.X = (xy.X-1)/fps;
 			m_handle2.push_back(handle);
 		}
 	}   // for i<getNumNodes()
@@ -139,19 +139,29 @@ float Ipo::get() const
 	// Search for the first point in the (sorted) array which is greater or equal
 	// to the current time. 
 	// FIXME: we should store the last point to speed this up!
-	while(n<m_points.size()-1 && m_time >=m_points[n].getX())
+	while(n<m_points.size()-1 && m_time >=m_points[n].X)
 		n++;
 	n--;
 	switch(m_interpolation)
 	{
-	case IP_CONST  : return m_points[n].getY();
+	case IP_CONST  : return m_points[n].Y;
 	case IP_LINEAR : {
-						float t = m_time-m_points[n].getX();
-						return m_points[n].getY() + t*(m_points[n+1].getY()-m_points[n].getY()) /
-							                          (m_points[n+1].getX()-m_points[n].getX());
+						float t = m_time-m_points[n].X;
+						return m_points[n].Y + t*(m_points[n+1].Y-m_points[n].Y) /
+							                     (m_points[n+1].X-m_points[n].X);
 					 }
-	case IP_BEZIER: {  // FIXME: for now only:
-						return m_points[n].getY();
+	case IP_BEZIER: {  
+						if(n==m_points.size()-1)
+						{
+							// FIXME: only const implemented atm.
+							return m_points[n].Y;
+						}
+						core::vector2df c = 3*(m_handle2[n]-m_points[n]);
+						core::vector2df b = 3*(m_handle1[n+1]-m_handle2[n])-c;
+						core::vector2df a = m_points[n+1] - m_points[n] - c - b;
+						float t = (m_time-m_points[n].X)/(m_points[n+1].X-m_points[n].X);
+						core::vector2df r = ((a*t+b)*t+c)*t+m_points[n];
+						return r.Y;
 					}
 	}   // switch
 	// Keep the compiler happy:

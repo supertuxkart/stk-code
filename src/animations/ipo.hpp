@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "utils/vec3.hpp"
 
 class XMLNode;
@@ -45,11 +48,10 @@ private:
 	/** The four extend types. */
 	enum {ET_CONST, ET_EXTRAP, ET_CYCLIC_EXTRAP, ET_CYCLIC} m_extend;
 
-	/** The actual control points. Using Vec3 is a bit of an overkill since
-	 *  the IPs are only 2d, but the amount of memory is small anyway.      */
-	std::vector<Vec3>  m_points;
+	/** The actual control points. */
+	std::vector<core::vector2df>  m_points;
 	/** Only used for bezier curves: the two handles. */
-	std::vector<Vec3>  m_handle1, m_handle2;
+	std::vector<core::vector2df>  m_handle1, m_handle2;
 
 	/** Current time in cycle. */
 	float m_time;
