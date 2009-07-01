@@ -21,6 +21,7 @@
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
+		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
 		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
 		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
 		95263DEE0FD7471900CF5F92 /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE40FD7471900CF5F92 /* highscore_manager.cpp */; };
@@ -304,6 +305,8 @@
 		9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../bullet/Demos/OpenGL/RenderTexture.cpp; sourceTree = SOURCE_ROOT; };
 		9507E9510FC1C8C200BD2B92 /* RenderTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTexture.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/RenderTexture.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = stk.icns; sourceTree = SOURCE_ROOT; };
+		951BC65C0FFAF290006B5FF1 /* ipo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipo.cpp; path = ../../animations/ipo.cpp; sourceTree = SOURCE_ROOT; };
+		951BC65D0FFAF290006B5FF1 /* ipo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ipo.hpp; path = ../../animations/ipo.hpp; sourceTree = SOURCE_ROOT; };
 		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = ../../tracks/quad_set.hpp; sourceTree = SOURCE_ROOT; };
 		951C357E0FC05BF400A48379 /* quad_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_set.cpp; path = ../../tracks/quad_set.cpp; sourceTree = SOURCE_ROOT; };
 		951C357F0FC05BF400A48379 /* quad_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_graph.hpp; path = ../../tracks/quad_graph.hpp; sourceTree = SOURCE_ROOT; };
@@ -1109,6 +1112,8 @@
 				954E4C280FF98B6E0047FE3E /* animation_manager.hpp */,
 				954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */,
 				954E4C2A0FF98B6E0047FE3E /* billboard_animation.hpp */,
+				951BC65C0FFAF290006B5FF1 /* ipo.cpp */,
+				951BC65D0FFAF290006B5FF1 /* ipo.hpp */,
 				954E4C2B0FF98B6E0047FE3E /* three_d_animation.cpp */,
 				954E4C2C0FF98B6E0047FE3E /* three_d_animation.hpp */,
 			);
@@ -2315,6 +2320,7 @@
 				954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */,
 				954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */,
 				954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */,
+				951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
