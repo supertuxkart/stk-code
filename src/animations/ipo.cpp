@@ -156,8 +156,8 @@ float Ipo::get() const
 							// FIXME: only const implemented atm.
 							return m_points[n].Y;
 						}
-						core::vector2df c = 3*(m_handle2[n]-m_points[n]);
-						core::vector2df b = 3*(m_handle1[n+1]-m_handle2[n])-c;
+						core::vector2df c = 3.0f*(m_handle2[n]-m_points[n]);
+						core::vector2df b = 3.0f*(m_handle1[n+1]-m_handle2[n])-c;
 						core::vector2df a = m_points[n+1] - m_points[n] - c - b;
 						float t = (m_time-m_points[n].X)/(m_points[n+1].X-m_points[n].X);
 						core::vector2df r = ((a*t+b)*t+c)*t+m_points[n];
