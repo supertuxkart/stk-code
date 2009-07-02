@@ -1032,8 +1032,8 @@
 				950557850F696A900056E88C /* widget.hpp */,
 			);
 			name = gui;
-			path = games/supertuxkart/src/gui;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../gui;
+			sourceTree = SOURCE_ROOT;
 		};
 		9507E9260FC1C8C100BD2B92 /* OpenGL */ = {
 			isa = PBXGroup;
@@ -1100,8 +1100,8 @@
 				95263DEB0FD7471900CF5F92 /* race_manager.hpp */,
 			);
 			name = race;
-			path = games/supertuxkart/src/race;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../race;
+			sourceTree = SOURCE_ROOT;
 		};
 		954E4C240FF98B6E0047FE3E /* animations */ = {
 			isa = PBXGroup;
@@ -1118,8 +1118,8 @@
 				954E4C2C0FF98B6E0047FE3E /* three_d_animation.hpp */,
 			);
 			name = animations;
-			path = games/supertuxkart/src/animations;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../animations;
+			sourceTree = SOURCE_ROOT;
 		};
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
@@ -1134,8 +1134,8 @@
 				95A1187C0F78026D00B18B3D /* device_manager.hpp */,
 			);
 			name = input;
-			path = games/supertuxkart/src/input;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../input;
+			sourceTree = SOURCE_ROOT;
 		};
 		95C2ABA60F29653F000D3E5D /* src */ = {
 			isa = PBXGroup;
@@ -1549,8 +1549,8 @@
 				95C2AE720F296542000D3E5D /* win32.c */,
 			);
 			name = enet;
-			path = games/supertuxkart/src/enet;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../enet;
+			sourceTree = SOURCE_ROOT;
 		};
 		95C2AE540F296541000D3E5D /* include */ = {
 			isa = PBXGroup;
@@ -1838,8 +1838,8 @@
 				95C65D770F532F7D00BE7BA7 /* xml_node.hpp */,
 			);
 			name = io;
-			path = games/supertuxkart/src/io;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
+			path = ../../io;
+			sourceTree = SOURCE_ROOT;
 		};
 		95D538830F69D61C00B4062E /* irrlicht */ = {
 			isa = PBXGroup;
@@ -2090,7 +2090,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\ncp -rf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n\nfi";
+			shellScript = "# copy data files\n\necho \"Copying Data Files\"\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]\nthen\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/data\ncp -rf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n\nelse\n\nmkdir -p ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\nln -sFhf ${PROJECT_DIR}/../../../data ${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Resources/\n\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
