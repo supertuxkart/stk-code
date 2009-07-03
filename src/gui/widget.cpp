@@ -296,6 +296,14 @@ void LabelWidget::add()
     m_element->setTabGroup(false);
 }
 
+void LabelWidget::setText(stringw newText)
+{
+    IGUIStaticText* irrwidget = dynamic_cast<IGUIStaticText*>(m_element);
+    assert(irrwidget != NULL);
+    
+    irrwidget->setText(newText.c_str());
+}
+
 #if 0
 #pragma mark -
 #pragma mark Check Box Widget
@@ -487,10 +495,14 @@ bool RibbonWidget::leftPressed()
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::focused()
-{
-    if(m_event_handler != NULL) ((RibbonGridWidget*)m_event_handler)->updateLabel( this );
-    
+{    
     if(m_focus == NULL) m_focus = m_children.get(m_selection);
+    
+    if(m_event_handler != NULL)
+    {
+        GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
+        ((RibbonGridWidget*)m_event_handler)->onRowChange( this );
+    }
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::mouseHovered(Widget* child)
@@ -1013,6 +1025,11 @@ void RibbonGridWidget::add()
     m_children.push_back( m_left_widget );
 }
 // -----------------------------------------------------------------------------
+void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
+{
+    m_hover_listeners.push_back(listener);
+}
+// -----------------------------------------------------------------------------
 bool RibbonGridWidget::rightPressed()
 {
     RibbonWidget* w = getSelectedRibbon();
@@ -1022,6 +1039,12 @@ bool RibbonGridWidget::rightPressed()
 
         updateLabel();
         propagateSelection();
+    }
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
     }
     
     if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
@@ -1038,6 +1061,12 @@ bool RibbonGridWidget::leftPressed()
 
         updateLabel();
         propagateSelection();
+    }
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString());
     }
     
     if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
@@ -1057,7 +1086,7 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
         scroll(1);
         return false;
     }
-
+    
     // if it's something else, it might be a ribbon child with its own parent
     if(w->m_event_handler != NULL && w->m_event_handler != this)
         return w->m_event_handler->transmitEvent(w, originator);
@@ -1082,6 +1111,16 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
 {
     updateLabel();
     propagateSelection();
+    
+    if(getSelectedRibbon() != NULL)
+    {
+        const int listenerAmount = m_hover_listeners.size();
+        for(int n=0; n<listenerAmount; n++)
+        {
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
+        }
+    }
+    
     return false;
 }
 // -----------------------------------------------------------------------------
@@ -1112,6 +1151,23 @@ void RibbonGridWidget::propagateSelection()
 void RibbonGridWidget::focused()
 {
     updateLabel();
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
+    }
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::onRowChange(RibbonWidget* row)
+{
+    updateLabel(row);
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString());
+    }
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
@@ -1305,6 +1361,12 @@ void ModelViewWidget::add()
     
     std::string name = "model view "; name += m_properties[PROP_ID].c_str();
     m_texture = GUIEngine::getDriver()->addTexture( core::dimension2d< s32 >(512, 512), name.c_str() );
+}
+// -----------------------------------------------------------------------------
+void ModelViewWidget::clearModels()
+{
+    m_models.clearWithoutDeleting();
+    m_model_location.clear();
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)

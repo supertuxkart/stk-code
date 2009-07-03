@@ -7,7 +7,7 @@
     <spinner id="player" width="40%" height="40" min_value="0" max_value="8" align="center"/>
 
     <model id="modelview" width="40%" proportion="3" align="center"/>
-    <label width="100%" height="25" text="Wilber" align="center" text_align="center" />
+    <label id="currkartname" width="100%" height="25" text="Tux" align="center" text_align="center" />
     
     <spacer height="15" width="25"/>
     

@@ -90,6 +90,38 @@ namespace StateManager
     }
 
     // -------------------------------------------------------------------------
+    
+    class KartHoverListener : public RibbonGridHoverListener
+    {
+    public:
+        void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID)
+        {
+            //std::cout << "hovered " << selectionID.c_str() << std::endl;
+            
+            if(selectionID.size() == 0) return;
+            
+            ModelViewWidget* w3 = getCurrentScreen()->getWidget<ModelViewWidget>("modelview");
+            assert( w3 != NULL );
+            
+            const KartProperties* kart = kart_properties_manager->getKart(selectionID);
+            if(kart == NULL) return;
+            KartModel* kartModel = kart->getKartModel();
+                        
+            w3->clearModels();
+            w3->addModel( kartModel->getModel() );
+            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+            w3->update(0);
+            
+            LabelWidget* label = getCurrentScreen()->getWidget<LabelWidget>("currkartname");
+            assert(label != NULL);
+            label->setText( kart->getName().c_str() );
+        }
+    };
+    KartHoverListener* karthoverListener = NULL;
+    
     /**
      * Callback handling events from the kart selection menu
      */
@@ -100,6 +132,12 @@ namespace StateManager
             RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
             assert( w != NULL );
                     
+            if(karthoverListener == NULL)
+            {
+                karthoverListener = new KartHoverListener();
+                w->registerHoverListener(karthoverListener);
+            }
+            
             if(!getCurrentScreen()->m_inited)
             {
                 const int kart_amount = kart_properties_manager->getNumberOfKarts();
@@ -127,7 +165,7 @@ namespace StateManager
 
             assert( w3 != NULL );
 
-            // set kart model - FIXME - doesn't work very much
+            // set initial kart model
             KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
 
             w3->addModel( kartModel->getModel() );

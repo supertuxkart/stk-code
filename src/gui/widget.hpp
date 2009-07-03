@@ -178,9 +178,9 @@ namespace GUIEngine
     {
     public:
         ButtonWidget();
-        
-        void add();
         virtual ~ButtonWidget() {}
+
+        void add();
         void setLabel(const char* label);
     };
     
@@ -188,9 +188,10 @@ namespace GUIEngine
     {
     public:
         LabelWidget();
+        virtual ~LabelWidget() {}
         
         void add();
-        virtual ~LabelWidget() {}
+        void setText(stringw newText);
     };
     
     class CheckBoxWidget : public Widget
@@ -250,7 +251,7 @@ namespace GUIEngine
         RIBBON_TOOLBAR, /* a row of individual buttons */
         RIBBON_TABS /* a tab bar */
     };
-    
+        
     class RibbonWidget : public Widget
     {
         friend class RibbonGridWidget;
@@ -287,6 +288,17 @@ namespace GUIEngine
         
     };
     
+    /**
+      * Even if you have a ribbon that only acts on click/enter, you may wish to know which
+      * item is currently highlighted. In this case, create a listener and pass it to the ribbon.
+      */
+    class RibbonGridHoverListener
+    {
+    public:
+        virtual ~RibbonGridHoverListener() {}
+        virtual void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID) = 0;
+    };
+
     struct ItemDescription
     {
         std::string m_user_name;
@@ -297,6 +309,8 @@ namespace GUIEngine
     class RibbonGridWidget : public Widget
     {
         friend class RibbonWidget;
+        
+        ptr_vector<RibbonGridHoverListener> m_hover_listeners;
         
         virtual ~RibbonGridWidget() {}
         
@@ -331,6 +345,8 @@ namespace GUIEngine
     public:
         RibbonGridWidget(const bool combo=false, const int max_rows=4);
         
+        void registerHoverListener(RibbonGridHoverListener* listener);
+        
         void add();
         bool rightPressed();
         bool leftPressed();
@@ -339,7 +355,8 @@ namespace GUIEngine
         void updateItemDisplay();
         
         bool mouseHovered(Widget* child);
-        
+        void onRowChange(RibbonWidget* row);
+
         const std::string& getSelectionIDString();
         const std::string& getSelectionText();
 
@@ -360,6 +377,7 @@ namespace GUIEngine
         ~ModelViewWidget();
         
         void add();
+        void clearModels();
         void addModel(irr::scene::IMesh* mesh, const Vec3& location = Vec3(0,0,0));
         void update(float delta);
     };
