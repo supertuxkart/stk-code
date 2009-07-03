@@ -120,6 +120,7 @@ void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr)
 	case Ipo::IPO_ROTX : hpr->X = get(); break;
 	case Ipo::IPO_ROTY : hpr->Y = get(); break;
 	case Ipo::IPO_ROTZ : hpr->Z = get(); break;
+    default: assert(false); // shut up compiler warning
 	}    // switch
 
 }   // update

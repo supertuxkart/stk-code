@@ -44,7 +44,7 @@ ThreeDAnimation::ThreeDAnimation(const std::string &track_name,
 	m_mesh = irr_driver->getAnimatedMesh(full_path);
     if(!m_mesh)
     {
-        fprintf(stderr, "Warning: animated model '%s' not found, aborting.\n",
+        fprintf(stderr, "Warning: node '%s' animated model '%s' not found, aborting.\n",
                 node.getName().c_str(), model_name.c_str());
         exit(-1);
     }
