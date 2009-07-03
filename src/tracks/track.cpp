@@ -986,7 +986,7 @@ void Track::loadTrackModel()
         const std::string name = node->getName();
         // The track object was already converted before the loop
         if(name=="track") continue;
-        if(name=="object")
+        if(name=="physical-object")
         {
             m_physical_objects.push_back(new PhysicalObject(node));
         }
