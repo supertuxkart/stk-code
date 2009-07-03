@@ -45,6 +45,7 @@ protected:
     ModalDialog(const float percentWidth, const float percentHeight);
     
     virtual void onEnterPressedInternal();
+    void clearWindow();
     
 public:
     ptr_vector<Widget> m_children;
@@ -97,6 +98,9 @@ class PlayerInfoDialog : public ModalDialog
 {
     TextBoxWidget* textCtrl;
     Player* m_player;
+    
+    void showRegularDialog();
+    void showConfirmDialog();
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
