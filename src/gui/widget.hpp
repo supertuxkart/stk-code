@@ -32,6 +32,8 @@ using namespace gui;
 namespace GUIEngine
 {
     
+    class RibbonGridWidget;
+    
     enum WidgetType
     {
         WTYPE_NONE = -1,
