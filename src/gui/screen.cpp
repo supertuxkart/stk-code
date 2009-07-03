@@ -617,8 +617,6 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         case PA_FIRE:
             if(type == Input::IT_STICKBUTTON)
             {
-
-                std::cout << "sending event, pressedDown=" << pressedDown << "\n";
                 // simulate a 'enter' key press. doesn't seem to work
                 irr::SEvent::SKeyInput evt;
                 evt.PressedDown = pressedDown;
@@ -666,7 +664,7 @@ bool Screen::OnEvent(const SEvent& event)
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
                 
-                if(ModalDialog::isADialogActive())
+                if(ModalDialog::isADialogActive() && w->m_event_handler == NULL)
                 {
                     ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
                     return false;

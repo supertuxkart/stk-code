@@ -21,6 +21,8 @@
 #include "gui/engine.hpp"
 #include "gui/my_button.hpp"
 #include "io/file_manager.hpp"
+#include "utils/translation.hpp"
+
 #include <irrlicht.h>
 #include <iostream>
 #include <sstream>
@@ -854,9 +856,19 @@ void SpinnerWidget::setValue(const int new_value)
         ((IGUIImage*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
     }
     else if(m_labels.size() > 0)
+    {
         m_children[1].m_element->setText( stringw(m_labels[new_value].c_str()).c_str() );
+    }
+    else if(m_properties[PROP_TEXT].size() > 0)
+    {
+        char text[128];
+        sprintf(text, _(m_properties[PROP_TEXT].c_str()), m_value );
+        m_children[1].m_element->setText( stringw(text).c_str() );
+    }
     else
+    {
         m_children[1].m_element->setText( stringw(m_value).c_str() );
+    }
 }
 
 #if 0

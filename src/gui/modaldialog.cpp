@@ -117,12 +117,6 @@ void ModalDialog::onEnterPressedInternal()
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    //core::rect< s32 > area2(0, 0, m_area.getWidth(), m_area.getHeight());
-    //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Press a key")).c_str(),
-    //                                      area2, false /* border */, true /* word wrap */,
-    //                                      m_irrlicht_window);
-    //label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    
     LabelWidget* widget = new LabelWidget();
     widget->m_properties[PROP_TEXT] = _("Press a key");
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
@@ -300,6 +294,7 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
     
     widget->m_properties[PROP_MIN_VALUE] = "1";
     widget->m_properties[PROP_MAX_VALUE] = "99";
+    widget->m_properties[PROP_TEXT] = "%i laps";
     
     m_children.push_back(widget);
     widget->add();

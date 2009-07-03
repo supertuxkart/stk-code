@@ -44,7 +44,10 @@ over values (default will be from 0 to 10). You can specify an icon; then, inclu
 like %i in the name, and at runtime the current number will be inserted into the given name to find the
 right file for each possible value the spinner can take. It may also display arbitrary text instead of
 numbers, though this cannot be achieve in the XML file; use the ->addLabel(...) method in code to do this.
+It can also display arbitrary text containing the value; just define the PROP_TEXT property to contain
+the text you want, including a format string %i where the value should appear.
 The "gauge" variant behaves similarly, but a fill band shows how close to the max the value is.
+
 
 WTYPE_BUTTON            "button"
 A plain text buttons.
