@@ -144,7 +144,7 @@ void Physics::update(float dt)
                 p->a->getPointerFlyable()->hit(p->b->getPointerKart());
             }
             else                                     // projectile hits projectile
-            {
+            {      
                 p->a->getPointerFlyable()->hit(NULL);
                 p->b->getPointerFlyable()->hit(NULL);
             }

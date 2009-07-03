@@ -159,7 +159,7 @@ void Camera::update(float dt)
         steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
         dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
         m_angle_around = m_kart->getHPR().getX() + m_rotation_range * dampened_steer * 0.5f;
-        m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(30.0f);      
+        m_angle_up     = m_kart->getHPR().getY() - 30.0f*DEGREE_TO_RAD;      
 
         m_target = m_kart->getXYZ();
         m_target.setZ(m_target.getZ()+0.75f);
@@ -173,7 +173,7 @@ void Camera::update(float dt)
         break;
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         m_angle_around = m_kart->getHPR().getX() - m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
-        m_angle_up     = m_kart->getHPR().getY() + DEGREE_TO_RAD(30.0f);      
+        m_angle_up     = m_kart->getHPR().getY() + 30.0f*DEGREE_TO_RAD;
 
         m_target = m_kart->getXYZ();
         m_target.setZ(m_target.getZ()+0.75f);
@@ -187,7 +187,7 @@ void Camera::update(float dt)
         break;
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
         m_angle_around = m_kart->getHPR().getX() + m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
-        m_angle_up     = m_kart->getHPR().getY() - DEGREE_TO_RAD(20.0f);
+        m_angle_up     = m_kart->getHPR().getY() - 20.0f*DEGREE_TO_RAD;
 
         m_target = m_kart->getXYZ();
         m_target.setZ(m_target.getZ()+0.75f);
@@ -202,7 +202,7 @@ void Camera::update(float dt)
     case CM_LEADER_MODE: // Follows the leader kart, higher off of the ground, further from the kart,
                          // and turns in the opposite direction from the kart for a nice effect. :)
         m_angle_around = RaceManager::getKart(0)->getHPR().getX();
-        m_angle_up     = RaceManager::getKart(0)->getHPR().getY() + DEGREE_TO_RAD(40.0f);
+        m_angle_up     = RaceManager::getKart(0)->getHPR().getY() + 40.0f*DEGREE_TO_RAD;
 
         m_target = RaceManager::getKart(0)->getXYZ();
 

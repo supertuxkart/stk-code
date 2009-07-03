@@ -302,7 +302,7 @@ void DefaultRobot::handleBraking()
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
-        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD(20.0f);
+        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD*20.0f;
         const float CURVE_INSIDE_PERC = 0.25f;
 
         //Brake only if the road does not goes somewhat straight.
@@ -314,7 +314,7 @@ void DefaultRobot::handleBraking()
             //out of the curve.
             if(!(m_world->getDistanceToCenterForKart(getWorldKartId()) 
                  > m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE(getMaxSteerAngle())))
+                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE*getMaxSteerAngle()))
             {
                 m_controls.m_brake = false;
                 return;
@@ -324,7 +324,7 @@ void DefaultRobot::handleBraking()
         {
             if(!(m_world->getDistanceToCenterForKart( getWorldKartId() ) 
                 < m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE(getMaxSteerAngle())))
+                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE*getMaxSteerAngle()))
             {
                 m_controls.m_brake = false;
                 return;

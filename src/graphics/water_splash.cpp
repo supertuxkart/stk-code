@@ -97,8 +97,8 @@ void WaterSplash::update(float t)
     float f=m_kart->getSpeed();
     if(f<1) return;  // avoid problem with modulo 0
     Vec3 dir((rand()%int(f))*(left?-1:1)*0.004f,
-             sin(DEGREE_TO_RAD(rand()%180))*0.004f,
-             sin(DEGREE_TO_RAD(rand()%100))*0.004f);
+             sin(DEGREE_TO_RAD*(rand()%180))*0.004f,
+             sin(DEGREE_TO_RAD*(rand()%100))*0.004f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 

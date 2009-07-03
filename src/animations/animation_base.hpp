@@ -48,6 +48,11 @@ private:
 	/** The current time in the cycle of a cyclic animation. */
 	float m_current_time;
 
+	/** The inital position of this object. */
+	core::vector3df m_initial_xyz;
+	
+	/** The initial rotation of this object. */
+	core::vector3df m_initial_hpr;
 protected:
 	/** All IPOs for this animation. */
 	std::vector<Ipo*> m_all_ipos;

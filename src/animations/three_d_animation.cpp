@@ -23,9 +23,15 @@
 
 #include "animations/ipo.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
+#include "physics/physics.hpp"
+#include "physics/kart_motion_state.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "utils/constants.hpp"
 
 ThreeDAnimation::ThreeDAnimation(const std::string &track_name, 
 								 const XMLNode &node, float fps) 
@@ -46,8 +52,68 @@ ThreeDAnimation::ThreeDAnimation(const std::string &track_name,
 	core::vector3df xyz;
 	node.get("xyz", &xyz);
 	m_animated_node->setPosition(xyz);
+	core::vector3df hpr(0,0,0);
+	node.get("hpr", &hpr);
+	m_animated_node->setRotation(hpr);
+	/** Save the initial position and rotation in the base animation object. */
 	setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
+
+	m_body            = NULL;
+	m_motion_state    = NULL;
+	m_collision_shape = NULL;
+	std::string shape;
+	node.get("shape", &shape);
+	if(shape!="")
+	{
+		createPhysicsBody(shape);
+	}
 }   // ThreeDAnimation
+
+// ----------------------------------------------------------------------------
+/** Creates a bullet rigid body for this animated model. */
+void ThreeDAnimation::createPhysicsBody(const std::string &shape)
+{
+    // 1. Determine size of the object
+    // -------------------------------
+    Vec3 min, max;
+    MeshTools::minMax3D(m_mesh, &min, &max);
+    Vec3 extend = max-min;
+	if(shape=="box")
+	{
+		m_collision_shape = new btBoxShape(0.5*extend);
+	}
+	else if(shape=="cone")
+	{
+		float radius = 0.5f*std::max(extend.getX(), extend.getY());
+		m_collision_shape = new btConeShapeZ(radius, extend.getZ());
+	}
+	else
+	{
+		fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
+		return;
+	}
+	const core::vector3df &hpr=m_animated_node->getRotation()*DEGREE_TO_RAD;
+	btQuaternion q(hpr.X, hpr.Y, hpr.Z);
+	const core::vector3df &xyz=m_animated_node->getPosition();
+	Vec3 p(xyz);
+	btTransform trans(q,p);
+	m_motion_state = new KartMotionState(trans);
+	btRigidBody::btRigidBodyConstructionInfo info(0, m_motion_state, 
+		                                          m_collision_shape);
+    
+    m_body = new btRigidBody(info);
+    m_user_pointer.set(this);
+    m_body->setUserPointer(&m_user_pointer);
+    RaceManager::getWorld()->getPhysics()->addBody(m_body);
+	m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	m_body->setActivationState(DISABLE_DEACTIVATION);
+}   // createPhysicsBody
+
+// ----------------------------------------------------------------------------
+/** Destructor. */
+ThreeDAnimation::~ThreeDAnimation()
+{
+}   // ~ThreeDAnimation
 
 // ----------------------------------------------------------------------------
 /** Updates position and rotation of this model. Called once per time step.
@@ -60,4 +126,14 @@ void ThreeDAnimation::update(float dt)
 	AnimationBase::update(dt, &xyz, &hpr);     //updates all IPOs
 	m_animated_node->setPosition(xyz);
 	m_animated_node->setRotation(hpr);
+
+	// Now update the position of the bullet body if there is one:
+	if(m_body)
+	{
+		hpr = DEGREE_TO_RAD*hpr;
+		btQuaternion q(hpr.X, hpr.Y, hpr.Z);
+		Vec3 p(xyz);
+		btTransform trans(q,p);
+		m_motion_state->setWorldTransform(trans);
+	}
 }   // update

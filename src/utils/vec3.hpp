@@ -17,11 +17,8 @@
 #ifndef HEADER_VEC3_HPP
 #define HEADER_VEC3_HPP
 
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
-
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
@@ -35,7 +32,6 @@ private:
     void         setPitchRoll(const Vec3 &normal);
 
 public:
-#ifdef HAVE_IRRLICHT
     /** Convert an irrlicht vector3df into the internal (bullet) format.
      *  Irrlicht's and STK's axis are different (STK: Z up, irrlicht: Y up).
      *  We might want to change this as well, makes it easier to work with 
@@ -45,7 +41,6 @@ public:
      *  a vec3).
      */
     inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Z, v.Y) {}
-#endif
     //inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     inline Vec3()                          : btVector3()                 {}
@@ -68,11 +63,9 @@ public:
     inline const void     setPitch(float f)        {m_y = f;}
     inline const void     setRoll(float f)         {m_z = f;}
     float*                toFloat() const          {return (float*)this;     }
-#ifdef HAVE_IRRLICHT
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
     const core::vector3df toIrrVector() const;
     const core::vector3df toIrrHPR()    const;
-#endif
     void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}

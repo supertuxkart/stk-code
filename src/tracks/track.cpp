@@ -159,7 +159,7 @@ btTransform Track::getStartTransform(unsigned int pos) const
     start.setOrigin(orig);
     start.setRotation(btQuaternion(btVector3(0, 0, 1), 
                                    pos<m_start_heading.size() 
-                                   ? DEGREE_TO_RAD(m_start_heading[pos]) 
+                                   ? DEGREE_TO_RAD*m_start_heading[pos]
                                    : 0.0f ));
     return start;
 }   // getStartTransform

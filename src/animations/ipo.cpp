@@ -110,16 +110,16 @@ void Ipo::reset()
 void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr)
 {
 	m_time += dt;
-	if(m_time>m_max_time) m_time = 0;
+	if(m_extend!=ET_CONST && m_time>m_max_time) m_time = 0;
 		
 	switch(m_channel)
 	{
 	case Ipo::IPO_LOCX : xyz->X = get(); break;
 	case Ipo::IPO_LOCY : xyz->Y = get(); break;
 	case Ipo::IPO_LOCZ : xyz->Z = get(); break;
-	case Ipo::IPO_ROTX : hpr->Y = get()*10.0f; break;
-	case Ipo::IPO_ROTY : hpr->Y = get()*10.0f; break;
-	case Ipo::IPO_ROTZ : hpr->Z = get()*10.0f; break;
+	case Ipo::IPO_ROTX : hpr->X = get(); break;
+	case Ipo::IPO_ROTY : hpr->Y = get(); break;
+	case Ipo::IPO_ROTZ : hpr->Z = get(); break;
 	}    // switch
 
 }   // update

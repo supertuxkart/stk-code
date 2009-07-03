@@ -28,22 +28,29 @@ class Moveable;
 class Flyable;
 class Kart;
 class PhysicalObject;
+class ThreeDAnimation;
 
+/** A UserPointer is stored as a user pointer in all bullet bodies. This
+ *  allows easily finding the appropriate STK object for a bullet body.
+ */
 class UserPointer
 {
 public:
+	/** List of all possibles STK objects that are represented in the
+	 *  physics. */
     enum   UserPointerType {UP_UNDEF, UP_KART, UP_FLYABLE, UP_TRACK,
-                            UP_PHYSICAL_OBJECT};
+                            UP_PHYSICAL_OBJECT, UP_ANIMATION};
 private:
     void*  m_pointer;
     UserPointerType m_user_pointer_type;
 public:
-    bool            is(UserPointerType t)      const {return m_user_pointer_type==t;    }
-    TriangleMesh*   getPointerTriangleMesh()   const {return (TriangleMesh*)m_pointer;  }
-    Moveable*       getPointerMoveable()       const {return (Moveable*)m_pointer;      }
-    Flyable*        getPointerFlyable()        const {return (Flyable*)m_pointer;       }
-    Kart*           getPointerKart()           const {return (Kart*)m_pointer;          }
-    PhysicalObject *getPointerPhysicalObject() const {return (PhysicalObject*)m_pointer;}
+    bool            is(UserPointerType t)      const {return m_user_pointer_type==t;     }
+    TriangleMesh*   getPointerTriangleMesh()   const {return (TriangleMesh*)m_pointer;   }
+    Moveable*       getPointerMoveable()       const {return (Moveable*)m_pointer;       }
+    Flyable*        getPointerFlyable()        const {return (Flyable*)m_pointer;        }
+    Kart*           getPointerKart()           const {return (Kart*)m_pointer;           }
+    PhysicalObject *getPointerPhysicalObject() const {return (PhysicalObject*)m_pointer; }
+	ThreeDAnimation*getPointerAnimation()      const {return (ThreeDAnimation*)m_pointer;}
     void            set(PhysicalObject* p) { m_user_pointer_type=UP_PHYSICAL_OBJECT;
                                              m_pointer          =p;           }
     void            set(Kart* p)           { m_user_pointer_type=UP_KART;
@@ -51,6 +58,8 @@ public:
     void            set(Flyable* p)        { m_user_pointer_type=UP_FLYABLE;
                                              m_pointer          =p;           }
     void            set(TriangleMesh* p)   { m_user_pointer_type=UP_TRACK;
+                                             m_pointer          =p;           }
+	void            set(ThreeDAnimation* p){ m_user_pointer_type=UP_ANIMATION;
                                              m_pointer          =p;           }
                     UserPointer()          { zero();                          }
     void            zero()                 { m_user_pointer_type=UP_UNDEF;

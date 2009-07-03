@@ -78,9 +78,9 @@ void Vec3::setHPR(const btMatrix3x3& m)
 // ----------------------------------------------------------------------------
 void Vec3::degreeToRad()
 {
-    m_x=DEGREE_TO_RAD(m_x);      
-    m_y=DEGREE_TO_RAD(m_y);      
-    m_z=DEGREE_TO_RAD(m_z);
+    m_x=DEGREE_TO_RAD*m_x;
+    m_y=DEGREE_TO_RAD*m_y;      
+    m_z=DEGREE_TO_RAD*m_z;
 }   // degreeToRad
 
 // ----------------------------------------------------------------------------
@@ -109,12 +109,11 @@ void Vec3::setPitchRoll(const Vec3 &normal)
  *  FIXME: this function should be inlined, but while debugging it's
  *  easier (compile-time wise) to modify it here :)
  */
-#ifdef HAVE_IRRLICHT
 const core::vector3df Vec3::toIrrHPR() const
 {
-    core::vector3df r(RAD_TO_DEGREE(-getY()),     // pitch
-                      RAD_TO_DEGREE(-getX()),     // heading
-                      RAD_TO_DEGREE(-getZ()) );   // roll
+    core::vector3df r(RAD_TO_DEGREE*(-getY()),     // pitch
+                      RAD_TO_DEGREE*(-getX()),     // heading
+                      RAD_TO_DEGREE*(-getZ()) );   // roll
     return r;
 
 }  // toIrrHPR
@@ -124,4 +123,3 @@ const core::vector3df Vec3::toIrrVector() const
     core::vector3df v(m_x, m_z, m_y);
     return v;
 }   // toIrrVector
-#endif

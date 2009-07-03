@@ -72,9 +72,9 @@ void Nitro::update(float t)
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
-    Vec3 dir(cos(DEGREE_TO_RAD(rand()%180))*0.001f,
-             sin(DEGREE_TO_RAD(rand()%180))*0.001f,
-             sin(DEGREE_TO_RAD(rand()%100))*0.001f);
+    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD*(rand()%180))*0.001f,
+             sin(DEGREE_TO_RAD*(rand()%100))*0.001f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
