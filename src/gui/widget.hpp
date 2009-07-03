@@ -177,6 +177,8 @@ namespace GUIEngine
     class ButtonWidget : public Widget
     {
     public:
+        ButtonWidget();
+        
         void add();
         virtual ~ButtonWidget() {}
         void setLabel(const char* label);
@@ -185,6 +187,8 @@ namespace GUIEngine
     class LabelWidget : public Widget
     {
     public:
+        LabelWidget();
+        
         void add();
         virtual ~LabelWidget() {}
     };
@@ -269,6 +273,7 @@ namespace GUIEngine
     public:
         Widget* m_focus;
         
+        RibbonWidget(const RibbonType type=RIBBON_COMBO);
         virtual ~RibbonWidget() {}
         
         int getSelection() const { return m_selection; }
@@ -280,7 +285,6 @@ namespace GUIEngine
         const std::string& getSelectionText() { return m_children[m_selection].m_properties[PROP_TEXT]; }
         void setLabel(const int id, std::string new_name);
         
-        RibbonWidget(const RibbonType type=RIBBON_COMBO);
     };
     
     struct ItemDescription
@@ -352,6 +356,7 @@ namespace GUIEngine
         video::ITexture* m_texture;
         float angle;
     public:
+        ModelViewWidget();
         ~ModelViewWidget();
         
         void add();
@@ -362,6 +367,8 @@ namespace GUIEngine
     class ListWidget : public Widget
     {
     public:
+        ListWidget();
+        
         SkinWidgetContainer m_selection_skin_info;
         
         void add();
@@ -375,6 +382,8 @@ namespace GUIEngine
     class TextBoxWidget : public Widget
     {
     public:
+        TextBoxWidget();
+        
         void add();
         void addItem(const char* item);
         

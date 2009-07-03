@@ -124,7 +124,6 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     //label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
     LabelWidget* widget = new LabelWidget();
-    widget->m_type = WTYPE_LABEL;
     widget->m_properties[PROP_TEXT] = _("Press a key");
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
     widget->x = 0;
@@ -141,7 +140,6 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     const int textHeight = font->getDimension(L"X").Height;
         
     ButtonWidget* widget2 = new ButtonWidget();
-    widget2->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
     widget2->m_properties[PROP_ID] = "cancel";
     widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel");
     widget2->x = 15;
@@ -181,7 +179,6 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
    // label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
   
     LabelWidget* widget = new LabelWidget();
-    widget->m_type = WTYPE_LABEL;
     widget->m_properties[PROP_TEXT] = _("Enter the new player's name");
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
     widget->x = 0;
@@ -201,7 +198,6 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     const int textAreaYFrom = m_area.getHeight()/2 - textHeight/2;
     
     textCtrl = new TextBoxWidget();
-    textCtrl->m_type = WTYPE_BUTTON;
     textCtrl->m_properties[PROP_TEXT] = "";
     textCtrl->x = 50;
     textCtrl->y = textAreaYFrom - 10;
@@ -215,7 +211,6 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     // TODO : add Ok button
 
     cancelButton = new ButtonWidget();
-    cancelButton->m_type = WTYPE_BUTTON; // FIXME : shouldn't constructor set type?
     cancelButton->m_properties[PROP_ID] = "cancel";
     cancelButton->m_properties[PROP_TEXT] = _("Cancel");
     cancelButton->x = 15;
@@ -297,7 +292,6 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
 
     
     SpinnerWidget* widget = new SpinnerWidget();
-    widget->m_type = WTYPE_SPINNER;
     widget->x = 0;
     widget->y = y2;
     widget->w = m_area.getWidth();
@@ -386,7 +380,6 @@ void PlayerInfoDialog::showRegularDialog()
     
     {
         textCtrl = new TextBoxWidget();
-        textCtrl->m_type = WTYPE_BUTTON;
         textCtrl->m_properties[PROP_ID] = "renameplayer";
         textCtrl->m_properties[PROP_TEXT] = m_player->getName();
         textCtrl->x = 50;
@@ -401,7 +394,6 @@ void PlayerInfoDialog::showRegularDialog()
     
     {
         ButtonWidget* widget = new ButtonWidget();
-        widget->m_type = WTYPE_BUTTON;
         widget->m_properties[PROP_ID] = "renameplayer";
         widget->m_properties[PROP_TEXT] = _("Rename");
         
@@ -417,7 +409,6 @@ void PlayerInfoDialog::showRegularDialog()
     }
     {
         ButtonWidget* widget = new ButtonWidget();
-        widget->m_type = WTYPE_BUTTON;
         widget->m_properties[PROP_ID] = "cancel";
         widget->m_properties[PROP_TEXT] = _("Cancel");
         
@@ -434,7 +425,6 @@ void PlayerInfoDialog::showRegularDialog()
     
     {
         ButtonWidget* widget = new ButtonWidget();
-        widget->m_type = WTYPE_BUTTON;
         widget->m_properties[PROP_ID] = "removeplayer";
         widget->m_properties[PROP_TEXT] = _("Remove");
         
@@ -472,7 +462,6 @@ void PlayerInfoDialog::showConfirmDialog()
 
     {
         ButtonWidget* widget = new ButtonWidget();
-        widget->m_type = WTYPE_BUTTON;
         widget->m_properties[PROP_ID] = "confirmremove";
         widget->m_properties[PROP_TEXT] = _("Confirm Remove");
         
@@ -489,7 +478,6 @@ void PlayerInfoDialog::showConfirmDialog()
     
     {
         ButtonWidget* widget = new ButtonWidget();
-        widget->m_type = WTYPE_BUTTON;
         widget->m_properties[PROP_ID] = "cancelremove";
         widget->m_properties[PROP_TEXT] = _("Cancel Remove");
         

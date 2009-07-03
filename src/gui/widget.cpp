@@ -243,6 +243,11 @@ void Widget::setParent(IGUIElement* parent)
 #pragma mark Button Widget
 #endif
 
+ButtonWidget::ButtonWidget()
+{
+    m_type = WTYPE_BUTTON;
+}
+
 void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -262,6 +267,11 @@ void ButtonWidget::setLabel(const char* label)
 #pragma mark -
 #pragma mark Label Widget
 #endif
+
+LabelWidget::LabelWidget()
+{
+    m_type = WTYPE_LABEL;
+}
 
 void LabelWidget::add()
 {
@@ -293,6 +303,7 @@ CheckBoxWidget::CheckBoxWidget()
 {
     m_state = true;
     m_event_handler = this;
+    m_type = WTYPE_CHECKBOX;
 }
 
 void CheckBoxWidget::add()
@@ -327,6 +338,7 @@ IconButtonWidget::IconButtonWidget(const bool clickable)
 {
     IconButtonWidget::clickable = clickable;
     label = NULL;
+    m_type = WTYPE_ICON_BUTTON;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -416,6 +428,8 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     m_ribbon_type = type;
     m_focus = NULL;
     updateSelection();
+    m_type = WTYPE_RIBBON;
+
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::select(std::string item)
@@ -699,6 +713,8 @@ void RibbonWidget::setLabel(const int id, std::string new_name)
 SpinnerWidget::SpinnerWidget(const bool gauge)
 {
     m_gauge = gauge;
+    m_type = WTYPE_SPINNER;
+
 }
 
 void SpinnerWidget::add()
@@ -860,6 +876,8 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
 
     m_left_widget = NULL;
     m_right_widget = NULL;
+    m_type = WTYPE_RIBBON_GRID;
+
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::add()
@@ -1135,7 +1153,7 @@ void RibbonGridWidget::setSelection(int item_id)
 }
 void RibbonGridWidget::setSelection(const std::string& code_name)
 {
-assert(false);
+    assert(false);
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateItemDisplay()
@@ -1243,6 +1261,10 @@ RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
 #endif
 
 // -----------------------------------------------------------------------------
+ModelViewWidget::ModelViewWidget()
+{
+    m_type = WTYPE_MODEL_VIEW;
+}
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
@@ -1304,6 +1326,10 @@ void ModelViewWidget::update(float delta)
 
 
 // -----------------------------------------------------------------------------
+ListWidget::ListWidget()
+{
+    m_type = WTYPE_LIST;
+}
 void ListWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -1345,7 +1371,10 @@ std::string ListWidget::getSelectionName() const
 #endif
 
 // -----------------------------------------------------------------------------
-
+TextBoxWidget::TextBoxWidget()
+{
+    m_type = WTYPE_TEXTBOX;
+}
 void TextBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);

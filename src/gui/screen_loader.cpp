@@ -48,101 +48,82 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 break;
             case irr::io::EXN_ELEMENT:
             {
-                WidgetType type;
-                
                 /* find which type of widget is specified by the current tag, and instanciate it */
                 if (!strcmp("div", xml->getNodeName()))
                 {
-                    type = WTYPE_DIV;
-                    append_to.push_back(new Widget());
+                    Widget* w = new Widget();
+                    w->m_type = WTYPE_DIV;
+                    append_to.push_back(w);
                 }
                 else if (!strcmp("box", xml->getNodeName()))
                 {
-                    type = WTYPE_DIV;
                     Widget* w = new Widget();
+                    w->m_type = WTYPE_DIV;
                     w->m_show_bounding_box = true;
                     append_to.push_back(w);
                 }
                 else if (!strcmp("ribbon", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON;
                     append_to.push_back(new RibbonWidget());
                 }
                 else if (!strcmp("buttonbar", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON;
                     append_to.push_back(new RibbonWidget(RIBBON_TOOLBAR));
                 }
                 else if (!strcmp("tabs", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON;
                     append_to.push_back(new RibbonWidget(RIBBON_TABS));
                 }
                 else if (!strcmp("spinner", xml->getNodeName()))
                 {
-                    type = WTYPE_SPINNER;
                     append_to.push_back(new SpinnerWidget());
                 }
                 else if (!strcmp("button", xml->getNodeName()))
                 {
-                    type = WTYPE_BUTTON;
                     append_to.push_back(new ButtonWidget());
                 }
                 else if (!strcmp("gauge", xml->getNodeName()))
                 {
-                    //type = WTYPE_GAUGE;
-                    //append_to.push_back(new GaugeWidget());
-                    type = WTYPE_SPINNER;
                     append_to.push_back(new SpinnerWidget(true));
                 }
                 else if (!strcmp("icon-button", xml->getNodeName()))
                 {
-                    type = WTYPE_ICON_BUTTON;
                     append_to.push_back(new IconButtonWidget());
                 }
                 else if (!strcmp("icon", xml->getNodeName()))
                 {
-                    type = WTYPE_ICON_BUTTON;
                     append_to.push_back(new IconButtonWidget(false));
                 }
                 else if (!strcmp("checkbox", xml->getNodeName()))
                 {
-                    type = WTYPE_CHECKBOX;
                     append_to.push_back(new CheckBoxWidget());
                 }
                 else if (!strcmp("label", xml->getNodeName()))
                 {
-                    type = WTYPE_LABEL;
                     append_to.push_back(new LabelWidget());
                 }
                 else if (!strcmp("spacer", xml->getNodeName()))
                 {
-                    type = WTYPE_NONE;
                     append_to.push_back(new Widget());
                 }
                 else if (!strcmp("ribbon_grid", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON_GRID;
                     append_to.push_back(new RibbonGridWidget());
                 }
                 else if (!strcmp("scrollable_ribbon", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON_GRID;
                     append_to.push_back(new RibbonGridWidget(true, 1));
                 }
                 else if (!strcmp("scrollable_toolbar", xml->getNodeName()))
                 {
-                    type = WTYPE_RIBBON_GRID;
                     append_to.push_back(new RibbonGridWidget(false, 1));
                 }
                 else if (!strcmp("model", xml->getNodeName()))
                 {
-                    type = WTYPE_MODEL_VIEW;
                     append_to.push_back(new ModelViewWidget());
                 }
                 else if (!strcmp("list", xml->getNodeName()))
                 {
-                    type = WTYPE_LIST;
                     append_to.push_back(new ListWidget());
                 }
                 else
@@ -151,9 +132,8 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     continue;
                 }
                 
-                /* retrieve teh created widget */
+                /* retrieve the created widget */
                 Widget& widget = append_to[append_to.size()-1];
-                widget.m_type = type;
                 
                 /* read widget properties using macro magic */
                 
