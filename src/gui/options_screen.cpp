@@ -321,7 +321,7 @@ namespace StateManager
             {
                 if(UserConfigParams::m_player[n].getName() == selectedPlayer)
                 {
-                    new PlayerInfoDialog( &UserConfigParams::m_player[n], 0.5f, 0.4f );
+                    new PlayerInfoDialog( &UserConfigParams::m_player[n], 0.5f, 0.6f );
                     return;
                 }
             } // end for

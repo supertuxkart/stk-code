@@ -322,9 +322,10 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
 {
     m_player = player;
     
-    const int y1 = m_area.getHeight()/4;
-    const int y2 = m_area.getHeight()*2/4;
-    const int y3 = m_area.getHeight()*3/4;
+    const int y1 = m_area.getHeight()/6;
+    const int y2 = m_area.getHeight()*2/6;
+    const int y3 = m_area.getHeight()*3/6;
+    const int y4 = m_area.getHeight()*5/6;
     
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = font->getDimension(L"X").Height;
@@ -361,6 +362,22 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     m_children.push_back(widget);
     widget->add();
     }
+    {
+        ButtonWidget* widget = new ButtonWidget();
+        widget->m_type = WTYPE_BUTTON;
+        widget->m_properties[PROP_ID] = "cancel";
+        widget->m_properties[PROP_TEXT] = _("Cancel");
+        
+        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        
+        widget->x = m_area.getWidth()/2 - textWidth/2;
+        widget->y = y3;
+        widget->w = textWidth;
+        widget->h = buttonHeight;
+        widget->setParent(m_irrlicht_window);
+        m_children.push_back(widget);
+        widget->add();
+    }
     
     {
     ButtonWidget* widget = new ButtonWidget();
@@ -371,7 +388,7 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
     
     widget->x = m_area.getWidth()/2 - textWidth/2;
-    widget->y = y3;
+    widget->y = y4;
     widget->w = textWidth;
     widget->h = buttonHeight;
     widget->setParent(m_irrlicht_window);
@@ -379,7 +396,6 @@ PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h)
     widget->add();
     }
     
-    // TODO : add cancel button
 }
 void PlayerInfoDialog::onEnterPressedInternal()
 {
@@ -406,7 +422,9 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         return;
     }
     if(eventSource == "removeplayer")
-    {
+    {   
+        // FIXME : ask for confirmation
+        
         StateManager::deletePlayer( m_player );
 
         // irrLicht is too stupid to remove focus from deleted widgets
@@ -418,6 +436,18 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         
         return;
     }
+    if(eventSource == "cancel")
+    {   
+        // irrLicht is too stupid to remove focus from deleted widgets
+        // so do it by hand
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
+        
+        ModalDialog::dismiss();
+        
+        return;
+    }
+    
 }
     
 }
