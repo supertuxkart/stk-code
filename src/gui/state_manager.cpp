@@ -22,6 +22,7 @@
 
 #include "main_loop.hpp"
 #include "audio/sound_manager.hpp"
+#include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "gui/credits.hpp"
@@ -154,18 +155,20 @@ namespace StateManager
             }
             w->updateItemDisplay();
 
+            // Set-up player list
             SpinnerWidget* w2 = getCurrentScreen()->getWidget<SpinnerWidget>("player");
             assert( w2 != NULL );
-            w2->addLabel("Hiker"); // TODO : don't hardcode
-            w2->addLabel("Auria");
-            w2->addLabel("Conso");
-            w2->addLabel("MiniBjorn");
+            
+            const int playerAmount = UserConfigParams::m_player.size();
+            for(int n=0; n<playerAmount; n++)
+            {
+                w2->addLabel( UserConfigParams::m_player[n].getName() );
+            }
 
+            // Set-up kart model preview
             ModelViewWidget* w3 = getCurrentScreen()->getWidget<ModelViewWidget>("modelview");
-
             assert( w3 != NULL );
 
-            // set initial kart model
             KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
 
             w3->addModel( kartModel->getModel() );
