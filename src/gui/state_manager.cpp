@@ -66,6 +66,16 @@ namespace StateManager
         g_active_players.push_back(p);
     }
 
+    void resetActivePlayers()
+    {
+        const int amount = g_active_players.size();
+        for(int i=0; i<amount; i++)
+        {
+            g_active_players[i].setDevice(NULL);
+        }
+        g_active_players.clearWithoutDeleting();
+    }
+    
 #if 0
 #pragma mark Callbacks
 #endif

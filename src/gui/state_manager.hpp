@@ -39,6 +39,7 @@ namespace StateManager
     
     const ptr_vector<Player, REF>& getActivePlayers();
     void addActivePlayer(Player* p);
+    void resetActivePlayers();
     
     void escapePressed();
 }

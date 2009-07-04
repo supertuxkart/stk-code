@@ -44,9 +44,23 @@ bool DeviceManager::initGamePadSupport()
     return something_new_to_write;
 }
 // -----------------------------------------------------------------------------
+
 void DeviceManager::setNoAssignMode(const bool noAssignMode)
 {
     m_no_assign_mode = noAssignMode;
+    
+    // when going back to no-assign mode, do some cleanup
+    if(noAssignMode)
+    {
+        for(unsigned int i=0; i<m_gamepad_amount; i++)
+        {
+            m_gamepads[i].setPlayer(NULL);
+        }
+        for(unsigned int n=0; n<m_keyboard_amount; n++)
+        {
+            m_keyboards[n].setPlayer(NULL);
+        }
+    }
 }
 // -----------------------------------------------------------------------------
 GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)

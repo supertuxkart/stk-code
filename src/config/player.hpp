@@ -57,7 +57,9 @@ public:
     void setDevice(InputDevice* device)
     {
         m_device = device;
-        device->setPlayer(this);
+        
+        if(device != NULL)
+            device->setPlayer(this);
     }
     
     void setName(const std::string &name_){m_name = name_;}

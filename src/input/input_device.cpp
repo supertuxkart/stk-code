@@ -16,19 +16,28 @@ InputDevice::InputDevice()
     m_player_id = -1;
 }
 // -----------------------------------------------------------------------------
+/**
+  * Sets which players uses this device; or pass NULL to say no player uses it. 
+  */
 void InputDevice::setPlayer(Player* owner)
 {
+    if(owner == NULL)
+    {
+        m_player_id = -1;
+        return;
+    }
+    
     const ptr_vector<Player, REF>& players = StateManager::getActivePlayers();
     const int playerAmount = players.size();
     for(int n=0; n<playerAmount; n++)
     {
         if(players.getConst(n) == owner)
         {
-            m_player_id = n; // TODO : reset m_player_id when ending a game
+            m_player_id = n;
             return;
         }
     }
-    std::cerr << "Error, trying to assign that doesn't exist to a device\n";
+    std::cerr << "\n\nError, trying to assign that doesn't exist to a device!!!\n\n";
 }
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)

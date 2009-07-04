@@ -169,13 +169,15 @@ void setPlayer0Device(InputDevice* device)
         std::cout << "Player 0 is using a gamepad\n";
     }
     
-    // TODO : support moer than 1 player
+    // TODO : support more than 1 player
     StateManager::addActivePlayer( UserConfigParams::m_player.get(0) );
     UserConfigParams::m_player[0].setDevice(device);
-    
-    // TODO : fall back in no-assign mode when aborting a game and going back to the menu
     input_manager->getDeviceList()->setNoAssignMode(false);
     
+    // TODO : fall back in no-assign mode when aborting a game and going back to the menu
+    // how to revert assign mode :
+    // StateManager::resetActivePlayers();
+    // input_manager->getDeviceList()->setNoAssignMode(true);
 }
     
 /**

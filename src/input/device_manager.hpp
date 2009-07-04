@@ -32,6 +32,8 @@ public:
     /**
       * The device manager starts in "no-assign" mode, which means no input configuration is associated
       * to any player. So all devices will react. This is used in menus before player set-up is done.
+      * Switching back to no-assign mode will also clear anything in devices that was associated with
+      * players in assign mode.
       */
     bool noAssignMode() const { return m_no_assign_mode; }
     void setNoAssignMode(const bool noAssignMode);
