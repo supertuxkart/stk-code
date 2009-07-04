@@ -7,6 +7,8 @@
 #include <fstream>
 #include "io/xml_node.hpp"
 
+class Player;
+
 enum DeviceType
 {
     DT_KEYBOARD,
@@ -25,17 +27,21 @@ struct KeyBinding
 
 class InputDevice
 {
+    friend class DeviceManager;
 protected:
     DeviceType m_type;
     KeyBinding m_default_bindings[PA_COUNT];
 
-    
+    int m_player_id;
+
 public:
     std::string m_name; // if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart
     
     InputDevice();
     
     DeviceType getType() const { return m_type; };
+    
+    void setPlayer(Player* owner);
     
     /**
       * returns a human-readable string for the key binded with the given action

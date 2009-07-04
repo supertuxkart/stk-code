@@ -22,11 +22,14 @@
 
 #include <string>
 #include "config/user_config.hpp"
+#include "input/input_device.hpp"
 
 class InputDevice;
 
 /**
-  * class for managing player name and control configuration
+  * class for managing player name and control configuration.
+  * A list of all possible players is stored in the user config.
+  * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
   */
 class Player
 {
@@ -50,8 +53,12 @@ public:
         m_device = NULL;
     }
     
-    InputDevice* getDevice() { return m_device; }
-    void setDevice(InputDevice* device) { m_device = device; }
+    InputDevice* getDevice() const { return m_device; }
+    void setDevice(InputDevice* device)
+    {
+        m_device = device;
+        device->setPlayer(this);
+    }
     
     void setName(const std::string &name_){m_name = name_;}
 

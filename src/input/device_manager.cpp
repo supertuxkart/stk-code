@@ -3,14 +3,18 @@
 #include <iostream>
 #include <fstream>
 
+#include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 
 DeviceManager::DeviceManager()
 {
     m_keyboard_amount = 0;
     m_gamepad_amount = 0;
+    m_latest_used_device = NULL;
+    m_no_assign_mode = true;
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::initGamePadSupport()
@@ -38,6 +42,11 @@ bool DeviceManager::initGamePadSupport()
     std::cout << "====================\n";
     
     return something_new_to_write;
+}
+// -----------------------------------------------------------------------------
+void DeviceManager::setNoAssignMode(const bool noAssignMode)
+{
+    m_no_assign_mode = noAssignMode;
 }
 // -----------------------------------------------------------------------------
 GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
@@ -91,16 +100,53 @@ void DeviceManager::add(GamePadDevice* d)
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int deviceID, int btnID, int axisDir, int value,
-                                              int* player /* out */, PlayerAction* action /* out */ )
+                                              const bool programaticallyGenerated, int* player /* out */,
+                                              PlayerAction* action /* out */ )
 {
-    // TODO - auto-detect player ID from device
-    *player = 0;
+    if(m_no_assign_mode)
+    {
+        *player = -1;
+    }
+
     
     if(type == Input::IT_KEYBOARD)
     {
         for(unsigned int n=0; n<m_keyboard_amount; n++)
         {
-            if( m_keyboards[n].hasBinding(btnID, action) ) return true;
+            if( m_keyboards[n].hasBinding(btnID, action) )
+            {
+                // We found which device was triggered.
+                
+                if(m_no_assign_mode)
+                {
+                    // In no-assign mode, simply keep track of which device is used
+                    if(!programaticallyGenerated) m_latest_used_device = m_keyboards.get(n);
+                    
+                    //if(programaticallyGenerated) std::cout << "devieManager ignores programatical event\n";
+                }
+                else
+                {
+                    // In assign mode, find to which active player this binding belongs
+                    // FIXME : in order to speed this use, a Player* pointer could be
+                    // stored inside the device so we don't need to iterate through devices
+                    const ptr_vector<Player, REF>& players = StateManager::getActivePlayers();
+                    const int playerAmount = players.size();
+                    for(int n=0; n<playerAmount; n++)
+                    {
+                        if(players[n].getDevice() == m_keyboards.get(n))
+                        {
+                            // we found which active player has this binding
+                            *player = n;
+                            return true;
+                        }
+                    }
+                    // no active player has this binding
+                    return false;
+                }
+                           
+                
+                return true;
+            }
         }
         return false;
     }
@@ -110,16 +156,33 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
     }
     else if(type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
     {
-        for(unsigned int n=0; n<m_gamepad_amount; n++)
+
+        GamePadDevice* gamepad = getGamePadFromIrrID(deviceID);
+        
+        if(m_no_assign_mode)
         {
-            //std::cout << "checking gamepad #" << n << " out of " << m_gamepad_amount << std::endl;
+            // In no-assign mode, simply keep track of which device is used
+            if(!programaticallyGenerated)
+                m_latest_used_device = gamepad;
             
-            if(m_gamepads[n].hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
+            if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
             {
-                //std::cout << "that's the one.\n";
                 return true;
             }
         }
+        else
+        {
+            if(gamepad->m_player_id != -1)
+                *player = gamepad->m_player_id;
+            else
+                return false; // no player mapped to this device
+            
+            if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
+            {
+                return true;
+            }
+        }
+        
         return false;
     }
     else
@@ -128,6 +191,14 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
     }
     
     return false;
+}
+// -----------------------------------------------------------------------------
+InputDevice* DeviceManager::getLatestUsedDevice()
+{
+    // If none, probably the user clicked or used enter; give keyboard by default
+    if (m_latest_used_device == NULL ) return m_keyboards.get(0);
+    
+    return m_latest_used_device;
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::deserialize()

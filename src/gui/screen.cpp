@@ -443,17 +443,19 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
     switch(action)
     {
         case PA_LEFT:
+            /*
         if(type == Input::IT_STICKMOTION)
         {
             // simulate a key press
             irr::SEvent::SKeyInput evt;
             evt.PressedDown = pressedDown;
-            evt.Key = KEY_LEFT;
+            evt.Key = KEY_LEFT;  // FIXME : what if keyboard bindings are not set to use this key?
             irr::SEvent wrapper;
             wrapper.KeyInput = evt;
             wrapper.EventType = EET_KEY_INPUT_EVENT;
             GUIEngine::getDevice()->postEventFromUser(wrapper);
         }
+             */
         {
             IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
             if(el == NULL) break;
@@ -475,17 +477,18 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             break;
             
         case PA_RIGHT:
+            /*
         if(type == Input::IT_STICKMOTION)
         {
             // simulate a key press
             irr::SEvent::SKeyInput evt;
             evt.PressedDown = pressedDown;
-            evt.Key = KEY_RIGHT;
+            evt.Key = KEY_RIGHT;  // FIXME : what if keyboard bindings are not set to use this key?
             irr::SEvent wrapper;
             wrapper.KeyInput = evt;
             wrapper.EventType = EET_KEY_INPUT_EVENT;
             GUIEngine::getDevice()->postEventFromUser(wrapper);
-        }
+        }*/
         {
             IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
             if(el == NULL) break;
@@ -537,9 +540,10 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
                 if(stay_within_list) break;
                 else list->setSelected(-1);
             }
-            
+
+            // find closest widget
             if(el != NULL && el->getTabGroup() != NULL &&
-               el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))
+               el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
             {
                 GUIEngine::getGUIEnv()->setFocus(closest);
                 
@@ -558,6 +562,8 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
             }
             else
             {
+                std::cout << "Could not find any!\n";
+                
                 // select the first widget
                 Widget* w = getLastWidget();
                 
@@ -622,28 +628,16 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         case PA_FIRE:
             if(type == Input::IT_STICKBUTTON)
             {
-                // simulate a 'enter' key press. doesn't seem to work
+                // simulate a 'enter' key press
                 irr::SEvent::SKeyInput evt;
                 evt.PressedDown = pressedDown;
-                evt.Key = KEY_SPACE; // KEY_RETURN
+                evt.Key = KEY_SPACE;  // FIXME : what if keyboard bindings are not set to use this key?
+                evt.Char = 666; // My magic code to know it's a fake event (FIXME : ugly, but irrlicht doesn't seem to offer better)
                 irr::SEvent wrapper;
                 wrapper.KeyInput = evt;
+
                 wrapper.EventType = EET_KEY_INPUT_EVENT;
                 GUIEngine::getDevice()->postEventFromUser(wrapper);
-                
-                /*
-                irr::SEvent::SGUIEvent evt;
-                evt.EventType = EGET_BUTTON_CLICKED;
-                evt.Element = GUIEngine::getGUIEnv()->getFocus();
-                evt.Caller = GUIEngine::getGUIEnv()->getFocus();
-                irr::SEvent wrapper;
-                wrapper.GUIEvent = evt;
-                wrapper.EventType = EET_GUI_EVENT;
-                // GUIEngine::getDevice()->postEventFromUser(wrapper);
-                this->OnEvent(wrapper);
-                // std::cout << "posting event to simulate 'enter'\n";
-                 */
-
             }
             break;
         default:

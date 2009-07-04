@@ -20,8 +20,10 @@
 #define STATE_MANAGER_HPP
 
 #include <string>
+#include "utils/ptr_vector.hpp"
 
 struct Input;
+class Player;
 
 namespace StateManager
 {
@@ -34,6 +36,9 @@ namespace StateManager
     void enterGameState();
     bool isGameState();
     void reshowTopMostMenu();
+    
+    const ptr_vector<Player, REF>& getActivePlayers();
+    void addActivePlayer(Player* p);
     
     void escapePressed();
 }

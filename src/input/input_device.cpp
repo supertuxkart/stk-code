@@ -11,8 +11,24 @@ InputDevice::InputDevice()
     {
         m_default_bindings[n].id = -1;
         m_default_bindings[n].type = Input::IT_NONE;
-        m_default_bindings[n].dir = Input::AD_NEGATIVE;
+        m_default_bindings[n].dir = Input::AD_NEUTRAL;
     }
+    m_player_id = -1;
+}
+// -----------------------------------------------------------------------------
+void InputDevice::setPlayer(Player* owner)
+{
+    const ptr_vector<Player, REF>& players = StateManager::getActivePlayers();
+    const int playerAmount = players.size();
+    for(int n=0; n<playerAmount; n++)
+    {
+        if(players.getConst(n) == owner)
+        {
+            m_player_id = n; // TODO : reset m_player_id when ending a game
+            return;
+        }
+    }
+    std::cerr << "Error, trying to assign that doesn't exist to a device\n";
 }
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)
@@ -295,7 +311,8 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
     if(m_prevAxisDirections == NULL) return false; // device not open
-
+    //if(player != m_player_id && player != -1) return false; // device open, but belongs to another player
+    
     if(type == Input::IT_STICKMOTION)
     {
         if(id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
@@ -305,7 +322,6 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
         {
             //  set positive id to 0
             resetAxisDirection(id, Input::AD_POSITIVE, player);
-
         }
         // going to positive from negative
         else if (value > 0 && m_prevAxisDirections[id] == Input::AD_NEGATIVE)

@@ -768,6 +768,8 @@ void SpinnerWidget::add()
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, ++id_counter, L"");
     m_element = btn;
+    
+    m_element->setTabOrder( m_element->getID() );
 
     // left arrow
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);

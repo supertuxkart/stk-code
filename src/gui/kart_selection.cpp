@@ -24,6 +24,9 @@
 #include "gui/engine.hpp"
 #include "gui/screen.hpp"
 #include "gui/state_manager.hpp"
+#include "input/input.hpp"
+#include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -84,9 +87,7 @@ namespace StateManager
             const int modelMaxHeight =  area->h - 25 - 65;
             const int modelMaxWidth =  area->w;
             const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-            
-            std::cout << "bestSize=" << bestSize << std::endl;
-            
+                        
             modelView->x = area->x + area->w/2 - bestSize*1.2/2;
             modelView->y = modelY + modelMaxHeight/2 - bestSize/2;
             modelView->w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
@@ -117,8 +118,8 @@ namespace StateManager
         
     };
     
-    // TODO : have one per player
-    PlayerKart* playerKart1 = NULL;
+    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+    ptr_vector<PlayerKart, REF> g_player_karts;
     
 class KartHoverListener : public RibbonGridHoverListener
     {
@@ -129,7 +130,8 @@ class KartHoverListener : public RibbonGridHoverListener
             
             if(selectionID.size() == 0) return;
             
-            ModelViewWidget* w3 = playerKart1->modelView;
+            // TODO : support players other than player 0 (i.e. multiplayer)
+            ModelViewWidget* w3 = g_player_karts[0].modelView;
             assert( w3 != NULL );
             
             const KartProperties* kart = kart_properties_manager->getKart(selectionID);
@@ -144,11 +146,38 @@ class KartHoverListener : public RibbonGridHoverListener
             w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             w3->update(0);
             
-            playerKart1->kartName->setText( kart->getName().c_str() );
+            // TODO : support players other than player 0 (i.e. multiplayer)
+            g_player_karts[0].kartName->setText( kart->getName().c_str() );
         }
     };
 KartHoverListener* karthoverListener = NULL;
 
+void setPlayer0Device(InputDevice* device)
+{
+    if(device == NULL)
+    {
+        std::cout << "I don't know which device to assign to player 0 :'(\n";
+        return;
+    }
+    
+    if(device->getType() == DT_KEYBOARD)
+    {
+        std::cout << "Player 0 is using a keyboard\n";
+    }
+    if(device->getType() == DT_GAMEPAD)
+    {
+        std::cout << "Player 0 is using a gamepad\n";
+    }
+    
+    // TODO : support moer than 1 player
+    StateManager::addActivePlayer( UserConfigParams::m_player.get(0) );
+    UserConfigParams::m_player[0].setDevice(device);
+    
+    // TODO : fall back in no-assign mode when aborting a game and going back to the menu
+    input_manager->getDeviceList()->setNoAssignMode(false);
+    
+}
+    
 /**
  * Callback handling events from the kart selection menu
  */
@@ -171,9 +200,10 @@ void menuEventKarts(Widget* widget, std::string& name)
 
             Widget* area = getCurrentScreen()->getWidget("playerskarts");
             
-            playerKart1 = new PlayerKart(area);
+            PlayerKart* playerKart1 = new PlayerKart(area);
             getCurrentScreen()->manualAddWidget(playerKart1);
             playerKart1->add();
+            g_player_karts.push_back(playerKart1);
             
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();

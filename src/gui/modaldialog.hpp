@@ -92,6 +92,7 @@ public:
      */
     TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
     void onEnterPressedInternal();
+    void processEvent(std::string& eventSource);
 };
 
 class PlayerInfoDialog : public ModalDialog

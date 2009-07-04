@@ -251,16 +251,18 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
+void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection, int value,
+                         const bool programaticallyGenerated)
 {
     int player;
     PlayerAction action;
 
-    bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection, value, &player, &action );
+    bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection,
+                                                                     value, programaticallyGenerated, &player, &action );
 
-
-    // in menus, some keyboard keys are standard
-    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU)
+    // in menus, some keyboard keys are standard (before each player selected his device)
+    // FIXME: should enter always work to accept for a player using keyboard?
+    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU && m_device_manager->noAssignMode())
     {
         action = PA_FIRST;
 
@@ -339,6 +341,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 bool InputManager::input(const SEvent& event)
 {
 
+    //const bool programaticallyGenerated = (event.UserEvent.UserData1 == 666 && event.UserEvent.UserData1 == 999);
+    const bool programaticallyGenerated = event.EventType == EET_KEY_INPUT_EVENT && (event.KeyInput.Char == 666);
+
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
@@ -359,9 +364,9 @@ bool InputManager::input(const SEvent& event)
 
             // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
             if(value < 0)
-                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value);
+                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value, programaticallyGenerated);
             else
-                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
+                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value, programaticallyGenerated);
         }
 
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
@@ -371,7 +376,7 @@ bool InputManager::input(const SEvent& event)
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 
             if(gp->isButtonPressed(i) || isButtonPressed)
-                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, isButtonPressed ? MAX_VALUE : 0);
+                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, isButtonPressed ? MAX_VALUE : 0, programaticallyGenerated);
             gp->setButtonPressed(i, isButtonPressed);
         }
 
@@ -413,12 +418,12 @@ bool InputManager::input(const SEvent& event)
 #else
                   ev.key.keysym.unicode,
 #endif
-                  MAX_VALUE);
+                  MAX_VALUE, programaticallyGenerated);
 
         }
         else
         {
-            input(Input::IT_KEYBOARD, 0, key, 0, 0);
+            input(Input::IT_KEYBOARD, 0, key, 0, 0, programaticallyGenerated);
         }
     }
 #if 0 // in case we ever use mouse in-game...

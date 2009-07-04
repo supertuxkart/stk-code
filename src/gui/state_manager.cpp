@@ -41,19 +41,34 @@
 
 using namespace GUIEngine;
 
-/**
- * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
- */
-std::vector<std::string> g_menu_stack;
 
-static bool g_game_mode = false;
+namespace StateManager
+{
+    static bool g_game_mode = false;
+
+    /**
+     * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
+     */
+    std::vector<std::string> g_menu_stack;
+
+    /**
+      * A list of all currently playing players. (only storing references since
+      * the original is in UserConfig)
+      */
+    ptr_vector<Player, REF> g_active_players;
+    
+    const ptr_vector<Player, REF>& getActivePlayers()
+    {
+        return g_active_players;
+    }
+    void addActivePlayer(Player* p)
+    {
+        g_active_players.push_back(p);
+    }
 
 #if 0
 #pragma mark Callbacks
 #endif
-
-namespace StateManager
-{
 
     // -------------------------------------------------------------------------
     /**
@@ -68,6 +83,8 @@ namespace StateManager
 
         if(selection == "new")
         {
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            StateManager::setPlayer0Device(device);
             StateManager::pushMenu("karts.stkgui");
         }
         else if(selection == "options")
@@ -239,7 +256,7 @@ namespace StateManager
                 
                 ITexture* screenshot = GUIEngine::getDriver()->getTexture( (file_manager->getDataDir() + "/gui/track1.png").c_str() );
                 
-                new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.75f, 0.6f);
+                new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.8f, 0.7f);
             }
         }
         else if(name == "gps")

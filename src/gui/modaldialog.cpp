@@ -89,7 +89,6 @@ void ModalDialog::dismiss()
 
 void ModalDialog::onEnterPressed()
 {
-    std::cout << "onEnterPressed()\n";
     if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
 }
 
@@ -263,51 +262,69 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
 TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
 {
-    const int y1 = m_area.getHeight()/3;
-    const int y2 = m_area.getHeight() - 50;
+    const int y1 = m_area.getHeight()/7;
+    const int y2 = m_area.getHeight()*5/7;
+    const int y3 = m_area.getHeight()*6/7;
+
+    SpinnerWidget* spinner = new SpinnerWidget();
+    spinner->x = m_area.getWidth()/2 - 200;
+    spinner->y = y2;
+    spinner->w = 400;
+    spinner->h = y3 - y2 - 15;
+    spinner->setParent(m_irrlicht_window);
+    
+    spinner->m_properties[PROP_MIN_VALUE] = "1";
+    spinner->m_properties[PROP_MAX_VALUE] = "99";
+    spinner->m_properties[PROP_TEXT] = "%i laps";
+    
+    m_children.push_back(spinner);
+    spinner->add();
+    spinner->setValue(3);
+    spinner->m_element->setTabStop(true);
+    spinner->m_element->setTabGroup(false);
+
+    ButtonWidget* okBtn = new ButtonWidget();
+    okBtn->m_properties[PROP_ID] = "start";
+    okBtn->m_properties[PROP_TEXT] = _("Start Race");
+    okBtn->x = m_area.getWidth()/2 - 200;
+    okBtn->y = y3;
+    okBtn->w = 400;
+    okBtn->h = m_area.getHeight() - y3 - 15;
+    okBtn->setParent(m_irrlicht_window);
+    m_children.push_back(okBtn);
+    okBtn->add();
+    okBtn->m_element->setTabStop(true);
+    okBtn->m_element->setTabGroup(false);
+    
+    GUIEngine::getGUIEnv()->setFocus( okBtn->m_element );
+    
     
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( stringw(trackName).c_str(),
-                                                                  area_top, false /* border */, true /* word wrap */,
+                                                                  area_top, false, true, // border, word warp
                                                                   m_irrlicht_window);
-    
+    a->setTabStop(false);
+
     
     core::rect< s32 > area_left(0, y1, m_area.getWidth()/2, y2);
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( stringw(_("High Scores & Track Info")).c_str(),
-                                                                  area_left, false /* border */, true /* word wrap */,
+                                                                  area_left, false , true , // border, word warp
                                                                   m_irrlicht_window);
- 
+    b->setTabStop(false);
+
     
     // TODO : preserve aspect ratio
-    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2);
+    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     IGUIImage* screenshotWidget = GUIEngine::getGUIEnv()->addImage( area_right, m_irrlicht_window );
     screenshotWidget->setImage(screenshot);
     screenshotWidget->setScaleImage(true);
+    screenshotWidget->setTabStop(false);
 
-    
-    SpinnerWidget* widget = new SpinnerWidget();
-    widget->x = 0;
-    widget->y = y2;
-    widget->w = m_area.getWidth();
-    widget->h = m_area.getHeight() - y2;
-    widget->setParent(m_irrlicht_window);
-    
-    widget->m_properties[PROP_MIN_VALUE] = "1";
-    widget->m_properties[PROP_MAX_VALUE] = "99";
-    widget->m_properties[PROP_TEXT] = "%i laps";
-    
-    m_children.push_back(widget);
-    widget->add();
-    widget->setValue(3);
-    
-    //IGUIStaticText* d = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Number of laps")).c_str(),
-    //                                                          area_bottom, false /* border */, true /* word wrap */,
-    //                                                          m_irrlicht_window);
 
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    //d->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -343,7 +360,11 @@ void TrackInfoDialog::onEnterPressedInternal()
 {
     startGame();
 }
-
+    
+void TrackInfoDialog::processEvent(std::string& eventSource)
+{
+    if (eventSource == "start" ) startGame();
+}
 
 // ------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------

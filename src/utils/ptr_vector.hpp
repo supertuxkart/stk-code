@@ -128,6 +128,15 @@ TYPE* get(const int ID)
     return contentsVector[ID];
 }
 
+const TYPE* getConst(const int ID) const
+{
+    
+    assert(ID > -1);
+    assert((unsigned int)ID < contentsVector.size());
+    
+    return contentsVector[ID];
+}
+
 int size() const
 {
     return contentsVector.size();
