@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "gui/credits.hpp"
 #include "gui/engine.hpp"
+#include "gui/kart_selection.hpp"
 #include "gui/modaldialog.hpp"
 #include "gui/options_screen.hpp"
 #include "gui/screen.hpp"
@@ -34,8 +35,6 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart.hpp"
-#include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/translation.hpp"
@@ -87,107 +86,6 @@ namespace StateManager
         else if (selection == "help")
         {
             pushMenu("help1.stkgui");
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    
-    class KartHoverListener : public RibbonGridHoverListener
-    {
-    public:
-        void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID)
-        {
-            //std::cout << "hovered " << selectionID.c_str() << std::endl;
-            
-            if(selectionID.size() == 0) return;
-            
-            ModelViewWidget* w3 = getCurrentScreen()->getWidget<ModelViewWidget>("modelview");
-            assert( w3 != NULL );
-            
-            const KartProperties* kart = kart_properties_manager->getKart(selectionID);
-            if(kart == NULL) return;
-            KartModel* kartModel = kart->getKartModel();
-                        
-            w3->clearModels();
-            w3->addModel( kartModel->getModel() );
-            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-            w3->update(0);
-            
-            LabelWidget* label = getCurrentScreen()->getWidget<LabelWidget>("currkartname");
-            assert(label != NULL);
-            label->setText( kart->getName().c_str() );
-        }
-    };
-    KartHoverListener* karthoverListener = NULL;
-    
-    /**
-     * Callback handling events from the kart selection menu
-     */
-    void menuEventKarts(Widget* widget, std::string& name)
-    {
-        if(name == "init")
-        {
-            RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
-            assert( w != NULL );
-                    
-            if(karthoverListener == NULL)
-            {
-                karthoverListener = new KartHoverListener();
-                w->registerHoverListener(karthoverListener);
-            }
-            
-            if(!getCurrentScreen()->m_inited)
-            {
-                const int kart_amount = kart_properties_manager->getNumberOfKarts();
-                for(int n=0; n<kart_amount; n++)
-                {
-                    const KartProperties* prop = kart_properties_manager->getKartById(n);
-                    std::string icon_path = "karts/";
-                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
-                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
-                    
-                }
-                
-                getCurrentScreen()->m_inited = true;
-            }
-            w->updateItemDisplay();
-
-            // Set-up player list
-            SpinnerWidget* w2 = getCurrentScreen()->getWidget<SpinnerWidget>("player");
-            assert( w2 != NULL );
-            
-            const int playerAmount = UserConfigParams::m_player.size();
-            for(int n=0; n<playerAmount; n++)
-            {
-                w2->addLabel( UserConfigParams::m_player[n].getName() );
-            }
-
-            // Set-up kart model preview
-            ModelViewWidget* w3 = getCurrentScreen()->getWidget<ModelViewWidget>("modelview");
-            assert( w3 != NULL );
-
-            KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
-
-            w3->addModel( kartModel->getModel() );
-            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-            w3->update(0);
-            
-            getCurrentScreen()->m_inited = true;
-        } // end if init
-        else if(name == "karts")
-        {
-            RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
-            assert( w != NULL );
-            
-            race_manager->setLocalKartInfo(0, w->getSelectionIDString());
-            
-            StateManager::pushMenu("racesetup.stkgui");
         }
     }
 

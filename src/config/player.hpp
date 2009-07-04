@@ -23,6 +23,8 @@
 #include <string>
 #include "config/user_config.hpp"
 
+class InputDevice;
+
 /**
   * class for managing player name and control configuration
   */
@@ -37,10 +39,19 @@ private:
     
     int m_last_kart_id;
 
+    InputDevice* m_device;
+
 public:
+    
     Player(const char* name) : m_player_group("Player", "Represents one human player"),
                                       m_name(name, "name", &m_player_group),
-                                      m_last_kart_id(-1) {}
+                                      m_last_kart_id(-1)
+    {
+        m_device = NULL;
+    }
+    
+    InputDevice* getDevice() { return m_device; }
+    void setDevice(InputDevice* device) { m_device = device; }
     
     void setName(const std::string &name_){m_name = name_;}
 

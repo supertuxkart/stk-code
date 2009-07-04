@@ -27,9 +27,8 @@ class InputDevice
 {
 protected:
     DeviceType m_type;
-    KeyBinding m_bindings[PA_COUNT];
+    KeyBinding m_default_bindings[PA_COUNT];
 
-    std::string m_player;
     
 public:
     std::string m_name; // if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart

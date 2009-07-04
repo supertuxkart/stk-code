@@ -302,6 +302,11 @@ void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
         }
     }
 }
+// -----------------------------------------------------------------------------
+void Screen::manualAddWidget(Widget* w)
+{
+    m_widgets.push_back(w);
+}
 
 #if 0
 #pragma mark -

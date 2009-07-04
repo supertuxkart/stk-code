@@ -9,28 +9,27 @@ InputDevice::InputDevice()
 {
     for(int n=0; n<PA_COUNT; n++)
     {
-        m_bindings[n].id = -1;
-        m_bindings[n].type = Input::IT_NONE;
-        m_bindings[n].dir = Input::AD_NEGATIVE;
+        m_default_bindings[n].id = -1;
+        m_default_bindings[n].type = Input::IT_NONE;
+        m_default_bindings[n].dir = Input::AD_NEGATIVE;
     }
-
-    m_player = "default";
 }
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)
 {
-    if (m_type == DT_KEYBOARD) stream << "<keyboard ";
-    else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name.c_str() << "\" ";
+    if (m_type == DT_KEYBOARD) stream << "<keyboard>\n\n";
+    else if (m_type == DT_GAMEPAD) stream << "<gamepad name=\"" << m_name.c_str() << "\" >\n\n";
     else std::cerr << "Warning, unknown input device type, skipping it\n";
 
-    stream << "owner=\"" << m_player << "\">\n\n";
+   // stream << "owner=\"" << m_player << "\">\n\n";
 
+    
     for(int n=0; n<PA_COUNT; n++)
     {
         stream << "    <action name=\"" << KartActionStrings[n] <<  "\" id=\""
-            << m_bindings[n].id << "\" event=\"" << m_bindings[n].type << "\" ";
+            << m_default_bindings[n].id << "\" event=\"" << m_default_bindings[n].type << "\" ";
 
-        if (m_type == DT_GAMEPAD) stream << "direction=\"" << m_bindings[n].dir << "\"";
+        if (m_type == DT_GAMEPAD) stream << "direction=\"" << m_default_bindings[n].dir << "\"";
 
         stream << "/>\n";
     }
@@ -71,8 +70,8 @@ bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
     if(event_string == NULL) return false;
     const int event_id = atoi(event_string);
 
-    m_bindings[binding_id].id = id;
-    m_bindings[binding_id].type = (Input::InputType)event_id;
+    m_default_bindings[binding_id].id = id;
+    m_default_bindings[binding_id].type = (Input::InputType)event_id;
 
 
     // ---- read axis direction
@@ -80,7 +79,7 @@ bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
     if(dir_string != NULL)
     {
         const int dir = atoi(dir_string);
-        m_bindings[binding_id].dir = (Input::AxisDirection)dir;
+        m_default_bindings[binding_id].dir = (Input::AxisDirection)dir;
     }
 
     return true;
@@ -89,7 +88,7 @@ bool InputDevice::deserializeAction(irr::io::IrrXMLReader* xml)
 // -----------------------------------------------------------------------------
 std::string InputDevice::getBindingAsString(const PlayerAction action) const
 {
-    return Input::getInputAsString(m_bindings[action].type, m_bindings[action].id, m_bindings[action].dir);
+    return Input::getInputAsString(m_default_bindings[action].type, m_default_bindings[action].id, m_default_bindings[action].dir);
 }
 
 #if 0
@@ -107,37 +106,34 @@ KeyboardDevice::KeyboardDevice(irr::io::IrrXMLReader* xml)
 {
     m_type = DT_KEYBOARD;
 
-    const char* owner_string = xml->getAttributeValue("owner");
-    if(owner_string == NULL) m_player = "default";
-    else m_player = owner_string;
 }
 // -----------------------------------------------------------------------------
 void KeyboardDevice::loadDefaults()
 {
-    m_bindings[PA_NITRO].id = KEY_KEY_N;
-    m_bindings[PA_ACCEL].id = KEY_UP;
-    m_bindings[PA_BRAKE].id = KEY_DOWN;
-    m_bindings[PA_LEFT].id = KEY_LEFT;
-    m_bindings[PA_RIGHT].id = KEY_RIGHT;
-    m_bindings[PA_DRIFT].id = KEY_KEY_V;
-    m_bindings[PA_RESCUE].id = KEY_BACK;
-    m_bindings[PA_FIRE].id = KEY_SPACE;
-    m_bindings[PA_LOOK_BACK].id = KEY_KEY_B ;
+    m_default_bindings[PA_NITRO].id = KEY_KEY_N;
+    m_default_bindings[PA_ACCEL].id = KEY_UP;
+    m_default_bindings[PA_BRAKE].id = KEY_DOWN;
+    m_default_bindings[PA_LEFT].id = KEY_LEFT;
+    m_default_bindings[PA_RIGHT].id = KEY_RIGHT;
+    m_default_bindings[PA_DRIFT].id = KEY_KEY_V;
+    m_default_bindings[PA_RESCUE].id = KEY_BACK;
+    m_default_bindings[PA_FIRE].id = KEY_SPACE;
+    m_default_bindings[PA_LOOK_BACK].id = KEY_KEY_B ;
 
-    m_bindings[PA_NITRO].type = Input::IT_KEYBOARD;
-    m_bindings[PA_ACCEL].type = Input::IT_KEYBOARD;
-    m_bindings[PA_BRAKE].type = Input::IT_KEYBOARD;
-    m_bindings[PA_LEFT].type = Input::IT_KEYBOARD;
-    m_bindings[PA_RIGHT].type = Input::IT_KEYBOARD;
-    m_bindings[PA_DRIFT].type = Input::IT_KEYBOARD;
-    m_bindings[PA_RESCUE].type = Input::IT_KEYBOARD;
-    m_bindings[PA_FIRE].type = Input::IT_KEYBOARD;
-    m_bindings[PA_LOOK_BACK].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_NITRO].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_ACCEL].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_BRAKE].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_LEFT].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_RIGHT].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_DRIFT].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_RESCUE].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_FIRE].type = Input::IT_KEYBOARD;
+    m_default_bindings[PA_LOOK_BACK].type = Input::IT_KEYBOARD;
 }
 // -----------------------------------------------------------------------------
 void KeyboardDevice::editBinding(PlayerAction action, int key_id)
 {
-    m_bindings[action].id = key_id;
+    m_default_bindings[action].id = key_id;
 }
 // -----------------------------------------------------------------------------
 /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
@@ -145,7 +141,7 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
 {
     for(int n=0; n<PA_COUNT; n++)
     {
-        if(m_bindings[n].id == key_id)
+        if(m_default_bindings[n].id == key_id)
         {
             *action = (PlayerAction)n;
             return true;
@@ -171,10 +167,6 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
     m_type = DT_GAMEPAD;
     m_prevAxisDirections = NULL;
     m_deadzone = DEADZONE_JOYSTICK;
-
-    const char* owner_string = xml->getAttributeValue("owner");
-    if(owner_string == NULL) m_player = "default";
-    else m_player = owner_string;
 
     const char* name_string = xml->getAttributeValue("name");
     if(name_string == NULL)
@@ -223,37 +215,37 @@ void GamePadDevice::open(const int irrIndex, const std::string name, const int a
 void GamePadDevice::loadDefaults()
 {
     // buttons
-    m_bindings[PA_FIRE].type = Input::IT_STICKBUTTON;
-    m_bindings[PA_FIRE].id = 0;
+    m_default_bindings[PA_FIRE].type = Input::IT_STICKBUTTON;
+    m_default_bindings[PA_FIRE].id = 0;
 
-    m_bindings[PA_NITRO].type = Input::IT_STICKBUTTON;
-    m_bindings[PA_NITRO].id = 1;
+    m_default_bindings[PA_NITRO].type = Input::IT_STICKBUTTON;
+    m_default_bindings[PA_NITRO].id = 1;
 
-    m_bindings[PA_DRIFT].type = Input::IT_STICKBUTTON;
-    m_bindings[PA_DRIFT].id = 2;
+    m_default_bindings[PA_DRIFT].type = Input::IT_STICKBUTTON;
+    m_default_bindings[PA_DRIFT].id = 2;
 
-    m_bindings[PA_RESCUE].type = Input::IT_STICKBUTTON;
-    m_bindings[PA_RESCUE].id = 3;
+    m_default_bindings[PA_RESCUE].type = Input::IT_STICKBUTTON;
+    m_default_bindings[PA_RESCUE].id = 3;
 
-    m_bindings[PA_LOOK_BACK].type = Input::IT_STICKBUTTON;
-    m_bindings[PA_LOOK_BACK].id = 4;
+    m_default_bindings[PA_LOOK_BACK].type = Input::IT_STICKBUTTON;
+    m_default_bindings[PA_LOOK_BACK].id = 4;
 
     // axes
-    m_bindings[PA_ACCEL].type = Input::IT_STICKMOTION;
-    m_bindings[PA_ACCEL].id = 1;
-    m_bindings[PA_ACCEL].dir = Input::AD_NEGATIVE;
+    m_default_bindings[PA_ACCEL].type = Input::IT_STICKMOTION;
+    m_default_bindings[PA_ACCEL].id = 1;
+    m_default_bindings[PA_ACCEL].dir = Input::AD_NEGATIVE;
 
-    m_bindings[PA_BRAKE].type = Input::IT_STICKMOTION;
-    m_bindings[PA_BRAKE].id = 1;
-    m_bindings[PA_BRAKE].dir = Input::AD_POSITIVE;
+    m_default_bindings[PA_BRAKE].type = Input::IT_STICKMOTION;
+    m_default_bindings[PA_BRAKE].id = 1;
+    m_default_bindings[PA_BRAKE].dir = Input::AD_POSITIVE;
 
-    m_bindings[PA_LEFT].type = Input::IT_STICKMOTION;
-    m_bindings[PA_LEFT].id = 0;
-    m_bindings[PA_LEFT].dir = Input::AD_NEGATIVE;
+    m_default_bindings[PA_LEFT].type = Input::IT_STICKMOTION;
+    m_default_bindings[PA_LEFT].id = 0;
+    m_default_bindings[PA_LEFT].dir = Input::AD_NEGATIVE;
 
-    m_bindings[PA_RIGHT].type = Input::IT_STICKMOTION;
-    m_bindings[PA_RIGHT].id = 0;
-    m_bindings[PA_RIGHT].dir = Input::AD_POSITIVE;
+    m_default_bindings[PA_RIGHT].type = Input::IT_STICKMOTION;
+    m_default_bindings[PA_RIGHT].id = 0;
+    m_default_bindings[PA_RIGHT].dir = Input::AD_POSITIVE;
 
 
     /*
@@ -281,9 +273,9 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 // -----------------------------------------------------------------------------
 void GamePadDevice::editBinding(const PlayerAction action, const Input::InputType type, const int id, Input::AxisDirection direction)
 {
-    m_bindings[action].type = type;
-    m_bindings[action].id = id;
-    m_bindings[action].dir = direction;
+    m_default_bindings[action].type = type;
+    m_default_bindings[action].id = id;
+    m_default_bindings[action].dir = direction;
 }
 // -----------------------------------------------------------------------------
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)
@@ -292,7 +284,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 
     for(int n=0; n<PA_COUNT; n++)
     {
-        if(m_bindings[n].id == axis && m_bindings[n].dir == direction)
+        if(m_default_bindings[n].id == axis && m_default_bindings[n].dir == direction)
         {
             RaceManager::getWorld()->getLocalPlayerKart(player)->action((PlayerAction)n, 0);
             return;
@@ -354,14 +346,14 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
         // find corresponding action and return it
         for(int n=0; n<PA_COUNT; n++)
         {
-            if(m_bindings[n].type == type && m_bindings[n].id == id)
+            if(m_default_bindings[n].type == type && m_default_bindings[n].id == id)
             {
-                if(m_bindings[n].dir == Input::AD_NEGATIVE && value < 0)
+                if(m_default_bindings[n].dir == Input::AD_NEGATIVE && value < 0)
                 {
                     *action = (PlayerAction)n;
                     return true;
                 }
-                else if(m_bindings[n].dir == Input::AD_POSITIVE && value > 0)
+                else if(m_default_bindings[n].dir == Input::AD_POSITIVE && value > 0)
                 {
                     *action = (PlayerAction)n;
                     return true;
@@ -375,7 +367,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
         // find corresponding action and return it
         for(int n=0; n<PA_COUNT; n++)
         {
-            if(m_bindings[n].type == type && m_bindings[n].id == id)
+            if(m_default_bindings[n].type == type && m_default_bindings[n].id == id)
             {
                 *action = (PlayerAction)n;
                 return true;

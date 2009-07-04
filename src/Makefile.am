@@ -77,6 +77,8 @@ supertuxkart_SOURCES = \
  gui/engine.hpp \
  gui/font.cpp \
  gui/font.hpp \
+ gui/kart_selection.cpp \
+ gui/kart_selection.hpp \
  gui/modaldialog.cpp \
  gui/modaldialog.hpp \
  gui/my_button.cpp \

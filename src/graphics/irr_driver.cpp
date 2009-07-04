@@ -335,9 +335,9 @@ void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector
     
     ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
     
-    camera->setPosition( core::vector3df(0.0, 25.0f, 70.0f) );
+    camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
     camera->setUpVector( core::vector3df(0.0, -1.0, 0.0) );
-    camera->setTarget( core::vector3df(0, 0 ,0) );
+    camera->setTarget( core::vector3df(0, 10, 0.0f) );
     camera->updateAbsolutePosition();
     
     m_device->getVideoDriver()->setRenderTarget(target);
