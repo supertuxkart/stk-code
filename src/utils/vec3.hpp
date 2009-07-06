@@ -64,8 +64,9 @@ public:
     inline const void     setRoll(float f)         {m_z = f;}
     float*                toFloat() const          {return (float*)this;     }
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
-    const core::vector3df toIrrVector() const;
-    const core::vector3df toIrrHPR()    const;
+    const core::vector3df toIrrVector()   const;
+    const core::vector3df toIrrHPR()      const;
+    const core::vector2df toIrrVector2d() const;
     void                  degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
     Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}

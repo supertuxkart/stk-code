@@ -141,18 +141,15 @@ void World::init()
                 break;
             }
         }   // if !UserConfigParams::m_profile
-#ifdef HAVE_IRRLICHT
-#else
-        newkart -> getModelTransform() -> clrTraversalMaskBits(SSGTRAV_ISECT|SSGTRAV_HOT);
-
-        stk_scene->add ( newkart -> getModelTransform() ) ;
-#endif
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
     }  // for i
 
     resetAllKarts();
-
+    // Note: track reset must be called after all karts exist, since check 
+    // objects need to allocate data structures depending on the number
+    // of karts.
+    m_track->reset();
 #ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
     //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
 #endif

@@ -46,6 +46,7 @@ using namespace irr;
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/string_utils.hpp"
@@ -72,9 +73,9 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
     m_is_arena           = false;
     m_quad_graph         = NULL;
 	m_animation_manager  = NULL;
+	m_check_manager      = NULL;
     loadTrack(m_filename);
     loadDriveline();
-
 }   // Track
 
 //-----------------------------------------------------------------------------
@@ -83,13 +84,20 @@ Track::~Track()
 {
     if(m_quad_graph)        delete m_quad_graph;
 	if(m_animation_manager) delete m_animation_manager;
+	if(m_check_manager)     delete m_check_manager;
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+/** Prepates the track for a new race. This function must be called after all
+ *  karts are created, since the check objects allocate data structures 
+ *  depending on the number of karts.
+ */
 void Track::reset()
 {
 	if(m_animation_manager)
 		m_animation_manager->reset();
+    if(m_check_manager)
+        m_check_manager->reset(*this);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -879,6 +887,8 @@ void Track::update(float dt)
     }
 	if(m_animation_manager)
 		m_animation_manager->update(dt);
+	if(m_check_manager)
+		m_check_manager->update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -1035,6 +1045,10 @@ void Track::loadTrackModel()
 		else if(name=="animations")
 		{
 			m_animation_manager = new AnimationManager(getIdent(), *node);
+		}
+		else if(name=="checks")
+		{
+			m_check_manager = new CheckManager(*node);
 		}
         else
         {
@@ -1334,7 +1348,6 @@ void Track::loadTrackModel()
     createPhysicsModel();
     if(UserConfigParams::m_track_debug)
         m_quad_graph->createDebugMesh();
-
 }   // loadTrack
 
 //-----------------------------------------------------------------------------

@@ -47,6 +47,7 @@ class XMLNode;
 class PhysicalObject;
 class BezierCurve;
 class AnimationManager;
+class CheckManager;
 
 class Track
 {
@@ -104,6 +105,9 @@ private:
 
 	/** Animation manager. */
 	AnimationManager         *m_animation_manager;
+
+	/** Checkline manager. */
+	CheckManager             *m_check_manager;
 
 	void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);

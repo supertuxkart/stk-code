@@ -234,6 +234,12 @@ supertuxkart_SOURCES = \
  robots/default_robot.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
+ tracks/check_manager.cpp \
+ tracks/check_manager.hpp \
+ tracks/check_structure.cpp \
+ tracks/check_structure.hpp \
+ tracks/checkline.cpp \
+ tracks/checkline.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
  tracks/quad.cpp \

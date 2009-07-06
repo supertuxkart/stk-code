@@ -1,4 +1,4 @@
-//  $Id: animation_manager.cpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: check_manager.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,49 +17,43 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "animations/animation_manager.hpp"
+#include "tracks/check_manager.hpp"
 
 #include <string>
 
-#include "animations/billboard_animation.hpp"
-#include "animations/three_d_animation.hpp"
 #include "io/xml_node.hpp"
+#include "tracks/checkline.hpp"
+#include "tracks/check_structure.hpp"
 
-AnimationManager::AnimationManager(const std::string &track_name, const XMLNode &node)
+CheckManager::CheckManager(const XMLNode &node)
 {
 	for(unsigned int i=0; i<node.getNumNodes(); i++)
 	{
-		const XMLNode *anim_node = node.getNode(i);
-		std::string type = anim_node->getName();
-		float fps=25;
-		anim_node->get("fps", &fps);
-		if(type=="anim_billboard")
-			m_all_animations.push_back(new BillboardAnimation(track_name, *anim_node, fps));
-		else if(type=="animations-IPO")
-			m_all_animations.push_back(new ThreeDAnimation(track_name, *anim_node, fps));
-		else
-			fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
-				    type.c_str());
+		const XMLNode *check_node = node.getNode(i);
+		const std::string &type = check_node->getName();
+		if(type=="checkline")
+		{
+			m_all_checks.push_back(new Checkline(*check_node));
+		}
 	}   // for i<node.getNumNodes
-}   // AnimationManager
+}   // CheckManager
 
 // ----------------------------------------------------------------------------
-/** Resets all animations.
- */
-void AnimationManager::reset()
+/** Resets all checks. */
+void CheckManager::reset(const Track &track)
 {
-	std::vector<AnimationBase*>::iterator i;
-	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
-		(*i)->reset();
+    std::vector<CheckStructure*>::iterator i;
+	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+		(*i)->reset(track);
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Updates all animations. Called once per time step.
+/** Updates all animations. Called one per time step.
  *  \param dt Time since last call.
  */
-void AnimationManager::update(float dt)
+void CheckManager::update(float dt)
 {
-	std::vector<AnimationBase*>::iterator i;
-	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+	std::vector<CheckStructure*>::iterator i;
+	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
 		(*i)->update(dt);
 }   // update

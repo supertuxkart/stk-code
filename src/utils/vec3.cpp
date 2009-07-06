@@ -123,3 +123,10 @@ const core::vector3df Vec3::toIrrVector() const
     core::vector3df v(m_x, m_z, m_y);
     return v;
 }   // toIrrVector
+// ----------------------------------------------------------------------------
+/** Returns the X and Y component as an irrlicht 2d vector. */
+const core::vector2df Vec3::toIrrVector2d() const
+{
+    core::vector2df v(m_x, m_y);
+    return v;
+}   // toIrrVector2d

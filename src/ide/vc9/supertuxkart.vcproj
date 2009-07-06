@@ -581,6 +581,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_structure.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\checkline.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\graph_node.cpp"
 					>
 				</File>
@@ -1188,6 +1200,18 @@
 				>
 				<File
 					RelativePath="..\..\tracks\bezier_curve.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_structure.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\checkline.hpp"
 					>
 				</File>
 				<File
