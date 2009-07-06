@@ -217,6 +217,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\gui\kart_selection.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\gui\modaldialog.cpp"
 					>
 				</File>
@@ -756,6 +760,10 @@
 				</File>
 				<File
 					RelativePath="..\..\gui\font.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\gui\kart_selection.hpp"
 					>
 				</File>
 				<File
