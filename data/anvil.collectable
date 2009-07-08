@@ -1,8 +1,8 @@
 ;; -*- mode: lisp -*-
 
 (tuxkart-collectable
- (name  "anvil")
- (mesh  "anvil.b3d")
+ (name  "anchor")
+ (mesh  "anchor.b3d")
  (icon  "anchor-icon.png")
 )
 
