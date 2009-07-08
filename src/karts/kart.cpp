@@ -563,8 +563,6 @@ void Kart::update(float dt)
     }  // UserConfigParams::m_graphical_effects
     updatePhysics(dt);
 
-    //kart_info.m_last_track_coords = kart_info.m_curr_track_coords;
-
     Moveable::update(dt);
 
     m_engine_sound->position ( getXYZ() );

@@ -18,12 +18,23 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/kart.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/check_structure.hpp"
 
 
-CheckStructure::CheckStructure()
+CheckStructure::CheckStructure(const XMLNode &node)
 {
+    std::string type;
+    node.get("type", &type);
+    if(type=="new-lap")
+        m_check_type = CT_NEW_LAP;
+    else if(type=="reset-new-lap")
+        m_check_type = CT_RESET_NEW_LAP;
+    else
+    {
+        printf("Unknown check structure '%s' - ignored.\n", type.c_str());
+    }
 }   // CheckStructure
 
 // ----------------------------------------------------------------------------
@@ -34,10 +45,14 @@ CheckStructure::CheckStructure()
 void CheckStructure::reset(const Track &track)
 {
 	m_previous_position.clear();
+    m_is_active.clear();
 	for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
 	{
 		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
 		m_previous_position.push_back(xyz);
+        
+        // Deactivate all lap counters, activate everything else
+        m_is_active.push_back(m_check_type!=CT_NEW_LAP);
 	}   // for i<getNumKarts
 }   // reset
 
@@ -49,10 +64,12 @@ void CheckStructure::update(float dt)
 {
 	for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
 	{
+        // Ignore all non-active checklines.
+        if(!m_is_active[i]) continue;
 		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
         if(isTriggered(m_previous_position[i], xyz, i))
         {
-            trigger();
+            trigger(i);
         }
 	}   // for i<getNumKarts
 }   // update
@@ -60,7 +77,14 @@ void CheckStructure::update(float dt)
 /** Is called when this check structure is triggered. This then can cause
  *  a lap to be counted, animation to be started etc.
  */
-void CheckStructure::trigger()
+void CheckStructure::trigger(unsigned int kart_index)
 {
-    printf("Triggered\n");
+    switch(m_check_type)
+    {
+    case CT_NEW_LAP : RaceManager::getWorld()->newLap(kart_index); 
+                      m_is_active[kart_index] = false;
+                      break;
+    case CT_RESET_NEW_LAP : break;
+    default:          break;
+    }   // switch m_check_type
 }   // trigger

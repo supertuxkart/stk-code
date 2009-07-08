@@ -196,6 +196,11 @@ public:
     /** Called when it is needed to know whether this kind of race involves counting laps.
       */
     virtual bool raceHasLaps() = 0;
+
+    /** Called whenever a kart starts a new lap. Meaningless (and won't be 
+     *  called) in non-laped races.
+     */
+    virtual void newLap(unsigned int kart_index) {}
     
     /** Called when a kart was hit by a projectile
      */

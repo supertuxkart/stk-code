@@ -24,7 +24,7 @@
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 
-Checkline::Checkline(const XMLNode &node) : CheckStructure()
+Checkline::Checkline(const XMLNode &node) : CheckStructure(node)
 {
     m_previous_sign.resize(race_manager->getNumKarts());
     core::vector2df p1, p2;

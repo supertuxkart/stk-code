@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef _LINEAR_WORLD_H_
-#define _LINEAR_WORLD_H_
+#ifndef HEADER_LINEAR_WORLD_HPP
+#define HEADER_LINEAR_WORLD_HPP
 
 #include "modes/world.hpp"
 #include <vector>
@@ -41,7 +41,6 @@ struct KartInfo
     int         m_last_valid_race_lap;  /* when a kart is rescued, we need to give it back the number of lap it had */
     
     Vec3        m_curr_track_coords;
-    Vec3        m_last_track_coords;
     
     bool        m_on_road;             // true if the kart is on top of the
                                        // road path drawn by the drivelines
@@ -63,7 +62,6 @@ protected:
     void            rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
     
     void            checkForWrongDirection(unsigned int i);
-    void            doLapCounting ( KartInfo& kart_info, Kart* kart );
     float           estimateFinishTimeForKart(Kart* kart);
     void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
 public:
@@ -97,6 +95,8 @@ public:
     virtual void    restartRace();
     
     virtual bool raceHasLaps(){ return true; }
+    virtual void newLap(unsigned int kart_index);
+
     virtual bool enableBonusBoxes(){ return true; }
     
     /** Called by the race result GUI at the end of the race to know the final order

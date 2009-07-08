@@ -27,16 +27,45 @@
 class XMLNode;
 class Track;
 
-/** Virtual base class for a check structure. */
+/** Virtual base class for a check structure. A check structure has a certain
+ *  type:
+ *  CT_NEW_LAP  : triggering this check structure will cause a new lap to be
+ *                counted. If this type is triggered, it will set itselt to
+ *                inactive (which means it is not possible to count several
+ *                laps by driving over the starting line forwardws and 
+ *                backwards)
+ *  CT_RESET_NEW_LAP: Activates all lap checks. Each track must have at least
+ *                one reset checks somewhere on the track. This is used to 
+ *                avoid shortcuts, since karts are forced to cross this reset
+ *                check first before a new lap can be counted.
+ * Each check structure can be active or inactive. A new_la counter is 
+ * initialised as non-active, so that karts have to trigger a reset check
+ * before a lap can be counted.
+ */
 class CheckStructure
 {
+public:
+    /** Different types of check structures: one which triggers couting a new 
+     *  lap, and one which resets all lap counters. This is used to avoid
+     *  shortcuts: a new lap is only counted if a reset_new_lap check 
+     *  structure was triggered in between. So by adding a single reset
+     *  structure at the rhoughly halfway mark of the track karts have to
+     *  drive there first before a new lap will be counted.
+     */
+    enum CheckType {CT_NEW_LAP, CT_RESET_NEW_LAP};
+
 protected:
 	/** Stores the previous position of all karts. This is needed to detect
      *  when e.g. a check point is reached the first time, or a checkline is
      *  crossed. */
     std::vector<Vec3> m_previous_position;
+    /** Stores if this check structure is active (for a given kart). USed e.g.
+     *  in lap counting. */
+    std::vector<bool> m_is_active;
+    /** The type of this checkline. */
+    CheckType         m_check_type;
 public:
-                CheckStructure();
+                CheckStructure(const XMLNode &node);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     /** True if going from old_pos to new_pos crosses this checkline. This function
@@ -47,7 +76,7 @@ public:
      *                  additional data.
      */
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
-    virtual void trigger();
+    virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
 };   // CheckStructure
 

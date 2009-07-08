@@ -64,10 +64,7 @@ void LinearWorld::init()
                                                m_kart[n]->getXYZ(),
                                                info.m_track_sector );
 
-        // Init the last track coords so that no new lap (or undoing
-        // a lap) is counted in the first doLapCounting call.
-        info.m_last_track_coords    = Vec3(0, 999, 999);
-        info.m_race_lap             = -1;
+        info.m_race_lap             = 0;
         info.m_lap_start_time       = -1.0f;
         info.m_time_at_last_lap     = 99999.9f;
         
@@ -113,11 +110,7 @@ void LinearWorld::restartRace()
         m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
                                                m_kart[n]->getXYZ(),
                                                info.m_track_sector );
-        // This assignmet is important, otherwise (depending on previous
-        // value of m_last_track_coors) a lap could be counted as 'undone',
-        // decreasing the number of laps to -2.
-        info.m_last_track_coords    = Vec3(0, 999, 999);
-        info.m_race_lap             = -1;
+        info.m_race_lap             = 0;
         info.m_lap_start_time       = -1.0f;
         info.m_time_at_last_lap     = 99999.9f;
 
@@ -164,16 +157,10 @@ void LinearWorld::update(float delta)
         }   
         
         // Update track coords (=progression)
-        m_kart_info[n].m_last_track_coords = m_kart_info[n].m_curr_track_coords;
         m_track->getQuadGraph().spatialToTrack(&kart_info.m_curr_track_coords, 
                                                kart->getXYZ(),
                                                kart_info.m_track_sector    );
 
-        // Lap counting, based on the new position, but only if the kart
-        // hasn't finished the race (otherwise it would be counted more than
-        // once for the number of finished karts).
-        if(!kart->hasFinishedRace())
-            doLapCounting(kart_info, kart);
     }   // for n
 
     // Update all positions. This must be done after _all_ karts have
@@ -218,81 +205,67 @@ void LinearWorld::update(float delta)
 }   // update
 
 //-----------------------------------------------------------------------------
-void LinearWorld::doLapCounting ( KartInfo& kart_info, Kart* kart )
+/** Is called by check structures if a kart starts a new lap. Note that the
+ *  new check structure does not trigger a new lap the first time a kart
+ *  crosses the starting line!
+ *  \param kart_index Index of the kart.
+ */
+void LinearWorld::newLap(unsigned int kart_index)
 {
-    const float delta=20.0f;
-    float track_length = m_track->getTrackLength();
-    bool newLap = kart_info.m_last_track_coords.getY() > track_length-delta && 
-                  kart_info.m_curr_track_coords.getY() <  delta;
-  
-    if ( newLap )
+    KartInfo kart_info = m_kart_info[kart_index];
+    Kart    *kart      = m_kart[kart_index];
+    // Only increase the lap counter and set the new time if the
+    // kart hasn't already finished the race (otherwise the race_gui
+    // will begin another countdown).
+    if(kart_info.m_race_lap+1 <= race_manager->getNumLaps())
     {
-        // Only increase the lap counter and set the new time if the
-        // kart hasn't already finished the race (otherwise the race_gui
-        // will begin another countdown).
-        if(kart_info.m_race_lap+1 <= race_manager->getNumLaps())
-        {
-            setTimeAtLapForKart(getTime(), kart->getWorldKartId() );
-            kart_info.m_race_lap++ ;
-        }
-        // Race finished
-        if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
-        {
-            // A client wait does not detect race finished by itself, it will
-            // receive a message from the server. So a client does not do
-            // anything here.
-            if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-                kart->raceFinished(getTime());
-        }
-        // Only do timings if original time was set properly. Driving backwards
-        // over the start line will cause the lap start time to be set to -1.
-        if(kart_info.m_lap_start_time>=0.0)
-        {
-            float time_per_lap;
-            if (kart_info.m_race_lap == 1) // just completed first lap
-            {
-            	time_per_lap=getTime();
-            }
-            else //completing subsequent laps
-            {
-            	time_per_lap=getTime() - kart_info.m_lap_start_time;
-            }
-            
-            // if new fastest lap
-            if(time_per_lap < getFastestLapTime() && raceHasLaps())
-            {
-                setFastestLap(kart, time_per_lap);
-                RaceGUI* m=(RaceGUI*)getRaceGUI();
-                if(m)
-                {
-                    m->addMessage(_("New fastest lap"), NULL, 
-                                  2.0f, 40, 100, 210, 100);
-                    char s[20];
-                    timeToString(time_per_lap, s);
-                    
-                    std::ostringstream m_fastest_lap_message;
-                    m_fastest_lap_message << s << ": " << kart->getName();
-                    m->addMessage(m_fastest_lap_message.str(), NULL, 
-                                  2.0f, 40, 100, 210, 100);
-                }   // if m
-            } // end if new fastest lap
-        }
-        kart_info.m_lap_start_time = getTime();
+        setTimeAtLapForKart(getTime(), kart->getWorldKartId() );
+        kart_info.m_race_lap++ ;
     }
-    else if ( kart_info.m_curr_track_coords.getY() > track_length-delta &&
-              kart_info.m_last_track_coords.getY() <  delta)
+    // Race finished
+    if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
-        // Previously we had bugs where (on taking shortcuts etc) a lap was
-        // 'uncounted' more than once, resulting in m_race_lap=-2, and even if
-        // the starting line was then crossed correctly, it would still not be
-        // counted. The if can most likely be removed mid term.
-        if(kart_info.m_race_lap>-1)
-            kart_info.m_race_lap-- ;
-        // Prevent cheating by setting time to a negative number, indicating
-        // that the line wasn't crossed properly.
-        kart_info.m_lap_start_time = -1.0f;
+        // A client wait does not detect race finished by itself, it will
+        // receive a message from the server. So a client does not do
+        // anything here.
+        if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
+            kart->raceFinished(getTime());
     }
-}   // doLapCounting
+    // Only do timings if original time was set properly. Driving backwards
+    // over the start line will cause the lap start time to be set to -1.
+    if(kart_info.m_lap_start_time>=0.0)
+    {
+        float time_per_lap;
+        if (kart_info.m_race_lap == 1) // just completed first lap
+        {
+            time_per_lap=getTime();
+        }
+        else //completing subsequent laps
+        {
+            time_per_lap=getTime() - kart_info.m_lap_start_time;
+        }
+
+        // if new fastest lap
+        if(time_per_lap < getFastestLapTime() && raceHasLaps())
+        {
+            setFastestLap(kart, time_per_lap);
+            RaceGUI* m=(RaceGUI*)getRaceGUI();
+            if(m)
+            {
+                m->addMessage(_("New fastest lap"), NULL, 
+                    2.0f, 40, 100, 210, 100);
+                char s[20];
+                timeToString(time_per_lap, s);
+
+                std::ostringstream m_fastest_lap_message;
+                m_fastest_lap_message << s << ": " << kart->getName();
+                m->addMessage(m_fastest_lap_message.str(), NULL, 
+                    2.0f, 40, 100, 210, 100);
+            }   // if m
+        } // end if new fastest lap
+    }
+    kart_info.m_lap_start_time = getTime();
+}   // newLap
 
 //-----------------------------------------------------------------------------
 int LinearWorld::getSectorForKart(const int kart_id) const
@@ -508,9 +481,6 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     if ( info.m_track_sector > 0 ) info.m_track_sector-- ;
     info.m_last_valid_sector = info.m_track_sector;
     if ( info.m_last_valid_sector > 0 ) info.m_last_valid_sector --;
-        
-    // check if by removing 1 we 'warped around'; if so, remove a lap.
-    if(info.m_track_sector <= 0) info.m_race_lap--;   
     
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
     
