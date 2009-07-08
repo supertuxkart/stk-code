@@ -25,6 +25,9 @@
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/scene.hpp"
+#include "gui/kart_selection.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/standard_race.hpp"
@@ -182,6 +185,11 @@ void RaceManager::computeRandomKartList()
  */
 void RaceManager::startNew()
 {
+    if(UserConfigParams::m_no_start_screen == true)
+    {
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            StateManager::setPlayer0Device(device);
+    }
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
     {
         m_tracks   = m_grand_prix.getTracks();
