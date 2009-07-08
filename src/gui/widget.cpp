@@ -298,9 +298,7 @@ void LabelWidget::add()
 
 void LabelWidget::setText(stringw newText)
 {
-    IGUIStaticText* irrwidget = dynamic_cast<IGUIStaticText*>(m_element);
-    assert(irrwidget != NULL);
-    
+    IGUIStaticText* irrwidget = static_cast<IGUIStaticText*>(m_element);   
     irrwidget->setText(newText.c_str());
 }
 
