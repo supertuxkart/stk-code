@@ -24,7 +24,13 @@
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 
-Checkline::Checkline(const XMLNode &node) : CheckStructure(node)
+/** Constructor for a checkline. 
+ *  \param check_manager Pointer to the check manager, which is needed when
+ *         resetting e.g. new lap counters. 
+ *  \param node XML node containing the parameters for this checkline.
+ */
+Checkline::Checkline(CheckManager *check_manager, const XMLNode &node) 
+         : CheckStructure(check_manager, node)
 {
     m_previous_sign.resize(race_manager->getNumKarts());
     core::vector2df p1, p2;
@@ -77,4 +83,4 @@ bool Checkline::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
         result = false;
     m_previous_sign[indx] = sign;
     return result;
-}   // update
+}   // isTriggered

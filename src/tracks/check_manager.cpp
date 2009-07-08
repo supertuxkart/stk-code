@@ -33,7 +33,7 @@ CheckManager::CheckManager(const XMLNode &node)
 		const std::string &type = check_node->getName();
 		if(type=="checkline")
 		{
-			m_all_checks.push_back(new Checkline(*check_node));
+			m_all_checks.push_back(new Checkline(this, *check_node));
 		}
 	}   // for i<node.getNumNodes
 }   // CheckManager
@@ -57,3 +57,14 @@ void CheckManager::update(float dt)
 	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
 		(*i)->update(dt);
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Called when a reset-new-lap check is triggered. It re-activates all new
+ *  lap checks.
+ */
+void CheckManager::activateNewLapChecks(int kart_index)
+{
+    std::vector<CheckStructure*>::iterator i;
+	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+        (*i)->activateNewLapCheck(kart_index);
+}   // resetNewLaps

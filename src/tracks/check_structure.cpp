@@ -20,11 +20,14 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
 
 
-CheckStructure::CheckStructure(const XMLNode &node)
+CheckStructure::CheckStructure(CheckManager *check_manager, 
+                               const XMLNode &node)
 {
+    m_check_manager = check_manager;
     std::string type;
     node.get("type", &type);
     if(type=="new-lap")
@@ -71,8 +74,10 @@ void CheckStructure::update(float dt)
         {
             trigger(i);
         }
+        m_previous_position[i] = xyz;
 	}   // for i<getNumKarts
 }   // update
+
 // ----------------------------------------------------------------------------
 /** Is called when this check structure is triggered. This then can cause
  *  a lap to be counted, animation to be started etc.
@@ -84,7 +89,19 @@ void CheckStructure::trigger(unsigned int kart_index)
     case CT_NEW_LAP : RaceManager::getWorld()->newLap(kart_index); 
                       m_is_active[kart_index] = false;
                       break;
-    case CT_RESET_NEW_LAP : break;
+    case CT_RESET_NEW_LAP : 
+                      m_check_manager->activateNewLapChecks(kart_index);
+                      break;
     default:          break;
     }   // switch m_check_type
 }   // trigger
+
+// ----------------------------------------------------------------------------
+/** If this check structure is a new-lap check, activate it again.
+ *  \param kart_index Index of the kart for which the lap check is activated.
+ */
+void CheckStructure::activateNewLapCheck(int kart_index)
+{
+    if(m_check_type==CT_NEW_LAP)
+        m_is_active[kart_index] = true;
+}   // resetNewLap

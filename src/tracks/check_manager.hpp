@@ -35,6 +35,7 @@ public:
 	     CheckManager(const XMLNode &node);
 	void update(float dt);
 	void reset(const Track &track);
+    void activateNewLapChecks(int kart_index);
 };   // CheckManager
 
 #endif

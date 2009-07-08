@@ -26,6 +26,7 @@ using namespace irr;
 #include "tracks/check_structure.hpp"
 
 class XMLNode;
+class CheckManager;
 
 /** Implements a simple checkline. It's a finite line with 2 endpoints in 2d 
  *  and a minimum height (i.e. the minimum Y coordinate of the two points). 
@@ -48,7 +49,7 @@ private:
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
 public:
-	             Checkline(const XMLNode &node);
+	             Checkline(CheckManager *check_manager, const XMLNode &node);
     virtual     ~Checkline() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);

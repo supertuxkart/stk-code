@@ -26,6 +26,7 @@
 
 class XMLNode;
 class Track;
+class CheckManager;
 
 /** Virtual base class for a check structure. A check structure has a certain
  *  type:
@@ -62,10 +63,14 @@ protected:
     /** Stores if this check structure is active (for a given kart). USed e.g.
      *  in lap counting. */
     std::vector<bool> m_is_active;
+private:
+    /** Stores a pointer to the check manager. */
+    CheckManager      *m_check_manager;
+
     /** The type of this checkline. */
     CheckType         m_check_type;
 public:
-                CheckStructure(const XMLNode &node);
+                CheckStructure(CheckManager *check_manager, const XMLNode &node);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     /** True if going from old_pos to new_pos crosses this checkline. This function
@@ -78,6 +83,7 @@ public:
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
+    virtual void activateNewLapCheck(int kart_index);
 };   // CheckStructure
 
 #endif
