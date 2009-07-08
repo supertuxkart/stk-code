@@ -15,22 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "gui/widget.hpp"
 
-#include "graphics/irr_driver.hpp"
-#include "gui/screen.hpp"
-#include "gui/engine.hpp"
-#include "gui/my_button.hpp"
-#include "io/file_manager.hpp"
-#include "utils/translation.hpp"
-
-#include <irrlicht.h>
 #include <iostream>
 #include <sstream>
 
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
-
+#include "irrlicht.h"
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -39,7 +29,18 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-#include "gui/widget.hpp"
+#include "graphics/irr_driver.hpp"
+#include "gui/screen.hpp"
+#include "gui/engine.hpp"
+#include "gui/my_button.hpp"
+#include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
+
+
+#ifndef round
+# define round(x)  (floor(x+0.5f))
+#endif
 
 static unsigned int id_counter = 0;
 static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
@@ -782,10 +783,10 @@ void SpinnerWidget::add()
     // label
     if(m_graphical)
     {
-        char imagefile[128];
-        std::string icon = file_manager->getDataDir() + "/" + m_properties[PROP_ICON];
-        snprintf(imagefile, 128, icon.c_str(), m_value);
-        ITexture* texture = GUIEngine::getDriver()->getTexture(imagefile);
+        std::ostringstream icon_stream;
+        icon_stream<<file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
+        std::string imagefile = StringUtils::insert_values(icon_stream.str(), m_value);
+        ITexture* texture = irr_driver->getTexture(imagefile);
         const int texture_width = texture->getSize().Width;
         const int free_h_space = w-h*2-texture_width; // to center image
 
@@ -861,11 +862,11 @@ void SpinnerWidget::setValue(const int new_value)
 
     if(m_graphical)
     {
-        char imagefile[128];
-        std::string icon = file_manager->getDataDir() + "/" + m_properties[PROP_ICON];
-        snprintf(imagefile, 128, icon.c_str(), m_value);
+        std::ostringstream icon;
+        icon << file_manager->getDataDir() << "/"  << m_properties[PROP_ICON];
+        std::string imagefile = StringUtils::insert_values(icon.str(), m_value);
         //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
-        ((IGUIImage*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
+        ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
     else if(m_labels.size() > 0)
     {
@@ -873,9 +874,8 @@ void SpinnerWidget::setValue(const int new_value)
     }
     else if(m_properties[PROP_TEXT].size() > 0)
     {
-        char text[128];
-        sprintf(text, _(m_properties[PROP_TEXT].c_str()), m_value );
-        m_children[1].m_element->setText( stringw(text).c_str() );
+        std::string text = StringUtils::insert_values(_(m_properties[PROP_TEXT].c_str()), m_value);
+        m_children[1].m_element->setText( stringw(text.c_str()).c_str() );
     }
     else
     {
