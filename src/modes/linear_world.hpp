@@ -24,27 +24,6 @@
 struct KartIconDisplayInfo;
 class RaceGUI;
 
-/** Some additional info that needs to be kept for each kart
-  * in this kind of race.
-  */
-struct KartInfo
-{
-    int         m_race_lap;             /**<Number of finished(!) laps. */
-    float       m_time_at_last_lap;     /**<Time at finishing last lap. */
-    float       m_lap_start_time;       /**<Time at start of a new lap. */
-    float       m_estimated_finish;     /**<During last lap only:
-                                         *  estimated finishing time!   */
-    int         m_track_sector;         /**<Index in driveline, special values
-                                         * e.g. UNKNOWN_SECTOR can be negative!*/
-    
-    int         m_last_valid_sector;    /* used when rescusing, e.g. for invalid shortcuts */
-    int         m_last_valid_race_lap;  /* when a kart is rescued, we need to give it back the number of lap it had */
-    
-    Vec3        m_curr_track_coords;
-    
-    bool        m_on_road;             // true if the kart is on top of the
-                                       // road path drawn by the drivelines
-};
 
 /*
  * A 'linear world' is a subcategory of world used in 'standard' races, i.e.
@@ -53,6 +32,29 @@ struct KartInfo
  */
 class LinearWorld : public World
 {
+private:
+    /** Some additional info that needs to be kept for each kart
+     * in this kind of race.
+     */
+    struct KartInfo
+    {
+        int         m_race_lap;             /**<Number of finished(!) laps. */
+        float       m_time_at_last_lap;     /**<Time at finishing last lap. */
+        float       m_lap_start_time;       /**<Time at start of a new lap. */
+        float       m_estimated_finish;     /**<During last lap only:
+                                            *  estimated finishing time!   */
+        int         m_track_sector;         /**<Index in driveline, special values
+                                            * e.g. UNKNOWN_SECTOR can be negative!*/
+
+        int         m_last_valid_sector;    /* used when rescusing, e.g. for invalid shortcuts */
+        int         m_last_valid_race_lap;  /* when a kart is rescued, we need to give it back the number of lap it had */
+
+        Vec3        m_curr_track_coords;
+
+        bool        m_on_road;             // true if the kart is on top of the
+        // road path drawn by the drivelines
+    };
+
 protected:
     KartIconDisplayInfo* m_kart_display_info;
     
@@ -102,6 +104,11 @@ public:
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
     virtual void raceResultOrder( int* order );
+    /** Returns true if the kart is on a valid driveline quad.
+     *  \param kart_index  Index of the kart.
+     */
+    bool isOnRoad(unsigned int kart_index) const 
+        { return m_kart_info[kart_index].m_on_road; }
 };
 
 #endif

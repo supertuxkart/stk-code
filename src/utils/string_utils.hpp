@@ -47,6 +47,11 @@ namespace StringUtils
         return oss.str();
     }
 
+    /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
+     *  seconds, 1/100 seconds.
+     *  \param time Time in seconds.
+     */
+    std::string timeToString(float time);
     /** Convert the contents in string \a rep to type \a T, if conversion
         fails false is returned and the value of \a x is unchanged, if
         true is returned the conversation was successfull. */

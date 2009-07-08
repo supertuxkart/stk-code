@@ -30,6 +30,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include "irrlicht.h"
@@ -42,13 +43,19 @@ RaceGUI* getRaceGUI()
     return instance;
 }
 
-void timeToString(const double TIME, char *s)
+// ----------------------------------------------------------------------------
+/** Converts a time into a string.
+ *  \param time Time in seconds.
+ *  \param s Output string.
+ */
+void XXtimeToString(const double TIME, char *s)
 {
     int min     = (int) floor ( TIME / 60.0 ) ;
     int sec     = (int) floor ( TIME - (double) ( 60 * min ) ) ;
     int tenths  = (int) floor ( 10.0f * (TIME - (double)(sec + 60* min)));
     sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
 }   // TimeToString
+// ----------------------------------------------------------------------------
 
 
 RaceGUI::RaceGUI()
@@ -143,11 +150,9 @@ void RaceGUI::drawTimer ()
     assert(RaceManager::getWorld() != NULL);
     
     if(!RaceManager::getWorld()->shouldDrawTimer()) return;
-    char str[256];
-    
-    timeToString(RaceManager::getWorld()->getTime(), str);
+    std::string s = StringUtils::timeToString(RaceManager::getWorld()->getTime());
 #ifdef HAVE_IRRLICHT
-    m_time->setText(core::stringw(str).c_str());
+    m_time->setText(core::stringw(s.c_str()).c_str());
 #else
     font_race->PrintShadow(str, 60, UserConfigParams::m_width-260,
                            UserConfigParams::m_height-64);

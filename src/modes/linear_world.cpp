@@ -24,6 +24,7 @@
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 //-----------------------------------------------------------------------------
@@ -254,8 +255,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             {
                 m->addMessage(_("New fastest lap"), NULL, 
                     2.0f, 40, 100, 210, 100);
-                char s[20];
-                timeToString(time_per_lap, s);
+                std::string s = StringUtils::timeToString(time_per_lap);
 
                 std::ostringstream m_fastest_lap_message;
                 m_fastest_lap_message << s << ": " << kart->getName();
@@ -363,11 +363,10 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
            (getTime() - getTimeAtLapForKart(kart->getWorldKartId())<5.0f || rank_info.lap != laps_of_leader) &&
            raceHasLaps())
         {  // Display for 5 seconds
-            char str[256];
+            std::string str;
             if(position==1)
             {
-                str[0]=' '; str[1]=0;
-                timeToString(getTimeAtLapForKart(kart->getWorldKartId()), str+1);
+                str = " "+StringUtils::timeToString(getTimeAtLapForKart(kart->getWorldKartId()));
             }
             else
             {
@@ -376,8 +375,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
                                 ? getTimeAtLapForKart(kart->getWorldKartId()) 
                                 : getTime())
                            - time_of_leader;
-                str[0]='+'; str[1]=0;
-                timeToString(timeBehind, str+1);
+                str="+"+StringUtils::timeToString(timeBehind);
             }
             rank_info.time = str;
         }

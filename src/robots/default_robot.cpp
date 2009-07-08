@@ -289,11 +289,11 @@ void DefaultRobot::handleBraking()
     }
         
     const float MIN_SPEED = 5.0f;
-    KartInfo &kart_info  = m_world->m_kart_info[ getWorldKartId() ];
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if ( m_crashes.m_road && kart_info.m_on_road && getVelocityLC().getY() > MIN_SPEED)
+    if (m_crashes.m_road && getVelocityLC().getY() > MIN_SPEED && 
+        m_world->isOnRoad(getWorldKartId()) )
     {
         float kart_ang_diff = 
             m_quad_graph->getAngleToNext(m_track_node,
