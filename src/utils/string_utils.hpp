@@ -109,7 +109,7 @@ namespace StringUtils
         std::string new_string="";
         for(unsigned int i=0; i<sv.size(); i++)
         {
-            if(sv[i][0]=='s' || sv[i][0]=='d')
+            if(sv[i][0]=='s' || sv[i][0]=='d' || sv[i][0]=='i')
             {
                 new_string+=all_vals[0]+sv[i].substr(1);
                 all_vals.erase(all_vals.begin());
