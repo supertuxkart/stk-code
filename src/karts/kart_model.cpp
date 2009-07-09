@@ -265,8 +265,8 @@ void KartModel::update(float rotation, float visual_steer,
     // (say) 50% of left or right.
     int end;
     static int last_end=-1;
-    if(steer<0.0f)       end = m_af_left;
-    else if(steer>0.0f)  end = m_af_right;
+    if(steer>0.0f)       end = m_af_straight-(int)((m_af_straight-m_af_left)*steer);
+    else if(steer<0.0f)  end = m_af_straight+(int)((m_af_straight-m_af_right)*steer);
     else                 end = m_af_straight;
 
     // No changes to current frame loop
