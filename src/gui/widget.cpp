@@ -71,7 +71,7 @@ Widget::Widget()
 // -----------------------------------------------------------------------------
 template<typename T> T* Widget::getIrrlichtElement()
 {
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(NDEBUG)
     return static_cast<T*>(m_element);
 #else
     T* out = dynamic_cast<T*>(m_element);
