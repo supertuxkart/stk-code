@@ -515,7 +515,7 @@ namespace StateManager
 
         // re-select the previous button
         ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-        if(btn != NULL) GUIEngine::getGUIEnv()->setFocus( btn->m_element );
+        if(btn != NULL) GUIEngine::getGUIEnv()->setFocus( btn->getIrrlichtElement() );
 
         // save new binding to file
         input_manager->getDeviceList()->serialize();

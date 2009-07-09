@@ -64,7 +64,7 @@ void ModalDialog::clearWindow()
     const int children_amount = m_children.size();
     for(int i=0; i<children_amount; i++)
     {
-        m_irrlicht_window->removeChild( m_children[i].m_element );
+        m_irrlicht_window->removeChild( m_children[i].getIrrlichtElement() );
     }
     m_children.clearAndDeleteAll();   
     
@@ -199,7 +199,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->setParent(m_irrlicht_window);
     m_children.push_back(textCtrl);
     textCtrl->add();
-    GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
+    GUIEngine::getGUIEnv()->setFocus( textCtrl->getIrrlichtElement() );
     
     // TODO : add Ok button
 
@@ -218,7 +218,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
 }
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
-    textCtrl->m_element->remove();
+    textCtrl->getIrrlichtElement()->remove();
 }
 void EnterPlayerNameDialog::processEvent(std::string& eventSource)
 {
@@ -231,7 +231,7 @@ void EnterPlayerNameDialog::processEvent(std::string& eventSource)
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
-    if( GUIEngine::getGUIEnv()->hasFocus(cancelButton->m_element) )
+    if( GUIEngine::getGUIEnv()->hasFocus(cancelButton->getIrrlichtElement()) )
     {
         std::string fakeEvent = "cancel";
         processEvent(fakeEvent);
@@ -245,7 +245,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     
     // irrLicht is too stupid to remove focus from deleted widgets
     // so do it by hand
-    GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+    GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
     GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
 
     ModalDialog::dismiss();
@@ -280,8 +280,8 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
     m_children.push_back(spinner);
     spinner->add();
     spinner->setValue(3);
-    spinner->m_element->setTabStop(true);
-    spinner->m_element->setTabGroup(false);
+    spinner->getIrrlichtElement()->setTabStop(true);
+    spinner->getIrrlichtElement()->setTabGroup(false);
 
     ButtonWidget* okBtn = new ButtonWidget();
     okBtn->m_properties[PROP_ID] = "start";
@@ -293,10 +293,10 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
     okBtn->setParent(m_irrlicht_window);
     m_children.push_back(okBtn);
     okBtn->add();
-    okBtn->m_element->setTabStop(true);
-    okBtn->m_element->setTabGroup(false);
+    okBtn->getIrrlichtElement()->setTabStop(true);
+    okBtn->getIrrlichtElement()->setTabGroup(false);
     
-    GUIEngine::getGUIEnv()->setFocus( okBtn->m_element );
+    GUIEngine::getGUIEnv()->setFocus( okBtn->getIrrlichtElement() );
     
     
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
@@ -405,7 +405,7 @@ void PlayerInfoDialog::showRegularDialog()
         textCtrl->setParent(m_irrlicht_window);
         m_children.push_back(textCtrl);
         textCtrl->add();
-        GUIEngine::getGUIEnv()->setFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->setFocus( textCtrl->getIrrlichtElement() );
     }
     
     {
@@ -506,7 +506,7 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
-        GUIEngine::getGUIEnv()->setFocus( widget->m_element );
+        GUIEngine::getGUIEnv()->setFocus( widget->getIrrlichtElement() );
 
     }
     
@@ -528,7 +528,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
         ModalDialog::dismiss();
@@ -546,7 +546,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
         ModalDialog::dismiss();
@@ -561,7 +561,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
     {   
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->m_element );
+        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
         ModalDialog::dismiss();

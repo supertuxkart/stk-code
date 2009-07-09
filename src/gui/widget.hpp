@@ -126,11 +126,21 @@ namespace GUIEngine
         IGUIElement* m_parent;
         
         static bool convertToCoord(std::string& x, int* absolute, int* percentage);
+        
+        /**
+         * IrrLicht widget created to represent this object.
+         */
+        IGUIElement* m_element;
+        
     public:
         Widget();
         virtual ~Widget() {}
         
         bool m_show_bounding_box;
+        
+        template<typename T> T* getIrrlichtElement();
+        IGUIElement* getIrrlichtElement() { return m_element; }
+
         
         virtual void update(float delta) { }
         
@@ -162,11 +172,6 @@ namespace GUIEngine
           * (not the same as the string identificator specified in the XML file)
           */
         int id;
-        
-        /**
-          * IrrLicht widget created to represent this object.
-          */
-        IGUIElement* m_element;
         
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;

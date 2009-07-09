@@ -69,6 +69,16 @@ Widget::Widget()
     m_parent = NULL;
 }
 // -----------------------------------------------------------------------------
+template<typename T> T* Widget::getIrrlichtElement()
+{
+#ifdef __WIN32__
+    return static_cast<T*>(m_element);
+#else
+    T* out = dynamic_cast<T*>(m_element);
+    return out;
+#endif
+}
+// -----------------------------------------------------------------------------
 /**
  * Receives as string the raw property value retrieved from XML file.
  * Will try to make sense of it, as an absolute value or a percentage.
@@ -299,7 +309,7 @@ void LabelWidget::add()
 
 void LabelWidget::setText(stringw newText)
 {
-    IGUIStaticText* irrwidget = static_cast<IGUIStaticText*>(m_element);   
+    IGUIStaticText* irrwidget = getIrrlichtElement<IGUIStaticText>();   
     irrwidget->setText(newText.c_str());
 }
 
@@ -784,9 +794,11 @@ void SpinnerWidget::add()
     if(m_graphical)
     {
         std::ostringstream icon_stream;
-        icon_stream<<file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
+        icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
         std::string imagefile = StringUtils::insert_values(icon_stream.str(), m_value);
         ITexture* texture = irr_driver->getTexture(imagefile);
+        assert(texture != NULL);
+        
         const int texture_width = texture->getSize().Width;
         const int free_h_space = w-h*2-texture_width; // to center image
 
