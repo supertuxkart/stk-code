@@ -146,9 +146,9 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                     // stored inside the device so we don't need to iterate through players
                     const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
                     const int playerAmount = players.size();
-                    for(int n=0; n<playerAmount; n++)
+                    for(int p=0; p<playerAmount; p++)
                     {
-                        if(players[n].getDevice() == m_keyboards.get(n))
+                        if(players[p].getDevice() == m_keyboards.get(n))
                         {
                             // we found which active player has this binding
                             *player = n;
@@ -162,7 +162,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                             
                             return true;
                         }
-                    }
+                    } // end for player
                     
                     // no active player has this binding. if we want to check for new players trying to join,
                     // check now
