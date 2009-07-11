@@ -314,38 +314,43 @@ namespace StateManager
             this->w = w;
             this->h = h;
             
-            player_id_x = x;
-            player_id_y = y;
+            // -- sizes
             player_id_w = w;
             player_id_h = 25;
             
-            player_name_w = std::min(400, w);
-            player_name_x = x + w/2 - player_name_w/2;
-            player_name_y = y + 25;
             player_name_h = 40;
+            player_name_w = std::min(400, w);
             
-            const int modelMaxHeight =  h - 25 - 65;
+            kart_name_w = w;
+            kart_name_h = 25;
+            
+            // for shrinking effect
+            if (h < 175)
+            {
+                const float factor = h / 175.0f;
+                kart_name_h *= factor;
+                player_name_h *= factor;
+                player_id_h *= factor;
+            }
+            
+            // --- layout
+            player_id_x = x;
+            player_id_y = y;
+            
+            player_name_x = x + w/2 - player_name_w/2;
+            player_name_y = y + player_id_h;
+
+            const int modelMaxHeight =  h - kart_name_h - player_name_h - player_id_h;
             const int modelMaxWidth =  w;
             const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-            const int modelY = y + 65;
+            const int modelY = y + player_name_h + player_id_h;
             model_x = x + w/2 - bestSize*1.2/2;
             model_y = modelY + modelMaxHeight/2 - bestSize/2;
             model_w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
             model_h = bestSize;
             
             kart_name_x = x;
-            kart_name_y = y + h - 25;;
-            kart_name_w = w;
-            kart_name_h = 25;
-            
-            // for shrinking effect
-            if (h < 150)
-            {
-                const float factor = h / 150.0f;
-                kart_name_h *= factor;
-                player_name_h *= factor;
-                player_id_h *= factor;
-            }
+            kart_name_y = y + h - kart_name_h;
         }
     };
     
