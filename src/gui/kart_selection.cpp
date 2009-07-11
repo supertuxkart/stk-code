@@ -32,6 +32,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 #include <string>
 
@@ -49,7 +50,7 @@ namespace StateManager
     class PlayerKartWidget : public Widget
     {
     public:
-        LabelWidget* playerID;
+        LabelWidget* playerIDLabel;
         SpinnerWidget* playerName;
         ModelViewWidget* modelView;
         LabelWidget* kartName;
@@ -61,9 +62,10 @@ namespace StateManager
 
         int target_x, target_y, target_w, target_h;
         
-        PlayerKartWidget(Widget* area) : Widget()
+        PlayerKartWidget(Widget* area, const int playerID) : Widget()
         {
-            this->m_properties[PROP_ID] = "@p1";
+            // FIXME : if a player removes itself, all IDs need to be updated
+            this->m_properties[PROP_ID] = StringUtils::insert_values("@p%i", playerID);
             
             setSize(area->x, area->y, area->w, area->h);
             target_x = x;
@@ -71,16 +73,16 @@ namespace StateManager
             target_w = w;
             target_h = h;
             
-            playerID = new LabelWidget();
-            playerID->m_properties[PROP_TEXT] = _("Player 1 (keyboard)"); // TODO : determine this string dynamically
-            playerID->m_properties[PROP_TEXT_ALIGN] = "center";
-            playerID->m_properties[PROP_ID] = "@p1_label";
-            playerID->x = player_id_x;
-            playerID->y = player_id_y;
-            playerID->w = player_id_w;
-            playerID->h = player_id_h;
+            playerIDLabel = new LabelWidget();
+            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i (keyboard)"), playerID); // TODO : determine this string dynamically
+            playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
+            playerIDLabel->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", playerID);
+            playerIDLabel->x = player_id_x;
+            playerIDLabel->y = player_id_y;
+            playerIDLabel->w = player_id_w;
+            playerIDLabel->h = player_id_h;
             //playerID->setParent(this);
-            m_children.push_back(playerID);
+            m_children.push_back(playerIDLabel);
             
             playerName = new SpinnerWidget();
             playerName->x = player_name_x;
@@ -91,7 +93,7 @@ namespace StateManager
             const int playerAmount = UserConfigParams::m_player.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
-            playerName->m_properties[PROP_ID] = "@p1_spinner";
+            playerName->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_spinner", playerID);
             //playerName->setParent(this);
             m_children.push_back(playerName);
             
@@ -102,7 +104,7 @@ namespace StateManager
             modelView->y = model_y;
             modelView->w = model_w;
             modelView->h = model_h;
-            modelView->m_properties[PROP_ID] = "@p1_model";
+            modelView->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_model", playerID);
             //modelView->setParent(this);
             m_children.push_back(modelView);
             
@@ -118,7 +120,7 @@ namespace StateManager
             kartName = new LabelWidget();
             kartName->m_properties[PROP_TEXT] = _("Tux");
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
-            kartName->m_properties[PROP_ID] = "@p1_kartname";
+            kartName->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_kartname", playerID);
             kartName->x = kart_name_x;
             kartName->y = kart_name_y;
             kartName->w = kart_name_w;
@@ -128,7 +130,7 @@ namespace StateManager
         }
         virtual void add()
         {
-            playerID->add();
+            playerIDLabel->add();
             playerName->add();
             modelView->add();
             kartName->add();
@@ -206,10 +208,10 @@ namespace StateManager
             
             setSize(x, y, w, h);
             
-            playerID->move(player_id_x,
-                           player_id_y,
-                           player_id_w,
-                           player_id_h);
+            playerIDLabel->move(player_id_x,
+                                player_id_y,
+                                player_id_w,
+                                player_id_h);
             playerName->move(player_name_x,
                              player_name_y,
                              player_name_w,
@@ -312,7 +314,8 @@ void firePressedOnNewDevice(InputDevice* device)
     Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
     rightarea.x = irr_driver->getFrameSize().Width;
     
-    PlayerKartWidget* newPlayer = new PlayerKartWidget(&rightarea);
+    // FIXME : player ID needs to be synced with active player list
+    PlayerKartWidget* newPlayer = new PlayerKartWidget(&rightarea, g_player_karts.size());
     getCurrentScreen()->manualAddWidget(newPlayer);
     g_player_karts.push_back(newPlayer);
     newPlayer->add();
@@ -376,7 +379,8 @@ void menuEventKarts(Widget* widget, std::string& name)
 {
     if(name == "init")
     {
-              
+        g_player_karts.clearWithoutDeleting();      
+        
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
         
@@ -402,7 +406,7 @@ void menuEventKarts(Widget* widget, std::string& name)
                 
             }
             
-            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area);
+            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area, 0 /* first player */);
             getCurrentScreen()->manualAddWidget(playerKart1);
             playerKart1->add();
             g_player_karts.push_back(playerKart1);
@@ -420,6 +424,7 @@ void menuEventKarts(Widget* widget, std::string& name)
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
         
+        g_player_karts.clearWithoutDeleting();      
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
