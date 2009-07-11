@@ -277,6 +277,7 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
     return m_scene_manager->addMeshSceneNode(mesh);
 }   // addMesh
 
+// ----------------------------------------------------------------------------
 void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector<Vec3>& mesh_location, ITexture* target, float angle)
 {      
     scene::ISceneNode* main_node = NULL;

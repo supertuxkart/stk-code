@@ -1323,13 +1323,11 @@ void Track::loadTrackModel()
 
     const core::vector3df &sun_pos = getSunPos();
     
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
+
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f));
     m_light->setLightType(video::ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
     m_light->setRotation( core::vector3df(180, 45, 45) );
-#ifdef WIN32
-	//FIXME: for unknown reasons on windows there is no ambient light :(
-    m_light->getLightData().AmbientColor = irr::video::SColorf(0.3f, 0.3f, 0.3f, 1.0f);
-#endif
 
     //m_light->getLightData().Attenuation = core::vector3df(0.01, 0.01, 0.01);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
