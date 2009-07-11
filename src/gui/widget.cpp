@@ -107,6 +107,16 @@ bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percen
         return true;
     }
 }
+void Widget::move(const int x, const int y, const int w, const int h)
+{
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    
+    m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
+}
+
 // -----------------------------------------------------------------------------
 /**
  * Finds its x, y, w and h coords from what is specified in the XML properties.
@@ -838,6 +848,38 @@ void SpinnerWidget::add()
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
 }
+void SpinnerWidget::move(const int x, const int y, const int w, const int h)
+{
+    Widget::move(x, y, w, h);
+
+    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
+    m_children[0].m_element->setRelativePosition(subsize_left_arrow);
+    
+    if(m_graphical)
+    {
+        // FIXME : code duplicated from add()
+        std::ostringstream icon_stream;
+        icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
+        std::string imagefile = StringUtils::insert_values(icon_stream.str(), m_value);
+        ITexture* texture = irr_driver->getTexture(imagefile);
+        assert(texture != NULL);
+        
+        const int texture_width = texture->getSize().Width;
+        const int free_h_space = w-h*2-texture_width; // to center image
+        
+        rect<s32> subsize_label = rect<s32>(h+free_h_space/2, 0, w-h+free_h_space/2, h);
+        m_children[1].m_element->setRelativePosition(subsize_label);
+    }
+    else
+    {
+        rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
+        m_children[1].m_element->setRelativePosition(subsize_label);
+    }
+    
+    rect<s32> subsize_right_arrow = rect<s32>(w-h, 0, w, h);
+    m_children[2].m_element->setRelativePosition(subsize_right_arrow);
+}
+
 // -----------------------------------------------------------------------------
 bool SpinnerWidget::rightPressed()
 {

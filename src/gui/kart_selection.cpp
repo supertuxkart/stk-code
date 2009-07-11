@@ -206,26 +206,22 @@ namespace StateManager
             
             setSize(x, y, w, h);
             
-            playerID->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
-                                                                (player_id_x,
-                                                                 player_id_y,
-                                                                 player_id_x + player_id_w,
-                                                                 player_id_y + player_id_h) );
-            playerName->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
-                                                                  (player_name_x,
-                                                                   player_name_y,
-                                                                   player_name_x + player_name_w,
-                                                                   player_name_y + player_name_h) );
-            modelView->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
-                                                                 (model_x,
-                                                                  model_y,
-                                                                  model_x + model_w,
-                                                                  model_y + model_h) );
-            kartName->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
-                                                                (kart_name_x,
-                                                                 kart_name_y,
-                                                                 kart_name_x + kart_name_w,
-                                                                 kart_name_y + kart_name_h) );
+            playerID->move(player_id_x,
+                           player_id_y,
+                           player_id_w,
+                           player_id_h);
+            playerName->move(player_name_x,
+                             player_name_y,
+                             player_name_w,
+                             player_name_h );
+            modelView->move(model_x,
+                            model_y,
+                            model_w,
+                            model_h);
+            kartName->move(kart_name_x,
+                           kart_name_y,
+                           kart_name_w,
+                           kart_name_h);
             
         }
         

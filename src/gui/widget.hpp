@@ -178,6 +178,12 @@ namespace GUIEngine
         
         static void resetIDCounters();
         
+        /**
+          * Call to resize/move the widget. Not all widgets can resize gracefully.
+          */
+        virtual void move(const int x, const int y, const int w, const int h);
+        
+        
         bool isSelected() const { return m_selected; }
     };
     
@@ -230,7 +236,8 @@ namespace GUIEngine
         
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
-        
+        virtual void move(const int x, const int y, const int w, const int h);
+
         void setValue(const int new_value);
         void addLabel(std::string label);
         void add();
