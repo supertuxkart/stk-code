@@ -308,6 +308,11 @@ void Screen::manualAddWidget(Widget* w)
     m_widgets.push_back(w);
 }
 
+void Screen::manualRemoveWidget(Widget* w)
+{
+    m_widgets.remove(w);
+}
+
 #if 0
 #pragma mark -
 #pragma mark Getting widgets

@@ -45,11 +45,14 @@ namespace StateManager
     class PlayerKartWidget;
     
     // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+    // FIXME : delete these objects when leaving the screen (especially when suing escape)
     ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
     class PlayerKartWidget : public Widget
     {
         ActivePlayer* m_associatedPlayer;
+        float x_speed, y_speed, w_speed, h_speed;
+
     public:
         LabelWidget* playerIDLabel;
         SpinnerWidget* playerName;
@@ -69,7 +72,11 @@ namespace StateManager
         PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID) : Widget()
         {
             m_associatedPlayer = associatedPlayer;
-            
+            x_speed = 1.0f;
+            y_speed = 1.0f;
+            w_speed = 1.0f;
+            h_speed = 1.0f;
+
             this->playerID = playerID;
             
             // FIXME : if a player removes itself, all IDs need to be updated
@@ -140,6 +147,32 @@ namespace StateManager
             //kartName->setParent(this);
             m_children.push_back(kartName);
         }
+        
+        ~PlayerKartWidget()
+        {
+            if (playerIDLabel->getIrrlichtElement() != NULL)
+                playerIDLabel->getIrrlichtElement()->remove();
+            
+            if (playerName->getIrrlichtElement() != NULL)
+                playerName->getIrrlichtElement()->remove();
+            
+            if (modelView->getIrrlichtElement() != NULL)
+                modelView->getIrrlichtElement()->remove();
+            
+            if (kartName->getIrrlichtElement() != NULL)
+                kartName->getIrrlichtElement()->remove();
+        }
+        
+        void setPlayerID(const int newPlayerID)
+        {
+            if (StateManager::getActivePlayers().get(newPlayerID) != m_associatedPlayer)
+            {
+                std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
+                assert(false);
+            }
+            playerID = newPlayerID;
+        }
+        
         virtual void add()
         {
             playerIDLabel->add();
@@ -157,12 +190,18 @@ namespace StateManager
             }
             
         }
+                
         void move(const int x, const int y, const int w, const int h)
         {
             target_x = x;
             target_y = y;
             target_w = w;
             target_h = h;
+            
+            x_speed = abs( this->x - x ) / 300.0f;
+            y_speed = abs( this->y - y ) / 300.0f;
+            w_speed = abs( this->w - w ) / 300.0f;
+            h_speed = abs( this->h - h ) / 300.0f;
         }
         
         void onUpdate(float delta)
@@ -174,47 +213,47 @@ namespace StateManager
             // move x towards target
             if (x < target_x)
             {
-                x += move_step;
+                x += move_step*x_speed;
                 if (x > target_x) x = target_x; // don't move to the other side of the target
             }
             else if (x > target_x)
             {
-                x -= move_step;
+                x -= move_step*x_speed;
                 if (x < target_x) x = target_x; // don't move to the other side of the target
             }
             
             // move y towards target
             if (y < target_y)
             {
-                y += move_step;
+                y += move_step*y_speed;
                 if (y > target_y) y = target_y; // don't move to the other side of the target
             }
             else if (y > target_y)
             {
-                y -= move_step;
+                y -= move_step*y_speed;
                 if (y < target_y) y = target_y; // don't move to the other side of the target
             }
             
             // move w towards target
             if (w < target_w)
             {
-                w += move_step;
+                w += move_step*w_speed;
                 if (w > target_w) w = target_w; // don't move to the other side of the target
             }
             else if (w > target_w)
             {
-                w -= move_step;
+                w -= move_step*w_speed;
                 if (w < target_w) w = target_w; // don't move to the other side of the target
             }
             // move h towards target
             if (h < target_h)
             {
-                h += move_step;
+                h += move_step*h_speed;
                 if (h > target_h) h = target_h; // don't move to the other side of the target
             }
             else if (h > target_h)
             {
-                h -= move_step;
+                h -= move_step*h_speed;
                 if (h < target_h) h = target_h; // don't move to the other side of the target
             }
             
@@ -298,6 +337,15 @@ namespace StateManager
             kart_name_y = y + h - 25;;
             kart_name_w = w;
             kart_name_h = 25;
+            
+            // for shrinking effect
+            if (h < 150)
+            {
+                const float factor = h / 150.0f;
+                kart_name_h *= factor;
+                player_name_h *= factor;
+                player_id_h *= factor;
+            }
         }
     };
     
@@ -364,6 +412,7 @@ void firePressedOnNewDevice(InputDevice* device)
     newPlayer->add();
     
     StateManager::addActivePlayer(aplayer);
+    aplayer->setDevice(device);
     
     const int amount = g_player_karts.size();
     
@@ -408,6 +457,30 @@ void setPlayer0Device(InputDevice* device)
     // input_manager->getDeviceList()->setNoAssignMode(true);
 }
     
+PlayerKartWidget* removedWidget = NULL;
+    
+void playerPressedRescue(int playerID)
+{
+    std::cout << "Player " << playerID << " no more wishes to play!\n";
+    
+    removedWidget = g_player_karts.remove(playerID);
+    StateManager::removeActivePlayer(playerID);
+    
+    const int amount = g_player_karts.size();
+    
+    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    const int splitWidth = fullarea->w / amount;
+    
+    assert( amount == StateManager::activePlayerCount() );
+    
+    for (int n=0; n<amount; n++)
+    {
+        g_player_karts[n].setPlayerID(n);
+        g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
+    }
+    removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h,
+                         0, 0);
+}
     
 void kartSelectionUpdate(float delta)
 {
@@ -416,6 +489,19 @@ void kartSelectionUpdate(float delta)
     {
         g_player_karts[n].onUpdate(delta);
     }
+    
+   if (removedWidget != NULL)
+   {
+       removedWidget->onUpdate(delta);
+       
+       if (removedWidget->w == 0 || removedWidget->h == 0)
+       {
+           // destruct when too small (for "disappear" effects)
+           GUIEngine::getCurrentScreen()->manualRemoveWidget(removedWidget);
+           delete removedWidget;
+           removedWidget = NULL;
+       }
+   }
 }
     
 /**

@@ -37,7 +37,7 @@ void InputDevice::setPlayer(ActivePlayer* owner)
             return;
         }
     }
-    std::cerr << "\n\nError, trying to assign that doesn't exist to a device!!!\n\n";
+    std::cerr << "\n\nError, trying to assign a player that doesn't exist to a device!!!\n\n";
 }
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)

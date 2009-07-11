@@ -105,12 +105,14 @@ void erase(const int ID)
     contentsVector.erase(contentsVector.begin()+ID);
 }
 
-void remove(const int ID)
+TYPE* remove(const int ID)
 {
     assert(ID > -1);
     assert((unsigned int)ID < contentsVector.size());
 
+    TYPE* out = contentsVector[ID];
     contentsVector.erase(contentsVector.begin()+ID);
+    return out;
 }
 
 bool contains( TYPE* instance ) const

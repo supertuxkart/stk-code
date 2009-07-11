@@ -73,6 +73,10 @@ public:
         m_player = player;
         m_device = NULL;
     }
+    ~ActivePlayer()
+    {
+        setDevice(NULL);
+    }
     
     Player* getPlayer()
     {
@@ -86,6 +90,8 @@ public:
     InputDevice* getDevice() const { return m_device; }
     void setDevice(InputDevice* device)
     {
+        if (m_device != NULL) m_device->setPlayer(NULL);
+        
         m_device = device;
         
         if(device != NULL)

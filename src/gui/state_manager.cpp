@@ -64,6 +64,14 @@ namespace StateManager
     {
         g_active_players.push_back(p);
     }
+    void removeActivePlayer(int id)
+    {
+        g_active_players.erase(id);
+    }
+    int activePlayerCount()
+    {
+        return g_active_players.size();
+    }
 
     void resetActivePlayers()
     {

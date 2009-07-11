@@ -131,7 +131,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
             if( m_keyboards[n].hasBinding(btnID, action) )
             {
                 // We found which device was triggered.
-                
+                          
                 if(m_assign_mode == NO_ASSIGN)
                 {
                     // In no-assign mode, simply keep track of which device is used
@@ -143,7 +143,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                 {
                     // In assign mode, find to which active player this binding belongs
                     // FIXME : in order to speed this use, a Player* pointer could be
-                    // stored inside the device so we don't need to iterate through devices
+                    // stored inside the device so we don't need to iterate through players
                     const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
                     const int playerAmount = players.size();
                     for(int n=0; n<playerAmount; n++)
@@ -152,6 +152,14 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                         {
                             // we found which active player has this binding
                             *player = n;
+                            
+                            if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
+                            {
+                                if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
+                                *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                                return true;
+                            }
+                            
                             return true;
                         }
                     }
@@ -163,9 +171,13 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                         for(unsigned int n=0; n<m_keyboard_amount; n++)
                         {
                             PlayerAction localaction = PA_FIRST; // none
-                            if (m_keyboards[n].hasBinding(btnID, &localaction) && localaction == PA_FIRE)
+                            if (m_keyboards[n].hasBinding(btnID, &localaction))
                             {
-                                if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
+                                if(localaction == PA_FIRE)
+                                {
+                                    if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
+                                }
+                                
                                 *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
                                 return true;
                             }
@@ -237,6 +249,12 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
             
             if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
             {
+                if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
+                {
+                    if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
+                    *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                }
+                
                 return true;
             }
         }

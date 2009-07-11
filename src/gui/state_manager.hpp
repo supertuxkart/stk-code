@@ -44,7 +44,9 @@ namespace StateManager
       * so no need to delete it yourself.
       */
     void addActivePlayer(ActivePlayer* p);
-    
+    void removeActivePlayer(int id);
+
+    int activePlayerCount();
     void resetActivePlayers();
     
     void escapePressed();
