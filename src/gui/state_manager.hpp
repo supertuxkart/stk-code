@@ -23,7 +23,7 @@
 #include "utils/ptr_vector.hpp"
 
 struct Input;
-class Player;
+class ActivePlayer;
 
 namespace StateManager
 {
@@ -37,8 +37,14 @@ namespace StateManager
     bool isGameState();
     void reshowTopMostMenu();
     
-    const ptr_vector<Player, REF>& getActivePlayers();
-    void addActivePlayer(Player* p);
+    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
+    
+    /**
+      * Adds a new player to the list of active players. StateManager takes ownership of the object
+      * so no need to delete it yourself.
+      */
+    void addActivePlayer(ActivePlayer* p);
+    
     void resetActivePlayers();
     
     void escapePressed();

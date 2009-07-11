@@ -42,15 +42,45 @@ private:
     
     int m_last_kart_id;
 
-    InputDevice* m_device;
-
 public:
     
     Player(const char* name) : m_player_group("Player", "Represents one human player"),
                                       m_name(name, "name", &m_player_group),
                                       m_last_kart_id(-1)
     {
+    }
+    
+    
+    void setName(const std::string &name_){m_name = name_;}
+
+    const char* getName() { return m_name.c_str(); }
+
+    int getLastKartId(){ return m_last_kart_id; }
+    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
+};
+
+/**
+  * Represents a player that is currently playing.
+  */
+class ActivePlayer
+{
+    Player* m_player;
+    InputDevice* m_device;
+public:
+    
+    ActivePlayer(Player* player)
+    {
+        m_player = player;
         m_device = NULL;
+    }
+    
+    Player* getPlayer()
+    {
+        return m_player;
+    }
+    void setPlayer(Player* player)
+    {
+        m_player = player;
     }
     
     InputDevice* getDevice() const { return m_device; }
@@ -61,13 +91,6 @@ public:
         if(device != NULL)
             device->setPlayer(this);
     }
-    
-    void setName(const std::string &name_){m_name = name_;}
-
-    const char* getName() { return m_name.c_str(); }
-
-    int getLastKartId(){ return m_last_kart_id; }
-    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
 };
 
 #endif

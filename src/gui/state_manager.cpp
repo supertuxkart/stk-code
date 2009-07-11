@@ -52,16 +52,15 @@ namespace StateManager
     std::vector<std::string> g_menu_stack;
 
     /**
-      * A list of all currently playing players. (only storing references since
-      * the original is in UserConfig)
+      * A list of all currently playing players.
       */
-    ptr_vector<Player, REF> g_active_players;
+    ptr_vector<ActivePlayer, HOLD> g_active_players;
     
-    const ptr_vector<Player, REF>& getActivePlayers()
+    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers()
     {
         return g_active_players;
     }
-    void addActivePlayer(Player* p)
+    void addActivePlayer(ActivePlayer* p)
     {
         g_active_players.push_back(p);
     }

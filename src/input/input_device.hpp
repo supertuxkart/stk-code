@@ -7,7 +7,7 @@
 #include <fstream>
 #include "io/xml_node.hpp"
 
-class Player;
+class ActivePlayer;
 
 enum DeviceType
 {
@@ -41,7 +41,7 @@ public:
     
     DeviceType getType() const { return m_type; };
     
-    void setPlayer(Player* owner);
+    void setPlayer(ActivePlayer* owner);
     
     /**
       * returns a human-readable string for the key binded with the given action

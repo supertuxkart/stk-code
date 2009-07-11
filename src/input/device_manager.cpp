@@ -144,7 +144,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                     // In assign mode, find to which active player this binding belongs
                     // FIXME : in order to speed this use, a Player* pointer could be
                     // stored inside the device so we don't need to iterate through devices
-                    const ptr_vector<Player, REF>& players = StateManager::getActivePlayers();
+                    const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
                     const int playerAmount = players.size();
                     for(int n=0; n<playerAmount; n++)
                     {

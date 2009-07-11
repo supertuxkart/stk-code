@@ -19,7 +19,7 @@ InputDevice::InputDevice()
 /**
   * Sets which players uses this device; or pass NULL to say no player uses it. 
   */
-void InputDevice::setPlayer(Player* owner)
+void InputDevice::setPlayer(ActivePlayer* owner)
 {
     if(owner == NULL)
     {
@@ -27,7 +27,7 @@ void InputDevice::setPlayer(Player* owner)
         return;
     }
     
-    const ptr_vector<Player, REF>& players = StateManager::getActivePlayers();
+    const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
     const int playerAmount = players.size();
     for(int n=0; n<playerAmount; n++)
     {

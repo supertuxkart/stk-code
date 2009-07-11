@@ -352,8 +352,10 @@ void setPlayer0Device(InputDevice* device)
     }
     
     // TODO : support more than 1 player
-    StateManager::addActivePlayer( UserConfigParams::m_player.get(0) );
-    UserConfigParams::m_player[0].setDevice(device);
+    ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_player.get(0));
+    StateManager::addActivePlayer( newPlayer );
+    newPlayer->setDevice(device);
+    
     input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
     
     // TODO : fall back in no-assign mode when aborting a game and going back to the menu

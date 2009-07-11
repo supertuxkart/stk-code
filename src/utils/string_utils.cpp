@@ -23,6 +23,7 @@
 #include "math.h"
 #include <algorithm>
 #include <cstring>
+#include <stdio.h>
 
 namespace StringUtils
 {
