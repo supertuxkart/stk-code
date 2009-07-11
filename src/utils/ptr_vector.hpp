@@ -72,53 +72,6 @@ void swap(int ID1, int ID2)
     contentsVector[ID1] = temp;
 }
 
-// mark is a way to delete an object without changing the order of the element sin the vector
-// it can be useful in a 'for' loop when the loop relies on object IDs and vector size not changing
-
-void markToBeDeleted(const int ID) // object is removed from vector and deleted
-{
-    assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
-
-    delete ( TYPE *) contentsVector[ID];
-
-    contentsVector[ID] = 0;
-
-}
-void markToBeRemoved(const int ID) // object is removed from vector but not deleted
-{
-    assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
-
-    contentsVector[ID] = 0;
-
-}
-
-bool isMarked(const int ID) const
-{
-    assert(ID > -1);
-    assert((unsigned int)ID < contentsVector.size());
-
-    return (contentsVector[ID] == 0);
-}
-
-void removeMarked()
-{
-    int size = contentsVector.size();
-    for(int n=0; n<size; n++)
-    {
-
-        if( contentsVector[n] == 0 )
-        {
-            contentsVector.erase(contentsVector.begin()+n);
-            size = contentsVector.size();
-            n -= 2;
-            if(n < -1) n=-1;
-        }
-    }//next
-
-}
-
 TYPE* get(const int ID)
 {
 
