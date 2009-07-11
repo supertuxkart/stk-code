@@ -29,6 +29,8 @@ const int MULTIPLIER_MOUSE     =  750;
 
 struct Input
 {
+    static const int MAX_VALUE = 32768;
+    
     enum AxisDirection {
         AD_NEGATIVE,
         AD_POSITIVE,

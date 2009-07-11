@@ -4,6 +4,13 @@
 #include "input/input_device.hpp"
 #include "utils/ptr_vector.hpp"
 
+enum PlayerAssignMode
+{
+    NO_ASSIGN,  // react to all devices
+    DETECT_NEW, // notify the manager when an inactive device is being asked to activate with fire
+    ASSIGN      // only react to assigned devices
+};
+
 class DeviceManager
 {
     ptr_vector<KeyboardDevice, HOLD> m_keyboards;
@@ -16,7 +23,7 @@ class DeviceManager
     
     InputDevice* m_latest_used_device;
     
-    bool m_no_assign_mode;
+    PlayerAssignMode m_assign_mode;
     
 public:
     DeviceManager();
@@ -35,14 +42,15 @@ public:
       * Switching back to no-assign mode will also clear anything in devices that was associated with
       * players in assign mode.
       */
-    bool noAssignMode() const { return m_no_assign_mode; }
-    void setNoAssignMode(const bool noAssignMode);
+    PlayerAssignMode playerAssignMode() const { return m_assign_mode; }
+    void setAssignMode(const PlayerAssignMode assignMode);
     
     int getKeyboardAmount() const                           { return m_keyboard_amount; }
     KeyboardDevice* getKeyboard(const int i)                { return m_keyboards.get(i); }
         
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
-        maps this input to the corresponding player and game action. returns false if player/action could not be set */
+        maps this input to the corresponding player and game action. returns false if player/action could not be set.
+        Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an action and a player */
     bool mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value, const bool programaticallyGenerated,
                                    int* player /* out */, PlayerAction* action /* out */ );
     

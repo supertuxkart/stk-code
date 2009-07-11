@@ -432,11 +432,36 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 #pragma mark irrLicht events
 #endif
 
-#define MAX_VALUE 32768
+bool Screen::onWidgetActivated(Widget* w)
+{
+    if(ModalDialog::isADialogActive() && w->m_event_handler == NULL)
+    {
+        ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
+        return false;
+    }
+    
+    Widget* parent = w->m_event_handler;
+    if(w->m_event_handler != NULL)
+    {
+        /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+         in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+         notified of clicks onto themselves so they can toggle their state. ) */
+        while(parent->m_event_handler != NULL && parent->m_event_handler != parent)
+            parent = parent->m_event_handler;
+        
+        /* notify the found event event handler, and also notify the main callback if the
+         parent event handler says so */
+        if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
+            transmitEvent(parent, parent->m_properties[PROP_ID]);
+    }
+    else transmitEvent(w, w->m_properties[PROP_ID]);
+ 
+    return true;
+}
 
 void Screen::processAction(const int action, const unsigned int value, Input::InputType type)
 {
-    const bool pressedDown = value > MAX_VALUE*2/3;
+    const bool pressedDown = value > Input::MAX_VALUE*2/3;
     
     if(!pressedDown && type == Input::IT_STICKMOTION) return;
     
@@ -628,6 +653,15 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
         case PA_FIRE:
             if(type == Input::IT_STICKBUTTON)
             {
+                if (pressedDown)
+                {
+                    IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
+                    Widget* w = getWidget( element->getID() );
+                    if(w == NULL) break;
+                    onWidgetActivated( w );
+                }
+                
+                /*
                 // simulate a 'enter' key press
                 irr::SEvent::SKeyInput evt;
                 evt.PressedDown = pressedDown;
@@ -638,6 +672,7 @@ void Screen::processAction(const int action, const unsigned int value, Input::In
 
                 wrapper.EventType = EET_KEY_INPUT_EVENT;
                 GUIEngine::getDevice()->postEventFromUser(wrapper);
+                 */
             }
             break;
         default:
@@ -663,28 +698,7 @@ bool Screen::OnEvent(const SEvent& event)
                 Widget* w = getWidget(id);
                 if(w == NULL) break;
                 
-                if(ModalDialog::isADialogActive() && w->m_event_handler == NULL)
-                {
-                    ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
-                    return false;
-                }
-                
-                Widget* parent = w->m_event_handler;
-                if(w->m_event_handler != NULL)
-                {
-                    /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-                       in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-                       notified of clicks onto themselves so they can toggle their state. ) */
-                    while(parent->m_event_handler != NULL && parent->m_event_handler != parent)
-                        parent = parent->m_event_handler;
-                    
-                    /* notify the found event event handler, and also notify the main callback if the
-                       parent event handler says so */
-                    if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
-                        transmitEvent(parent, parent->m_properties[PROP_ID]);
-                }
-                else transmitEvent(w, w->m_properties[PROP_ID]);
-                break;
+                return onWidgetActivated(w);
             }    
             case EGET_ELEMENT_HOVERED:
             {

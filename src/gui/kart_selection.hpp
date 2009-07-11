@@ -28,5 +28,7 @@ class InputDevice;
 namespace StateManager
 {
     void setPlayer0Device(InputDevice* device);
+    void firePressedOnNewDevice(InputDevice* device);
+    
     void menuEventKarts(GUIEngine::Widget* widget, std::string& name);
 }

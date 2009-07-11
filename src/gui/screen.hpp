@@ -52,6 +52,7 @@ namespace GUIEngine
 
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        bool onWidgetActivated(Widget* w);
     public:
         // current mouse position, read-only...
         int m_mouse_x, m_mouse_y;

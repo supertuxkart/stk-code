@@ -6,6 +6,7 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "gui/kart_selection.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 
@@ -14,7 +15,7 @@ DeviceManager::DeviceManager()
     m_keyboard_amount = 0;
     m_gamepad_amount = 0;
     m_latest_used_device = NULL;
-    m_no_assign_mode = true;
+    m_assign_mode = NO_ASSIGN;
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::initGamePadSupport()
@@ -45,12 +46,12 @@ bool DeviceManager::initGamePadSupport()
 }
 // -----------------------------------------------------------------------------
 
-void DeviceManager::setNoAssignMode(const bool noAssignMode)
+void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
 {
-    m_no_assign_mode = noAssignMode;
+    m_assign_mode = assignMode;
     
     // when going back to no-assign mode, do some cleanup
-    if(noAssignMode)
+    if(assignMode == NO_ASSIGN)
     {
         for(unsigned int i=0; i<m_gamepad_amount; i++)
         {
@@ -117,7 +118,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                                               const bool programaticallyGenerated, int* player /* out */,
                                               PlayerAction* action /* out */ )
 {
-    if(m_no_assign_mode)
+    if(m_assign_mode == NO_ASSIGN)
     {
         *player = -1;
     }
@@ -131,7 +132,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
             {
                 // We found which device was triggered.
                 
-                if(m_no_assign_mode)
+                if(m_assign_mode == NO_ASSIGN)
                 {
                     // In no-assign mode, simply keep track of which device is used
                     if(!programaticallyGenerated) m_latest_used_device = m_keyboards.get(n);
@@ -154,9 +155,26 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                             return true;
                         }
                     }
-                    // no active player has this binding
+                    
+                    // no active player has this binding. if we want to check for new players trying to join,
+                    // check now
+                    if (m_assign_mode == DETECT_NEW)
+                    {
+                        for(unsigned int n=0; n<m_keyboard_amount; n++)
+                        {
+                            PlayerAction localaction = PA_FIRST; // none
+                            if (m_keyboards[n].hasBinding(btnID, &localaction) && localaction == PA_FIRE)
+                            {
+                                if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
+                                *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                                return true;
+                            }
+                        } // end for
+
+                    } // end if assign_mode == DETECT_NEW
+                    
                     return false;
-                }
+                } // end if/else NO_ASSIGN mode
                            
                 
                 return true;
@@ -173,23 +191,49 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
 
         GamePadDevice* gamepad = getGamePadFromIrrID(deviceID);
         
-        if(m_no_assign_mode)
+        if(m_assign_mode == NO_ASSIGN)
         {
-            // In no-assign mode, simply keep track of which device is used
-            if(!programaticallyGenerated)
-                m_latest_used_device = gamepad;
-            
             if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
             {
+                // In no-assign mode, simply keep track of which device is used.
+                // Only assign for buttons, since axes may send some small values even when
+                // not actively used by user
+                if(!programaticallyGenerated && type == Input::IT_STICKBUTTON)
+                {
+                    m_latest_used_device = gamepad;
+                }
+                
                 return true;
             }
         }
         else
         {
             if(gamepad->m_player_id != -1)
+            {
                 *player = gamepad->m_player_id;
+            }
             else
+            {
+                
+                // no active player has this binding. if we want to check for new players trying to join,
+                // check now
+                if (m_assign_mode == DETECT_NEW)
+                {
+                    for(unsigned int n=0; n<m_gamepad_amount; n++)
+                    {
+                        PlayerAction localaction = PA_FIRST; // none
+                        if (m_gamepads[n].hasBinding(type, btnID, value, -1, &localaction) && localaction == PA_FIRE)
+                        {
+                            if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_gamepads.get(n) );
+                            *action = PA_FIRST;
+                            return true;
+                        }
+                    } // end for
+                }
+                
                 return false; // no player mapped to this device
+            }
+                
             
             if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
             {

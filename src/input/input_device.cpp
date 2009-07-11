@@ -317,33 +317,39 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
     }
 }
 // -----------------------------------------------------------------------------
+/**
+  * Player ID can either be a player ID or -1. If -1, the method only returns whether a binding exists for this player.
+  * If it's a player name, it also handles axis resets, direction changes, etc.
+  */
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
 {
     if(m_prevAxisDirections == NULL) return false; // device not open
-    //if(player != m_player_id && player != -1) return false; // device open, but belongs to another player
     
     if(type == Input::IT_STICKMOTION)
     {
         if(id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
 
-        // going to negative from positive
-        if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
+        if (player != -1)
         {
-            //  set positive id to 0
-            resetAxisDirection(id, Input::AD_POSITIVE, player);
-        }
-        // going to positive from negative
-        else if (value > 0 && m_prevAxisDirections[id] == Input::AD_NEGATIVE)
-        {
-            //  set negative id to 0
-            resetAxisDirection(id, Input::AD_NEGATIVE, player);
+            // going to negative from positive
+            if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
+            {
+                //  set positive id to 0
+                resetAxisDirection(id, Input::AD_POSITIVE, player);
+            }
+            // going to positive from negative
+            else if (value > 0 && m_prevAxisDirections[id] == Input::AD_NEGATIVE)
+            {
+                //  set negative id to 0
+                resetAxisDirection(id, Input::AD_NEGATIVE, player);
+            }
         }
 
         if(value > 0) m_prevAxisDirections[id] = Input::AD_POSITIVE;
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
         // check if within deadzone
-        if(value > -m_deadzone && value < m_deadzone)
+        if(value > -m_deadzone && value < m_deadzone && player != -1)
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the

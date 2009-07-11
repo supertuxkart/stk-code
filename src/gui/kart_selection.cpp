@@ -40,7 +40,12 @@ using namespace GUIEngine;
 
 namespace StateManager
 {
-    class PlayerKart : public Widget
+    class PlayerKartWidget;
+    
+    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+    ptr_vector<PlayerKartWidget, REF> g_player_karts;
+    
+    class PlayerKartWidget : public Widget
     {
     public:
         LabelWidget* playerID;
@@ -48,7 +53,12 @@ namespace StateManager
         ModelViewWidget* modelView;
         LabelWidget* kartName;
         
-        PlayerKart(Widget* area) : Widget()
+        int player_id_x, player_id_y, player_id_w, player_id_h;
+        int player_name_x, player_name_y, player_name_w, player_name_h;
+        int model_x, model_y, model_w, model_h;
+        int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
+
+        PlayerKartWidget(Widget* area) : Widget()
         {
             this->m_properties[PROP_ID] = "@p1";
             this->x = area->x;
@@ -56,24 +66,25 @@ namespace StateManager
             this->w = area->w;
             this->h = area->h;
             
+            setSize(area);
+            
             playerID = new LabelWidget();
             playerID->m_properties[PROP_TEXT] = _("Player 1 (keyboard)");
             playerID->m_properties[PROP_TEXT_ALIGN] = "center";
             playerID->m_properties[PROP_ID] = "@p1_label";
-            playerID->x = area->x;
-            playerID->y = area->y;
-            playerID->w = area->w;
-            playerID->h = 25;
+            playerID->x = player_id_x;
+            playerID->y = player_id_y;
+            playerID->w = player_id_w;
+            playerID->h = player_id_h;
             //playerID->setParent(this);
             m_children.push_back(playerID);
             
             const int playerAmount = UserConfigParams::m_player.size();
-            const int spinnerWidth = std::min(400, area->w/3 /* FIXME : replace by number of players */);
             playerName = new SpinnerWidget();
-            playerName->x = area->x + area->w/2 - spinnerWidth/2;
-            playerName->y = area->y + 25;
-            playerName->w = spinnerWidth;
-            playerName->h = 40;
+            playerName->x = player_name_x;
+            playerName->y = player_name_y;
+            playerName->w = player_name_w;
+            playerName->h = player_name_h;
             
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
@@ -83,28 +94,23 @@ namespace StateManager
             
             
             modelView = new ModelViewWidget();
-            const int modelY = area->y + 65;
-            const int modelMaxHeight =  area->h - 25 - 65;
-            const int modelMaxWidth =  area->w;
-            const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-                        
-            modelView->x = area->x + area->w/2 - bestSize*1.2/2;
-            modelView->y = modelY + modelMaxHeight/2 - bestSize/2;
-            modelView->w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
-            modelView->h = bestSize;
+            
+            modelView->x = model_x;
+            modelView->y = model_y;
+            modelView->w = model_w;
+            modelView->h = model_h;
             modelView->m_properties[PROP_ID] = "@p1_model";
             //modelView->setParent(this);
             m_children.push_back(modelView);
-            
             
             kartName = new LabelWidget();
             kartName->m_properties[PROP_TEXT] = _("Tux");
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
             kartName->m_properties[PROP_ID] = "@p1_kartname";
-            kartName->x = area->x;
-            kartName->y = area->y + area->h - 25;
-            kartName->w = area->w;
-            kartName->h = 25;
+            kartName->x = kart_name_x;
+            kartName->y = kart_name_y;
+            kartName->w = kart_name_w;
+            kartName->h = kart_name_h;
             //kartName->setParent(this);
             m_children.push_back(kartName);
         }
@@ -114,13 +120,36 @@ namespace StateManager
             playerName->add();
             modelView->add();
             kartName->add();
-        } 
-        
+        }
+        void setSize(Widget* area)
+        {
+            player_id_x = area->x;
+            player_id_y = area->y;
+            player_id_w = area->w;
+            player_id_h = 25;
+            
+            player_name_w = std::min(400, area->w);
+            player_name_x = area->x + area->w/2 - player_name_w/2;
+            player_name_y = area->y + 25;
+            player_name_h = 40;
+            
+            const int modelMaxHeight =  area->h - 25 - 65;
+            const int modelMaxWidth =  area->w;
+            const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
+            const int modelY = area->y + 65;
+            model_x = area->x + area->w/2 - bestSize*1.2/2;
+            model_y = modelY + modelMaxHeight/2 - bestSize/2;
+            model_w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
+            model_h = bestSize;
+            
+            kart_name_x = area->x;
+            kart_name_y = area->y + area->h - 25;;
+            kart_name_w = area->w;
+            kart_name_h = 25;
+        }
     };
     
-    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
-    ptr_vector<PlayerKart, REF> g_player_karts;
-    
+
 class KartHoverListener : public RibbonGridHoverListener
     {
     public:
@@ -152,19 +181,40 @@ class KartHoverListener : public RibbonGridHoverListener
     };
 KartHoverListener* karthoverListener = NULL;
 
+void firePressedOnNewDevice(InputDevice* device)
+{
+    std::cout << "===== firePressedOnNewDevice =====\n";
+
+    if(device == NULL)
+    {
+        std::cout << "I don't know which device was pressed :'(\n";
+        return;
+    }
+    else if(device->getType() == DT_KEYBOARD)
+    {
+        std::cout << "Fire was pressed on a keyboard\n";
+    }
+    else if(device->getType() == DT_GAMEPAD)
+    {
+        std::cout << "Fire was pressed on a gamepad\n";
+    }
+    
+}
+    
 void setPlayer0Device(InputDevice* device)
 {
+    std::cout << "===== setPlayer0Device =====\n";
+    
     if(device == NULL)
     {
         std::cout << "I don't know which device to assign to player 0 :'(\n";
         return;
     }
-    
-    if(device->getType() == DT_KEYBOARD)
+    else if(device->getType() == DT_KEYBOARD)
     {
         std::cout << "Player 0 is using a keyboard\n";
     }
-    if(device->getType() == DT_GAMEPAD)
+    else if(device->getType() == DT_GAMEPAD)
     {
         std::cout << "Player 0 is using a gamepad\n";
     }
@@ -172,7 +222,7 @@ void setPlayer0Device(InputDevice* device)
     // TODO : support more than 1 player
     StateManager::addActivePlayer( UserConfigParams::m_player.get(0) );
     UserConfigParams::m_player[0].setDevice(device);
-    input_manager->getDeviceList()->setNoAssignMode(false);
+    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
     
     // TODO : fall back in no-assign mode when aborting a game and going back to the menu
     // how to revert assign mode :
@@ -202,7 +252,7 @@ void menuEventKarts(Widget* widget, std::string& name)
 
             Widget* area = getCurrentScreen()->getWidget("playerskarts");
             
-            PlayerKart* playerKart1 = new PlayerKart(area);
+            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area);
             getCurrentScreen()->manualAddWidget(playerKart1);
             playerKart1->add();
             g_player_karts.push_back(playerKart1);
@@ -250,6 +300,8 @@ void menuEventKarts(Widget* widget, std::string& name)
         
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         
+        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+
         StateManager::pushMenu("racesetup.stkgui");
     }
 }

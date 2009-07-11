@@ -97,9 +97,6 @@ InputManager::~InputManager()
     delete m_device_manager;
 }   // ~InputManager
 
-
-#define MAX_VALUE 32768
-
 void InputManager::handleStaticAction(int key, int value)
 {
     static int isWireframe = false;
@@ -186,7 +183,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
     
     // only store axes when they're pushed quite far
-    if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < MAX_VALUE *2/3) store_new = false;
+    if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < Input::MAX_VALUE *2/3) store_new = false;
     
     // for axis bindings, we request at least 2 different values bhefore accepting (ignore non-moving axes
     // as some devices have special axes that are at max value at rest)
@@ -223,7 +220,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         m_max_sensed_type    = type;
         
         // don't notify on first axis value (unless the axis is pushed to the maximum)
-        if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && first_value && abs(value) != MAX_VALUE)
+        if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && first_value && abs(value) != Input::MAX_VALUE)
         {
             std::cout << "not notifying on first value\n";
             return;
@@ -231,7 +228,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     }
     
     // Notify the completion of the input sensing when key is released
-    if( abs(value) < MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
+    if( abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
        m_sensed_input->btnID == btnID)
     {
         StateManager::gotSensedInput(m_sensed_input);
@@ -260,9 +257,12 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection,
                                                                      value, programaticallyGenerated, &player, &action );
 
+    if (action_found && action == PA_FIRST) return; // input handled internally by the device manager
+    
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
-    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU && m_device_manager->noAssignMode())
+    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
+        m_device_manager->playerAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
 
@@ -311,7 +311,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             // menu input
             if(!m_timer_in_use)
             {
-                if(abs(value) > MAX_VALUE*2/3)
+                if(abs(value) > Input::MAX_VALUE*2/3)
                 {
                     m_timer_in_use = true;
                     m_timer = 0.25;
@@ -342,7 +342,7 @@ bool InputManager::input(const SEvent& event)
 {
 
     //const bool programaticallyGenerated = (event.UserEvent.UserData1 == 666 && event.UserEvent.UserData1 == 999);
-    const bool programaticallyGenerated = event.EventType == EET_KEY_INPUT_EVENT && (event.KeyInput.Char == 666);
+    const bool programaticallyGenerated = false; //event.EventType == EET_KEY_INPUT_EVENT && (event.KeyInput.Char == 666);
 
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
@@ -376,7 +376,8 @@ bool InputManager::input(const SEvent& event)
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 
             if(gp->isButtonPressed(i) || isButtonPressed)
-                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0, isButtonPressed ? MAX_VALUE : 0, programaticallyGenerated);
+                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0,
+                      isButtonPressed ? Input::MAX_VALUE : 0, programaticallyGenerated);
             gp->setButtonPressed(i, isButtonPressed);
         }
 
@@ -418,7 +419,7 @@ bool InputManager::input(const SEvent& event)
 #else
                   ev.key.keysym.unicode,
 #endif
-                  MAX_VALUE, programaticallyGenerated);
+                  Input::MAX_VALUE, programaticallyGenerated);
 
         }
         else
