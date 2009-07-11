@@ -20,13 +20,15 @@
 
 #include <iostream>
 #include <assert.h>
-#include "gui/screen.hpp"
-#include "gui/skin.hpp"
-#include "gui/widget.hpp"
-#include "gui/credits.hpp"
+
 #include "io/file_manager.hpp"
-#include "gui/state_manager.hpp"
 #include "input/input_manager.hpp"
+#include "gui/credits.hpp"
+#include "gui/screen.hpp"
+#include "gui/kart_selection.hpp"
+#include "gui/skin.hpp"
+#include "gui/state_manager.hpp"
+#include "gui/widget.hpp"
 
 namespace GUIEngine
 {
@@ -219,9 +221,13 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- additionnal drawing
-    if(!StateManager::isGameState() && getCurrentScreen()->getName() == "credits.stkgui")
+    if(!StateManager::isGameState())
     {
-        Credits::getInstance()->render(elapsed_time);
+        // FIXME : don't hardcode?
+        if (getCurrentScreen()->getName() == "credits.stkgui")
+            Credits::getInstance()->render(elapsed_time);
+        else if (getCurrentScreen()->getName() == "karts.stkgui")
+            StateManager::kartSelectionUpdate(elapsed_time);
     }
 
 }

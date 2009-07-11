@@ -29,6 +29,7 @@ namespace StateManager
 {
     void setPlayer0Device(InputDevice* device);
     void firePressedOnNewDevice(InputDevice* device);
+    void kartSelectionUpdate(float delta);
     
     void menuEventKarts(GUIEngine::Widget* widget, std::string& name);
 }

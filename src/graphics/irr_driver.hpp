@@ -55,6 +55,7 @@ public:
     void                 initDevice();
     
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
+    const core::dimension2d<s32> getFrameSize() const { return m_device->getVideoDriver()->getCurrentRenderTargetSize(); }
     
     IrrlichtDevice       *getDevice()       const { return m_device;        }
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }

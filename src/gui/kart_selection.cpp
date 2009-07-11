@@ -20,6 +20,7 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "kart_selection.hpp"
+#include "graphics/irr_driver.hpp"
 #include "gui/widget.hpp"
 #include "gui/engine.hpp"
 #include "gui/screen.hpp"
@@ -58,18 +59,20 @@ namespace StateManager
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
 
+        int target_x, target_y, target_w, target_h;
+        
         PlayerKartWidget(Widget* area) : Widget()
         {
             this->m_properties[PROP_ID] = "@p1";
-            this->x = area->x;
-            this->y = area->y;
-            this->w = area->w;
-            this->h = area->h;
             
-            setSize(area);
+            setSize(area->x, area->y, area->w, area->h);
+            target_x = x;
+            target_y = y;
+            target_w = w;
+            target_h = h;
             
             playerID = new LabelWidget();
-            playerID->m_properties[PROP_TEXT] = _("Player 1 (keyboard)");
+            playerID->m_properties[PROP_TEXT] = _("Player 1 (keyboard)"); // TODO : determine this string dynamically
             playerID->m_properties[PROP_TEXT_ALIGN] = "center";
             playerID->m_properties[PROP_ID] = "@p1_label";
             playerID->x = player_id_x;
@@ -79,13 +82,13 @@ namespace StateManager
             //playerID->setParent(this);
             m_children.push_back(playerID);
             
-            const int playerAmount = UserConfigParams::m_player.size();
             playerName = new SpinnerWidget();
             playerName->x = player_name_x;
             playerName->y = player_name_y;
             playerName->w = player_name_w;
             playerName->h = player_name_h;
             
+            const int playerAmount = UserConfigParams::m_player.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
             playerName->m_properties[PROP_ID] = "@p1_spinner";
@@ -102,6 +105,15 @@ namespace StateManager
             modelView->m_properties[PROP_ID] = "@p1_model";
             //modelView->setParent(this);
             m_children.push_back(modelView);
+            
+            // Init kart model
+            KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
+            
+            this->modelView->addModel( kartModel->getModel() );
+            this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+            this->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+            this->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+            this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             
             kartName = new LabelWidget();
             kartName->m_properties[PROP_TEXT] = _("Tux");
@@ -120,31 +132,132 @@ namespace StateManager
             playerName->add();
             modelView->add();
             kartName->add();
+            
+            modelView->update(0);
+            
+            // TODO : only fill list on first add
+            const int playerAmount = UserConfigParams::m_player.size();
+            for(int n=0; n<playerAmount; n++)
+            {
+                playerName->addLabel( UserConfigParams::m_player[n].getName() );
+            }
+            
         }
-        void setSize(Widget* area)
+        void move(const int x, const int y, const int w, const int h)
         {
-            player_id_x = area->x;
-            player_id_y = area->y;
-            player_id_w = area->w;
+            target_x = x;
+            target_y = y;
+            target_w = w;
+            target_h = h;
+        }
+        
+        void onUpdate(float delta)
+        {
+            if (target_x == x && target_y == y && target_w == w && target_h == h) return;
+            
+            int move_step = (int)(delta*1000.0f);
+            
+            // move x towards target
+            if (x < target_x)
+            {
+                x += move_step;
+                if (x > target_x) x = target_x; // don't move to the other side of the target
+            }
+            else if (x > target_x)
+            {
+                x -= move_step;
+                if (x < target_x) x = target_x; // don't move to the other side of the target
+            }
+            
+            // move y towards target
+            if (y < target_y)
+            {
+                y += move_step;
+                if (y > target_y) y = target_y; // don't move to the other side of the target
+            }
+            else if (y > target_y)
+            {
+                y -= move_step;
+                if (y < target_y) y = target_y; // don't move to the other side of the target
+            }
+            
+            // move w towards target
+            if (w < target_w)
+            {
+                w += move_step;
+                if (w > target_w) w = target_w; // don't move to the other side of the target
+            }
+            else if (w > target_w)
+            {
+                w -= move_step;
+                if (w < target_w) w = target_w; // don't move to the other side of the target
+            }
+            // move h towards target
+            if (h < target_h)
+            {
+                h += move_step;
+                if (h > target_h) h = target_h; // don't move to the other side of the target
+            }
+            else if (h > target_h)
+            {
+                h -= move_step;
+                if (h < target_h) h = target_h; // don't move to the other side of the target
+            }
+            
+            setSize(x, y, w, h);
+            
+            playerID->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
+                                                                (player_id_x,
+                                                                 player_id_y,
+                                                                 player_id_x + player_id_w,
+                                                                 player_id_y + player_id_h) );
+            playerName->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
+                                                                  (player_name_x,
+                                                                   player_name_y,
+                                                                   player_name_x + player_name_w,
+                                                                   player_name_y + player_name_h) );
+            modelView->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
+                                                                 (model_x,
+                                                                  model_y,
+                                                                  model_x + model_w,
+                                                                  model_y + model_h) );
+            kartName->getIrrlichtElement()->setRelativePosition(core::rect< s32 >
+                                                                (kart_name_x,
+                                                                 kart_name_y,
+                                                                 kart_name_x + kart_name_w,
+                                                                 kart_name_y + kart_name_h) );
+            
+        }
+        
+        void setSize(const int x, const int y, const int w, const int h)
+        {
+            this->x = x;
+            this->y = y;
+            this->w = w;
+            this->h = h;
+            
+            player_id_x = x;
+            player_id_y = y;
+            player_id_w = w;
             player_id_h = 25;
             
-            player_name_w = std::min(400, area->w);
-            player_name_x = area->x + area->w/2 - player_name_w/2;
-            player_name_y = area->y + 25;
+            player_name_w = std::min(400, w);
+            player_name_x = x + w/2 - player_name_w/2;
+            player_name_y = y + 25;
             player_name_h = 40;
             
-            const int modelMaxHeight =  area->h - 25 - 65;
-            const int modelMaxWidth =  area->w;
+            const int modelMaxHeight =  h - 25 - 65;
+            const int modelMaxWidth =  w;
             const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-            const int modelY = area->y + 65;
-            model_x = area->x + area->w/2 - bestSize*1.2/2;
+            const int modelY = y + 65;
+            model_x = x + w/2 - bestSize*1.2/2;
             model_y = modelY + modelMaxHeight/2 - bestSize/2;
             model_w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
             model_h = bestSize;
             
-            kart_name_x = area->x;
-            kart_name_y = area->y + area->h - 25;;
-            kart_name_w = area->w;
+            kart_name_x = x;
+            kart_name_y = y + h - 25;;
+            kart_name_w = w;
             kart_name_h = 25;
         }
     };
@@ -198,6 +311,26 @@ void firePressedOnNewDevice(InputDevice* device)
     {
         std::cout << "Fire was pressed on a gamepad\n";
     }
+
+    // make a copy of the area, ands move it to be outside the screen
+    Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
+    rightarea.x = irr_driver->getFrameSize().Width;
+    
+    PlayerKartWidget* newPlayer = new PlayerKartWidget(&rightarea);
+    getCurrentScreen()->manualAddWidget(newPlayer);
+    g_player_karts.push_back(newPlayer);
+    newPlayer->add();
+    
+    const int amount = g_player_karts.size();
+    
+    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    const int splitWidth = fullarea->w / amount;
+    
+    for (int n=0; n<amount; n++)
+    {
+        g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
+    }
+    
     
 }
     
@@ -230,6 +363,16 @@ void setPlayer0Device(InputDevice* device)
     // input_manager->getDeviceList()->setNoAssignMode(true);
 }
     
+    
+void kartSelectionUpdate(float delta)
+{
+    const int amount = g_player_karts.size();
+    for (int n=0; n<amount; n++)
+    {
+        g_player_karts[n].onUpdate(delta);
+    }
+}
+    
 /**
  * Callback handling events from the kart selection menu
  */
@@ -252,11 +395,6 @@ void menuEventKarts(Widget* widget, std::string& name)
 
             Widget* area = getCurrentScreen()->getWidget("playerskarts");
             
-            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area);
-            getCurrentScreen()->manualAddWidget(playerKart1);
-            playerKart1->add();
-            g_player_karts.push_back(playerKart1);
-            
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
             for(int n=0; n<kart_amount; n++)
@@ -268,23 +406,11 @@ void menuEventKarts(Widget* widget, std::string& name)
                 
             }
             
-            // Build player list
-            const int playerAmount = UserConfigParams::m_player.size();
-            for(int n=0; n<playerAmount; n++)
-            {
-                playerKart1->playerName->addLabel( UserConfigParams::m_player[n].getName() );
-            }
-            
-            // Init kart model
-            KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
-            
-            playerKart1->modelView->addModel( kartModel->getModel() );
-            playerKart1->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            playerKart1->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            playerKart1->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            playerKart1->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-            playerKart1->modelView->update(0);
-            
+            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area);
+            getCurrentScreen()->manualAddWidget(playerKart1);
+            playerKart1->add();
+            g_player_karts.push_back(playerKart1);
+
             
             getCurrentScreen()->m_inited = true;
         }
