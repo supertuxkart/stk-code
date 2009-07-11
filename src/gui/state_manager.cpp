@@ -56,7 +56,7 @@ namespace StateManager
       */
     ptr_vector<ActivePlayer, HOLD> g_active_players;
     
-    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers()
+    ptr_vector<ActivePlayer, HOLD>& getActivePlayers()
     {
         return g_active_players;
     }

@@ -99,10 +99,6 @@ namespace GUIEngine
         virtual bool rightPressed() { return false; }
         virtual bool leftPressed() { return false; }
         
-        /** used when you set parents - see m_event_handler explainations below.
-            returns whether main event callback should be notified or not */
-        virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
-        
         /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
             Returns 'true' if main event handler should be notified of a change. */
@@ -112,16 +108,6 @@ namespace GUIEngine
         virtual void focused() {}
         
         void readCoords(Widget* parent=NULL);
-        
-        /**
-          * This is set to NULL by default; set to something else in a widget to mean
-          * that events happening on this widget should not go straight into the
-          * event handler. Instead, they will first be passed to m_event_handler->transmitEvent,
-          * which is usually the parent analysing events from its children.
-          * This is especially useful with logical widgets built with more than
-          * one irrlicht widgets (e.g. Spinner, Ribbon)
-          */
-        Widget* m_event_handler;
         
         IGUIElement* m_parent;
         
@@ -133,6 +119,16 @@ namespace GUIEngine
         IGUIElement* m_element;
         
     public:
+        /**
+         * This is set to NULL by default; set to something else in a widget to mean
+         * that events happening on this widget should not go straight into the
+         * event handler. Instead, they will first be passed to m_event_handler->transmitEvent,
+         * which is usually the parent analysing events from its children.
+         * This is especially useful with logical widgets built with more than
+         * one irrlicht widgets (e.g. Spinner, Ribbon)
+         */
+        Widget* m_event_handler;
+        
         Widget();
         virtual ~Widget() {}
         
@@ -143,6 +139,10 @@ namespace GUIEngine
 
         
         virtual void update(float delta) { }
+        
+        /** used when you set parents - see m_event_handler explainations below.
+         returns whether main event callback should be notified or not */
+        virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
         
         /**
          * Create and add the irrLicht widget(s) associated with this object.

@@ -37,7 +37,7 @@ namespace StateManager
     bool isGameState();
     void reshowTopMostMenu();
     
-    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
+    ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
     
     /**
       * Adds a new player to the list of active players. StateManager takes ownership of the object

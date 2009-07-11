@@ -49,11 +49,15 @@ namespace StateManager
     
     class PlayerKartWidget : public Widget
     {
+        ActivePlayer* m_associatedPlayer;
     public:
         LabelWidget* playerIDLabel;
         SpinnerWidget* playerName;
         ModelViewWidget* modelView;
         LabelWidget* kartName;
+        
+        int playerID;
+        std::string spinnerID;
         
         int player_id_x, player_id_y, player_id_w, player_id_h;
         int player_name_x, player_name_y, player_name_w, player_name_h;
@@ -62,8 +66,12 @@ namespace StateManager
 
         int target_x, target_y, target_w, target_h;
         
-        PlayerKartWidget(Widget* area, const int playerID) : Widget()
+        PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID) : Widget()
         {
+            m_associatedPlayer = associatedPlayer;
+            
+            this->playerID = playerID;
+            
             // FIXME : if a player removes itself, all IDs need to be updated
             this->m_properties[PROP_ID] = StringUtils::insert_values("@p%i", playerID);
             
@@ -90,13 +98,17 @@ namespace StateManager
             playerName->w = player_name_w;
             playerName->h = player_name_h;
             
+            spinnerID = StringUtils::insert_values("@p%i_spinner", playerID);
+            
             const int playerAmount = UserConfigParams::m_player.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
-            playerName->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_spinner", playerID);
+            playerName->m_properties[PROP_ID] = spinnerID;
             //playerName->setParent(this);
             m_children.push_back(playerName);
             
+            
+            playerName->m_event_handler = this;
             
             modelView = new ModelViewWidget();
             
@@ -227,6 +239,35 @@ namespace StateManager
             
         }
         
+        virtual bool transmitEvent(Widget* w, std::string& originator)
+        {
+            if (w->m_event_handler != NULL && w->m_event_handler != this)
+            {
+                if (!w->m_event_handler->transmitEvent(w, originator)) return false;
+            }
+            
+            Widget* topmost = w;
+            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+             notified of clicks onto themselves so they can toggle their state. )
+             */
+            while(topmost->m_event_handler != NULL && topmost->m_event_handler != topmost)
+            {
+                topmost = topmost->m_event_handler;
+                
+                std::string name = topmost->m_properties[PROP_ID];
+                
+                if (name == spinnerID)
+                {
+                    m_associatedPlayer->setPlayer( UserConfigParams::m_player.get(playerName->getValue()) );
+                    return false; // do not continue propagating the event
+                }
+
+            }
+         
+            return true; // continue propagating the event
+        }
+        
         void setSize(const int x, const int y, const int w, const int h)
         {
             this->x = x;
@@ -314,11 +355,15 @@ void firePressedOnNewDevice(InputDevice* device)
     Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
     rightarea.x = irr_driver->getFrameSize().Width;
     
+    ActivePlayer* aplayer = new ActivePlayer( UserConfigParams::m_player.get(0) );
+    
     // FIXME : player ID needs to be synced with active player list
-    PlayerKartWidget* newPlayer = new PlayerKartWidget(&rightarea, g_player_karts.size());
+    PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
     getCurrentScreen()->manualAddWidget(newPlayer);
     g_player_karts.push_back(newPlayer);
     newPlayer->add();
+    
+    StateManager::addActivePlayer(aplayer);
     
     const int amount = g_player_karts.size();
     
@@ -351,7 +396,6 @@ void setPlayer0Device(InputDevice* device)
         std::cout << "Player 0 is using a gamepad\n";
     }
     
-    // TODO : support more than 1 player
     ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_player.get(0));
     StateManager::addActivePlayer( newPlayer );
     newPlayer->setDevice(device);
@@ -407,8 +451,8 @@ void menuEventKarts(Widget* widget, std::string& name)
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
                 
             }
-            
-            PlayerKartWidget* playerKart1 = new PlayerKartWidget(area, 0 /* first player */);
+
+            PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::getActivePlayers().get(0), area, 0 /* first player */);
             getCurrentScreen()->manualAddWidget(playerKart1);
             playerKart1->add();
             g_player_karts.push_back(playerKart1);
@@ -425,6 +469,14 @@ void menuEventKarts(Widget* widget, std::string& name)
     {
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
+        
+        ptr_vector< ActivePlayer, HOLD >& players = StateManager::getActivePlayers();
+        std::cout << "==========\n" << players.size() << " players :\n";
+        for(int n=0; n<players.size(); n++)
+        {
+            std::cout << "     Player " << n << " is " << players[n].getPlayer()->getName() << std::endl;
+        }
+        std::cout << "==========\n";
         
         g_player_karts.clearWithoutDeleting();      
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
