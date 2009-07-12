@@ -196,7 +196,7 @@ void ThreeStrikesBattle::restartRace()
 }
 //void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* caller)
+KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 {
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)

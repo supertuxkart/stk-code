@@ -250,18 +250,14 @@ void LinearWorld::newLap(unsigned int kart_index)
         if(time_per_lap < getFastestLapTime() && raceHasLaps())
         {
             setFastestLap(kart, time_per_lap);
-            RaceGUI* m=(RaceGUI*)getRaceGUI();
-            if(m)
-            {
-                m->addMessage(_("New fastest lap"), NULL, 
-                    2.0f, 40, 100, 210, 100);
-                std::string s = StringUtils::timeToString(time_per_lap);
+            m_race_gui->addMessage(_("New fastest lap"), NULL, 
+                                   2.0f, 40, 100, 210, 100);
+            std::string s = StringUtils::timeToString(time_per_lap);
 
-                std::ostringstream m_fastest_lap_message;
-                m_fastest_lap_message << s << ": " << kart->getName();
-                m->addMessage(m_fastest_lap_message.str(), NULL, 
-                    2.0f, 40, 100, 210, 100);
-            }   // if m
+            std::ostringstream m_fastest_lap_message;
+            m_fastest_lap_message << s << ": " << kart->getName();
+            m_race_gui->addMessage(m_fastest_lap_message.str(), NULL, 
+                                   2.0f, 40, 100, 210, 100);
         } // end if new fastest lap
     }
     kart_info.m_lap_start_time = getTime();
@@ -314,7 +310,7 @@ float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo(const RaceGUI* caller)
+KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 {
     int   laps_of_leader       = -1;
     float time_of_leader       = -1;
@@ -565,10 +561,8 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     if(!m_kart[i]->isPlayerKart()) return;
     if(!m_kart_info[i].m_on_road) return;
 
-    RaceGUI* m = getRaceGUI();
-    // This can happen if the option menu is called, since the
-    // racegui gets deleted
-    if(!m) return;
+    // FIXME: Don't do this if the in-game option menu is on the screen!
+    // if(option_menu) return;
 
     const Kart *kart=m_kart[i];
     // If the kart can go in more than one directions from the current track
@@ -589,7 +583,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
         kart->getVelocityLC().getY() > 0.0f        &&
         !kart->hasFinishedRace() )
     {
-        m->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
+        m_race_gui->addMessage(_("WRONG WAY!"), kart, -1.0f, 60);
     }  // if angle is too big
 }   // checkForWrongDirection
 

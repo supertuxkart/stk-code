@@ -135,9 +135,9 @@ std::string FollowTheLeaderRace::getInternalCode() const
     return "FOLLOW_LEADER";
 }
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* caller)
+KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 {
-    LinearWorld::getKartsDisplayInfo(caller);
+    LinearWorld::getKartsDisplayInfo();
     m_kart_display_info[0].special_title = _("Leader");
     return m_kart_display_info;
 }

@@ -344,7 +344,7 @@ void startGame()
     
     StateManager::enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
-    race_manager->setTrack("beach");
+    race_manager->setTrack("lighthouse");
     race_manager->setNumLaps( 3 );
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );

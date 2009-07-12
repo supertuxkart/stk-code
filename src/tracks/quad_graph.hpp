@@ -60,6 +60,7 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
+    void         drawMiniMap(const core::rect<s32> &where);
 
     /** Returns the number of nodes in the graph. */
     unsigned int   getNumNodes() const { return m_all_nodes.size();         } 

@@ -27,7 +27,6 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "modes/linear_world.hpp"
 #include "network/flyable_info.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"

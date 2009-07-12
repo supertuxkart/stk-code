@@ -33,7 +33,6 @@
 #include "gui/state_manager.hpp"
 #include "gui/modaldialog.hpp"
 #include "gui/engine.hpp"
-#include "gui/race_gui.hpp"
 #include "gui/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
@@ -129,10 +128,6 @@ void InputManager::handleStaticAction(int key, int value)
 #endif
 		case KEY_F12:
 			UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
-			if(UserConfigParams::m_display_fps)
-			{
-                getRaceGUI()->resetFPSCounter();
-            }
 			break;
 		case KEY_F11:
 			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);

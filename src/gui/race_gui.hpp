@@ -52,9 +52,6 @@ struct KartIconDisplayInfo
     int lap;
 };
 
-extern RaceGUI* getRaceGUI();
-void timeToString(const double TIME, char *s);
-
 class RaceGUI
 {
 private:
@@ -92,14 +89,6 @@ private:
     };
 
 private:
-#ifdef HAVE_IRRLICHT
-    gui::IGUIStaticText *m_time;
-    gui::IGUIImage     **m_icons;
-    gui::IGUIImage      *m_attachment_icon;
-#endif
-    //ulClock        m_fps_timer;
-    int            m_fps_counter;
-    char           m_fps_string[10];
     const char    *m_pos_string [11];
     Material      *m_speed_back_icon;
     Material      *m_speed_fore_icon;
@@ -108,7 +97,7 @@ private:
     AllMessageType m_messages;
 
     /* Display informat on screen */
-    void drawStatusText        (const float dt);
+    void drawStatusText        ();
     void drawEnergyMeter       (Kart *player_kart,
                                 int   offset_x, int   offset_y,
                                 float ratio_x,  float ratio_y  );
@@ -130,15 +119,13 @@ private:
                                    int offset_y, float ratio_x, float ratio_y  );
 public:
 
-    RaceGUI();
-    ~RaceGUI();
+         RaceGUI();
+        ~RaceGUI();
+    void render();
     void update(float dt);
-    void select() {}
-    void handleKartAction(PlayerAction ka, int value);
     void addMessage(const std::string &m, const Kart *kart, float time, 
                     int fonst_size, int red=255, int green=0, int blue=255);
     
-    void resetFPSCounter();
 };
 
 #endif

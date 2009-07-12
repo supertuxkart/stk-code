@@ -49,6 +49,8 @@ private:
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
+    void renderBulletDebugView();
+    void displayFPS();
 public:
                           IrrDriver();
                          ~IrrDriver();
@@ -90,7 +92,9 @@ public:
     void showPointer();
     void hidePointer();
     
-    void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector<Vec3>& mesh_location, video::ITexture* target, float angle);
+    void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
+                         std::vector<Vec3>& mesh_location, 
+                         video::ITexture* target, float angle);
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

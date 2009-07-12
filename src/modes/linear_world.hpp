@@ -22,8 +22,6 @@
 #include <vector>
 
 struct KartIconDisplayInfo;
-class RaceGUI;
-
 
 /*
  * A 'linear world' is a subcategory of world used in 'standard' races, i.e.
@@ -90,7 +88,7 @@ public:
     void            setTimeAtLapForKart(float t, const int kart_id);
     float           getTimeAtLapForKart(const int kart_id) const;
 
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
+    virtual KartIconDisplayInfo* getKartsDisplayInfo();
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     
     virtual void    terminateRace();

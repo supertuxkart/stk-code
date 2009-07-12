@@ -214,47 +214,47 @@ namespace StateManager
             // move x towards target
             if (x < target_x)
             {
-                x += move_step*x_speed;
+                x += (int)(move_step*x_speed);
                 if (x > target_x) x = target_x; // don't move to the other side of the target
             }
             else if (x > target_x)
             {
-                x -= move_step*x_speed;
+                x -= (int)(move_step*x_speed);
                 if (x < target_x) x = target_x; // don't move to the other side of the target
             }
             
             // move y towards target
             if (y < target_y)
             {
-                y += move_step*y_speed;
+                y += (int)(move_step*y_speed);
                 if (y > target_y) y = target_y; // don't move to the other side of the target
             }
             else if (y > target_y)
             {
-                y -= move_step*y_speed;
+                y -= (int)(move_step*y_speed);
                 if (y < target_y) y = target_y; // don't move to the other side of the target
             }
             
             // move w towards target
             if (w < target_w)
             {
-                w += move_step*w_speed;
+                w += (int)(move_step*w_speed);
                 if (w > target_w) w = target_w; // don't move to the other side of the target
             }
             else if (w > target_w)
             {
-                w -= move_step*w_speed;
+                w -= (int)(move_step*w_speed);
                 if (w < target_w) w = target_w; // don't move to the other side of the target
             }
             // move h towards target
             if (h < target_h)
             {
-                h += move_step*h_speed;
+                h += (int)(move_step*h_speed);
                 if (h > target_h) h = target_h; // don't move to the other side of the target
             }
             else if (h > target_h)
             {
-                h -= move_step*h_speed;
+                h -= (int)(move_step*h_speed);
                 if (h < target_h) h = target_h; // don't move to the other side of the target
             }
             
@@ -329,9 +329,9 @@ namespace StateManager
             if (h < 175)
             {
                 const float factor = h / 175.0f;
-                kart_name_h *= factor;
-                player_name_h *= factor;
-                player_id_h *= factor;
+                kart_name_h   = (int)(kart_name_h*factor);
+                player_name_h = (int)(player_name_h*factor);
+                player_id_h   = (int)(player_id_h*factor);
             }
             
             // --- layout
@@ -345,9 +345,9 @@ namespace StateManager
             const int modelMaxWidth =  w;
             const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
             const int modelY = y + player_name_h + player_id_h;
-            model_x = x + w/2 - bestSize*1.2/2;
+            model_x = x + w/2 - (int)(bestSize*1.2f/2);
             model_y = modelY + modelMaxHeight/2 - bestSize/2;
-            model_w = bestSize*1.2; // FIXME : for some reason, it looks better this way, though full square should be ok
+            model_w = (int)(bestSize*1.2f); // FIXME : for some reason, it looks better this way, though full square should be ok
             model_h = bestSize;
             
             kart_name_x = x;

@@ -494,6 +494,78 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
 }   // setAmbientLight
 
 // ----------------------------------------------------------------------------
+/** Renders the bullet debug view using glut.
+ */
+void IrrDriver::renderBulletDebugView()
+{
+#ifdef HAVE_GLUT
+    // Use bullets debug drawer
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    /*	light_position is NOT default value	*/
+    GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
+    GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glClearColor(0.8f,0.8f,0.8f,0);
+
+    glCullFace(GL_BACK);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    float f=2.0f;
+    glFrustum(-f, f, -f, f, 1.0, 1000.0);
+
+    Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
+    gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
+        xyz.getX(), xyz.getY(),     xyz.getZ(),
+        0.0f, 0.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
+
+    for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+    {
+        Kart *kart=RaceManager::getKart((int)i);
+        if(!kart->isEliminated()) kart->draw();
+    }
+    RaceManager::getWorld()->getPhysics()->draw();
+#endif
+}   // renderBulletDebugView
+
+// ----------------------------------------------------------------------------
+/** Displays the FPS on the screen.
+ */
+void IrrDriver::displayFPS()
+{
+    gui::IGUIFont* font = getRaceFont();
+    const int fps       = m_device->getVideoDriver()->getFPS();
+
+    static char buffer[32];
+    sprintf(buffer, "FPS : %i", fps);
+
+    core::stringw fpsString = buffer;
+
+    static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
+    font->draw( fpsString.c_str(), core::rect< s32 >(0,0,600,200), fpsColor, true );
+}   // updateFPS
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  */
@@ -502,96 +574,32 @@ void IrrDriver::update(float dt)
     if(!m_device->run()) return;
     
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
-    
-    if(!StateManager::isGameState())
-    {
-        // this code needs to go outside beginScene() / endScene() since
-        // the model view widget will do off-screen rendering there
-        const int updateAmount = GUIEngine::needsUpdate.size();
-        for(int n=0; n<updateAmount; n++)
+
+    {    // just to mark the beding/end scene block
+        if(!StateManager::isGameState())
         {
-            GUIEngine::needsUpdate[n].update(dt);
+            // this code needs to go outside beginScene() / endScene() since
+            // the model view widget will do off-screen rendering there
+            const int updateAmount = GUIEngine::needsUpdate.size();
+            for(int n=0; n<updateAmount; n++)
+            {
+                GUIEngine::needsUpdate[n].update(dt);
+            }
         }
-    }
-    
-    
-#ifdef HAVE_GLUT
-    if(UserConfigParams::m_bullet_debug && race_manager->raceIsActive())
-    {
-        // Use bullets debug drawer
-        GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-        GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-        GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-        /*	light_position is NOT default value	*/
-        GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
-        GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
 
-        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-
-        glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
-        glEnable(GL_LIGHT1);
-
-        glShadeModel(GL_SMOOTH);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-
-        glClearColor(0.8f,0.8f,0.8f,0);
-
-        glCullFace(GL_BACK);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        float f=2.0f;
-        glFrustum(-f, f, -f, f, 1.0, 1000.0);
-
-        Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
-        gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
-                  xyz.getX(), xyz.getY(),     xyz.getZ(),
-                  0.0f, 0.0f, 1.0f);
-        glMatrixMode(GL_MODELVIEW);
-
-        for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+        if(race_manager->raceIsActive())
         {
-            Kart *kart=RaceManager::getKart((int)i);
-            if(!kart->isEliminated()) kart->draw();
+            if(UserConfigParams::m_bullet_debug) renderBulletDebugView();
+            m_scene_manager->drawAll();
+            RaceManager::getWorld()->render();
         }
-        RaceManager::getWorld()->getPhysics()->draw();
+        else   // GUI is active
+            GUIEngine::render(dt);
 
-    }
-    else
-#endif
-    {
-        m_scene_manager->drawAll();
-        GUIEngine::render(dt);
-    }
-    
-    // draw FPS if enabled
-    if ( UserConfigParams::m_display_fps )
-    {
-        // TODO : don't re-create string every frame
-        video::IVideoDriver* driver = irr_driver->getDevice()->getVideoDriver();
-        gui::IGUIFont* font = irr_driver->getRaceFont();
-        const int fps = driver->getFPS();
-        
-        static char buffer[32];
-        sprintf(buffer, "FPS : %i", fps);
-        
-        core::stringw fpsString = buffer;
-        
-        //std::cout << "===== Drawing FPS " << fpsString.c_str() << "=====\n";
-        
-        static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
-        font->draw( fpsString.c_str(), core::rect< s32 >(0,0,600,200), fpsColor, true );
-    }
-    
+        // draw FPS if enabled
+        if ( UserConfigParams::m_display_fps ) displayFPS();
+
+    }   // just to makr the begin/end scene block
     m_device->getVideoDriver()->endScene();
     
 }   // update

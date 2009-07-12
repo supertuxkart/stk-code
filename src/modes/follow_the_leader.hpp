@@ -37,7 +37,7 @@ public:
     virtual void restartRace();
     virtual std::string getInternalCode() const;
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
+    virtual KartIconDisplayInfo* getKartsDisplayInfo();
     
     virtual bool raceHasLaps(){ return false; }
     

@@ -54,8 +54,11 @@
 //-----------------------------------------------------------------------------
 World::World() : TimedRace()
 {
-    m_physics = NULL;
-}
+    m_physics  = NULL;
+    m_race_gui = NULL;
+}   // World
+
+// ----------------------------------------------------------------------------
 void World::init()
 {
     RaceManager::setWorld(this);
@@ -153,12 +156,8 @@ void World::init()
     // objects need to allocate data structures depending on the number
     // of karts.
     m_track->reset();
-#ifdef SSG_BACKFACE_COLLISIONS_SUPPORTED
-    //ssgSetBackFaceCollisions ( !not defined! race_manager->mirror ) ;
-#endif
 
-    // TODO - race GUI
-    //menu_manager->switchToRace();
+    m_race_gui = new RaceGUI();
 
     m_track->startMusic();
 
@@ -169,6 +168,8 @@ void World::init()
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    delete m_race_gui;
+
     item_manager->cleanup();
     delete race_state;
     // In case that a race is aborted (e.g. track not found) m_track is 0.
@@ -185,20 +186,8 @@ World::~World()
         delete m_physics;
 
     sound_manager -> stopMusic();
-/*
-    sgVec3 sun_pos;
-    sgVec4 ambient_col, specular_col, diffuse_col;
-    sgSetVec3 ( sun_pos, 0.0f, 0.0f, 1.0f );
-    sgSetVec4 ( ambient_col , 0.2f, 0.2f, 0.2f, 1.0f );
-    sgSetVec4 ( specular_col, 1.0f, 1.0f, 1.0f, 1.0f );
-    sgSetVec4 ( diffuse_col , 1.0f, 1.0f, 1.0f, 1.0f );
-
-    ssgGetLight ( 0 ) -> setPosition ( sun_pos ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_AMBIENT , ambient_col  ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_DIFFUSE , diffuse_col ) ;
-    ssgGetLight ( 0 ) -> setColour ( GL_SPECULAR, specular_col ) ;
- */
 }   // ~World
+
 //-----------------------------------------------------------------------------
 void World::terminateRace()
 {
@@ -267,6 +256,16 @@ void World::resetAllKarts()
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------
+/** Called during rendering. In this function direct calls to the graphics
+ *  are possible, e.g. using an irrlicht font object to directly print to
+ *  the screen, ...
+ */
+void World::render()
+{
+    m_race_gui->render();
+}   // render
+
+//-----------------------------------------------------------------------------
 void World::update(float dt)
 {
     if(history->replayHistory()) dt=history->getNextDelta();
@@ -290,7 +289,7 @@ void World::update(float dt)
 
     projectile_manager->update(dt);
     item_manager->update(dt);
-
+    m_race_gui->update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -400,25 +399,22 @@ void World::printProfileResultAndExit()
 void World::removeKart(int kart_number)
 {
     Kart *kart = m_kart[kart_number];
+
     // Display a message about the eliminated kart in the race gui 
-    RaceGUI* m=getRaceGUI();
-    if(m)
-    {
-        for (std::vector<PlayerKart*>::iterator i  = m_player_karts.begin();
-                                                i != m_player_karts.end();  i++ )
-        {   
-            if(*i==kart) 
-            {
-                m->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
-            }
-            else
-            {
-                std::string s = _("'%s' has\nbeen eliminated.");
-                m->addMessage( StringUtils::insert_values(s, kart->getName()),
-                                                          *i, 2.0f, 60);
-            }
-        }   // for i in kart
-    }   // if raceMenu exist
+    for (std::vector<PlayerKart*>::iterator i  = m_player_karts.begin();
+        i != m_player_karts.end();  i++ )
+    {   
+        if(*i==kart) 
+        {
+            m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
+        }
+        else
+        {
+            std::string s = _("'%s' has\nbeen eliminated.");
+            m_race_gui->addMessage( StringUtils::insert_values(s, kart->getName()),
+                *i, 2.0f, 60);
+        }
+    }   // for i in kart
     if(kart->isPlayerKart())
     {
         // Change the camera so that it will be attached to the leader 

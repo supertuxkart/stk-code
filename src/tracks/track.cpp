@@ -551,14 +551,6 @@ void Track::loadCurves(const XMLNode &node)
 	{
 		const XMLNode *curve = node.getNode(i);
 		m_all_curves.push_back(new BezierCurve(*curve));
-		float t=0;
-		const BezierCurve &c=*m_all_curves[m_all_curves.size()-1];
-		while(t<=c.getNumPoints()-0.9998)  // allow for some rounding errors
-		{
-			Vec3 xyz = c.getXYZ(t);
-			printf("t %f xyz %f %f %f\n", t, xyz.getX(),xyz.getY(),xyz.getZ());
-			t=t+0.1f;
-		}
 	}   // for i<node.getNumNodes
 }   // loadCurves
 

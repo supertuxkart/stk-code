@@ -52,7 +52,7 @@ public:
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     //virtual bool enableBonusBoxes();
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
+    virtual KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     virtual bool acceptPowerup(const int type) const;

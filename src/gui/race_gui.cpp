@@ -36,28 +36,6 @@
 #include "irrlicht.h"
 using namespace irr;
 
-RaceGUI* instance = NULL;
-RaceGUI* getRaceGUI()
-{
-    if(instance == NULL) instance = new RaceGUI();
-    return instance;
-}
-
-// ----------------------------------------------------------------------------
-/** Converts a time into a string.
- *  \param time Time in seconds.
- *  \param s Output string.
- */
-void XXtimeToString(const double TIME, char *s)
-{
-    int min     = (int) floor ( TIME / 60.0 ) ;
-    int sec     = (int) floor ( TIME - (double) ( 60 * min ) ) ;
-    int tenths  = (int) floor ( 10.0f * (TIME - (double)(sec + 60* min)));
-    sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
-}   // TimeToString
-// ----------------------------------------------------------------------------
-
-
 RaceGUI::RaceGUI()
 {
     // FIXME: translation problem
@@ -73,12 +51,7 @@ RaceGUI::RaceGUI()
     m_pos_string[9] = "9th";
     m_pos_string[10] = "10th";
 
-#ifdef HAVE_IRRLICHT
     gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
-    core::rect<s32> pos(UserConfigParams::m_width-60, 10, 
-                        UserConfigParams::m_width,    50);
-    m_time = gui_env->addStaticText(L"", pos);
-    m_time->setOverrideFont(irr_driver->getRaceFont());
 
     int icon_width=40;
     int icon_player_width=50;
@@ -88,19 +61,7 @@ RaceGUI::RaceGUI()
         icon_player_width = 35;
     }
 
-    m_icons = new gui::IGUIImage*[race_manager->getNumKarts()];
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
-    {
-        core::position2d<s32> p(0, i*20);
-        Kart *kart  = race_manager->getKart(i);
-        Material *m = kart->getKartProperties()->getIconMaterial();
-        // FIXME: The icons needs to be resized.
-        m_icons[i]  = irr_driver->getGUI()->addImage(m->getTexture(), p);
-    }
-    core::rect<s32> p(UserConfigParams::m_width-10, 0, 
-                      UserConfigParams::m_width+10, 10);
-    m_attachment_icon = irr_driver->getGUI()->addImage(p);
-#else
+#ifndef HAVE_IRRLICHT
     m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
     m_speed_back_icon->getState()->disable(GL_CULL_FACE);
     m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");
@@ -110,12 +71,6 @@ RaceGUI::RaceGUI()
     m_plunger_face->getState()->disable(GL_CULL_FACE);
 #endif
     
-    m_fps_counter = 0;
-    m_fps_string[0]=0;
-    //m_fps_timer.reset();
-    //m_fps_timer.update();
-    //m_fps_timer.setMaxDelta(1000);
-
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -125,25 +80,26 @@ RaceGUI::~RaceGUI()
 }   // ~Racegui
 
 //-----------------------------------------------------------------------------
-void RaceGUI::resetFPSCounter()
-{
-    // TODO - FPS
-    //m_fps_timer.reset();
-    //m_fps_timer.setMaxDelta(1000);
-    m_fps_counter=0;
-}
-//-----------------------------------------------------------------------------
-
+/** Called before rendering, so no direct output to the screen can be done
+ *  here.
+ *  \param dt Time step size.
+ */
 void RaceGUI::update(float dt)
 {
-    drawStatusText(dt);
     cleanupMessages(dt);
-
-    //BaseGUI::update( dt );
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Displays the racing time on the screen.
+/** Render the race gui. Direct access to the screen is possible here, since 
+ *  this is called during irrlicht rendering.
+ */
+void RaceGUI::render()
+{
+    drawStatusText();
+}   // render
+
+//-----------------------------------------------------------------------------
+/** Displays the racing time on the screen.s
  */
 void RaceGUI::drawTimer ()
 {
@@ -151,12 +107,13 @@ void RaceGUI::drawTimer ()
     
     if(!RaceManager::getWorld()->shouldDrawTimer()) return;
     std::string s = StringUtils::timeToString(RaceManager::getWorld()->getTime());
-#ifdef HAVE_IRRLICHT
-    m_time->setText(core::stringw(s.c_str()).c_str());
-#else
-    font_race->PrintShadow(str, 60, UserConfigParams::m_width-260,
-                           UserConfigParams::m_height-64);
-#endif
+    core::stringw sw(s.c_str());
+
+    static video::SColor time_color = video::SColor(255, 255, 255, 255);
+    core::rect<s32> pos(UserConfigParams::m_width-120, 10, 
+                        UserConfigParams::m_width,     50);
+    gui::IGUIFont* font = irr_driver->getRaceFont();
+    font->draw(sw.c_str(), pos, time_color);
 }   // drawTimer
 
 //-----------------------------------------------------------------------------
@@ -326,7 +283,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
 #ifdef HAVE_IRRLICHT
-    m_attachment_icon->setImage(powerup->getIcon()->getTexture());
+//    m_attachment_icon->setImage(powerup->getIcon()->getTexture());
 #else
     powerup->getIcon()->apply();
 
@@ -682,58 +639,42 @@ void RaceGUI::drawMusicDescription()
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawStatusText(const float dt)
+void RaceGUI::drawStatusText()
 {
     assert(RaceManager::getWorld() != NULL);
-
-    glMatrixMode   ( GL_MODELVIEW ) ;
-    glPushMatrix   () ;
-    glLoadIdentity () ;
-
-    glMatrixMode   ( GL_PROJECTION ) ;
-    glPushMatrix   () ;
-    glLoadIdentity () ;
-
-    glPushAttrib   ( GL_ENABLE_BIT | GL_LIGHTING_BIT ) ;
-    glDisable      ( GL_DEPTH_TEST   );
-    glDisable      ( GL_LIGHTING     );
-    glDisable      ( GL_FOG          );
-    glDisable      ( GL_CULL_FACE    );
-    glEnable       ( GL_ALPHA_TEST   );
-    glAlphaFunc    ( GL_GREATER, 0.1f);
-    glEnable       ( GL_BLEND        );
-
-    glOrtho        ( 0, UserConfigParams::m_width, 0, UserConfigParams::m_height, 0, 100 ) ;
     switch (RaceManager::getWorld()->getPhase())
     {
     case READY_PHASE:
         {
-            GLfloat const COLORS[] = { 0.9f, 0.66f, 0.62f, 1.0f };
+            static video::SColor color = video::SColor(255, 230, 168, 158);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            gui::IGUIFont* font = irr_driver->getRaceFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
-            font_race->PrintShadow( _("Ready!"), 90,
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   COLORS );
+            core::stringw s=_("Ready!");
+            font->draw(s.c_str(), pos, color, true, true);
         }
         break;
     case SET_PHASE:
         {
-            GLfloat const COLORS[] = { 0.9f, 0.9f, 0.62f, 1.0f };
+            static video::SColor color = video::SColor(255, 230, 230, 158);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            gui::IGUIFont* font = irr_driver->getRaceFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
-            font_race->PrintShadow( _("Set!"), 90,
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   COLORS );
+            core::stringw s=_("Set!");
+            font->draw(s.c_str(), pos, color, true, true);
         }
         break;
     case GO_PHASE:
         {
-            GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
+            static video::SColor color = video::SColor(255, 100, 209, 100);
+            core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
+                                UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
+            gui::IGUIFont* font = irr_driver->getRaceFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
-            font_race->PrintShadow( _("Go!"), 90, 
-                                   Font::CENTER_OF_SCREEN,
-                                   Font::CENTER_OF_SCREEN,
-                                   COLORS );
+            core::stringw s=_("Go!");
+            font->draw(s.c_str(), pos, color, true, true);
         }
         break;
     default: 
@@ -744,9 +685,10 @@ void RaceGUI::drawStatusText(const float dt)
     {
         if(RaceManager::getWorld()->m_debug_text[i] != "")
         {
-            GLfloat const COLORS[] = { 0.39f, 0.82f, 0.39f, 1.0f };
-            font_race->Print( RaceManager::getWorld()->m_debug_text[i].c_str(),
-                             20, 20, 200 -i*20, COLORS );
+            static video::SColor color = video::SColor(255, 100, 209, 100);
+            core::rect<s32> pos(20, i*20, 20, (i+1)*20);
+            gui::IGUIFont* font = irr_driver->getRaceFont();
+            font->draw(RaceManager::getWorld()->m_debug_text[i].c_str(), pos, color);
         }
     }
 
@@ -760,111 +702,103 @@ void RaceGUI::drawStatusText(const float dt)
     // The penalty message needs to be displayed for up to one second
     // after the start of the race, otherwise it disappears if 
     // "Go" is displayed and the race starts
+    const unsigned int num_players = race_manager->getNumLocalPlayers();
     if(RaceManager::getWorld()->isStartPhase() || RaceManager::getWorld()->getTime()<1.0f)
     {
-        for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+        for(unsigned int i=0; i<num_players; i++)
         {
             if(RaceManager::getWorld()->getLocalPlayerKart(i)->earlyStartPenalty())
             {
-                GLfloat const COLORS[] = { 0.78f, 0.025f, 0.025f, 1.0f };
-
-                font_race->PrintShadow( _("Penalty time!!"), 80,
-                                       Font::CENTER_OF_SCREEN, 200,
-                                        COLORS );
+                static video::SColor color = video::SColor(255, 179, 6, 6);
+                // FIXME: the position should take split screen into account!
+                core::rect<s32> pos(UserConfigParams::m_width>>1, (UserConfigParams::m_height>>1)-40,
+                                    UserConfigParams::m_width>>1, (UserConfigParams::m_height>>1)-40);
+                gui::IGUIFont* font = irr_driver->getRaceFont();
+                core::stringw s=_("Penalty time!!");
+                font->draw(s.c_str(), pos, color, true, true);
             }   // if penalty
-        }  // for i < getNumPlayers
+        }  // for i < getNum_players
     }  // if not RACE_PHASE
 
 
-    if ( RaceManager::getWorld()->isRacePhase() )
+    if(!RaceManager::getWorld()->isRacePhase()) return;
+
+
+    KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
+
+    for(int pla = 0; pla < num_players; pla++)
     {
-        KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo(this);
-        
-        const int numPlayers = race_manager->getNumLocalPlayers();
+        int offset_x = 0, offset_y = 0;
 
-        for(int pla = 0; pla < numPlayers; pla++)
+        if(num_players == 2)
         {
-            int offset_x = 0, offset_y = 0;
-
-            if(numPlayers == 2)
-            {
-              if(pla == 0) offset_y = UserConfigParams::m_height/2;
-            }
-            else if (numPlayers == 3)
-            {
-              if (pla == 0  || pla == 1)
+            if(pla == 0) offset_y = UserConfigParams::m_height/2;
+        }
+        else if (num_players == 3)
+        {
+            if (pla == 0  || pla == 1)
                 offset_y = UserConfigParams::m_height/2;
-              else
-              {
+            else
+            {
                 // Fixes width for player 3
                 split_screen_ratio_x = 1.0;
-              }
+            }
 
-              if (pla == 1)
+            if (pla == 1)
                 offset_x = UserConfigParams::m_width/2;
 
-            }
-            else if(numPlayers == 4)
-            {
-              if(pla == 0  || pla == 1)
+        }
+        else if(num_players == 4)
+        {
+            if(pla == 0  || pla == 1)
                 offset_y = UserConfigParams::m_height/2;
 
-              if((pla == 1) || pla == 3)
+            if((pla == 1) || pla == 3)
                 offset_x = UserConfigParams::m_width/2;
-            }
-
-            Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
-            drawPowerupIcons(player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawEnergyMeter     (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawSpeed           (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawLap             (info, player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            drawAllMessages     (player_kart, offset_x, offset_y,
-                                 split_screen_ratio_x, split_screen_ratio_y );
-            
-            if(player_kart->hasViewBlockedByPlunger())
-            {
-                const int screen_width = (numPlayers > 2) ? UserConfigParams::m_width/2 : UserConfigParams::m_width;
-                const int plunger_size = (numPlayers > 1) ? UserConfigParams::m_height/2 : UserConfigParams::m_height;
-                int plunger_x = offset_x + screen_width/2 - plunger_size/2;
-                
-                if (numPlayers == 3 && pla > 1)
-                    plunger_x = offset_x + UserConfigParams::m_width/2 - plunger_size/2;
-                        
-#ifndef HAVE_IRRLICHT
-                m_plunger_face->getState()->force();
-#endif
-                glBegin ( GL_QUADS ) ;
-                glTexCoord2f(1, 0); glVertex2i(plunger_x+plunger_size,    offset_y);
-                glTexCoord2f(0, 0); glVertex2i(plunger_x,                 offset_y);
-                glTexCoord2f(0, 1); glVertex2i(plunger_x,                 offset_y+plunger_size);
-                glTexCoord2f(1, 1); glVertex2i(plunger_x+plunger_size,    offset_y+plunger_size);
-                glEnd () ;                
-            }
-        }   // next player
-        
-        drawTimer();
-        
-        if(RaceManager::getWorld()->getPhase() == GO_PHASE ||
-           RaceManager::getWorld()->getPhase() == MUSIC_PHASE)
-        {
-            drawMusicDescription();
         }
 
-            
-        drawMap();
-        
-        drawPlayerIcons(info);
-        
-    }   // if RACE_PHASE
+        Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
+        //            drawPowerupIcons(player_kart, offset_x, offset_y,
+        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        //            drawEnergyMeter     (player_kart, offset_x, offset_y,
+        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        //            drawSpeed           (player_kart, offset_x, offset_y,
+        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        //            drawLap             (info, player_kart, offset_x, offset_y,
+        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        //            drawAllMessages     (player_kart, offset_x, offset_y,
+        //                                 split_screen_ratio_x, split_screen_ratio_y );
 
-    glPopAttrib  () ;
-    glPopMatrix  () ;
-    glMatrixMode ( GL_MODELVIEW ) ;
-    glPopMatrix  () ;
+        if(player_kart->hasViewBlockedByPlunger())
+        {
+            const int screen_width = (num_players > 2) ? UserConfigParams::m_width/2 : UserConfigParams::m_width;
+            const int plunger_size = (num_players > 1) ? UserConfigParams::m_height/2 : UserConfigParams::m_height;
+            int plunger_x = offset_x + screen_width/2 - plunger_size/2;
+
+            if (num_players == 3 && pla > 1)
+                plunger_x = offset_x + UserConfigParams::m_width/2 - plunger_size/2;
+
+#ifndef HAVE_IRRLICHT
+            m_plunger_face->getState()->force();
+#endif
+            glBegin ( GL_QUADS ) ;
+            glTexCoord2f(1, 0); glVertex2i(plunger_x+plunger_size,    offset_y);
+            glTexCoord2f(0, 0); glVertex2i(plunger_x,                 offset_y);
+            glTexCoord2f(0, 1); glVertex2i(plunger_x,                 offset_y+plunger_size);
+            glTexCoord2f(1, 1); glVertex2i(plunger_x+plunger_size,    offset_y+plunger_size);
+            glEnd () ;                
+        }
+    }   // next player
+
+    drawTimer();
+
+    if(RaceManager::getWorld()->getPhase() == GO_PHASE ||
+        RaceManager::getWorld()->getPhase() == MUSIC_PHASE)
+    {
+        drawMusicDescription();
+    }
+
+    //drawMap();
+    //drawPlayerIcons(info);
+
 }   // drawStatusText
-
-/* EOF */

@@ -372,3 +372,18 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
     return min_sector;
 }   // findOutOfRoadSector
 
+//-----------------------------------------------------------------------------
+/** Draws the mini map on the screen.
+ *  \param where the top left and lower right corner for the mini map.
+ */
+void QuadGraph::drawMiniMap(const core::rect<s32> &where)
+{
+    int width  = where.LowerRightCorner.X-where.UpperLeftCorner.X;
+    int height = where.UpperLeftCorner.Y -where.LowerRightCorner.Y;
+
+
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        const Quad &q=m_all_quads->getQuad(m_all_nodes[i]->getIndex());
+    }
+}   // drawMiniMap

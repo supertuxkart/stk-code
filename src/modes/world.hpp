@@ -64,7 +64,7 @@ class RaceGUI;
  *  be passed into the world constructor, and world just calls functions in
  *  this object.
  *  \todo The handling of the FollowTheLeader mode should probably be changed
- *        as well. Currently the leader kart is anormal AI kart (so it is 
+ *        as well. Currently the leader kart is a normal AI kart (so it is 
  *        included in the number of karts selected), and this causes some 
  *        unnecessary handling of special cases everywhere (e.g. score 
  *        counting will subtract one from the rank, since the kart on position
@@ -98,7 +98,7 @@ protected:
     bool        m_faster_music_active; // true if faster music was activated
 
     /** Whether highscores should be used for this kind of race.
-        * True by default, change to false in a child class to disable.
+     *  True by default, change to false in a child class to disable.
     */
     bool        m_use_highscores;
     
@@ -111,12 +111,15 @@ protected:
     void  printProfileResultAndExit();
     void  estimateFinishTimes();
     
+    /** Pointer to the track. The track is managed by world. */
     Track* m_track;
     
+    /** Pointer to the race GUI. The race GUI is handedl by world. */
+    RaceGUI *m_race_gui;
     
 public:
     /** debug text that will be overlaid to the screen */
-    std::string m_debug_text[10];
+    core::stringw m_debug_text[10];
     
     World();
     /** call just after instanciating. can't be moved to the contructor as child
@@ -126,6 +129,7 @@ public:
     
     virtual         ~World();
     virtual void    update(float delta);
+    virtual void    render();
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
     
@@ -186,7 +190,7 @@ public:
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode
       */
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller) = 0;
+    virtual KartIconDisplayInfo* getKartsDisplayInfo() = 0;
     
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.
