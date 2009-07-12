@@ -348,8 +348,6 @@ void startGame()
     race_manager->setNumLaps( 3 );
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );
-    race_manager->setNumPlayers( 1 );
-    race_manager->setNumLocalPlayers( 1 );
     network_manager->setupPlayerKartInfo();
     //race_manager->getKartType(1) = KT_PLAYER;
     

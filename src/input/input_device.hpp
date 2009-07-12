@@ -32,7 +32,7 @@ protected:
     DeviceType m_type;
     KeyBinding m_default_bindings[PA_COUNT];
 
-    int m_player_id;
+    ActivePlayer* m_player;
 
 public:
     std::string m_name; // if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart
@@ -68,7 +68,7 @@ public:
 
 class GamePadDevice : public InputDevice
 {
-    void resetAxisDirection(const int axis, Input::AxisDirection direction, const int player);
+    void resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player);
     bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
 public:
     int                   m_deadzone;
@@ -79,7 +79,7 @@ public:
         
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
      The 'player' id passed is simply to know where to send 'axis reset's when necessary*/
-    bool hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */);
+    bool hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action /* out */);
     
     void editBinding(const PlayerAction action, const Input::InputType type, const int id,
                      Input::AxisDirection direction=Input::AD_NEUTRAL);

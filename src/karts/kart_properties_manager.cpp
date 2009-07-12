@@ -116,9 +116,13 @@ void KartPropertiesManager::loadKartData(bool dont_load_models)
 //-----------------------------------------------------------------------------
 const int KartPropertiesManager::getKartId(const std::string &ident) const
 {
+    std::cout << "======\n";
+    std::cout << "Searching for kart " << ident.c_str() << std::endl;
+    
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
     {
+        std::cout << " -- " << (*i)->getIdent().c_str() << std::endl;
         if ((*i)->getIdent() == ident)
             return i-m_karts_properties.begin();
     }
@@ -264,7 +268,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     // -----------------------------------------
     std::vector<bool> used;
     used.resize(getNumberOfKarts(), false);
-
+    
     std::vector<std::string> all_karts;
     for(unsigned int i=0; i<existing_karts.size(); i++)
     {

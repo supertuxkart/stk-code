@@ -120,6 +120,7 @@ void World::init()
             switch(race_manager->getKartType(i))
             {
             case RaceManager::KT_PLAYER:
+                std::cout << "===== World : creating player kart for #" << i << "===========\n";
                 newkart = new PlayerKart(kart_name, position,
                                          &(UserConfigParams::m_player[local_player_id]),
                                          init_pos, local_player_id);
@@ -133,6 +134,8 @@ void World::init()
                 m_player_karts[global_player_id] = (PlayerKart*)newkart;
                 break;
             case RaceManager::KT_AI:
+                std::cout << "===== World : creating AI kart for #" << i << "===========\n";
+
                 newkart = loadRobot(kart_name, position, init_pos);
                 break;
             case RaceManager::KT_GHOST:

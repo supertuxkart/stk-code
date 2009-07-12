@@ -13,7 +13,7 @@ InputDevice::InputDevice()
         m_default_bindings[n].type = Input::IT_NONE;
         m_default_bindings[n].dir = Input::AD_NEUTRAL;
     }
-    m_player_id = -1;
+    m_player = NULL;
 }
 // -----------------------------------------------------------------------------
 /**
@@ -21,23 +21,7 @@ InputDevice::InputDevice()
   */
 void InputDevice::setPlayer(ActivePlayer* owner)
 {
-    if(owner == NULL)
-    {
-        m_player_id = -1;
-        return;
-    }
-    
-    const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
-    const int playerAmount = players.size();
-    for(int n=0; n<playerAmount; n++)
-    {
-        if(players.getConst(n) == owner)
-        {
-            m_player_id = n;
-            return;
-        }
-    }
-    std::cerr << "\n\nError, trying to assign a player that doesn't exist to a device!!!\n\n";
+    m_player = owner;
 }
 // -----------------------------------------------------------------------------
 void InputDevice::serialize(std::ofstream& stream)
@@ -303,15 +287,22 @@ void GamePadDevice::editBinding(const PlayerAction action, const Input::InputTyp
     m_default_bindings[action].dir = direction;
 }
 // -----------------------------------------------------------------------------
-void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, const int player)
+void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player)
 {
     if(!StateManager::isGameState()) return; // ignore this while in menus
 
+    PlayerKart* pk = player->getKart();
+    if (pk == NULL)
+    {
+        std::cerr << "Error, trying to reset axis for an unknown player\n";
+        return;
+    }
+    
     for(int n=0; n<PA_COUNT; n++)
     {
         if(m_default_bindings[n].id == axis && m_default_bindings[n].dir == direction)
         {
-            RaceManager::getWorld()->getLocalPlayerKart(player)->action((PlayerAction)n, 0);
+            pk->action((PlayerAction)n, 0);
             return;
         }
     }
@@ -321,7 +312,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
   * Player ID can either be a player ID or -1. If -1, the method only returns whether a binding exists for this player.
   * If it's a player name, it also handles axis resets, direction changes, etc.
   */
-bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, const int player, PlayerAction* action /* out */)
+bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action /* out */)
 {
     if(m_prevAxisDirections == NULL) return false; // device not open
     
@@ -329,7 +320,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
     {
         if(id >= m_axis_count) return false; // this gamepad doesn't even have that many axes
 
-        if (player != -1)
+        if (player != NULL)
         {
             // going to negative from positive
             if (value < 0 && m_prevAxisDirections[id] == Input::AD_POSITIVE)
@@ -349,7 +340,7 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
         else if(value < 0) m_prevAxisDirections[id] = Input::AD_NEGATIVE;
 
         // check if within deadzone
-        if(value > -m_deadzone && value < m_deadzone && player != -1)
+        if(value > -m_deadzone && value < m_deadzone && player != NULL)
         {
             // Axis stands still: This is reported once for digital axes and
             // can be called multipled times for analog ones. Uses the

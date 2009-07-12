@@ -52,7 +52,7 @@ public:
         maps this input to the corresponding player and game action. returns false if player/action could not be set.
         Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an action and a player */
     bool mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value, const bool programaticallyGenerated,
-                                   int* player /* out */, PlayerAction* action /* out */ );
+                                   ActivePlayer** player /* out */, PlayerAction* action /* out */ );
     
     void serialize();
     bool deserialize();

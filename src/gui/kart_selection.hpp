@@ -24,12 +24,13 @@ namespace GUIEngine
     class Widget;
 }
 class InputDevice;
+class ActivePlayer;
 
 namespace StateManager
 {
     void setPlayer0Device(InputDevice* device);
     void firePressedOnNewDevice(InputDevice* device);
-    void playerPressedRescue(int playerID);
+    void playerPressedRescue(ActivePlayer* player);
     
     void kartSelectionUpdate(float delta);
     

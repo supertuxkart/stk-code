@@ -25,6 +25,7 @@
 #include "input/input_device.hpp"
 
 class InputDevice;
+class PlayerKart;
 
 /**
   * class for managing player name and control configuration.
@@ -61,6 +62,7 @@ public:
 
 /**
   * Represents a player that is currently playing.
+  * FIXME: this class seems very closely related to PlayerKart, maybe merge them
   */
 class ActivePlayer
 {
@@ -68,35 +70,16 @@ class ActivePlayer
     InputDevice* m_device;
 public:
     
-    ActivePlayer(Player* player)
-    {
-        m_player = player;
-        m_device = NULL;
-    }
-    ~ActivePlayer()
-    {
-        setDevice(NULL);
-    }
+    ActivePlayer(Player* player);
+    ~ActivePlayer();
     
-    Player* getPlayer()
-    {
-        return m_player;
-    }
-    void setPlayer(Player* player)
-    {
-        m_player = player;
-    }
+    Player* getPlayer();
+    void setPlayer(Player* player);
     
-    InputDevice* getDevice() const { return m_device; }
-    void setDevice(InputDevice* device)
-    {
-        if (m_device != NULL) m_device->setPlayer(NULL);
-        
-        m_device = device;
-        
-        if(device != NULL)
-            device->setPlayer(this);
-    }
+    InputDevice* getDevice() const;
+    void setDevice(InputDevice* device);
+    
+    PlayerKart* getKart();
 };
 
 #endif

@@ -188,7 +188,7 @@ namespace StateManager
         {
             SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
             
-            race_manager->setNumKarts( w->getValue() + 1 );
+            race_manager->setNumKarts( w->getValue() );
         }
         /*
          289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);

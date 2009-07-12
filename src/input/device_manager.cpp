@@ -115,12 +115,12 @@ void DeviceManager::add(GamePadDevice* d)
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int deviceID, int btnID, int axisDir, int value,
-                                              const bool programaticallyGenerated, int* player /* out */,
+                                              const bool programaticallyGenerated, ActivePlayer** player /* out */,
                                               PlayerAction* action /* out */ )
 {
     if(m_assign_mode == NO_ASSIGN)
     {
-        *player = -1;
+        *player = NULL;
     }
 
     
@@ -142,48 +142,40 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                 else
                 {
                     // In assign mode, find to which active player this binding belongs
-                    // FIXME : in order to speed this use, a Player* pointer could be
-                    // stored inside the device so we don't need to iterate through players
-                    const ptr_vector<ActivePlayer, HOLD>& players = StateManager::getActivePlayers();
-                    const int playerAmount = players.size();
-                    for(int p=0; p<playerAmount; p++)
+                    if (m_keyboards[n].m_player != NULL)
                     {
-                        if(players[p].getDevice() == m_keyboards.get(n))
-                        {
-                            // we found which active player has this binding
-                            *player = n;
-                            
-                            if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
-                            {
-                                if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
-                                *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                                return true;
-                            }
-                            
-                            return true;
-                        }
-                    } // end for player
-                    
-                    // no active player has this binding. if we want to check for new players trying to join,
-                    // check now
-                    if (m_assign_mode == DETECT_NEW)
-                    {
-                        for(unsigned int n=0; n<m_keyboard_amount; n++)
-                        {
-                            PlayerAction localaction = PA_FIRST; // none
-                            if (m_keyboards[n].hasBinding(btnID, &localaction))
-                            {
-                                if(localaction == PA_FIRE)
-                                {
-                                    if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
-                                }
+                        *player = m_keyboards[n].m_player;
                                 
-                                *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                                return true;
-                            }
-                        } // end for
+                        if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
+                        {
+                            if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
+                            *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        // no active player has this binding. if we want to check for new players trying to join,
+                        // check now
+                        if (m_assign_mode == DETECT_NEW)
+                        {
+                            for(unsigned int n=0; n<m_keyboard_amount; n++)
+                            {
+                                PlayerAction localaction = PA_FIRST; // none
+                                if (m_keyboards[n].hasBinding(btnID, &localaction))
+                                {
+                                    if(localaction == PA_FIRE)
+                                    {
+                                        if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
+                                    }
+                                    
+                                    *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                                    return true;
+                                }
+                            } // end for
 
-                    } // end if assign_mode == DETECT_NEW
+                        } // end if assign_mode == DETECT_NEW
+                    }
                     
                     return false;
                 } // end if/else NO_ASSIGN mode
@@ -220,9 +212,9 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
         }
         else
         {
-            if(gamepad->m_player_id != -1)
+            if(gamepad->m_player != NULL)
             {
-                *player = gamepad->m_player_id;
+                *player = gamepad->m_player;
             }
             else
             {
@@ -234,7 +226,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                     for(unsigned int n=0; n<m_gamepad_amount; n++)
                     {
                         PlayerAction localaction = PA_FIRST; // none
-                        if (m_gamepads[n].hasBinding(type, btnID, value, -1, &localaction) && localaction == PA_FIRE)
+                        if (m_gamepads[n].hasBinding(type, btnID, value, NULL, &localaction) && localaction == PA_FIRE)
                         {
                             if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_gamepads.get(n) );
                             *action = PA_FIRST;

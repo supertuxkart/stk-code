@@ -251,7 +251,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection, int value,
                          const bool programaticallyGenerated)
 {
-    int player;
+    ActivePlayer* player = NULL;
     PlayerAction action;
 
     bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection,
@@ -293,7 +293,16 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         // ... when in-game
         if(StateManager::isGameState())
         {
-            RaceManager::getWorld()->getLocalPlayerKart(player)->action(action, abs(value));
+            // Find the corresponding PlayerKart from our ActivePlayer instance
+            PlayerKart* pk = player->getKart();
+            
+            if (pk == NULL)
+            {
+                std::cerr << "Error, trying to process action for an unknown player\n";
+                return;
+            }
+            
+            pk->action(action, abs(value));
         }
         // ... when in menus
         else

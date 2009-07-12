@@ -50,7 +50,6 @@ namespace StateManager
     
     class PlayerKartWidget : public Widget
     {
-        ActivePlayer* m_associatedPlayer;
         float x_speed, y_speed, w_speed, h_speed;
 
     public:
@@ -59,6 +58,8 @@ namespace StateManager
         ModelViewWidget* modelView;
         LabelWidget* kartName;
         
+        ActivePlayer* m_associatedPlayer;
+
         int playerID;
         std::string spinnerID;
         
@@ -464,9 +465,22 @@ void setPlayer0Device(InputDevice* device)
     
 PlayerKartWidget* removedWidget = NULL;
     
-void playerPressedRescue(int playerID)
-{
-    std::cout << "Player " << playerID << " no more wishes to play!\n";
+void playerPressedRescue(ActivePlayer* player)
+{    
+    int playerID = -1;
+    
+    for (int n=0; n<g_player_karts.size(); n++)
+    {
+        if (g_player_karts[n].m_associatedPlayer == player)
+        {
+            playerID = n;
+            break;
+        }
+    }
+    if (playerID == -1)
+    {
+        std::cerr << "void playerPressedRescue(ActivePlayer* player) : cannot find passed player\n";
+    }
     
     removedWidget = g_player_karts.remove(playerID);
     StateManager::removeActivePlayer(playerID);
@@ -569,9 +583,22 @@ void menuEventKarts(Widget* widget, std::string& name)
         }
         std::cout << "==========\n";
         
+        std::cout << "Calling setNumKarts(" << race_manager->getNumKarts() + players.size() << ")\n";
+        race_manager->setNumKarts( race_manager->getNumKarts() + players.size() );
+        
+        std::cout << "Calling setNumPlayers(" << players.size() << ")\n";
+        race_manager->setNumPlayers( players.size() );
+        race_manager->setNumLocalPlayers( players.size() );
+        
         g_player_karts.clearWithoutDeleting();      
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         
+        // TODO : assign karts to other players too
+        for(int n=1; n<players.size(); n++)
+        {
+            race_manager->setLocalKartInfo(n, "tux"); 
+        }
+
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
 
         StateManager::pushMenu("racesetup.stkgui");
