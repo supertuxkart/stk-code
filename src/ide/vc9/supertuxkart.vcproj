@@ -709,6 +709,10 @@
 				Name="config"
 				>
 				<File
+					RelativePath="..\..\config\player.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\config\stk_config.cpp"
 					>
 				</File>
