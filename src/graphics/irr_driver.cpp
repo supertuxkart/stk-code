@@ -556,8 +556,25 @@ void IrrDriver::displayFPS()
     gui::IGUIFont* font = getRaceFont();
     const int fps       = m_device->getVideoDriver()->getFPS();
 
+    // Min and max info tracking, per mode, so user can check game vs menus
+    bool current_state     = StateManager::isGameState();
+    static bool prev_state = false;
+    static int min         = 999; // Absurd values for start will print first time
+    static int max         = 0;   // but no big issue, maybe even "invisible"
+
+    // Reset limits if state changes
+    if (prev_state != current_state)
+    {
+        min = 999;
+        max = 0;
+        prev_state = current_state;
+    }
+
+    if (min > fps && fps > 1) min = fps; // Start moments always give useless 1
+    if (max < fps) max = fps;
+
     static char buffer[32];
-    sprintf(buffer, "FPS : %i", fps);
+    sprintf(buffer, "FPS : %i/%i/%i", min, fps, max);
 
     core::stringw fpsString = buffer;
 
