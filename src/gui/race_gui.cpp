@@ -165,7 +165,7 @@ void RaceGUI::drawMap ()
 }   // drawMap
 
 //-----------------------------------------------------------------------------
-// Draw players position on the race
+// Draw players icons and their times (if defined in the current mode).
 void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 {
     assert(RaceManager::getWorld() != NULL);
@@ -179,13 +179,8 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         ICON_WIDTH        = 27;
         ICON_PLAYER_WIDTH = 35;
     }
-
-    //glEnable(GL_TEXTURE_2D);
-    Material *last_players_gst = 0;
-
-    int bFirst                 = 1;
-    glDisable(GL_CULL_FACE);
     
+    gui::IGUIFont* font = irr_driver->getRaceFont();
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -193,79 +188,36 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         if(kart->isEliminated()) continue;
         const int position = kart->getPosition();
 
-        y = UserConfigParams::m_height*7/8-20 - ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
+        y = 20 + ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
 
-        GLfloat COLOR[] = {info[i].r, info[i].g, info[i].b, 1.0f};
-        font_race->PrintShadow(info[i].time.c_str(), 30, ICON_PLAYER_WIDTH+x, y+5, COLOR);
+        if(info[i].time.length()>0)
+        {
+            static video::SColor color = video::SColor(255, (int)(255*info[i].r),
+                                                       (int)(255*info[i].g), 
+                                                       (int)(255*info[i].b)      );
+            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
+            core::stringw s=info[i].time.c_str();
+            font->draw(s.c_str(), pos, color);
+        }
         
         if(info[i].special_title.length() >0)
         {
-            GLfloat const RED[] = { 1.0f, 0, 0, 1.0f};
-            font_race->PrintShadow(info[i].special_title.c_str(), 30, ICON_PLAYER_WIDTH+x, y+5, RED );
+            static video::SColor color = video::SColor(255, 255, 0, 0);
+            core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
+            core::stringw s(info[i].special_title.c_str());
+            font->draw(s.c_str(), pos, color);
         }
-        
-        glEnable(GL_CULL_FACE);
 
-        bFirst = 0;
         // draw icon
-        Material* players_gst = kart->getKartProperties()->getIconMaterial();
-        // Hmm - if the same icon is displayed more than once in a row,
-        // plib does only do the first setTexture, therefore nothing is
-        // displayed for the remaining icons. So we have to call force() if
-        // the same icon is displayed more than once in a row.
-        if(last_players_gst==players_gst)
-        {
-#ifndef HAVE_IRRLICHT
-            players_gst->getState()->force();
-#endif
-        }
-        //The material of the icons should not have a non-zero alpha_ref value,
-        //because if so the next call can make the text look aliased.
-#ifdef HAVE_IRRLICHT
-#else
-        players_gst -> apply ();
-#endif
-        last_players_gst = players_gst;
-        glBegin ( GL_QUADS ) ;
-        glColor4f    ( 1, 1, 1, 1 ) ;
-        if (kart -> isPlayerKart ())
-        {
-            glTexCoord2f ( 0, 0 ) ; glVertex2i ( x                  , y                   ) ;
-            glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_PLAYER_WIDTH, y                   ) ;
-            glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_PLAYER_WIDTH, y+ICON_PLAYER_WIDTH ) ;
-            glTexCoord2f ( 0, 1 ) ; glVertex2i ( x                  , y+ICON_PLAYER_WIDTH ) ;
-        }
-        else
-        {
-            glTexCoord2f ( 0, 0 ) ; glVertex2i ( x           , y            ) ;
-            glTexCoord2f ( 1, 0 ) ; glVertex2i ( x+ICON_WIDTH, y            ) ;
-            glTexCoord2f ( 1, 1 ) ; glVertex2i ( x+ICON_WIDTH, y+ICON_WIDTH ) ;
-            glTexCoord2f ( 0, 1 ) ; glVertex2i ( x           , y+ICON_WIDTH ) ;
-        }
-        glEnd () ;
+        video::ITexture *icon = kart->getKartProperties()->getIconMaterial()->getTexture();
+        int w = kart->isPlayerKart() ? ICON_PLAYER_WIDTH : ICON_WIDTH;
+        const core::rect<s32> pos(x, y, x+w, y+w);
+        const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
+        irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, 0,
+                                                  &video::SColor(255,255,255,255), true);
 
-        // draw position (1st, 2nd...)
-        glDisable(GL_CULL_FACE);
-        char str[256];
-
-        if(position != -1)
-        {
-            sprintf(str, "%d", position);
-            font_race->PrintShadow(str, 33, x-7, y-4);
-            
-            // FIXME: translation
-            if (kart->getPosition() == 1)
-                font_race->PrintShadow("st", 13, x-7+17, y-4+17);
-            else if (kart->getPosition() == 2)
-                font_race->PrintShadow("nd", 13, x-7+17, y-4+17);
-            else if (kart->getPosition() == 3)
-                font_race->PrintShadow("rd", 13, x-7+17, y-4+17);
-            else
-                font_race->PrintShadow("th", 13, x-7+17, y-4+17);
-        }
     } // next kart
     
-    glEnable(GL_CULL_FACE);
 }   // drawPlayerIcons
 
 //-----------------------------------------------------------------------------
@@ -283,7 +235,7 @@ void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
 #ifdef HAVE_IRRLICHT
-//    m_attachment_icon->setImage(powerup->getIcon()->getTexture());
+    video::ITexture *t=powerup->getIcon()->getTexture();
 #else
     powerup->getIcon()->apply();
 
@@ -726,7 +678,7 @@ void RaceGUI::drawStatusText()
 
     KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
 
-    for(int pla = 0; pla < num_players; pla++)
+    for(unsigned int pla = 0; pla < num_players; pla++)
     {
         int offset_x = 0, offset_y = 0;
 
@@ -799,6 +751,6 @@ void RaceGUI::drawStatusText()
     }
 
     //drawMap();
-    //drawPlayerIcons(info);
+    drawPlayerIcons(info);
 
 }   // drawStatusText

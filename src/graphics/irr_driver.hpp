@@ -43,6 +43,8 @@ private:
     scene::ISceneManager       *m_scene_manager;
     /** Irrlicht gui environment. */
     gui::IGUIEnvironment       *m_gui_env;
+    /** Irrlicht video driver. */
+    video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
 
@@ -56,10 +58,16 @@ public:
                          ~IrrDriver();
     void                 initDevice();
     
+    /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
-    const core::dimension2d<s32> getFrameSize() const { return m_device->getVideoDriver()->getCurrentRenderTargetSize(); }
-    
+    /** Returns the frame size. */
+    const core::dimension2d<s32> getFrameSize() const 
+                       { return m_video_driver->getCurrentRenderTargetSize(); }
+    /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
+    /** Returns the irrlicht video driver. */
+    video::IVideoDriver  *getVideoDriver()  const { return m_video_driver;  }
+    /** Returns the irrlicht scene manager. */
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);

@@ -98,10 +98,10 @@ void IrrDriver::initDevice()
     for(int driver_type=0; driver_type<3; driver_type++)
     {
         video::E_DRIVER_TYPE type = driver_type==0
-        ? video::EDT_OPENGL
-        : (driver_type==1
-           ? video::EDT_DIRECT3D9
-           : video::EDT_DIRECT3D8);
+                                  ? video::EDT_OPENGL
+                                  : (driver_type==1
+                                    ? video::EDT_DIRECT3D9
+                                    : video::EDT_DIRECT3D8);
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for(int bits=32; bits>15; bits -=8)
         {
@@ -131,6 +131,7 @@ void IrrDriver::initDevice()
     m_device->setWindowCaption(L"SuperTuxKart");
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
+    m_video_driver  = m_device->getVideoDriver();
     const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     m_race_font     = m_gui_env->getFont(font.c_str());
 }
