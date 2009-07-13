@@ -67,10 +67,9 @@ void CheckStructure::update(float dt)
 {
 	for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
 	{
-        // Ignore all non-active checklines.
-        if(!m_is_active[i]) continue;
 		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
-        if(isTriggered(m_previous_position[i], xyz, i))
+        // Only check active checklines.
+        if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {
             trigger(i);
         }
