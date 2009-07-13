@@ -103,5 +103,5 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
         result->setX( (closest-xyz2d).getLength());   // to the right
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
-    result->setY( (closest-m_lower_center).getLength());
+    result->setY( m_distance_from_start + (closest-m_lower_center).getLength());
 }   // getDistances
