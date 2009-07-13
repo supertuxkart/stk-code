@@ -47,7 +47,7 @@ void LinearWorld::init()
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_race_lap  = -1;
-        info.m_lap_start_time       = -1.0f;
+        info.m_lap_start_time       = 0;
         m_track->getQuadGraph().findRoadSector(m_kart[n]->getXYZ(), 
                                                &info.m_track_sector);
         
@@ -66,7 +66,7 @@ void LinearWorld::init()
                                                info.m_track_sector );
 
         info.m_race_lap             = 0;
-        info.m_lap_start_time       = -1.0f;
+        info.m_lap_start_time       = 0;
         info.m_time_at_last_lap     = 99999.9f;
         
         m_kart_info.push_back(info);
@@ -94,7 +94,7 @@ void LinearWorld::restartRace()
         KartInfo& info = m_kart_info[n];
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
-        info.m_lap_start_time       = -1.0f;
+        info.m_lap_start_time       = 0;
         m_track->getQuadGraph().findRoadSector(m_kart[n]->getXYZ(), 
                                                &info.m_track_sector);
         
@@ -112,7 +112,7 @@ void LinearWorld::restartRace()
                                                m_kart[n]->getXYZ(),
                                                info.m_track_sector );
         info.m_race_lap             = 0;
-        info.m_lap_start_time       = -1.0f;
+        info.m_lap_start_time       = -0;
         info.m_time_at_last_lap     = 99999.9f;
 
         updateRacePosition(m_kart[n], info);
@@ -213,8 +213,8 @@ void LinearWorld::update(float delta)
  */
 void LinearWorld::newLap(unsigned int kart_index)
 {
-    KartInfo kart_info = m_kart_info[kart_index];
-    Kart    *kart      = m_kart[kart_index];
+    KartInfo &kart_info = m_kart_info[kart_index];
+    Kart    *kart       = m_kart[kart_index];
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
     // will begin another countdown).
@@ -232,9 +232,6 @@ void LinearWorld::newLap(unsigned int kart_index)
         if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
             kart->raceFinished(getTime());
     }
-    // Only do timings if original time was set properly. Driving backwards
-    // over the start line will cause the lap start time to be set to -1.
-    if(kart_info.m_lap_start_time>=0.0)
     {
         float time_per_lap;
         if (kart_info.m_race_lap == 1) // just completed first lap
