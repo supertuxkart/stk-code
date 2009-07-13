@@ -1068,14 +1068,14 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     if(m_smoke_system)
     {
         float f=0.0f;
-        if(getMaterial()->hasSmoke() && fabsf(m_controls.m_steer) > 0.8 && 
+        if(getMaterial() && getMaterial()->hasSmoke() && fabsf(m_controls.m_steer) > 0.8 && 
             isOnGround())
             f=250.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
     }
     if(m_water_splash_system)
     {
-        float f = getMaterial()->hasWaterSplash() &&isOnGround() 
+        float f = getMaterial() && getMaterial()->hasWaterSplash() && isOnGround() 
                 ? sqrt(getSpeed())*40.0f 
                 : 0.0f;
         m_water_splash_system->setCreationRate(f);
