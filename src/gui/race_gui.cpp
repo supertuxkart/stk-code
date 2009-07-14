@@ -221,41 +221,33 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 }   // drawPlayerIcons
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawPowerupIcons ( Kart* player_kart, int offset_x,
-                                     int offset_y, float ratio_x,
-                                     float ratio_y                    )
+void RaceGUI::drawPowerupIcons(Kart* player_kart, int offset_x,
+                               int offset_y, float ratio_x,
+                               float ratio_y                    )
 {
     // If player doesn't have anything, do nothing.
     Powerup* powerup=player_kart->getPowerup();
     if(powerup->getType() == POWERUP_NOTHING) return;
+    int n  = player_kart->getNumPowerup() ;
+    if(n<1) return;    // shouldn't happen, but just in case
+    if(n>5) n=5;       // Display at most 5 items
 
     // Originally the hardcoded sizes were 320-32 and 400
-    int x1 = (int)((UserConfigParams::m_width/2-32) * ratio_x) + offset_x ;
-    int y1 = (int)(UserConfigParams::m_height*5/6 * ratio_y)      + offset_y;
+    int x1 = (int)((UserConfigParams::m_width/2-32) * ratio_x) + offset_x;
+    int y1 = (int)(20 * ratio_y) + offset_y;
 
     int nSize=(int)(64.0f*std::min(ratio_x, ratio_y));
-#ifdef HAVE_IRRLICHT
+
     video::ITexture *t=powerup->getIcon()->getTexture();
-#else
-    powerup->getIcon()->apply();
-
-    int n  = player_kart->getNumPowerup() ;
-
-    if ( n > 5 ) n = 5 ;
-    if ( n < 1 ) n = 1 ;
-
-    glBegin(GL_QUADS) ;
-    glColor4f(1, 1, 1, 1 );
+    core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        glTexCoord2f(0, 0); glVertex2i( i*30 + x1      , y1      );
-        glTexCoord2f(1, 0); glVertex2i( i*30 + x1+nSize, y1      );
-        glTexCoord2f(1, 1); glVertex2i( i*30 + x1+nSize, y1+nSize);
-        glTexCoord2f(0, 1); glVertex2i( i*30 + x1      , y1+nSize);
+        core::rect<s32> pos(x1+i*30, y1, x1+i*30+nSize, y1+nSize);
+        irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, 0, 
+                                                  &video::SColor(255,255,255,255),
+                                                  true);
     }   // for i
-    glEnd () ;
-#endif
 }   // drawPowerupIcons
 
 //-----------------------------------------------------------------------------
@@ -482,24 +474,29 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
     
     if(lap<0) return;  // don't display 'lap 0/...', or do nothing if laps are disabled (-1)
     float minRatio = std::min(ratio_x, ratio_y);
-    char str[256];
     offset_x += (int)(120*ratio_x);
-    offset_y += (int)(70*minRatio);
+    offset_y += (int)(UserConfigParams::m_height*5/6*minRatio);
 
+    gui::IGUIFont* font = irr_driver->getRaceFont();
     if(kart->hasFinishedRace())
     {
-        sprintf(str, _("Finished"));
-        font_race->PrintShadow(str, (int)(48*minRatio), offset_x, offset_y);
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        core::rect<s32> pos(offset_x, offset_y, offset_x, offset_y);
+        core::stringw s=_("Finished");
+        font->draw(s.c_str(), pos, color);
     }
     else
     {
-        font_race->PrintShadow( _("Lap"), (int)(48*minRatio), offset_x, offset_y);
-
-        offset_y -= (int)(50*ratio_y);
-
-        sprintf(str, "%d/%d", lap < 0 ? 0 : lap+1, 
-                race_manager->getNumLaps());
-        font_race->PrintShadow(str, (int)(48*minRatio), offset_x, offset_y);
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        core::rect<s32> pos(offset_x, offset_y, offset_x, offset_y);
+        core::stringw s = _("Lap");
+        font->draw(core::stringw(_("Lap")).c_str(), pos, color);
+    
+        char str[256];
+        sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
+        pos.UpperLeftCorner.Y  += (int)(40*ratio_y);
+        pos.LowerRightCorner.Y += (int)(40*ratio_y);
+        font->draw(core::stringw(str).c_str(), pos, color);
     }
 } // drawLap
 
@@ -680,7 +677,8 @@ void RaceGUI::drawStatusText()
 
     for(unsigned int pla = 0; pla < num_players; pla++)
     {
-        int offset_x = 0, offset_y = 0;
+        int offset_x = 0;
+        int offset_y = 0;
 
         if(num_players == 2)
         {
@@ -710,14 +708,14 @@ void RaceGUI::drawStatusText()
         }
 
         Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
-        //            drawPowerupIcons(player_kart, offset_x, offset_y,
-        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        drawPowerupIcons(player_kart, offset_x, offset_y,
+                         split_screen_ratio_x, split_screen_ratio_y );
         //            drawEnergyMeter     (player_kart, offset_x, offset_y,
         //                                 split_screen_ratio_x, split_screen_ratio_y );
         //            drawSpeed           (player_kart, offset_x, offset_y,
         //                                 split_screen_ratio_x, split_screen_ratio_y );
-        //            drawLap             (info, player_kart, offset_x, offset_y,
-        //                                 split_screen_ratio_x, split_screen_ratio_y );
+                    drawLap             (info, player_kart, offset_x, offset_y,
+                                         split_screen_ratio_x, split_screen_ratio_y );
         //            drawAllMessages     (player_kart, offset_x, offset_y,
         //                                 split_screen_ratio_x, split_screen_ratio_y );
 
