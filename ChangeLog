@@ -1,3 +1,7 @@
+SuperTuxKart 0.6.2 (July 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: game could crash in rare circumstances.
+
 SuperTuxKart 0.6.1a (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Bugfix: battle mode would not display track groups.

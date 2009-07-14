@@ -1,6 +1,6 @@
 dnl Process this file with autogen.sh to produce a configure script.
 
-AC_INIT(supertuxkart, 0.6.1a)
+AC_INIT(supertuxkart, 0.6.2)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
 AC_PREREQ(2.61)
