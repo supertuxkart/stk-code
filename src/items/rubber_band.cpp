@@ -51,7 +51,7 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart)
     vertices->add(0, 0, 0); vertices->add(0, 0, 0);
     vertices->add(0, 0, 0); vertices->add(0, 0, 0);
     m_attached_state = RB_TO_PLUNGER;
-    update(0);
+    updatePosition();
 
     sgVec3 norm;
     sgSetVec3(norm, 1/sqrt(2.0f), 0, 1/sqrt(2.0f));
@@ -80,6 +80,42 @@ void RubberBand::removeFromScene()
 }   // removeFromScene
 
 // ----------------------------------------------------------------------------
+/** Updates the position of the rubber band. It especially sets the
+ *  end position of the rubber band, i.e. the side attached to the plunger,
+ *  track, or kart hit.
+ */
+void RubberBand::updatePosition()
+{
+    const Vec3 &k = m_owner.getXYZ();
+
+    // Get the position to which the band is attached
+    // ----------------------------------------------
+    switch(m_attached_state)
+    {
+    case RB_TO_KART:    m_end_position = m_hit_kart->getXYZ(); break;
+    case RB_TO_TRACK:   m_end_position = m_hit_position;       break;
+    case RB_TO_PLUNGER: m_end_position = m_plunger->getXYZ();
+                        checkForHit(k, m_end_position);        break;
+    }   // switch(m_attached_state);
+
+    // Update the rubber band positions
+    // --------------------------------
+    // Todo: make height dependent on length (i.e. rubber band gets
+    // thinner). And call explosion if the band is too long.
+    const float hh=.1f;  // half height of the band
+    const Vec3 &p=m_end_position;  // for shorter typing
+    float *f = vertices->get(0);
+    f[0] = p.getX()-hh; f[1] = p.getY(); f[2] = p.getZ()-hh;
+    f = vertices->get(1);
+    f[0] = p.getX()+hh; f[1] = p.getY(); f[2] = p.getZ()+hh;
+    f = vertices->get(2);
+    f[0] = k.getX()+hh; f[1] = k.getY(); f[2] = k.getZ()+hh;
+    f = vertices->get(3);
+    f[0] = k.getX()-hh; f[1] = k.getY(); f[2] = k.getZ()-hh;
+    dirtyBSphere();
+}   // updatePosition
+
+// ----------------------------------------------------------------------------
 /** Updates the rubber band. It takes the new position of the kart and the
  *  plunger, and sets the quad representing the rubber band appropriately.
  *  It then casts a ray along the rubber band to detect if anything is hit. If
@@ -97,38 +133,12 @@ void RubberBand::update(float dt)
         return;
     }
 
-    Vec3 p;
+    updatePosition();
     const Vec3 &k = m_owner.getXYZ();
-
-    // Get the position to which the band is attached
-    // ----------------------------------------------
-    switch(m_attached_state)
-    {
-    case RB_TO_KART:    p = m_hit_kart->getXYZ(); break;
-    case RB_TO_TRACK:   p = m_hit_position;       break;
-    case RB_TO_PLUNGER: p = m_plunger->getXYZ();
-                        checkForHit(k, p);        break;
-    }   // switch(m_attached_state);
-
-    // Draw the rubber band
-    // --------------------
-    // Todo: make height dependent on length (i.e. rubber band gets
-    // thinner). And call explosion if the band is too long.
-    const float hh=.1f;  // half height of the band
-  
-    float *f = vertices->get(0);
-    f[0] = p.getX()-hh; f[1] = p.getY(); f[2] = p.getZ()-hh;
-    f = vertices->get(1);
-    f[0] = p.getX()+hh; f[1] = p.getY(); f[2] = p.getZ()+hh;
-    f = vertices->get(2);
-    f[0] = k.getX()+hh; f[1] = k.getY(); f[2] = k.getZ()+hh;
-    f = vertices->get(3);
-    f[0] = k.getX()-hh; f[1] = k.getY(); f[2] = k.getZ()-hh;
-    dirtyBSphere();
-
+    
     // Check for rubber band snapping
     // ------------------------------
-    float l = (p-k).length2();
+    float l = (m_end_position-k).length2();
     float max_len = m_owner.getKartProperties()->getRubberBandMaxLength();
     if(l>max_len*max_len)
     {
@@ -143,7 +153,7 @@ void RubberBand::update(float dt)
     if(m_attached_state!=RB_TO_PLUNGER)
     {
         float force = m_owner.getKartProperties()->getRubberBandForce();
-        Vec3 diff   = p-k;
+        Vec3 diff   = m_end_position-k;
         
         // detach rubber band if kart gets very close to hit point
         if(m_attached_state==RB_TO_TRACK && diff.length2() < 10*10)

@@ -50,7 +50,12 @@ private:
     /** State for rubber band. */
     ssgSimpleState *m_state;
 
+    /** Stores the end of the rubber band (i.e. the side attached to the 
+     *  plunger. */
+    Vec3                m_end_position;
+
     void checkForHit(const Vec3 &k, const Vec3 &p);
+    void updatePosition();
 
 public:
          RubberBand(Plunger *plunger, const Kart &kart);
