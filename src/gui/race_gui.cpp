@@ -252,149 +252,71 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart, int offset_x,
 
 //-----------------------------------------------------------------------------
 /* Energy meter that gets filled with coins */
-
-// Meter fluid color (0 - 255)
-#define METER_TOP_COLOR    240, 0, 0, 255
-#define METER_BOTTOM_COLOR    240, 200, 0, 160
-// Meter border color (0.0 - 1.0)
-#define METER_BORDER_BLACK 0.0, 0.0, 0.0
-#define METER_BORDER_WHITE 1.0, 1.0, 1.0
-#define METER_TARGET_RED   1.0, 0.0, 0.0
-
-//-----------------------------------------------------------------------------
 void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
                                 float ratio_x, float ratio_y             )
 {
-    float state = (float)(player_kart->getEnergy()) /
-                  MAX_ITEMS_COLLECTED;
+    float state = (float)(player_kart->getEnergy()) / MAX_ITEMS_COLLECTED;
     int x = (int)((UserConfigParams::m_width-24) * ratio_x) + offset_x;
     int y = (int)(250 * ratio_y) + offset_y;
     int w = (int)(16 * ratio_x);
     int h = (int)(UserConfigParams::m_height/4 * ratio_y);
-    int wl = (int)(ratio_x);
-    if(wl < 1)
-        wl = 1;
-    const int GRADS = (int)(MAX_ITEMS_COLLECTED/5);  // each graduation equals 5 items
-    int gh = (int)(h/GRADS);  //graduation height
     float coin_target = (float)race_manager->getCoinTarget();
     int th = (int)(h*(coin_target/MAX_ITEMS_COLLECTED));
+    
+    video::SColor black_border(255, 0, 0, 0);
+    video::SColor white_border(255, 255, 255, 255);
+    video::IVideoDriver *video = irr_driver->getVideoDriver();
+#define LINE(x0,y0,x1,y1, color) video->draw2DLine(core::position2di(x0,y0), \
+                                                   core::position2di(x1,y1), color)
 
-    glDisable(GL_TEXTURE_2D);
-    // Draw a Meter border
-    x-=1;
-    y-=1;
-    // left side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_BLACK ) ;
-    glVertex2i ( x-wl, y-wl ) ;
-    glVertex2i ( x,    y-wl ) ;
-    glVertex2i ( x,    y + h+1) ;
-    glVertex2i ( x-wl, y + h+1) ;
-    glEnd () ;
+    // FIXME: the original code drew a rectangle, i.e. two lines. This seems to be
+    // unnecesssary, so it's commented out here 
+    // Left side:
+    LINE(x-1,   y+1,   x-1,   y-h-1, black_border);
+    //LINE(x,     y-1,   x,     y+h+1, black_border);
+    LINE(x,     y,     x,     y-h-2, white_border);
+    //LINE(x+1,   y,     x+1,   y+h+2, white_border);
 
-    // right side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_BLACK ) ;
-    glVertex2i ( x+w,    y-wl ) ;
-    glVertex2i ( x+w+wl, y-wl ) ;
-    glVertex2i ( x+w+wl, y + h+1) ;
-    glVertex2i ( x+w,    y + h+1) ;
-    glEnd () ;
+    // Right side:
+    LINE(x+w,   y+1,   x+w,   y-h-1, black_border);
+    //LINE(x+w+1, y-1,   x+w+1, y+h+1, black_border);
+    LINE(x+w+1, y,     x+w+1, y-h-2, white_border);
+    //LINE(x+w+2, y,     x+w+2, y+h+2, white_border);
 
-    // down side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_BLACK ) ;
-    glVertex2i ( x,   y-wl ) ;
-    glVertex2i ( x+w, y-wl ) ;
-    glVertex2i ( x+w, y ) ;
-    glVertex2i ( x,   y ) ;
-    glEnd () ;
+    // Bottom
+    LINE(x,     y+1,   x+w,   y+1,   black_border);
+    //LINE(x,     y,     x+w,   y,     black_border);
+    LINE(x+1,   y,     x+w+1, y,     white_border);
+    //LINE(x+1,   y+1,   x+w+1, y+1,   white_border);
+    // Top
+    LINE(x,     y-h,   x+w,   y-h,   black_border);
+    //LINE(x,     y+h+1, x+w,   y+h+1, black_border);
+    LINE(x,     y-h-1, x+w,   y-h-1, white_border);
+    //LINE(x,     y+h+2, x+w,   y+h+2, white_border);
 
-    // up side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_BLACK ) ;
-    glVertex2i ( x,   y+h ) ;
-    glVertex2i ( x+w, y+h ) ;
-    glVertex2i ( x+w, y+h+wl ) ;
-    glVertex2i ( x,   y+h+wl ) ;
-    glEnd () ;
+    const int GRADS = (int)(MAX_ITEMS_COLLECTED/5);  // each graduation equals 5 items
+    int gh = (int)(h/GRADS);  //graduation height
 
-    x+=1;
-    y+=1;
-
-    // left side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_WHITE ) ;
-    glVertex2i ( x-wl, y-wl ) ;
-    glVertex2i ( x,    y-wl ) ;
-    glVertex2i ( x,    y + h+1) ;
-    glVertex2i ( x-wl, y + h+1) ;
-    glEnd () ;
-
-    // right side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_WHITE ) ;
-    glVertex2i ( x+w,    y-wl ) ;
-    glVertex2i ( x+w+wl, y-wl ) ;
-    glVertex2i ( x+w+wl, y + h+1) ;
-    glVertex2i ( x+w,    y + h+1) ;
-    glEnd () ;
-
-    // down side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_WHITE ) ;
-    glVertex2i ( x,   y-wl ) ;
-    glVertex2i ( x+w, y-wl ) ;
-    glVertex2i ( x+w, y ) ;
-    glVertex2i ( x,   y ) ;
-    glEnd () ;
-
-    //Graduations
+    // 'Meter marks;
     int gh_incr = gh;
     for (int i=0; i<GRADS-1; i++)
     {
-        glBegin( GL_QUADS );
-        glColor3f(METER_BORDER_WHITE);
-        glVertex2i(x,   y+gh);
-        glVertex2i(x+w, y+gh);
-        glVertex2i(x+w, y+gh+wl);
-        glVertex2i(x,   y+gh+wl);
-        glEnd();
+        LINE(x+1, y-1-gh, x+1+w, y-1-gh, white_border);
         gh+=gh_incr;
     }
-    
+
     //Target line
     if (coin_target > 0)
     {
-        glBegin ( GL_QUADS );
-        glColor3f(METER_TARGET_RED);
-        glVertex2i(x,   y+th);
-        glVertex2i(x+w, y+th);
-        glVertex2i(x+w, y+th+wl);
-        glVertex2i(x,   y+th+wl);
-        glEnd();
+        LINE(x+1, y-1-th, x+1+w, y-1-th, video::SColor(255, 255, 0, 0));
     }
-    
-    // up side
-    glBegin ( GL_QUADS ) ;
-    glColor3f ( METER_BORDER_WHITE ) ;
-    glVertex2i ( x,   y+h ) ;
-    glVertex2i ( x+w, y+h ) ;
-    glVertex2i ( x+w, y+h+wl ) ;
-    glVertex2i ( x,   y+h+wl ) ;
-    glEnd () ;
+#undef LINE
 
-    // Draw the Meter fluid
-    glBegin ( GL_QUADS ) ;
-    glColor4ub ( METER_BOTTOM_COLOR ) ;
-    glVertex2i ( x,   y ) ;
-    glVertex2i ( x+w, y ) ;
-
-    glColor4ub ( METER_TOP_COLOR ) ;
-    glVertex2i ( x+w, y + (int)(state * h));
-    glVertex2i ( x,   y + (int)(state * h) ) ;
-    glEnd () ;
-    glEnable(GL_TEXTURE_2D);
+    // The actual energy meter
+    core::rect<s32> energy(x+1, y-1-(int)(state*h), x+1+w, y-1);
+    video::SColor bottom(255, 240, 0,   0);
+    video::SColor top   (160, 240, 200, 0);
+    video->draw2DRectangle(energy, top, top, bottom, bottom);
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -710,8 +632,8 @@ void RaceGUI::drawStatusText()
         Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(pla);
         drawPowerupIcons(player_kart, offset_x, offset_y,
                          split_screen_ratio_x, split_screen_ratio_y );
-        //            drawEnergyMeter     (player_kart, offset_x, offset_y,
-        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        drawEnergyMeter     (player_kart, offset_x, offset_y,
+                            split_screen_ratio_x, split_screen_ratio_y );
         //            drawSpeed           (player_kart, offset_x, offset_y,
         //                                 split_screen_ratio_x, split_screen_ratio_y );
                     drawLap             (info, player_kart, offset_x, offset_y,
