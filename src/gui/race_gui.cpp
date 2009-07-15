@@ -61,15 +61,9 @@ RaceGUI::RaceGUI()
         icon_player_width = 35;
     }
 
-#ifndef HAVE_IRRLICHT
-    m_speed_back_icon = material_manager->getMaterial("speedback.rgb");
-    m_speed_back_icon->getState()->disable(GL_CULL_FACE);
-    m_speed_fore_icon = material_manager->getMaterial("speedfore.rgb");
-    m_speed_fore_icon->getState()->disable(GL_CULL_FACE);
-    
-    m_plunger_face = material_manager->getMaterial("plungerface.rgb");
-    m_plunger_face->getState()->disable(GL_CULL_FACE);
-#endif
+    m_speed_back_icon = material_manager->getMaterial("speedback.png");
+    m_speed_fore_icon = material_manager->getMaterial("speedfore.png");    
+    m_plunger_face    = material_manager->getMaterial("plungerface.png");
     
 }   // RaceGUI
 
@@ -325,49 +319,58 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 {
 
     float minRatio = std::min(ratio_x, ratio_y);
-#define SPEEDWIDTH 128
+    const int SPEEDWIDTH=128;
     int width  = (int)(SPEEDWIDTH*minRatio);
     int height = (int)(SPEEDWIDTH*minRatio);
     offset_x += (int)((UserConfigParams::m_width-10)*ratio_x) - width;
     offset_y += (int)(10*ratio_y);
 
-#ifdef HAVE_IRRLICHT
-#else
-    glMatrixMode(GL_MODELVIEW);
-    m_speed_back_icon->getState()->force();
-    // If the colour isn't set, the speedometer is blended with the last
-    // used colour.
-    glColor4f(1,1,1,1);
-    glBegin ( GL_QUADS ) ;
-    glTexCoord2f(0, 0);glVertex2i(offset_x      , offset_y       );
-    glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y       );
-    glTexCoord2f(1, 1);glVertex2i(offset_x+width, offset_y+height);
-    glTexCoord2f(0, 1);glVertex2i(offset_x      , offset_y+height);
-    glEnd () ;
-
-    //convention taken from btRaycastVehicle::updateVehicle
-    const float speed =  kart->getSpeed();
+    video::IVideoDriver *video = irr_driver->getVideoDriver();
+    video::SColor color(255, 255, 255, 255);
+    const core::rect<s32> pos(offset_x,       UserConfigParams::m_height-offset_y-height, 
+                              offset_x+width, UserConfigParams::m_height-offset_y);
+    video::ITexture *t = m_speed_back_icon->getTexture();
+    const core::rect<s32> rect(core::position2d<s32>(0,0), t->getOriginalSize());
+    video->draw2DImage(t, pos, rect, 0, &color, true);
 
     if ( !kart->isOnGround() )
-        font_race->PrintShadow("!", (int)(60*minRatio), 
-                               offset_x-(int)(30*minRatio), 
-                               offset_y-(int)(10*minRatio));
-    /* Show speed */
-    if ( speed < 0 )
-        font_race->PrintShadow(_("REV"), (int)(40*minRatio), 
-                               offset_x+(int)(40*minRatio), 
-                               offset_y+(int)(10*minRatio));
-    else
     {
-        float speedRatio = speed/KILOMETERS_PER_HOUR/110.0f;
-        // The following does not work with wheelie or Zipper
-        //float speedRatio = kart->getVelocity()->xyz[1]/(kart->getMaxSpeed();
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        core::rect<s32> pos(offset_x-(int)(30*minRatio), 
+                            UserConfigParams::m_height-(offset_y-(int)(10*minRatio)),
+                            offset_x-(int)(30*minRatio), 
+                            UserConfigParams::m_height-(offset_y-(int)(10*minRatio)) );
+        irr_driver->getRaceFont()->draw(core::stringw("!").c_str(), pos, color);
+    }
+    const float speed =  kart->getSpeed();
+    if(speed>0)
+    {
+        float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
+        if(speed_ratio>1) speed_ratio = 1;
 
-        if ( speedRatio > 1 )
-            speedRatio = 1;
-        
-        m_speed_fore_icon->getState()->force();
-        glBegin ( GL_POLYGON ) ;
+        core::rect<s32> pos;
+        video::ITexture *t = m_speed_fore_icon->getTexture();
+        core::dimension2di tex_coords=t->getOriginalSize();
+        if(speed_ratio<0.5f)
+        {
+            pos = core::rect<s32>(offset_x,
+                                  UserConfigParams::m_height-offset_y-height, 
+                                  offset_x+width,
+                                  UserConfigParams::m_height-offset_y-(int)(height*(1-speed_ratio)));
+            tex_coords.set(tex_coords.Width, (int)(tex_coords.Height*speed_ratio));
+        }
+        else
+        {
+            pos = core::rect<s32>(offset_x,
+                                  UserConfigParams::m_height-offset_y-height, 
+                                  (int)(offset_x+width*speed_ratio),
+                                  UserConfigParams::m_height-offset_y);
+            tex_coords.set((int)(tex_coords.Width*speed_ratio), tex_coords.Height);
+        }
+        const core::rect<s32> rect(core::position2d<s32>(0,0), tex_coords);
+        video->draw2DImage(t, pos, rect, 0, &color, true);
+#ifdef XX
+
         glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y);
         glTexCoord2f(0, 0);glVertex2i(offset_x, offset_y);
         if (speedRatio < 0.5)
@@ -381,8 +384,8 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
         }
 
         glEnd () ;
-    }   // speed<0
 #endif
+    }   // speed<0
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
@@ -496,17 +499,22 @@ void RaceGUI::drawMusicDescription()
 {
     const MusicInformation* mi=sound_manager->getCurrentMusic();
     if(!mi) return;
-    int y=0;
+    int y=UserConfigParams::m_height-40;
+    static video::SColor white = video::SColor(255, 255, 255, 255);
+    gui::IGUIFont*       font = irr_driver->getRaceFont();
     if(mi->getComposer()!="")
     {
+    core::rect<s32> pos_by(UserConfigParams::m_width>>1, y,
+                           UserConfigParams::m_width>>1, y);
         std::string s="by "+mi->getComposer();
-        font_race->Print( s.c_str(), 25, 
-                          Font::CENTER_OF_SCREEN, y );
-        y+=20;
+        font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, true, true);
+        y-=40;
     }
+
     std::string s="\""+mi->getTitle()+"\"";
-    font_race->Print( s.c_str(), 25, 
-                      Font::CENTER_OF_SCREEN, y );
+    core::rect<s32> pos(UserConfigParams::m_width>>1, y,
+                        UserConfigParams::m_width>>1, y);
+    font->draw(core::stringw(s.c_str()).c_str(), pos, white, true, true);
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------
@@ -634,10 +642,10 @@ void RaceGUI::drawStatusText()
                          split_screen_ratio_x, split_screen_ratio_y );
         drawEnergyMeter     (player_kart, offset_x, offset_y,
                             split_screen_ratio_x, split_screen_ratio_y );
-        //            drawSpeed           (player_kart, offset_x, offset_y,
-        //                                 split_screen_ratio_x, split_screen_ratio_y );
-                    drawLap             (info, player_kart, offset_x, offset_y,
-                                         split_screen_ratio_x, split_screen_ratio_y );
+        //drawSpeed           (player_kart, offset_x, offset_y,
+        //                     split_screen_ratio_x, split_screen_ratio_y );
+        drawLap             (info, player_kart, offset_x, offset_y,
+                             split_screen_ratio_x, split_screen_ratio_y );
         //            drawAllMessages     (player_kart, offset_x, offset_y,
         //                                 split_screen_ratio_x, split_screen_ratio_y );
 
