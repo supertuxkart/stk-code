@@ -24,7 +24,6 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "gui/font.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "race/race_manager.hpp"
@@ -456,7 +455,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
     int y;
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
-    y = (int)(ratio_y*(UserConfigParams::m_height -164)+offset_y);
+    y = (int)(ratio_y*164+offset_y);
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
@@ -467,17 +466,11 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
         // Display only messages for all karts, or messages for this kart
         if( msg.m_kart && msg.m_kart!=player_kart) continue;
 
-        //FIXME: instead of the next line, in msg there should be a GLfloat that acts as the colors.
-        GLfloat const COLORS[] = {msg.m_red/255.0f, msg.m_green/255.0f, msg.m_blue/255.0f, 255.0f};
-        font_race->Print( msg.m_message.c_str(), msg.m_font_size, 
-                          Font::CENTER_OF_SCREEN, y,
-                          COLORS,
-                          ratio_x, ratio_y,
-                          offset_x, offset_x+(int)(UserConfigParams::m_width*ratio_x));
-        // Add 20% of font size as space between the lines
-        y-=msg.m_font_size*12/10;
-        
-        
+        core::rect<s32> pos(UserConfigParams::m_width>>1, y,
+                            UserConfigParams::m_width>>1, y);
+        irr_driver->getRaceFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                                        pos, msg.m_color, true, true);
+        y+=40;        
     }   // for i in all messages
 }   // drawAllMessages
 
@@ -487,9 +480,9 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
  *  once).
  **/
 void RaceGUI::addMessage(const std::string &msg, const Kart *kart, float time, 
-                         int font_size, int red, int green, int blue)
+                         int font_size, const video::SColor &color)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, font_size, red, green, blue));
+    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color));
 }   // addMessage
 
 //-----------------------------------------------------------------------------
@@ -504,8 +497,8 @@ void RaceGUI::drawMusicDescription()
     gui::IGUIFont*       font = irr_driver->getRaceFont();
     if(mi->getComposer()!="")
     {
-    core::rect<s32> pos_by(UserConfigParams::m_width>>1, y,
-                           UserConfigParams::m_width>>1, y);
+        core::rect<s32> pos_by(UserConfigParams::m_width>>1, y,
+                              UserConfigParams::m_width>>1, y);
         std::string s="by "+mi->getComposer();
         font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, true, true);
         y-=40;
@@ -646,8 +639,8 @@ void RaceGUI::drawStatusText()
         //                     split_screen_ratio_x, split_screen_ratio_y );
         drawLap             (info, player_kart, offset_x, offset_y,
                              split_screen_ratio_x, split_screen_ratio_y );
-        //            drawAllMessages     (player_kart, offset_x, offset_y,
-        //                                 split_screen_ratio_x, split_screen_ratio_y );
+        drawAllMessages     (player_kart, offset_x, offset_y,
+                             split_screen_ratio_x, split_screen_ratio_y );
 
         if(player_kart->hasViewBlockedByPlunger())
         {
@@ -658,15 +651,12 @@ void RaceGUI::drawStatusText()
             if (num_players == 3 && pla > 1)
                 plunger_x = offset_x + UserConfigParams::m_width/2 - plunger_size/2;
 
-#ifndef HAVE_IRRLICHT
-            m_plunger_face->getState()->force();
-#endif
-            glBegin ( GL_QUADS ) ;
-            glTexCoord2f(1, 0); glVertex2i(plunger_x+plunger_size,    offset_y);
-            glTexCoord2f(0, 0); glVertex2i(plunger_x,                 offset_y);
-            glTexCoord2f(0, 1); glVertex2i(plunger_x,                 offset_y+plunger_size);
-            glTexCoord2f(1, 1); glVertex2i(plunger_x+plunger_size,    offset_y+plunger_size);
-            glEnd () ;                
+            video::ITexture *t=m_plunger_face->getTexture();
+            core::rect<s32> dest(plunger_x,              offset_y, 
+                                 plunger_x+plunger_size, offset_y+plunger_size);
+            const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
+
+            irr_driver->getVideoDriver()->draw2DImage(t, dest, source);
         }
     }   // next player
 

@@ -132,7 +132,8 @@ public:
     virtual void    render();
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
-    
+    /** Returns a pointer to the race gui. */
+    RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     PlayerKart     *getPlayerKart(int player)   const { return m_player_karts[player];      }
     unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
     PlayerKart     *getLocalPlayerKart(int n)   const { return m_local_player_karts[n];     }

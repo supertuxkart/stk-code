@@ -49,7 +49,6 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
 #include "gui/engine.hpp"
-#include "gui/font.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
@@ -503,11 +502,10 @@ void initRest()
 }
 
 //=============================================================================
-void CleanTuxKart()
+void cleanTuxKart()
 {
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
-    //if(menu_manager)            delete menu_manager;
     if(race_manager)            delete race_manager;
     if(network_manager)         delete network_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
@@ -586,11 +584,6 @@ int main(int argc, char *argv[] )
         item_manager            -> loadDefaultItems();
         attachment_manager      -> loadModels      ();
         stk_scene = new Scene();
-
-        //For some reason, calling this before the material loading screws
-        //the background picture.
-        //fntInit();
-        init_fonts();
 
         // prepare main menu
         StateManager::initGUI();
@@ -675,9 +668,7 @@ int main(int argc, char *argv[] )
         fclose(stdout);
     }
 
-    delete_fonts();
-
-    CleanTuxKart();
+    cleanTuxKart();
 
     return 0 ;
 }

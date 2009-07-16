@@ -30,7 +30,6 @@
 #include "config/user_config.hpp"
 #include "graphics/material_manager.hpp"
 #include "gui/engine.hpp"
-#include "gui/font.hpp"
 #include "gui/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -179,16 +178,10 @@ void IrrDriver::changeResolution()
     projectile_manager      -> loadData();
     attachment_manager      -> loadModels();
 
-    //FIXME: the font reinit funcs should be inside the font class
-    //Reinit fonts
-    delete_fonts();
-    init_fonts();
-
     StateManager::initGUI();
     GUIEngine::reshowCurrentScreen();
-        //        startScreen             -> installMaterial();
+}   // changeResolution
 
-}
 // ----------------------------------------------------------------------------
 /** Loads an animated mesh and returns a pointer to it.
  *  \param filename File to load.
@@ -279,7 +272,16 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
-void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, std::vector<Vec3>& mesh_location, ITexture* target, float angle)
+/** Renders a given vector of meshes onto a texture. Parameters:
+ *  \param mesh Vector of meshes to render.
+ *  \param mesh_location For each mesh the location where it should be 
+ *         positioned.
+ *  \param target The texture to render the meshes to.
+ *  \param angle Heading for all meshes.
+ */
+void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
+                                std::vector<Vec3>& mesh_location,
+                                ITexture* target, float angle)
 {      
     scene::ISceneNode* main_node = NULL;
     

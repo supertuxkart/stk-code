@@ -58,27 +58,23 @@ private:
     class TimedMessage
     {
      public:
-        std::string m_message;            // message to display
-        float       m_remaining_time;     // time remaining before removing this message from screen
-        int         m_red,m_blue,m_green; // colour
-        int         m_font_size;          // size
-        const Kart *m_kart;
+        std::string   m_message;            // message to display
+        float         m_remaining_time;     // time remaining before removing this message from screen
+        video::SColor m_color;              // color of message
+        int           m_font_size;          // size
+        const Kart   *m_kart;
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
         TimedMessage(const std::string &message, 
                      const Kart *kart, float time, int size, 
-                     int red, int green, int blue)
+                     const video::SColor &color)
         {
-            m_message    = message; 
-            m_font_size  = size;
-            m_kart       = kart;
-            if( time < 0.0f ) m_remaining_time = -1.0f;
-            else
-            {
-                m_remaining_time = time;
-            }
-            m_red=red; m_blue=blue; m_green=green; 
+            m_message        = message; 
+            m_font_size      = size;
+            m_kart           = kart;
+            m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
+            m_color          = color;
         }
         // in follow leader the clock counts backwards
         bool done(const float dt)
@@ -124,8 +120,8 @@ public:
     void render();
     void update(float dt);
     void addMessage(const std::string &m, const Kart *kart, float time, 
-                    int fonst_size, int red=255, int green=0, int blue=255);
-    
+                    int fonst_size, 
+                    const video::SColor &color=video::SColor(255, 255, 0, 255));
 };
 
 #endif

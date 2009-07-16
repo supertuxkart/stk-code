@@ -248,13 +248,13 @@ void LinearWorld::newLap(unsigned int kart_index)
         {
             setFastestLap(kart, time_per_lap);
             m_race_gui->addMessage(_("New fastest lap"), NULL, 
-                                   2.0f, 40, 100, 210, 100);
+                                   2.0f, 40, video::SColor(255, 100, 210, 100));
             std::string s = StringUtils::timeToString(time_per_lap);
 
             std::ostringstream m_fastest_lap_message;
             m_fastest_lap_message << s << ": " << kart->getName();
             m_race_gui->addMessage(m_fastest_lap_message.str(), NULL, 
-                                   2.0f, 40, 100, 210, 100);
+                                   2.0f, 40, video::SColor(255, 100, 210, 100));
         } // end if new fastest lap
     }
     kart_info.m_lap_start_time = getTime();
