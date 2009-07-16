@@ -27,7 +27,6 @@
 #include "lisp/lisp.hpp"
 
 class Kart;
-class ssgEntity;
 
 class ItemManager
 {
@@ -38,18 +37,8 @@ private:
     AllItemTypes m_all_items;
 
     // This stores all item models
-#ifdef HAVE_IRRLICHT
-    // FIXME: why ITEM_SILVER_COINT+1 in plib??
     scene::IMesh *m_item_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
     std::map<std::string,scene::IMesh*> m_all_meshes;
-#else
-    ssgEntity *m_item_model[Item::ITEM_SILVER_COIN+1];
-
-    // This is the active model. It gets determined by first loading the
-    // default, then track models, user models, grand prix models. This means that
-    // an item style specified in a track overwrites a command line option.
-    std::map<std::string,ssgEntity*> m_all_models;
-#endif
 
     std::string m_user_filename;
     void setDefaultItemStyle();
@@ -57,8 +46,8 @@ private:
                  Item::ItemType type);
 
 public:
-    ItemManager();
-    ~ItemManager();
+                ItemManager();
+               ~ItemManager();
     void        loadDefaultItems();
     void        loadItemStyle   (const std::string filename);
     Item*       newItem         (Item::ItemType type, const Vec3& xyz, 
@@ -71,16 +60,10 @@ public:
     void        setUserFilename (char *s) {m_user_filename=s;}
     void        collectedItem   (int item_id, Kart *kart,
                                  int add_info=-1);
-#ifdef HAVE_IRRLICHT
     scene::IMesh*  getItemModel (Item::ItemType type)
                                 {return m_item_mesh[type];}
-#else
-    ssgEntity*  getItemModel (Item::ItemType type)
-                                {return m_item_model[type];}
-#endif
 };
 
 extern ItemManager* item_manager;
-
 
 #endif

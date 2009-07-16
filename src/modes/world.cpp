@@ -475,6 +475,7 @@ void World::loadTrack()
 
     m_track->loadTrackModel();
 }   // loadTrack
+
 //-----------------------------------------------------------------------------
 void World::getDefaultCollectibles(int& collectible_type, int& amount )
 {

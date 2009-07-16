@@ -60,7 +60,8 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
-    void         drawMiniMap(const core::rect<s32> &where);
+    video::ITexture *makeMiniMap(const core::dimension2di &where,
+                                 const std::string &name);
 
     /** Returns the number of nodes in the graph. */
     unsigned int   getNumNodes() const { return m_all_nodes.size();         } 

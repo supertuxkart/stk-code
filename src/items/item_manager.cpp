@@ -198,9 +198,7 @@ void ItemManager::cleanup()
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-#ifndef HAVE_IRRLICHT
         delete *i;
-#endif
     }
     m_all_items.clear();
 

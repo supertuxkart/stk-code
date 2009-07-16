@@ -49,6 +49,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 //-----------------------------------------------------------------------------
 Item::~Item()
 {
+    irr_driver->removeNode(m_node);
     m_node->drop();
 }   // ~Item
 

@@ -75,7 +75,7 @@ Track::Track( std::string filename_, float w, float h, bool stretch )
 	m_animation_manager  = NULL;
 	m_check_manager      = NULL;
     loadTrack(m_filename);
-    loadDriveline();
+    loadQuadGraph();
 }   // Track
 
 //-----------------------------------------------------------------------------
@@ -106,6 +106,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+    item_manager->cleanup();
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
@@ -177,7 +178,7 @@ btTransform Track::getStartTransform(unsigned int pos) const
  *  i.e. drawScaled2D and draw2Dview - but to keep both versions const, the
  *  values m_scale_x/m_scale_y can not be changed, but they are needed in glVtx.
  *  So two functions are provided: one which uses temporary variables, and one
- *  which uses the pre-computed attributes (see constructor/loadDriveline)
+ *  which uses the pre-computed attributes (see constructor/loadQuadGraph)
  *  - which saves a bit of time at runtime as well.
  *  drawScaled2D is called from gui/TrackSel, draw2Dview from RaceGUI.
  */
@@ -326,7 +327,7 @@ void Track::draw2Dview (float x_offset, float y_offset) const
 
 
 /*FIXME: Too much calculations here, we should be generating scaled driveline arrays
- * in Track::loadDriveline so all we'd be doing is pumping out predefined
+ * in Track::loadQuadGraph so all we'd be doing is pumping out predefined
  * vertexes in-game.
  */
     /*Draw white filling of the map*/
@@ -589,10 +590,14 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-void Track::loadDriveline()
+/** Loads the quad graph, i.e. the definition of all quads, and the way
+ *  they are connected to each other.
+ */
+void Track::loadQuadGraph()
 {
     m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".quads"), 
                                  file_manager->getTrackFile(m_ident+".graph"));
+    m_mini_map = m_quad_graph->makeMiniMap(core::dimension2di(100,100), m_ident);
     if(m_quad_graph->getNumNodes()==0)
     {
         fprintf(stderr, "No graph nodes defined for track '%s'\n",
@@ -651,7 +656,7 @@ void Track::loadDriveline()
 
     if(!m_do_stretch) m_scale_x = m_scale_y = std::min(m_scale_x, m_scale_y);
     
-}   // loadDriveline
+}   // loadQuadGraph
 
 //-----------------------------------------------------------------------------
 void
@@ -950,6 +955,11 @@ void Track::createWater(const XMLNode &node)
 }   // createWater
 
 // ----------------------------------------------------------------------------
+/** This function load the actual scene, i.e. all parts of the track, 
+ *  animations, items, ... It  is called from world during initialisation. 
+ *  Track is the first model to be loaded, so at this stage the root scene node 
+ * is empty.
+ */
 void Track::loadTrackModel()
 {
     // Add the track directory to the texture search path
@@ -1024,7 +1034,7 @@ void Track::loadTrackModel()
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
         {
-            Item::ItemType type=Item::ITEM_BANANA;
+            Item::ItemType type;
             if     (name=="banana"     ) type = Item::ITEM_BANANA;
             else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
             else if(name=="small-nitro") type = Item::ITEM_SILVER_COIN;
@@ -1058,229 +1068,8 @@ void Track::loadTrackModel()
         (*i)->init();
     }
 
-#ifndef HAVE_IRRLICHT
-    std::string path = file_manager->getTrackFile(getIdent()+".loc");
-
-    FILE *fd = fopen (path.c_str(), "r" );
-    if ( fd == NULL )
-    {
-        std::ostringstream msg;
-        msg<<"Can't open track location file '"<<path<<"'.";
-        throw std::runtime_error(msg.str());
-    }
-    m_model = new ssgBranch ;
-    stk_scene->add(m_model);
-
-    char s [ 1024 ] ;
-
-    while ( fgets ( s, 1023, fd ) != NULL )
-    {
-        if ( *s == '#' || *s < ' ' )
-            continue ;
-
-        int need_hat = false ;
-        int fit_skin = false ;
-        char fname [ 1024 ] ;
-        sgCoord loc;
-        sgZeroVec3 ( loc.xyz ) ;
-        sgZeroVec3 ( loc.hpr ) ;
-
-        char htype = '\0' ;
-
-        /* the first 2 are for backwards compatibility. Don't use 'herring' names in any new track */
-        if ( sscanf ( s, "%cHERRING,%f,%f,%f", &htype,
-                      &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 4 )
-        {
-            Item::ItemType type=Item::ITEM_BANANA;
-            if ( htype=='Y' || htype=='y' ) { type = Item::ITEM_GOLD_COIN   ;}
-            if ( htype=='G' || htype=='g' ) { type = Item::ITEM_BANANA  ;}
-            if ( htype=='R' || htype=='r' ) { type = Item::ITEM_BONUS_BOX    ;}
-            if ( htype=='S' || htype=='s' ) { type = Item::ITEM_SILVER_COIN ;}
-            itemCommand(&loc.xyz, type, false) ;
-        }
-        else if ( sscanf ( s, "%cHERRING,%f,%f", &htype,
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-        {
-            Item::ItemType type=Item::ITEM_BANANA;
-            if ( htype=='Y' || htype=='y' ) { type = Item::ITEM_GOLD_COIN   ;}
-            if ( htype=='G' || htype=='g' ) { type = Item::ITEM_BANANA  ;}
-            if ( htype=='R' || htype=='r' ) { type = Item::ITEM_BONUS_BOX    ;}
-            if ( htype=='S' || htype=='s' ) { type = Item::ITEM_SILVER_COIN ;}
-            itemCommand (&loc.xyz, type, true) ;
-        }
-        /* and now the new names */
-        else if ( sscanf ( s, "BBOX,%f,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_BONUS_BOX, false);
-        }
-        else if ( sscanf ( s, "BBOX,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_BONUS_BOX, true);
-        }
-        
-        else if ( sscanf ( s, "BANA,%f,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_BANANA, false);
-        }
-        
-        else if ( sscanf ( s, "BANA,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_BANANA, true);
-        }
-        
-        else if ( sscanf ( s, "COIN,%f,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_SILVER_COIN, false);
-        }
-        else if ( sscanf ( s, "COIN,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_SILVER_COIN, true);
-        }
-        
-        else if ( sscanf ( s, "GOLD,%f,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_GOLD_COIN, false);
-        }
-        else if ( sscanf ( s, "GOLD,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]) ) == 2 )
-        {
-            itemCommand(&loc.xyz, Item::ITEM_GOLD_COIN, true);
-        }
-        
-        else if ( sscanf ( s, "START,%f,%f,%f",
-                           &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]) ) == 3 )
-        {
-            m_start_positions.push_back(Vec3(loc.xyz[0], loc.xyz[1], loc.xyz[2]));
-        }
-        else if ( s[0] == '\"' )
-        {
-            if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f,%f,%f",
-                          fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                          &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2]) ) == 7 )
-            {
-                /* All 6 DOF specified */
-                need_hat = false;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]), &(loc.hpr[1]), &(loc.hpr[2])) == 6 )
-            {
-                /* All 6 DOF specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]), &(loc.xyz[2]),
-                               &(loc.hpr[0]) ) == 5 )
-            {
-                /* No Roll/Pitch specified - assumed zero */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f,{},{}",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]) ) == 4 )
-            {
-                /* All 6 DOF specified - but need height, roll, pitch */
-                need_hat = true ;
-                fit_skin = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{},%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.hpr[0]) ) == 4 )
-            {
-                /* No Roll/Pitch specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]),
-                               &(loc.xyz[2]) ) == 4 )
-            {
-                /* No Heading/Roll/Pitch specified - but need height */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f,{}",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-            {
-                /* No Roll/Pitch specified - but need height */
-                need_hat = true ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\",%f,%f",
-                               fname, &(loc.xyz[0]), &(loc.xyz[1]) ) == 3 )
-            {
-                /* No Z/Heading/Roll/Pitch specified */
-                need_hat = false ;
-            }
-            else if ( sscanf ( s, "\"%[^\"]\"", fname ) == 1 )
-            {
-                /* Nothing specified */
-                need_hat = false ;
-            }
-            else
-            {
-                fclose(fd);
-                std::ostringstream msg;
-                msg<< "Syntax error in '"<<path<<"': "<<s;
-                throw std::runtime_error(msg.str());
-            }
-
-            if ( need_hat )
-            {
-                sgVec3 nrm ;
-                loc.xyz[2] = 1000.0f ;
-                loc.xyz[2] = getHeightAndNormal ( m_model, loc.xyz, nrm ) ;
-                if ( fit_skin )
-                {
-                    float sy = sin ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
-                    float cy = cos ( -loc.hpr [ 0 ] * SG_DEGREES_TO_RADIANS ) ;
-
-                    loc.hpr[2] =  SG_RADIANS_TO_DEGREES * atan2 ( nrm[0] * cy -
-                                  nrm[1] * sy, nrm[2] ) ;
-                    loc.hpr[1] = -SG_RADIANS_TO_DEGREES * atan2 ( nrm[1] * cy +
-                                 nrm[0] * sy, nrm[2] ) ;
-                }
-            }   // if need_hat
-
-            ssgEntity        *obj   = load(file_manager->getModelFile(fname),
-                                                   CB_TRACK,
-                                                   /* optimise   */  true,
-                                                   /*is_full_path*/  true);
-            if(!obj)
-            {
-                fclose(fd);
-                std::ostringstream msg;
-                msg<<"Can't open track model '"<<fname<<"'.";
-                file_manager->popTextureSearchPath();
-                file_manager->popModelSearchPath  ();
-                throw std::runtime_error(msg.str());
-            }
-            SSGHelp::createDisplayLists(obj);
-            ssgRangeSelector *lod   = new ssgRangeSelector ;
-            ssgTransform     *trans = new ssgTransform ( & loc ) ;
-
-            float r [ 2 ] = { -10.0f, 2000.0f } ;
-
-            lod    -> addKid(obj   );
-            trans  -> addKid(lod   );
-            m_model-> addKid(trans );
-            lod    -> setRanges(r, 2);
-
-        }
-        else
-        {
-            fprintf(stderr, "Warning: Syntax error in '%s': %s",
-                     path.c_str(), s);
-        }
-    }   // while fgets
-
-    fclose ( fd ) ;
-#endif
-
+    // Sky dome and boxes support
+    // --------------------------
     if(m_sky_type==SKY_DOME)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
@@ -1310,6 +1099,7 @@ void Track::loadTrackModel()
     {
         m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
     }
+
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
@@ -1318,10 +1108,9 @@ void Track::loadTrackModel()
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
 
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f));
-    m_light->setLightType(video::ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
+    m_light->setLightType(video::ELT_DIRECTIONAL);
     m_light->setRotation( core::vector3df(180, 45, 45) );
 
-    //m_light->getLightData().Attenuation = core::vector3df(0.01, 0.01, 0.01);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     

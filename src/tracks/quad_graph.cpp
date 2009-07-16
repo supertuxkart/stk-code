@@ -376,14 +376,17 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 /** Draws the mini map on the screen.
  *  \param where the top left and lower right corner for the mini map.
  */
-void QuadGraph::drawMiniMap(const core::rect<s32> &where)
+video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
+                                        const std::string &name)
 {
-    int width  = where.LowerRightCorner.X-where.UpperLeftCorner.X;
-    int height = where.UpperLeftCorner.Y -where.LowerRightCorner.Y;
+    video::ITexture *texture = 
+        irr_driver->getVideoDriver()->addTexture(dimension, name.c_str());
 
-
+    scene::IMesh *mesh = irr_driver->createQuadMesh();
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         const Quad &q=m_all_quads->getQuad(m_all_nodes[i]->getIndex());
     }
+    irr_driver->removeMesh(mesh);
+    return texture;
 }   // drawMiniMap

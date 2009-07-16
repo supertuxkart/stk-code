@@ -100,6 +100,9 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
+    /** The texture for the mini map, which is displayed in the race gui. */
+    video::ITexture         *m_mini_map;
+
 	/** List of all bezier curves in the track - for e.g. camera, ... */
 	std::vector<BezierCurve*> m_all_curves;
 
@@ -226,7 +229,7 @@ private:
     void  loadTrack(const std::string &filename);
     void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                       int bNeedHeight);
-    void  loadDriveline();
+    void  loadQuadGraph();
     void  readDrivelineFromFile(std::vector<Vec3>& line,
                                 const std::string& file_ext);
     void  convertTrackToBullet(const scene::IMesh *mesh);
