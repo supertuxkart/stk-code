@@ -30,7 +30,7 @@ Shadow::Shadow(const std::string &name)
     m.setTexture(0, texture);
     m.BackfaceCulling = false;
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m_mesh   = irr_driver->createQuadMesh(&m);
+    m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
     m_buffer = m_mesh->getMeshBuffer(0);
     irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
     v[0].Pos.X = -1.0f; v[0].Pos.Z =  1.0f; v[0].Pos.Y = 0.01f;

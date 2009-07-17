@@ -50,6 +50,7 @@ public:
                                 const std::string graph_file_name);
                 ~QuadGraph     ();
     void         createDebugMesh();
+    void         cleanupDebugMesh();
     void         getSuccessors(int quadNumber, 
                                std::vector<unsigned int>& succ) const;
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz, 

@@ -116,7 +116,15 @@ void RaceGUI::drawMap ()
 {
     // arenas currently don't have a map.
     if(RaceManager::getTrack()->isArena()) return;
+    const video::ITexture *t=RaceManager::getTrack()->getMiniMap();
     
+    core::rect<s32> dest(10, UserConfigParams::m_height-60, 
+                         60, UserConfigParams::m_height-10);
+    core::rect<s32> source(core::position2di(0, 0), t->getOriginalSize());
+    irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 0, 0, true);
+    
+    return;
+
     glDisable ( GL_TEXTURE_2D ) ;
     assert(RaceManager::getWorld() != NULL);
     int xLeft = 10;

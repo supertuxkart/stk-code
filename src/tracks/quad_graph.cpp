@@ -163,40 +163,35 @@ void QuadGraph::createDebugMesh()
     m_mesh_buffer     = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
 
-    video::S3DVertex* v=(video::S3DVertex*)m_mesh_buffer->getVertices();
-    // The mesh buffer already contains one quad, so set the coordinates
-    // of the first quad in there.
-    video::SColor c(255, 255, 0, 0);
-    m_all_quads->getQuad(0).setVertices(v, c);
-    
+    video::SColor     c(255, 255, 0, 0);    
     unsigned int      n     = m_all_quads->getNumberOfQuads();
     // Four vertices for each of the n-1 remaining quads
-    video::S3DVertex *new_v = new video::S3DVertex[(n-1)*4];
+    video::S3DVertex *new_v = new video::S3DVertex[n*4];
     // Each quad consists of 2 triangles with 3 elements, so 
     // we need 2*3 indices for each quad.
-    irr::u16         *ind   = new irr::u16[(n-1)*6];
+    irr::u16         *ind   = new irr::u16[n*6];
 
     // Now add all other quads
-    for(unsigned int i=1; i<n; i++)
+    for(unsigned int i=0; i<n; i++)
     {
         // Swap the colours from red to blue and back
         c.setRed (i%2 ? 255 : 0); 
         c.setBlue(i%2 ? 0 : 255);
         // Transfer the 4 points of the current quad to the list of vertices
-        m_all_quads->getQuad(i).setVertices(new_v+(4*i-4), c);
+        m_all_quads->getQuad(i).setVertices(new_v+4*i, c);
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code 
         // would not be portable to directx anymore).
-        ind[6*i-6] = 4*i-4;  // First triangle: vertex 0, 1, 2
-        ind[6*i-5] = 4*i-3;
-        ind[6*i-4] = 4*i-2;
-        ind[6*i-3] = 4*i-4;  // second triangle: vertex 0, 1, 3
-        ind[6*i-2] = 4*i-2;
-        ind[6*i-1] = 4*i-1;
+        ind[6*i  ] = 4*i;  // First triangle: vertex 0, 1, 2
+        ind[6*i+1] = 4*i+1;
+        ind[6*i+2] = 4*i+2;
+        ind[6*i+3] = 4*i;  // second triangle: vertex 0, 1, 3
+        ind[6*i+4] = 4*i+2;
+        ind[6*i+5] = 4*i+3;
     }   // for i=1; i<m_all_quads
     
-    m_mesh_buffer->append(new_v, (n-1)*4, ind, (n-1)*6);
+    m_mesh_buffer->append(new_v, n*4, ind, n*6);
     // Instead of setting the bounding boxes, we could just disable culling,
     // since the debug track should always be drawn.
     //m_node->setAutomaticCulling(scene::EAC_OFF);
@@ -204,6 +199,15 @@ void QuadGraph::createDebugMesh()
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
     m_node           = irr_driver->addMesh(m_mesh);
 }   // createDebugMesh
+
+// -----------------------------------------------------------------------------
+/** Removes the debug mesh from the scene.
+ */
+void QuadGraph::cleanupDebugMesh()
+{
+    irr_driver->removeNode(m_node);
+    irr_driver->removeMesh(m_mesh);
+}   // cleanupDebugMesh
 
 // -----------------------------------------------------------------------------
 /** Returns the list of successors or a node.
@@ -382,11 +386,21 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
     video::ITexture *texture = 
         irr_driver->getVideoDriver()->addTexture(dimension, name.c_str());
 
+    // FIXME: all very much work in progress, only committed as a backup
+    // (and to include the debug cleanup)
+    createDebugMesh();
+
     scene::IMesh *mesh = irr_driver->createQuadMesh();
-    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+
+
+    unsigned int n = m_all_nodes.size();
+    for(unsigned int i=0; i<n; i++)
     {
         const Quad &q=m_all_quads->getQuad(m_all_nodes[i]->getIndex());
     }
     irr_driver->removeMesh(mesh);
+    const std::string f=file_manager->getTrackFile("waterfall.png", "beach");
+    return irr_driver->getTexture(f);
     return texture;
 }   // drawMiniMap

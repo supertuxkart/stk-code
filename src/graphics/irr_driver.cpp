@@ -359,36 +359,33 @@ void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh,
 // ----------------------------------------------------------------------------
 /** Creates a quad mesh buffer and adds it to the scene graph.
  */
-scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material)
+scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
+                                        bool create_one_quad)
 {
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
-    video::S3DVertex v;
-    v.Pos = core::vector3df(0,0,0);
-    
-    // Add the vertices
-    // ----------------
-    buffer->Vertices.push_back(v);
-    buffer->Vertices.push_back(v);
-    buffer->Vertices.push_back(v);
-    buffer->Vertices.push_back(v);
+    if(create_one_quad)
+    {
+        video::S3DVertex v;
+        v.Pos    = core::vector3df(0,0,0);
+        v.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
 
-    // Define the indices for the triangles
-    // ------------------------------------
-    buffer->Indices.push_back(0);
-    buffer->Indices.push_back(1);
-    buffer->Indices.push_back(2);
+        // Add the vertices
+        // ----------------
+        buffer->Vertices.push_back(v);
+        buffer->Vertices.push_back(v);
+        buffer->Vertices.push_back(v);
+        buffer->Vertices.push_back(v);
 
-    buffer->Indices.push_back(0);
-    buffer->Indices.push_back(2);
-    buffer->Indices.push_back(3);
+        // Define the indices for the triangles
+        // ------------------------------------
+        buffer->Indices.push_back(0);
+        buffer->Indices.push_back(1);
+        buffer->Indices.push_back(2);
 
-    // Set the normals
-    // ---------------
-    core::vector3df n(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
-    buffer->Vertices[0].Normal = n;
-    buffer->Vertices[1].Normal = n;
-    buffer->Vertices[2].Normal = n;
-    buffer->Vertices[3].Normal = n;
+        buffer->Indices.push_back(0);
+        buffer->Indices.push_back(2);
+        buffer->Indices.push_back(3);
+    }
     if(material)
         buffer->Material = *material;
     SMesh *mesh       = new SMesh();

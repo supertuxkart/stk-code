@@ -161,6 +161,8 @@ public:
                       ~Track             ();
     bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
+    /** Returns the texture with the mini map for this track. */
+    const video::ITexture*getMiniMap     () const { return m_mini_map; }
     void               draw2Dview        (float x_offset,
                                           float y_offset              ) const;
     void               drawScaled2D      (float x, float y, float w,
