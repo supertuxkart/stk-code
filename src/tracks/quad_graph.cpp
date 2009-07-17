@@ -383,12 +383,14 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
                                         const std::string &name)
 {
+    return NULL;
+
     video::ITexture *texture = 
         irr_driver->getVideoDriver()->addTexture(dimension, name.c_str());
 
     // FIXME: all very much work in progress, only committed as a backup
     // (and to include the debug cleanup)
-    createDebugMesh();
+    // createDebugMesh();
 
     scene::IMesh *mesh = irr_driver->createQuadMesh();
     scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
