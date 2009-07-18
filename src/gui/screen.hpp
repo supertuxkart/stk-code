@@ -41,7 +41,7 @@ namespace GUIEngine
    
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     
-    class Screen : public IEventReceiver
+    class Screen
     {
         friend class Skin;
         
@@ -52,7 +52,6 @@ namespace GUIEngine
 
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
-        bool onWidgetActivated(Widget* w);
     public:
         // current mouse position, read-only...
         int m_mouse_x, m_mouse_y;
@@ -89,10 +88,6 @@ namespace GUIEngine
         const std::string& getName() const { return m_filename; }
         
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
-        
-        virtual bool OnEvent(const SEvent& event);
-        void processAction(const int action, const unsigned int value, Input::InputType type);
-
     };
     
 }

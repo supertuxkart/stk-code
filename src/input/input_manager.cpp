@@ -33,6 +33,7 @@
 #include "gui/state_manager.hpp"
 #include "gui/modaldialog.hpp"
 #include "gui/engine.hpp"
+#include "gui/event_handler.hpp"
 #include "gui/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
@@ -320,7 +321,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                     m_timer_in_use = true;
                     m_timer = 0.25;
                 }
-                GUIEngine::getCurrentScreen()->processAction(action, abs(value), type);
+                GUIEngine::EventHandler::get()->processAction(action, abs(value), type);
             }
         }
     }

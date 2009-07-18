@@ -244,6 +244,7 @@
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		955DE88D1004273B006A4F3C /* checkline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8891004273B006A4F3C /* checkline.cpp */; };
 		956D36A710095035007FCB95 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956D36A610095035007FCB95 /* player.cpp */; };
+		958330391012248A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330381012248A00C5137E /* event_handler.cpp */; };
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
 		95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */; };
@@ -376,6 +377,8 @@
 		955DE8891004273B006A4F3C /* checkline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = checkline.cpp; path = ../../tracks/checkline.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88A1004273B006A4F3C /* checkline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = checkline.hpp; path = ../../tracks/checkline.hpp; sourceTree = SOURCE_ROOT; };
 		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = games/supertuxkart/src/config/player.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		958330371012248A00C5137E /* event_handler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = event_handler.hpp; path = games/supertuxkart/src/gui/event_handler.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		958330381012248A00C5137E /* event_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_handler.cpp; path = games/supertuxkart/src/gui/event_handler.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1022,6 +1025,8 @@
 				951C35BD0FC066ED00A48379 /* credits.hpp */,
 				9505577A0F696A900056E88C /* engine.cpp */,
 				9505577B0F696A900056E88C /* engine.hpp */,
+				958330381012248A00C5137E /* event_handler.cpp */,
+				958330371012248A00C5137E /* event_handler.hpp */,
 				9516162C0FFFB12B004B16D8 /* kart_selection.cpp */,
 				9516164D0FFFB1F0004B16D8 /* kart_selection.hpp */,
 				954A57DB0FEC5AE40073C16C /* modaldialog.cpp */,
@@ -2343,6 +2348,7 @@
 				955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */,
 				955DE88D1004273B006A4F3C /* checkline.cpp in Sources */,
 				956D36A710095035007FCB95 /* player.cpp in Sources */,
+				958330391012248A00C5137E /* event_handler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

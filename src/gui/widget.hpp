@@ -77,6 +77,7 @@ namespace GUIEngine
     
     class Widget : public SkinWidgetContainer
     {
+        friend class EventHandler;
     protected:
         friend class RibbonWidget;
         friend class Screen;
@@ -269,7 +270,7 @@ namespace GUIEngine
     class RibbonWidget : public Widget
     {
         friend class RibbonGridWidget;
-        friend class Screen;
+        friend class EventHandler;
         
         int m_selection;
         RibbonType m_ribbon_type;

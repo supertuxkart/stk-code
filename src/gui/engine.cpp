@@ -25,6 +25,7 @@
 #include "input/input_manager.hpp"
 #include "gui/credits.hpp"
 #include "gui/screen.hpp"
+#include "gui/event_handler.hpp"
 #include "gui/kart_selection.hpp"
 #include "gui/skin.hpp"
 #include "gui/state_manager.hpp"
@@ -50,30 +51,6 @@ namespace GUIEngine
         return dt;
     }
     
-    class IrrlichtEventCore : public IEventReceiver
-    {
-    public:
-        IrrlichtEventCore()
-        {
-        }
-        ~IrrlichtEventCore()
-        {
-        }
-        bool OnEvent (const SEvent &event)
-        {
-            if(event.EventType == EET_GUI_EVENT ||
-               (!StateManager::isGameState() && event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT)
-               )
-            {
-                if(g_current_screen == NULL) return false;
-                g_current_screen->OnEvent(event);
-                return false;
-            }
-            else
-                return input_manager->input(event);
-        }
-    };
-    IrrlichtEventCore* g_irrlicht_event_core = NULL;
 // -----------------------------------------------------------------------------
 IrrlichtDevice* getDevice()
 {
@@ -105,8 +82,6 @@ void cleanForGame()
 {
     clear();
     needsUpdate.clearWithoutDeleting();
-    if(g_irrlicht_event_core == NULL) g_irrlicht_event_core = new IrrlichtEventCore();
-    g_device->setEventReceiver(g_irrlicht_event_core);
 }
 // -----------------------------------------------------------------------------  
 void switchToScreen(const char* screen_name)
@@ -137,16 +112,9 @@ void switchToScreen(const char* screen_name)
         g_current_screen = new_screen;
     }
     
-
     
     // show screen
     g_current_screen->addWidgets();
-    
-    // set event listener
-    if(g_irrlicht_event_core == NULL) g_irrlicht_event_core = new IrrlichtEventCore();
-    g_device->setEventReceiver(g_irrlicht_event_core);
-    //g_env->setUserEventReceiver(g_irrlicht_event_core);
-
 }
 // -----------------------------------------------------------------------------
 /** to be called after e.g. a resolution switch */
@@ -195,6 +163,9 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback
 	if (g_font) g_skin->setFont(g_font);
     
 	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
+    
+    // set event receiver
+    g_device->setEventReceiver(EventHandler::get());
 }
 // -----------------------------------------------------------------------------
 /** transmit event to user event callback (out of encapsulated GUI module) */
