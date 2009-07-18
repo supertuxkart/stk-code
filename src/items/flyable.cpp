@@ -153,7 +153,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
         Kart *kart = RaceManager::getKart(i);
-        if(kart->isEliminated() || kart == m_owner || (!kart->isOnGround()) ) continue;
+        if(kart->isEliminated() || kart == m_owner || kart->isRescue() ) continue;
         btTransform t=kart->getTrans();
        
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
@@ -257,10 +257,15 @@ void Flyable::update(float dt)
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat
         // unphysical, but feels right in the game.
-        hat = std::max(std::min(hat, m_max_height) , m_min_height);
-        float delta = m_average_height - hat;
-        btVector3 v=getVelocity();
-        v.setZ(m_force_updown*delta);
+
+        float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
+        btVector3 v = getVelocity();
+        float heading = atan2f(-v.getX(), v.getY());
+        float pitch   = getTerrainPitch (heading);
+        float vel_z = m_force_updown*(delta);
+        if (hat < m_max_height) // take into account pitch of surface
+            vel_z += hypotf(v.getX(), v.getY())*tanf(pitch);
+        v.setZ(vel_z);
         setVelocity(v);
     }   // if m_adjust_z_velocity
 

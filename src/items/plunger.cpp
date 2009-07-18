@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Physics improvements and linear intersection algorithm by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -33,60 +36,56 @@
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 {
+    const float gravity = 0.0f;
+
     float y_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getY();
-    
+    float up_velocity = 0.0f;
+    float plunger_speed = 2 * m_speed;
+
     // if the kart is looking backwards, release from the back
     m_reverse_mode = kart->getControls().m_look_back;
-    
+
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
     getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */, m_reverse_mode);
-    
+
     btTransform trans = kart->getTrans();
-    
+
     btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
     btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
                                 thisKartDirMatrix[1][1],
                                 thisKartDirMatrix[2][1]);
-    
-    float heading=atan2(-thisKartDirVector.getX(), thisKartDirVector.getY());
+
+    float heading=atan2f(-thisKartDirVector.getX(), thisKartDirVector.getY());
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
     if(closest_kart != NULL && kartDistSquared < 30*30)
     {
-        btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
-        
-        if(!m_reverse_mode) // substracting speeds doesn't work backwards, since both speeds go in opposite directions
-        {
-            // FIXME - this approximation will be wrong if both karts' directions are not colinear
-            const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
-            
-            // calculate the approximate location of the aimed kart in 'time' seconds
-            closestKartLoc += time*closest_kart->getVelocity();
-        }
-        
-        // calculate the angle at which the projectile should be thrown
-        // to hit the aimed kart
-        float projectileAngle=atan2(-(closestKartLoc.getX() - kart->getTrans().getOrigin().getX()),
-                                    closestKartLoc.getY() - kart->getTrans().getOrigin().getY() );
-        
-        // apply transformation to the bullet object
+        float fire_angle     = 0.0f;
+        float time_estimated = 0.0f;
+        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
+                                       plunger_speed, gravity,
+                                       &fire_angle, &up_velocity, &time_estimated);
+
+        // apply transformation to the bullet object (without pitch)
         btMatrix3x3 m;
-        m.setEulerZYX(pitch, 0.0f, projectileAngle);
+        m.setEulerZYX(0.0f, 0.0f, fire_angle);
         trans.setBasis(m);
-        
-        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, false, &trans );
+
+        m_initial_velocity = btVector3(0.0f, plunger_speed, up_velocity);
+
+        createPhysics(y_offset, m_initial_velocity,
+                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, false, &trans );
     }
     else
     {
         trans = kart->getKartHeading();
 
-        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
+        createPhysics(y_offset, btVector3(pitch, plunger_speed, 0.0f),
+                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
     }
-    
+
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
@@ -133,16 +132,20 @@ void Plunger::update(float dt)
     
     if(getHoT()==Track::NOHIT) return;
     float hat = getTrans().getOrigin().getZ()-getHoT();
-    
+
     // Use the Height Above Terrain to set the Z velocity.
     // HAT is clamped by min/max height. This might be somewhat
     // unphysical, but feels right in the game.
-    hat = std::max(std::min(hat, m_max_height) , m_min_height);
-    float delta = m_average_height - hat;
-    btVector3 v=getVelocity();
-    v.setZ( m_st_force_updown[POWERUP_PLUNGER]*delta);
+
+    float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
+    btVector3 v = getVelocity();
+    float heading = atan2f(-v.getX(), v.getY());
+    float pitch   = getTerrainPitch (heading);
+    float vel_z = m_force_updown*(delta);
+    if (hat < m_max_height) // take into account pitch of surface
+        vel_z += hypotf(v.getX(), v.getY())*tanf(pitch);
+    v.setZ(vel_z);
     setVelocity(v);
-    
 }   // update
 
 // -----------------------------------------------------------------------------

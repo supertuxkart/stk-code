@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Physics improvements and linear intersection algorithm by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -35,6 +38,7 @@ private:
     RubberBand  *m_rubber_band;
     /** Timer to keep the plunger alive while the rubber band is working. */
     float        m_keep_alive;
+    btVector3    m_initial_velocity;
 
     bool m_reverse_mode;
 public:
