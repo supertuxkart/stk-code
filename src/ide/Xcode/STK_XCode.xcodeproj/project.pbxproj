@@ -256,6 +256,16 @@
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D80FE4741D002E10AD /* water_splash.cpp */; };
+		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
+		95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */; };
+		95ECA10210124C5000D47C5F /* icon_button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */; };
+		95ECA10310124C5000D47C5F /* label_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F210124C5000D47C5F /* label_widget.cpp */; };
+		95ECA10410124C5000D47C5F /* list_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F410124C5000D47C5F /* list_widget.cpp */; };
+		95ECA10510124C5000D47C5F /* model_view_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F610124C5000D47C5F /* model_view_widget.cpp */; };
+		95ECA10610124C5000D47C5F /* ribbon_grid_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */; };
+		95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */; };
+		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
+		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -362,7 +372,7 @@
 		955DE8881004273B006A4F3C /* check_structure.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_structure.hpp; path = ../../tracks/check_structure.hpp; sourceTree = SOURCE_ROOT; };
 		955DE8891004273B006A4F3C /* checkline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = checkline.cpp; path = ../../tracks/checkline.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88A1004273B006A4F3C /* checkline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = checkline.hpp; path = ../../tracks/checkline.hpp; sourceTree = SOURCE_ROOT; };
-		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = games/supertuxkart/src/config/player.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = ../../config/player.cpp; sourceTree = SOURCE_ROOT; };
 		958330B210122B4A00C5137E /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../guiengine/engine.cpp; sourceTree = SOURCE_ROOT; };
 		958330B310122B4A00C5137E /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = engine.hpp; path = ../../guiengine/engine.hpp; sourceTree = SOURCE_ROOT; };
 		958330B410122B4A00C5137E /* event_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_handler.cpp; path = ../../guiengine/event_handler.cpp; sourceTree = SOURCE_ROOT; };
@@ -982,6 +992,27 @@
 		95D950D10FE473CA002E10AD /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../config/user_config.hpp; sourceTree = SOURCE_ROOT; };
 		95D950D70FE4741D002E10AD /* water_splash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = water_splash.hpp; path = ../../graphics/water_splash.hpp; sourceTree = SOURCE_ROOT; };
 		95D950D80FE4741D002E10AD /* water_splash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = water_splash.cpp; path = ../../graphics/water_splash.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0EC10124C5000D47C5F /* button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = button_widget.cpp; path = ../../guiengine/widgets/button_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0ED10124C5000D47C5F /* button_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = button_widget.hpp; path = ../../guiengine/widgets/button_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_box_widget.cpp; path = ../../guiengine/widgets/check_box_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0EF10124C5000D47C5F /* check_box_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_box_widget.hpp; path = ../../guiengine/widgets/check_box_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = icon_button_widget.cpp; path = ../../guiengine/widgets/icon_button_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F110124C5000D47C5F /* icon_button_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = icon_button_widget.hpp; path = ../../guiengine/widgets/icon_button_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F210124C5000D47C5F /* label_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = label_widget.cpp; path = ../../guiengine/widgets/label_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F310124C5000D47C5F /* label_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = label_widget.hpp; path = ../../guiengine/widgets/label_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F410124C5000D47C5F /* list_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = list_widget.cpp; path = ../../guiengine/widgets/list_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F510124C5000D47C5F /* list_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = list_widget.hpp; path = ../../guiengine/widgets/list_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F610124C5000D47C5F /* model_view_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = model_view_widget.cpp; path = ../../guiengine/widgets/model_view_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F710124C5000D47C5F /* model_view_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = model_view_widget.hpp; path = ../../guiengine/widgets/model_view_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ribbon_grid_widget.cpp; path = ../../guiengine/widgets/ribbon_grid_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0F910124C5000D47C5F /* ribbon_grid_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ribbon_grid_widget.hpp; path = ../../guiengine/widgets/ribbon_grid_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ribbon_widget.cpp; path = ../../guiengine/widgets/ribbon_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FB10124C5000D47C5F /* ribbon_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ribbon_widget.hpp; path = ../../guiengine/widgets/ribbon_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinner_widget.cpp; path = ../../guiengine/widgets/spinner_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FD10124C5000D47C5F /* spinner_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = spinner_widget.hpp; path = ../../guiengine/widgets/spinner_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text_box_widget.cpp; path = ../../guiengine/widgets/text_box_widget.cpp; sourceTree = SOURCE_ROOT; };
+		95ECA0FF10124C5000D47C5F /* text_box_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = text_box_widget.hpp; path = ../../guiengine/widgets/text_box_widget.hpp; sourceTree = SOURCE_ROOT; };
+		95ECA13C10124E6900D47C5F /* widgets.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widgets.hpp; path = games/supertuxkart/src/guiengine/widgets.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
@@ -1139,6 +1170,8 @@
 				958330BE10122B4A00C5137E /* skin.hpp */,
 				958330BF10122B4A00C5137E /* widget.cpp */,
 				958330C010122B4A00C5137E /* widget.hpp */,
+				95ECA0EB10124C5000D47C5F /* widgets */,
+				95ECA13C10124E6900D47C5F /* widgets.hpp */,
 			);
 			name = guiengine;
 			path = ../../guiengine;
@@ -2093,6 +2126,34 @@
 			path = ../../config;
 			sourceTree = SOURCE_ROOT;
 		};
+		95ECA0EB10124C5000D47C5F /* widgets */ = {
+			isa = PBXGroup;
+			children = (
+				95ECA0EC10124C5000D47C5F /* button_widget.cpp */,
+				95ECA0ED10124C5000D47C5F /* button_widget.hpp */,
+				95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */,
+				95ECA0EF10124C5000D47C5F /* check_box_widget.hpp */,
+				95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */,
+				95ECA0F110124C5000D47C5F /* icon_button_widget.hpp */,
+				95ECA0F210124C5000D47C5F /* label_widget.cpp */,
+				95ECA0F310124C5000D47C5F /* label_widget.hpp */,
+				95ECA0F410124C5000D47C5F /* list_widget.cpp */,
+				95ECA0F510124C5000D47C5F /* list_widget.hpp */,
+				95ECA0F610124C5000D47C5F /* model_view_widget.cpp */,
+				95ECA0F710124C5000D47C5F /* model_view_widget.hpp */,
+				95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */,
+				95ECA0F910124C5000D47C5F /* ribbon_grid_widget.hpp */,
+				95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */,
+				95ECA0FB10124C5000D47C5F /* ribbon_widget.hpp */,
+				95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */,
+				95ECA0FD10124C5000D47C5F /* spinner_widget.hpp */,
+				95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */,
+				95ECA0FF10124C5000D47C5F /* text_box_widget.hpp */,
+			);
+			name = widgets;
+			path = ../../guiengine/widgets;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2397,6 +2458,16 @@
 				95833240101243ED00C5137E /* player_info_dialog.cpp in Sources */,
 				95833241101243ED00C5137E /* press_a_key_dialog.cpp in Sources */,
 				95833242101243ED00C5137E /* track_info_dialog.cpp in Sources */,
+				95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */,
+				95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */,
+				95ECA10210124C5000D47C5F /* icon_button_widget.cpp in Sources */,
+				95ECA10310124C5000D47C5F /* label_widget.cpp in Sources */,
+				95ECA10410124C5000D47C5F /* list_widget.cpp in Sources */,
+				95ECA10510124C5000D47C5F /* model_view_widget.cpp in Sources */,
+				95ECA10610124C5000D47C5F /* ribbon_grid_widget.cpp in Sources */,
+				95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */,
+				95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */,
+				95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

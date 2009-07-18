@@ -187,7 +187,7 @@ use rectangular icons (this will affect the type of focus/highlighting used)
 #include <string>
 
 #include "guiengine/abstract_state_manager.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "utils/ptr_vector.hpp"
 
 using namespace irr;

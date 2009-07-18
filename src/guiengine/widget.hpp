@@ -85,6 +85,9 @@ namespace GUIEngine
         friend class Skin;
         friend class RibbonGridWidget;
         
+        int getNewID();
+        int getNewNoFocusID();
+        
         /**
           * Can be used in children to indicate whether a widget is selected or not
           * - in widgets where it makes sense (e.g. ribbon children) and where the
@@ -135,7 +138,16 @@ namespace GUIEngine
         
         bool m_show_bounding_box;
         
-        template<typename T> T* getIrrlichtElement();
+        template<typename T> T* Widget::getIrrlichtElement()
+        {
+            #if defined(WIN32) || defined(NDEBUG)
+                return static_cast<T*>(m_element);
+            #else
+                T* out = dynamic_cast<T*>(m_element);
+                return out;
+            #endif
+        }
+        
         IGUIElement* getIrrlichtElement() { return m_element; }
 
         
@@ -187,241 +199,7 @@ namespace GUIEngine
         
         bool isSelected() const { return m_selected; }
     };
-    
-    class ButtonWidget : public Widget
-    {
-    public:
-        ButtonWidget();
-        virtual ~ButtonWidget() {}
 
-        void add();
-        void setLabel(const char* label);
-    };
-    
-    class LabelWidget : public Widget
-    {
-    public:
-        LabelWidget();
-        virtual ~LabelWidget() {}
-        
-        void add();
-        void setText(stringw newText);
-    };
-    
-    class CheckBoxWidget : public Widget
-    {
-        bool m_state;
-        bool transmitEvent(Widget* w, std::string& originator);
-        
-    public:
-        CheckBoxWidget();
-        virtual ~CheckBoxWidget() {}
-        
-        void add();
-        bool getState() const { return m_state; }
-        void setState(const bool enabled)  { m_state = enabled; }
-    };
-    
-    
-    class SpinnerWidget : public Widget
-    {
-        int m_value, m_min, m_max;
-        std::vector<std::string> m_labels;
-        bool m_graphical;
-        bool m_gauge;
-        
-        bool transmitEvent(Widget* w, std::string& originator);
-        bool rightPressed();
-        bool leftPressed();
-    public:
-        
-        SpinnerWidget(const bool gauge=false);
-        virtual ~SpinnerWidget() {}
-        virtual void move(const int x, const int y, const int w, const int h);
-
-        void setValue(const int new_value);
-        void addLabel(std::string label);
-        void add();
-        bool isGauge()  const { return m_gauge; }
-        int  getValue() const { return m_value; }
-        int  getMax()   const { return m_max;   }
-        int  getMin()   const { return m_min;   }
-    };
-    
-    class IconButtonWidget : public Widget
-    {
-        bool clickable;
-        IGUIStaticText* label;
-    public:
-        IconButtonWidget(const bool clickable=true);
-        virtual ~IconButtonWidget() {}
-        
-        void add();
-        void setLabel(std::string new_label);
-    };
-    
-    enum RibbonType
-    {
-        RIBBON_COMBO, /* select one item out of many, like in a combo box */
-        RIBBON_TOOLBAR, /* a row of individual buttons */
-        RIBBON_TABS /* a tab bar */
-    };
-        
-    class RibbonWidget : public Widget
-    {
-        friend class RibbonGridWidget;
-        friend class EventHandler;
-        
-        int m_selection;
-        RibbonType m_ribbon_type;
-        
-        void add();
-        
-        bool rightPressed();
-        bool leftPressed();
-        bool mouseHovered(Widget* child);
-        
-        void updateSelection();
-        bool transmitEvent(Widget* w, std::string& originator);
-        void focused();
-        
-        ptr_vector<IGUIStaticText, REF> m_labels;
-    public:
-        Widget* m_focus;
-        
-        RibbonWidget(const RibbonType type=RIBBON_COMBO);
-        virtual ~RibbonWidget() {}
-        
-        int getSelection() const { return m_selection; }
-        void setSelection(const int i) { m_selection = i; updateSelection(); }
-        void select(std::string item);
-        
-        RibbonType getRibbonType() const { return m_ribbon_type; }
-        const std::string& getSelectionIDString() { return m_children[m_selection].m_properties[PROP_ID]; }
-        const std::string& getSelectionText() { return m_children[m_selection].m_properties[PROP_TEXT]; }
-        void setLabel(const int id, std::string new_name);
-        
-    };
-    
-    /**
-      * Even if you have a ribbon that only acts on click/enter, you may wish to know which
-      * item is currently highlighted. In this case, create a listener and pass it to the ribbon.
-      */
-    class RibbonGridHoverListener
-    {
-    public:
-        virtual ~RibbonGridHoverListener() {}
-        virtual void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID) = 0;
-    };
-
-    struct ItemDescription
-    {
-        std::string m_user_name;
-        std::string m_code_name;
-        std::string m_sshot_file;
-    };
-    
-    class RibbonGridWidget : public Widget
-    {
-        friend class RibbonWidget;
-        
-        ptr_vector<RibbonGridHoverListener> m_hover_listeners;
-        
-        virtual ~RibbonGridWidget() {}
-        
-        /* reference pointers only, the actual instances are owned by m_children */
-        ptr_vector<RibbonWidget, REF> m_rows;
-        
-        std::vector<ItemDescription> m_items;
-        IGUIStaticText* m_label;
-        RibbonWidget* getSelectedRibbon() const;
-        RibbonWidget* getRowContaining(Widget* w) const;
-        
-        void updateLabel(RibbonWidget* from_this_ribbon=NULL);
-        
-        void propagateSelection();
-        void focused();
-        
-        bool transmitEvent(Widget* w, std::string& originator);
-        
-        void scroll(const int x_delta);
-        
-        int m_scroll_offset;
-        int m_needed_cols;
-        int m_col_amount;
-        int m_max_rows;
-        bool m_combo;
-        
-        bool m_has_label;
-        
-        /* reference pointers only, the actual instances are owned by m_children */
-        Widget* m_left_widget;
-        Widget* m_right_widget;
-    public:
-        RibbonGridWidget(const bool combo=false, const int max_rows=4);
-        
-        void registerHoverListener(RibbonGridHoverListener* listener);
-        
-        void add();
-        bool rightPressed();
-        bool leftPressed();
-        
-        void addItem( std::string user_name, std::string code_name, std::string image_file );
-        void updateItemDisplay();
-        
-        bool mouseHovered(Widget* child);
-        void onRowChange(RibbonWidget* row);
-
-        const std::string& getSelectionIDString();
-        const std::string& getSelectionText();
-
-        void setSelection(int item_id);
-        void setSelection(const std::string& code_name);
-    };
-
-    class ModelViewWidget : public Widget
-    {
-        
-        ptr_vector<scene::IMesh, REF> m_models;
-        std::vector<Vec3> m_model_location;
-        
-        video::ITexture* m_texture;
-        float angle;
-    public:
-        ModelViewWidget();
-        ~ModelViewWidget();
-        
-        void add();
-        void clearModels();
-        void addModel(irr::scene::IMesh* mesh, const Vec3& location = Vec3(0,0,0));
-        void update(float delta);
-    };
-    
-    class ListWidget : public Widget
-    {
-    public:
-        ListWidget();
-        
-        SkinWidgetContainer m_selection_skin_info;
-        
-        void add();
-        void addItem(const char* item);
-
-        int getSelection() const;
-        std::string getSelectionName() const;
-        void clear();
-    };
-
-    class TextBoxWidget : public Widget
-    {
-    public:
-        TextBoxWidget();
-        
-        void add();
-        void addItem(const char* item);
-        
-        core::stringw getText() const;
-    };
     
 }
 #endif

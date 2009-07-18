@@ -89,6 +89,26 @@ supertuxkart_SOURCES = \
  guiengine/widget.cpp \
  guiengine/widget.hpp \
  guiengine/event_handler.cpp \
+ guiengine/widgets/button_widget.cpp \
+ guiengine/widgets/button_widget.hpp \
+ guiengine/widgets/check_box_widget.cpp \
+ guiengine/widgets/check_box_widget.hpp \
+ guiengine/widgets/icon_button_widget.cpp \
+ guiengine/widgets/icon_button_widget.hpp \
+ guiengine/widgets/label_widget.cpp \
+ guiengine/widgets/label_widget.hpp \
+ guiengine/widgets/list_widget.cpp \
+ guiengine/widgets/list_widget.hpp \
+ guiengine/widgets/model_view_widget.cpp \
+ guiengine/widgets/model_view_widget.hpp \
+ guiengine/widgets/ribbon_grid_widget.cpp \
+ guiengine/widgets/ribbon_grid_widget.hpp \
+ guiengine/widgets/ribbon_widget.cpp \
+ guiengine/widgets/ribbon_widget.hpp \
+ guiengine/widgets/spinner_widget.cpp \
+ guiengine/widgets/spinner_widget.hpp \
+ guiengine/widgets/text_box_widget.cpp \
+ guiengine/widgets/text_box_widget.hpp \
  input/device_manager.cpp \
  input/device_manager.hpp \
  input/input.cpp \
