@@ -186,7 +186,8 @@ use rectangular icons (this will affect the type of focus/highlighting used)
 #include <irrlicht.h>
 #include <string>
 
-#include "gui/widget.hpp"
+#include "guiengine/abstract_state_manager.hpp"
+#include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 using namespace irr;
@@ -206,13 +207,14 @@ namespace GUIEngine
     extern IGUIEnvironment* getGUIEnv();
     extern IVideoDriver* getDriver();
     extern IGUIFont* getFont();
-
+    extern AbstractStateManager* getStateManager();
+    
     float getLatestDt();
     
     // Widgets that need to be notified at every frame can add themselves there
     extern ptr_vector<Widget, REF> needsUpdate;
     
-    void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, void (*eventCallback)(Widget* widget, std::string& name) );
+    void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
     void cleanUp();
     void switchToScreen(const char* );
     void clear();
@@ -224,6 +226,9 @@ namespace GUIEngine
     void render(float dt);
     void transmitEvent(Widget* widget, std::string& name);
      
+    
+    void onUpdate(float elapsedTime);
+    
 }
 
 #endif

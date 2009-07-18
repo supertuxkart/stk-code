@@ -20,12 +20,12 @@
 #include "audio/sfx_base.hpp"
 #include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/options_screen.hpp"
-#include "gui/screen.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/widget.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "states_screens/options_screen.hpp"
+#include "guiengine/screen.hpp"
+#include "states_screens/state_manager.hpp"
+#include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 
@@ -36,7 +36,7 @@ using namespace GUIEngine;
 /**
  * Callback handling events from the options menus
  */
-namespace StateManager
+namespace OptionsScreen
 {
     void eventInput(Widget* widget, const std::string& name);
 
@@ -597,13 +597,13 @@ namespace StateManager
         {
             std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
 
-            if(selection == "audio_video") StateManager::replaceTopMostMenu("options_av.stkgui");
-            else if(selection == "players") StateManager::replaceTopMostMenu("options_players.stkgui");
-            else if(selection == "controls") StateManager::replaceTopMostMenu("options_input.stkgui");
+            if(selection == "audio_video") StateManager::get()->replaceTopMostMenu("options_av.stkgui");
+            else if(selection == "players") StateManager::get()->replaceTopMostMenu("options_players.stkgui");
+            else if(selection == "controls") StateManager::get()->replaceTopMostMenu("options_input.stkgui");
         }
         else if(name == "back")
         {
-            StateManager::escapePressed();
+            StateManager::get()->escapePressed();
         }
         else
         {

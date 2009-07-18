@@ -16,15 +16,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config/player.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/options_screen.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/widget.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "utils/translation.hpp"
+
+// FIXME : gui engine should not depend on the STK-specific implementation
+#include "states_screens/options_screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 using namespace irr;
 
@@ -241,7 +243,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     // ---- Otherwise, accept entered name
     stringw playerName = textCtrl->getText();
     if(playerName.size() > 0)
-        StateManager::gotNewPlayerName( playerName );
+        OptionsScreen::gotNewPlayerName( playerName );
     
     // irrLicht is too stupid to remove focus from deleted widgets
     // so do it by hand
@@ -342,7 +344,7 @@ void startGame()
     driver->endScene();
     
     
-    StateManager::enterGameState();
+    StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
     race_manager->setTrack("lighthouse");
     race_manager->setNumLaps( 3 );
@@ -521,7 +523,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         stringw playerName = textCtrl->getText();
         if(playerName.size() > 0)
         {
-            StateManager::gotNewPlayerName( playerName, m_player );
+            OptionsScreen::gotNewPlayerName( playerName, m_player );
         }
         
         // irrLicht is too stupid to remove focus from deleted widgets
@@ -540,7 +542,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
     }
     else if(eventSource == "confirmremove")
     {
-        StateManager::deletePlayer( m_player );
+        OptionsScreen::deletePlayer( m_player );
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

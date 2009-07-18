@@ -29,12 +29,12 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "gui/options_screen.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/engine.hpp"
-#include "gui/event_handler.hpp"
-#include "gui/screen.hpp"
+#include "states_screens/options_screen.hpp"
+#include "states_screens/state_manager.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/event_handler.hpp"
+#include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "items/projectile_manager.hpp"
@@ -227,7 +227,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     if( abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
        m_sensed_input->btnID == btnID)
     {
-        StateManager::gotSensedInput(m_sensed_input);
+        OptionsScreen::gotSensedInput(m_sensed_input);
     }
 }
 
@@ -257,7 +257,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
-    if(!StateManager::isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
+    if(!StateManager::get()->isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
         m_device_manager->playerAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
@@ -287,7 +287,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     else if (action_found)
     {
         // ... when in-game
-        if(StateManager::isGameState())
+        if(StateManager::get()->isGameState())
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
             PlayerKart* pk = player->getKart();
@@ -406,7 +406,7 @@ bool InputManager::input(const SEvent& event)
             // escape is a little special
             if(key == KEY_ESCAPE)
             {
-                StateManager::escapePressed();
+                StateManager::get()->escapePressed();
                 return true;
             }
 

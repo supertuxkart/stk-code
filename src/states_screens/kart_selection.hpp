@@ -1,5 +1,7 @@
+//  $Id: font.cpp 3625 2009-06-21 01:10:43Z auria $
+//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2006 
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,27 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#ifndef __HEADER_OPTIONS_SCREEN_HPP__
-#define __HEADER_OPTIONS_SCREEN_HPP__
-
 #include <string>
-#include "irrlicht.h"
 
 namespace GUIEngine
 {
     class Widget;
 }
+class InputDevice;
+class ActivePlayer;
 
-struct Input;
-
-namespace StateManager
+namespace KartSelectionScreen
 {
-    void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
+    void setPlayer0Device(InputDevice* device);
+    void firePressedOnNewDevice(InputDevice* device);
+    void playerPressedRescue(ActivePlayer* player);
     
-    void gotSensedInput(Input* sensedInput);
-    void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
-    void deletePlayer(PlayerProfile* player);
+    void kartSelectionUpdate(float delta);
+    
+    void menuEventKarts(GUIEngine::Widget* widget, const std::string& name);
 }
-
-#endif

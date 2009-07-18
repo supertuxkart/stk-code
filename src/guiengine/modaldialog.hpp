@@ -17,7 +17,7 @@
 
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
-#include "gui/skin.hpp"
+#include "guiengine/skin.hpp"
 
 class PlayerProfile;
 

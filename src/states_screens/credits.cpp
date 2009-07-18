@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "gui/credits.hpp"
+#include "states_screens/credits.hpp"
 
 #include <fstream>
 
@@ -25,7 +25,7 @@ using irr::core::stringw;
 using irr::core::stringc;
 
 #include "config/user_config.hpp"
-#include "gui/engine.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
 

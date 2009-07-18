@@ -4,7 +4,7 @@
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include <irrlicht.h>
-#include "gui/my_button.hpp"
+#include "guiengine/my_button.hpp"
 
 using namespace GUIEngine;
 

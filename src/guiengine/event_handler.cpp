@@ -15,12 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#include "gui/event_handler.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/screen.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/abstract_state_manager.hpp"
+#include "guiengine/event_handler.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 #include "input/input_manager.hpp"
 
 using GUIEngine::EventHandler;
@@ -36,7 +35,8 @@ EventHandler::~EventHandler()
 bool EventHandler::OnEvent (const SEvent &event)
 {
     if(event.EventType == EET_GUI_EVENT ||
-       (!StateManager::isGameState() && event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT)
+       (!GUIEngine::getStateManager()->isGameState() && event.EventType != EET_KEY_INPUT_EVENT &&
+         event.EventType != EET_JOYSTICK_INPUT_EVENT)
        )
     {
         return onGUIEvent(event);
@@ -46,6 +46,9 @@ bool EventHandler::OnEvent (const SEvent &event)
         // FIXME : it's a bit unclean that all input events go trough the gui module
         return input_manager->input(event);
     }
+    
+    // to shut up a warning. gcc is too stupid too see the code will never get here
+    return false;
 }
 
 bool EventHandler::onGUIEvent(const SEvent& event)
@@ -326,7 +329,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             
         case PA_RESCUE:
             if(pressedDown)
-                StateManager::escapePressed();
+                GUIEngine::getStateManager()->escapePressed();
             break;
             
         case PA_FIRE:

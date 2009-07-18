@@ -25,8 +25,8 @@
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/scene.hpp"
-#include "gui/kart_selection.hpp"
-#include "gui/state_manager.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "states_screens/state_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -119,7 +119,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
     assert(0<=player_id && player_id <m_local_kart_info.size());
 
     m_local_kart_info[player_id] = RemoteKartInfo(player_id, kart,
-                                                  StateManager::getActivePlayer(player_id)->getProfile()->getName(),
+                                                  StateManager::get()->getActivePlayer(player_id)->getProfile()->getName(),
                                                   network_manager->getMyHostId());
 }   // setLocalKartInfo
 
@@ -189,7 +189,7 @@ void RaceManager::startNew()
     if(UserConfigParams::m_no_start_screen == true)
     {
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-            StateManager::setPlayer0Device(device);
+            KartSelectionScreen::setPlayer0Device(device);
     }
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
     {

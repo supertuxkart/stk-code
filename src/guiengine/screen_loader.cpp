@@ -16,9 +16,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "gui/screen.hpp"
-#include "gui/engine.hpp"
-#include "gui/widget.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/widget.hpp"
 #include <irrlicht.h>
 #include <iostream>
 #include <irrXML.h>

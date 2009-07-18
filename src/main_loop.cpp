@@ -26,8 +26,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
-#include "gui/engine.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "states_screens/state_manager.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
@@ -78,7 +78,7 @@ float MainLoop::getLimitedDt()
         // Throttle fps if more than maximum, which can reduce 
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = StateManager::isGameState() ? UserConfigParams::m_max_fps : 35;
+        const int max_fps = StateManager::get()->isGameState() ? UserConfigParams::m_max_fps : 35;
         const int current_fps = (int)(1000.0f/dt);
         if( current_fps > max_fps )
         {

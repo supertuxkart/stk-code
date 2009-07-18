@@ -16,20 +16,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "gui/engine.hpp"
+#include "guiengine/engine.hpp"
 
 #include <iostream>
 #include <assert.h>
 
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
-#include "gui/credits.hpp"
-#include "gui/screen.hpp"
-#include "gui/event_handler.hpp"
-#include "gui/kart_selection.hpp"
-#include "gui/skin.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/widget.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/event_handler.hpp"
+#include "guiengine/skin.hpp"
+#include "guiengine/widget.hpp"
+
 
 namespace GUIEngine
 {
@@ -43,6 +41,7 @@ namespace GUIEngine
     Screen* g_current_screen = NULL;
     ptr_vector<Widget, REF> needsUpdate;
 
+    AbstractStateManager* g_state_manager = NULL;
     
     float dt = 0;
     
@@ -50,7 +49,6 @@ namespace GUIEngine
     {
         return dt;
     }
-    
 // -----------------------------------------------------------------------------
 IrrlichtDevice* getDevice()
 {
@@ -70,6 +68,11 @@ IVideoDriver* getDriver()
 IGUIEnvironment* getGUIEnv()
 {
     return g_env;
+}
+// -----------------------------------------------------------------------------
+AbstractStateManager* getStateManager()
+{
+    return g_state_manager;
 }
 // -----------------------------------------------------------------------------  
 void clear()
@@ -121,7 +124,7 @@ void switchToScreen(const char* screen_name)
 void reshowCurrentScreen()
 {
     needsUpdate.clearWithoutDeleting();
-    StateManager::reshowTopMostMenu();
+    g_state_manager->reshowTopMostMenu();
     //g_current_screen->addWidgets();
 }
 // -----------------------------------------------------------------------------
@@ -141,14 +144,14 @@ void cleanUp()
     needsUpdate.clearWithoutDeleting();
     // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
 }
+    
 // -----------------------------------------------------------------------------
-void (*g_event_callback)(Widget* widget, std::string& name);
-void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback)(Widget* widget, std::string& name) )
+void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager* state_manager )
 {
     g_env = device_a->getGUIEnvironment();
     g_device = device_a;
     g_driver = driver_a;
-    g_event_callback = eventCallback;
+    g_state_manager = state_manager;
     
 	/*
      To make the g_font a little bit nicer, we load an external g_font
@@ -171,8 +174,8 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, void (*eventCallback
 /** transmit event to user event callback (out of encapsulated GUI module) */
 void transmitEvent(Widget* widget, std::string& name)
 {
-    assert(g_event_callback != NULL);
-    g_event_callback(widget, name);
+    assert(g_state_manager != NULL);
+    g_state_manager->eventCallback(widget, name);
 }
     
 // -----------------------------------------------------------------------------    
@@ -182,7 +185,7 @@ void render(float elapsed_time)
     
      // ---- menu drawing
     // draw background image and sections
-    if(!StateManager::isGameState())
+    if(!g_state_manager->isGameState())
     {
         g_skin->drawBgImage();
         g_skin->renderSections();
@@ -191,14 +194,10 @@ void render(float elapsed_time)
     // let irrLicht do the rest (the Skin object will be called for further render)
     g_env->drawAll();
     
-    // ---- additionnal drawing
-    if(!StateManager::isGameState())
+    // ---- some menus may need updating
+    if(!g_state_manager->isGameState())
     {
-        // FIXME : don't hardcode?
-        if (getCurrentScreen()->getName() == "credits.stkgui")
-            Credits::getInstance()->render(elapsed_time);
-        else if (getCurrentScreen()->getName() == "karts.stkgui")
-            StateManager::kartSelectionUpdate(elapsed_time);
+        g_state_manager->onUpdate(elapsed_time);
     }
 
 }

@@ -49,8 +49,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
-#include "gui/engine.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -586,11 +586,13 @@ int main(int argc, char *argv[] )
         attachment_manager      -> loadModels      ();
         stk_scene = new Scene();
 
-        // prepare main menu
-        StateManager::initGUI();
+        // Init GUI prepare main menu
+        IrrlichtDevice* device = irr_driver->getDevice();
+        video::IVideoDriver* driver = device->getVideoDriver();
+        GUIEngine::init(device, driver, StateManager::get());
         
-        if(!UserConfigParams::m_no_start_screen) StateManager::pushMenu("main.stkgui");
-        else StateManager::enterGameState();
+        if(!UserConfigParams::m_no_start_screen) StateManager::get()->pushMenu("main.stkgui");
+        else StateManager::get()->enterGameState();
 
         // Replay a race
         // =============
@@ -630,7 +632,7 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                StateManager::addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
+                StateManager::get()->addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
                 race_manager->setNumLocalPlayers(1);
                 race_manager->setLocalKartInfo(0, "tux");
                 network_manager->setupPlayerKartInfo();

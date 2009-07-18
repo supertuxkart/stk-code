@@ -20,23 +20,34 @@
 #define STATE_MANAGER_HPP
 
 #include <string>
+#include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
 struct Input;
 class ActivePlayer;
 
-namespace StateManager
+namespace GUIEngine
 {
-    void initGUI();
+    class Widget;
+}
+
+class StateManager : public GUIEngine::AbstractStateManager
+{
+    /**
+     * A list of all currently playing players.
+     */
+    ptr_vector<ActivePlayer, HOLD> m_active_players;
     
-    void pushMenu(std::string name);
-    void replaceTopMostMenu(std::string name);
-    void popMenu();
-    void resetAndGoToMenu(std::string name);
-    void enterGameState();
-    bool isGameState();
-    void reshowTopMostMenu();
-    
+    /** The main 'eventCallback' will dispatch to one of those.
+      * A few screens have their callbacks in a file of their own because they are
+      * too big to fit in here.
+      */
+    void menuEventHelp      ( GUIEngine::Widget* widget, const std::string& name );
+    void menuEventTracks    ( GUIEngine::Widget* widget, const std::string& name );
+    void menuEventRaceSetup ( GUIEngine::Widget* widget, const std::string& name );
+    void menuEventMain      ( GUIEngine::Widget* widget, const std::string& name );
+
+public:
     ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
     ActivePlayer* getActivePlayer(const int id);
     
@@ -51,6 +62,12 @@ namespace StateManager
     void resetActivePlayers();
     
     void escapePressed();
-}
+    
+    void onUpdate(float elpased_time);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    
+    // singleton
+    static StateManager* get();
+};
 
 #endif

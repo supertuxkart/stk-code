@@ -21,10 +21,10 @@
 #include "config/user_config.hpp"
 #include "kart_selection.hpp"
 #include "graphics/irr_driver.hpp"
-#include "gui/widget.hpp"
-#include "gui/engine.hpp"
-#include "gui/screen.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/widget.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/screen.hpp"
+#include "states_screens/state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -40,7 +40,7 @@ InputDevice* player_1_device = NULL;
 
 using namespace GUIEngine;
 
-namespace StateManager
+namespace KartSelectionScreen
 {
     class PlayerKartWidget;
     
@@ -166,7 +166,7 @@ namespace StateManager
         
         void setPlayerID(const int newPlayerID)
         {
-            if (StateManager::getActivePlayers().get(newPlayerID) != m_associatedPlayer)
+            if (StateManager::get()->getActivePlayers().get(newPlayerID) != m_associatedPlayer)
             {
                 std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
                 assert(false);
@@ -417,7 +417,7 @@ void firePressedOnNewDevice(InputDevice* device)
     g_player_karts.push_back(newPlayer);
     newPlayer->add();
     
-    StateManager::addActivePlayer(aplayer);
+    StateManager::get()->addActivePlayer(aplayer);
     aplayer->setDevice(device);
     
     const int amount = g_player_karts.size();
@@ -452,7 +452,7 @@ void setPlayer0Device(InputDevice* device)
     }
     
     ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
-    StateManager::addActivePlayer( newPlayer );
+    StateManager::get()->addActivePlayer( newPlayer );
     newPlayer->setDevice(device);
     
     input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
@@ -483,14 +483,14 @@ void playerPressedRescue(ActivePlayer* player)
     }
     
     removedWidget = g_player_karts.remove(playerID);
-    StateManager::removeActivePlayer(playerID);
+    StateManager::get()->removeActivePlayer(playerID);
     
     const int amount = g_player_karts.size();
     
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
     const int splitWidth = fullarea->w / amount;
     
-    assert( amount == StateManager::activePlayerCount() );
+    assert( amount == StateManager::get()->activePlayerCount() );
     
     for (int n=0; n<amount; n++)
     {
@@ -526,7 +526,7 @@ void kartSelectionUpdate(float delta)
 /**
  * Callback handling events from the kart selection menu
  */
-void menuEventKarts(Widget* widget, std::string& name)
+void menuEventKarts(Widget* widget, const std::string& name)
 {
     if(name == "init")
     {
@@ -557,7 +557,8 @@ void menuEventKarts(Widget* widget, std::string& name)
                 
             }
 
-            PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::getActivePlayers().get(0), area, 0 /* first player */);
+            PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::get()->getActivePlayers().get(0),
+                                                                 area, 0 /* first player */);
             getCurrentScreen()->manualAddWidget(playerKart1);
             playerKart1->add();
             g_player_karts.push_back(playerKart1);
@@ -575,7 +576,7 @@ void menuEventKarts(Widget* widget, std::string& name)
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
         
-        ptr_vector< ActivePlayer, HOLD >& players = StateManager::getActivePlayers();
+        ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
         std::cout << "==========\n" << players.size() << " players :\n";
         for(int n=0; n<players.size(); n++)
         {
@@ -601,7 +602,7 @@ void menuEventKarts(Widget* widget, std::string& name)
 
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
 
-        StateManager::pushMenu("racesetup.stkgui");
+        StateManager::get()->pushMenu("racesetup.stkgui");
     }
 }
 

@@ -1,5 +1,5 @@
 
-#include "gui/state_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
 #include "modes/world.hpp"
@@ -289,7 +289,7 @@ void GamePadDevice::editBinding(const PlayerAction action, const Input::InputTyp
 // -----------------------------------------------------------------------------
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player)
 {
-    if(!StateManager::isGameState()) return; // ignore this while in menus
+    if(!StateManager::get()->isGameState()) return; // ignore this while in menus
 
     PlayerKart* pk = player->getKart();
     if (pk == NULL)

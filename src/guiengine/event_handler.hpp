@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef __EVENT_HANDLER_HPP__
-#define __EVENT_HANDLER_HPP__
+#ifndef HEADER_EVENT_HANDLER_HPP
+#define HEADER_EVENT_HANDLER_HPP
 
 #include "irrlicht.h"
 #include "input/input.hpp"

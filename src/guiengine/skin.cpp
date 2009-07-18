@@ -17,12 +17,11 @@
 
 
 #include "config/user_config.hpp"
-#include "gui/skin.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/screen.hpp"
-#include "gui/widget.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/skin.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include <cassert>
 #include <iostream>
@@ -844,7 +843,7 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
 
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    if(StateManager::isGameState()) return; // ignore in game mode
+    if(GUIEngine::getStateManager()->isGameState()) return; // ignore in game mode
     
     //const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();

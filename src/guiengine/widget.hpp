@@ -22,7 +22,7 @@
 #include <irrlicht.h>
 #include <map>
 
-#include "gui/skin.hpp"
+#include "guiengine/skin.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 

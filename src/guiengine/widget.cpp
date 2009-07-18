@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "gui/widget.hpp"
+#include "guiengine/widget.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -30,9 +30,9 @@ using namespace gui;
 using namespace GUIEngine;
 
 #include "graphics/irr_driver.hpp"
-#include "gui/screen.hpp"
-#include "gui/engine.hpp"
-#include "gui/my_button.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/my_button.hpp"
+#include "guiengine/screen.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"

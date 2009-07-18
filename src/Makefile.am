@@ -72,31 +72,23 @@ supertuxkart_SOURCES = \
  graphics/smoke.hpp \
  graphics/water_splash.hpp \
  graphics/water_splash.cpp \
- gui/credits.cpp \
- gui/credits.hpp \
- gui/engine.cpp \
- gui/engine.hpp \
- gui/event_handler.cpp \
- gui/event_handler.hpp \
- gui/kart_selection.cpp \
- gui/kart_selection.hpp \
- gui/modaldialog.cpp \
- gui/modaldialog.hpp \
- gui/my_button.cpp \
- gui/my_button.hpp \
- gui/options_screen.cpp \
- gui/options_screen.hpp \
- gui/race_gui.cpp \
- gui/race_gui.hpp \
- gui/screen.cpp \
- gui/screen.hpp \
- gui/screen_loader.cpp \
- gui/skin.cpp \
- gui/skin.hpp \
- gui/state_manager.cpp \
- gui/state_manager.hpp \
- gui/widget.cpp \
- gui/widget.hpp \
+ guiengine/abstract_state_manager.cpp \
+ guiengine/abstract_state_manager.hpp \
+ guiengine/engine.cpp \
+ guiengine/engine.hpp \
+ guiengine/event_handler.hpp \
+ guiengine/modaldialog.cpp \
+ guiengine/modaldialog.hpp \
+ guiengine/my_button.cpp \
+ guiengine/my_button.hpp \
+ guiengine/screen_loader.cpp \
+ guiengine/screen.cpp \
+ guiengine/screen.hpp \
+ guiengine/skin.cpp \
+ guiengine/skin.hpp \
+ guiengine/widget.cpp \
+ guiengine/widget.hpp \
+ guiengine/event_handler.cpp \
  input/device_manager.cpp \
  input/device_manager.hpp \
  input/input.cpp \
@@ -233,6 +225,16 @@ supertuxkart_SOURCES = \
  replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
+ states_screens/credits.cpp \
+ states_screens/credits.hpp \
+ states_screens/kart_selection.cpp \
+ states_screens/kart_selection.hpp \
+ states_screens/options_screen.cpp \
+ states_screens/options_screen.hpp \
+ states_screens/race_gui.cpp \
+ states_screens/race_gui.hpp \
+ states_screens/state_manager.cpp  \
+ states_screens/state_manager.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
  tracks/check_manager.cpp \

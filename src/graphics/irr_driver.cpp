@@ -29,8 +29,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/material_manager.hpp"
-#include "gui/engine.hpp"
-#include "gui/state_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -178,7 +178,10 @@ void IrrDriver::changeResolution()
     projectile_manager      -> loadData();
     attachment_manager      -> loadModels();
 
-    StateManager::initGUI();
+    // Re-init GUI engine
+    IrrlichtDevice* device = irr_driver->getDevice();
+    video::IVideoDriver* driver = device->getVideoDriver();
+    GUIEngine::init(device, driver, StateManager::get());
     GUIEngine::reshowCurrentScreen();
 }   // changeResolution
 
@@ -557,7 +560,7 @@ void IrrDriver::displayFPS()
     const int fps       = m_device->getVideoDriver()->getFPS();
 
     // Min and max info tracking, per mode, so user can check game vs menus
-    bool current_state     = StateManager::isGameState();
+    bool current_state     = StateManager::get()->isGameState();
     static bool prev_state = false;
     static int min         = 999; // Absurd values for start will print first time
     static int max         = 0;   // but no big issue, maybe even "invisible"
@@ -593,7 +596,7 @@ void IrrDriver::update(float dt)
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
 
     {    // just to mark the beding/end scene block
-        if(!StateManager::isGameState())
+        if(!StateManager::get()->isGameState())
         {
             // this code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there

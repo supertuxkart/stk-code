@@ -21,7 +21,6 @@
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
-		9516162D0FFFB12B004B16D8 /* kart_selection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9516162C0FFFB12B004B16D8 /* kart_selection.cpp */; };
 		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
 		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
 		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
@@ -34,7 +33,6 @@
 		9540E24F0FD5F8A8002985B8 /* explosion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E2490FD5F8A8002985B8 /* explosion.cpp */; };
 		9540E2500FD5F8A8002985B8 /* material_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E24B0FD5F8A8002985B8 /* material_manager.cpp */; };
 		9540E2510FD5F8A8002985B8 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9540E24D0FD5F8A8002985B8 /* material.cpp */; };
-		954A57DC0FEC5AE40073C16C /* modaldialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954A57DB0FEC5AE40073C16C /* modaldialog.cpp */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
 		954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C270FF98B6E0047FE3E /* animation_manager.cpp */; };
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
@@ -213,21 +211,12 @@
 		9551C8EA0FC1B72500DB481B /* shadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA00F532FD400BE7BA7 /* shadow.cpp */; };
 		9551C8EB0FC1B72500DB481B /* nitro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C65DA10F532FD400BE7BA7 /* nitro.cpp */; };
 		9551C8EC0FC1B72500DB481B /* file_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505570E0F6963790056E88C /* file_manager.cpp */; };
-		9551C8ED0FC1B72500DB481B /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577A0F696A900056E88C /* engine.cpp */; };
-		9551C8EE0FC1B72500DB481B /* my_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577C0F696A900056E88C /* my_button.cpp */; };
-		9551C8EF0FC1B72500DB481B /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9505577F0F696A900056E88C /* screen.cpp */; };
-		9551C8F00FC1B72500DB481B /* screen_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557810F696A900056E88C /* screen_loader.cpp */; };
-		9551C8F10FC1B72500DB481B /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557820F696A900056E88C /* skin.cpp */; };
-		9551C8F20FC1B72500DB481B /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557840F696A900056E88C /* widget.cpp */; };
-		9551C8F30FC1B72500DB481B /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
-		9551C8F50FC1B72500DB481B /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
 		9551C8F60FC1B72500DB481B /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1182A0F77EA3100B18B3D /* input_manager.cpp */; };
 		9551C8F70FC1B72500DB481B /* input_device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1184A0F77FC3900B18B3D /* input_device.cpp */; };
 		9551C8F80FC1B72500DB481B /* device_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1187A0F78024E00B18B3D /* device_manager.cpp */; };
 		9551C8F90FC1B72500DB481B /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CA59F70F82FCB7003323DB /* physical_object.cpp */; };
 		9551C8FA0FC1B72500DB481B /* quad_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C357E0FC05BF400A48379 /* quad_set.cpp */; };
 		9551C8FB0FC1B72500DB481B /* quad_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C35800FC05BF400A48379 /* quad_graph.cpp */; };
-		9551C8FC0FC1B72500DB481B /* credits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951C35BE0FC066ED00A48379 /* credits.cpp */; };
 		9551C9F00FC1B7EE00DB481B /* libintl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F80FC1B63C00DB481B /* libintl.framework */; };
 		9551C9F10FC1B7EE00DB481B /* Ogg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9551C9F20FC1B7EE00DB481B /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
@@ -244,10 +233,22 @@
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		955DE88D1004273B006A4F3C /* checkline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8891004273B006A4F3C /* checkline.cpp */; };
 		956D36A710095035007FCB95 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956D36A610095035007FCB95 /* player.cpp */; };
-		958330391012248A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330381012248A00C5137E /* event_handler.cpp */; };
+		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
+		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
+		958330CE10122B4A00C5137E /* modaldialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B610122B4A00C5137E /* modaldialog.cpp */; };
+		958330CF10122B4A00C5137E /* my_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B810122B4A00C5137E /* my_button.cpp */; };
+		958330D010122B4A00C5137E /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BA10122B4A00C5137E /* screen.cpp */; };
+		958330D110122B4A00C5137E /* screen_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BC10122B4A00C5137E /* screen_loader.cpp */; };
+		958330D210122B4A00C5137E /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BD10122B4A00C5137E /* skin.cpp */; };
+		958330D310122B4A00C5137E /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BF10122B4A00C5137E /* widget.cpp */; };
+		958330D410122B4A00C5137E /* credits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330C210122B4A00C5137E /* credits.cpp */; };
+		958330D510122B4A00C5137E /* kart_selection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330C410122B4A00C5137E /* kart_selection.cpp */; };
+		958330D610122B4A00C5137E /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330C610122B4A00C5137E /* options_screen.cpp */; };
+		958330D710122B4A00C5137E /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330C810122B4A00C5137E /* race_gui.cpp */; };
+		958330D810122B4A00C5137E /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330CA10122B4A00C5137E /* state_manager.cpp */; };
+		9583319910123B0200C5137E /* abstract_state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583319810123B0200C5137E /* abstract_state_manager.cpp */; };
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
-		95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D80FE4741D002E10AD /* water_splash.cpp */; };
@@ -277,17 +278,6 @@
 		950557570F6968860056E88C /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9505575F0F6968A50056E88C /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		950557640F6968BE0056E88C /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
-		9505577A0F696A900056E88C /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../gui/engine.cpp; sourceTree = SOURCE_ROOT; };
-		9505577B0F696A900056E88C /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = engine.hpp; path = ../../gui/engine.hpp; sourceTree = SOURCE_ROOT; };
-		9505577C0F696A900056E88C /* my_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_button.cpp; path = ../../gui/my_button.cpp; sourceTree = SOURCE_ROOT; };
-		9505577D0F696A900056E88C /* my_button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = my_button.hpp; path = ../../gui/my_button.hpp; sourceTree = SOURCE_ROOT; };
-		9505577F0F696A900056E88C /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen.cpp; path = ../../gui/screen.cpp; sourceTree = SOURCE_ROOT; };
-		950557800F696A900056E88C /* screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = screen.hpp; path = ../../gui/screen.hpp; sourceTree = SOURCE_ROOT; };
-		950557810F696A900056E88C /* screen_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen_loader.cpp; path = ../../gui/screen_loader.cpp; sourceTree = SOURCE_ROOT; };
-		950557820F696A900056E88C /* skin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skin.cpp; path = ../../gui/skin.cpp; sourceTree = SOURCE_ROOT; };
-		950557830F696A900056E88C /* skin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skin.hpp; path = ../../gui/skin.hpp; sourceTree = SOURCE_ROOT; };
-		950557840F696A900056E88C /* widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget.cpp; path = ../../gui/widget.cpp; sourceTree = SOURCE_ROOT; };
-		950557850F696A900056E88C /* widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget.hpp; path = ../../gui/widget.hpp; sourceTree = SOURCE_ROOT; };
 		9507E9310FC1C8C100BD2B92 /* BMF_Api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMF_Api.cpp; path = ../../bullet/Demos/OpenGL/BMF_Api.cpp; sourceTree = SOURCE_ROOT; };
 		9507E9320FC1C8C100BD2B92 /* BMF_Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_Api.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/BMF_Api.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9507E9340FC1C8C100BD2B92 /* BMF_BitmapFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMF_BitmapFont.cpp; path = ../../bullet/Demos/OpenGL/BMF_BitmapFont.cpp; sourceTree = SOURCE_ROOT; };
@@ -310,16 +300,12 @@
 		9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../bullet/Demos/OpenGL/RenderTexture.cpp; sourceTree = SOURCE_ROOT; };
 		9507E9510FC1C8C200BD2B92 /* RenderTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTexture.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/RenderTexture.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = stk.icns; sourceTree = SOURCE_ROOT; };
-		9516162C0FFFB12B004B16D8 /* kart_selection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = kart_selection.cpp; path = ../../gui/kart_selection.cpp; sourceTree = SOURCE_ROOT; };
-		9516164D0FFFB1F0004B16D8 /* kart_selection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_selection.hpp; path = ../../gui/kart_selection.hpp; sourceTree = SOURCE_ROOT; };
 		951BC65C0FFAF290006B5FF1 /* ipo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipo.cpp; path = ../../animations/ipo.cpp; sourceTree = SOURCE_ROOT; };
 		951BC65D0FFAF290006B5FF1 /* ipo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ipo.hpp; path = ../../animations/ipo.hpp; sourceTree = SOURCE_ROOT; };
 		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = ../../tracks/quad_set.hpp; sourceTree = SOURCE_ROOT; };
 		951C357E0FC05BF400A48379 /* quad_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_set.cpp; path = ../../tracks/quad_set.cpp; sourceTree = SOURCE_ROOT; };
 		951C357F0FC05BF400A48379 /* quad_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_graph.hpp; path = ../../tracks/quad_graph.hpp; sourceTree = SOURCE_ROOT; };
 		951C35800FC05BF400A48379 /* quad_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_graph.cpp; path = ../../tracks/quad_graph.cpp; sourceTree = SOURCE_ROOT; };
-		951C35BD0FC066ED00A48379 /* credits.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = credits.hpp; path = ../../gui/credits.hpp; sourceTree = SOURCE_ROOT; };
-		951C35BE0FC066ED00A48379 /* credits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = credits.cpp; path = ../../gui/credits.cpp; sourceTree = SOURCE_ROOT; };
 		95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = ../../race/grand_prix_data.cpp; sourceTree = SOURCE_ROOT; };
 		95263DE10FD7471900CF5F92 /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../race/grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
 		95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../race/grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -342,8 +328,6 @@
 		953EAAB10F30A4410000D57D /* triangle_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = triangle_mesh.cpp; path = ../../physics/triangle_mesh.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB40F30A4650000D57D /* translation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = translation.hpp; path = ../../utils/translation.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAB50F30A4650000D57D /* translation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = translation.cpp; path = ../../utils/translation.cpp; sourceTree = SOURCE_ROOT; };
-		953F038B0F6C880D00C77FE2 /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = ../../gui/state_manager.cpp; sourceTree = SOURCE_ROOT; };
-		953F038E0F6C8AD800C77FE2 /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../gui/state_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2490FD5F8A8002985B8 /* explosion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = explosion.cpp; path = ../../graphics/explosion.cpp; sourceTree = SOURCE_ROOT; };
 		9540E24A0FD5F8A8002985B8 /* explosion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = explosion.hpp; path = ../../graphics/explosion.hpp; sourceTree = SOURCE_ROOT; };
 		9540E24B0FD5F8A8002985B8 /* material_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = material_manager.cpp; path = ../../graphics/material_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -352,8 +336,6 @@
 		9540E24E0FD5F8A8002985B8 /* material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = material.hpp; path = ../../graphics/material.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ptr_vector.hpp; path = ../../utils/ptr_vector.hpp; sourceTree = SOURCE_ROOT; };
 		9540E2570FD5F8FD002985B8 /* no_copy.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = no_copy.hpp; path = ../../utils/no_copy.hpp; sourceTree = SOURCE_ROOT; };
-		954A57DB0FEC5AE40073C16C /* modaldialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = modaldialog.cpp; path = ../../gui/modaldialog.cpp; sourceTree = SOURCE_ROOT; };
-		954A57ED0FEC5BB00073C16C /* modaldialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = modaldialog.hpp; path = ../../gui/modaldialog.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C250FF98B6E0047FE3E /* animation_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_base.cpp; path = ../../animations/animation_base.cpp; sourceTree = SOURCE_ROOT; };
 		954E4C260FF98B6E0047FE3E /* animation_base.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = animation_base.hpp; path = ../../animations/animation_base.hpp; sourceTree = SOURCE_ROOT; };
 		954E4C270FF98B6E0047FE3E /* animation_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = animation_manager.cpp; path = ../../animations/animation_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -377,8 +359,33 @@
 		955DE8891004273B006A4F3C /* checkline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = checkline.cpp; path = ../../tracks/checkline.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88A1004273B006A4F3C /* checkline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = checkline.hpp; path = ../../tracks/checkline.hpp; sourceTree = SOURCE_ROOT; };
 		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = games/supertuxkart/src/config/player.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		958330371012248A00C5137E /* event_handler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = event_handler.hpp; path = games/supertuxkart/src/gui/event_handler.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		958330381012248A00C5137E /* event_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_handler.cpp; path = games/supertuxkart/src/gui/event_handler.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		958330B210122B4A00C5137E /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../guiengine/engine.cpp; sourceTree = SOURCE_ROOT; };
+		958330B310122B4A00C5137E /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = engine.hpp; path = ../../guiengine/engine.hpp; sourceTree = SOURCE_ROOT; };
+		958330B410122B4A00C5137E /* event_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_handler.cpp; path = ../../guiengine/event_handler.cpp; sourceTree = SOURCE_ROOT; };
+		958330B510122B4A00C5137E /* event_handler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = event_handler.hpp; path = ../../guiengine/event_handler.hpp; sourceTree = SOURCE_ROOT; };
+		958330B610122B4A00C5137E /* modaldialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = modaldialog.cpp; path = ../../guiengine/modaldialog.cpp; sourceTree = SOURCE_ROOT; };
+		958330B710122B4A00C5137E /* modaldialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = modaldialog.hpp; path = ../../guiengine/modaldialog.hpp; sourceTree = SOURCE_ROOT; };
+		958330B810122B4A00C5137E /* my_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_button.cpp; path = ../../guiengine/my_button.cpp; sourceTree = SOURCE_ROOT; };
+		958330B910122B4A00C5137E /* my_button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = my_button.hpp; path = ../../guiengine/my_button.hpp; sourceTree = SOURCE_ROOT; };
+		958330BA10122B4A00C5137E /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen.cpp; path = ../../guiengine/screen.cpp; sourceTree = SOURCE_ROOT; };
+		958330BB10122B4A00C5137E /* screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = screen.hpp; path = ../../guiengine/screen.hpp; sourceTree = SOURCE_ROOT; };
+		958330BC10122B4A00C5137E /* screen_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen_loader.cpp; path = ../../guiengine/screen_loader.cpp; sourceTree = SOURCE_ROOT; };
+		958330BD10122B4A00C5137E /* skin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = skin.cpp; path = ../../guiengine/skin.cpp; sourceTree = SOURCE_ROOT; };
+		958330BE10122B4A00C5137E /* skin.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = skin.hpp; path = ../../guiengine/skin.hpp; sourceTree = SOURCE_ROOT; };
+		958330BF10122B4A00C5137E /* widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = widget.cpp; path = ../../guiengine/widget.cpp; sourceTree = SOURCE_ROOT; };
+		958330C010122B4A00C5137E /* widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = widget.hpp; path = ../../guiengine/widget.hpp; sourceTree = SOURCE_ROOT; };
+		958330C210122B4A00C5137E /* credits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = credits.cpp; path = ../../states_screens/credits.cpp; sourceTree = SOURCE_ROOT; };
+		958330C310122B4A00C5137E /* credits.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = credits.hpp; path = ../../states_screens/credits.hpp; sourceTree = SOURCE_ROOT; };
+		958330C410122B4A00C5137E /* kart_selection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = kart_selection.cpp; path = ../../states_screens/kart_selection.cpp; sourceTree = SOURCE_ROOT; };
+		958330C510122B4A00C5137E /* kart_selection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_selection.hpp; path = ../../states_screens/kart_selection.hpp; sourceTree = SOURCE_ROOT; };
+		958330C610122B4A00C5137E /* options_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen.cpp; path = ../../states_screens/options_screen.cpp; sourceTree = SOURCE_ROOT; };
+		958330C710122B4A00C5137E /* options_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen.hpp; path = ../../states_screens/options_screen.hpp; sourceTree = SOURCE_ROOT; };
+		958330C810122B4A00C5137E /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../states_screens/race_gui.cpp; sourceTree = SOURCE_ROOT; };
+		958330C910122B4A00C5137E /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../states_screens/race_gui.hpp; sourceTree = SOURCE_ROOT; };
+		958330CA10122B4A00C5137E /* state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = state_manager.cpp; path = ../../states_screens/state_manager.cpp; sourceTree = SOURCE_ROOT; };
+		958330CB10122B4A00C5137E /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../states_screens/state_manager.hpp; sourceTree = SOURCE_ROOT; };
+		9583319710123B0200C5137E /* abstract_state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = abstract_state_manager.hpp; path = ../../guiengine/abstract_state_manager.hpp; sourceTree = SOURCE_ROOT; };
+		9583319810123B0200C5137E /* abstract_state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abstract_state_manager.cpp; path = ../../guiengine/abstract_state_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -386,8 +393,6 @@
 		95A1184C0F77FC8800B18B3D /* input_device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_device.hpp; path = ../../input/input_device.hpp; sourceTree = SOURCE_ROOT; };
 		95A1187A0F78024E00B18B3D /* device_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = device_manager.cpp; path = ../../input/device_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
-		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
-		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC280F296540000D3E5D /* music_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_information.cpp; path = ../../audio/music_information.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC290F296540000D3E5D /* music_information.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_information.hpp; path = ../../audio/music_information.hpp; sourceTree = SOURCE_ROOT; };
@@ -792,8 +797,6 @@
 		95CB476A0FF30EF400413BAE /* bezier_curve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bezier_curve.hpp; path = ../../tracks/bezier_curve.hpp; sourceTree = SOURCE_ROOT; };
 		95CB476B0FF30EF400413BAE /* bezier_curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bezier_curve.cpp; path = ../../tracks/bezier_curve.cpp; sourceTree = SOURCE_ROOT; };
 		95D1F5F60FC8C3E300FF6968 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../../input/input.cpp; sourceTree = SOURCE_ROOT; };
-		95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = options_screen.hpp; path = ../../gui/options_screen.hpp; sourceTree = SOURCE_ROOT; };
-		95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options_screen.cpp; path = ../../gui/options_screen.cpp; sourceTree = SOURCE_ROOT; };
 		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
 		95D538840F69D61C00B4062E /* aabbox3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aabbox3d.h; path = /usr/local/include/irrlicht/aabbox3d.h; sourceTree = "<absolute>"; };
 		95D538850F69D61C00B4062E /* CDynamicMeshBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDynamicMeshBuffer.h; path = /usr/local/include/irrlicht/CDynamicMeshBuffer.h; sourceTree = "<absolute>"; };
@@ -1018,39 +1021,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		950557790F696A900056E88C /* gui */ = {
-			isa = PBXGroup;
-			children = (
-				951C35BE0FC066ED00A48379 /* credits.cpp */,
-				951C35BD0FC066ED00A48379 /* credits.hpp */,
-				9505577A0F696A900056E88C /* engine.cpp */,
-				9505577B0F696A900056E88C /* engine.hpp */,
-				958330381012248A00C5137E /* event_handler.cpp */,
-				958330371012248A00C5137E /* event_handler.hpp */,
-				9516162C0FFFB12B004B16D8 /* kart_selection.cpp */,
-				9516164D0FFFB1F0004B16D8 /* kart_selection.hpp */,
-				954A57DB0FEC5AE40073C16C /* modaldialog.cpp */,
-				954A57ED0FEC5BB00073C16C /* modaldialog.hpp */,
-				9505577C0F696A900056E88C /* my_button.cpp */,
-				9505577D0F696A900056E88C /* my_button.hpp */,
-				95D1F6180FC8CDBB00FF6968 /* options_screen.cpp */,
-				95D1F6170FC8CDBB00FF6968 /* options_screen.hpp */,
-				95C1E3F10F699079005D33E6 /* race_gui.cpp */,
-				95C1E3EB0F698F23005D33E6 /* race_gui.hpp */,
-				9505577F0F696A900056E88C /* screen.cpp */,
-				950557800F696A900056E88C /* screen.hpp */,
-				950557810F696A900056E88C /* screen_loader.cpp */,
-				953F038B0F6C880D00C77FE2 /* state_manager.cpp */,
-				953F038E0F6C8AD800C77FE2 /* state_manager.hpp */,
-				950557820F696A900056E88C /* skin.cpp */,
-				950557830F696A900056E88C /* skin.hpp */,
-				950557840F696A900056E88C /* widget.cpp */,
-				950557850F696A900056E88C /* widget.hpp */,
-			);
-			name = gui;
-			path = ../../gui;
-			sourceTree = SOURCE_ROOT;
-		};
 		9507E9260FC1C8C100BD2B92 /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
@@ -1137,6 +1107,49 @@
 			path = ../../animations;
 			sourceTree = SOURCE_ROOT;
 		};
+		958330B110122B4A00C5137E /* guiengine */ = {
+			isa = PBXGroup;
+			children = (
+				9583319810123B0200C5137E /* abstract_state_manager.cpp */,
+				9583319710123B0200C5137E /* abstract_state_manager.hpp */,
+				958330B210122B4A00C5137E /* engine.cpp */,
+				958330B310122B4A00C5137E /* engine.hpp */,
+				958330B410122B4A00C5137E /* event_handler.cpp */,
+				958330B510122B4A00C5137E /* event_handler.hpp */,
+				958330B610122B4A00C5137E /* modaldialog.cpp */,
+				958330B710122B4A00C5137E /* modaldialog.hpp */,
+				958330B810122B4A00C5137E /* my_button.cpp */,
+				958330B910122B4A00C5137E /* my_button.hpp */,
+				958330BA10122B4A00C5137E /* screen.cpp */,
+				958330BB10122B4A00C5137E /* screen.hpp */,
+				958330BC10122B4A00C5137E /* screen_loader.cpp */,
+				958330BD10122B4A00C5137E /* skin.cpp */,
+				958330BE10122B4A00C5137E /* skin.hpp */,
+				958330BF10122B4A00C5137E /* widget.cpp */,
+				958330C010122B4A00C5137E /* widget.hpp */,
+			);
+			name = guiengine;
+			path = ../../guiengine;
+			sourceTree = SOURCE_ROOT;
+		};
+		958330C110122B4A00C5137E /* states_screens */ = {
+			isa = PBXGroup;
+			children = (
+				958330C210122B4A00C5137E /* credits.cpp */,
+				958330C310122B4A00C5137E /* credits.hpp */,
+				958330C410122B4A00C5137E /* kart_selection.cpp */,
+				958330C510122B4A00C5137E /* kart_selection.hpp */,
+				958330C610122B4A00C5137E /* options_screen.cpp */,
+				958330C710122B4A00C5137E /* options_screen.hpp */,
+				958330C810122B4A00C5137E /* race_gui.cpp */,
+				958330C910122B4A00C5137E /* race_gui.hpp */,
+				958330CA10122B4A00C5137E /* state_manager.cpp */,
+				958330CB10122B4A00C5137E /* state_manager.hpp */,
+			);
+			name = states_screens;
+			path = ../../states_screens;
+			sourceTree = SOURCE_ROOT;
+		};
 		95A118280F77EA3100B18B3D /* input */ = {
 			isa = PBXGroup;
 			children = (
@@ -1160,9 +1173,9 @@
 				95C2AC260F296540000D3E5D /* audio */,
 				95C2AC360F296540000D3E5D /* bullet */,
 				95D950CC0FE473CA002E10AD /* config */,
+				958330B110122B4A00C5137E /* guiengine */,
 				95C2AE250F296541000D3E5D /* challenges */,
 				95C2AE370F296541000D3E5D /* enet */,
-				950557790F696A900056E88C /* gui */,
 				95C2AE870F296542000D3E5D /* graphics */,
 				95C65D750F532F7D00BE7BA7 /* io */,
 				95C2B0F50F296545000D3E5D /* items */,
@@ -1175,6 +1188,7 @@
 				95263DDF0FD7471900CF5F92 /* race */,
 				95C2B19C0F296545000D3E5D /* replay */,
 				95C2B1AA0F296545000D3E5D /* robots */,
+				958330C110122B4A00C5137E /* states_screens */,
 				95C2B1CE0F296545000D3E5D /* tracks */,
 				95C2B1DF0F296546000D3E5D /* utils */,
 				95C2B1360F296545000D3E5D /* main.cpp */,
@@ -2296,21 +2310,12 @@
 				9551C8EA0FC1B72500DB481B /* shadow.cpp in Sources */,
 				9551C8EB0FC1B72500DB481B /* nitro.cpp in Sources */,
 				9551C8EC0FC1B72500DB481B /* file_manager.cpp in Sources */,
-				9551C8ED0FC1B72500DB481B /* engine.cpp in Sources */,
-				9551C8EE0FC1B72500DB481B /* my_button.cpp in Sources */,
-				9551C8EF0FC1B72500DB481B /* screen.cpp in Sources */,
-				9551C8F00FC1B72500DB481B /* screen_loader.cpp in Sources */,
-				9551C8F10FC1B72500DB481B /* skin.cpp in Sources */,
-				9551C8F20FC1B72500DB481B /* widget.cpp in Sources */,
-				9551C8F30FC1B72500DB481B /* race_gui.cpp in Sources */,
-				9551C8F50FC1B72500DB481B /* state_manager.cpp in Sources */,
 				9551C8F60FC1B72500DB481B /* input_manager.cpp in Sources */,
 				9551C8F70FC1B72500DB481B /* input_device.cpp in Sources */,
 				9551C8F80FC1B72500DB481B /* device_manager.cpp in Sources */,
 				9551C8F90FC1B72500DB481B /* physical_object.cpp in Sources */,
 				9551C8FA0FC1B72500DB481B /* quad_set.cpp in Sources */,
 				9551C8FB0FC1B72500DB481B /* quad_graph.cpp in Sources */,
-				9551C8FC0FC1B72500DB481B /* credits.cpp in Sources */,
 				9507E95C0FC1C8C200BD2B92 /* BMF_Api.cpp in Sources */,
 				9507E95E0FC1C8C200BD2B92 /* BMF_BitmapFont.cpp in Sources */,
 				9507E9600FC1C8C200BD2B92 /* BMF_font_helv10.cpp in Sources */,
@@ -2323,7 +2328,6 @@
 				953789730FC7829100DD1F8E /* graph_node.cpp in Sources */,
 				953789820FC7831400DD1F8E /* quad.cpp in Sources */,
 				95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */,
-				95D1F6190FC8CDBB00FF6968 /* options_screen.cpp in Sources */,
 				9540E24F0FD5F8A8002985B8 /* explosion.cpp in Sources */,
 				9540E2500FD5F8A8002985B8 /* material_manager.cpp in Sources */,
 				9540E2510FD5F8A8002985B8 /* material.cpp in Sources */,
@@ -2336,19 +2340,30 @@
 				95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */,
 				95D950D30FE473CA002E10AD /* user_config.cpp in Sources */,
 				95D950DB0FE4741D002E10AD /* water_splash.cpp in Sources */,
-				954A57DC0FEC5AE40073C16C /* modaldialog.cpp in Sources */,
 				95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */,
 				954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */,
 				954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */,
 				954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */,
 				954E4C300FF98B6F0047FE3E /* three_d_animation.cpp in Sources */,
 				951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */,
-				9516162D0FFFB12B004B16D8 /* kart_selection.cpp in Sources */,
 				955DE88310042701006A4F3C /* check_manager.cpp in Sources */,
 				955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */,
 				955DE88D1004273B006A4F3C /* checkline.cpp in Sources */,
 				956D36A710095035007FCB95 /* player.cpp in Sources */,
-				958330391012248A00C5137E /* event_handler.cpp in Sources */,
+				958330CC10122B4A00C5137E /* engine.cpp in Sources */,
+				958330CD10122B4A00C5137E /* event_handler.cpp in Sources */,
+				958330CE10122B4A00C5137E /* modaldialog.cpp in Sources */,
+				958330CF10122B4A00C5137E /* my_button.cpp in Sources */,
+				958330D010122B4A00C5137E /* screen.cpp in Sources */,
+				958330D110122B4A00C5137E /* screen_loader.cpp in Sources */,
+				958330D210122B4A00C5137E /* skin.cpp in Sources */,
+				958330D310122B4A00C5137E /* widget.cpp in Sources */,
+				958330D410122B4A00C5137E /* credits.cpp in Sources */,
+				958330D510122B4A00C5137E /* kart_selection.cpp in Sources */,
+				958330D610122B4A00C5137E /* options_screen.cpp in Sources */,
+				958330D710122B4A00C5137E /* race_gui.cpp in Sources */,
+				958330D810122B4A00C5137E /* state_manager.cpp in Sources */,
+				9583319910123B0200C5137E /* abstract_state_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

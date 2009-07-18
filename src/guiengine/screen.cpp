@@ -24,11 +24,10 @@
 
 #include "input/input.hpp"
 #include "io/file_manager.hpp"
-#include "gui/engine.hpp"
-#include "gui/modaldialog.hpp"
-#include "gui/screen.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/widget.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
+#include "guiengine/widget.hpp"
 #include "utils/translation.hpp"
 
 using namespace irr;

@@ -32,8 +32,8 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
-#include "gui/state_manager.hpp"
-#include "gui/race_gui.hpp"
+#include "states_screens/state_manager.hpp"
+#include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -126,7 +126,7 @@ void World::init()
             case RaceManager::KT_PLAYER:
                 std::cout << "===== World : creating player kart for kart #" << i << " which has local_player_id " << local_player_id << " ===========\n";
                 newkart = new PlayerKart(kart_name, position,
-                                         StateManager::getActivePlayer(local_player_id),
+                                         StateManager::get()->getActivePlayer(local_player_id),
                                          init_pos, local_player_id);
                 m_player_karts[global_player_id] = (PlayerKart*)newkart;
                 m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);

@@ -6,8 +6,8 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "gui/kart_selection.hpp"
-#include "gui/state_manager.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 
 DeviceManager::DeviceManager()
@@ -148,7 +148,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                                 
                         if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
                         {
-                            if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
+                            if (value > Input::MAX_VALUE/2) KartSelectionScreen::playerPressedRescue( *player );
                             *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
                         }
                         return true;
@@ -166,7 +166,8 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                                 {
                                     if(localaction == PA_FIRE)
                                     {
-                                        if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_keyboards.get(n) );
+                                        if (value > Input::MAX_VALUE/2)
+                                            KartSelectionScreen::firePressedOnNewDevice( m_keyboards.get(n) );
                                     }
                                     
                                     *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
@@ -228,7 +229,8 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                         PlayerAction localaction = PA_FIRST; // none
                         if (m_gamepads[n].hasBinding(type, btnID, value, NULL, &localaction) && localaction == PA_FIRE)
                         {
-                            if (value > Input::MAX_VALUE/2) StateManager::firePressedOnNewDevice( m_gamepads.get(n) );
+                            if (value > Input::MAX_VALUE/2)
+                                KartSelectionScreen::firePressedOnNewDevice( m_gamepads.get(n) );
                             *action = PA_FIRST;
                             return true;
                         }
@@ -243,7 +245,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
             {
                 if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
                 {
-                    if (value > Input::MAX_VALUE/2) StateManager::playerPressedRescue( *player );
+                    if (value > Input::MAX_VALUE/2) KartSelectionScreen::playerPressedRescue( *player );
                     *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
                 }
                 
