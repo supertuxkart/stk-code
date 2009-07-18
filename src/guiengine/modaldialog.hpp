@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_MODAL_DIALOG_HPP
+#define HEADER_MODAL_DIALOG_HPP
+
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
 #include "guiengine/skin.hpp"
@@ -57,60 +60,7 @@ public:
     static void onEnterPressed();
     static ModalDialog* getCurrent();
     static bool isADialogActive();
-};
-
-class PressAKeyDialog : public ModalDialog
-{
-public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    PressAKeyDialog(const float percentWidth, const float percentHeight);
-    void processEvent(std::string& eventSource);
-};
-
-class EnterPlayerNameDialog : public ModalDialog
-{
-    TextBoxWidget* textCtrl;
-    ButtonWidget* cancelButton;
-public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    EnterPlayerNameDialog(const float percentWidth, const float percentHeight);
-    ~EnterPlayerNameDialog();
-
-    void onEnterPressedInternal();
-    void processEvent(std::string& eventSource);
-};
-
-class TrackInfoDialog : public ModalDialog
-{
-public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
-    void onEnterPressedInternal();
-    void processEvent(std::string& eventSource);
-};
-
-class PlayerInfoDialog : public ModalDialog
-{
-    TextBoxWidget* textCtrl;
-    PlayerProfile* m_player;
-    
-    void showRegularDialog();
-    void showConfirmDialog();
-public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
-                     const float percentWidth, const float percentHeight);
-    void onEnterPressedInternal();
-    void processEvent(std::string& eventSource);
-};
-    
+};  
     
 }
+#endif

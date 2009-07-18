@@ -225,6 +225,14 @@ supertuxkart_SOURCES = \
  replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
+ states_screens/dialogs/enter_player_name_dialog.cpp \
+ states_screens/dialogs/enter_player_name_dialog.hpp \
+ states_screens/dialogs/player_info_dialog.hpp \
+ states_screens/dialogs/press_a_key_dialog.hpp \
+ states_screens/dialogs/track_info_dialog.cpp \
+ states_screens/dialogs/track_info_dialog.hpp \
+ states_screens/dialogs/player_info_dialog.cpp \
+ states_screens/dialogs/press_a_key_dialog.cpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
  states_screens/kart_selection.cpp \

@@ -21,13 +21,16 @@
 #include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/modaldialog.hpp"
-#include "states_screens/options_screen.hpp"
 #include "guiengine/screen.hpp"
-#include "states_screens/state_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "states_screens/dialogs/enter_player_name_dialog.hpp"
+#include "states_screens/dialogs/player_info_dialog.hpp"
+#include "states_screens/dialogs/press_a_key_dialog.hpp"
+#include "states_screens/options_screen.hpp"
+#include "states_screens/state_manager.hpp"
+
 
 #include <iostream>
 

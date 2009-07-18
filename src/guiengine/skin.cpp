@@ -27,6 +27,12 @@
 #include <iostream>
 
 using namespace GUIEngine;
+using namespace irr;
+using namespace core;
+using namespace scene;
+using namespace video;
+using namespace io;
+using namespace gui;
 
 /**
  * Small utility to read config file info from a XML file.

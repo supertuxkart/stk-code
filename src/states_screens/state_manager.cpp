@@ -26,7 +26,6 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "input/device_manager.hpp"
@@ -37,6 +36,7 @@
 #include "states_screens/options_screen.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/credits.hpp"
+#include "states_screens/dialogs/track_info_dialog.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;

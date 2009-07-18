@@ -247,6 +247,10 @@
 		958330D710122B4A00C5137E /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330C810122B4A00C5137E /* race_gui.cpp */; };
 		958330D810122B4A00C5137E /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330CA10122B4A00C5137E /* state_manager.cpp */; };
 		9583319910123B0200C5137E /* abstract_state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583319810123B0200C5137E /* abstract_state_manager.cpp */; };
+		9583323F101243ED00C5137E /* enter_player_name_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95833237101243ED00C5137E /* enter_player_name_dialog.cpp */; };
+		95833240101243ED00C5137E /* player_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95833239101243ED00C5137E /* player_info_dialog.cpp */; };
+		95833241101243ED00C5137E /* press_a_key_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323B101243ED00C5137E /* press_a_key_dialog.cpp */; };
+		95833242101243ED00C5137E /* track_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323D101243ED00C5137E /* track_info_dialog.cpp */; };
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
@@ -386,6 +390,14 @@
 		958330CB10122B4A00C5137E /* state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = state_manager.hpp; path = ../../states_screens/state_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9583319710123B0200C5137E /* abstract_state_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = abstract_state_manager.hpp; path = ../../guiengine/abstract_state_manager.hpp; sourceTree = SOURCE_ROOT; };
 		9583319810123B0200C5137E /* abstract_state_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abstract_state_manager.cpp; path = ../../guiengine/abstract_state_manager.cpp; sourceTree = SOURCE_ROOT; };
+		95833237101243ED00C5137E /* enter_player_name_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = enter_player_name_dialog.cpp; path = ../../states_screens/dialogs/enter_player_name_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		95833238101243ED00C5137E /* enter_player_name_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = enter_player_name_dialog.hpp; path = ../../states_screens/dialogs/enter_player_name_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		95833239101243ED00C5137E /* player_info_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player_info_dialog.cpp; path = ../../states_screens/dialogs/player_info_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		9583323A101243ED00C5137E /* player_info_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player_info_dialog.hpp; path = ../../states_screens/dialogs/player_info_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		9583323B101243ED00C5137E /* press_a_key_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = press_a_key_dialog.cpp; path = ../../states_screens/dialogs/press_a_key_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		9583323C101243ED00C5137E /* press_a_key_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = press_a_key_dialog.hpp; path = ../../states_screens/dialogs/press_a_key_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		9583323D101243ED00C5137E /* track_info_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info_dialog.cpp; path = ../../states_screens/dialogs/track_info_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		9583323E101243ED00C5137E /* track_info_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info_dialog.hpp; path = ../../states_screens/dialogs/track_info_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1135,6 +1147,7 @@
 		958330C110122B4A00C5137E /* states_screens */ = {
 			isa = PBXGroup;
 			children = (
+				95833236101243ED00C5137E /* dialogs */,
 				958330C210122B4A00C5137E /* credits.cpp */,
 				958330C310122B4A00C5137E /* credits.hpp */,
 				958330C410122B4A00C5137E /* kart_selection.cpp */,
@@ -1148,6 +1161,22 @@
 			);
 			name = states_screens;
 			path = ../../states_screens;
+			sourceTree = SOURCE_ROOT;
+		};
+		95833236101243ED00C5137E /* dialogs */ = {
+			isa = PBXGroup;
+			children = (
+				95833237101243ED00C5137E /* enter_player_name_dialog.cpp */,
+				95833238101243ED00C5137E /* enter_player_name_dialog.hpp */,
+				95833239101243ED00C5137E /* player_info_dialog.cpp */,
+				9583323A101243ED00C5137E /* player_info_dialog.hpp */,
+				9583323B101243ED00C5137E /* press_a_key_dialog.cpp */,
+				9583323C101243ED00C5137E /* press_a_key_dialog.hpp */,
+				9583323D101243ED00C5137E /* track_info_dialog.cpp */,
+				9583323E101243ED00C5137E /* track_info_dialog.hpp */,
+			);
+			name = dialogs;
+			path = ../../states_screens/dialogs;
 			sourceTree = SOURCE_ROOT;
 		};
 		95A118280F77EA3100B18B3D /* input */ = {
@@ -2364,6 +2393,10 @@
 				958330D710122B4A00C5137E /* race_gui.cpp in Sources */,
 				958330D810122B4A00C5137E /* state_manager.cpp in Sources */,
 				9583319910123B0200C5137E /* abstract_state_manager.cpp in Sources */,
+				9583323F101243ED00C5137E /* enter_player_name_dialog.cpp in Sources */,
+				95833240101243ED00C5137E /* player_info_dialog.cpp in Sources */,
+				95833241101243ED00C5137E /* press_a_key_dialog.cpp in Sources */,
+				95833242101243ED00C5137E /* track_info_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
