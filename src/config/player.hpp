@@ -28,11 +28,11 @@ class InputDevice;
 class PlayerKart;
 
 /**
-  * class for managing player name and control configuration.
-  * A list of all possible players is stored in the user config.
+  * class for managing player profiles (name, control configuration, etc.)
+  * A list of all possible players is stored as PlayerProfiles in the user config.
   * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
   */
-class Player
+class PlayerProfile
 {
 private:
     
@@ -45,14 +45,14 @@ private:
 
 public:
     
-    Player(const char* name) : m_player_group("Player", "Represents one human player"),
+    PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
                                       m_name(name, "name", &m_player_group),
                                       m_last_kart_id(-1)
     {
     }
     
     
-    void setName(const std::string &name_){m_name = name_;}
+    void setName(const std::string &name_){ m_name = name_;}
 
     const char* getName() { return m_name.c_str(); }
 
@@ -61,20 +61,21 @@ public:
 };
 
 /**
-  * Represents a player that is currently playing.
-  * FIXME: this class seems very closely related to PlayerKart, maybe merge them
+  * Represents a player that is currently playing. It helps manage associating with a
+  * player profile and an input device (we're very flexible on this; ActivePlayer #1
+  * can choose to e.g. use profile #5 and device #2)
   */
 class ActivePlayer
 {
-    Player* m_player;
+    PlayerProfile* m_player;
     InputDevice* m_device;
 public:
     
-    ActivePlayer(Player* player);
+    ActivePlayer(PlayerProfile* player);
     ~ActivePlayer();
     
-    Player* getPlayer();
-    void setPlayer(Player* player);
+    PlayerProfile* getProfile();
+    void setPlayerProfile(PlayerProfile* player);
     
     InputDevice* getDevice() const;
     void setDevice(InputDevice* device);

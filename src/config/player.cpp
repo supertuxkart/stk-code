@@ -3,7 +3,7 @@
 #include "race/race_manager.hpp"
 #include "modes/world.hpp"
 
-ActivePlayer::ActivePlayer(Player* player)
+ActivePlayer::ActivePlayer(PlayerProfile* player)
 {
     m_player = player;
     m_device = NULL;
@@ -13,11 +13,11 @@ ActivePlayer::~ActivePlayer()
     setDevice(NULL);
 }
 
-Player* ActivePlayer::getPlayer()
+PlayerProfile* ActivePlayer::getProfile()
 {
     return m_player;
 }
-void ActivePlayer::setPlayer(Player* player)
+void ActivePlayer::setPlayerProfile(PlayerProfile* player)
 {
     m_player = player;
 }
@@ -42,7 +42,7 @@ PlayerKart* ActivePlayer::getKart()
     const int amount = RaceManager::getWorld()->getCurrentNumLocalPlayers();
     for (int p=0; p<amount; p++)
     {
-        if (RaceManager::getWorld()->getLocalPlayerKart(p)->getPlayer() == m_player)
+        if (RaceManager::getWorld()->getLocalPlayerKart(p)->getPlayer()->getProfile() == m_player)
         {
             return RaceManager::getWorld()->getLocalPlayerKart(p);
         }

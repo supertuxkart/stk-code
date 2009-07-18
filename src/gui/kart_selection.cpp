@@ -299,7 +299,7 @@ namespace StateManager
                 
                 if (name == spinnerID)
                 {
-                    m_associatedPlayer->setPlayer( UserConfigParams::m_all_players.get(playerName->getValue()) );
+                    m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
                     return false; // do not continue propagating the event
                 }
 
@@ -579,7 +579,7 @@ void menuEventKarts(Widget* widget, std::string& name)
         std::cout << "==========\n" << players.size() << " players :\n";
         for(int n=0; n<players.size(); n++)
         {
-            std::cout << "     Player " << n << " is " << players[n].getPlayer()->getName() << std::endl;
+            std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << std::endl;
         }
         std::cout << "==========\n";
         

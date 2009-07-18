@@ -369,7 +369,7 @@ void UserConfig::addDefaultPlayer()
         username = getenv("LOGNAME");
 
     // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back( new Player(username.c_str()) );
+    UserConfigParams::m_all_players.push_back( new PlayerProfile(username.c_str()) );
 
 }
 
@@ -523,7 +523,7 @@ bool UserConfig::loadConfig(const std::string& filename)
     {
         std::string name;
         players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back( new Player(name.c_str()) );
+        UserConfigParams::m_all_players.push_back( new PlayerProfile(name.c_str()) );
     }
 
     // --- Read challenges

@@ -53,21 +53,21 @@ public:
                  PlayerKart(const std::string& kart_name,
                             int position, ActivePlayer *_player,
                             const btTransform& init_pos, int player_index);
-                 ~PlayerKart        ();
-    int           earlyStartPenalty () {return m_penalty_time>0;       }
-    ActivePlayer *getActivePlayer   () {return m_player;               }
-    Player       *getPlayer         () {return m_player->getPlayer();  }
-    void          update            (float);
-    void          action            (PlayerAction action, int value);
-    void          handleZipper      ();
-    void          collectedItem     (const Item &item, int add_info=-1);
-    virtual void  crashed           (Kart *k);
-    virtual void  setPosition       (int p);
-    virtual void  raceFinished      (float time);
-    bool          isPlayerKart      () const {return true;}
-    Camera*       getCamera         () {return m_camera;}
-    void          reset             ();
-    void          resetInputState   ();
+                  ~PlayerKart        ();
+    int            earlyStartPenalty () { return m_penalty_time>0;        }
+    ActivePlayer  *getPlayer         () { return m_player;                }
+    PlayerProfile *getPlayerProfile  () { return m_player->getProfile();  }
+    void           update            (float);
+    void           action            (PlayerAction action, int value);
+    void           handleZipper      ();
+    void           collectedItem     (const Item &item, int add_info=-1);
+    virtual void   crashed           (Kart *k);
+    virtual void   setPosition       (int p);
+    virtual void   raceFinished      (float time);
+    bool           isPlayerKart      () const {return true;}
+    Camera*        getCamera         () {return m_camera;}
+    void           reset             ();
+    void           resetInputState   ();
 };
 
 #endif

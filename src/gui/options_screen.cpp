@@ -524,7 +524,7 @@ namespace StateManager
     /**
       * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
       */
-    void gotNewPlayerName(const stringw& newName, Player* player)
+    void gotNewPlayerName(const stringw& newName, PlayerProfile* player)
     {
         stringc newNameC( newName );
         ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
@@ -533,7 +533,7 @@ namespace StateManager
         // ---- Add new player
         if(player == NULL)
         {
-            UserConfigParams::m_all_players.push_back( new Player(newNameC.c_str()) );
+            UserConfigParams::m_all_players.push_back( new PlayerProfile(newNameC.c_str()) );
             
             players->addItem( newNameC.c_str() );
         }
@@ -553,7 +553,7 @@ namespace StateManager
         // TODO : need to re-save user config here?
     }
     
-    void deletePlayer(Player* player)
+    void deletePlayer(PlayerProfile* player)
     {
         UserConfigParams::m_all_players.erase(player);
         

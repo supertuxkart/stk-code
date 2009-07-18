@@ -373,7 +373,7 @@ void TrackInfoDialog::processEvent(std::string& eventSource)
 #pragma mark PlayerInfoDialog
 #endif
     
-PlayerInfoDialog::PlayerInfoDialog(Player* player, const float w, const float h) : ModalDialog(w, h)
+PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {
     m_player = player;
     

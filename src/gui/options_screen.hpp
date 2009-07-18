@@ -34,8 +34,8 @@ namespace StateManager
     void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
     
     void gotSensedInput(Input* sensedInput);
-    void gotNewPlayerName(const irr::core::stringw& newName,  Player* player=NULL);
-    void deletePlayer(Player* player);
+    void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
+    void deletePlayer(PlayerProfile* player);
 }
 
 #endif

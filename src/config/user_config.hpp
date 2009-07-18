@@ -52,7 +52,7 @@ const int CURRENT_CONFIG_VERSION = 7;
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;
-class Player;
+class PlayerProfile;
 
 /**
   * The base of a set of small utilities to enable quickly adding/removing stuff to/from config painlessly.
@@ -268,7 +268,7 @@ namespace UserConfigParams
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
-    PARAM_PREFIX ptr_vector<Player>         m_all_players;
+    PARAM_PREFIX ptr_vector<PlayerProfile>  m_all_players;
     
 }
 #undef PARAM_PREFIX

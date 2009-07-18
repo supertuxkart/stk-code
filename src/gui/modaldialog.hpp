@@ -19,7 +19,7 @@
 #include "utils/ptr_vector.hpp"
 #include "gui/skin.hpp"
 
-class Player;
+class PlayerProfile;
 
 namespace GUIEngine
 {
@@ -98,7 +98,7 @@ public:
 class PlayerInfoDialog : public ModalDialog
 {
     TextBoxWidget* textCtrl;
-    Player* m_player;
+    PlayerProfile* m_player;
     
     void showRegularDialog();
     void showConfirmDialog();
@@ -106,7 +106,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    PlayerInfoDialog(Player* PlayerInfoDialog,
+    PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
     void onEnterPressedInternal();
     void processEvent(std::string& eventSource);

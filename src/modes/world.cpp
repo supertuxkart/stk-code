@@ -367,7 +367,7 @@ void World::updateHighscores()
         HighscoreEntry* highscores = getHighscores();
         
         if(highscores->addData(k->getName(),
-                               k->getPlayer()->getName(),
+                               k->getPlayer()->getProfile()->getName(),
                                k->getFinishTime())>0 )
         {
             highscore_manager->Save();
