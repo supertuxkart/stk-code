@@ -220,7 +220,6 @@
 		9551C8F10FC1B72500DB481B /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557820F696A900056E88C /* skin.cpp */; };
 		9551C8F20FC1B72500DB481B /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 950557840F696A900056E88C /* widget.cpp */; };
 		9551C8F30FC1B72500DB481B /* race_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3F10F699079005D33E6 /* race_gui.cpp */; };
-		9551C8F40FC1B72500DB481B /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C1E3FF0F699427005D33E6 /* font.cpp */; };
 		9551C8F50FC1B72500DB481B /* state_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953F038B0F6C880D00C77FE2 /* state_manager.cpp */; };
 		9551C8F60FC1B72500DB481B /* input_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1182A0F77EA3100B18B3D /* input_manager.cpp */; };
 		9551C8F70FC1B72500DB481B /* input_device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95A1184A0F77FC3900B18B3D /* input_device.cpp */; };
@@ -386,8 +385,6 @@
 		95A1187C0F78026D00B18B3D /* device_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = device_manager.hpp; path = ../../input/device_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3EB0F698F23005D33E6 /* race_gui.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_gui.hpp; path = ../../gui/race_gui.hpp; sourceTree = SOURCE_ROOT; };
 		95C1E3F10F699079005D33E6 /* race_gui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_gui.cpp; path = ../../gui/race_gui.cpp; sourceTree = SOURCE_ROOT; };
-		95C1E3FF0F699427005D33E6 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../gui/font.cpp; sourceTree = SOURCE_ROOT; };
-		95C1E4020F69943D005D33E6 /* font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = font.hpp; path = ../../gui/font.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC270F296540000D3E5D /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music.hpp; path = ../../audio/music.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC280F296540000D3E5D /* music_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_information.cpp; path = ../../audio/music_information.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC290F296540000D3E5D /* music_information.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_information.hpp; path = ../../audio/music_information.hpp; sourceTree = SOURCE_ROOT; };
@@ -1025,8 +1022,6 @@
 				951C35BD0FC066ED00A48379 /* credits.hpp */,
 				9505577A0F696A900056E88C /* engine.cpp */,
 				9505577B0F696A900056E88C /* engine.hpp */,
-				95C1E3FF0F699427005D33E6 /* font.cpp */,
-				95C1E4020F69943D005D33E6 /* font.hpp */,
 				9516162C0FFFB12B004B16D8 /* kart_selection.cpp */,
 				9516164D0FFFB1F0004B16D8 /* kart_selection.hpp */,
 				954A57DB0FEC5AE40073C16C /* modaldialog.cpp */,
@@ -2303,7 +2298,6 @@
 				9551C8F10FC1B72500DB481B /* skin.cpp in Sources */,
 				9551C8F20FC1B72500DB481B /* widget.cpp in Sources */,
 				9551C8F30FC1B72500DB481B /* race_gui.cpp in Sources */,
-				9551C8F40FC1B72500DB481B /* font.cpp in Sources */,
 				9551C8F50FC1B72500DB481B /* state_manager.cpp in Sources */,
 				9551C8F60FC1B72500DB481B /* input_manager.cpp in Sources */,
 				9551C8F70FC1B72500DB481B /* input_device.cpp in Sources */,
