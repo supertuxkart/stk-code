@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Linear item-kart intersection function written by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -183,6 +186,54 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     }  // for i<getNumKarts
     
 }   // getClosestKart
+
+//-----------------------------------------------------------------------------
+void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart *target_kart,
+                                             float item_XY_speed, float gravity,
+                                             float *fire_angle, float *up_velocity, float *time_estimated)
+{
+    btVector3 targetKartLoc = target_kart->getTrans().getOrigin();
+
+    float dx = targetKartLoc.getX() - origin.getX();
+    float dy = targetKartLoc.getY() - origin.getY();
+    float dz = targetKartLoc.getZ() - origin.getZ();
+
+    btTransform trans = target_kart->getTrans();
+    btVector3 target_direction(trans.getBasis()[0][1],
+                               trans.getBasis()[1][1],
+                               trans.getBasis()[2][1]);
+
+    float gx = target_direction.getX();
+    float gy = target_direction.getY();
+    float gz = target_direction.getZ();
+
+    float target_kart_speed = hypotf(gx, gy) * target_kart->getSpeed(); //Projected onto X-Y plane
+
+    float target_kart_heading = atan2f(-gx, gy); //anti-clockwise
+
+    target_kart_heading += M_PI;
+
+    float dist = (target_kart_speed / item_XY_speed) * (dx * cosf(target_kart_heading) + dy * sinf(target_kart_heading));
+
+    float fire_th = (dx*dist - dy * sqrtf(dx*dx + dy*dy - dist*dist)) / (dx*dx + dy*dy);
+    fire_th = (((dist - dx*fire_th) / dy < 0) ? -acosf(fire_th): acosf(fire_th));
+
+    float time = 0.0f;
+    float a = item_XY_speed * sinf (fire_th) - target_kart_speed * sinf (target_kart_heading);
+    float b = item_XY_speed * cosf (fire_th) - target_kart_speed * cosf (target_kart_heading);
+
+    if (fabsf(a) > fabsf(b))
+        time = fabsf (dx / a);
+    else if (b != 0.0f)
+        time = fabsf(dy / b);
+
+    fire_th += M_PI;
+
+
+    *fire_angle = fire_th;
+    *up_velocity = (0.5 * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
+    *time_estimated = time;
+}
 
 //-----------------------------------------------------------------------------
 void Flyable::update(float dt)

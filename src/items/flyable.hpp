@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Linear item-kart intersection function written by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -87,6 +90,16 @@ protected:
     void              getClosestKart(const Kart **minKart, float *minDistSquared, 
                                      btVector3 *minDelta, const Kart* inFrontOf=NULL,
                                      const bool backwards=false) const;
+
+    /** Returns information on the parameters needed to hit a target kart
+        moving at constant velocity and direction for a given speed in the
+        XY-plane.
+     */
+    void getLinearKartItemIntersection(const btVector3 origin, const Kart *target_kart,
+                                       float item_XY_velocity, float gravity,
+                                       float *fire_angle, float *up_velocity, float *time);
+
+
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset, 
                                     const btVector3 &velocity,
