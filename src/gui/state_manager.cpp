@@ -60,6 +60,10 @@ namespace StateManager
     {
         return g_active_players;
     }
+    ActivePlayer* getActivePlayer(const int id)
+    {
+        return g_active_players.get(id);
+    }
     void addActivePlayer(ActivePlayer* p)
     {
         g_active_players.push_back(p);

@@ -33,7 +33,7 @@
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
-PlayerKart::PlayerKart(const std::string& kart_name, int position, Player *player,
+PlayerKart::PlayerKart(const std::string& kart_name, int position, ActivePlayer *player,
                        const btTransform& init_pos, int player_index) :
             Kart(kart_name, position, init_pos)
 {

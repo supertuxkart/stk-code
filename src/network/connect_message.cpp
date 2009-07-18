@@ -29,6 +29,7 @@
 #include "config/user_config.hpp"
 #include "config/player.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "gui/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 
 // ----------------------------------------------------------------------------
@@ -71,7 +72,7 @@ void ConnectMessage::setId()
 {
     char hostname[256];
     gethostname(hostname, 255);
-    const std::string& id=UserConfigParams::m_player[0].getName();
+    const std::string& id = StateManager::getActivePlayer(0)->getPlayer()->getName();
     std::ostringstream o;
     o << id << '@' << hostname;
     m_id = o.str();

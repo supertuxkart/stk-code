@@ -26,6 +26,7 @@
 #include "config/stk_config.hpp"
 #include "graphics/scene.hpp"
 #include "gui/kart_selection.hpp"
+#include "gui/state_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -78,8 +79,8 @@ RaceManager::RaceManager()
     m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
     setTrack("jungle");
-    setNumLocalPlayers(1);
-    setLocalKartInfo(0, "tux");
+    setNumLocalPlayers(0);
+    //setLocalKartInfo(0, "tux");
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -117,9 +118,9 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
 {
     assert(0<=player_id && player_id <m_local_kart_info.size());
 
-    m_local_kart_info[player_id]=RemoteKartInfo(player_id, kart,
-                                                UserConfigParams::m_player[player_id].getName(),
-                                                network_manager->getMyHostId());
+    m_local_kart_info[player_id] = RemoteKartInfo(player_id, kart,
+                                                  StateManager::getActivePlayer(player_id)->getPlayer()->getName(),
+                                                  network_manager->getMyHostId());
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------

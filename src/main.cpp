@@ -45,6 +45,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/scene.hpp"
@@ -629,6 +630,9 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
+                StateManager::addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
+                race_manager->setNumLocalPlayers(1);
+                race_manager->setLocalKartInfo(0, "tux");
                 network_manager->setupPlayerKartInfo();
                 race_manager->startNew();
             }

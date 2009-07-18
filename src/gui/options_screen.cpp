@@ -296,10 +296,10 @@ namespace StateManager
         ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
         assert(players != NULL);
         
-        const int playerAmount = UserConfigParams::m_player.size();
+        const int playerAmount = UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            players->addItem( UserConfigParams::m_player[n].getName() );
+            players->addItem( UserConfigParams::m_all_players[n].getName() );
         }
     }
     
@@ -311,17 +311,17 @@ namespace StateManager
         }
         else if(name == "players")
         {
-            std::cout << "Event : players\n";
+            // Find which player in the list was clicked
             ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
             assert(players != NULL);
 
             std::string selectedPlayer = players->getSelectionName();
-            const int playerAmount = UserConfigParams::m_player.size();
+            const int playerAmount = UserConfigParams::m_all_players.size();
             for(int n=0; n<playerAmount; n++)
             {
-                if(UserConfigParams::m_player[n].getName() == selectedPlayer)
+                if(UserConfigParams::m_all_players[n].getName() == selectedPlayer)
                 {
-                    new PlayerInfoDialog( &UserConfigParams::m_player[n], 0.5f, 0.6f );
+                    new PlayerInfoDialog( &UserConfigParams::m_all_players[n], 0.5f, 0.6f );
                     return;
                 }
             } // end for
@@ -533,7 +533,7 @@ namespace StateManager
         // ---- Add new player
         if(player == NULL)
         {
-            UserConfigParams::m_player.push_back( new Player(newNameC.c_str()) );
+            UserConfigParams::m_all_players.push_back( new Player(newNameC.c_str()) );
             
             players->addItem( newNameC.c_str() );
         }
@@ -543,10 +543,10 @@ namespace StateManager
             
             // refresh list display
             players->clear();
-            const int playerAmount =  UserConfigParams::m_player.size();
+            const int playerAmount =  UserConfigParams::m_all_players.size();
             for(int n=0; n<playerAmount; n++)
             {
-                players->addItem(UserConfigParams::m_player[n].getName());
+                players->addItem(UserConfigParams::m_all_players[n].getName());
             }
 
         }
@@ -555,17 +555,17 @@ namespace StateManager
     
     void deletePlayer(Player* player)
     {
-        UserConfigParams::m_player.erase(player);
+        UserConfigParams::m_all_players.erase(player);
         
         // refresh list display
         ListWidget* players = getCurrentScreen()->getWidget<ListWidget>("players");
         if(players == NULL) return;
         players->clear();
 
-        const int playerAmount =  UserConfigParams::m_player.size();
+        const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            players->addItem(UserConfigParams::m_player[n].getName());
+            players->addItem(UserConfigParams::m_all_players[n].getName());
         }
 
         // TODO : need to re-save user config here?

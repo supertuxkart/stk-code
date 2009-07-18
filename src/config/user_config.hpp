@@ -268,7 +268,7 @@ namespace UserConfigParams
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
-    PARAM_PREFIX ptr_vector<Player>         m_player;
+    PARAM_PREFIX ptr_vector<Player>         m_all_players;
     
 }
 #undef PARAM_PREFIX

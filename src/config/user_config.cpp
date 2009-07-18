@@ -333,7 +333,7 @@ UserConfig *user_config;
 UserConfig::UserConfig()
 {
     setDefaults();
-    if(!loadConfig() || UserConfigParams::m_player.size() == 0)
+    if(!loadConfig() || UserConfigParams::m_all_players.size() == 0)
     {
         addDefaultPlayer();
     }
@@ -343,7 +343,7 @@ UserConfig::UserConfig()
 UserConfig::UserConfig(const std::string& filename)
 {
     setDefaults();
-    if(!loadConfig(filename) || UserConfigParams::m_player.size() == 0)
+    if(!loadConfig(filename) || UserConfigParams::m_all_players.size() == 0)
     {
         addDefaultPlayer();
     }
@@ -369,7 +369,7 @@ void UserConfig::addDefaultPlayer()
         username = getenv("LOGNAME");
 
     // Set the name as the default name for all players.
-    UserConfigParams::m_player.push_back( new Player(username.c_str()) );
+    UserConfigParams::m_all_players.push_back( new Player(username.c_str()) );
 
 }
 
@@ -514,7 +514,7 @@ bool UserConfig::loadConfig(const std::string& filename)
     }
 
     // ---- Read players
-    UserConfigParams::m_player.clearAndDeleteAll();
+    UserConfigParams::m_all_players.clearAndDeleteAll();
 
     std::vector<XMLNode*> players;
     root->getNodes("Player", players);
@@ -523,8 +523,7 @@ bool UserConfig::loadConfig(const std::string& filename)
     {
         std::string name;
         players[i]->get("name", &name);
-        UserConfigParams::m_player.push_back( new Player(name.c_str()) );
-        std::cout << "----- player : " << name.c_str() << std::endl;
+        UserConfigParams::m_all_players.push_back( new Player(name.c_str()) );
     }
 
     // --- Read challenges

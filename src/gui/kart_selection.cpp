@@ -108,7 +108,7 @@ namespace StateManager
             
             spinnerID = StringUtils::insert_values("@p%i_spinner", playerID);
             
-            const int playerAmount = UserConfigParams::m_player.size();
+            const int playerAmount = UserConfigParams::m_all_players.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
             playerName->m_properties[PROP_ID] = spinnerID;
@@ -184,10 +184,10 @@ namespace StateManager
             modelView->update(0);
             
             // TODO : only fill list on first add
-            const int playerAmount = UserConfigParams::m_player.size();
+            const int playerAmount = UserConfigParams::m_all_players.size();
             for(int n=0; n<playerAmount; n++)
             {
-                playerName->addLabel( UserConfigParams::m_player[n].getName() );
+                playerName->addLabel( UserConfigParams::m_all_players[n].getName() );
             }
             
         }
@@ -299,7 +299,7 @@ namespace StateManager
                 
                 if (name == spinnerID)
                 {
-                    m_associatedPlayer->setPlayer( UserConfigParams::m_player.get(playerName->getValue()) );
+                    m_associatedPlayer->setPlayer( UserConfigParams::m_all_players.get(playerName->getValue()) );
                     return false; // do not continue propagating the event
                 }
 
@@ -409,7 +409,7 @@ void firePressedOnNewDevice(InputDevice* device)
     Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
     rightarea.x = irr_driver->getFrameSize().Width;
     
-    ActivePlayer* aplayer = new ActivePlayer( UserConfigParams::m_player.get(0) );
+    ActivePlayer* aplayer = new ActivePlayer( UserConfigParams::m_all_players.get(0) );
     
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
@@ -451,7 +451,7 @@ void setPlayer0Device(InputDevice* device)
         std::cout << "Player 0 is using a gamepad\n";
     }
     
-    ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_player.get(0));
+    ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
     StateManager::addActivePlayer( newPlayer );
     newPlayer->setDevice(device);
     

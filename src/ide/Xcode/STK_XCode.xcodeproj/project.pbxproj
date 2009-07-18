@@ -2034,8 +2034,8 @@
 		95D950CC0FE473CA002E10AD /* config */ = {
 			isa = PBXGroup;
 			children = (
-				95D950CD0FE473CA002E10AD /* player.hpp */,
 				956D36A610095035007FCB95 /* player.cpp */,
+				95D950CD0FE473CA002E10AD /* player.hpp */,
 				95D950CE0FE473CA002E10AD /* stk_config.cpp */,
 				95D950CF0FE473CA002E10AD /* stk_config.hpp */,
 				95D950D00FE473CA002E10AD /* user_config.cpp */,

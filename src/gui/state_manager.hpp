@@ -38,6 +38,7 @@ namespace StateManager
     void reshowTopMostMenu();
     
     ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
+    ActivePlayer* getActivePlayer(const int id);
     
     /**
       * Adds a new player to the list of active players. StateManager takes ownership of the object
