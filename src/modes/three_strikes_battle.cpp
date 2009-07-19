@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gui/race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 #include "audio/sound_manager.hpp"
 #include "tracks/track.hpp"
 

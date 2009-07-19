@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/linear_world.hpp"
-#include "gui/race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 
 #include <sstream>
 

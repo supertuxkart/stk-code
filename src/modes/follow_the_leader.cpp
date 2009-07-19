@@ -20,7 +20,7 @@
 #include "audio/sound_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
-#include "gui/race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 #include "items/powerup_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
