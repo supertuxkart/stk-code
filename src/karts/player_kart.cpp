@@ -25,7 +25,7 @@
 #include "config/player.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scene.hpp"
-#include "gui/race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 #include "input/input_manager.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
