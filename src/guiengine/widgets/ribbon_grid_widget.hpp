@@ -23,7 +23,7 @@
 #include <irrlicht.h>
 
 #include "guiengine/widget.hpp"
-#include "guiengine/ribbon_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 using namespace irr;
