@@ -138,7 +138,7 @@ namespace GUIEngine
         
         bool m_show_bounding_box;
         
-        template<typename T> T* Widget::getIrrlichtElement()
+        template<typename T> T* getIrrlichtElement()
         {
             #if defined(WIN32) || defined(NDEBUG)
                 return static_cast<T*>(m_element);
