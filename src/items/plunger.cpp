@@ -138,12 +138,12 @@ void Plunger::update(float dt)
     // unphysical, but feels right in the game.
 
     float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
-    btVector3 v = getVelocity();
+    Vec3 v = getVelocity();
     float heading = atan2f(-v.getX(), v.getY());
     float pitch   = getTerrainPitch (heading);
     float vel_z = m_force_updown*(delta);
     if (hat < m_max_height) // take into account pitch of surface
-        vel_z += hypotf(v.getX(), v.getY())*tanf(pitch);
+        vel_z += v.length_2d()*tanf(pitch);
     v.setZ(vel_z);
     setVelocity(v);
 }   // update

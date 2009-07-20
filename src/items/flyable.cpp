@@ -199,15 +199,15 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
     float dz = targetKartLoc.getZ() - origin.getZ();
 
     btTransform trans = target_kart->getTrans();
-    btVector3 target_direction(trans.getBasis()[0][1],
-                               trans.getBasis()[1][1],
-                               trans.getBasis()[2][1]);
+    Vec3 target_direction(trans.getBasis()[0][1],
+                          trans.getBasis()[1][1],
+                          trans.getBasis()[2][1]);
 
     float gx = target_direction.getX();
     float gy = target_direction.getY();
     float gz = target_direction.getZ();
-
-    float target_kart_speed = hypotf(gx, gy) * target_kart->getSpeed(); //Projected onto X-Y plane
+    
+    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed(); //Projected onto X-Y plane
 
     float target_kart_heading = atan2f(-gx, gy); //anti-clockwise
 
@@ -231,7 +231,7 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
 
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5 * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
+    *up_velocity = (0.5f * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
     *time_estimated = time;
 }
 
@@ -259,12 +259,12 @@ void Flyable::update(float dt)
         // unphysical, but feels right in the game.
 
         float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
-        btVector3 v = getVelocity();
+        Vec3 v = getVelocity();
         float heading = atan2f(-v.getX(), v.getY());
         float pitch   = getTerrainPitch (heading);
         float vel_z = m_force_updown*(delta);
         if (hat < m_max_height) // take into account pitch of surface
-            vel_z += hypotf(v.getX(), v.getY())*tanf(pitch);
+            vel_z += v.length_2d()*tanf(pitch);
         v.setZ(vel_z);
         setVelocity(v);
     }   // if m_adjust_z_velocity
