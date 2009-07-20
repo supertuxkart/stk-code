@@ -20,6 +20,10 @@
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
 
+#ifndef round
+#  define round(x)  (floor(x+0.5f))
+#endif
+
 RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
 {
     m_scroll_offset = 0;

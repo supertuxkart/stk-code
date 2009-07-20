@@ -15,11 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/widgets/ribbon_widget.hpp"
+
 #include "guiengine/engine.hpp"
 #include "guiengine/my_button.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
+
+#ifndef round
+#  define round(x)  (floor(x+0.5f))
+#endif
 
 RibbonWidget::RibbonWidget(const RibbonType type)
 {

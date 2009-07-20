@@ -15,11 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/event_handler.hpp"
+
+#include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 
 using GUIEngine::EventHandler;
@@ -136,7 +138,7 @@ bool EventHandler::onGUIEvent(const SEvent& event)
     return false;        
 }
 
-bool EventHandler::onWidgetActivated(Widget* w)
+bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
 {
     if(ModalDialog::isADialogActive() && w->m_event_handler == NULL)
     {
