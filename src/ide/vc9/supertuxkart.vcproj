@@ -202,56 +202,88 @@
 				>
 			</File>
 			<Filter
-				Name="gui"
+				Name="guiengine"
 				>
 				<File
-					RelativePath="..\..\gui\credits.cpp"
+					RelativePath="..\..\guiengine\abstract_state_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\engine.cpp"
+					RelativePath="..\..\guiengine\engine.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\kart_selection.cpp"
+					RelativePath="..\..\guiengine\event_handler.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\modaldialog.cpp"
+					RelativePath="..\..\guiengine\modaldialog.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\my_button.cpp"
+					RelativePath="..\..\guiengine\my_button.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\options_screen.cpp"
+					RelativePath="..\..\guiengine\screen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\race_gui.cpp"
+					RelativePath="..\..\guiengine\screen_loader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\screen.cpp"
+					RelativePath="..\..\guiengine\skin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\screen_loader.cpp"
+					RelativePath="..\..\guiengine\widget.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\gui\skin.cpp"
+				<Filter
+					Name="widgets"
 					>
-				</File>
-				<File
-					RelativePath="..\..\gui\state_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\widget.cpp"
-					>
-				</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\button_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\check_box_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\icon_button_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\label_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\list_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\model_view_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_grid_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\spinner_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\text_box_widget.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lisp"
@@ -741,6 +773,50 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="states_screen"
+				>
+				<File
+					RelativePath="..\..\states_screens\credits.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\kart_selection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_gui.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\state_manager.cpp"
+					>
+				</File>
+				<Filter
+					Name="dialogs"
+					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\player_info_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\press_a_key_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\track_info_dialog.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Headerdateien"
@@ -752,52 +828,88 @@
 				>
 			</File>
 			<Filter
-				Name="gui"
+				Name="guiengine"
 				>
 				<File
-					RelativePath="..\..\gui\credits.hpp"
+					RelativePath="..\..\guiengine\abstract_state_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\kart_selection.hpp"
+					RelativePath="..\..\guiengine\engine.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\modaldialog.hpp"
+					RelativePath="..\..\guiengine\event_handler.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\my_button.hpp"
+					RelativePath="..\..\guiengine\modaldialog.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\options_screen.hpp"
+					RelativePath="..\..\guiengine\my_button.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\ptr_vector.hpp"
+					RelativePath="..\..\guiengine\screen.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\race_gui.hpp"
+					RelativePath="..\..\guiengine\skin.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\screen.hpp"
+					RelativePath="..\..\guiengine\widget.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\skin.hpp"
+					RelativePath="..\..\guiengine\widgets.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\gui\state_manager.hpp"
+				<Filter
+					Name="widgets"
 					>
-				</File>
-				<File
-					RelativePath="..\..\gui\widget.hpp"
-					>
-				</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\button_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\check_box_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\icon_button_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\label_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\list_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\model_view_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_grid_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\spinner_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\text_box_widget.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lisp"
@@ -1370,6 +1482,50 @@
 					RelativePath="..\..\animations\three_d_animation.hpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="states_screens"
+				>
+				<File
+					RelativePath="..\..\states_screens\credits.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\kart_selection.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_gui.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\state_manager.hpp"
+					>
+				</File>
+				<Filter
+					Name="dialogs"
+					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\player_info_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\press_a_key_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\track_info_dialog.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
