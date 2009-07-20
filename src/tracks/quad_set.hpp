@@ -24,15 +24,15 @@
 #include <string>
 
 #include "tracks/quad.hpp"
+#include "utils/vec3.hpp"
 
-class Vec3;
 class XMLNode;
 
 class QuadSet {
 private:
     /** The 2d bounding box, used for hashing. */
-    // FIXME: named with z being the forward axis
-    float               m_xMin, m_xMax, m_zMin, m_zMax;
+    Vec3                m_min;
+    Vec3                m_max;
     /** The list of all quads. */
     std::vector<Quad*>  m_all_quads;
     void load    (const std::string &filename);
@@ -51,10 +51,8 @@ public:
     /** Returns true if the point p is in the n-th. quad. */
     bool pointInQuad   (int n,         const btVector3& p) const
                                 {return pointInQuad(*m_all_quads[n],p);}
-    void getBoundingBox(float* xMin, float* xMax,
-                        float* zMin, float* zMax) const
-                                { *xMin=m_xMin; *xMax=m_xMax;
-                                  *zMin=m_zMin; *zMax=m_zMax;}
+    /** Return the minimum and maximum coordinates of this quad set. */
+    void getBoundingBox(Vec3 *min, Vec3 *max) { *min=m_min; *max=m_max;   }
     /** Returns the number of quads. */
     unsigned int getNumberOfQuads() const 
                                 {return (unsigned int)m_all_quads.size(); }

@@ -53,7 +53,7 @@ void ModelViewWidget::add()
     m_element->setTabStop(false);
     
     std::string name = "model view "; name += m_properties[PROP_ID].c_str();
-    m_texture = GUIEngine::getDriver()->addTexture( core::dimension2d< s32 >(512, 512), name.c_str() );
+    m_texture = GUIEngine::getDriver()->addRenderTargetTexture( core::dimension2d< s32 >(512, 512), name.c_str() );
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::clearModels()

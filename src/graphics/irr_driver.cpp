@@ -275,6 +275,31 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
+/** Begins a rendering to a texture.
+ *  \param dimension The size of the texture. 
+ *  \param name Name of the texture.
+ */
+void IrrDriver::beginRenderToTexture(const core::dimension2di &dimension, 
+                                     const std::string &name)
+{
+    m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
+                                                                     name.c_str());
+    m_device->getVideoDriver()->setRenderTarget(m_render_target_texture);
+}   // beginRenderToTexture
+
+// ----------------------------------------------------------------------------
+/** Does the actual rendering to a texture, and switches the rendering system
+ *  back to render on the screen.
+ *  \return A pointer to the texture on which the scene was rendered.
+ */
+video::ITexture *IrrDriver::endRenderToTexture()
+{
+    m_scene_manager->drawAll();   
+    m_device->getVideoDriver()->setRenderTarget(0, false, false);
+    return m_render_target_texture;
+}   // endRenderToTexture
+
+// ----------------------------------------------------------------------------
 /** Renders a given vector of meshes onto a texture. Parameters:
  *  \param mesh Vector of meshes to render.
  *  \param mesh_location For each mesh the location where it should be 
@@ -343,7 +368,7 @@ void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh,
     ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
     
     camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
-    camera->setUpVector( core::vector3df(0.0, -1.0, 0.0) );
+    camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     camera->setTarget( core::vector3df(0, 10, 0.0f) );
     camera->updateAbsolutePosition();
     

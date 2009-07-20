@@ -59,8 +59,8 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 }   // getPoint 
 // -----------------------------------------------------------------------------
 void QuadSet::load(const std::string &filename) {
-    m_xMin = m_zMin =  9999999.9f;
-    m_xMax = m_zMax = -9999999.9f;
+    m_min = Vec3( 99999,  99999,  99999);
+    m_max = Vec3(-99999, -99999, -99999);
 
     XMLNode *xml = file_manager->createXMLTree(filename);
     if(!xml || xml->getName()!="quads") 
@@ -85,6 +85,8 @@ void QuadSet::load(const std::string &filename) {
         getPoint(xml_node, "p3", &p3);
         Quad* q=new Quad(p0,p1,p2,p3);
         m_all_quads.push_back(q);
+        m_max.max(p0);m_max.max(p1);m_max.max(p2);m_max.max(p3);
+        m_min.min(p0);m_min.min(p1);m_min.min(p2);m_min.min(p3);
 
     }
     delete xml;

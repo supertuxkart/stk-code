@@ -43,6 +43,7 @@ private:
 
     void setDefaultSuccessors();
     void load         (const std::string &filename);
+    void createMesh();
 public:
     static const int UNKNOWN_SECTOR;
 
@@ -62,7 +63,9 @@ public:
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
     video::ITexture *makeMiniMap(const core::dimension2di &where,
-                                 const std::string &name);
+                                 const std::string &name, 
+                                 const video::SColor &fill_color
+                                        =video::SColor(127, 255, 255, 255) );
 
     /** Returns the number of nodes in the graph. */
     unsigned int   getNumNodes() const { return m_all_nodes.size();         } 

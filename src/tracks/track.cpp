@@ -600,7 +600,7 @@ void Track::loadQuadGraph()
 {
     m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".quads"), 
                                  file_manager->getTrackFile(m_ident+".graph"));
-    m_mini_map = m_quad_graph->makeMiniMap(core::dimension2di(100,100), m_ident);
+    m_mini_map = m_quad_graph->makeMiniMap(core::dimension2di(128,128), m_ident);
     if(m_quad_graph->getNumNodes()==0)
     {
         fprintf(stderr, "No graph nodes defined for track '%s'\n",

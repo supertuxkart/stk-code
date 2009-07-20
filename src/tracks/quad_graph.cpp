@@ -149,12 +149,11 @@ void QuadGraph::setDefaultSuccessors()
 }   // setDefaultSuccessors
 
 // -----------------------------------------------------------------------------
-/** Creates the debug mesh to display the quad graph on top of the track 
- *  model. */
-void QuadGraph::createDebugMesh()
+/** Creates a mesh for this graph. The mesh is not added to a scene node and 
+ *  is stored in m_mesh.
+ */
+void QuadGraph::createMesh()
 {
-    if(m_all_nodes.size()<=0) return;  // no debug output if not graph
-
     // The debug track will not be lighted or culled.
     video::SMaterial m;
     m.BackfaceCulling = false;
@@ -171,7 +170,7 @@ void QuadGraph::createDebugMesh()
     // we need 2*3 indices for each quad.
     irr::u16         *ind   = new irr::u16[n*6];
 
-    // Now add all other quads
+    // Now add all quads
     for(unsigned int i=0; i<n; i++)
     {
         // Swap the colours from red to blue and back
@@ -197,6 +196,28 @@ void QuadGraph::createDebugMesh()
     //m_node->setAutomaticCulling(scene::EAC_OFF);
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
+}   // createMesh
+
+// -----------------------------------------------------------------------------
+
+/** Creates the debug mesh to display the quad graph on top of the track 
+ *  model. */
+void QuadGraph::createDebugMesh()
+{
+    if(m_all_nodes.size()<=0) return;  // no debug output if not graph
+
+    createMesh();
+
+    // Now colour the quads red/blue/red ...
+    video::SColor     c(255, 255, 0, 0);    
+    video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
+    for(unsigned int i=0; m_mesh_buffer->getVertexCount(); i++)
+    {
+        // Swap the colours from red to blue and back
+        c.setRed (i%2 ? 255 : 0); 
+        c.setBlue(i%2 ? 0 : 255);
+        v[i].Color = c;
+    }
     m_node           = irr_driver->addMesh(m_mesh);
 }   // createDebugMesh
 
@@ -381,28 +402,29 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
  *  \param where the top left and lower right corner for the mini map.
  */
 video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
-                                        const std::string &name)
+                                        const std::string &name,
+                                        const video::SColor &fill_color)
 {
-    return NULL;
-
-    video::ITexture *texture = 
-        irr_driver->getVideoDriver()->addTexture(dimension, name.c_str());
-
-    // FIXME: all very much work in progress, only committed as a backup
-    // (and to include the debug cleanup)
-    // createDebugMesh();
-
-    scene::IMesh *mesh = irr_driver->createQuadMesh();
-    scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
-
-
-    unsigned int n = m_all_nodes.size();
-    for(unsigned int i=0; i<n; i++)
+    irr_driver->beginRenderToTexture(dimension, name);
+    createMesh();   
+    video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
+    for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
-        const Quad &q=m_all_quads->getQuad(m_all_nodes[i]->getIndex());
+        v[i].Color = fill_color;
     }
-    irr_driver->removeMesh(mesh);
-    const std::string f=file_manager->getTrackFile("waterfall.png", "beach");
-    return irr_driver->getTexture(f);
+
+    m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+    // Add the camera:
+    Vec3 bb_min, bb_max;
+    m_all_quads->getBoundingBox(&bb_min, &bb_max);
+    Vec3 center = (bb_max+bb_min)*0.5f;
+    scene::ICameraSceneNode *camera = irr_driver->addCamera();
+    camera->setPosition(core::vector3df(center.getX(), 120, center.getY()));
+    camera->setUpVector(core::vector3df(0,0,1));
+    camera->setTarget(core::vector3df(center.getX(),0,center.getY()));
+    video::ITexture *texture=irr_driver->endRenderToTexture();
+    cleanupDebugMesh();
     return texture;
+
 }   // drawMiniMap

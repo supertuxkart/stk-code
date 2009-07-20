@@ -74,7 +74,8 @@ public:
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
     float          length2_2d() const              {return m_x*m_x + m_y*m_y;}
-    /** Returns the length of the vector. */
+    /** Returns the length of this vector in the plane, i.e. the vector is 
+     *  used as a 2d vector. */
     float          length_2d()  const              {return sqrt(m_x*m_x + m_y*m_y);}
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */

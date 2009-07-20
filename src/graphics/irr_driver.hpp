@@ -48,6 +48,9 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
 
+    /** A pointer to texture on which a scene is rendered. Only used
+     *  in between beginRenderToTexture() and endRenderToTexture calls. */
+    video::ITexture            *m_render_target_texture;
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
@@ -104,6 +107,9 @@ public:
     void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
                          std::vector<Vec3>& mesh_location, 
                          video::ITexture* target, float angle);
+    void beginRenderToTexture(const core::dimension2di &dimension, 
+                              const std::string &name);
+    video::ITexture *endRenderToTexture();
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;
