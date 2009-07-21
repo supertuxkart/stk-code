@@ -355,6 +355,10 @@ int handleCmdLine(int argc, char **argv)
             //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
             //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
             //FIXME:raceSetup.reverse = 1;
+            
+            StateManager::get()->addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
+            race_manager->setNumLocalPlayers(1);
+            race_manager->setLocalKartInfo(0, "tux");
         }
         else if ( !strcmp(argv[i], "--mirror") )
         {
@@ -632,9 +636,6 @@ int main(int argc, char *argv[] )
                 // Quickstart (-N)
                 // ===============
                 // all defaults are set in InitTuxkart()
-                StateManager::get()->addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
-                race_manager->setNumLocalPlayers(1);
-                race_manager->setLocalKartInfo(0, "tux");
                 network_manager->setupPlayerKartInfo();
                 race_manager->startNew();
             }
