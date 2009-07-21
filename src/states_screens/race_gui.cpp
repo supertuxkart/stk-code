@@ -35,6 +35,8 @@
 #include "irrlicht.h"
 using namespace irr;
 
+const video::SColor white(255,255,255,255);
+
 RaceGUI::RaceGUI()
 {
     // FIXME: translation problem
@@ -215,7 +217,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         const core::rect<s32> pos(x, y, x+w, y+w);
         const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
         irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, 0,
-                                                  &video::SColor(255,255,255,255), true);
+                                                  &white, true);
 
     } // next kart
     
@@ -246,7 +248,7 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart, int offset_x,
     {
         core::rect<s32> pos(x1+i*30, y1, x1+i*30+nSize, y1+nSize);
         irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, 0, 
-                                                  &video::SColor(255,255,255,255),
+                                                  &white,
                                                   true);
     }   // for i
 }   // drawPowerupIcons
