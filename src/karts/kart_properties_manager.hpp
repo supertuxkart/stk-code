@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KARTPROPERTIESMANAGER_HPP
-#define HEADER_KARTPROPERTIESMANAGER_HPP
+#ifndef HEADER_KART_PROPERTIES_MANAGER_HPP
+#define HEADER_KART_PROPERTIES_MANAGER_HPP
 
 #include <vector>
 #include <map>

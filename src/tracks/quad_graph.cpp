@@ -406,6 +406,11 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
                                         const video::SColor &fill_color)
 {
     irr_driver->beginRenderToTexture(dimension, name);
+    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+    {
+//        core::array<core::vector2df> vertices;
+//        vertices.push_back(core::vertices
+    }
     createMesh();   
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)

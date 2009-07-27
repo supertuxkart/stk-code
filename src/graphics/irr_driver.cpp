@@ -440,6 +440,14 @@ void IrrDriver::removeMesh(scene::IMesh *mesh)
 {
     m_scene_manager->getMeshCache()->removeMesh(mesh);
 }   // removeMesh
+// ----------------------------------------------------------------------------
+/** Removes a texture from irrlicht's texture cache.
+ *  \param t The texture to remove.
+ */
+void IrrDriver::removeTexture(video::ITexture *t)
+{
+    m_video_driver->removeTexture(t);
+}   // removeTexture
 
 // ----------------------------------------------------------------------------
 /** Adds an animated mesh to the scene.
@@ -449,6 +457,7 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
 {
     return m_scene_manager->addAnimatedMeshSceneNode(mesh);
 }   // addAnimatedMesh
+
 
 // ----------------------------------------------------------------------------
 /** Adds a sky dome. Documentation from irrlicht:

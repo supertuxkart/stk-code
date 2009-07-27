@@ -253,6 +253,7 @@ int handleCmdLine(int argc, char **argv)
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");
             if(filename!="")
             {
+                race_manager->setNumLocalPlayers(1);
                 race_manager->setLocalKartInfo(0, argv[i+1]);
                 fprintf ( stdout, "You choose to use kart '%s'.\n", argv[i+1] ) ;
             }

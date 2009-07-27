@@ -20,23 +20,26 @@
 
 #include "states_screens/race_gui.hpp"
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "audio/sound_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include "irrlicht.h"
-using namespace irr;
-
-const video::SColor white(255,255,255,255);
-
+/** The constructor is called before anything is attached to the scene node.
+ *  So rendering to a texture can be done here. But world is not yet fully
+ *  created, so only the race manager can be accessed safely.
+ */
 RaceGUI::RaceGUI()
 {
     // FIXME: translation problem
@@ -52,8 +55,6 @@ RaceGUI::RaceGUI()
     m_pos_string[9] = "9th";
     m_pos_string[10] = "10th";
 
-    gui::IGUIEnvironment *gui_env = irr_driver->getGUI();
-
     int icon_width=40;
     int icon_player_width=50;
     if(UserConfigParams::m_height<600)
@@ -62,17 +63,75 @@ RaceGUI::RaceGUI()
         icon_player_width = 35;
     }
 
-    m_speed_back_icon = material_manager->getMaterial("speedback.png");
-    m_speed_fore_icon = material_manager->getMaterial("speedfore.png");    
-    m_plunger_face    = material_manager->getMaterial("plungerface.png");
-    
+    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
+    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");    
+    m_plunger_face     = material_manager->getMaterial("plungerface.png");
+    createMarkerTexture();
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
-    //FIXME: does all that material stuff need freeing somehow?
+    irr_driver->removeTexture(m_marker);
 }   // ~Racegui
+
+//-----------------------------------------------------------------------------
+/** Creates a texture with the markers for all karts in the current race
+ *  on it. This assumes that nothing is attached to the scene node at
+ *  this stage.
+ */
+void RaceGUI::createMarkerTexture()
+{
+    unsigned int n=race_manager->getNumKarts();
+    unsigned int npower2 = 1;
+    // Textures must be power of 2, so 
+    while(npower2<n) npower2*=2;
+
+    int marker_size = 64;  // must be a power of 2
+    int radius     = (marker_size>>1)-1;
+    irr_driver->beginRenderToTexture(core::dimension2di(marker_size * npower2, marker_size), 
+                                     "RaceGUI::markers");
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    {
+        const std::string& kart_name = race_manager->getKartName(i);
+        const KartProperties *kp = kart_properties_manager->getKart(kart_name);
+        core::vector2df center((float)((marker_size>>1)+i*marker_size), 
+                               (float)(marker_size>>1));
+        int count = kp->getShape();
+        core::array<core::vector2df> vertices;
+        createRegularPolygon(count, (float)radius, center,&vertices);
+
+        video::SColor color = kp->getColor();
+        core::array<video::SColor> colors;
+        colors.push_back(color);
+#ifdef IRRLICHT_HAS_SUPERTUXKART_POLYGON
+        irr_driver->getVideoDriver()->draw2DPolygon(vertices, &colors);
+#endif
+    }
+    m_marker = irr_driver->endRenderToTexture();
+    core::dimension2di X = m_marker->getOriginalSize();
+}   // createMarkerTexture
+
+//-----------------------------------------------------------------------------
+/** Creates the 2D vertices for a regular polygon. Adopted from Irrlicht.
+ *  \param n Number of vertices to use.
+ *  \param radius Radius of the polygon.
+ *  \param center The center point of the polygon.
+ *  \param v Pointer to the array of vertices.
+ */
+void RaceGUI::createRegularPolygon(unsigned int n, float radius, 
+                                   const core::vector2df &center,
+                                   core::array<core::vector2df> *v)
+{
+    float f = 2*M_PI/(float)n;
+    for (unsigned int i=0; i<n; i++)
+    {
+        float p = i*f;
+        core::vector2df X = center + core::vector2df(sin(p)*radius, -cos(p)*radius);
+        v->push_back(X);
+    }
+
+}   // createRegularPolygon
 
 //-----------------------------------------------------------------------------
 /** Called before rendering, so no direct output to the screen can be done
@@ -114,16 +173,21 @@ void RaceGUI::drawTimer ()
 //-----------------------------------------------------------------------------
 #define TRACKVIEW_SIZE 100
 
-void RaceGUI::drawMap ()
+void RaceGUI::drawMap()
 {
     // arenas currently don't have a map.
     if(RaceManager::getTrack()->isArena()) return;
-    const video::ITexture *t=RaceManager::getTrack()->getMiniMap();
+    const video::ITexture *mini_map=RaceManager::getTrack()->getMiniMap();
     
     core::rect<s32> dest(10, UserConfigParams::m_height-60, 
                          60, UserConfigParams::m_height-10);
-    core::rect<s32> source(core::position2di(0, 0), t->getOriginalSize());
-    irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 0, 0, true);
+    core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
+    //FIXME irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
+
+    core::rect<s32> dest1( 10, UserConfigParams::m_height-10, 
+                          100, UserConfigParams::m_height-110);
+    core::rect<s32> source1(core::position2di(0, 0), m_marker->getOriginalSize());
+    irr_driver->getVideoDriver()->draw2DImage(m_marker, dest, source1, 0, 0, true);
     
     return;
 
@@ -140,7 +204,7 @@ void RaceGUI::drawMap ()
     {
         Kart* kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        glColor3fv ( kart->getColor().toFloat());
+        //glColor3fv ( kart->getColor().toFloat());
 	const Vec3& xyz = kart->getXYZ();
 
         /* If it's a player, draw a bigger sign */
@@ -216,6 +280,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         int w = kart->isPlayerKart() ? ICON_PLAYER_WIDTH : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
         const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
+        static const video::SColor white(255, 255, 255, 255);
         irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, 0,
                                                   &white, true);
 
@@ -244,6 +309,7 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart, int offset_x,
     video::ITexture *t=powerup->getIcon()->getTexture();
     core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
 
+    static const video::SColor white(255, 255, 255, 255);
     for ( int i = 0 ; i < n ; i++ )
     {
         core::rect<s32> pos(x1+i*30, y1, x1+i*30+nSize, y1+nSize);
@@ -272,30 +338,21 @@ void RaceGUI::drawEnergyMeter ( Kart *player_kart, int offset_x, int offset_y,
 #define LINE(x0,y0,x1,y1, color) video->draw2DLine(core::position2di(x0,y0), \
                                                    core::position2di(x1,y1), color)
 
-    // FIXME: the original code drew a rectangle, i.e. two lines. This seems to be
-    // unnecesssary, so it's commented out here 
     // Left side:
     LINE(x-1,   y+1,   x-1,   y-h-1, black_border);
-    //LINE(x,     y-1,   x,     y+h+1, black_border);
     LINE(x,     y,     x,     y-h-2, white_border);
-    //LINE(x+1,   y,     x+1,   y+h+2, white_border);
-
+ 
     // Right side:
     LINE(x+w,   y+1,   x+w,   y-h-1, black_border);
-    //LINE(x+w+1, y-1,   x+w+1, y+h+1, black_border);
     LINE(x+w+1, y,     x+w+1, y-h-2, white_border);
-    //LINE(x+w+2, y,     x+w+2, y+h+2, white_border);
-
+ 
     // Bottom
     LINE(x,     y+1,   x+w,   y+1,   black_border);
-    //LINE(x,     y,     x+w,   y,     black_border);
     LINE(x+1,   y,     x+w+1, y,     white_border);
-    //LINE(x+1,   y+1,   x+w+1, y+1,   white_border);
+ 
     // Top
     LINE(x,     y-h,   x+w,   y-h,   black_border);
-    //LINE(x,     y+h+1, x+w,   y+h+1, black_border);
     LINE(x,     y-h-1, x+w,   y-h-1, white_border);
-    //LINE(x,     y+h+2, x+w,   y+h+2, white_border);
 
     const int GRADS = (int)(MAX_ITEMS_COLLECTED/5);  // each graduation equals 5 items
     int gh = (int)(h/GRADS);  //graduation height
@@ -327,21 +384,25 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
                         float ratio_x, float ratio_y           )
 {
 
-    float minRatio = std::min(ratio_x, ratio_y);
-    const int SPEEDWIDTH=128;
-    int width  = (int)(SPEEDWIDTH*minRatio);
-    int height = (int)(SPEEDWIDTH*minRatio);
-    offset_x += (int)((UserConfigParams::m_width-10)*ratio_x) - width;
-    offset_y += (int)(10*ratio_y);
+    float minRatio       = std::min(ratio_x, ratio_y);
+    const int SPEEDWIDTH = 128;
+    int meter_width      = (int)(SPEEDWIDTH*minRatio);
+    int meter_height     = (int)(SPEEDWIDTH*minRatio);
+    offset_x            += (int)((UserConfigParams::m_width-10)*ratio_x) - meter_width;
+    offset_y            += (int)(10*ratio_y);
 
+    // First draw the meter (i.e. the background which contains the numbers etc.
+    // -------------------------------------------------------------------------
     video::IVideoDriver *video = irr_driver->getVideoDriver();
-    video::SColor color(255, 255, 255, 255);
-    const core::rect<s32> pos(offset_x,       UserConfigParams::m_height-offset_y-height, 
-                              offset_x+width, UserConfigParams::m_height-offset_y);
-    video::ITexture *t = m_speed_back_icon->getTexture();
-    const core::rect<s32> rect(core::position2d<s32>(0,0), t->getOriginalSize());
-    video->draw2DImage(t, pos, rect, 0, &color, true);
+    const core::rect<s32> meter_pos(offset_x,             UserConfigParams::m_height-offset_y-meter_height, 
+                                    offset_x+meter_width, UserConfigParams::m_height-offset_y);
+    video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
+    const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0), 
+                                               meter_texture->getOriginalSize());
+    video->draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL, NULL, true);
 
+    // Indicate when the kart is off ground
+    // ------------------------------------
     if ( !kart->isOnGround() )
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -351,50 +412,48 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
                             UserConfigParams::m_height-(offset_y-(int)(10*minRatio)) );
         irr_driver->getRaceFont()->draw(core::stringw("!").c_str(), pos, color);
     }
+
     const float speed =  kart->getSpeed();
-    if(speed>0)
+    if(speed <=0) return;  // Nothing to do if speed is negative.
+
+    // Draw the actual speed bar (if the speed is >0)
+    // ----------------------------------------------
+    float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
+    if(speed_ratio>1) speed_ratio = 1;
+
+    video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
+    core::dimension2di bar_size    = bar_texture->getOriginalSize();
+    core::array<core::vector2di> tex_coords;        // texture coordinates
+    core::array<core::vector2df> bar_vertices;      // screen coordinates
+
+    tex_coords.push_back(core::vector2di(bar_size.Width, bar_size.Height));
+    bar_vertices.push_back(core::vector2df((float)meter_pos.LowerRightCorner.X, 
+                                           (float)meter_pos.LowerRightCorner.Y));
+    tex_coords.push_back(core::vector2di(0,bar_size.Height));
+    bar_vertices.push_back(core::vector2df((float)meter_pos.UpperLeftCorner.X, 
+                                           (float)meter_pos.LowerRightCorner.Y));
+
+    if(speed_ratio<=0.5f)
     {
-        float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
-        if(speed_ratio>1) speed_ratio = 1;
+        core::vector2di v0(0, bar_size.Height-(int)(2*(speed_ratio)*bar_size.Height));
+        tex_coords.push_back(v0);
+        bar_vertices.push_back(core::vector2df((float)meter_pos.UpperLeftCorner.X, 
+                                               (float)meter_pos.LowerRightCorner.Y-speed_ratio*2*meter_height));
+    }
+    else
+    {
+        tex_coords.push_back(core::vector2di(0, 0));
+        bar_vertices.push_back(core::vector2df((float)offset_x, 
+                                               (float)(UserConfigParams::m_height-offset_y-meter_height)));
 
-        core::rect<s32> pos;
-        video::ITexture *t = m_speed_fore_icon->getTexture();
-        core::dimension2di tex_coords=t->getOriginalSize();
-        if(speed_ratio<0.5f)
-        {
-            pos = core::rect<s32>(offset_x,
-                                  UserConfigParams::m_height-offset_y-height, 
-                                  offset_x+width,
-                                  UserConfigParams::m_height-offset_y-(int)(height*(1-speed_ratio)));
-            tex_coords.set(tex_coords.Width, (int)(tex_coords.Height*speed_ratio));
-        }
-        else
-        {
-            pos = core::rect<s32>(offset_x,
-                                  UserConfigParams::m_height-offset_y-height, 
-                                  (int)(offset_x+width*speed_ratio),
-                                  UserConfigParams::m_height-offset_y);
-            tex_coords.set((int)(tex_coords.Width*speed_ratio), tex_coords.Height);
-        }
-        const core::rect<s32> rect(core::position2d<s32>(0,0), tex_coords);
-        video->draw2DImage(t, pos, rect, 0, &color, true);
-#ifdef XX
-
-        glTexCoord2f(1, 0);glVertex2i(offset_x+width, offset_y);
-        glTexCoord2f(0, 0);glVertex2i(offset_x, offset_y);
-        if (speedRatio < 0.5)
-        {
-            glTexCoord2f(0, speedRatio*2);glVertex2i(offset_x, (int)(offset_y+width*speedRatio*2));
-        }
-        else
-        {
-            glTexCoord2f(0, 1);glVertex2i(offset_x, offset_y+width);
-            glTexCoord2f((speedRatio-0.5f)*2, 1);glVertex2i((int)(offset_x+height*(speedRatio-0.5f)*2), offset_y+height);
-        }
-
-        glEnd () ;
+        core::vector2di v0((int)(2*(speed_ratio-0.5f)*bar_size.Width), 0);
+        tex_coords.push_back(v0);
+        bar_vertices.push_back(core::vector2df(offset_x+2*(speed_ratio-0.5f)*meter_width, 
+                                               (float)(UserConfigParams::m_height-offset_y-meter_height)));
+    }
+#ifdef IRRLICHT_HAS_SUPERTUXKART_POLYGON
+    irr_driver->getVideoDriver()->draw2DPolygon(bar_vertices, NULL, bar_texture, true, &tex_coords);
 #endif
-    }   // speed<0
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
@@ -503,7 +562,7 @@ void RaceGUI::drawMusicDescription()
     const MusicInformation* mi=sound_manager->getCurrentMusic();
     if(!mi) return;
     int y=UserConfigParams::m_height-40;
-    static video::SColor white = video::SColor(255, 255, 255, 255);
+    static const video::SColor white = video::SColor(255, 255, 255, 255);
     gui::IGUIFont*       font = irr_driver->getRaceFont();
     if(mi->getComposer()!="")
     {
@@ -645,8 +704,8 @@ void RaceGUI::drawStatusText()
                          split_screen_ratio_x, split_screen_ratio_y );
         drawEnergyMeter     (player_kart, offset_x, offset_y,
                             split_screen_ratio_x, split_screen_ratio_y );
-        //drawSpeed           (player_kart, offset_x, offset_y,
-        //                     split_screen_ratio_x, split_screen_ratio_y );
+        drawSpeed           (player_kart, offset_x, offset_y,
+                             split_screen_ratio_x, split_screen_ratio_y );
         drawLap             (info, player_kart, offset_x, offset_y,
                              split_screen_ratio_x, split_screen_ratio_y );
         drawAllMessages     (player_kart, offset_x, offset_y,
@@ -678,7 +737,7 @@ void RaceGUI::drawStatusText()
         drawMusicDescription();
     }
 
-    drawMap();
+    //drawMap();
     drawPlayerIcons(info);
 
 }   // drawStatusText

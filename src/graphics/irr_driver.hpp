@@ -94,6 +94,7 @@ public:
     scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMesh(scene::IMesh *mesh);
+    void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
                          *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
@@ -110,6 +111,12 @@ public:
     void beginRenderToTexture(const core::dimension2di &dimension, 
                               const std::string &name);
     video::ITexture *endRenderToTexture();
+    void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
+                        const core::vector2df &c, 
+                        const video::ITexture *texture = NULL,
+                        const video::SColor *ca=NULL,  const video::SColor *cb=NULL,
+                        const video::SColor *cc=NULL);
+
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

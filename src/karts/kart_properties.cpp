@@ -69,8 +69,9 @@ KartProperties::KartProperties() : m_icon_material(0)
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
-    m_color.setValue(1.0f, 0.0f, 0.0f);
-    m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
+    m_color                  = video::SColor(255, 0, 0, 0);
+    m_shape                  = 32;  // close enough to a circle.
+    m_engine_sfx_type        = SFXManager::SOUND_ENGINE_SMALL;
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -183,8 +184,9 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("name",                       m_name);
     lisp->get("icon-file",                  m_icon_file);
     lisp->get("shadow-file",                m_shadow_file);
-    lisp->get("rgb",                        m_color);
-
+    Vec3 c;
+    lisp->get("rgb",                        c);
+    m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
     lisp->get("engine-power",               m_engine_power, 3);
     lisp->get("time-full-steer",            m_time_full_steer);
     lisp->get("time-full-steer-ai",         m_time_full_steer_ai);

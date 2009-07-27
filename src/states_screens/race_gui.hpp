@@ -84,13 +84,18 @@ private:
         }
     };
 
-private:
-    const char    *m_pos_string [11];
-    Material      *m_speed_back_icon;
-    Material      *m_speed_fore_icon;
-    Material      *m_plunger_face;
-    typedef        std::vector<TimedMessage> AllMessageType;
-    AllMessageType m_messages;
+    const char      *m_pos_string [11];
+    Material        *m_speed_meter_icon;
+    Material        *m_speed_bar_icon;
+    Material        *m_plunger_face;
+    typedef          std::vector<TimedMessage> AllMessageType;
+    AllMessageType   m_messages;
+    video::ITexture *m_marker;
+
+    void createMarkerTexture();
+    void createRegularPolygon(unsigned int n, float radius, 
+                              const core::vector2df &center,
+                              core::array<core::vector2df> *v);
 
     /* Display informat on screen */
     void drawStatusText        ();

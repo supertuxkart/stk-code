@@ -203,6 +203,28 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
 }   // get(Vec3)
 
 // ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, video::SColor *color) const
+{
+    std::string s;
+    if(!get(attribute, &s)) return 0;
+
+    std::vector<std::string> v = StringUtils::split(s,' ');
+    if(v.size()<3 || v.size()>4) return 0;
+    if(v.size()==3)
+    {
+        color->setRed  (atoi(v[0].c_str()));
+        color->setGreen(atoi(v[1].c_str()));
+        color->setBlue (atoi(v[2].c_str()));
+    }
+    else
+        color->set(atoi(v[0].c_str()),
+                   atoi(v[1].c_str()),
+                   atoi(v[2].c_str()),
+                   atoi(v[3].c_str()));
+    return 1;
+}   // get(SColor)
+
+// ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, video::SColorf *color) const
 {
     std::string s;

@@ -196,7 +196,7 @@ public:
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
     // -------------------------------------------------------------------------
-    const Vec3    &getColor         () const {return m_kart_properties->getColor();}
+    const video::SColor &getColor   () const {return m_kart_properties->getColor();}
     float          getMass          () const
     {
         return m_kart_properties->getMass()

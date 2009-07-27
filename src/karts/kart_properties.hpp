@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+#include "irrlicht.h"
+using namespace irr;
+
 #include "audio/sfx_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
@@ -30,7 +33,6 @@
 #include "utils/vec3.hpp"
 
 class Material;
-class ssgEntity;
 
 /** This class stores the properties of a kart. This includes size, name, 
  *  identifier, physical properties etc. It is atm also the base class for
@@ -62,9 +64,10 @@ private:
                                        *   character select screen. */
     std::string m_shadow_file;        /**< Filename of the image file that 
                                        *   contains the shadow for this kart.*/
-    Vec3 m_color;                     /**< Color the represents the kart in the
+    video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
-
+    int  m_shape;                     /**< Number of vertices in polygon when 
+                                       *   drawing the dot on the mini map. */
     // Physic properties
     // -----------------
     float m_mass;                     /**< Weight of kart.  */
@@ -88,14 +91,9 @@ private:
                                            kart length. */
           m_max_radius;               /**< Largest turn radius. */
 
-    //ssgEntity  *m_wheel_model[4];      /**< The four wheel models.           */
     std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */
                                        /**  Radius of the graphical wheels.  */
     float       m_wheel_graphics_radius[4];  
-    //ssgTransform 
-    //           *m_wheel_transform[4];  /**< The transform for the wheels, used
-    //                                    *   to rotate the wheels and display
-    //                                    *   the suspension in the race.      */
     float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
@@ -173,7 +171,11 @@ public:
     const std::string& getIconFile  () const {return m_icon_file;                }
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;                  }
-    const Vec3   &getColor          () const {return m_color;                    }
+    /** Returns the dot color to use for this kart in the race gui. */
+    const video::SColor &getColor   () const {return m_color;                    }
+    /** Returns the number of edges for the polygon used to draw the dot of 
+     *  this kart on the mini map of the race gui. */
+    int   getShape                  () const {return m_shape;                    }
     const std::vector<std::string>&
                   getGroups         () const {return m_groups;                   }
     float getMass                   () const {return m_mass;                     }
