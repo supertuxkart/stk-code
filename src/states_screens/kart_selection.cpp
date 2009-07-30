@@ -568,16 +568,33 @@ void menuEventKarts(Widget* widget, const std::string& name)
         Widget* area = getCurrentScreen()->getWidget("playerskarts");
         
         if(!getCurrentScreen()->m_inited)
-        {
+        {            
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
+            
+            // add Tux first
             for(int n=0; n<kart_amount; n++)
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
-                std::string icon_path = "karts/";
-                icon_path += prop->getIdent() + "/" + prop->getIconFile();
-                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
-                
+                if (prop->getIdent() == "tux")
+                {
+                    std::string icon_path = "karts/";
+                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
+                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                    break;
+                }
+            }
+            
+            // add others
+            for(int n=0; n<kart_amount; n++)
+            {
+                const KartProperties* prop = kart_properties_manager->getKartById(n);
+                if (prop->getIdent() != "tux")
+                {
+                    std::string icon_path = "karts/";
+                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
+                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                }
             }
             getCurrentScreen()->m_inited = true;
         }
