@@ -42,26 +42,15 @@ using namespace irr;
  */
 RaceGUI::RaceGUI()
 {
-    // FIXME: translation problem
-    m_pos_string[0] = "?!?";
-    m_pos_string[1] = "1st";
-    m_pos_string[2] = "2nd";
-    m_pos_string[3] = "3rd";
-    m_pos_string[4] = "4th";
-    m_pos_string[5] = "5th";
-    m_pos_string[6] = "6th";
-    m_pos_string[7] = "7th";
-    m_pos_string[8] = "8th";
-    m_pos_string[9] = "9th";
-    m_pos_string[10] = "10th";
-
-    int icon_width=40;
-    int icon_player_width=50;
-    if(UserConfigParams::m_height<600)
-    {
-        icon_width        = 27;
-        icon_player_width = 35;
-    }
+    m_marker_rendered_size =  32;
+    m_marker_ai_size       =  14;
+    m_marker_player_size   =  16;
+    m_map_rendered_width   = 128;
+    m_map_rendered_height  = 128;
+    m_map_width            = 100;
+    m_map_height           = 100;
+    m_map_left             =  10;
+    m_map_bottom           =  10;
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");    
@@ -87,16 +76,16 @@ void RaceGUI::createMarkerTexture()
     // Textures must be power of 2, so 
     while(npower2<n) npower2*=2;
 
-    int marker_size = 64;  // must be a power of 2
-    int radius     = (marker_size>>1)-1;
-    irr_driver->beginRenderToTexture(core::dimension2di(marker_size * npower2, marker_size), 
+    int radius     = (m_marker_rendered_size>>1)-1;
+    irr_driver->beginRenderToTexture(core::dimension2di(m_marker_rendered_size * npower2, 
+                                     m_marker_rendered_size), 
                                      "RaceGUI::markers");
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         const std::string& kart_name = race_manager->getKartName(i);
         const KartProperties *kp = kart_properties_manager->getKart(kart_name);
-        core::vector2df center((float)((marker_size>>1)+i*marker_size), 
-                               (float)(marker_size>>1));
+        core::vector2df center((float)((m_marker_rendered_size>>1)+i*m_marker_rendered_size), 
+                               (float)(m_marker_rendered_size>>1)                   );
         int count = kp->getShape();
         core::array<core::vector2df> vertices;
         createRegularPolygon(count, (float)radius, center,&vertices);
@@ -109,7 +98,6 @@ void RaceGUI::createMarkerTexture()
 #endif
     }
     m_marker = irr_driver->endRenderToTexture();
-    core::dimension2di X = m_marker->getOriginalSize();
 }   // createMarkerTexture
 
 //-----------------------------------------------------------------------------
@@ -171,64 +159,40 @@ void RaceGUI::drawTimer ()
 }   // drawTimer
 
 //-----------------------------------------------------------------------------
-#define TRACKVIEW_SIZE 100
-
-void RaceGUI::drawMap()
+/** Draws the mini map and the position of all karts on it.
+ */
+void RaceGUI::drawMiniMap()
 {
     // arenas currently don't have a map.
     if(RaceManager::getTrack()->isArena()) return;
+
     const video::ITexture *mini_map=RaceManager::getTrack()->getMiniMap();
     
-    core::rect<s32> dest(10, UserConfigParams::m_height-60, 
-                         60, UserConfigParams::m_height-10);
+    int upper_y = UserConfigParams::m_height-m_map_bottom-m_map_height;
+    int lower_y = UserConfigParams::m_height-m_map_bottom;
+    core::rect<s32> dest(m_map_left,               upper_y, 
+                         m_map_left + m_map_width, lower_y);
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-    //FIXME irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
-
-    core::rect<s32> dest1( 10, UserConfigParams::m_height-10, 
-                          100, UserConfigParams::m_height-110);
-    core::rect<s32> source1(core::position2di(0, 0), m_marker->getOriginalSize());
-    irr_driver->getVideoDriver()->draw2DImage(m_marker, dest, source1, 0, 0, true);
+    irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     
-    return;
-
-    glDisable ( GL_TEXTURE_2D ) ;
-    assert(RaceManager::getWorld() != NULL);
-    int xLeft = 10;
-    int yTop   =  10;
-
-    RaceManager::getTrack() -> draw2Dview ( (float)xLeft,   (float)yTop   );
-
-    glBegin ( GL_QUADS ) ;
-
-    for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
-        Kart* kart = RaceManager::getKart(i);
+        const Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        //glColor3fv ( kart->getColor().toFloat());
-	const Vec3& xyz = kart->getXYZ();
-
-        /* If it's a player, draw a bigger sign */
-        // TODO
-        /*
-        if (kart -> isPlayerKart ())
-        {
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop+3);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop+3);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-2, (float)yTop-2);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+3, (float)yTop-2);
-        }
-        else
-        {
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop+2);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop+2);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft-1, (float)yTop-1);
-            RaceManager::getTrack() -> glVtx ( xyz.toFloat(), (float)xLeft+2, (float)yTop-1);
-        }
-         */
-    }
-
-    glEnd () ;
-    glEnable ( GL_TEXTURE_2D ) ;
+    	const Vec3& xyz = kart->getXYZ();
+        Vec3 draw_at;
+        RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+        int marker_height = m_marker->getOriginalSize().Height;
+        core::rect<s32> source(i    *m_marker_rendered_size, 0, 
+                               (i+1)*m_marker_rendered_size, m_marker_rendered_size);
+        int marker_half_size =  (kart->isPlayerKart() ? m_marker_player_size 
+                                                      : m_marker_ai_size      )>>1;
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
+                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                 m_map_left+(int)(draw_at.getX()+marker_half_size), 
+                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
+        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source, NULL, NULL, true);
+    }   // for i<getNumKarts
 }   // drawMap
 
 //-----------------------------------------------------------------------------
@@ -737,7 +701,7 @@ void RaceGUI::drawStatusText()
         drawMusicDescription();
     }
 
-    //drawMap();
+    drawMiniMap();
     drawPlayerIcons(info);
 
 }   // drawStatusText

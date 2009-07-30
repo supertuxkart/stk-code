@@ -104,7 +104,7 @@ const std::string Challenge::getUnlockedMessage() const
                     Track* track = track_manager->getTrack( m_feature[n].name );
                     message = StringUtils::insert_values(
                         _("New track '%s'\nnow available"), 
-                        _(track->getName()) );
+                        _(track->getName().c_str()) );
                     break;
                 }
             case UNLOCK_MODE:

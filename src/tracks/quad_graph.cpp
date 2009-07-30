@@ -38,6 +38,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_node        = NULL;
     m_mesh        = NULL;
     m_mesh_buffer = NULL;
+    m_lap_length  = 0;
     m_all_quads   = new QuadSet(quad_file_name);
     GraphNode::m_all_quads = m_all_quads;
     GraphNode::m_all_nodes = this;
@@ -132,6 +133,15 @@ void QuadGraph::load(const std::string &filename)
     }
     delete xml;
 
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
+        if(m_all_nodes[i]->getSuccessor(0)==0)
+        {
+            m_lap_length = m_all_nodes[i]->getDistanceFromStart()
+                + m_all_nodes[i]->getDistanceToSuccessor(0);
+            break;
+        }
+    }
     setDefaultSuccessors();
 }   // load
 
@@ -406,11 +416,6 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
                                         const video::SColor &fill_color)
 {
     irr_driver->beginRenderToTexture(dimension, name);
-    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
-    {
-//        core::array<core::vector2df> vertices;
-//        vertices.push_back(core::vertices
-    }
     createMesh();   
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
@@ -420,16 +425,38 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
 
     m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
     m_node->setMaterialFlag(video::EMF_LIGHTING, false);
+
     // Add the camera:
+    // ---------------
+    scene::ICameraSceneNode *camera = irr_driver->addCamera();
     Vec3 bb_min, bb_max;
     m_all_quads->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
-    scene::ICameraSceneNode *camera = irr_driver->addCamera();
-    camera->setPosition(core::vector3df(center.getX(), 120, center.getY()));
+    core::matrix4 projection;
+    projection.buildProjectionMatrixOrthoLH(bb_max.getX()-bb_min.getX(), 
+                                            bb_max.getY()-bb_min.getY(),
+                                            -1, bb_max.getZ()-bb_min.getZ()+1);
+    camera->setProjectionMatrix(projection, true);
+    camera->setPosition(core::vector3df(center.getX(), bb_max.getZ(), center.getY()));
     camera->setUpVector(core::vector3df(0,0,1));
     camera->setTarget(core::vector3df(center.getX(),0,center.getY()));
     video::ITexture *texture=irr_driver->endRenderToTexture();
     cleanupDebugMesh();
+    m_min_coord = bb_min;
+    m_scaling   = dimension.Width/(bb_max.getX()-bb_min.getX());
     return texture;
 
 }   // drawMiniMap
+//-----------------------------------------------------------------------------
+    /** Returns the 2d coordinates of a point when drawn on the mini map 
+     *  texture.
+     *  \param xyz Coordinates of the point to map.
+     *  \param draw_at The coordinates in pixel on the mini map of the point,
+     *         only the first two coordinates will be used.
+     */
+void QuadGraph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
+{
+    draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling.getX());
+    draw_at->setY((xyz.getY()-m_min_coord.getY())*m_scaling.getY());
+
+}   // mapPoint

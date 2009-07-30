@@ -84,13 +84,46 @@ private:
         }
     };
 
-    const char      *m_pos_string [11];
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
     Material        *m_plunger_face;
     typedef          std::vector<TimedMessage> AllMessageType;
     AllMessageType   m_messages;
+    /** A texture with all mini dots to be displayed in the minimap for all karts. */
     video::ITexture *m_marker;
+
+    /** The mini map of the track. */
+    video::ITexture *m_mini_map;
+        /** The size of a single marker in pixels, must be a power of 2. */
+    int              m_marker_rendered_size;
+
+    /** The size of a single marker on the screen for AI karts, 
+     *  need not be a power of 2. */
+    int              m_marker_ai_size;
+
+    /** The size of a single marker on the screen or player karts, 
+     *  need not be a power of 2. */
+    int              m_marker_player_size;
+
+    /** The width of the rendered mini map in pixels, must be a power of 2. */
+    int              m_map_rendered_width;
+
+    /** The height of the rendered mini map in pixels, must be a power of 2. */
+    int              m_map_rendered_height;
+    
+    /** Width of the map in pixels on the screen, need not be a power of 2. */
+    int              m_map_width;
+
+    /** Height of the map in pixels on the screen, need not be a power of 2. */
+    int              m_map_height;
+
+    /** Distance of map from left side of screen. */
+    int              m_map_left;
+
+    /** Distance of map from bottom of screen. */
+    int              m_map_bottom;
+
+
 
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
@@ -110,7 +143,7 @@ private:
                                 float ratio_x,  float ratio_y  );
     void drawPlayerIcons       (const KartIconDisplayInfo* info);
     void oldDrawPlayerIcons    ();
-    void drawMap               ();
+    void drawMiniMap           ();
     void drawTimer             ();
     void drawMusicDescription  ();
     void cleanupMessages       (const float dt);
@@ -127,6 +160,10 @@ public:
     void addMessage(const std::string &m, const Kart *kart, float time, 
                     int fonst_size, 
                     const video::SColor &color=video::SColor(255, 255, 0, 255));
+
+    /** Returns the size of the texture on which to render the minimap to. */
+    const core::dimension2di getMiniMapSize() const 
+                  { return core::dimension2di(m_map_width, m_map_height); }
 };
 
 #endif

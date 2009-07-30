@@ -72,13 +72,14 @@ private:
     Vec3                     m_camera_final_hpr;
     bool                     m_is_arena;
     int                      m_version;
-    bool                     loadMainTrack(const XMLNode &node);
-    void                     createWater(const XMLNode &node);
+
     /** The graph used to connect the quads. */
     QuadGraph               *m_quad_graph;
+
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
           SKY_DOME}          m_sky_type;
+
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
     std::vector<std::string> m_sky_textures;
@@ -100,6 +101,18 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
+    std::string     m_name;
+    bool            m_use_fog;
+    float           m_fog_density;
+    float           m_fog_start;
+    float           m_fog_end;
+    core::vector3df m_sun_position;
+    video::SColorf  m_ambient_color;
+    video::SColorf  m_specular_color;
+    video::SColorf  m_diffuse_color;
+    video::SColorf  m_sky_color;
+    video::SColor   m_fog_color;
+
     /** The texture for the mini map, which is displayed in the race gui. */
     video::ITexture         *m_mini_map;
 
@@ -112,86 +125,60 @@ private:
 	/** Checkline manager. */
 	CheckManager             *m_check_manager;
 
+    void  loadTrack(const std::string &filename);
+    void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
+                      int bNeedHeight);
+    void  loadQuadGraph();
+    void  convertTrackToBullet(const scene::IMesh *mesh);
+    bool                     loadMainTrack(const XMLNode &node);
+    void                     createWater(const XMLNode &node);
+    void  getMusicInformation(std::vector<std::string>&             filenames, 
+                              std::vector<MusicInformation*>& m_music   );
 	void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
 public:
-
-    std::string     m_name;
-    bool            m_use_fog;
-    float           m_fog_density;
-    float           m_fog_start;
-    float           m_fog_end;
-    core::vector3df m_sun_position;
-    video::SColorf  m_ambient_color;
-    video::SColorf  m_specular_color;
-    video::SColorf  m_diffuse_color;
-    video::SColorf  m_sky_color;
-    video::SColorf  m_fog_color;
-
-    //FIXME: Maybe the next 4 vectors should be inside an struct and be used
-    //from a vector of structs?
-    //FIXME: should the driveline be set as a sgVec2?
-private:
-    std::vector<Vec3>    m_driveline;
-	//Left and Right drivelines for overhead map rendering.
-    std::vector<Vec3>    m_left_driveline;
-    std::vector<Vec3>    m_right_driveline;
-public:
     
     /** Start positions for arenas (unused in linear races) */
     std::vector<Vec3>   m_start_positions;
-    
 
-    Vec3 m_driveline_min;
-    Vec3 m_driveline_max;
-
-
-    float m_total_distance;
     static const float NOHIT;
 
-    float m_track_2d_width,  // Width and heigth of the 2d display of the track
-          m_track_2d_height;
-    float m_scale_x,        // Scaling to fit track into the size determined by
-          m_scale_y;        // track2dWidth/Heightheigth
-    bool m_do_stretch;      // 2d track display might be stretched to fit better
-
-                       Track             (std::string filename,float w=100,
-                                          float h=100, bool stretch=1);
+                       Track             (std::string filename);
                       ~Track             ();
     bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
     /** Returns the texture with the mini map for this track. */
     const video::ITexture*getMiniMap     () const { return m_mini_map; }
-    void               draw2Dview        (float x_offset,
-                                          float y_offset              ) const;
-    void               drawScaled2D      (float x, float y, float w,
-                                          float h                     ) const;
-
     const Vec3&        trackToSpatial    (const int SECTOR) const;
     void               loadTrackModel    ();
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
     float              getGravity        () const {return m_gravity;            }
+
     /** Returns the version of the .track file. */
     int                getVersion        () const {return m_version;            }
-    float              getTrackLength    () const {return m_total_distance;     }
+
+    /** Returns the length of the main driveline. */
+    float              getTrackLength    () const {return m_quad_graph->getLapLength(); }
+
+    /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;              }
-    const char*        getName           () const {return m_name.c_str();       }
+
+    /** Returns the name of the track, which is e.g. displayed on the screen. */
+
+    const std::string& getName           () const {return m_name;               }
+
+    /** Returns all groups this track belongs to. */
     const std::vector<std::string>
                        getGroups         () const {return m_groups;             }
+
+    /** Starts the music for this track. */
     void               startMusic        () const;
+
+    /** Returns the filename of this track. */
     const std::string& getFilename       () const {return m_filename;           }
-    const core::vector3df& getSunPos     () const {return m_sun_position;       }
-    const video::SColorf& getAmbientCol  () const {return m_ambient_color;      }
-    const video::SColorf& getDiffuseCol  () const {return m_diffuse_color;      }
-    const video::SColorf& getSpecularCol () const {return m_specular_color;     }
-    const video::SColorf& getFogColor    () const {return m_fog_color;          }
-    const video::SColorf& getSkyColor    () const {return m_sky_color;          }
-    const bool&   useFog                 () const {return m_use_fog;            }
-    const float&  getFogDensity          () const {return m_fog_density;        }
-    const float&  getFogStart            () const {return m_fog_start;          }
-    const float&  getFogEnd              () const {return m_fog_end;            }
+
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
@@ -218,26 +205,15 @@ public:
      *  \param n Number of the quad for which the angle is asked. 
      */
     float              getAngle(int n) const 
-                                   { return m_quad_graph->getAngleToNext(n, 0); }
-    /*
-    void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
-    {
-        glVertex2f(
-            x_offset+(v[0]-m_driveline_min[0])*m_scale_x,
-            y_offset+(v[1]-m_driveline_min[1])*m_scale_y);
-    }*/
-
-private:
-    void  loadTrack(const std::string &filename);
-    void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
-                      int bNeedHeight);
-    void  loadQuadGraph();
-    void  readDrivelineFromFile(std::vector<Vec3>& line,
-                                const std::string& file_ext);
-    void  convertTrackToBullet(const scene::IMesh *mesh);
-    void  getMusicInformation(std::vector<std::string>&             filenames, 
-                              std::vector<MusicInformation*>& m_music   );
-}
-;   // class Track
+                                { return m_quad_graph->getAngleToNext(n, 0);    }
+    /** Returns the 2d coordinates of a point when drawn on the mini map 
+     *  texture.
+     *  \param xyz Coordinates of the point to map.
+     *  \param draw_at The coordinates in pixel on the mini map of the point,
+     *         only the first two coordinates will be used.
+     */
+    void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
+                                { m_quad_graph->mapPoint2MiniMap(xyz, draw_at); }
+};   // class Track
 
 #endif

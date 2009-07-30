@@ -74,8 +74,9 @@ void World::init()
     TimedRace::setClockMode( CHRONO );
     m_use_highscores = true;
 
-    // Create the race gui before anything else is attached to the scene node.
-    // This allows the race gui to do any rendering on texture.
+    // Create the race gui before anything else is attached to the scene node
+    // (which happens when the track is loaded). This allows the race gui to 
+    // do any rendering on texture.
     m_race_gui = new RaceGUI();
 
     // Grab the track file
@@ -161,7 +162,6 @@ void World::init()
     // objects need to allocate data structures depending on the number
     // of karts.
     m_track->reset();
-
     m_track->startMusic();
 
     if(!history->replayHistory()) history->initRecording();

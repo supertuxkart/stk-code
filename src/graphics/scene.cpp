@@ -69,22 +69,11 @@ void Scene::reset()
 //-----------------------------------------------------------------------------
 void Scene::draw(float dt)
 {
-    glEnable ( GL_DEPTH_TEST ) ;
-
     const Track* TRACK = RaceManager::getTrack();
-
-    glClear      ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) ;
-
     for (Cameras::iterator i = m_cameras.begin(); i != m_cameras.end(); ++i)
     {
         (*i)->update(dt);
         (*i)->apply ();
     }   // for cameras
 
-    if (TRACK->useFog())
-    {
-        glDisable ( GL_FOG ) ;
-    }
-
-    glViewport ( 0, 0, UserConfigParams::m_width, UserConfigParams::m_height ) ;
 }

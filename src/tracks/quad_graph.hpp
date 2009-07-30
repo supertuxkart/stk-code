@@ -41,6 +41,15 @@ private:
     /** For debug only: the actual mesh buffer storing the quads. */
     scene::IMeshBuffer      *m_mesh_buffer;
 
+    /** The length of the first loop. */
+    float                    m_lap_length;
+
+    /** The minimum coordinates of the quad graph. */
+    Vec3                     m_min_coord;
+
+    /** Scaling for mini map, only x and y components are used. */
+    Vec3                     m_scaling;
+
     void setDefaultSuccessors();
     void load         (const std::string &filename);
     void createMesh();
@@ -66,33 +75,37 @@ public:
                                  const std::string &name, 
                                  const video::SColor &fill_color
                                         =video::SColor(127, 255, 255, 255) );
+    void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
 
     /** Returns the number of nodes in the graph. */
-    unsigned int   getNumNodes() const { return m_all_nodes.size();         } 
+    unsigned int getNumNodes() const { return m_all_nodes.size();         } 
     // ----------------------------------------------------------------------
     /** Return the distance to the j-th successor of node n. */
-    float          getDistanceToNext(int n, int j) const
+    float        getDistanceToNext(int n, int j) const
                          { return m_all_nodes[n]->getDistanceToSuccessor(j);}
     // ----------------------------------------------------------------------
     /** Returns the angle of the line between node n and its j-th. 
      *  successor. */
-    float          getAngleToNext(int n, int j) const
+    float        getAngleToNext(int n, int j) const
                          { return m_all_nodes[n]->getAngleToSuccessor(j);   }
     // ----------------------------------------------------------------------
     /** Returns the number of successors of a node n. */
-    int            getNumberOfSuccessors(int n) const 
+    int          getNumberOfSuccessors(int n) const 
                          { return m_all_nodes[n]->getNumberOfSuccessors();  }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
-    const Quad&    getQuad(unsigned int j) const
+    const Quad&  getQuad(unsigned int j) const
                  { return m_all_quads->getQuad(m_all_nodes[j]->getIndex()); }
     // ----------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
-    GraphNode&     getNode(unsigned int j) const{ return *m_all_nodes[j]; }
+    GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }
     // ----------------------------------------------------------------------
     /** Returns the distance from the start to the beginning of a quad. */
-    float          getDistanceFromStart(int j) const
+    float        getDistanceFromStart(int j) const
                            { return m_all_nodes[j]->getDistanceFromStart(); }
+    // ----------------------------------------------------------------------
+    /** Returns the length of the main driveline. */
+    float        getLapLength() const {return m_lap_length; }
 };   // QuadGraph
 
 #endif
