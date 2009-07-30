@@ -45,7 +45,7 @@ namespace KartSelectionScreen
     class PlayerKartWidget;
     
     // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
-    // FIXME : delete these objects when leaving the screen (especially when suing escape)
+    // FIXME : delete these objects when leaving the screen (especially when using escape)
     ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
     class PlayerKartWidget : public Widget
@@ -89,8 +89,18 @@ namespace KartSelectionScreen
             target_w = w;
             target_h = h;
             
+            std::string deviceName;
+            if(associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+            {
+                deviceName += "keyboard";
+            }
+            else if(associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
+            {
+                deviceName += "gamepad";
+            }
+            
             playerIDLabel = new LabelWidget();
-            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i (keyboard)"), playerID); // TODO : determine this string dynamically
+            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), playerID) + deviceName + ")"; 
             playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", playerID);
             playerIDLabel->x = player_id_x;
@@ -162,6 +172,8 @@ namespace KartSelectionScreen
             
             if (kartName->getIrrlichtElement() != NULL)
                 kartName->getIrrlichtElement()->remove();
+            
+            getCurrentScreen()->manualRemoveWidget(this);
         }
         
         void setPlayerID(const int newPlayerID)
@@ -410,15 +422,16 @@ void firePressedOnNewDevice(InputDevice* device)
     rightarea.x = irr_driver->getFrameSize().Width;
     
     ActivePlayer* aplayer = new ActivePlayer( UserConfigParams::m_all_players.get(0) );
+    StateManager::get()->addActivePlayer(aplayer);
+    aplayer->setDevice(device);
     
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
+    
     getCurrentScreen()->manualAddWidget(newPlayer);
     g_player_karts.push_back(newPlayer);
     newPlayer->add();
     
-    StateManager::get()->addActivePlayer(aplayer);
-    aplayer->setDevice(device);
     
     const int amount = g_player_karts.size();
     
@@ -432,7 +445,11 @@ void firePressedOnNewDevice(InputDevice* device)
     
     
 }
-    
+
+/**
+  * Called before this screen is inited to tell which device was used to trigger "new game"; this
+  * device will be assigned to player 0.
+  */
 void setPlayer0Device(InputDevice* device)
 {
     std::cout << "===== setPlayer0Device =====\n";
@@ -451,6 +468,7 @@ void setPlayer0Device(InputDevice* device)
         std::cout << "Player 0 is using a gamepad\n";
     }
     
+    // Use player profile 0 by default; user can later change this by using the arrows
     ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
     StateManager::get()->addActivePlayer( newPlayer );
     newPlayer->setDevice(device);
@@ -528,9 +546,15 @@ void kartSelectionUpdate(float delta)
  */
 void menuEventKarts(Widget* widget, const std::string& name)
 {
-    if(name == "init")
+    if(name == "tearDown")
     {
-        g_player_karts.clearWithoutDeleting();      
+        //g_player_karts.clearWithoutDeleting();
+        g_player_karts.clearAndDeleteAll();
+    }
+    else if(name == "init")
+    {
+        //g_player_karts.clearWithoutDeleting();
+        g_player_karts.clearAndDeleteAll();
         
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
@@ -541,11 +565,10 @@ void menuEventKarts(Widget* widget, const std::string& name)
             w->registerHoverListener(karthoverListener);
         }
         
+        Widget* area = getCurrentScreen()->getWidget("playerskarts");
+        
         if(!getCurrentScreen()->m_inited)
         {
-
-            Widget* area = getCurrentScreen()->getWidget("playerskarts");
-            
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
             for(int n=0; n<kart_amount; n++)
@@ -556,16 +579,15 @@ void menuEventKarts(Widget* widget, const std::string& name)
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
                 
             }
-
-            PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::get()->getActivePlayers().get(0),
-                                                                 area, 0 /* first player */);
-            getCurrentScreen()->manualAddWidget(playerKart1);
-            playerKart1->add();
-            g_player_karts.push_back(playerKart1);
-
-            
             getCurrentScreen()->m_inited = true;
         }
+        
+        PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::get()->getActivePlayers().get(0),
+                                                             area, 0 /* first player */);
+        getCurrentScreen()->manualAddWidget(playerKart1);
+        playerKart1->add();
+        g_player_karts.push_back(playerKart1);
+
         w->updateItemDisplay();
         
         
@@ -592,7 +614,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         race_manager->setNumPlayers( players.size() );
         race_manager->setNumLocalPlayers( players.size() );
         
-        g_player_karts.clearWithoutDeleting();      
+        g_player_karts.clearAndDeleteAll();      
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         
         // TODO : assign karts to other players too

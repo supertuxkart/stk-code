@@ -47,6 +47,11 @@ using namespace GUIEngine;
 */
 const std::string g_init_event = "init";
 
+/**
+ * Name of the event sent when destructing a menu
+ */
+const std::string g_teardown_event = "tearDown";
+
 AbstractStateManager::AbstractStateManager()
 {
     m_game_mode = false;
@@ -88,31 +93,46 @@ bool AbstractStateManager::isGameState()
 
 void AbstractStateManager::pushMenu(std::string name)
 {
+    // Send tear-down event to previous menu
+    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
     m_game_mode = false;
     switchToScreen(name.c_str());
     
+    // Send init event to new menu
     eventCallback(NULL, g_init_event);
 }
 void AbstractStateManager::replaceTopMostMenu(std::string name)
 {
+    // Send tear-down event to previous menu
+    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    
     input_manager->setMode(InputManager::MENU);
     m_menu_stack[m_menu_stack.size()-1] = name;
     m_game_mode = false;
     switchToScreen(name.c_str());
     
+    // Send init event to new menu
     eventCallback(NULL, g_init_event);
 }
 
 void AbstractStateManager::reshowTopMostMenu()
 {
+    // Send tear-down event to previous menu
+    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    
     switchToScreen( m_menu_stack[m_menu_stack.size()-1].c_str() );
+    
+    // Send init event to new menu
     eventCallback(NULL, g_init_event);
 }
 
 void AbstractStateManager::popMenu()
 {
+    // Send tear-down event to menu
+    eventCallback(NULL, g_teardown_event);
     m_menu_stack.pop_back();
     
     if(m_menu_stack.size() == 0)
