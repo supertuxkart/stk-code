@@ -244,9 +244,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         int w = kart->isPlayerKart() ? ICON_PLAYER_WIDTH : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
         const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
-        static const video::SColor white(255, 255, 255, 255);
-        irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, 0,
-                                                  &white, true);
+        irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, NULL, NULL, true);
 
     } // next kart
     
@@ -273,13 +271,11 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart, int offset_x,
     video::ITexture *t=powerup->getIcon()->getTexture();
     core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
 
-    static const video::SColor white(255, 255, 255, 255);
     for ( int i = 0 ; i < n ; i++ )
     {
         core::rect<s32> pos(x1+i*30, y1, x1+i*30+nSize, y1+nSize);
-        irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, 0, 
-                                                  &white,
-                                                  true);
+        irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, NULL, 
+                                                  NULL, true);
     }   // for i
 }   // drawPowerupIcons
 
