@@ -290,8 +290,16 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         if(StateManager::get()->isGameState())
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
-            PlayerKart* pk = player->getKart();
-            
+            PlayerKart* pk;
+
+            if (player == NULL)
+            {
+                // Prevent null pointer crash
+                return;
+            }
+
+            pk = player->getKart();
+
             if (pk == NULL)
             {
                 std::cerr << "Error, trying to process action for an unknown player\n";
@@ -375,6 +383,12 @@ bool InputManager::input(const SEvent& event)
         }
 
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
+
+        if (gp == NULL)
+        {
+            // Prevent null pointer crash
+            return false;
+        }
 
         for(int i=0; i<gp->m_button_count; i++)
         {

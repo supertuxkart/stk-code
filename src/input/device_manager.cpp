@@ -69,7 +69,10 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
     for(unsigned int i=0; i<m_gamepad_amount; i++)
     {
         if(m_gamepads[i].m_index == id)
+        {
+
             return m_gamepads.get(i);
+        }
     }
     return NULL;
 }
@@ -89,7 +92,7 @@ bool DeviceManager::checkForGamePad(const int irr_id)
         std::cout << "  (checking...) I remember that gamepad #" << n << " is named " << m_gamepads[n].m_name.c_str() << std::endl;
         
         // FIXME - don't check only name, but also number of axes and buttons?
-        if(m_gamepads[n].m_name == name)
+        if((m_gamepads[n].m_name == name) && (m_gamepads[n].m_index == irr_id))
         {
             std::cout << "--> that's the one currently connected\n";
             m_gamepads[n].open(irr_id, m_gamepads[n].m_name, m_irrlicht_gamepads[irr_id].Axes, m_irrlicht_gamepads[irr_id].Buttons);
@@ -195,6 +198,12 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
     {
 
         GamePadDevice* gamepad = getGamePadFromIrrID(deviceID);
+
+        if (gamepad == NULL) {
+            // Prevent null pointer crash
+            *player = NULL;
+            return false;
+        }
         
         if(m_assign_mode == NO_ASSIGN)
         {
