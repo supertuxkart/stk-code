@@ -25,6 +25,7 @@
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "io/file_manager.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
@@ -94,20 +95,20 @@ namespace OptionsScreen
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
 
                     if( ABOUT_EQUAL( ratio, (5.0f/4.0f) ) )
-                        res->addItem(name,name,"gui/screen54.png");
+                        res->addItem(name, name, file_manager->getDataDir() + "/gui/screen54.png");
                     else if( ABOUT_EQUAL( ratio, (4.0f/3.0f) ) )
-                        res->addItem(name,name,"gui/screen43.png");
+                        res->addItem(name, name, file_manager->getDataDir() + "/gui/screen43.png");
                     else if( ABOUT_EQUAL( ratio, (16.0f/10.0f) ) )
-                        res->addItem(name,name,"gui/screen1610.png");
+                        res->addItem(name, name, file_manager->getDataDir() + "/gui/screen1610.png");
                     else if( ABOUT_EQUAL( ratio, (5.0f/3.0f) ) )
-                        res->addItem(name,name,"gui/screen53.png");
+                        res->addItem(name, name, file_manager->getDataDir() + "/gui/screen53.png");
                     else if( ABOUT_EQUAL( ratio, (3.0f/2.0f) ) )
-                        res->addItem(name,name,"gui/screen32.png");
+                        res->addItem(name, name, file_manager->getDataDir() + "/gui/screen32.png");
                     else
                     {
                         std::cout << "Unknown screen size ratio : " << ratio << std::endl;
                         // FIXME - do something better than showing a random icon
-                        res->addItem(name,name,"gui/screen1610.png");
+                        res->addItem(name,name, file_manager->getDataDir() + "/gui/screen1610.png");
                     }
 #undef ABOUT_EQUAL
                 } // next resolution
@@ -271,7 +272,7 @@ namespace OptionsScreen
 
             if(!getCurrentScreen()->m_inited)
             {
-                devices->addItem("Keyboard","keyboard","gui/keyboard.png");
+                devices->addItem("Keyboard","keyboard", file_manager->getDataDir() + "/gui/keyboard.png");
 
                 const int gamepad_count = input_manager->getDeviceList()->getGamePadAmount();
 
@@ -280,7 +281,7 @@ namespace OptionsScreen
                     std::string name = input_manager->getDeviceList()->getGamePad(i)->m_name;
                     char internal_name[32];
                     sprintf(internal_name, "gamepad%i", i);
-                    devices->addItem(name,internal_name,"gui/gamepad.png");
+                    devices->addItem(name,internal_name, file_manager->getDataDir() + "/gui/gamepad.png");
                 }
 
                 getCurrentScreen()->m_inited = true;

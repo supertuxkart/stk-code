@@ -23,11 +23,12 @@
 
 class TrackInfoDialog : public GUIEngine::ModalDialog
 {
+    std::string m_track_ident;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    TrackInfoDialog(const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
+    TrackInfoDialog(const std::string& trackIdent, const char* trackName, irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
     void onEnterPressedInternal();
     void processEvent(std::string& eventSource);
 };

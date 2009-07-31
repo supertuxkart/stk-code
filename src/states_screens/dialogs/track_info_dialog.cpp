@@ -27,11 +27,13 @@
 using namespace GUIEngine;
 
 
-TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
+TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trackName, ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
 {
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*5/7;
     const int y3 = m_area.getHeight()*6/7;
+    
+    m_track_ident = trackIdent;
 
     SpinnerWidget* spinner = new SpinnerWidget();
     spinner->x = m_area.getWidth()/2 - 200;
@@ -97,7 +99,7 @@ TrackInfoDialog::TrackInfoDialog(const char* trackName, ITexture* screenshot, co
 // ------------------------------------------------------------------------------------------------------
 
 // FIXME : this probably doesn't belong here
-void startGame()
+void startGame(const std::string trackIdent)
 {
     ModalDialog::dismiss();
     
@@ -111,7 +113,7 @@ void startGame()
     
     StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
-    race_manager->setTrack("lighthouse");
+    race_manager->setTrack(trackIdent.c_str());
     race_manager->setNumLaps( 3 );
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );
@@ -123,10 +125,10 @@ void startGame()
     
 void TrackInfoDialog::onEnterPressedInternal()
 {
-    startGame();
+    startGame(m_track_ident);
 }
     
 void TrackInfoDialog::processEvent(std::string& eventSource)
 {
-    if (eventSource == "start" ) startGame();
+    if (eventSource == "start" ) startGame(m_track_ident);
 }

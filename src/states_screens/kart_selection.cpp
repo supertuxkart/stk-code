@@ -29,6 +29,7 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/translation.hpp"
@@ -578,8 +579,8 @@ void menuEventKarts(Widget* widget, const std::string& name)
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
                 if (prop->getIdent() == "tux")
                 {
-                    std::string icon_path = "karts/";
-                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
+                    std::string icon_path = file_manager->getDataDir() ;
+                    icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
                     w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
                     break;
                 }
@@ -591,8 +592,8 @@ void menuEventKarts(Widget* widget, const std::string& name)
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
                 if (prop->getIdent() != "tux")
                 {
-                    std::string icon_path = "karts/";
-                    icon_path += prop->getIdent() + "/" + prop->getIconFile();
+                    std::string icon_path = file_manager->getDataDir() ;
+                    icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
                     w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
                 }
             }

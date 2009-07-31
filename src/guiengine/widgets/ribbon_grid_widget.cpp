@@ -389,7 +389,7 @@ void RibbonGridWidget::updateItemDisplay()
             
             if( icon_id < item_amount )
             {
-                std::string track_sshot = file_manager->getDataDir() + "/" + m_items[icon_id].m_sshot_file;
+                std::string track_sshot = m_items[icon_id].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
                 

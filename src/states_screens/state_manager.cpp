@@ -37,6 +37,8 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -150,16 +152,16 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
         {
             w2->addItem( _("Snaky Competition\nAll blows allowed, so catch weapons and make clever use of them!"),
                         "normal",
-                        "gui/mode_normal.png");
+                        file_manager->getDataDir() + "/gui/mode_normal.png");
             w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
                         "timetrial",
-                        "gui/mode_tt.png");
+                        file_manager->getDataDir() + "/gui/mode_tt.png");
             w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
                         "ftl",
-                        "gui/mode_ftl.png");
+                        file_manager->getDataDir() + "/gui/mode_ftl.png");
             w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
                         "3strikes",
-                        "gui/mode_3strikes.png");
+                        file_manager->getDataDir() + "/gui/mode_3strikes.png");
             getCurrentScreen()->m_inited = true;
         }
         w2->updateItemDisplay();
@@ -253,6 +255,25 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
 
         if(!getCurrentScreen()->m_inited)
         {
+            /*
+            const std::vector<std::string>&
+            getAllGroups()      const { return m_all_groups;    }
+            size_t        getNumberOfTracks() const { return m_tracks.size(); }
+            Track        *getTrack(size_t id) const { return m_tracks[id];    }
+            Track        *getTrack(const std::string& ident) const;
+            void          unavailable(const std::string &ident);
+            void          setUnavailableTracks(const std::vector<std::string> &tracks);
+            bool          isAvailable(unsigned int n) const {return m_track_avail[n];}
+             */
+            
+            const int trackAmount = track_manager->getNumberOfTracks();
+            for (int n=0; n<trackAmount; n++)
+            {
+                Track* curr = track_manager->getTrack(n);
+                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile());
+            }
+            
+            /*
             w->addItem("Track 1","t1","gui/track1.png");
             w->addItem("Track 2","t2","gui/track2.png");
             w->addItem("Track 3","t3","gui/track3.png");
@@ -261,6 +282,7 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
             w->addItem("Track 6","t6","gui/track6.png");
             w->addItem("Track 7","t7","gui/track7.png");
             w->addItem("Track 8","t8","gui/track8.png");
+             */
             getCurrentScreen()->m_inited = true;
         }
         w->updateItemDisplay();
@@ -274,9 +296,13 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
         {
             std::cout << "Clicked on track " << w2->getSelectionIDString().c_str() << std::endl;
             
-            ITexture* screenshot = GUIEngine::getDriver()->getTexture( (file_manager->getDataDir() + "/gui/track1.png").c_str() );
-            
-            new TrackInfoDialog( w2->getSelectionText().c_str(), screenshot, 0.8f, 0.7f);
+            Track* clickedTrack = track_manager->getTrack(w2->getSelectionIDString());
+            if (clickedTrack != NULL)
+            {
+                ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                
+                new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
+            }
         }
     }
     else if(name == "gps")

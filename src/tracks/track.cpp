@@ -186,7 +186,7 @@ void Track::loadTrack(const std::string &filename)
     m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
     XMLNode *root       = file_manager->createXMLTree(m_filename);
-    
+        
     if(!root || root->getName()!="track")
     {
         std::ostringstream o;
@@ -219,6 +219,7 @@ void Track::loadTrack(const std::string &filename)
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
+        
     if(m_groups.size()==0)
         m_groups.push_back("standard");
     // if both camera position and rotation are defined,
