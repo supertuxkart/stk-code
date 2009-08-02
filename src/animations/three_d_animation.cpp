@@ -131,7 +131,7 @@ void ThreeDAnimation::update(float dt)
 	if(m_body)
 	{
 		hpr = DEGREE_TO_RAD*hpr;
-		btQuaternion q(hpr.X, hpr.Y, hpr.Z);
+		btQuaternion q(hpr.X, hpr.Z, -hpr.Y);
 		Vec3 p(xyz);
 		btTransform trans(q,p);
 		m_motion_state->setWorldTransform(trans);
