@@ -570,11 +570,16 @@ void IrrDriver::renderBulletDebugView()
     float f=2.0f;
     glFrustum(-f, f, -f, f, 1.0, 1000.0);
 
-    Vec3 xyz = RaceManager::getKart(race_manager->getNumKarts()-1)->getXYZ();
-    gluLookAt(xyz.getX(), xyz.getY()-5.f, xyz.getZ()+4,
-        xyz.getX(), xyz.getY(),     xyz.getZ(),
-        0.0f, 0.0f, 1.0f);
+    const Kart *kart = RaceManager::getKart(race_manager->getNumKarts()-1);
+    Vec3 xyz = kart->getXYZ();
+    // Compute the camera position 5 units behind and 4 units higher than the kart
+    Vec3 cam_pos= kart->getTrans()(Vec3(0, -5, 4));
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    gluLookAt(cam_pos.getX(), cam_pos.getY(), cam_pos.getZ(),
+              xyz.getX(),     xyz.getY(),     xyz.getZ(),
+              0.0f,           0.0f,           1.0f            );
 
     for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
     {
@@ -643,9 +648,13 @@ void IrrDriver::update(float dt)
 
         if(race_manager->raceIsActive())
         {
-            if(UserConfigParams::m_bullet_debug) renderBulletDebugView();
-            m_scene_manager->drawAll();
-            RaceManager::getWorld()->render();
+            if(UserConfigParams::m_bullet_debug) 
+                renderBulletDebugView();
+            else
+            {
+                m_scene_manager->drawAll();
+                RaceManager::getWorld()->render();   // renders e.g. race gui
+            }
         }
         else   // GUI is active
             GUIEngine::render(dt);
