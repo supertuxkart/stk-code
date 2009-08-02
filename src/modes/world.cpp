@@ -470,7 +470,7 @@ void World::loadTrack()
         catch(std::runtime_error)
         {
             fprintf(stderr, "The track '%s' contains an invalid item style '%s'.\n",
-                    m_track->getName(), m_track->getItemStyle().c_str());
+                    m_track->getName().c_str(), m_track->getItemStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",
                     m_track->getFilename().c_str());
         }
