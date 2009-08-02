@@ -193,7 +193,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     {
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         
-        race_manager->setNumKarts( w->getValue() );
+        race_manager->setNumKarts( race_manager->getNumPlayers() + w->getValue() );
     }
     /*
      289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);

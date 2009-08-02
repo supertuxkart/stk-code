@@ -167,6 +167,7 @@ void RaceManager::setTrack(const std::string& track)
 void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - m_player_karts.size();
+    std::cout << "AI karts count = " << n << " for m_num_karts=" << m_num_karts << " and m_player_karts.size()=" << m_player_karts.size() << std::endl;
     // If less kart selected than there are player karts, adjust the number of
     // karts to the minimum
     if(n<0)

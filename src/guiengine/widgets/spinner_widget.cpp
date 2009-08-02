@@ -130,8 +130,6 @@ void SpinnerWidget::add()
     m_children[2].m_event_handler = this;
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
-    
-    std::cout << "Adding spinner with m_event_handler=" << m_event_handler << std::endl;
 }
 
 void SpinnerWidget::move(const int x, const int y, const int w, const int h)

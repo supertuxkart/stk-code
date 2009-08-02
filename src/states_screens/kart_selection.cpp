@@ -630,11 +630,6 @@ void menuEventKarts(Widget* widget, const std::string& name)
         }
         std::cout << "==========\n";
         
-        std::cout << "Calling setNumKarts(" << race_manager->getNumKarts() << " AIs + " << players.size() << " players = " <<
-                race_manager->getNumKarts() + players.size() << ")\n";
-                race_manager->setNumKarts( race_manager->getNumKarts() + players.size() ); // FIXME : doesn't work. add AI karts
-        
-        std::cout << "Calling setNumPlayers(" << players.size() << ")\n";
         race_manager->setNumPlayers( players.size() );
         race_manager->setNumLocalPlayers( players.size() );
         
