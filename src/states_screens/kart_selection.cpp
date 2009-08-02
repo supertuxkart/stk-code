@@ -140,7 +140,8 @@ namespace KartSelectionScreen
             m_children.push_back(modelView);
             
             // Init kart model
-            KartModel* kartModel = kart_properties_manager->getKart("tux")->getKartModel();
+            std::string& default_kart = UserConfigParams::m_default_kart;
+            KartModel* kartModel = kart_properties_manager->getKart(default_kart)->getKartModel();
             
             this->modelView->addModel( kartModel->getModel() );
             this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
@@ -573,11 +574,12 @@ void menuEventKarts(Widget* widget, const std::string& name)
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
             
-            // add Tux first
+            // add Tux (or whatever default kart) first
+            std::string& default_kart = UserConfigParams::m_default_kart;
             for(int n=0; n<kart_amount; n++)
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
-                if (prop->getIdent() == "tux")
+                if (prop->getIdent() == default_kart)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
                     icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
@@ -590,7 +592,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
             for(int n=0; n<kart_amount; n++)
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
-                if (prop->getIdent() != "tux")
+                if (prop->getIdent() != default_kart)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
                     icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();

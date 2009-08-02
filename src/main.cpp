@@ -253,9 +253,16 @@ int handleCmdLine(int argc, char **argv)
             std::string filename=file_manager->getKartFile(std::string(argv[i+1])+".tkkf");
             if(filename!="")
             {
-                race_manager->setNumLocalPlayers(1);
-                race_manager->setLocalKartInfo(0, argv[i+1]);
-                fprintf ( stdout, "You choose to use kart '%s'.\n", argv[i+1] ) ;
+                UserConfigParams::m_default_kart = argv[i+1];
+                
+                // if a player was added with -N, change its kart. Otherwise, nothing to do,
+                // kart choice will be picked up upon player creation.
+                if (StateManager::get()->activePlayerCount() > 0)
+                {
+                    race_manager->setNumLocalPlayers(1);
+                    race_manager->setLocalKartInfo(0, argv[i+1]);
+                }
+                fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
             }
             else
             {
@@ -324,7 +331,7 @@ int handleCmdLine(int argc, char **argv)
                 {
                     fprintf ( stdout, "\t%10s: %s\n",
                               track->getIdent().c_str(),
-                              track->getName());
+                              track->getName().c_str());
                 }
             }    
 
@@ -359,7 +366,8 @@ int handleCmdLine(int argc, char **argv)
             
             StateManager::get()->addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
             race_manager->setNumLocalPlayers(1);
-            race_manager->setLocalKartInfo(0, "tux");
+            std::string& default_kart = UserConfigParams::m_default_kart;
+            race_manager->setLocalKartInfo(0, default_kart);
         }
         else if ( !strcmp(argv[i], "--mirror") )
         {

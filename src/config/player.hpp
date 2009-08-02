@@ -41,13 +41,12 @@ private:
     
     StringUserConfigParam m_name;
     
-    int m_last_kart_id;
+    // int m_last_kart_id;
 
 public:
     
     PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
-                                      m_name(name, "name", &m_player_group),
-                                      m_last_kart_id(-1)
+                                      m_name(name, "name", &m_player_group) //, m_last_kart_id(-1)
     {
     }
     
@@ -56,8 +55,8 @@ public:
 
     const char* getName() { return m_name.c_str(); }
 
-    int getLastKartId(){ return m_last_kart_id; }
-    void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
+    //int getLastKartId(){ return m_last_kart_id; }
+    //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
 };
 
 /**

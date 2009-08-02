@@ -265,6 +265,8 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool        m_no_start_screen   PARAM_DEFAULT( false ); // not saved to file
 
+    PARAM_PREFIX std::string m_default_kart  PARAM_DEFAULT( "tux" ); // not saved to file
+    
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
