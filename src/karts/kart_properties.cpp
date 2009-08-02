@@ -187,6 +187,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     Vec3 c;
     lisp->get("rgb",                        c);
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
+    lisp->get("shape",                      m_shape);
     lisp->get("engine-power",               m_engine_power, 3);
     lisp->get("time-full-steer",            m_time_full_steer);
     lisp->get("time-full-steer-ai",         m_time_full_steer_ai);
