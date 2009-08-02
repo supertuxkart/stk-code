@@ -80,7 +80,7 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
-    angle += delta*10;
+    angle += delta*25;
     if(angle > 360) angle -= 360;
     
     irr_driver->renderToTexture(m_models, m_model_location, m_texture, angle);
