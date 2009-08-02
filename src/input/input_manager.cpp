@@ -99,61 +99,69 @@ InputManager::~InputManager()
 
 void InputManager::handleStaticAction(int key, int value)
 {
-    static int isWireframe = false;
-
-	switch (key)
-	{
+    static bool control_is_pressed=false;
+    printf("%d %d %d\n",key,value,control_is_pressed);
+    switch (key)
+    {
 #ifdef DEBUG
-		case KEY_F1:
-			if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
+        case KEY_CONTROL:
+        case KEY_RCONTROL:
+        case KEY_LCONTROL:
+            control_is_pressed = value!=0;
+            break;
+        case KEY_F1:
+            if (race_manager->getNumPlayers() ==1 )
+            {
+                Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BOWLING, 10000);
                 projectile_manager->newExplosion(Vec3(0, 8, 0.5));
-			}
-			break;
-		case KEY_F2:
+            }
+            break;
+        case KEY_F2:
             if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setPowerup(POWERUP_PLUNGER, 10000);
-			}
-			break;
-		case KEY_F3:
-			if (race_manager->getNumPlayers() ==1 )
-			{
-				Kart* kart = RaceManager::getPlayerKart(0);
-				kart->setPowerup(POWERUP_CAKE, 10000);
-			}
-			break;
+            {
+                Kart* kart = RaceManager::getPlayerKart(0);
+                kart->setPowerup(POWERUP_PLUNGER, 10000);
+            }
+            break;
+        case KEY_F3:
+            if (race_manager->getNumPlayers() ==1 )
+            {
+                Kart* kart = RaceManager::getPlayerKart(0);
+                kart->setPowerup(POWERUP_CAKE, 10000);
+            }
+            break;
+        case KEY_F11:
+            // FIXME: at this stage you can only switch back from debug view to normal
+            // view, if switching again you noly get a grey screen - some opengl settings
+            // are missing.
+            if(value && control_is_pressed)
+                UserConfigParams::m_bullet_debug = !UserConfigParams::m_bullet_debug;
+            break;
 #endif
-		case KEY_F12:
-			UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
-			break;
-		case KEY_F11:
-			glPolygonMode(GL_FRONT_AND_BACK, isWireframe ? GL_FILL : GL_LINE);
-			isWireframe = ! isWireframe;
-			break;
+        case KEY_F12:
+            UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
+            break;
 #ifndef WIN32
             // For now disable F9 toggling fullscreen, since windows requires
             // to reload all textures, display lists etc. Fullscreen can
             // be toggled from the main menu (options->display).
-		case KEY_F9:
+        case KEY_F9:
             // TODO
             //irrDriver->toggleFullscreen(false);   // 0: do not reset textures
-			// Fall through to put the game into pause mode.
+            // Fall through to put the game into pause mode.
 #endif
-		case KEY_ESCAPE:
+        case KEY_ESCAPE:
             // TODO - show race menu
             // RaceManager::getWorld()->pause();
              //menu_manager->pushMenu(MENUID_RACEMENU);
             break;
-		case KEY_F10:
-			history->Save();
-			break;
-		default:
-			break;
-	} // switch
+        case KEY_F10:
+            history->Save();
+            break;
+        default:
+            break;
+    } // switch
 
 }
 
@@ -425,7 +433,6 @@ bool InputManager::input(const SEvent& event)
             }
 
             input(Input::IT_KEYBOARD, 0, key,
-#ifdef HAVE_IRRLICHT
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config
                   // assume that the unicode value is 0, it does not work
@@ -434,10 +441,7 @@ bool InputManager::input(const SEvent& event)
                   // (till user_config is migrated to full irrlicht support)
                   // we pass the 0 here artifically so that keyboard handling
                   // works.
-                  0,
-#else
-                  ev.key.keysym.unicode,
-#endif
+                  0,  // FIXME: was ev.key.keysym.unicode,
                   Input::MAX_VALUE, programaticallyGenerated);
 
         }
@@ -459,14 +463,14 @@ bool InputManager::input(const SEvent& event)
         }
 
         /*
-         EMIE_LMOUSE_PRESSED_DOWN 	Left mouse button was pressed down.
-         EMIE_RMOUSE_PRESSED_DOWN 	Right mouse button was pressed down.
-         EMIE_MMOUSE_PRESSED_DOWN 	Middle mouse button was pressed down.
-         EMIE_LMOUSE_LEFT_UP 	Left mouse button was left up.
-         EMIE_RMOUSE_LEFT_UP 	Right mouse button was left up.
-         EMIE_MMOUSE_LEFT_UP 	Middle mouse button was left up.
-         EMIE_MOUSE_MOVED 	The mouse cursor changed its position.
-         EMIE_MOUSE_WHEEL 	The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast.
+        EMIE_LMOUSE_PRESSED_DOWN    Left mouse button was pressed down.
+        EMIE_RMOUSE_PRESSED_DOWN    Right mouse button was pressed down.
+        EMIE_MMOUSE_PRESSED_DOWN    Middle mouse button was pressed down.
+        EMIE_LMOUSE_LEFT_UP     Left mouse button was left up.
+        EMIE_RMOUSE_LEFT_UP     Right mouse button was left up.
+        EMIE_MMOUSE_LEFT_UP     Middle mouse button was left up.
+        EMIE_MOUSE_MOVED    The mouse cursor changed its position.
+        EMIE_MOUSE_WHEEL    The mouse wheel was moved. Use Wheel value in event data to find out in what direction and how fast.
          */
     }
 #endif
