@@ -35,19 +35,6 @@ ProjectileManager *projectile_manager=0;
 
 void ProjectileManager::loadData()
 {
-#ifdef HAVE_IRRLICHT
-#else
-    // Load the explosion model and find the actual selector branch in it.
-    // Only the explosion model is loaded here, see powerup_manager.
-    m_explosion_model = find_selector((ssgBranch*)loader->load("explode.ac",
-                                   CB_EXPLOSION) );
-    m_explosion_model->ref();
-    if ( m_explosion_model == NULL )
-    {
-        fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
-        exit ( 1 ) ;
-    }
-#endif
 }   // loadData
 
 //-----------------------------------------------------------------------------
@@ -66,22 +53,15 @@ void ProjectileManager::cleanup()
     for(Projectiles::iterator i = m_active_projectiles.begin();
         i != m_active_projectiles.end(); ++i)
     {
-#ifdef HAVE_IRRLICHT
-#else
-        ssgTransform *m = (*i)->getModelTransform();
-        m->removeAllKids();
-#endif
         delete *i;
     }
     m_active_projectiles.clear();
     for(Explosions::iterator i  = m_active_explosions.begin();
         i != m_active_explosions.end(); ++i)
     {
-#ifndef HAVE_IRRLICHT
-        stk_scene->remove((ssgTransform*)*i);
-#endif
-        //ssgDeRefDelete(*i);
+    // FIXME: still to do
     }
+
     m_active_explosions.clear();
 }   // cleanup
 

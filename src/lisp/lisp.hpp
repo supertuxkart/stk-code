@@ -22,9 +22,7 @@
 
 #include <string>
 #include <vector>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
-#endif
 #include "utils/vec3.hpp"
 
 namespace lisp
@@ -154,7 +152,6 @@ namespace lisp
             }
          */
         
-#ifdef HAVE_IRRLICHT
         bool get(const char* name, core::vector3df& val) const
             {
                 const Lisp* lisp = getLisp(name);
@@ -179,7 +176,7 @@ namespace lisp
 
                 return true;
             }
-#endif
+
         bool get(const char* name, Vec3& val) const
             {
                 const Lisp* lisp = getLisp(name);

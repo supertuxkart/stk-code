@@ -70,11 +70,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
 }   // Bowling
 
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Bowling::init(const lisp::Lisp* lisp, scene::IMesh *bowling)
-#else
-void Bowling::init(const lisp::Lisp* lisp, ssgEntity *bowling)
-#endif
 {
     Flyable::init(lisp, bowling, POWERUP_BOWLING);
     m_st_max_distance    = 20.0f;

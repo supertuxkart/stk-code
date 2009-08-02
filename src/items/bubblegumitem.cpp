@@ -19,21 +19,13 @@
 
 #include "items/bubblegumitem.hpp"
 
-#ifdef HAVE_IRRLICHT
 BubbleGumItem::BubbleGumItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
                              scene::IMesh* mesh, unsigned int item_id) 
              : Item(type, xyz, normal, mesh, item_id,
                     /* rotate */ false)
 {
 }   // BubbleGumItem
-#else
-BubbleGumItem::BubbleGumItem(ItemType type, const Vec3& xyz, const Vec3 &normal,
-                             ssgEntity* model, unsigned int item_id) 
-             : Item(type, xyz, normal, model, item_id,
-                    /* rotate */ false)
-{
-}   // BubbleGumItem
-#endif
+
 //-----------------------------------------------------------------------------
 BubbleGumItem::~BubbleGumItem()
 {

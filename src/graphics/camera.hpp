@@ -23,12 +23,9 @@
 #define HEADER_CAMERA_HPP
 
 #include "utils/vec3.hpp"
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#else
-class ssgContext;
-#endif
+
 class Kart;
 
 class Camera
@@ -43,11 +40,9 @@ public:
         CM_SIMPLE_REPLAY
     };
 
-protected:
-#ifdef HAVE_IRRLICHT
+private:
     scene::ICameraSceneNode 
                *m_camera;
-#endif
     Mode        m_mode;             // Camera's mode
     Vec3        m_position;         // The ultimate position which the camera wants to obtain
     Vec3        m_temp_position;    // The position the camera currently has

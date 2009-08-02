@@ -20,10 +20,8 @@
 #ifndef HEADER_BOWLING_HPP
 #define HEADER_BOWLING_HPP
 
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
 
 #include "items/flyable.hpp"
 
@@ -36,11 +34,7 @@ private:
     
 public:
     Bowling(Kart* kart);
-#ifdef HAVE_IRRLICHT
     static  void init(const lisp::Lisp* lisp, scene::IMesh *bowling);
-#else
-    static  void init(const lisp::Lisp* lisp, ssgEntity* bowling);
-#endif
     virtual void update(float dt);
     
 	int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }

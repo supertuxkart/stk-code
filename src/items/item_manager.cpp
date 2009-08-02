@@ -135,11 +135,8 @@ void ItemManager::setDefaultItemStyle()
                     i->first.c_str());
             }  // if i->second
         }
-#ifndef HAVE_IRRLICHT
-        // For now disable this, irrlicht does not yet load any items.
         throw std::runtime_error(msg.str());
         exit(-1);
-#endif
     }   // if bError
 
 }   // setDefaultItemStyle

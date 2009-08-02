@@ -90,9 +90,6 @@ Material::Material(const std::string& fname, int index, bool is_full_path)
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
-#ifndef HAVE_IRRLICHT
-    ssgDeRefDelete(m_state);
-#endif
 }   // ~Material
 
 //-----------------------------------------------------------------------------

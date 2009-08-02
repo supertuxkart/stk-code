@@ -26,15 +26,9 @@
 class BubbleGumItem : public Item
 {
 public:
-#ifdef HAVE_IRRLICHT
                  BubbleGumItem(ItemType type, const Vec3& xyz, 
                                const Vec3 &normal, scene::IMesh* mesh,
                                unsigned int item_id);
-#else
-                 BubbleGumItem(ItemType type, const Vec3& xyz, 
-                               const Vec3 &normal, ssgEntity* model,
-                               unsigned int item_id);
-#endif
                 ~BubbleGumItem ();
     virtual void collected(float t);
 }
