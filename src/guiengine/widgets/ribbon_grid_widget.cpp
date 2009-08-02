@@ -219,11 +219,6 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
         return false;
     }
     
-    // if it's something else, it might be a ribbon child with its own parent
-    if(w->m_event_handler != NULL && w->m_event_handler != this)
-        return w->m_event_handler->transmitEvent(w, originator);
-    
-    // if we got there, must be a ribbon itself. in this case we can just transmit the event directly
     return true;
 }
 // -----------------------------------------------------------------------------

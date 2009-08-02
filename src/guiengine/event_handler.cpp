@@ -149,16 +149,21 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
     Widget* parent = w->m_event_handler;
     if(w->m_event_handler != NULL)
     {
-        /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
+        /* Find all parents. Stop looping if a widget event handler's is itself, to not fall
          in an infinite loop (this can happen e.g. in checkboxes, where they need to be
          notified of clicks onto themselves so they can toggle their state. ) */
         while(parent->m_event_handler != NULL && parent->m_event_handler != parent)
+        {
+            parent->transmitEvent(w, w->m_properties[PROP_ID]);
             parent = parent->m_event_handler;
+        }
         
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
         if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
+        {
             transmitEvent(parent, parent->m_properties[PROP_ID]);
+        }
     }
     else transmitEvent(w, w->m_properties[PROP_ID]);
     
@@ -192,9 +197,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the left press. */
             while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                if (widget_to_call->leftPressed())
-                    transmitEvent(w, w->m_properties[PROP_ID]);
-                
+                widget_to_call->leftPressed();
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
@@ -218,9 +221,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the right press */
             while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                if(widget_to_call->rightPressed())
-                    transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
-                
+                widget_to_call->rightPressed();
                 widget_to_call = widget_to_call->m_event_handler;
             }
             

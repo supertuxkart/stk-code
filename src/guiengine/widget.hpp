@@ -125,8 +125,7 @@ namespace GUIEngine
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
-         * that events happening on this widget should not go straight into the
-         * event handler. Instead, they will first be passed to m_event_handler->transmitEvent,
+         * that events happening on this widget should also be passed to m_event_handler->transmitEvent,
          * which is usually the parent analysing events from its children.
          * This is especially useful with logical widgets built with more than
          * one irrlicht widgets (e.g. Spinner, Ribbon)
@@ -153,8 +152,10 @@ namespace GUIEngine
         
         virtual void update(float delta) { }
         
-        /** used when you set parents - see m_event_handler explainations below.
-         returns whether main event callback should be notified or not */
+        /** All widgets, including their parents (m_event_handler) will be notified on event through
+         this call. Must return whether main (GUI engine user) event callback should be notified or not.
+         Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
+         of the chain decides whether the main handler is notified; return value is not read for others. */
         virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
         
         /**
