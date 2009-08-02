@@ -29,7 +29,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge)
 {
     m_gauge = gauge;
     m_type = WTYPE_SPINNER;
-    
 }
 
 void SpinnerWidget::add()
@@ -100,6 +99,7 @@ void SpinnerWidget::add()
         m_children[1].m_element = subbtn;
         m_children[1].m_type = WTYPE_ICON_BUTTON;
         m_children[1].id = subbtn->getID();
+        m_children[1].m_event_handler = this;
         subbtn->setUseAlphaChannel(true);
         
         subbtn->setImage(texture);
@@ -113,6 +113,7 @@ void SpinnerWidget::add()
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
         m_children[1].m_type = WTYPE_LABEL;
+        m_children[1].m_event_handler = this;
         m_children[1].id = label->getID();
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
@@ -129,7 +130,10 @@ void SpinnerWidget::add()
     m_children[2].m_event_handler = this;
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
+    
+    std::cout << "Adding spinner with m_event_handler=" << m_event_handler << std::endl;
 }
+
 void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 {
     Widget::move(x, y, w, h);

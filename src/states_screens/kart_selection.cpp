@@ -295,11 +295,7 @@ namespace KartSelectionScreen
         
         virtual bool transmitEvent(Widget* w, std::string& originator)
         {
-            if (w->m_event_handler != NULL && w->m_event_handler != this)
-            {
-                if (!w->m_event_handler->transmitEvent(w, originator)) return false;
-            }
-            
+            std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
             Widget* topmost = w;
             /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
              in an infinite loop (this can happen e.g. in checkboxes, where they need to be
@@ -307,6 +303,9 @@ namespace KartSelectionScreen
              */
             while(topmost->m_event_handler != NULL && topmost->m_event_handler != topmost)
             {
+                // transmit events to all listeners in the chain
+                std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
+                if (!topmost->transmitEvent(w, originator)) return false;
                 topmost = topmost->m_event_handler;
                 
                 std::string name = topmost->m_properties[PROP_ID];
@@ -314,6 +313,11 @@ namespace KartSelectionScreen
                 if (name == spinnerID)
                 {
                     m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
+                    
+                    // transmit events to all listeners in the chain
+                    std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
+                    if (!topmost->transmitEvent(w, originator)) return false;
+                    
                     return false; // do not continue propagating the event
                 }
 

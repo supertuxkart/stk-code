@@ -171,8 +171,6 @@ bool RibbonGridWidget::rightPressed()
     RibbonWidget* w = getSelectedRibbon();
     if(w != NULL)
     {
-        w->rightPressed();
-        
         updateLabel();
         propagateSelection();
     }
@@ -193,8 +191,6 @@ bool RibbonGridWidget::leftPressed()
     RibbonWidget* w = getSelectedRibbon();
     if(w != NULL)
     {
-        w->leftPressed();
-        
         updateLabel();
         propagateSelection();
     }

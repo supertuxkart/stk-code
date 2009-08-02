@@ -180,19 +180,26 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
         {
             IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
             if(el == NULL) break;
-            
+                        
             Widget* w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
             if(w == NULL) break;
-            
+                        
             Widget* widget_to_call = w;
             
             /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
              in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-             notified of clicks onto themselves so they can toggle their state. ) */
-            while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+             notified of clicks onto themselves so they can toggle their state. )
+             On the way, also notify everyone in the chain of the left press. */
+            while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+            {
+                if (widget_to_call->leftPressed())
+                    transmitEvent(w, w->m_properties[PROP_ID]);
+                
                 widget_to_call = widget_to_call->m_event_handler;
+            }
             
-            if(widget_to_call->leftPressed())
+            
+            if (widget_to_call->leftPressed())
                 transmitEvent(w, w->m_properties[PROP_ID]);
         }
             break;
@@ -207,9 +214,15 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             Widget* widget_to_call = w;
             /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
              in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-             notified of clicks onto themselves so they can toggle their state. ) */
+             notified of clicks onto themselves so they can toggle their state. )
+             On the way, also notify everyone in the chain of the right press */
             while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+            {
+                if(widget_to_call->rightPressed())
+                    transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
+                
                 widget_to_call = widget_to_call->m_event_handler;
+            }
             
             if(widget_to_call->rightPressed())
                 transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
