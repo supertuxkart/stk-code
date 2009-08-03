@@ -75,6 +75,18 @@ namespace GUIEngine
         PROP_SQUARE
     };
     
+    /**
+      * The nearly-abstract base of all widgets (not fully abstract since a bare Widget
+      * can be created for the sore goal of containing children widgets in a group)
+      *
+      * Provides basic common functionnality, as well as providing a few callbacks
+      * for children to override if they need to do something special on event.
+      *
+      * Each widget may have an irrlicht parent (most often used to put widgets in dialogs)
+      * and also optionally one or many children.
+      *
+      * Each widget also has a set of properties stored in a ma (see enum above)
+      */
     class Widget : public SkinWidgetContainer
     {
         friend class EventHandler;
@@ -85,6 +97,11 @@ namespace GUIEngine
         friend class Skin;
         friend class RibbonGridWidget;
         
+        /**
+          * These methods provide new unique IDs each time you call them.
+          * Since IDs are used to determine tabbing order, "non-tabbable"
+          * objects are being given very different IDs so that they don't interfere.
+          */
         int getNewID();
         int getNewNoFocusID();
         
@@ -111,10 +128,26 @@ namespace GUIEngine
         /** override in children if you need to know when the widget is focused */
         virtual void focused() {}
         
+        /**
+          * The XML loader stored coords in their raw string form inside this widget.
+          * This method parses the strings. Most notably, expands coords relative to parent
+          * and calculates percentages.
+          */
         void readCoords(Widget* parent=NULL);
         
+        /**
+         * An irrlicht parent (most often used to put widgets in dialogs)
+         */
         IGUIElement* m_parent;
         
+        /**
+         * Receives as string the raw property value retrieved from XML file.
+         * Will try to make sense of it, as an absolute value or a percentage.
+         *
+         * Return values :
+         *     Will write to either absolute or percentage, depending on the case.
+         *     Returns false if couldn't convert to either
+         */
         static bool convertToCoord(std::string& x, int* absolute, int* percentage);
         
         /**
@@ -122,6 +155,14 @@ namespace GUIEngine
          */
         IGUIElement* m_element;
         
+        
+        // FIXME... i forgot the m_ everywhere ... XD
+
+        /** numerical ID used by irrLicht to identify this widget
+         * (not the same as the string identificator specified in the XML file)
+         */
+        int id;
+
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -132,11 +173,20 @@ namespace GUIEngine
          */
         Widget* m_event_handler;
         
+        
+        /** Coordinates of the widget */
+        int x, y, w, h;
+        
+        /** Whether to show a bounding box around this widget (used for sections) */
+        bool m_show_bounding_box;
+        
+        
         Widget();
         virtual ~Widget() {}
         
-        bool m_show_bounding_box;
-        
+        /**
+          * Get the underlying irrLicht GUI element, casted to the right type.
+          */
         template<typename T> T* getIrrlichtElement()
         {
             #if defined(WIN32) || defined(NDEBUG)
@@ -149,21 +199,6 @@ namespace GUIEngine
         
         IGUIElement* getIrrlichtElement() { return m_element; }
 
-        
-        virtual void update(float delta) { }
-        
-        /** All widgets, including their parents (m_event_handler) will be notified on event through
-         this call. Must return whether main (GUI engine user) event callback should be notified or not.
-         Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
-         of the chain decides whether the main handler is notified; return value is not read for others. */
-        virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
-        
-        /**
-         * Create and add the irrLicht widget(s) associated with this object.
-         * Call after Widget was read from XML file and laid out.
-         */
-        virtual void add() {} 
-        
         void setParent(IGUIElement* parent);
         
         /**
@@ -177,16 +212,6 @@ namespace GUIEngine
         /** Type of this widget */
         WidgetType m_type;
         
-        // FIXME... i forgot the m_ everywhere ... XD
-        
-        /** coordinates of the widget */
-        int x, y, w, h;
-        
-        /** numerical ID used by irrLicht to identify this widget
-          * (not the same as the string identificator specified in the XML file)
-          */
-        int id;
-        
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
         
@@ -199,6 +224,25 @@ namespace GUIEngine
         
         
         bool isSelected() const { return m_selected; }
+        
+        
+        /**
+         * Override in children to possibly receive updates (you may need to register to
+         * them first)
+         */
+        virtual void update(float delta) { }
+        
+        /** All widgets, including their parents (m_event_handler) will be notified on event through
+         this call. Must return whether main (GUI engine user) event callback should be notified or not.
+         Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
+         of the chain decides whether the main handler is notified; return value is not read for others. */
+        virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
+        
+        /**
+         * Create and add the irrLicht widget(s) associated with this object.
+         * Call after Widget was read from XML file and laid out.
+         */
+        virtual void add() {};
     };
 
     

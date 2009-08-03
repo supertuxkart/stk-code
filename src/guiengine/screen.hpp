@@ -41,6 +41,12 @@ namespace GUIEngine
    
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     
+    /**
+      * Represents a single screen. Mainly responsible of its children widgets; Screen lays them
+      * out, asks them to add themselves, asks them to remove themselves, etc.
+      *
+      * Also initiates the read of GUI files, even though most of that work is done in "screen_loader.cpp"
+      */
     class Screen
     {
         friend class Skin;

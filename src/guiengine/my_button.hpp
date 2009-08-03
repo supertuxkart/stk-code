@@ -12,7 +12,11 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    
+
+/**
+  * The base irrLicht button, doesn't allow to stretch bitmaps inside it, so we "forked" it
+  * with a patch of our own.
+  */
 class MyGUIButton : public IGUIButton
 	{
 	public:

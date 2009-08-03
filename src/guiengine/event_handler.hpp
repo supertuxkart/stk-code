@@ -34,8 +34,13 @@ namespace GUIEngine
     class Widget;
     
 /**
-  * Class to handle irrLicht events (GUI and input as well)
-  * Input events will be redirected to the input module
+  * Class to handle irrLicht events (GUI and input as well : input events will be redirected to the input
+  * module in game mode). In menu mode, input is mapped to game actions with the help of the input
+  * module, then calls are made to move focus / trigger an event / etc.
+  *
+  * This is really only the irrLicht events bit, not to be confused with my own simple events dispatched
+  * mainly through AbstractStateManager, and also to widgets (this class is some kind of bridge between
+  * the base irrLicht GUI engine and the STK layer on top of it)
   */
 class EventHandler : public IEventReceiver
 {

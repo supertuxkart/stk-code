@@ -178,6 +178,20 @@ PROP_SQUARE             "square_items"
 Valid on Ribbons or RibbonGrids. Can be "true" (omitting it means "false"). Indicates whether the contents
 use rectangular icons (this will affect the type of focus/highlighting used)
 
++--------------------------+
++ Using the Engine in Code +
++--------------------------+
+
+The first thing to do is to derive a class of your own from AbstractStateManager. There are a few callbacks
+you will need to override. Once it's done, you have all AbstractStateManager methods ready to be used to
+push/pop/set menus on the screen stack.
+Once you have instanciated your state manager class, call GUIEngine::init and pass it as argument.
+One of the most important callbacks is 'eventCallback', which will be called everytime sometimes happens.
+Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
+name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
+bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
+being left, allowing for setup/clean-up.
+ 
 */
 
 #ifndef HEADER_ENGINE_HPP
@@ -224,11 +238,8 @@ namespace GUIEngine
     void reshowCurrentScreen();
     
     void render(float dt);
+    
     void transmitEvent(Widget* widget, std::string& name);
-     
-    
-    void onUpdate(float elapsedTime);
-    
 }
 
 #endif

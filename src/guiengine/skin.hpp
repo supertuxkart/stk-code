@@ -29,6 +29,75 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+/**
+ Here lies the skin handling. It loads images and their sizing from a XML file.
+ Since the irrLicht way of handling skin is quite "boxy" and results in games
+ looking like Window 95, this class overrides it very much; in pretty much all
+ callbacks, rather drawing plainly what irrLicht asks it to draw, it first
+ checks which widget we're asked to render and redirects the call to a more
+ specific method.
+ Furthermore, since irrLicht widgets were quite basic, a few widgets were created
+ by combining several irrLicht widgets (e.g. 2 buttons and a label in a box make
+ a spinner). Because of this, some jumping through hoops is performed (we get a
+ callback for each of these sub-widgets, but want to draw the whole thing as a single
+ block)
+
+ = Rendering =
+ There are two types of images : some will be simply stretched as a whole, others will
+ have non-stretchable borders (you cannot choose which one you must use, it's hardcoded
+ for each element type; though, as you will see below, for all "advanced stretching" images
+ you can easily fake "simple stretch")
+ 
+ All elements will have at least 2 properties :
+ type="X"                                sets what you're skinning with this entry
+ image="skinDirectory/imageName.png"     sets which image is used for this element
+ 
+ Most elements also support states :
+ state="neutral"
+ state="focused"
+ state="down"
+ You can thus give different looks for different states.  Not all widgets support all states,
+ see entries and comments below to know what's supported.
+ Note that checkboxes are an exception and have the following styles :
+ "neutral+unchecked"
+ "neutral+checked"
+ "focused+unchecked"
+ "focused+checked"
+ 
+ "Advanced stretching" images are split this way :
+ 
+ +----+--------------------+----+
+ |    |                    |    |
+ +----+--------------------+----+
+ |    |                    |    |
+ |    |                    |    |     
+ |    |                    |    |     
+ +----+--------------------+----+
+ |    |                    |    | 
+ +----+--------------------+----+
+ 
+ The center border will be stretched in all directions. The 4 corners will not stretch at all.
+ Horizontal borders will stretch horizontally, verticallt borders will stretch vertically.
+ Use properties left_border="X" right_border="X" top_border="X" bottom_border="X" to specify
+ the size of each border in pixels (setting all borders to '0' makes the whole image scaled).
+ 
+ In some cases, you may not want vertical stretching to occur (like if the left and right sides
+ of the image must not be stretched vertically, e.g. for the spinner). In this case, pass
+ parameter preserve_h_aspect_ratios="true" to make the left and right areas stretch by keeping
+ their aspect ratio.
+ 
+ Some components may fill the full inner area with stuff; others will only take a smaller
+ area at the center. To adjust for this, there are properties "hborder_out_portion" and "vborder_out_portion"
+ that take a float from 0 to 1, representing the percentage of each border that goes out of the widget's
+ area (this might include stuff like shadows, etc.). The 'h' one is for horizontal borders,
+ the 'v' one is for vertical borders.
+ 
+ Finnally : the image is split, as shown above, into 9 areas. In osme cases, you may not want
+ all areas to be rendered. Then you can pass parameter areas="body+left+right+top+bottom"
+ and explicitely specify which parts you want to see. The 4 corner areas are only visible
+ when the border that intersect at this corner are enabled.
+ 
+  */
 namespace GUIEngine
 {
     

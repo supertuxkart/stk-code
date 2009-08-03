@@ -36,9 +36,27 @@ public:
     bool isGameState();
     void reshowTopMostMenu();
 
-    // method to override in children
+    /*  ***********************************
+        * methods to override in children *
+        *********************************** */
+    
+    /**
+      * callback called whenever escape was pressed (or any similar cancel operation)
+      */
     virtual void escapePressed() = 0;
+    
+    /**
+      * Called every frame, to allow updating animations if there is any need.
+      */
     virtual void onUpdate(float elpased_time) = 0;
+    
+    /**
+     * will be called everytime sometimes happens.
+     * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
+     * name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
+     * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
+     * being left, allowing for setup/clean-up.
+     */
     virtual void eventCallback(Widget* widget, const std::string& name) = 0;
 };
 

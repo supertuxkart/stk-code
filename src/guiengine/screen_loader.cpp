@@ -33,6 +33,11 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
+/**
+  * Loads a GUI screen from its XML file. Builds a hierarchy of Widget objects whose
+  * contents are a direct transcription of the XML file, with little analysis or layout
+  * performed on them.
+  */
 namespace GUIEngine
 {
     

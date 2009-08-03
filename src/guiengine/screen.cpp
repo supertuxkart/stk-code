@@ -125,7 +125,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
             left_space -= (horizontal ? widgets[n].w : widgets[n].h);
         } // next widget
         
-        // lay widgets in row
+        // ---- lay widgets in row
         int x = parent->x, y = parent->y;
         for(int n=0; n<widgets_amount; n++)
         {
@@ -235,6 +235,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
     }
 }
 
+// -----------------------------------------------------------------------------
 #if 0
 #pragma mark -
 #pragma mark Adding/Removing widgets
@@ -306,12 +307,13 @@ void Screen::manualAddWidget(Widget* w)
 {
     m_widgets.push_back(w);
 }
-
+// -----------------------------------------------------------------------------
 void Screen::manualRemoveWidget(Widget* w)
 {
     m_widgets.remove(w);
 }
 
+// -----------------------------------------------------------------------------
 #if 0
 #pragma mark -
 #pragma mark Getting widgets
