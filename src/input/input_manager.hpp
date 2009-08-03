@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <irrlicht.h>
+#include <map>
 
 #include "input/input.hpp"
 
@@ -32,6 +33,7 @@ class DeviceManager;
  */
 class InputManager
 {
+    std::map<int, int> m_sensed_input_on_all_axes;
 public:
     enum InputDriverMode {
         MENU = 0,

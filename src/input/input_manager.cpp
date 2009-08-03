@@ -165,9 +165,6 @@ void InputManager::handleStaticAction(int key, int value)
 
 }
 
-// TODO: move as class member
-std::map<int, int> m_sensed_input_on_all_axes;
-
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */
@@ -186,8 +183,13 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
     if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
     
-    // only store axes when they're pushed quite far
-    if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && abs(value) < Input::MAX_VALUE *2/3) store_new = false;
+    // only store axes and button presses when they're pushed quite far
+    if(m_mode == INPUT_SENSE_GAMEPAD &&
+            (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON) &&
+            abs(value) < Input::MAX_VALUE *2/3)
+    {
+        store_new = false;
+    }
     
     // for axis bindings, we request at least 2 different values bhefore accepting (ignore non-moving axes
     // as some devices have special axes that are at max value at rest)
@@ -204,7 +206,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         }
         else if(type == Input::IT_STICKBUTTON)
         {
-            std::cout << "%% storing new gamepad button binding\n";
+            std::cout << "%% storing new gamepad button binding value=" << value <<
+            " deviceID=" << deviceID << " btnID=" << btnID << "\n";
         }
         
         m_sensed_input->deviceID = deviceID;
