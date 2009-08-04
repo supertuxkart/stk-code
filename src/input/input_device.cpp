@@ -183,6 +183,7 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
         std::cerr << "Warning, joystick without name in config file, making it undetectable\n";
     }
     else m_name = name_string;
+    m_index = -1; // Set to -1 so we can establish when a device ID has been associated
     
     for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
         m_buttonPressed[n] = false;

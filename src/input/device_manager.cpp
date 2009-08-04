@@ -92,7 +92,8 @@ bool DeviceManager::checkForGamePad(const int irr_id)
         std::cout << "  (checking...) I remember that gamepad #" << n << " is named " << m_gamepads[n].m_name.c_str() << std::endl;
         
         // FIXME - don't check only name, but also number of axes and buttons?
-        if((m_gamepads[n].m_name == name) && (m_gamepads[n].m_index == irr_id))
+        // Only assign device IDs to gamepads which have not yet been assigned a device ID
+        if((m_gamepads[n].m_name == name) && (m_gamepads[n].m_index == -1))
         {
             std::cout << "--> that's the one currently connected\n";
             m_gamepads[n].open(irr_id, m_gamepads[n].m_name, m_irrlicht_gamepads[irr_id].Axes, m_irrlicht_gamepads[irr_id].Buttons);
