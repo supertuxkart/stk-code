@@ -22,8 +22,7 @@
 #include "io/xml_node.hpp"
 
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
-                {std::string("LocX"), std::string("LocY"), std::string("LocZ"),
-                 std::string("RotX"), "RotY", "RotZ"};
+                {"LocX", "LocY", "LocZ", "RotX", "RotY", "RotZ"};
 
 Ipo::Ipo(const XMLNode &curve, float fps)
 {
@@ -114,12 +113,12 @@ void Ipo::update(float dt, core::vector3df *xyz, core::vector3df *hpr)
 		
 	switch(m_channel)
 	{
-	case Ipo::IPO_LOCX : xyz->X = get(); break;
-	case Ipo::IPO_LOCY : xyz->Y = get(); break;
-	case Ipo::IPO_LOCZ : xyz->Z = get(); break;
-	case Ipo::IPO_ROTX : hpr->X = get(); break;
-	case Ipo::IPO_ROTY : hpr->Y = get(); break;
-	case Ipo::IPO_ROTZ : hpr->Z = get(); break;
+	case Ipo::IPO_LOCX : xyz->X =  get(); break;
+	case Ipo::IPO_LOCY : xyz->Y =  get(); break;
+	case Ipo::IPO_LOCZ : xyz->Z =  get(); break;
+	case Ipo::IPO_ROTX : hpr->X = -get(); break;  // the - signs are odd,
+	case Ipo::IPO_ROTY : hpr->Y = -get(); break;  // but it works
+	case Ipo::IPO_ROTZ : hpr->Z =  get(); break;  // why no - ??
     default: assert(false); // shut up compiler warning
 	}    // switch
 

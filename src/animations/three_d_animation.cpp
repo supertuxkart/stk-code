@@ -82,10 +82,23 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
 	{
 		m_collision_shape = new btBoxShape(0.5*extend);
 	}
-	else if(shape=="cone")
+	else if(shape=="coneX")
 	{
+		float radius = 0.5f*std::max(extend.getY(), extend.getZ());
+        m_collision_shape = new btConeShapeX(radius, extend.getX());
+	}
+	else if(shape=="coneY")
+	{
+		float radius = 0.5f*std::max(extend.getX(), extend.getZ());
+		m_collision_shape = new btConeShape(radius, extend.getY());
+	}
+	else if(shape=="coneZ")
+	{
+        // Note that the b3d model and therefore the extend has the
+        // irrlicht axis, i.e. Y and Z swapped. Also we need to
+        // convert 
 		float radius = 0.5f*std::max(extend.getX(), extend.getY());
-		m_collision_shape = new btConeShapeZ(radius, extend.getZ());
+        m_collision_shape = new btConeShapeZ(radius, extend.getZ());
 	}
 	else
 	{
@@ -131,7 +144,7 @@ void ThreeDAnimation::update(float dt)
 	if(m_body)
 	{
 		hpr = DEGREE_TO_RAD*hpr;
-		btQuaternion q(hpr.X, hpr.Z, -hpr.Y);
+		btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
 		Vec3 p(xyz);
 		btTransform trans(q,p);
 		m_motion_state->setWorldTransform(trans);

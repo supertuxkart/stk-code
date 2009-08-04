@@ -100,7 +100,6 @@ InputManager::~InputManager()
 void InputManager::handleStaticAction(int key, int value)
 {
     static bool control_is_pressed=false;
-    printf("%d %d %d\n",key,value,control_is_pressed);
     switch (key)
     {
 #ifdef DEBUG

@@ -529,14 +529,14 @@ void Track::createWater(const XMLNode &node)
 
     //scene::IMesh *mesh = irr_driver->getMesh(full_path);
     scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
-    irr_driver->getSceneManager()->addWaterSurfaceSceneNode(mesh->getMesh(0));
-//    scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->addHillPlaneMesh("myHill",
-//                core::dimension2d<f32>(20,20),
-//                core::dimension2d<u32>(40,40), 0, 0,
-//                core::dimension2d<f32>(0,0),
-//                core::dimension2d<f32>(10,10));
+    //irr_driver->getSceneManager()->addWaterSurfaceSceneNode(mesh->getMesh(0));
+    //scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->addHillPlaneMesh("myHill",
+    //            core::dimension2d<f32>(20,20),
+    //            core::dimension2d<u32>(40,40), 0, 0,
+    //            core::dimension2d<f32>(0,0),
+    //            core::dimension2d<f32>(10,10));
 
-    scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMesh(0)->getMeshBuffer(0)));
+    //scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMesh(0)->getMeshBuffer(0)));
     //scene::SMeshBuffer* buffer = new scene::SMeshBuffer(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
     
     float wave_height  = 2.0f;
