@@ -926,7 +926,7 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    if(dynamic_cast<IGUIEditBox*>(element) != NULL)
+    if(element->getType()==gui::EGUIET_EDIT_BOX)
     {
         // TODO : make configurable in skin file
         GUIEngine::getDriver()->draw2DRectangle( SColor(100, 150, 150, 150), rect );
