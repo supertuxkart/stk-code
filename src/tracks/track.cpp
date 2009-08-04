@@ -79,10 +79,10 @@ Track::Track( std::string filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-    if(m_quad_graph)        delete m_quad_graph;
-	if(m_animation_manager) delete m_animation_manager;
-	if(m_check_manager)     delete m_check_manager;
-    if(m_mini_map)          irr_driver->removeTexture(m_mini_map);
+    if(m_quad_graph)            delete m_quad_graph;
+	if(m_animation_manager)     delete m_animation_manager;
+	if(m_check_manager)         delete m_check_manager;
+    if(m_mini_map)              irr_driver->removeTexture(m_mini_map);
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -111,18 +111,24 @@ void Track::cleanup()
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
+        m_animated_textures.clear();
     }
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         irr_driver->removeNode(m_all_nodes[i]);
+        m_all_nodes.clear();
     }
     for(unsigned int i=0; i<m_all_meshes.size(); i++)
     {
         irr_driver->removeMesh(m_all_meshes[i]);
+        m_all_meshes.clear();
     }
 
+
     delete m_non_collision_mesh;
+    m_non_collision_mesh = new TriangleMesh();
     delete m_track_mesh;
+    m_track_mesh = new TriangleMesh();
 
     // remove temporary materials loaded by the material manager
     material_manager->popTempMaterial();
@@ -351,6 +357,18 @@ void Track::createPhysicsModel()
     // Note that removing the rigid body does not remove the already collected
     // triangle information, so there is no need to convert the actual track
     // (first element in m_track_mesh) again!
+
+    if (m_track_mesh == NULL)
+    {
+        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
+        return;
+    }
+    if (m_non_collision_mesh == NULL)
+    {
+        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot createPhysicsModel\n");
+        return;
+    }
+
     m_track_mesh->removeBody();
     for(unsigned int i=1; i<m_all_meshes.size(); i++)
     {
@@ -424,6 +442,12 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
     RaceManager::getWorld()->getPhysics()->init(min, max);
     // This will (at this stage) only convert the main track model.
     convertTrackToBullet(mesh);
+    if (m_track_mesh == NULL)
+    {
+        fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot loadMainTrack\n");
+        return false;
+    }
+    
     m_track_mesh->createBody();
 
 
@@ -488,7 +512,8 @@ void Track::update(float dt)
 {
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
-        m_animated_textures[i]->update(dt);
+        if (m_animated_textures[i] != NULL)
+            m_animated_textures[i]->update(dt);
     }
     for(unsigned int i=0; i<m_physical_objects.size(); i++)
     {
