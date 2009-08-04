@@ -39,7 +39,7 @@ void TextBoxWidget::add()
 // -----------------------------------------------------------------------------
 stringw TextBoxWidget::getText() const
 {
-    IGUIEditBox* textCtrl = dynamic_cast<IGUIEditBox*>(m_element);
+    const IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
     assert(textCtrl != NULL);
     
     return stringw(textCtrl->getText());

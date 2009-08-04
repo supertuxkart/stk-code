@@ -32,7 +32,7 @@ void ListWidget::add()
 
 void ListWidget::clear()
 {
-    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     
     list->clear();
@@ -40,20 +40,20 @@ void ListWidget::clear()
 
 void ListWidget::addItem(const char* item)
 {
-    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     list->addItem( stringw(item).c_str() );
 }
 
 int ListWidget::getSelection() const
 {
-    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     return list->getSelected();
 }
 std::string ListWidget::getSelectionName() const
 {
-    IGUIListBox* list = dynamic_cast<IGUIListBox*>(m_element);
+    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     return stringc( list->getListItem( list->getSelected() ) ).c_str();
 }

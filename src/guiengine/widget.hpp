@@ -196,7 +196,17 @@ namespace GUIEngine
                 return out;
             #endif
         }
-        
+
+        template<typename T> const T* getIrrlichtElement() const
+        {
+            #if defined(WIN32) || defined(NDEBUG)
+                return static_cast<T*>(m_element);
+            #else
+                T* out = dynamic_cast<T*>(m_element);
+                return out;
+            #endif
+        }
+
         IGUIElement* getIrrlichtElement() { return m_element; }
 
         void setParent(IGUIElement* parent);
