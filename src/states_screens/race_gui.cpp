@@ -185,11 +185,6 @@ void RaceGUI::drawMiniMap()
     {
         const Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
-        video::SMaterial m;
-        m.Thickness = 5;
-        irr_driver->getVideoDriver()->draw3DLine(kart->getXYZ().toIrrVector(),
-                                                 core::vector3df(10, 10, 10));
-
     	const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
