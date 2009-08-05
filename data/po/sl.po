@@ -1,44 +1,65 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: SuperTuxKaer 0.5\n"
+"Project-Id-Version: SuperTuxKart 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-25 13:22+1000\n"
-"PO-Revision-Date: 2008-06-03 19:16+0100\n"
+"POT-Creation-Date: 2009-01-19 03:13+0100\n"
+"PO-Revision-Date: 2009-08-03 20:15+0100\n"
 "Last-Translator: Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
 "Language-Team: Andrej Znidarsic <andrej.znidarsic@gmail.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Slovenian\n"
 "X-Poedit-Country: SLOVENIA\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Bookmarks: 48,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
-#: src/gui/config_display.cpp:385
+#: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
 msgstr "%dx%d je na črni listi"
 
-#: src/world.cpp:611
+#: src/modes/world.cpp:418
 #, c-format
 msgid ""
 "'%s' has\n"
 "been eliminated."
 msgstr ""
-"'%s' je\n"
+"'%s' je bil \n"
 "izločen."
 
-#: src/gui/player_controls.cpp:64
-msgid "Accelerate"
-msgstr "Pospeši"
+#: src/gui/game_mode.cpp:87
+msgid "3 Strikes Battle"
+msgstr "Bitka na 3 zmage"
 
-#: src/gui/challenges_menu.cpp:36
+#: src/gui/help_page_three.cpp:75
+msgid ""
+"3 Strikes Battle : only in multiplayer games.\n"
+"Hit others with weapons until they lose all their lives."
+msgstr ""
+"Bitka na 3 zmage: samo v več igralskem načinu. \n"
+"Streljajte na ostale z orožji, dokler ne izgubijo vseh svojih življenj."
+
+#: src/gui/help_page_three.cpp:83
+#: src/gui/help_page_two.cpp:128
+msgid "< Back"
+msgstr "< Nazaj"
+
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:72
+msgid "Accelerate"
+msgstr "Pospešek"
+
+#: src/gui/challenges_menu.cpp:37
 msgid "Active Challenges"
 msgstr "Aktivni izzivi"
 
-#: data/all.cup:4
+#: data/grandprix/alltracks.grandprix:4
 msgid "All tracks"
 msgstr "Vse proge"
 
-#: data/all.cup:5
+#: data/grandprix/alltracks.grandprix:5
 msgid "All tracks included in SuperTuxKart"
 msgstr "Vse proge vključene v SuperTuxKart"
 
@@ -46,15 +67,15 @@ msgstr "Vse proge vključene v SuperTuxKart"
 msgid "Amazonian Journey"
 msgstr "Amazonsko potovanje"
 
-#: src/gui/help_page_two.cpp:108
+#: src/gui/help_page_two.cpp:111
 msgid "Anvil - slows down greatly the kart in the first position"
 msgstr "Nakovalo - močno upočasni prvo vozilo"
 
-#: src/gui/config_display.cpp:92
+#: src/gui/config_display.cpp:99
 msgid "Apply "
 msgstr "Uporabi"
 
-#: src/gui/config_display.cpp:351
+#: src/gui/config_display.cpp:361
 #, c-format
 msgid "Apply %dx%d"
 msgstr "Uporabi %dx%d"
@@ -63,46 +84,66 @@ msgstr "Uporabi %dx%d"
 msgid "Around the Lighthouse"
 msgstr "Okoli svetilnika"
 
-#: src/gui/help_page_one.cpp:107
-msgid ""
-"At high speeds wheelies drive you faster, but you can't steer. If you\n"
-"get stuck or fall too far, use the rescue button to get back on track."
-msgstr ""
-"Pri visokih hitrostih lahko z vožnjo po zadnjih kolesih vozite hitreje, toda ne morete zavijati. \n"
-"Če se zataknete ali padete predaleč, uporabite rešitveni gumb za vrnitev na progo."
-
-#: src/challenges/worlds_end_gp.cpp:54
-#: data/gp4.cup:4
+#: data/grandprix/atworldsend.grandprix:4
 msgid "At world's end"
 msgstr "Na koncu sveta"
 
-#: src/gui/help_page_one.cpp:73
+#: src/gui/help_page_one.cpp:74
 msgid "Avoid bananas"
 msgstr "Izogibajte se bananam"
 
-#: src/gui/grand_prix_ending.cpp:148
-#: src/gui/leader_result.cpp:152
-#: src/gui/race_results_gui.cpp:144
+#: src/gui/race_results_gui.cpp:70
+#: src/gui/grand_prix_ending.cpp:138
 msgid "Back to the main menu"
-msgstr "Nazaj v glaven menu"
+msgstr "Nazaj v glavni meni"
 
-#: src/gui/help_page_two.cpp:122
+#: src/gui/help_page_three.cpp:87
+#: src/gui/help_page_two.cpp:131
+#: src/gui/help_page_one.cpp:153
 msgid "Back to the menu"
-msgstr "Nazaj v emnu"
+msgstr "Nazaj v meni"
 
-#: src/gui/player_controls.cpp:65
+#: src/gui/network_gui.cpp:60
+msgid "Become server"
+msgstr "Postani strežnik"
+
+#: src/gui/help_page_two.cpp:84
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back,\n"
+"it will be thrown backwards."
+msgstr ""
+"Krogla za kegljanje - se odbija od zidov. Če gledate nazaj, \n"
+"jo vržete nazaj."
+
+#: src/gui/player_controls.cpp:72
 msgid "Brake"
 msgstr "Zavora"
+
+#: src/gui/help_page_two.cpp:66
+msgid "BubbleGum - leave a sticky pink puddle behind you"
+msgstr "Žvečilni gumi - za sabo pustite lepljivo roza packo"
+
+#: src/gui/help_page_two.cpp:75
+msgid ""
+"Cake - thrown at the closest rival,\n"
+"best on short ranges and long straights"
+msgstr ""
+"Torta - avtomatsko vržena v najbližjega nasprotnika, \n"
+"najboljša na kratkih razdaljah in dolgih ravninah"
+
+#: src/gui/network_gui.cpp:179
+msgid "Can't connect to server"
+msgstr "Ne morem se povezati s strežnikom."
 
 #: data/tracks/canyon/canyon.track:4
 msgid "Canyon"
 msgstr "Kanjon"
 
-#: src/gui/main_menu.cpp:52
+#: src/gui/main_menu.cpp:61
 msgid "Challenges"
 msgstr "Izzivi"
 
-#: src/gui/player_controls.cpp:74
+#: src/gui/player_controls.cpp:85
 #, c-format
 msgid "Choose your controls, %s"
 msgstr "Izberite način nadzora vozila %s"
@@ -111,53 +152,29 @@ msgstr "Izberite način nadzora vozila %s"
 msgid "City"
 msgstr "Mesto"
 
-#: src/gui/config_display.cpp:97
+#: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
-msgstr "Očisti s črne liste"
+msgstr "Očisti s črnega seznama"
 
-#: src/challenges/energy_math_class.cpp:26
-msgid "Collect Coins in Math Class"
-msgstr "Zberite kovance v Matematični Učilnici"
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
+msgid "Collect Nitro in Math Class"
+msgstr "Zberite nitro v Matematični Učilnici"
 
-#: src/challenges/energy_math_class.cpp:28
-msgid ""
-"Collect at least 6 points\n"
-"worth of coins\n"
-"on three laps of\n"
-"Oliver's Math Class\n"
-"in under 1 minute."
-msgstr ""
-"Zberite vsaj 6 točk\n"
-"vrednih kovancev \n"
-"v treh krogih \n"
-"Oliverjeve Matematične Učilnice\v manj kot 1 minuti"
-
-#: src/challenges/energy_shifting_sands.cpp:27
-msgid ""
-"Collect at least 9 coins\n"
-"on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
-msgstr ""
-"Zberite vsaj 9 kovancev \v 3 krogih Peščenih Sipin\n"
-"v manj kot 2 minutah in 20 skundah"
-
-#: src/challenges/energy_shifting_sands.cpp:25
+#: data/grandprix/tothemoonandback.challenge:5
 msgid "Collect the Pharaohs Treasure"
-msgstr "Zberi faraonov zaklad"
+msgstr "Zberite faraonov zaklad"
 
-#: src/gui/help_page_one.cpp:117
+#: src/gui/help_page_one.cpp:123
 msgid ""
-"Collecting coins increases the number of collectables you receive.\n"
-"After 5 silver coins, each blue box will yield 2 collectables,\n"
-"after 10, 3 collectables and so on.\n"
-"Each gold coin is worth 3 silver coins, so look out for them!"
+"Collecting nitro allows you to get speed boosts whenever you\n"
+"wish by pressing the appropriate key. You can see your\n"
+"current level of nitro in the bar at the right of the game screen."
 msgstr ""
-"Zbiranje kovancev poveča število prejetih bonusov.\n"
-"Po 5 srebrnih kovancih bo vsaka modra škatla dala 2 bonusa,\n"
-"po 10 kovancih 3 bonuse in tako naprej.\n"
-"Vsak zlat kovanec je vreden 3 srebrne kovance, zato bodite pozorni nanje !"
+"Pobiranje nitra vam omogoča povečano hitrost, kadarkoli \n"
+"pritisnete primerno tipko. Vašo trenutno vrednost \n"
+"nitrota lahko vidite v stolpcu na desni strani zaslona."
 
-#: src/challenges/worlds_end_gp.cpp:27
+#: data/grandprix/alltracks.challenge:6
 msgid ""
 "Come first in the At World's End\n"
 "Grand Prix with 3 'Racer'\n"
@@ -167,11 +184,11 @@ msgstr ""
 "Na koncu sveta s 3 \n"
 "'Drikač' tekmovalci."
 
-#: src/gui/display_res_confirm.cpp:55
+#: src/gui/display_res_confirm.cpp:56
 msgid "Confirm Resolution"
 msgstr "Potrdite Resolucijo"
 
-#: src/gui/display_res_confirm.cpp:109
+#: src/gui/display_res_confirm.cpp:110
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
 msgstr "Potrdite resolucijo v %d sekundah"
@@ -180,19 +197,26 @@ msgstr "Potrdite resolucijo v %d sekundah"
 msgid "Confirm Resolution Within 5 Seconds"
 msgstr "Potrdite resolucijo v 5 sekundah"
 
-#: src/gui/grand_prix_ending.cpp:144
-#: src/gui/leader_result.cpp:148
-#: src/gui/feature_unlocked.cpp:47
-#: src/gui/race_results_gui.cpp:135
+#: src/gui/network_gui.cpp:56
+msgid "Connect to server"
+msgstr "Poveži se s strežnikom"
+
+#: src/gui/network_gui.cpp:155
+msgid "Connected:"
+msgstr "Povezan:"
+
+#: src/gui/feature_unlocked.cpp:48
+#: src/gui/race_results_gui.cpp:59
+#: src/gui/grand_prix_ending.cpp:134
 msgid "Continue"
-msgstr "Nadaljujte"
+msgstr "Nadaljevanje"
 
-#: src/gui/race_results_gui.cpp:140
+#: src/gui/race_results_gui.cpp:66
 msgid "Continue Grand Prix"
-msgstr "Nadaljujte Grand Prix"
+msgstr "Nadaljevanje turnirja"
 
-#: data/tracks/beach/beach.track:5
-#: data/tracks/lighthouse/lighthouse.track:5
+#: data/tracks/beach/beach.track:6
+#: data/tracks/lighthouse/lighthouse.track:6
 msgid ""
 "Created by Ingo Ruhnke,\n"
 "modified by M. Gagnon"
@@ -200,9 +224,9 @@ msgstr ""
 "Ustvaril Ingo Ruhnke, \n"
 " spremenil M.Gagnon"
 
-#: data/tracks/fortmagma/fortmagma.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
+#: data/tracks/snowtuxpeak/snowtuxpeak.track:6
+#: data/tracks/sandtrack/sandtrack.track:6
+#: data/tracks/fortmagma/fortmagma.track:6
 msgid ""
 "Created by Oliver & Steve Baker\n"
 "modified by Marianne Gagnon"
@@ -210,7 +234,7 @@ msgstr ""
 "Ustvarila Oliver & Steve Baker \n"
 "spremenila Marianne Gagnon"
 
-#: src/gui/main_menu.cpp:63
+#: src/gui/main_menu.cpp:78
 msgid "Credits"
 msgstr "Zasluge"
 
@@ -218,104 +242,128 @@ msgstr "Zasluge"
 msgid "Crescent Crossing"
 msgstr "Roglijčkovo Prečkanje"
 
-#: src/gui/config_display.cpp:83
+#. I18N: displays current resolution
+#: src/gui/config_display.cpp:89
 #, c-format
 msgid "Current: %dx%d"
 msgstr "Trenutno: %dx%d"
 
-#: src/gui/config_display.cpp:89
+#: src/gui/config_display.cpp:96
 msgid "Decrease Resolution"
-msgstr "Zmanjšaj resolucijo"
+msgstr "Znižaj resolucijo"
 
-#: src/gui/race_options.cpp:64
+#: src/gui/race_options.cpp:84
 msgid "Difficulty"
 msgstr "Težavnost"
 
-#: src/gui/options.cpp:49
+#: src/gui/options.cpp:50
 msgid "Display"
 msgstr "Zaslon"
 
-#: src/gui/config_display.cpp:55
+#: src/gui/config_display.cpp:58
 msgid "Display Settings"
 msgstr "Nastavitve zaslona"
 
-#: src/gui/race_options.cpp:276
+#: src/gui/race_options.cpp:328
 msgid "Driver"
 msgstr "Voznik"
 
 #: src/gui/config_controls.cpp:43
 msgid "Edit controls for who?"
-msgstr "Urejanje tipk za koga"
+msgstr "Urejanje tipk za koga ?"
 
-#: src/gui/race_menu.cpp:60
+#: src/gui/race_menu.cpp:58
 msgid "Exit Race"
 msgstr "Končaj dirko"
 
-#: src/challenges/race_track_time.cpp:28
+#: data/tracks/jungle/jungle.challenge:6
 msgid ""
-"Finish 3 laps in the Race track\n"
-"with 3 AI karts\n"
-"in under 1:15 minutes."
+"Finish 3 laps in Racetrack\n"
+"with 3 easy AI karts\n"
+"in under 2:40 minutes."
 msgstr ""
-"Končajte 3 kroge v Dirkalni progi \n"
-"z 3 računalniškimi vozniki \n"
-"v manj kot 1 minuti 15 sekund."
+"Končajte 3 kroge v dirkalni progi \n"
+"s 3 računalniškimi nasprotniki \n"
+"v manj kot 2 minutah 40 sekund."
 
-#: src/challenges/city_time.cpp:27
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
 msgid ""
 "Finish 3 laps on the City track\n"
 "with 3 AI karts\n"
-"in under 5:20 minutes."
+"in under 4:20 minutes."
 msgstr ""
 "Končajte 3 kroge v progi Mesto \n"
-"z 3 računalniškimi vozniki \n"
-"v manj kot 5 minutah 20 sekundah"
+"s 3 računalniškimi vozniki \n"
+"v manj kot 4 minutah in 20 sekundah."
 
-#: src/challenges/tollway_time.cpp:27
+#: data/tracks/canyon/canyon.challenge:6
 msgid ""
 "Finish 3 laps on the Tux Tollway\n"
 "track with 3 AI karts\n"
-"in under 3:00 minutes."
+"in under 3:35 minutes."
 msgstr ""
 "Končajte 3 kroge na progi\n"
 "Tuxova avtocesta s 3 računalniškimi \n"
-"vozniki v manj kot 3 minutah. "
+"vozniki v manj kot 3 minutah 35 sekundah. "
 
-#: src/challenges/race_track_time.cpp:26
-msgid "Finish Race track in 1:15"
-msgstr "Končajte progo Dirka v 1:15"
+#: data/tracks/jungle/jungle.challenge:5
+msgid "Finish Race track in 2:40"
+msgstr "Končajte progo Dirkališče v 2:40"
 
-#: src/challenges/tollway_time.cpp:25
-msgid "Finish Tux Tollway track in 3:00"
-msgstr "Končajte progo Tuxova avtocesta v 3:00"
+#: data/tracks/canyon/canyon.challenge:5
+msgid "Finish Tux Tollway track in 3:35"
+msgstr "Končajte progo Tuxova avtocesta v 3:35"
 
-#: src/challenges/city_time.cpp:25
-msgid "Finish the City track in 5:20"
-msgstr "Končajte progo Mesto v 5:20"
+#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
+msgid "Finish the City track in 4:20"
+msgstr "Končajte progo Mesto v 4:20"
 
-#: src/gui/race_gui.cpp:800
+#: data/grandprix/tothemoonandback.challenge:6
+msgid ""
+"Finish with at least 9 nitro \n"
+"points on 3 laps of Shifting Sands\n"
+"in under 2:20 minutes."
+msgstr ""
+"Zberite vsaj 9 nitro \v 3 krogih Peščenih Sipin\n"
+"v manj kot 2 minutah in 20 skundah"
+
+#: src/gui/race_gui.cpp:685
 #, c-format
 msgid "Finished"
 msgstr "Končano"
 
-#: src/gui/player_controls.cpp:66
+#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
+msgid ""
+"Finsih with at least 6 points\n"
+" of intro on three laps of\n"
+"Oliver's Math Class\n"
+"in under 52 seconds."
+msgstr ""
+"Zberite vsaj 6 točk\n"
+"nitro \n"
+"v treh krogih \n"
+"Oliverjeve Matematične Učilnice\v manj kot 52 sekundah."
+
+#. I18N: name of controls, like in "fire missile"
+#: src/gui/player_controls.cpp:74
 msgid "Fire"
 msgstr "Ogenj"
 
-#: data/gp1.cup:5
+#: data/grandprix/penguinplayground.grandprix:5
 msgid "First grand prix, easy to get started"
 msgstr "Prvi turnir, lahek za začetek"
 
-#: src/gui/game_mode.cpp:68
-#: src/challenges/penguin_playground_gp.cpp:28
+#: src/gui/game_mode.cpp:77
+#: src/gui/game_mode.cpp:115
+#: data/followtheleader.challenge:7
 msgid "Follow the Leader"
 msgstr "Sledenje vodji"
 
-#: src/challenges/jungle_follow.cpp:25
+#: data/tracks/city/city.challenge:5
 msgid "Follow the Leader in the Jungle"
-msgstr "Sledi vodji v Džungli"
+msgstr "Sledite vodji v Džungli"
 
-#: src/challenges/island_follow.cpp:25
+#: data/grandprix/atworldsend.challenge:5
 msgid ""
 "Follow the Leader on a\n"
 "Desert Island"
@@ -323,17 +371,17 @@ msgstr ""
 "Sledite vodji na \n"
 "Puščavskem Otoku"
 
-#: src/gui/help_page_three.cpp:74
+#: src/gui/help_page_three.cpp:70
 msgid ""
-"Follow the leader: Stay behind the leader kart.                 \n"
-"When the countdown reaches zero, a kart ahead\n"
-"of the leader or the last kart is eliminated."
+"Follow the leader: run for second place, as the last kart\n"
+"will be disqualified every time the counter hits zero.\n"
+" Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
-"Sledenje vodji: Ostanite za vodjo. \n"
-"Ko se odštevanje konča, je avto pred \n"
-"vodjo ali zadnji avto eliminiran.  "
+"Sledite vodji: poskusite biti drugi, saj bo zadnji\n"
+"dirkači izgubil, ko števec pride do ničle. \n"
+"Pozor: izgubite tudi, če vodjo prehitite !"
 
-#: src/gui/help_page_one.cpp:68
+#: src/gui/help_page_one.cpp:69
 msgid "Force your rivals bite *your* dust!"
 msgstr "Prisilite nasprotnike da žrejo *vaš* prah!"
 
@@ -341,137 +389,131 @@ msgstr "Prisilite nasprotnike da žrejo *vaš* prah!"
 msgid "Fort Magma"
 msgstr "Trdnjava magme"
 
-#: src/gui/num_players.cpp:40
+#: src/gui/num_players.cpp:41
 msgid "Four Players"
 msgstr "Štirje igralci"
 
-#: src/gui/config_display.cpp:76
-#: src/gui/config_display.cpp:128
-#: src/gui/config_display.cpp:183
+#: src/gui/config_display.cpp:80
+#: src/gui/config_display.cpp:135
+#: src/gui/config_display.cpp:193
 msgid "Fullscreen mode"
 msgstr "Polno zaslonski način"
 
-#: src/gui/help_page_two.cpp:84
-msgid "Fuzzy blob/Spark - very slow, but bounces from walls"
-msgstr "Meglena kaplja / Iskra - zelo počasna, toda se odbija od zidu"
-
-#: src/gui/game_mode.cpp:82
+#: src/gui/game_mode.cpp:152
 msgid "Game mode help"
 msgstr "Pomoč načinov iger"
 
-#: src/gui/help_page_three.cpp:47
+#: src/gui/help_page_three.cpp:43
 msgid "Game modes"
 msgstr "Načini iger"
 
-#: src/gui/credits_menu.cpp:76
-#: src/gui/challenges_menu.cpp:51
+#: src/gui/credits_menu.cpp:79
+#: src/gui/challenges_menu.cpp:55
 msgid "Go back to the main menu"
-msgstr "Nazaj v glavni menu"
+msgstr "Nazaj v glavni meni"
 
-#: src/gui/help_page_three.cpp:87
-#: src/gui/help_page_one.cpp:133
-msgid "Go back to the menu"
-msgstr "Nazaj v menu"
-
-#: src/gui/race_gui.cpp:948
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:836
 msgid "Go!"
-msgstr "Pojdite ! "
+msgstr "Zdaj ! "
 
-#: src/gui/help_page_one.cpp:72
-msgid "Grab blue boxes and coins"
-msgstr "Pobirajte modre škatle in kovance"
+#: src/gui/help_page_one.cpp:73
+msgid "Grab blue boxes and nitro"
+msgstr "Pobirajte modre škatle in nitro"
 
-#: src/gui/game_mode.cpp:46
+#: src/gui/game_mode.cpp:99
 msgid "Grand Prix"
-msgstr "Gand Prix"
+msgstr "Turnir"
 
-#: src/gui/help_page_three.cpp:54
+#: src/gui/help_page_three.cpp:50
 msgid ""
 "Grand Prix: Win victory points \n"
 "by racing through a group of tracks,  \n"
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
-"Grand Prix: Z dobro uvrstitvijo \n"
-"pridobite točke na več dirkah. \n"
-"Igralec z največ točk zmanjka \n"
+"Turnir: Z dobro uvrstitvijo pridobite točke na več dirkah. \n"
+"Igralec z največ točkami zmaga. \n"
 "(V primeru izenačenja se gleda najkrajši čas!)"
 
-#: src/gui/main_menu.cpp:60
-#: src/gui/race_menu.cpp:51
+#: src/gui/race_menu.cpp:49
+#: src/gui/main_menu.cpp:75
 msgid "Help"
 msgstr "Pomoč"
 
-#: src/gui/race_results_gui.cpp:55
+#: src/gui/race_results_gui.cpp:120
 msgid "Highscores"
 msgstr "Seznam najboljših"
 
-#: src/gui/help_page_two.cpp:76
-msgid "Homing missile - follows rivals, but is slower than the missile"
-msgstr "Sledeči izstrelek - sledi tarči, toda je počasnejši od izstrelka"
+#: src/gui/help_page_one.cpp:130
+msgid ""
+"If you see a button with a lock like the one to the right,\n"
+"you need to complete a challenge to unlock it."
+msgstr ""
+"Če vidite gumb s ključavnico kot je na desni,\n"
+"morate dokončati izziv da jo odklenete."
 
-#: src/gui/config_display.cpp:87
+#: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
-msgstr "Povečaj resolucijo"
+msgstr "Zvišaj resolucijo"
 
-#: src/user_config.cpp:861
+#: src/user_config.cpp:1004
 #, c-format
 msgid "Invalid"
 msgstr "Neveljaven/o"
 
-#: src/kart.cpp:650
+#: src/karts/player_kart.cpp:368
 msgid "Invalid short-cut!!"
 msgstr "Neveljavna bližnjica !!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Jump"
-msgstr "Skok"
+#: data/tracks/castle/castle.track:4
+msgid "King Weird's Castle"
+msgstr "Grad kralja Čudaka"
 
-#: src/gui/race_gui.cpp:805
+#: src/gui/race_gui.cpp:690
 msgid "Lap"
 msgstr "Krog"
 
-#: data/gp4.cup:5
+#: data/grandprix/atworldsend.grandprix:5
 msgid "Last grand prix, longer and harder"
-msgstr "Zadnji grand prix, daljši in težji"
+msgstr "Zadnji turnir, daljši in težji"
 
-#: src/gui/race_gui.cpp:409
+#: src/modes/follow_the_leader.cpp:139
 msgid "Leader"
 msgstr "Vodja"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:68
 msgid "Left"
 msgstr "Levo"
 
-#: src/gui/start_race_feedback.cpp:35
+#: src/gui/race_results_gui.cpp:303
+#: src/gui/start_race_feedback.cpp:86
 msgid "Loading race..."
-msgstr "Nalagam dirko..."
+msgstr "Nalaganje dirke..."
 
-#: src/gui/player_controls.cpp:66
+#. I18N: name of controls
+#: src/gui/player_controls.cpp:76
 msgid "Look back"
-msgstr "Poglej nazaj"
+msgstr "Pogled nazaj"
 
-#: src/gui/help_page_two.cpp:68
-msgid "Missile - fast stopper in a straight line"
-msgstr "Izstrelek - hiter, potuje naravnost"
-
-#: src/gui/main_menu.cpp:47
-msgid "Multiplayer"
-msgstr "Več igralni način"
+#: src/gui/main_menu.cpp:58
+msgid "Networking"
+msgstr "Mrežno igranje"
 
 #: src/gui/feature_unlocked.cpp:37
 msgid "New Feature Unlocked"
 msgstr "Nova funkcija je odklenjena"
 
-#: src/challenges/challenge.cpp:121
+#: src/challenges/challenge.cpp:136
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
 "now available"
 msgstr ""
-"Dostopen je nov Grand Prix \n"
+"Dostopen je nov turnir \n"
 "'%s' "
 
-#: src/challenges/challenge.cpp:124
+#: src/challenges/challenge.cpp:140
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -482,11 +524,11 @@ msgstr ""
 "'%s' \n"
 "je na voljo"
 
-#: src/kart.cpp:407
+#: src/modes/linear_world.cpp:290
 msgid "New fastest lap"
 msgstr "Nov najhitrejši krog"
 
-#: src/challenges/challenge.cpp:118
+#: src/challenges/challenge.cpp:131
 #, c-format
 msgid ""
 "New game mode\n"
@@ -497,7 +539,17 @@ msgstr ""
 "'%s' \n"
 "so na voljo"
 
-#: src/challenges/challenge.cpp:114
+#: src/challenges/challenge.cpp:144
+#, c-format
+msgid ""
+"New kart\n"
+"'%s'\n"
+"now available"
+msgstr ""
+"Nov dirkalnik '%s' \n"
+"je na voljo"
+
+#: src/challenges/challenge.cpp:127
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -506,34 +558,43 @@ msgstr ""
 "Nova proga '%s' \n"
 "je na voljo"
 
-#: src/gui/help_page_two.cpp:118
-#: src/gui/help_page_one.cpp:129
-msgid "Next help screen"
-msgstr "Naslednji zaslon s pomočjo"
+#: src/gui/help_page_two.cpp:134
+#: src/gui/help_page_one.cpp:156
+msgid "Next >"
+msgstr "Naprej >"
 
-#: src/gui/grand_prix_select.cpp:71
-#: src/gui/grand_prix_select.cpp:77
+#: src/gui/config_display.cpp:84
+msgid "Next background"
+msgstr "Naslednje ozadje"
+
+#: src/gui/player_controls.cpp:72
+msgid "Nitro"
+msgstr "Nitro "
+
+#: src/gui/grand_prix_select.cpp:63
+#: src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
-msgstr "Noben Grand Prix ni izbran"
+msgstr "Noben turnir ni izbran"
 
-#: src/gui/track_sel.cpp:87
-msgid "No track selected"
-msgstr "Nobena proga ni izbrana"
-
-#: src/gui/race_options.cpp:275
-#: src/gui/race_options.cpp:279
+#: src/gui/race_options.cpp:327
+#: src/gui/race_options.cpp:330
 msgid "Novice"
 msgstr "Začetnik"
 
-#: src/gui/race_options.cpp:80
+#: src/gui/race_options.cpp:100
 msgid "Number of karts"
 msgstr "Število tekmovalcev"
 
-#: src/gui/race_options.cpp:101
+#: src/gui/race_options.cpp:122
 msgid "Number of laps"
 msgstr "Število krogov"
 
-#: src/user_config.cpp:488
+#: src/gui/network_gui.cpp:158
+#: src/gui/race_results_gui.cpp:49
+msgid "OK"
+msgstr "V redu"
+
+#: src/user_config.cpp:528
 msgid "Old config file found, check your key bindings!"
 msgstr "Obstaja stara nastavitvena datoteka, preverite nastavitve tipkovnice !"
 
@@ -545,304 +606,357 @@ msgstr "Oliverjeva matematična učilnica"
 msgid "On the Beach"
 msgstr "Na plaži"
 
+#: src/gui/race_menu.cpp:48
 #: src/gui/options.cpp:40
-#: src/gui/main_menu.cpp:55
-#: src/gui/race_menu.cpp:50
+#: src/gui/main_menu.cpp:63
 msgid "Options"
 msgstr "Možnosti"
 
-#: src/gui/help_page_two.cpp:100
+#: src/gui/help_page_two.cpp:102
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Padalo - upočasni vse tekmovalce na boljšem mestu!"
 
-#: src/gui/race_menu.cpp:47
+#: src/gui/race_menu.cpp:45
 msgid "Paused"
 msgstr "Odmor"
 
-#: src/gui/race_gui.cpp:977
+#: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
 msgstr "Kazenski čas!!"
 
-#: src/challenges/penguin_playground_gp.cpp:46
-#: data/gp1.cup:4
+#: data/grandprix/penguinplayground.grandprix:4
 msgid "Penguin Playground"
 msgstr "Pingvinovo igrišče"
 
-#: src/gui/player_controls.cpp:251
+#. I18N: as in 'Player 2'
+#: src/gui/player_controls.cpp:290
 msgid "Player "
 msgstr "Igralec"
 
-#: src/gui/char_sel.cpp:68
+#: src/gui/char_sel.cpp:86
 #, c-format
 msgid "Player %d, choose a driver"
 msgstr "Igralec %d, izberite voznika"
 
-#: src/gui/config_controls.cpp:45
+#: src/gui/config_controls.cpp:46
 msgid "Player 1"
 msgstr "Igralec 1"
 
-#: src/gui/config_controls.cpp:46
+#: src/gui/config_controls.cpp:47
 msgid "Player 2"
 msgstr "Igralec 2"
 
-#: src/gui/config_controls.cpp:47
+#: src/gui/config_controls.cpp:48
 msgid "Player 3"
 msgstr "Igralec 3"
 
-#: src/gui/config_controls.cpp:48
+#: src/gui/config_controls.cpp:49
 msgid "Player 4"
 msgstr "Igralec 4"
 
-#: src/gui/options.cpp:41
+#: src/gui/options.cpp:42
 msgid "Player Config"
 msgstr "Igralčeve nastavitve"
 
-#: src/gui/player_controls.cpp:80
+#: src/gui/player_controls.cpp:92
 msgid "Player name"
 msgstr "Ime igralca"
 
-#: src/gui/display_res_confirm.cpp:59
+#: src/gui/help_page_two.cpp:120
+msgid ""
+"Plunger - throw straight to pull an opponent back,\n"
+"or throw while looking back to make one lose sight!"
+msgstr ""
+"Odmaševalec odtokov - vrzite naravnost in potegnite nasprotnika\n"
+"nazaj, ali vrzite ko gledate nazaj in nasprotnika začasno oslepite!"
+
+#: data/tracks/prehistoric/prehistoric.track:4
+msgid "Prehistoric Island"
+msgstr "Prazgodovinski otok"
+
+#: src/gui/display_res_confirm.cpp:60
 msgid "Press <ESC> to Cancel"
 msgstr "Pritisnite <ESC> za preklic"
 
-#: src/gui/options.cpp:57
-#: src/gui/player_controls.cpp:112
-#: src/gui/race_options.cpp:128
-#: src/gui/config_display.cpp:101
-#: src/gui/game_mode.cpp:87
-#: src/gui/config_sound.cpp:63
-#: src/gui/config_controls.cpp:52
-#: src/gui/grand_prix_select.cpp:88
-#: src/gui/num_players.cpp:45
+#: src/gui/num_players.cpp:46
+#: src/gui/player_controls.cpp:124
+#: src/gui/race_options.cpp:152
+#: src/gui/config_controls.cpp:53
+#: src/gui/config_display.cpp:108
+#: src/gui/options.cpp:58
+#: src/gui/grand_prix_select.cpp:80
+#: src/gui/network_gui.cpp:79
+#: src/gui/game_mode.cpp:158
+#: src/gui/config_sound.cpp:64
 msgid "Press <ESC> to go back"
 msgstr "Pritisnite <ESC> za nazaj"
 
-#: src/gui/player_controls.cpp:156
+#: src/gui/player_controls.cpp:168
 msgid "Press key"
 msgstr "Pritisnite tipko"
 
-#: src/gui/help_page_three.cpp:83
-msgid "Previous help screen"
-msgstr "Prejšnji zaslon s pomočjo"
-
-#: src/gui/help_page_two.cpp:114
-msgid "Previous screen"
-msgstr "Prejšnji zaslon"
-
-#: src/gui/game_mode.cpp:59
+#: src/gui/game_mode.cpp:67
+#: src/gui/game_mode.cpp:105
 msgid "Quick Race"
 msgstr "Hitra dirka"
 
-#: src/gui/help_page_three.cpp:62
+#: src/gui/help_page_three.cpp:58
 msgid "Quick race: Pick a single track, shortest time wins.         "
-msgstr "Hitra dirka: Izberite eno samo progo, najkrajši čas zmaga."
+msgstr "Hitra dirka: Izberite eno progo, najhitrejši zmaga."
 
-#: src/gui/main_menu.cpp:56
+#: src/gui/main_menu.cpp:64
 msgid "Quit"
 msgstr "Izhod"
 
-#: src/gui/race_gui.cpp:746
+#: src/gui/race_gui.cpp:637
 msgid "REV"
 msgstr "Nazaj"
 
-#: data/tracks/race/race.track:4
-msgid "Race Track"
-msgstr "Dirkalna proga"
-
-#: src/gui/race_results_gui.cpp:148
+#: src/gui/race_results_gui.cpp:74
 msgid "Race in this track again"
 msgstr "Ponovno dirkaj na tej progi"
 
-#: src/gui/race_results_gui.cpp:54
+#: src/gui/race_results_gui.cpp:92
 msgid "Race results"
 msgstr "Rezultati dirke"
 
-#: src/gui/race_options.cpp:277
+#: src/gui/race_options.cpp:329
 msgid "Racer"
 msgstr "Dirkač"
 
-#: src/gui/race_gui.cpp:930
+#: data/tracks/racetrack/racetrack.track:4
+msgid "Racetrack"
+msgstr "Dirkališče"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:816
 msgid "Ready!"
 msgstr "Pripravljeni!"
 
-#: src/gui/player_controls.cpp:66
+#: src/gui/player_controls.cpp:72
 msgid "Rescue"
-msgstr "Rešite"
+msgstr "Rešitev"
 
-#: src/gui/race_menu.cpp:52
+#: src/gui/race_menu.cpp:50
 msgid "Restart Race"
 msgstr "Ponovno začni dirko "
 
-#: src/gui/race_results_gui.cpp:48
-msgid "Result"
-msgstr "Rezultat"
-
-#: src/gui/race_menu.cpp:49
+#: src/gui/race_menu.cpp:47
 msgid "Return To Race"
 msgstr "Vrni se k dirki"
 
-#: src/gui/player_controls.cpp:64
+#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
+#: src/gui/player_controls.cpp:70
 msgid "Right"
 msgstr "Desno"
 
-#: data/gp2.cup:5
+#: data/grandprix/tothemoonandback.grandprix:5
 msgid "Second grand prix"
-msgstr "Drugi grand prix"
+msgstr "Drugi turnir"
 
-#: src/gui/race_gui.cpp:939
+#: src/gui/network_gui.cpp:52
+msgid "Select network mode"
+msgstr "Izberite mrežni način"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/gui/race_gui.cpp:826
 msgid "Set!"
 msgstr "Pozor!"
 
-#: src/gui/race_menu.cpp:57
-#: src/gui/race_results_gui.cpp:153
+#: src/gui/race_menu.cpp:55
+#: src/gui/race_results_gui.cpp:79
 msgid "Setup New Race"
 msgstr "Nastavi novo dirko"
+
+#: src/gui/player_controls.cpp:72
+msgid "Sharp Turn"
+msgstr "Oster zavoj"
 
 #: data/tracks/sandtrack/sandtrack.track:4
 msgid "Shifting Sands"
 msgstr "Premikajoče sipine"
 
-#: src/gui/main_menu.cpp:46
+#: src/gui/main_menu.cpp:53
 msgid "Single Player"
 msgstr "En igralec"
 
-#: src/gui/race_options.cpp:278
-msgid "Skidding Preview"
-msgstr "Predogled zanašanja"
+#: src/gui/game_mode.cpp:61
+msgid "Single Race"
+msgstr "Ena dirka"
 
-#: data/gp3.cup:4
+#: data/tracks/skyline/skyline.track:4
+msgid "Skyline"
+msgstr "Nebotičnik"
+
+#: data/grandprix/snagdrive.grandprix:4
 msgid "Snag Drive"
 msgstr "Problematična vožnja"
 
+#: data/tracks/snowmountain/snowmountain.track:4
+msgid "Snow Mountain"
+msgstr "Snežena gora"
+
 #: data/tracks/snowtuxpeak/snowtuxpeak.track:4
 msgid "SnowTux Peak"
-msgstr "Vrh sneženoTux"
+msgstr "Vrh snežnoTux"
 
-#: src/gui/options.cpp:52
+#: src/gui/options.cpp:53
 msgid "Sound"
 msgstr "Zvok"
 
 #: src/gui/config_sound.cpp:40
 msgid "Sound Settings"
-msgstr "Nastavitve Zvoka"
+msgstr "Nastavitve zvoka"
 
-#: data/tracks/startrack.new/startrack.track:4
+#: src/gui/main_menu.cpp:54
+msgid "Splitscreen"
+msgstr "Razdeljen zaslon"
+
 #: data/tracks/startrack/startrack.track:4
 msgid "Star Track"
 msgstr "Zvezdna proga"
 
-#: src/gui/race_options.cpp:121
+#: src/gui/race_options.cpp:142
 msgid "Start race"
 msgstr "Začni dirko"
 
-#: data/tracks/subseatrack/subseatrack.track:4
-msgid "Sub Sea"
-msgstr "Pod morjem"
+#: src/gui/start_race_feedback.cpp:39
+msgid "Synchronising network..."
+msgstr "Sinhronizacija mreže"
+
+#: src/gui/race_results_gui.cpp:273
+msgid "Synchronising."
+msgstr "Sinhroniziracija..."
+
+#: src/gui/help_page_one.cpp:145
+msgid ""
+"The 'sharp turn' key allows you to do sharp turns\n"
+"and have better control in tight curves"
+msgstr ""
+"Tipka 'oster zavoj' omogoča delanje ostrih zavojev \n"
+"in boljši nadzor v ostrih ovinkih"
 
 #: data/tracks/islandtrack/islandtrack.track:4
 msgid "The Island"
 msgstr "Otok"
 
-#: src/gui/help_page_one.cpp:113
+#: src/gui/help_page_one.cpp:117
 msgid ""
 "The current key bindings can be seen/changed in the\n"
 "Options->Player Config menu."
-msgstr "Trenutne nastavitve tipkovnice lahko vidite/shranite v meniju  Možnosti->Nastavitve igralca"
+msgstr ""
+"Trenutne nastavitve tipkovnice lahko vidite/shranite v meniju\n"
+" Možnosti->Nastavitve igralca"
 
-#: src/gui/grand_prix_ending.cpp:107
-#: src/gui/leader_result.cpp:109
+#: src/highscore_manager.cpp:108
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr ""
+"Datoteka z najboljšimi izidi je bila prestara, \n"
+"zato so bili vsi rezultati izbrisani."
+
+#: data/tracks/mines/mines.track:4
+msgid "The old mine"
+msgstr "Stari rudnik"
+
+#: src/gui/grand_prix_ending.cpp:84
 #, c-format
 msgid "The winner is %s!"
 msgstr "Zmagovalec je %s!"
 
-#: data/gp3.cup:5
+#: data/grandprix/snagdrive.grandprix:5
 msgid "Third grand prix"
-msgstr "Tretji grand prix"
+msgstr "Tretji turnir"
 
-#: src/gui/num_players.cpp:39
+#: src/gui/num_players.cpp:40
 msgid "Three Players"
 msgstr "Trije igralci"
 
-#: src/gui/game_mode.cpp:63
+#: src/gui/game_mode.cpp:72
+#: src/gui/game_mode.cpp:110
 msgid "Time Trial"
-msgstr "Poskusni čas"
+msgstr "Vožnja na čas"
 
-#: src/gui/help_page_three.cpp:67
-msgid "Time Trial: As quick race, but no items.                       "
-msgstr "Poskusni čas: Enako kot hitra dirka, a brez predmetov"
+#: src/gui/help_page_three.cpp:63
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr ""
+"Vožnja na čas: Ne vsebuje dodatkov,\n"
+"zato štejejo samo vaše vozniške sposobnosti!"
 
-#: src/gui/help_page_two.cpp:61
-msgid "To help you win, there are certain collectables you can grab:"
+#: src/gui/help_page_two.cpp:58
+msgid "To help you win, there are certain powerups you can grab:"
 msgstr "Za lažjo zmago lahko poberete različne predmete:"
 
-#: src/challenges/moon_and_back_gp.cpp:49
-#: data/gp2.cup:4
+#: data/grandprix/tothemoonandback.grandprix:4
 msgid "To the Moon and Back"
 msgstr "Na luno in nazaj"
 
-#: src/gui/config_sound.cpp:45
-#: src/gui/config_sound.cpp:90
+#: src/gui/config_sound.cpp:46
+#: src/gui/config_sound.cpp:91
 msgid "Turn off music"
 msgstr "Izklopi glasbo"
 
-#: src/gui/config_sound.cpp:54
-#: src/gui/config_sound.cpp:103
+#: src/gui/config_sound.cpp:55
+#: src/gui/config_sound.cpp:104
 msgid "Turn off sound effects"
-msgstr "Izklopi zvočne efekte"
+msgstr "Izklopi zvočne učinke"
 
-#: src/gui/config_sound.cpp:49
-#: src/gui/config_sound.cpp:84
+#: src/gui/config_sound.cpp:50
+#: src/gui/config_sound.cpp:85
 msgid "Turn on music"
 msgstr "Vklopi glasbo"
 
-#: src/gui/config_sound.cpp:58
-#: src/gui/config_sound.cpp:98
+#: src/gui/config_sound.cpp:59
+#: src/gui/config_sound.cpp:99
 msgid "Turn on sound effects"
-msgstr "Vklopi zvočne efekte"
+msgstr "Vklopi zvočne učinke"
 
-#: data/tracks/tuxtrack/tuxtrack.track:4
+#: data/tracks/tuxtollway/tuxtollway.track:4
 msgid "Tux Tollway"
 msgstr "Tuxova avtocesta"
 
-#: src/gui/num_players.cpp:38
+#: src/gui/num_players.cpp:39
 msgid "Two Players"
 msgstr "Dva igralca"
 
-#: data/tracks/volcano/volcano.track:4
-msgid "Volcano"
-msgstr "Vulkan"
-
-#: src/player_kart.cpp:276
+#: src/modes/linear_world.cpp:658
 msgid "WRONG WAY!"
 msgstr "NAPAČNA SMER!"
 
-#: src/gui/player_controls.cpp:65
-msgid "Wheelie"
-msgstr "Zadnja kolesa"
+#: src/gui/char_sel.cpp:126
+#: src/gui/network_gui.cpp:162
+msgid "Waiting for clients"
+msgstr "Čakanje na ostale igralce"
 
-#: src/challenges/penguin_playground_gp.cpp:25
+#: src/gui/char_sel.cpp:124
+#: src/gui/network_gui.cpp:118
+msgid "Waiting for server"
+msgstr "Čakanje na strežnik"
+
+#: data/followtheleader.challenge:5
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix"
-msgstr "Zmagajte grand prix Pingvinovo igrišče"
+msgstr "Zmagajte turnir Pingvinovo igrišče"
 
-#: src/challenges/penguin_playground_gp.cpp:27
+#: data/followtheleader.challenge:6
 msgid ""
 "Win Penguin Playground Grand\n"
 "Prix with 3 'Racer' Level AI karts."
 msgstr ""
-"Zmagajte grand prix Pingvinovo igrišče \n"
-"s tremi 'Dirkač' računalniškimi tekmovalci."
+"Zmagajte turnir Pingvinovo igrišče \n"
+"s tremi dirkač' računalniškimi tekmovalci."
 
-#: src/challenges/moon_and_back_gp.cpp:25
+#: data/grandprix/snagdrive.challenge:5
 msgid ""
 "Win To the Moon and Back\n"
 "Grand Prix"
 msgstr ""
-"Zmagajte grand prix Na luno \n"
+"Zmagajte turnir Na luno \n"
 "in nazaj"
 
-#: src/challenges/tollway_head2head.cpp:27
+#: data/tracks/fortmagma/fortmagma.challenge:6
 msgid ""
 "Win a 1 lap Head to Head\n"
 "on Tux Tollway against 1 'Racer'\n"
@@ -850,9 +964,9 @@ msgid ""
 msgstr ""
 "Zmagajte 1 krog dolgo dirko\n"
 "na Tuxovi avtocesti proti \n"
-"1 'racer' tekmovalcu."
+"1 'dirkač' tekmovalcu."
 
-#: src/challenges/jungle_follow.cpp:27
+#: data/tracks/city/city.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
@@ -862,7 +976,7 @@ msgstr ""
 "s 3 tekmovalci \n"
 "v Amazonski džungli."
 
-#: src/challenges/island_follow.cpp:27
+#: data/grandprix/atworldsend.challenge:6
 msgid ""
 "Win a Follow the Leader race\n"
 "with 3 AI karts\n"
@@ -872,7 +986,7 @@ msgstr ""
 "s 3 tekmovalci \n"
 "na Puščavskem otoku."
 
-#: src/challenges/tollway_head2head.cpp:25
+#: data/tracks/fortmagma/fortmagma.challenge:5
 msgid ""
 "Win a Head to Head on\n"
 "Tux Tollway"
@@ -880,78 +994,78 @@ msgstr ""
 "Zmagajte 1 na 1\n"
 "na Tuxovi avtocesti"
 
-#: src/challenges/worlds_end_gp.cpp:25
+#: data/grandprix/alltracks.challenge:5
 msgid ""
 "Win the At World's End\n"
 "Grand Prix"
 msgstr ""
-"Zmagajte grand prix\n"
+"Zmagajte turnir\n"
 "Na koncu sveta"
 
-#: src/challenges/moon_and_back_gp.cpp:27
+#: data/grandprix/snagdrive.challenge:6
 msgid ""
 "Win the To the Moon and Back\n"
 "Grand Prix with 3 'Racer'\n"
 "Level AI karts."
 msgstr ""
-"Zmagajte grand prix Na luno\n"
-"in nazaj s 3 'Dirkač'\n"
+"Zmagajte turnir Na luno\n"
+"in nazaj s 3 'dirkač'\n"
 "tekmovalci."
 
-#: src/gui/config_display.cpp:71
+#: src/gui/config_display.cpp:75
 msgid "Window mode"
 msgstr "Okenski način"
 
-#: src/player_kart.cpp:231
-msgid "You finished"
-msgstr "Končali ste!"
+#: data/tracks/xr591/xr591.track:4
+msgid "XR591"
+msgstr "XR591"
 
-#: src/world.cpp:606
+#: src/karts/player_kart.cpp:306
+msgid "You finished the race!"
+msgstr "Končali ste dirko !"
+
+#: src/modes/world.cpp:413
 msgid ""
 "You have been\n"
 "eliminated!"
 msgstr "Zgubili ste !"
 
-#: src/player_kart.cpp:231
-msgid "You won"
+#: src/karts/player_kart.cpp:306
+msgid "You won the race!"
 msgstr "Zmagali ste !"
 
-#: src/gui/help_page_two.cpp:92
+#: src/gui/help_page_two.cpp:93
 msgid "Zipper - speed boost"
 msgstr "Vžigalnik - poveča hitrost"
 
-#: src/user_config.cpp:844
+#: src/user_config.cpp:986
 #, c-format
 msgid "joy %d axis %d  %c"
 msgstr "joy %d os %d %c"
 
-#: src/user_config.cpp:848
+#: src/user_config.cpp:991
 #, c-format
 msgid "joy %d btn %d"
 msgstr "joy %d gumb %d"
 
-#: src/user_config.cpp:851
+#: src/user_config.cpp:994
 #, fuzzy, c-format
 msgid "joy %d hat %d"
-msgstr "joy %d hat %d"
+msgstr "joystick %d  %d"
 
-#: src/user_config.cpp:857
+#: src/user_config.cpp:1000
 #, c-format
 msgid "mouse axis %d %c"
 msgstr "miškina os %d %c"
 
-#: src/user_config.cpp:854
+#: src/user_config.cpp:997
 #, c-format
 msgid "mouse btn %d"
 msgstr "miškin gumb %d"
 
-#: src/user_config.cpp:838
-#: src/user_config.cpp:883
+#: src/user_config.cpp:980
+#: src/user_config.cpp:1025
 #, c-format
 msgid "not set"
 msgstr "ni nastavljeno"
-
-#: src/player_kart.cpp:233
-msgid "the race!"
-msgstr "dirka !"
 
