@@ -162,8 +162,13 @@ public:
                     const video::SColor &color=video::SColor(255, 255, 0, 255));
 
     /** Returns the size of the texture on which to render the minimap to. */
+#ifdef IRR_SVN
+    const core::dimension2du getMiniMapSize() const 
+                  { return core::dimension2du(m_map_width, m_map_height); }
+#else
     const core::dimension2di getMiniMapSize() const 
                   { return core::dimension2di(m_map_width, m_map_height); }
+#endif
 };
 
 #endif

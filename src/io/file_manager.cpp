@@ -410,7 +410,11 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
 {
     result.clear();
 
+#ifdef IRR_SVN
+    std::string previous_cwd1 = std::string(m_file_system->getWorkingDirectory().c_str());
+#else
     std::string previous_cwd1 = m_file_system->getWorkingDirectory();
+#endif
 #ifdef WIN32
     std::string path = is_full_path ? dir : m_root_dir+"/"+dir;
 #else
@@ -423,7 +427,11 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
     if(stat(path.c_str(), &mystat) < 0) return;
     if(! S_ISDIR(mystat.st_mode))       return;
 
+#ifdef IRR_SVN
+    std::string previous_cwd = std::string(m_file_system->getWorkingDirectory().c_str());
+#else
     std::string previous_cwd = m_file_system->getWorkingDirectory();
+#endif
 
     if(!m_file_system->changeWorkingDirectoryTo( path.c_str() ))
     {
@@ -435,7 +443,11 @@ void FileManager::listFiles(std::set<std::string>& result, const std::string& di
     for(int n=0; n<(int)files->getFileCount(); n++)
     {
         //printf("---- Entry : %s \n", (make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n)).c_str());
+#ifdef IRR_SVN
+        result.insert(make_full_path ? path+"/"+ files->getFileName(n).c_str() : files->getFileName(n).c_str());
+#else
         result.insert(make_full_path ? path+"/"+ files->getFileName(n) : files->getFileName(n));
+#endif
     }
 
     m_file_system->changeWorkingDirectoryTo( previous_cwd.c_str() );

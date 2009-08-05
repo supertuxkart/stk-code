@@ -136,7 +136,11 @@ void Widget::readCoords(Widget* parent)
     unsigned int parent_w, parent_h, parent_x, parent_y;
     if(parent == NULL)
     {
+#ifdef IRR_SVN
+        core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#else
         core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#endif
         parent_w = frame_size.Width;
         parent_h = frame_size.Height;
         parent_x = 0;
@@ -193,7 +197,11 @@ void Widget::readCoords(Widget* parent)
     if(m_properties[PROP_TEXT].size() > 0)
     {
         IGUIFont* font = GUIEngine::getFont();
+#ifdef IRR_SVN
+        core::dimension2d< u32 > dim = font->getDimension( stringw(m_properties[PROP_TEXT].c_str()).c_str() );
+#else
         core::dimension2d< s32 > dim = font->getDimension( stringw(m_properties[PROP_TEXT].c_str()).c_str() );
+#endif
         label_w = dim.Width;
         // FIXME - won't work with multiline labels. thus, for now, when multiple
         // lines are required, we need to specify a height explicitely

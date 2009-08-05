@@ -77,9 +77,15 @@ void RaceGUI::createMarkerTexture()
     while(npower2<n) npower2*=2;
 
     int radius     = (m_marker_rendered_size>>1)-1;
+#ifdef IRR_SVN
+    irr_driver->beginRenderToTexture(core::dimension2du(m_marker_rendered_size * npower2, 
+                                     m_marker_rendered_size), 
+                                     "RaceGUI::markers");
+#else
     irr_driver->beginRenderToTexture(core::dimension2di(m_marker_rendered_size * npower2, 
                                      m_marker_rendered_size), 
                                      "RaceGUI::markers");
+#endif
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         const std::string& kart_name = race_manager->getKartName(i);
@@ -179,6 +185,11 @@ void RaceGUI::drawMiniMap()
     {
         const Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
+        video::SMaterial m;
+        m.Thickness = 5;
+        irr_driver->getVideoDriver()->draw3DLine(kart->getXYZ().toIrrVector(),
+                                                 core::vector3df(10, 10, 10));
+
     	const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
@@ -382,7 +393,11 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     if(speed_ratio>1) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
+#ifdef IRR_SVN
+    core::dimension2du bar_size    = bar_texture->getOriginalSize();
+#else
     core::dimension2di bar_size    = bar_texture->getOriginalSize();
+#endif
     core::array<core::vector2di> tex_coords;        // texture coordinates
     core::array<core::vector2df> bar_vertices;      // screen coordinates
 

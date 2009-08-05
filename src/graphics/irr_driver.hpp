@@ -64,8 +64,13 @@ public:
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     /** Returns the frame size. */
+#ifdef IRR_SVN
+    const core::dimension2d<u32> getFrameSize() const 
+                       { return m_video_driver->getCurrentRenderTargetSize(); }
+#else
     const core::dimension2d<s32> getFrameSize() const 
                        { return m_video_driver->getCurrentRenderTargetSize(); }
+#endif
     /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
     /** Returns the irrlicht video driver. */
@@ -108,8 +113,13 @@ public:
     void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
                          std::vector<Vec3>& mesh_location, 
                          video::ITexture* target, float angle);
+#ifdef IRR_SVN
+    void beginRenderToTexture(const core::dimension2du &dimension, 
+                              const std::string &name);
+#else
     void beginRenderToTexture(const core::dimension2di &dimension, 
                               const std::string &name);
+#endif
     video::ITexture *endRenderToTexture();
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c, 

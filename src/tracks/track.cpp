@@ -766,7 +766,11 @@ void Track::loadTrackModel()
 
     if(m_use_fog)
     {
+#ifdef IRR_SVN
+        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
+#else
         irr_driver->getVideoDriver()->setFog(m_fog_color, true, m_fog_start, m_fog_end, m_fog_density);
+#endif
     }
     
     // Note: the physics world for irrlicht is created in loadMainTrack

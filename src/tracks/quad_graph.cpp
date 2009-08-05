@@ -411,9 +411,15 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 /** Draws the mini map on the screen.
  *  \param where the top left and lower right corner for the mini map.
  */
+#ifdef IRR_SVN
+video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
+                                        const std::string &name,
+                                        const video::SColor &fill_color)
+#else
 video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
                                         const std::string &name,
                                         const video::SColor &fill_color)
+#endif
 {
     irr_driver->beginRenderToTexture(dimension, name);
     createMesh();   

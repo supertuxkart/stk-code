@@ -27,7 +27,11 @@ static ModalDialog* modalWindow = NULL;
 
 ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 {
+#ifdef IRR_SVN
+    const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#else
     const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#endif
     const int w = (int)(frame_size.Width*percentWidth);
     const int h = (int)(frame_size.Height*percentHeight);
     m_area = core::rect< s32 >( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),

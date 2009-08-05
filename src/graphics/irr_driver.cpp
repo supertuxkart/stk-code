@@ -62,7 +62,7 @@ void IrrDriver::initDevice()
     // ---- the first time, get a list of available video modes
     if(firstTime)
     {
-        m_device = createDevice(EDT_NULL);
+        m_device = createDevice(video::EDT_NULL);
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
         const int count = modes->getVideoModeCount();
@@ -105,8 +105,13 @@ void IrrDriver::initDevice()
         for(int bits=32; bits>15; bits -=8)
         {
             m_device = createDevice(type,
+#ifdef IRR_SVN
+                                    core::dimension2d<u32>(UserConfigParams::m_width,
+                                                           UserConfigParams::m_height ),
+#else
                                     core::dimension2d<s32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
+#endif
                                     bits, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
@@ -279,8 +284,13 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
  *  \param dimension The size of the texture. 
  *  \param name Name of the texture.
  */
+#ifdef IRR_SVN
+void IrrDriver::beginRenderToTexture(const core::dimension2du &dimension, 
+                                     const std::string &name)
+#else
 void IrrDriver::beginRenderToTexture(const core::dimension2di &dimension, 
                                      const std::string &name)
+#endif
 {
     m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
                                                                      name.c_str());
