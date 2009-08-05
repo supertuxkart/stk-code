@@ -111,18 +111,20 @@ void Track::cleanup()
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
-        m_animated_textures.clear();
     }
+    m_animated_textures.clear();
+
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         irr_driver->removeNode(m_all_nodes[i]);
-        m_all_nodes.clear();
     }
+    m_all_nodes.clear();
+
     for(unsigned int i=0; i<m_all_meshes.size(); i++)
     {
         irr_driver->removeMesh(m_all_meshes[i]);
-        m_all_meshes.clear();
     }
+    m_all_meshes.clear();
 
 
     delete m_non_collision_mesh;
@@ -512,8 +514,7 @@ void Track::update(float dt)
 {
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
-        if (m_animated_textures[i] != NULL)
-            m_animated_textures[i]->update(dt);
+        m_animated_textures[i]->update(dt);
     }
     for(unsigned int i=0; i<m_physical_objects.size(); i++)
     {
