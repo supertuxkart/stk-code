@@ -60,11 +60,8 @@ PhysicalObject::PhysicalObject(const XMLNode *xml_node)
     m_node = irr_driver->addMesh(m_mesh);
     //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
     Vec3 xyz(0,0,0);
-    int result = xml_node->getXYZ(&xyz);
-    if(!XMLNode::hasZ(result))   // needs height
-    {
-        xyz.setZ(RaceManager::getTrack()->getTerrainHeight(xyz));
-    }
+    int result = xml_node->get("xyz", &xyz);
+    xyz.setZ(RaceManager::getTrack()->getTerrainHeight(xyz));
     Vec3 hpr(0,0,0);
     result = xml_node->getHPR(&hpr);
     if(!XMLNode::hasP(result) ||
@@ -106,6 +103,7 @@ PhysicalObject::~PhysicalObject()
  */
 void PhysicalObject::init()
 {
+    assert(m_mesh);
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
