@@ -58,6 +58,7 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
 
     bool something_new_to_write = false;
 
+/*
     if(!m_device_manager->deserialize())
     {
         std::cerr << "Failed to read input config file, using defaults\n";
@@ -66,6 +67,7 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
         KeyboardDevice* default_device = new KeyboardDevice();
         something_new_to_write = true;
     }
+*/
 
     if(m_device_manager->initGamePadSupport() /* returns whether a new gamepad was detected */)
     {

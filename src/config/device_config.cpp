@@ -30,6 +30,7 @@ std::string DeviceConfig::toString ()
                                                                    m_bindings[n].dir));
         returnString = returnString.append("\n");
     }
+    returnString = returnString.append("\n");
     return returnString;
 }
 
@@ -85,7 +86,7 @@ bool DeviceConfig::getBinding ( Input::InputType    type,
 
 void DeviceConfig::serialize (std::ofstream& stream)
 {
-    for(int n=0; n<PA_COUNT; n++) // Start at 0?
+    for(int n = 0; n < PA_COUNT; n++) // Start at 0?
     {
         stream << "    "
                << "<action "

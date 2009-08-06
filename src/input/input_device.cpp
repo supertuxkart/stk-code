@@ -61,7 +61,6 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
     m_prevAxisDirections = new Input::AxisDirection[axis_count];
     m_button_count = btnAmount;
     
-    printf("New Gamepad Created.  Assigned the following configuration:\n%s", m_configuration->toString().c_str());
     std::cout << "(i) This gamepad has " << axis_count << " axes and " << m_button_count << " buttons\n";
 
     m_index = irrIndex;    

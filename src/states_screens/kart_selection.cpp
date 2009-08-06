@@ -478,7 +478,7 @@ void setPlayer0Device(InputDevice* device)
     ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
     StateManager::get()->addActivePlayer( newPlayer );
     newPlayer->setDevice(device);
-    
+    device->setPlayer(newPlayer);
     input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
     
     // TODO : fall back in no-assign mode when aborting a game and going back to the menu

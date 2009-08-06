@@ -463,7 +463,7 @@ namespace OptionsScreen
             std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
 
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
-            keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
+            //keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
 
             // refresh display
             initInput(NULL, "init");
