@@ -14,7 +14,7 @@ enum PlayerAssignMode
 
 class DeviceManager
 {
-    ptr_vector<KeyboardDevice, HOLD>    m_keyboards;
+    KeyboardDevice                     *m_keyboard;
     ptr_vector<GamePadDevice, HOLD>     m_gamepads;
     ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
     ptr_vector<GamepadConfig, HOLD>     m_gamepad_configs;
@@ -49,7 +49,7 @@ public:
     void setAssignMode(const PlayerAssignMode assignMode);
     
     int getKeyboardAmount() const                           { return m_keyboard_amount; }
-    KeyboardDevice* getKeyboard(const int i)                { return m_keyboards.get(i); }
+    KeyboardDevice* getKeyboard(const int i)                { return m_keyboard; }
         
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
         maps this input to the corresponding player and game action. returns false if player/action could not be set.

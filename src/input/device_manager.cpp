@@ -12,8 +12,7 @@
 
 DeviceManager::DeviceManager()
 {
-    m_keyboards.push_back(new KeyboardDevice());
-    m_keyboard_amount = m_keyboards.size();
+    m_keyboard_amount = 0;
     m_gamepad_amount = 0;
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
@@ -58,10 +57,7 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
         {
             m_gamepads[i].setPlayer(NULL);
         }
-        for(unsigned int n=0; n<m_keyboard_amount; n++)
-        {
-            m_keyboards[n].setPlayer(NULL);
-        }
+        m_keyboard->setPlayer(NULL);
     }
 }
 // -----------------------------------------------------------------------------
@@ -113,8 +109,11 @@ GamepadConfig *DeviceManager::getGamepadConfig(const int irr_id)
 // -----------------------------------------------------------------------------
 void DeviceManager::add(KeyboardDevice* d)
 {
+    m_keyboard = d;
+/*
     m_keyboards.push_back(d);
     m_keyboard_amount = m_keyboards.size();
+*/
 }
 // -----------------------------------------------------------------------------
 void DeviceManager::add(GamePadDevice* d)
@@ -137,23 +136,23 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
     {
         for(unsigned int n=0; n<m_keyboard_amount; n++)
         {
-            if( m_keyboards[n].hasBinding(btnID, action) )
+            if( m_keyboard->hasBinding(btnID, action) )
             {
                 // We found which device was triggered.
                           
                 if(m_assign_mode == NO_ASSIGN)
                 {
                     // In no-assign mode, simply keep track of which device is used
-                    if(!programaticallyGenerated) m_latest_used_device = m_keyboards.get(n);
+                    if(!programaticallyGenerated) m_latest_used_device = m_keyboard;
                     
                     //if(programaticallyGenerated) std::cout << "devieManager ignores programatical event\n";
                 }
                 else
                 {
                     // In assign mode, find to which active player this binding belongs
-                    if (m_keyboards[n].m_player != NULL)
+                    if (m_keyboard->m_player != NULL)
                     {
-                        *player = m_keyboards[n].m_player;
+                        *player = m_keyboard->m_player;
                                 
                         if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
                         {
@@ -168,21 +167,18 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                         // check now
                         if (m_assign_mode == DETECT_NEW)
                         {
-                            for(unsigned int n=0; n<m_keyboard_amount; n++)
+                            PlayerAction localaction = PA_FIRST; // none
+                            if (m_keyboard->hasBinding(btnID, &localaction))
                             {
-                                PlayerAction localaction = PA_FIRST; // none
-                                if (m_keyboards[n].hasBinding(btnID, &localaction))
+                                if(localaction == PA_FIRE)
                                 {
-                                    if(localaction == PA_FIRE)
-                                    {
-                                        if (value > Input::MAX_VALUE/2)
-                                            KartSelectionScreen::firePressedOnNewDevice( m_keyboards.get(n) );
-                                    }
-                                    
-                                    *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                                    return true;
+                                    if (value > Input::MAX_VALUE/2)
+                                        KartSelectionScreen::firePressedOnNewDevice( m_keyboard );
                                 }
-                            } // end for
+                                
+                                *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
+                                return true;
+                            }
 
                         } // end if assign_mode == DETECT_NEW
                     }
@@ -281,7 +277,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
 InputDevice* DeviceManager::getLatestUsedDevice()
 {
     // If none, probably the user clicked or used enter; give keyboard by default
-    if (m_latest_used_device == NULL ) return m_keyboards.get(0);
+    if (m_latest_used_device == NULL ) return m_keyboard;
     
     return m_latest_used_device;
 }
@@ -364,6 +360,8 @@ bool DeviceManager::deserialize()
 
     if (m_keyboard_configs.size() == 0)
         m_keyboard_configs.push_back(new KeyboardConfig());
+
+    m_keyboard->setConfiguration(m_keyboard_configs.get(0));
 
     for (int n = 0; n < m_keyboard_configs.size(); n++)
         printf("%s\n", m_keyboard_configs[n].toString().c_str());

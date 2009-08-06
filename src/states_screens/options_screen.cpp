@@ -19,6 +19,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/player.hpp"
+#include "config/device_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -222,44 +223,44 @@ namespace OptionsScreen
     }
 
     // -----------------------------------------------------------------------------
-    void updateInputButtons(const InputDevice* device)
+    void updateInputButtons(InputDevice* device)
     {
 
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_up");
-            btn->setLabel( device->getBindingAsString(PA_ACCEL).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_ACCEL).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_down");
-            btn->setLabel( device->getBindingAsString(PA_BRAKE).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_BRAKE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_left");
-            btn->setLabel( device->getBindingAsString(PA_LEFT).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_LEFT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_right");
-            btn->setLabel( device->getBindingAsString(PA_RIGHT).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_RIGHT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_fire");
-            btn->setLabel( device->getBindingAsString(PA_FIRE).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_FIRE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_nitro");
-            btn->setLabel( device->getBindingAsString(PA_NITRO).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_NITRO).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_drift");
-            btn->setLabel( device->getBindingAsString(PA_DRIFT).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_DRIFT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_rescue");
-            btn->setLabel( device->getBindingAsString(PA_RESCUE).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_RESCUE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_look_back");
-            btn->setLabel( device->getBindingAsString(PA_LOOK_BACK).c_str() );
+            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_LOOK_BACK).c_str() );
         }
 
     }
@@ -462,7 +463,7 @@ namespace OptionsScreen
             std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
 
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
-            keyboard->editBinding(binding_to_set, sensedInput->btnID);
+            keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
 
             // refresh display
             initInput(NULL, "init");
@@ -503,7 +504,7 @@ namespace OptionsScreen
 
             }
             GamePadDevice* gamepad =  input_manager->getDeviceList()->getGamePad(gamepadID);
-            gamepad->editBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
+            gamepad->getConfiguration()->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
                                  (Input::AxisDirection)sensedInput->axisDirection);
 
             // refresh display

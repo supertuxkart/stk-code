@@ -41,6 +41,7 @@ class DeviceConfig
                                          const int              id,
                                          Input::AxisDirection   direction = Input::AD_NEUTRAL);
 
+        // Don't call this directly unless you are KeyboardDevice or GamepadDevice
         bool        getBinding          (Input::InputType       type, 
                                          const int              id,
                                          const int              value,

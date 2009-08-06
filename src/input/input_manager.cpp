@@ -64,8 +64,6 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
 
         // could not read config file so use defaults
         KeyboardDevice* default_device = new KeyboardDevice();
-        default_device->loadDefaults();
-
         something_new_to_write = true;
     }
 
