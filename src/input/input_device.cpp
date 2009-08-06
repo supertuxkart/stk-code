@@ -1,9 +1,11 @@
 
 #include "states_screens/state_manager.hpp"
+#include "config/device_config.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+
 
 InputDevice::InputDevice()
 {
@@ -106,8 +108,15 @@ std::string InputDevice::getBindingAsString(const PlayerAction action) const
 #endif
 
 // -----------------------------------------------------------------------------
+KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
+{
+    m_configuration = configuration;
+    m_type = DT_KEYBOARD;
+}
+// -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()
 {
+    m_configuration = new KeyboardConfig();
     m_type = DT_KEYBOARD;
 }
 // -----------------------------------------------------------------------------
@@ -148,6 +157,7 @@ void KeyboardDevice::editBinding(PlayerAction action, int key_id)
 /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
 bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */) const
 {
+/*
     for(int n=0; n<PA_COUNT; n++)
     {
         if(m_default_bindings[n].id == key_id)
@@ -156,8 +166,8 @@ bool KeyboardDevice::hasBinding(const int key_id, PlayerAction* action /* out */
             return true;
         }
     }// next device
-
-    return false;
+*/
+    return m_configuration->getBinding(Input::IT_KEYBOARD, key_id, 0, action);
 }
 // -----------------------------------------------------------------------------
 
@@ -193,11 +203,15 @@ GamePadDevice::GamePadDevice(irr::io::IrrXMLReader* xml)
 * (defaults will be used)
  *  \param sdlIndex Index of stick.
  */
-GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount)
+GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount, GamepadConfig *configuration)
 {
     m_type = DT_GAMEPAD;
     m_deadzone = DEADZONE_JOYSTICK;
     m_prevAxisDirections = NULL;
+    m_configuration = configuration;
+
+    printf("New Gamepad Created.  Assigned the following configuration:\n%s", m_configuration->toString().c_str());
+    
 
     open(irrIndex, name, axis_count, btnAmount);
     m_name = name;
@@ -365,40 +379,9 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
 
             return false;
         }
-
-        // find corresponding action and return it
-        for(int n=0; n<PA_COUNT; n++)
-        {
-            if(m_default_bindings[n].type == type && m_default_bindings[n].id == id)
-            {
-                if(m_default_bindings[n].dir == Input::AD_NEGATIVE && value < 0)
-                {
-                    *action = (PlayerAction)n;
-                    return true;
-                }
-                else if(m_default_bindings[n].dir == Input::AD_POSITIVE && value > 0)
-                {
-                    *action = (PlayerAction)n;
-                    return true;
-                }
-            }
-        }// next device
-
-    }
-    else if(type == Input::IT_STICKBUTTON)
-    {
-        // find corresponding action and return it
-        for(int n=0; n<PA_COUNT; n++)
-        {
-            if(m_default_bindings[n].type == type && m_default_bindings[n].id == id)
-            {
-                *action = (PlayerAction)n;
-                return true;
-            }
-        }// next device
     }
 
-    return false;
+    return m_configuration->getBinding(type, id, value, action);
 }
 // -----------------------------------------------------------------------------
 /** Destructor for GamePadDevice.

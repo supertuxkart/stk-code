@@ -3,6 +3,7 @@
 
 #include <string>
 #include "input/input.hpp"
+#include "config/device_config.hpp"
 #include <iostream>
 #include <fstream>
 #include "io/xml_node.hpp"
@@ -13,16 +14,6 @@ enum DeviceType
 {
     DT_KEYBOARD,
     DT_GAMEPAD
-};
-
-struct KeyBinding
-{
-    Input::InputType type;
-    
-    // key for keyboards, axis for gamepads
-    int id;
-    
-    Input::AxisDirection dir; // for gamepads
 };
 
 class InputDevice
@@ -55,7 +46,10 @@ public:
 class KeyboardDevice : public InputDevice
 {
 public:
+    KeyboardConfig  *m_configuration;
+
     KeyboardDevice();
+    KeyboardDevice(KeyboardConfig *configuration);
     KeyboardDevice(irr::io::IrrXMLReader* xml);
     
     /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
@@ -70,7 +64,9 @@ class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player);
     bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
+
 public:
+    GamepadConfig        *m_configuration;
     int                   m_deadzone;
     int                   m_index;
     int                   m_axis_count;
@@ -88,7 +84,7 @@ public:
     
     void loadDefaults();
     
-    GamePadDevice(const int irrIndex, const std::string name, const int axis_number, const int btnAmount);
+    GamePadDevice(const int irrIndex, const std::string name, const int axis_number, const int btnAmount, GamepadConfig *configuration);
     GamePadDevice(irr::io::IrrXMLReader* xml);
     
     bool isButtonPressed(const int i);

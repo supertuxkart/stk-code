@@ -2,6 +2,7 @@
 #define DEVICE_MANAGER_HPP
 
 #include "input/input_device.hpp"
+#include "config/device_config.hpp"
 #include "utils/ptr_vector.hpp"
 
 enum PlayerAssignMode
@@ -13,8 +14,10 @@ enum PlayerAssignMode
 
 class DeviceManager
 {
-    ptr_vector<KeyboardDevice, HOLD> m_keyboards;
-    ptr_vector<GamePadDevice, HOLD> m_gamepads;
+    ptr_vector<KeyboardDevice, HOLD>    m_keyboards;
+    ptr_vector<GamePadDevice, HOLD>     m_gamepads;
+    ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
+    ptr_vector<GamepadConfig, HOLD>     m_gamepad_configs;
     
     core::array<SJoystickInfo> m_irrlicht_gamepads;
     
@@ -60,7 +63,7 @@ public:
     /* returns whether a new gamepad was detected */
     bool initGamePadSupport();
 
-    bool checkForGamePad(const int sdl_id);
+    GamepadConfig *getGamepadConfig(const int sdl_id);
 };
 
 
