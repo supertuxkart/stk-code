@@ -34,39 +34,39 @@
 #include "utils/constants.hpp"
 
 ThreeDAnimation::ThreeDAnimation(const std::string &track_name, 
-								 const XMLNode &node, float fps) 
+                                 const XMLNode &node, float fps) 
                : AnimationBase(node, fps)
 {
-	std::string model_name;
-	node.get("obj", &model_name);
+    std::string model_name;
+    node.get("obj", &model_name);
 
-	std::string full_path = file_manager->getTrackFile(model_name, track_name);
-	m_mesh = irr_driver->getAnimatedMesh(full_path);
+    std::string full_path = file_manager->getTrackFile(model_name, track_name);
+    m_mesh = irr_driver->getAnimatedMesh(full_path);
     if(!m_mesh)
     {
         fprintf(stderr, "Warning: node '%s' animated model '%s' not found, aborting.\n",
                 node.getName().c_str(), model_name.c_str());
         exit(-1);
     }
-	m_animated_node = irr_driver->addAnimatedMesh(m_mesh);
-	core::vector3df xyz;
-	node.get("xyz", &xyz);
-	m_animated_node->setPosition(xyz);
-	core::vector3df hpr(0,0,0);
-	node.get("hpr", &hpr);
-	m_animated_node->setRotation(hpr);
-	/** Save the initial position and rotation in the base animation object. */
-	setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
+    m_animated_node = irr_driver->addAnimatedMesh(m_mesh);
+    core::vector3df xyz;
+    node.get("xyz", &xyz);
+    m_animated_node->setPosition(xyz);
+    core::vector3df hpr(0,0,0);
+    node.get("hpr", &hpr);
+    m_animated_node->setRotation(hpr);
+    /** Save the initial position and rotation in the base animation object. */
+    setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
 
-	m_body            = NULL;
-	m_motion_state    = NULL;
-	m_collision_shape = NULL;
-	std::string shape;
-	node.get("shape", &shape);
-	if(shape!="")
-	{
-		createPhysicsBody(shape);
-	}
+    m_body            = NULL;
+    m_motion_state    = NULL;
+    m_collision_shape = NULL;
+    std::string shape;
+    node.get("shape", &shape);
+    if(shape!="")
+    {
+        createPhysicsBody(shape);
+    }
 }   // ThreeDAnimation
 
 // ----------------------------------------------------------------------------
@@ -78,48 +78,48 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 extend = max-min;
-	if(shape=="box")
-	{
-		m_collision_shape = new btBoxShape(0.5*extend);
-	}
-	else if(shape=="coneX")
-	{
-		float radius = 0.5f*std::max(extend.getY(), extend.getZ());
+    if(shape=="box")
+    {
+        m_collision_shape = new btBoxShape(0.5*extend);
+    }
+    else if(shape=="coneX")
+    {
+        float radius = 0.5f*std::max(extend.getY(), extend.getZ());
         m_collision_shape = new btConeShapeX(radius, extend.getX());
-	}
-	else if(shape=="coneY")
-	{
-		float radius = 0.5f*std::max(extend.getX(), extend.getZ());
-		m_collision_shape = new btConeShape(radius, extend.getY());
-	}
-	else if(shape=="coneZ")
-	{
+    }
+    else if(shape=="coneY")
+    {
+        float radius = 0.5f*std::max(extend.getX(), extend.getZ());
+        m_collision_shape = new btConeShape(radius, extend.getY());
+    }
+    else if(shape=="coneZ")
+    {
         // Note that the b3d model and therefore the extend has the
         // irrlicht axis, i.e. Y and Z swapped. Also we need to
         // convert 
-		float radius = 0.5f*std::max(extend.getX(), extend.getY());
+        float radius = 0.5f*std::max(extend.getX(), extend.getY());
         m_collision_shape = new btConeShapeZ(radius, extend.getZ());
-	}
-	else
-	{
-		fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
-		return;
-	}
-	const core::vector3df &hpr=m_animated_node->getRotation()*DEGREE_TO_RAD;
-	btQuaternion q(hpr.X, hpr.Y, hpr.Z);
-	const core::vector3df &xyz=m_animated_node->getPosition();
-	Vec3 p(xyz);
-	btTransform trans(q,p);
-	m_motion_state = new KartMotionState(trans);
-	btRigidBody::btRigidBodyConstructionInfo info(0, m_motion_state, 
-		                                          m_collision_shape);
+    }
+    else
+    {
+        fprintf(stderr, "Shape '%s' is not supported, ignored.\n", shape.c_str());
+        return;
+    }
+    const core::vector3df &hpr=m_animated_node->getRotation()*DEGREE_TO_RAD;
+    btQuaternion q(hpr.X, hpr.Y, hpr.Z);
+    const core::vector3df &xyz=m_animated_node->getPosition();
+    Vec3 p(xyz);
+    btTransform trans(q,p);
+    m_motion_state = new KartMotionState(trans);
+    btRigidBody::btRigidBodyConstructionInfo info(0, m_motion_state, 
+                                                  m_collision_shape);
     
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
     RaceManager::getWorld()->getPhysics()->addBody(m_body);
-	m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-	m_body->setActivationState(DISABLE_DEACTIVATION);
+    m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+    m_body->setActivationState(DISABLE_DEACTIVATION);
 }   // createPhysicsBody
 
 // ----------------------------------------------------------------------------
@@ -134,19 +134,19 @@ ThreeDAnimation::~ThreeDAnimation()
  */
 void ThreeDAnimation::update(float dt)
 {
-	core::vector3df xyz = m_animated_node->getPosition();
-	core::vector3df hpr = m_animated_node->getRotation();
-	AnimationBase::update(dt, &xyz, &hpr);     //updates all IPOs
-	m_animated_node->setPosition(xyz);
-	m_animated_node->setRotation(hpr);
+    core::vector3df xyz = m_animated_node->getPosition();
+    core::vector3df hpr = m_animated_node->getRotation();
+    AnimationBase::update(dt, &xyz, &hpr);     //updates all IPOs
+    m_animated_node->setPosition(xyz);
+    m_animated_node->setRotation(hpr);
 
-	// Now update the position of the bullet body if there is one:
-	if(m_body)
-	{
-		hpr = DEGREE_TO_RAD*hpr;
-		btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
-		Vec3 p(xyz);
-		btTransform trans(q,p);
-		m_motion_state->setWorldTransform(trans);
-	}
+    // Now update the position of the bullet body if there is one:
+    if(m_body)
+    {
+        hpr = DEGREE_TO_RAD*hpr;
+        btQuaternion q(-hpr.Z, -hpr.X, -hpr.Y);
+        Vec3 p(xyz);
+        btTransform trans(q,p);
+        m_motion_state->setWorldTransform(trans);
+    }
 }   // update

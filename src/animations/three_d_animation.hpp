@@ -37,31 +37,31 @@ class BezierCurve;
 class ThreeDAnimation : public AnimationBase
 {
 private:
-	/** Mesh of this animation. */
-	scene::IAnimatedMesh *m_mesh;
+    /** Mesh of this animation. */
+    scene::IAnimatedMesh *m_mesh;
 
-	/** The scene node for the model. */
-	scene::IAnimatedMeshSceneNode *m_animated_node;
+    /** The scene node for the model. */
+    scene::IAnimatedMeshSceneNode *m_animated_node;
 
-	/** The bullet collision shape for the physics. */
-	btCollisionShape     *m_collision_shape;
+    /** The bullet collision shape for the physics. */
+    btCollisionShape     *m_collision_shape;
 
-	/** The bullet rigid body. */
-	btRigidBody          *m_body;
+    /** The bullet rigid body. */
+    btRigidBody          *m_body;
 
-	/** Motion state of the physical object. */
-	btMotionState        *m_motion_state;
+    /** Motion state of the physical object. */
+    btMotionState        *m_motion_state;
 
-	/** A user pointer to connect a bullet body with this object. */
-	UserPointer           m_user_pointer;
+    /** A user pointer to connect a bullet body with this object. */
+    UserPointer           m_user_pointer;
 
-	void createPhysicsBody(const std::string &shape);
+    void createPhysicsBody(const std::string &shape);
 
 public:
-	             ThreeDAnimation(const std::string &track_name, 
-					            const XMLNode &node, float fps);
+                 ThreeDAnimation(const std::string &track_name, 
+                                const XMLNode &node, float fps);
     virtual     ~ThreeDAnimation();
-	virtual void update(float dt);
+    virtual void update(float dt);
 
 };   // ThreeDAnimation
 #endif
