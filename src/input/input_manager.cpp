@@ -257,11 +257,11 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection, int value,
                          const bool programaticallyGenerated)
 {
-    ActivePlayer* player = NULL;
-    PlayerAction action;
-
-    bool action_found = m_device_manager->mapInputToPlayerAndAction( type, deviceID, btnID, axisDirection,
-                                                                     value, programaticallyGenerated, &player, &action );
+    ActivePlayer*   player = NULL;
+    PlayerAction    action;
+    bool            btnAlreadyPressed = false;
+    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection,
+                                                          value, programaticallyGenerated, &player, &action );
 
     if (action_found && action == PA_FIRST) return; // input handled internally by the device manager
     

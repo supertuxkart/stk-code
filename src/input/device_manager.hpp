@@ -14,16 +14,31 @@ enum PlayerAssignMode
 
 class DeviceManager
 {
+private:
     KeyboardDevice                     *m_keyboard;
     ptr_vector<GamePadDevice, HOLD>     m_gamepads;
     ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
     ptr_vector<GamepadConfig, HOLD>     m_gamepad_configs;
-    
-    core::array<SJoystickInfo> m_irrlicht_gamepads;
-    
-    InputDevice* m_latest_used_device;
-    
-    PlayerAssignMode m_assign_mode;
+    core::array<SJoystickInfo>          m_irrlicht_gamepads;
+    InputDevice*                        m_latest_used_device;
+    PlayerAssignMode                    m_assign_mode;
+
+    // Helper functions, only used internally
+    InputDevice *mapGamepadInput      ( Input::InputType type,
+                                        int deviceID,
+                                        int btnID,
+                                        int axisDir,
+                                        int value,
+                                        const bool progGen,
+                                        ActivePlayer **player,
+                                        PlayerAction *action );
+
+    InputDevice *mapKeyboardInput     ( int deviceID,
+                                        int btnID,
+                                        const bool progGen,
+                                        ActivePlayer **player,
+                                        PlayerAction *action );
+
     
 public:
     DeviceManager();
@@ -50,10 +65,19 @@ public:
     KeyboardDevice* getKeyboard(const int i)                { return m_keyboard; }
         
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
-        maps this input to the corresponding player and game action. returns false if player/action could not be set.
-        Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an action and a player */
-    bool mapInputToPlayerAndAction( Input::InputType type, int id0, int id1, int id2, int value, const bool programaticallyGenerated,
-                                   ActivePlayer** player /* out */, PlayerAction* action /* out */ );
+      * maps this input to the corresponding player and game action. returns false if player/action could not be set.
+      * Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an
+      * action and a player
+      */
+
+    bool translateInput( Input::InputType type,
+                         int deviceID,
+                         int btnID,
+                         int axisDir,
+                         int value,
+                         const bool programaticallyGenerated,
+                         ActivePlayer** player /* out */,
+                         PlayerAction* action /* out */ );
     
     void serialize();
     bool deserialize();

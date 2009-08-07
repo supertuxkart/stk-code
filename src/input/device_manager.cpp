@@ -15,6 +15,7 @@ DeviceManager::DeviceManager()
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
 }
+
 // -----------------------------------------------------------------------------
 bool DeviceManager::initGamePadSupport()
 {
@@ -30,7 +31,7 @@ bool DeviceManager::initGamePadSupport()
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     numGamepads = m_irrlicht_gamepads.size();    
 
-    // Create GamePadDevice for each physical gamepad and attach a configuration
+    // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
     for (int id = 0; id < numGamepads; id++)
     {
         printf("#%d: %s detected...", id, m_irrlicht_gamepads[id].Name.c_str());
@@ -128,168 +129,112 @@ bool DeviceManager::getGamepadConfig(const int irr_id, GamepadConfig **config)
 void DeviceManager::addKeyboard(KeyboardDevice* d)
 {
     m_keyboard = d;
-/*
-    m_keyboards.push_back(d);
-    m_keyboard_amount = m_keyboards.size();
-*/
 }
 // -----------------------------------------------------------------------------
 void DeviceManager::addGamepad(GamePadDevice* d)
 {
     m_gamepads.push_back(d);
-//    m_gamepad_amount = m_gamepads.size();
 }
 // -----------------------------------------------------------------------------
-
-// TODO: rewrite this
-bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int deviceID, int btnID, int axisDir, int value,
-                                              const bool programaticallyGenerated, ActivePlayer** player /* out */,
-                                              PlayerAction* action /* out */ )
+InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
+                                              int btnID,
+                                              const bool progGen,
+                                              ActivePlayer **player,
+                                              PlayerAction *action )
 {
-    if(m_assign_mode == NO_ASSIGN)
-    {
-        *player = NULL;
-    }
+    InputDevice *device = m_keyboard;
 
-    
-    if(type == Input::IT_KEYBOARD)
+    if (m_keyboard->hasBinding(btnID, action))
     {
-        if( m_keyboard->hasBinding(btnID, action) )
+        if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
         {
-            // We found which device was triggered.
-                         
-            if(m_assign_mode == NO_ASSIGN)
-            {
-                // In no-assign mode, simply keep track of which device is used
-                if(!programaticallyGenerated) m_latest_used_device = m_keyboard;
-                 
-                //if(programaticallyGenerated) std::cout << "devieManager ignores programatical event\n";
-            }
-            else
-            {
-                // In assign mode, find to which active player this binding belongs
-                if (m_keyboard->m_player != NULL)
-                {
-                    *player = m_keyboard->m_player;
-                            
-                    if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
-                    {
-                        if (value > Input::MAX_VALUE/2) KartSelectionScreen::playerPressedRescue( *player );
-                        *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                    }
-                    return true;
-                }
-                else
-                {
-                    // no active player has this binding. if we want to check for new players trying to join,
-                    // check now
-                    if (m_assign_mode == DETECT_NEW)
-                    {
-                        PlayerAction localaction = PA_FIRST; // none
-                        if (m_keyboard->hasBinding(btnID, &localaction))
-                        {
-                            if(localaction == PA_FIRE)
-                            {
-                                if (value > Input::MAX_VALUE/2)
-                                    KartSelectionScreen::firePressedOnNewDevice( m_keyboard );
-                            }
-                                
-                            *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                            return true;
-                        }
-                    } // end if assign_mode == DETECT_NEW
-                }
-                  
-                return false;
-            } // end if/else NO_ASSIGN mode
-                       
-            
-            return true;
-        }
-        return false;
-    }
-    else if(type == Input::IT_MOUSEBUTTON)
-    {
-        return false;
-    }
-    else if(type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
-    {
-
-        GamePadDevice* gamepad = getGamePadFromIrrID(deviceID);
-
-        if (gamepad == NULL) {
-            // Prevent null pointer crash
             *player = NULL;
-            return false;
+            if (!progGen) m_latest_used_device = m_keyboard;
         }
-        
-        if(m_assign_mode == NO_ASSIGN)
-        {
-            if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
-            {
-                // In no-assign mode, simply keep track of which device is used.
-                // Only assign for buttons, since axes may send some small values even when
-                // not actively used by user
-                if(!programaticallyGenerated && type == Input::IT_STICKBUTTON)
-                {
-                    m_latest_used_device = gamepad;
-                }
-                
-                return true;
-            }
-        }
-        else
-        {
-            if(gamepad->m_player != NULL)
-            {
-                *player = gamepad->m_player;
-            }
-            else
-            {
-                
-                // no active player has this binding. if we want to check for new players trying to join,
-                // check now
-                if (m_assign_mode == DETECT_NEW)
-                {
-                    for(int n=0; n < m_gamepads.size(); n++)
-                    {
-                        PlayerAction localaction = PA_FIRST; // none
-                        if (m_gamepads[n].hasBinding(type, btnID, value, NULL, &localaction) && localaction == PA_FIRE)
-                        {
-                            if (value > Input::MAX_VALUE/2)
-                                KartSelectionScreen::firePressedOnNewDevice( m_gamepads.get(n) );
-                            *action = PA_FIRST;
-                            return true;
-                        }
-                    } // end for
-                }
-                
-                return false; // no player mapped to this device
-            }
-                
-            
-            if(gamepad->hasBinding(type, btnID /* axis or button */, value, *player, action /* out */) )
-            {
-                if (m_assign_mode == DETECT_NEW && *action == PA_RESCUE)
-                {
-                    if (value > Input::MAX_VALUE/2) KartSelectionScreen::playerPressedRescue( *player );
-                    *action = PA_FIRST; // FIXME : returning PA_FIRST is quite a hackish way to tell input was handled internally
-                }
-                
-                return true;
-            }
-        }
-        
-        return false;
+        else *player = m_keyboard->m_player;
     }
-    else
-    {
-        return false;
-    }
-    
-    return false;
+    else device = NULL; // If no appropriate bind was found, return NULL
+
+    return device;
 }
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
+                                             int deviceID,
+                                             int btnID,
+                                             int axisDir,
+                                             int value,
+                                             const bool progGen,
+                                             ActivePlayer **player,
+                                             PlayerAction *action )
+{
+    GamePadDevice  *gPad = getGamePadFromIrrID(deviceID);
+
+    if (gPad->hasBinding(type, btnID, value, NULL, action))
+    {
+        if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+        {
+            *player = NULL;
+            // IT_STICKMOTION happens all the time, don't consider it discrete input
+            if ((!progGen) && (type == Input::IT_STICKBUTTON)) m_latest_used_device = gPad;
+        }
+        else *player = gPad->m_player;
+    }
+    else gPad = NULL; // If no bind was found, return NULL
+
+    return gPad;
+}
+//-----------------------------------------------------------------------------
+
+// Formerly mapInputToPlayerAndAction(), broken down to be more readable
+
+bool DeviceManager::translateInput( Input::InputType type,
+                                    int deviceID,
+                                    int btnID,
+                                    int axisDir,
+                                    int value,
+                                    const bool programaticallyGenerated,
+                                    ActivePlayer** player /* out */,
+                                    PlayerAction* action /* out */ )
+{
+    InputDevice *device = NULL;
+
+    // If the input event matches a bind on an input device, get a pointer to the device
+    switch (type)
+    {
+        case Input::IT_KEYBOARD:
+            device = mapKeyboardInput(deviceID, btnID, programaticallyGenerated, player, action);
+            break;
+        case Input::IT_STICKBUTTON:
+            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, programaticallyGenerated, player, action);
+            break;
+        case Input::IT_STICKMOTION:
+            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, programaticallyGenerated, player, action);
+            break;
+        default:
+            break;
+    };
+
+    // If a matching device was found
+    if (device != NULL)
+    {
+        // Handle internal events
+        if ((*player != NULL) && (*action == PA_RESCUE))
+        {
+            KartSelectionScreen::playerPressedRescue( *player );
+            *action = PA_FIRST; // FIXME: action set to PA_FIRST if handled internally (too hackish)
+        }
+
+        if ((*player == NULL) && (*action == PA_FIRE) && (m_assign_mode == DETECT_NEW))
+        {
+            KartSelectionScreen::firePressedOnNewDevice( device );
+            *action = PA_FIRST;
+        }
+    }
+
+    // Return true if a matching device was found
+    return (device != NULL);
+}
+//-----------------------------------------------------------------------------
 InputDevice* DeviceManager::getLatestUsedDevice()
 {
     // If none, probably the user clicked or used enter; give keyboard by default
