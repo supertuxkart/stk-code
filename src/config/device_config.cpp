@@ -49,7 +49,7 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
 //------------------------------------------------------------------------------
 
 // Don't call this directly unless you are KeyboardDevice or GamepadDevice
-bool DeviceConfig::getBinding ( Input::InputType    type,
+bool DeviceConfig::getAction  ( Input::InputType    type,
                                 const int           id,
                                 const int           value,
                                 PlayerAction*       action )
@@ -255,6 +255,7 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml)
     {
         m_name = name_string;
     }
+    setDefaultBinds();
 }
 
 //------------------------------------------------------------------------------

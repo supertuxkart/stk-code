@@ -12,51 +12,51 @@
 
 DeviceManager::DeviceManager()
 {
-    printf("================================================================================\n");
-    printf("Parsing Keyboard & Gamepad Configurations\n");
-    printf("================================================================================\n\n");
-    deserialize();
-
-    m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
-    printf("Keyboard Configs:\n");
-    for (int n = 0; n < m_keyboard_configs.size(); n++)
-        printf("%s\n", m_keyboard_configs[n].toString().c_str());
-    printf("Gamepad Configs:\n");
-    for (int n = 0; n < m_gamepad_configs.size(); n++)
-        printf("%s\n", m_gamepad_configs[n].toString().c_str());
-    
-
-    m_keyboard_amount = 0;
-    m_gamepad_amount = 0;
     m_latest_used_device = NULL;
     m_assign_mode = NO_ASSIGN;
 }
 // -----------------------------------------------------------------------------
 bool DeviceManager::initGamePadSupport()
 {
-    GamepadConfig           *gamepadConfig;
-    bool something_new_to_write = true;
+    GamepadConfig           *gamepadConfig = NULL;
+    GamePadDevice           *gamepadDevice = NULL;
+    bool created = false;
+    int numGamepads;
 
-    // Prepare a list of connected joysticks.
-    std::cout << "====================\nGamePad/Joystick detection and configuration\n====================\n";
-    
+    printf("================================================================================\n");
+    printf("Initializing Gamepad Support\n");
+    printf("================================================================================\n\n");
+
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
-    const int numSticks = m_irrlicht_gamepads.size();    
-    
-    std::cout << "irrLicht detects " << numSticks << " gamepads" << std::endl;
+    numGamepads = m_irrlicht_gamepads.size();    
 
-    for (int i = 0; i < numSticks; i++)
+    // Create GamePadDevice for each physical gamepad and attach a configuration
+    for (int id = 0; id < numGamepads; id++)
     {
-        std::cout << m_irrlicht_gamepads[i].Name.c_str() << " : "
-        << m_irrlicht_gamepads[i].Axes << " axes , "
-        << m_irrlicht_gamepads[i].Buttons << " buttons\n";
-        gamepadConfig = getGamepadConfig(i);
-        add(new GamePadDevice(i, m_irrlicht_gamepads[i].Name.c_str(), m_irrlicht_gamepads[i].Axes, m_irrlicht_gamepads[i].Buttons, gamepadConfig));
-    }
-    
-    std::cout << "====================\n";
-    
-    return something_new_to_write;
+        printf("#%d: %s detected...", id, m_irrlicht_gamepads[id].Name.c_str());
+        // Returns true if new configuration was created
+        if (getGamepadConfig(id, &gamepadConfig) == true)
+        {
+            printf("creating new configuration.\n");
+            created = true;
+        }
+        else
+        {
+            printf("using existing configuration.\n");
+        }
+
+        gamepadDevice = new GamePadDevice( id, 
+                                           m_irrlicht_gamepads[id].Name.c_str(),
+                                           m_irrlicht_gamepads[id].Axes,
+                                           m_irrlicht_gamepads[id].Buttons,
+                                           gamepadConfig );
+
+        addGamepad(gamepadDevice);
+        
+    } // end for
+    printf("Gamepad support initialization complete.\n\n");
+
+    return created;
 }
 // -----------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
     // when going back to no-assign mode, do some cleanup
     if(assignMode == NO_ASSIGN)
     {
-        for(unsigned int i=0; i<m_gamepad_amount; i++)
+        for(int i=0; i < m_gamepads.size(); i++)
         {
             m_gamepads[i].setPlayer(NULL);
         }
@@ -77,51 +77,55 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
 // -----------------------------------------------------------------------------
 GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
 {
-    for(unsigned int i=0; i<m_gamepad_amount; i++)
+    GamePadDevice *gamepad = NULL;
+
+    for(int i = 0; i < m_gamepads.size(); i++)
     {
         if(m_gamepads[i].m_index == id)
         {
 
-            return m_gamepads.get(i);
+            gamepad = m_gamepads.get(i);
         }
     }
-    return NULL;
+    return gamepad;
 }
 // -----------------------------------------------------------------------------
 /**
  * Check if we already have a config object for gamepad 'irr_id' as reported by irrLicht
- * If yes, return a pointer to the configuration. If no, create one. Returns pointer.
+ * If no, create one. Returns true if new configuration was created, otherwise false.
  */
-GamepadConfig *DeviceManager::getGamepadConfig(const int irr_id)
+bool DeviceManager::getGamepadConfig(const int irr_id, GamepadConfig **config)
 {
+    bool found = false;
+    bool configCreated = false;
     std::string name = m_irrlicht_gamepads[irr_id].Name.c_str();
-    GamepadConfig *config = NULL;
     
-    std::cout << "trying to find gamepad configuration" << name.c_str() << std::endl;
-    
-    for(int n=0; n<m_gamepad_configs.size(); n++)
+    // Find appropriate configuration
+    for(int n=0; n < m_gamepad_configs.size(); n++)
     {
-        std::cout << "  (checking...) I remember that gamepad configuration #" << n << " is named " << m_gamepad_configs[n].getName().c_str() << std::endl;
-        
-        // FIXME - don't check only name, but also number of axes and buttons?
-        // Only assign device IDs to gamepads which have not yet been assigned a device ID
         if(m_gamepad_configs[n].getName() == name)
         {
-            std::cout << "--> that's the one currently connected\n";
-            config = m_gamepad_configs.get(n);
+            *config = m_gamepad_configs.get(n);
+            found = true;
         }
     }
     
-    if (config == NULL)
+    // If we can't find an appropriate configuration then create one.
+    if (!found)
     {
-        std::cout << "couldn't find a configuration for this gamepad, creating one" << std::endl;
-        config = new GamepadConfig(m_irrlicht_gamepads[irr_id].Name.c_str(), m_irrlicht_gamepads[irr_id].Axes, m_irrlicht_gamepads[irr_id].Buttons);
-        m_gamepad_configs.push_back(config);
+        *config = new GamepadConfig( m_irrlicht_gamepads[irr_id].Name.c_str(), 
+                                     m_irrlicht_gamepads[irr_id].Axes, 
+                                     m_irrlicht_gamepads[irr_id].Buttons );
+
+        // Add new config to list
+        m_gamepad_configs.push_back(*config);
+        configCreated = true;
     }
-    return config;
+
+    return configCreated;
 }
 // -----------------------------------------------------------------------------
-void DeviceManager::add(KeyboardDevice* d)
+void DeviceManager::addKeyboard(KeyboardDevice* d)
 {
     m_keyboard = d;
 /*
@@ -130,12 +134,14 @@ void DeviceManager::add(KeyboardDevice* d)
 */
 }
 // -----------------------------------------------------------------------------
-void DeviceManager::add(GamePadDevice* d)
+void DeviceManager::addGamepad(GamePadDevice* d)
 {
     m_gamepads.push_back(d);
-    m_gamepad_amount = m_gamepads.size();
+//    m_gamepad_amount = m_gamepads.size();
 }
 // -----------------------------------------------------------------------------
+
+// TODO: rewrite this
 bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int deviceID, int btnID, int axisDir, int value,
                                               const bool programaticallyGenerated, ActivePlayer** player /* out */,
                                               PlayerAction* action /* out */ )
@@ -245,7 +251,7 @@ bool DeviceManager::mapInputToPlayerAndAction( Input::InputType type, int device
                 // check now
                 if (m_assign_mode == DETECT_NEW)
                 {
-                    for(unsigned int n=0; n<m_gamepad_amount; n++)
+                    for(int n=0; n < m_gamepads.size(); n++)
                     {
                         PlayerAction localaction = PA_FIRST; // none
                         if (m_gamepads[n].hasBinding(type, btnID, value, NULL, &localaction) && localaction == PA_FIRE)
@@ -313,6 +319,10 @@ bool DeviceManager::deserialize()
     KeyboardConfig* keyboard_config = NULL;
     GamepadConfig* gamepad_config = NULL;
     
+    printf("================================================================================\n");
+    printf("Deserializing input.config\n");
+    printf("================================================================================\n\n");
+
     // parse XML file
     while(xml && xml->read())
     {
@@ -339,15 +349,15 @@ bool DeviceManager::deserialize()
                     {
                         if(keyboard_config != NULL)
                             if(!keyboard_config->deserializeAction(xml))
-                                std::cerr << "Ignoring an ill-formed action in input config\n";
+                                std::cerr << "Ignoring an ill-formed action in input config.\n";
                     }
                     else if(reading_now == GAMEPAD) 
                     {
                         if(gamepad_config != NULL)
                             if(!gamepad_config->deserializeAction(xml))
-                                std::cerr << "Ignoring an ill-formed action in input config\n";
+                                std::cerr << "Ignoring an ill-formed action in input config.\n";
                     }
-                    else std::cerr << "Warning: An action is placed in an unexpected area in the input config file\n";
+                    else std::cerr << "Warning: An action is placed in an unexpected area in the input config file.\n";
                 }
             }
             break;
@@ -372,8 +382,22 @@ bool DeviceManager::deserialize()
         } // end switch
     } // end while
 
+    // For Debugging....
+    printf("Keyboard Configs:\n");
+    for (int n = 0; n < m_keyboard_configs.size(); n++)
+        printf("%s\n", m_keyboard_configs[n].toString().c_str());
+    printf("Gamepad Configs:\n");
+    for (int n = 0; n < m_gamepad_configs.size(); n++)
+        printf("%s\n", m_gamepad_configs[n].toString().c_str());
+
     if (m_keyboard_configs.size() == 0)
+    {
+        printf("No keyboard configuration exists, creating one.\n");
         m_keyboard_configs.push_back(new KeyboardConfig());
+    }
+
+    m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
+    printf("Deserialization completed.\n\n");
 
     return true;
 }
@@ -382,8 +406,8 @@ void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
     user_config->CheckAndCreateDir();
-    
-    std::cout << "writing " << filepath.c_str() << std::endl;
+    printf("Saving Gamepad & Keyboard Configuration\n");
+
     
     std::ofstream configfile;
     configfile.open (filepath.c_str());

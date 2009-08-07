@@ -10,6 +10,7 @@
 InputDevice::InputDevice()
 {
     m_player = NULL;
+    m_configuration = NULL;
 }
 // -----------------------------------------------------------------------------
 /**
@@ -36,7 +37,7 @@ KeyboardDevice::KeyboardDevice()
 // -----------------------------------------------------------------------------
 bool KeyboardDevice::hasBinding(const int id, PlayerAction* action)
 {
-    return m_configuration->getBinding(Input::IT_KEYBOARD, id, 0, action);
+    return m_configuration->getAction(Input::IT_KEYBOARD, id, 0, action);
 }
 // -----------------------------------------------------------------------------
 
@@ -53,18 +54,15 @@ bool KeyboardDevice::hasBinding(const int id, PlayerAction* action)
  */
 GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount, GamepadConfig *configuration)
 {
-    m_type = DT_GAMEPAD;
-    m_deadzone = DEADZONE_JOYSTICK;
-    m_prevAxisDirections = NULL;
-    m_configuration = configuration;
-    m_axis_count = axis_count;
-    m_prevAxisDirections = new Input::AxisDirection[axis_count];
-    m_button_count = btnAmount;
-    
-    std::cout << "(i) This gamepad has " << axis_count << " axes and " << m_button_count << " buttons\n";
-
-    m_index = irrIndex;    
-    m_name = name;
+    m_type                  = DT_GAMEPAD;
+    m_deadzone              = DEADZONE_JOYSTICK;
+    m_prevAxisDirections    = NULL;
+    m_configuration         = configuration;
+    m_axis_count            = axis_count;
+    m_prevAxisDirections    = new Input::AxisDirection[axis_count];
+    m_button_count          = btnAmount;
+    m_index                 = irrIndex;    
+    m_name                  = name;
     
     for (int i = 0; i < axis_count; i++)
         m_prevAxisDirections[i] = Input::AD_NEUTRAL;
@@ -86,6 +84,7 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player)
 {
+    KeyBinding bind;
     if(!StateManager::get()->isGameState()) return; // ignore this while in menus
 
     PlayerKart* pk = player->getKart();
@@ -95,16 +94,16 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
         return;
     }
     
-/*
     for(int n=0; n<PA_COUNT; n++)
     {
-        if(m_default_bindings[n].id == axis && m_default_bindings[n].dir == direction)
+        bind = m_configuration->getBinding(n);
+        if(bind.id == axis && bind.dir == direction)
         {
             pk->action((PlayerAction)n, 0);
             return;
         }
     }
-*/
+
 }
 // -----------------------------------------------------------------------------
 
@@ -116,6 +115,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
 
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action /* out */)
 {
+    bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open
     
     if(type == Input::IT_STICKMOTION)
@@ -168,7 +168,17 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
         }
     }
 
-    return m_configuration->getBinding(type, id, value, action);
+    if (m_configuration != NULL)
+    {
+        success = m_configuration->getAction(type, id, value, action);
+    }
+    else
+    {
+        printf("hasBinding() called on improperly initialized GamePadDevice\n");
+        abort();
+    }
+
+    return success;
 }
 // -----------------------------------------------------------------------------
 /** Destructor for GamePadDevice.

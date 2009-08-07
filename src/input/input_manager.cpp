@@ -52,6 +52,7 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
                                m_mouse_val_x(0), m_mouse_val_y(0)
 {
     m_device_manager = new DeviceManager();
+    m_device_manager->deserialize();
 
     m_timer_in_use = false;
     m_timer = 0;

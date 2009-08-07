@@ -42,10 +42,11 @@ class DeviceConfig
                                          Input::AxisDirection   direction = Input::AD_NEUTRAL);
 
         // Don't call this directly unless you are KeyboardDevice or GamepadDevice
-        bool        getBinding          (Input::InputType       type, 
+        bool        getAction           (Input::InputType       type, 
                                          const int              id,
                                          const int              value,
                                          PlayerAction*          action);
+        KeyBinding  getBinding          (int i) {return m_bindings[i];}
 
 };
 

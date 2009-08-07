@@ -21,9 +21,6 @@ class DeviceManager
     
     core::array<SJoystickInfo> m_irrlicht_gamepads;
     
-    unsigned int m_keyboard_amount;
-    unsigned int m_gamepad_amount;
-    
     InputDevice* m_latest_used_device;
     
     PlayerAssignMode m_assign_mode;
@@ -31,10 +28,12 @@ class DeviceManager
 public:
     DeviceManager();
     
-    void add(KeyboardDevice* d);
-    void add(GamePadDevice* d);
+    void clearGamepads() { m_gamepads.clearAndDeleteAll(); }
+    void clearKeyboard() {delete m_keyboard;}
+    void addKeyboard(KeyboardDevice* d);
+    void addGamepad(GamePadDevice* d);
     
-    int getGamePadAmount() const                            { return m_gamepad_amount; }
+    int getGamePadAmount() const                            { return m_gamepads.size(); }
     GamePadDevice* getGamePad(const int i)                  { return m_gamepads.get(i); }
     GamePadDevice* getGamePadFromIrrID(const int i);
     InputDevice* getLatestUsedDevice();
@@ -48,7 +47,6 @@ public:
     PlayerAssignMode playerAssignMode() const { return m_assign_mode; }
     void setAssignMode(const PlayerAssignMode assignMode);
     
-    int getKeyboardAmount() const                           { return m_keyboard_amount; }
     KeyboardDevice* getKeyboard(const int i)                { return m_keyboard; }
         
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
@@ -63,7 +61,7 @@ public:
     /* returns whether a new gamepad was detected */
     bool initGamePadSupport();
 
-    GamepadConfig *getGamepadConfig(const int sdl_id);
+    bool getGamepadConfig(const int sdl_id, GamepadConfig **config);
 };
 
 
