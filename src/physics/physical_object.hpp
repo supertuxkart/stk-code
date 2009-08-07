@@ -21,13 +21,15 @@
 #define HEADER_PHYSICAL_OBJECT_HPP
 
 #include <string>
+
 #include "irrlicht.h"
 using namespace irr;
 
 #include "btBulletDynamicsCommon.h"
-#include "physics/user_pointer.hpp"
 
-class Vec3;
+#include "physics/user_pointer.hpp"
+#include "utils/vec3.hpp"
+
 class scene::IAnimatedMesh;
 class XMLNode;
 
@@ -37,16 +39,27 @@ public:
     enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
 
 protected:
+    /** The shape of this object. */
     bodyTypes             m_body_type;
+    /** The bullet collision shape. */
     btCollisionShape     *m_shape;
+    /** The corresponding bullet rigid body. */
     btRigidBody          *m_body;
+    /** Bullet's motion state for this object. */
     btDefaultMotionState *m_motion_state;
-    float                 m_half_height;
+    /** The mass of this object. */
     float                 m_mass;
+    /** The pointer that is stored in the bullet rigid body back to 
+     *  this object. */
     UserPointer           m_user_pointer;
+    /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
+    /** The irrlicht mesh for this object. */
     scene::IMesh         *m_mesh;
+    /** The irrlicht scene node this object is attached to. */
     scene::ISceneNode    *m_node;
+    /** Radius of the object - this obviously depends on the actual shape. */
+    float                 m_radius;
 public:
                  PhysicalObject (const XMLNode *node);
     virtual     ~PhysicalObject (); 

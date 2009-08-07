@@ -78,10 +78,12 @@ PhysicalObject::PhysicalObject(const XMLNode *xml_node)
     m_body         = NULL;
     m_motion_state = NULL;
     m_mass         = 1;
+    m_radius       = -1;
 
     std::string shape;
-    xml_node->get("shape", &shape);
-    xml_node->get("mass",  &m_mass);
+    xml_node->get("mass",   &m_mass  );
+    xml_node->get("radius", &m_radius);
+    xml_node->get("shape",  &shape   );
 
     m_body_type = MP_NONE;
     if     (shape=="cone"   ) m_body_type = MP_CONE;
@@ -104,36 +106,56 @@ PhysicalObject::~PhysicalObject()
 void PhysicalObject::init()
 {
     assert(m_mesh);
+
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 extend = max-min;
-    m_half_height = 0.5f*(extend.getZ());
+    // Adjust the mesth of the graphical object so that its center is where it
+    // is in bullet (usually at (0,0,0)). It can be changed in the case clause
+    // if this is not correct for a particular shape.
+    Vec3 offset_from_center = -0.5f*(max+min);
     switch (m_body_type)
     {
     case MP_CONE:   {
-                    float radius = 0.5f*std::max(extend.getX(), extend.getY());
-                    m_shape = new btConeShapeZ(radius, extend.getZ());
+                    if(m_radius<0) m_radius = 0.5f*extend.length_2d();
+                    m_shape = new btConeShapeZ(m_radius, extend.getZ());
                     break;
                     }
     case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
                     break;
     case MP_SPHERE: {
-                    float radius = std::max(extend.getX(), extend.getY());
-                    radius = 0.5f*std::max(radius, extend.getZ());
-                    m_shape = new btSphereShape(radius);
+                    if(m_radius<0)
+                    {
+                        float max_axis = std::max(extend.getX(), extend.getY());
+                        max_axis       = std::max(max_axis, extend.getZ());
+                        // Worst case radius: if the actual shape is more like
+                        // a box, the actual radius can be up to sqrt(3) larger
+                        // than the maxium axis size:
+                        // sqrt(x*x+y*y+z*z) <= sqrt(3*max_axis*max_axis)
+                        m_radius   = sqrt(3.0f)*max_axis;
+                    }
+                    m_shape = new btSphereShape(m_radius);
                     break;
                     }
     case MP_NONE:   fprintf(stderr, "WARNING: Uninitialised moving shape\n");
                     break;
     }
 
+    // 2. Adjust the mesh so that its center is where it is in bullet
+    // --------------------------------------------------------------
+    // This means that the graphical and physical position are identical
+    // which simplifies drawing later on.
+    scene::IMeshManipulator *mesh_manipulator = 
+        irr_driver->getSceneManager()->getMeshManipulator();
+    core::matrix4 transform(core::matrix4::EM4CONST_IDENTITY);  // 
+    transform.setTranslation(offset_from_center.toIrrVector());
+    mesh_manipulator->transformMesh(m_mesh, transform);
+
     // 2. Create the rigid object
     // --------------------------
-    Vec3 pos = m_init_pos.getOrigin();
-    pos.setZ(m_init_pos.getOrigin().getZ()+m_half_height);
-    m_init_pos.setOrigin(pos);
+    m_init_pos.setOrigin(m_init_pos.getOrigin()-offset_from_center);
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
