@@ -737,6 +737,10 @@
 				Name="config"
 				>
 				<File
+					RelativePath="..\..\config\device_config.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\config\player.cpp"
 					>
 				</File>
@@ -1446,6 +1450,10 @@
 			<Filter
 				Name="config"
 				>
+				<File
+					RelativePath="..\..\config\device_config.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\config\player.hpp"
 					>
