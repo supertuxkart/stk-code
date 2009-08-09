@@ -106,7 +106,24 @@ void Moveable::reset()
 void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC = getVelocity()*getTrans().getBasis();
+    m_velocityLC = getVelocity()*m_transform.getBasis();
+    // The following code would synchronise bullet to irrlicht rotations, but
+    // heading etc. might not be 'correct', e.g. a 180 degree heading rotation
+    // would be reported as 180 degree roll and pitch, and 0 degree heading.
+    // So to get heading, pitch etc. the way needed elsewhere (camera etc),
+    // we would still have to rotate unit vectors and compute heading etc.
+    // with atan.
+    //btQuaternion q = m_transform.getRotation();
+    //core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
+    //core::vector3df r;
+    //qirr.toEuler(r);
+    // Note: toIrrHPR mixes the axis back etc., so the assignments below
+    // mean that getIrrHPR returns exactly (r.x,r.y,r.z)*RAD_TO_DEGREE
+    //m_hpr.setX(-r.Y);
+    //m_hpr.setY(-r.X);
+    //m_hpr.setZ(-r.Z);
+
+
     m_hpr.setHPR(m_transform.getBasis());
     // roll is not set correctly, I assume due to a different HPR order.
     // So we compute the proper roll (by taking the angle between the up

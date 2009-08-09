@@ -155,7 +155,8 @@ void PhysicalObject::init()
 
     // 2. Create the rigid object
     // --------------------------
-    m_init_pos.setOrigin(m_init_pos.getOrigin()-offset_from_center);
+    // m_init_pos is the point on the track - add the offset
+    m_init_pos.setOrigin(m_init_pos.getOrigin()+btVector3(0,0,extend.getZ()*0.5f));
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
@@ -166,6 +167,7 @@ void PhysicalObject::init()
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
+
     RaceManager::getWorld()->getPhysics()->addBody(m_body);
 }   // init
 
@@ -174,6 +176,7 @@ void PhysicalObject::update(float dt)
 {
     btTransform t;
     m_motion_state->getWorldTransform(t);
+
     Coord c(t);
     if(c.getXYZ().getZ()<-100)
     {
@@ -181,7 +184,13 @@ void PhysicalObject::update(float dt)
         c.setXYZ(m_init_pos.getOrigin());
     }
     m_node->setPosition(c.getXYZ().toIrrVector());
-    m_node->setRotation(c.getHPR().toIrrHPR());
+    btQuaternion q=t.getRotation();
+    core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
+    core::vector3df r;
+    qirr.toEuler(r);
+    m_node->setRotation(r*RAD_TO_DEGREE);
+    return;
+
 }   // update
 
 // -----------------------------------------------------------------------------
