@@ -26,12 +26,14 @@ KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
 {
     m_configuration = configuration;
     m_type = DT_KEYBOARD;
+    m_player = NULL;
 }
 // -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice()
 {
     m_configuration = new KeyboardConfig();
     m_type = DT_KEYBOARD;
+    m_player = NULL;
 }
 
 // -----------------------------------------------------------------------------

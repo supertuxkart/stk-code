@@ -30,7 +30,6 @@ std::string DeviceConfig::toString ()
                                                                    m_bindings[n].dir));
         returnString = returnString.append("\n");
     }
-    returnString = returnString.append("\n");
     return returnString;
 }
 

@@ -15,6 +15,7 @@ enum PlayerAssignMode
 class DeviceManager
 {
 private:
+
     KeyboardDevice                     *m_keyboard;
     ptr_vector<GamePadDevice, HOLD>     m_gamepads;
     ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
@@ -39,8 +40,19 @@ private:
                                         ActivePlayer **player,
                                         PlayerAction *action );
 
-    
+    bool deserialize();
+    void shutdown();
+
 public:
+
+    /**
+      * The device manager starts in "no-assign" mode, which means no input configuration is associated
+      * to any player. So all devices will react. This is used in menus before player set-up is done.
+      * Switching back to no-assign mode will also clear anything in devices that was associated with
+      * players in assign mode.
+      */
+
+
     DeviceManager();
     
     void clearGamepads() { m_gamepads.clearAndDeleteAll(); }
@@ -49,21 +61,14 @@ public:
     void addGamepad(GamePadDevice* d);
     
     int getGamePadAmount() const                            { return m_gamepads.size(); }
-    GamePadDevice* getGamePad(const int i)                  { return m_gamepads.get(i); }
-    GamePadDevice* getGamePadFromIrrID(const int i);
-    InputDevice* getLatestUsedDevice();
-
-    /**
-      * The device manager starts in "no-assign" mode, which means no input configuration is associated
-      * to any player. So all devices will react. This is used in menus before player set-up is done.
-      * Switching back to no-assign mode will also clear anything in devices that was associated with
-      * players in assign mode.
-      */
-    PlayerAssignMode playerAssignMode() const { return m_assign_mode; }
-    void setAssignMode(const PlayerAssignMode assignMode);
-    
-    KeyboardDevice* getKeyboard(const int i)                { return m_keyboard; }
-        
+    GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
+    PlayerAssignMode    playerAssignMode() const            { return m_assign_mode; }
+    KeyboardDevice*     getKeyboard(const int i)            { return m_keyboard; }
+    GamePadDevice*      getGamePadFromIrrID(const int i);
+    InputDevice*        getLatestUsedDevice();
+    void                setAssignMode(const PlayerAssignMode assignMode);
+    bool                getConfigForGamepad(const int sdl_id, GamepadConfig **config);    
+       
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
       * maps this input to the corresponding player and game action. returns false if player/action could not be set.
       * Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an
@@ -78,14 +83,10 @@ public:
                          const bool programaticallyGenerated,
                          ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );
-    
-    void serialize();
-    bool deserialize();
-    
-    /* returns whether a new gamepad was detected */
-    bool initGamePadSupport();
 
-    bool getGamepadConfig(const int sdl_id, GamepadConfig **config);
+    /* returns whether a new gamepad was detected */
+    bool initialize();
+    void serialize();
 };
 
 

@@ -52,31 +52,10 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
                                m_mouse_val_x(0), m_mouse_val_y(0)
 {
     m_device_manager = new DeviceManager();
-    m_device_manager->deserialize();
+    m_device_manager->initialize();
 
     m_timer_in_use = false;
     m_timer = 0;
-
-    bool something_new_to_write = false;
-
-/*
-    if(!m_device_manager->deserialize())
-    {
-        std::cerr << "Failed to read input config file, using defaults\n";
-
-        // could not read config file so use defaults
-        KeyboardDevice* default_device = new KeyboardDevice();
-        something_new_to_write = true;
-    }
-*/
-
-    if(m_device_manager->initGamePadSupport() /* returns whether a new gamepad was detected */)
-    {
-        something_new_to_write = true;
-    }
-
-    // write config file if necessary
-    if(something_new_to_write) m_device_manager->serialize();
 
 }
 // -----------------------------------------------------------------------------
@@ -259,7 +238,6 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 {
     ActivePlayer*   player = NULL;
     PlayerAction    action;
-    bool            btnAlreadyPressed = false;
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection,
                                                           value, programaticallyGenerated, &player, &action );
 

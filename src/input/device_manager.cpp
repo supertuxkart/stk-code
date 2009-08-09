@@ -13,20 +13,38 @@
 DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
+    m_keyboard = NULL;
     m_assign_mode = NO_ASSIGN;
 }
 
 // -----------------------------------------------------------------------------
-bool DeviceManager::initGamePadSupport()
+bool DeviceManager::initialize()
 {
     GamepadConfig           *gamepadConfig = NULL;
     GamePadDevice           *gamepadDevice = NULL;
     bool created = false;
     int numGamepads;
 
-    printf("================================================================================\n");
-    printf("Initializing Gamepad Support\n");
-    printf("================================================================================\n\n");
+
+    // Shutdown in case the device manager is being re-initialized
+    shutdown();
+
+    printf("Initializing Device Manager\n");
+    printf("---------------------------\n");
+
+    deserialize();
+
+    // Assign a configuration to the keyboard, or create one if we haven't yet
+    printf("Initializing keyboard support.\n");
+    if (m_keyboard_configs.size() == 0)
+    {
+        printf("No keyboard configuration exists, creating one.\n");
+        m_keyboard_configs.push_back(new KeyboardConfig());
+        created = true;
+    }
+    m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
+
+    printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     numGamepads = m_irrlicht_gamepads.size();    
@@ -36,7 +54,7 @@ bool DeviceManager::initGamePadSupport()
     {
         printf("#%d: %s detected...", id, m_irrlicht_gamepads[id].Name.c_str());
         // Returns true if new configuration was created
-        if (getGamepadConfig(id, &gamepadConfig) == true)
+        if (getConfigForGamepad(id, &gamepadConfig) == true)
         {
             printf("creating new configuration.\n");
             created = true;
@@ -51,12 +69,10 @@ bool DeviceManager::initGamePadSupport()
                                            m_irrlicht_gamepads[id].Axes,
                                            m_irrlicht_gamepads[id].Buttons,
                                            gamepadConfig );
-
         addGamepad(gamepadDevice);
-        
     } // end for
-    printf("Gamepad support initialization complete.\n\n");
 
+    if (created) serialize();
     return created;
 }
 // -----------------------------------------------------------------------------
@@ -95,7 +111,7 @@ GamePadDevice* DeviceManager::getGamePadFromIrrID(const int id)
  * Check if we already have a config object for gamepad 'irr_id' as reported by irrLicht
  * If no, create one. Returns true if new configuration was created, otherwise false.
  */
-bool DeviceManager::getGamepadConfig(const int irr_id, GamepadConfig **config)
+bool DeviceManager::getConfigForGamepad(const int irr_id, GamepadConfig **config)
 {
     bool found = false;
     bool configCreated = false;
@@ -136,6 +152,7 @@ void DeviceManager::addGamepad(GamePadDevice* d)
     m_gamepads.push_back(d);
 }
 // -----------------------------------------------------------------------------
+
 InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
                                               int btnID,
                                               const bool progGen,
@@ -158,6 +175,7 @@ InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
     return device;
 }
 //-----------------------------------------------------------------------------
+
 InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int deviceID,
                                              int btnID,
@@ -169,17 +187,23 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 {
     GamePadDevice  *gPad = getGamePadFromIrrID(deviceID);
 
-    if (gPad->hasBinding(type, btnID, value, NULL, action))
+    if (gPad != NULL) 
     {
-        if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+        if (gPad->hasBinding(type, btnID, value, NULL, action))
         {
-            *player = NULL;
-            // IT_STICKMOTION happens all the time, don't consider it discrete input
-            if ((!progGen) && (type == Input::IT_STICKBUTTON)) m_latest_used_device = gPad;
+            if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+            {
+                *player = NULL;
+                // IT_STICKMOTION happens all the time, don't consider it discrete input
+                if ((!progGen) && (type == Input::IT_STICKBUTTON)) m_latest_used_device = gPad;
+            }
+            else 
+            {
+                *player = gPad->m_player;
+            }
         }
-        else *player = gPad->m_player;
+        else gPad = NULL; // If no bind was found, return NULL
     }
-    else gPad = NULL; // If no bind was found, return NULL
 
     return gPad;
 }
@@ -218,11 +242,15 @@ bool DeviceManager::translateInput( Input::InputType type,
     if (device != NULL)
     {
         // Handle internal events
+
+
+/*  FIXME: only call when in kart selection screen
         if ((*player != NULL) && (*action == PA_RESCUE))
         {
             KartSelectionScreen::playerPressedRescue( *player );
             *action = PA_FIRST; // FIXME: action set to PA_FIRST if handled internally (too hackish)
         }
+*/
 
         if ((*player == NULL) && (*action == PA_FIRE) && (m_assign_mode == DETECT_NEW))
         {
@@ -231,7 +259,7 @@ bool DeviceManager::translateInput( Input::InputType type,
         }
     }
 
-    // Return true if a matching device was found
+    // Return true if input was successfully translated to an action and player
     return (device != NULL);
 }
 //-----------------------------------------------------------------------------
@@ -251,98 +279,95 @@ bool DeviceManager::deserialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
     
-    if(!file_manager->fileExists(filepath)) return false;
-    
-    irr::io::IrrXMLReader* xml = irr::io::createIrrXMLReader( filepath.c_str() );
-    
-    const int GAMEPAD = 1;
-    const int KEYBOARD = 2;
-    const int NOTHING = 3;
-    
-    int reading_now = NOTHING;
-    
-    KeyboardConfig* keyboard_config = NULL;
-    GamepadConfig* gamepad_config = NULL;
-    
-    printf("================================================================================\n");
-    printf("Deserializing input.config\n");
-    printf("================================================================================\n\n");
+    printf("Deserializing input.config...\n");
 
-    // parse XML file
-    while(xml && xml->read())
+    if(!file_manager->fileExists(filepath))
     {
-        switch(xml->getNodeType())
-        {
-            case irr::io::EXN_TEXT:
-                break;
-                
-            case irr::io::EXN_ELEMENT:
-            {
-                if (strcmp("keyboard", xml->getNodeName()) == 0)
-                {
-                    keyboard_config = new KeyboardConfig();
-                    reading_now = KEYBOARD;
-                }
-                else if (strcmp("gamepad", xml->getNodeName()) == 0)
-                {
-                    gamepad_config = new GamepadConfig(xml);
-                    reading_now = GAMEPAD;
-                }
-                else if (strcmp("action", xml->getNodeName()) == 0)
-                {
-                    if(reading_now == KEYBOARD) 
-                    {
-                        if(keyboard_config != NULL)
-                            if(!keyboard_config->deserializeAction(xml))
-                                std::cerr << "Ignoring an ill-formed action in input config.\n";
-                    }
-                    else if(reading_now == GAMEPAD) 
-                    {
-                        if(gamepad_config != NULL)
-                            if(!gamepad_config->deserializeAction(xml))
-                                std::cerr << "Ignoring an ill-formed action in input config.\n";
-                    }
-                    else std::cerr << "Warning: An action is placed in an unexpected area in the input config file.\n";
-                }
-            }
-            break;
-            // ---- section ending
-            case irr::io::EXN_ELEMENT_END:
-            {
-                if (strcmp("keyboard", xml->getNodeName()) == 0)
-                {
-                    m_keyboard_configs.push_back(keyboard_config);
-                    reading_now = NOTHING;
-                }
-                else if (strcmp("gamepad", xml->getNodeName()) == 0)
-                {
-                    m_gamepad_configs.push_back(gamepad_config);
-                    reading_now = NOTHING;
-                }
-            }
-                break;
-                
-            default: break;
-                
-        } // end switch
-    } // end while
-
-    // For Debugging....
-    printf("Keyboard Configs:\n");
-    for (int n = 0; n < m_keyboard_configs.size(); n++)
-        printf("%s\n", m_keyboard_configs[n].toString().c_str());
-    printf("Gamepad Configs:\n");
-    for (int n = 0; n < m_gamepad_configs.size(); n++)
-        printf("%s\n", m_gamepad_configs[n].toString().c_str());
-
-    if (m_keyboard_configs.size() == 0)
-    {
-        printf("No keyboard configuration exists, creating one.\n");
-        m_keyboard_configs.push_back(new KeyboardConfig());
+        printf("Warning: no configuration file exists.\n");
     }
+    else
+    {
+        irr::io::IrrXMLReader* xml = irr::io::createIrrXMLReader( filepath.c_str() );
+    
+        const int GAMEPAD = 1;
+        const int KEYBOARD = 2;
+        const int NOTHING = 3;
+    
+        int reading_now = NOTHING;
+    
+        KeyboardConfig* keyboard_config = NULL;
+        GamepadConfig* gamepad_config = NULL;
+    
+    
+        // parse XML file
+        while(xml && xml->read())
+        {
+            switch(xml->getNodeType())
+            {
+                case irr::io::EXN_TEXT:
+                    break;
+                    
+                case irr::io::EXN_ELEMENT:
+                {
+                    if (strcmp("keyboard", xml->getNodeName()) == 0)
+                    {
+                        keyboard_config = new KeyboardConfig();
+                        reading_now = KEYBOARD;
+                    }
+                    else if (strcmp("gamepad", xml->getNodeName()) == 0)
+                    {
+                        gamepad_config = new GamepadConfig(xml);
+                        reading_now = GAMEPAD;
+                    }
+                    else if (strcmp("action", xml->getNodeName()) == 0)
+                    {
+                        if(reading_now == KEYBOARD) 
+                        {
+                            if(keyboard_config != NULL)
+                                if(!keyboard_config->deserializeAction(xml))
+                                    std::cerr << "Ignoring an ill-formed action in input config.\n";
+                        }
+                        else if(reading_now == GAMEPAD) 
+                        {
+                            if(gamepad_config != NULL)
+                                if(!gamepad_config->deserializeAction(xml))
+                                    std::cerr << "Ignoring an ill-formed action in input config.\n";
+                        }
+                        else std::cerr << "Warning: An action is placed in an unexpected area in the input config file.\n";
+                    }
+                }
+                break;
+                // ---- section ending
+                case irr::io::EXN_ELEMENT_END:
+                {
+                    if (strcmp("keyboard", xml->getNodeName()) == 0)
+                    {
+                        m_keyboard_configs.push_back(keyboard_config);
+                        reading_now = NOTHING;
+                    }
+                    else if (strcmp("gamepad", xml->getNodeName()) == 0)
+                    {
+                        m_gamepad_configs.push_back(gamepad_config);
+                        reading_now = NOTHING;
+                    }
+                }
+                    break;
+                    
+                default: break;
+                
+            } // end switch
+        } // end while
 
-    m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
-    printf("Deserialization completed.\n\n");
+        printf("Found %d keyboard and %d gamepad configurations.\n", m_keyboard_configs.size(), m_gamepad_configs.size());
+        // For Debugging....
+        /*
+        for (int n = 0; n < m_keyboard_configs.size(); n++)
+            printf("Config #%d\n%s", n + 1, m_keyboard_configs[n].toString().c_str());
+
+        for (int n = 0; n < m_gamepad_configs.size(); n++)
+            printf("%s", m_gamepad_configs[n].toString().c_str());
+        */
+    }
 
     return true;
 }
@@ -351,7 +376,7 @@ void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getHomeDir() + "/input.config";
     user_config->CheckAndCreateDir();
-    printf("Saving Gamepad & Keyboard Configuration\n");
+    printf("Serializing input.config...\n");
 
     
     std::ofstream configfile;
@@ -376,6 +401,23 @@ void DeviceManager::serialize()
     }
     
     configfile << "</input>\n";
-    
-    configfile.close();    
+    configfile.close(); 
+    printf("Serialization complete.\n\n");
 }
+
+
+// -----------------------------------------------------------------------------
+
+void DeviceManager::shutdown()
+{
+    m_gamepads.clearAndDeleteAll();
+    m_gamepad_configs.clearAndDeleteAll();
+    m_keyboard_configs.clearAndDeleteAll();
+    m_latest_used_device = NULL;
+    if (m_keyboard != NULL)
+    {
+        delete m_keyboard;
+        m_keyboard = NULL;
+    }
+}
+
