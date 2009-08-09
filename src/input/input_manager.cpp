@@ -382,7 +382,8 @@ bool InputManager::input(const SEvent& event)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 
-            if(gp->isButtonPressed(i) || isButtonPressed)
+            // Only report button events when the state of the button changes
+            if((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
                 input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0,
                       isButtonPressed ? Input::MAX_VALUE : 0, programaticallyGenerated);
             gp->setButtonPressed(i, isButtonPressed);
