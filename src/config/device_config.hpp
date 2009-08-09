@@ -25,11 +25,16 @@ class DeviceConfig
     private:
 
         KeyBinding  m_bindings[PA_COUNT];
+        bool        m_inuse;  // Is there a device connected to the system 
+                              // which uses this config?
 
     protected:
 
+        std::string m_name;
+
     public:
 
+        std::string getName()           const { return m_name; };
         std::string getBindingAsString  (const PlayerAction action) const;
         std::string toString            ();
 
@@ -40,6 +45,9 @@ class DeviceConfig
                                          const Input::InputType type,
                                          const int              id,
                                          Input::AxisDirection   direction = Input::AD_NEUTRAL);
+
+        void        setInUse            (bool inuse) {m_inuse = inuse;}
+        bool        isInUse            () {return m_inuse;}
 
         // Don't call this directly unless you are KeyboardDevice or GamepadDevice
         bool        getAction           (Input::InputType       type, 
@@ -75,14 +83,12 @@ class GamepadConfig : public DeviceConfig
 
     private:
 
-        std::string m_name;
         int         m_axis_count;
         int         m_button_count;
 
     public:
 
         std::string toString            ();
-        std::string getName()           const { return m_name; };
         int         getAxisCount()      const { return m_axis_count; };
         int         getButtonCount()    const { return m_button_count; };
         void        serialize           (std::ofstream& stream);

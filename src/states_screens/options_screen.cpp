@@ -223,18 +223,8 @@ namespace OptionsScreen
     }
 
     // -----------------------------------------------------------------------------
-    void updateInputButtons(InputDevice* device)
+    void updateInputButtons(DeviceConfig* config)
     {
-        DeviceConfig *config;
-
-        // Should never happen
-        if (device == NULL)
-        {
-            printf("updateInputButtons: passed NULL pointer\n");
-            abort();
-        }
-                
-        config = device->getConfiguration();
 
         // Should never happen
         if (config == NULL)
@@ -265,19 +255,19 @@ namespace OptionsScreen
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_nitro");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_NITRO).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_NITRO).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_drift");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_DRIFT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_DRIFT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_rescue");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_RESCUE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_RESCUE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_look_back");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_LOOK_BACK).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_LOOK_BACK).c_str() );
         }
 
     }
@@ -292,14 +282,19 @@ namespace OptionsScreen
             {
                 devices->addItem("Keyboard","keyboard", file_manager->getDataDir() + "/gui/keyboard.png");
 
-                const int gamepad_count = input_manager->getDeviceList()->getGamePadAmount();
+                const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
 
-                for(int i=0; i<gamepad_count; i++)
+                for(int i = 0; i < gpad_config_count; i++)
                 {
-                    std::string name = input_manager->getDeviceList()->getGamePad(i)->m_name;
-                    char internal_name[32];
-                    sprintf(internal_name, "gamepad%i", i);
-                    devices->addItem(name,internal_name, file_manager->getDataDir() + "/gui/gamepad.png");
+                    GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
+                    // Don't display the configuration if a matching device is not available
+                    if (config->isInUse())
+                    {
+                        std::string name = config->getName();
+                        char internal_name[32];
+                        sprintf(internal_name, "gamepad%i", i);
+                        devices->addItem(name,internal_name, file_manager->getDataDir() + "/gui/gamepad.png");
+                    }
                 }
 
                 getCurrentScreen()->m_inited = true;
@@ -369,7 +364,7 @@ namespace OptionsScreen
                 read = sscanf( selection.c_str(), "gamepad%i", &i );
                 if(read == 1 && i != -1)
                 {
-                    updateInputButtons( input_manager->getDeviceList()->getGamePad(i) );
+                    updateInputButtons( input_manager->getDeviceList()->getGamepadConfig(i) );
                 }
                 else
                 {
@@ -378,7 +373,7 @@ namespace OptionsScreen
             }
             else if(selection == "keyboard")
             {
-                updateInputButtons( input_manager->getDeviceList()->getKeyboard(0) );
+                updateInputButtons( input_manager->getDeviceList()->getKeyboard(0)->getConfiguration() );
             }
             else
             {
@@ -480,7 +475,7 @@ namespace OptionsScreen
             std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
 
             KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
-            //keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
+            keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
 
             // refresh display
             initInput(NULL, "init");
@@ -500,8 +495,10 @@ namespace OptionsScreen
             else
                 std::cout << "Sensed unknown gamepad event type??\n";
 
-            int gamepadID = -1;
+            int configID = -1;
+            sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &configID );
 
+            /*
             if(sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &gamepadID ) != 1 ||
                gamepadID >= input_manager->getDeviceList()->getGamePadAmount())
             {
@@ -511,7 +508,7 @@ namespace OptionsScreen
                     gamepadID = sensedInput->deviceID;
                 }
 
-                if(input_manager->getDeviceList()->getGamePad(gamepadID)->m_index != sensedInput->deviceID)
+                if(input_manager->getDeviceList()->getGamepadConfig(gamepadID)->m_index != sensedInput->deviceID)
                 {
                     // should not happen, but let's try to be bulletproof...
                     std::cerr << "The key that was pressed is not on the gamepad we're trying to configure! ID in list=" << gamepadID <<
@@ -520,8 +517,10 @@ namespace OptionsScreen
                 }
 
             }
-            GamePadDevice* gamepad =  input_manager->getDeviceList()->getGamePad(gamepadID);
-            gamepad->getConfiguration()->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
+            */
+
+            GamepadConfig* config =  input_manager->getDeviceList()->getGamepadConfig(configID);
+            config->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
                                  (Input::AxisDirection)sensedInput->axisDirection);
 
             // refresh display

@@ -61,7 +61,9 @@ public:
     void addGamepad(GamePadDevice* d);
     
     int getGamePadAmount() const                            { return m_gamepads.size(); }
+    int getGamePadConfigAmount() const                      { return m_gamepad_configs.size(); }
     GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
+    GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     PlayerAssignMode    playerAssignMode() const            { return m_assign_mode; }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboard; }
     GamePadDevice*      getGamePadFromIrrID(const int i);

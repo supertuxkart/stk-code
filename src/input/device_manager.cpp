@@ -43,11 +43,14 @@ bool DeviceManager::initialize()
         created = true;
     }
     m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
+    // TODO: Detect keyboard presence, if there is no keyboard, this should be false
+    m_keyboard_configs.get(0)->setInUse(true);
 
     printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     numGamepads = m_irrlicht_gamepads.size();    
+    printf("Irrlicht reports %d gamepads are attached to the system.\n", numGamepads);
 
     // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
     for (int id = 0; id < numGamepads; id++)
@@ -64,6 +67,7 @@ bool DeviceManager::initialize()
             printf("using existing configuration.\n");
         }
 
+        gamepadConfig->setInUse(true);
         gamepadDevice = new GamePadDevice( id, 
                                            m_irrlicht_gamepads[id].Name.c_str(),
                                            m_irrlicht_gamepads[id].Axes,

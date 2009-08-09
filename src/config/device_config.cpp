@@ -201,6 +201,8 @@ void KeyboardConfig::setDefaultBinds()
 
 KeyboardConfig::KeyboardConfig()
 {
+    m_name = "Keyboard";
+    setInUse(true);
     setDefaultBinds();
 }
 
@@ -238,6 +240,7 @@ GamepadConfig::GamepadConfig   ( const std::string      name,
     m_name = name;
     m_axis_count = axis_count;
     m_button_count = btnCount;
+    setInUse(false);
     setDefaultBinds();
 }
 
@@ -254,6 +257,7 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml)
     {
         m_name = name_string;
     }
+    setInUse(false);
     setDefaultBinds();
 }
 
