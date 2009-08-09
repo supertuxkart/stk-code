@@ -225,26 +225,43 @@ namespace OptionsScreen
     // -----------------------------------------------------------------------------
     void updateInputButtons(InputDevice* device)
     {
+        DeviceConfig *config;
+
+        // Should never happen
+        if (device == NULL)
+        {
+            printf("updateInputButtons: passed NULL pointer\n");
+            abort();
+        }
+                
+        config = device->getConfiguration();
+
+        // Should never happen
+        if (config == NULL)
+        {
+            printf("ERROR: No configuration associated with device?\n");
+            abort();
+        }
 
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_up");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_ACCEL).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_ACCEL).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_down");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_BRAKE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_BRAKE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_left");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_LEFT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_LEFT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_right");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_RIGHT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_RIGHT).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_fire");
-            btn->setLabel( device->getConfiguration()->getBindingAsString(PA_FIRE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_FIRE).c_str() );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_nitro");

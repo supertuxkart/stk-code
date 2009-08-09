@@ -4,13 +4,13 @@
 
 std::string DeviceConfig::getBindingAsString (const PlayerAction action) const
 {
-    std::string returnString = NULL;
+    std::string returnString = "";
 
     if ((action < PA_COUNT) && (action >= 0))
     {
-        returnString = Input::getInputAsString(m_bindings[action].type, 
-                                               m_bindings[action].id,
-                                               m_bindings[action].dir);
+        returnString = returnString.append( Input::getInputAsString(m_bindings[action].type, 
+                                                                    m_bindings[action].id,
+                                                                    m_bindings[action].dir) );
     }
 
     return returnString;
