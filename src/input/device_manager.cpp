@@ -193,7 +193,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 
     if (gPad != NULL) 
     {
-        if (gPad->hasBinding(type, btnID, value, NULL, action))
+        if (gPad->hasBinding(type, btnID, value, gPad->getPlayer(), action))
         {
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
