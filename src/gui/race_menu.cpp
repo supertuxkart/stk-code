@@ -91,7 +91,7 @@ void RaceMenu::select()
     case WTOK_RESTART_RACE:
         menu_manager->popMenu();
         if(user_config->m_fullscreen) SDL_ShowCursor(SDL_DISABLE);
-        RaceManager::getWorld()->restartRace();
+        race_manager->rerunRace();
         break;
 
     case WTOK_OPTIONS:
