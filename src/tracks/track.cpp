@@ -1413,9 +1413,8 @@ void Track::loadTrackModel()
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
-    Vec3 min, max;
-    SSGHelp::MinMax(m_model, &min, &max);
-    RaceManager::getWorld()->getPhysics()->init(min, max);
+    SSGHelp::MinMax(m_model, &m_aabb_min, &m_aabb_max);
+    RaceManager::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
     createPhysicsModel();
 }   // loadTrack
 

@@ -60,6 +60,8 @@ private:
     Vec3                     m_camera_final_hpr;
     bool                     m_is_arena;
     int                      m_version;
+    Vec3                     m_aabb_min;
+    Vec3                     m_aabb_max;
     
 public:
     enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
@@ -195,6 +197,7 @@ public:
             y_offset+(v[1]-m_driveline_min[1])*m_scale_y);
     }
 
+    void  getAABB(Vec3 *min, Vec3 *max) const {*min=m_aabb_min; *max=m_aabb_max; }
 private:
     void  loadTrack                      (std::string filename);
     void  itemCommand                    (sgVec3 *xyz, int item_type, int bNeedHeight);

@@ -197,7 +197,14 @@ void Flyable::update (float dt)
 	
     Vec3 pos=getBody()->getWorldTransform().getOrigin();
     TerrainInfo::update(pos);
-    if(getHoT()==Track::NOHIT) 
+    // Check if the flyable is out of the track  boundary.
+    // If so, let it explode. Note: height is not tested,
+    // so that things can fly as high as they want to.
+    Vec3 min, max;
+    RaceManager::getTrack()->getAABB(&min, &max);
+    Vec3 xyz=getXYZ();
+    if( xyz[0]<min[0] || xyz[1]<min[1] || xyz[2]<min[2] || 
+        xyz[0]>max[0] || xyz[1]>max[1]                    )    
     {
         hit(NULL);    // flyable out of track boundary
         return;
