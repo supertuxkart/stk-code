@@ -187,8 +187,9 @@ void LinearWorld::update(float delta)
 
         // Lap counting, based on the new position, but only if the kart
         // hasn't finished the race (otherwise it would be counted more than
-        // once for the number of finished karts).
-        if(!kart->hasFinishedRace())
+        // once for the number of finished karts), and not if the kart is
+        // being rescued (which can happen as a result of a shortcut)
+        if(!kart->hasFinishedRace() && !kart->isRescue())
             doLapCounting(kart_info, kart);
     }   // for n
 
