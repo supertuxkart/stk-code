@@ -51,6 +51,8 @@ private:
     WidgetTokens     m_selected_widget;
     Widget          *displayRaceResults();
     Widget          *displayKartList(Widget *w_prev, int *order, float horizontal);
+    /** Waiting time before this menu can be left. */
+    float            m_waiting_time;
 public:
                      RaceResultsGUI();
                     ~RaceResultsGUI();

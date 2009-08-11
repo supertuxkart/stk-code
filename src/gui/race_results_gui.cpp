@@ -31,8 +31,18 @@
 #include "network/network_manager.hpp"
 #include "utils/translation.hpp"
 
+/** It can happen (e.g. if a player has skidding assigned to space or enter)
+ *  that a selection key is still pressed when this menu is shown (e.g. follow
+ *  the leader race which doesn't have a end-race-camera). To avoid that this
+ *  menu is left as soon as it is entered (since back to main menu is selected
+ *  as default), WAITING_TIME seconds have to pass before a selection is 
+ *  accepted. Admittedly a somehwat ugly work around.
+ */
+#define WAITING_TIME 1
+
 RaceResultsGUI::RaceResultsGUI()
 {
+    m_waiting_time    = WAITING_TIME;
     m_first_time      = true;
     m_selected_widget = WTOK_NONE;
 
@@ -217,6 +227,10 @@ RaceResultsGUI::~RaceResultsGUI()
  */
 void RaceResultsGUI::select()
 {
+    // Ignore a selection if the menu is still in 'waiting' mode. This helps
+    // in case that someone presses space or enter while a FTL race finishes
+    // --> this menu isn't immediately canceled.
+    if(m_waiting_time>=0) return;
     // Push the unlocked-feature menu in for now
     if(unlock_manager->getUnlockedFeatures().size()>0)
     {
@@ -228,7 +242,6 @@ void RaceResultsGUI::select()
     // The selected token is saved here, which triggers a change of the text
     // in update().
     m_selected_widget = (WidgetTokens)widget_manager->getSelectedWgt();
-
     // Clients send the ack to the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
         network_manager->sendRaceResultAck();
@@ -273,6 +286,7 @@ void RaceResultsGUI::setSelectedWidget(int token)
  */
 void RaceResultsGUI::update(float dt)
 {
+    m_waiting_time -= dt;
     BaseGUI::update(dt);
     // If an item is selected (for the first time), change the text
     // so that the user has feedback about his selection.
