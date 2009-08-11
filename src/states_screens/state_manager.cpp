@@ -182,11 +182,28 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     }
     else if(name == "gamemode")
     {
-        // TODO - detect more game modes
         RibbonGridWidget* w = dynamic_cast<RibbonGridWidget*>(widget);
-        if(w->getSelectionIDString() == "normal")
+        const std::string selectedMode = w->getSelectionIDString();
+        
+        if (selectedMode == "normal")
         {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);
             pushMenu("tracks.stkgui");
+        }
+        else if (selectedMode == "timetrial")
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+            pushMenu("tracks.stkgui");
+        }
+        else if (selectedMode == "ftl")
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+            pushMenu("tracks.stkgui");
+        }
+        else if (selectedMode == "3strikes")
+        {
+            // TODO - 3 strikes battle mode selection
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         }
     }
     else if(name == "aikartamount")

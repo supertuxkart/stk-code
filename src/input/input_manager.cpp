@@ -338,6 +338,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
  * negative direction. This simplifies input configuration and allows greater
  * flexibility (= treat 4 directions as four buttons).
  *
+ * Returns whether to halt the event's propagation here
  */
 bool InputManager::input(const SEvent& event)
 {
@@ -375,7 +376,7 @@ bool InputManager::input(const SEvent& event)
         if (gp == NULL)
         {
             // Prevent null pointer crash
-            return false;
+            return true;
         }
 
         for(int i=0; i<gp->m_button_count; i++)
@@ -455,9 +456,8 @@ bool InputManager::input(const SEvent& event)
          */
     }
 #endif
-    // FIXME: to restore the original behaviour (engine returns false in the
-    //        case the input_manager::input is called)
-    return false;
+
+    return getDeviceList()->playerAssignMode() != NO_ASSIGN; // block events in all modes but initial menus
 }
 
 //-----------------------------------------------------------------------------

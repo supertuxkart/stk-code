@@ -46,7 +46,8 @@ bool EventHandler::OnEvent (const SEvent &event)
     else
     {
         // FIXME : it's a bit unclean that all input events go trough the gui module
-        return input_manager->input(event);
+        const bool blockPropagation = input_manager->input(event);
+        return blockPropagation;
     }
     
     // to shut up a warning. gcc is too stupid too see the code will never get here
@@ -145,6 +146,8 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
         ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
         return false;
     }
+    
+    std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
     
     Widget* parent = w->m_event_handler;
     if(w->m_event_handler != NULL)
@@ -349,29 +352,26 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             break;
             
         case PA_FIRE:
-            if(type == Input::IT_STICKBUTTON)
+            if (pressedDown)
             {
-                if (pressedDown)
-                {
-                    IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
-                    Widget* w = GUIEngine::getCurrentScreen()->getWidget( element->getID() );
-                    if(w == NULL) break;
-                    onWidgetActivated( w );
-                }
-                
-                /*
-                 // simulate a 'enter' key press
-                 irr::SEvent::SKeyInput evt;
-                 evt.PressedDown = pressedDown;
-                 evt.Key = KEY_SPACE;  // FIXME : what if keyboard bindings are not set to use this key?
-                 evt.Char = 666; // My magic code to know it's a fake event (FIXME : ugly, but irrlicht doesn't seem to offer better)
-                 irr::SEvent wrapper;
-                 wrapper.KeyInput = evt;
-                 
-                 wrapper.EventType = EET_KEY_INPUT_EVENT;
-                 GUIEngine::getDevice()->postEventFromUser(wrapper);
-                 */
+                IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
+                Widget* w = GUIEngine::getCurrentScreen()->getWidget( element->getID() );
+                if(w == NULL) break;
+                onWidgetActivated( w );
             }
+            
+            /*
+             // simulate a 'enter' key press
+             irr::SEvent::SKeyInput evt;
+             evt.PressedDown = pressedDown;
+             evt.Key = KEY_SPACE;  // FIXME : what if keyboard bindings are not set to use this key?
+             evt.Char = 666; // My magic code to know it's a fake event (FIXME : ugly, but irrlicht doesn't seem to offer better)
+             irr::SEvent wrapper;
+             wrapper.KeyInput = evt;
+             
+             wrapper.EventType = EET_KEY_INPUT_EVENT;
+             GUIEngine::getDevice()->postEventFromUser(wrapper);
+             */
             break;
         default:
             return;
