@@ -66,6 +66,7 @@ public:
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     PlayerAssignMode    playerAssignMode() const            { return m_assign_mode; }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboard; }
+    PlayerAssignMode    getAssignMode()                     { return m_assign_mode; }
     GamePadDevice*      getGamePadFromIrrID(const int i);
     InputDevice*        getLatestUsedDevice();
     void                setAssignMode(const PlayerAssignMode assignMode);

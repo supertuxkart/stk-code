@@ -30,6 +30,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "states_screens/options_screen.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/engine.hpp"
@@ -239,7 +240,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     ActivePlayer*   player = NULL;
     PlayerAction    action;
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection,
-                                                          value, programaticallyGenerated, &player, &action );
+                                                          value, programaticallyGenerated, &player, &action);
 
     if (action_found && action == PA_FIRST) return; // input handled internally by the device manager
     
@@ -274,6 +275,32 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     // Otherwise, do something with the key if it matches a binding
     else if (action_found)
     {
+        // If we're in the kart menu awaiting new players, do special things
+        // when a device presses fire or rescue
+        if( m_device_manager->getAssignMode() == DETECT_NEW )
+        {
+            // Player is unjoining
+            if ((player != NULL) && (action == PA_RESCUE))
+            {
+                KartSelectionScreen::playerPressedRescue( player );
+                return; // we're done here
+            }
+
+            // New player is joining
+            else if ((player == NULL) && (action == PA_FIRE))
+            {
+                InputDevice *device = NULL;
+                if (type == Input::IT_KEYBOARD)
+                    device = m_device_manager->getKeyboard(0);
+                else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+                    device = m_device_manager->getGamePadFromIrrID(deviceID);
+
+                if (device != NULL)
+                    KartSelectionScreen::firePressedOnNewDevice( device );
+                return; // we're done here
+            }
+        }
+
         // ... when in-game
         if(StateManager::get()->isGameState())
         {

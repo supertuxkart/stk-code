@@ -163,20 +163,20 @@ InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
                                               ActivePlayer **player,
                                               PlayerAction *action )
 {
-    InputDevice *device = m_keyboard;
+    KeyboardDevice *keyboard = m_keyboard;
 
-    if (m_keyboard->hasBinding(btnID, action))
+    if (keyboard->hasBinding(btnID, action))
     {
         if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
         {
             *player = NULL;
-            if (!progGen) m_latest_used_device = m_keyboard;
+            if (!progGen) m_latest_used_device = keyboard;
         }
-        else *player = m_keyboard->m_player;
+        else *player = keyboard->m_player;
     }
-    else device = NULL; // If no appropriate bind was found, return NULL
+    else keyboard = NULL; // If no appropriate bind was found, return NULL
 
-    return device;
+    return keyboard;
 }
 //-----------------------------------------------------------------------------
 
@@ -233,35 +233,12 @@ bool DeviceManager::translateInput( Input::InputType type,
             device = mapKeyboardInput(deviceID, btnID, programaticallyGenerated, player, action);
             break;
         case Input::IT_STICKBUTTON:
-            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, programaticallyGenerated, player, action);
-            break;
         case Input::IT_STICKMOTION:
             device = mapGamepadInput(type, deviceID, btnID, axisDir, value, programaticallyGenerated, player, action);
             break;
         default:
             break;
     };
-
-    // If a matching device was found
-    if (device != NULL)
-    {
-        // Handle internal events
-
-
-/*  FIXME: only call when in kart selection screen
-        if ((*player != NULL) && (*action == PA_RESCUE))
-        {
-            KartSelectionScreen::playerPressedRescue( *player );
-            *action = PA_FIRST; // FIXME: action set to PA_FIRST if handled internally (too hackish)
-        }
-*/
-
-        if ((*player == NULL) && (*action == PA_FIRE) && (m_assign_mode == DETECT_NEW))
-        {
-            KartSelectionScreen::firePressedOnNewDevice( device );
-            *action = PA_FIRST;
-        }
-    }
 
     // Return true if input was successfully translated to an action and player
     return (device != NULL);
