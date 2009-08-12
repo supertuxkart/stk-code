@@ -265,7 +265,19 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_QUICK_RACE || m_minor_mode==MINOR_MODE_TIME_TRIAL) new StandardRace();
     else if(m_minor_mode==MINOR_MODE_3_STRIKES) new ThreeStrikesBattle();
     else{ fprintf(stderr,"Could not create given race mode\n"); assert(0); }
-    
+
+    // Save the current score and set last time to zero. This is necessary
+    // if someone presses esc after finishing a gp, and selects restart:
+    // The race is rerun, and the points and scores get reset ... but if
+    // a kart hasn't finished the race at this stage, last_score and time
+    // would be undefined.
+    for(int i=0; i<m_num_karts; i++)
+    {
+        m_kart_status[i].m_last_score = m_kart_status[i].m_score;
+        m_kart_status[i].m_last_time  = 0;
+    }
+
+
     m_active_race = true;
 }   // startNextRace
 //-----------------------------------------------------------------------------
@@ -397,8 +409,6 @@ void RaceManager::exitRace()
 void RaceManager::RaceFinished(const Kart *kart, float time)
 {
     unsigned int id = kart->getWorldKartId();
-    // In follow the leader mode, kart 0 does not get any points,
-    // so the position of each kart is actually one better --> decrease pos
     int pos = kart->getPosition();
 
     assert(pos-1 >= 0);
