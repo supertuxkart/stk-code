@@ -29,8 +29,8 @@ class ActivePlayer;
 namespace KartSelectionScreen
 {
     void setPlayer0Device(InputDevice* device);
-    void firePressedOnNewDevice(InputDevice* device);
-    void playerPressedRescue(ActivePlayer* player);
+    bool firePressedOnNewDevice(InputDevice* device);
+    bool playerPressedRescue(ActivePlayer* player);
     
     void kartSelectionUpdate(float delta);
     

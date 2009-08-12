@@ -405,14 +405,15 @@ class KartHoverListener : public RibbonGridHoverListener
     };
 KartHoverListener* karthoverListener = NULL;
 
-void firePressedOnNewDevice(InputDevice* device)
+// Return true if event was handled successfully
+bool firePressedOnNewDevice(InputDevice* device)
 {
     std::cout << "===== firePressedOnNewDevice =====\n";
 
     if(device == NULL)
     {
         std::cout << "I don't know which device was pressed :'(\n";
-        return;
+        return false;
     }
     else if(device->getType() == DT_KEYBOARD)
     {
@@ -449,7 +450,7 @@ void firePressedOnNewDevice(InputDevice* device)
         g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
     }
     
-    
+    return true;
 }
 
 /**
@@ -489,10 +490,13 @@ void setPlayer0Device(InputDevice* device)
     
 PlayerKartWidget* removedWidget = NULL;
     
-void playerPressedRescue(ActivePlayer* player)
+// Return true if event was handled succesfully
+bool playerPressedRescue(ActivePlayer* player)
 {    
     int playerID = -1;
     
+    if (g_player_karts.size() <= 1) return false; // can't back out last player
+
     for (int n=0; n<g_player_karts.size(); n++)
     {
         if (g_player_karts[n].m_associatedPlayer == player)
@@ -503,7 +507,8 @@ void playerPressedRescue(ActivePlayer* player)
     }
     if (playerID == -1)
     {
-        std::cerr << "void playerPressedRescue(ActivePlayer* player) : cannot find passed player\n";
+        std::cout << "void playerPressedRescue(ActivePlayer* player) : cannot find passed player\n";
+        return false;
     }
     
     removedWidget = g_player_karts.remove(playerID);
@@ -514,7 +519,8 @@ void playerPressedRescue(ActivePlayer* player)
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
     const int splitWidth = fullarea->w / amount;
     
-    assert( amount == StateManager::get()->activePlayerCount() );
+    // TODO: fix this
+    //assert( amount == StateManager::get()->activePlayerCount() );
     
     for (int n=0; n<amount; n++)
     {
@@ -523,6 +529,7 @@ void playerPressedRescue(ActivePlayer* player)
     }
     removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h,
                          0, 0);
+    return true;
 }
     
 void kartSelectionUpdate(float delta)

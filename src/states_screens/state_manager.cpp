@@ -432,6 +432,7 @@ void StateManager::escapePressed()
     {
         // TODO : show in-game menu
         resetAndGoToMenu("main.stkgui");
+        input_manager->setMode(InputManager::MENU);
     }
     // In menus
     else

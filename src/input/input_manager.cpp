@@ -282,8 +282,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             // Player is unjoining
             if ((player != NULL) && (action == PA_RESCUE))
             {
-                KartSelectionScreen::playerPressedRescue( player );
-                return; // we're done here
+                // returns true if the event was handled
+                if (KartSelectionScreen::playerPressedRescue( player ))
+                    return; // we're done here
             }
 
             // New player is joining
