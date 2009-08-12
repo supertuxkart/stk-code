@@ -221,6 +221,7 @@ void ChallengeData::setRace() const
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts);
         race_manager->setNumPlayers(1);
+        race_manager->setNumLocalPlayers(1);
         race_manager->setCoinTarget(m_energy);
     }
     else   // GP
@@ -231,7 +232,7 @@ void ChallengeData::setRace() const
         race_manager->setDifficulty(m_difficulty);
         race_manager->setNumKarts(m_num_karts);
         race_manager->setNumPlayers(1);
-        //race_manager->setGrandPrix();
+        race_manager->setNumLocalPlayers(1);
     }
 }   // setRace
 
