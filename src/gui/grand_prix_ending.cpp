@@ -80,8 +80,11 @@ GrandPrixEnd::GrandPrixEnd()
     }
     
     static char output[MAX_MESSAGE_LENGTH];
-    snprintf(output, sizeof(output),
-        _("The winner is %s!"),race_manager->getKartName(winner_kart_id).c_str()); // FIXME - uses inner-name and not user name
+    const std::string kart_id = race_manager->getKartName(winner_kart_id);
+    const KartProperties* winning_kart = kart_properties_manager->getKart(kart_id);
+
+    snprintf(output, sizeof(output), 
+             _("The winner is %s!"),winning_kart->getName().c_str());
     widget_manager->addWgt( WTOK_TITLE, 60, 10);
     widget_manager->showWgtRect(WTOK_TITLE);
     widget_manager->showWgtText(WTOK_TITLE);
