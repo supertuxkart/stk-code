@@ -70,6 +70,10 @@ private:
     bool                     m_has_final_camera;
     Vec3                     m_camera_final_position;
     Vec3                     m_camera_final_hpr;
+    /** Minimum coordinates of this track. */
+    Vec3                     m_aabb_min;
+    /** Maximum coordinates of this track. */
+    Vec3                     m_aabb_max;
     bool                     m_is_arena;
     int                      m_version;
 
@@ -116,14 +120,14 @@ private:
     /** The texture for the mini map, which is displayed in the race gui. */
     video::ITexture         *m_mini_map;
 
-	/** List of all bezier curves in the track - for e.g. camera, ... */
-	std::vector<BezierCurve*> m_all_curves;
+    /** List of all bezier curves in the track - for e.g. camera, ... */
+    std::vector<BezierCurve*> m_all_curves;
 
-	/** Animation manager. */
-	AnimationManager         *m_animation_manager;
+    /** Animation manager. */
+    AnimationManager         *m_animation_manager;
 
-	/** Checkline manager. */
-	CheckManager             *m_check_manager;
+    /** Checkline manager. */
+    CheckManager             *m_check_manager;
 
     void  loadTrack(const std::string &filename);
     void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
@@ -134,7 +138,7 @@ private:
     void                     createWater(const XMLNode &node);
     void  getMusicInformation(std::vector<std::string>&             filenames, 
                               std::vector<MusicInformation*>& m_music   );
-	void loadCurves(const XMLNode &node);
+    void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
 public:
@@ -192,9 +196,11 @@ public:
     float              getTerrainHeight(const Vec3 &pos) const;
     void               createPhysicsModel();
     void               update(float dt);
-	void               reset();
+    void               reset();
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
-
+    /** Sets pointer to the aabb of this track. */
+    void               getAABB(const Vec3 **min, const Vec3 **max) const
+    { *min = &m_aabb_min; *max = &m_aabb_max; }
     /** Returns the graph of quads, mainly for the AI. */
     const QuadGraph&   getQuadGraph() const { return *m_quad_graph; }
 

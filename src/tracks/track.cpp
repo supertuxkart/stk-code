@@ -439,9 +439,8 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
 
     m_all_meshes.push_back(mesh);
 
-    Vec3 min, max;
-    MeshTools::minMax3D(mesh, &min, &max);
-    RaceManager::getWorld()->getPhysics()->init(min, max);
+    MeshTools::minMax3D(mesh, &m_aabb_min, &m_aabb_max);
+    RaceManager::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
     // This will (at this stage) only convert the main track model.
     convertTrackToBullet(mesh);
     if (m_track_mesh == NULL)
