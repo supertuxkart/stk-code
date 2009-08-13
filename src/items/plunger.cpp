@@ -65,7 +65,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
         float fire_angle     = 0.0f;
         float time_estimated = 0.0f;
         getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
-                                       plunger_speed, gravity,
+                                       plunger_speed, gravity, y_offset,
                                        &fire_angle, &up_velocity, &time_estimated);
 
         // apply transformation to the bullet object (without pitch)
@@ -85,6 +85,9 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
         createPhysics(y_offset, btVector3(pitch, plunger_speed, 0.0f),
                       new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
     }
+
+    //adjust height according to terrain
+    setAdjustZVelocity(true);
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
@@ -129,23 +132,8 @@ void Plunger::update(float dt)
     // Else: update the flyable and rubber band
     Flyable::update(dt);
     if(m_rubber_band != NULL) m_rubber_band->update(dt);
-    
+
     if(getHoT()==Track::NOHIT) return;
-    float hat = getTrans().getOrigin().getZ()-getHoT();
-
-    // Use the Height Above Terrain to set the Z velocity.
-    // HAT is clamped by min/max height. This might be somewhat
-    // unphysical, but feels right in the game.
-
-    float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
-    Vec3 v = getVelocity();
-    float heading = atan2f(-v.getX(), v.getY());
-    float pitch   = getTerrainPitch (heading);
-    float vel_z = m_force_updown*(delta);
-    if (hat < m_max_height) // take into account pitch of surface
-        vel_z += v.length_2d()*tanf(pitch);
-    v.setZ(vel_z);
-    setVelocity(v);
 }   // update
 
 // -----------------------------------------------------------------------------
@@ -188,7 +176,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             getNode()->setPosition(hell.toIrrVector());
         }
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
-        
+
         if(kart)
         {
             m_rubber_band->hit(kart);
@@ -208,7 +196,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
 
 // -----------------------------------------------------------------------------
 /** Called when the plunger hits the track. In this case, notify the rubber
- *  band, and remove the plunger (but keep it alive). 
+ *  band, and remove the plunger (but keep it alive).
  */
 void Plunger::hitTrack()
 {

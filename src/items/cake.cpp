@@ -48,7 +48,7 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     // give a speed proportional to kart speed
     m_speed = kart->getSpeed() * m_speed / 23.0f;
     if (kart->getSpeed() < 0)
-	m_speed /= 3.5f; //when going backwards, decrease speed of cake by less
+	m_speed /= 3.6f; //when going backwards, decrease speed of cake by less
 
     m_speed += 16.0f;
 
@@ -80,14 +80,10 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 
         float fire_angle     = 0.0f;
         float time_estimated = 0.0f;
-        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
-                                       m_speed, m_gravity,
-                                       &fire_angle, &up_velocity, &time_estimated);
 
-        btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
-        btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
-                                    thisKartDirMatrix[1][1],
-                                    thisKartDirMatrix[2][1]);
+        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
+                                       m_speed, m_gravity, y_offset,
+                                       &fire_angle, &up_velocity, &time_estimated);
 
         // apply transformation to the bullet object (without pitch)
         btMatrix3x3 m;
@@ -107,6 +103,9 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     createPhysics(y_offset, m_initial_velocity,
                   new btCylinderShape(0.5f*m_extend), -m_gravity,
                   true /* rotation */, false /* backwards */, &trans);
+
+    //do not adjust height according to terrain
+    setAdjustZVelocity(false);
 
     m_body->setActivationState(DISABLE_DEACTIVATION);
 
@@ -133,43 +132,31 @@ void Cake::init(const lisp::Lisp* lisp, scene::IMesh *cake_model)
 // -----------------------------------------------------------------------------
 void Cake::update(float dt)
 {
+    //The following commented out code adds a lock on to the cake. It is kept
+    //because it shows how to lock on to a moving target precisely with the
+    //intersection algorithm and may be one day useful for something else.
 
+    /*
     if(m_target != NULL)
     {
-        /*
         // correct direction to go towards aimed kart
         btTransform my_trans = getTrans();
-        btTransform target   = m_target->getTrans();
 
         float fire_angle     = 0.0f;
         float time_estimated = 0.0f;
         float up_velocity    = 0.0f;
-        getLinearKartItemIntersection (my_trans.getOrigin(), m_target,
-                                       m_speed, m_gravity,
+
+        btVector3 origin = my_trans.getOrigin() - m_target->getNormal() * 0.5 * m_target->getKartHeight();
+
+        getLinearKartItemIntersection (origin, m_target,
+                                       m_speed, m_gravity, 0,
                                        &fire_angle, &up_velocity, &time_estimated);
 
         m_body->setLinearVelocity( btVector3(-m_speed * sinf (fire_angle),
                                              m_speed * cosf (fire_angle),
                                              up_velocity) );
-        */
-
-        /*
-        // pull towards aimed kart
-        btVector3 pullForce = target.getOrigin() - my_trans.getOrigin();
-        pullForce.setZ(0);
-        pullForce.normalize();
-        pullForce *= 10;
-        m_body->applyCentralImpulse( pullForce );
-        */
-        /*
-        // if over aimed kart, pull down
-        if(fabsf(my_trans.getOrigin().getX() - target.getOrigin().getX()) < 5.0 &&
-           fabsf(my_trans.getOrigin().getY() - target.getOrigin().getY()) < 5.0)
-        {
-            m_body->applyCentralForce( btVector3(0, 0, -20.0f) );
-        }
-        */
     }
+    */
 
     Flyable::update(dt);
 }   // update

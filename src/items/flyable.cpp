@@ -64,7 +64,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 	m_time_since_thrown = 0;
 	m_owner_has_temporary_immunity = true;
 	m_max_lifespan = -1;
-	
+
     // Add the graphical model
     setNode(irr_driver->addMesh(m_st_model[type]));
 }   // Flyable
@@ -72,7 +72,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 // ----------------------------------------------------------------------------
 void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
                             btCollisionShape *shape, const float gravity,
-                            const bool rotates, const bool turn_around, 
+                            const bool rotates, const bool turn_around,
                             const btTransform* customDirection)
 {
     // Get Kart heading direction
@@ -83,7 +83,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
     offset_transform.setIdentity();
     btVector3 offset=btVector3(0,y_offset,m_average_height);
     offset_transform.setOrigin(offset);
-        
+
     // turn around
     if(turn_around)
     {
@@ -93,7 +93,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
         turn_around_trans.setRotation(btQuaternion(btVector3(0, 0, 1), M_PI));
         trans  *= turn_around_trans;
     }
-    
+
     trans  *= offset_transform;
 
     m_shape = shape;
@@ -115,7 +115,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
 
 }   // createPhysics
 // -----------------------------------------------------------------------------
-void Flyable::init(const lisp::Lisp* lisp, scene::IMesh *model, 
+void Flyable::init(const lisp::Lisp* lisp, scene::IMesh *model,
                    PowerupType type)
 {
     m_st_speed[type]        = 25.0f;
@@ -146,37 +146,37 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
                              btVector3 *minDelta, const Kart* inFrontOf, const bool backwards) const
 {
     btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() : getTrans());
-    
+
     *minDistSquared = -1.0f;
     *minKart = NULL;
-    
+
     for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
     {
         Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated() || kart == m_owner || kart->isRescue() ) continue;
         btTransform t=kart->getTrans();
-       
+
         btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
         float distance2 = delta.length2();
-        
+
         if(inFrontOf != NULL)
         {
             // Ignore karts behind the current one
             btVector3 to_target = kart->getXYZ() - inFrontOf->getXYZ();
             const float distance = to_target.length();
             if(distance > 50) continue; // kart too far, don't aim at it
-            
+
             btTransform trans = inFrontOf->getTrans();
             // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
             btVector3 direction(trans.getBasis()[0][1],
                                 trans.getBasis()[1][1],
                                 trans.getBasis()[2][1]);
-            
+
             const float angle = to_target.angle( backwards ? -direction : direction );
-            
+
             if(fabsf(angle) > 1) continue;
         }
-        
+
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
         {
             *minDistSquared = distance2;
@@ -184,54 +184,57 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
             *minDelta = delta;
         }
     }  // for i<getNumKarts
-    
+
 }   // getClosestKart
 
 //-----------------------------------------------------------------------------
 void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart *target_kart,
-                                             float item_XY_speed, float gravity,
+                                             float item_XY_speed, float gravity, float y_offset,
                                              float *fire_angle, float *up_velocity, float *time_estimated)
 {
-    btVector3 targetKartLoc = target_kart->getTrans().getOrigin();
-
-    float dx = targetKartLoc.getX() - origin.getX();
-    float dy = targetKartLoc.getY() - origin.getY();
-    float dz = targetKartLoc.getZ() - origin.getZ();
+    btVector3 relative_target_kart_loc = target_kart->getTrans().getOrigin() - origin;
 
     btTransform trans = target_kart->getTrans();
-    Vec3 target_direction(trans.getBasis()[0][1],
-                          trans.getBasis()[1][1],
-                          trans.getBasis()[2][1]);
+    btVector3 target_direction(trans.getBasis()[0][1],
+                               trans.getBasis()[1][1],
+                               trans.getBasis()[2][1]);
+
+    float dx = relative_target_kart_loc.getX();
+    float dy = relative_target_kart_loc.getY();
+    float dz = relative_target_kart_loc.getZ();
 
     float gx = target_direction.getX();
     float gy = target_direction.getY();
     float gz = target_direction.getZ();
-    
-    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed(); //Projected onto X-Y plane
+
+    float target_kart_speed = hypotf(gx, gy) * target_kart->getSpeed(); //Projected onto X-Y plane
 
     float target_kart_heading = atan2f(-gx, gy); //anti-clockwise
 
-    target_kart_heading += M_PI;
-
-    float dist = (target_kart_speed / item_XY_speed) * (dx * cosf(target_kart_heading) + dy * sinf(target_kart_heading));
+    float dist = -(target_kart_speed / item_XY_speed) * (dx * cosf(target_kart_heading) + dy * sinf(target_kart_heading));
 
     float fire_th = (dx*dist - dy * sqrtf(dx*dx + dy*dy - dist*dist)) / (dx*dx + dy*dy);
     fire_th = (((dist - dx*fire_th) / dy < 0) ? -acosf(fire_th): acosf(fire_th));
 
     float time = 0.0f;
-    float a = item_XY_speed * sinf (fire_th) - target_kart_speed * sinf (target_kart_heading);
-    float b = item_XY_speed * cosf (fire_th) - target_kart_speed * cosf (target_kart_heading);
+    float a = item_XY_speed * sinf (fire_th) + target_kart_speed * sinf (target_kart_heading);
+    float b = item_XY_speed * cosf (fire_th) + target_kart_speed * cosf (target_kart_heading);
 
     if (fabsf(a) > fabsf(b))
         time = fabsf (dx / a);
     else if (b != 0.0f)
         time = fabsf(dy / b);
 
-    fire_th += M_PI;
+    if (fire_th > M_PI)
+        fire_th -= M_PI;
+    else
+        fire_th += M_PI;
 
+    //createPhysics offset
+    time -= y_offset / hypotf(a, b);
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
+    *up_velocity = (0.5 * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
     *time_estimated = time;
 }
 
@@ -240,9 +243,9 @@ void Flyable::update(float dt)
 {
 	m_time_since_thrown += dt;
 	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);
-	
+
     if(m_exploded) return;
-	
+
     Vec3 pos=getBody()->getWorldTransform().getOrigin();
     TerrainInfo::update(pos);
 
@@ -280,7 +283,7 @@ void Flyable::update(float dt)
 
 // -----------------------------------------------------------------------------
 /** Updates the position of a projectile based on information received frmo the
- *  server. 
+ *  server.
  */
 void Flyable::updateFromServer(const FlyableInfo &f, float dt)
 {
@@ -299,8 +302,8 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
  */
 bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 {
-	return m_owner_has_temporary_immunity && 
-           kart_hit == m_owner            && 
+	return m_owner_has_temporary_immunity &&
+           kart_hit == m_owner            &&
            m_time_since_thrown < 2.0f;
 }   // isOwnerImmunity
 
@@ -309,7 +312,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
 	// the owner of this flyable should not be hit by his own flyable
 	if(m_exploded || isOwnerImmunity(kart_hit)) return;
-	
+
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.
@@ -324,10 +327,10 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
     for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
     {
         Kart *kart = RaceManager::getKart(i);
-        // Handle the actual explosion. The kart that fired a flyable will 
+        // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.
-        if(m_owner!=kart || m_owner==kart_hit) 
+        if(m_owner!=kart || m_owner==kart_hit)
         {
             // Set a flag it if was a direct hit.
             kart->handleExplosion(getXYZ(), kart==kart_hit);
