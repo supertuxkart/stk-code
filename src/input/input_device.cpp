@@ -26,6 +26,7 @@ KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
 {
     m_configuration = configuration;
     m_type = DT_KEYBOARD;
+    m_name = "Keyboard";
     m_player = NULL;
 }
 // -----------------------------------------------------------------------------

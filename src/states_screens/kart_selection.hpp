@@ -31,5 +31,6 @@ namespace KartSelectionScreen
     bool playerJoin(InputDevice* device);
     bool playerQuit(ActivePlayer* player);
     void kartSelectionUpdate(float delta);
+    void renumberKarts();
     void menuEventKarts(GUIEngine::Widget* widget, const std::string& name);
 }

@@ -70,6 +70,8 @@ namespace KartSelectionScreen
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
 
         int target_x, target_y, target_w, target_h;
+
+        LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
         
         PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID) : Widget()
         {
@@ -101,7 +103,7 @@ namespace KartSelectionScreen
             }
             
             playerIDLabel = new LabelWidget();
-            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), playerID) + deviceName + ")"; 
+            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), playerID + 1) + deviceName + ")"; 
             playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", playerID);
             playerIDLabel->x = player_id_x;
@@ -409,7 +411,7 @@ KartHoverListener* karthoverListener = NULL;
 // Return true if event was handled successfully
 bool playerJoin(InputDevice* device)
 {
-    std::cout << "===== playerJoin =====\n";
+    std::cout << "playerJoin() ==========\n";
 
     RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
     if (w == NULL )
@@ -417,7 +419,6 @@ bool playerJoin(InputDevice* device)
         std::cout << "playerJoin() called outside of kart selection screen.\n";
         return false;
     }
-
     if(device == NULL)
     {
         std::cout << "I don't know which device was pressed :'(\n";
@@ -442,10 +443,11 @@ bool playerJoin(InputDevice* device)
     
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
-    
     getCurrentScreen()->manualAddWidget(newPlayer);
-    g_player_karts.push_back(newPlayer);
     newPlayer->add();
+
+    g_player_karts.push_back(newPlayer);
+
     
     
     const int amount = g_player_karts.size();
@@ -471,6 +473,8 @@ bool playerQuit(ActivePlayer* player)
     // If last player quits, return to main menu
     if (g_player_karts.size() <= 1) return false;
 
+    std::cout << "playerQuit() ==========\n";
+
     for (int n=0; n<g_player_karts.size(); n++)
     {
         if (g_player_karts[n].m_associatedPlayer == player)
@@ -485,24 +489,15 @@ bool playerQuit(ActivePlayer* player)
         return false;
     }
     
+    // Just a cheap way to check if there is any discrepancy 
+    // between g_player_karts and the active player array
+    assert( g_player_karts.size() == StateManager::get()->activePlayerCount() );
+
     removedWidget = g_player_karts.remove(playerID);
     StateManager::get()->removeActivePlayer(playerID);
-    
-    const int amount = g_player_karts.size();
-    
+    renumberKarts();    
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
-    const int splitWidth = fullarea->w / amount;
-    
-    // TODO: fix this
-    //assert( amount == StateManager::get()->activePlayerCount() );
-    
-    for (int n=0; n < amount; n++)
-    {
-        g_player_karts[n].setPlayerID(n);
-        g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
-    }
-    removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h,
-                         0, 0);
+    removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h, 0, 0);
     return true;
 }
     
@@ -536,19 +531,15 @@ void menuEventKarts(Widget* widget, const std::string& name)
     if(name == "tearDown")
     {
         //g_player_karts.clearWithoutDeleting();
-        g_player_karts.clearAndDeleteAll();
+        //g_player_karts.clearAndDeleteAll();
     }
     else if(name == "init")
     {
-        //g_player_karts.clearWithoutDeleting();
-
-        // Always switch to detect_new when the kart selection screen is active??
-        //input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
-
+        // FIXME: Reload previous kart selection screen state
         g_player_karts.clearAndDeleteAll();
         StateManager::get()->resetActivePlayers();
         input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
-        
+       
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
         
@@ -594,19 +585,35 @@ void menuEventKarts(Widget* widget, const std::string& name)
         }
         
         /*
-        PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::get()->getActivePlayers().get(0),
-                                                             area, 0); // first player
-        getCurrentScreen()->manualAddWidget(playerKart1);
-        playerKart1->add();
-        g_player_karts.push_back(playerKart1);
+
+            TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
+            when players return to the kart selection screen, it will appear as
+            it did when they left (at least when returning from the track menu).
+            Rebuilding the screen is a little tricky.
+
         */
-        
-        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice() );
-        w->updateItemDisplay();
-        
+
+        if (g_player_karts.size() > 0)
+        {
+            // FIXME: trying to rebuild the screen
+            for (int n = 0; n < g_player_karts.size(); n++)
+            {
+                PlayerKartWidget *pkw;
+                pkw = g_player_karts.get(n);
+                getCurrentScreen()->manualAddWidget(pkw);
+                pkw->add();
+            }
+
+        }
+        else // For now this is what will happen
+        {
+            playerJoin( input_manager->getDeviceList()->getLatestUsedDevice() );
+            w->updateItemDisplay();
+        }
         
         getCurrentScreen()->m_inited = true;
     } // end if init
+
     else if(name == "karts")
     {
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
@@ -616,7 +623,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         std::cout << "==========\n" << players.size() << " players :\n";
         for(int n=0; n<players.size(); n++)
         {
-            std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << std::endl;
+            std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << " on " << players[n].getDevice()->m_name << std::endl;
         }
         std::cout << "==========\n";
         
@@ -636,6 +643,29 @@ void menuEventKarts(Widget* widget, const std::string& name)
 
         StateManager::get()->pushMenu("racesetup.stkgui");
     }
+}
+
+void renumberKarts()
+{
+    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    assert( w != NULL );
+    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    const int splitWidth = fullarea->w / g_player_karts.size();
+
+    printf("Renumbering karts...");
+    for (int n=0; n < g_player_karts.size(); n++)
+    {
+        g_player_karts[n].setPlayerID(n);
+        g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
+
+        // FIXME: Not sure why this isn't updating the labels properly ??
+        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), n + 1) + ")"; 
+        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", n);
+    }
+
+    w->updateItemDisplay();
+    printf("OK\n");
+
 }
 
 }
