@@ -71,6 +71,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
+    m_slipstream_time      = 0.0f;
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
@@ -111,6 +112,15 @@ Kart::Kart (const std::string& kart_name, int position,
     }
 
     loadData();
+    float l = m_kart_properties->getSlipstreamLength();
+
+    Vec3 p0(-getKartWidth()*0.5f, -getKartLength()*0.5f, 0);
+    Vec3 p1(-getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
+    Vec3 p2( getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
+    Vec3 p3( getKartWidth()*0.5f, -getKartLength()*0.5f, 0);
+    m_slipstream_original_area = new Quad(p0, p1, p2, p3);
+    m_slipstream_area          = new Quad(p0, p1, p2, p3);
+
     reset();
 }   // Kart
 
@@ -261,6 +271,8 @@ Kart::~Kart()
     {
         delete m_kart_chassis.getChildShape(i);
     }
+    delete m_slipstream_original_area;
+    delete m_slipstream_area;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -561,6 +573,7 @@ void Kart::update(float dt)
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
     }  // UserConfigParams::m_graphical_effects
+
     updatePhysics(dt);
 
     Moveable::update(dt);
@@ -723,6 +736,65 @@ float Kart::handleNitro(float dt)
 
 }   // handleNitro
 
+//-----------------------------------------------------------------------------
+/** This function manages slipstreaming. It adds up the time a kart was 
+ *  slipstreaming, and returns the potential power boost due to coming
+ *  out of slipstream.
+ */
+float Kart::handleSlipstream(float dt)
+{
+    m_slipstream_original_area->transform(getTrans(), m_slipstream_area);
+
+    // Note: there is a slight inconsistency here: Karts are updated one
+    // after another. So if the position of this kart is compared with the
+    // slipstream area of a kart already updated, it will use the new
+    // slipstream area of that kart, but for karts not yet updated the
+    // old position will be used. The differences should not be noticable,
+    // and simplifies the update process (which would otherwise have to be
+    // done in two stages).
+    unsigned int n     = race_manager->getNumKarts();
+    bool is_sstreaming = false;
+    for(unsigned int i=0; i<n; i++)
+    {
+        Kart *kart = race_manager->getKart(i);
+        // Don't test for slipstream with itself.
+        if(kart==this) continue;  
+
+        // Quick test: the kart must be not more than 
+        // slipstream length+kart_length() away from the other kart
+        Vec3 delta = getXYZ() - kart->getXYZ();
+        float l    = kart->m_kart_properties->getSlipstreamLength() + kart->getKartLength()*0.5f;
+        if(delta.length2_2d() > l*l) continue;
+
+        if(kart->m_slipstream_area->pointInQuad(getXYZ()))
+        {
+            is_sstreaming = true;
+            break;
+        }
+    }
+
+    float add_power = 0;
+    
+
+    if(m_slipstream_time >0 && !is_sstreaming)
+    {
+        // Kart is using slipstream advantage
+        add_power         = getMaxPower() * m_kart_properties->getSlipstreamAddPower();
+        m_slipstream_time = std::max(m_slipstream_time - dt, 0.0f);
+        printf("Add power %f, t=%f for '%s'\n", m_slipstream_time, add_power, getIdent().c_str());
+    }
+    else if(is_sstreaming)
+    {
+        // Kart is collecting sliptstream advantage
+        m_slipstream_time = std::min(m_slipstream_time + dt,
+                                     m_kart_properties->getSlipstreamTime());
+
+    }
+
+    return add_power;
+}   // handleSlipstream
+
+
 // -----------------------------------------------------------------------------
 /** This function is called when the race starts. Up to then all brakes are
     braking (to avoid the kart from rolling downhill), but they need to be set
@@ -766,8 +838,10 @@ void Kart::beep()
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt) 
 {
+
     m_bounce_back_time-=dt;
-    float engine_power = getActualWheelForce() + handleNitro(dt);
+    float engine_power = getActualWheelForce() + handleNitro(dt) 
+                                               + handleSlipstream(dt);
     if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
     if(m_controls.m_accel)   // accelerating

@@ -65,7 +65,8 @@ KartProperties::KartProperties() : m_icon_material(0)
         m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_camera_max_accel = m_camera_max_brake = 
-        m_camera_distance    = UNDEFINED;
+        m_slipstream_length = m_slipstream_time = m_slipstream_add_power = 
+        m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -260,6 +261,9 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("has-skidmarks",             m_has_skidmarks            );
     lisp->get("skid-max",                  m_skid_max                 );
     lisp->get("skid-visual",               m_skid_visual              );
+    lisp->get("slipstream-length",         m_slipstream_length        );
+    lisp->get("slipstream-time",           m_slipstream_time          );
+    lisp->get("slipstream-add-power",      m_slipstream_add_power     );
 
     lisp->getVector("groups",              m_groups                   );
 
@@ -348,6 +352,9 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_increase,             "skid-increase"              );
     CHECK_NEG(m_skid_max,                  "skid-max"                   );
     CHECK_NEG(m_skid_visual,               "skid-visual"                );
+    CHECK_NEG(m_slipstream_length,         "slipstream-length"          );
+    CHECK_NEG(m_slipstream_time,           "slipstream-time"            );
+    CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"        );
 
     CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
     CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );

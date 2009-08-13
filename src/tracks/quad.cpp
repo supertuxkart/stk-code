@@ -21,6 +21,8 @@
 
 #include "irrlicht.h"
 
+#include "LinearMath/btTransform.h"
+
 /** Constructor, takes 4 points. */
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3)
  {
@@ -35,7 +37,7 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3)
  *  \param v The vertex array in which to set the vertices. 
  *  \param color The color to use for this quad.
  */
-void Quad::setVertices(video::S3DVertex *v, const video::SColor &color) const
+void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 {
     // Eps is used to raise the track debug quads a little bit higher than
     // the ground, so that they are actually visible.
@@ -86,4 +88,20 @@ bool Quad::pointInQuad(const Vec3& p) const
                sideOfLine2D(m_p[3], m_p[0], p) >= 0.0;
     }
 }   // pointInQuad
+// ----------------------------------------------------------------------------
+/** Transforms a quad by a given transform (i.e. translation+rotation). This
+ *  function does not modify this quad, the results are stored in the quad
+ *  specified as parameter. These functions are used for slipstreaming to
+ *  determine the slipstream area from the original value (kart at 0,0,0 and
+ *  no rotation) to the current value.
+ *  \param t The transform to apply.
+ *  \param result The quad which stores the result.
+ */
+void Quad::transform(const btTransform &t, Quad *result) const
 
+{
+    result->m_p[0] = t(m_p[0]);
+    result->m_p[1] = t(m_p[1]);
+    result->m_p[2] = t(m_p[2]);
+    result->m_p[3] = t(m_p[3]);
+}   // transform

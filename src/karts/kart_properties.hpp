@@ -126,6 +126,11 @@ private:
 
     float m_skid_visual;              /**< Additional rotation of 3d model
                                        *   when skidding. */
+    float m_slipstream_length;        /**< How far behind a kart slipstreaming
+                                       *   is effective. */
+    float m_slipstream_time;          /**< Time after which sstream has maxium
+                                       *   benefit. */
+    float m_slipstream_add_power;     /**< Additional power due to sstreaming. */
     float m_skid_max;                 /**< Maximal increase of steering when
                                        *   skidding. */
     float m_skid_increase;            /**< Skidding is multiplied by this when
@@ -217,6 +222,12 @@ public:
     float getRubberBandDuration     () const {return m_rubber_band_duration;     }
     /** Returns additional rotation of 3d model when skidding. */
     float getSkidVisual             () const {return m_skid_visual;              }
+    /** Returns how far behind a kart slipstreaming works. */
+    float getSlipstreamLength       () const {return m_slipstream_length;        }
+    /** Returns time after which slipstream has maximum effect. */
+    float getSlipstreamTime         () const {return m_slipstream_time;          }
+    /** Returns additional power due to slipstreaming. */
+    float getSlipstreamAddPower     () const {return m_slipstream_add_power;     }
     /** Returns the maximum factor by which the steering angle can be increased. */
     float getMaxSkid                () const {return m_skid_max;                 }
     /** Returns the factor by which m_skidding is multiplied when the kart is 

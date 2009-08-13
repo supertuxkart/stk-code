@@ -187,7 +187,7 @@ void QuadGraph::createMesh()
         c.setRed (i%2 ? 255 : 0); 
         c.setBlue(i%2 ? 0 : 255);
         // Transfer the 4 points of the current quad to the list of vertices
-        m_all_quads->getQuad(i).setVertices(new_v+4*i, c);
+        m_all_quads->getQuad(i).getVertices(new_v+4*i, c);
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code 

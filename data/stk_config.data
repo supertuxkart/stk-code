@@ -96,6 +96,12 @@
    (time-till-max-skid   0.4 )   ;; Time till maximum skidding is reached.
    (skid-visual          0.16)   ;; Additional graphical rotation of kart.
 
+   (slipstream-length    5   )   ;; How far behind a kart slipstream works
+   (slipstream-time      5   )   ;; How many seconds of sstream give 
+                                 ;; maximum benefit
+   (slipstream-add-power 3   )   ;; Additional power due to sstreaming.
+                                 ;; 1 = +100%
+
    ;; Bullet physics attributes
    (brake-factor             11.0 )
    ;; Defines the smallest turn radius at lowest speed (4.64 m at

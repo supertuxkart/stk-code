@@ -621,7 +621,7 @@ void DefaultRobot::handleAcceleration( const float DELTA )
         //Find if any player is ahead of this kart
         bool player_winning = false;
         for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-            if( m_race_position > RaceManager::getPlayerKart(i)->getPosition() )
+            if( getPosition() > RaceManager::getPlayerKart(i)->getPosition() )
             {
                 player_winning = true;
                 break;

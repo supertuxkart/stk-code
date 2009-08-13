@@ -26,6 +26,7 @@
 
 #include "utils/vec3.hpp"
 
+class btTransform;
 class Quad 
 {
 private:
@@ -43,9 +44,9 @@ private:
 
 public:
          Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
-    void setVertices(video::S3DVertex *v, const video::SColor &color) const;
+    void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     bool pointInQuad(const Vec3& p) const;
-
+    void transform(const btTransform &t, Quad *result) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
     const Vec3& operator[](int i) const {return m_p[i];     }
@@ -54,6 +55,6 @@ public:
     const Vec3& getCenter ()      const {return m_center;   }
     // ------------------------------------------------------------------------
     /** Returns the minimum height of a quad. */
-    float       getMinHeight() const { return m_min_height; }
+    float       getMinHeight() const { return m_min_height; }    
 };   // class Quad
 #endif
