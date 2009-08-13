@@ -1,6 +1,18 @@
 SuperTuxKart 0.6.2 (July 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Bugfix: game could crash in rare circumstances.
+* Bugfix: Restarting a GP (with the in-race menu ESC) would
+          not subtract already allocated points.
+* Bugfix: A race could be finished with an invalid shortcut.
+* Bugfix: Playing a challenge after a splitscreen game would
+          play the challenge in split screen.
+* Bugfix: Items explode over void.
+* Bugfix: Grass in castle arena slowed down the kart.
+* Bugfix: GP result showed kart identifier instead of name.
+* Improvement: there is now 1 1 sec. wait period for the race
+          result screen, avoiding the problem that someone 
+          presses space/enter at the end of a race, immediately
+          quitting the menu before it can be read.
 
 SuperTuxKart 0.6.1a (February 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
