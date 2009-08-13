@@ -34,6 +34,7 @@ private:
 
 public:
 	     AnimationManager(const std::string &track_name, const XMLNode &node);
+        ~AnimationManager();
 	void update(float dt);
 	void reset();
 };   // AnimationManager

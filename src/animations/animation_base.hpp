@@ -59,7 +59,7 @@ protected:
 
 public:
                  AnimationBase(const XMLNode &node, float fps);
-    virtual     ~AnimationBase() {}
+    virtual     ~AnimationBase();
 	virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr);
 	/** This needs to be implemented by the inheriting classes. It is called
 	 *  once per frame from the track. */

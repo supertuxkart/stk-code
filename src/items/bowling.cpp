@@ -43,8 +43,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
            so the player doesn't catch up with the ball
            and explode by touching it */
         m_speed = kart->getSpeed() + m_speed;
-        if(m_speed < min_speed) m_speed
-            = min_speed;
+        if(m_speed < min_speed) m_speed = min_speed;
     }
 
     createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
@@ -52,7 +51,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
                   -70.0f /*gravity*/, 
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
-    // otherwise the ball can start to vibrate when enery is added.
+    // otherwise the ball can start to vibrate when energy is added.
     m_speed = fabsf(m_speed);
     // Do not adjust the z velociy depending on height above terrain, since
     // this would disable gravity.

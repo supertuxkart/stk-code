@@ -80,7 +80,6 @@ Track::Track( std::string filename)
 Track::~Track()
 {
     if(m_quad_graph)            delete m_quad_graph;
-	if(m_animation_manager)     delete m_animation_manager;
 	if(m_check_manager)         delete m_check_manager;
     if(m_mini_map)              irr_driver->removeTexture(m_mini_map);
 }   // ~Track
@@ -96,6 +95,8 @@ void Track::reset()
 		m_animation_manager->reset();
     if(m_check_manager)
         m_check_manager->reset(*this);
+    item_manager->reset();
+
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -125,7 +126,12 @@ void Track::cleanup()
         irr_driver->removeMesh(m_all_meshes[i]);
     }
     m_all_meshes.clear();
-
+    
+    if(m_animation_manager)
+    {
+        delete m_animation_manager;
+        m_animation_manager = NULL;
+    }
 
     delete m_non_collision_mesh;
     m_non_collision_mesh = new TriangleMesh();
@@ -523,6 +529,8 @@ void Track::update(float dt)
 		m_animation_manager->update(dt);
 	if(m_check_manager)
 		m_check_manager->update(dt);
+    item_manager->update(dt);
+
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -599,6 +607,8 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel()
 {
+    item_manager->setStyle();
+
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini

@@ -32,36 +32,39 @@ class ItemManager
 {
 
 private:
-    // The vector of all items of the current track
+    /** The vector of all items of the current track. */
     typedef std::vector<Item*> AllItemTypes;
     AllItemTypes m_all_items;
 
-    // This stores all item models
+    /** This stores all item models. */
     scene::IMesh *m_item_mesh[Item::ITEM_LAST-Item::ITEM_FIRST+1];
+
+    /** Stores all meshes for all items. */
     std::map<std::string,scene::IMesh*> m_all_meshes;
 
     std::string m_user_filename;
     void setDefaultItemStyle();
     void setItem(const lisp::Lisp *item_node, const char *colour,
                  Item::ItemType type);
+    void           loadItemStyle   (const std::string filename);
 
 public:
-                ItemManager();
-               ~ItemManager();
-    void        loadDefaultItems();
-    void        loadItemStyle   (const std::string filename);
-    Item*       newItem         (Item::ItemType type, const Vec3& xyz, 
-                                 const Vec3 &normal, Kart* parent=NULL);
-    void        update          (float delta);
-    void        hitItem         (Kart* kart);
-    void        cleanup         ();
-    void        reset           ();
-    void        removeTextures  ();
-    void        setUserFilename (char *s) {m_user_filename=s;}
-    void        collectedItem   (int item_id, Kart *kart,
-                                 int add_info=-1);
-    scene::IMesh*  getItemModel (Item::ItemType type)
-                                {return m_item_mesh[type];}
+                   ItemManager();
+                  ~ItemManager();
+    void           loadDefaultItems();
+    Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
+                                    const Vec3 &normal, Kart* parent=NULL);
+    void           update          (float delta);
+    void           hitItem         (Kart* kart);
+    void           cleanup         ();
+    void           reset           ();
+    void           removeTextures  ();
+    void           setUserFilename (char *s) {m_user_filename=s;}
+    void           collectedItem   (int item_id, Kart *kart,
+                                    int add_info=-1);
+    void           setStyle        ();
+    scene::IMesh*  getItemModel    (Item::ItemType type)
+                                      {return m_item_mesh[type];}
 };
 
 extern ItemManager* item_manager;

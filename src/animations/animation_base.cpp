@@ -35,6 +35,17 @@ AnimationBase::AnimationBase(const XMLNode &node, float fps)
 
 }   // AnimationBase
 // ----------------------------------------------------------------------------
+/** Removes all IPOs.
+ */
+AnimationBase::~AnimationBase()
+{
+	std::vector<Ipo*>::iterator i;
+	for(i=m_all_ipos.begin(); i<m_all_ipos.end(); i++)
+        delete *i;
+    m_all_ipos.clear();
+}   // ~AnimationBase
+
+// ----------------------------------------------------------------------------
 /** Stores the initial transform (in the IPOs actually). This is necessary
  *  for relative IPOs.
  *  \param xyz Position of the object.

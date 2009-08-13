@@ -31,6 +31,7 @@
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
 ItemManager* item_manager;
@@ -235,8 +236,8 @@ void ItemManager::cleanup()
 }   // cleanup
 
 //-----------------------------------------------------------------------------
-/** Remove all item instances, and the track specific models. This is used
- * just before a new track is loaded and a race is started
+/** Resets all items and removes bubble gum that is stuck on the track.
+ *  This is necessary in case that a race is restarted.
  */
 void ItemManager::reset()
 {
@@ -258,6 +259,44 @@ void ItemManager::reset()
         }
     }  // for i
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Sets the selected item style to be used in the track. The style depends on
+ *  either the GP or the track selected.
+ */
+void ItemManager::setStyle()
+{
+    if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        try
+        {
+            item_manager->loadItemStyle(race_manager->getItemStyle());
+        }
+        catch(std::runtime_error)
+        {
+            fprintf(stderr, "The grand prix '%s' contains an invalid item style '%s'.\n",
+                    race_manager->getGrandPrix()->getName().c_str(),
+                    race_manager->getItemStyle().c_str());
+            fprintf(stderr, "Please fix the file '%s'.\n",
+                    race_manager->getGrandPrix()->getFilename().c_str());
+        }
+    }
+    else
+    {
+        try
+        {
+            item_manager->loadItemStyle(RaceManager::getTrack()->getItemStyle());
+        }
+        catch(std::runtime_error)
+        {
+            fprintf(stderr, "The track '%s' contains an invalid item style '%s'.\n",
+                    RaceManager::getTrack()->getName().c_str(), 
+                    RaceManager::getTrack()->getItemStyle().c_str());
+            fprintf(stderr, "Please fix the file '%s'.\n",
+                    RaceManager::getTrack()->getFilename().c_str());
+        }
+    }
+}   // setStyle
 
 //-----------------------------------------------------------------------------
 void ItemManager::update(float delta)

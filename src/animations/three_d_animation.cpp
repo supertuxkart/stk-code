@@ -126,6 +126,12 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
 /** Destructor. */
 ThreeDAnimation::~ThreeDAnimation()
 {
+    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+    delete m_body;
+    delete m_motion_state;
+    delete m_collision_shape;
+    irr_driver->removeNode(m_animated_node);
+    irr_driver->removeMesh(m_mesh);
 }   // ~ThreeDAnimation
 
 // ----------------------------------------------------------------------------

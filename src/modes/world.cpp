@@ -35,7 +35,6 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
-#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/auto_kart.hpp"
 #include "karts/player_kart.hpp"
@@ -98,7 +97,7 @@ void World::init()
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    loadTrack() ;
+    m_track->loadTrackModel();
 
     m_player_karts.resize(race_manager->getNumPlayers());
     m_network_karts.resize(race_manager->getNumPlayers());
@@ -289,7 +288,6 @@ void World::update(float dt)
     }
 
     projectile_manager->update(dt);
-    item_manager->update(dt);
     m_race_gui->update(dt);
 }   // update
 
@@ -435,44 +433,6 @@ void World::removeKart(int kart_number)
     m_eliminated_karts++;
 
 }   // removeKart
-//-----------------------------------------------------------------------------
-/** Cleans up old items (from a previous race), removes old track specific
- *  item models, and loads the actual track.
- */
-void World::loadTrack()
-{
-    if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
-        try
-        {
-            item_manager->loadItemStyle(race_manager->getItemStyle());
-        }
-        catch(std::runtime_error)
-        {
-            fprintf(stderr, "The grand prix '%s' contains an invalid item style '%s'.\n",
-                    race_manager->getGrandPrix()->getName().c_str(),
-                    race_manager->getItemStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
-                    race_manager->getGrandPrix()->getFilename().c_str());
-        }
-    }
-    else
-    {
-        try
-        {
-            item_manager->loadItemStyle(m_track->getItemStyle());
-        }
-        catch(std::runtime_error)
-        {
-            fprintf(stderr, "The track '%s' contains an invalid item style '%s'.\n",
-                    m_track->getName().c_str(), m_track->getItemStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
-                    m_track->getFilename().c_str());
-        }
-    }
-
-    m_track->loadTrackModel();
-}   // loadTrack
 
 //-----------------------------------------------------------------------------
 void World::getDefaultCollectibles(int& collectible_type, int& amount )
@@ -503,7 +463,6 @@ void World::restartRace()
     // Enable SFX again
     sfx_manager->resumeAll();
 
-    item_manager->reset();
     projectile_manager->cleanup();
     race_manager->reset();
 

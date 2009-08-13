@@ -44,6 +44,18 @@ AnimationManager::AnimationManager(const std::string &track_name, const XMLNode 
 }   // AnimationManager
 
 // ----------------------------------------------------------------------------
+/** Removes all animations from the scene node and memory. Called from
+ *  Track::cleanup().
+ */
+AnimationManager::~AnimationManager()
+{
+	std::vector<AnimationBase*>::iterator i;
+	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+		delete *i;
+    m_all_animations.clear();
+}   // ~AnimationManager
+
+// ----------------------------------------------------------------------------
 /** Resets all animations.
  */
 void AnimationManager::reset()
