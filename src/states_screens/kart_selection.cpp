@@ -410,6 +410,13 @@ bool firePressedOnNewDevice(InputDevice* device)
 {
     std::cout << "===== firePressedOnNewDevice =====\n";
 
+    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    if (w == NULL )
+    {
+        std::cout << "firePressedOnNewDevice() called outside of kart selection screen.\n";
+        return false;
+    }
+
     if(device == NULL)
     {
         std::cout << "I don't know which device was pressed :'(\n";
@@ -566,7 +573,11 @@ void menuEventKarts(Widget* widget, const std::string& name)
     }
     else if(name == "init")
     {
-        //g_player_karts.clearWithoutDeleting();
+        g_player_karts.clearWithoutDeleting();
+
+        // Always switch to detect_new when the kart selection screen is active??
+        //input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
+
         g_player_karts.clearAndDeleteAll();
         
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");

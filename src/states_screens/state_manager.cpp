@@ -105,6 +105,7 @@ void StateManager::menuEventMain(Widget* widget, const std::string& name)
 
     if(selection == "new")
     {
+        resetActivePlayers();
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         KartSelectionScreen::setPlayer0Device(device);
         pushMenu("karts.stkgui");

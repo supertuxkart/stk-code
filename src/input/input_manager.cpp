@@ -242,8 +242,6 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection,
                                                           value, programaticallyGenerated, &player, &action);
 
-    if (action_found && action == PA_FIRST) return; // input handled internally by the device manager
-    
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
     if(!StateManager::get()->isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
@@ -287,18 +285,30 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                     return; // we're done here
             }
 
-            // New player is joining
-            else if ((player == NULL) && (action == PA_FIRE))
-            {
-                InputDevice *device = NULL;
-                if (type == Input::IT_KEYBOARD)
-                    device = m_device_manager->getKeyboard(0);
-                else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
-                    device = m_device_manager->getGamePadFromIrrID(deviceID);
+            /* The way this is currently structured, any time an event is
+               received from an input device that is not associated with a
+               player and the device manager is in DETECT_NEW mode, the event
+               is ignored, unless it is a PA_FIRE event (a player is joining)
 
-                if (device != NULL)
-                    KartSelectionScreen::firePressedOnNewDevice( device );
-                return; // we're done here
+               perhaps it will be good to let unassigned devices back out
+               of the kart selection menu?
+            */
+
+            else if (player == NULL)
+            {
+                // New player is joining
+                if (action == PA_FIRE)
+                {
+                    InputDevice *device = NULL;
+                    if (type == Input::IT_KEYBOARD)
+                        device = m_device_manager->getKeyboard(0);
+                    else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+                        device = m_device_manager->getGamePadFromIrrID(deviceID);
+
+                    if (device != NULL)
+                        KartSelectionScreen::firePressedOnNewDevice( device );
+                }
+                return; // we're done here, ignore devices that aren't associated with players
             }
         }
 

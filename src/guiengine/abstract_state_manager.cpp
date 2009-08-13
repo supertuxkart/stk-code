@@ -145,7 +145,7 @@ void AbstractStateManager::popMenu()
     
     std::cout << "-- switching to screen " << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
     switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
-    
+    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN); // No assign mode on menus by default
     eventCallback(NULL, g_init_event);
 }
 
