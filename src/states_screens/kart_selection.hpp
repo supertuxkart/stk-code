@@ -28,11 +28,8 @@ class ActivePlayer;
 
 namespace KartSelectionScreen
 {
-    void setPlayer0Device(InputDevice* device);
-    bool firePressedOnNewDevice(InputDevice* device);
-    bool playerPressedRescue(ActivePlayer* player);
-    
+    bool playerJoin(InputDevice* device);
+    bool playerQuit(ActivePlayer* player);
     void kartSelectionUpdate(float delta);
-    
     void menuEventKarts(GUIEngine::Widget* widget, const std::string& name);
 }

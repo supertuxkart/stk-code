@@ -281,7 +281,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             if ((player != NULL) && (action == PA_RESCUE))
             {
                 // returns true if the event was handled
-                if (KartSelectionScreen::playerPressedRescue( player ))
+                if (KartSelectionScreen::playerQuit( player ))
                     return; // we're done here
             }
 
@@ -306,7 +306,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                         device = m_device_manager->getGamePadFromIrrID(deviceID);
 
                     if (device != NULL)
-                        KartSelectionScreen::firePressedOnNewDevice( device );
+                        KartSelectionScreen::playerJoin( device );
                 }
                 return; // we're done here, ignore devices that aren't associated with players
             }

@@ -182,6 +182,7 @@ namespace KartSelectionScreen
         {
             if (StateManager::get()->getActivePlayers().get(newPlayerID) != m_associatedPlayer)
             {
+                printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n", StateManager::get()->getActivePlayers().get(newPlayerID), newPlayerID, m_associatedPlayer);
                 std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
                 assert(false);
             }
@@ -406,14 +407,14 @@ class KartHoverListener : public RibbonGridHoverListener
 KartHoverListener* karthoverListener = NULL;
 
 // Return true if event was handled successfully
-bool firePressedOnNewDevice(InputDevice* device)
+bool playerJoin(InputDevice* device)
 {
-    std::cout << "===== firePressedOnNewDevice =====\n";
+    std::cout << "===== playerJoin =====\n";
 
     RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
     if (w == NULL )
     {
-        std::cout << "firePressedOnNewDevice() called outside of kart selection screen.\n";
+        std::cout << "playerJoin() called outside of kart selection screen.\n";
         return false;
     }
 
@@ -460,49 +461,15 @@ bool firePressedOnNewDevice(InputDevice* device)
     return true;
 }
 
-/**
-  * Called before this screen is inited to tell which device was used to trigger "new game"; this
-  * device will be assigned to player 0.
-  */
-void setPlayer0Device(InputDevice* device)
-{
-    std::cout << "===== setPlayer0Device =====\n";
-    
-    if(device == NULL)
-    {
-        std::cout << "I don't know which device to assign to player 0 :'(\n";
-        return;
-    }
-    else if(device->getType() == DT_KEYBOARD)
-    {
-        std::cout << "Player 0 is using a keyboard\n";
-    }
-    else if(device->getType() == DT_GAMEPAD)
-    {
-        std::cout << "Player 0 is using a gamepad\n";
-    }
-    
-    // Use player profile 0 by default; user can later change this by using the arrows
-    ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
-    StateManager::get()->addActivePlayer( newPlayer );
-    newPlayer->setDevice(device);
-    device->setPlayer(newPlayer);
-    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
-    
-    // TODO : fall back in no-assign mode when aborting a game and going back to the menu
-    // how to revert assign mode :
-    // StateManager::resetActivePlayers();
-    // input_manager->getDeviceList()->setNoAssignMode(true);
-}
-    
 PlayerKartWidget* removedWidget = NULL;
     
 // Return true if event was handled succesfully
-bool playerPressedRescue(ActivePlayer* player)
+bool playerQuit(ActivePlayer* player)
 {    
     int playerID = -1;
     
-    if (g_player_karts.size() <= 1) return false; // can't back out last player
+    // If last player quits, return to main menu
+    if (g_player_karts.size() <= 1) return false;
 
     for (int n=0; n<g_player_karts.size(); n++)
     {
@@ -514,7 +481,7 @@ bool playerPressedRescue(ActivePlayer* player)
     }
     if (playerID == -1)
     {
-        std::cout << "void playerPressedRescue(ActivePlayer* player) : cannot find passed player\n";
+        std::cout << "void playerQuit(ActivePlayer* player) : cannot find passed player\n";
         return false;
     }
     
@@ -529,7 +496,7 @@ bool playerPressedRescue(ActivePlayer* player)
     // TODO: fix this
     //assert( amount == StateManager::get()->activePlayerCount() );
     
-    for (int n=0; n<amount; n++)
+    for (int n=0; n < amount; n++)
     {
         g_player_karts[n].setPlayerID(n);
         g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
@@ -573,12 +540,14 @@ void menuEventKarts(Widget* widget, const std::string& name)
     }
     else if(name == "init")
     {
-        g_player_karts.clearWithoutDeleting();
+        //g_player_karts.clearWithoutDeleting();
 
         // Always switch to detect_new when the kart selection screen is active??
         //input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
 
         g_player_karts.clearAndDeleteAll();
+        StateManager::get()->resetActivePlayers();
+        input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
         
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );
@@ -589,7 +558,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
             w->registerHoverListener(karthoverListener);
         }
         
-        Widget* area = getCurrentScreen()->getWidget("playerskarts");
+        //Widget* area = getCurrentScreen()->getWidget("playerskarts");
         
         if(!getCurrentScreen()->m_inited)
         {            
@@ -624,12 +593,15 @@ void menuEventKarts(Widget* widget, const std::string& name)
             getCurrentScreen()->m_inited = true;
         }
         
+        /*
         PlayerKartWidget* playerKart1 = new PlayerKartWidget(StateManager::get()->getActivePlayers().get(0),
-                                                             area, 0 /* first player */);
+                                                             area, 0); // first player
         getCurrentScreen()->manualAddWidget(playerKart1);
         playerKart1->add();
         g_player_karts.push_back(playerKart1);
-
+        */
+        
+        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice() );
         w->updateItemDisplay();
         
         
@@ -651,7 +623,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         race_manager->setNumPlayers( players.size() );
         race_manager->setNumLocalPlayers( players.size() );
         
-        g_player_karts.clearAndDeleteAll();      
+        //g_player_karts.clearAndDeleteAll();      
         race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         
         // TODO : assign karts to other players too
