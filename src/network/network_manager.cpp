@@ -534,6 +534,10 @@ void NetworkManager::worldLoaded()
 */
 void NetworkManager::setupPlayerKartInfo()
 {
+    // Not sure if this should be here, but without it extra uncontrolled
+    // human players accumulate after each race.
+    m_kart_info.clear();
+
     // Get the local kart info
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         m_kart_info.push_back(race_manager->getLocalKartInfo(i));

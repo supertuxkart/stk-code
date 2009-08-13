@@ -249,8 +249,13 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
         video::ITexture *icon = kart->getKartProperties()->getIconMaterial()->getTexture();
         int w = kart->isPlayerKart() ? ICON_PLAYER_WIDTH : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
-        const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, NULL, NULL, true);
+
+        // Fixes crash bug, why are certain icons not showing up?
+        if (icon != NULL)
+        {
+            const core::rect<s32> rect(core::position2d<s32>(0,0), icon->getOriginalSize());
+            irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect, NULL, NULL, true);
+        }
 
     } // next kart
     

@@ -152,7 +152,7 @@ namespace KartSelectionScreen
             this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             
             kartName = new LabelWidget();
-            kartName->m_properties[PROP_TEXT] = _("Tux");
+            kartName->m_properties[PROP_TEXT] = default_kart;
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
             kartName->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_kartname", playerID);
             kartName->x = kart_name_x;
@@ -409,6 +409,7 @@ class KartHoverListener : public RibbonGridHoverListener
             ModelViewWidget* w3 = g_player_karts[pKartIndex].modelView;
             assert( w3 != NULL );
             
+            printf("%s\n", selectionID.c_str());
             const KartProperties* kart = kart_properties_manager->getKart(selectionID);
             if(kart == NULL) return;
             KartModel* kartModel = kart->getKartModel();
@@ -421,8 +422,8 @@ class KartHoverListener : public RibbonGridHoverListener
             w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             w3->update(0);
             
-
-            g_player_karts[pKartIndex].kartName->setText( kart->getName().c_str() );
+            g_player_karts[pKartIndex].kartName->m_properties[PROP_TEXT] = selectionID;
+            g_player_karts[pKartIndex].kartName->setText( selectionID.c_str() );
         }
     };
 KartHoverListener* karthoverListener = NULL;
@@ -489,6 +490,13 @@ bool playerQuit(ActivePlayer* player)
 {    
     int playerID = -1;
     
+    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    if (w == NULL )
+    {
+        std::cout << "playerQuit() called outside of kart selection screen.\n";
+        return false;
+    }
+
     // If last player quits, return to main menu
     if (g_player_karts.size() <= 1) return false;
 
@@ -550,7 +558,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
     if(name == "tearDown")
     {
         //g_player_karts.clearWithoutDeleting();
-        //g_player_karts.clearAndDeleteAll();
+        g_player_karts.clearAndDeleteAll();
     }
     else if(name == "init")
     {
@@ -650,14 +658,13 @@ void menuEventKarts(Widget* widget, const std::string& name)
         race_manager->setNumLocalPlayers( players.size() );
         
         //g_player_karts.clearAndDeleteAll();      
-        race_manager->setLocalKartInfo(0, w->getSelectionIDString());
-        
-        // TODO : assign karts to other players too
-        for(int n=1; n<players.size(); n++)
+        //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
+        for (int n = 0; n < g_player_karts.size(); n++)
         {
-            race_manager->setLocalKartInfo(n, "tux"); 
+            race_manager->setLocalKartInfo(n, g_player_karts[n].kartName->m_properties[PROP_TEXT]);
         }
 
+        //Return to assign mode
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
 
         StateManager::get()->pushMenu("racesetup.stkgui");

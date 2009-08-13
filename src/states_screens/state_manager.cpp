@@ -62,7 +62,16 @@ ptr_vector<ActivePlayer, HOLD>& StateManager::getActivePlayers()
 }
 ActivePlayer* StateManager::getActivePlayer(const int id)
 {
-    return m_active_players.get(id);
+    ActivePlayer *returnPlayer = NULL;
+    if (id < m_active_players.size() && id >= 0)
+    {
+        returnPlayer = m_active_players.get(id);
+    }
+    else
+    {
+        fprintf(stderr, "getActivePlayer(): id out of bounds\n");
+    }
+    return returnPlayer;
 }
 void StateManager::addActivePlayer(ActivePlayer* p)
 {
