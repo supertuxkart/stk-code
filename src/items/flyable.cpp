@@ -192,12 +192,12 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
                                              float item_XY_speed, float gravity, float y_offset,
                                              float *fire_angle, float *up_velocity, float *time_estimated)
 {
-    btVector3 relative_target_kart_loc = target_kart->getTrans().getOrigin() - origin;
+    Vec3 relative_target_kart_loc = target_kart->getTrans().getOrigin() - origin;
 
     btTransform trans = target_kart->getTrans();
-    btVector3 target_direction(trans.getBasis()[0][1],
-                               trans.getBasis()[1][1],
-                               trans.getBasis()[2][1]);
+    Vec3 target_direction(trans.getBasis()[0][1],
+                          trans.getBasis()[1][1],
+                          trans.getBasis()[2][1]);
 
     float dx = relative_target_kart_loc.getX();
     float dy = relative_target_kart_loc.getY();
@@ -207,7 +207,7 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
     float gy = target_direction.getY();
     float gz = target_direction.getZ();
 
-    float target_kart_speed = hypotf(gx, gy) * target_kart->getSpeed(); //Projected onto X-Y plane
+    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed(); //Projected onto X-Y plane
 
     float target_kart_heading = atan2f(-gx, gy); //anti-clockwise
 
@@ -231,10 +231,10 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
         fire_th += M_PI;
 
     //createPhysics offset
-    time -= y_offset / hypotf(a, b);
+    time -= y_offset / sqrt(a*a+b*b);
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5 * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
+    *up_velocity = (0.5f * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
     *time_estimated = time;
 }
 
