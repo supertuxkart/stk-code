@@ -449,7 +449,8 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
     video::ITexture *texture=irr_driver->endRenderToTexture();
     cleanupDebugMesh();
     m_min_coord = bb_min;
-    m_scaling   = dimension.Width/(bb_max.getX()-bb_min.getX());
+    m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
+    m_scaling.setY(dimension.Width/(bb_max.getY()-bb_min.getY()));
     return texture;
 
 }   // drawMiniMap
