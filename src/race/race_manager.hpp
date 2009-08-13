@@ -201,7 +201,7 @@ public:
                                           const { return m_kart_status[kart_id].m_gp_final_rank; }
     
     const std::string&  
-                 getKartName(int kart)    const { return m_kart_status[kart].m_ident;}
+                 getKartIdent(int kart)   const { return m_kart_status[kart].m_ident;}
     int          getKartScore(int krt)    const { return m_kart_status[krt].m_score;     }
     int          getKartPrevScore(int krt)const { return m_kart_status[krt].m_last_score;}
     int          getKartLocalPlayerId(int k)

@@ -109,13 +109,13 @@ void World::init()
         int position = i+1;   // position start with 1
         btTransform init_pos=m_track->getStartTransform(i);
         Kart* newkart;
-        const std::string& kart_name = race_manager->getKartName(i);
-        int local_player_id          = race_manager->getKartLocalPlayerId(i);
-        int global_player_id         = race_manager->getKartGlobalPlayerId(i);
+        const std::string& kart_ident = race_manager->getKartIdent(i);
+        int local_player_id           = race_manager->getKartLocalPlayerId(i);
+        int global_player_id          = race_manager->getKartGlobalPlayerId(i);
         if(UserConfigParams::m_profile)
         {
             // In profile mode, load only the old kart
-            newkart = new DefaultRobot(kart_name, position, init_pos, m_track);
+            newkart = new DefaultRobot(kart_ident, position, init_pos, m_track);
     	    // Create a camera for the last kart (since this way more of the 
 	        // karts can be seen.
             if(i==race_manager->getNumKarts()-1) 
@@ -130,14 +130,14 @@ void World::init()
             {
             case RaceManager::KT_PLAYER:
                 std::cout << "===== World : creating player kart for kart #" << i << " which has local_player_id " << local_player_id << " ===========\n";
-                newkart = new PlayerKart(kart_name, position,
+                newkart = new PlayerKart(kart_ident, position,
                                          StateManager::get()->getActivePlayer(local_player_id),
                                          init_pos, local_player_id);
                 m_player_karts[global_player_id] = (PlayerKart*)newkart;
                 m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
                 break;
             case RaceManager::KT_NETWORK_PLAYER:
-                newkart = new NetworkKart(kart_name, position, init_pos,
+                newkart = new NetworkKart(kart_ident, position, init_pos,
                                           global_player_id);
                 m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
                 m_player_karts[global_player_id] = (PlayerKart*)newkart;
@@ -145,7 +145,7 @@ void World::init()
             case RaceManager::KT_AI:
                 std::cout << "===== World : creating AI kart for #" << i << "===========\n";
 
-                newkart = loadRobot(kart_name, position, init_pos);
+                newkart = loadRobot(kart_ident, position, init_pos);
                 break;
             case RaceManager::KT_GHOST:
                 break;
@@ -172,8 +172,6 @@ void World::init()
 World::~World()
 {
     delete m_race_gui;
-
-    item_manager->cleanup();
     delete race_state;
     // In case that a race is aborted (e.g. track not found) m_track is 0.
     if(m_track)
@@ -443,9 +441,6 @@ void World::removeKart(int kart_number)
  */
 void World::loadTrack()
 {
-    // remove old items (from previous race), and remove old
-    // track specific item models
-    item_manager->cleanup();
     if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         try

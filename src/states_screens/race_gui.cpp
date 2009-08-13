@@ -88,8 +88,8 @@ void RaceGUI::createMarkerTexture()
 #endif
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
-        const std::string& kart_name = race_manager->getKartName(i);
-        const KartProperties *kp = kart_properties_manager->getKart(kart_name);
+        const std::string& kart_ident = race_manager->getKartIdent(i);
+        const KartProperties *kp = kart_properties_manager->getKart(kart_ident);
         core::vector2df center((float)((m_marker_rendered_size>>1)+i*m_marker_rendered_size), 
                                (float)(m_marker_rendered_size>>1)                   );
         int count = kp->getShape();
