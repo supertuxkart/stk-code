@@ -523,6 +523,20 @@ scene::ICameraSceneNode *IrrDriver::addCamera()
  }   // addCamera
 
 // ----------------------------------------------------------------------------
+/** Removes a camera. This can't be done with removeNode() since the camera
+ *  can be marked as active, meaning a drop will not delete it. While this
+ *  doesn't really cause a memory leak (the camera is removed the next time
+ *  a camera is added), it's a bit cleaner and easier to check for memory
+ *  leaks, since the scene root should now always be empty.
+ */
+void IrrDriver::removeCamera(scene::ICameraSceneNode *camera)
+{
+    if(camera==m_scene_manager->getActiveCamera())
+        m_scene_manager->setActiveCamera(NULL);    // basically causes a drop
+    camera->remove();
+}   // removeCamera
+
+// ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object.
  *  \param filename File name of the texture to load.
  */

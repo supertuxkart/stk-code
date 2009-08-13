@@ -104,6 +104,7 @@ public:
                          *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
                          *addCamera();
+    void                  removeCamera(scene::ICameraSceneNode *camera);
     void                  update(float dt);
     
     void                  changeResolution();

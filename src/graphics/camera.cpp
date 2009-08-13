@@ -56,7 +56,8 @@ Camera::Camera(int camera_index, const Kart* kart)
 // ----------------------------------------------------------------------------
 Camera::~Camera()
 {
-    reset();
+    irr_driver->removeCamera(m_camera);
+    m_camera=NULL;
 }
 
 // ----------------------------------------------------------------------------
