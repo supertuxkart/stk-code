@@ -170,7 +170,6 @@ InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
         if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
         {
             *player = NULL;
-            if (!progGen) m_latest_used_device = keyboard;
         }
         else *player = keyboard->m_player;
     }
@@ -198,8 +197,6 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
                 *player = NULL;
-                // IT_STICKMOTION happens all the time, don't consider it discrete input
-                if ((!progGen) && (type == Input::IT_STICKBUTTON)) m_latest_used_device = gPad;
             }
             else 
             {
@@ -241,6 +238,7 @@ bool DeviceManager::translateInput( Input::InputType type,
     };
 
     // Return true if input was successfully translated to an action and player
+    if (device != NULL) m_latest_used_device = device;
     return (device != NULL);
 }
 //-----------------------------------------------------------------------------

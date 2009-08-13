@@ -382,12 +382,31 @@ class KartHoverListener : public RibbonGridHoverListener
     public:
         void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID)
         {
+            InputDevice *device;
+            ActivePlayer *player;
+            int pKartIndex = -1;
             //std::cout << "hovered " << selectionID.c_str() << std::endl;
             
-            if(selectionID.size() == 0) return;
+            // FIXME: temporary work around for multiplayer support on the kart selection screen
+            // The ribbon grid widget needs to be rewritten to support multiple selection boxes
             
-            // TODO : support players other than player 0 (i.e. multiplayer)
-            ModelViewWidget* w3 = g_player_karts[0].modelView;
+            device = input_manager->getDeviceList()->getLatestUsedDevice();
+            if(selectionID.size() == 0) return;
+            if((player = device->getPlayer()) == NULL) return;
+
+            for (int n = 0; (n < g_player_karts.size() && pKartIndex == -1); n++)
+            {
+                if (g_player_karts[n].m_associatedPlayer == player)
+                    pKartIndex = n;
+            }
+            if (pKartIndex == -1)
+            {
+                fprintf(stderr, "onSelectionChanged(): Unable to determine kart associated with device\n");
+                return;
+            }
+
+
+            ModelViewWidget* w3 = g_player_karts[pKartIndex].modelView;
             assert( w3 != NULL );
             
             const KartProperties* kart = kart_properties_manager->getKart(selectionID);
@@ -402,8 +421,8 @@ class KartHoverListener : public RibbonGridHoverListener
             w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             w3->update(0);
             
-            // TODO : support players other than player 0 (i.e. multiplayer)
-            g_player_karts[0].kartName->setText( kart->getName().c_str() );
+
+            g_player_karts[pKartIndex].kartName->setText( kart->getName().c_str() );
         }
     };
 KartHoverListener* karthoverListener = NULL;
