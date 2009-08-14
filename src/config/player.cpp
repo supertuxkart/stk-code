@@ -42,7 +42,7 @@ PlayerKart* ActivePlayer::getKart()
     const int amount = RaceManager::getWorld()->getCurrentNumLocalPlayers();
     for (int p=0; p<amount; p++)
     {
-        if (RaceManager::getWorld()->getLocalPlayerKart(p)->getPlayer()->getProfile() == m_player)
+        if (RaceManager::getWorld()->getLocalPlayerKart(p)->getPlayer() == this)
         {
             return RaceManager::getWorld()->getLocalPlayerKart(p);
         }
