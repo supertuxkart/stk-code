@@ -53,6 +53,7 @@
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -363,11 +364,6 @@ int handleCmdLine(int argc, char **argv)
             //FIXME} else if ( !strcmp(argv[i], "--reverse") ) {
             //FIXME:fprintf ( stdout, "Enabling reverse mode.\n" ) ;
             //FIXME:raceSetup.reverse = 1;
-            
-            StateManager::get()->addActivePlayer( new ActivePlayer( &(UserConfigParams::m_all_players[0]) ) );
-            race_manager->setNumLocalPlayers(1);
-            std::string& default_kart = UserConfigParams::m_default_kart;
-            race_manager->setLocalKartInfo(0, default_kart);
         }
         else if ( !strcmp(argv[i], "--mirror") )
         {
@@ -604,8 +600,34 @@ int main(int argc, char *argv[] )
         video::IVideoDriver* driver = device->getVideoDriver();
         GUIEngine::init(device, driver, StateManager::get());
         
-        if(!UserConfigParams::m_no_start_screen) StateManager::get()->pushMenu("main.stkgui");
-        else StateManager::get()->enterGameState();
+        if(!UserConfigParams::m_no_start_screen)
+        {
+            StateManager::get()->pushMenu("main.stkgui");
+        }
+        else 
+        {
+            InputDevice *device;
+            ActivePlayer* newPlayer;
+
+            // Use keyboard by default in --no-start-screen
+            device = input_manager->getDeviceList()->getKeyboard(0);
+
+            // Create player and associate player with keyboard
+            newPlayer = new ActivePlayer( UserConfigParams::m_all_players.get(0) );
+            StateManager::get()->addActivePlayer(newPlayer);
+            newPlayer->setDevice(device);
+
+            // Set up race manager appropriately
+            race_manager->setNumLocalPlayers(1);
+            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+
+            // ASSIGN should make sure that only input from assigned devices
+            // is read.
+            input_manager->getDeviceList()->setAssignMode(ASSIGN);
+
+            // Go straight to the race
+            StateManager::get()->enterGameState();
+        }
 
         // Replay a race
         // =============
