@@ -436,30 +436,22 @@ bool playerJoin(InputDevice* device)
     RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
     if (w == NULL )
     {
-        std::cout << "playerJoin() called outside of kart selection screen.\n";
+        std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
         return false;
     }
-    if(device == NULL)
+    else if (device == NULL)
     {
-        std::cout << "I don't know which device was pressed :'(\n";
+        std::cerr << "playerJoin(): Passed null pointer\n";
         return false;
-    }
-    else if(device->getType() == DT_KEYBOARD)
-    {
-        std::cout << "Fire was pressed on a keyboard\n";
-    }
-    else if(device->getType() == DT_GAMEPAD)
-    {
-        std::cout << "Fire was pressed on a gamepad\n";
     }
 
     // make a copy of the area, ands move it to be outside the screen
     Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
     rightarea.x = irr_driver->getFrameSize().Width;
     
-    ActivePlayer* aplayer = new ActivePlayer( UserConfigParams::m_all_players.get(0) );
-    StateManager::get()->addActivePlayer(aplayer);
-    aplayer->setDevice(device);
+    // Create new active player
+    int id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+    ActivePlayer *aplayer = StateManager::get()->getActivePlayer(id);
     
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
@@ -467,11 +459,7 @@ bool playerJoin(InputDevice* device)
     newPlayer->add();
 
     g_player_karts.push_back(newPlayer);
-
-    
-    
     const int amount = g_player_karts.size();
-    
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
     const int splitWidth = fullarea->w / amount;
     

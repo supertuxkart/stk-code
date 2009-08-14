@@ -70,7 +70,7 @@ class ActivePlayer
     InputDevice* m_device;
 public:
     
-    ActivePlayer(PlayerProfile* player);
+    ActivePlayer(PlayerProfile* player, InputDevice* device);
     ~ActivePlayer();
     
     PlayerProfile* getProfile();

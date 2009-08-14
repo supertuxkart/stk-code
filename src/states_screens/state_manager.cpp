@@ -30,6 +30,7 @@
 #include "guiengine/widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/input_device.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -73,9 +74,20 @@ ActivePlayer* StateManager::getActivePlayer(const int id)
     }
     return returnPlayer;
 }
+/*
 void StateManager::addActivePlayer(ActivePlayer* p)
 {
     m_active_players.push_back(p);
+}
+*/
+int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
+{
+    ActivePlayer *p;
+    int i;
+    p = new ActivePlayer(profile, device);
+    i = m_active_players.size();
+    m_active_players.push_back(p);
+    return i;
 }
 void StateManager::removeActivePlayer(int id)
 {

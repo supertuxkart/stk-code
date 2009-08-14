@@ -187,14 +187,6 @@ void RaceManager::computeRandomKartList()
  */
 void RaceManager::startNew()
 {
-    if(UserConfigParams::m_no_start_screen == true)
-    {
-            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-            ActivePlayer* newPlayer = new ActivePlayer(UserConfigParams::m_all_players.get(0));
-            StateManager::get()->addActivePlayer( newPlayer );
-            newPlayer->setDevice(device);
-            device->setPlayer(newPlayer);
-    }
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)   // GP: get tracks and laps from grand prix
     {
         m_tracks   = m_grand_prix.getTracks();

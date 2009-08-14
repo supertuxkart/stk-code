@@ -3,10 +3,11 @@
 #include "race/race_manager.hpp"
 #include "modes/world.hpp"
 
-ActivePlayer::ActivePlayer(PlayerProfile* player)
+ActivePlayer::ActivePlayer(PlayerProfile* player, InputDevice *device)
 {
     m_player = player;
     m_device = NULL;
+    setDevice(device);
 }
 ActivePlayer::~ActivePlayer()
 {
@@ -33,8 +34,7 @@ void ActivePlayer::setDevice(InputDevice* device)
     
     m_device = device;
     
-    if(device != NULL)
-        device->setPlayer(this);
+    if(device != NULL) device->setPlayer(this);
 }
 
 PlayerKart* ActivePlayer::getKart()

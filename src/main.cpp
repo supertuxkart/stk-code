@@ -607,15 +607,12 @@ int main(int argc, char *argv[] )
         else 
         {
             InputDevice *device;
-            ActivePlayer* newPlayer;
 
             // Use keyboard by default in --no-start-screen
             device = input_manager->getDeviceList()->getKeyboard(0);
 
             // Create player and associate player with keyboard
-            newPlayer = new ActivePlayer( UserConfigParams::m_all_players.get(0) );
-            StateManager::get()->addActivePlayer(newPlayer);
-            newPlayer->setDevice(device);
+            StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
 
             // Set up race manager appropriately
             race_manager->setNumLocalPlayers(1);

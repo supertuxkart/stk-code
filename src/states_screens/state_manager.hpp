@@ -22,6 +22,8 @@
 #include <string>
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
+#include "input/input_device.hpp"
+#include "config/player.hpp"
 
 struct Input;
 class ActivePlayer;
@@ -55,7 +57,8 @@ public:
       * Adds a new player to the list of active players. StateManager takes ownership of the object
       * so no need to delete it yourself.
       */
-    void addActivePlayer(ActivePlayer* p);
+//    void addActivePlayer(ActivePlayer* p);
+    int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
 
     int activePlayerCount();
