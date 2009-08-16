@@ -68,12 +68,7 @@ protected:
     
 
     Phase           m_phase;
-    /**
-     * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
-     * This timer basically kicks in when we need to calculate non-race time like labels.
-     */
-    float           m_auxiliary_timer;
-    
+
     /**
         * Remember previous phase e.g. on pause
      */
@@ -94,6 +89,12 @@ public:
                                           (m_phase==LIMBO_PHASE &&
                                            m_previous_phase==FINISH_PHASE);}
     const Phase getPhase() const  { return m_phase;                      }
+    
+    /**
+     * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
+     * This timer basically kicks in when we need to calculate non-race time like labels.
+     */
+    float           m_auxiliary_timer;
     
     /**
      * Call to specify what kind of clock you want. The second argument

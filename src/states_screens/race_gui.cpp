@@ -27,6 +27,7 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -55,6 +56,7 @@ RaceGUI::RaceGUI()
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");    
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
+    m_music_icon       = material_manager->getMaterial("notes.png");
     createMarkerTexture();
 }   // RaceGUI
 
@@ -536,24 +538,70 @@ void RaceGUI::drawMusicDescription()
 {
     if (!UserConfigParams::m_music) return; // show no music description when it's off
     
+    // 3.0 is the duration of ready/set (TODO: don't hardcode)
+    float timeProgression = (float)(RaceManager::getWorld()->m_auxiliary_timer - 2.0f) /
+    (float)(stk_config->m_music_credit_time - 2.0f);
+    
+    const int x_pulse = sin(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f;
+    const int y_pulse = cos(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f;
+    
+    float resize = 1.0f;
+    if (timeProgression < 0.1)
+    {
+        resize = timeProgression/0.1f;
+    }
+    else if (timeProgression > 0.9)
+    {
+        resize = 1.0f - (timeProgression - 0.9f)/0.1f;
+    }
+    
+    
     const MusicInformation* mi=sound_manager->getCurrentMusic();
     if(!mi) return;
-    int y=UserConfigParams::m_height-40;
+    
+    const float resize3 = resize*resize*resize;
+    
+    const int y = UserConfigParams::m_height - 80;
+    const int text_y = UserConfigParams::m_height - 80*(resize3) + 40*(1-resize);
+    
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     gui::IGUIFont*       font = irr_driver->getRaceFont();
     if(mi->getComposer()!="")
     {
-        core::rect<s32> pos_by(UserConfigParams::m_width>>1, y,
-                              UserConfigParams::m_width>>1, y);
+        core::rect<s32> pos_by((UserConfigParams::m_width>>1) + 32, text_y+40,
+                              (UserConfigParams::m_width>>1) + 32, text_y+40);
         std::string s="by "+mi->getComposer();
         font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, true, true);
-        y-=40;
     }
 
     std::string s="\""+mi->getTitle()+"\"";
-    core::rect<s32> pos(UserConfigParams::m_width>>1, y,
-                        UserConfigParams::m_width>>1, y);
-    font->draw(core::stringw(s.c_str()).c_str(), pos, white, true, true);
+
+    // Draw text
+    core::stringw thetext(s.c_str());
+    
+    core::dimension2d< s32 > textSize = font->getDimension(thetext.c_str());
+    const int textWidth = textSize.Width;
+    
+    core::rect<s32> pos((UserConfigParams::m_width >> 1) + 32, text_y,
+                        (UserConfigParams::m_width >> 1) + 32, text_y);
+    
+    font->draw(thetext.c_str(), pos, white, true, true);
+    
+    
+
+    int iconSizeX = 64*resize + x_pulse*resize*resize;
+    int iconSizeY = 64*resize + y_pulse*resize*resize;
+
+    // Draw music icon
+    video::ITexture *t = m_music_icon->getTexture();
+    const int noteX = (UserConfigParams::m_width >> 1) - textWidth/2 - 32;
+    const int noteY = y;
+    core::rect<s32> dest(noteX-iconSizeX/2+20,    noteY-iconSizeY/2+32, 
+                         noteX+iconSizeX/2+20,    noteY+iconSizeY/2+32);
+    const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
+    
+    irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL, NULL, true);
+
 }   // drawMusicDescription
 
 //-----------------------------------------------------------------------------

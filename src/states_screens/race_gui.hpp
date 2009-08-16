@@ -92,6 +92,9 @@ private:
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
     video::ITexture *m_marker;
 
+    /** Musical notes icon (for music description and credits) */
+    Material        *m_music_icon;
+    
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
         /** The size of a single marker in pixels, must be a power of 2. */
