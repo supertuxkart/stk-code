@@ -75,6 +75,8 @@ namespace GUIEngine
         PROP_SQUARE
     };
     
+    static bool isWithinATextBox = false;
+    
     /**
       * The nearly-abstract base of all widgets (not fully abstract since a bare Widget
       * can be created for the sore goal of containing children widgets in a group)
@@ -89,8 +91,8 @@ namespace GUIEngine
       */
     class Widget : public SkinWidgetContainer
     {
-        friend class EventHandler;
     protected:
+        friend class EventHandler;
         friend class RibbonWidget;
         friend class Screen;
         friend class SpinnerWidget;
@@ -126,7 +128,7 @@ namespace GUIEngine
         virtual bool mouseHovered(Widget* child) { return false; }
         
         /** override in children if you need to know when the widget is focused */
-        virtual void focused() {}
+        virtual void focused() { isWithinATextBox = false; }
         
         /**
           * The XML loader stored coords in their raw string form inside this widget.

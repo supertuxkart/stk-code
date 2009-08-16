@@ -451,10 +451,10 @@ bool InputManager::input(const SEvent& event)
                 StateManager::get()->escapePressed();
                 return true;
             }
-            // 'backspace' in a modal dialog must never be mapped, since user can be in a text
+            // 'backspace' in a text control must never be mapped, since user can be in a text
             // area trying to erase text (and if it's mapped to rescue that would dismiss the
             // dialog instead of erasing a single letter)
-            if (key == KEY_BACK && GUIEngine::ModalDialog::isADialogActive())
+            if (key == KEY_BACK && GUIEngine::isWithinATextBox)
             {
                 return false;
             }
@@ -502,8 +502,8 @@ bool InputManager::input(const SEvent& event)
     }
 #endif
 
-    // block events in all modes but initial menus (except for modal dialogs to allow for typing text)
-    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::ModalDialog::isADialogActive();
+    // block events in all modes but initial menus (except in text boxes to allow typing)
+    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox;
 }
 
 //-----------------------------------------------------------------------------

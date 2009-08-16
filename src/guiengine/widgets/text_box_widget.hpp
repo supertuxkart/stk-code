@@ -34,10 +34,16 @@ namespace GUIEngine
     {
     public:
         TextBoxWidget();
+        ~TextBoxWidget()
+        {
+            isWithinATextBox = false;   
+        }
         
         void add();
         void addItem(const char* item);
         
+        virtual void focused() { isWithinATextBox = true; }
+
         core::stringw getText() const;
     };
 }
