@@ -534,6 +534,8 @@ void RaceGUI::addMessage(const std::string &msg, const Kart *kart, float time,
 // usually the title and composer.
 void RaceGUI::drawMusicDescription()
 {
+    if (!UserConfigParams::m_music) return; // show no music description when it's off
+    
     const MusicInformation* mi=sound_manager->getCurrentMusic();
     if(!mi) return;
     int y=UserConfigParams::m_height-40;

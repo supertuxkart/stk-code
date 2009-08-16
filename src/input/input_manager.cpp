@@ -501,7 +501,7 @@ bool InputManager::input(const SEvent& event)
          */
     }
 #endif
-
+    
     // block events in all modes but initial menus (except in text boxes to allow typing)
     return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox;
 }
