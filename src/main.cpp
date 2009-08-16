@@ -502,7 +502,8 @@ void initRest()
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
-    race_manager->setDifficulty(RaceManager::RD_HARD);
+    race_manager->setDifficulty((RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
+    // race_manager->setDifficulty(RaceManager::RD_HARD);
 
     //menu_manager= new MenuManager();
 

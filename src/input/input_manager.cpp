@@ -383,7 +383,7 @@ bool InputManager::input(const SEvent& event)
 
     //const bool programaticallyGenerated = (event.UserEvent.UserData1 == 666 && event.UserEvent.UserData1 == 999);
     const bool programaticallyGenerated = false; //event.EventType == EET_KEY_INPUT_EVENT && (event.KeyInput.Char == 666);
-
+    
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
@@ -446,10 +446,17 @@ bool InputManager::input(const SEvent& event)
         if(event.KeyInput.PressedDown)
         {
             // escape is a little special
-            if(key == KEY_ESCAPE)
+            if (key == KEY_ESCAPE)
             {
                 StateManager::get()->escapePressed();
                 return true;
+            }
+            // 'backspace' in a modal dialog must never be mapped, since user can be in a text
+            // area trying to erase text (and if it's mapped to rescue that would dismiss the
+            // dialog instead of erasing a single letter)
+            if (key == KEY_BACK && GUIEngine::ModalDialog::isADialogActive())
+            {
+                return false;
             }
 
             input(Input::IT_KEYBOARD, 0, key,
@@ -495,7 +502,8 @@ bool InputManager::input(const SEvent& event)
     }
 #endif
 
-    return getDeviceList()->playerAssignMode() != NO_ASSIGN; // block events in all modes but initial menus
+    // block events in all modes but initial menus (except for modal dialogs to allow for typing text)
+    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::ModalDialog::isADialogActive();
 }
 
 //-----------------------------------------------------------------------------

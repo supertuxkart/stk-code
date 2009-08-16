@@ -157,12 +157,10 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     {
         RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("difficulty");
         assert( w != NULL );
-        w->setSelection(UserConfigParams::m_difficulty);
-
-        race_manager->setDifficulty( (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty );
+        w->setSelection( race_manager->getDifficulty() );
         
         SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
-        race_manager->setNumKarts( kartamount->getValue() + 1 );
+        kartamount->setValue( race_manager->getNumKarts() - race_manager->getNumPlayers() );
         
         RibbonGridWidget* w2 = getCurrentScreen()->getWidget<RibbonGridWidget>("gamemode");
         assert( w2 != NULL );
@@ -193,11 +191,20 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
         const std::string& selection = w->getSelectionIDString();
 
         if(selection == "novice")
+        {
+            UserConfigParams::m_difficulty = RaceManager::RD_EASY;
             race_manager->setDifficulty(RaceManager::RD_EASY);
+        }
         else if(selection == "intermediate")
+        {
+            UserConfigParams::m_difficulty = RaceManager::RD_MEDIUM;
             race_manager->setDifficulty(RaceManager::RD_MEDIUM);
+        }
         else if(selection == "expert")
+        {
+            UserConfigParams::m_difficulty = RaceManager::RD_HARD;
             race_manager->setDifficulty(RaceManager::RD_HARD);
+        }
     }
     else if(name == "gamemode")
     {
