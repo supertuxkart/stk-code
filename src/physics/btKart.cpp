@@ -426,7 +426,7 @@ void	btKart::updateFriction(btScalar	timeStep)
                 {
                     if (wheel==2 || wheel==3)
                     {
-                        m_forwardImpulse[wheel] = 0.5*(m_zipper_velocity - getRigidBody()->getLinearVelocity().length()) / m_chassisBody->getInvMass();
+                        m_forwardImpulse[wheel] = 0.5f*(m_zipper_velocity - getRigidBody()->getLinearVelocity().length()) / m_chassisBody->getInvMass();
                     }
                 }
                 else
