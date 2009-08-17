@@ -23,7 +23,7 @@
 
 #include "graphics/irr_driver.hpp"
 
-Shadow::Shadow(const std::string &name)
+Shadow::Shadow(const std::string &name, scene::IAnimatedMeshSceneNode *node)
 {
     video::ITexture *texture = irr_driver->getTexture(name);
     video::SMaterial m;
@@ -31,8 +31,8 @@ Shadow::Shadow(const std::string &name)
     m.BackfaceCulling = false;
     m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m_mesh   = irr_driver->createQuadMesh(&m, /*create_one_quad*/true);
-    m_buffer = m_mesh->getMeshBuffer(0);
-    irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
+    scene::IMeshBuffer *buffer = m_mesh->getMeshBuffer(0);
+    irr::video::S3DVertex* v=(video::S3DVertex*)buffer->getVertices();
     v[0].Pos.X = -1.0f; v[0].Pos.Z =  1.0f; v[0].Pos.Y = 0.01f;
     v[1].Pos.X =  1.0f; v[1].Pos.Z =  1.0f; v[1].Pos.Y = 0.01f;
     v[2].Pos.X =  1.0f; v[2].Pos.Z = -1.0f; v[2].Pos.Y = 0.01f;
@@ -46,17 +46,23 @@ Shadow::Shadow(const std::string &name)
     v[1].Normal  = normal;
     v[2].Normal  = normal;
     v[3].Normal  = normal;
-    m_buffer->recalculateBoundingBox();
+    buffer->recalculateBoundingBox();
     
     m_node   = irr_driver->addMesh(m_mesh);
-    
+    m_mesh->drop();   // the node grabs the mesh, so we can drop this reference
     m_node->setAutomaticCulling(scene::EAC_OFF);
+    m_parent_kart_node = node;
+    m_parent_kart_node->addChild(m_node);
 }   // Shadow
 
 // ----------------------------------------------------------------------------
 Shadow::~Shadow()
 {
+    // Note: the mesh was not loaded from disk, so it is not cached,
+    // and does not need to be removed. It's clean up when removing the node
+    m_parent_kart_node->removeChild(m_node);
 }   // ~Shadow
+
 // ----------------------------------------------------------------------------
 /** Removes the shadow, used for the simplified shadow when the kart is in
  *  the air.

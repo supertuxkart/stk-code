@@ -257,7 +257,6 @@ Kart::~Kart()
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
 
-    m_animated_node->removeChild(m_shadow->getSceneNode());
     delete m_shadow;
 
     if(m_skidmarks) delete m_skidmarks ;
@@ -1090,8 +1089,8 @@ void Kart::loadData()
         m_skidmarks = new SkidMarks(*this);
 
     m_shadow = new Shadow(file_manager->getKartFile(m_kart_properties->getShadowFile(),
-                                                    getIdent()                         ));
-    m_animated_node->addChild(m_shadow->getSceneNode());
+                                                    getIdent()                         ),
+                          m_animated_node);
 }   // loadData
 
 //-----------------------------------------------------------------------------

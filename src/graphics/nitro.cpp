@@ -51,6 +51,7 @@ Nitro::Nitro(Kart* kart) : m_kart(kart)
     m_emitter->setMinStartSize(core::dimension2df(particle_size/2.0f, particle_size/2.0f));
     m_emitter->setMaxStartSize(core::dimension2df(particle_size*2.0f, particle_size*2.0f));
     m_node->setEmitter(m_emitter); // this grabs the emitter
+    m_emitter->drop();             // so we can drop our reference
 
     scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
     m_node->addAffector(af);

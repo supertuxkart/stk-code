@@ -50,6 +50,7 @@ WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m_emitter->setMinStartSize(core::dimension2df(m_particle_size/1.5f, m_particle_size/1.5f));
     m_emitter->setMaxStartSize(core::dimension2df(m_particle_size*1.5f, m_particle_size*1.5f));
     m_node->setEmitter(m_emitter); // this grabs the emitter
+    m_emitter->drop();             // so we can drop it now
 
     scene::IParticleFadeOutAffector *fade_af = 
         m_node->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), 500);

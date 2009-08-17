@@ -95,6 +95,7 @@ PhysicalObject::PhysicalObject(const XMLNode *xml_node)
 PhysicalObject::~PhysicalObject()
 {
     RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+    irr_driver->removeNode(m_node);
     delete m_body;
     delete m_motion_state;
     delete m_shape;

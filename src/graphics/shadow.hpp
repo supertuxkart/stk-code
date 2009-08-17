@@ -36,15 +36,14 @@ private:
     scene::ISceneNode  *m_node;
     /** The mesh of the shadow. */
     scene::IMesh       *m_mesh;
-    /** The mesh buffer containing the actual vertices of the shadow. */
-    scene::IMeshBuffer *m_buffer;
+    /** The scene node of the kart to which this shadow belongs. */
+    scene::ISceneNode  *m_parent_kart_node;
 public:
-                       Shadow(const std::string &name);
+                       Shadow(const std::string &name,
+                           scene::IAnimatedMeshSceneNode *node);
                       ~Shadow();
     void               enableShadow();
     void               disableShadow();
-    /** Returns the scene node of the shadow. */
-    scene::ISceneNode* getSceneNode() const {return m_node; }
 };   // Shadow
 #endif
 

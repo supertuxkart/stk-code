@@ -133,6 +133,14 @@ void Track::cleanup()
         m_animation_manager = NULL;
     }
 
+    for(unsigned int i=0; i<m_physical_objects.size(); i++)
+    {
+        delete m_physical_objects[i];
+    }
+    m_physical_objects.clear();
+
+    irr_driver->removeNode(m_light);
+
     delete m_non_collision_mesh;
     m_non_collision_mesh = new TriangleMesh();
     delete m_track_mesh;
@@ -741,11 +749,7 @@ void Track::loadTrackModel()
             }   // for j<MATERIAL_MAX_TEXTURES
         }   // for i<getMaterialCount
 
-        m_all_nodes.push_back(irr_driver->addSkyDome(m_sky_textures[0],
-                                                     m_sky_hori_segments, 
-                                                     m_sky_vert_segments, 
-                                                     m_sky_texture_percent, 
-                                                     m_sky_sphere_percent) );
+        m_all_nodes.push_back(node);
     }
     else if(m_sky_type==SKY_BOX)
     {
