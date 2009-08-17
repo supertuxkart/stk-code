@@ -356,6 +356,9 @@ void Kart::reset()
     m_controls.m_nitro     = false;
     m_controls.m_drift     = false;
     m_controls.m_fire      = false;
+    m_controls.m_look_back = false;
+
+    m_vehicle->deactivateZipper();
 
     // Set the brakes so that karts don't slide downhill
     for(int i=0; i<4; i++) m_vehicle->setBrake(5.0f, i);
