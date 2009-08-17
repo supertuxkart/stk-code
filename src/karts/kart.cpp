@@ -681,18 +681,13 @@ void Kart::handleZipper()
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake) return;
     m_zipper_time_left  = stk_config->m_zipper_time;
+
     btVector3 v         = m_body->getLinearVelocity();
     float current_speed = v.length();
     float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain,
                                    getMaxSpeedOnTerrain());
-    // If the speed is too low, very minor components of the velocity vector
-    // can become too big. E.g. each kart has a z component (to offset gravity
-    // I assume, around 0.16) --> if the karts are (nearly) at standstill,
-    // the z component is exaggerated, resulting in a jump. Even if Z
-    // is set to 0, minor left/right movements are then too strong.
-    // Therefore a zipper only adds the speed if the speed is at least 1
-    // (experimentally found valud).  It also avoids NAN problems (if v=0).
-    if(current_speed>1.0f) m_body->setLinearVelocity(v*(speed/current_speed));
+
+    m_vehicle->activateZipper(speed);
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
@@ -1066,6 +1061,8 @@ void Kart::endRescue()
 
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
+
+    m_vehicle->deactivateZipper();
 
     // let the mode decide where to put the kart
     RaceManager::getWorld()->moveKartAfterRescue(this, m_body);

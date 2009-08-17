@@ -24,6 +24,8 @@ class btKart : public btRaycastVehicle
     void         defaultInit(const btVehicleTuning& tuning);
     btScalar     m_track_connect_accel;
     btScalar     m_skidding_factor;
+    bool         m_zipper_active;
+    btScalar     m_zipper_velocity;
 public:
     btKart(const btVehicleTuning& tuning,btRigidBody* chassis,
            btVehicleRaycaster* raycaster, float track_connect_accel );
@@ -36,6 +38,8 @@ public:
                                      const btVector3& hitPoint,
                                      const btVector3& hitNormal,btScalar depth);
     void         setPitchControl(btScalar pitch) { m_pitchControl = pitch; }
+    void         activateZipper(btScalar vel) { m_zipper_active = true; m_zipper_velocity = vel; }
+    void         deactivateZipper() { m_zipper_active = false; }
     void         updateSuspension(btScalar deltaTime);
     virtual void updateFriction(btScalar timeStep);
 };
