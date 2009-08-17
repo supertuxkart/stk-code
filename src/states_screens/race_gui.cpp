@@ -542,8 +542,8 @@ void RaceGUI::drawMusicDescription()
     float timeProgression = (float)(RaceManager::getWorld()->m_auxiliary_timer - 2.0f) /
     (float)(stk_config->m_music_credit_time - 2.0f);
     
-    const int x_pulse = sin(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f;
-    const int y_pulse = cos(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f;
+    const int x_pulse = (int)(sin(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
+    const int y_pulse = (int)(cos(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
     
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -562,7 +562,7 @@ void RaceGUI::drawMusicDescription()
     const float resize3 = resize*resize*resize;
     
     const int y = UserConfigParams::m_height - 80;
-    const int text_y = UserConfigParams::m_height - 80*(resize3) + 40*(1-resize);
+    const int text_y = (int)(UserConfigParams::m_height - 80*(resize3) + 40*(1-resize));
     
     static const video::SColor white = video::SColor(255, 255, 255, 255);
     gui::IGUIFont*       font = irr_driver->getRaceFont();
@@ -589,8 +589,8 @@ void RaceGUI::drawMusicDescription()
     
     
 
-    int iconSizeX = 64*resize + x_pulse*resize*resize;
-    int iconSizeY = 64*resize + y_pulse*resize*resize;
+    int iconSizeX = (int)(64*resize + x_pulse*resize*resize);
+    int iconSizeY = (int)(64*resize + y_pulse*resize*resize);
 
     // Draw music icon
     video::ITexture *t = m_music_icon->getTexture();
