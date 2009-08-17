@@ -278,7 +278,10 @@ Kart::~Kart()
 void Kart::eliminate()
 {
     m_eliminated = true;
-    RaceManager::getWorld()->getPhysics()->removeKart(this);
+    if (!m_rescue)
+    {
+        RaceManager::getWorld()->getPhysics()->removeKart(this);
+    }
 
     // make the kart invisible by placing it way under the track
     Vec3 hell(0, 0, -10000.0f);
@@ -553,9 +556,10 @@ void Kart::update(float dt)
             m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
-            RaceManager::getWorld()->getPhysics()->removeKart(this);
             race_state->itemCollected(getWorldKartId(), -1, -1);
         }
+        RaceManager::getWorld()->getPhysics()->removeKart(this);
+
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
