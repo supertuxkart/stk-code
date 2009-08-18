@@ -205,13 +205,27 @@ void World::terminateRace()
  */
 void World::resetAllKarts()
 {
+    //Project karts onto track from above. This will lower each kart so
+    //that at least one of its wheel will be on the surface of the track
+    for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+    {
+        bool kart_over_ground = m_physics->projectKartDownwards(*i);
+
+        if (!kart_over_ground)
+        {
+            fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
+                    (int)(i-m_kart.begin()), m_track->getIdent().c_str());
+            exit(-1);
+        }
+    }
+
     bool all_finished=false;
     // kart->isInRest() is not fully correct, since it only takes the
     // velocity in count, which might be close to zero when the kart
     // is just hitting the floor, before being pushed up again by
     // the suspension. So we just do a longer initial simulation,
     // which should be long enough for all karts to be firmly on ground.
-    for(int i=0; i<200; i++) m_physics->update(1.f/60.f);
+    for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
 
     // Stil wait will all karts are in rest (and handle the case that a kart
     // fell through the ground, which can happen if a kart falls for a long

@@ -106,6 +106,7 @@ public:
     btDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}
     void  debugDraw        (float m[16], btCollisionShape *s, const btVector3 color);
+    bool  projectKartDownwards(const Kart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

@@ -9,6 +9,10 @@
  * It is provided "as is" without express or implied warranty.
 */
 
+/* Based on btRayCastVehicle, but modified for STK.
+ * projectVehicleToSurface function and shorter raycast functions added.
+ */
+
 #include "physics/btKart.hpp"
 
 #include "LinearMath/btMinMax.h"
@@ -128,6 +132,247 @@ btScalar btKart::rayCast(btWheelInfo& wheel)
 	}
 
 	return depth;
+}
+
+
+// ----------------------------------------------------------------------------
+//Shorter version of above raycast function. This is used when projecting
+//vehicles towards the ground at the start of a race
+btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
+{
+    updateWheelTransformsWS( wheel,false);
+
+    btScalar depth          = -1;
+
+    const btVector3& source = wheel.m_raycastInfo.m_hardPointWS;
+    wheel.m_raycastInfo.m_contactPointWS = source + ray;
+    const btVector3& target = source + ray;
+
+    btVehicleRaycaster::btVehicleRaycasterResult    rayResults;
+
+    assert(m_vehicleRaycaster);
+
+    void* object            = m_vehicleRaycaster->castRay(source,target,rayResults);
+
+    wheel.m_raycastInfo.m_groundObject = 0;
+
+    if (object)
+    {
+        depth = ray.length() * rayResults.m_distFraction;
+
+        wheel.m_raycastInfo.m_contactPointWS   = rayResults.m_hitPointInWorld;
+        wheel.m_raycastInfo.m_contactNormalWS  = rayResults.m_hitNormalInWorld;
+        wheel.m_raycastInfo.m_isInContact      = true;
+    }
+
+    return depth;
+}
+
+// ----------------------------------------------------------------------------
+//Project vehicle onto surface in a particular direction.
+//Used in reseting kart positions.
+//Please align wheel direction with ray direction first.
+bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicle)
+{
+    for (int i=0;i<getNumWheels();i++)
+    {
+        updateWheelTransform(i,false);
+    }
+
+
+    btScalar min_depth(-1);   //minimum distance of wheel to surface
+    int min_wheel_index  = 0; //wheel with 1st minimum distance to surface
+    int min_wheel_index2 = 0; //wheel with 2nd minimum distance to surface
+    int min_wheel_index3 = 0; //wheel with 3nd minimum distance to surface
+
+    btScalar depth[4];
+
+    for (int i=0;i<m_wheelInfo.size();i++)
+    {
+        depth[i] = rayCast( m_wheelInfo[i], ray);
+        depth[i] -= m_wheelInfo[i].m_wheelsRadius;
+
+        if (!(m_wheelInfo[i].m_raycastInfo.m_isInContact))
+        {
+            return false; //a wheel is not over ground
+        }
+
+        if (depth[i]<min_depth || i ==0)
+        {
+            min_depth = depth[i];
+            min_wheel_index = i;
+        }
+
+    }
+
+    bool flag = true;
+
+    for (int i=0;i<m_wheelInfo.size();i++)
+    {
+        if (i==min_wheel_index)
+            continue;
+
+        if (depth[i]<min_depth || flag)
+        {
+            min_depth = depth[i];
+            min_wheel_index2 = i;
+            flag = false;
+        }
+    }
+
+    flag = true;
+    for (int i=0;i<m_wheelInfo.size();i++)
+    {
+        if (i==min_wheel_index || i==min_wheel_index2)
+            continue;
+
+        if (depth[i]<min_depth || flag)
+        {
+            min_depth = depth[i];
+            min_wheel_index3 = i;
+            flag = false;
+        }
+    }
+
+    min_depth = depth[min_wheel_index];
+
+    btWheelInfo& min_wheel  = m_wheelInfo[min_wheel_index];
+    btWheelInfo& min_wheel2 = m_wheelInfo[min_wheel_index2];
+    btWheelInfo& min_wheel3 = m_wheelInfo[min_wheel_index3];
+
+    btVector3 ray_dir = btVector3(0,0,0);
+    if (ray.length() > btScalar(0))
+        ray_dir = ray / ray.length();
+
+    btTransform trans = getRigidBody()->getCenterOfMassTransform();
+    btTransform rot_trans;
+    rot_trans.setIdentity();
+    rot_trans.setRotation(trans.getRotation());
+    rot_trans = rot_trans.inverse();
+
+
+    btTransform offset_trans;
+    offset_trans.setIdentity();
+    btVector3 offset= min_wheel.m_raycastInfo.m_hardPointWS + min_wheel.m_wheelsRadius * ray_dir;
+    offset -= getRigidBody()->getCenterOfMassPosition();
+    offset_trans.setOrigin(rot_trans*offset);
+
+
+    //the effect of the following rotations is to make the 3 wheels with initial
+    //minimum distance to surface (in the ray direction) in contact with the
+    //plane between the points of intersection (between the ray and surface).
+
+    //Note - For possible complex surfaces with lots of bumps directly under vehicle,
+    //       the raycast needs to be done from a slightly higher above the surface.
+    //       For such surfaces, the end result should be that no wheel is below the
+    //       surface, but there can be not all wheels touching surface.
+
+    //We need to rotate vehicle, using above contact point as a pivot to put
+    //2nd closest wheel nearer to the surface of the track
+    btScalar d_hpws  = (min_wheel.m_raycastInfo.m_hardPointWS - min_wheel2.m_raycastInfo.m_hardPointWS).length();
+    btScalar d_depth = (min_wheel2.m_raycastInfo.m_contactPointWS - min_wheel2.m_raycastInfo.m_hardPointWS - ray_dir * min_wheel.m_wheelsRadius).length();
+    d_depth -= min_depth;
+
+    //calculate rotation angle from pivot point and plane perpendicular to ray
+    float rot_angle = atanf(d_depth / d_hpws);
+    rot_angle -= atanf((min_wheel2.m_wheelsRadius - min_wheel.m_wheelsRadius) / d_hpws);
+
+    getRigidBody()->setAngularVelocity(btVector3(0,0,0));
+    getRigidBody()->setLinearVelocity(btVector3(0,0,0));
+
+
+    btVector3 rot_axis = (min_wheel2.m_raycastInfo.m_hardPointWS - min_wheel.m_raycastInfo.m_hardPointWS).cross(ray_dir);
+
+    btTransform operator_trans;
+    operator_trans.setIdentity();
+
+    //perform pivot rotation
+    if (rot_axis.length() != btScalar(0))
+    {
+        //rotate kart about pivot point, about line perpendicular to
+        //ray and vector between the 2 wheels
+        operator_trans *= offset_trans;
+        operator_trans.setRotation(btQuaternion(rot_trans*rot_axis.normalize(), rot_angle));
+        offset_trans.setOrigin(-(rot_trans*offset));
+        operator_trans *= offset_trans;
+    }
+
+    //apply tranform
+    trans *= operator_trans;
+    getRigidBody()->setCenterOfMassTransform(trans);
+
+    //next, rotate about axis which is a vector between 2 wheels above, so that
+    //the 3rd wheel is correctly positioned.
+
+    rot_axis = min_wheel2.m_raycastInfo.m_contactPointWS - min_wheel.m_raycastInfo.m_contactPointWS;
+    btVector3 wheel_dist = min_wheel3.m_raycastInfo.m_hardPointWS - min_wheel.m_raycastInfo.m_hardPointWS;
+    if (rot_axis.length() != btScalar(0))
+    {
+        btVector3 proj = wheel_dist.dot(rot_axis) * rot_axis.normalize();
+
+        //calculate position on axis when a perpendicular line would go through
+        //3rd wheel position when translated in ray position and rotated as above
+        btVector3 pos_on_axis = min_wheel.m_raycastInfo.m_contactPointWS + proj;
+
+        btVector3 to_contact_pt = min_wheel3.m_raycastInfo.m_contactPointWS - pos_on_axis;
+        btScalar dz = to_contact_pt.dot(ray_dir);
+        btScalar dw = (to_contact_pt - dz * ray_dir).length();
+        rot_angle = atanf (dz / dw);
+
+        btVector3 rot_point = getRigidBody()->getCenterOfMassPosition() + min_depth * ray_dir - min_wheel.m_raycastInfo.m_contactPointWS;
+        rot_point = rot_point.dot(rot_axis) * rot_axis.normalize() - rot_point;
+
+
+        //calculate translation offset to axis from center of mass along perpendicular
+        offset_trans.setIdentity();
+
+        offset= rot_point;
+        offset_trans.setOrigin(rot_trans*offset);
+
+        btVector3 a = min_wheel3.m_raycastInfo.m_hardPointWS - min_wheel.m_raycastInfo.m_hardPointWS;
+        btVector3 b = min_wheel2.m_raycastInfo.m_hardPointWS - min_wheel.m_raycastInfo.m_hardPointWS;
+
+        if ( (a.cross(b)).dot(ray_dir) > 0 )
+        {
+            rot_angle *= btScalar(-1);
+        }
+
+        //rotate about new axis
+        operator_trans.setIdentity();
+        operator_trans *= offset_trans;
+        operator_trans.setRotation(btQuaternion(rot_trans*rot_axis.normalize(), rot_angle));
+        offset_trans.setOrigin(-(rot_trans*offset));
+        operator_trans *= offset_trans;
+
+        //apply tranform
+        trans *= operator_trans;
+        getRigidBody()->setCenterOfMassTransform(trans);
+    }
+
+    if (!translate_vehicle)
+        return true;
+
+    min_depth = btScalar(-1);   //minimum distance of wheel to surface
+
+    for (int i=0;i<m_wheelInfo.size();i++)
+    {
+        btScalar depth = rayCast( m_wheelInfo[i], ray);
+        depth -= m_wheelInfo[i].m_wheelsRadius;
+
+        if (!(m_wheelInfo[i].m_raycastInfo.m_isInContact))
+        {
+            return false; //a wheel is not over ground
+        }
+
+        if (depth<min_depth || i==0)
+        {
+            min_depth  = depth;
+        }
+    }
+
+    //translate along ray so wheel closest to surface is exactly on the surface
+    getRigidBody()->translate((min_depth - min_wheel.getSuspensionRestLength()) * ray_dir);
+    return true;
 }
 
 // ----------------------------------------------------------------------------

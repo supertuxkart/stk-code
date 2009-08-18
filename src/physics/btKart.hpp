@@ -31,6 +31,8 @@ public:
            btVehicleRaycaster* raycaster, float track_connect_accel );
     virtual     ~btKart() ;
     btScalar     rayCast(btWheelInfo& wheel);
+    btScalar     rayCast(btWheelInfo& wheel, const btVector3& ray);
+    bool         projectVehicleToSurface(const btVector3& ray, bool translate_vehicle);
     void         setSkidding(btScalar sf) { m_skidding_factor = sf; }
     virtual void updateVehicle(btScalar step);
     void         resetSuspension();
