@@ -74,7 +74,7 @@ void World::init()
     m_use_highscores = true;
 
     // Create the race gui before anything else is attached to the scene node
-    // (which happens when the track is loaded). This allows the race gui to 
+    // (which happens when the track is loaded). This allows the race gui to
     // do any rendering on texture.
     m_race_gui = new RaceGUI();
 
@@ -115,9 +115,9 @@ void World::init()
         {
             // In profile mode, load only the old kart
             newkart = new DefaultRobot(kart_ident, position, init_pos, m_track);
-    	    // Create a camera for the last kart (since this way more of the 
+    	    // Create a camera for the last kart (since this way more of the
 	        // karts can be seen.
-            if(i==race_manager->getNumKarts()-1) 
+            if(i==race_manager->getNumKarts()-1)
             {
                 stk_scene->createCamera(local_player_id, newkart);
                 m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
@@ -148,7 +148,7 @@ void World::init()
                 break;
             case RaceManager::KT_GHOST:
                 break;
-            case RaceManager::KT_LEADER: 
+            case RaceManager::KT_LEADER:
                 break;
             }
         }   // if !UserConfigParams::m_profile
@@ -157,7 +157,7 @@ void World::init()
     }  // for i
 
     resetAllKarts();
-    // Note: track reset must be called after all karts exist, since check 
+    // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
     // of karts.
     m_track->reset();
@@ -222,17 +222,17 @@ void World::resetAllKarts()
         all_finished=true;
         for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
         {
-            if(!(*i)->isInRest()) 
+            if(!(*i)->isInRest())
             {
                 float           hot;
                 Vec3            normal;
                 const Material *material;
-                // We can't use (*i)->getXYZ(), since this is only defined 
+                // We can't use (*i)->getXYZ(), since this is only defined
                 // after update() was called. Instead we have to get the
                 // real position of the rigid body.
                 btTransform     t;
                 (*i)->getBody()->getMotionState()->getWorldTransform(t);
-                // This test can not be done only once before the loop, since 
+                // This test can not be done only once before the loop, since
                 // it can happen that the kart falls through the track later!
                 m_track->getTerrainInfo(t.getOrigin(), &hot, &normal, &material);
                 if(!material)
@@ -296,16 +296,16 @@ void World::update(float dt)
 HighscoreEntry* World::getHighscores() const
 {
     if(!m_use_highscores) return NULL;
-    
+
     const HighscoreEntry::HighscoreType type = "HST_" + getInternalCode();
-    
+
     HighscoreEntry* highscores =
         highscore_manager->getHighscoreEntry(type,
-                                             race_manager->getNumKarts(), 
+                                             race_manager->getNumKarts(),
                                              race_manager->getDifficulty(),
                                              race_manager->getTrackName(),
                                              race_manager->getNumLaps());
-    
+
     return highscores;
 }
 // ----------------------------------------------------------------------------
@@ -316,7 +316,7 @@ HighscoreEntry* World::getHighscores() const
 void World::updateHighscores()
 {
     if(!m_use_highscores) return;
-    
+
     // Add times to highscore list. First compute the order of karts,
     // so that the timing of the fastest kart is added first (otherwise
     // someone might get into the highscore list, only to be kicked out
@@ -343,7 +343,7 @@ void World::updateHighscores()
         {
             // no kart claimed to be in this position, most likely means
             // the kart location data is wrong
-            
+
 #ifdef DEBUG
             fprintf(stderr, "Error, incorrect kart positions:");
             for (unsigned int i=0; i<m_kart.size(); i++ )
@@ -353,9 +353,9 @@ void World::updateHighscores()
 #endif
             continue;
         }
-        
+
         // Only record times for player karts and only if they finished the race
-        if(!m_kart[index[pos]]->isPlayerKart()) continue; 
+        if(!m_kart[index[pos]]->isPlayerKart()) continue;
         if (!m_kart[index[pos]]->hasFinishedRace()) continue;
 
         assert(index[pos] >= 0);
@@ -363,7 +363,7 @@ void World::updateHighscores()
         PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
 
         HighscoreEntry* highscores = getHighscores();
-        
+
         if(highscores->addData(k->getName(),
                                k->getPlayer()->getProfile()->getName(),
                                k->getFinishTime())>0 )
@@ -372,7 +372,7 @@ void World::updateHighscores()
         }
     } // next position
     delete []index;
-    
+
 }   // updateHighscores
 //-----------------------------------------------------------------------------
 void World::printProfileResultAndExit()
@@ -387,7 +387,7 @@ void World::printProfileResultAndExit()
             m_kart[i]->getName().c_str(),(int)i,
             m_kart[i]->getPosition(),
             m_kart[i]->getFinishTime());
-    } 
+    }
     printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
     std::exit(-2);
 }   // printProfileResultAndExit
@@ -399,11 +399,11 @@ void World::removeKart(int kart_number)
 {
     Kart *kart = m_kart[kart_number];
 
-    // Display a message about the eliminated kart in the race gui 
+    // Display a message about the eliminated kart in the race gui
     for (std::vector<PlayerKart*>::iterator i  = m_player_karts.begin();
         i != m_player_karts.end();  i++ )
-    {   
-        if(*i==kart) 
+    {
+        if(*i==kart)
         {
             m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
         }
@@ -416,17 +416,17 @@ void World::removeKart(int kart_number)
     }   // for i in kart
     if(kart->isPlayerKart())
     {
-        // Change the camera so that it will be attached to the leader 
+        // Change the camera so that it will be attached to the leader
         // and facing backwards.
         Camera* camera=((PlayerKart*)kart)->getCamera();
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
     projectile_manager->newExplosion(kart->getXYZ());
-    // The kart can't be really removed from the m_kart array, since otherwise 
-    // a race can't be restarted. So it's only marked to be eliminated (and 
-    // ignored in all loops). Important:world->getCurrentNumKarts() returns 
-    // the number of karts still racing. This value can not be used for loops 
+    // The kart can't be really removed from the m_kart array, since otherwise
+    // a race can't be restarted. So it's only marked to be eliminated (and
+    // ignored in all loops). Important:world->getCurrentNumKarts() returns
+    // the number of karts still racing. This value can not be used for loops
     // over all karts, use race_manager->getNumKarts() instead!
     race_manager->RaceFinished(kart, TimedRace::getTime());
     kart->eliminate();
@@ -453,9 +453,9 @@ void World::restartRace()
     {
         (*i)->reset();
     }
-    
+
     resetAllKarts();
-    
+
     // Start music from beginning
     sound_manager->stopMusic();
     m_track->startMusic();
@@ -475,7 +475,7 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
                        const btTransform& init_pos)
 {
     Kart* currentRobot;
-    
+
     const int NUM_ROBOTS = 1;
 
     switch(m_random.get(NUM_ROBOTS))
@@ -488,7 +488,7 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
             currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
             break;
     }
-    
+
     return currentRobot;
 }
 
