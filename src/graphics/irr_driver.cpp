@@ -388,7 +388,7 @@ void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh,
     //m_device->getVideoDriver()->endScene();
     
     removeNode(main_node);
-    removeNode(camera);
+    removeCamera(camera);
     removeNode(light);
     
     m_device->getVideoDriver()->setRenderTarget(0, false, false);

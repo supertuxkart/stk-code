@@ -88,6 +88,23 @@ void RaceGUI::createMarkerTexture()
                                      m_marker_rendered_size), 
                                      "RaceGUI::markers");
 #endif
+    scene::ICameraSceneNode *camera = irr_driver->addCamera();
+    core::matrix4 projection;
+    projection.buildProjectionMatrixOrthoLH((float)(m_marker_rendered_size*npower2), 
+                                            (float)(m_marker_rendered_size), -1.0f, 1.0f);
+    camera->setProjectionMatrix(projection, true);
+    core::vector3df center( (float)(m_marker_rendered_size*npower2>>1),
+                            (float)(m_marker_rendered_size>>1), 0.0f);
+    camera->setPosition(center);
+    camera->setUpVector(core::vector3df(0,1,0));
+    camera->setTarget(center + core::vector3df(0,0,4));
+    // The call to render sets the projection matrix etc. So we have to call 
+    // this now before doing the direct OpenGL calls.
+    // FIXME: perhaps we should use three calls to irr_driver: begin(),
+    // render(), end() - so we could do the rendering by calling to
+    // draw2DPolygon() between render() and end(), avoiding the
+    // call to camera->render()
+    camera->render();
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         const std::string& kart_ident = race_manager->getKartIdent(i);
@@ -105,7 +122,9 @@ void RaceGUI::createMarkerTexture()
         irr_driver->getVideoDriver()->draw2DPolygon(vertices, &colors);
 #endif
     }
+
     m_marker = irr_driver->endRenderToTexture();
+    irr_driver->removeCamera(camera);
 }   // createMarkerTexture
 
 //-----------------------------------------------------------------------------
