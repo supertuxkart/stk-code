@@ -22,23 +22,21 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #undef AI_DEBUG
 
-#ifdef AI_DEBUG
-#define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
-//checks for crashes with the outside of the track.
-#define ERASE_PATH   //If not defined, the spheres drawn in the future path
-//won't be erased the next time the function is called.
-#define SHOW_NON_CRASHING_POINT //If defined, draws a green sphere where the
-//n farthest non-crashing point is.
-
-#endif
-
 #include "robots/default_robot.hpp"
+
+#ifdef AI_DEBUG
+#  include "irrlicht.h"
+   using namespace irr;
+#endif
 
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
 #include <iostream>
 
+#ifdef AI_DEBUG
+#include "graphics/irr_driver.hpp"
+#endif
 #include "graphics/scene.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
@@ -154,6 +152,9 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         break;
     }
 
+#ifdef AI_DEBUG
+    m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
+#endif
 }   // DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -162,6 +163,9 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
  */
 DefaultRobot::~DefaultRobot()
 {
+#ifdef AI_DEBUG
+    irr_driver->removeNode(m_debug_sphere);
+#endif
 }   // ~DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -417,6 +421,9 @@ void DefaultRobot::handleSteering(float dt)
             {
                 Vec3 straight_point;
                 findNonCrashingPoint(&straight_point);
+#ifdef AI_DEBUG
+                m_debug_sphere->setPosition(straight_point.toIrrVector());
+#endif
                 steer_angle = steerToPoint(straight_point, dt);
             }
             break;

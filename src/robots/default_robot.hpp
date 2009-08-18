@@ -27,6 +27,7 @@
 class Track;
 class LinearWorld;
 class QuadGraph;
+class irr::scene::ISceneNode;
 
 class DefaultRobot : public AutoKart
 {
@@ -147,6 +148,10 @@ private:
 
     /** Cache width of kart. */
     float m_kart_width;
+
+    /** For debugging purpose: a sphere indicating where the AI 
+     *  is targeting at. */
+    irr::scene::ISceneNode *m_debug_sphere;
 
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
