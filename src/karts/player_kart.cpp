@@ -24,7 +24,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/scene.hpp"
 #include "states_screens/race_gui.hpp"
 #include "input/input_manager.hpp"
 #include "items/item.hpp"
@@ -39,7 +38,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position, ActivePlayer 
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = stk_scene->createCamera(player_index, this);
+    m_camera       = new Camera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
@@ -216,6 +215,7 @@ void PlayerKart::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 void PlayerKart::update(float dt)
 {
+    m_camera->update(dt);
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.

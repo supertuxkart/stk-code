@@ -20,7 +20,6 @@
 #include "items/projectile_manager.hpp"
 
 #include "graphics/explosion.hpp"
-#include "graphics/scene.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"

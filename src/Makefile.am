@@ -64,8 +64,6 @@ supertuxkart_SOURCES = \
  graphics/moving_texture.hpp \
  graphics/nitro.cpp \
  graphics/nitro.hpp \
- graphics/scene.cpp \
- graphics/scene.hpp \
  graphics/shadow.cpp \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \

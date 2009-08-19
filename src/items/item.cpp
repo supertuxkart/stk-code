@@ -20,7 +20,6 @@
 #include "items/item.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/scene.hpp"
 #include "karts/kart.hpp"
 #include "utils/coord.hpp"
 #include "utils/vec3.hpp"

@@ -24,7 +24,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/scene.hpp"
 #include "items/projectile_manager.hpp"
 #include "utils/vec3.hpp"
 

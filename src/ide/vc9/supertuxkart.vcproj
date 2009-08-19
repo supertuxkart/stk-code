@@ -517,7 +517,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\explosion.hpp"
+					RelativePath="..\..\graphics\explosion.cpp"
 					>
 				</File>
 				<File
@@ -542,10 +542,6 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\nitro.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\scene.cpp"
 					>
 				</File>
 				<File
@@ -1267,7 +1263,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\explosion.cpp"
+					RelativePath="..\..\graphics\explosion.hpp"
 					>
 				</File>
 				<File
@@ -1292,10 +1288,6 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\nitro.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\scene.hpp"
 					>
 				</File>
 				<File

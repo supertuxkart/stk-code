@@ -23,7 +23,6 @@
 #include "items/plunger.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/scene.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"

@@ -24,7 +24,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
-#include "graphics/scene.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "input/device_manager.hpp"
@@ -290,7 +289,6 @@ void RaceManager::next()
             network_manager->beginReadySetGoBarrier();
         else
             network_manager->setState(NetworkManager::NS_WAIT_FOR_RACE_DATA);
-        stk_scene->clear();
         startNextRace();
     }
     else
@@ -387,7 +385,6 @@ void RaceManager::exitRace()
         // FIXME - back to main menu
         // menu_manager->switchToMainMenu();
     }
-    stk_scene->clear();
     delete world;
     world          = 0;
     m_track_number = 0;

@@ -73,7 +73,6 @@ public:
     void reset             ();
     void setInitialTransform();
     void update            (float dt);
-    void apply             ();
 } ;
 
 #endif

@@ -26,7 +26,6 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/scene.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"

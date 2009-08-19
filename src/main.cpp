@@ -48,7 +48,6 @@
 #include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/scene.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
@@ -536,7 +535,6 @@ void cleanTuxKart()
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;
-    if(stk_scene)               delete stk_scene;
     if(irr_driver)              delete irr_driver;
 }
 
@@ -594,7 +592,6 @@ int main(int argc, char *argv[] )
         powerup_manager         -> loadPowerups    ();
         item_manager            -> loadDefaultItems();
         attachment_manager      -> loadModels      ();
-        stk_scene = new Scene();
 
         // Init GUI prepare main menu
         IrrlichtDevice* device = irr_driver->getDevice();

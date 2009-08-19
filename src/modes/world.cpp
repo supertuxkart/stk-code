@@ -31,7 +31,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/scene.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
@@ -105,7 +104,6 @@ void World::init()
 
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
-        int position = i+1;   // position start with 1
         btTransform init_pos=m_track->getStartTransform(i);
         Kart* newkart;
         const std::string& kart_ident = race_manager->getKartIdent(i);
@@ -113,44 +111,17 @@ void World::init()
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
         if(UserConfigParams::m_profile)
         {
-            // In profile mode, load only the old kart
-            newkart = new DefaultRobot(kart_ident, position, init_pos, m_track);
     	    // Create a camera for the last kart (since this way more of the
 	        // karts can be seen.
-            if(i==race_manager->getNumKarts()-1)
-            {
-                stk_scene->createCamera(local_player_id, newkart);
-                m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
-            }
+            newkart = new DefaultRobot(kart_ident, i+1, init_pos, m_track, 
+                                       (i==race_manager->getNumKarts()-1) ? 0 : -1);
+            // FIXME: does this actually work???
+            m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
         }
         else
         {
-            switch(race_manager->getKartType(i))
-            {
-            case RaceManager::KT_PLAYER:
-                std::cout << "===== World : creating player kart for kart #" << i << " which has local_player_id " << local_player_id << " ===========\n";
-                newkart = new PlayerKart(kart_ident, position,
-                                         StateManager::get()->getActivePlayer(local_player_id),
-                                         init_pos, local_player_id);
-                m_player_karts[global_player_id] = (PlayerKart*)newkart;
-                m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
-                break;
-            case RaceManager::KT_NETWORK_PLAYER:
-                newkart = new NetworkKart(kart_ident, position, init_pos,
-                                          global_player_id);
-                m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
-                m_player_karts[global_player_id] = (PlayerKart*)newkart;
-                break;
-            case RaceManager::KT_AI:
-                std::cout << "===== World : creating AI kart for #" << i << "===========\n";
-
-                newkart = loadRobot(kart_ident, position, init_pos);
-                break;
-            case RaceManager::KT_GHOST:
-                break;
-            case RaceManager::KT_LEADER:
-                break;
-            }
+            newkart = createKart(kart_ident, i, local_player_id, 
+                                 global_player_id, init_pos);
         }   // if !UserConfigParams::m_profile
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
@@ -168,7 +139,75 @@ void World::init()
 }   // World
 
 //-----------------------------------------------------------------------------
-World::~World()
+/** Creates a kart, having a certain position, starting location, and local
+ *  and global player id (if applicable).
+ *  \param kart_ident Identifier of the kart to create.
+ *  \param index Index of the kart.
+ *  \param local_player_id If the kart is a player kart this is the index of
+ *         this player on the local machine.
+ *  \param global_player_id If the akrt is a player kart this is the index of
+ *         this player globally (i.e. including network players).
+ *  \param init_pos The start XYZ coordinates.
+ */
+Kart *World::createKart(const std::string &kart_ident, int index, 
+                        int local_player_id, int global_player_id,
+                        const btTransform &init_pos)
+{
+    Kart *newkart = NULL;
+    int position  = index+1;
+    switch(race_manager->getKartType(index))
+    {
+    case RaceManager::KT_PLAYER:
+        std::cout << "===== World : creating player kart for kart #" << index << " which has local_player_id " << local_player_id << " ===========\n";
+        newkart = new PlayerKart(kart_ident, position,
+                                 StateManager::get()->getActivePlayer(local_player_id),
+                                 init_pos, local_player_id);
+        m_player_karts[global_player_id] = (PlayerKart*)newkart;
+        m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
+        break;
+    case RaceManager::KT_NETWORK_PLAYER:
+        newkart = new NetworkKart(kart_ident, position, init_pos,
+                                  global_player_id);
+        m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
+        m_player_karts[global_player_id] = (PlayerKart*)newkart;
+        break;
+    case RaceManager::KT_AI:
+        std::cout << "===== World : creating AI kart for #" << index << "===========\n";
+
+        newkart = loadRobot(kart_ident, position, init_pos);
+        break;
+    case RaceManager::KT_GHOST:
+        break;
+    case RaceManager::KT_LEADER:
+        break;
+    }
+    return newkart;
+}   // createKart
+
+//-----------------------------------------------------------------------------
+Kart* World::loadRobot(const std::string& kart_name, int position,
+                       const btTransform& init_pos)
+{
+    Kart* currentRobot;
+
+    const int NUM_ROBOTS = 1;
+
+    switch(m_random.get(NUM_ROBOTS))
+    {
+        case 0:
+            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
+            break;
+        default:
+            std::cerr << "Warning: Unknown robot, using default." << std::endl;
+            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
+            break;
+    }
+
+    return currentRobot;
+}   // loadRobot
+
+//-----------------------------------------------------------------------------
+                 World::~World()
 {
     delete m_race_gui;
     delete race_state;
@@ -479,32 +518,7 @@ void World::restartRace()
 
     projectile_manager->cleanup();
     race_manager->reset();
-
-    // Resets the cameras in case that they are pointing too steep up or down
-    stk_scene->reset();
 }   // restartRace
-
-//-----------------------------------------------------------------------------
-Kart* World::loadRobot(const std::string& kart_name, int position,
-                       const btTransform& init_pos)
-{
-    Kart* currentRobot;
-
-    const int NUM_ROBOTS = 1;
-
-    switch(m_random.get(NUM_ROBOTS))
-    {
-        case 0:
-            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
-            break;
-        default:
-            std::cerr << "Warning: Unknown robot, using default." << std::endl;
-            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
-            break;
-    }
-
-    return currentRobot;
-}
 
 //-----------------------------------------------------------------------------
 void  World::pause()

@@ -110,6 +110,10 @@ protected:
     void  printProfileResultAndExit();
     void  estimateFinishTimes();
     
+    virtual Kart *createKart(const std::string &kart_ident, int index, 
+                             int local_player_id, int global_player_id,
+                             const btTransform &init_pos);
+
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
     
