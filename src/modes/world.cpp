@@ -40,6 +40,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "physics/btKart.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
