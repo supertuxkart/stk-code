@@ -67,15 +67,22 @@ private:
     std::vector<SFXBase*>     m_all_sfx;
     bool                      m_initialized;
     float                     m_masterGain;
+
     void                      loadSfx();
+
     void                      loadSingleSfx(const lisp::Lisp *lisp, 
                                             const  char *name, 
-                                            SFXType type);
+                                            int type);
+
+    int                       addSingleSfx( std::string    filename,
+                                            int            positional,
+                                            float          rolloff,
+                                            float          gain);
 public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    SFXBase                 *newSFX(SFXType id);
+    SFXBase                 *newSFX(int id);
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();

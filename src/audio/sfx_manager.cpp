@@ -214,11 +214,55 @@ bool loadVorbisBuffer(const char *name, ALuint buffer)
     return success;
 }
 
+/*
 
+addSingleSfx()
+
+    Introduces a mechanism by which one can load sound effects beyond the basic
+    enumerated types.  This will be used when loading custom sound effects for
+    individual karts (character voices) so that we can avoid creating an
+    enumeration for each effect, for each kart.
+
+    sfxFile must be an absolute pathname, so get that straight first.
+
+*/
+int SFXManager::addSingleSfx(std::string    sfxFile,
+                             int            positional,
+                             float          rolloff,
+                             float          gain)
+/* Returns sfx ID */
+{
+    int         sfxID;
+
+    m_sfx_buffers.push_back(0);
+    sfxID = m_sfx_buffers.size() - 1;
+
+    /* FIXME: Check for existance of file before resizing vectors */
+
+    m_sfx_rolloff.push_back(rolloff);
+    m_sfx_positional.push_back(positional);
+    m_sfx_gain.push_back(gain);
+
+    alGenBuffers(1, &(m_sfx_buffers[sfxID]));
+    if (!checkError("generating a buffer")) return -1;
+
+    if (!loadVorbisBuffer(sfxFile.c_str(), sfxID))
+    {
+        printf("Failed to load sound effect %s\n", sfxFile.c_str());
+    }
+
+    return sfxID;
+}
 
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
-                               const char *name, SFXType item)
+                               const char *name, int item)
 {
+    if (item < 0 || item >= m_sfx_gain.size())
+    {
+        printf("loadSingleSfx: Invalid SFX ID.\n");
+        return;
+    }
+
     const lisp::Lisp* sfxLisp = lisp->getLisp(name);
     std::string wav; float rolloff = 0.1f; float gain = 1.0f; int positional = 0;
 
@@ -249,9 +293,16 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase *SFXManager::newSFX(SFXType id)
+SFXBase *SFXManager::newSFX(int id)
 {
     bool positional = false;
+
+    if (id < 0 || id >= m_sfx_gain.size())
+    {
+        printf("newSFX: Invalid SFX ID.\n");
+        return NULL;
+    }
+
     if(race_manager->getNumLocalPlayers() < 2)
         positional = m_sfx_positional[id]!=0;
 
