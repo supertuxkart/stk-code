@@ -174,6 +174,11 @@ btScalar btKart::rayCast(btWheelInfo& wheel, const btVector3& ray)
 //Please align wheel direction with ray direction first.
 bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicle)
 {
+    if (ray.length() <= btScalar(0))
+        return false;
+
+    btVector3 ray_dir = ray / ray.length();
+
     for (int i=0;i<getNumWheels();i++)
     {
         updateWheelTransform(i,false);
@@ -240,16 +245,11 @@ bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicl
     btWheelInfo& min_wheel2 = m_wheelInfo[min_wheel_index2];
     btWheelInfo& min_wheel3 = m_wheelInfo[min_wheel_index3];
 
-    btVector3 ray_dir = btVector3(0,0,0);
-    if (ray.length() > btScalar(0))
-        ray_dir = ray / ray.length();
-
     btTransform trans = getRigidBody()->getCenterOfMassTransform();
     btTransform rot_trans;
     rot_trans.setIdentity();
     rot_trans.setRotation(trans.getRotation());
     rot_trans = rot_trans.inverse();
-
 
     btTransform offset_trans;
     offset_trans.setIdentity();
@@ -264,8 +264,8 @@ bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicl
 
     //Note - For possible complex surfaces with lots of bumps directly under vehicle,
     //       the raycast needs to be done from a slightly higher above the surface.
-    //       For such surfaces, the end result should be that no wheel is below the
-    //       surface, but there can be not all wheels touching surface.
+    //       For such surfaces, the end result should be that at least 1 wheel touches
+    //       the surface, and no wheel goes below the surface.
 
     //We need to rotate vehicle, using above contact point as a pivot to put
     //2nd closest wheel nearer to the surface of the track
@@ -352,6 +352,12 @@ bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicl
     if (!translate_vehicle)
         return true;
 
+
+    for (int i=0;i<getNumWheels();i++)
+    {
+        updateWheelTransform(i,false);
+    }
+
     min_depth = btScalar(-1);   //minimum distance of wheel to surface
 
     for (int i=0;i<m_wheelInfo.size();i++)
@@ -371,7 +377,10 @@ bool btKart::projectVehicleToSurface(const btVector3& ray, bool translate_vehicl
     }
 
     //translate along ray so wheel closest to surface is exactly on the surface
-    getRigidBody()->translate((min_depth - min_wheel.getSuspensionRestLength()) * ray_dir);
+    getRigidBody()->translate((min_depth) * ray_dir);
+    //offset for suspension rest length
+    getRigidBody()->translate(-min_wheel.getSuspensionRestLength() *
+                               min_wheel.m_raycastInfo.m_wheelDirectionWS);
     return true;
 }
 
