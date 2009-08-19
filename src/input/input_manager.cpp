@@ -475,6 +475,7 @@ bool InputManager::input(const SEvent& event)
         else
         {
             input(Input::IT_KEYBOARD, 0, key, 0, 0, programaticallyGenerated);
+            return true; // Don't propagate key up events
         }
     }
 #if 0 // in case we ever use mouse in-game...
