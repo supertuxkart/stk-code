@@ -692,7 +692,8 @@ void Kart::handleZipper()
     btVector3 v         = m_body->getLinearVelocity();
     float current_speed = v.length();
     float speed         = std::min(current_speed+stk_config->m_zipper_speed_gain,
-                                   getMaxSpeedOnTerrain());
+                                   getMaxSpeedOnTerrain() *
+                                   (1 + stk_config->m_zipper_max_speed_fraction));
 
     m_vehicle->activateZipper(speed);
 }   // handleZipper

@@ -30,33 +30,35 @@ class MusicInformation;
  *  includes the list of default kart physics parameters which are used for
  *  each kart (but which can be overwritten for each kart, too).
  */
-class STKConfig 
+class STKConfig
 {
 protected:
     KartProperties  m_kart_properties; /**< Default kart properties. */
 public:
     static float UNDEFINED;
-    float m_anvil_weight;            /**<Additional kart weight if anvil is 
+    float m_anvil_weight;            /**<Additional kart weight if anvil is
                                          attached.                           */
     float m_anvil_speed_factor;      /**<Speed decrease when attached first. */
     float m_parachute_friction;      /**<Increased parachute air friction.   */
-    float m_parachute_done_fraction; /**<Fraction of speed when lost will 
+    float m_parachute_done_fraction; /**<Fraction of speed when lost will
                                          detach parachute.                   */
     float m_parachute_time;          /**<Time a parachute is active.         */
-    float m_parachute_time_other;    /**<Time a parachute attached to other 
+    float m_parachute_time_other;    /**<Time a parachute attached to other
                                          karts is active.                    */
     float m_bomb_time;               /**<Time before a bomb explodes.        */
-    float m_bomb_time_increase;      /**<Time added to bomb timer when it's 
+    float m_bomb_time_increase;      /**<Time added to bomb timer when it's
                                          passed on.                          */
     float m_anvil_time;              /**<Time an anvil is active.            */
     float m_zipper_time;             /**<Duration a zipper is active.        */
-    float m_zipper_force;            /**<Additional force added to the 
+    float m_zipper_force;            /**<Additional force added to the
                                          acceleration.                       */
     float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
+    float m_zipper_max_speed_fraction;/**<Fraction of max speed allowed past
+                                          regular max speed                  */
     float m_final_camera_time;       /**<Time for the movement of the final
                                       *  camera.                             */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
-    float m_explosion_impulse_objects;/**<Impulse of explosion on moving 
+    float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                          objects, e.g. road cones, ...       */
     float m_delay_finish_time;       /**<Delay after a race finished before
                                          the results are displayed.          */
@@ -68,9 +70,9 @@ public:
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
     int   m_max_skidmarks;           /**<Maximum number of skid marks/kart.  */
-    float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */ 
+    float m_skid_fadeout_time;       /**<Time till skidmarks fade away.      */
     float m_slowdown_factor;         /**<Used in terrain specific slowdown.  */
-    float m_near_ground;             /**<Determines when a kart is not near 
+    float m_near_ground;             /**<Determines when a kart is not near
                                       *  ground anymore and the upright
                                       *  constraint is disabled to allow for
                                       *  more violent explosions.            */
@@ -79,20 +81,20 @@ public:
     int   m_min_track_version,       /**<The minimum and maximum .track file */
           m_max_track_version;       /**<version supported by this binary.   */
     bool  m_enable_networking;
-    
-    std::vector<float> 
-          m_leader_intervals;        /**<Interval in follow the leader till 
+
+    std::vector<float>
+          m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
     std::vector<int>
           m_scores;                  /**<Scores depending on position.       */
 
-    MusicInformation 
+    MusicInformation
          *m_title_music;             /**<Filename of the title music to play.*/
     std::vector<std::string>
           m_mainmenu_background;     /**<Picture used as menu background.    */
     std::vector<std::string>
           m_menu_background;         /**<Picture used as background for other menus.    */
-    
+
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {};
     void init_defaults    ();

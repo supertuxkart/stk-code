@@ -56,14 +56,14 @@ void STKConfig::load(const std::string &filename)
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing KartProperties '%s':\n", 
+        fprintf(stderr, "Error while parsing KartProperties '%s':\n",
                 filename.c_str());
         fprintf(stderr, "%s", err.what());
         fprintf(stderr, "\n");
     }
     delete root;
 
-    // Check that all necessary values are indeed set 
+    // Check that all necessary values are indeed set
     // -----------------------------------------------
 
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                         \
@@ -104,6 +104,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_zipper_time,               "zipper-time"                );
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
+    CHECK_NEG(m_zipper_max_speed_fraction, "zipper-max-speed-fraction"  );
     CHECK_NEG(m_final_camera_time,         "final-camera-time"          );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
@@ -128,14 +129,15 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight             = m_parachute_friction        = 
-        m_parachute_time       = m_parachute_done_fraction   = 
+    m_anvil_weight             = m_parachute_friction        =
+        m_parachute_time       = m_parachute_done_fraction   =
         m_parachute_time_other = m_anvil_speed_factor        =
         m_bomb_time            = m_bomb_time_increase        =
         m_anvil_time           = m_zipper_time               =
         m_zipper_force         = m_zipper_speed_gain         =
-        m_explosion_impulse    = m_explosion_impulse_objects = 
-        m_music_credit_time    = m_slowdown_factor           = 
+        m_zipper_max_speed_fraction =
+        m_explosion_impulse    = m_explosion_impulse_objects =
+        m_music_credit_time    = m_slowdown_factor           =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_final_camera_time    = m_near_ground               = UNDEFINED;
     m_max_karts                = -100;
@@ -193,6 +195,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("zipper-time",                  m_zipper_time              );
     lisp->get("zipper-force",                 m_zipper_force             );
     lisp->get("zipper-speed-gain",            m_zipper_speed_gain        );
+    lisp->get("zipper-max-speed-fraction",    m_zipper_max_speed_fraction);
     lisp->get("explosion-impulse",            m_explosion_impulse        );
     lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
     lisp->get("max-karts",                    m_max_karts                );
@@ -210,7 +213,7 @@ void STKConfig::getAllData(const lisp::Lisp* lisp)
     lisp->get("delay-finish-time",            m_delay_finish_time        );
     lisp->get("music-credit-time",            m_music_credit_time        );
     lisp->getVector("menu-background",        m_menu_background          );
-    lisp->getVector("mainmenu-background",    m_mainmenu_background          );
+    lisp->getVector("mainmenu-background",    m_mainmenu_background      );
     lisp->get("enable_networking",            m_enable_networking        );
     std::string title_music;
     lisp->get("title-music",                  title_music                );

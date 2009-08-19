@@ -48,6 +48,7 @@
  (zipper-time                3.5 )  ;; time a zipper is active
  (zipper-force             250.0 )  ;; additional zipper force
  (zipper-speed-gain          4.5 )  ;; one time additional speed  
+ (zipper-max-speed-fraction  0.2 )  ;; fraction of max speed allowed past regular max speed
 
  (shortcut-length            90  )  ;; leaving the road and coming back on it more than
                                     ;; x 'meters" later is considered to be a shortcut
