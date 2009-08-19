@@ -113,14 +113,14 @@ void World::init()
         {
     	    // Create a camera for the last kart (since this way more of the
 	        // karts can be seen.
-            newkart = new DefaultRobot(kart_ident, i+1, init_pos, m_track, 
+            newkart = new DefaultRobot(kart_ident, i+1, init_pos, m_track,
                                        (i==race_manager->getNumKarts()-1) ? 0 : -1);
             // FIXME: does this actually work???
             m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
         }
         else
         {
-            newkart = createKart(kart_ident, i, local_player_id, 
+            newkart = createKart(kart_ident, i, local_player_id,
                                  global_player_id, init_pos);
         }   // if !UserConfigParams::m_profile
         m_kart.push_back(newkart);
@@ -149,7 +149,7 @@ void World::init()
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-Kart *World::createKart(const std::string &kart_ident, int index, 
+Kart *World::createKart(const std::string &kart_ident, int index,
                         int local_player_id, int global_player_id,
                         const btTransform &init_pos)
 {
@@ -248,6 +248,10 @@ void World::resetAllKarts()
     //that at least one of its wheel will be on the surface of the track
     for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
     {
+        ///start projection from top of kart
+        btVector3 up_offset(0, 0, 0.5f * ((*i)->getKartHeight()));
+        (*i)->getVehicle()->getRigidBody()->translate (up_offset);
+
         bool kart_over_ground = m_physics->projectKartDownwards(*i);
 
         if (!kart_over_ground)
