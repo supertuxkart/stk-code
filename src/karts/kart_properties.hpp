@@ -34,7 +34,7 @@ using namespace irr;
 
 class Material;
 
-/** This class stores the properties of a kart. This includes size, name, 
+/** This class stores the properties of a kart. This includes size, name,
  *  identifier, physical properties etc. It is atm also the base class for
  *  STKConfig, which stores the default values for all physics constants.
  */
@@ -44,7 +44,7 @@ private:
 
     Material                *m_icon_material;  /**< The icon texture to use. */
     /** The kart model and wheels. It is mutable since the wheels of the
-     *  KartModel can rotate and turn, but otherwise the kart_properties 
+     *  KartModel can rotate and turn, but otherwise the kart_properties
      *  object is const. */
     mutable KartModel        m_kart_model;
     std::vector<std::string> m_groups;         /**< List of all groups the kart
@@ -54,26 +54,26 @@ private:
     int   m_version;                  /**< Version of the .kart file.         */
 
     // Display and gui
-    // --------------- 
+    // ---------------
     std::string m_name;               /**< The human readable Name of the kart
                                        *   driver. */
     std::string m_ident;              /**< The computer readable-name of the
                                        *   kart driver. */
-    std::string m_icon_file;          /**< Filename of icon that represents the 
-                                       *   kart in the statusbar and the 
+    std::string m_icon_file;          /**< Filename of icon that represents the
+                                       *   kart in the statusbar and the
                                        *   character select screen. */
-    std::string m_shadow_file;        /**< Filename of the image file that 
+    std::string m_shadow_file;        /**< Filename of the image file that
                                        *   contains the shadow for this kart.*/
     video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
-    int  m_shape;                     /**< Number of vertices in polygon when 
+    int  m_shape;                     /**< Number of vertices in polygon when
                                        *   drawing the dot on the mini map. */
     // Physic properties
     // -----------------
     float m_mass;                     /**< Weight of kart.  */
-    float m_engine_power[3];          /**< Maximum force from engine for each 
+    float m_engine_power[3];          /**< Maximum force from engine for each
                                        *   difficulty. */
-    float m_brake_factor;             /**< Braking factor * engine_power = 
+    float m_brake_factor;             /**< Braking factor * engine_power =
                                        *   braking force. */
     float m_time_full_steer;          /**< Time for player karts to reach full
                                        *   steer angle. */
@@ -81,28 +81,28 @@ private:
                                        *   steer angle (used to reduce shaking
                                        *   of karts). */
     float m_min_speed_turn,           /**< Speed for smallest turn radius. */
-          m_angle_at_min,             /**< Steering angle for minimal turn 
+          m_angle_at_min,             /**< Steering angle for minimal turn
                                            radius. Computed from radius and
                                            kart length. */
           m_min_radius;               /**< Smallest turn radius. */
     float m_max_speed_turn,           /**< Speed for largest turn radius. */
-          m_angle_at_max,             /**< Steering angle for maximum turn 
+          m_angle_at_max,             /**< Steering angle for maximum turn
                                            radius. Computed from radius and
                                            kart length. */
           m_max_radius;               /**< Largest turn radius. */
 
     std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */
                                        /**  Radius of the graphical wheels.  */
-    float       m_wheel_graphics_radius[4];  
+    float       m_wheel_graphics_radius[4];
     float       m_rubber_band_max_length;/**< Max. length of plunger rubber band.*/
     float       m_rubber_band_force;   /**< Force of an attached rubber band.*/
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
     float       m_wheel_base;          /**< Wheel base of the kart.          */
     float       m_nitro_power_boost;   /**< Nitro power boost.               */
-    SFXManager::SFXType 
+    SFXManager::SFXType
                 m_engine_sfx_type;     /**< Engine sound effect.         */
 
-    // bullet physics data 
+    // bullet physics data
     // -------------------
     float m_suspension_stiffness;
     float m_wheel_damping_relaxation;
@@ -115,12 +115,13 @@ private:
     float m_max_speed[3];
     float m_max_speed_reverse_ratio;
     Vec3  m_gravity_center_shift;    /**< Shift of center of gravity. */
-    float m_track_connection_accel;  /**< Artifical acceleration that pulls a 
+    float m_track_connection_accel;  /**< Artifical acceleration that pulls a
                                       *   kart down onto the track if one axis
                                       *   loses contact with the track. */
     float m_suspension_rest;
 	float m_suspension_travel_cm;
     float m_jump_velocity;            // z velocity set when jumping
+    float m_z_rescue_offset;          // z offset after rescue
     float m_upright_tolerance;
     float m_upright_max_force;
 
@@ -134,11 +135,11 @@ private:
     float m_skid_max;                 /**< Maximal increase of steering when
                                        *   skidding. */
     float m_skid_increase;            /**< Skidding is multiplied by this when
-                                       *   skidding to increase to 
+                                       *   skidding to increase to
                                        *   m_skid_increase. */
     float m_skid_decrease;            /**< Skidding is multiplied by this when
                                        *   not skidding to decrease to 1.0. */
-    float m_time_till_max_skid;       /**< Time till maximum skidding is 
+    float m_time_till_max_skid;       /**< Time till maximum skidding is
                                        *   reached. */
     bool  m_has_skidmarks;            /**< Kart leaves skid marks. */
 
@@ -147,7 +148,7 @@ private:
     float m_camera_max_accel;         // maximum acceleration of camera
     float m_camera_max_brake;         // maximum braking of camera
     float m_camera_distance;          // distance of normal camera from kart
-    
+
     /** The following two vectors define at what ratio of the maximum speed what
      * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
      *                         0.5  means: if speed <=0.5 *maxSpeed --> gear 2
@@ -178,7 +179,7 @@ public:
     int   getVersion                () const {return m_version;                  }
     /** Returns the dot color to use for this kart in the race gui. */
     const video::SColor &getColor   () const {return m_color;                    }
-    /** Returns the number of edges for the polygon used to draw the dot of 
+    /** Returns the number of edges for the polygon used to draw the dot of
      *  this kart on the mini map of the race gui. */
     int   getShape                  () const {return m_shape;                    }
     const std::vector<std::string>&
@@ -189,7 +190,7 @@ public:
     float getTimeFullSteerAI        () const {return m_time_full_steer_ai;       }
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
-    SFXManager::SFXType getEngineSfxType() 
+    SFXManager::SFXType getEngineSfxType()
                                        const {return m_engine_sfx_type;          }
 
     //bullet physics get functions
@@ -203,7 +204,7 @@ public:
     float getChassisLinearDamping   () const {return m_chassis_linear_damping;   }
     float getChassisAngularDamping  () const {return m_chassis_angular_damping;  }
     /** Returns the maximum speed dependent on the difficult level. */
-    float getMaxSpeed               () const {return 
+    float getMaxSpeed               () const {return
                                       m_max_speed[race_manager->getDifficulty()];}
     /** Returns the nitro power boost. */
     float getNitroPowerBoost        () const {return m_nitro_power_boost;        }
@@ -211,6 +212,7 @@ public:
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }
+    float getZRescueOffset          () const {return m_z_rescue_offset;          }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }
     float getTrackConnectionAccel   () const {return m_track_connection_accel;   }
@@ -230,10 +232,10 @@ public:
     float getSlipstreamAddPower     () const {return m_slipstream_add_power;     }
     /** Returns the maximum factor by which the steering angle can be increased. */
     float getMaxSkid                () const {return m_skid_max;                 }
-    /** Returns the factor by which m_skidding is multiplied when the kart is 
+    /** Returns the factor by which m_skidding is multiplied when the kart is
      *  skidding to increase it to the maximum. */
     float getSkidIncrease           () const {return m_skid_increase;            }
-    /** Returns the factor by which m_skidding is multiplied when the kart is 
+    /** Returns the factor by which m_skidding is multiplied when the kart is
      *  not skidding to decrease it back to 1.0f . */
     float getSkidDecrease           () const {return m_skid_decrease;            }
     /** Returns the time (in seconds) of drifting till the maximum skidding
@@ -241,9 +243,9 @@ public:
     float getTimeTillMaxSkid        () const {return m_time_till_max_skid;       }
     /** Returns if the kart leaves skidmarks or not. */
     bool hasSkidmarks               () const {return m_has_skidmarks;            }
-    const std::vector<float>& 
+    const std::vector<float>&
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
-    const std::vector<float>& 
+    const std::vector<float>&
           getGearPowerIncrease      () const {return m_gear_power_increase;      }
     float getCameraMaxAccel         () const {return m_camera_max_accel;         }
     float getCameraMaxBrake         () const {return m_camera_max_brake;         }

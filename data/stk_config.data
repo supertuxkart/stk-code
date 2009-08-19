@@ -140,6 +140,9 @@
    ;; and will be in the air longer
    (jump-velocity             3.0  )
 
+   ;; z-axis offset when kart is being put back on track after being rescued
+   (z-rescue-offset           0.0  ) ;; fraction of kart height
+
    ;; The following two vectors define at what ratio of the maximum speed what
    ;; gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
    ;;                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2

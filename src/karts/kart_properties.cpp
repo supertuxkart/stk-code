@@ -48,24 +48,25 @@ KartProperties::KartProperties() : m_icon_material(0)
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_min_speed_turn = m_angle_at_min = 
+    m_mass = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max = m_brake_factor =
-        m_engine_power[0] = m_engine_power[1] = m_engine_power[2] = 
-        m_max_speed[0] = m_max_speed[1] = m_max_speed[2] = 
+        m_engine_power[0] = m_engine_power[1] = m_engine_power[2] =
+        m_max_speed[0] = m_max_speed[1] = m_max_speed[2] =
         m_time_full_steer = m_time_full_steer_ai = m_nitro_power_boost =
         m_suspension_stiffness = m_wheel_damping_relaxation = m_wheel_base =
-        m_wheel_damping_compression = m_friction_slip = m_roll_influence = 
-        m_wheel_radius = m_chassis_linear_damping = 
-        m_chassis_angular_damping = m_suspension_rest = 
-        m_max_speed_reverse_ratio = m_jump_velocity = m_upright_tolerance = 
-        m_upright_max_force = m_suspension_travel_cm = 
-        m_track_connection_accel = m_min_speed_turn = m_angle_at_min = 
+        m_wheel_damping_compression = m_friction_slip = m_roll_influence =
+        m_wheel_radius = m_chassis_linear_damping =
+        m_chassis_angular_damping = m_suspension_rest =
+        m_max_speed_reverse_ratio = m_jump_velocity =
+        m_z_rescue_offset = m_upright_tolerance =
+        m_upright_max_force = m_suspension_travel_cm =
+        m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max =
-        m_rubber_band_max_length = m_rubber_band_force = 
+        m_rubber_band_max_length = m_rubber_band_force =
         m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
-        m_camera_max_accel = m_camera_max_brake = 
-        m_slipstream_length = m_slipstream_time = m_slipstream_add_power = 
+        m_camera_max_accel = m_camera_max_brake =
+        m_slipstream_length = m_slipstream_time = m_slipstream_add_power =
         m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
@@ -84,7 +85,7 @@ KartProperties::~KartProperties()
 //-----------------------------------------------------------------------------
 /** Loads the kart properties from a file.
  *  \param filename Filename to load.
- *  \param node Name of the lisp node to load the data from 
+ *  \param node Name of the lisp node to load the data from
  *              (default: tuxkart-kart)
  *  \param dont_load_models If set does not load the actual kart models, used
  *              when only printing kart information to stdout.
@@ -115,7 +116,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     }
     catch(std::exception& err)
     {
-        fprintf(stderr, "Error while parsing KartProperties '%s':\n", 
+        fprintf(stderr, "Error while parsing KartProperties '%s':\n",
                 filename.c_str());
         fprintf(stderr, "%s\n", err.what());
     }
@@ -164,7 +165,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
 
         // Useful when tweaking kart parameters
         if(UserConfigParams::m_print_kart_sizes)
-            printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(), 
+            printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(),
             m_kart_model.getWidth(), m_kart_model.getLength(),
             m_kart_model.getHeight());
 
@@ -230,7 +231,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
             m_min_radius     = v[1];
         }
     }
-                             
+
     lisp->get("nitro-power-boost",         m_nitro_power_boost       );
 
     //bullet physics data
@@ -248,6 +249,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
     lisp->get("jump-velocity",             m_jump_velocity            );
+    lisp->get("z-rescue-offset",           m_z_rescue_offset          );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
     lisp->get("track-connection-accel",    m_track_connection_accel   );
@@ -274,7 +276,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     temp.clear();
     lisp->getVector("gear-power-increase", temp);
     if(temp.size()>0) m_gear_power_increase = temp;
-    
+
     // Camera
     lisp->get("camera-max-accel",             m_camera_max_accel);
     lisp->get("camera-max-brake",             m_camera_max_brake);
@@ -341,6 +343,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
+    CHECK_NEG(m_z_rescue_offset,           "z-rescue-offset"            );
     CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
     CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
     CHECK_NEG(m_track_connection_accel,    "track-connection-accel"     );

@@ -497,11 +497,10 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 
     if (kart_over_ground)
     {
-        //add vertical offset so that the kart starts off above track
-
-        //TODO - offset needs to be a configurable parameter
-        //float vertical_offset = 0.5f * kart->getKartHeight();
-        //body->translate(btVector3(0, 0, vertical_offset));
+        //add vertical offset so that the kart starts off above the track
+        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+                                kart->getKartHeight();
+        body->translate(btVector3(0, 0, vertical_offset));
     }
     else
     {
