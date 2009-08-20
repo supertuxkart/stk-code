@@ -259,7 +259,7 @@ int SFXManager::addSingleSfx(std::string    sfxFile,
 void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
                                const char *name, int item)
 {
-    if (item < 0 || item >= m_sfx_gain.size())
+    if (item < 0 || item >= (int)m_sfx_gain.size())
     {
         printf("loadSingleSfx: Invalid SFX ID.\n");
         return;
@@ -300,7 +300,7 @@ SFXBase *SFXManager::newSFX(int id)
 {
     bool positional = false;
 
-    if (id < 0 || id >= m_sfx_gain.size())
+    if (id < 0 || id >= (int)m_sfx_gain.size())
     {
         printf("newSFX: Invalid SFX ID.\n");
         return NULL;
