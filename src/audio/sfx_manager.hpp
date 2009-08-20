@@ -57,26 +57,21 @@ public:
     */
     enum CustomSFX
     {
-        CUSTOM_HORN,
-        CUSTOM_CRASH,
-        CUSTOM_WIN,
-        CUSTOM_EXPLODE,
+        CUSTOM_HORN,    // Replaces default horn
+        CUSTOM_CRASH,   // Played when colliding with another kart
+        CUSTOM_WIN,     // Played when racer wins
+        CUSTOM_EXPLODE, // Played when struck by bowling ball or dynamite
+        CUSTOM_GOO,     // Played when driving through goo
+        CUSTOM_PASS,    // Played when passing another kart
+        CUSTOM_ZIPPER,  // Played when kart hits zipper
+        CUSTOM_NAME,    // Introduction "I'm Tux!"
+        CUSTOM_BOMB,    // Played when dynamite is attached to kart
+        CUSTOM_SHOOT,   // Played when weapon is used
         NUM_CUSTOMS
     };
 
     // LISP (or in the future xml) tag for each custom sound
-    // TODO: fix this to use some kind of string array ini, I'm just too stupid with c++ to figure it out
-    static const char *getCustomTagName(int id)
-    {
-        switch (id)
-        {
-        case 0: return "horn-sound";
-        case 1: return "crash-sound";
-        case 2: return "win-sound";
-        case 3: return "explode-sound";
-        };
-        return "";
-    }
+    const char *getCustomTagName(int id);
 
 
     /** Status of a sound effect. */

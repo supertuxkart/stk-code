@@ -127,6 +127,7 @@ private:
     bool          m_eliminated;
 
     std::vector<SFXBase*> m_custom_sounds;
+    SFXBase      *m_beep_sound;
     SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_skid_sound;

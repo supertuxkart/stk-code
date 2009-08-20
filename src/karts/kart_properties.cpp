@@ -202,21 +202,26 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
 
-    // Load custom kart SFX files  ===================================================
-    std::string tempFile;
-
+    // Load custom kart SFX files
     for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
     {
-        // Get lisp string tag for each custom sfx
+        std::string tempFile;
+        // Get filename associated with each custom sfx tag in sfx config
         if (lisp->get(sfx_manager->getCustomTagName(i), tempFile))
         {
-            // retrieve filename, load file and store id in vector
+            // determine absolute filename
+            // TODO: will this work with add-on packs (is data dir the same)?
             tempFile = file_manager->getDataDir() + "/karts/" + getIdent() + "/" + tempFile;
+
+            // Create sfx in sfx manager and store id
             m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
-            printf("%s custom SFX #%d : %s\n", getIdent().c_str(), i, tempFile.c_str());
+
+            // debugging
+            printf("%s custom sfx %s:\t %s\n", getIdent().c_str(), sfx_manager->getCustomTagName(i), tempFile.c_str());
         }
         else
         {
+            // if there is no filename associated with a given tag
             m_custom_sfx_id[i] = -1;
         }
     }

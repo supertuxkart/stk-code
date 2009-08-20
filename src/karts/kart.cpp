@@ -107,10 +107,14 @@ Kart::Kart (const std::string& kart_name, int position,
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
     {
         int id = m_kart_properties->getCustomSfxId((SFXManager::CustomSFX)n);
-        m_custom_sounds[n] = sfx_manager->newSFX(id);
+
+        // If id == -1 the custom sound was not defined in the .irrkart config file
+        if (id != -1)
+            m_custom_sounds[n] = sfx_manager->newSFX(id);
     }
 
     m_engine_sound = sfx_manager->newSFX(m_kart_properties->getEngineSfxType());
+    m_beep_sound   = sfx_manager->newSFX(  SFXManager::SOUND_BEEP             );
     m_crash_sound  = sfx_manager->newSFX(  SFXManager::SOUND_CRASH            );
     m_goo_sound    = sfx_manager->newSFX(  SFXManager::SOUND_GOO              );
     m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
