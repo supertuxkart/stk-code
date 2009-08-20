@@ -65,7 +65,7 @@ public:
         CUSTOM_PASS,    // Played when passing another kart
         CUSTOM_ZIPPER,  // Played when kart hits zipper
         CUSTOM_NAME,    // Introduction "I'm Tux!"
-        CUSTOM_BOMB,    // Played when dynamite is attached to kart
+        CUSTOM_ATTACH,  // Played when something is attached to kart (Uh-Oh)
         CUSTOM_SHOOT,   // Played when weapon is used
         NUM_CUSTOMS
     };

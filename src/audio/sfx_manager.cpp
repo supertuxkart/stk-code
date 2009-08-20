@@ -238,7 +238,7 @@ const char *SFXManager::getCustomTagName(int id)
         case CUSTOM_PASS:    return "pass-sound";       // Played when passing another kart
         case CUSTOM_ZIPPER:  return "zipper-sound";     // Played when kart hits zipper
         case CUSTOM_NAME:    return "name-sound";       // Introduction "I'm Tux!"
-        case CUSTOM_BOMB:    return "bomb-sound";       // Played when dynamite is attached to kart
+        case CUSTOM_ATTACH:  return "attach-sound";     // Played when something is attached to kart
         case CUSTOM_SHOOT:   return "shoot-sound";      // Played when weapon is used
     };
     return "";
