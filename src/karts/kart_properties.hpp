@@ -55,7 +55,7 @@ private:
 
     // SFX files
     // ---------------
-    std::string m_horn_sfx_file;       /**< Absolute path name of horn SFX file */
+    std::vector<int> m_custom_sfx_id;     /**< Vector of custom SFX ids */
 
     // Display and gui
     // ---------------
@@ -179,8 +179,8 @@ public:
     const std::string& getIdent     () const {return m_ident;                    }
     const std::string& getShadowFile() const {return m_shadow_file;              }
     const std::string& getIconFile  () const {return m_icon_file;                }
-    const
-         std::string& getHornSfxFile() const {return m_horn_sfx_file;            }
+    const int          getCustomSfxId (SFXManager::CustomSFX type) 
+                                       const {return m_custom_sfx_id[type];      }
 
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;                  }

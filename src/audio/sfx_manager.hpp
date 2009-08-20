@@ -50,6 +50,35 @@ public:
         NUM_SOUNDS
     };
 
+
+    /*
+        Entries for custom SFX sounds.  These are unique for each kart.
+        eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
+    */
+    enum CustomSFX
+    {
+        CUSTOM_HORN,
+        CUSTOM_CRASH,
+        CUSTOM_WIN,
+        CUSTOM_EXPLODE,
+        NUM_CUSTOMS
+    };
+
+    // LISP (or in the future xml) tag for each custom sound
+    // TODO: fix this to use some kind of string array ini, I'm just too stupid with c++ to figure it out
+    static const char *getCustomTagName(int id)
+    {
+        switch (id)
+        {
+        case 0: return "horn-sound";
+        case 1: return "crash-sound";
+        case 2: return "win-sound";
+        case 3: return "explode-sound";
+        };
+        return "";
+    }
+
+
     /** Status of a sound effect. */
     enum SFXStatus
     {

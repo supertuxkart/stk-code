@@ -252,7 +252,7 @@ int SFXManager::addSingleSfx(std::string    sfxFile,
     }
 
     // debugging
-    /*printf("addSingleSfx() id:%d sfxFile:%s\n", sfxID, sfxFile.c_str());*/
+    printf("addSingleSfx() id:%d sfxFile:%s\n", sfxID, sfxFile.c_str());
     return sfxID;
 }
 
@@ -302,7 +302,7 @@ SFXBase *SFXManager::newSFX(int id)
 
     if (id < 0 || id >= (int)m_sfx_gain.size())
     {
-        printf("newSFX: Invalid SFX ID.\n");
+        printf("newSFX: Invalid SFX ID %d.\n", id);
         return NULL;
     }
 

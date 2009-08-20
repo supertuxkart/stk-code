@@ -82,6 +82,9 @@ Kart::Kart (const std::string& kart_name, int position,
 
     m_view_blocked_by_plunger = 0;
 
+    // Initialize custom sound vector
+    m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
+
     // Set position and heading:
     m_reset_transform      = init_transform;
 
@@ -100,20 +103,17 @@ Kart::Kart (const std::string& kart_name, int position,
     m_rescue                  = false;
     m_wheel_rotation          = 0;
 
+    // Create SFXBase for each custom sound
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        int id = m_kart_properties->getCustomSfxId((SFXManager::CustomSFX)n);
+        m_custom_sounds[n] = sfx_manager->newSFX(id);
+    }
+
     m_engine_sound = sfx_manager->newSFX(m_kart_properties->getEngineSfxType());
-
-    // If horn sfx is defined, load it.  Otherwise use default
-    int sfxId;
-
-    if (m_kart_properties->getHornSfxFile() == "")
-        sfxId = SFXManager::SOUND_BEEP;
-    else
-        sfxId = sfx_manager->addSingleSfx(m_kart_properties->getHornSfxFile(), 1, 0.2f,1.0f);
-
-    m_beep_sound   = sfx_manager->newSFX(  sfxId                              );
     m_crash_sound  = sfx_manager->newSFX(  SFXManager::SOUND_CRASH            );
-    m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
     m_goo_sound    = sfx_manager->newSFX(  SFXManager::SOUND_GOO              );
+    m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
 
     if(!m_engine_sound)
     {
@@ -256,8 +256,15 @@ Kart::~Kart()
     {
         m_engine_sound->stop();
     }
+
+    // Delete all custom sounds
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        if (m_custom_sounds[n] != NULL)
+            sfx_manager->deleteSFX(m_custom_sounds[n]);
+    }
+
     sfx_manager->deleteSFX(m_engine_sound );
-    sfx_manager->deleteSFX(m_beep_sound   );
     sfx_manager->deleteSFX(m_crash_sound  );
     sfx_manager->deleteSFX(m_skid_sound   );
     sfx_manager->deleteSFX(m_goo_sound    );
@@ -593,8 +600,12 @@ void Kart::update(float dt)
 
     Moveable::update(dt);
 
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position   ( getXYZ() );
+    }
+
     m_engine_sound->position ( getXYZ() );
-    m_beep_sound->position   ( getXYZ() );
     m_crash_sound->position  ( getXYZ() );
     m_skid_sound->position   ( getXYZ() );
 
@@ -843,9 +854,25 @@ void Kart::crashed(Kart *k)
 // -----------------------------------------------------------------------------
 void Kart::beep()
 {
-    m_beep_sound->play();
+    playCustomSFX(SFXManager::CUSTOM_HORN);
 } // beep
 
+// -----------------------------------------------------------------------------
+// Plays custom SFX, returns whether or not the sound was played
+
+bool Kart::playCustomSFX(unsigned int type)
+{
+    bool ret = false;
+    if (type < SFXManager::NUM_CUSTOMS) 
+        if (m_custom_sounds[type] != NULL)
+        {
+            ret = true;
+            // Don't stutter
+            if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
+                m_custom_sounds[type]->play();
+        }
+    return ret;
+}
 // -----------------------------------------------------------------------------
 void Kart::updatePhysics (float dt)
 {

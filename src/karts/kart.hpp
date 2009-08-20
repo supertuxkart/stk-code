@@ -126,8 +126,8 @@ private:
     bool          m_rescue;
     bool          m_eliminated;
 
+    std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_engine_sound;
-    SFXBase      *m_beep_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
@@ -283,6 +283,7 @@ public:
     virtual void   update           (float dt);
     virtual void   raceFinished     (float time);
     void           beep             ();
+    bool           playCustomSFX    (unsigned int type);
 };
 
 

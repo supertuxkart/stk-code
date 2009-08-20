@@ -45,6 +45,7 @@ KartProperties::KartProperties() : m_icon_material(0)
     m_icon_file     = "tuxicon.png";
     m_shadow_file   = "tuxkartshadow.png";
     m_groups.clear();
+    m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
@@ -201,19 +202,24 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
 
-    // Load SFX filenames
-    if (lisp->get("horn-sound", m_horn_sfx_file))
-    {
-        m_horn_sfx_file = file_manager->getDataDir() + "karts/" + getIdent() + "/" + m_horn_sfx_file;
-    }
-    else
-    {
-        /* TODO: Think of cleaner way to define when there 
-                 is no sfx file (empty filename is hackish) 
-        */
-        m_horn_sfx_file = "";
-    }
+    // Load custom kart SFX files  ===================================================
+    std::string tempFile;
 
+    for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
+    {
+        // Get lisp string tag for each custom sfx
+        if (lisp->get(sfx_manager->getCustomTagName(i), tempFile))
+        {
+            // retrieve filename, load file and store id in vector
+            tempFile = file_manager->getDataDir() + "/karts/" + getIdent() + "/" + tempFile;
+            m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
+            printf("%s custom SFX #%d : %s\n", getIdent().c_str(), i, tempFile.c_str());
+        }
+        else
+        {
+            m_custom_sfx_id[i] = -1;
+        }
+    }
 
     std::string sfx_type_string;
     lisp->get("engine-sound",                 sfx_type_string);
