@@ -851,6 +851,10 @@ void Kart::crashed(Kart *k)
         // it's not already playing.
         if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
             m_crash_sound->play();
+
+        // If we hit another kart, yell at it! (play custom kart sound)
+        if (k != NULL) playCustomSFX(SFXManager::CUSTOM_CRASH);
+
         m_bounce_back_time = 0.1f;
     }
 }   // crashed
@@ -858,7 +862,10 @@ void Kart::crashed(Kart *k)
 // -----------------------------------------------------------------------------
 void Kart::beep()
 {
-    playCustomSFX(SFXManager::CUSTOM_HORN);
+    // If the custom horn can't play (isn't defined) then play the default one
+    if (!playCustomSFX(SFXManager::CUSTOM_HORN))
+        m_beep_sound->play();
+
 } // beep
 
 // -----------------------------------------------------------------------------
@@ -872,6 +879,7 @@ bool Kart::playCustomSFX(unsigned int type)
         {
             ret = true;
             // Don't stutter
+            printf("Kart SFX: playing %s for %s.\n", sfx_manager->getCustomTagName(type), m_kart_properties->getIdent().c_str());
             if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
                 m_custom_sounds[type]->play();
         }
