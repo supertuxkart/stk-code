@@ -74,14 +74,15 @@ private:
                                             const  char *name, 
                                             int type);
 
-    int                       addSingleSfx( std::string    filename,
-                                            int            positional,
-                                            float          rolloff,
-                                            float          gain);
 public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
+    int                       addSingleSfx( std::string    filename,
+                                            int            positional,
+                                            float          rolloff,
+                                            float          gain);
+
     SFXBase                 *newSFX(int id);
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();

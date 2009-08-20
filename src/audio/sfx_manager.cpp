@@ -230,7 +230,7 @@ int SFXManager::addSingleSfx(std::string    sfxFile,
                              int            positional,
                              float          rolloff,
                              float          gain)
-/* Returns sfx ID */
+/* Returns sfx ID or -1 on error*/
 {
     int         sfxID;
 
@@ -246,11 +246,13 @@ int SFXManager::addSingleSfx(std::string    sfxFile,
     alGenBuffers(1, &(m_sfx_buffers[sfxID]));
     if (!checkError("generating a buffer")) return -1;
 
-    if (!loadVorbisBuffer(sfxFile.c_str(), sfxID))
+    if (!loadVorbisBuffer(sfxFile.c_str(), m_sfx_buffers[sfxID]))
     {
         printf("Failed to load sound effect %s\n", sfxFile.c_str());
     }
 
+    // debugging
+    /*printf("addSingleSfx() id:%d sfxFile:%s\n", sfxID, sfxFile.c_str());*/
     return sfxID;
 }
 
@@ -276,6 +278,7 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
     m_sfx_gain[item] = gain;
 
     std::string path = file_manager->getSFXFile(wav);
+    printf("Loading SFX %s\n", path.c_str());
 
     alGenBuffers(1, &(m_sfx_buffers[item]));
     if (!checkError("generating a buffer")) return;
@@ -307,6 +310,8 @@ SFXBase *SFXManager::newSFX(int id)
         positional = m_sfx_positional[id]!=0;
 
     SFXBase *p = new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
+    // debugging
+    /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
     p->volume(m_masterGain);
     m_all_sfx.push_back(p);
     return p;

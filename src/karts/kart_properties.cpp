@@ -196,6 +196,20 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
 
+    // Load SFX filenames
+    if (lisp->get("horn-sound", m_horn_sfx_file))
+    {
+        m_horn_sfx_file = file_manager->getDataDir() + "karts/" + getIdent() + "/" + m_horn_sfx_file;
+    }
+    else
+    {
+        /* TODO: Think of cleaner way to define when there 
+                 is no sfx file (empty filename is hackish) 
+        */
+        m_horn_sfx_file = "";
+    }
+
+
     std::string sfx_type_string;
     lisp->get("engine-sound",                 sfx_type_string);
     if(sfx_type_string == "large")

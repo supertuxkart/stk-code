@@ -53,6 +53,10 @@ private:
     float m_speed_angle_increase;     /**< Increase of turn angle with speed. */
     int   m_version;                  /**< Version of the .kart file.         */
 
+    // SFX files
+    // ---------------
+    std::string m_horn_sfx_file;       /**< Absolute path name of horn SFX file */
+
     // Display and gui
     // ---------------
     std::string m_name;               /**< The human readable Name of the kart
@@ -175,6 +179,9 @@ public:
     const std::string& getIdent     () const {return m_ident;                    }
     const std::string& getShadowFile() const {return m_shadow_file;              }
     const std::string& getIconFile  () const {return m_icon_file;                }
+    const
+         std::string& getHornSfxFile() const {return m_horn_sfx_file;            }
+
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;                  }
     /** Returns the dot color to use for this kart in the race gui. */

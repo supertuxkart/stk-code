@@ -101,7 +101,16 @@ Kart::Kart (const std::string& kart_name, int position,
     m_wheel_rotation          = 0;
 
     m_engine_sound = sfx_manager->newSFX(m_kart_properties->getEngineSfxType());
-    m_beep_sound   = sfx_manager->newSFX(  SFXManager::SOUND_BEEP             );
+
+    // If horn sfx is defined, load it.  Otherwise use default
+    int sfxId;
+
+    if (m_kart_properties->getHornSfxFile() == "")
+        sfxId = SFXManager::SOUND_BEEP;
+    else
+        sfxId = sfx_manager->addSingleSfx(m_kart_properties->getHornSfxFile(), 1, 0.2f,1.0f);
+
+    m_beep_sound   = sfx_manager->newSFX(  sfxId                              );
     m_crash_sound  = sfx_manager->newSFX(  SFXManager::SOUND_CRASH            );
     m_skid_sound   = sfx_manager->newSFX(  SFXManager::SOUND_SKID             );
     m_goo_sound    = sfx_manager->newSFX(  SFXManager::SOUND_GOO              );
