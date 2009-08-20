@@ -134,7 +134,12 @@ void KartProperties::load(const std::string &filename, const std::string &node,
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
-    m_icon_material = material_manager->getMaterial(m_icon_file);
+    // Make permanent is important, since otherwise icons can get deleted
+    // (e.g. when freeing temp. materials from a track, the last icon
+    //  would get deleted, too.
+    m_icon_material = material_manager->getMaterial(m_icon_file,
+                                                    /*is_full+path*/false, 
+                                                    /*make_permanent*/true);
 
     // Load model, except when called as part of --list-karts
     if(!dont_load_models)
