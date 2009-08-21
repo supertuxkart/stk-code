@@ -215,7 +215,7 @@ public:
     KartType     getKartType(int kart)    const { return m_kart_status[kart].m_kart_type;}
     int          getCoinTarget()          const { return m_coin_target;                  }
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
-    int          allPlayerFinished()      const {return 
+    bool         allPlayerFinished()      const {return 
                                            m_num_finished_players==m_player_karts.size();}
     int          raceIsActive()           const { return m_active_race;                  }
     const std::vector<std::string>&

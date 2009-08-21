@@ -40,6 +40,7 @@ public:
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     
+    virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }
     
     /** Called by the race result GUI at the end of the race to know the final order

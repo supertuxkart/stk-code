@@ -26,11 +26,16 @@ class Kart;
 
 class ProfileWorld : public StandardRace
 {
+private:
+    int m_frame_count;
+protected:
+
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
                              const btTransform &init_pos);
 
 public:
+             ProfileWorld();
     virtual ~ProfileWorld();
     /** Returns identifier for this world. */
     virtual  std::string getInternalCode() const {return "PROFILE"; }

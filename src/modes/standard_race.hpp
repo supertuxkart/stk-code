@@ -27,11 +27,12 @@
 class StandardRace : public LinearWorld
 {
 public:
-    StandardRace();
+             StandardRace();
     virtual ~StandardRace();
     
     // clock events
     virtual void onGo();
+    virtual bool isRaceOver();
     virtual void terminateRace();
     
     // overriding World methods

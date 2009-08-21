@@ -21,6 +21,16 @@
 #include "robots/default_robot.hpp"
 
 //-----------------------------------------------------------------------------
+/** The constructor sets the number of (local) players to 0, since only AI
+ *  karts are used.
+ */
+ProfileWorld::ProfileWorld()
+{
+    race_manager->setNumPlayers(0);
+    race_manager->setNumLocalPlayers(0);
+}   // ProfileWorld
+
+//-----------------------------------------------------------------------------
 /** Prints the profile statistic and exits!!
  */
 ProfileWorld::~ProfileWorld()

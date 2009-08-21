@@ -108,7 +108,7 @@ protected:
     Kart* loadRobot         (const std::string& kart_name, int position,
                              const btTransform& init_pos);
     void  estimateFinishTimes();
-public:    
+
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
                              const btTransform &init_pos);
@@ -120,9 +120,6 @@ protected:
     RaceGUI *m_race_gui;
     
 public:
-    /** debug text that will be overlaid to the screen */
-    core::stringw m_debug_text[10];
-    
     World();
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
@@ -132,6 +129,8 @@ public:
     virtual         ~World();
     virtual void    update(float delta);
     virtual void    render();
+    /** Returns true if the race is over. Must be defined by all modes. */
+    virtual bool    isRaceOver() = 0;
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
     /** Returns a pointer to the race gui. */

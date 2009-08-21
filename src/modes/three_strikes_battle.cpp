@@ -176,7 +176,7 @@ void ThreeStrikesBattle::update(float delta)
     World::update(delta);
 
     // check if over
-    if(getCurrentNumKarts()==1 || getCurrentNumPlayers()==0)
+    if(isRaceOver())
     {
         // Add the results for the remaining kart
         for(int i=0; i<(int)race_manager->getNumKarts(); i++)
@@ -188,6 +188,14 @@ void ThreeStrikesBattle::update(float delta)
         return;
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** The battle is over if only one kart is left, or no player kart.
+ */
+bool ThreeStrikesBattle::isRaceOver()
+{
+    return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
+}   // isRaceOver
 
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()

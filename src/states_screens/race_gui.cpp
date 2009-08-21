@@ -682,17 +682,6 @@ void RaceGUI::drawStatusText()
          break;
     }   // switch
 
-    for(int i = 0; i < 10; ++i)
-    {
-        if(RaceManager::getWorld()->m_debug_text[i] != "")
-        {
-            static video::SColor color = video::SColor(255, 100, 209, 100);
-            core::rect<s32> pos(20, i*20, 20, (i+1)*20);
-            gui::IGUIFont* font = irr_driver->getRaceFont();
-            font->draw(RaceManager::getWorld()->m_debug_text[i].c_str(), pos, color);
-        }
-    }
-
     float split_screen_ratio_x, split_screen_ratio_y;
     split_screen_ratio_x = split_screen_ratio_y = 1.0;
     if(race_manager->getNumLocalPlayers() >= 2)

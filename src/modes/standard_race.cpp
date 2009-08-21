@@ -84,9 +84,17 @@ void StandardRace::update(float delta)
     {
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
-        TimedRace::enterRaceOverState(true /* delay */);
+        enterRaceOverState(true /* delay */);
     }
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Returns tru if the race is finished, i.e. all player karts are finished.
+ */
+bool StandardRace::isRaceOver()
+{
+    return race_manager->allPlayerFinished();
+}   // isRaceOver
 
 //-----------------------------------------------------------------------------
 void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)

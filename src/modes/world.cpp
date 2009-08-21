@@ -61,6 +61,7 @@ World::World() : TimedRace()
 {
     m_physics  = NULL;
     m_race_gui = NULL;
+    TimedRace::setClockMode( CHRONO );
 }   // World
 
 // ----------------------------------------------------------------------------
@@ -78,7 +79,6 @@ void World::init()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
 
-    TimedRace::setClockMode( CHRONO );
     m_use_highscores = true;
 
     // Create the race gui before anything else is attached to the scene node
