@@ -64,9 +64,6 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
     }
 
-    // Play appropriate custom character sound
-    // m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -162,6 +159,8 @@ void Attachment::moveBombFromTo(Kart *from, Kart *to)
     to->setAttachmentType(ATTACH_BOMB,
                           from->getAttachment()->getTimeLeft()+
                           stk_config->m_bomb_time_increase, from);
+
+    to->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     from->getAttachment()->clear();
 }   // moveBombFromTo
 

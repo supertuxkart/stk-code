@@ -413,7 +413,12 @@ void Kart::collectedItem(const Item &item, int add_info)
 
     switch (type)
     {
-    case Item::ITEM_BANANA     : m_attachment.hitBanana(item, add_info); break;
+    case Item::ITEM_BANANA: 
+        m_attachment.hitBanana(item, add_info); 
+        // Play appropriate custom character sound
+        playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        break;
+
     case Item::ITEM_SILVER_COIN: m_collected_energy++ ;                  break;
     case Item::ITEM_GOLD_COIN  : m_collected_energy += 3 ;               break;
     case Item::ITEM_BONUS_BOX  :
@@ -429,6 +434,8 @@ void Kart::collectedItem(const Item &item, int add_info)
         m_body->setLinearVelocity(m_body->getLinearVelocity()*0.3f);
         m_goo_sound->position(getXYZ());
         m_goo_sound->play();
+        // Play appropriate custom character sound
+        playCustomSFX(SFXManager::CUSTOM_GOO);
         break;
     default        : break;
     }   // switch TYPE
@@ -494,6 +501,8 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
     int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
     if(direct_hit)
     {
+        // Play associated kart sound
+        playCustomSFX(SFXManager::CUSTOM_EXPLODE);
         float sign_a = (sign_bits & (0x1 <<  8)) ? 1.0f : -1.0f;
         float sign_b = (sign_bits & (0x1 <<  9)) ? 1.0f : -1.0f;
         float sign_c = (sign_bits & (0x1 << 10)) ? 1.0f : -1.0f;
