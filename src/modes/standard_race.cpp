@@ -24,13 +24,12 @@
 StandardRace::StandardRace() : LinearWorld()
 {
     TimedRace::setClockMode(CHRONO);
-    LinearWorld::init();
-}
+}   // StandardRace
 
 //-----------------------------------------------------------------------------
 StandardRace::~StandardRace()
 {
-}
+}   // ~StandardRace
     
 #if 0
 #pragma mark -
@@ -47,12 +46,13 @@ void StandardRace::onGo()
     {
         m_kart[i]->resetBrakes();
     }
-}
+}   // onGo
+
 //-----------------------------------------------------------------------------
 void StandardRace::terminateRace()
 {
     LinearWorld::terminateRace();
-}
+}   // terminateRace
 
 #if 0
 #pragma mark -
@@ -63,7 +63,8 @@ void StandardRace::terminateRace()
 void StandardRace::restartRace()
 {
     LinearWorld::restartRace();
-}
+}   // restartRace
+
 //-----------------------------------------------------------------------------
 void StandardRace::update(float delta)
 {    
@@ -74,7 +75,6 @@ void StandardRace::update(float delta)
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
         TimedRace::enterRaceOverState();
-	    if(UserConfigParams::m_profile<0) printProfileResultAndExit();
         unlock_manager->raceFinished();
     }   // if all karts are finished
     
@@ -86,7 +86,7 @@ void StandardRace::update(float delta)
         // to give the AI some time to get non-estimated timings
         TimedRace::enterRaceOverState(true /* delay */);
     }
-}
+}   // update
 
 //-----------------------------------------------------------------------------
 void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
@@ -98,18 +98,24 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
         amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
-}
+}   // getDefaultCollectibles
+
 //-----------------------------------------------------------------------------
-bool StandardRace::enableBonusBoxes()
+/** Returns if this mode supports bonus boxes or not.
+ */
+bool StandardRace::haveBonusBoxes()
 {
     // in time trial mode, don't use bonus boxes
     return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
-}
+}   // haveBonusBoxes
+
 //-----------------------------------------------------------------------------
-std::string StandardRace::getInternalCode() const
+/** Returns an identifier for this race. 
+ */
+std::string StandardRace::getIdent() const
 {
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return "STD_TIMETRIAL";
     else
         return "STANDARD";
-}
+}   // getIdent

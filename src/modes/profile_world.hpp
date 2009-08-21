@@ -1,5 +1,7 @@
+//  $Id: profile_world.hpp 3849 2009-08-13 11:12:26Z hikerstk $
+//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2009 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,31 +17,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef _standard_race_
-#define _standard_race_
+#ifndef HEADER_PROFILE_WORLD_HPP
+#define HEADER_PROFILE_WORLD_HPP
 
-#include "modes/linear_world.hpp"
+#include "modes/standard_race.hpp"
 
-/**
-  * Represents a standard race, i.e. with a start, end and laps.
-  * Used in Grand Prix, Quick Race and Time Trial.
-  */
-class StandardRace : public LinearWorld
+class Kart;
+
+class ProfileWorld : public StandardRace
 {
+    virtual Kart *createKart(const std::string &kart_ident, int index, 
+                             int local_player_id, int global_player_id,
+                             const btTransform &init_pos);
+
 public:
-    StandardRace();
-    virtual ~StandardRace();
-    
-    // clock events
-    virtual void onGo();
-    virtual void terminateRace();
-    
-    // overriding World methods
-    virtual void update(float delta);
-    virtual void restartRace();
-    virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    virtual bool haveBonusBoxes();
-    virtual std::string getIdent() const;
+    virtual ~ProfileWorld();
+    /** Returns identifier for this world. */
+    virtual  std::string getInternalCode() const {return "PROFILE"; }
 };
 
 #endif

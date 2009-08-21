@@ -25,12 +25,14 @@ using namespace irr;
 
 #include "audio/sound_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -149,12 +151,26 @@ void RaceGUI::createRegularPolygon(unsigned int n, float radius,
 }   // createRegularPolygon
 
 //-----------------------------------------------------------------------------
+/** Adds a camera. The number of cameras determines e.g. if split screen is 
+ *  used.
+ */
+Camera *RaceGUI::addCamera(unsigned int index, Kart *kart)
+{
+    Camera *camera = new Camera(index, kart);
+    m_cameras.push_back(camera);
+    return camera;
+}   // addCamera
+
+//-----------------------------------------------------------------------------
 /** Called before rendering, so no direct output to the screen can be done
  *  here.
  *  \param dt Time step size.
  */
 void RaceGUI::update(float dt)
 {
+    std::vector<Camera*>::iterator i;
+    for(i=m_cameras.begin(); i!=m_cameras.end(); i++)
+        (*i)->update(dt);
     cleanupMessages(dt);
 }   // update
 
@@ -709,7 +725,7 @@ void RaceGUI::drawStatusText()
     if(!RaceManager::getWorld()->isRacePhase()) return;
 
 
-    KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
+    RaceGUI::KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
 
     for(unsigned int pla = 0; pla < num_players; pla++)
     {
@@ -769,7 +785,9 @@ void RaceGUI::drawStatusText()
                                  plunger_x+plunger_size, offset_y+plunger_size);
             const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
 
-            irr_driver->getVideoDriver()->draw2DImage(t, dest, source);
+            irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 0, 
+                                                      &video::SColor(255,255,255,255), 
+                                                      true);
         }
     }   // next player
 

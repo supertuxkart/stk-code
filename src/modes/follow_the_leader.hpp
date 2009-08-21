@@ -19,6 +19,7 @@
 #define _follow_the_leader_hpp_
 
 #include "modes/linear_world.hpp"
+#include "states_screens/race_gui.hpp"
 
 class FollowTheLeaderRace : public LinearWorld
 {
@@ -35,9 +36,9 @@ public:
     // overriding World methods
     virtual void update(float delta);
     virtual void restartRace();
-    virtual std::string getInternalCode() const;
+    virtual std::string getIdent() const;
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     
     virtual bool raceHasLaps(){ return false; }
     

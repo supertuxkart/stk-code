@@ -175,6 +175,8 @@ supertuxkart_SOURCES = \
  modes/follow_the_leader.hpp \
  modes/linear_world.cpp \
  modes/linear_world.hpp \
+ modes/profile_world.cpp \
+ modes/profile_world.hpp \
  modes/standard_race.cpp \
  modes/standard_race.hpp \
  modes/three_strikes_battle.cpp \

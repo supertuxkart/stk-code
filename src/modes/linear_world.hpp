@@ -18,11 +18,10 @@
 #ifndef HEADER_LINEAR_WORLD_HPP
 #define HEADER_LINEAR_WORLD_HPP
 
-#include "modes/world.hpp"
 #include <vector>
 
-struct KartIconDisplayInfo;
-
+#include "modes/world.hpp"
+#include "states_screens/race_gui.hpp"
 /*
  * A 'linear world' is a subcategory of world used in 'standard' races, i.e.
  * with a start line and a road that loops. This includes management of drivelines
@@ -54,7 +53,7 @@ private:
     };
 
 protected:
-    KartIconDisplayInfo* m_kart_display_info;
+    RaceGUI::KartIconDisplayInfo* m_kart_display_info;
     
     /** Linear races can trigger rescues for one additional reason : shortcuts.
     * It may need to do some specific world before calling the generic Kart::forceRescue
@@ -88,7 +87,7 @@ public:
     void            setTimeAtLapForKart(float t, const int kart_id);
     float           getTimeAtLapForKart(const int kart_id) const;
 
-    virtual KartIconDisplayInfo* getKartsDisplayInfo();
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     
     virtual void    terminateRace();

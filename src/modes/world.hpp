@@ -28,10 +28,10 @@
 #include "network/network_kart.hpp"
 #include "physics/physics.hpp"
 #include "race/highscores.hpp"
+#include "states_screens/race_gui.hpp"
 #include "utils/random_generator.hpp"
 
 class SFXBase;
-struct KartIconDisplayInfo;
 class btRigidBody;
 class Track;
 class RaceGUI;
@@ -107,13 +107,12 @@ protected:
     void  removeKart        (int kart_number);
     Kart* loadRobot         (const std::string& kart_name, int position,
                              const btTransform& init_pos);
-    void  printProfileResultAndExit();
     void  estimateFinishTimes();
-    
+public:    
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
                              const btTransform &init_pos);
-
+protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
     
@@ -128,7 +127,7 @@ public:
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
-    void init();
+    virtual void init();
     
     virtual         ~World();
     virtual void    update(float delta);
@@ -169,10 +168,10 @@ public:
       */
     virtual bool enableBonusBoxes(){ return true; }
     
-    /** Each game mode should have a unique internal code. Override
+    /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it.
       */
-    virtual std::string getInternalCode() const = 0;
+    virtual std::string getIdent() const = 0;
         
     virtual bool useFastMusicNearEnd() const { return true; }
     
@@ -194,7 +193,7 @@ public:
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode
       */
-    virtual KartIconDisplayInfo* getKartsDisplayInfo() = 0;
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
     
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.

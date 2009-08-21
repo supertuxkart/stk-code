@@ -128,14 +128,17 @@ void FollowTheLeaderRace::restartRace()
 	m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
 	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
-}
+}   // restartRace
+
 //-----------------------------------------------------------------------------
-std::string FollowTheLeaderRace::getInternalCode() const
+/** Returns the internal identifier for this kind of race. 
+ */
+std::string FollowTheLeaderRace::getIdent() const
 {
     return "FOLLOW_LEADER";
 }
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
+RaceGUI::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 {
     LinearWorld::getKartsDisplayInfo();
     m_kart_display_info[0].special_title = _("Leader");

@@ -744,7 +744,7 @@ void Track::loadTrackModel()
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                m_animated_textures.push_back(new MovingTexture(m, 0.5f, 0.5f));
+                m_animated_textures.push_back(new MovingTexture(m, 0.05f, 0.05f));
             }   // for j<MATERIAL_MAX_TEXTURES
         }   // for i<getMaterialCount
 

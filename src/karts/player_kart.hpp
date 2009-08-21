@@ -50,9 +50,10 @@ private:
 
     void steer(float, int);
 public:
-                 PlayerKart(const std::string& kart_name,
-                            int position, ActivePlayer *_player,
-                            const btTransform& init_pos, int player_index);
+                   PlayerKart(const std::string& kart_name,
+                              int position, ActivePlayer *_player,
+                              const btTransform& init_pos, 
+                              unsigned int player_index);
                   ~PlayerKart        ();
     int            earlyStartPenalty () { return m_penalty_time>0;        }
     ActivePlayer  *getPlayer         () { return m_player;                }

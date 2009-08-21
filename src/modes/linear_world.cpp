@@ -39,7 +39,7 @@ void LinearWorld::init()
     World::init();
     const unsigned int kart_amount = m_kart.size();
 
-    m_kart_display_info = new KartIconDisplayInfo[kart_amount];
+    m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -307,7 +307,7 @@ float LinearWorld::getTimeAtLapForKart(const int kart_id) const
 }   // getTimeAtLapForKart
 
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
+RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 {
     int   laps_of_leader       = -1;
     float time_of_leader       = -1;
@@ -317,7 +317,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         Kart* kart = m_kart[i];
 
         // reset color
@@ -346,7 +346,7 @@ KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     // we now know the best time of the lap. fill the remaining bits of info
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         KartInfo& kart_info = m_kart_info[i];
         Kart* kart = m_kart[i];
 

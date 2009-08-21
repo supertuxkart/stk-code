@@ -28,7 +28,6 @@ class Track;
 class LinearWorld;
 class QuadGraph;
 class irr::scene::ISceneNode;
-class Camera;
 
 class DefaultRobot : public AutoKart
 {
@@ -154,10 +153,6 @@ private:
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
-    /** A camera that can be attached to a robot. This is mainly a debugging 
-     *  tool, used in working on the AI and in doing profile runs. Otherwise
-     *  this variable is not used. */
-    Camera *m_camera;
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
      *  different AI levels.
@@ -192,8 +187,7 @@ private:
 
 public:
                  DefaultRobot(const std::string& kart_name, int position,
-                              const btTransform& init_pos, const Track *track,
-                              int camera_number=-1);
+                              const btTransform& init_pos, const Track *track);
                 ~DefaultRobot();
     void         update      (float delta) ;
     void         reset       ();

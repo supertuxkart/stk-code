@@ -29,31 +29,30 @@ using namespace irr;
 
 
 #include "config/player.hpp"
-#include "graphics/material.hpp"
-#include "karts/kart.hpp"
-#include "karts/player_kart.hpp"
-#include "modes/world.hpp"
-#include "race/race_manager.hpp"
 
+class Camera;
 class InputMap;
+class Kart;
+class Material;
 class RaceSetup;
-
-/**
-  * Used to display the list of karts and their times or
-  * whatever other info is relevant to the current mode.
-  */
-struct KartIconDisplayInfo
-{
-    std::string time;
-    float r, g, b;
-    std::string special_title;
-    /** Current lap of this kart, or -1 if irrelevant
-      */
-    int lap;
-};
 
 class RaceGUI
 {
+public:
+    /**
+    * Used to display the list of karts and their times or
+    * whatever other info is relevant to the current mode.
+    */
+    struct KartIconDisplayInfo
+    {
+        std::string time;
+        float r, g, b;
+        std::string special_title;
+        /** Current lap of this kart, or -1 if irrelevant
+        */
+        int lap;
+    };   // KartIconDisplayInfo
+
 private:
     class TimedMessage
     {
@@ -63,6 +62,7 @@ private:
         video::SColor m_color;              // color of message
         int           m_font_size;          // size
         const Kart   *m_kart;
+        // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
@@ -75,14 +75,16 @@ private:
             m_kart           = kart;
             m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
             m_color          = color;
-        }
+        }   // TimedMessage
+        // -----------------------------------------------------
         // in follow leader the clock counts backwards
         bool done(const float dt)
         {
             m_remaining_time -= dt;
             return m_remaining_time < 0;
-        }
-    };
+        }   // done
+    };   // TimedMessage
+    // ---------------------------------------------------------
 
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
@@ -95,9 +97,11 @@ private:
     /** Musical notes icon (for music description and credits) */
     Material        *m_music_icon;
     
+    // Minimap related variables
+    // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
-        /** The size of a single marker in pixels, must be a power of 2. */
+    /** The size of a single marker in pixels, must be a power of 2. */
     int              m_marker_rendered_size;
 
     /** The size of a single marker on the screen for AI karts, 
@@ -126,7 +130,8 @@ private:
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
 
-
+    /** The list of all cameras. */
+    std::vector<Camera*> m_cameras;
 
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
@@ -160,6 +165,7 @@ public:
         ~RaceGUI();
     void render();
     void update(float dt);
+    Camera *addCamera(unsigned int index, Kart *kart);
     void addMessage(const std::string &m, const Kart *kart, float time, 
                     int fonst_size, 
                     const video::SColor &color=video::SColor(255, 255, 0, 255));

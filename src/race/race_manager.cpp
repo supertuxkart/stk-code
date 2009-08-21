@@ -30,6 +30,7 @@
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -38,30 +39,26 @@
 
 RaceManager* race_manager= NULL;
 
+World *RaceManager::m_world=NULL;
 //-----------------------------------------------------------------------------
-World* world = NULL;
-World* RaceManager::getWorld()
-{
-    return world;
-}
 /** Call to set the world, or call setWorld(NULL) to delete the current world.
  */
-void RaceManager::setWorld(World* world_arg)
+void RaceManager::setWorld(World* world)
 {
-    if(world != NULL) delete world;
-    world = world_arg;
+    assert(!m_world);
+    m_world = world;
 }
 Track* RaceManager::getTrack()
 {
-    return world->getTrack();
+    return m_world->getTrack();
 }
 Kart* RaceManager::getPlayerKart(const unsigned int n)
 {
-    return world->getPlayerKart(n);
+    return m_world->getPlayerKart(n);
 }
 Kart* RaceManager::getKart(const unsigned int n)
 {
-    return world->getKart(n);
+    return m_world->getKart(n);
 }
 //-----------------------------------------------------------------------------
 
@@ -77,6 +74,7 @@ RaceManager::RaceManager()
     m_active_race        = false;
     m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
+    m_world              = NULL;
     setTrack("jungle");
     setNumLocalPlayers(0);
     //setLocalKartInfo(0, "tux");
@@ -255,11 +253,21 @@ void RaceManager::startNextRace()
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
     // and need world to be defined.
-    if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) new FollowTheLeaderRace();
-    else if(m_minor_mode==MINOR_MODE_QUICK_RACE || m_minor_mode==MINOR_MODE_TIME_TRIAL) new StandardRace();
-    else if(m_minor_mode==MINOR_MODE_3_STRIKES) new ThreeStrikesBattle();
-    else{ fprintf(stderr,"Could not create given race mode\n"); assert(0); }
-
+    if     (UserConfigParams::m_profile)            
+        m_world = new ProfileWorld();
+    else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
+        m_world = new FollowTheLeaderRace();
+    else if(m_minor_mode==MINOR_MODE_QUICK_RACE || 
+            m_minor_mode==MINOR_MODE_TIME_TRIAL)    
+        m_world = new StandardRace();
+    else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
+        m_world = new ThreeStrikesBattle();
+    else
+    { 
+        fprintf(stderr,"Could not create given race mode\n"); 
+        assert(0); 
+    }
+    m_world->init();
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
     // The race is rerun, and the points and scores get reset ... but if
@@ -385,8 +393,8 @@ void RaceManager::exitRace()
         // FIXME - back to main menu
         // menu_manager->switchToMainMenu();
     }
-    delete world;
-    world          = 0;
+    delete m_world;
+    m_world        = NULL;
     m_track_number = 0;
     m_active_race  = false;    
 }   // exitRace
@@ -426,7 +434,7 @@ void RaceManager::rerunRace()
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
-    world->restartRace();
+    m_world->restartRace();
 }   // rerunRace
 
 /* EOF */

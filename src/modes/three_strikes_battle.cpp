@@ -39,7 +39,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
     }
  
     const unsigned int kart_amount = m_kart.size();
-    m_kart_display_info = new KartIconDisplayInfo[kart_amount];
+    m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -51,12 +51,14 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         // no positions in this mode
         m_kart[n]->setPosition(-1);
     }// next kart
-}
+}   // ThreeStrikesBattle
+
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     delete[] m_kart_display_info;
-}
+}   // ~ThreeStrikesBattle
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::onGo()
 {
@@ -67,8 +69,9 @@ void ThreeStrikesBattle::onGo()
     {
         m_kart[i]->resetBrakes();
     }
-}
+}   // onGo
 //-----------------------------------------------------------------------------
+
 void ThreeStrikesBattle::terminateRace()
 {
     updateKartRanks();
@@ -84,7 +87,8 @@ void ThreeStrikesBattle::terminateRace()
     }   // for i
     
     World::terminateRace();
-}
+}   // terminateRace
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
@@ -109,12 +113,16 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         sound_manager->switchToFastMusic();
         m_faster_music_active = true;
     }
-}
+}   // kartHit
+
 //-----------------------------------------------------------------------------
-std::string ThreeStrikesBattle::getInternalCode() const
+/** Returns the internal identifier for this race.
+ */
+std::string ThreeStrikesBattle::getIdent() const
 {
     return "BATTLE_3_STRIKES";
-}
+}   // getIdent
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::updateKartRanks()
 {
@@ -160,7 +168,8 @@ void ThreeStrikesBattle::updateKartRanks()
         m_kart[ karts_list[n] ]->setPosition( n+1 );
     }
     delete [] karts_list;
-}
+}   // updateKartRank
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::update(float delta)
 {
@@ -178,7 +187,8 @@ void ThreeStrikesBattle::update(float delta)
             TimedRace::enterRaceOverState();
         return;
     }
-}
+}   // update
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()
 {
@@ -193,15 +203,15 @@ void ThreeStrikesBattle::restartRace()
         // no positions in this mode
         m_kart[n]->setPosition(-1);
     }// next kart
-}
-//void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
+}   // restartRace
+
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
+RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 {
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         
         // reset color
         rank_info.lap = -1;
@@ -237,7 +247,8 @@ KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
     }
     
     return m_kart_display_info;
-}
+}   // getKartDisplayInfo
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
@@ -281,7 +292,8 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     
     body->setCenterOfMassTransform(pos);
     
-}
+}   // moveKartAfterRescue
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::raceResultOrder( int* order )
 {
@@ -295,7 +307,8 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
         assert(pos < (int)num_karts);
         order[pos] = kart_id;
     }
-}
+}   // raceResultOrder
+
 //-----------------------------------------------------------------------------
 bool ThreeStrikesBattle::acceptPowerup(const int type) const
 {
@@ -303,5 +316,5 @@ bool ThreeStrikesBattle::acceptPowerup(const int type) const
     if(type == POWERUP_PARACHUTE || type == POWERUP_ANVIL || type == POWERUP_ZIPPER) return false;
     
     return true;
-}
+}   // acceptPowerup
 

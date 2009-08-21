@@ -52,6 +52,11 @@
 #include "utils/string_utils.hpp"
 
 //-----------------------------------------------------------------------------
+/** Constructor. Note that in the constructor it is not possible to call any
+ *  functions that use RaceManager::getWorld(), since this is only defined
+ *  after the constructor. Those functions can be called in the init() 
+ *  function, which is called immediately after the constructor.
+ */
 World::World() : TimedRace()
 {
     m_physics  = NULL;
@@ -59,9 +64,12 @@ World::World() : TimedRace()
 }   // World
 
 // ----------------------------------------------------------------------------
+/** This function is called after the World constructor. In init() functions
+ *  can be called that use RaceManager::getWorld(). The init function is 
+ *  called immediately after the constructor.
+ */
 void World::init()
 {
-    RaceManager::setWorld(this);
     race_state            = new RaceState();
     m_track               = NULL;
     m_faster_music_active = false;
@@ -106,24 +114,11 @@ void World::init()
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         btTransform init_pos=m_track->getStartTransform(i);
-        Kart* newkart;
         const std::string& kart_ident = race_manager->getKartIdent(i);
         int local_player_id           = race_manager->getKartLocalPlayerId(i);
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
-        if(UserConfigParams::m_profile)
-        {
-    	    // Create a camera for the last kart (since this way more of the
-	        // karts can be seen.
-            newkart = new DefaultRobot(kart_ident, i+1, init_pos, m_track,
-                                       (i==race_manager->getNumKarts()-1) ? 0 : -1);
-            // FIXME: does this actually work???
-            m_local_player_karts[0] = static_cast<PlayerKart*>(newkart);
-        }
-        else
-        {
-            newkart = createKart(kart_ident, i, local_player_id,
-                                 global_player_id, init_pos);
-        }   // if !UserConfigParams::m_profile
+        Kart* newkart = this->createKart(kart_ident, i, local_player_id,  
+                                   global_player_id, init_pos);
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
     }  // for i
@@ -137,7 +132,7 @@ void World::init()
 
     if(!history->replayHistory()) history->initRecording();
     network_manager->worldLoaded();
-}   // World
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Creates a kart, having a certain position, starting location, and local
@@ -208,7 +203,7 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 }   // loadRobot
 
 //-----------------------------------------------------------------------------
-                 World::~World()
+World::~World()
 {
     delete m_race_gui;
     delete race_state;
@@ -355,7 +350,7 @@ HighscoreEntry* World::getHighscores() const
 {
     if(!m_use_highscores) return NULL;
 
-    const HighscoreEntry::HighscoreType type = "HST_" + getInternalCode();
+    const HighscoreEntry::HighscoreType type = "HST_" + getIdent();
 
     HighscoreEntry* highscores =
         highscore_manager->getHighscoreEntry(type,
@@ -432,23 +427,6 @@ void World::updateHighscores()
     delete []index;
 
 }   // updateHighscores
-//-----------------------------------------------------------------------------
-void World::printProfileResultAndExit()
-{
-    float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-    {
-        max_t = std::max(max_t, m_kart[i]->getFinishTime());
-        min_t = std::min(min_t, m_kart[i]->getFinishTime());
-        av_t += m_kart[i]->getFinishTime();
-        printf("%s  start %d  end %d time %f\n",
-            m_kart[i]->getName().c_str(),(int)i,
-            m_kart[i]->getPosition(),
-            m_kart[i]->getFinishTime());
-    }
-    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
-    std::exit(-2);
-}   // printProfileResultAndExit
 
 //-----------------------------------------------------------------------------
 /** Called in follow-leader-mode to remove the last kart

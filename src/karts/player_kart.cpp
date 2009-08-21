@@ -2,7 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, Steve Baker
+//  Copyright (C) 2006-2009 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,21 +24,22 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
 #include "graphics/camera.hpp"
-#include "states_screens/race_gui.hpp"
 #include "input/input_manager.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
+#include "states_screens/race_gui.hpp"
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
-PlayerKart::PlayerKart(const std::string& kart_name, int position, ActivePlayer *player,
-                       const btTransform& init_pos, int player_index) :
+PlayerKart::PlayerKart(const std::string& kart_name, int position, 
+                       ActivePlayer *player, const btTransform& init_pos, 
+                       unsigned int player_index) :
             Kart(kart_name, position, init_pos)
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = new Camera(player_index, this);
+    m_camera       = RaceManager::getWorld()->getRaceGUI()->addCamera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
@@ -215,7 +216,6 @@ void PlayerKart::steer(float dt, int steer_val)
 //-----------------------------------------------------------------------------
 void PlayerKart::update(float dt)
 {
-    m_camera->update(dt);
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.

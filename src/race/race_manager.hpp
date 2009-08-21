@@ -143,6 +143,9 @@ private:
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
     
+    /** The race manager manages the world, i.e. maintains 
+     *  this world pointer. */
+    static World                    *m_world;
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -153,7 +156,7 @@ private:
 public:
     bool   m_active_race; //True if there is a race
 
-    static World* getWorld();
+    static World* getWorld() {return m_world;}
     static void setWorld(World* world);
     static Track* getTrack();
     static Kart* getPlayerKart(const unsigned int n);

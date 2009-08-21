@@ -37,7 +37,6 @@
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
-#include "graphics/camera.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -47,10 +46,9 @@
 
 DefaultRobot::DefaultRobot(const std::string& kart_name,
                            int position, const btTransform& init_pos, 
-                           const Track *track, int camera_number ) :
+                           const Track *track) :
     AutoKart( kart_name, position, init_pos )
 {
-    m_camera      = camera_number >=0 ? new Camera(camera_number, this) : NULL;
     m_kart_length = m_kart_properties->getKartModel()->getLength();
     m_kart_width  = m_kart_properties->getKartModel()->getWidth();
     m_track = RaceManager::getTrack();
