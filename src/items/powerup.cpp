@@ -119,7 +119,7 @@ Material *Powerup::getIcon()
 void Powerup::use()
 {
     // Play custom kart sound when collectible is used
-    if (m_type != POWERUP_NOTHING) m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
+    if (m_type != POWERUP_NOTHING && m_type != POWERUP_ZIPPER) m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
 	// FIXME - for some collectibles, set() is never called
 	if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);

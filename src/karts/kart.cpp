@@ -415,8 +415,6 @@ void Kart::collectedItem(const Item &item, int add_info)
     {
     case Item::ITEM_BANANA: 
         m_attachment.hitBanana(item, add_info); 
-        // Play appropriate custom character sound
-        playCustomSFX(SFXManager::CUSTOM_ATTACH);
         break;
 
     case Item::ITEM_SILVER_COIN: m_collected_energy++ ;                  break;
@@ -730,6 +728,8 @@ void Kart::handleZipper()
                                    (1 + stk_config->m_zipper_max_speed_fraction));
 
     m_vehicle->activateZipper(speed);
+    // Play custom character sound (weee!)
+    playCustomSFX(SFXManager::CUSTOM_ZIPPER);
 }   // handleZipper
 
 //-----------------------------------------------------------------------------

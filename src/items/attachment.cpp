@@ -113,6 +113,10 @@ void Attachment::hitBanana(const Item &item, int new_attachment)
         leftover_time     = m_time_left;
         break;
     default:
+        // There is no attachment currently, but there will be one
+        // so play the character sound ("Uh-Oh")
+        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
     }   // switch

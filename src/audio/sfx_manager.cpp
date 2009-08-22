@@ -232,12 +232,12 @@ const char *SFXManager::getCustomTagName(int id)
     {
         case CUSTOM_HORN:    return "horn-sound";       // Replaces horn
         case CUSTOM_CRASH:   return "crash-sound";      // Played when colliding with another kart
-        case CUSTOM_WIN:     return "win-sound";        // Played when racer wins
+        case CUSTOM_WIN:     return "win-sound";        // Played when racer wins (not yet implemented)
         case CUSTOM_EXPLODE: return "explode-sound";    // Played when kart explodes
         case CUSTOM_GOO:     return "goo-sound";        // Played when driving through goo
-        case CUSTOM_PASS:    return "pass-sound";       // Played when passing another kart
+        case CUSTOM_PASS:    return "pass-sound";       // Played when passing another kart (not yet implemented)
         case CUSTOM_ZIPPER:  return "zipper-sound";     // Played when kart hits zipper
-        case CUSTOM_NAME:    return "name-sound";       // Introduction "I'm Tux!"
+        case CUSTOM_NAME:    return "name-sound";       // Introduction "I'm Tux!" (not yet implemented)
         case CUSTOM_ATTACH:  return "attach-sound";     // Played when something is attached to kart
         case CUSTOM_SHOOT:   return "shoot-sound";      // Played when weapon is used
     };
