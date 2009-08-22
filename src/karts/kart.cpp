@@ -618,6 +618,7 @@ void Kart::update(float dt)
         if (m_custom_sounds[n] != NULL) m_custom_sounds[n]->position   ( getXYZ() );
     }
 
+    m_beep_sound->position   ( getXYZ() );
     m_engine_sound->position ( getXYZ() );
     m_crash_sound->position  ( getXYZ() );
     m_skid_sound->position   ( getXYZ() );
