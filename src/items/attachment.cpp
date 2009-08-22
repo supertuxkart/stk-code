@@ -160,7 +160,6 @@ void Attachment::moveBombFromTo(Kart *from, Kart *to)
                           from->getAttachment()->getTimeLeft()+
                           stk_config->m_bomb_time_increase, from);
 
-    to->playCustomSFX(SFXManager::CUSTOM_ATTACH);
     from->getAttachment()->clear();
 }   // moveBombFromTo
 

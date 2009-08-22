@@ -862,9 +862,6 @@ void Kart::crashed(Kart *k)
         if(m_crash_sound->getStatus() != SFXManager::SFX_PLAYING)
             m_crash_sound->play();
 
-        // If we hit another kart, yell at it! (play custom kart sound)
-        if (k != NULL) playCustomSFX(SFXManager::CUSTOM_CRASH);
-
         m_bounce_back_time = 0.1f;
     }
 }   // crashed

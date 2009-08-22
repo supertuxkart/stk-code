@@ -192,6 +192,8 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
             if(attachmentA->getPreviousOwner()!=kartB)
             {
                 attachmentA->moveBombFromTo(kartA, kartB);
+                // Play appropriate SFX
+                kartB->playCustomSFX(SFXManager::CUSTOM_ATTACH);
             }
         }
     }
@@ -199,6 +201,13 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
         attachmentB->getPreviousOwner()!=kartA)
     {
         attachmentB->moveBombFromTo(kartB, kartA);
+        kartA->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+    }
+    else
+    {
+        // No bombs exchanged, no explosions, tell the other driver to move it!
+        kartA->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        kartB->playCustomSFX(SFXManager::CUSTOM_CRASH);
     }
 }   // KartKartCollision
 
