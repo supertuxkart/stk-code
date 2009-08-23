@@ -24,7 +24,8 @@
 #include <sstream>
 
 #include "io/file_manager.hpp"
-#include "lisp/parser.hpp"
+//#include "lisp/parser.hpp"
+#include "io/xml_node.hpp"
 #include "audio/music_information.hpp"
 
 STKConfig* stk_config=0;
@@ -38,22 +39,20 @@ float STKConfig::UNDEFINED = -99.9f;
  */
 void STKConfig::load(const std::string &filename)
 {
-    const lisp::Lisp* root = 0;
-
+    XMLNode *root = 0;
     try
     {
-        lisp::Parser parser;
-        root = parser.parse(filename);
-
-        const lisp::Lisp* const LISP = root->getLisp("config");
-        if(!LISP)
+        root = new XMLNode(filename);
+        if(!root || root->getName()!="config")
         {
+            if(root) delete root;
             std::ostringstream msg;
-            msg<<"No 'config' node found in '"<<filename<<"'.";
+            msg << "Couldn't load config '" << filename << "': no config node.";
             throw std::runtime_error(msg.str());
         }
-        getAllData(LISP);
+        getAllData(root);
     }
+
     catch(std::exception& err)
     {
         fprintf(stderr, "Error while parsing KartProperties '%s':\n",
@@ -119,6 +118,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
+
     m_kart_properties.checkAllSet(filename);
 }   // load
 
@@ -173,54 +173,92 @@ const std::string &STKConfig::getBackgroundPicture(int n)
 }   // getBackgroundPicture
 
 //-----------------------------------------------------------------------------
-/** Extracts the actual information from a lisp file.
- *  \param lisp Pointer to the lisp data structure.
+/** Extracts the actual information from a xml file.
+ *  \param xml Pointer to the xml data structure.
  */
-void STKConfig::getAllData(const lisp::Lisp* lisp)
+void STKConfig::getAllData(const XMLNode * root)
 {
+    const XMLNode *node = root -> getNode("stk-parameters");
+    if(!node)
+    {
+        std::ostringstream msg;
+        msg << "Couldn't load stk-parameters: no node.";
+        throw std::runtime_error(msg.str());
+    }
 
     // Get the values which are not part of the default KartProperties
     // ---------------------------------------------------------------
-    lisp->get("anvil-weight",                 m_anvil_weight             );
-    lisp->get("final-camera-time",            m_final_camera_time        );
-    lisp->get("anvil-speed-factor",           m_anvil_speed_factor       );
-    lisp->get("parachute-friction",           m_parachute_friction       );
-    lisp->get("parachute-time",               m_parachute_time           );
-    lisp->get("parachute-time-other",         m_parachute_time_other     );
-    lisp->get("parachute-done-fraction",      m_parachute_done_fraction  );
-    lisp->get("bomb-time",                    m_bomb_time                );
-    lisp->get("bomb-time-increase",           m_bomb_time_increase       );
-    lisp->getVector("leader-intervals",       m_leader_intervals         );
-    lisp->get("anvil-time",                   m_anvil_time               );
-    lisp->get("zipper-time",                  m_zipper_time              );
-    lisp->get("zipper-force",                 m_zipper_force             );
-    lisp->get("zipper-speed-gain",            m_zipper_speed_gain        );
-    lisp->get("zipper-max-speed-fraction",    m_zipper_max_speed_fraction);
-    lisp->get("explosion-impulse",            m_explosion_impulse        );
-    lisp->get("explosion-impulse-objects",    m_explosion_impulse_objects);
-    lisp->get("max-karts",                    m_max_karts                );
-    lisp->get("grid-order",                   m_grid_order               );
-    lisp->getVector("scores",                 m_scores                   );
-    lisp->get("max-history",                  m_max_history              );
-    lisp->get("max-skidmarks",                m_max_skidmarks            );
-    lisp->get("min-kart-version",             m_min_kart_version         );
-    lisp->get("max-kart-version",             m_max_kart_version         );
-    lisp->get("min-track-version",            m_min_track_version        );
-    lisp->get("max-track-version",            m_max_track_version        );
-    lisp->get("skid-fadeout-time",            m_skid_fadeout_time        );
-    lisp->get("slowdown-factor",              m_slowdown_factor          );
-    lisp->get("near-ground",                  m_near_ground              );
-    lisp->get("delay-finish-time",            m_delay_finish_time        );
-    lisp->get("music-credit-time",            m_music_credit_time        );
-    lisp->getVector("menu-background",        m_menu_background          );
-    lisp->getVector("mainmenu-background",    m_mainmenu_background      );
-    lisp->get("enable_networking",            m_enable_networking        );
+
+    node->get("min-kart-version", &m_min_kart_version);
+    node->get("max-kart-version", &m_max_kart_version);
+    node->get("min-track-version", &m_min_track_version);
+    node->get("max-track-version", &m_max_track_version);
+    node->get("max-karts", &m_max_karts);
+    node->get("scores", &m_scores);
+    node->get("grid-order", &m_grid_order);
+
     std::string title_music;
-    lisp->get("title-music",                  title_music                );
+    node->get("title-music", &title_music);
     m_title_music = new MusicInformation(file_manager->getMusicFile(title_music));
+
+    node->get("mainmenu-background", &m_mainmenu_background);
+    node->get("menu-background", &m_menu_background);
+    node->get("max-history", &m_max_history);
+    node->get("max-skidmarks", &m_max_skidmarks);
+    node->get("skid-fadeout-time", &m_skid_fadeout_time);
+    node->get("slowdown-factor", &m_slowdown_factor);
+    node->get("near-ground", &m_near_ground);
+    node->get("delay-finish-time", &m_delay_finish_time);
+    node->get("music-credit-time", &m_music_credit_time);
+    node->get("final-camera-time", &m_final_camera_time);
+
+
+    node = root -> getNode("attachment-parameters");
+    if(!node)
+    {
+        std::ostringstream msg;
+        msg << "Couldn't load attachment-parameters: no node.";
+        throw std::runtime_error(msg.str());
+    }
+
+    node->get("anvil-weight", &m_anvil_weight);
+    node->get("anvil-speed-factor", &m_anvil_speed_factor);
+    node->get("parachute-friction", &m_parachute_friction);
+    node->get("parachute-time", &m_parachute_time);
+    node->get("parachute-time-other", &m_parachute_time_other);
+    node->get("parachute-done-fraction", &m_parachute_done_fraction);
+    node->get("bomb-time", &m_bomb_time);
+    node->get("bomb-time-increase", &m_bomb_time_increase);
+    node->get("leader-intervals", &m_leader_intervals);
+    node->get("anvil-time", &m_anvil_time);
+    node->get("zipper-time", &m_zipper_time);
+    node->get("zipper-force", &m_zipper_force);
+    node->get("zipper-speed-gain", &m_zipper_speed_gain);
+    node->get("zipper-max-speed-fraction", &m_zipper_max_speed_fraction);
+
+
+    node = root -> getNode("misc-defaults");
+    if(!node)
+    {
+        std::ostringstream msg;
+        msg << "Couldn't load misc-defaults: no node.";
+        throw std::runtime_error(msg.str());
+    }
+
+    node->get("explosion-impulse", &m_explosion_impulse);
+    node->get("explosion-impulse-objects", &m_explosion_impulse_objects);
+    node->get("enable-networking", &m_enable_networking);
 
     // Get the default KartProperties
     // ------------------------------
-    m_kart_properties.getAllData(lisp->getLisp("kart-defaults"));
+    node = root -> getNode("general-kart-defaults");
+    if(!node)
+    {
+        std::ostringstream msg;
+        msg << "Couldn't load general-kart-defaults: no node.";
+        throw std::runtime_error(msg.str());
+    }
+    m_kart_properties.getAllData(node);
 
 }   // getAllData
+

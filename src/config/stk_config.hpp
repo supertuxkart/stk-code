@@ -22,7 +22,8 @@
 
 #include "karts/kart_properties.hpp"
 
-class Lisp;
+//class Lisp;
+class XMLNode;
 class MusicInformation;
 
 /** Global STK configuration information. Parameters here can be tuned without
@@ -98,7 +99,8 @@ public:
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {};
     void init_defaults    ();
-    void getAllData       (const lisp::Lisp* lisp);
+//    void getAllData       (const lisp::Lisp* lisp);
+    void getAllData       (const XMLNode * root);
     void load             (const std::string &filename);
     /** Returns the default kart properties for each kart. */
     const KartProperties &

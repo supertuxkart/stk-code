@@ -29,7 +29,7 @@ XMLNode::XMLNode(io::IXMLReader *xml)
 }   // XMLNode
 
 // ----------------------------------------------------------------------------
-/** Reads a XML file and convert it intoa XMLNode tree.
+/** Reads a XML file and convert it into a XMLNode tree.
  *  \param filename Name of the XML file to read.
  */
 XMLNode::XMLNode(const std::string &filename)

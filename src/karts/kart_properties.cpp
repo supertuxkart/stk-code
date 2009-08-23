@@ -21,14 +21,16 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/lisp.hpp"
+//#include "lisp/parser.hpp"
+//#include "lisp/lisp.hpp"
+#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 
 float KartProperties::UNDEFINED = -99.9f;
@@ -98,6 +100,24 @@ void KartProperties::load(const std::string &filename, const std::string &node,
    // Get the default values from STKConfig:
    *this = stk_config->getDefaultKartProperties();
 
+#if 0
+    const XMLNode * root = 0;
+    m_ident = StringUtils::basename(StringUtils::without_extension(filename));
+
+    try
+    {
+        root = new XMLNode(filename);
+        if(!root || root->getName()!="kart")
+        {
+            if(root) delete root;
+            std::ostringstream msg;
+            msg << "Couldn't load kart properties '" << filename <<
+                "': no kart node.";
+            throw std::runtime_error(msg.str());
+        }
+        getAllData(root);
+    }
+#else
     const lisp::Lisp* root = 0;
     m_ident = StringUtils::basename(StringUtils::without_extension(filename));
 
@@ -115,6 +135,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
         }
         getAllData(LISP);
     }
+#endif
     catch(std::exception& err)
     {
         fprintf(stderr, "Error while parsing KartProperties '%s':\n",
@@ -183,6 +204,132 @@ void KartProperties::load(const std::string &filename, const std::string &node,
 }   // load
 
 //-----------------------------------------------------------------------------
+void KartProperties::getAllData(const XMLNode * root)
+{
+    root->get("version", &m_version);
+    root->get("name", &m_name);
+    root->get("icon-file", &m_icon_file);
+    root->get("shadow-file", &m_shadow_file);
+
+    Vec3 c;
+    root->get("rgb", &c);
+
+    std::string sfx_type_string;
+    root->get("engine-sound", &sfx_type_string);
+
+    if(sfx_type_string == "large")
+    {
+        m_engine_sfx_type = SFXManager::SOUND_ENGINE_LARGE;
+    }
+    else if(sfx_type_string == "small")
+    {
+        m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
+    }
+
+    root->get("has-skidmarks", &m_has_skidmarks);
+    root->get("groups", &m_groups);
+    root->get("time-full-steer", &m_time_full_steer);
+    root->get("time-full-steer-ai", &m_time_full_steer_ai);
+    root->get("gravity-center-shift", &m_gravity_center_shift);
+    root->get("nitro-power-boost", &m_nitro_power_boost);
+    root->get("skid-increase", &m_skid_increase);
+    root->get("skid-decrease", &m_skid_decrease);
+    root->get("skid-max", &m_skid_max);
+    root->get("time-till-max-skid", &m_time_till_max_skid);
+    root->get("skid-visual", &m_skid_visual);
+    root->get("slipstream-length", &m_slipstream_length);
+    root->get("slipstream-time", &m_slipstream_time);
+    root->get("slipstream-add-power", &m_slipstream_add_power);
+    root->get("brake-factor", &m_brake_factor);
+
+    std::vector<float> v;
+    if(root->get("min-speed-radius", &v))
+    {
+        if(v.size()!=2)
+            printf("Incorrect min-speed-radius specifications for kart '%s'\n",
+                   getIdent().c_str());
+        else
+        {
+            m_min_speed_turn = v[0];
+            m_min_radius     = v[1];
+        }
+    }
+
+    v.clear();
+    if(root->get("max-speed-radius", &v))
+    {
+        if(v.size()!=2)
+            printf("Incorrect max-speed-radius specifications for kart '%s'\n",
+                   getIdent().c_str());
+        else
+        {
+            m_max_speed_turn = v[0];
+            m_max_radius     = v[1];
+        }
+    }
+
+    v.clear();
+    if( root->get("engine-power", &v))
+    {
+        if(v.size()!=3)
+            printf("Incorrect engine-power specifications for kart '%s'\n",
+                   getIdent().c_str());
+        else
+        {
+            m_engine_power[0] = v[0];
+            m_engine_power[1] = v[1];
+            m_engine_power[2] = v[2];
+        }
+    }
+
+    v.clear();
+    if( root->get("max-speed", &v))
+    {
+        if(v.size()!=3)
+            printf("Incorrect max-speed specifications for kart '%s'\n",
+                   getIdent().c_str());
+        else
+        {
+            m_max_speed[0] = v[0];
+            m_max_speed[1] = v[1];
+            m_max_speed[2] = v[2];
+        }
+    }
+
+    root->get("mass", &m_mass);
+    root->get("suspension-stiffness", &m_suspension_stiffness);
+    root->get("wheel-damping-relaxation", &m_wheel_damping_relaxation);
+    root->get("wheel-damping-compression", &m_wheel_damping_compression);
+    root->get("friction-slip", &m_friction_slip);
+    root->get("roll-influence", &m_roll_influence);
+    root->get("wheel-radius", &m_wheel_radius);
+
+    //TODO: wheel width is not loaded, yet is listed as an attribute in the xml file after wheel-radius?
+
+    root->get("chassis-linear-damping", &m_chassis_linear_damping);
+    root->get("chassis-angular-damping", &m_chassis_angular_damping);
+    root->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
+    root->get("suspension-rest", &m_suspension_rest);
+    root->get("suspension-travel-cm", &m_suspension_travel_cm);
+    root->get("jump-velocity", &m_jump_velocity);
+    root->get("z-rescue-offset", &m_z_rescue_offset);
+
+    //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
+    //TODO: same goes for their rear equivalents
+
+    root->get("gear-switch-ratio", &m_gear_switch_ratio);
+    root->get("gear-power-increase", &m_gear_power_increase);
+    root->get("upright-tolerance", &m_upright_tolerance);
+    root->get("upright-max-force", &m_upright_max_force);
+    root->get("track-connection-accel", &m_track_connection_accel);
+    root->get("rubber-band-max-length", &m_rubber_band_max_length);
+    root->get("rubber-band-force", &m_rubber_band_force);
+    root->get("rubber-band-duration", &m_rubber_band_duration);
+    root->get("camera-max-accel", &m_camera_max_accel);
+    root->get("camera-max-brake", &m_camera_max_brake);
+    root->get("camera-distance", &m_camera_distance);
+}
+
 void KartProperties::getAllData(const lisp::Lisp* lisp)
 {
     lisp->get("version",                    m_version);

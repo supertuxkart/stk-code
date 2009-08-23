@@ -1,174 +1,252 @@
-;; -*- mode: lisp -*-
 
-(config
+<?xml version="1.0"?>
 
- ;; STK parameters
- ;; --------------
- (min-kart-version           1   )  ;; Minimum and maximum .kart files supported
- (max-kart-version           1   )  ;; by this binary. Older/newer files are ignored.
- (min-track-version          1   )  ;; Minimum and maximum .track files supported
- (max-track-version          1   )  ;; by this binary, older/newer files are ignored.
- (max-karts                  8   )  ;; maximum number of karts
- (scores            10 8 6 5 4 3 2 1 ) ;; 10 8 6 5 4 3 2 1 0 0 
- (grid-order	   	     1   )  ;; order for grand prix, 1 is most 
-				    ;; points 1st, 0 is least points
-				    ;; 1st
- (title-music              "main_theme.music")
- ;; Two lists which must have the same length, containing the list of all
- ;; possible main menu and background images.
- (mainmenu-background      "st_title_screen.rgb" "st_title_screen2.rgb")
- (menu-background          "menu_background.rgb" "menu_background2.rgb")
+<config>
 
- (max-history              10000)   ;; maximum number of history frames.
- (max-skidmarks              100)   ;; max. number of skidmarks per kart.
- (skid-fadeout-time           60)   ;; Time till skidm marks fade out
- (slowdown-factor             10)   ;; Engine reduction depending on terrain,
-                                    ;; see kart for details.
- (near-ground                  2)   ;; Distance above ground when the upright
-                                    ;; constraint will be disabled to allow 
-                                    ;; more violent explosions.
- (delay-finish-time           10)   ;; delay till race results are displayed.
- (music-credit-time           10)   ;; time for which the music credits 
-                                    ;; are displayed.
- (final-camera-time          1.5)   ;; time for the final camera to reach 
-                                    ;; its destination
+<!-- STK PARAMETERS
 
- ;; Attachment related parameters
- ;; -----------------------------
- (anvil-weight             150.0 )  ;; additional weight an anvil adds to a kart
- (anvil-speed-factor         0.2 )  ;; additional slowdown caused by anvil
- (parachute-friction         2.0 )  ;; friction increase when a parachute is sttached
- (parachute-time             4.0 )  ;; time an attached parachute is active
- (parachute-time-other       8.0 )  ;; time a parachute attached from other kart is active
- (parachute-done-fraction    0.7 )  ;; fraction of speed when lost will detach parachute
- (bomb-time                 30.0 )  ;; time till a bomb explodes
- (bomb-time-increase        -5.0 )  ;; time added to timer when bomb is passed on
- (leader-intervals          30 20 10)  ;; Time till a kart is removed in follow leader mode
- (anvil-time                 2.0 )  ;; time an anvil is active
- (zipper-time                3.5 )  ;; time a zipper is active
- (zipper-force             250.0 )  ;; additional zipper force
- (zipper-speed-gain          4.5 )  ;; one time additional speed  
- (zipper-max-speed-fraction  0.2 )  ;; fraction of max speed allowed past regular max speed
+min-kart-version and max-kart-version are the the minimum and maximum .kart
+files supported. Older/newer files are ignored.
 
- (shortcut-length            90  )  ;; leaving the road and coming back on it more than
-                                    ;; x 'meters" later is considered to be a shortcut
- (offroad-tolerance          0.15)  ;; Widen the road 15% for shortcut detection.
- (enable_networking          #f  )  ;; For now disable networking
- (explosion-impulse     10000.0  )  ;; explosion impulse on not directly hit karts
- (explosion-impulse-objects 500.0)  ;; explosion impulse for physics objects (smaller
-                                    ;; else a cone e.g. will be pushed way too far)
+min-track-version and max-track-version are the minimum and maximum .track
+files supported, older/newer files are ignored.
 
- ;; The following files are the defaults for karts
- ;; ----------------------------------------------
- (kart-defaults
-   (wheel-base               1.2 )
-   (heightCOG                0.2 )
-   (time-full-steer          0.25 )
-   ;; Time for the AI to go from neutral steering to extreme
-   ;; left (or right). This can be used to reduce 'shaking' of
-   ;; AI karts caused by changing steering direction too often.
-   ;; It also helps with making it easier to push the AI karts
-   ;; (otherwise micro-corrections make this nearly impossible).
-   ;; A value of 1/maxFPS / 2 will guarantee that the wheel can
-   ;; go from -1 to +1 steering in one frame, basically 
-   ;; disabling this mechanism.
-   (time-full-steer-ai       0.1 ) 
-   (corn-f                   4   )
-   (corn-r                   4   )
+max-karts is maximum number of karts.
+scores are the number of points given when the race ends.
+grid-order is the grand prix order, 1 = most points 1st, 0 = least points 1st.
+title-music is umm... the title music.
 
-   ;; Shift of the chassis with regards to the center of mass. E.g. with the
-   ;; the value commented out below the chassis will be 30 cm higher than the
-   ;; center of mass - or the center of mass will be 30 cm lower than the
-   ;; middle of the chassis. So this effectively lowers the center of mass,
-   ;; making the kart more stable and less likely to topple over.
-   ;; Default (if nothing is defined here) is that the center of the mass is
-   ;; at the very bottom of the chassis!
-   ;;(gravity-center-shift  0 0 0.3)
+mainmenu-background and menu-background must have the same length, containing
+all the possible main menu and background images.
 
-   (nitro-power-boost      3 )   ;; increase in engine power, i.e. 1=plus 100%
+max-history is the maximum number of history frames.
 
-   ;; Skidding related parameters:
-   (skid-increase        1.05)   ;; Multiplicative increase of skidding factor
-                                 ;; in each frame.
-   (skid-decrease        0.95)   ;; Multiplicative decrease of skidding factor
-                                 ;; in each frame.
-   (skid-max             2.5 )   ;; Maximum skidding factor = maximum increase
-                                 ;; of steering angle.
-   (time-till-max-skid   0.4 )   ;; Time till maximum skidding is reached.
-   (skid-visual          0.16)   ;; Additional graphical rotation of kart.
+max-skidmarks is the max. number o skidmarks per kart.
+skid-fadeout-time is the time till the skid marks fade out
 
-   (slipstream-length    5   )   ;; How far behind a kart slipstream works
-   (slipstream-time      5   )   ;; How many seconds of sstream give 
-                                 ;; maximum benefit
-   (slipstream-add-power 3   )   ;; Additional power due to sstreaming.
-                                 ;; 1 = +100%
+slowdown-factor is the engine reduction depending on terrain; see kart for
+details
 
-   ;; Bullet physics attributes
-   (brake-factor             11.0 )
-   ;; Defines the smallest turn radius at lowest speed (4.64 m at
-   ;; speed 0) and at high speed (13.5 m at speed 12 m/s). Maximum
-   ;; steering angles for speeds in between will be interpolated. This 
-   ;; allows for tighter turns at lower speeds. The actual steering
-   ;; angle is dependent on the wheel base of the kart:
-   ;; radius = wheel_base/sin(steering_angle)
-   ;; By specifying the radius the steering behaviour can be defined
-   ;; independent of the kart size.
-   (min-speed-radius          0   6.64)
-   (max-speed-radius         15  21.5)
-   ;; Different engine powers for different difficulties:
-   ;; hard, medium, low level order!
-   (engine-power        400 400  300    )
-   ;; Different maximum speed for different difficulties:
-   ;; hard, medium, low level order!
-   (max-speed           32.22 28 25 ) ;; = 116 101 90 km/h
-   (mass                    225    )
-   (suspension-stiffness     48.0  )
-   (wheel-damping-relaxation 20    )
-   (wheel-damping-compression 4.4  )
-   (friction-slip      10000000    )
-   (roll-influence            0.03 )
-   (wheel-radius              0.25 )
-   (wheel-width               0.3  )
-   (chassis-linear-damping    0.2  )
-   (chassis-angular-damping  30.2  )
-   (max-speed-reverse-ratio   0.3  ) ;; percentage of max speed for reverse gear
-   (suspension-rest           0.2  )
-   (suspension-travel-cm     19    )
+near-ground is the distance above ground when the upright constraint will be
+disabled to allow more violent explosions.
 
-   ;; The z-axis velocity set when a jump is initiated. This will cause the
-   ;; kart to start rising, till it is pulled back by gravity. A higher value
-   ;; means higher Z velocity, meaning the kart will rise faster and higher,
-   ;; and will be in the air longer
-   (jump-velocity             3.0  )
+delay-finish-time is the delay till the race results are displayed
+music-credit-time is the time for which the music credits are displayed
+final-camera-time is the time for the final camera to reach it's destination
 
-   ;; z-axis offset when kart is being put back on track after being rescued
-   (z-rescue-offset           0.0  ) ;; fraction of kart height
+-->
 
-   ;; The following two vectors define at what ratio of the maximum speed what
-   ;; gear is selected, e.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
-   ;;                        0.5  means: if speed <=0.5 *maxSpeed --> gear 2
-   ;; The next vector contains the increase in max power (to simulate different
-   ;; gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
-   ;;                     | first  | second |  third |
-   ;; The position of the physics raycast wheels relative to the center of 
-   ;; gravity. Default is to use the corners of the chassis to attach the
-   ;; wheels to.
-   ;;(wheel-front-right (physics-position  0.38  0.6 0))
-   ;;(wheel-front-left  (physics-position -0.38  0.6 0))
-   ;;(wheel-rear-right  (physics-position  0.38 -0.6 0))
-   ;;(wheel-rear-left   (physics-position -0.38 -0.6 0))
+<stk-parameters
+    min-kart-version="1"
+    max-kart-version="1"
+    min-track-version="1"
+    max-track-version="1"
+    max-karts="8"
+    scores="10 8 6 5 4 3 2 1"
+    grid-order="1"
+    title-music="main_theme.music"
+    mainmenu-background="st_title_screen.rgb st_title_screen2.rgb"
+    menu-background="menu_background.rgb menu_background2.rgb"
+    max-history="10000"
+    max-skidmarks="100"
+    skid-fadeout-time="60"
+    slowdown-factor="10"
+    near-ground="2"
+    delay-finish-time="10"
+    music-credit-time="10"
+    final-camera-time="1.5"
+/>
 
-   (gear-switch-ratio          0.25      0.7      1.0)
-   (gear-power-increase    2.2      1.7      1.3)
-   (upright-tolerance         0.2)
-   (upright-max-force         30)
-   (track-connection-accel     2)
-   (rubber-band-max-length    50)  ;; Maximum length of rubber band
-   (rubber-band-force       1500)  ;; Force a plunger/rubber band applies to the kart(s).
-   (rubber-band-duration       1)  ;; Duration a rubber band acts.
-   (camera-max-accel          10)
-   (camera-max-brake          10)
-   (camera-distance           3.0) 
-  )   ;; end kart-defaults
-)
-;; EOF ;;
+<!-- ATTACHMENT PARAMETERS
+
+anvil-weight is the additional weight an anvil adds to a kart
+anvil-speed-factor is the additional slowdown caused by the anvil
+parachute-friction is the friction increase when a parachute is attached
+parachute-time is the time an attached parachute is active
+parachute-time-other is the time a parachute attached from other kart works
+parachute-done-fraction is the fraction of speed when lost will detach
+parachute
+
+bomb-time is the time till a bomb explodes
+bomb-time-increase is the time added to timer when bomb is passed on
+leader-intervals is the time till a kart is removed in follow leader mode
+anvil-time is the time an anvil is active
+zipper-time is the time a zipper is active
+zipper-force is the additional zipper force
+zipper-speed-gain is the one time additional speed  
+-->
+
+<attachment-parameters
+    anvil-weight="150.0"
+    anvil-speed-factor="0.2"
+    parachute-friction="2.0"
+    parachute-time="4.0"
+    parachute-time-other="8.0"
+    parachute-done-fraction="0.7"
+    bomb-time="30.0"
+    bomb-time-increase="-5.0"
+    leader-intervals="30 20 10"
+    anvil-time="2.0"
+    zipper-time="3.5"
+    zipper-force="250.0"
+    zipper-speed-gain="4.5"
+/>
+
+<!-- GENERAL KART DEFAULTS
+
+time-full-steer = is the time when a player's input goes from neutral
+steering to extreme left or right.
+
+time-full-steer-ai is the time for the AI to go from neutral steering to
+extreme left (or right). This can be used to reduce 'shaking' of AI karts
+caused by changing steering direction too often. It also helps with making it
+easier to push the AI karts (otherwise micro-corrections make this nearly
+impossible). A value of 1/maxFPS / 2 will guarantee that the wheel can go from
+-1 to +1 steering in one frame, basically  disabling this mechanism.
+
+gravity-center-shift is the shift of the chassis with regards to the center of
+mass. E.g. with the the value commented out below the chassis will be 30 cm
+higher than the  center of mass - or the center of mass will be 30 cm lower
+than the  middle of the chassis. So this effectively lowers the center of
+mass, making the kart more stable and less likely to topple over. Default (if
+nothing is defined here) is that the center of the mass is at the very bottom
+of the chassis!
+
+nitro-power-boost is the increase in engine power, i.e. 1=plus 100%
+
+skid-increase: multiplicative increase of skidding factor in each frame.
+skid-decrease: multiplicative decrease of skidding factor in each frame.
+skid-max: maximum skidding factor = maximum increase of steering angle.
+time-till-max-skid: Time till maximum skidding is reached.
+skid-visual: Additional graphical rotation of kart.
+slipstrea slipstream-length: How far behind a kart slipstream works
+slipstream-time: How many seconds of sstream give  maximum benefit
+slipstream-add-power: Additional power due to sstreaming. 1 = +100%
+
+min-speed-radius and max-speed-radius define the smallest turn radius at
+lowest speed (4.64 m at speed 0) and at high speed (13.5 m at speed 12 m/s).
+Maximum steering angles for speeds in between will be interpolated. This
+allows for tighter turns at lower speeds. The actual steering  angle is
+dependent on the wheel base of the kart:
+radius = wheel_base/sin(steering_angle)
+By specifying the radius the steering behaviour can be defined independent
+of the kart size.
+
+
+engine-power and max-speed have 3 values, one for hard, medium and low
+difficulties; Max speed right now would be 116 101 90 km/h.
+
+mass: kart's mass
+suspension-stiffness: kart's suspension stiffness
+
+max-speed-reverse-ratio is the percentage of max speed for reverse gear
+
+jump-velocity is the z-axis velocity set when a jump is initiated. This
+will cause the kart to start rising, till it is pulled back by gravity.
+A higher value means higher Z velocity, meaning the kart will rise faster
+and higher, and will be in the air longer
+   
+z-rescue-offset is the z-axis offset when kart is being put back on track
+after being rescued, it's a fraction of kart height
+
+gear-switch-ratio defines at what ratio of the maximum speed what gear is
+selected, e.g. 0.25 means that if the speed is bigger or equal to 0.25 x
+maxSpeed then use gear 1, 0.5 means if the speed is bigger or equal to 0.5 x
+maxSpeed then gear 2.
+
+gear-power-increase contains the increase in max power (to simulate
+different gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
+| first  | second |  third | .
+
+wheel-front-right, wheel-front-left, wheel-rear-right and wheel-rear-left
+give the position of the physics raycast wheels relative to the center of
+gravity. Default is to use the corners of the chassis to attach the wheels
+to.
+
+rubber-band-max-length is the maximum length of rubber band
+
+rubber-band-force is the force a plunger/rubber band applies to the kart(s).
+
+rubber-band-duration is the duration a rubber band acts.
+-->
+
+<general-kart-defaults 
+    wheel-base="1.2"
+    heightCOG="0.2"
+    time-full-steer="0.25"
+    time-full-steer-ai="0.1"
+    corn-f ="4"
+    corn-r="4"
+    gravity-center-shift="0 0 0.3"
+    nitro-power-boost="3"
+
+    skid-increase="1.05"
+    skid-decrease="0.95"
+    skid-max="2.5"
+    time-till-max-skid="0.4"
+    skid-visual="0.16"
+    slipstream-length="5"
+    slipstream-time="5"
+    slipstream-add-power="3"
+
+    brake-factor="11.0"
+    min-speed-radius="0 6.64"
+    max-speed-radius="15 21.5"
+    engine-power="400 400 300"
+    max-speed="32.22 28 25"
+    mass="225"
+    suspension-stiffness="48.0"
+    wheel-damping-relaxation="20"
+    wheel-damping-compression="4.4"
+    friction-slip="10000000"
+    roll-influence="0.03"
+    wheel-radius="0.25"
+    wheel-width="0.3"
+    chassis-linear-damping="0.2"
+    chassis-angular-damping="30.2"
+    max-speed-reverse-ratio="0.3"
+    suspension-rest="0.2"
+    suspension-travel-cm="19"
+    jump-velocity="3.0"
+    z-rescue-offset="0.0"
+    wheel-front-right="0.38  0.6 0"
+    wheel-front-left="-0.38  0.6 0"
+    wheel-rear-right="0.38 -0.6 0"
+    wheel-rear-left="-0.38 -0.6 0"
+    gear-switch-ratio="0.25 0.7 1.0"
+    gear-power-increase="2.2 1.7 1.3"
+    upright-tolerance="0.2"
+    upright-max-force="30"
+    track-connection-accel="2"
+    rubber-band-max-length="50"
+    rubber-band-force="1500"
+    rubber-band-duration="1"
+    camera-max-accel="10"
+    camera-max-brake="10"
+    camera-distance="3.0"
+/>
+
+<!-- MISC DEFAULTS
+
+shortcut-length is the length that when leaving the road and coming back on
+it more than X 'meters"
+    later is considered to be a shortcut
+
+offroad-tolerance widens the road % for shortcut detection.
+
+enable-networking is a boolean value that enables / disables networking
+explosion-impulse is the push from explosions when karts aren't hit directly
+explosion-impulse-objects 500.0 is the impulse for  physics objects (smaller
+ones like the cone, will be pushed way too far
+-->
+
+<misc-defaults
+    shortcut-length="90"
+    offroad-tolerance="0.15"
+    enable-networking="f"
+    explosion-impulse="10000.0"
+    explosion-impulse-objects="500.0"
+/>
+
+</config>
+

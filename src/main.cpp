@@ -86,7 +86,7 @@ void cmdLineHelp (char* invocation)
     "Options:\n"
     "  -N,  --no-start-screen  Quick race\n"
     "  -t,  --track NAME       Start at track NAME (see --list-tracks)\n"
-    "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.data\n"
+    "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
     "  -l,  --list-tracks      Show available tracks\n"
     "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
     "       --kart NAME        Use kart number NAME (see --list-karts)\n"
@@ -493,7 +493,7 @@ void initRest()
     grand_prix_manager      = new GrandPrixManager     ();
     network_manager         = new NetworkManager       ();
 
-    stk_config->load(file_manager->getConfigFile("stk_config.data"));
+    stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();
     // unlock_manager->check needs GP and track manager.
     unlock_manager->check();

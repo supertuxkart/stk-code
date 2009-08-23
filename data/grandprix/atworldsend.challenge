@@ -1,19 +1,18 @@
-;; -*- mode: lisp -*-
+<?xml version="1.0"?>
 
-(challenge
- (id            "islandfollow")
- (name          _("Follow the Leader on a\nDesert Island"))
- (description   _("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island."))
- (unlock-gp    "atworldsend")
- (depend-on    "tothemoonandbackgp" "tollwayhead2head" "tollwaytime" "citytime")
- (major        "single")
- (minor        "followtheleader")
- (track        "islandtrack")
- (difficulty   "easy")
- (laps         3)
- (karts        4)
- (position     2)
-)
+<challenge
+    id="islandfollow"
+    name=_("Follow the Leader on a\nDesert Island")
+    description=_("Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island.")
+    unlock-gp="atworldsend"
+    depend-on="tothemoonandbackgp tollwayhead2head tollwaytime citytime"
+    major="single"
+    minor="followtheleader"
+    track="islandtrack"
+    difficulty="easy"
+    laps="3"
+    karts="4"
+    position="2"
+/>
 
-;; EOF ;;
 

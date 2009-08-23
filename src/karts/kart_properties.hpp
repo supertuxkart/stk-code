@@ -29,10 +29,12 @@ using namespace irr;
 #include "audio/sfx_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "lisp/lisp.hpp"
+#include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
 
 class Material;
+class XMLNode;
 
 /** This class stores the properties of a kart. This includes size, name,
  *  identifier, physical properties etc. It is atm also the base class for
@@ -166,6 +168,7 @@ public:
           KartProperties    ();
          ~KartProperties    ();
     void  getAllData        (const lisp::Lisp* lisp);
+    void  getAllData        (const XMLNode * root);
     void  load              (const std::string &filename,
                              const std::string &node="tuxkart-kart",
                              bool dont_load_models=false);
