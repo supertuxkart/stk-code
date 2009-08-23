@@ -58,6 +58,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
@@ -402,21 +403,24 @@ int handleCmdLine(int argc, char **argv)
             UserConfigParams::m_log_errors=true;
         } else if( sscanf(argv[i], "--profile=%d",  &n)==1)
         {
-            UserConfigParams::m_profile=n;
-	    if(n<0) 
-	    {
-                fprintf(stdout,"Profiling %d laps\n",-n);
-                race_manager->setNumLaps(-n);
-	    }
-	    else
+            if(n<0) 
             {
-	        printf("Profiling: %d seconds.\n", (int)UserConfigParams::m_profile);
+                printf("Profiling %d laps\n",-n);
+                ProfileWorld::setProfileModeLaps(-n);
+                race_manager->setNumLaps(-n);
+            }
+            else
+            {
+                printf("Profiling: %d seconds.\n", n);
+                ProfileWorld::setProfileModeTime(n);
                 race_manager->setNumLaps(999999); // profile end depends on time
             }
         }
         else if( !strcmp(argv[i], "--profile") )
         {
-            UserConfigParams::m_profile=20;
+                printf("Profiling: %d seconds.\n", n);
+                ProfileWorld::setProfileModeTime(20);
+                race_manager->setNumLaps(999999); // profile end depends on time
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
@@ -451,7 +455,7 @@ int handleCmdLine(int argc, char **argv)
             return 0;
         }
     }   // for i <argc
-    if(UserConfigParams::m_profile)
+    if(ProfileWorld::isProfileMode())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects 
         UserConfigParams::m_music = false;// and music when profiling
@@ -655,7 +659,7 @@ int main(int argc, char *argv[] )
         }
         // Not replaying
         // =============
-        if(!UserConfigParams::m_profile)
+        if(!ProfileWorld::isProfileMode())
         {
             if(UserConfigParams::m_no_start_screen)
             {

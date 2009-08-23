@@ -110,6 +110,10 @@ public:
     void                  changeResolution();
     void showPointer();
     void hidePointer();
+    /** Returns the current real time, which might not be 0 at start of the
+     *  application. Value in msec.
+     */
+    unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
     
     void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
                          std::vector<Vec3>& mesh_location, 

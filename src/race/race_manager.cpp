@@ -253,7 +253,7 @@ void RaceManager::startNextRace()
     // variable world. Admittedly a bit ugly, but simplifies
     // handling of objects which get created in the constructor
     // and need world to be defined.
-    if     (UserConfigParams::m_profile)            
+    if     (ProfileWorld::isProfileMode())            
         m_world = new ProfileWorld();
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
         m_world = new FollowTheLeaderRace();

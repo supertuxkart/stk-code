@@ -74,13 +74,13 @@ void StandardRace::update(float delta)
     // All karts are finished
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
-        TimedRace::enterRaceOverState();
+        enterRaceOverState();
         unlock_manager->raceFinished();
     }   // if all karts are finished
     
     // All player karts are finished, but computer still racing
     // ===========================================================
-    else if(race_manager->allPlayerFinished())
+    else if(isRaceOver())
     {
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings

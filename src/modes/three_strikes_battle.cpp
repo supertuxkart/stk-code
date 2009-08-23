@@ -171,23 +171,14 @@ void ThreeStrikesBattle::updateKartRanks()
 }   // updateKartRank
 
 //-----------------------------------------------------------------------------
-void ThreeStrikesBattle::update(float delta)
+void ThreeStrikesBattle::enterRaceOverState(const bool delay)
 {
-    World::update(delta);
-
-    // check if over
-    if(isRaceOver())
-    {
-        // Add the results for the remaining kart
-        for(int i=0; i<(int)race_manager->getNumKarts(); i++)
-            if(!m_kart[i]->isEliminated()) 
-                race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
-    
-        if(!RaceManager::getWorld()->isFinishPhase())
-            TimedRace::enterRaceOverState();
-        return;
-    }
-}   // update
+    World::enterRaceOverState(delay);
+    // Add the results for the remaining kart
+    for(int i=0; i<(int)race_manager->getNumKarts(); i++)
+        if(!m_kart[i]->isEliminated()) 
+            race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
+}   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.

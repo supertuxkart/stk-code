@@ -17,8 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/irr_driver.hpp"
 #include "modes/profile_world.hpp"
 #include "robots/default_robot.hpp"
+
+
+ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
+int   ProfileWorld::m_num_laps = 0;
+float ProfileWorld::m_time   = 0.0f;
 
 //-----------------------------------------------------------------------------
 /** The constructor sets the number of (local) players to 0, since only AI
@@ -28,27 +34,35 @@ ProfileWorld::ProfileWorld()
 {
     race_manager->setNumPlayers(0);
     race_manager->setNumLocalPlayers(0);
+    // Set number of laps so that the end of the race can be detected by 
+    // quering the number of finished karts from the race manager (in laps
+    // based profiling) - otherwise just a high number.
+    race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps : 99999);
+    m_phase       = RACE_PHASE;
+    m_frame_count = 0;
+    m_start_time  = irr_driver->getRealTime();
 }   // ProfileWorld
 
 //-----------------------------------------------------------------------------
-/** Prints the profile statistic and exits!!
+/** Enables profiling for a certain amount of time.
+ *  \param time Time to profile a race for.
  */
-ProfileWorld::~ProfileWorld()
+void ProfileWorld::setProfileModeTime(float time)
 {
-    float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
-    {
-        max_t = std::max(max_t, m_kart[i]->getFinishTime());
-        min_t = std::min(min_t, m_kart[i]->getFinishTime());
-        av_t += m_kart[i]->getFinishTime();
-        printf("%s  start %d  end %d time %f\n",
-            m_kart[i]->getName().c_str(),(int)i,
-            m_kart[i]->getPosition(),
-            m_kart[i]->getFinishTime());
-    }
-    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
-    std::exit(-2);
-}   // ~ProfileWorld
+    m_profile_mode = PROFILE_TIME;
+    m_time         = time;
+}   // setProfileModeTime
+
+//-----------------------------------------------------------------------------
+/** Enables profiling for a certain number of laps. The race will end when all
+ *  karts have done (at least) this number of laps.
+ *  \param laps The number of laps.
+ */
+void ProfileWorld::setProfileModeLaps(int laps)
+{
+    m_profile_mode = PROFILE_LAPS;
+    m_num_laps     = laps;
+}   // setProfileModeLaps
 
 //-----------------------------------------------------------------------------
 /** Creates a kart, having a certain position, starting location, and local
@@ -81,3 +95,47 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     return newkart;
 }   // createKart
 
+//-----------------------------------------------------------------------------
+/** The race is over if either the requested number of laps have been done
+ *  or the requested time is over.
+ */
+bool ProfileWorld::isRaceOver()
+{
+    if(m_profile_mode==PROFILE_TIME)
+        return getTime()>m_time;
+
+    // Now it must be laps based profiling:
+    return race_manager->getFinishedKarts()==race_manager->getNumKarts();
+}   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Counts the number of framces and aborts if the end condition is fulfilled.
+ */
+void ProfileWorld::update(float dt)
+{
+    StandardRace::update(dt);
+    m_frame_count++;
+}   // update
+
+//-----------------------------------------------------------------------------
+void ProfileWorld::enterRaceOverState(const bool delay)
+{
+    float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
+    printf("Number of frames: %d time %f, Average FPS: %f\n",
+           m_frame_count, runtime, (float)m_frame_count/runtime);
+
+    float min_t=999999.9f, max_t=0.0, av_t=0.0;
+    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+    {
+        max_t = std::max(max_t, m_kart[i]->getFinishTime());
+        min_t = std::min(min_t, m_kart[i]->getFinishTime());
+        av_t += m_kart[i]->getFinishTime();
+        printf("%s  start %d  end %d time %f\n",
+            m_kart[i]->getName().c_str(),(int)i,
+            m_kart[i]->getPosition(),
+            m_kart[i]->getFinishTime());
+    }
+    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
+
+    std::exit(-2);
+}   // enterRaceOverState

@@ -26,12 +26,13 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "states_screens/state_manager.hpp"
 #include "input/input_manager.hpp"
+#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/state_manager.hpp"
 
 MainLoop* main_loop = 0;
 
@@ -91,23 +92,6 @@ float MainLoop::getLimitedDt()
     dt *= 0.001f;
     return dt;
 }
-//-----------------------------------------------------------------------------
-/** Updates the profiling frame counter, and if the end of the profiling
- *  period is reached prints the results and aborts STK.
- */
-void MainLoop::updateProfiling()
-{
-    m_frame_count++;
-    if (RaceManager::getWorld()->getTime()>UserConfigParams::m_profile)
-    {
-        IrrlichtDevice* device = irr_driver->getDevice();
-        printf("Number of frames: %d time %f, Average FPS: %f\n",
-               m_frame_count, device->getTimer()->getRealTime()*0.001,
-               (float)m_frame_count/(device->getTimer()->getRealTime()));
-        if(!history->replayHistory()) history->Save();
-        std::exit(-2);
-    }   // if profile finished
-}   // updateProfiling
 
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
@@ -121,7 +105,7 @@ void MainLoop::updateRace(float dt)
     // messages can be mixed up in the race manager)
     if(!race_manager->getWorld()->isFinishPhase())
         network_manager->sendUpdates();
-    if(UserConfigParams::m_profile) dt=1.0f/60.0f;
+    if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
     // Again, only receive updates if the race isn't over - once the
     // race results are displayed (i.e. game is in finish phase) 
@@ -134,8 +118,6 @@ void MainLoop::updateRace(float dt)
     {
         history->update(dt);
         RaceManager::getWorld()->update(dt);
-
-        if(UserConfigParams::m_profile>0)  updateProfiling();
     }   // phase != limbo phase
 }   // updateRace
 

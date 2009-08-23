@@ -27,7 +27,19 @@ class Kart;
 class ProfileWorld : public StandardRace
 {
 private:
-    int m_frame_count;
+    /** Profiling modes. */
+    enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS};
+    /** If profiling is done, and if so, which mode. */
+    static ProfileType m_profile_mode;
+    /** In laps based profiling: number of laps to run. */
+    static int   m_num_laps;
+    /** In time based profiling only: time to run. */
+    static float m_time;
+    /** Return value of real time at start of race. */
+    unsigned int m_start_time;
+    /** Number of frames. For statistics only. */
+    int          m_frame_count;
+
 protected:
 
     virtual Kart *createKart(const std::string &kart_ident, int index, 
@@ -35,10 +47,18 @@ protected:
                              const btTransform &init_pos);
 
 public:
-             ProfileWorld();
-    virtual ~ProfileWorld();
+                          ProfileWorld();
+    virtual              ~ProfileWorld() {};
     /** Returns identifier for this world. */
     virtual  std::string getInternalCode() const {return "PROFILE"; }
+    virtual  void        update(float dt);
+    virtual  bool        isRaceOver();
+    virtual  void        enterRaceOverState(const bool delay=false);
+
+    static   void setProfileModeTime(float time);
+    static   void setProfileModeLaps(int laps);
+    /** Returns true if profile mode was selected. */
+    static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
 };
 
 #endif

@@ -232,11 +232,6 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_track_debug       PARAM_DEFAULT( IntUserConfigParam(false, "track_debug") );
     PARAM_PREFIX bool                       m_bullet_debug      PARAM_DEFAULT( false );
     PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
-
-    // Used to profile AI. Not saved to file.
-    // Positive: time in seconds; Negative: # laps; 0: no profiling.
-    PARAM_PREFIX int         m_profile                          PARAM_DEFAULT( 0 ); 
-
     
     // ---- Networking
     PARAM_PREFIX StringUserConfigParam      m_server_address
