@@ -424,19 +424,34 @@ void btKart::updateVehicle( btScalar step )
     // are on ground, or none of them. This avoids the problem of
     // the kart suddenly getting additional angular velocity because
     // e.g. only one rear wheel is on the ground.
-    for(i=0; i<4; i+=2)
+    for(i=0; i<m_wheelInfo.size(); i+=2)
     {
-        if(m_wheelInfo[i].m_raycastInfo.m_isInContact &&
-           !(m_wheelInfo[i+1].m_raycastInfo.m_isInContact))
+        if(m_wheelInfo[i].m_raycastInfo.m_isInContact != m_wheelInfo[i+1].m_raycastInfo.m_isInContact)
         {
-            m_wheelInfo[i+1].m_raycastInfo = m_wheelInfo[i].m_raycastInfo;
+            int wheel_air_index = i;
+            if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
+                wheel_air_index = i+1;
+
+            btWheelInfo& wheel_air = m_wheelInfo[wheel_air_index];
+
+            wheel_air.m_raycastInfo.m_isInContact = true;
+
+            wheel_air.m_raycastInfo.m_groundObject     = &s_fixedObject;//todo for driving on dynamic/movable objects!;
+
+            btScalar maxSuspensionLength =wheel_air.getSuspensionRestLength()+ wheel_air.m_maxSuspensionTravelCm*btScalar(0.01);
+            wheel_air.m_raycastInfo.m_suspensionLength = maxSuspensionLength;
+            
+            //extra fix to suspension
+            btVector3 chassis_velocity_at_contactPoint;
+            btVector3 relpos = wheel_air.m_raycastInfo.m_contactPointWS-getRigidBody()->getCenterOfMassPosition();
+
+            chassis_velocity_at_contactPoint = getRigidBody()->getVelocityInLocalPoint(relpos);
+
+            btScalar projVel = wheel_air.m_raycastInfo.m_contactNormalWS.dot( chassis_velocity_at_contactPoint );
+
+            wheel_air.m_suspensionRelativeVelocity = projVel;
         }
-        if(!(m_wheelInfo[i].m_raycastInfo.m_isInContact) &&
-           m_wheelInfo[i+1].m_raycastInfo.m_isInContact)
-        {
-           m_wheelInfo[i].m_raycastInfo = m_wheelInfo[i+1].m_raycastInfo;
-        }
-    }   // for i=0; i<4; i+=2
+    }   // for i=0; i<m_wheelInfo.size(); i+=2
 
 	updateSuspension(step);
 
