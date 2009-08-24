@@ -90,6 +90,7 @@ zipper-speed-gain is the one time additional speed
     zipper-time="3.5"
     zipper-force="250.0"
     zipper-speed-gain="4.5"
+    zipper-max-speed-fraction="2.0"
 />
 
 <!-- GENERAL KART DEFAULTS
