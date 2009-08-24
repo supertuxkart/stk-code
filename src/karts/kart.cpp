@@ -475,10 +475,7 @@ float Kart::getActualWheelForce()
 */
 bool Kart::isOnGround() const
 {
-    return m_vehicle->getWheelInfo(0).m_raycastInfo.m_isInContact &&
-           m_vehicle->getWheelInfo(1).m_raycastInfo.m_isInContact &&
-           m_vehicle->getWheelInfo(2).m_raycastInfo.m_isInContact &&
-           m_vehicle->getWheelInfo(3).m_raycastInfo.m_isInContact;
+    return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels());
 }   // isOnGround
 //-----------------------------------------------------------------------------
 /** The kart is near the ground, but not necesarily on it (small jumps). This

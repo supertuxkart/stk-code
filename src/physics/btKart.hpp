@@ -24,6 +24,7 @@ class btKart : public btRaycastVehicle
     void         defaultInit(const btVehicleTuning& tuning);
     btScalar     m_track_connect_accel;
     btScalar     m_skidding_factor;
+    int          m_num_wheels_on_ground;
     bool         m_zipper_active;
     btScalar     m_zipper_velocity;
 public:
@@ -36,6 +37,7 @@ public:
     void         setSkidding(btScalar sf) { m_skidding_factor = sf; }
     virtual void updateVehicle(btScalar step);
     void         resetSuspension();
+    int          getNumWheelsOnGround() const { return m_num_wheels_on_ground; }
     void         setRaycastWheelInfo(int wheelIndex , bool isInContact,
                                      const btVector3& hitPoint,
                                      const btVector3& hitNormal,btScalar depth);
