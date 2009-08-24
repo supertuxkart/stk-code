@@ -873,20 +873,58 @@ void Kart::beep()
 } // beep
 
 // -----------------------------------------------------------------------------
-// Plays custom SFX, returns whether or not the sound was played
+/*
+    playCustomSFX()
+
+    This function will play a particular character voice for this kart.  It
+    returns whether or not a character voice sample exists for the particular
+    event.  If there is no voice sample, a default can be played instead.
+
+    Use entries from the CustomSFX enumeration as a parameter (see
+    sfx_manager.hpp).  eg. playCustomSFX(SFXManager::CUSTOM_CRASH)
+
+    Obviously we don't want a certain character voicing multiple phrases
+    simultaneously.  It just sounds bad.  There are two ways of avoiding this:
+
+    1.  If there is already a voice sample playing for the character
+        don't play another until it is finished.
+
+    2.  If there is already a voice sample playing for the character
+        stop the sample, and play the new one.
+
+    Currently we're doing #2.
+
+    rforder
+
+*/
 
 bool Kart::playCustomSFX(unsigned int type)
 {
     bool ret = false;
+
+    // Stop all other character voices for this kart before playing a new one
+    // we don't want overlapping phrases coming from the same kart
+    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    {
+        if (m_custom_sounds[n] != NULL)
+        {
+            // If the sound we're trying to play is already playing
+            // don't stop it, we'll just let it finish.
+            if (type != n) m_custom_sounds[n]->stop();
+        }
+    }
+
     if (type < SFXManager::NUM_CUSTOMS) 
+    {
         if (m_custom_sounds[type] != NULL)
         {
             ret = true;
-            // Don't stutter
             printf("Kart SFX: playing %s for %s.\n", sfx_manager->getCustomTagName(type), m_kart_properties->getIdent().c_str());
+            // If it's already playing, let it finish
             if (m_custom_sounds[type]->getStatus() != SFXManager::SFX_PLAYING)
                 m_custom_sounds[type]->play();
         }
+    }
     return ret;
 }
 // -----------------------------------------------------------------------------
