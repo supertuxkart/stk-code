@@ -50,7 +50,7 @@ MaterialManager::MaterialManager()
 void MaterialManager::setAllMaterialFlags(video::ITexture* t, 
                                           scene::IMeshBuffer *mb) const
 {
-    const std::string image = StringUtils::basename(t->getName().c_str());
+    const std::string image = StringUtils::getBasename(t->getName().c_str());
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
@@ -181,7 +181,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
         return NULL;
     }
 
-    std::string basename=StringUtils::basename(fname);
+    std::string basename=StringUtils::getBasename(fname);
 
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )

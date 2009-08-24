@@ -120,7 +120,7 @@ void Material::install(bool is_full_path)
     m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
 
     // now set the name to the basename, so that all tests work as expected
-    m_texname  = StringUtils::basename(m_texname);
+    m_texname  = StringUtils::getBasename(m_texname);
 }   // isntall
 
 //-----------------------------------------------------------------------------

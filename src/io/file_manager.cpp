@@ -136,38 +136,7 @@ FileManager::FileManager()
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
     {
         std::string path=getenv("SUPERTUXKART_MUSIC_PATH");
-        std::vector<std::string> dirs=StringUtils::split(path,':');
-        for(int i=(int)dirs.size()-1; i>=0; i--)
-        {
-            // Remove '/' at the end of paths, since this can cause
-            // problems with windows when using stat()
-            while(dirs[i].size()>=1 && dirs[i][dirs[i].size()-1]=='/')
-            {
-                dirs[i]=dirs[i].substr(0, dirs[i].size()-1);
-            }
-            // remove empty entries
-            if(dirs[i].size()==0)
-            {
-                dirs.erase(dirs.begin()+i);
-                continue;
-            }
-        }
-#ifdef WIN32
-        // Handle filenames like d:/dir, which becomes ["d","/dir"]
-        for(int i=(int)dirs.size()-1; i>=0; i--)
-        {
-            if(dirs[i].size()>1) continue;
-            if(i==dirs.size()-1)    // last element
-            {
-                dirs[i]+=":";      // turn "c" back into "c:"
-            }
-            else
-            {
-                dirs[i]+=":"+dirs[i+1]; // restore "d:/dir" back
-                dirs.erase(dirs.begin()+i+1);
-            }
-        }
-#endif
+        std::vector<std::string> dirs = StringUtils::splitPath(path);
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
@@ -316,7 +285,7 @@ std::string FileManager::getTrackFile(const std::string& fname,
     // but if a track name is supplied use it (which is necessary
     // e.g. to load a model from a track directory
     std::string basename = (track_name!="") ? track_name
-                           : StringUtils::without_extension(fname);
+                           : StringUtils::removeExtension(fname);
     return getTrackDir()+"/"+basename+"/"+fname;
 }   // getTrackFile
 
@@ -328,7 +297,7 @@ std::string FileManager::getKartFile(const std::string& fname,
     // but if a kart name is supplied use it (which is necessary
     // e.g. to load a model from a kart directory
     std::string basename = (kart_name!="") ? kart_name
-                           : StringUtils::without_extension(fname);
+                           : StringUtils::removeExtension(fname);
     return getKartDir()+"/"+basename+"/"+fname;
 }   // getKartFile
 

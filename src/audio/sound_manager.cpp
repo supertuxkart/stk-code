@@ -108,8 +108,8 @@ void SoundManager::loadMusicFromOneDir(const std::string& dir)
                             /*make_full_path*/ true);
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
-        if(StringUtils::extension(*i)!="music") continue;
-        m_allMusic[StringUtils::basename(*i)] = new MusicInformation(*i);
+        if(StringUtils::getExtension(*i)!="music") continue;
+        m_allMusic[StringUtils::getBasename(*i)] = new MusicInformation(*i);
     }   // for i
 } // loadMusicFromOneDir
 
@@ -171,7 +171,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
     {
         return NULL;
     }
-    const std::string basename = StringUtils::basename(filename);
+    const std::string basename = StringUtils::getBasename(filename);
     MusicInformation* mi = m_allMusic[basename];
     if(!mi)
     {

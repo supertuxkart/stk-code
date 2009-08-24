@@ -446,8 +446,8 @@ void World::removeKart(int kart_number)
         else
         {
             std::string s = _("'%s' has\nbeen eliminated.");
-            m_race_gui->addMessage( StringUtils::insert_values(s, kart->getName()),
-                *i, 2.0f, 60);
+            m_race_gui->addMessage(StringUtils::insertValues(s, kart->getName()),
+                                   *i, 2.0f, 60);
         }
     }   // for i in kart
     if(kart->isPlayerKart())

@@ -84,38 +84,37 @@ void cmdLineHelp (char* invocation)
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
     "Options:\n"
-    "  -N,  --no-start-screen  Quick race\n"
-    "  -t,  --track NAME       Start at track NAME (see --list-tracks)\n"
+    "  -N,  --no-start-screen  Immediatgely start race without showing a menu.\n"
+    "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
     "       --stk-config FILE  use ./data/FILE instead of ./data/stk_config.xml\n"
-    "  -l,  --list-tracks      Show available tracks\n"
-    "  -k,  --numkarts NUM     Number of karts on the racetrack\n"
-    "       --kart NAME        Use kart number NAME (see --list-karts)\n"
-    "       --list-karts       Show available karts\n"
-    "       --laps N           Define number of laps to N\n"
-    "       --mode N           N=1 novice, N=2 driver, N=3 racer\n"
+    "  -l,  --list-tracks      Show available tracks.\n"
+    "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
+    "       --kart NAME        Use kart number NAME (see --list-karts).\n"
+    "       --list-karts       Show available karts.\n"
+    "       --laps N           Define number of laps to N.\n"
+    "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
     //FIXME"     --players n             Define number of players to between 1 and 4.\n"
-    //FIXME     "  --reverse               Enable reverse mode\n"
-    //FIXME     "  --mirror                Enable mirror mode (when supported)\n"
-    "       --item STYLE       Use STYLE as your item style\n"
-    "  -f,  --fullscreen       Fullscreen display\n"
-    "  -w,  --windowed         Windowed display (default)\n"
-    "  -s,  --screensize WxH   Set the screen size (e.g. 320x200)\n"
-    "  -v,  --version          Show version\n"
+    "       --item STYLE       Use STYLE as your item style.\n"
+    "  -f,  --fullscreen       Select fullscreen display.\n"
+    "  -w,  --windowed         Windowed display (default).\n"
+    "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
+    "  -v,  --version          Show version of SuperTuxKart.\n"
+    "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
     // should not be used by unaware users:
-    // "  --profile            Enable automatic driven profile mode for 20 seconds\n"
-    // "  --profile=n          Enable automatic driven profile mode for n seconds\n"
-    // "                       if n<0 --> (-n) = number of laps to drive
-    // "  --history            Replay history file 'history.dat'\n"
+    // "  --profile            Enable automatic driven profile mode for 20 seconds.\n"
+    // "  --profile=n          Enable automatic driven profile mode for n seconds.\n"
+    // "                       if n<0 --> (-n) = number of laps to drive.
+    // "  --history            Replay history file 'history.dat'.\n"
     // "  --history=n          Replay history file 'history.dat' using mode:\n"
     // "                       n=1: use recorded positions\n"
     // "                       n=2: use recorded key strokes\n"
-    "  --server[=port]         This is the server (running on the specified port)\n"
-    "  --client=ip             This is a client, connect to the specified ip address\n"
-    "  --port=n                Port number to use\n"
-    "  --numclients=n          Number of clients to wait for (server only)\n"
-    "  --log=terminal          Write messages to screen\n"
-    "  --log=file              Write messages/warning to log files stdout.log/stderr.log\n"
-    "  -h,  --help             Show this help\n"
+    "  --server[=port]         This is the server (running on the specified port).\n"
+    "  --client=ip             This is a client, connect to the specified ip address.\n"
+    "  --port=n                Port number to use.\n"
+    "  --numclients=n          Number of clients to wait for (server only).\n"
+    "  --log=terminal          Write messages to screen.\n"
+    "  --log=file              Write messages/warning to log files stdout.log/stderr.log.\n"
+    "  -h,  --help             Show this help.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n", invocation
@@ -123,8 +122,9 @@ void cmdLineHelp (char* invocation)
 }   // cmdLineHelp
 
 //=============================================================================
-// for base options that don't need much to be inited (and, in some cases, that need to
-// be read before initing stuff)
+/** For base options that don't need much to be inited (and, in some cases, 
+ *   that need to be read before initing stuff.
+ */
 int handleCmdLinePreliminary(int argc, char **argv)
 {
     for(int i=1; i<argc; i++)
@@ -202,13 +202,17 @@ int handleCmdLinePreliminary(int argc, char **argv)
     return 0;
 }
 
+// ============================================================================
+/** Handles command line options.
+ *  \param argc Number of command line options
+ *  \param argv Command line options.
+ */
 int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[80];
     for(int i=1; i<argc; i++)
     {
-        if(argv[i][0] != '-') continue;
         if(!strcmp(argv[i], "--gamepad-debug"))
         {
             UserConfigParams::m_gamepad_debug=true;
@@ -264,6 +268,7 @@ int handleCmdLine(int argc, char **argv)
                     race_manager->setLocalKartInfo(0, argv[i+1]);
                 }
                 fprintf ( stdout, "You chose to use kart '%s'.\n", argv[i+1] ) ;
+                i++;
             }
             else
             {
@@ -379,9 +384,10 @@ int handleCmdLine(int argc, char **argv)
         {
             fprintf ( stdout, "You choose to have %d laps.\n", atoi(argv[i+1]) ) ;
             race_manager->setNumLaps(atoi(argv[i+1]));
+            i++;
         }
         /* FIXME:
-        else if ( !strcmp(argv[i], "--players") && i+1<argc ) {
+        else if ( !strcmp(argv[i], "--playqers") && i+1<argc ) {
           raceSetup.numPlayers = atoi(argv[i+1]);
 
           if ( raceSetup.numPlayers < 0 || raceSetup.numPlayers > 4) {
@@ -433,6 +439,12 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--item") && i+1<argc )
         {
             item_manager->setUserFilename(argv[i+1]);
+            i++;
+        }
+        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
+        {
+            track_manager->addTrackDir(argv[i+1]);
+            i++;
         }
         // these commands are already processed in handleCmdLinePreliminary, but repeat this
         // just so that we don't get error messages about unknown commands

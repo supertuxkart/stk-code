@@ -102,32 +102,32 @@ const std::string Challenge::getUnlockedMessage() const
             case UNLOCK_TRACK:
                 {    // {} avoids compiler warning
                     Track* track = track_manager->getTrack( m_feature[n].name );
-                    message = StringUtils::insert_values(
+                    message = StringUtils::insertValues(
                         _("New track '%s'\nnow available"), 
                         _(track->getName().c_str()) );
                     break;
                 }
             case UNLOCK_MODE:
-                message = StringUtils::insert_values( 
+                message = StringUtils::insertValues( 
                     _("New game mode\n'%s'\nnow available"), 
                     m_feature[n].user_name);
                 break;
             case UNLOCK_GP:
             {
                 std::string gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
-                message = StringUtils::insert_values(
+                message = StringUtils::insertValues(
                     _("New Grand Prix '%s'\nnow available"),
                     gp_user_name);
                 break;
             }
             case UNLOCK_DIFFICULTY:
-                message = StringUtils::insert_values(
+                message = StringUtils::insertValues(
                     _("New difficulty\n'%s'\nnow available"), 
                     m_feature[n].user_name);
                 break;
             case UNLOCK_KART:
                 const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
-                message = StringUtils::insert_values(
+                message = StringUtils::insertValues(
                     _("New kart\n'%s'\nnow available"),
                     kp->getName());
                 break;

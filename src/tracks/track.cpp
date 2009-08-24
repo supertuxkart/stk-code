@@ -190,9 +190,8 @@ btTransform Track::getStartTransform(unsigned int pos) const
 void Track::loadTrack(const std::string &filename)
 {
     m_filename          = filename;
-    m_ident             = StringUtils::basename(
-                                StringUtils::without_extension(m_filename));
-    std::string path    = StringUtils::without_extension(m_filename);
+    std::string path    = StringUtils::removeExtension(m_filename);
+    m_ident             = StringUtils::getBasename(path);
 
     // Default values
     m_use_fog           = false;
@@ -413,7 +412,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
         TriangleMesh *tmesh = m_track_mesh;
         if(t) {
             std::string image = std::string(t->getName().c_str());
-            material=material_manager->getMaterial(StringUtils::basename(image));
+            material=material_manager->getMaterial(StringUtils::getBasename(image));
             if(material->isZipper()) tmesh = m_non_collision_mesh;
         } 
 
@@ -509,7 +508,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 const std::string texture_name = 
-                    StringUtils::basename(t->getName().c_str());
+                    StringUtils::getBasename(t->getName().c_str());
                 if(texture_name!=name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));

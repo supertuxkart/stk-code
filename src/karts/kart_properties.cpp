@@ -119,7 +119,7 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     }
 #else
     const lisp::Lisp* root = 0;
-    m_ident = StringUtils::basename(StringUtils::without_extension(filename));
+    m_ident = StringUtils::getBasename(StringUtils::removeExtension(filename));
 
     try
     {

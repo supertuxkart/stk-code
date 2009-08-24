@@ -86,7 +86,7 @@ void SpinnerWidget::add()
     {
         std::ostringstream icon_stream;
         icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
-        std::string imagefile = StringUtils::insert_values(icon_stream.str(), m_value);
+        std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
         ITexture* texture = irr_driver->getTexture(imagefile);
         assert(texture != NULL);
         
@@ -144,7 +144,7 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
         // FIXME : code duplicated from add()
         std::ostringstream icon_stream;
         icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
-        std::string imagefile = StringUtils::insert_values(icon_stream.str(), m_value);
+        std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
         ITexture* texture = irr_driver->getTexture(imagefile);
         assert(texture != NULL);
         
@@ -202,7 +202,7 @@ void SpinnerWidget::setValue(const int new_value)
     {
         std::ostringstream icon;
         icon << file_manager->getDataDir() << "/"  << m_properties[PROP_ICON];
-        std::string imagefile = StringUtils::insert_values(icon.str(), m_value);
+        std::string imagefile = StringUtils::insertValues(icon.str(), m_value);
         //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
@@ -212,7 +212,7 @@ void SpinnerWidget::setValue(const int new_value)
     }
     else if(m_properties[PROP_TEXT].size() > 0)
     {
-        std::string text = StringUtils::insert_values(_(m_properties[PROP_TEXT].c_str()), m_value);
+        std::string text = StringUtils::insertValues(_(m_properties[PROP_TEXT].c_str()), m_value);
         m_children[1].m_element->setText( stringw(text.c_str()).c_str() );
     }
     else

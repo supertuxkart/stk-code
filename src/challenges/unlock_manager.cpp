@@ -46,7 +46,7 @@ UnlockManager::UnlockManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::has_suffix(*i, ".challenge")) 
+        if (StringUtils::hasSuffix(*i, ".challenge")) 
             addChallenge(file_manager->getConfigFile(*i));
     }   // for i
 
@@ -70,7 +70,7 @@ UnlockManager::UnlockManager()
         }
         // Check for a challenge file
         std::string challenge_file = 
-            StringUtils::without_extension(config_file)+".challenge";
+            StringUtils::removeExtension(config_file)+".challenge";
         FILE *f=fopen(challenge_file.c_str(), "r");
         if(f)
         {
@@ -110,7 +110,7 @@ UnlockManager::UnlockManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::has_suffix(*i, ".challenge")) 
+        if (StringUtils::hasSuffix(*i, ".challenge")) 
             addChallenge(file_manager->getConfigFile("grandprix/"+*i));
     }   // for i
 

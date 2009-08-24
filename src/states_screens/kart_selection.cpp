@@ -84,7 +84,7 @@ namespace KartSelectionScreen
             this->playerID = playerID;
             
             // FIXME : if a player removes itself, all IDs need to be updated
-            this->m_properties[PROP_ID] = StringUtils::insert_values("@p%i", playerID);
+            this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", playerID);
             
             setSize(area->x, area->y, area->w, area->h);
             target_x = x;
@@ -103,9 +103,10 @@ namespace KartSelectionScreen
             }
             
             playerIDLabel = new LabelWidget();
-            playerIDLabel->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), playerID + 1) + deviceName + ")"; 
+            playerIDLabel->m_properties[PROP_TEXT] = 
+                StringUtils::insertValues(_("Player %i ("), playerID + 1) + deviceName + ")"; 
             playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
-            playerIDLabel->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", playerID);
+            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
             playerIDLabel->x = player_id_x;
             playerIDLabel->y = player_id_y;
             playerIDLabel->w = player_id_w;
@@ -119,7 +120,7 @@ namespace KartSelectionScreen
             playerName->w = player_name_w;
             playerName->h = player_name_h;
             
-            spinnerID = StringUtils::insert_values("@p%i_spinner", playerID);
+            spinnerID = StringUtils::insertValues("@p%i_spinner", playerID);
             
             const int playerAmount = UserConfigParams::m_all_players.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
@@ -137,7 +138,7 @@ namespace KartSelectionScreen
             modelView->y = model_y;
             modelView->w = model_w;
             modelView->h = model_h;
-            modelView->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_model", playerID);
+            modelView->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", playerID);
             //modelView->setParent(this);
             m_children.push_back(modelView);
             
@@ -154,7 +155,7 @@ namespace KartSelectionScreen
             kartName = new LabelWidget();
             kartName->m_properties[PROP_TEXT] = default_kart;
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
-            kartName->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_kartname", playerID);
+            kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", playerID);
             kartName->x = kart_name_x;
             kartName->y = kart_name_y;
             kartName->w = kart_name_w;
@@ -673,8 +674,10 @@ void renumberKarts()
         g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
 
         // FIXME: Not sure why this isn't updating the labels properly ??
-        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_TEXT] = StringUtils::insert_values(_("Player %i ("), n + 1) + ")"; 
-        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_ID] = StringUtils::insert_values("@p%i_label", n);
+        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_TEXT] =
+            StringUtils::insertValues(_("Player %i ("), n + 1) + ")"; 
+        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_ID] = 
+            StringUtils::insertValues("@p%i_label", n);
     }
 
     w->updateItemDisplay();

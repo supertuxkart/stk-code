@@ -31,6 +31,8 @@ class Track;
 class TrackManager
 {
 private:
+    /** All directories in which tracks are searched. */
+    std::vector<std::string>                 m_track_dirs;
     typedef std::vector<Track*>              Tracks;
     Tracks                                   m_tracks;
     std::map<std::string, std::vector<int> > m_groups;
@@ -47,6 +49,7 @@ public:
                   TrackManager();
                  ~TrackManager();
 
+    void          addTrackDir(const std::string &dir);
     const std::vector<std::string>&
                   getAllGroups()      const { return m_all_groups;    }
     size_t        getNumberOfTracks() const { return m_tracks.size(); }

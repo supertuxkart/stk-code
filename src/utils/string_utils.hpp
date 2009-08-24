@@ -28,19 +28,19 @@
 namespace StringUtils
 {
 
-    bool has_suffix(const std::string& lhs, const std::string rhs);
+    bool hasSuffix(const std::string& lhs, const std::string rhs);
 
     /** Return the filename part of a path */
-    std::string basename(const std::string& filename);
+    std::string getBasename(const std::string& filename);
 
     /** Return the path ( i.e. up to the last / )  */
-    std::string path(const std::string& filename);
+    std::string getPath(const std::string& filename);
 
-    std::string without_extension(const std::string& filename);
-    std::string extension(const std::string& filename);
+    std::string removeExtension(const std::string& filename);
+    std::string getExtension(const std::string& filename);
 
     template <class T>
-    std::string to_string (const T& any)
+    std::string toString (const T& any)
     {
         std::ostringstream oss;
         oss << any ;
@@ -56,7 +56,7 @@ namespace StringUtils
         fails false is returned and the value of \a x is unchanged, if
         true is returned the conversation was successfull. */
     template <class T>
-    bool from_string(const std::string& rep, T& x)
+    bool fromString(const std::string& rep, T& x)
     {
         // this is necessary so that if "x" is not modified if the conversion fails
         T temp;
@@ -74,9 +74,9 @@ namespace StringUtils
         }
     }
 
-    std::string upcase (const std::string&);
-    std::string downcase (const std::string&);
+    std::string toUpperCase(const std::string&);
     std::vector<std::string> split(const std::string& s, char c);
+    std::vector<std::string> splitPath(const std::string& path);
 
     // ------------------------------------------------------------------------
     /** Replaces the first %s or %d in the string with the first value 
@@ -96,8 +96,8 @@ namespace StringUtils
      *  \param v1,v2,v3 Value(s) to replace all %s or %d with.
      */
     template <class T1, class T2, class T3>
-    std::string insert_values(const std::string &s, const T1 &v1,
-                              const T2 &v2, const T3 &v3)
+    std::string insertValues(const std::string &s, const T1 &v1,
+                             const T2 &v2, const T3 &v3)
     {
         std::vector<std::string> all_vals;
         std::ostringstream dummy;
@@ -129,10 +129,10 @@ namespace StringUtils
      *  \param v1,v2 Value(s) to replace all %s or %d with.
      */
     template <class T1, class T2>
-    std::string insert_values(const std::string &s, const T1 &v1,
-                              const T2 &v2)
+    std::string insertValues(const std::string &s, const T1 &v1,
+                             const T2 &v2)
     {
-        return insert_values(s, v1, v2, "");
+        return insertValues(s, v1, v2, "");
     }
     // ------------------------------------------------------------------------
     /** Overloaded insert_values taking one value, see below for
@@ -141,9 +141,9 @@ namespace StringUtils
      *  \param v1 Value to replace.
      */
     template <class T1>
-    std::string insert_values(const std::string &s, const T1 &v1)
+    std::string insertValues(const std::string &s, const T1 &v1)
     {
-        return insert_values(s, v1, "", "");
+        return insertValues(s, v1, "", "");
     }
 } // namespace StringUtils
 

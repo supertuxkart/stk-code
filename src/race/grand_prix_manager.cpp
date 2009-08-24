@@ -34,7 +34,7 @@ GrandPrixManager::GrandPrixManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::has_suffix(*i, ".grandprix")) load("grandprix/"+*i);
+        if (StringUtils::hasSuffix(*i, ".grandprix")) load("grandprix/"+*i);
     }   // for i
 }   // GrandPrixManager
 

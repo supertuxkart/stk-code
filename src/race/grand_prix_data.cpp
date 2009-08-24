@@ -32,7 +32,7 @@
 GrandPrixData::GrandPrixData(const std::string filename)
 {
     m_filename = filename;
-    m_id       = StringUtils::basename(StringUtils::without_extension(filename));
+    m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
     const lisp::Lisp* lisp = 0;
     try
     {

@@ -476,23 +476,23 @@ std::string Input::getInputAsString(const Input::InputType type, const int id, c
             break;
         case Input::IT_STICKMOTION:
             //I18N : to appear in input configuration screen, for gamepad axes
-            s = StringUtils::insert_values( _("Axis %d %s"), id, (dir == Input::AD_NEGATIVE) ? '-' : '+');
+            s = StringUtils::insertValues( _("Axis %d %s"), id, (dir == Input::AD_NEGATIVE) ? '-' : '+');
             break;
         case Input::IT_STICKBUTTON:
             //I18N : to appear in input configuration screen, for gamepad buttons
-            s = StringUtils::insert_values( _("Gamepad button %d"), (id+1));
+            s = StringUtils::insertValues( _("Gamepad button %d"), (id+1));
             break;
         case Input::IT_STICKHAT:
             //I18N : to appear in input configuration screen, for gamepad hats
-            s = StringUtils::insert_values( _("Gamepad hat %d"), (id+1));
+            s = StringUtils::insertValues( _("Gamepad hat %d"), (id+1));
             break;
         case Input::IT_MOUSEBUTTON:
             //I18N : to appear in input configuration screen, for mouse (might not be used at all)
-            s = StringUtils::insert_values( _("Mouse button %d"), (id+1));
+            s = StringUtils::insertValues( _("Mouse button %d"), (id+1));
             break;
         case Input::IT_MOUSEMOTION: // FIXME : I don't reckon this is used at all
             //I18N : to appear in input configuration screen, for mouse (might not be used at all)
-            s = StringUtils::insert_values( _("Mouse axis %d %s"),
+            s = StringUtils::insertValues( _("Mouse axis %d %s"),
                                            (id+1), 
                                            (dir == Input::AD_NEGATIVE) 
                                            ? '-': '+'                        );

@@ -31,7 +31,7 @@
 
 TrackManager* track_manager = 0;
 
-/** Constructor (currently empty). The real work happens in loadTrack.
+/** Constructor (currently empty). The real work happens in loadTrackList.
  */
 TrackManager::TrackManager()
 {}   // TrackManager
@@ -44,6 +44,17 @@ TrackManager::~TrackManager()
     for(Tracks::iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
         delete *i;
 }   // ~TrackManager
+
+//-----------------------------------------------------------------------------
+/** Adds a directory from which tracks are loaded. The track manager checks if
+ *  either this directory itself contains a track, and if any subdirectory 
+ *  contains a track.
+ *  \param dir The directory to add. 
+ */
+void TrackManager::addTrackDir(const std::string &dir)
+{
+    m_track_dirs.push_back(dir);
+}   // addTrackDir
 
 //-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
