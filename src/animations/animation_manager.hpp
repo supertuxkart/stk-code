@@ -24,6 +24,7 @@
 #include <vector>
 
 class AnimationBase;
+class Track;
 class XMLNode;
 
 /** Controls all animations of a track. */
@@ -33,7 +34,7 @@ private:
 	std::vector<AnimationBase*> m_all_animations;
 
 public:
-	     AnimationManager(const std::string &track_name, const XMLNode &node);
+	     AnimationManager(const Track &track, const XMLNode &node);
         ~AnimationManager();
 	void update(float dt);
 	void reset();

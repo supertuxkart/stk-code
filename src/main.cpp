@@ -139,6 +139,11 @@ int handleCmdLinePreliminary(int argc, char **argv)
             cmdLineHelp(argv[0]);
             exit(0);
         }
+        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
+        {
+            TrackManager::addTrackDir(argv[i+1]);
+            i++;
+        }
 #if !defined(WIN32) && !defined(__CYGWIN)
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
         {
@@ -157,7 +162,8 @@ int handleCmdLinePreliminary(int argc, char **argv)
             UserConfigParams::m_fullscreen = false;
         }
 #endif
-        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
+        else if ( (!strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
+             && i+1<argc)
         {
             //Check if fullscreen and new res is blacklisted
             int width, height;
@@ -176,6 +182,7 @@ int handleCmdLinePreliminary(int argc, char **argv)
                	}
                	else
                		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+                i++;
             }
             else
             {
@@ -290,6 +297,7 @@ int handleCmdLine(int argc, char **argv)
                 race_manager->setDifficulty(RaceManager::RD_HARD);
                 break;
             }
+            i++;
         }
         else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
                  && i+1<argc                                              )
@@ -311,6 +319,7 @@ int handleCmdLine(int argc, char **argv)
         {
             stk_config->load(file_manager->getConfigFile(argv[i+1]));
             fprintf ( stdout, "STK config will be read from %s.\n", argv[i+1] ) ;
+            i++;
         }
         else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
                  i+1<argc )
@@ -398,6 +407,7 @@ int handleCmdLine(int argc, char **argv)
         return 0;
           }
           fprintf ( stdout, "You choose to have %d players.\n", atoi(argv[i+1]) ) ;
+          i++;
         }
         */
         else if( !strcmp(argv[i], "--log=terminal"))
@@ -441,13 +451,12 @@ int handleCmdLine(int argc, char **argv)
             item_manager->setUserFilename(argv[i+1]);
             i++;
         }
-        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
-        {
-            track_manager->addTrackDir(argv[i+1]);
-            i++;
-        }
         // these commands are already processed in handleCmdLinePreliminary, but repeat this
         // just so that we don't get error messages about unknown commands
+        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
+        {
+            i++;
+        }
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
         {
         }
@@ -481,10 +490,10 @@ void initPreliminary()
 {
     file_manager            = new FileManager();
     translations            = new Translations();
-    // unlock manager is needed when reading the config file
-    unlock_manager          = new UnlockManager();
     user_config             = new UserConfig();
-}
+}   // initPreliminary
+
+//=============================================================================
 void initRest()
 {
     irr_driver              = new IrrDriver();
@@ -507,8 +516,7 @@ void initRest()
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();
-    // unlock_manager->check needs GP and track manager.
-    unlock_manager->check();
+    unlock_manager          = new UnlockManager();
     sound_manager->addMusicToTracks();
 
     race_manager            = new RaceManager          ();
@@ -597,11 +605,6 @@ int main(int argc, char *argv[] )
         input_manager->setMode(InputManager::MENU);  
         
         main_loop = new MainLoop();
-        // loadMaterials needs ssgLoadTextures (internally), which can
-        // only be called after ssgInit (since this adds the actual file_manager)
-        // so this next call can't be in InitTuxkart. And InitPlib needs
-        // config, which gets defined in InitTuxkart, so swapping those two
-        // calls is not possible either ... so loadMaterial has to be done here :(
         material_manager        -> loadMaterial    ();
         kart_properties_manager -> loadKartData    ();
         projectile_manager      -> loadData        ();

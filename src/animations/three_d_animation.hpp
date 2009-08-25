@@ -30,8 +30,9 @@ using namespace irr;
 #include "animations/animation_base.hpp"
 #include "physics/user_pointer.hpp"
 
-class XMLNode;
 class BezierCurve;
+class Track;
+class XMLNode;
 
 /** A virtual base class for all animations. */
 class ThreeDAnimation : public AnimationBase
@@ -58,7 +59,7 @@ private:
     void createPhysicsBody(const std::string &shape);
 
 public:
-                 ThreeDAnimation(const std::string &track_name, 
+                 ThreeDAnimation(const Track &track,
                                 const XMLNode &node, float fps);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);

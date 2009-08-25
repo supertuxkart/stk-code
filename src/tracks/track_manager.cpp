@@ -30,6 +30,7 @@
 #include "tracks/track.hpp"
 
 TrackManager* track_manager = 0;
+std::vector<std::string>  TrackManager::m_track_search_path;
 
 /** Constructor (currently empty). The real work happens in loadTrackList.
  */
@@ -53,12 +54,12 @@ TrackManager::~TrackManager()
  */
 void TrackManager::addTrackDir(const std::string &dir)
 {
-    m_track_dirs.push_back(dir);
+    m_track_search_path.push_back(dir);
 }   // addTrackDir
 
 //-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
- *  \param ident Identifier = filename without .track
+ *  \param ident Identifier = basename of the directory the track is in.
  */
 Track* TrackManager::getTrack(const std::string& ident) const
 {
@@ -72,25 +73,6 @@ Track* TrackManager::getTrack(const std::string& ident) const
     msg<<"TrackManager: Couldn't find track: '"<<ident<<"'";
     throw std::runtime_error(msg.str());
 }   // getTrack
-
-//-----------------------------------------------------------------------------
-/** Marks the specified track as unavailable (i.e. not available on all
- *  clients and server. 
- *  \param ident Track identifier (i.e. track name without .track)
- */
-void TrackManager::unavailable(const std::string& ident)
-{
-    for(Tracks::const_iterator i = m_tracks.begin(); i != m_tracks.end(); ++i)
-    {
-        if ((*i)->getIdent() == ident)
-        {
-            m_track_avail[i-m_tracks.begin()] = false;
-            return;
-        }
-    }
-    // Do nothing if the track does not exist here ... it's not available.
-    return;
-}   // unavailable
 
 //-----------------------------------------------------------------------------
 /** Sets all tracks that are not in the list a to be unavailable. This is used
@@ -130,46 +112,60 @@ std::vector<std::string> TrackManager::getAllTrackIdentifiers()
 //-----------------------------------------------------------------------------
 /** Loads all tracks from the track directory (data/track).
  */
-void TrackManager::loadTrackList ()
+void TrackManager::loadTrackList()
 {
-    // Load up a list of tracks - and their names
-    std::set<std::string> dirs;
-    file_manager->listFiles(dirs, file_manager->getTrackDir(), /*is_full_path*/ true);
-    for(std::set<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
+    m_all_track_dirs.clear();
+    for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
-        if(*dir=="." || *dir=="..") continue;
-        std::string config_file;
-        try
-        {
-            // getTrackFile appends dir, so it's opening: *dir/*dir.track
-            // FIXME: rename from .irrtrack to .track
-            config_file = file_manager->getTrackFile((*dir)+".irrtrack");
-        }
-        catch (std::exception& e)
-        {
-            (void)e;   // remove warning about unused variable
-            continue;
-        }
-        FILE *f=fopen(config_file.c_str(),"r");
-        if(!f) continue;
-        fclose(f);
+        const std::string &dir = m_track_search_path[i];
 
-        Track *track = new Track(config_file);
-        if(track->getVersion()<stk_config->m_min_track_version ||
-            track->getVersion()>stk_config->m_max_track_version)
+        // First test if the directory itself contains a track:
+        // ----------------------------------------------------
+        if(loadTrack(dir)) continue;  // track found, no more tests
+        
+        // Then see if a subdir of this dir contains tracks
+        // ------------------------------------------------
+        std::set<std::string> dirs;
+        file_manager->listFiles(dirs, dir, /*is_ileull_path*/ true);
+        for(std::set<std::string>::iterator subdir = dirs.begin(); 
+            subdir != dirs.end(); subdir++)
         {
-            fprintf(stderr, "Warning: track '%s' is not supported by this binary, ignored.\n",
-                track->getIdent().c_str());
-            delete track;
-            continue;
-        }
-        m_tracks.push_back(track);
-        m_track_avail.push_back(true);
-        updateGroups(track);
-        // Read music files in that dir as well
-        sound_manager->loadMusicFromOneDir(*dir);
-    }
+            if(*subdir=="." || *subdir=="..") continue;
+            loadTrack(dir+"/"+*subdir);
+        }   // for dir in dirs
+    }   // for i <m_track_search_path.size()
 }  // loadTrackList
+
+// ----------------------------------------------------------------------------
+/** Tries to load a track from a single directory. Returns true if a track was
+ *  successfully loaded.
+ *  \param dirname Name of the directory to load the track from.
+ */
+bool TrackManager::loadTrack(const std::string& dirname)
+{
+    std::string config_file = dirname+"/track.xml";
+    FILE *f=fopen(config_file.c_str(),"r");
+    if(!f) return false;
+    fclose(f);
+
+    Track *track = new Track(config_file);
+    if(track->getVersion()<stk_config->m_min_track_version ||
+        track->getVersion()>stk_config->m_max_track_version)
+    {
+        fprintf(stderr, "Warning: track '%s' is not supported by this binary, ignored.\n",
+            track->getIdent().c_str());
+        delete track;
+        return false;
+    }
+    m_all_track_dirs.push_back(dirname);
+    m_tracks.push_back(track);
+    m_track_avail.push_back(true);
+    updateGroups(track);
+    // Read music files in that dir as well
+    sound_manager->loadMusicFromOneDir(dirname);
+    return true;
+}   // loadTrack
+
 // ----------------------------------------------------------------------------
 /** Updates the groups after a track was read in.
  *  \param track Pointer to the new track, whose groups are now analysed.

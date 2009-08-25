@@ -54,9 +54,11 @@ using namespace irr;
 const float Track::NOHIT           = -99999.9f;
 
 // ----------------------------------------------------------------------------
-Track::Track( std::string filename)
+Track::Track(std::string filename)
 {
     m_filename             = filename;
+    m_root                 = StringUtils::getPath(StringUtils::removeExtension(m_filename));
+    m_ident                = StringUtils::getBasename(m_root);
     m_item_style           = "";
     m_description          = "";
     m_designer             = "";
@@ -71,7 +73,7 @@ Track::Track( std::string filename)
     m_quad_graph           = NULL;
 	m_animation_manager    = NULL;
 	m_check_manager        = NULL;
-    loadTrack(m_filename);
+    loadTrackInfo(m_filename);
 }   // Track
 
 //-----------------------------------------------------------------------------
@@ -187,12 +189,8 @@ btTransform Track::getStartTransform(unsigned int pos) const
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
-void Track::loadTrack(const std::string &filename)
+void Track::loadTrackInfo(const std::string &filename)
 {
-    m_filename          = filename;
-    std::string path    = StringUtils::removeExtension(m_filename);
-    m_ident             = StringUtils::getBasename(path);
-
     // Default values
     m_use_fog           = false;
     m_fog_density       = 1.0f/100.0f;
@@ -292,10 +290,10 @@ void Track::loadTrack(const std::string &filename)
 		loadCurves(*xml_node);
 
 	// Set the correct paths
-    m_screenshot = file_manager->getTrackFile(m_screenshot, getIdent());
+    m_screenshot = m_root+"/"+m_screenshot;
     delete root;
 
-}   // loadTrack
+}   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
 void Track::loadCurves(const XMLNode &node)
@@ -313,7 +311,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
 {
     for(int i=0; i<(int)filenames.size(); i++)
     {
-        std::string full_path = file_manager->getTrackFile(filenames[i], getIdent());
+        std::string full_path = m_root+"/"+filenames[i];
         MusicInformation* mi;
         try
         {
@@ -321,7 +319,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         }
         catch(std::runtime_error)
         {
-            mi = sound_manager->getMusicInformation(file_manager->getMusicFile(filenames[i]));
+            mi = sound_manager->getMusicInformation(m_root+"/"+filenames[i]);
         }
         if(!mi)
         {
@@ -347,8 +345,7 @@ void Track::startMusic() const
  */
 void Track::loadQuadGraph()
 {
-    m_quad_graph = new QuadGraph(file_manager->getTrackFile(m_ident+".quads"), 
-                                 file_manager->getTrackFile(m_ident+".graph"));
+    m_quad_graph = new QuadGraph(m_root+"/quads.xml", m_root+"/graph.xml");
     m_mini_map   = m_quad_graph->makeMiniMap(RaceManager::getWorld()->getRaceGUI()->getMiniMapSize(), 
                                              "minimap::"+m_ident);
     if(m_quad_graph->getNumNodes()==0)
@@ -439,8 +436,7 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
 {
     std::string model_name;
     xml_node.get("model", &model_name);
-    std::string full_path = file_manager->getTrackFile(model_name, 
-                                                       getIdent());
+    std::string full_path = m_root+"/"+model_name;
     scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
     if(!mesh)
     {
@@ -563,8 +559,7 @@ void Track::createWater(const XMLNode &node)
 {
     std::string model_name;
     node.get("model", &model_name);
-    std::string full_path = file_manager->getTrackFile(model_name, 
-                                                       getIdent());
+    std::string full_path = m_root+"/"+model_name;
 
     //scene::IMesh *mesh = irr_driver->getMesh(full_path);
     scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
@@ -621,12 +616,12 @@ void Track::loadTrackModel()
     // map to.
     loadQuadGraph();
     // Add the track directory to the texture search path
-    file_manager->pushTextureSearchPath(file_manager->getTrackFile("",getIdent()));
-    file_manager->pushModelSearchPath  (file_manager->getTrackFile("",getIdent()));
+    file_manager->pushTextureSearchPath(m_root);
+    file_manager->pushModelSearchPath  (m_root);
     // First read the temporary materials.dat file if it exists
     try
     {
-        std::string materials_file = file_manager->getTrackFile("materials.xml",getIdent());
+        std::string materials_file = m_root+"/materials.xml";
         material_manager->pushTempMaterial(materials_file);
     }
     catch (std::exception& e)
@@ -636,7 +631,7 @@ void Track::loadTrackModel()
     }
 
     // Start building the scene graph
-    std::string path = file_manager->getTrackFile(getIdent()+".scene");
+    std::string path = m_root+"/scene.xml";
     XMLNode *root    = file_manager->createXMLTree(path);
 
     // Make sure that we have a track (which is used for raycasts to 
@@ -668,8 +663,7 @@ void Track::loadTrackModel()
         {
             std::string model_name;
             node->get("model", &model_name);
-            std::string full_path = file_manager->getTrackFile(model_name, 
-                getIdent());
+            std::string full_path = m_root+"/"+model_name;
             scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
             if(!mesh)
             {
@@ -704,7 +698,7 @@ void Track::loadTrackModel()
         }
 		else if(name=="animations")
 		{
-			m_animation_manager = new AnimationManager(getIdent(), *node);
+			m_animation_manager = new AnimationManager(*this, *node);
 		}
 		else if(name=="checks")
 		{
@@ -788,7 +782,7 @@ void Track::loadTrackModel()
     createPhysicsModel();
     if(UserConfigParams::m_track_debug)
         m_quad_graph->createDebugMesh();
-}   // loadTrack
+}   // loadTrackModel
 
 //-----------------------------------------------------------------------------
 void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 

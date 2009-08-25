@@ -32,11 +32,17 @@ class TrackManager
 {
 private:
     /** All directories in which tracks are searched. */
-    std::vector<std::string>                 m_track_dirs;
+    static std::vector<std::string>          m_track_search_path;
+    /** All directories in which tracks were found. */
+    std::vector<std::string>                 m_all_track_dirs;
+    /** All track objects. */
     typedef std::vector<Track*>              Tracks;
-    Tracks                                   m_tracks;
+     Tracks                                  m_tracks;
+    /** List of all racing track groups. */
     std::map<std::string, std::vector<int> > m_groups;
+    /** List of all arena groups. */
     std::map<std::string, std::vector<int> > m_arena_groups;
+    /** List of all groups. */
     std::vector<std::string>                 m_all_groups;
     /** Flag if this track is available or not. Tracks are set unavailable
      *  if they are not available on all clients (applies only to network mode)
@@ -44,27 +50,44 @@ private:
     std::vector<bool>                        m_track_avail;
 
     void          updateGroups(const Track* track);
+    bool          loadTrack(const std::string& dirname);
 
 public:
                   TrackManager();
                  ~TrackManager();
 
-    void          addTrackDir(const std::string &dir);
+    static void   addTrackDir(const std::string &dir);
+    /** Returns a list of all directories that contain a track. */
+    const std::vector<std::string>*  getAllTrackDirs() const 
+                                            { return &m_all_track_dirs; }
+    /** Returns a list of all used track groups. */
     const std::vector<std::string>&
                   getAllGroups()      const { return m_all_groups;    }
+    /** Returns the number of tracks. */
     size_t        getNumberOfTracks() const { return m_tracks.size(); }
-    Track        *getTrack(size_t id) const { return m_tracks[id];    }
+    /** Returns the track with a given index number. 
+     *  \param index The index number of the track. */
+    Track        *getTrack(unsigned int index) const { return m_tracks[index];}
     Track        *getTrack(const std::string& ident) const;
-    void          unavailable(const std::string &ident);
+    /** Sets a list of track as being unavailable (e.g. in network mode the 
+     *  track is not on all connected machines. 
+     *  \param tracks List of tracks to mark as unavilable. */
     void          setUnavailableTracks(const std::vector<std::string> &tracks);
+    /** Checks if a certain track is available. 
+     *  \param n Index of the track to check. */
     bool          isAvailable(unsigned int n) const {return m_track_avail[n];}
+    /** Returns a list of all tracks in a given group.
+     *  \param g Name of the group. */
     const std::vector<int>& 
                   getTracksInGroup(const std::string& g) {return m_groups[g];}
+    /** Returns a list of all arenas in a given group. 
+     *  \param g Name of the group. */
     const std::vector<int>& 
         getArenasInGroup(const std::string& g) {return m_arena_groups[g];}
+    /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();
-    /** load all .track files from all directories */
-    void          loadTrackList ();
+    /** Load all .track files from all directories */
+    void          loadTrackList();
 };
 
 extern TrackManager* track_manager;

@@ -39,8 +39,7 @@ PhysicalObject::PhysicalObject(const XMLNode *xml_node)
     std::string model_name;
     const Track *track=RaceManager::getTrack();
     xml_node->get("model", &model_name);
-    std::string full_path = file_manager->getTrackFile(model_name, 
-                                                       track->getIdent());
+    std::string full_path = track->getTrackFile(model_name);
     scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
     if(!obj)
     {

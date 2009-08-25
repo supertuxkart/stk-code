@@ -60,7 +60,10 @@ private:
     std::string              m_item_style;
     std::string              m_description;
     std::string              m_designer;
+    /** The full filename of the config (xml) file. */
     std::string              m_filename;
+    /** The base dir of all files of this track. */
+    std::string              m_root;
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
@@ -129,7 +132,7 @@ private:
     /** Checkline manager. */
     CheckManager             *m_check_manager;
 
-    void  loadTrack(const std::string &filename);
+    void  loadTrackInfo(const std::string &filename);
     void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                       int bNeedHeight);
     void  loadQuadGraph();
@@ -220,6 +223,9 @@ public:
      */
     void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
                                 { m_quad_graph->mapPoint2MiniMap(xyz, draw_at); }
+    /** Returns the full path of a given file inside this track directory. */
+    std::string        getTrackFile(const std::string &s) const 
+                                { return m_root+"/"+s; }
 };   // class Track
 
 #endif

@@ -24,6 +24,7 @@
 
 #include "animations/animation_base.hpp"
 
+class Track;
 class XMLNode;
 
 /** A 2d billboard animation. */
@@ -32,7 +33,7 @@ class BillboardAnimation : public AnimationBase
 private:
 
 public:
-	BillboardAnimation(const std::string &track, const XMLNode &node, float fps);
+	BillboardAnimation(const Track &track, const XMLNode &node, float fps);
     virtual ~BillboardAnimation(){}
 	virtual void update(float dt);
 

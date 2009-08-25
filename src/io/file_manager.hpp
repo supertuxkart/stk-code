@@ -60,7 +60,6 @@ public:
     XMLNode        *createXMLTree(const std::string &filename);
 
     std::string getHomeDir       () const;
-    std::string getTrackDir      () const;
     std::string getKartDir       () const;
     std::string getDataDir       () const;
     std::string getItemsDir      () const;
@@ -70,10 +69,9 @@ public:
     std::string getTextureFile   (const std::string& fname) const;
     std::string getKartFile      (const std::string& fname,
                                   const std::string& kart="") const;
-    std::string getTrackFile     (const std::string& fname, 
-                                  const std::string& track="") const;
     std::string getConfigFile    (const std::string& fname) const;
     std::string getHighscoreFile (const std::string& fname) const;
+    std::string getChallengeFile (const std::string& fname) const;
     std::string getLogFile       (const std::string& fname) const;
     std::string getItemFile      (const std::string& fname) const;
     std::string getMusicFile     (const std::string& fname) const;

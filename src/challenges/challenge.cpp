@@ -149,11 +149,8 @@ void Challenge::load(const XMLNode* challengesNode)
     
     // See if the challenge is solved (it's activated later from the
     // unlock_manager).
-    
-    std::string solvedString;
-    node->get("solved", &solvedString);
-    
-    bool finished = (solvedString == "true");
+    bool finished=false;    
+    node->get("solved", &finished);
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
     
     if(m_state == CH_SOLVED)

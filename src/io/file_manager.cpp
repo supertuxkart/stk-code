@@ -42,6 +42,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
 #ifdef __APPLE__
@@ -128,6 +129,7 @@ FileManager::FileManager()
     fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
 
+    TrackManager::addTrackDir(m_root_dir+"/data/tracks");
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/data/models"  );
     pushMusicSearchPath  (m_root_dir+"/data/music"   );
@@ -240,11 +242,6 @@ std::string FileManager::getModelFile(const std::string& FNAME) const
 }   // getModelFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getTrackDir() const
-{
-    return m_root_dir+"/data/tracks";
-}   // getTrackDir
-//-----------------------------------------------------------------------------
 std::string FileManager::getDataDir() const
 {
     return m_root_dir+"/data/";
@@ -276,18 +273,6 @@ std::vector<std::string> FileManager::getMusicDirs() const
 {
     return m_music_search_path;
 }   // getMusicDirs
-
-//-----------------------------------------------------------------------------
-std::string FileManager::getTrackFile(const std::string& fname,
-                                      const std::string& track_name) const
-{
-    // tracks file are in data/tracks/TRACKNAME/TRACKNAME.ext
-    // but if a track name is supplied use it (which is necessary
-    // e.g. to load a model from a track directory
-    std::string basename = (track_name!="") ? track_name
-                           : StringUtils::removeExtension(fname);
-    return getTrackDir()+"/"+basename+"/"+fname;
-}   // getTrackFile
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getKartFile(const std::string& fname,
@@ -372,6 +357,13 @@ std::string FileManager::getHighscoreFile(const std::string& fname) const
 {
     return getHomeDir()+"/"+fname;
 }   // getHighscoreFile
+
+//-----------------------------------------------------------------------------
+/** Returns the full path of the challenge file. */
+std::string FileManager::getChallengeFile(const std::string &fname) const
+{
+    return getHomeDir()+"/"+fname;
+}   // getChallengeFile
 
 //-----------------------------------------------------------------------------
 void FileManager::listFiles(std::set<std::string>& result, const std::string& dir,

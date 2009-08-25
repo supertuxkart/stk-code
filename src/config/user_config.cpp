@@ -46,7 +46,6 @@ static ptr_vector<UserConfigParam, REF> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
@@ -524,15 +523,9 @@ bool UserConfig::loadConfig(const std::string& filename)
         std::string name;
         players[i]->get("name", &name);
         UserConfigParams::m_all_players.push_back( new PlayerProfile(name.c_str()) );
-    }
-
-    // --- Read challenges
-    
-    unlock_manager->load(root);
-    
+    }    
     delete root;
     return true;
-
 }   // loadConfig
 
 // -----------------------------------------------------------------------------
@@ -569,9 +562,7 @@ void UserConfig::saveConfig(const std::string& filepath)
         //std::cout << "saving parameter " << i << " to file\n";
         all_params[i].write(configfile);
     }
-    
-    unlock_manager->save(configfile);
-    
+        
     configfile << "</stkconfig>\n";
     configfile.close();
 

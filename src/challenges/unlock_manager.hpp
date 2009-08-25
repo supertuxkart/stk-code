@@ -36,24 +36,25 @@ private:
     std::vector<const Challenge*> m_unlocked_features;
     Challenge *getChallenge      (const std::string& id);
     void       computeActive     ();
+    void       load              ();
 public:
-               UnlockManager    ();
-    void       addChallenge     (Challenge *c);
-    void       addChallenge     (const std::string& filename);
-    void       load             (const XMLNode*);
-    void       save             (std::ofstream& writer);
+               UnlockManager     ();
+              ~UnlockManager     ();
+    void       addChallenge      (Challenge *c);
+    void       addChallenge      (const std::string& filename);
+    void       save              ();
     std::vector<const Challenge*> 
                getActiveChallenges();
     const std::vector<const Challenge*> 
                getUnlockedFeatures() {return m_unlocked_features;}
 
-    void       clearUnlocked      () {m_unlocked_features.clear(); }
-    void       raceFinished       ();
-    void       grandPrixFinished  ();
-    void       unlockFeature      (Challenge* c, bool save=true);
-    void       lockFeature        (Challenge* challenge);
-    bool       isLocked           (const std::string& feature);
-    void       check              () const;
+    void       clearUnlocked     () {m_unlocked_features.clear(); }
+    void       raceFinished      ();
+    void       grandPrixFinished ();
+    void       unlockFeature     (Challenge* c, bool do_save=true);
+    void       lockFeature       (Challenge* challenge);
+    bool       isLocked          (const std::string& feature);
+    void       check             () const;
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;

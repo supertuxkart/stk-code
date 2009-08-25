@@ -24,23 +24,23 @@
 #include "animations/ipo.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "physics/kart_motion_state.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-ThreeDAnimation::ThreeDAnimation(const std::string &track_name, 
+ThreeDAnimation::ThreeDAnimation(const Track &track,
                                  const XMLNode &node, float fps) 
                : AnimationBase(node, fps)
 {
     std::string model_name;
     node.get("obj", &model_name);
 
-    std::string full_path = file_manager->getTrackFile(model_name, track_name);
+    std::string full_path = track.getTrackFile(model_name);
     m_mesh = irr_driver->getAnimatedMesh(full_path);
     if(!m_mesh)
     {

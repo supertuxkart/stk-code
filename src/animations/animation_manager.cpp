@@ -25,7 +25,7 @@
 #include "animations/three_d_animation.hpp"
 #include "io/xml_node.hpp"
 
-AnimationManager::AnimationManager(const std::string &track_name, const XMLNode &node)
+AnimationManager::AnimationManager(const Track &track, const XMLNode &node)
 {
 	for(unsigned int i=0; i<node.getNumNodes(); i++)
 	{
@@ -34,9 +34,9 @@ AnimationManager::AnimationManager(const std::string &track_name, const XMLNode 
 		float fps=25;
 		anim_node->get("fps", &fps);
 		if(type=="anim_billboard")
-			m_all_animations.push_back(new BillboardAnimation(track_name, *anim_node, fps));
+			m_all_animations.push_back(new BillboardAnimation(track, *anim_node, fps));
 		else if(type=="animations-IPO")
-			m_all_animations.push_back(new ThreeDAnimation(track_name, *anim_node, fps));
+			m_all_animations.push_back(new ThreeDAnimation(track, *anim_node, fps));
 		else
 			fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
 				    type.c_str());
