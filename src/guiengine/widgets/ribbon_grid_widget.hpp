@@ -57,21 +57,35 @@ namespace GUIEngine
         
         virtual ~RibbonGridWidget() {}
         
-        /* reference pointers only, the actual instances are owned by m_children */
+        /** reference pointers only, the actual instances are owned by m_children */
         ptr_vector<RibbonWidget, REF> m_rows;
         
-        std::vector<ItemDescription> m_items;
+        /** Used for ribbon grids that have a label */
+        bool m_has_label;
         IGUIStaticText* m_label;
+        int m_label_height;
+        
+        std::vector<ItemDescription> m_items;
+        
+        int m_arrows_w;
+        
         RibbonWidget* getSelectedRibbon() const;
         RibbonWidget* getRowContaining(Widget* w) const;
         
         void updateLabel(RibbonWidget* from_this_ribbon=NULL);
         
+        /** Even though the ribbon grid widget looks like a grid, it is really a vertical stack of
+            independant ribbons. When moving selection horizontally, this method is used to notify
+            other rows above and below of which column is selected, so that moving vertically to
+            another row keeps the same selected column. */
         void propagateSelection();
+        
         void focused();
         
         bool transmitEvent(Widget* w, std::string& originator);
         
+        void setSubElements();
+
         void scroll(const int x_delta);
         
         int m_scroll_offset;
@@ -80,7 +94,7 @@ namespace GUIEngine
         int m_max_rows;
         bool m_combo;
         
-        bool m_has_label;
+        
         
         /* reference pointers only, the actual instances are owned by m_children */
         Widget* m_left_widget;

@@ -42,18 +42,86 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::add()
 {
-    // Work-around for FIXME below... first clear children to avoid duplicates since we're adding everything again everytime
-    m_children.clearAndDeleteAll();
-    m_rows.clearWithoutDeleting();
-    
     m_has_label = m_properties[PROP_TEXT] == "bottom";
-    const int label_height = m_has_label ? 25 : 0;
+    m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
+    
+    // ----- add dynamic label at bottom
+    if (m_has_label)
+    {
+        // leave room for many lines, just in case
+        rect<s32> label_size = rect<s32>(x, y + h - m_label_height, x+w, y+h+m_label_height*5);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
+        m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
+        m_label->setWordWrap(true);
+    }
+    
+    // ---- add arrow buttons on each side
+    // FIXME? these arrow buttons are outside of the widget's boundaries
+    if (m_left_widget != NULL)
+    {
+        // FIXME - do proper memory management, find why it crashes when i try to clean-up
+        //delete m_left_widget;
+        //delete m_right_widget;
+    }
+    m_left_widget = new Widget();
+    m_right_widget = new Widget();
+    
+    const int average_y = y + (h-m_label_height)/2;
+    m_arrows_w = 30;
+    const int button_h = 50;
+    
+    // right arrow
+    rect<s32> right_arrow_location = rect<s32>(x + w - m_arrows_w,
+                                               average_y - button_h/2,
+                                               x + w,
+                                               average_y + button_h/2);
+    stringw  rmessage = ">>";
+    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID(), rmessage.c_str(), L"");
+    right_arrow->setTabStop(false);
+    m_right_widget->m_element = right_arrow;
+    m_right_widget->m_event_handler = this;
+    m_right_widget->m_properties[PROP_ID] = "right";
+    m_right_widget->id = right_arrow->getID();
+    m_children.push_back( m_right_widget );
+    
+    // left arrow
+    rect<s32> left_arrow_location = rect<s32>(x,
+                                              average_y - button_h/2,
+                                              x + m_arrows_w,
+                                              average_y + button_h/2);
+    stringw  lmessage = "<<";
+    IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID(), lmessage.c_str(), L"");
+    left_arrow->setTabStop(false);
+    m_left_widget->m_element = left_arrow;
+    m_left_widget->m_event_handler = this;
+    m_left_widget->m_properties[PROP_ID] = "left";
+    m_left_widget->id = left_arrow->getID();
+    m_children.push_back( m_left_widget );
+    
+    setSubElements();
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::setSubElements()
+{
+    // Work-around for FIXME below... first clear children to avoid duplicates since we're adding everything again everytime
+    for (int i=0; i<m_children.size(); i++)
+    {
+        IGUIElement* elem = m_children[i].m_element;
+        if (elem != NULL && m_children[i].m_type == WTYPE_RIBBON)
+        {
+            elem->remove();
+            m_children.erase(i);
+            i--;
+            if (i<0) i = 0;
+        }
+    }
+    m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
     
     int child_width, child_height;
     child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
     child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
     
-    if( child_width == 0 || child_height == 0 )
+    if (child_width == 0 || child_height == 0)
     {
         std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
         child_width = 256;
@@ -61,13 +129,13 @@ void RibbonGridWidget::add()
     }
     
     // decide how many rows and column we can show in the available space
-    int row_amount = (int)round((h-label_height) / (float)child_height);
+    int row_amount = (int)round((h-m_label_height) / (float)child_height);
     //if(row_amount < 2) row_amount = 2;
-    if(row_amount > m_max_rows) row_amount = m_max_rows;
+    if (row_amount > m_max_rows) row_amount = m_max_rows;
     
-    const float row_height = (float)(h - label_height)/(float)row_amount;
+    const float row_height = (float)(h - m_label_height)/(float)row_amount;
     
-    float ratio_zoom = (float)row_height / (float)(child_height - label_height);
+    float ratio_zoom = (float)row_height / (float)(child_height - m_label_height);
     m_col_amount = (int)round( w / ( child_width*ratio_zoom ) );
     
     // std::cout << "w=" << w << " child_width=" << child_width << " ratio_zoom="<< ratio_zoom << " m_col_amount=" << m_col_amount << std::endl;
@@ -78,13 +146,13 @@ void RibbonGridWidget::add()
     for(int n=0; n<row_amount; n++)
     {
         RibbonWidget* ribbon;
-        if(m_combo)
+        if (m_combo)
             ribbon = new RibbonWidget(RIBBON_COMBO);
         else
             ribbon = new RibbonWidget(RIBBON_TOOLBAR);
-        ribbon->x = x;
+        ribbon->x = x + m_arrows_w;
         ribbon->y = y + (int)(n*row_height);
-        ribbon->w = w;
+        ribbon->w = w - m_arrows_w*2;
         ribbon->h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
         ribbon->m_properties[PROP_ID] = this->m_properties[PROP_ID];
@@ -111,55 +179,7 @@ void RibbonGridWidget::add()
         ribbon->add();
     }
     
-    // add dynamic label at bottom
-    if(m_has_label)
-    {
-        // leave room for many lines, just in case
-        rect<s32> label_size = rect<s32>(x, y + h - label_height, x+w, y+h+label_height*5);
-        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
-        m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
-        m_label->setWordWrap(true);
-    }
-    
-    // add arrow buttons on each side
-    // FIXME? these arrow buttons are outside of the widget's boundaries
-    if(m_left_widget != NULL)
-    {
-        // FIXME - do proper memory management, find why it crashes when i try to clean-up
-        //delete m_left_widget;
-        //delete m_right_widget;
-    }
-    m_left_widget = new Widget();
-    m_right_widget = new Widget();
-    
-    const int average_y = y + (h-label_height)/2;
-    const int button_w = 30, button_h = 50;
-    rect<s32> right_arrow_location = rect<s32>(x + w,
-                                               average_y - button_h/2,
-                                               x + w + button_w,
-                                               average_y + button_h/2);
-    stringw  rmessage = ">>";
-    IGUIButton* right_arrow = GUIEngine::getGUIEnv()->addButton(right_arrow_location, NULL, getNewNoFocusID(), rmessage.c_str(), L"");
-    right_arrow->setTabStop(false);
-    m_right_widget->m_element = right_arrow;
-    m_right_widget->m_event_handler = this;
-    m_right_widget->m_properties[PROP_ID] = "right";
-    m_right_widget->id = right_arrow->getID();
-    m_children.push_back( m_right_widget );
-    
-    rect<s32> left_arrow_location = rect<s32>(x - button_w,
-                                              average_y - button_h/2,
-                                              x,
-                                              average_y + button_h/2);
-    stringw  lmessage = "<<";
-    IGUIButton* left_arrow = GUIEngine::getGUIEnv()->addButton(left_arrow_location, NULL, getNewNoFocusID(), lmessage.c_str(), L"");
-    left_arrow->setTabStop(false);
-    m_left_widget->m_element = left_arrow;
-    m_left_widget->m_event_handler = this;
-    m_left_widget->m_properties[PROP_ID] = "left";
-    m_left_widget->id = left_arrow->getID();
-    m_children.push_back( m_left_widget );
-}
+ }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
 {

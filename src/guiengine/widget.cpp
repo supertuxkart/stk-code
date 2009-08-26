@@ -43,7 +43,8 @@ using namespace gui;
 
 namespace GUIEngine
 {
-
+    
+// -----------------------------------------------------------------------------
 static unsigned int id_counter = 0;
 static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
 
@@ -56,14 +57,6 @@ int Widget::getNewNoFocusID()
     return id_counter_2++;
 }
 
-// -----------------------------------------------------------------------------
-/** When switching to a new screen, this function will be called to reset ID counters
- * (so we start again from ID 0, and don't grow to big numbers) */
-void Widget::resetIDCounters()
-{
-    id_counter = 0;
-    id_counter_2 = 1000;
-}
 // -----------------------------------------------------------------------------
 Widget::Widget()
 {
@@ -78,6 +71,14 @@ Widget::Widget()
     m_event_handler = NULL;
     m_show_bounding_box = false;
     m_parent = NULL;
+}
+// -----------------------------------------------------------------------------
+/** When switching to a new screen, this function will be called to reset ID counters
+ * (so we start again from ID 0, and don't grow to big numbers) */
+void Widget::resetIDCounters()
+{
+    id_counter = 0;
+    id_counter_2 = 1000;
 }
 // -----------------------------------------------------------------------------
 /**
