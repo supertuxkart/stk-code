@@ -65,8 +65,19 @@ void SpinnerWidget::add()
         m_children.push_back( new Widget() );
     }
     
+    int widgetID;
+    
+    if (m_reserved_id != -1)
+    {
+        widgetID = m_reserved_id;
+    }
+    else
+    {
+        widgetID = getNewID();
+    }
+    
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
+    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, widgetID, L"");
     m_element = btn;
     
     m_element->setTabOrder( m_element->getID() );
@@ -82,7 +93,7 @@ void SpinnerWidget::add()
     m_children[0].id = m_children[0].m_element->getID();
     
     // label
-    if(m_graphical)
+    if (m_graphical)
     {
         std::ostringstream icon_stream;
         icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];

@@ -258,9 +258,9 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
     const unsigned short widgets_amount = widgets.size();
     
     // ------- add widgets
-    for(int n=0; n<widgets_amount; n++)
+    for (int n=0; n<widgets_amount; n++)
     {
-        if(widgets[n].m_type == WTYPE_DIV)
+        if (widgets[n].m_type == WTYPE_DIV)
         {
             addWidgetsRecursively(widgets[n].m_children, &widgets[n]);
         }

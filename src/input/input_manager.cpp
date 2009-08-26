@@ -309,7 +309,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                         device = m_device_manager->getGamePadFromIrrID(deviceID);
 
                     if (device != NULL)
-                        KartSelectionScreen::playerJoin( device );
+                        KartSelectionScreen::playerJoin( device, false );
                 }
                 return; // we're done here, ignore devices that aren't associated with players
             }

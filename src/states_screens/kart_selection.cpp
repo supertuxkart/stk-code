@@ -68,18 +68,21 @@ namespace KartSelectionScreen
         int player_name_x, player_name_y, player_name_w, player_name_h;
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-
+        int m_irrlicht_widget_ID;
+        
         int target_x, target_y, target_w, target_h;
 
         LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
         
-        PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID) : Widget()
+        PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget()
         {
             m_associatedPlayer = associatedPlayer;
             x_speed = 1.0f;
             y_speed = 1.0f;
             w_speed = 1.0f;
             h_speed = 1.0f;
+
+            m_irrlicht_widget_ID = irrlichtWidgetID;
 
             this->playerID = playerID;
             
@@ -195,7 +198,11 @@ namespace KartSelectionScreen
         virtual void add()
         {
             playerIDLabel->add();
+            
+            // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
+            if (m_irrlicht_widget_ID != -1) playerName->m_reserved_id = m_irrlicht_widget_ID;
             playerName->add();
+            
             modelView->add();
             kartName->add();
             
@@ -430,7 +437,7 @@ class KartHoverListener : public RibbonGridHoverListener
 KartHoverListener* karthoverListener = NULL;
 
 // Return true if event was handled successfully
-bool playerJoin(InputDevice* device)
+bool playerJoin(InputDevice* device, bool firstPlayer)
 {
     std::cout << "playerJoin() ==========\n";
 
@@ -455,7 +462,12 @@ bool playerJoin(InputDevice* device)
     ActivePlayer *aplayer = StateManager::get()->getActivePlayer(id);
     
     // FIXME : player ID needs to be synced with active player list
-    PlayerKartWidget* newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
+    PlayerKartWidget* newPlayer;
+    if (firstPlayer)
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
+    else
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
+    
     getCurrentScreen()->manualAddWidget(newPlayer);
     newPlayer->add();
 
@@ -567,7 +579,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         
         //Widget* area = getCurrentScreen()->getWidget("playerskarts");
         
-        if(!getCurrentScreen()->m_inited)
+        if (!getCurrentScreen()->m_inited)
         {            
             // Build kart list
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
@@ -623,7 +635,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         }
         else // For now this is what will happen
         {
-            playerJoin( input_manager->getDeviceList()->getLatestUsedDevice() );
+            playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
             w->updateItemDisplay();
         }
         

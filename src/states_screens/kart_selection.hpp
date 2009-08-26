@@ -28,7 +28,7 @@ class ActivePlayer;
 
 namespace KartSelectionScreen
 {
-    bool playerJoin(InputDevice* device);
+    bool playerJoin(InputDevice* device, bool firstPlayer);
     bool playerQuit(ActivePlayer* player);
     void kartSelectionUpdate(float delta);
     void renumberKarts();

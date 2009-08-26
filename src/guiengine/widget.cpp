@@ -56,9 +56,16 @@ int Widget::getNewNoFocusID()
 {
     return id_counter_2++;
 }
-
+/** When switching to a new screen, this function will be called to reset ID counters
+ * (so we start again from ID 0, and don't grow to big numbers) */
+void Widget::resetIDCounters()
+{
+    id_counter = 0;
+    id_counter_2 = 1000;
+}
+    
 // -----------------------------------------------------------------------------
-Widget::Widget()
+Widget::Widget(bool reserve_id)
 {
     x = -1;
     y = -1;
@@ -71,14 +78,15 @@ Widget::Widget()
     m_event_handler = NULL;
     m_show_bounding_box = false;
     m_parent = NULL;
-}
-// -----------------------------------------------------------------------------
-/** When switching to a new screen, this function will be called to reset ID counters
- * (so we start again from ID 0, and don't grow to big numbers) */
-void Widget::resetIDCounters()
-{
-    id_counter = 0;
-    id_counter_2 = 1000;
+    
+    if (reserve_id)
+    {
+        m_reserved_id = getNewID();
+    }
+    else
+    {
+        m_reserved_id = -1;
+    }
 }
 // -----------------------------------------------------------------------------
 /**
@@ -109,6 +117,7 @@ bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percen
         return true;
     }
 }
+    
 void Widget::move(const int x, const int y, const int w, const int h)
 {
     this->x = x;
