@@ -122,21 +122,21 @@ void RibbonWidget::updateSelection()
 {
     const int subbuttons_amount = m_children.size();
     
-    for(int i=0; i<subbuttons_amount; i++)
+    for (int i=0; i<subbuttons_amount; i++)
     {
         m_children[i].m_selected = (i == m_selection);
     }
     
-    if(subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_focus = m_children.get(m_selection);
+    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_focus = m_children.get(m_selection);
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::transmitEvent(Widget* w, std::string& originator)
 {
     const int subbuttons_amount = m_children.size();
     
-    for(int i=0; i<subbuttons_amount; i++)
+    for (int i=0; i<subbuttons_amount; i++)
     {
-        if(m_children[i].m_properties[PROP_ID] == originator)
+        if (m_children[i].m_properties[PROP_ID] == originator)
         {
             m_selection = i;
             break;
@@ -161,11 +161,11 @@ void RibbonWidget::add()
     
     // ---- check how much space each child button will take and fit them within available space
     int total_needed_space = 0;
-    for(int i=0; i<subbuttons_amount; i++)
+    for (int i=0; i<subbuttons_amount; i++)
     {
         m_children[i].readCoords(this);
         
-        if(m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
+        if (m_children[i].m_type != WTYPE_ICON_BUTTON && m_children[i].m_type != WTYPE_BUTTON)
         {
             std::cerr << "/!\\ Warning /!\\ : ribbon widgets can only have (icon)button widgets as children " << std::endl;
             continue;

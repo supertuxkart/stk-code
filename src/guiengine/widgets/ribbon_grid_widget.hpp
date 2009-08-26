@@ -65,8 +65,10 @@ namespace GUIEngine
         IGUIStaticText* m_label;
         int m_label_height;
         
+        /** Used to keep track of item count changes */
         int m_previous_item_count;
         
+        /** List of items in the ribbon */
         std::vector<ItemDescription> m_items;
         
         /** Width of the scrolling arrows on each side */
@@ -80,7 +82,6 @@ namespace GUIEngine
         /** Whether this is a "combo" style ribbon grid widget */
         bool m_combo;
         
-        
         /* reference pointers only, the actual instances are owned by m_children */
         Widget* m_left_widget;
         Widget* m_right_widget;
@@ -88,6 +89,7 @@ namespace GUIEngine
         RibbonWidget* getSelectedRibbon() const;
         RibbonWidget* getRowContaining(Widget* w) const;
         
+        /** Updates the visible label to match the currently selected item */
         void updateLabel(RibbonWidget* from_this_ribbon=NULL);
         
         /** Even though the ribbon grid widget looks like a grid, it is really a vertical stack of
@@ -96,13 +98,18 @@ namespace GUIEngine
             another row keeps the same selected column. */
         void propagateSelection();
         
+        /** Callback called widget is focused */
         void focused();
         
         bool transmitEvent(Widget* w, std::string& originator);
         
+        /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();
 
         void scroll(const int x_delta);
+        
+        /** Used  for combo ribbons, to contain the ID of the currently selected item */
+        int m_selected_item;
         
     public:
         RibbonGridWidget(const bool combo=false, const int max_rows=4);
@@ -110,10 +117,15 @@ namespace GUIEngine
         void registerHoverListener(RibbonGridHoverListener* listener);
         
         void add();
+        
+        /** Called when right key is pressed */
         bool rightPressed();
+        
+        /** Called when left key is pressed */
         bool leftPressed();
         
         void addItem( std::string user_name, std::string code_name, std::string image_file );
+        
         void updateItemDisplay();
         
         bool mouseHovered(Widget* child);

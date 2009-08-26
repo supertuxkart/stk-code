@@ -38,6 +38,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     m_left_widget = NULL;
     m_right_widget = NULL;
     m_type = WTYPE_RIBBON_GRID;
+    m_selected_item = 0;
     
 }
 // -----------------------------------------------------------------------------
@@ -279,19 +280,19 @@ void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
 bool RibbonGridWidget::rightPressed()
 {
     RibbonWidget* w = getSelectedRibbon();
-    if(w != NULL)
+    if (w != NULL)
     {
         updateLabel();
         propagateSelection();
     }
     
     const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
+    for (int n=0; n<listenerAmount; n++)
     {
         m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
     }
     
-    if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
     
     return true;
 }
@@ -299,34 +300,45 @@ bool RibbonGridWidget::rightPressed()
 bool RibbonGridWidget::leftPressed()
 {
     RibbonWidget* w = getSelectedRibbon();
-    if(w != NULL)
+    if (w != NULL)
     {
         updateLabel();
         propagateSelection();
     }
     
     const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
+    for (int n=0; n<listenerAmount; n++)
     {
         m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString());
     }
     
-    if(m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
     
     return true;
 }
 // -----------------------------------------------------------------------------
 bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
 {
-    if(originator=="left")
+    if (originator=="left")
     {
         scroll(-1);
         return false;
     }
-    if(originator=="right")
+    if (originator=="right")
     {
         scroll(1);
         return false;
+    }
+    
+    // find selection in current ribbon
+    if (m_combo)
+    {
+        RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon();
+        if (selected_ribbon != NULL)
+        {
+            m_selected_item = selected_ribbon->m_selection + m_scroll_offset;
+            if (m_selected_item >= (int)m_items.size()) m_selected_item -= m_items.size();
+        }
     }
     
     return true;
@@ -337,10 +349,10 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
     updateLabel();
     propagateSelection();
     
-    if(getSelectedRibbon() != NULL)
+    if (getSelectedRibbon() != NULL)
     {
         const int listenerAmount = m_hover_listeners.size();
-        for(int n=0; n<listenerAmount; n++)
+        for (int n=0; n<listenerAmount; n++)
         {
             m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
         }
@@ -365,7 +377,7 @@ void RibbonGridWidget::onRowChange(RibbonWidget* row)
     updateLabel(row);
     
     const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
+    for (int n=0; n<listenerAmount; n++)
     {
         m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString());
     }
@@ -382,10 +394,19 @@ void RibbonGridWidget::scroll(const int x_delta)
     
     const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
     
-    if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
-    else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
+    if (m_scroll_offset < 0) m_scroll_offset = max_scroll;
+    else if (m_scroll_offset > max_scroll) m_scroll_offset = 0;
     
     updateItemDisplay();
+
+    // update selection markers in child ribbon
+    if (m_combo)
+    {
+        RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
+        int id = m_selected_item - m_scroll_offset;
+        if (id < 0) id += m_items.size();
+        ribbon->setSelection(id);
+    }
 }
 // -----------------------------------------------------------------------------
 /** RibbonGridWidget is made of several ribbons; each of them thus has
@@ -396,17 +417,23 @@ void RibbonGridWidget::propagateSelection()
 {
     // find selection in current ribbon
     RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon();
-    if(selected_ribbon == NULL) return;
-    const int i = selected_ribbon->m_selection;
+    if (selected_ribbon == NULL) return;
+    const int relative_selection = selected_ribbon->m_selection;
+    
+    if (m_combo)
+    {
+        m_selected_item = relative_selection + m_scroll_offset;
+        if (m_selected_item >= (int)m_items.size()) m_selected_item -= m_items.size();
+    }
     
     // set same selection in all ribbons
     const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
+    for (int n=0; n<row_amount; n++)
     {
         RibbonWidget* ribbon = m_rows.get(n);
-        if(ribbon != selected_ribbon)
+        if (ribbon != selected_ribbon)
         {
-            ribbon->m_selection = i;
+            ribbon->m_selection = relative_selection;
             ribbon->updateSelection();
         }
     }
@@ -414,18 +441,18 @@ void RibbonGridWidget::propagateSelection()
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
-    if(!m_has_label) return;
+    if (!m_has_label) return;
     
     RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon();
-    if(row == NULL) return;
+    if (row == NULL) return;
     
     
     std::string selection_id = row->getSelectionIDString();
     
     const int amount = m_items.size();
-    for(int n=0; n<amount; n++)
+    for (int n=0; n<amount; n++)
     {
-        if(m_items[n].m_code_name == selection_id)
+        if (m_items[n].m_code_name == selection_id)
         {
             m_label->setText( stringw(m_items[n].m_user_name.c_str()).c_str() );
             return;
@@ -433,27 +460,6 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
     }
     
     m_label->setText( L"Random" );
-}
-// -----------------------------------------------------------------------------
-void RibbonGridWidget::setSelection(int item_id)
-{
-    if(m_rows.size() > 1)
-    {
-        std::cout << "/!\\ Warning, RibbonGridWidget::setSelection only makes sense on 1-row ribbons (since there can't logically be a selection with more than one row)\n";
-    }
-    
-    
-    // scroll so selection is visible
-    m_scroll_offset = item_id;
-    updateItemDisplay();
-    
-    // set selection again, because scrolling made it wrong
-    RibbonWidget* ribbon = m_rows.get(0);
-    ribbon->setSelection(0);
-}
-void RibbonGridWidget::setSelection(const std::string& code_name)
-{
-    assert(false);
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateItemDisplay()
@@ -510,4 +516,31 @@ void RibbonGridWidget::updateItemDisplay()
         } // next column
     } // next row
 }
-
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::setSelection(int item_id)
+{
+    if (m_rows.size() > 1)
+    {
+        std::cout << "\n/!\\ Warning, RibbonGridWidget::setSelection only makes sense on 1-row ribbons " <<
+                     "(since there can't logically be a permanent with more than one row)\n\n";
+        return;
+    }
+    
+    m_selected_item = item_id;
+    if (m_selected_item >= (int)m_items.size()) m_selected_item -= m_items.size();
+    
+    // scroll so selection is visible
+    m_scroll_offset = m_selected_item; // works because in this case there is a single row
+    updateItemDisplay();
+    
+    // set selection
+    RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
+    int id = m_selected_item - m_scroll_offset;
+    if (id < 0) id += m_items.size();
+    ribbon->setSelection(id);
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::setSelection(const std::string& code_name)
+{
+    assert(false);
+}
