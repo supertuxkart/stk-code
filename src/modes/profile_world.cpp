@@ -82,7 +82,7 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     // Create a camera for the last kart (since this way more of the
     // karts can be seen.
     Kart *newkart = new DefaultRobot(kart_ident, index+1, init_pos, m_track);
-    if(index==race_manager->getNumKarts()-1)
+    if (index == (int)race_manager->getNumKarts()-1)
     {
         // The pointer to the camera does not have to be stored, since it
         // the camera for robots is not modified.

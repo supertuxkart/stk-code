@@ -904,7 +904,7 @@ bool Kart::playCustomSFX(unsigned int type)
 
     // Stop all other character voices for this kart before playing a new one
     // we don't want overlapping phrases coming from the same kart
-    for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
+    for (unsigned int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
     {
         if (m_custom_sounds[n] != NULL)
         {

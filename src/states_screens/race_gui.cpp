@@ -225,7 +225,7 @@ void RaceGUI::drawMiniMap()
     	const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
-        int marker_height = m_marker->getOriginalSize().Height;
+        // int marker_height = m_marker->getOriginalSize().Height;
         core::rect<s32> source(i    *m_marker_rendered_size, 0, 
                                (i+1)*m_marker_rendered_size, m_marker_rendered_size);
         int marker_half_size =  (kart->isPlayerKart() ? m_marker_player_size 
@@ -774,8 +774,10 @@ void RaceGUI::drawStatusText()
                                  plunger_x+plunger_size, offset_y+plunger_size);
             const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
 
+            static const video::SColor white = video::SColor(255, 255, 255, 255);
+
             irr_driver->getVideoDriver()->draw2DImage(t, dest, source, 0, 
-                                                      &video::SColor(255,255,255,255), 
+                                                      &white, 
                                                       true);
         }
     }   // next player
