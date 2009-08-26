@@ -65,9 +65,25 @@ namespace GUIEngine
         IGUIStaticText* m_label;
         int m_label_height;
         
+        int m_previous_item_count;
+        
         std::vector<ItemDescription> m_items;
         
+        /** Width of the scrolling arrows on each side */
         int m_arrows_w;
+        
+        int m_scroll_offset;
+        int m_needed_cols;
+        int m_col_amount;
+        int m_max_rows;
+        
+        /** Whether this is a "combo" style ribbon grid widget */
+        bool m_combo;
+        
+        
+        /* reference pointers only, the actual instances are owned by m_children */
+        Widget* m_left_widget;
+        Widget* m_right_widget;
         
         RibbonWidget* getSelectedRibbon() const;
         RibbonWidget* getRowContaining(Widget* w) const;
@@ -88,17 +104,6 @@ namespace GUIEngine
 
         void scroll(const int x_delta);
         
-        int m_scroll_offset;
-        int m_needed_cols;
-        int m_col_amount;
-        int m_max_rows;
-        bool m_combo;
-        
-        
-        
-        /* reference pointers only, the actual instances are owned by m_children */
-        Widget* m_left_widget;
-        Widget* m_right_widget;
     public:
         RibbonGridWidget(const bool combo=false, const int max_rows=4);
         

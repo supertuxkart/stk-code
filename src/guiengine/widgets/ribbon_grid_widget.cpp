@@ -30,6 +30,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     m_needed_cols = 0;
     m_col_amount = 0;
     m_has_label = false;
+    m_previous_item_count = 0;
     
     m_max_rows = max_rows;
     m_combo = combo;
@@ -103,7 +104,7 @@ void RibbonGridWidget::add()
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::setSubElements()
 {
-    // Work-around for FIXME below... first clear children to avoid duplicates since we're adding everything again everytime
+    // ---- Clean-up what was previously there
     for (int i=0; i<m_children.size(); i++)
     {
         IGUIElement* elem = m_children[i].m_element;
@@ -117,30 +118,48 @@ void RibbonGridWidget::setSubElements()
     }
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
     
+    // ---- Determine number of rows and columns
+    // Find children size (and ratio)
     int child_width, child_height;
     child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
     child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
     
-    if (child_width == 0 || child_height == 0)
+    if (child_width <= 0 || child_height <= 0)
     {
         std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
         child_width = 256;
         child_height = 256;
     }
     
-    // decide how many rows and column we can show in the available space
+    // determine row amonunt
     int row_amount = (int)round((h-m_label_height) / (float)child_height);
-    //if(row_amount < 2) row_amount = 2;
     if (row_amount > m_max_rows) row_amount = m_max_rows;
     
+    // determine column amount
     const float row_height = (float)(h - m_label_height)/(float)row_amount;
-    
     float ratio_zoom = (float)row_height / (float)(child_height - m_label_height);
     m_col_amount = (int)round( w / ( child_width*ratio_zoom ) );
     
-    // std::cout << "w=" << w << " child_width=" << child_width << " ratio_zoom="<< ratio_zoom << " m_col_amount=" << m_col_amount << std::endl;
-    
-    //if(m_col_amount < 5) m_col_amount = 5;
+    // ajust row and column amount to not add more items slot than we actually need
+    const int item_count = m_items.size();
+    std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << row_amount*m_col_amount << std::endl;
+    if (row_amount*m_col_amount > item_count)
+    {
+        m_col_amount = ceil((float)item_count/(float)row_amount);
+        std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
+    }
+        
+    // Hide arrows when everything is visible
+    if (item_count <= row_amount*m_col_amount)
+    {
+        m_left_widget->m_element->setVisible(false);
+        m_right_widget->m_element->setVisible(false);
+    }
+    else
+    {
+        m_left_widget->m_element->setVisible(true);
+        m_right_widget->m_element->setVisible(true);
+    }
     
     // add rows
     for(int n=0; n<row_amount; n++)
@@ -181,6 +200,77 @@ void RibbonGridWidget::setSubElements()
     
  }
 // -----------------------------------------------------------------------------
+void RibbonGridWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
+{
+    ItemDescription desc;
+    desc.m_user_name = user_name;
+    desc.m_code_name = code_name;
+    desc.m_sshot_file = image_file;
+    
+    m_items.push_back(desc);
+}
+
+#if 0
+#pragma mark -
+#pragma mark Getters
+#endif
+
+const std::string& RibbonGridWidget::getSelectionIDString()
+{
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+    
+    if(row != NULL) return row->getSelectionIDString();
+    
+    static const std::string nothing = "";
+    return nothing;
+}
+// -----------------------------------------------------------------------------
+const std::string& RibbonGridWidget::getSelectionText()
+{
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+    
+    if(row != NULL) return row->getSelectionText();
+    
+    static const std::string nothing = "";
+    return nothing;
+}
+// -----------------------------------------------------------------------------
+RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
+{
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
+    {
+        const RibbonWidget* row = &m_rows[n];
+        if(row != NULL)
+        {
+            if(m_children.contains( w ) ) return (RibbonWidget*)row;
+        }
+    }
+    
+    return NULL;
+}
+// -----------------------------------------------------------------------------
+RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
+{
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
+    {
+        const RibbonWidget* row = &m_rows[n];
+        if(row != NULL)
+        {
+            if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
+               m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
+        }
+    }
+    
+    return NULL;
+}
+
+#if 0
+#pragma mark -
+#pragma mark Event Handling
+#endif
+
 void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
 {
     m_hover_listeners.push_back(listener);
@@ -242,18 +332,6 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator)
     return true;
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::scroll(const int x_delta)
-{
-    m_scroll_offset += x_delta;
-    
-    const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
-    
-    if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
-    else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
-    
-    updateItemDisplay();
-}
-// -----------------------------------------------------------------------------
 bool RibbonGridWidget::mouseHovered(Widget* child)
 {
     updateLabel();
@@ -269,6 +347,45 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
     }
     
     return false;
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::focused()
+{
+    updateLabel();
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
+    }
+}
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::onRowChange(RibbonWidget* row)
+{
+    updateLabel(row);
+    
+    const int listenerAmount = m_hover_listeners.size();
+    for(int n=0; n<listenerAmount; n++)
+    {
+        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString());
+    }
+}
+
+#if 0
+#pragma mark -
+#pragma mark Setters / Actions
+#endif
+
+void RibbonGridWidget::scroll(const int x_delta)
+{
+    m_scroll_offset += x_delta;
+    
+    const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
+    
+    if(m_scroll_offset < 0) m_scroll_offset = max_scroll;
+    else if(m_scroll_offset > max_scroll) m_scroll_offset = 0;
+    
+    updateItemDisplay();
 }
 // -----------------------------------------------------------------------------
 /** RibbonGridWidget is made of several ribbons; each of them thus has
@@ -295,28 +412,6 @@ void RibbonGridWidget::propagateSelection()
     }
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::focused()
-{
-    updateLabel();
-    
-    const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
-    {
-        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
-    }
-}
-// -----------------------------------------------------------------------------
-void RibbonGridWidget::onRowChange(RibbonWidget* row)
-{
-    updateLabel(row);
-    
-    const int listenerAmount = m_hover_listeners.size();
-    for(int n=0; n<listenerAmount; n++)
-    {
-        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString());
-    }
-}
-// -----------------------------------------------------------------------------
 void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
     if(!m_has_label) return;
@@ -338,16 +433,6 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
     }
     
     m_label->setText( L"Random" );
-}
-// -----------------------------------------------------------------------------
-void RibbonGridWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
-{
-    ItemDescription desc;
-    desc.m_user_name = user_name;
-    desc.m_code_name = code_name;
-    desc.m_sshot_file = image_file;
-    
-    m_items.push_back(desc);
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::setSelection(int item_id)
@@ -373,6 +458,13 @@ void RibbonGridWidget::setSelection(const std::string& code_name)
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::updateItemDisplay()
 {
+    // Check if we need to update the number of icons in the ribbon
+    if ((int)m_items.size() != m_previous_item_count)
+    {
+        setSubElements();
+        m_previous_item_count = m_items.size();
+    }
+    
     int icon_id = 0;
     
     const int row_amount = m_rows.size();
@@ -417,56 +509,5 @@ void RibbonGridWidget::updateItemDisplay()
             }
         } // next column
     } // next row
-}
-// -----------------------------------------------------------------------------
-const std::string& RibbonGridWidget::getSelectionIDString()
-{
-    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
-    
-    if(row != NULL) return row->getSelectionIDString();
-    
-    static const std::string nothing = "";
-    return nothing;
-}
-// -----------------------------------------------------------------------------
-const std::string& RibbonGridWidget::getSelectionText()
-{
-    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
-    
-    if(row != NULL) return row->getSelectionText();
-    
-    static const std::string nothing = "";
-    return nothing;
-}
-// -----------------------------------------------------------------------------
-RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
-{
-    const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
-    {
-        const RibbonWidget* row = &m_rows[n];
-        if(row != NULL)
-        {
-            if(m_children.contains( w ) ) return (RibbonWidget*)row;
-        }
-    }
-    
-    return NULL;
-}
-// -----------------------------------------------------------------------------
-RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
-{
-    const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
-    {
-        const RibbonWidget* row = &m_rows[n];
-        if(row != NULL)
-        {
-            if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
-               m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
-        }
-    }
-    
-    return NULL;
 }
 
