@@ -46,6 +46,8 @@ namespace GUIEngine
         int m_selection;
         RibbonType m_ribbon_type;
         
+        int m_given_id;
+        
         void add();
         
         bool rightPressed();
@@ -60,7 +62,7 @@ namespace GUIEngine
     public:
         Widget* m_focus;
         
-        RibbonWidget(const RibbonType type=RIBBON_COMBO);
+        RibbonWidget(const RibbonType type=RIBBON_COMBO, int id=-1);
         virtual ~RibbonWidget() {}
         
         int getSelection() const { return m_selection; }

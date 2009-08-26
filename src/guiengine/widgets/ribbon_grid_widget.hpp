@@ -76,8 +76,16 @@ namespace GUIEngine
         
         int m_scroll_offset;
         int m_needed_cols;
+        
+        int m_child_width, m_child_height;
+        
+        /** Number of rows and columns. Number of columns can dynamically change, number of row is
+            determined at creation */
+        int m_row_amount;
         int m_col_amount;
+        
         int m_max_rows;
+        std::vector<int> m_ids;
         
         /** Whether this is a "combo" style ribbon grid widget */
         bool m_combo;

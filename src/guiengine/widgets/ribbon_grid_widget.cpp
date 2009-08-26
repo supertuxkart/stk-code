@@ -38,8 +38,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     m_left_widget = NULL;
     m_right_widget = NULL;
     m_type = WTYPE_RIBBON_GRID;
-    m_selected_item = 0;
-    
+    m_selected_item = 0;  
 }
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::add()
@@ -100,6 +99,32 @@ void RibbonGridWidget::add()
     m_left_widget->id = left_arrow->getID();
     m_children.push_back( m_left_widget );
     
+    // ---- Determine number of rows and columns
+    
+    // Find children size (and ratio)
+    m_child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
+    m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
+    
+    if (m_child_width <= 0 || m_child_height <= 0)
+    {
+        std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
+        m_child_width = 256;
+        m_child_height = 256;
+    }
+    
+    // determine row amonunt
+    m_row_amount = (int)round((h-m_label_height) / (float)m_child_height);
+    if (m_row_amount > m_max_rows) m_row_amount = m_max_rows;
+    
+    // get and build a list of IDs (by now we may not yet know how many rows we will needs,
+    // but we need to get IDs *now* in order for tabbing to work.
+    m_ids.resize(m_row_amount);
+    for (int i=0; i<m_row_amount; i++)
+    {
+        m_ids[i] = getNewID();
+        std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
+    }
+    
     setSubElements();
 }
 // -----------------------------------------------------------------------------
@@ -119,39 +144,23 @@ void RibbonGridWidget::setSubElements()
     }
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete
     
-    // ---- Determine number of rows and columns
-    // Find children size (and ratio)
-    int child_width, child_height;
-    child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
-    child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
+    // ---- determine column amount
+    const float row_height = (float)(h - m_label_height)/(float)m_row_amount;
+    float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
+    m_col_amount = (int)round( w / ( m_child_width*ratio_zoom ) );
     
-    if (child_width <= 0 || child_height <= 0)
-    {
-        std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
-        child_width = 256;
-        child_height = 256;
-    }
-    
-    // determine row amonunt
-    int row_amount = (int)round((h-m_label_height) / (float)child_height);
-    if (row_amount > m_max_rows) row_amount = m_max_rows;
-    
-    // determine column amount
-    const float row_height = (float)(h - m_label_height)/(float)row_amount;
-    float ratio_zoom = (float)row_height / (float)(child_height - m_label_height);
-    m_col_amount = (int)round( w / ( child_width*ratio_zoom ) );
-    
-    // ajust row and column amount to not add more items slot than we actually need
+    // ajust column amount to not add more items slot than we actually need
     const int item_count = m_items.size();
-    std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << row_amount*m_col_amount << std::endl;
-    if (row_amount*m_col_amount > item_count)
+    std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
+    if (m_row_amount*m_col_amount > item_count)
     {
-        m_col_amount = ceil((float)item_count/(float)row_amount);
+        m_col_amount = ceil((float)item_count/(float)m_row_amount);
         std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
+    
         
     // Hide arrows when everything is visible
-    if (item_count <= row_amount*m_col_amount)
+    if (item_count <= m_row_amount*m_col_amount)
     {
         m_left_widget->m_element->setVisible(false);
         m_right_widget->m_element->setVisible(false);
@@ -163,13 +172,14 @@ void RibbonGridWidget::setSubElements()
     }
     
     // add rows
-    for(int n=0; n<row_amount; n++)
+    for(int n=0; n<m_row_amount; n++)
     {
         RibbonWidget* ribbon;
         if (m_combo)
-            ribbon = new RibbonWidget(RIBBON_COMBO);
+            ribbon = new RibbonWidget(RIBBON_COMBO, m_ids[n]);
         else
-            ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+            ribbon = new RibbonWidget(RIBBON_TOOLBAR, m_ids[n]);
+                
         ribbon->x = x + m_arrows_w;
         ribbon->y = y + (int)(n*row_height);
         ribbon->w = w - m_arrows_w*2;
@@ -284,12 +294,12 @@ bool RibbonGridWidget::rightPressed()
     {
         updateLabel();
         propagateSelection();
-    }
-    
-    const int listenerAmount = m_hover_listeners.size();
-    for (int n=0; n<listenerAmount; n++)
-    {
-        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
+        
+        const int listenerAmount = m_hover_listeners.size();
+        for (int n=0; n<listenerAmount; n++)
+        {
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString());
+        }
     }
     
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
@@ -304,13 +314,14 @@ bool RibbonGridWidget::leftPressed()
     {
         updateLabel();
         propagateSelection();
+        
+        const int listenerAmount = m_hover_listeners.size();
+        for (int n=0; n<listenerAmount; n++)
+        {
+            m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString());
+        }
     }
     
-    const int listenerAmount = m_hover_listeners.size();
-    for (int n=0; n<listenerAmount; n++)
-    {
-        m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString());
-    }
     
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
     
@@ -390,6 +401,9 @@ void RibbonGridWidget::onRowChange(RibbonWidget* row)
 
 void RibbonGridWidget::scroll(const int x_delta)
 {
+    // Refuse to scroll when everything is visible
+    if ((int)m_items.size() <= m_row_amount*m_col_amount) return;
+    
     m_scroll_offset += x_delta;
     
     const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
