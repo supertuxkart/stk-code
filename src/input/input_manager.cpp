@@ -79,7 +79,10 @@ InputManager::~InputManager()
 
 void InputManager::handleStaticAction(int key, int value)
 {
-    // static bool control_is_pressed=false;
+#ifdef DEBUG
+    static bool control_is_pressed=false;
+#endif
+    
     switch (key)
     {
 #ifdef DEBUG
