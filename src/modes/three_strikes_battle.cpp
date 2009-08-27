@@ -107,8 +107,17 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         removeKart(kart_id);
     }
     
-    // almost over, use fast music
-    if(getCurrentNumKarts()==2 && m_faster_music_active==false)  
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    int num_karts_many_lives = 0;
+ 
+    for( unsigned int n = 0; n < NUM_KARTS; ++n )
+    {
+        if (m_kart_info[n].m_lives > 1)
+            num_karts_many_lives++;
+    }
+    
+    // when almost over, use fast music
+    if (num_karts_many_lives<=1 && !m_faster_music_active)
     {
         sound_manager->switchToFastMusic();
         m_faster_music_active = true;
