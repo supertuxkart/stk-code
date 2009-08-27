@@ -81,7 +81,8 @@ Widget::Widget(bool reserve_id)
     
     for (int n=0; n<32; n++)
     {
-        m_special_focus[n] = false;
+        m_player_focus[n] = false;
+        GUIEngine::g_focus_for_player[n] = false;
     }
     
     if (reserve_id)
@@ -99,19 +100,34 @@ Widget::Widget(bool reserve_id)
   * Since the code tracks focus from main player, this will most likely be used only
   * for additionnal players
   */
-void Widget::setFocusForPlayer(const int playerID, const bool focused)
+void Widget::setFocusForPlayer(const int playerID)
 {
-    m_special_focus[playerID] = focused;
+    std::cout << "=========== setFocusForPlayer " << playerID << " : " <<  m_properties[PROP_ID].c_str() << " =============\n";
+    
+    // Unset focus flag on previous widget that had focus
+    if (GUIEngine::g_focus_for_player[playerID] != NULL)
+    {
+        GUIEngine::g_focus_for_player[playerID]->m_player_focus[playerID] = false;
+    }
+    
+    m_player_focus[playerID] = true;
+    GUIEngine::g_focus_for_player[playerID] = this;
 }
+
 /**
  * \param playerID ID of the player you want to set/unset focus for, starting from 0
  */
 bool Widget::isFocusedForPlayer(const int playerID)
 {
-    return m_special_focus[playerID];
+    return m_player_focus[playerID];
 }
     
-    
+
+void Widget::requestFocus()
+{
+    GUIEngine::getGUIEnv()->setFocus(m_element);
+}
+
 /**
  * Receives as string the raw property value retrieved from XML file.
  * Will try to make sense of it, as an absolute value or a percentage.

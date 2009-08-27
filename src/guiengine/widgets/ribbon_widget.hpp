@@ -82,7 +82,7 @@ namespace GUIEngine
         int getSelection(const int playerID) const { return m_selection[playerID]; }
         
         /** Returns the string ID (internal name) of the selection */
-        const std::string& getSelectionIDString(const int playerID) { return m_children[m_selection[playerID]].m_properties[PROP_ID]; }
+        const std::string& getSelectionIDString(const int playerID);
         
         /** Returns the user-visible text of the selection */
         const std::string& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_properties[PROP_TEXT]; }
@@ -99,6 +99,8 @@ namespace GUIEngine
             superclasses/wrappers of this do.) */
         void setLabel(const int id, std::string new_name);
         
+        /** Returns the ID of the item, or -1 if not found */
+        int findItemNamed(const char* internalName);
     };
 
 }

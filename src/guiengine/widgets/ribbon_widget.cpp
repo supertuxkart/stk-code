@@ -288,6 +288,15 @@ bool RibbonWidget::mouseHovered(Widget* child)
     updateSelection();
     return false;
 }
+
+// -----------------------------------------------------------------------------
+const std::string& RibbonWidget::getSelectionIDString(const int playerID)
+{
+    static std::string empty;
+    if (m_selection[playerID] == -1) return empty;
+    return m_children[m_selection[playerID]].m_properties[PROP_ID];
+}
+
 // -----------------------------------------------------------------------------
 void RibbonWidget::updateSelection()
 {
@@ -297,15 +306,6 @@ void RibbonWidget::updateSelection()
     {
         // Player 0 selection
         m_children[i].m_selected = (i == m_selection[0]);
-        
-        // Other player selection (FIXME: merge with player 0 selection)
-        for (int n=1; n<32; n++)
-        {
-            if (i == m_selection[n])
-                m_children[i].setFocusForPlayer(n, true);
-            else
-                m_children[i].setFocusForPlayer(n, false);
-        }
     }
     
     // FIXME: don't hardcode player 0
@@ -340,4 +340,14 @@ void RibbonWidget::setLabel(const int id, std::string new_name)
     assert(id >= 0);
     assert(id < m_labels.size());
     m_labels[id].setText( stringw(new_name.c_str()).c_str() );
+}
+// -----------------------------------------------------------------------------
+int RibbonWidget::findItemNamed(const char* internalName)
+{    
+    const int size = m_children.size();
+    for (int n=0; n<size; n++)
+    {
+        if (m_children[n].m_properties[PROP_ID] == internalName) return n;
+    }
+    return -1;
 }

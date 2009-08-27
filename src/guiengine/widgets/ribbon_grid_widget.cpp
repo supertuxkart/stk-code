@@ -18,6 +18,9 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/ribbon_grid_widget.hpp"
 #include "io/file_manager.hpp"
+
+#include <sstream>
+
 using namespace GUIEngine;
 
 #ifndef round
@@ -176,7 +179,7 @@ void RibbonGridWidget::setSubElements()
         m_right_widget->m_element->setVisible(true);
     }
     
-    // add rows
+    // ---- add rows
     for (int n=0; n<m_row_amount; n++)
     {
         RibbonWidget* ribbon;
@@ -195,7 +198,10 @@ void RibbonGridWidget::setSubElements()
         ribbon->w = w - m_arrows_w*2;
         ribbon->h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
-        ribbon->m_properties[PROP_ID] = this->m_properties[PROP_ID];
+
+        std::stringstream name;
+        name << this->m_properties[PROP_ID] << "_row" << n;
+        ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
         
         // add columns
@@ -238,7 +244,7 @@ void RibbonGridWidget::addItem( std::string user_name, std::string code_name, st
 
 const std::string& RibbonGridWidget::getSelectionIDString(const int playerID)
 {
-    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
     if(row != NULL) return row->getSelectionIDString(playerID);
     
@@ -248,7 +254,7 @@ const std::string& RibbonGridWidget::getSelectionIDString(const int playerID)
 // -----------------------------------------------------------------------------
 const std::string& RibbonGridWidget::getSelectionText(const int playerID)
 {
-    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
+    RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
     if(row != NULL) return row->getSelectionText(playerID);
     
@@ -271,17 +277,33 @@ RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
     return NULL;
 }
 // -----------------------------------------------------------------------------
-RibbonWidget* RibbonGridWidget::getSelectedRibbon() const
-{
-    const int row_amount = m_rows.size();
-    for(int n=0; n<row_amount; n++)
+RibbonWidget* RibbonGridWidget::getSelectedRibbon(const int playerID) const
+{    
+    if (playerID == 0)
     {
-        const RibbonWidget* row = &m_rows[n];
-        if(row != NULL)
+        const int row_amount = m_rows.size();
+        for(int n=0; n<row_amount; n++)
         {
-            if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
-               m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
+            const RibbonWidget* row = &m_rows[n];
+            if(row != NULL)
+            {
+                if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
+                   m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
+            }
         }
+    }
+    else
+    {
+        const int row_amount = m_rows.size();
+        for(int n=0; n<row_amount; n++)
+        {
+            const RibbonWidget* row = &m_rows[n];
+            if (row == GUIEngine::g_focus_for_player[playerID])
+            {
+                return (RibbonWidget*)row;
+            }
+        }
+        
     }
     
     return NULL;
@@ -299,7 +321,7 @@ void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
 // -----------------------------------------------------------------------------
 bool RibbonGridWidget::rightPressed(const int playerID)
 {
-    RibbonWidget* w = getSelectedRibbon();
+    RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
         updateLabel();
@@ -309,7 +331,7 @@ bool RibbonGridWidget::rightPressed(const int playerID)
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
         }
     }
     
@@ -320,7 +342,7 @@ bool RibbonGridWidget::rightPressed(const int playerID)
 // -----------------------------------------------------------------------------
 bool RibbonGridWidget::leftPressed(const int playerID)
 {
-    RibbonWidget* w = getSelectedRibbon();
+    RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
         updateLabel();
@@ -355,7 +377,7 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator, const i
     // find selection in current ribbon
     if (m_combo)
     {
-        RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon();
+        RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon(playerID);
         if (selected_ribbon != NULL)
         {
             m_selected_item[playerID] = selected_ribbon->m_selection[playerID] + m_scroll_offset;
@@ -371,14 +393,15 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
     updateLabel();
     propagateSelection();
     
-    if (getSelectedRibbon() != NULL)
+    // FIXME: don't hardcode player 0
+    const int playerID = 0;
+    
+    if (getSelectedRibbon(playerID) != NULL)
     {
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            // FIXME: don't hardcode player 0
-            const int playerID = 0;
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
         }
     }
     
@@ -395,7 +418,7 @@ void RibbonGridWidget::focused()
     {
         // FIXME: don't hardcode player 0
         const int playerID = 0;
-        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon()->getSelectionIDString(playerID), playerID);
+        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
     }
 }
 // -----------------------------------------------------------------------------
@@ -450,12 +473,12 @@ void RibbonGridWidget::scroll(const int x_delta)
  used to ensure that all children ribbons always select the same column */
 void RibbonGridWidget::propagateSelection()
 {    
-    // find selection in current ribbon
-    RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon();
-    if (selected_ribbon == NULL) return;
-    
     for (int p=0; p<32; p++)
     {
+        // find selection in current ribbon
+        RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon(p);
+        if (selected_ribbon == NULL) continue;
+        
         const int relative_selection = selected_ribbon->m_selection[p];
         
         if (m_combo)
@@ -483,11 +506,13 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
     if (!m_has_label) return;
     
-    RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon();
+    // FIXME? Don't hardcode player 0 (even though label can only work with a single player)
+    const int playerID = 0;
+    
+    RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon(playerID);
     if (row == NULL) return;
     
-    // FIXME? Don't hardcode player 0 (even though label can only work with a single player)
-    std::string selection_id = row->getSelectionIDString(0);
+    std::string selection_id = row->getSelectionIDString(playerID);
     
     const int amount = m_items.size();
     for (int n=0; n<amount; n++)
@@ -587,5 +612,32 @@ void RibbonGridWidget::setSelection(int item_id)
 void RibbonGridWidget::setSelection(int item_id, const int playerID)
 {
     m_selected_item[playerID] = item_id;
+    
+
+    const std::string& name = m_items[item_id].m_code_name;
+    
+    int row = -1;
+    int id;
+    
+    for (int r=0; r<m_row_amount; r++)
+    {
+        id = m_rows[r].findItemNamed(name.c_str());
+        if (id > -1)
+        {
+            row = r;
+            break;
+        }
+    }
+    
+    if (row == -1)
+    {
+        std::cerr << "RibbonGridWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
+        return;
+    }
+    
+    std::cout << "Player " << playerID << " has kart " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
+    m_rows[row].setSelection(id, playerID);
+    m_rows[row].setFocusForPlayer(playerID);
+
     propagateSelection();
 }

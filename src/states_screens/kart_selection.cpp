@@ -399,30 +399,6 @@ class KartHoverListener : public RibbonGridHoverListener
     public:
         void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID, const int playerID)
         {
-            std::cout << "Player " << playerID << " selected kart " << selectionID.c_str() << std::endl;
-            /*
-            InputDevice *device;
-            ActivePlayer *player;
-            int pKartIndex = -1;
-            //std::cout << "hovered " << selectionID.c_str() << std::endl;
-            
-
-            device = input_manager->getDeviceList()->getLatestUsedDevice();
-            if (selectionID.size() == 0) return;
-            if ((player = device->getPlayer()) == NULL) return;
-
-            for (int n = 0; (n < g_player_karts.size() && pKartIndex == -1); n++)
-            {
-                if (g_player_karts[n].m_associatedPlayer == player)
-                    pKartIndex = n;
-            }
-            if (pKartIndex == -1)
-            {
-                fprintf(stderr, "onSelectionChanged(): Unable to determine kart associated with device\n");
-                return;
-            }
-        */
-
             ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
             
@@ -631,6 +607,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
                     w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
                 }
             }
+            
             getCurrentScreen()->m_inited = true;
         }
         
@@ -660,6 +637,10 @@ void menuEventKarts(Widget* widget, const std::string& name)
             playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
             w->updateItemDisplay();
         }
+        
+        // Player 0 select first kart (Tux)
+        w->setSelection(0, 0);
+        w->m_rows[0].requestFocus();
         
         getCurrentScreen()->m_inited = true;
     } // end if init

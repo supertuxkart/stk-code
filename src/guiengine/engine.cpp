@@ -31,6 +31,8 @@
 
 namespace GUIEngine
 {
+    Widget* g_focus_for_player[32]; // unused for player 0, player 0's focus is tracked by irrlicht
+    
     IGUIEnvironment* g_env;
     Skin* g_skin = NULL;
     IGUIFont* g_font;
@@ -152,6 +154,11 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_device = device_a;
     g_driver = driver_a;
     g_state_manager = state_manager;
+    
+    for (int n=0; n<32; n++)
+    {
+        g_focus_for_player[n] = NULL;
+    }
     
 	/*
      To make the g_font a little bit nicer, we load an external g_font

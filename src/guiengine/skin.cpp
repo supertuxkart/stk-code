@@ -573,7 +573,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     
     const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_event_handler->m_element;
     
-    RibbonType type = ((RibbonWidget*)widget->m_event_handler)->getRibbonType();
+    RibbonWidget* parentRibbon = (RibbonWidget*)widget->m_event_handler;
+    RibbonType type = parentRibbon->getRibbonType();
     
     /* tab-bar ribbons */
     if(type == RIBBON_TABS)
@@ -704,40 +705,44 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         } // end if mark_focused
         
         // ---- Draw selection for other players than player 1
-        if (parent_focused)
-        {
-            if (widget->isFocusedForPlayer(1))
+        //if (parentRibbon->isFocusedForPlayer(1))
+        //{
+        //std::cout << 
+        //parentRibbon->getSelectionIDString(1) << " vs " << widget->m_properties[PROP_ID].c_str() << std::endl;
+        //}
+        
+        if (parentRibbon->isFocusedForPlayer(1) && parentRibbon->getSelectionIDString(1) == widget->m_properties[PROP_ID])
+        {            
+            if (nPlayersOnThisItem > 0)
             {
-                if (nPlayersOnThisItem > 0)
-                {
-                    core::rect< s32 > rect2 =  rect;
-                    const int enlarge = nPlayersOnThisItem*6;
-                    rect2.UpperLeftCorner.X -= enlarge;
-                    rect2.UpperLeftCorner.Y -= enlarge;
-                    rect2.LowerRightCorner.X += enlarge;
-                    rect2.LowerRightCorner.Y += enlarge;
-                    drawBoxFromStretchableTexture(w, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
-                }
-                else
-                {
-                    drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
-                }
-                
-                nPlayersOnThisItem++;
+                // TODO: use the same stretching got players 2, 3, etc.
+                core::rect< s32 > rect2 =  rect;
+                const int enlarge = nPlayersOnThisItem*6;
+                rect2.UpperLeftCorner.X -= enlarge;
+                rect2.UpperLeftCorner.Y -= enlarge;
+                rect2.LowerRightCorner.X += enlarge;
+                rect2.LowerRightCorner.Y += enlarge;
+                drawBoxFromStretchableTexture(w, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+            }
+            else
+            {
+                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             
-            if (widget->isFocusedForPlayer(2))
-            {
-                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
-                nPlayersOnThisItem++;
-            }
-            
-            if (widget->isFocusedForPlayer(3))
-            {
-                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
-            }
+            nPlayersOnThisItem++;
         }
         
+        if (parentRibbon->isFocusedForPlayer(2) && parentRibbon->getSelectionIDString(2) == widget->m_properties[PROP_ID])
+        {
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            nPlayersOnThisItem++;
+        }
+        
+        if (parentRibbon->isFocusedForPlayer(3) && parentRibbon->getSelectionIDString(3) == widget->m_properties[PROP_ID])
+        {
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+        }
+
     } // end if icon ribbons
     
 }

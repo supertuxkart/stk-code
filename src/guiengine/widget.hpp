@@ -168,7 +168,7 @@ namespace GUIEngine
         /** Usually, only one widget at a time can be focused. There is however a special case where all
             players can move through the screen. This variable will then be used as a bitmask to contain
             which players beyong player 1 have this widget focused. */
-        bool m_special_focus[32]; // FIXME : the 32 there is arbitrary, settle for a max number of players
+        bool m_player_focus[32]; // FIXME : the 32 there is arbitrary, settle for a max number of players
 
     public:
         /**
@@ -244,7 +244,7 @@ namespace GUIEngine
         /**
          * \param playerID ID of the player you want to set/unset focus for, starting from 0
          */
-        void setFocusForPlayer(const int playerID, const bool focused);
+        void setFocusForPlayer(const int playerID);
         
         /**
          * \param playerID ID of the player you want to set/unset focus for, starting from 0
@@ -259,6 +259,8 @@ namespace GUIEngine
         
         bool isSelected() const { return m_selected; }
         
+        void requestFocus();
+
         
         /**
          * Override in children to possibly receive updates (you may need to register to
