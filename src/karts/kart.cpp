@@ -1157,6 +1157,8 @@ void Kart::endRescue()
 {
     m_rescue = false ;
 
+    RaceManager::getWorld()->getPhysics()->addKart(this);
+    
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
 
@@ -1164,8 +1166,7 @@ void Kart::endRescue()
 
     // let the mode decide where to put the kart
     RaceManager::getWorld()->moveKartAfterRescue(this, m_body);
-
-    RaceManager::getWorld()->getPhysics()->addKart(this);
+    
 }   // endRescue
 
 //-----------------------------------------------------------------------------

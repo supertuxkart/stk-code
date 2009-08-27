@@ -300,6 +300,8 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     
     body->setCenterOfMassTransform(pos);
     
+    //add hit to kart
+    kartHit(kart->getWorldKartId());
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
