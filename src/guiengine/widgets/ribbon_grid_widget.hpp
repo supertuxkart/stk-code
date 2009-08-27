@@ -39,7 +39,7 @@ namespace GUIEngine
     {
     public:
         virtual ~RibbonGridHoverListener() {}
-        virtual void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID) = 0;
+        virtual void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID, const int playerID) = 0;
     };
     
     struct ItemDescription
@@ -127,7 +127,7 @@ namespace GUIEngine
         /** Callback called widget is focused */
         void focused();
         
-        bool transmitEvent(Widget* w, std::string& originator);
+        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
         
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();
@@ -135,8 +135,8 @@ namespace GUIEngine
         /** Call this to scroll within a scrollable ribbon */
         void scroll(const int x_delta);
         
-        /** Used  for combo ribbons, to contain the ID of the currently selected item */
-        int m_selected_item;
+        /** Used  for combo ribbons, to contain the ID of the currently selected item for each player */
+        int m_selected_item[32]; // FIXME: 32 is arbitrary, settle for a max number of players
         
         /** Callbacks */
         void onRowChange(RibbonWidget* row);
@@ -146,25 +146,25 @@ namespace GUIEngine
     public:
         RibbonGridWidget(const bool combo=false, const int max_rows=4);
         
+        /** Dynamically add an item to the ribbon's list of items (will not be visible until you
+         call 'updateItemDisplay' or 'add') */
+        void addItem( std::string user_name, std::string code_name, std::string image_file );
+        
         /** Register a listener to be notified of selection changes within the ribbon */
         void registerHoverListener(RibbonGridHoverListener* listener);
         
         /** Called when right key is pressed */
-        bool rightPressed();
+        bool rightPressed(const int playerID);
         
         /** Called when left key is pressed */
-        bool leftPressed();
-        
-        /** Dynamically add an item to the ribbon's list of items (will not be visible until you
-            call 'updateItemDisplay' or 'add') */
-        void addItem( std::string user_name, std::string code_name, std::string image_file );
+        bool leftPressed(const int playerID);
         
         /** Updates icons/labels given current items and scrolling offset, taking care of resizing
             the dynamic ribbon if the number of items changed */
         void updateItemDisplay();
         
         /** Get the internal name (ID) of the selected item */
-        const std::string& getSelectionIDString();
+        const std::string& getSelectionIDString(const int playerID=0);
         
         /** Get the user-visible text of the selected item */
         const std::string& getSelectionText();
@@ -173,8 +173,7 @@ namespace GUIEngine
             ID ranges from {0} to {number of items added through 'addItem' - 1} */
         void setSelection(int item_id);
         
-        /** Select an item from its internal name */
-        void setSelection(const std::string& code_name);
+        void setSelection(int item_id, const int playerID);
     };
     
 }

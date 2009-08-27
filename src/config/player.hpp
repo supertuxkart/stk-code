@@ -69,6 +69,8 @@ class ActivePlayer
     PlayerProfile* m_player;
     InputDevice* m_device;
 public:
+    // ID of this player within the lsit of active players
+    int m_id;
     
     ActivePlayer(PlayerProfile* player, InputDevice* device);
     ~ActivePlayer();

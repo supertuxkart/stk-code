@@ -49,6 +49,11 @@ namespace KartSelectionScreen
     // FIXME : delete these objects when leaving the screen (especially when using escape)
     ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
+#if 0
+#pragma mark -
+#pragma mark PlayerKartWidget
+#endif
+    
     class PlayerKartWidget : public Widget
     {
         float x_speed, y_speed, w_speed, h_speed;
@@ -304,7 +309,7 @@ namespace KartSelectionScreen
             
         }
         
-        virtual bool transmitEvent(Widget* w, std::string& originator)
+        virtual bool transmitEvent(Widget* w, std::string& originator, const int playerID)
         {
             std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
             Widget* topmost = w;
@@ -316,7 +321,7 @@ namespace KartSelectionScreen
             {
                 // transmit events to all listeners in the chain
                 std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
-                if (!topmost->transmitEvent(w, originator)) return false;
+                if (!topmost->transmitEvent(w, originator, playerID)) return false;
                 topmost = topmost->m_event_handler;
                 
                 std::string name = topmost->m_properties[PROP_ID];
@@ -327,7 +332,7 @@ namespace KartSelectionScreen
                     
                     // transmit events to all listeners in the chain
                     std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
-                    if (!topmost->transmitEvent(w, originator)) return false;
+                    if (!topmost->transmitEvent(w, originator, playerID)) return false;
                     
                     return false; // do not continue propagating the event
                 }
@@ -384,23 +389,27 @@ namespace KartSelectionScreen
         }
     };
     
-
+#if 0
+#pragma mark -
+#pragma mark KartHoverListener
+#endif
+    
 class KartHoverListener : public RibbonGridHoverListener
     {
     public:
-        void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID)
+        void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID, const int playerID)
         {
+            std::cout << "Player " << playerID << " selected kart " << selectionID.c_str() << std::endl;
+            /*
             InputDevice *device;
             ActivePlayer *player;
             int pKartIndex = -1;
             //std::cout << "hovered " << selectionID.c_str() << std::endl;
             
-            // FIXME: temporary work around for multiplayer support on the kart selection screen
-            // The ribbon grid widget needs to be rewritten to support multiple selection boxes
-            
+
             device = input_manager->getDeviceList()->getLatestUsedDevice();
-            if(selectionID.size() == 0) return;
-            if((player = device->getPlayer()) == NULL) return;
+            if (selectionID.size() == 0) return;
+            if ((player = device->getPlayer()) == NULL) return;
 
             for (int n = 0; (n < g_player_karts.size() && pKartIndex == -1); n++)
             {
@@ -412,9 +421,9 @@ class KartHoverListener : public RibbonGridHoverListener
                 fprintf(stderr, "onSelectionChanged(): Unable to determine kart associated with device\n");
                 return;
             }
+        */
 
-
-            ModelViewWidget* w3 = g_player_karts[pKartIndex].modelView;
+            ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
             
             printf("%s\n", selectionID.c_str());
@@ -430,19 +439,24 @@ class KartHoverListener : public RibbonGridHoverListener
             w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             w3->update(0);
             
-            g_player_karts[pKartIndex].kartName->m_properties[PROP_TEXT] = selectionID;
-            g_player_karts[pKartIndex].kartName->setText( selectionID.c_str() );
+            g_player_karts[playerID].kartName->m_properties[PROP_TEXT] = selectionID;
+            g_player_karts[playerID].kartName->setText( selectionID.c_str() );
         }
     };
 KartHoverListener* karthoverListener = NULL;
 
+#if 0
+#pragma mark -
+#pragma mark Functions
+#endif
+    
 // Return true if event was handled successfully
 bool playerJoin(InputDevice* device, bool firstPlayer)
 {
     std::cout << "playerJoin() ==========\n";
 
     RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
-    if (w == NULL )
+    if (w == NULL)
     {
         std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
         return false;
@@ -453,14 +467,16 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
         return false;
     }
 
+    // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
     Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
-    rightarea.x = irr_driver->getFrameSize().Width;
+    rightarea.x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
-    // Create new active player
+    // ---- Create new active player
     int id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
     ActivePlayer *aplayer = StateManager::get()->getActivePlayer(id);
     
+    // ---- Create player/kart widget
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer;
     if (firstPlayer)
@@ -472,6 +488,8 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     newPlayer->add();
 
     g_player_karts.push_back(newPlayer);
+    
+    // ---- Divide screen space among all karts
     const int amount = g_player_karts.size();
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
     const int splitWidth = fullarea->w / amount;
@@ -480,6 +498,10 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     {
         g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
     }
+    
+    // ---- Focus a kart for this player
+    const int playerID = amount-1;
+    w->setSelection(playerID, playerID);
     
     return true;
 }

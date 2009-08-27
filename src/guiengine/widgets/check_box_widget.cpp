@@ -38,7 +38,7 @@ void CheckBoxWidget::add()
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
-bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator)
+bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     /* toggle */
     m_state = !m_state;

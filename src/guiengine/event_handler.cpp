@@ -70,7 +70,8 @@ bool EventHandler::onGUIEvent(const SEvent& event)
                 Widget* w = GUIEngine::getCurrentScreen()->getWidget(id);
                 if(w == NULL) break;
                 
-                return onWidgetActivated(w);
+                // FIXME: don't hardcode player 0
+                return onWidgetActivated(w, 0);
             }    
             case EGET_ELEMENT_HOVERED:
             {
@@ -139,9 +140,9 @@ bool EventHandler::onGUIEvent(const SEvent& event)
     return false;        
 }
 
-bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
+bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if(ModalDialog::isADialogActive() && w->m_event_handler == NULL)
+    if (ModalDialog::isADialogActive() && w->m_event_handler == NULL)
     {
         ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
         return false;
@@ -150,20 +151,20 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
     std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
     
     Widget* parent = w->m_event_handler;
-    if(w->m_event_handler != NULL)
+    if (w->m_event_handler != NULL)
     {
         /* Find all parents. Stop looping if a widget event handler's is itself, to not fall
          in an infinite loop (this can happen e.g. in checkboxes, where they need to be
          notified of clicks onto themselves so they can toggle their state. ) */
-        while(parent->m_event_handler != NULL && parent->m_event_handler != parent)
+        while (parent->m_event_handler != NULL && parent->m_event_handler != parent)
         {
-            parent->transmitEvent(w, w->m_properties[PROP_ID]);
+            parent->transmitEvent(w, w->m_properties[PROP_ID], playerID);
             parent = parent->m_event_handler;
         }
         
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
-        if(parent->transmitEvent(w, w->m_properties[PROP_ID]))
+        if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID))
         {
             transmitEvent(parent, parent->m_properties[PROP_ID]);
         }
@@ -176,13 +177,13 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w)
 /**
  * Called by the input module
  */
-void EventHandler::processAction(const int action, const unsigned int value, Input::InputType type)
+void EventHandler::processAction(const int action, const unsigned int value, Input::InputType type, const int playerID)
 {
     const bool pressedDown = value > Input::MAX_VALUE*2/3;
     
-    if(!pressedDown && type == Input::IT_STICKMOTION) return;
+    if (!pressedDown && type == Input::IT_STICKMOTION) return;
     
-    switch(action)
+    switch (action)
     {
         case PA_LEFT:
         {
@@ -200,12 +201,12 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the left press. */
             while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                widget_to_call->leftPressed();
+                widget_to_call->leftPressed(playerID);
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
             
-            if (widget_to_call->leftPressed())
+            if (widget_to_call->leftPressed(playerID))
                 transmitEvent(w, w->m_properties[PROP_ID]);
         }
             break;
@@ -224,11 +225,11 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the right press */
             while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                widget_to_call->rightPressed();
+                widget_to_call->rightPressed(playerID);
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
-            if(widget_to_call->rightPressed())
+            if(widget_to_call->rightPressed(playerID))
                 transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
         }
             
@@ -357,7 +358,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
                 IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
                 Widget* w = GUIEngine::getCurrentScreen()->getWidget( element->getID() );
                 if(w == NULL) break;
-                onWidgetActivated( w );
+                onWidgetActivated( w, playerID );
             }
             
             /*

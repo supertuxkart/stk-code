@@ -45,7 +45,7 @@ namespace GUIEngine
         friend class RibbonGridWidget;
         friend class EventHandler;
         
-        int m_selection;
+        int m_selection[32]; // FIXME: 32 is a bit arbitrary, settle for a max number of players
         
         /** The type of this ribbon (toolbar, combo, tabs) */
         RibbonType m_ribbon_type;
@@ -58,10 +58,10 @@ namespace GUIEngine
         void updateSelection();
         
         /** Callbacks */
-        bool rightPressed();
-        bool leftPressed();
+        bool rightPressed(const int playerID=0);
+        bool leftPressed(const int playerID=0);
         bool mouseHovered(Widget* child);
-        bool transmitEvent(Widget* w, std::string& originator);
+        bool transmitEvent(Widget* w, std::string& originator, const int playerID=0);
         void focused();
         
         ptr_vector<IGUIStaticText, REF> m_labels;
@@ -74,23 +74,23 @@ namespace GUIEngine
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
         virtual ~RibbonWidget() {}
         
-        /** Returns the numerical ID of the selected item within the ribbon */
-        int getSelection() const { return m_selection; }
-        
-        /** Returns the string ID (internal name) of the selection */
-        const std::string& getSelectionIDString() { return m_children[m_selection].m_properties[PROP_ID]; }
-        
-        /** Returns the user-visible text of the selection */
-        const std::string& getSelectionText() { return m_children[m_selection].m_properties[PROP_TEXT]; }
-        
-        /** Returns the type of this ribbon (see guiengine/engine.hpp for detaield descriptions) */
+        /** Returns the type of this ribbon (see guiengine/engine.hpp for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         
+        /** Returns the numerical ID of the selected item within the ribbon */
+        int getSelection(const int playerID) const { return m_selection[playerID]; }
+        
+        /** Returns the string ID (internal name) of the selection */
+        const std::string& getSelectionIDString(const int playerID=0) { return m_children[m_selection[playerID]].m_properties[PROP_ID]; }
+        
+        /** Returns the user-visible text of the selection */
+        const std::string& getSelectionText(const int playerID=0) { return m_children[m_selection[playerID]].m_properties[PROP_TEXT]; }
+        
         /** Sets the ID of the selected item within the ribbon */
-        void setSelection(const int i) { m_selection = i; updateSelection(); }
+        void setSelection(const int i, const int playerID=0) { m_selection[playerID] = i; updateSelection(); }
         
         /** Select an item in the ribbon by its internal name */
-        void select(std::string item);
+        void select(std::string item, const int playerID=0);
         
         /** When each item has a label, this method can be used to rename an item 
             (especially used in scrolling ribbons, when scrolling occurs by renaming

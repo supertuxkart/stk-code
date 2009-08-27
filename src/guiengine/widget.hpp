@@ -119,8 +119,8 @@ namespace GUIEngine
           * Returns 'true' if main event handler should be notified of a change.
           * Override in children to be notified of left/right events.
           */
-        virtual bool rightPressed() { return false; }
-        virtual bool leftPressed() { return false; }
+        virtual bool rightPressed(const int playerID) { return false; }
+        virtual bool leftPressed(const int playerID) { return false; }
         
         /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
@@ -164,6 +164,11 @@ namespace GUIEngine
          * (not the same as the string identificator specified in the XML file)
          */
         int id;
+        
+        /** Usually, only one widget at a time can be focused. There is however a special case where all
+            players can move through the screen. This variable will then be used as a bitmask to contain
+            which players beyong player 1 have this widget focused. */
+        bool m_special_focus[32]; // FIXME : the 32 there is arbitrary, settle for a max number of players
 
     public:
         /**
@@ -237,6 +242,16 @@ namespace GUIEngine
         static void resetIDCounters();
         
         /**
+         * \param playerID ID of the player you want to set/unset focus for, starting from 0
+         */
+        void setFocusForPlayer(const int playerID, const bool focused);
+        
+        /**
+         * \param playerID ID of the player you want to set/unset focus for, starting from 0
+         */
+        bool isFocusedForPlayer(const int playerID);
+        
+        /**
           * Call to resize/move the widget. Not all widgets can resize gracefully.
           */
         virtual void move(const int x, const int y, const int w, const int h);
@@ -255,7 +270,7 @@ namespace GUIEngine
          this call. Must return whether main (GUI engine user) event callback should be notified or not.
          Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
          of the chain decides whether the main handler is notified; return value is not read for others. */
-        virtual bool transmitEvent(Widget* w, std::string& originator) { return true; }
+        virtual bool transmitEvent(Widget* w, std::string& originator, const int playerID) { return true; }
         
         /**
          * Create and add the irrLicht widget(s) associated with this object.

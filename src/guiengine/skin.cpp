@@ -622,7 +622,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         /* in combo ribbons, always show selection */
         RibbonWidget* w = NULL;
         
-        if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
+        if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
         {
             w = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
             if(w->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
@@ -632,7 +632,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                                   (mark_selected && !always_show_selection && parent_focused);
         
         
-        if(always_show_selection && mark_selected)
+        if (always_show_selection && mark_selected)
         {
             core::rect< s32 > rect2 = rect;
             rect2.UpperLeftCorner.X -= rect.getWidth() / 5;
@@ -651,7 +651,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
-        if(mark_focused)
+        if (mark_focused)
         {
             if (use_glow)
             {
@@ -689,7 +689,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             {
                 const bool show_focus = focused || parent_focused;
                 
-                if(!always_show_selection && !show_focus) return;
+                if (!always_show_selection && !show_focus) return;
                 
                 //const int texture_w = m_tex_squarefocus->getSize().Width;
                 //const int texture_h = m_tex_squarefocus->getSize().Height;
@@ -699,8 +699,18 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             }
         } // end if mark_focused
         
+        // ---- Draw selection for other players than player 1
+        if (parent_focused)
+        {
+            if (widget->isFocusedForPlayer(1))
+                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+            if (widget->isFocusedForPlayer(2))
+                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            if (widget->isFocusedForPlayer(3))
+                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+        }
         
-    }
+    } // end if icon ribbons
     
 }
 

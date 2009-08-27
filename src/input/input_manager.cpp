@@ -247,7 +247,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
-    if(!StateManager::get()->isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
+    if (!StateManager::get()->isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
         m_device_manager->playerAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
@@ -358,7 +358,8 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                     m_timer_in_use = true;
                     m_timer = 0.25;
                 }
-                GUIEngine::EventHandler::get()->processAction(action, abs(value), type);
+                int playerID = (player == NULL ? 0 : player->m_id);
+                GUIEngine::EventHandler::get()->processAction(action, abs(value), type, playerID);
             }
         }
     }

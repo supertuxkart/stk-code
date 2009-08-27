@@ -79,6 +79,11 @@ Widget::Widget(bool reserve_id)
     m_show_bounding_box = false;
     m_parent = NULL;
     
+    for (int n=0; n<32; n++)
+    {
+        m_special_focus[n] = false;
+    }
+    
     if (reserve_id)
     {
         m_reserved_id = getNewID();
@@ -89,6 +94,24 @@ Widget::Widget(bool reserve_id)
     }
 }
 // -----------------------------------------------------------------------------
+/**
+  * \param playerID ID of the player you want to set/unset focus for, starting from 0
+  * Since the code tracks focus from main player, this will most likely be used only
+  * for additionnal players
+  */
+void Widget::setFocusForPlayer(const int playerID, const bool focused)
+{
+    m_special_focus[playerID] = focused;
+}
+/**
+ * \param playerID ID of the player you want to set/unset focus for, starting from 0
+ */
+bool Widget::isFocusedForPlayer(const int playerID)
+{
+    return m_special_focus[playerID];
+}
+    
+    
 /**
  * Receives as string the raw property value retrieved from XML file.
  * Will try to make sense of it, as an absolute value or a percentage.

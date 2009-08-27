@@ -38,9 +38,9 @@ namespace GUIEngine
         bool m_graphical;
         bool m_gauge;
         
-        bool transmitEvent(Widget* w, std::string& originator);
-        bool rightPressed();
-        bool leftPressed();
+        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
+        bool rightPressed(const int playerID);
+        bool leftPressed(const int playerID);
     public:
         
         SpinnerWidget(const bool gauge=false);

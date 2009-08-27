@@ -72,14 +72,20 @@ ActivePlayer* StateManager::getActivePlayer(const int id)
     {
         fprintf(stderr, "getActivePlayer(): id out of bounds\n");
     }
+    
+    assert( returnPlayer->m_id == id );
+    
     return returnPlayer;
 }
-/*
-void StateManager::addActivePlayer(ActivePlayer* p)
+void StateManager::updateActivePlayerIDs()
 {
-    m_active_players.push_back(p);
+    const int amount = m_active_players.size();
+    for (int n=0; n<amount; n++)
+    {
+        m_active_players[n].m_id = n;
+    }
 }
-*/
+
 int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
 {
     ActivePlayer *p;
@@ -87,11 +93,16 @@ int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device
     p = new ActivePlayer(profile, device);
     i = m_active_players.size();
     m_active_players.push_back(p);
+    
+    updateActivePlayerIDs();
+    
     return i;
 }
+
 void StateManager::removeActivePlayer(int id)
 {
     m_active_players.erase(id);
+    updateActivePlayerIDs();
 }
 int StateManager::activePlayerCount()
 {

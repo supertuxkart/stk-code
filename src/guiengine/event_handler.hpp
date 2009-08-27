@@ -45,7 +45,7 @@ namespace GUIEngine
 class EventHandler : public IEventReceiver
 {
     bool onGUIEvent(const SEvent& event);
-    bool onWidgetActivated(Widget* w);
+    bool onWidgetActivated(Widget* w, const int playerID);
 public:
     EventHandler();
     ~EventHandler();
@@ -61,7 +61,7 @@ public:
       * and this action needs to be applied to the GUI (e.g. fire pressed, left
       * pressed, etc.) this method is called back by the input module.
       */
-    void processAction(const int action, const unsigned int value, Input::InputType type);
+    void processAction(const int action, const unsigned int value, Input::InputType type, const int playerID);
 
     // singleton
     static EventHandler* get();
