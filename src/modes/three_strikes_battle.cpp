@@ -289,16 +289,29 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     // FIXME - implement correct heading
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */ );
     kart->setRotation(heading);
-    
-    // A certain epsilon is added here to the Z coordinate (0.1), in case
-    // that the points are somewhat under the track. Otherwise, the
-    // kart will be placed a little bit under the track, triggering
-    // a rescue, ...
+
+    //position kart from same height as in World::resetAllKarts
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
+    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()));
     pos.setRotation( btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */) );
-    
+
     body->setCenterOfMassTransform(pos);
+
+    //project kart to surface of track
+    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+
+    if (kart_over_ground)
+    {
+        //add vertical offset so that the kart starts off above the track
+        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+                                kart->getKartHeight();
+        body->translate(btVector3(0, 0, vertical_offset));
+    }
+    else
+    {
+        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
+                (kart->getIdent().c_str()), m_track->getIdent().c_str());
+    }
     
     //add hit to kart
     kartHit(kart->getWorldKartId());
