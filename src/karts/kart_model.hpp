@@ -29,6 +29,8 @@ using namespace irr;
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+class KartProperties;
+
 /** This class stores a 3D kart model. It takes especially care of attaching
  *  the wheels, which are loaded as separate objects. The wheels can turn
  *  and (for the front wheels) rotate. The implementation is dependent on the
@@ -101,7 +103,7 @@ public:
          KartModel();
         ~KartModel();
     void loadInfo(const lisp::Lisp* lisp);
-    void loadModels(const std::string &kart_ident);
+    void loadModels(const KartProperties &kart_properties);
     void attachModel(scene::IAnimatedMeshSceneNode **node);
     scene::IAnimatedMesh* getModel() const { return m_mesh; }
 

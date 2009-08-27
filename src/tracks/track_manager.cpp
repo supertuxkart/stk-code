@@ -52,7 +52,7 @@ TrackManager::~TrackManager()
  *  contains a track.
  *  \param dir The directory to add. 
  */
-void TrackManager::addTrackDir(const std::string &dir)
+void TrackManager::addTrackSearchDir(const std::string &dir)
 {
     m_track_search_path.push_back(dir);
 }   // addTrackDir

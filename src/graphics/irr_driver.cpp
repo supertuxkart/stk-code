@@ -178,7 +178,7 @@ void IrrDriver::changeResolution()
     material_manager->reInit();
 
     powerup_manager         -> loadPowerups();
-    kart_properties_manager -> loadKartData();
+    kart_properties_manager -> loadAllKarts();
     item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();
     attachment_manager      -> loadModels();

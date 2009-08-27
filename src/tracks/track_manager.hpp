@@ -56,7 +56,7 @@ public:
                   TrackManager();
                  ~TrackManager();
 
-    static void   addTrackDir(const std::string &dir);
+    static void   addTrackSearchDir(const std::string &dir);
     /** Returns a list of all directories that contain a track. */
     const std::vector<std::string>*  getAllTrackDirs() const 
                                             { return &m_all_track_dirs; }

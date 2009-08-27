@@ -43,7 +43,8 @@ class XMLNode;
 class KartProperties
 {
 private:
-
+    /** Base directory for this kart. */
+    std::string  m_root;
     Material                *m_icon_material;  /**< The icon texture to use. */
     /** The kart model and wheels. It is mutable since the wheels of the
      *  KartModel can rotate and turn, but otherwise the kart_properties
@@ -163,15 +164,14 @@ private:
     std::vector<float> m_gear_switch_ratio,
                        m_gear_power_increase;
 
+    void  load              (const std::string &filename,
+                             const std::string &node="tuxkart-kart");
 
 public:
-          KartProperties    ();
+          KartProperties    (const std::string &filename="");
          ~KartProperties    ();
     void  getAllData        (const lisp::Lisp* lisp);
     void  getAllData        (const XMLNode * root);
-    void  load              (const std::string &filename,
-                             const std::string &node="tuxkart-kart",
-                             bool dont_load_models=false);
     void  checkAllSet(const std::string &filename);
 
     float getMaxSteerAngle          (float speed) const;
@@ -260,6 +260,8 @@ public:
     float getCameraMaxAccel         () const {return m_camera_max_accel;         }
     float getCameraMaxBrake         () const {return m_camera_max_brake;         }
     float getCameraDistance         () const {return m_camera_distance;          }
+    /** Returns the full path where the files for this kart are stored. */
+    const std::string& getKartDir   () const {return m_root;                     }
 };
 
 #endif

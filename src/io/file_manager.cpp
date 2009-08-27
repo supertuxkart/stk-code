@@ -42,6 +42,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -129,7 +130,8 @@ FileManager::FileManager()
     fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
 
-    TrackManager::addTrackDir(m_root_dir+"/data/tracks");
+    TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
+    KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/data/models"  );
     pushMusicSearchPath  (m_root_dir+"/data/music"   );

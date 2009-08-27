@@ -100,7 +100,7 @@ void cmdLineHelp (char* invocation)
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
     "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
-    // should not be used by unaware users:
+    // should not be used by unaware users:u
     // "  --profile            Enable automatic driven profile mode for 20 seconds.\n"
     // "  --profile=n          Enable automatic driven profile mode for n seconds.\n"
     // "                       if n<0 --> (-n) = number of laps to drive.
@@ -123,7 +123,11 @@ void cmdLineHelp (char* invocation)
 
 //=============================================================================
 /** For base options that don't need much to be inited (and, in some cases, 
- *   that need to be read before initing stuff.
+ *  that need to be read before initing stuff) - it only assumes that
+ *  user config is loaded (necessary to check for blacklisted screen
+ *  resolutions), but nothing else (esp. not kart_properties_manager and
+ *  track_manager, since their search path might be extended by command
+ *  line options).
  */
 int handleCmdLinePreliminary(int argc, char **argv)
 {
@@ -141,7 +145,12 @@ int handleCmdLinePreliminary(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
         {
-            TrackManager::addTrackDir(argv[i+1]);
+            TrackManager::addTrackSearchDir(argv[i+1]);
+            i++;
+        }
+        else if( !strcmp(argv[i], "--kartdir") && i+1<argc )
+        {
+            KartPropertiesManager::addKartSearchDir(argv[i+1]);
             i++;
         }
 #if !defined(WIN32) && !defined(__CYGWIN)
@@ -351,16 +360,9 @@ int handleCmdLine(int argc, char **argv)
             }    
 
             fprintf ( stdout, "Use --track N to choose track.\n\n");
-            delete track_manager;
-            track_manager = 0;
-
-            return 0;
         }
         else if( !strcmp(argv[i], "--list-karts") )
         {
-            bool dont_load_models=true;
-            kart_properties_manager->loadKartData(dont_load_models) ;
-
             fprintf ( stdout, "  Available karts:\n" );
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
@@ -368,8 +370,6 @@ int handleCmdLine(int argc, char **argv)
                 fprintf (stdout, "\t%10s: %s\n", KP->getIdent().c_str(), KP->getName().c_str());
             }
             fprintf ( stdout, "\n" );
-
-            return 0;
         }
         else if (    !strcmp(argv[i], "--no-start-screen")
                      || !strcmp(argv[i], "-N")                )
@@ -453,22 +453,12 @@ int handleCmdLine(int argc, char **argv)
         }
         // these commands are already processed in handleCmdLinePreliminary, but repeat this
         // just so that we don't get error messages about unknown commands
-        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
-        {
-            i++;
-        }
-        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
-        {
-        }
-        else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
-        {
-        }
-        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
-        {
-        }
-        else if ( !strcmp(argv[i], "--version") || !strcmp(argv[i], "-v") )
-        {
-        }
+        else if( !strcmp(argv[i], "--trackdir") && i+1<argc ) i++;
+        else if( !strcmp(argv[i], "--kartdir")  && i+1<argc ) i++;
+        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
+        else if ( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
+        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {}
+        else if ( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
         else
         {
             fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
@@ -486,12 +476,14 @@ int handleCmdLine(int argc, char **argv)
 }   /* handleCmdLine */
 
 //=============================================================================
-void initPreliminary()
+/** Initialises the minimum number of managers to get access to user_config.
+ */
+void initUserConfig()
 {
     file_manager            = new FileManager();
-    translations            = new Translations();
-    user_config             = new UserConfig();
-}   // initPreliminary
+    translations            = new Translations();   // needs file_manager
+    user_config             = new UserConfig();     // needs file_manager
+}   // initUserConfig
 
 //=============================================================================
 void initRest()
@@ -500,7 +492,7 @@ void initRest()
     sound_manager           = new SoundManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
-    // defaultKartProperties.
+    // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
@@ -516,7 +508,6 @@ void initRest()
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();
-    unlock_manager          = new UnlockManager();
     sound_manager->addMusicToTracks();
 
     race_manager            = new RaceManager          ();
@@ -564,7 +555,6 @@ void cleanTuxKart()
 
 //=============================================================================
 
-
 int main(int argc, char *argv[] ) 
 {
     try {
@@ -572,14 +562,13 @@ int main(int argc, char *argv[] )
         // only needed for bullet debugging.
         glutInit(&argc, argv);
 #endif
-        
-        initPreliminary();
+        // Init the minimum managers so that user config exists, then
+        // handle all command line options that do not need (or must
+        // not have) other managers initialised:
+        initUserConfig();
         handleCmdLinePreliminary(argc, argv);
         
         initRest();
-
-        //handleCmdLine() needs InitTuxkart() so it can't be called first
-        if(!handleCmdLine(argc, argv)) exit(0);
         
         if (UserConfigParams::m_log_errors) //Enable logging of stdout and stderr to logfile
         {
@@ -606,7 +595,8 @@ int main(int argc, char *argv[] )
         
         main_loop = new MainLoop();
         material_manager        -> loadMaterial    ();
-        kart_properties_manager -> loadKartData    ();
+        kart_properties_manager -> loadAllKarts    ();
+        unlock_manager          = new UnlockManager();
         projectile_manager      -> loadData        ();
         powerup_manager         -> loadPowerups    ();
         item_manager            -> loadDefaultItems();
@@ -616,7 +606,10 @@ int main(int argc, char *argv[] )
         IrrlichtDevice* device = irr_driver->getDevice();
         video::IVideoDriver* driver = device->getVideoDriver();
         GUIEngine::init(device, driver, StateManager::get());
-        
+
+        //handleCmdLine() needs InitTuxkart() so it can't be called first
+        if(!handleCmdLine(argc, argv)) exit(0);
+
         if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushMenu("main.stkgui");

@@ -23,7 +23,6 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "io/file_manager.hpp"
 #include "utils/constants.hpp"
 
 float KartModel::UNDEFINED = -99.9f;
@@ -100,10 +99,9 @@ void KartModel::attachModel(scene::IAnimatedMeshSceneNode **node)
 // ----------------------------------------------------------------------------
 /** Loads the 3d model and all wheels.
  */
-void KartModel::loadModels(const std::string &kart_ident)
+void KartModel::loadModels(const KartProperties &kart_properties)
 {
-    std::string  full_path = file_manager->getKartFile(m_model_filename, 
-                                                       kart_ident);
+    std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     Vec3 min, max;
     MeshTools::minMax3D(m_mesh, &min, &max);
@@ -139,8 +137,8 @@ void KartModel::loadModels(const std::string &kart_ident)
     // depend on the size of the model.
     for(unsigned int i=0; i<4; i++)
     {
-        std::string full_wheel = file_manager->getKartFile(m_wheel_filename[i],
-                                                           kart_ident);
+        std::string full_wheel = 
+            kart_properties.getKartDir()+"/"+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
         // FIXME: wheel handling still missing.
     }   // for i<4

@@ -27,6 +27,7 @@
 #include "config/user_config.hpp"
 #include "challenges/challenge_data.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -76,29 +77,28 @@ UnlockManager::UnlockManager()
 
     // Load challenges from .../data/karts
     // -----------------------------------
-    std::set<std::string> dirs;
-    file_manager->listFiles(dirs, file_manager->getKartDir(), 
-                            /*is_full_path*/ true);
+    const std::vector<std::string> *all_kart_dirs = 
+        kart_properties_manager->getAllKartDirs();
 
     // Find out which characters are available and load them
-    for(std::set<std::string>::iterator i  = dirs.begin();
-                                        i != dirs.end();  i++)
+    for(std::vector<std::string>::const_iterator dir  = all_kart_dirs->begin();
+                                                 dir != all_kart_dirs->end();  dir++)
     {
-        std::string challenge_file;
-        try
+        std::set<std::string> all_files;
+        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        for(std::set<std::string>::iterator file=all_files.begin(); 
+            file!=all_files.end(); file++)
         {
-            challenge_file = file_manager->getKartFile((*i)+".challenge");
-        }
-        catch (std::exception& e)
-        {
-            (void)e;   // remove warning about unused variable
-            continue;
-        }
-        FILE *f=fopen(challenge_file.c_str(),"r");
-        if(!f) continue;
-        fclose(f);
-        addChallenge(new ChallengeData(challenge_file));
-    }   // for i
+            if(!StringUtils::hasSuffix(*file,".challenge")) continue;
+            std::string filename=*dir+"/"+*file;
+            FILE *f=fopen(filename.c_str(), "r");
+            if(f)
+            {
+                fclose(f);
+                addChallenge(new ChallengeData(filename));
+            }   // if file
+        }   // for file in files
+    }   // for dir in all_karts_dirs
 
     // Challenges from .../data/grandprix
     // ----------------------------------

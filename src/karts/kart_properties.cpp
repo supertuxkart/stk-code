@@ -40,7 +40,7 @@ float KartProperties::UNDEFINED = -99.9f;
  *  Otherwise the defaults are taken from STKConfig (and since they are all
  *  defined, it is guaranteed that each kart has well defined physics values.
  */
-KartProperties::KartProperties() : m_icon_material(0)
+KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
 {
     m_name          = "Tux";
     m_ident         = "tux";
@@ -77,6 +77,9 @@ KartProperties::KartProperties() : m_icon_material(0)
     m_color                  = video::SColor(255, 0, 0, 0);
     m_shape                  = 32;  // close enough to a circle.
     m_engine_sfx_type        = SFXManager::SOUND_ENGINE_SMALL;
+    // The default constructor for stk_config uses filename=""
+    if(filename!="")
+        load(filename);
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -90,11 +93,8 @@ KartProperties::~KartProperties()
  *  \param filename Filename to load.
  *  \param node Name of the lisp node to load the data from
  *              (default: tuxkart-kart)
- *  \param dont_load_models If set does not load the actual kart models, used
- *              when only printing kart information to stdout.
  */
-void KartProperties::load(const std::string &filename, const std::string &node,
-                          bool dont_load_models)
+void KartProperties::load(const std::string &filename, const std::string &node)
 {
 
    // Get the default values from STKConfig:
@@ -119,7 +119,8 @@ void KartProperties::load(const std::string &filename, const std::string &node,
     }
 #else
     const lisp::Lisp* root = 0;
-    m_ident = StringUtils::getBasename(StringUtils::removeExtension(filename));
+    m_root = StringUtils::getPath(filename);
+    m_ident = StringUtils::getBasename(m_root);
 
     try
     {
@@ -163,40 +164,35 @@ void KartProperties::load(const std::string &filename, const std::string &node,
                                                     /*is_full+path*/false, 
                                                     /*make_permanent*/true);
 
-    // Load model, except when called as part of --list-karts
-    if(!dont_load_models)
+    // Only load the model if the .kart file has the appropriate version,
+    // otherwise warnings are printed.
+    if(m_version>=1)
+        m_kart_model.loadModels(*this);
+    if(m_gravity_center_shift.getX()==UNDEFINED)
     {
-        // Only load the model if the .kart file has the appropriate version,
-        // otherwise warnings are printed.
-        if(m_version>=1)
-            m_kart_model.loadModels(m_ident);
-        if(m_gravity_center_shift.getX()==UNDEFINED)
-        {
-            m_gravity_center_shift.setX(0);
-            m_gravity_center_shift.setY(0);
-            // Default: center at the very bottom of the kart.
-            m_gravity_center_shift.setZ(m_kart_model.getHeight()*0.5f);
-        }
-        m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
-                                               m_wheel_radius);
-        m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
-                             -m_kart_model.getWheelPhysicsPosition(2).getY());
-        m_angle_at_min = asinf(m_wheel_base/m_min_radius);
-        m_angle_at_max = asinf(m_wheel_base/m_max_radius);
-        if(m_max_speed_turn == m_min_speed_turn)
-            m_speed_angle_increase = 0.0;
-        else
-            m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-                                   / (m_max_speed_turn - m_min_speed_turn);
+        m_gravity_center_shift.setX(0);
+        m_gravity_center_shift.setY(0);
+        // Default: center at the very bottom of the kart.
+        m_gravity_center_shift.setZ(m_kart_model.getHeight()*0.5f);
+    }
+    m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
+        m_wheel_radius);
+    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
+        -m_kart_model.getWheelPhysicsPosition(2).getY());
+    m_angle_at_min = asinf(m_wheel_base/m_min_radius);
+    m_angle_at_max = asinf(m_wheel_base/m_max_radius);
+    if(m_max_speed_turn == m_min_speed_turn)
+        m_speed_angle_increase = 0.0;
+    else
+        m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
+        / (m_max_speed_turn - m_min_speed_turn);
 
 
-        // Useful when tweaking kart parameters
-        if(UserConfigParams::m_print_kart_sizes)
-            printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(),
-            m_kart_model.getWidth(), m_kart_model.getLength(),
-            m_kart_model.getHeight());
-
-    }  // if
+    // Useful when tweaking kart parameters
+    if(UserConfigParams::m_print_kart_sizes)
+        printf("%s:\twidth: %f\tlength: %f\theight: %f\n",getIdent().c_str(),
+        m_kart_model.getWidth(), m_kart_model.getLength(),
+        m_kart_model.getHeight());
 
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
@@ -330,6 +326,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("camera-distance", &m_camera_distance);
 }
 
+// ----------------------------------------------------------------------------
 void KartProperties::getAllData(const lisp::Lisp* lisp)
 {
     lisp->get("version",                    m_version);
