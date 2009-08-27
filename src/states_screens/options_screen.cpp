@@ -202,7 +202,7 @@ namespace OptionsScreen
             RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
             assert(w1 != NULL);
 
-            const std::string& res = w1->getSelectionIDString();
+            const std::string& res = w1->getSelectionIDString(GUI_PLAYER_ID);
 
             int w = -1, h = -1;
             if( sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1 )
@@ -357,7 +357,7 @@ namespace OptionsScreen
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert(devices != NULL);
 
-            const std::string& selection = devices->getSelectionIDString();
+            const std::string& selection = devices->getSelectionIDString(GUI_PLAYER_ID);
             if( selection.find("gamepad") != std::string::npos )
             {
                 int i = -1, read = 0;
@@ -428,21 +428,22 @@ namespace OptionsScreen
 
             RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
             assert( devices != NULL );
-            std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString().c_str() << std::endl;
+            std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
 
             new PressAKeyDialog(0.4f, 0.4f);
 
-            if(devices->getSelectionIDString() == "keyboard")
+            std::string selection = devices->getSelectionIDString(GUI_PLAYER_ID);
+            if (selection == "keyboard")
             {
                 input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
             }
-            else if(devices->getSelectionIDString().find("gamepad") != std::string::npos)
+            else if (selection.find("gamepad") != std::string::npos)
             {
                 input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);
             }
             else
             {
-                std::cerr << "unknown selection device in options : " << devices->getSelectionIDString() << std::endl;
+                std::cerr << "unknown selection device in options : " << selection.c_str() << std::endl;
             }
 
         }
@@ -456,10 +457,12 @@ namespace OptionsScreen
         RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
         assert( devices != NULL );
 
-        const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && devices->getSelectionIDString() == "keyboard";
+        std::string deviceID = devices->getSelectionIDString(GUI_PLAYER_ID);
+        
+        const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && deviceID== "keyboard";
         const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
                                sensedInput->type == Input::IT_STICKBUTTON) &&
-                               devices->getSelectionIDString().find("gamepad") != std::string::npos;
+                               deviceID.find("gamepad") != std::string::npos;
 
         if(!keyboard && !gamepad) return;
         if(gamepad)
@@ -496,7 +499,7 @@ namespace OptionsScreen
                 std::cout << "Sensed unknown gamepad event type??\n";
 
             int configID = -1;
-            sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &configID );
+            sscanf( devices->getSelectionIDString(GUI_PLAYER_ID).c_str(), "gamepad%i", &configID );
 
             /*
             if(sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &gamepadID ) != 1 ||
@@ -605,9 +608,9 @@ namespace OptionsScreen
             RibbonWidget* ribbon = getCurrentScreen()->getWidget<RibbonWidget>("options_choice");
             if(ribbon != NULL)
             {
-                if(screen_name == "options_av.stkgui") ribbon->select( "audio_video" );
-                else if(screen_name == "options_players.stkgui") ribbon->select( "players" );
-                else if(screen_name == "options_input.stkgui") ribbon->select( "controls" );
+                if (screen_name == "options_av.stkgui") ribbon->select( "audio_video", GUI_PLAYER_ID );
+                else if (screen_name == "options_players.stkgui") ribbon->select( "players", GUI_PLAYER_ID );
+                else if (screen_name == "options_input.stkgui") ribbon->select( "controls", GUI_PLAYER_ID );
             }
 
             if(screen_name == "options_av.stkgui") initAudioVideo(widget, name);
@@ -616,7 +619,7 @@ namespace OptionsScreen
         }
         else if(name == "options_choice")
         {
-            std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
+            std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
 
             if(selection == "audio_video") StateManager::get()->replaceTopMostMenu("options_av.stkgui");
             else if(selection == "players") StateManager::get()->replaceTopMostMenu("options_players.stkgui");

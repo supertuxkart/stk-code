@@ -132,7 +132,7 @@ void StateManager::menuEventMain(Widget* widget, const std::string& name)
 {
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if(ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
-    std::string selection = ribbon->getSelectionIDString().c_str();
+    std::string selection = ribbon->getSelectionIDString(GUI_PLAYER_ID);
 
 
     if(selection == "new")
@@ -168,7 +168,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     {
         RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("difficulty");
         assert( w != NULL );
-        w->setSelection( race_manager->getDifficulty() );
+        w->setSelection( race_manager->getDifficulty(), GUI_PLAYER_ID );
         
         SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
         kartamount->setValue( race_manager->getNumKarts() - race_manager->getNumPlayers() );
@@ -199,7 +199,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     {
         RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
         assert(w != NULL);
-        const std::string& selection = w->getSelectionIDString();
+        const std::string& selection = w->getSelectionIDString(GUI_PLAYER_ID);
 
         if(selection == "novice")
         {
@@ -220,7 +220,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     else if(name == "gamemode")
     {
         RibbonGridWidget* w = dynamic_cast<RibbonGridWidget*>(widget);
-        const std::string selectedMode = w->getSelectionIDString();
+        const std::string selectedMode = w->getSelectionIDString(GUI_PLAYER_ID);
         
         if (selectedMode == "normal")
         {
@@ -348,9 +348,9 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
         RibbonGridWidget* w2 = dynamic_cast<RibbonGridWidget*>(widget);
         if(w2 != NULL)
         {
-            std::cout << "Clicked on track " << w2->getSelectionIDString().c_str() << std::endl;
+            std::cout << "Clicked on track " << w2->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
             
-            Track* clickedTrack = track_manager->getTrack(w2->getSelectionIDString());
+            Track* clickedTrack = track_manager->getTrack(w2->getSelectionIDString(GUI_PLAYER_ID));
             if (clickedTrack != NULL)
             {
                 ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
@@ -363,7 +363,7 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
     {
         RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
         if(w != NULL)
-            std::cout << "Clicked on GrandPrix " << w->getSelectionIDString().c_str() << std::endl;
+            std::cout << "Clicked on GrandPrix " << w->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
     }
 
 }
@@ -382,15 +382,15 @@ void StateManager::menuEventHelp(Widget* widget, const std::string& name)
         if(w != NULL)
         {
             const std::string& screen_name = getCurrentScreen()->getName();
-            if(screen_name == "help1.stkgui") w->select( "page1" );
-            else if(screen_name == "help2.stkgui") w->select( "page2" );
-            else if(screen_name == "help3.stkgui") w->select( "page3" );
+            if(screen_name == "help1.stkgui") w->select( "page1", GUI_PLAYER_ID );
+            else if(screen_name == "help2.stkgui") w->select( "page2", GUI_PLAYER_ID );
+            else if(screen_name == "help3.stkgui") w->select( "page3", GUI_PLAYER_ID );
         }
     }
     // -- options
     else if(name == "category")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString().c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
 
         if(selection == "page1") replaceTopMostMenu("help1.stkgui");
         else if(selection == "page2") replaceTopMostMenu("help2.stkgui");

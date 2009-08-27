@@ -81,16 +81,16 @@ namespace GUIEngine
         int getSelection(const int playerID) const { return m_selection[playerID]; }
         
         /** Returns the string ID (internal name) of the selection */
-        const std::string& getSelectionIDString(const int playerID=0) { return m_children[m_selection[playerID]].m_properties[PROP_ID]; }
+        const std::string& getSelectionIDString(const int playerID) { return m_children[m_selection[playerID]].m_properties[PROP_ID]; }
         
         /** Returns the user-visible text of the selection */
-        const std::string& getSelectionText(const int playerID=0) { return m_children[m_selection[playerID]].m_properties[PROP_TEXT]; }
+        const std::string& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_properties[PROP_TEXT]; }
         
         /** Sets the ID of the selected item within the ribbon */
-        void setSelection(const int i, const int playerID=0) { m_selection[playerID] = i; updateSelection(); }
+        void setSelection(const int i, const int playerID) { m_selection[playerID] = i; updateSelection(); }
         
         /** Select an item in the ribbon by its internal name */
-        void select(std::string item, const int playerID=0);
+        void select(std::string item, const int playerID);
         
         /** When each item has a label, this method can be used to rename an item 
             (especially used in scrolling ribbons, when scrolling occurs by renaming

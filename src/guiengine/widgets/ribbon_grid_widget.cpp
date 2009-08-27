@@ -246,11 +246,11 @@ const std::string& RibbonGridWidget::getSelectionIDString(const int playerID)
     return nothing;
 }
 // -----------------------------------------------------------------------------
-const std::string& RibbonGridWidget::getSelectionText()
+const std::string& RibbonGridWidget::getSelectionText(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon());
     
-    if(row != NULL) return row->getSelectionText();
+    if(row != NULL) return row->getSelectionText(playerID);
     
     static const std::string nothing = "";
     return nothing;
@@ -439,7 +439,7 @@ void RibbonGridWidget::scroll(const int x_delta)
             RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
             int id = m_selected_item[n] - m_scroll_offset;
             if (id < 0) id += m_items.size();
-            ribbon->setSelection(id);
+            ribbon->setSelection(id, n);
         }
     }
 }
@@ -486,8 +486,8 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
     RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon();
     if (row == NULL) return;
     
-    
-    std::string selection_id = row->getSelectionIDString();
+    // FIXME? Don't hardcode player 0 (even though label can only work with a single player)
+    std::string selection_id = row->getSelectionIDString(0);
     
     const int amount = m_items.size();
     for (int n=0; n<amount; n++)
@@ -580,7 +580,7 @@ void RibbonGridWidget::setSelection(int item_id)
     RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
     int id = m_selected_item[PLAYER_ID] - m_scroll_offset;
     if (id < 0) id += m_items.size();
-    ribbon->setSelection(id);
+    ribbon->setSelection(id, PLAYER_ID);
 }
 
 // -----------------------------------------------------------------------------

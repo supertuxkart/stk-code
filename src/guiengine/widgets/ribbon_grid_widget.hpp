@@ -164,10 +164,10 @@ namespace GUIEngine
         void updateItemDisplay();
         
         /** Get the internal name (ID) of the selected item */
-        const std::string& getSelectionIDString(const int playerID=0);
+        const std::string& getSelectionIDString(const int playerID);
         
         /** Get the user-visible text of the selected item */
-        const std::string& getSelectionText();
+        const std::string& getSelectionText(const int playerID);
         
         /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
             ID ranges from {0} to {number of items added through 'addItem' - 1} */
