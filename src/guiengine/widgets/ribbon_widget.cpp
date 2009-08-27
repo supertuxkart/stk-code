@@ -230,7 +230,7 @@ bool RibbonWidget::rightPressed(const int playerID)
         else m_selection[playerID] = 0;
     }
     updateSelection();
-    m_focus = m_children.get(m_selection[playerID]);
+    if (playerID == 0) m_focus = m_children.get(m_selection[playerID]);
     
     return m_ribbon_type != RIBBON_TOOLBAR;
 }
@@ -248,7 +248,8 @@ bool RibbonWidget::leftPressed(const int playerID)
         else m_selection[playerID] = m_children.size()-1;
     }
     updateSelection();
-    m_focus = m_children.get(m_selection[playerID]);
+    
+    if (playerID == 0) m_focus = m_children.get(m_selection[playerID]);
     
     return m_ribbon_type != RIBBON_TOOLBAR;
 }

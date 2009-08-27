@@ -68,7 +68,8 @@ namespace GUIEngine
         
     public:
         
-        /** Contains which element within the ribbon is currently focused (used by the skin) */
+        /** Contains which element within the ribbon is currently focused (used by the skin to
+            show mouse hovers over items that are not selected) */
         Widget* m_focus;
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);

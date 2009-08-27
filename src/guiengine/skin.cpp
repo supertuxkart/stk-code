@@ -651,6 +651,9 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
         
+        // if multiple player selected the same ribbon item, we need to know to make it visible
+        int nPlayersOnThisItem = 0;
+        
         if (mark_focused)
         {
             if (use_glow)
@@ -696,6 +699,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                 //core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
                 drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+                nPlayersOnThisItem++;
             }
         } // end if mark_focused
         
@@ -703,11 +707,35 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         if (parent_focused)
         {
             if (widget->isFocusedForPlayer(1))
-                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+            {
+                if (nPlayersOnThisItem > 0)
+                {
+                    core::rect< s32 > rect2 =  rect;
+                    const int enlarge = nPlayersOnThisItem*6;
+                    rect2.UpperLeftCorner.X -= enlarge;
+                    rect2.UpperLeftCorner.Y -= enlarge;
+                    rect2.LowerRightCorner.X += enlarge;
+                    rect2.LowerRightCorner.Y += enlarge;
+                    drawBoxFromStretchableTexture(w, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                }
+                else
+                {
+                    drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                }
+                
+                nPlayersOnThisItem++;
+            }
+            
             if (widget->isFocusedForPlayer(2))
+            {
                 drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+                nPlayersOnThisItem++;
+            }
+            
             if (widget->isFocusedForPlayer(3))
+            {
                 drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+            }
         }
         
     } // end if icon ribbons
