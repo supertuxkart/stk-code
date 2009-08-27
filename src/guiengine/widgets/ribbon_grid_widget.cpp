@@ -154,7 +154,7 @@ void RibbonGridWidget::setSubElements()
     std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
     if (m_row_amount*m_col_amount > item_count)
     {
-        m_col_amount = ceil((float)item_count/(float)m_row_amount);
+        m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
         std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
     
