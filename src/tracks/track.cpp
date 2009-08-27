@@ -696,6 +696,12 @@ void Track::loadTrackModel()
             // Height is needed if bit 2 (for z) is not set
             itemCommand(xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
         }
+        else if (name=="start")
+        {
+            core::vector3df xyz(0,0,0);
+            node->getXYZ(&xyz);
+            m_start_positions.push_back(Vec3(xyz.X, xyz.Y, xyz.Z));
+        }
 		else if(name=="animations")
 		{
 			m_animation_manager = new AnimationManager(*this, *node);
