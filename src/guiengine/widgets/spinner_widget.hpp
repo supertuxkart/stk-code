@@ -30,6 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A spinner or gauge widget (to select numbers / percentages). See guiengine/engine.hpp for a detailed overview */
     class SpinnerWidget : public Widget
     {
         int m_value, m_min, m_max;

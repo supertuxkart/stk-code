@@ -30,6 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A text field widget. See guiengine/engine.hpp for a detailed overview */
     class TextBoxWidget : public Widget
     {
     public:

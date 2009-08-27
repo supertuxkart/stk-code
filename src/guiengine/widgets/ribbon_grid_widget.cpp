@@ -43,7 +43,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::add()
 {
-    m_has_label = m_properties[PROP_TEXT] == "bottom";
+    m_has_label = (m_properties[PROP_TEXT] == "bottom");
     m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
     
     // ----- add dynamic label at bottom
@@ -172,13 +172,18 @@ void RibbonGridWidget::setSubElements()
     }
     
     // add rows
-    for(int n=0; n<m_row_amount; n++)
+    for (int n=0; n<m_row_amount; n++)
     {
         RibbonWidget* ribbon;
         if (m_combo)
-            ribbon = new RibbonWidget(RIBBON_COMBO, m_ids[n]);
+        {
+            ribbon = new RibbonWidget(RIBBON_COMBO);
+        }
         else
-            ribbon = new RibbonWidget(RIBBON_TOOLBAR, m_ids[n]);
+        {
+            ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+        }
+        ribbon->m_reserved_id = m_ids[n];
                 
         ribbon->x = x + m_arrows_w;
         ribbon->y = y + (int)(n*row_height);
@@ -374,6 +379,7 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
 // -----------------------------------------------------------------------------
 void RibbonGridWidget::focused()
 {
+    Widget::focused();
     updateLabel();
     
     const int listenerAmount = m_hover_listeners.size();
@@ -494,11 +500,11 @@ void RibbonGridWidget::updateItemDisplay()
     
     const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
     
-    for(int n=0; n<row_amount; n++)
+    for (int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
         
-        for(int i=0; i<m_col_amount; i++)
+        for (int i=0; i<m_col_amount; i++)
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
@@ -510,7 +516,7 @@ void RibbonGridWidget::updateItemDisplay()
             
             icon_id = (col_scroll)*row_amount + n;
             
-            if( icon_id < item_amount )
+            if (icon_id < item_amount)
             {
                 std::string track_sshot = m_items[icon_id].m_sshot_file;
                 button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));

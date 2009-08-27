@@ -30,7 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    
+    /** A model view widget. See guiengine/engine.hpp for a detailed overview */
     class ModelViewWidget : public Widget
     {
         

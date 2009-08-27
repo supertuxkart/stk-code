@@ -26,14 +26,14 @@ using namespace GUIEngine;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
-RibbonWidget::RibbonWidget(const RibbonType type, int id)
+// -----------------------------------------------------------------------------
+RibbonWidget::RibbonWidget(const RibbonType type)
 {
     m_selection = 0;
     m_ribbon_type = type;
     m_focus = NULL;
     updateSelection();
     m_type = WTYPE_RIBBON;
-    m_given_id = id;
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::add()
@@ -43,7 +43,7 @@ void RibbonWidget::add()
     
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     
-    int id = (m_given_id == -1 ? getNewID() : m_given_id);
+    int id = (m_reserved_id == -1 ? getNewID() : m_reserved_id);
     
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, id, L"");
     m_element = btn;
@@ -250,11 +250,14 @@ bool RibbonWidget::leftPressed()
 // -----------------------------------------------------------------------------
 void RibbonWidget::focused()
 {    
-    if(m_focus == NULL) m_focus = m_children.get(m_selection);
+    Widget::focused();
     
-    if(m_event_handler != NULL)
+    if (m_focus == NULL) m_focus = m_children.get(m_selection);
+    
+    if (m_event_handler != NULL)
     {
         GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
+        // FIXME : unclean, children ribbons shouldn't need to know about their parent
         ((RibbonGridWidget*)m_event_handler)->onRowChange( this );
     }
 }
@@ -265,12 +268,12 @@ bool RibbonWidget::mouseHovered(Widget* child)
     
     m_focus = child;
     
-    for(int i=0; i<subbuttons_amount; i++)
+    for (int i=0; i<subbuttons_amount; i++)
     {
-        if(m_children.get(i) == child)
+        if (m_children.get(i) == child)
         {
-            if(m_selection == i) return false; // was already selected, don't send another event
-            if(m_ribbon_type == RIBBON_TOOLBAR) m_selection = i; // don't change selection on hover for others
+            if (m_selection == i) return false; // was already selected, don't send another event
+            if (m_ribbon_type == RIBBON_TOOLBAR) m_selection = i; // don't change selection on hover for others
             break;
         }
     }
@@ -306,10 +309,10 @@ bool RibbonWidget::transmitEvent(Widget* w, std::string& originator)
     GUIEngine::getGUIEnv()->setFocus(m_element);
     return true;
 }
-
+// -----------------------------------------------------------------------------
 void RibbonWidget::setLabel(const int id, std::string new_name)
 {
-    if(m_labels.size() == 0) return; // ignore this call for ribbons without labels
+    if (m_labels.size() == 0) return; // ignore this call for ribbons without labels
     
     assert(id >= 0);
     assert(id < m_labels.size());

@@ -30,6 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A checkbox widget. See guiengine/engine.hpp for a detailed overview */
     class CheckBoxWidget : public Widget
     {
         bool m_state;
@@ -40,8 +41,12 @@ namespace GUIEngine
         virtual ~CheckBoxWidget() {}
         
         void add();
+        
+        /** Get whether the checkbox is checked */
         bool getState() const { return m_state; }
-        void setState(const bool enabled)  { m_state = enabled; }
+        
+        /** Set whether the checkbox is checked */
+        void setState(const bool checked)  { m_state = checked; }
     };  
 }
 

@@ -186,7 +186,7 @@ namespace GUIEngine
             1) For 'placeholder' divisions; at the time the layout is created, there is nothing to
                place there yet, but we know there eventually will. So in this case pass 'true' to the
                Widget constructor and it will reserve a widget ID and store it here.
-            2) Theorically, in 'add()', derivded widgets should checked if this value is set, and use
+            2) Theorically, in 'add()', derived widgets should checked if this value is set, and use
                it instead of creating a new ID if it is. In practice, it's not widely implemented (FIXME) */
         int m_reserved_id;
         

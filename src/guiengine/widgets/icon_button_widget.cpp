@@ -30,6 +30,7 @@ IconButtonWidget::IconButtonWidget(const bool clickable)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
 {
+    // ---- Icon
     ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
     const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
     /*
@@ -63,8 +64,10 @@ void IconButtonWidget::add()
         btn->setTabStop(false);
         btn->setScaleImage(true);
     }
+    
+    // ---- label if any
     stringw  message = m_properties[PROP_TEXT].c_str();
-    if(message.size() > 0)
+    if (message.size() > 0)
     {
         widget_size += position2d<s32>(0, widget_size.getHeight());
         label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
@@ -72,6 +75,7 @@ void IconButtonWidget::add()
         label->setTabStop(false);
     }
     
+    // ---- IDs
     id = m_element->getID();
     if(clickable) m_element->setTabOrder(id);
     m_element->setTabGroup(false);
@@ -96,10 +100,10 @@ void IconButtonWidget::add()
      button->setSprite(EGBS_BUTTON_DOWN, sprite_bank->getSprites().size()-1);
      */
 }
-
+// -----------------------------------------------------------------------------
 void IconButtonWidget::setLabel(std::string new_label)
 {
-    if(label == NULL) return;
+    if (label == NULL) return;
     
     label->setText( stringw(new_label.c_str()).c_str() );
 }

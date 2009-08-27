@@ -30,6 +30,8 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A button widget with an icon and optionnaly a label beneath (from its properties in base class Widget)
+        See guiengine/engine.hpp for a detailed overview */
     class IconButtonWidget : public Widget
     {
         bool clickable;
@@ -39,6 +41,8 @@ namespace GUIEngine
         virtual ~IconButtonWidget() {}
         
         void add();
+        
+        /** Change the text label if there is a label (label won't be added if there initially wasn't one) */
         void setLabel(std::string new_label);
     };
 }

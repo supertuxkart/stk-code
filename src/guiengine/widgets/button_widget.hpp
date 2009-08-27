@@ -30,6 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A text button widget. See guiengine/engine.hpp for a detailed overview */
     class ButtonWidget : public Widget
     {
     public:
@@ -37,6 +38,8 @@ namespace GUIEngine
         virtual ~ButtonWidget() {}
         
         void add();
+        
+        /**  Change the label on the button */
         void setLabel(const char* label);
     }; 
 }

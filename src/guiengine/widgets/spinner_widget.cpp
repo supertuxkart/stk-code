@@ -25,12 +25,13 @@
 #include "utils/translation.hpp"
 using namespace GUIEngine;
 
+// -----------------------------------------------------------------------------
 SpinnerWidget::SpinnerWidget(const bool gauge)
 {
     m_gauge = gauge;
     m_type = WTYPE_SPINNER;
 }
-
+// -----------------------------------------------------------------------------
 void SpinnerWidget::add()
 {
     // retrieve min and max values
@@ -142,7 +143,7 @@ void SpinnerWidget::add()
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
 }
-
+// -----------------------------------------------------------------------------
 void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 {
     Widget::move(x, y, w, h);

@@ -629,7 +629,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         }
         
         const bool mark_focused = focused || (parent_focused && w != NULL && w->m_focus == widget) ||
-        (mark_selected && !always_show_selection && parent_focused);
+                                  (mark_selected && !always_show_selection && parent_focused);
         
         
         if(always_show_selection && mark_selected)

@@ -23,7 +23,7 @@ LabelWidget::LabelWidget()
 {
     m_type = WTYPE_LABEL;
 }
-
+// -----------------------------------------------------------------------------
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -44,7 +44,7 @@ void LabelWidget::add()
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
 }
-
+// -----------------------------------------------------------------------------
 void LabelWidget::setText(stringw newText)
 {
     IGUIStaticText* irrwidget = Widget::getIrrlichtElement<IGUIStaticText>();   

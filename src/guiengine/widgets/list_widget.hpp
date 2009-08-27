@@ -30,6 +30,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    /** A vertical list widget with text entries. See guiengine/engine.hpp for a detailed overview */
     class ListWidget : public Widget
     {
     public:

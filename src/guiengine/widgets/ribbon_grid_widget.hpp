@@ -49,6 +49,8 @@ namespace GUIEngine
         std::string m_sshot_file;
     };
     
+    /** A dynamic ribbon (builds upon RibbonWidget, adding dynamic contents creation and sizing, scrolling, multiple-row
+        layouts). See guiengine/engine.hpp for a detailed overview */
     class RibbonGridWidget : public Widget
     {
         friend class RibbonWidget;
@@ -57,10 +59,11 @@ namespace GUIEngine
         
         virtual ~RibbonGridWidget() {}
         
-        /** reference pointers only, the actual instances are owned by m_children */
+        /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
+            ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */
         ptr_vector<RibbonWidget, REF> m_rows;
         
-        /** Used for ribbon grids that have a label */
+        /** Used for ribbon grids that have a label at the bottom */
         bool m_has_label;
         IGUIStaticText* m_label;
         int m_label_height;
@@ -74,9 +77,10 @@ namespace GUIEngine
         /** Width of the scrolling arrows on each side */
         int m_arrows_w;
         
+        /** Current scroll offset within items */
         int m_scroll_offset;
-        int m_needed_cols;
         
+        /** Width and height of children as declared in the GUI file */
         int m_child_width, m_child_height;
         
         /** Number of rows and columns. Number of columns can dynamically change, number of row is
@@ -84,7 +88,18 @@ namespace GUIEngine
         int m_row_amount;
         int m_col_amount;
         
+        /** The total number of columns given item count and row count (even counting not visible with current scrolling) */
+        int m_needed_cols;
+        
+        /** The maximum number of rows, as passed to the constructor */
         int m_max_rows;
+        
+        /** irrlicht relies on consecutive IDs to perform keyboard navigation between widgets. However, since this
+            widget is dynamic, irrlicht widgets are not created as early as all others, so by the time we're ready
+            to create the full contents of this widget, the ID generator is already incremented, thus messing up
+            keyboard navigation. To work around this, at the same time all other widgets are created, I gather a
+            number of IDs (the number of rows) and store them here. Then, when we're finally ready to create the
+            contents dynamically, we can re-use these IDs and get correct navigation order. */
         std::vector<int> m_ids;
         
         /** Whether this is a "combo" style ribbon grid widget */
@@ -94,7 +109,10 @@ namespace GUIEngine
         Widget* m_left_widget;
         Widget* m_right_widget;
         
+        /** Returns the currently selected row */
         RibbonWidget* getSelectedRibbon() const;
+        
+        /** Returns the row */
         RibbonWidget* getRowContaining(Widget* w) const;
         
         /** Updates the visible label to match the currently selected item */
@@ -114,17 +132,22 @@ namespace GUIEngine
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();
 
+        /** Call this to scroll within a scrollable ribbon */
         void scroll(const int x_delta);
         
         /** Used  for combo ribbons, to contain the ID of the currently selected item */
         int m_selected_item;
         
+        /** Callbacks */
+        void onRowChange(RibbonWidget* row);
+        void add();
+        bool mouseHovered(Widget* child);
+        
     public:
         RibbonGridWidget(const bool combo=false, const int max_rows=4);
         
+        /** Register a listener to be notified of selection changes within the ribbon */
         void registerHoverListener(RibbonGridHoverListener* listener);
-        
-        void add();
         
         /** Called when right key is pressed */
         bool rightPressed();
@@ -132,17 +155,25 @@ namespace GUIEngine
         /** Called when left key is pressed */
         bool leftPressed();
         
+        /** Dynamically add an item to the ribbon's list of items (will not be visible until you
+            call 'updateItemDisplay' or 'add') */
         void addItem( std::string user_name, std::string code_name, std::string image_file );
         
+        /** Updates icons/labels given current items and scrolling offset, taking care of resizing
+            the dynamic ribbon if the number of items changed */
         void updateItemDisplay();
         
-        bool mouseHovered(Widget* child);
-        void onRowChange(RibbonWidget* row);
-        
+        /** Get the internal name (ID) of the selected item */
         const std::string& getSelectionIDString();
+        
+        /** Get the user-visible text of the selected item */
         const std::string& getSelectionText();
         
+        /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
+            ID ranges from {0} to {number of items added through 'addItem' - 1} */
         void setSelection(int item_id);
+        
+        /** Select an item from its internal name */
         void setSelection(const std::string& code_name);
     };
     

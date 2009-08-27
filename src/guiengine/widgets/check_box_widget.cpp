@@ -25,7 +25,7 @@ CheckBoxWidget::CheckBoxWidget()
     m_event_handler = this;
     m_type = WTYPE_CHECKBOX;
 }
-
+// -----------------------------------------------------------------------------
 void CheckBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -37,7 +37,7 @@ void CheckBoxWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
-
+// -----------------------------------------------------------------------------
 bool CheckBoxWidget::transmitEvent(Widget* w, std::string& originator)
 {
     /* toggle */
