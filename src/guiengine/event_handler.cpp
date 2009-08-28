@@ -26,13 +26,19 @@
 
 using GUIEngine::EventHandler;
 
+// -----------------------------------------------------------------------------
+
 EventHandler::EventHandler()
 {
 }
 
+// -----------------------------------------------------------------------------
+
 EventHandler::~EventHandler()
 {
 }
+
+// -----------------------------------------------------------------------------
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
@@ -54,13 +60,15 @@ bool EventHandler::OnEvent (const SEvent &event)
     return false;
 }
 
+// -----------------------------------------------------------------------------
+
 bool EventHandler::onGUIEvent(const SEvent& event)
 {    
-    if(event.EventType == EET_GUI_EVENT)
+    if (event.EventType == EET_GUI_EVENT)
     {
         const s32 id = event.GUIEvent.Caller->getID();
         
-        switch(event.GUIEvent.EventType)
+        switch (event.GUIEvent.EventType)
         {
             case EGET_BUTTON_CLICKED:
             case EGET_SCROLL_BAR_CHANGED:
@@ -140,6 +148,8 @@ bool EventHandler::onGUIEvent(const SEvent& event)
     return false;        
 }
 
+// -----------------------------------------------------------------------------
+
 bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
     if (ModalDialog::isADialogActive() && w->m_event_handler == NULL)
@@ -174,6 +184,8 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
     return true;
 }
 
+// -----------------------------------------------------------------------------
+
 /**
  * Called by the input module
  */
@@ -187,11 +199,21 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
     {
         case PA_LEFT:
         {
-            IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-            if(el == NULL) break;
-                        
-            Widget* w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
-            if(w == NULL) break;
+            Widget* w = NULL;
+            
+            if (playerID == 0)
+            {
+                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
+                if (el == NULL) break;
+                            
+                w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+            }
+            else
+            {
+                w = GUIEngine::g_focus_for_player[playerID];
+            }
+            
+            if (w == NULL) break;
                         
             Widget* widget_to_call = w;
             
@@ -213,138 +235,44 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             
         case PA_RIGHT:
         {
-            IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-            if(el == NULL) break;
-            Widget* w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
-            if(w == NULL) break;
+            Widget* w = NULL;
+            
+            if (playerID == 0)
+            {
+                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
+                if(el == NULL) break;
+                w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+            }
+            else
+            {
+                w = GUIEngine::g_focus_for_player[playerID];
+            }
+            
+            if (w == NULL) break;
             
             Widget* widget_to_call = w;
             /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
              in an infinite loop (this can happen e.g. in checkboxes, where they need to be
              notified of clicks onto themselves so they can toggle their state. )
              On the way, also notify everyone in the chain of the right press */
-            while(widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
+            while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
                 widget_to_call->rightPressed(playerID);
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
-            if(widget_to_call->rightPressed(playerID))
+            if (widget_to_call->rightPressed(playerID))
                 transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
         }
             
             break;
             
         case PA_ACCEL:
-        {
-            IGUIElement *el, *first=NULL, *closest=NULL;
-            el = GUIEngine::getGUIEnv()->getFocus();
-            
-            Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
-            
-            // list widgets are a bit special, because up/down keys are also used
-            // to navigate between various list items, not only to navigate between
-            // components
-            if(w != NULL && w->m_type == WTYPE_LIST)
-            {
-                IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
-                assert(list != NULL);
-                
-                const bool stay_within_list = list->getSelected() > 0;
-                
-                if(type == Input::IT_STICKMOTION)
-                {
-                    // simulate a key press
-                    irr::SEvent::SKeyInput evt;
-                    evt.PressedDown = pressedDown;
-                    evt.Key = KEY_UP;
-                    irr::SEvent wrapper;
-                    wrapper.KeyInput = evt;
-                    wrapper.EventType = EET_KEY_INPUT_EVENT;
-                    GUIEngine::getDevice()->postEventFromUser(wrapper);
-                }
-                
-                if(stay_within_list) break;
-                else list->setSelected(-1);
-            }
-            
-            // find closest widget
-            if(el != NULL && el->getTabGroup() != NULL &&
-               el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
-            {
-                GUIEngine::getGUIEnv()->setFocus(closest);
-                
-                // when focusing a list by going up, select the last item of the list
-                Widget* w = GUIEngine::getCurrentScreen()->getWidget( closest->getID() );
-                if(w != NULL && w->m_type == WTYPE_LIST)
-                {
-                    IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
-                    assert(list != NULL);
-                    
-                    list->setSelected( list->getItemCount()-1 );
-                    return;
-                }
-                
-                
-            }
-            else
-            {
-                std::cout << "Could not find any!\n";
-                
-                // select the first widget
-                Widget* w = GUIEngine::getCurrentScreen()->getLastWidget();
-                
-                if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
-            }
-        }
+            navigateUp(playerID, type, pressedDown);
             break;
             
         case PA_BRAKE:
-        {
-            IGUIElement *el, *first = NULL, *closest = NULL;
-            el = GUIEngine::getGUIEnv()->getFocus();
-            
-            Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
-            
-            // list widgets are a bit special, because up/down keys are also used
-            // to navigate between various list items, not only to navigate between
-            // components
-            if(w != NULL && w->m_type == WTYPE_LIST)
-            {
-                IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
-                assert(list != NULL);
-                
-                const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
-                
-                if(type == Input::IT_STICKMOTION)
-                {
-                    // simulate a key press
-                    irr::SEvent::SKeyInput evt;
-                    evt.PressedDown = pressedDown;
-                    evt.Key = KEY_DOWN;
-                    irr::SEvent wrapper;
-                    wrapper.KeyInput = evt;
-                    wrapper.EventType = EET_KEY_INPUT_EVENT;
-                    GUIEngine::getDevice()->postEventFromUser(wrapper);
-                }
-                
-                if(stay_within_list) break;
-                else list->setSelected(-1);
-            }
-            
-            if(el != NULL && el->getTabGroup() != NULL &&
-               el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
-            {
-                GUIEngine::getGUIEnv()->setFocus(closest);
-            }
-            else
-            {
-                // select the first widget
-                Widget* w = GUIEngine::getCurrentScreen()->getFirstWidget();                    
-                if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
-            }
-        }
-            
+            navigateDown(playerID, type, pressedDown);
             break;
             
         case PA_RESCUE:
@@ -379,6 +307,153 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
     }
 }
 
+// -----------------------------------------------------------------------------
+
+void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
+{
+    IGUIElement *el, *first=NULL, *closest=NULL;
+    
+    if (playerID == 0)
+        el = GUIEngine::getGUIEnv()->getFocus();
+    else
+        el = GUIEngine::g_focus_for_player[playerID]->m_element;
+    
+    Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+    
+    // list widgets are a bit special, because up/down keys are also used
+    // to navigate between various list items, not only to navigate between
+    // components
+    if (w != NULL && w->m_type == WTYPE_LIST)
+    {
+        IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+        assert(list != NULL);
+        
+        const bool stay_within_list = list->getSelected() > 0;
+        
+        if (type == Input::IT_STICKMOTION)
+        {
+            // simulate a key press
+            irr::SEvent::SKeyInput evt;
+            evt.PressedDown = pressedDown;
+            evt.Key = KEY_UP;
+            irr::SEvent wrapper;
+            wrapper.KeyInput = evt;
+            wrapper.EventType = EET_KEY_INPUT_EVENT;
+            GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }
+        
+        if (stay_within_list) return;
+        else list->setSelected(-1);
+    }
+    
+    // find closest widget
+    if (el != NULL && el->getTabGroup() != NULL &&
+        el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
+    {
+        Widget* w = GUIEngine::getCurrentScreen()->getWidget( closest->getID() );
+
+        if (playerID == 0)
+        {
+            GUIEngine::getGUIEnv()->setFocus(closest);
+        }
+        else if (w != NULL)
+        {
+            w->setFocusForPlayer(playerID);
+        }
+        
+        // when focusing a list by going up, select the last item of the list
+        if (w != NULL && w->m_type == WTYPE_LIST)
+        {
+            IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+            assert(list != NULL);
+            
+            list->setSelected( list->getItemCount()-1 );
+            return;
+        }
+        
+    }
+    else
+    {        
+        // select the last widget
+        Widget* w = GUIEngine::getCurrentScreen()->getLastWidget();
+        
+        if (w != NULL)
+        {
+            if (playerID == 0)
+                GUIEngine::getGUIEnv()->setFocus( w->m_element );
+            else
+                w->setFocusForPlayer(playerID);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void EventHandler::navigateDown(const int playerID, Input::InputType type, const bool pressedDown)
+{
+    IGUIElement *el, *first = NULL, *closest = NULL;
+    
+    if (playerID == 0)
+        el = GUIEngine::getGUIEnv()->getFocus();
+    else
+        el = GUIEngine::g_focus_for_player[playerID]->m_element;
+        
+    Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+    
+    // list widgets are a bit special, because up/down keys are also used
+    // to navigate between various list items, not only to navigate between
+    // components
+    if (w != NULL && w->m_type == WTYPE_LIST)
+    {
+        IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+        assert(list != NULL);
+        
+        const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
+        
+        if (type == Input::IT_STICKMOTION)
+        {
+            // simulate a key press
+            irr::SEvent::SKeyInput evt;
+            evt.PressedDown = pressedDown;
+            evt.Key = KEY_DOWN;
+            irr::SEvent wrapper;
+            wrapper.KeyInput = evt;
+            wrapper.EventType = EET_KEY_INPUT_EVENT;
+            GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }
+        
+        if (stay_within_list) return;
+        else list->setSelected(-1);
+    }
+    
+    if (el != NULL && el->getTabGroup() != NULL &&
+       el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
+    {
+        if (playerID == 0)
+        {
+            GUIEngine::getGUIEnv()->setFocus(closest);
+        }
+        else
+        {
+            Widget* w = GUIEngine::getCurrentScreen()->getWidget( closest->getID() );
+            w->setFocusForPlayer(playerID);
+        }
+    }
+    else
+    {
+        // select the first widget
+        Widget* w = GUIEngine::getCurrentScreen()->getFirstWidget();                    
+        if(w != NULL)
+        {
+            if (playerID == 0)
+                GUIEngine::getGUIEnv()->setFocus( w->m_element );
+            else
+                w->setFocusForPlayer(playerID);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
 
 EventHandler* event_handler_singleton = NULL;
 

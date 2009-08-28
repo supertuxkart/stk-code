@@ -46,6 +46,9 @@ class EventHandler : public IEventReceiver
 {
     bool onGUIEvent(const SEvent& event);
     bool onWidgetActivated(Widget* w, const int playerID);
+    void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
+    void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
+    
 public:
     EventHandler();
     ~EventHandler();
