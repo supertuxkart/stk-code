@@ -201,6 +201,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
         {
             Widget* w = NULL;
             
+            // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
             if (playerID == 0)
             {
                 IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
@@ -237,6 +238,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
         {
             Widget* w = NULL;
             
+            // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
             if (playerID == 0)
             {
                 IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
@@ -313,6 +315,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
 {
     IGUIElement *el, *first=NULL, *closest=NULL;
     
+    // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
     if (playerID == 0)
         el = GUIEngine::getGUIEnv()->getFocus();
     else
@@ -393,6 +396,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
 {
     IGUIElement *el, *first = NULL, *closest = NULL;
     
+    // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
     if (playerID == 0)
         el = GUIEngine::getGUIEnv()->getFocus();
     else

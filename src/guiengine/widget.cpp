@@ -101,9 +101,7 @@ Widget::Widget(bool reserve_id)
   * for additionnal players
   */
 void Widget::setFocusForPlayer(const int playerID)
-{
-    std::cout << "=========== setFocusForPlayer " << playerID << " : " <<  m_properties[PROP_ID].c_str() << " =============\n";
-    
+{    
     // Unset focus flag on previous widget that had focus
     if (GUIEngine::g_focus_for_player[playerID] != NULL)
     {

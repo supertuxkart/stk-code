@@ -502,54 +502,71 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     core::rect<s32>& GET_AREA(dest_area_bottom_right);
 #undef GET_AREA 
     
-    if((areas & BoxRenderParams::LEFT) != 0)
+    SColor* colorptr = NULL;
+    
+    if (w->r != -1 && w->g != -1 && w->b != -1)
+    {
+        SColor thecolor(255, w->r, w->g, w->b);
+        colorptr = new SColor[4]();
+        colorptr[0] = thecolor;
+        colorptr[1] = thecolor;
+        colorptr[2] = thecolor;
+        colorptr[3] = thecolor;
+    }
+    
+    if ((areas & BoxRenderParams::LEFT) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
     
-    if((areas & BoxRenderParams::BODY) != 0)
+    if ((areas & BoxRenderParams::BODY) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
     
-    if((areas & BoxRenderParams::RIGHT) != 0)
+    if ((areas & BoxRenderParams::RIGHT) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
     
-    if((areas & BoxRenderParams::TOP) != 0)
+    if ((areas & BoxRenderParams::TOP) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
-    if((areas & BoxRenderParams::BOTTOM) != 0)
+    if ((areas & BoxRenderParams::BOTTOM) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
     
-    if( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
+    if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
-    if( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
+    if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
-    if( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
+    if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
     }
-    if( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
+    if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
-                                            0 /* no clipping */, 0, true /* alpha */);
+                                            0 /* no clipping */, colorptr, true /* alpha */);
+    }
+    
+    if (colorptr != NULL)
+    {
+        delete[] colorptr;
     }
     
 }
@@ -749,15 +766,15 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
 
 void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    if(!focused)
+    if (!focused)
     {
         IGUIElement* focused_widget = GUIEngine::getGUIEnv()->getFocus();
         
-        if(focused_widget != NULL && widget->m_children.size()>2)
+        if (focused_widget != NULL && widget->m_children.size()>2)
         {
-            if(widget->m_children[0].id == focused_widget->getID() ||
-               widget->m_children[1].id == focused_widget->getID() ||
-               widget->m_children[2].id == focused_widget->getID())
+            if (widget->m_children[0].id == focused_widget->getID() ||
+                widget->m_children[1].id == focused_widget->getID() ||
+                widget->m_children[2].id == focused_widget->getID())
             {
                 focused = true;
             }
@@ -767,10 +784,37 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     
     BoxRenderParams& params = (focused || pressed) ? SkinConfig::m_render_params["spinner::focused"] : 
     SkinConfig::m_render_params["spinner::neutral"];
+    
+    // FIXME: temporary only
+    if (widget->isFocusedForPlayer(1))
+    {
+        widget->r = 0;
+        widget->g = 200;
+        widget->b = 255;
+    }
+    else if (widget->isFocusedForPlayer(2))
+    {
+        widget->r = 120;
+        widget->g = 0;
+        widget->b = 120;
+    }
+    else if (widget->isFocusedForPlayer(3))
+    {
+        widget->r = 255;
+        widget->g = 0;
+        widget->b = 0;
+    }
+    else
+    {
+        widget->r = -1;
+        widget->g = -1;
+        widget->b = -1;
+    }
+    
     drawBoxFromStretchableTexture(widget, rect, params);
     
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
-    if( w->isGauge() )
+    if (w->isGauge())
     {
         const int handle_size = (int)( widget->h*params.left_border/(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());

@@ -141,6 +141,8 @@ namespace GUIEngine
         core::rect<s32> dest_area_bottom_left_yflip;
         core::rect<s32> dest_area_bottom_right_yflip;   
         
+        short r, g, b;
+        
         SkinWidgetContainer()
         {
             dest_areas_inited = false;
@@ -149,6 +151,9 @@ namespace GUIEngine
             y = -1;
             w = -1;
             h = -1;
+            r = -1;
+            g = -1;
+            b = -1;
         }
     };
     
