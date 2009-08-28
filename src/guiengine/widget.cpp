@@ -111,6 +111,11 @@ void Widget::setFocusForPlayer(const int playerID)
     m_player_focus[playerID] = true;
     GUIEngine::g_focus_for_player[playerID] = this;
 }
+    
+void Widget::unsetFocusForPlayer(const int playerID)
+{
+    m_player_focus[playerID] = false;
+}
 
 /**
  * \param playerID ID of the player you want to set/unset focus for, starting from 0

@@ -251,6 +251,8 @@ namespace GUIEngine
          */
         bool isFocusedForPlayer(const int playerID);
         
+        void unsetFocusForPlayer(const int playerID);
+        
         /**
           * Call to resize/move the widget. Not all widgets can resize gracefully.
           */

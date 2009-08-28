@@ -525,6 +525,13 @@ bool playerQuit(ActivePlayer* player)
     // between g_player_karts and the active player array
     assert( g_player_karts.size() == StateManager::get()->activePlayerCount() );
 
+    // unset selection of this player
+    if (GUIEngine::g_focus_for_player[playerID] != NULL)
+    {
+        GUIEngine::g_focus_for_player[playerID]->unsetFocusForPlayer(playerID);
+    }
+    GUIEngine::g_focus_for_player[playerID] = NULL;
+    
     removedWidget = g_player_karts.remove(playerID);
     StateManager::get()->removeActivePlayer(playerID);
     renumberKarts();    
