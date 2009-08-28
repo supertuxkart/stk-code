@@ -258,6 +258,8 @@ void RibbonWidget::focused()
 {    
     Widget::focused();
     
+    if (m_children.size() < 1) return; // empty ribbon
+    
     if (m_focus == NULL) m_focus = m_children.get(m_selection[0]); // FIXME : don't hardcode player 0 here
     
     if (m_event_handler != NULL)
