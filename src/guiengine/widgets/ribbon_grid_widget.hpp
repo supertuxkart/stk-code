@@ -150,6 +150,8 @@ namespace GUIEngine
          call 'updateItemDisplay' or 'add') */
         void addItem( std::string user_name, std::string code_name, std::string image_file );
         
+        void clearItems();
+        
         /** Register a listener to be notified of selection changes within the ribbon */
         void registerHoverListener(RibbonGridHoverListener* listener);
         

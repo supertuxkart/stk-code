@@ -101,11 +101,11 @@ namespace KartSelectionScreen
             target_w = w;
             target_h = h;
             
-            if(associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+            if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
             {
                 deviceName += "keyboard";
             }
-            else if(associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
+            else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
             {
                 deviceName += "gamepad";
             }
@@ -589,13 +589,14 @@ void menuEventKarts(Widget* widget, const std::string& name)
         if (!getCurrentScreen()->m_inited)
         {            
             // Build kart list
-            const int kart_amount = kart_properties_manager->getNumberOfKarts();
+            std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
+            const int kart_amount = group.size();
             
             // add Tux (or whatever default kart) first
             std::string& default_kart = UserConfigParams::m_default_kart;
             for(int n=0; n<kart_amount; n++)
             {
-                const KartProperties* prop = kart_properties_manager->getKartById(n);
+                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
                 if (prop->getIdent() == default_kart)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
@@ -608,7 +609,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
             // add others
             for(int n=0; n<kart_amount; n++)
             {
-                const KartProperties* prop = kart_properties_manager->getKartById(n);
+                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
                 if (prop->getIdent() != default_kart)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
@@ -653,8 +654,51 @@ void menuEventKarts(Widget* widget, const std::string& name)
         
         getCurrentScreen()->m_inited = true;
     } // end if init
+    
+    else if (name == "kartgroups")
+    {
+        RibbonWidget* tabs = getCurrentScreen()->getWidget<RibbonWidget>("kartgroups");
+        assert(tabs != NULL);
 
-    else if(name == "karts")
+        std::string selection = tabs->getSelectionIDString(GUI_PLAYER_ID);
+
+        RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+        w->clearItems();
+        
+        // TODO : preserve selection of karts for all players
+        
+        if (selection == "all")
+        {
+            const int kart_amount = kart_properties_manager->getNumberOfKarts();
+            
+            for(int n=0; n<kart_amount; n++)
+            {
+                const KartProperties* prop = kart_properties_manager->getKartById(n);
+                
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+            }
+        }
+        else
+        {        
+            std::vector<int> group = kart_properties_manager->getKartsInGroup(selection);
+            const int kart_amount = group.size();
+            
+            for(int n=0; n<kart_amount; n++)
+            {
+                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+                
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+            }
+        }
+        
+        w->updateItemDisplay();
+
+    }
+    else if (name == "karts")
     {
         RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
         assert( w != NULL );

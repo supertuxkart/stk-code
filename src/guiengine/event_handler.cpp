@@ -313,13 +313,18 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
 
 void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
 {
-    IGUIElement *el, *first=NULL, *closest=NULL;
+    IGUIElement *el = NULL, *first=NULL, *closest=NULL;
     
     // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
     if (playerID == 0)
+    {
         el = GUIEngine::getGUIEnv()->getFocus();
+    }
     else
-        el = GUIEngine::g_focus_for_player[playerID]->m_element;
+    {
+        Widget* widget = g_focus_for_player[playerID];
+        if (widget != NULL) el = widget->m_element;
+    }
     
     Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
     
@@ -394,13 +399,18 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
 
 void EventHandler::navigateDown(const int playerID, Input::InputType type, const bool pressedDown)
 {
-    IGUIElement *el, *first = NULL, *closest = NULL;
+    IGUIElement *el = NULL, *first = NULL, *closest = NULL;
     
     // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
     if (playerID == 0)
+    {
         el = GUIEngine::getGUIEnv()->getFocus();
+    }
     else
-        el = GUIEngine::g_focus_for_player[playerID]->m_element;
+    {
+        Widget* widget = GUIEngine::g_focus_for_player[playerID];
+        if (widget != NULL) el = widget->m_element;
+    }
         
     Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
     

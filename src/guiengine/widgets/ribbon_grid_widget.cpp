@@ -236,6 +236,11 @@ void RibbonGridWidget::addItem( std::string user_name, std::string code_name, st
     
     m_items.push_back(desc);
 }
+// -----------------------------------------------------------------------------
+void RibbonGridWidget::clearItems()
+{
+    m_items.clear();
+}
 
 #if 0
 #pragma mark -
