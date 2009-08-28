@@ -121,7 +121,7 @@ namespace GUIEngine
         void propagateSelection();
         
         /** Callback called widget is focused */
-        void focused();
+        void focused(const int playerID);
         
         bool transmitEvent(Widget* w, std::string& originator, const int playerID);
         
@@ -135,7 +135,7 @@ namespace GUIEngine
         int m_selected_item[32]; // FIXME: 32 is arbitrary, settle for a max number of players
         
         /** Callbacks */
-        void onRowChange(RibbonWidget* row);
+        void onRowChange(RibbonWidget* row, const int playerID);
         void add();
         bool mouseHovered(Widget* child);
         

@@ -413,29 +413,25 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
     return false;
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::focused()
+void RibbonGridWidget::focused(const int playerID)
 {
-    Widget::focused();
+    Widget::focused(playerID);
     updateLabel();
     
     const int listenerAmount = m_hover_listeners.size();
     for(int n=0; n<listenerAmount; n++)
     {
-        // FIXME: don't hardcode player 0
-        const int playerID = 0;
         m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
     }
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::onRowChange(RibbonWidget* row)
+void RibbonGridWidget::onRowChange(RibbonWidget* row, const int playerID)
 {
     updateLabel(row);
     
     const int listenerAmount = m_hover_listeners.size();
     for (int n=0; n<listenerAmount; n++)
     {
-        // FIXME: don't hardcode player 0
-        const int playerID = 0;
         m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString(playerID), playerID);
     }
 }

@@ -110,6 +110,8 @@ void Widget::setFocusForPlayer(const int playerID)
     
     m_player_focus[playerID] = true;
     GUIEngine::g_focus_for_player[playerID] = this;
+    
+    this->focused(playerID);
 }
     
 void Widget::unsetFocusForPlayer(const int playerID)

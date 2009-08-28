@@ -254,20 +254,20 @@ bool RibbonWidget::leftPressed(const int playerID)
     return m_ribbon_type != RIBBON_TOOLBAR;
 }
 // -----------------------------------------------------------------------------
-void RibbonWidget::focused()
+void RibbonWidget::focused(const int playerID)
 {    
-    Widget::focused();
+    Widget::focused(playerID);
     
     if (m_children.size() < 1) return; // empty ribbon
     
-    if (m_focus == NULL) m_focus = m_children.get(m_selection[0]); // FIXME : don't hardcode player 0 here
+    if (m_focus == NULL) m_focus = m_children.get(m_selection[playerID]);
     
     if (m_event_handler != NULL)
     {
-        GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
+        if (playerID == 0) GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
                 
         // FIXME : unclean, children ribbons shouldn't need to know about their parent
-        ((RibbonGridWidget*)m_event_handler)->onRowChange( this );
+        ((RibbonGridWidget*)m_event_handler)->onRowChange( this, playerID );
     }
 }
 // -----------------------------------------------------------------------------

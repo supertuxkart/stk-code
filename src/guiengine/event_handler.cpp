@@ -116,9 +116,10 @@ bool EventHandler::onGUIEvent(const SEvent& event)
             case EGET_ELEMENT_FOCUSED:
             {
                 Widget* el = GUIEngine::getCurrentScreen()->getWidget(id);
-                if(el == NULL) break;
+                if (el == NULL) break;
                 
-                el->focused();
+                // FIXME: don't hardcode player 0
+                el->focused(0);
                 
                 break;
             }

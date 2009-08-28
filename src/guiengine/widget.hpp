@@ -128,7 +128,7 @@ namespace GUIEngine
         virtual bool mouseHovered(Widget* child) { return false; }
         
         /** override in children if you need to know when the widget is focused */
-        virtual void focused() { isWithinATextBox = false; }
+        virtual void focused(const int playerID) { isWithinATextBox = false; }
         
         /**
           * The XML loader stored coords in their raw string form inside this widget.

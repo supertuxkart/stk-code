@@ -43,7 +43,7 @@ namespace GUIEngine
         void add();
         void addItem(const char* item);
         
-        virtual void focused() { isWithinATextBox = true; }
+        virtual void focused(const int playerID) { isWithinATextBox = true; }
 
         core::stringw getText() const;
     };
