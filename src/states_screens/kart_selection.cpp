@@ -78,6 +78,7 @@ namespace KartSelectionScreen
         int target_x, target_y, target_w, target_h;
 
         LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
+        std::string deviceName;
         
         PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget()
         {
@@ -100,7 +101,6 @@ namespace KartSelectionScreen
             target_w = w;
             target_h = h;
             
-            std::string deviceName;
             if(associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
             {
                 deviceName += "keyboard";
@@ -197,7 +197,12 @@ namespace KartSelectionScreen
                 std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
                 assert(false);
             }
+            
             playerID = newPlayerID;
+            
+            std::string newLabel = StringUtils::insertValues(_("Player %i ("), playerID + 1) + deviceName + ")";
+            playerIDLabel->setText( newLabel.c_str() ); 
+            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
         }
         
         virtual void add()
@@ -483,7 +488,8 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
 }
 
 PlayerKartWidget* removedWidget = NULL;
-    
+
+// -----------------------------------------------------------------------------
 // Return true if event was handled succesfully
 bool playerQuit(ActivePlayer* player)
 {    
@@ -527,6 +533,8 @@ bool playerQuit(ActivePlayer* player)
     return true;
 }
     
+// -----------------------------------------------------------------------------
+    
 void kartSelectionUpdate(float delta)
 {
     const int amount = g_player_karts.size();
@@ -548,7 +556,8 @@ void kartSelectionUpdate(float delta)
        }
    }
 }
-    
+
+// -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
@@ -675,6 +684,8 @@ void menuEventKarts(Widget* widget, const std::string& name)
     }
 }
 
+// -----------------------------------------------------------------------------
+    
 void renumberKarts()
 {
     RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
@@ -687,12 +698,6 @@ void renumberKarts()
     {
         g_player_karts[n].setPlayerID(n);
         g_player_karts[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
-
-        // FIXME: Not sure why this isn't updating the labels properly ??
-        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_TEXT] =
-            StringUtils::insertValues(_("Player %i ("), n + 1) + ")"; 
-        g_player_karts[n].getPlayerIDLabel()->m_properties[PROP_ID] = 
-            StringUtils::insertValues("@p%i_label", n);
     }
 
     w->updateItemDisplay();

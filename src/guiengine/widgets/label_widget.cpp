@@ -49,4 +49,6 @@ void LabelWidget::setText(stringw newText)
 {
     IGUIStaticText* irrwidget = Widget::getIrrlichtElement<IGUIStaticText>();   
     irrwidget->setText(newText.c_str());
+    
+    m_properties[PROP_TEXT] = stringc(newText.c_str()).c_str();
 }
