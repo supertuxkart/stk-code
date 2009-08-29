@@ -82,11 +82,11 @@ void RaceGUI::createMarkerTexture()
 
     int radius     = (m_marker_rendered_size>>1)-1;
 #ifdef IRR_SVN
-    irr_driver->beginRenderToTexture(core::dimension2du(m_marker_rendered_size * npower2, 
+    IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size * npower2, 
                                      m_marker_rendered_size), 
                                      "RaceGUI::markers");
 #else
-    irr_driver->beginRenderToTexture(core::dimension2di(m_marker_rendered_size * npower2, 
+    IrrDriver::RTTProvider rttProvider(core::dimension2di(m_marker_rendered_size * npower2, 
                                      m_marker_rendered_size), 
                                      "RaceGUI::markers");
 #endif
@@ -125,7 +125,7 @@ void RaceGUI::createMarkerTexture()
 #endif
     }
 
-    m_marker = irr_driver->endRenderToTexture();
+    m_marker = rttProvider.renderToTexture();
     irr_driver->removeCamera(camera);
 }   // createMarkerTexture
 

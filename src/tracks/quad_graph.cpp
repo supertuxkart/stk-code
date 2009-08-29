@@ -421,7 +421,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
                                         const video::SColor &fill_color)
 #endif
 {
-    irr_driver->beginRenderToTexture(dimension, name);
+    IrrDriver::RTTProvider rttProvider(dimension, name);
     createMesh();   
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
@@ -446,7 +446,9 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
     camera->setPosition(core::vector3df(center.getX(), bb_max.getZ(), center.getY()));
     camera->setUpVector(core::vector3df(0,0,1));
     camera->setTarget(core::vector3df(center.getX(),0,center.getY()));
-    video::ITexture *texture=irr_driver->endRenderToTexture();
+    
+    video::ITexture *texture = rttProvider.renderToTexture();
+    
     cleanupDebugMesh();
     irr_driver->removeCamera(camera);
     m_min_coord = bb_min;

@@ -23,11 +23,15 @@ using namespace GUIEngine;
 ModelViewWidget::ModelViewWidget()
 {
     m_type = WTYPE_MODEL_VIEW;
+    m_rtt_provider = NULL;
 }
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
+    
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
@@ -51,13 +55,6 @@ void ModelViewWidget::add()
     //m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     m_element->setTabStop(false);
-    
-    std::string name = "model view "; name += m_properties[PROP_ID].c_str();
-#ifdef IRR_SVN
-    m_texture = GUIEngine::getDriver()->addRenderTargetTexture( core::dimension2d< u32 >(512, 512), name.c_str() );
-#else
-    m_texture = GUIEngine::getDriver()->addRenderTargetTexture( core::dimension2d< s32 >(512, 512), name.c_str() );
-#endif
 }   // add
 
 // -----------------------------------------------------------------------------
@@ -65,6 +62,9 @@ void ModelViewWidget::clearModels()
 {
     m_models.clearWithoutDeleting();
     m_model_location.clear();
+    
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
@@ -81,14 +81,29 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
      //mat.setFlag(EMF_NORMALIZE_NORMALS, true);
      ((IGUIMeshViewer*)m_element)->setMaterial(mat);
      */
+    
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
     angle += delta*25;
-    if(angle > 360) angle -= 360;
+    if (angle > 360) angle -= 360;
     
-    irr_driver->renderToTexture(m_models, m_model_location, m_texture, angle);
+    if (m_rtt_provider == NULL)
+    {
+        std::string name = "model view ";
+        name += m_properties[PROP_ID].c_str();
+#ifdef IRR_SVN
+        m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name );
+#else
+        m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< s32 >(512, 512), name );
+#endif
+        m_rtt_provider->setupRTTScene(m_models, m_model_location);
+    }
+    
+    m_texture = m_rtt_provider->renderToTexture(angle);
     ((IGUIImage*)m_element)->setImage(m_texture);
 }
 

@@ -22,11 +22,13 @@
 
 #include <irrlicht.h>
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 using namespace irr;
 using namespace gui;
+
 
 namespace GUIEngine
 {
@@ -38,6 +40,9 @@ namespace GUIEngine
         std::vector<Vec3> m_model_location;
         
         video::ITexture* m_texture;
+        
+        IrrDriver::RTTProvider* m_rtt_provider;
+        
         float angle;
     public:
         ModelViewWidget();

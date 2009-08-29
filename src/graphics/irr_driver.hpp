@@ -48,9 +48,7 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
 
-    /** A pointer to texture on which a scene is rendered. Only used
-     *  in between beginRenderToTexture() and endRenderToTexture calls. */
-    video::ITexture            *m_render_target_texture;
+    
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
@@ -115,22 +113,58 @@ public:
      */
     unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
     
-    void renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
-                         std::vector<Vec3>& mesh_location, 
-                         video::ITexture* target, float angle);
-#ifdef IRR_SVN
-    void beginRenderToTexture(const core::dimension2du &dimension, 
-                              const std::string &name);
-#else
-    void beginRenderToTexture(const core::dimension2di &dimension, 
-                              const std::string &name);
-#endif
-    video::ITexture *endRenderToTexture();
+
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c, 
                         const video::ITexture *texture = NULL,
                         const video::SColor *ca=NULL,  const video::SColor *cb=NULL,
                         const video::SColor *cc=NULL);
+    
+    // --------------------- RTT --------------------
+    /**
+      * Class that provides RTT (currently, only when no other 3D rendering in the main scene is required)
+      * Provides an optional 'setupRTTScene' method to make it quick and easy to prepare rendering of 3D objects
+      * but you can also manually set the scene/camera. If you use the factory 'setupRTTScene', cleanup can be
+      * done through 'tearDownRTTScene' (destructor will also do this). If you set it up manually, you need
+      * to clean it up manually.
+      */
+    class RTTProvider
+    {
+        /** A pointer to texture on which a scene is rendered. Only used
+         *  in between beginRenderToTexture() and endRenderToTexture calls. */
+        video::ITexture            *m_render_target_texture;
+        
+        /** Main node of the RTT scene */
+        scene::ISceneNode          *m_rtt_main_node;
+        
+        scene::ICameraSceneNode    *m_camera;
+        
+        scene::ILightSceneNode     *m_light;
+        
+        /** Irrlicht video driver. */
+        video::IVideoDriver        *m_video_driver;
+        
+    public:
+        #ifdef IRR_SVN
+        RTTProvider(const core::dimension2du &dimension, 
+                         const std::string &name);
+        #else
+        RTTProvider(const core::dimension2di &dimension, 
+                         const std::string &name);
+        #endif   
+        
+        ~RTTProvider();
+        
+        void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
+                           std::vector<Vec3>& mesh_location);
+        
+        /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
+        video::ITexture* renderToTexture(float angle=-1);
+        
+        void tearDownRTTScene();
+        
+    };
+    
 
 };   // IrrDriver
 

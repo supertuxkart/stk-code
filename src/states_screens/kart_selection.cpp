@@ -387,9 +387,9 @@ namespace KartSelectionScreen
             const int modelMaxWidth =  w;
             const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
             const int modelY = y + player_name_h + player_id_h;
-            model_x = x + w/2 - (int)(bestSize*1.2f/2);
+            model_x = x + w/2 - (int)(bestSize/2);
             model_y = modelY + modelMaxHeight/2 - bestSize/2;
-            model_w = (int)(bestSize*1.2f); // FIXME : for some reason, it looks better this way, though full square should be ok
+            model_w = (int)(bestSize);
             model_h = bestSize;
             
             kart_name_x = x;

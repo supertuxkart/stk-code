@@ -280,121 +280,6 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
-/** Begins a rendering to a texture.
- *  \param dimension The size of the texture. 
- *  \param name Name of the texture.
- */
-#ifdef IRR_SVN
-void IrrDriver::beginRenderToTexture(const core::dimension2du &dimension, 
-                                     const std::string &name)
-#else
-void IrrDriver::beginRenderToTexture(const core::dimension2di &dimension, 
-                                     const std::string &name)
-#endif
-{
-    m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
-                                                                     name.c_str());
-    m_device->getVideoDriver()->setRenderTarget(m_render_target_texture);
-}   // beginRenderToTexture
-
-// ----------------------------------------------------------------------------
-/** Does the actual rendering to a texture, and switches the rendering system
- *  back to render on the screen.
- *  \return A pointer to the texture on which the scene was rendered.
- */
-video::ITexture *IrrDriver::endRenderToTexture()
-{
-    m_scene_manager->drawAll();   
-    m_device->getVideoDriver()->setRenderTarget(0, false, false);
-    return m_render_target_texture;
-}   // endRenderToTexture
-
-// ----------------------------------------------------------------------------
-/** Renders a given vector of meshes onto a texture. Parameters:
- *  \param mesh Vector of meshes to render.
- *  \param mesh_location For each mesh the location where it should be 
- *         positioned.
- *  \param target The texture to render the meshes to.
- *  \param angle Heading for all meshes.
- */
-void IrrDriver::renderToTexture(ptr_vector<scene::IMesh, REF>& mesh, 
-                                std::vector<Vec3>& mesh_location,
-                                ITexture* target, float angle)
-{      
-    scene::ISceneNode* main_node = NULL;
-    
-    const int mesh_amount = mesh.size();
-    for(int n=0; n<mesh_amount; n++)
-    {
-        scene::ISceneNode* node = addMesh(mesh.get(n));
-        
-        if(main_node == NULL)
-        {
-            main_node = node;
-        }
-        else
-        {
-            node->setParent(main_node);
-        }
-        
-        node->setPosition( mesh_location[n].toIrrVector() );
-        node->updateAbsolutePosition();
-    }
-
-    main_node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
-    main_node->setRotation( core::vector3df(0, angle, 0) );
-    
-    //vector3d< f32 > modelsize = mesh->getBoundingBox().getExtent();
-    //std::cout << "box size " << modelsize.X*50.0 << ", " << modelsize.Y*50.0 << ", " << modelsize.Z*50.0 << std::endl;
-    
-    getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
-    
-    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    scene::ILightSceneNode* light = getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
-    //light->setLightType(ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
-    //light->getLightData().AmbientColor = irr::video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
-    //light->getLightData().Attenuation = core::vector3df(10, 10, 10);
-    light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-     
-    main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
-    main_node->setMaterialFlag(EMF_LIGHTING, true);
-   // node->setMaterialFlag(EMF_LIGHTING, true);
-    
-    const int materials = main_node->getMaterialCount();
-    for(int n=0; n<materials; n++)
-    {
-        main_node->getMaterial(n).setFlag(EMF_LIGHTING, true);
-
-        main_node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
-        main_node->getMaterial(n).SpecularColor.set(255,150,150,150); 
-        main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
-         
-        //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
-        main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
-        main_node->getMaterial(n).GouraudShading = true;
-    }
-    
-    ICameraSceneNode* camera =	m_scene_manager->addCameraSceneNode();
-    
-    camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
-    camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    camera->setTarget( core::vector3df(0, 10, 0.0f) );
-    camera->updateAbsolutePosition();
-    
-    m_device->getVideoDriver()->setRenderTarget(target);
-    //m_device->getVideoDriver()->beginScene(true, true, video::SColor(0,0,0,0));
-    m_scene_manager->drawAll();
-    //m_device->getVideoDriver()->endScene();
-    
-    removeNode(main_node);
-    removeCamera(camera);
-    removeNode(light);
-    
-    m_device->getVideoDriver()->setRenderTarget(0, false, false);
-}
-
-// ----------------------------------------------------------------------------
 /** Creates a quad mesh buffer and adds it to the scene graph.
  */
 scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
@@ -723,3 +608,133 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 }   // OnEvent
 
 // ----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark RTT
+#endif
+
+// ----------------------------------------------------------------------------
+/** Begins a rendering to a texture.
+ *  \param dimension The size of the texture. 
+ *  \param name Name of the texture.
+ */
+#ifdef IRR_SVN
+IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
+                              const std::string &name)
+#else
+IrrDriver::RTTProvider::RTTProvider(const core::dimension2di &dimension, 
+                                         const std::string &name)
+#endif
+{
+    m_video_driver = irr_driver->getVideoDriver();
+    
+    m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
+                                                                     name.c_str());
+    m_video_driver->setRenderTarget(m_render_target_texture);
+    
+    m_rtt_main_node = NULL;
+    m_camera = NULL;
+    m_light = NULL;
+}
+// ----------------------------------------------------------------------------
+IrrDriver::RTTProvider::~RTTProvider()
+{
+    tearDownRTTScene();
+}
+// ----------------------------------------------------------------------------
+/** Sets up a given vector of meshes for render-to-texture. Parameters:
+ *  \param mesh Vector of meshes to render.
+ *  \param mesh_location For each mesh the location where it should be 
+ *         positioned.
+ */
+void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
+                              std::vector<Vec3>& mesh_location)
+{      
+    m_rtt_main_node = NULL;
+    
+    const int mesh_amount = mesh.size();
+    for (int n=0; n<mesh_amount; n++)
+    {
+        scene::ISceneNode* node = irr_driver->addMesh(mesh.get(n));
+        
+        if (m_rtt_main_node == NULL)
+        {
+            m_rtt_main_node = node;
+        }
+        else
+        {
+            node->setParent(m_rtt_main_node);
+        }
+        
+        node->setPosition( mesh_location[n].toIrrVector() );
+        node->updateAbsolutePosition();
+    }
+    
+    m_rtt_main_node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
+    
+    //vector3d< f32 > modelsize = mesh->getBoundingBox().getExtent();
+    //std::cout << "box size " << modelsize.X*50.0 << ", " << modelsize.Y*50.0 << ", " << modelsize.Z*50.0 << std::endl;
+    
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
+    
+    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
+    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
+    //light->setLightType(ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
+    //light->getLightData().AmbientColor = irr::video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
+    //light->getLightData().Attenuation = core::vector3df(10, 10, 10);
+    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    
+    m_rtt_main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
+    m_rtt_main_node->setMaterialFlag(EMF_LIGHTING, true);
+    // node->setMaterialFlag(EMF_LIGHTING, true);
+    
+    const int materials = m_rtt_main_node->getMaterialCount();
+    for (int n=0; n<materials; n++)
+    {
+        m_rtt_main_node->getMaterial(n).setFlag(EMF_LIGHTING, true);
+        
+        m_rtt_main_node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
+        m_rtt_main_node->getMaterial(n).SpecularColor.set(255,150,150,150); 
+        m_rtt_main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
+        
+        //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
+        m_rtt_main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
+        m_rtt_main_node->getMaterial(n).GouraudShading = true;
+    }
+    
+    m_camera =	irr_driver->getSceneManager()->addCameraSceneNode();
+    
+    m_camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
+    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+    m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
+    m_camera->updateAbsolutePosition();
+}
+
+void IrrDriver::RTTProvider::tearDownRTTScene()
+{
+    if (m_rtt_main_node != NULL) irr_driver->removeNode(m_rtt_main_node);
+    if (m_camera != NULL) irr_driver->removeCamera(m_camera);
+    if (m_light != NULL) irr_driver->removeNode(m_light);
+    
+    m_rtt_main_node = NULL;
+    m_camera = NULL;
+    m_light = NULL;
+}
+
+/**
+ * Performs the actual render-to-texture
+ *  \param target The texture to render the meshes to.
+ *  \param angle (Optional) heading for all meshes.
+ */
+ITexture* IrrDriver::RTTProvider::renderToTexture(float angle)
+{
+    m_video_driver->setRenderTarget(m_render_target_texture);
+    irr_driver->getSceneManager()->drawAll();
+    
+    if (angle != -1) m_rtt_main_node->setRotation( core::vector3df(0, angle, 0) );
+    
+    m_video_driver->setRenderTarget(0, false, false);
+    return m_render_target_texture;
+}
