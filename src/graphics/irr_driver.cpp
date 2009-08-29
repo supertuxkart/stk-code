@@ -644,7 +644,9 @@ IrrDriver::RTTProvider::~RTTProvider()
 }
 // ----------------------------------------------------------------------------
 /** Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
- *  object insdie the GUI.
+ *  object inside the GUI. If there are multiple meshes, the first mesh is considered
+ *  to be the root, and all following meshes will have their locations relative to
+ * the location of the first mesh.
  *
  * Parameters:
  *  \param mesh Vector of meshes to render.
@@ -653,23 +655,14 @@ IrrDriver::RTTProvider::~RTTProvider()
  */
 void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
                               std::vector<Vec3>& mesh_location)
-{      
-    m_rtt_main_node = NULL;
+{     
+    m_rtt_main_node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0));
+    assert(m_rtt_main_node != NULL);
     
     const int mesh_amount = mesh.size();
-    for (int n=0; n<mesh_amount; n++)
+    for (int n=1; n<mesh_amount; n++)
     {
-        scene::ISceneNode* node = irr_driver->addMesh(mesh.get(n));
-        
-        if (m_rtt_main_node == NULL)
-        {
-            m_rtt_main_node = node;
-        }
-        else
-        {
-            node->setParent(m_rtt_main_node);
-        }
-        
+        scene::ISceneNode* node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n), m_rtt_main_node);
         node->setPosition( mesh_location[n].toIrrVector() );
         node->updateAbsolutePosition();
     }
@@ -683,15 +676,11 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
-    //light->setLightType(ELT_DIRECTIONAL); // ELT_DIRECTIONAL , ELT_POINT
-    //light->getLightData().AmbientColor = irr::video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
-    //light->getLightData().Attenuation = core::vector3df(10, 10, 10);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     
     m_rtt_main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
     m_rtt_main_node->setMaterialFlag(EMF_LIGHTING, true);
-    // node->setMaterialFlag(EMF_LIGHTING, true);
     
     const int materials = m_rtt_main_node->getMaterialCount();
     for (int n=0; n<materials; n++)
@@ -702,7 +691,6 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
         m_rtt_main_node->getMaterial(n).SpecularColor.set(255,50,50,50); 
         m_rtt_main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
         
-        //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
         m_rtt_main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
     }
     
@@ -713,13 +701,18 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
+    
+    // Detach the note from the scene so we can render it independently
+    m_rtt_main_node->setVisible(false);
+    m_light->setVisible(false);
 }
 
 void IrrDriver::RTTProvider::tearDownRTTScene()
 {
-    if (m_rtt_main_node != NULL) irr_driver->removeNode(m_rtt_main_node);
-    if (m_camera != NULL) irr_driver->removeCamera(m_camera);
-    if (m_light != NULL) irr_driver->removeNode(m_light);
+    //if (m_rtt_main_node != NULL) m_rtt_main_node->drop();
+    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
+    if (m_light != NULL) m_light->remove();
+    if (m_camera != NULL) m_camera->remove();
     
     m_rtt_main_node = NULL;
     m_camera = NULL;
@@ -733,10 +726,22 @@ void IrrDriver::RTTProvider::tearDownRTTScene()
  */
 ITexture* IrrDriver::RTTProvider::renderToTexture(float angle)
 {
-    m_video_driver->setRenderTarget(m_render_target_texture);
-    irr_driver->getSceneManager()->drawAll();
+    m_video_driver->setRenderTarget(m_render_target_texture);  
     
-    if (angle != -1) m_rtt_main_node->setRotation( core::vector3df(0, angle, 0) );
+    if (angle != -1 && m_rtt_main_node != NULL) m_rtt_main_node->setRotation( core::vector3df(0, angle, 0) );
+    
+    if (m_rtt_main_node == NULL)
+    {
+        irr_driver->getSceneManager()->drawAll();
+    }
+    else
+    {
+        m_rtt_main_node->setVisible(true);
+        m_light->setVisible(true);
+        irr_driver->getSceneManager()->drawAll();
+        m_rtt_main_node->setVisible(false);
+        m_light->setVisible(false);
+    }
     
     m_video_driver->setRenderTarget(0, false, false);
     return m_render_target_texture;
