@@ -25,6 +25,7 @@ class FollowTheLeaderRace : public LinearWorld
 {
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
+    
     FollowTheLeaderRace();
     virtual ~FollowTheLeaderRace();
     

@@ -143,7 +143,7 @@ void FollowTheLeaderRace::restartRace()
  */
 std::string FollowTheLeaderRace::getIdent() const
 {
-    return "FOLLOW_LEADER";
+    return FTL_IDENT;
 }
 //-----------------------------------------------------------------------------
 RaceGUI::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()

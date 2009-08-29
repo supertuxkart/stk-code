@@ -39,6 +39,7 @@ class ThreeStrikesBattle : public World
     std::vector<BattleInfo> m_kart_info;
     
 public:
+
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
     

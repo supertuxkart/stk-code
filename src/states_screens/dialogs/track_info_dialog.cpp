@@ -19,6 +19,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
 #include "network/network_manager.hpp"
+#include "race/highscores.hpp"
+#include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -74,9 +76,45 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
                                                                   m_irrlicht_window);
     a->setTabStop(false);
 
+    // ======== High Scores
+    std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
+    const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
+    
+    HighscoreEntry* highscores = highscore_manager->getHighscoreEntry(type,
+                                                                      race_manager->getNumKarts(),
+                                                                      race_manager->getDifficulty(),
+                                                                      trackIdent,
+                                                                      race_manager->getNumLaps()); 
+    
+    // TODO: update highscores display when number of laps changes
+    const int amount = highscores->getNumberEntries();
+    stringw highscores_string = "= Highscores =\n";
+    std::cout << "====== Highscores =====\n";
+    std::cout << "Checking for highscores of type " << type.c_str() << " with nkarts=" << race_manager->getNumKarts()
+              << ", difficulty=" << race_manager->getDifficulty() << ", track=" << trackIdent.c_str()
+              << ", nlaps=" << race_manager->getNumLaps() << std::endl;
+    std::cout << "Got " << amount << " entries\n";
+    
+    std::string kart_name;
+    std::string name;
+    float time;
+    
+    char buffer[512];
+    for (int n=0; n<amount; n++)
+    {
+        highscores->getEntry(n, kart_name, name, &time);
+        
+        sprintf(buffer, "%s (%s) : %.2f\n", kart_name.c_str(), name.c_str(), time);
+        
+        std::cout << buffer << std::endl;
+        highscores_string += buffer;
+    }
+    std::cout << "======================\n";
+
+    
     
     core::rect< s32 > area_left(0, y1, m_area.getWidth()/2, y2);
-    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( stringw(_("High Scores & Track Info")).c_str(),
+    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( highscores_string.c_str(),
                                                                   area_left, false , true , // border, word warp
                                                                   m_irrlicht_window);
     b->setTabStop(false);
@@ -93,7 +131,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-
+    
 }
 
 // ------------------------------------------------------------------------------------------------------

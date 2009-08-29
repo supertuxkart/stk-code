@@ -129,7 +129,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
  */
 std::string ThreeStrikesBattle::getIdent() const
 {
-    return "BATTLE_3_STRIKES";
+    return STRIKES_IDENT;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

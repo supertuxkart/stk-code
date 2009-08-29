@@ -87,6 +87,25 @@ public:
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0)
     };
+    
+    // Stupid C++ doesn't accept string constants
+    #define IDENT_STD     "STANDARD"
+    #define IDENT_TTRIAL  "STD_TIMETRIAL"
+    #define FTL_IDENT     "FOLLOW_LEADER"
+    #define STRIKES_IDENT "BATTLE_3_STRIKES"
+
+    static const char* getIdentOf(const MinorRaceModeType mode)
+    {
+        switch (mode)
+        {
+            case MINOR_MODE_QUICK_RACE:     return IDENT_STD;
+            case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
+            case MINOR_MODE_FOLLOW_LEADER:  return FTL_IDENT;
+            case MINOR_MODE_3_STRIKES:      return STRIKES_IDENT;
+            default: assert(false); return NULL;
+        }
+    }
+    
 #undef LINEAR_RACE
 #undef BATTLE_ARENA
     
