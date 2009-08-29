@@ -119,15 +119,15 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 }
                 else if (!strcmp("ribbon_grid", xml->getNodeName()))
                 {
-                    append_to.push_back(new RibbonGridWidget());
+                    append_to.push_back(new DynamicRibbonWidget());
                 }
                 else if (!strcmp("scrollable_ribbon", xml->getNodeName()))
                 {
-                    append_to.push_back(new RibbonGridWidget(true, 1));
+                    append_to.push_back(new DynamicRibbonWidget(true, 1));
                 }
                 else if (!strcmp("scrollable_toolbar", xml->getNodeName()))
                 {
-                    append_to.push_back(new RibbonGridWidget(false, 1));
+                    append_to.push_back(new DynamicRibbonWidget(false, 1));
                 }
                 else if (!strcmp("model", xml->getNodeName()))
                 {

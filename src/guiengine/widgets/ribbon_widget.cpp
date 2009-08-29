@@ -224,7 +224,7 @@ bool RibbonWidget::rightPressed(const int playerID)
     {
         if (m_event_handler != NULL)
         {
-            ((RibbonGridWidget*)m_event_handler)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
+            ((DynamicRibbonWidget*)m_event_handler)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
             m_selection[playerID] = m_children.size()-1;
         }
         else m_selection[playerID] = 0;
@@ -242,7 +242,7 @@ bool RibbonWidget::leftPressed(const int playerID)
     {
         if (m_event_handler != NULL)
         {
-            ((RibbonGridWidget*)m_event_handler)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
+            ((DynamicRibbonWidget*)m_event_handler)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
             m_selection[playerID] = 0;
         }
         else m_selection[playerID] = m_children.size()-1;
@@ -267,7 +267,7 @@ void RibbonWidget::focused(const int playerID)
         if (playerID == 0) GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
                 
         // FIXME : unclean, children ribbons shouldn't need to know about their parent
-        ((RibbonGridWidget*)m_event_handler)->onRowChange( this, playerID );
+        ((DynamicRibbonWidget*)m_event_handler)->onRowChange( this, playerID );
     }
 }
 // -----------------------------------------------------------------------------

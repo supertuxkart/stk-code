@@ -399,10 +399,10 @@ namespace KartSelectionScreen
 #pragma mark KartHoverListener
 #endif
     
-class KartHoverListener : public RibbonGridHoverListener
+class KartHoverListener : public DynamicRibbonHoverListener
     {
     public:
-        void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID, const int playerID)
+        void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, const int playerID)
         {
             ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
@@ -436,7 +436,7 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
 {
     std::cout << "playerJoin() ==========\n";
 
-    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
         std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
@@ -495,7 +495,7 @@ bool playerQuit(ActivePlayer* player)
 {    
     int playerID = -1;
     
-    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL )
     {
         std::cout << "playerQuit() called outside of kart selection screen.\n";
@@ -526,6 +526,7 @@ bool playerQuit(ActivePlayer* player)
     assert( g_player_karts.size() == StateManager::get()->activePlayerCount() );
 
     // unset selection of this player
+    // FIXME: will only work if the player that quits is the last of the list
     if (GUIEngine::g_focus_for_player[playerID] != NULL)
     {
         GUIEngine::g_focus_for_player[playerID]->unsetFocusForPlayer(playerID);
@@ -582,7 +583,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         StateManager::get()->resetActivePlayers();
         input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
        
-        RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
         assert( w != NULL );
         
         if(karthoverListener == NULL)
@@ -669,7 +670,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
 
         std::string selection = tabs->getSelectionIDString(GUI_PLAYER_ID);
 
-        RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
         w->clearItems();
         
         // TODO : preserve selection of karts for all players
@@ -707,7 +708,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
     }
     else if (name == "karts")
     {
-        RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
         assert( w != NULL );
         
         ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
@@ -739,7 +740,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
     
 void renumberKarts()
 {
-    RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("karts");
+    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
     const int splitWidth = fullarea->w / g_player_karts.size();

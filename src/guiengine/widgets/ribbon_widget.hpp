@@ -42,7 +42,7 @@ namespace GUIEngine
         See guiengine/engine.hpp for a detailed overview */
     class RibbonWidget : public Widget
     {
-        friend class RibbonGridWidget;
+        friend class DynamicRibbonWidget;
         friend class EventHandler;
         
         int m_selection[MAX_PLAYER_COUNT];

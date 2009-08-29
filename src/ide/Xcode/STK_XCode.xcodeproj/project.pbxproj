@@ -22,6 +22,7 @@
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
 		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
+		9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */; };
 		95263DEC0FD7471900CF5F92 /* grand_prix_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */; };
 		95263DED0FD7471900CF5F92 /* grand_prix_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */; };
 		95263DEE0FD7471900CF5F92 /* highscore_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95263DE40FD7471900CF5F92 /* highscore_manager.cpp */; };
@@ -263,7 +264,6 @@
 		95ECA10310124C5000D47C5F /* label_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F210124C5000D47C5F /* label_widget.cpp */; };
 		95ECA10410124C5000D47C5F /* list_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F410124C5000D47C5F /* list_widget.cpp */; };
 		95ECA10510124C5000D47C5F /* model_view_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F610124C5000D47C5F /* model_view_widget.cpp */; };
-		95ECA10610124C5000D47C5F /* ribbon_grid_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */; };
 		95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */; };
 		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
 		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
@@ -321,6 +321,8 @@
 		951C357E0FC05BF400A48379 /* quad_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_set.cpp; path = ../../tracks/quad_set.cpp; sourceTree = SOURCE_ROOT; };
 		951C357F0FC05BF400A48379 /* quad_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_graph.hpp; path = ../../tracks/quad_graph.hpp; sourceTree = SOURCE_ROOT; };
 		951C35800FC05BF400A48379 /* quad_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad_graph.cpp; path = ../../tracks/quad_graph.cpp; sourceTree = SOURCE_ROOT; };
+		9524739410497C75000C197E /* dynamic_ribbon_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dynamic_ribbon_widget.hpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.hpp; sourceTree = SOURCE_ROOT; };
+		9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_ribbon_widget.cpp; path = ../../guiengine/widgets/dynamic_ribbon_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95263DE00FD7471900CF5F92 /* grand_prix_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_data.cpp; path = ../../race/grand_prix_data.cpp; sourceTree = SOURCE_ROOT; };
 		95263DE10FD7471900CF5F92 /* grand_prix_data.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_data.hpp; path = ../../race/grand_prix_data.hpp; sourceTree = SOURCE_ROOT; };
 		95263DE20FD7471900CF5F92 /* grand_prix_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_manager.cpp; path = ../../race/grand_prix_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -1007,8 +1009,6 @@
 		95ECA0F510124C5000D47C5F /* list_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = list_widget.hpp; path = ../../guiengine/widgets/list_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0F610124C5000D47C5F /* model_view_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = model_view_widget.cpp; path = ../../guiengine/widgets/model_view_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0F710124C5000D47C5F /* model_view_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = model_view_widget.hpp; path = ../../guiengine/widgets/model_view_widget.hpp; sourceTree = SOURCE_ROOT; };
-		95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ribbon_grid_widget.cpp; path = ../../guiengine/widgets/ribbon_grid_widget.cpp; sourceTree = SOURCE_ROOT; };
-		95ECA0F910124C5000D47C5F /* ribbon_grid_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ribbon_grid_widget.hpp; path = ../../guiengine/widgets/ribbon_grid_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ribbon_widget.cpp; path = ../../guiengine/widgets/ribbon_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0FB10124C5000D47C5F /* ribbon_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ribbon_widget.hpp; path = ../../guiengine/widgets/ribbon_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinner_widget.cpp; path = ../../guiengine/widgets/spinner_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -2138,6 +2138,8 @@
 				95ECA0ED10124C5000D47C5F /* button_widget.hpp */,
 				95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */,
 				95ECA0EF10124C5000D47C5F /* check_box_widget.hpp */,
+				9524739510497C75000C197E /* dynamic_ribbon_widget.cpp */,
+				9524739410497C75000C197E /* dynamic_ribbon_widget.hpp */,
 				95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */,
 				95ECA0F110124C5000D47C5F /* icon_button_widget.hpp */,
 				95ECA0F210124C5000D47C5F /* label_widget.cpp */,
@@ -2146,8 +2148,6 @@
 				95ECA0F510124C5000D47C5F /* list_widget.hpp */,
 				95ECA0F610124C5000D47C5F /* model_view_widget.cpp */,
 				95ECA0F710124C5000D47C5F /* model_view_widget.hpp */,
-				95ECA0F810124C5000D47C5F /* ribbon_grid_widget.cpp */,
-				95ECA0F910124C5000D47C5F /* ribbon_grid_widget.hpp */,
 				95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */,
 				95ECA0FB10124C5000D47C5F /* ribbon_widget.hpp */,
 				95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */,
@@ -2456,7 +2456,6 @@
 				95ECA10310124C5000D47C5F /* label_widget.cpp in Sources */,
 				95ECA10410124C5000D47C5F /* list_widget.cpp in Sources */,
 				95ECA10510124C5000D47C5F /* model_view_widget.cpp in Sources */,
-				95ECA10610124C5000D47C5F /* ribbon_grid_widget.cpp in Sources */,
 				95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */,
 				95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */,
 				95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */,
@@ -2474,6 +2473,7 @@
 				952A154F103F66D600B1895D /* smoke.cpp in Sources */,
 				952A1550103F66D600B1895D /* water_splash.cpp in Sources */,
 				952A1554103F68D000B1895D /* profile_world.cpp in Sources */,
+				9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

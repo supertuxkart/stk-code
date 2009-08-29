@@ -35,11 +35,11 @@ namespace GUIEngine
      * Even if you have a ribbon that only acts on click/enter, you may wish to know which
      * item is currently highlighted. In this case, create a listener and pass it to the ribbon.
      */
-    class RibbonGridHoverListener
+    class DynamicRibbonHoverListener
     {
     public:
-        virtual ~RibbonGridHoverListener() {}
-        virtual void onSelectionChanged(RibbonGridWidget* theWidget, const std::string& selectionID, const int playerID) = 0;
+        virtual ~DynamicRibbonHoverListener() {}
+        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, const int playerID) = 0;
     };
     
     struct ItemDescription
@@ -51,13 +51,13 @@ namespace GUIEngine
     
     /** A dynamic ribbon (builds upon RibbonWidget, adding dynamic contents creation and sizing, scrolling, multiple-row
         layouts). See guiengine/engine.hpp for a detailed overview */
-    class RibbonGridWidget : public Widget
+    class DynamicRibbonWidget : public Widget
     {
         friend class RibbonWidget;
         
-        ptr_vector<RibbonGridHoverListener> m_hover_listeners;
+        ptr_vector<DynamicRibbonHoverListener> m_hover_listeners;
         
-        virtual ~RibbonGridWidget() {}
+        virtual ~DynamicRibbonWidget() {}
         
         /** Used for ribbon grids that have a label at the bottom */
         bool m_has_label;
@@ -140,7 +140,7 @@ namespace GUIEngine
         bool mouseHovered(Widget* child);
         
     public:
-        RibbonGridWidget(const bool combo=false, const int max_rows=4);
+        DynamicRibbonWidget(const bool combo=false, const int max_rows=4);
         
         /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
          ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */
@@ -153,7 +153,7 @@ namespace GUIEngine
         void clearItems();
         
         /** Register a listener to be notified of selection changes within the ribbon */
-        void registerHoverListener(RibbonGridHoverListener* listener);
+        void registerHoverListener(DynamicRibbonHoverListener* listener);
         
         /** Called when right key is pressed */
         bool rightPressed(const int playerID);

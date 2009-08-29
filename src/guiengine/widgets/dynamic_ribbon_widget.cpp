@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets/ribbon_grid_widget.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 
 #include <sstream>
@@ -27,7 +27,7 @@ using namespace GUIEngine;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
-RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
+DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const int max_rows)
 {
     m_scroll_offset = 0;
     m_needed_cols = 0;
@@ -40,7 +40,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     
     m_left_widget = NULL;
     m_right_widget = NULL;
-    m_type = WTYPE_RIBBON_GRID;
+    m_type = WTYPE_DYNAMIC_RIBBON;
     
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -49,7 +49,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     m_selected_item[0] = 0; // only player 0 has a selection by default
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::add()
+void DynamicRibbonWidget::add()
 {
     m_has_label = (m_properties[PROP_TEXT] == "bottom");
     m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
@@ -136,7 +136,7 @@ void RibbonGridWidget::add()
     setSubElements();
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::setSubElements()
+void DynamicRibbonWidget::setSubElements()
 {
     // ---- Clean-up what was previously there
     for (int i=0; i<m_children.size(); i++)
@@ -227,7 +227,7 @@ void RibbonGridWidget::setSubElements()
     
  }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
+void DynamicRibbonWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
@@ -237,7 +237,7 @@ void RibbonGridWidget::addItem( std::string user_name, std::string code_name, st
     m_items.push_back(desc);
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::clearItems()
+void DynamicRibbonWidget::clearItems()
 {
     m_items.clear();
 }
@@ -247,7 +247,7 @@ void RibbonGridWidget::clearItems()
 #pragma mark Getters
 #endif
 
-const std::string& RibbonGridWidget::getSelectionIDString(const int playerID)
+const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
@@ -257,7 +257,7 @@ const std::string& RibbonGridWidget::getSelectionIDString(const int playerID)
     return nothing;
 }
 // -----------------------------------------------------------------------------
-const std::string& RibbonGridWidget::getSelectionText(const int playerID)
+const std::string& DynamicRibbonWidget::getSelectionText(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
@@ -267,7 +267,7 @@ const std::string& RibbonGridWidget::getSelectionText(const int playerID)
     return nothing;
 }
 // -----------------------------------------------------------------------------
-RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
+RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w) const
 {
     const int row_amount = m_rows.size();
     for(int n=0; n<row_amount; n++)
@@ -282,7 +282,7 @@ RibbonWidget* RibbonGridWidget::getRowContaining(Widget* w) const
     return NULL;
 }
 // -----------------------------------------------------------------------------
-RibbonWidget* RibbonGridWidget::getSelectedRibbon(const int playerID) const
+RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID) const
 {    
     if (playerID == 0)
     {
@@ -319,12 +319,12 @@ RibbonWidget* RibbonGridWidget::getSelectedRibbon(const int playerID) const
 #pragma mark Event Handling
 #endif
 
-void RibbonGridWidget::registerHoverListener(RibbonGridHoverListener* listener)
+void DynamicRibbonWidget::registerHoverListener(DynamicRibbonHoverListener* listener)
 {
     m_hover_listeners.push_back(listener);
 }
 // -----------------------------------------------------------------------------
-bool RibbonGridWidget::rightPressed(const int playerID)
+bool DynamicRibbonWidget::rightPressed(const int playerID)
 {
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
@@ -345,7 +345,7 @@ bool RibbonGridWidget::rightPressed(const int playerID)
     return true;
 }
 // -----------------------------------------------------------------------------
-bool RibbonGridWidget::leftPressed(const int playerID)
+bool DynamicRibbonWidget::leftPressed(const int playerID)
 {
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
@@ -366,7 +366,7 @@ bool RibbonGridWidget::leftPressed(const int playerID)
     return true;
 }
 // -----------------------------------------------------------------------------
-bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+bool DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     if (originator=="left")
     {
@@ -393,7 +393,7 @@ bool RibbonGridWidget::transmitEvent(Widget* w, std::string& originator, const i
     return true;
 }
 // -----------------------------------------------------------------------------
-bool RibbonGridWidget::mouseHovered(Widget* child)
+bool DynamicRibbonWidget::mouseHovered(Widget* child)
 {
     updateLabel();
     propagateSelection();
@@ -413,7 +413,7 @@ bool RibbonGridWidget::mouseHovered(Widget* child)
     return false;
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::focused(const int playerID)
+void DynamicRibbonWidget::focused(const int playerID)
 {
     Widget::focused(playerID);
     updateLabel();
@@ -425,7 +425,7 @@ void RibbonGridWidget::focused(const int playerID)
     }
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::onRowChange(RibbonWidget* row, const int playerID)
+void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)
 {
     updateLabel(row);
     
@@ -441,7 +441,7 @@ void RibbonGridWidget::onRowChange(RibbonWidget* row, const int playerID)
 #pragma mark Setters / Actions
 #endif
 
-void RibbonGridWidget::scroll(const int x_delta)
+void DynamicRibbonWidget::scroll(const int x_delta)
 {
     // Refuse to scroll when everything is visible
     if ((int)m_items.size() <= m_row_amount*m_col_amount) return;
@@ -468,11 +468,11 @@ void RibbonGridWidget::scroll(const int x_delta)
     }
 }
 // -----------------------------------------------------------------------------
-/** RibbonGridWidget is made of several ribbons; each of them thus has
+/** DynamicRibbonWidget is made of several ribbons; each of them thus has
  its own selection independently of each other. To keep a grid feeling
  (i.e. you remain in the same column when pressing up/down), this method is
  used to ensure that all children ribbons always select the same column */
-void RibbonGridWidget::propagateSelection()
+void DynamicRibbonWidget::propagateSelection()
 {    
     for (int p=0; p<MAX_PLAYER_COUNT; p++)
     {
@@ -503,7 +503,7 @@ void RibbonGridWidget::propagateSelection()
     }
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
+void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
     if (!m_has_label) return;
     
@@ -528,7 +528,7 @@ void RibbonGridWidget::updateLabel(RibbonWidget* from_this_ribbon)
     m_label->setText( L"Random" );
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::updateItemDisplay()
+void DynamicRibbonWidget::updateItemDisplay()
 {
     // Check if we need to update the number of icons in the ribbon
     if ((int)m_items.size() != m_previous_item_count)
@@ -583,11 +583,11 @@ void RibbonGridWidget::updateItemDisplay()
     } // next row
 }
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::setSelection(int item_id)
+void DynamicRibbonWidget::setSelection(int item_id)
 {
     if (m_rows.size() > 1)
     {
-        std::cout << "\n/!\\ Warning, RibbonGridWidget::setSelection only makes sense on 1-row ribbons " <<
+        std::cout << "\n/!\\ Warning, DynamicRibbonWidget::setSelection only makes sense on 1-row ribbons " <<
                      "(since there can't logically be a permanent with more than one row)\n\n";
         return;
     }
@@ -610,7 +610,7 @@ void RibbonGridWidget::setSelection(int item_id)
 }
 
 // -----------------------------------------------------------------------------
-void RibbonGridWidget::setSelection(int item_id, const int playerID)
+void DynamicRibbonWidget::setSelection(int item_id, const int playerID)
 {
     m_selected_item[playerID] = item_id;
     
@@ -632,7 +632,7 @@ void RibbonGridWidget::setSelection(int item_id, const int playerID)
     
     if (row == -1)
     {
-        std::cerr << "RibbonGridWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
+        std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
         return;
     }
     

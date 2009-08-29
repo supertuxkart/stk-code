@@ -71,7 +71,7 @@ namespace OptionsScreen
 
         // ---- video modes
         {
-            RibbonGridWidget* res = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
+            DynamicRibbonWidget* res = getCurrentScreen()->getWidget<DynamicRibbonWidget>("resolutions");
             assert( res != NULL );
 
 
@@ -199,7 +199,7 @@ namespace OptionsScreen
             UserConfigParams::m_prev_width = UserConfigParams::m_width;
             UserConfigParams::m_prev_height = UserConfigParams::m_height;
 
-            RibbonGridWidget* w1 = getCurrentScreen()->getWidget<RibbonGridWidget>("resolutions");
+            DynamicRibbonWidget* w1 = getCurrentScreen()->getWidget<DynamicRibbonWidget>("resolutions");
             assert(w1 != NULL);
 
             const std::string& res = w1->getSelectionIDString(GUI_PLAYER_ID);
@@ -275,7 +275,7 @@ namespace OptionsScreen
     // -----------------------------------------------------------------------------
     void initInput(Widget* widget, const std::string& name)
     {
-            RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+            DynamicRibbonWidget* devices = getCurrentScreen()->getWidget<DynamicRibbonWidget>("devices");
             assert( devices != NULL );
 
             if(!getCurrentScreen()->m_inited)
@@ -354,7 +354,7 @@ namespace OptionsScreen
     {
         if(name == "devices")
         {
-            RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+            DynamicRibbonWidget* devices = getCurrentScreen()->getWidget<DynamicRibbonWidget>("devices");
             assert(devices != NULL);
 
             const std::string& selection = devices->getSelectionIDString(GUI_PLAYER_ID);
@@ -426,7 +426,7 @@ namespace OptionsScreen
                 return;
             }
 
-            RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+            DynamicRibbonWidget* devices = getCurrentScreen()->getWidget<DynamicRibbonWidget>("devices");
             assert( devices != NULL );
             std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
 
@@ -454,7 +454,7 @@ namespace OptionsScreen
     // -----------------------------------------------------------------------------
     void gotSensedInput(Input* sensedInput)
     {
-        RibbonGridWidget* devices = getCurrentScreen()->getWidget<RibbonGridWidget>("devices");
+        DynamicRibbonWidget* devices = getCurrentScreen()->getWidget<DynamicRibbonWidget>("devices");
         assert( devices != NULL );
 
         std::string deviceID = devices->getSelectionIDString(GUI_PLAYER_ID);

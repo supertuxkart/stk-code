@@ -33,7 +33,7 @@ using namespace gui;
 namespace GUIEngine
 {
     
-    class RibbonGridWidget;
+    class DynamicRibbonWidget;
     
     enum WidgetType
     {
@@ -46,7 +46,7 @@ namespace GUIEngine
         WTYPE_LABEL,
         WTYPE_SPACER,
         WTYPE_DIV,
-        WTYPE_RIBBON_GRID,
+        WTYPE_DYNAMIC_RIBBON,
         WTYPE_MODEL_VIEW,
         WTYPE_LIST,
         WTYPE_TEXTBOX
@@ -98,7 +98,7 @@ namespace GUIEngine
         friend class Screen;
         friend class SpinnerWidget;
         friend class Skin;
-        friend class RibbonGridWidget;
+        friend class DynamicRibbonWidget;
         
         /**
           * These methods provide new unique IDs each time you call them.

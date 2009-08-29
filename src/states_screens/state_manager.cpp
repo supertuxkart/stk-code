@@ -173,7 +173,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
         SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
         kartamount->setValue( race_manager->getNumKarts() - race_manager->getNumPlayers() );
         
-        RibbonGridWidget* w2 = getCurrentScreen()->getWidget<RibbonGridWidget>("gamemode");
+        DynamicRibbonWidget* w2 = getCurrentScreen()->getWidget<DynamicRibbonWidget>("gamemode");
         assert( w2 != NULL );
         
         if(!getCurrentScreen()->m_inited)
@@ -219,7 +219,7 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
     }
     else if(name == "gamemode")
     {
-        RibbonGridWidget* w = dynamic_cast<RibbonGridWidget*>(widget);
+        DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
         const std::string selectedMode = w->getSelectionIDString(GUI_PLAYER_ID);
         
         if (selectedMode == "normal")
@@ -304,7 +304,7 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
 {
     if(name == "init")
     {
-        RibbonGridWidget* w = getCurrentScreen()->getWidget<RibbonGridWidget>("tracks");
+        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("tracks");
         assert( w != NULL );
 
         if(!getCurrentScreen()->m_inited)
@@ -345,7 +345,7 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
     // -- track seelction screen
     if(name == "tracks")
     {
-        RibbonGridWidget* w2 = dynamic_cast<RibbonGridWidget*>(widget);
+        DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if(w2 != NULL)
         {
             std::cout << "Clicked on track " << w2->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;

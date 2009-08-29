@@ -70,18 +70,18 @@ A container. Does not do much on itself, but is useful to lay out children autom
 Supports property PROP_LAYOUT. Of spawn type (<div>...</div>, place children within)
  "box" is a variant that acts exactly the same but is visible on-screen
 
-WTYPE_RIBBON_GRID       "ribbon_grid", "scrollable_ribbon", "scrollable_toolbar"
-Shows a scrollable grid of icons. NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
-Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
-affect the type of highlighting used). Supports an optional label at the bottom if PROP_TEXT is set.
-PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added isk nown)
+WTYPE_DYNAMIC_RIBBON       "ribbon_grid", "scrollable_ribbon", "scrollable_toolbar"
+Builds uponc the basic Ribbon to be more dynamic (dynamics contents, possibly with scrolling, possibly multi-line)
+NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
+Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or icons (this will
+affect the type of highlighting used).
+PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added is nown)
 An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to show textures to any aspect ratio
 you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it in 4:3 ratio).
-Gives a special meaning to the text parameter. A value of "bottom" means to display the name of the selected icon at the bottom.
-A value of "all" means that each icon shall have its name under it.
-The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line scrollable ribbons; they use the ribbon-grid
-implementation since it already supports scrolling so no need to duplicate code... The difference between both is that
-'scrollable_ribbon always has a value selected (like in a combo box, or radio buttons), while 'scrollable_toolbar' is a
+Supports an optional label at the bottom if PROP_TEXT is set. Gives a special meaning to the text parameter. A value of "bottom"
+means to display the name of the selected icon at the bottom. A value of "all" means that each icon shall have its name under it.
+The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line scrollable ribbons. The difference between both is that
+'scrollable_ribbon' always has a value selected (like in a combo box, or radio buttons), while 'scrollable_toolbar' is a
 scrollable list of buttons that can be pressed to trigger actions.
  
 WTYPE_MODEL_VIEW        "model"

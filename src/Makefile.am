@@ -93,6 +93,8 @@ supertuxkart_SOURCES = \
  guiengine/widgets/button_widget.hpp \
  guiengine/widgets/check_box_widget.cpp \
  guiengine/widgets/check_box_widget.hpp \
+ guiengine/widgets/dynamic_ribbon_widget.cpp \
+ guiengine/widgets/dynamic_ribbon_widget.hpp \
  guiengine/widgets/icon_button_widget.cpp \
  guiengine/widgets/icon_button_widget.hpp \
  guiengine/widgets/label_widget.cpp \
@@ -101,8 +103,6 @@ supertuxkart_SOURCES = \
  guiengine/widgets/list_widget.hpp \
  guiengine/widgets/model_view_widget.cpp \
  guiengine/widgets/model_view_widget.hpp \
- guiengine/widgets/ribbon_grid_widget.cpp \
- guiengine/widgets/ribbon_grid_widget.hpp \
  guiengine/widgets/ribbon_widget.cpp \
  guiengine/widgets/ribbon_widget.hpp \
  guiengine/widgets/spinner_widget.cpp \
