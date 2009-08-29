@@ -21,9 +21,16 @@
 
 #include "guiengine/modaldialog.hpp"
 
+static const int HIGHSCORE_COUNT = 3;
+
+namespace irr { namespace gui { class IGUIImage; class IGUIStaticText; } }
+
 class TrackInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_track_ident;
+    
+    irr::gui::IGUIImage* m_kart_icons[HIGHSCORE_COUNT];
+    irr::gui::IGUIStaticText* m_highscore_entries[HIGHSCORE_COUNT];
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
