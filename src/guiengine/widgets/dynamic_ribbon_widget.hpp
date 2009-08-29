@@ -42,6 +42,7 @@ namespace GUIEngine
         virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, const int playerID) = 0;
     };
     
+    /** The description of an item added to a DynamicRibbonWidget */
     struct ItemDescription
     {
         std::string m_user_name;
@@ -55,6 +56,7 @@ namespace GUIEngine
     {
         friend class RibbonWidget;
         
+        /** A list of all listeners that registered to be notified on hover/selection */
         ptr_vector<DynamicRibbonHoverListener> m_hover_listeners;
         
         virtual ~DynamicRibbonWidget() {}
@@ -122,9 +124,7 @@ namespace GUIEngine
         
         /** Callback called widget is focused */
         void focused(const int playerID);
-        
-        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
-        
+                
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();
 
@@ -138,6 +138,7 @@ namespace GUIEngine
         void onRowChange(RibbonWidget* row, const int playerID);
         void add();
         bool mouseHovered(Widget* child);
+        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
         
     public:
         DynamicRibbonWidget(const bool combo=false, const int max_rows=4);
@@ -150,6 +151,8 @@ namespace GUIEngine
          call 'updateItemDisplay' or 'add') */
         void addItem( std::string user_name, std::string code_name, std::string image_file );
         
+        /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
+            'updateItemDisplay' to update the display. */
         void clearItems();
         
         /** Register a listener to be notified of selection changes within the ribbon */
