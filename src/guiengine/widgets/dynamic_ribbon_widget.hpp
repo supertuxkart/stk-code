@@ -178,6 +178,9 @@ namespace GUIEngine
             ID ranges from {0} to {number of items added through 'addItem' - 1} */
         void setSelection(int item_id);
         
+        /** Returns a read-only list of items added to this ribbon */
+        const std::vector<ItemDescription>& getItems() const { return m_items; }
+        
         void setSelection(int item_id, const int playerID);
     };
     

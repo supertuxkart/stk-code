@@ -29,10 +29,12 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
+#include "items/item_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/translation.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #include <string>
@@ -79,6 +81,7 @@ namespace KartSelectionScreen
 
         LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
         std::string deviceName;
+        std::string m_kartInternalName;
         
         PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget()
         {
@@ -322,7 +325,7 @@ namespace KartSelectionScreen
              in an infinite loop (this can happen e.g. in checkboxes, where they need to be
              notified of clicks onto themselves so they can toggle their state. )
              */
-            while(topmost->m_event_handler != NULL && topmost->m_event_handler != topmost)
+            while (topmost->m_event_handler != NULL && topmost->m_event_handler != topmost)
             {
                 // transmit events to all listeners in the chain
                 std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
@@ -392,6 +395,10 @@ namespace KartSelectionScreen
             kart_name_x = x;
             kart_name_y = y + h - kart_name_h;
         }
+        void setKartInternalName(const std::string& whichKart)
+        {
+            m_kartInternalName = whichKart;
+        }
     };
     
 #if 0
@@ -407,21 +414,34 @@ class KartHoverListener : public DynamicRibbonHoverListener
             ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
             
-            //printf("%s\n", selectionID.c_str());
-            const KartProperties* kart = kart_properties_manager->getKart(selectionID);
-            if(kart == NULL) return;
-            KartModel* kartModel = kart->getKartModel();
-            
-            w3->clearModels();
-            w3->addModel( kartModel->getModel() );
-            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-            w3->update(0);
-            
-            g_player_karts[playerID].kartName->m_properties[PROP_TEXT] = selectionID;
-            g_player_karts[playerID].kartName->setText( selectionID.c_str() );
+            if (selectionID == "gui/track_random.png")
+            {
+                scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
+                w3->clearModels();
+                w3->addModel( model, Vec3(0.0f, 0.0f, -12.0f) );
+                w3->update(0);
+                g_player_karts[playerID].kartName->setText( _("Random Kart") );
+            }
+            else
+            {
+                //printf("%s\n", selectionID.c_str());
+                const KartProperties* kart = kart_properties_manager->getKart(selectionID);
+                if (kart == NULL) return;
+                KartModel* kartModel = kart->getKartModel();
+                
+                w3->clearModels();
+                w3->addModel( kartModel->getModel() );
+                w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+                w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+                w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+                w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+                w3->update(0);
+                
+                // FIXME: don't display the internal name!
+                g_player_karts[playerID].kartName->setText( selectionID.c_str() );
+            }
+
+            g_player_karts[playerID].setKartInternalName(selectionID);
         }
     };
 KartHoverListener* karthoverListener = NULL;
@@ -586,7 +606,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
         DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
         assert( w != NULL );
         
-        if(karthoverListener == NULL)
+        if (karthoverListener == NULL)
         {
             karthoverListener = new KartHoverListener();
             w->registerHoverListener(karthoverListener);
@@ -722,11 +742,25 @@ void menuEventKarts(Widget* widget, const std::string& name)
         race_manager->setNumPlayers( players.size() );
         race_manager->setNumLocalPlayers( players.size() );
         
+        RandomGenerator random;
+        
         //g_player_karts.clearAndDeleteAll();      
         //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
         for (int n = 0; n < g_player_karts.size(); n++)
         {
-            race_manager->setLocalKartInfo(n, g_player_karts[n].kartName->m_properties[PROP_TEXT]);
+            std::string selection = g_player_karts[n].m_kartInternalName;
+            
+            if (selection == "gui/track_random.png")
+            {
+                // FIXME: in multiplayer game, if two players select' random' make sure they don't select
+                // the same kart or an already selected kart
+                const std::vector<ItemDescription>& items = w->getItems();
+                const int randomID = random.get(items.size());
+                selection = items[randomID].m_code_name;
+            }
+            // std::cout << "selection=" << selection.c_str() << std::endl;
+            
+            race_manager->setLocalKartInfo(n, selection);
         }
 
         //Return to assign mode

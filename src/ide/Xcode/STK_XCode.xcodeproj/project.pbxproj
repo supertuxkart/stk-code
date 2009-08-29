@@ -1205,8 +1205,8 @@
 				958330BE10122B4A00C5137E /* skin.hpp */,
 				958330BF10122B4A00C5137E /* widget.cpp */,
 				958330C010122B4A00C5137E /* widget.hpp */,
-				95ECA0EB10124C5000D47C5F /* widgets */,
 				95ECA13C10124E6900D47C5F /* widgets.hpp */,
+				95ECA0EB10124C5000D47C5F /* widgets */,
 			);
 			name = guiengine;
 			path = ../../guiengine;
@@ -1269,11 +1269,11 @@
 				954E4C240FF98B6E0047FE3E /* animations */,
 				95C2AC260F296540000D3E5D /* audio */,
 				95C2AC360F296540000D3E5D /* bullet */,
+				95C2AE250F296541000D3E5D /* challenges */,
 				95D950CC0FE473CA002E10AD /* config */,
+				95C2AE370F296541000D3E5D /* enet */,
 				952A152C103F66D600B1895D /* graphics */,
 				958330B110122B4A00C5137E /* guiengine */,
-				95C2AE250F296541000D3E5D /* challenges */,
-				95C2AE370F296541000D3E5D /* enet */,
 				95C65D750F532F7D00BE7BA7 /* io */,
 				95C2B0F50F296545000D3E5D /* items */,
 				95A118280F77EA3100B18B3D /* input */,
