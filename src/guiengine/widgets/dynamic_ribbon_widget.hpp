@@ -39,7 +39,8 @@ namespace GUIEngine
     {
     public:
         virtual ~DynamicRibbonHoverListener() {}
-        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, const int playerID) = 0;
+        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
+                                        const std::string& selectionText, const int playerID) = 0;
     };
     
     /** The description of an item added to a DynamicRibbonWidget */

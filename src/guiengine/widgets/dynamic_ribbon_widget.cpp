@@ -336,7 +336,8 @@ bool DynamicRibbonWidget::rightPressed(const int playerID)
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
+                                                    getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
     
@@ -356,7 +357,8 @@ bool DynamicRibbonWidget::leftPressed(const int playerID)
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString(playerID),
+                                                    w->getSelectionText(playerID), playerID);
         }
     }
     
@@ -406,7 +408,8 @@ bool DynamicRibbonWidget::mouseHovered(Widget* child)
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
+                                                    getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
     
@@ -421,7 +424,8 @@ void DynamicRibbonWidget::focused(const int playerID)
     const int listenerAmount = m_hover_listeners.size();
     for(int n=0; n<listenerAmount; n++)
     {
-        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID), playerID);
+        m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
+                                                getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
     }
 }
 // -----------------------------------------------------------------------------
@@ -432,7 +436,8 @@ void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)
     const int listenerAmount = m_hover_listeners.size();
     for (int n=0; n<listenerAmount; n++)
     {
-        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString(playerID), playerID);
+        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString(playerID),
+                                                row->getSelectionText(playerID), playerID);
     }
 }
 
