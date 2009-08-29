@@ -45,7 +45,7 @@ namespace GUIEngine
         friend class RibbonGridWidget;
         friend class EventHandler;
         
-        int m_selection[32]; // FIXME: 32 is a bit arbitrary, settle for a max number of players
+        int m_selection[MAX_PLAYER_COUNT];
         
         /** The type of this ribbon (toolbar, combo, tabs) */
         RibbonType m_ribbon_type;

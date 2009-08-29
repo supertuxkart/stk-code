@@ -56,5 +56,8 @@
 #define NINETY_DEGREE_RAD  (M_PI/2.0f)
 #define DEGREE_TO_RAD      (M_PI/180.0f)
 #define RAD_TO_DEGREE      (180.0f/M_PI)
-#endif
 
+const int MAX_PLAYER_COUNT = 4;
+
+
+#endif

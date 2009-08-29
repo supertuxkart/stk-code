@@ -407,7 +407,7 @@ class KartHoverListener : public RibbonGridHoverListener
             ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
             
-            printf("%s\n", selectionID.c_str());
+            //printf("%s\n", selectionID.c_str());
             const KartProperties* kart = kart_properties_manager->getKart(selectionID);
             if(kart == NULL) return;
             KartModel* kartModel = kart->getKartModel();

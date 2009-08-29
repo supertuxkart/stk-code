@@ -31,7 +31,7 @@
 
 namespace GUIEngine
 {
-    Widget* g_focus_for_player[32]; // unused for player 0, player 0's focus is tracked by irrlicht
+    Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
     
     IGUIEnvironment* g_env;
     Skin* g_skin = NULL;
@@ -155,7 +155,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_driver = driver_a;
     g_state_manager = state_manager;
     
-    for (int n=0; n<32; n++)
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         g_focus_for_player[n] = NULL;
     }

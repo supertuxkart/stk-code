@@ -132,7 +132,7 @@ namespace GUIEngine
         void scroll(const int x_delta);
         
         /** Used  for combo ribbons, to contain the ID of the currently selected item for each player */
-        int m_selected_item[32]; // FIXME: 32 is arbitrary, settle for a max number of players
+        int m_selected_item[MAX_PLAYER_COUNT];
         
         /** Callbacks */
         void onRowChange(RibbonWidget* row, const int playerID);

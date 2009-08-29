@@ -214,7 +214,7 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    extern Widget* g_focus_for_player[32]; // unused for player 0, player 0's focus is tracked by irrlicht;
+    extern Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht;
     
     class Screen;
     class Widget;

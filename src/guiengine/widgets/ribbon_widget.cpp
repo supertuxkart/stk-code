@@ -29,7 +29,7 @@ using namespace GUIEngine;
 // -----------------------------------------------------------------------------
 RibbonWidget::RibbonWidget(const RibbonType type)
 {
-    for (int n=0; n<32; n++)
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_selection[n] = -1;
     }

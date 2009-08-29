@@ -42,7 +42,7 @@ RibbonGridWidget::RibbonGridWidget(const bool combo, const int max_rows)
     m_right_widget = NULL;
     m_type = WTYPE_RIBBON_GRID;
     
-    for (int n=0; n<32; n++)
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_selected_item[n] = -1;
     }
@@ -458,7 +458,7 @@ void RibbonGridWidget::scroll(const int x_delta)
     // update selection markers in child ribbon
     if (m_combo)
     {
-        for (int n=0; n<32; n++)
+        for (int n=0; n<MAX_PLAYER_COUNT; n++)
         {
             RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
             int id = m_selected_item[n] - m_scroll_offset;
@@ -474,7 +474,7 @@ void RibbonGridWidget::scroll(const int x_delta)
  used to ensure that all children ribbons always select the same column */
 void RibbonGridWidget::propagateSelection()
 {    
-    for (int p=0; p<32; p++)
+    for (int p=0; p<MAX_PLAYER_COUNT; p++)
     {
         // find selection in current ribbon
         RibbonWidget* selected_ribbon = (RibbonWidget*)getSelectedRibbon(p);

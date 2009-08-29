@@ -79,7 +79,7 @@ Widget::Widget(bool reserve_id)
     m_show_bounding_box = false;
     m_parent = NULL;
     
-    for (int n=0; n<32; n++)
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
         GUIEngine::g_focus_for_player[n] = false;

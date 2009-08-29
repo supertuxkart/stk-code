@@ -23,6 +23,7 @@
 #include <map>
 
 #include "guiengine/skin.hpp"
+#include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
@@ -168,7 +169,7 @@ namespace GUIEngine
         /** Usually, only one widget at a time can be focused. There is however a special case where all
             players can move through the screen. This variable will then be used as a bitmask to contain
             which players beyong player 1 have this widget focused. */
-        bool m_player_focus[32]; // FIXME : the 32 there is arbitrary, settle for a max number of players
+        bool m_player_focus[MAX_PLAYER_COUNT];
 
     public:
         /**
