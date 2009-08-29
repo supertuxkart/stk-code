@@ -417,7 +417,7 @@ void World::updateHighscores()
 
         HighscoreEntry* highscores = getHighscores();
 
-        if(highscores->addData(k->getName(),
+        if(highscores->addData(k->getIdent(),
                                k->getPlayer()->getProfile()->getName(),
                                k->getFinishTime())>0 )
         {

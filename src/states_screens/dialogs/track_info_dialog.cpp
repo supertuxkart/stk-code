@@ -18,6 +18,8 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
+#include "io/file_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
@@ -39,6 +41,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     m_track_ident = trackIdent;
 
+    // ---- Lap count spinner
     SpinnerWidget* spinner = new SpinnerWidget();
     spinner->x = m_area.getWidth()/2 - 200;
     spinner->y = y2;
@@ -56,6 +59,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     spinner->getIrrlichtElement()->setTabStop(true);
     spinner->getIrrlichtElement()->setTabGroup(false);
 
+    // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
     okBtn->m_properties[PROP_ID] = "start";
     okBtn->m_properties[PROP_TEXT] = _("Start Race");
@@ -71,14 +75,29 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     GUIEngine::getGUIEnv()->setFocus( okBtn->getIrrlichtElement() );
     
-    
+    // ---- Track title
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( stringw(trackName).c_str(),
                                                                   area_top, false, true, // border, word warp
                                                                   m_irrlicht_window);
     a->setTabStop(false);
 
-    // ======== High Scores
+    // ---- High Scores & track info
+    //core::rect< s32 > area_left(0, y1, m_area.getWidth()/2, y2);
+
+    const int hscores_y_from = y1;
+    const int hscores_y_to = y1 + (y2 - y1)*2/3;
+
+    core::rect< s32 > hiscores_title_area(5, hscores_y_from, m_area.getWidth()/2, hscores_y_from + 30);
+    stringw text = _("= Highscores =");
+    IGUIStaticText* hscores_header = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), hiscores_title_area,
+                                                                           false , true , // border, word warp
+                                                                            m_irrlicht_window);
+    hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+
+    
+    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) ;
+
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
     
@@ -90,12 +109,6 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     // TODO: update highscores display when number of laps changes
     const int amount = highscores->getNumberEntries();
-    stringw highscores_string = "= Highscores =\n";
-    std::cout << "====== Highscores =====\n";
-    std::cout << "Checking for highscores of type " << type.c_str() << " with nkarts=" << race_manager->getNumKarts()
-              << ", difficulty=" << race_manager->getDifficulty() << ", track=" << trackIdent.c_str()
-              << ", nlaps=" << race_manager->getNumLaps() << std::endl;
-    std::cout << "Got " << amount << " entries\n";
     
     std::string kart_name;
     std::string name;
@@ -104,40 +117,68 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     char buffer[128];
     for (int n=0; n<3; n++)
     {
+        const int from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+1)/4;
+        const int next_from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+2)/4;
+
+        const int gap = 3;
+        const int icon_size = next_from_y - from_y - gap*2;
+        
+        core::rect< s32 > icon_area(5, from_y + gap, 5 + icon_size, from_y + icon_size);
+        
+        IGUIImage* kart_icon = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
+        kart_icon->setImage(texture);
+        kart_icon->setScaleImage(true);
+        kart_icon->setTabStop(false);
+        
+        core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
+
+    
         if (n < amount)
         {
             highscores->getEntry(n, kart_name, name, &time);
             
-            sprintf(buffer, "%s (%s) : %.2f\n", kart_name.c_str(), name.c_str(), time);
+            sprintf(buffer, "%s : %.2f s\n", name.c_str(), time);
             
             std::cout << buffer << std::endl;
-            highscores_string += buffer;
+            
+            const KartProperties* prop = kart_properties_manager->getKart(kart_name);
+            if (prop != NULL)
+            {
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                kart_icon->setImage(kart_icon_texture);
+            }
         }
         else
         {
             //I18N : for empty highscores entries
-            highscores_string += _("(Empty)");
-            highscores_string += "\n";
+            sprintf(buffer, "%s\n", _("(Empty)"));
         }
+        
+        text = buffer;
+        GUIEngine::getGUIEnv()->addStaticText( text.c_str(), entry_area, false , true , // border, word warp
+                                              m_irrlicht_window);
+        
     }
-    std::cout << "======================\n";
+    //std::cout << "======================\n";
 
     
     Track* track = track_manager->getTrack(trackIdent);
-    highscores_string += "\n"; /*+ track->getDescription() + "\n" */
+    
+    core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
     //I18N : when showing who is the author of track '%s'
-    sprintf(buffer, _("By %s"), track->getDesigner().c_str());
-    highscores_string += buffer;
-    
-    core::rect< s32 > area_left(0, y1, m_area.getWidth()/2, y2);
-    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( highscores_string.c_str(),
-                                                                  area_left, false , true , // border, word warp
+    sprintf(buffer, _("Track by %s"), track->getDesigner().c_str());
+    text = buffer;
+
+    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
+                                                                  creator_info_area, false , true , // border, word warp
                                                                   m_irrlicht_window);
     b->setTabStop(false);
 
     
-    // TODO : preserve aspect ratio
+    // ---- Track screenshot
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     IGUIImage* screenshotWidget = GUIEngine::getGUIEnv()->addImage( area_right, m_irrlicht_window );
     screenshotWidget->setImage(screenshot);
