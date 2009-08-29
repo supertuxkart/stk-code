@@ -88,7 +88,7 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
-    angle += delta*25;
+    angle += delta*35;
     if (angle > 360) angle -= 360;
     
     if (m_rtt_provider == NULL)

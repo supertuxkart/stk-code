@@ -643,7 +643,10 @@ IrrDriver::RTTProvider::~RTTProvider()
     tearDownRTTScene();
 }
 // ----------------------------------------------------------------------------
-/** Sets up a given vector of meshes for render-to-texture. Parameters:
+/** Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
+ *  object insdie the GUI.
+ *
+ * Parameters:
  *  \param mesh Vector of meshes to render.
  *  \param mesh_location For each mesh the location where it should be 
  *         positioned.
@@ -671,7 +674,7 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
         node->updateAbsolutePosition();
     }
     
-    m_rtt_main_node->setScale( core::vector3df(50.0f, 50.0f, 50.0f) );
+    m_rtt_main_node->setScale( core::vector3df(35.0f, 35.0f, 35.0f) );
     
     //vector3d< f32 > modelsize = mesh->getBoundingBox().getExtent();
     //std::cout << "box size " << modelsize.X*50.0 << ", " << modelsize.Y*50.0 << ", " << modelsize.Z*50.0 << std::endl;
@@ -695,20 +698,20 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
     {
         m_rtt_main_node->getMaterial(n).setFlag(EMF_LIGHTING, true);
         
-        m_rtt_main_node->getMaterial(n).Shininess = 200.0f; // set size of specular highlights
-        m_rtt_main_node->getMaterial(n).SpecularColor.set(255,150,150,150); 
+        m_rtt_main_node->getMaterial(n).Shininess = 100.0f; // set size of specular highlights
+        m_rtt_main_node->getMaterial(n).SpecularColor.set(255,50,50,50); 
         m_rtt_main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
         
         //node->getMaterial(n).setFlag(EMF_NORMALIZE_NORMALS , true);
         m_rtt_main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
-        m_rtt_main_node->getMaterial(n).GouraudShading = true;
     }
     
     m_camera =	irr_driver->getSceneManager()->addCameraSceneNode();
     
-    m_camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
+    m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
+    m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
 }
 
