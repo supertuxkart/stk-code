@@ -132,7 +132,6 @@ void reshowCurrentScreen()
 // -----------------------------------------------------------------------------
 Screen* getCurrentScreen()
 {
-    assert(g_current_screen != NULL);
     return g_current_screen;
 }
 // -----------------------------------------------------------------------------

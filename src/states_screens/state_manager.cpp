@@ -415,7 +415,9 @@ void StateManager::eventCallback(Widget* widget, const std::string& name)
 {
     std::cout << "event!! " << name.c_str() << std::endl;
 
-    const std::string& screen_name = getCurrentScreen()->getName();
+    Screen* topScreen = getCurrentScreen();
+    if (topScreen == NULL) return;
+    const std::string& screen_name = topScreen->getName();
 
     if( screen_name == "main.stkgui" )
         menuEventMain(widget, name);
