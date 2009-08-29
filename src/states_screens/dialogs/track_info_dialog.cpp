@@ -24,6 +24,8 @@
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -99,19 +101,34 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     std::string name;
     float time;
     
-    char buffer[512];
-    for (int n=0; n<amount; n++)
+    char buffer[128];
+    for (int n=0; n<3; n++)
     {
-        highscores->getEntry(n, kart_name, name, &time);
-        
-        sprintf(buffer, "%s (%s) : %.2f\n", kart_name.c_str(), name.c_str(), time);
-        
-        std::cout << buffer << std::endl;
-        highscores_string += buffer;
+        if (n < amount)
+        {
+            highscores->getEntry(n, kart_name, name, &time);
+            
+            sprintf(buffer, "%s (%s) : %.2f\n", kart_name.c_str(), name.c_str(), time);
+            
+            std::cout << buffer << std::endl;
+            highscores_string += buffer;
+        }
+        else
+        {
+            //I18N : for empty highscores entries
+            highscores_string += _("(Empty)");
+            highscores_string += "\n";
+        }
     }
     std::cout << "======================\n";
 
     
+    Track* track = track_manager->getTrack(trackIdent);
+    highscores_string += "\n"; /*+ track->getDescription() + "\n" */
+    
+    //I18N : when showing who is the author of track '%s'
+    sprintf(buffer, _("By %s"), track->getDesigner().c_str());
+    highscores_string += buffer;
     
     core::rect< s32 > area_left(0, y1, m_area.getWidth()/2, y2);
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( highscores_string.c_str(),
