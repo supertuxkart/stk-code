@@ -183,94 +183,9 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 const char* text = xml->getAttributeValue( "text" );
                 if (text != NULL)
                 {
-                    /*
-                    // FIXME: is this byteswapping necessary on all platforms?
-                    stringw byteswap = _(text);
-                    const int charcount = byteswap.size();
-                    for (int n=0; n<charcount; n++)
-                    {
-                        short thischar = byteswap[n];                        
-                        char* ptr = (char*)&thischar;
-                        char byteA = ptr[0];
-                        char byteB = ptr[1];
-                        ptr[0] = byteB;
-                        ptr[1] = byteA;
-                        byteswap[n] = thischar;
-                    }
-                    widget.m_text = byteswap;
-                    */
                     widget.m_text = _(text);
-                    
-                    const wchar_t* original = _(text);
-                    
-                    std::wcout << L"Output of mbstowcs : " << original << std::endl;
-                    
-                    stringw debug = original;
-                    
-                    //std::wcout << L"Original : " << debug.c_str() << std::endl;
-                    
-                    std::cout << "Before swapping : ";
-                    for (int n=0; ; n++)
-                    {
-                        int thischar = original[n];
-                        
-                        
-                        if (thischar != (int)debug[n])
-                        {
-                            std::cerr << "(mismatch : " << thischar << " vs " << (short)debug[n] << ")";
-                        }
-                        
-                        if ((thischar & 0xFFFF) == 0)
-                        {
-                            std::cout << "<EOS>\n";
-                            break;
-                        }
-                        
-                        std::cout << (char)(thischar & 0xFF) << "." << (char)((thischar >> 8) & 0xFF) << ".";
-                        
-                        
-                        if (((thischar >> 16) & 0xFFFF) == 0)
-                        {
-                            std::cout << "<EOS>\n";
-                            break;
-                        }
-                        
-                        
-                        std::cout << (char)((thischar >> 16) & 0xFF) << "." << (char)((thischar >> 24) & 0xFF) << "/";
-
-                        //char* ptr = (char*)&thischar;
-                        //char byteA = ptr[0];
-                        //char byteB = ptr[1];
-                        
-                        //ptr[0] = byteB;
-                        //ptr[1] = byteA;
-                        //debug[n] = thischar;
-                    }
-                    std::cout << "\n";
-                    //std::wcout << L"Swapped : " << debug.c_str() << std::endl;
                 }
-                
-  /*
-                if (widget.m_properties[PROP_TEXT].size() > 0)
-                {
 
-                    std::cout << "Raw print : ";
-                    for (wchar_t* ptr = utf16; *ptr != 0; ptr++)
-                    {
-                        std::cout << (*ptr & 0xFF) << " / " << ((*ptr >> 8) & 0xFF) << " / ";
-                    }
-                    std::cout << "\nIrr strinw print : ";
-
-                    stringc irrstrc = irrstr.c_str();
-                    for (u32 n=0; n<irrstrc.size(); n++)
-                    {
-                        std::cout << irrstrc[n] << " (" << (int)irrstrc[n] << ") ";
-                    }
-                    std::cout << std::endl;
-                    
-                    widget.m_properties[PROP_TEXT] = _(widget.m_properties[PROP_TEXT].c_str());
-                }*/
-                
                 /* a new div starts here, continue parsing with this new div as new parent */
                 if( widget.m_type == WTYPE_DIV || widget.m_type == WTYPE_RIBBON)
                     parseScreenFileDiv( xml, append_to[append_to.size()-1].m_children );
