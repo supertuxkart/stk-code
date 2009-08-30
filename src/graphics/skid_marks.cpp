@@ -33,8 +33,8 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
     m_width                   = width;
     m_material                = new video::SMaterial();
     m_material->MaterialType  = video::EMT_TRANSPARENT_VERTEX_ALPHA;
-    m_material->AmbientColor  = video::SColor(255, 0, 0, 0);
-    m_material->DiffuseColor  = video::SColor(255, 0, 0, 0);
+    m_material->AmbientColor  = video::SColor(128, 16, 16, 16);
+    m_material->DiffuseColor  = video::SColor(128, 16, 16, 16);
     m_material->Shininess     = 0;
     m_skid_marking            = false;
     m_current                 = -1;
