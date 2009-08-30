@@ -94,8 +94,6 @@ namespace KartSelectionScreen
             m_irrlicht_widget_ID = irrlichtWidgetID;
 
             this->playerID = playerID;
-            
-            // FIXME : if a player removes itself, all IDs need to be updated
             this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", playerID);
             
             setSize(area->x, area->y, area->w, area->h);

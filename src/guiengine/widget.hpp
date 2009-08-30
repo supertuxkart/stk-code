@@ -171,6 +171,8 @@ namespace GUIEngine
             which players beyong player 1 have this widget focused. */
         bool m_player_focus[MAX_PLAYER_COUNT];
 
+        bool m_reserve_id;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -285,7 +287,7 @@ namespace GUIEngine
          * Create and add the irrLicht widget(s) associated with this object.
          * Call after Widget was read from XML file and laid out.
          */
-        virtual void add() {};
+        virtual void add();
     };
 
     

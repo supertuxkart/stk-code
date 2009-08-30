@@ -78,6 +78,7 @@ Widget::Widget(bool reserve_id)
     m_event_handler = NULL;
     m_show_bounding_box = false;
     m_parent = NULL;
+    m_reserve_id = reserve_id;
     
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -85,15 +86,18 @@ Widget::Widget(bool reserve_id)
         GUIEngine::g_focus_for_player[n] = false;
     }
     
-    if (reserve_id)
+    m_reserved_id = -1;
+}
+    
+// -----------------------------------------------------------------------------
+void Widget::add()
+{
+    if (m_reserve_id)
     {
         m_reserved_id = getNewID();
     }
-    else
-    {
-        m_reserved_id = -1;
-    }
 }
+    
 // -----------------------------------------------------------------------------
 /**
   * \param playerID ID of the player you want to set/unset focus for, starting from 0

@@ -780,10 +780,9 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
             }
         }
     }
-    
-    
+        
     BoxRenderParams& params = (focused || pressed) ? SkinConfig::m_render_params["spinner::focused"] : 
-    SkinConfig::m_render_params["spinner::neutral"];
+                                                     SkinConfig::m_render_params["spinner::neutral"];
     
     // FIXME: temporary only
     if (widget->isFocusedForPlayer(1))
@@ -969,6 +968,10 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     const int id = element->getID();
     
     Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    
+    //std::cout << "3D Pane " << id << " : ";
+    //if(widget == NULL) std::cout << "NULL\n";
+    //else std::cout << widget->m_properties[PROP_ID].c_str() << std::endl;
     
     if(widget == NULL) return;
     
