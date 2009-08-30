@@ -28,7 +28,7 @@
 #  include <libintl.h>
 #endif
 
-#  define _(String) (wchar_t*)gettext(String)
+#  define _(String) w_gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) gettext_noop (String)
 // libintl defines its own fprintf, which doesn't work for me :(
@@ -46,6 +46,8 @@ class Translations
 public:
     Translations();
 };
+
+wchar_t* w_gettext(const char* original);
 
 extern Translations* translations;
 #endif

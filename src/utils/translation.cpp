@@ -44,8 +44,18 @@ Translations::Translations() {
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
     textdomain (PACKAGE);
-    printf("gettext codeset : %s \n", bind_textdomain_codeset(PACKAGE, "UTF-16"));
 #endif
         
 }   // Translations
 
+const int BUFFER_SIZE = 512;
+wchar_t out_buffer[BUFFER_SIZE];
+
+wchar_t* w_gettext(const char* original)
+{
+    const char* original_t = gettext(original);
+    
+    mbstowcs(out_buffer, original_t, BUFFER_SIZE);
+    
+    return out_buffer;
+}

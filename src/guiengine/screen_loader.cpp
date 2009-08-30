@@ -183,7 +183,71 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 const char* text = xml->getAttributeValue( "text" );
                 if (text != NULL)
                 {
-                    widget.m_text = text; //_(text);
+                    /*
+                    // FIXME: is this byteswapping necessary on all platforms?
+                    stringw byteswap = _(text);
+                    const int charcount = byteswap.size();
+                    for (int n=0; n<charcount; n++)
+                    {
+                        short thischar = byteswap[n];                        
+                        char* ptr = (char*)&thischar;
+                        char byteA = ptr[0];
+                        char byteB = ptr[1];
+                        ptr[0] = byteB;
+                        ptr[1] = byteA;
+                        byteswap[n] = thischar;
+                    }
+                    widget.m_text = byteswap;
+                    */
+                    widget.m_text = _(text);
+                    
+                    const wchar_t* original = _(text);
+                    
+                    std::wcout << L"Output of mbstowcs : " << original << std::endl;
+                    
+                    stringw debug = original;
+                    
+                    //std::wcout << L"Original : " << debug.c_str() << std::endl;
+                    
+                    std::cout << "Before swapping : ";
+                    for (int n=0; ; n++)
+                    {
+                        int thischar = original[n];
+                        
+                        
+                        if (thischar != (int)debug[n])
+                        {
+                            std::cerr << "(mismatch : " << thischar << " vs " << (short)debug[n] << ")";
+                        }
+                        
+                        if ((thischar & 0xFFFF) == 0)
+                        {
+                            std::cout << "<EOS>\n";
+                            break;
+                        }
+                        
+                        std::cout << (char)(thischar & 0xFF) << "." << (char)((thischar >> 8) & 0xFF) << ".";
+                        
+                        
+                        if (((thischar >> 16) & 0xFFFF) == 0)
+                        {
+                            std::cout << "<EOS>\n";
+                            break;
+                        }
+                        
+                        
+                        std::cout << (char)((thischar >> 16) & 0xFF) << "." << (char)((thischar >> 24) & 0xFF) << "/";
+
+                        //char* ptr = (char*)&thischar;
+                        //char byteA = ptr[0];
+                        //char byteB = ptr[1];
+                        
+                        //ptr[0] = byteB;
+                        //ptr[1] = byteA;
+                        //debug[n] = thischar;
+                    }
+                    std::cout << "\n";
+                    //std::wcout << L"Swapped : " << debug.c_str() << std::endl;
                 }
                 
   /*

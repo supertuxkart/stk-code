@@ -130,7 +130,7 @@ void ProfileWorld::enterRaceOverState(const bool delay)
         max_t = std::max(max_t, m_kart[i]->getFinishTime());
         min_t = std::min(min_t, m_kart[i]->getFinishTime());
         av_t += m_kart[i]->getFinishTime();
-        printf("%s  start %d  end %d time %f\n",
+        printf("%ls  start %d  end %d time %f\n",
             m_kart[i]->getName().c_str(),(int)i,
             m_kart[i]->getPosition(),
             m_kart[i]->getFinishTime());
