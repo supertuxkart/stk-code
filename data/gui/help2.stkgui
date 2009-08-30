@@ -37,7 +37,7 @@
             <icon align="center" icon="textures/bowling-icon.png"/>
             <spacer width="25" height="25"/>
             <label proportion="1" height="100%" align="left" word_wrap="true"
-                   text="Bowling Ball - bounces off walls. If you are looking back,\nit will be thrown backwards."/>
+                   text="Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">

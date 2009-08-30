@@ -152,7 +152,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
         }
         else
         {
-            //I18N : for empty highscores entries
+            //I18N: for empty highscores entries
             sprintf(buffer, "%s\n", _("(Empty)"));
         }
         
@@ -167,7 +167,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
-    //I18N : when showing who is the author of track '%s' (place %s where the name of the author should appear)
+    //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
     sprintf(buffer, _("Track by %s"), track->getDesigner().c_str());
     text = buffer;
 

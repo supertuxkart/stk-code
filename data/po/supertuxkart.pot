@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-29 17:13-0400\n"
+"POT-Creation-Date: 2009-08-29 19:36-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,7 @@ msgid ""
 "been eliminated."
 msgstr ""
 
+#. I18N: for empty highscores entries
 #: src/states_screens/dialogs/track_info_dialog.cpp:156
 msgid "(Empty)"
 msgstr ""
@@ -117,6 +118,7 @@ msgstr ""
 msgid "Audio/Video"
 msgstr ""
 
+#. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/input.cpp:479
 #, c-format
 msgid "Axis %d %s"
@@ -130,7 +132,9 @@ msgid "Back to main menu"
 msgstr ""
 
 #: data/po/gui_strings.txt:22
-msgid "Bowling Ball - bounces off walls. If you are looking back,"
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
+"backwards."
 msgstr ""
 
 #: data/po/gui_strings.txt:69
@@ -347,11 +351,13 @@ msgstr ""
 msgid "Game Modes"
 msgstr ""
 
+#. I18N: to appear in input configuration screen, for gamepad buttons
 #: src/input/input.cpp:483
 #, c-format
 msgid "Gamepad button %d"
 msgstr ""
 
+#. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/input.cpp:487
 #, c-format
 msgid "Gamepad hat %d"
@@ -425,11 +431,13 @@ msgstr ""
 msgid "Make your rivals bite dust!"
 msgstr ""
 
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:495
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr ""
 
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
 #: src/input/input.cpp:491
 #, c-format
 msgid "Mouse button %d"
@@ -745,6 +753,7 @@ msgstr ""
 msgid "To the Moon and Back"
 msgstr ""
 
+#. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
 #: src/states_screens/dialogs/track_info_dialog.cpp:171
 #, c-format
 msgid "Track by %s"
