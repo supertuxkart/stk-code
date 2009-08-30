@@ -252,6 +252,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\dynamic_ribbon_widget.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\icon_button_widget.cpp"
 						>
 					</File>
@@ -265,10 +269,6 @@
 					</File>
 					<File
 						RelativePath="..\..\guiengine\widgets\model_view_widget.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\guiengine\widgets\ribbon_grid_widget.cpp"
 						>
 					</File>
 					<File
@@ -882,6 +882,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\guiengine\widgets\dynamic_ribbon_widget.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\guiengine\widgets\icon_button_widget.hpp"
 						>
 					</File>
@@ -895,10 +899,6 @@
 					</File>
 					<File
 						RelativePath="..\..\guiengine\widgets\model_view_widget.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\guiengine\widgets\ribbon_grid_widget.hpp"
 						>
 					</File>
 					<File
