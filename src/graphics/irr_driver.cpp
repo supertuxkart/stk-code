@@ -541,7 +541,7 @@ void IrrDriver::update(float dt)
 {
     if(!m_device->run()) return;
     
-    m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+    m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
 
     {    // just to mark the beding/end scene block
         if(!StateManager::get()->isGameState())
