@@ -1,16 +1,21 @@
+<stkgui>
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
     <label align="center" text="SuperTuxKart Help"/>
     <spacer height="15" width="10"/>
        
     <tabs id="category" height="10%" max_height="110" width="100%" align="center">
-        <icon-button id="page1" width="128" height="128" icon="gui/track_random.png" text="General"/>
-        <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png" text="Weapons"/>
-        <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png" text="Game Modes"/>
+        <icon-button id="page1" width="128" height="128" icon="gui/track_random.png"
+                I18N="Tab in help menu" text="General"/>
+        <icon-button id="page2" width="128" height="128" icon="gui/mode_normal.png"
+                I18N="Tab in help menu" text="Weapons"/>
+        <icon-button id="page3" width="128" height="128" icon="gui/mode_ftl.png"
+                I18N="Tab in help menu" text="Game Modes"/>
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
-        <label align="center" text="To help you win, there are some powerups you can collect :"/>
+        <label align="center" I18N="In the help menu" text="To help you win, there are some powerups you can collect :"/>
         
         <spacer height="25" width="10"/>
         
@@ -56,3 +61,5 @@
     <spacer width="50" height="45" /> 
 </div>
 <button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+
+</stkgui>

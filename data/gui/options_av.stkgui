@@ -1,12 +1,17 @@
+<stkgui>
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
     <label align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
-        <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
-        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
+        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png"
+                I18N="Section in the settings menu" text="Audio/Video"/>
+        <icon-button id="players" width="128" height="128" icon="gui/options_players.png"
+                I18N="Section in the settings menu" text="Players"/>
+        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png"
+                I18N="Section in the settings menu" text="Controls"/>
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
@@ -14,10 +19,11 @@
         <spacer height="15" width="10"/>
         
         <div width="75%" height="40" layout="horizontal-row" >
-            <label proportion="2" height="100%" text="Music"/>
+            <label proportion="2" height="100%"
+                    I18N="Section in the audio/video settings submenu" text="Music"/>
             <checkbox id="music_enabled" width="40" icon="gui/glasscheckbox.png" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" text="Enabled"/>
+            <label proportion="1" height="100%" I18N="Next to checkbox in settings menu" text="Enabled"/>
         </div>
         <div width="75%" height="30" layout="horizontal-row" >
             <spacer proportion="1" height="100%"/>
@@ -27,10 +33,11 @@
         <spacer height="15" width="10"/>
         
         <div width="75%" height="40" layout="horizontal-row" >
-            <label proportion="2" height="100%" text="Sound Effects"/>
+            <label proportion="2" height="100%"
+                    I18N="Section in audio/video settings submenu" text="Sound Effects"/>
             <checkbox id="sfx_enabled" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" text="Enabled"/>
+            <label proportion="1" height="100%" I18N="Next to checkbox in settings menu" text="Enabled"/>
         </div>
         <div width="75%" height="30" layout="horizontal-row" >
             <spacer proportion="1" height="100%"/>
@@ -42,16 +49,19 @@
         
         
         <div width="75%" height="40" layout="horizontal-row" >
-            <label proportion="2" height="100%" text="Video"/>
+            <label proportion="2" height="100%"
+                    I18N="Section in the audio/video settings submenu" text="Video"/>
             <checkbox id="fullscreen" width="40" height="40"/>
             <spacer width="20" height="100%" />
-            <label proportion="1" height="100%" text="Fullscreen"/>
+            <label proportion="1" height="100%" I18N="In the video settings" text="Fullscreen"/>
         </div>
         
-        <scrollable_ribbon id="resolutions" proportion="2" text="all" width="100%" square_items="false"
+        <scrollable_ribbon id="resolutions" proportion="2" I18N="Ignore" text="all"
+                           width="100%" square_items="false"
                            align="center" child_width="128" child_height="128" max_height="150" />
         
-        <button id="apply_resolution" width="20%" height="30" text="Apply video changes" />
+        <button id="apply_resolution" width="20%" height="30"
+                I18N="In the video settings menu" text="Apply video changes" />
         
     </box>
     
@@ -60,3 +70,5 @@
 </div>
 
 <button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+
+</stkgui>

@@ -20,7 +20,13 @@ echo $PERL_FILE_LIST
 echo "--------------------"
 echo "    XMl Files :"
 echo "--------------------"
-echo $XML_FILE_LIST $STKGUI_FILE_LIST
+echo $STKGUI_FILE_LIST # $XML_FILE_LIST
+
+# XML Files
+# (Since xgettext cannot read XML directly, strings are extracted using 'grep' and 'sed' first
+#grep -ho 'text=\"[^\"]*' $XML_FILE_LIST $STKGUI_FILE_LIST | sed 's/text=\"\(.*\)/_(\"\1\")/' > ./data/po/gui_strings.txt
+# nothing in .xml files atm. If there ever is, add $XML_FILE_LIST below
+python ./data/po/extract_strings_from_XML.py $STKGUI_FILE_LIST
 
 
 
@@ -34,9 +40,7 @@ xgettext    -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -
 xgettext -j -L perl -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot $PERL_FILE_LIST
 
 # XML Files
-# (Since xgettext cannot read XML directly, strings are extracted using 'grep' and 'sed' first
-grep -ho 'text=\"[^\"]*' $XML_FILE_LIST $STKGUI_FILE_LIST | sed 's/text=\"\(.*\)/_(\"\1\")/' > ./data/po/gui_strings.txt
-xgettext -j -L perl -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot ./data/po/gui_strings.txt
+xgettext -j -d supertuxkart -s --keyword=_ --add-comments="I18N:" -p ./data/po -o supertuxkart.pot ./data/po/gui_strings.h
 
 echo "    Done"
 echo "---------------------------"

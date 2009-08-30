@@ -1,88 +1,103 @@
+<stkgui>
+
 <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
     <label align="center" text="SuperTuxKart Options"/>
     <spacer height="15" width="10"/>
     
     <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
-        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png" text="Audio/Video"/>
-        <icon-button id="players" width="128" height="128" icon="gui/options_players.png" text="Players"/>
-        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png" text="Controls"/>
+        <icon-button id="audio_video" width="128" height="128" icon="gui/options_audio_video.png"
+                I18N="Section in the settings menu"  text="Audio/Video"/>
+        <icon-button id="players" width="128" height="128" icon="gui/options_players.png"
+                I18N="Section in the settings menu"  text="Players"/>
+        <icon-button id="controls" width="128" height="128" icon="gui/options_input.png"
+                I18N="Section in the settings menu" text="Controls"/>
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
     
-        <scrollable_ribbon id="devices" proportion="3" text="all" width="100%" square_items="false" align="center" child_width="256" child_height="128" />
+        <scrollable_ribbon id="devices" proportion="3" I18N="Ignore" text="all" width="100%"
+                    square_items="false" align="center" child_width="256" child_height="128" />
         
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Accelerate" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Accelerate" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_up" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_up" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Brake" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Brake" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_down" proportion="3" height="100%" text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Left" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_left" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_down" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Right" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Left" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_right" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_left" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Fire" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Right" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_fire" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_right" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Fire" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_fire" proportion="3" height="100%"
+                    I18N="Unbound key binding"   text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center" >
-            <label proportion="2" height="100%" text="Nitro" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Nitro" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_nitro" proportion="3" height="100%" text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Sharp Turn" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_drift" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_nitro" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Rescue" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Sharp Turn" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_rescue" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_drift" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
         <spacer height="5" width="10"/>
         
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" text="Look Back" text_align="right"/>
+            <label proportion="2" height="100%" I18N="Key binding" text="Rescue" text_align="right"/>
             <spacer proportion="1" height="100%" />
-            <button id="binding_look_back" proportion="3" height="100%" text="[none]"/>
+            <button id="binding_rescue" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Look Back" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_look_back" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
 
@@ -94,3 +109,5 @@
 </div>
 
 <button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+
+</stkgui>

@@ -60,6 +60,11 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                     w->m_type = WTYPE_DIV;
                     append_to.push_back(w);
                 }
+                else if (!strcmp("stkgui", xml->getNodeName()))
+                {
+                    // outer node that's there only to comply with XML standard (and expat)
+                    continue;
+                }
                 else if (!strcmp("placeholder", xml->getNodeName()))
                 {
                     Widget* w = new Widget(true);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-29 19:36-0400\n"
+"POT-Creation-Date: 2009-08-29 21:17-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,11 +28,13 @@ msgstr ""
 msgid "(Empty)"
 msgstr ""
 
-#: data/po/gui_strings.txt:12
+#. I18N: in the help screen
+#: data/po/gui_strings.h:33
 msgid "* Current key bindings can be seen/changed in menu Options"
 msgstr ""
 
-#: data/po/gui_strings.txt:35
+#. I18N: In the help menu
+#: data/po/gui_strings.h:91
 msgid ""
 "* Most of these game modes can also be played in a Grand Prix fashion : "
 "instead of playing a single race, you play many in a row. The better you "
@@ -40,7 +42,8 @@ msgid ""
 "wins the cup."
 msgstr ""
 
-#: data/po/gui_strings.txt:34
+#. I18N: In the help menu
+#: data/po/gui_strings.h:88
 msgid ""
 "3 Strikes Battle : only in multiplayer games. Hit others with weapons until "
 "they lose all their lives."
@@ -57,27 +60,35 @@ msgstr ""
 msgid "= Highscores ="
 msgstr ""
 
-#: data/po/gui_strings.txt:47
+#. I18N: Main menu button
+#: data/po/gui_strings.h:126
 msgid "About"
 msgstr ""
 
-#: data/po/gui_strings.txt:67
+#. I18N: Key binding
+#: data/po/gui_strings.h:183
 msgid "Accelerate"
 msgstr ""
 
-#: data/po/gui_strings.txt:91
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:253
 msgid "Add Player"
 msgstr ""
 
-#: data/po/gui_strings.txt:39 data/po/gui_strings.txt:110
+#. I18N: Kart group
+#. I18N: track group
+#: data/po/gui_strings.h:102 data/po/gui_strings.h:296
 msgid "Add-Ons"
 msgstr ""
 
-#: data/po/gui_strings.txt:41 data/po/gui_strings.txt:111
+#. I18N: Kart group
+#. I18N: track group
+#: data/po/gui_strings.h:108 data/po/gui_strings.h:299
 msgid "All"
 msgstr ""
 
-#: data/po/gui_strings.txt:107
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:287
 msgid "All Tracks"
 msgstr ""
 
@@ -93,11 +104,12 @@ msgstr ""
 msgid "Amazonian Journey"
 msgstr ""
 
-#: data/po/gui_strings.txt:24
+#: data/po/gui_strings.h:61
 msgid "Anchor - slows down greatly the kart in the first position"
 msgstr ""
 
-#: data/po/gui_strings.txt:60
+#. I18N: In the video settings menu
+#: data/po/gui_strings.h:164
 msgid "Apply video changes"
 msgstr ""
 
@@ -105,7 +117,7 @@ msgstr ""
 msgid "Around the Lighthouse"
 msgstr ""
 
-#: data/po/gui_strings.txt:106
+#: data/po/gui_strings.h:284
 msgid "At World's End"
 msgstr ""
 
@@ -113,8 +125,9 @@ msgstr ""
 msgid "At world's end"
 msgstr ""
 
-#: data/po/gui_strings.txt:50 data/po/gui_strings.txt:63
-#: data/po/gui_strings.txt:87
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:134 data/po/gui_strings.h:171
+#: data/po/gui_strings.h:241
 msgid "Audio/Video"
 msgstr ""
 
@@ -124,28 +137,28 @@ msgstr ""
 msgid "Axis %d %s"
 msgstr ""
 
-#: data/po/gui_strings.txt:2 data/po/gui_strings.txt:13
-#: data/po/gui_strings.txt:25 data/po/gui_strings.txt:36
-#: data/po/gui_strings.txt:61 data/po/gui_strings.txt:85
-#: data/po/gui_strings.txt:94
+#: data/po/gui_strings.h:4 data/po/gui_strings.h:35 data/po/gui_strings.h:63
+#: data/po/gui_strings.h:93 data/po/gui_strings.h:166
+#: data/po/gui_strings.h:236 data/po/gui_strings.h:255
 msgid "Back to main menu"
 msgstr ""
 
-#: data/po/gui_strings.txt:22
+#: data/po/gui_strings.h:57
 msgid ""
 "Bowling Ball - bounces off walls. If you are looking back, it will be thrown "
 "backwards."
 msgstr ""
 
-#: data/po/gui_strings.txt:69
+#. I18N: Key binding
+#: data/po/gui_strings.h:189
 msgid "Brake"
 msgstr ""
 
-#: data/po/gui_strings.txt:19
+#: data/po/gui_strings.h:51
 msgid "BubbleGum - leave a sticky pink puddle behind you"
 msgstr ""
 
-#: data/po/gui_strings.txt:20
+#: data/po/gui_strings.h:53
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr ""
@@ -167,11 +180,13 @@ msgstr ""
 msgid "Cave X"
 msgstr ""
 
-#: data/po/gui_strings.txt:44
+#. I18N: Main menu button
+#: data/po/gui_strings.h:117
 msgid "Challenges"
 msgstr ""
 
-#: data/po/gui_strings.txt:37
+#. I18N: In the kart selection (player setup) screen
+#: data/po/gui_strings.h:96
 msgid "Choose a Kart (more players can join by pressing 'fire' now)"
 msgstr ""
 
@@ -183,7 +198,8 @@ msgstr ""
 msgid "Collect Nitro in Math Class"
 msgstr ""
 
-#: data/po/gui_strings.txt:8
+#. I18N: In the help menu
+#: data/po/gui_strings.h:21
 msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr ""
 
@@ -191,7 +207,8 @@ msgstr ""
 msgid "Collect the Pharaohs Treasure"
 msgstr ""
 
-#: data/po/gui_strings.txt:9
+#. I18N: In the help menu
+#: data/po/gui_strings.h:24
 msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key. You can see your current level of nitro in the "
@@ -209,8 +226,9 @@ msgstr ""
 msgid "Confirm Remove"
 msgstr ""
 
-#: data/po/gui_strings.txt:52 data/po/gui_strings.txt:65
-#: data/po/gui_strings.txt:89
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:140 data/po/gui_strings.h:177
+#: data/po/gui_strings.h:247
 msgid "Controls"
 msgstr ""
 
@@ -228,7 +246,8 @@ msgid ""
 "modified by Marianne Gagnon"
 msgstr ""
 
-#: data/po/gui_strings.txt:1
+#. I18N: Title in credits screen
+#: data/po/gui_strings.h:2
 msgid "Credits"
 msgstr ""
 
@@ -241,7 +260,8 @@ msgstr ""
 msgid "Do you really want to delete player '%s' ?"
 msgstr ""
 
-#: data/po/gui_strings.txt:54 data/po/gui_strings.txt:56
+#. I18N: Next to checkbox in settings menu
+#: data/po/gui_strings.h:146 data/po/gui_strings.h:152
 msgid "Enabled"
 msgstr ""
 
@@ -249,7 +269,8 @@ msgstr ""
 msgid "Enter the new player's name"
 msgstr ""
 
-#: data/po/gui_strings.txt:99
+#. I18N: Difficulty
+#: data/po/gui_strings.h:269
 msgid "Expert"
 msgstr ""
 
@@ -305,7 +326,8 @@ msgstr ""
 msgid "Finished"
 msgstr ""
 
-#: data/po/gui_strings.txt:75
+#. I18N: Key binding
+#: data/po/gui_strings.h:207
 msgid "Fire"
 msgstr ""
 
@@ -331,7 +353,8 @@ msgid ""
 "Desert Island"
 msgstr ""
 
-#: data/po/gui_strings.txt:33
+#. I18N: In the help menu
+#: data/po/gui_strings.h:85
 msgid ""
 "Follow the leader: run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware : going in front of "
@@ -342,12 +365,13 @@ msgstr ""
 msgid "Fort Magma"
 msgstr ""
 
-#: data/po/gui_strings.txt:58
+#. I18N: In the video settings
+#: data/po/gui_strings.h:158
 msgid "Fullscreen"
 msgstr ""
 
-#: data/po/gui_strings.txt:6 data/po/gui_strings.txt:17
-#: data/po/gui_strings.txt:29
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:15 data/po/gui_strings.h:46 data/po/gui_strings.h:74
 msgid "Game Modes"
 msgstr ""
 
@@ -363,8 +387,8 @@ msgstr ""
 msgid "Gamepad hat %d"
 msgstr ""
 
-#: data/po/gui_strings.txt:4 data/po/gui_strings.txt:15
-#: data/po/gui_strings.txt:27
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:9 data/po/gui_strings.h:40 data/po/gui_strings.h:68
 msgid "General"
 msgstr ""
 
@@ -373,11 +397,13 @@ msgstr ""
 msgid "Go!"
 msgstr ""
 
-#: data/po/gui_strings.txt:102
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:276
 msgid "Grand Prix"
 msgstr ""
 
-#: data/po/gui_strings.txt:46
+#. I18N: Main menu button
+#: data/po/gui_strings.h:123
 msgid "Help"
 msgstr ""
 
@@ -385,7 +411,8 @@ msgstr ""
 msgid "Ice Track"
 msgstr ""
 
-#: data/po/gui_strings.txt:10
+#. I18N: In the help menu
+#: data/po/gui_strings.h:27
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
@@ -395,7 +422,8 @@ msgstr ""
 msgid "Industry"
 msgstr ""
 
-#: data/po/gui_strings.txt:98
+#. I18N: Difficulty
+#: data/po/gui_strings.h:266
 msgid "Intermediate"
 msgstr ""
 
@@ -419,15 +447,18 @@ msgstr ""
 msgid "Leader"
 msgstr ""
 
-#: data/po/gui_strings.txt:71
+#. I18N: Key binding
+#: data/po/gui_strings.h:195
 msgid "Left"
 msgstr ""
 
-#: data/po/gui_strings.txt:83
+#. I18N: Key binding
+#: data/po/gui_strings.h:231
 msgid "Look Back"
 msgstr ""
 
-#: data/po/gui_strings.txt:7
+#. I18N: In the help menu
+#: data/po/gui_strings.h:18
 msgid "Make your rivals bite dust!"
 msgstr ""
 
@@ -443,7 +474,8 @@ msgstr ""
 msgid "Mouse button %d"
 msgstr ""
 
-#: data/po/gui_strings.txt:53
+#. I18N: Section in the audio/video settings submenu
+#: data/po/gui_strings.h:143
 msgid "Music"
 msgstr ""
 
@@ -451,7 +483,8 @@ msgstr ""
 msgid "Mystery Island"
 msgstr ""
 
-#: data/po/gui_strings.txt:43
+#. I18N: Main menu button
+#: data/po/gui_strings.h:114
 msgid "Networking"
 msgstr ""
 
@@ -497,15 +530,18 @@ msgid ""
 "now available"
 msgstr ""
 
-#: data/po/gui_strings.txt:77
+#. I18N: Key binding
+#: data/po/gui_strings.h:213
 msgid "Nitro"
 msgstr ""
 
-#: data/po/gui_strings.txt:97
+#. I18N: Difficulty
+#: data/po/gui_strings.h:263
 msgid "Novice"
 msgstr ""
 
-#: data/po/gui_strings.txt:96
+#. I18N: In race setup menu
+#: data/po/gui_strings.h:260
 msgid "Number of AI karts"
 msgstr ""
 
@@ -517,11 +553,12 @@ msgstr ""
 msgid "On the Beach"
 msgstr ""
 
-#: data/po/gui_strings.txt:45
+#. I18N: Main menu button
+#: data/po/gui_strings.h:120
 msgid "Options"
 msgstr ""
 
-#: data/po/gui_strings.txt:23
+#: data/po/gui_strings.h:59
 msgid "Parachute - slows down all karts in a better position!"
 msgstr ""
 
@@ -529,7 +566,7 @@ msgstr ""
 msgid "Penalty time!!"
 msgstr ""
 
-#: data/grandprix/penguinplayground.grandprix:4 data/po/gui_strings.txt:103
+#: data/grandprix/penguinplayground.grandprix:4 data/po/gui_strings.h:278
 msgid "Penguin Playground"
 msgstr ""
 
@@ -539,12 +576,13 @@ msgstr ""
 msgid "Player %i ("
 msgstr ""
 
-#: data/po/gui_strings.txt:51 data/po/gui_strings.txt:64
-#: data/po/gui_strings.txt:88
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:137 data/po/gui_strings.h:174
+#: data/po/gui_strings.h:244
 msgid "Players"
 msgstr ""
 
-#: data/po/gui_strings.txt:21
+#: data/po/gui_strings.h:55
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight!"
@@ -562,19 +600,22 @@ msgstr ""
 msgid "Press a key"
 msgstr ""
 
-#: data/po/gui_strings.txt:90
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:250
 msgid "Press enter or double-click on a player to edit him/her"
 msgstr ""
 
-#: data/po/gui_strings.txt:48
+#. I18N: Main menu button
+#: data/po/gui_strings.h:129
 msgid "Quit"
 msgstr ""
 
-#: data/po/gui_strings.txt:42
+#. I18N: Main menu button
+#: data/po/gui_strings.h:111
 msgid "Race"
 msgstr ""
 
-#: data/po/gui_strings.txt:95
+#: data/po/gui_strings.h:257
 msgid "Race Setup"
 msgstr ""
 
@@ -591,7 +632,8 @@ msgstr ""
 msgid "Ready!"
 msgstr ""
 
-#: data/po/gui_strings.txt:31
+#. I18N: In the help menu
+#: data/po/gui_strings.h:79
 msgid ""
 "Regular Race (TODO - find a better name :( ) - all blows allowed, so catch "
 "weapons and make clever use of them!"
@@ -601,23 +643,17 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: data/po/gui_strings.txt:93
-msgid "Remove Player"
-msgstr ""
-
 #: src/states_screens/dialogs/player_info_dialog.cpp:65
 msgid "Rename"
 msgstr ""
 
-#: data/po/gui_strings.txt:92
-msgid "Rename Player"
-msgstr ""
-
-#: data/po/gui_strings.txt:81
+#. I18N: Key binding
+#: data/po/gui_strings.h:225
 msgid "Rescue"
 msgstr ""
 
-#: data/po/gui_strings.txt:73
+#. I18N: Key binding
+#: data/po/gui_strings.h:201
 msgid "Right"
 msgstr ""
 
@@ -629,7 +665,7 @@ msgstr ""
 msgid "Secret Garden"
 msgstr ""
 
-#: data/po/gui_strings.txt:100
+#: data/po/gui_strings.h:271
 msgid "Select a game mode"
 msgstr ""
 
@@ -638,7 +674,8 @@ msgstr ""
 msgid "Set!"
 msgstr ""
 
-#: data/po/gui_strings.txt:79
+#. I18N: Key binding
+#: data/po/gui_strings.h:219
 msgid "Sharp Turn"
 msgstr ""
 
@@ -650,7 +687,7 @@ msgstr ""
 msgid "Skyline"
 msgstr ""
 
-#: data/grandprix/snagdrive.grandprix:4 data/po/gui_strings.txt:104
+#: data/grandprix/snagdrive.grandprix:4 data/po/gui_strings.h:280
 msgid "Snag Drive"
 msgstr ""
 
@@ -668,15 +705,19 @@ msgstr ""
 msgid "SnowTux Peak"
 msgstr ""
 
-#: data/po/gui_strings.txt:55
+#. I18N: Section in audio/video settings submenu
+#: data/po/gui_strings.h:149
 msgid "Sound Effects"
 msgstr ""
 
-#: data/po/gui_strings.txt:40
+#. I18N: Kart group
+#: data/po/gui_strings.h:105
 msgid "Special"
 msgstr ""
 
-#: data/po/gui_strings.txt:38 data/po/gui_strings.txt:109
+#. I18N: Kart group
+#. I18N: track group
+#: data/po/gui_strings.h:99 data/po/gui_strings.h:293
 msgid "Standard"
 msgstr ""
 
@@ -692,22 +733,22 @@ msgstr ""
 msgid "Sub Sea"
 msgstr ""
 
-#: data/po/gui_strings.txt:3 data/po/gui_strings.txt:14
-#: data/po/gui_strings.txt:26
+#: data/po/gui_strings.h:6 data/po/gui_strings.h:37 data/po/gui_strings.h:65
 msgid "SuperTuxKart Help"
 msgstr ""
 
-#: data/po/gui_strings.txt:49 data/po/gui_strings.txt:62
-#: data/po/gui_strings.txt:86
+#: data/po/gui_strings.h:131 data/po/gui_strings.h:168
+#: data/po/gui_strings.h:238
 msgid "SuperTuxKart Options"
 msgstr ""
 
-#: data/po/gui_strings.txt:30
+#: data/po/gui_strings.h:76
 msgid ""
 "SuperTuxKart features several game modes (TO BE UPDATED FOR NEW GUI LAYOUT!!)"
 msgstr ""
 
-#: data/po/gui_strings.txt:11
+#. I18N: in the help menu
+#: data/po/gui_strings.h:30
 msgid ""
 "The 'sharp turn' key allows you to do sharp turns and have better control in "
 "tight curves"
@@ -741,15 +782,17 @@ msgid ""
 "Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
-#: data/po/gui_strings.txt:32
+#. I18N: In the help menu
+#: data/po/gui_strings.h:82
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr ""
 
-#: data/po/gui_strings.txt:18
+#. I18N: In the help menu
+#: data/po/gui_strings.h:49
 msgid "To help you win, there are some powerups you can collect :"
 msgstr ""
 
-#: data/grandprix/tothemoonandback.grandprix:4 data/po/gui_strings.txt:105
+#: data/grandprix/tothemoonandback.grandprix:4 data/po/gui_strings.h:282
 msgid "To the Moon and Back"
 msgstr ""
 
@@ -763,7 +806,8 @@ msgstr ""
 msgid "Tux Tollway"
 msgstr ""
 
-#: data/po/gui_strings.txt:57
+#. I18N: Section in the audio/video settings submenu
+#: data/po/gui_strings.h:155
 msgid "Video"
 msgstr ""
 
@@ -771,8 +815,8 @@ msgstr ""
 msgid "WRONG WAY!"
 msgstr ""
 
-#: data/po/gui_strings.txt:5 data/po/gui_strings.txt:16
-#: data/po/gui_strings.txt:28
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:12 data/po/gui_strings.h:43 data/po/gui_strings.h:71
 msgid "Weapons"
 msgstr ""
 
@@ -853,19 +897,22 @@ msgstr ""
 msgid "You won the race!"
 msgstr ""
 
-#: data/po/gui_strings.txt:68 data/po/gui_strings.txt:70
-#: data/po/gui_strings.txt:72 data/po/gui_strings.txt:74
-#: data/po/gui_strings.txt:76 data/po/gui_strings.txt:78
-#: data/po/gui_strings.txt:80 data/po/gui_strings.txt:82
-#: data/po/gui_strings.txt:84
+#. I18N: Unbound key binding
+#: data/po/gui_strings.h:186 data/po/gui_strings.h:192
+#: data/po/gui_strings.h:198 data/po/gui_strings.h:204
+#: data/po/gui_strings.h:210 data/po/gui_strings.h:216
+#: data/po/gui_strings.h:222 data/po/gui_strings.h:228
+#: data/po/gui_strings.h:234
 msgid "[none]"
 msgstr ""
 
-#: data/po/gui_strings.txt:59 data/po/gui_strings.txt:66
+#. I18N: Ignore
+#: data/po/gui_strings.h:161 data/po/gui_strings.h:180
 msgid "all"
 msgstr ""
 
-#: data/po/gui_strings.txt:101 data/po/gui_strings.txt:108
+#. I18N: Ignore
+#: data/po/gui_strings.h:273 data/po/gui_strings.h:290
 msgid "bottom"
 msgstr ""
 
