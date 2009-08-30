@@ -114,8 +114,11 @@ namespace KartSelectionScreen
             }
             
             playerIDLabel = new LabelWidget();
+            
             playerIDLabel->m_properties[PROP_TEXT] = 
-                StringUtils::insertValues(_("Player %i ("), playerID + 1) + deviceName + ")"; 
+                //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+                StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str()); 
+            
             playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
             playerIDLabel->x = player_id_x;
@@ -203,7 +206,8 @@ namespace KartSelectionScreen
             
             playerID = newPlayerID;
             
-            std::string newLabel = StringUtils::insertValues(_("Player %i ("), playerID + 1) + deviceName + ")";
+            //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+            std::string newLabel = StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str());
             playerIDLabel->setText( newLabel.c_str() ); 
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
         }

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-29 21:17-0400\n"
-"PO-Revision-Date: 2009-08-29 21:27-0500\n"
+"POT-Creation-Date: 2009-08-29 21:48-0400\n"
+"PO-Revision-Date: 2009-08-29 21:49-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -127,7 +127,7 @@ msgid "Audio/Video"
 msgstr "Audio/Vidéo"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/input.cpp:479
+#: src/input/input.cpp:478
 #, c-format
 msgid "Axis %d %s"
 msgstr "Axe %d %s"
@@ -161,12 +161,13 @@ msgstr ""
 msgid "Cake - thrown at the closest rival, best on short ranges and long straights"
 msgstr "Gâteau - lance-le sur ton plus proche rival, idéal sur courtes distances et sur les routes droites"
 
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:69
-#: src/states_screens/dialogs/player_info_dialog.cpp:80
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:72
+#: src/states_screens/dialogs/player_info_dialog.cpp:81
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:149
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:155
 msgid "Cancel Remove"
 msgstr "Annuler la supression"
 
@@ -186,7 +187,7 @@ msgstr "Défis"
 #. I18N: In the kart selection (player setup) screen
 #: data/po/gui_strings.h:96
 msgid "Choose a Kart (more players can join by pressing 'fire' now)"
-msgstr "Choisis ton kart (d'autres joueurs puevent se joindre en appuyant sur 'feu')"
+msgstr "Choisis ton kart (d'autres joueurs peuvent se joindre en appuyant sur 'feu')"
 
 #: data/tracks/city/city.track:4
 msgid "City"
@@ -220,7 +221,8 @@ msgstr ""
 "'Au bout du monde' contre 3 opposants\n"
 "virtuels de niveau élevé."
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:133
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:138
 msgid "Confirm Remove"
 msgstr "Confirme la suppression"
 
@@ -259,7 +261,8 @@ msgstr "Crédits"
 msgid "Crescent Crossing"
 msgstr "Sous la pleine lune"
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:122
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:126
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
 msgstr "Voulez-vous vraiment supprimer le joueur '%s' ?"
@@ -270,7 +273,8 @@ msgstr "Voulez-vous vraiment supprimer le joueur '%s' ?"
 msgid "Enabled"
 msgstr "Activé"
 
-#: src/states_screens/dialogs/enter_player_name_dialog.cpp:36
+#. I18N: In the 'add new player' dialog
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:38
 msgid "Enter the new player's name"
 msgstr "Entre le nom du nouveau joueur"
 
@@ -345,7 +349,8 @@ msgstr ""
 "sur la piste 'Sables\n"
 "mouvants' en 2:20."
 
-#: src/states_screens/race_gui.cpp:490
+#. I18N: Shown at the end of a race
+#: src/states_screens/race_gui.cpp:491
 msgid "Finished"
 msgstr "Fini"
 
@@ -400,13 +405,13 @@ msgid "Game Modes"
 msgstr "Modes de jeu"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/input.cpp:483
+#: src/input/input.cpp:482
 #, c-format
 msgid "Gamepad button %d"
 msgstr "Manette, bouton %d"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/input.cpp:487
+#: src/input/input.cpp:486
 #, c-format
 msgid "Gamepad hat %d"
 msgstr ""
@@ -419,7 +424,7 @@ msgid "General"
 msgstr "Général"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:677
+#: src/states_screens/race_gui.cpp:678
 msgid "Go!"
 msgstr "Partez!"
 
@@ -440,7 +445,7 @@ msgstr ""
 #. I18N: In the help menu
 #: data/po/gui_strings.h:27
 msgid "If you see a button with a lock like this one, you need to complete a challenge to unlock it."
-msgstr "Certains boutons ont un cadenas (comme celui à droite). Tu dois réussir un défi pour en gagner l'accès."
+msgstr "Certains boutons ont un cadenas comme celui-ci. Tu dois réussir un défi pour en gagner l'accès."
 
 #: data/tracks/industry/industry.track:4
 msgid "Industry"
@@ -451,16 +456,12 @@ msgstr ""
 msgid "Intermediate"
 msgstr "Intermédiaire"
 
-#: src/input/input.cpp:501
-msgid "Invalid"
-msgstr "Invalide"
-
 #: data/tracks/castle/castle.track:4
 msgid "King Weird's Castle"
 msgstr "Château du Roi Tordu"
 
-#: src/states_screens/race_gui.cpp:497
 #: src/states_screens/race_gui.cpp:498
+#: src/states_screens/race_gui.cpp:499
 msgid "Lap"
 msgstr "Tour"
 
@@ -488,13 +489,13 @@ msgid "Make your rivals bite dust!"
 msgstr "Fais mordre la poussière à tes rivaux!"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/input.cpp:495
+#: src/input/input.cpp:494
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "Souris, axe %d %s"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used at all)
-#: src/input/input.cpp:491
+#: src/input/input.cpp:490
 #, c-format
 msgid "Mouse button %d"
 msgstr "Souris, bouton %d"
@@ -602,7 +603,7 @@ msgstr "Options"
 msgid "Parachute - slows down all karts in a better position!"
 msgstr "Parachute - ralentit tous les karts en meilleure position que toi !"
 
-#: src/states_screens/race_gui.cpp:707
+#: src/states_screens/race_gui.cpp:708
 msgid "Penalty time!!"
 msgstr "Temps de pénalité !"
 
@@ -611,11 +612,12 @@ msgstr "Temps de pénalité !"
 msgid "Penguin Playground"
 msgstr "Pour jeunes pingouins"
 
-#: src/states_screens/kart_selection.cpp:118
-#: src/states_screens/kart_selection.cpp:206
-#, fuzzy, c-format
-msgid "Player %i ("
-msgstr "Joueur %i ("
+#. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+#: src/states_screens/kart_selection.cpp:120
+#: src/states_screens/kart_selection.cpp:210
+#, c-format
+msgid "Player %i (%s)"
+msgstr "Joueur %i (%s)"
 
 #. I18N: Section in the settings menu
 #: data/po/gui_strings.h:137
@@ -664,12 +666,12 @@ msgstr "Réglages de la course"
 msgid "Racetrack"
 msgstr "Piste de course"
 
-#: src/states_screens/kart_selection.cpp:424
+#: src/states_screens/kart_selection.cpp:428
 msgid "Random Kart"
 msgstr "Kart aléatoire"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:655
+#: src/states_screens/race_gui.cpp:656
 msgid "Ready!"
 msgstr "À vos marques..."
 
@@ -678,11 +680,13 @@ msgstr "À vos marques..."
 msgid "Regular Race (TODO - find a better name :( ) - all blows allowed, so catch weapons and make clever use of them!"
 msgstr ""
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:96
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:99
 msgid "Remove"
 msgstr "Supprimer"
 
-#: src/states_screens/dialogs/player_info_dialog.cpp:65
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:66
 msgid "Rename"
 msgstr "Renommer"
 
@@ -709,7 +713,7 @@ msgid "Select a game mode"
 msgstr "Choisis un mode de jeu"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:666
+#: src/states_screens/race_gui.cpp:667
 msgid "Set!"
 msgstr "Prêts"
 
@@ -971,6 +975,7 @@ msgid "You won the race!"
 msgstr "Tu as gagné la course !"
 
 #. I18N: Unbound key binding
+#: src/input/input.cpp:39
 #: data/po/gui_strings.h:186
 #: data/po/gui_strings.h:192
 #: data/po/gui_strings.h:198
@@ -995,17 +1000,11 @@ msgstr ""
 msgid "bottom"
 msgstr ""
 
-#: src/input/input.cpp:38
-msgid "not set"
-msgstr "non défini"
-
 #: data/tracks/mystery_island/mystery_island.track:7
 msgid "sj04736"
 msgstr ""
 
 #, fuzzy
-#~ msgid "Remove Player"
-#~ msgstr "Supprimmer un joueur"
-#~ msgid "Rename Player"
-#~ msgstr "Renommer le joueur"
+#~ msgid "Player %i ("
+#~ msgstr "Joueur %i ("
 

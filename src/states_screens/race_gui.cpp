@@ -487,6 +487,7 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, int offset_x,
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         core::rect<s32> pos(offset_x, offset_y, offset_x, offset_y);
+        //I18N: Shown at the end of a race
         core::stringw s=_("Finished");
         font->draw(s.c_str(), pos, color);
     }

@@ -62,6 +62,7 @@ void PlayerInfoDialog::showRegularDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "renameplayer";
+        //I18N: In the player info dialog
         widget->m_properties[PROP_TEXT] = _("Rename");
         
         const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
@@ -93,6 +94,8 @@ void PlayerInfoDialog::showRegularDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "removeplayer";
+        
+        //I18N: In the player info dialog
         widget->m_properties[PROP_TEXT] = _("Remove");
         
         const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
@@ -119,6 +122,7 @@ void PlayerInfoDialog::showConfirmDialog()
     
     
     char message[256];
+    //I18N: In the player info dialog (when deleting)
     sprintf(message, _("Do you really want to delete player '%s' ?"), m_player->getName());
     
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
@@ -130,6 +134,7 @@ void PlayerInfoDialog::showConfirmDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
+        //I18N: In the player info dialog (when deleting)
         widget->m_properties[PROP_TEXT] = _("Confirm Remove");
         
         const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
@@ -146,6 +151,7 @@ void PlayerInfoDialog::showConfirmDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancelremove";
+        //I18N: In the player info dialog (when deleting)
         widget->m_properties[PROP_TEXT] = _("Cancel Remove");
         
         const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;

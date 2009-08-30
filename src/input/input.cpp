@@ -35,12 +35,11 @@ std::string Input::getInputAsString(const Input::InputType type, const int id, c
     switch (type)
     {
         case Input::IT_NONE:
-            s = _("not set");
+            //I18N: Unbound key binding
+            s = _("[none]");
             break;
         case Input::IT_KEYBOARD:
-            // TODO - implement with non-SDL code
-            // s = SDL_GetKeyName((SDLKey) input.id0);
-            s = "some key";
+            s = "?";
             
             switch(id)
         {
@@ -498,7 +497,7 @@ std::string Input::getInputAsString(const Input::InputType type, const int id, c
                                            ? '-': '+'                        );
             break;
         default:
-            s = _("Invalid");
+            s = "?";
     }
     
     return s;

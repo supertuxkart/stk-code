@@ -33,7 +33,10 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
    // label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
   
     LabelWidget* widget = new LabelWidget();
+    
+    //I18N: In the 'add new player' dialog
     widget->m_properties[PROP_TEXT] = _("Enter the new player's name");
+    
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
     widget->x = 0;
     widget->y = 0;
