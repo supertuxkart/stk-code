@@ -248,13 +248,13 @@ void Widget::readCoords(Widget* parent)
 
     // ---- if this widget has a label, get text length. this can helpful determine its optimal size
     int label_w = -1, label_h = -1;
-    if(m_properties[PROP_TEXT].size() > 0)
+    if (m_text.size() > 0)
     {
         IGUIFont* font = GUIEngine::getFont();
 #ifdef IRR_SVN
-        core::dimension2d< u32 > dim = font->getDimension( stringw(m_properties[PROP_TEXT].c_str()).c_str() );
+        core::dimension2d< u32 > dim = font->getDimension( m_text.c_str() );
 #else
-        core::dimension2d< s32 > dim = font->getDimension( stringw(m_properties[PROP_TEXT].c_str()).c_str() );
+        core::dimension2d< s32 > dim = font->getDimension( m_text.c_str() );
 #endif
         label_w = dim.Width;
         // FIXME - won't work with multiline labels. thus, for now, when multiple

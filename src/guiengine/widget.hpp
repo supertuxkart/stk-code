@@ -66,7 +66,7 @@ namespace GUIEngine
         PROP_Y,
         PROP_LAYOUT,
         PROP_ALIGN,
-        PROP_TEXT,
+        // PROP_TEXT, // this one is a bit special, can't go along others since it's wide strings
         PROP_ICON,
         PROP_TEXT_ALIGN,
         PROP_MIN_VALUE,
@@ -239,6 +239,10 @@ namespace GUIEngine
         
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
+        
+        /** PROP_TEXT is a special case : since it can be transalted it can't go in the map above, which
+            uses narrow strings */
+        stringw m_text;
         
         static void resetIDCounters();
         

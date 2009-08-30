@@ -35,7 +35,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     LabelWidget* widget = new LabelWidget();
     
     //I18N: In the 'add new player' dialog
-    widget->m_properties[PROP_TEXT] = _("Enter the new player's name");
+    widget->m_text = _("Enter the new player's name");
     
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
     widget->x = 0;
@@ -55,7 +55,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     const int textAreaYFrom = m_area.getHeight()/2 - textHeight/2;
     
     textCtrl = new TextBoxWidget();
-    textCtrl->m_properties[PROP_TEXT] = "";
+    textCtrl->m_text = "";
     textCtrl->x = 50;
     textCtrl->y = textAreaYFrom - 10;
     textCtrl->w = m_area.getWidth()-100;
@@ -69,7 +69,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
 
     cancelButton = new ButtonWidget();
     cancelButton->m_properties[PROP_ID] = "cancel";
-    cancelButton->m_properties[PROP_TEXT] = _("Cancel");
+    cancelButton->m_text = _("Cancel");
     cancelButton->x = 15;
     cancelButton->y = m_area.getHeight() - textHeight - 12;
     cancelButton->w = m_area.getWidth() - 30;

@@ -28,6 +28,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include "irrlicht.h"
@@ -36,7 +37,8 @@ using namespace irr::gui;
 using namespace GUIEngine;
 
 
-TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trackName, ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
+TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
+                                 ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
 {
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*5/7;
@@ -54,7 +56,9 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     spinner->m_properties[PROP_MIN_VALUE] = "1";
     spinner->m_properties[PROP_MAX_VALUE] = "99";
-    spinner->m_properties[PROP_TEXT] = "%i laps";
+    
+    //I18N: In the track setup screen (number of laps choice, where %i is the number)
+    spinner->m_text = _("%i laps");
     
     m_children.push_back(spinner);
     spinner->add();
@@ -65,7 +69,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
     okBtn->m_properties[PROP_ID] = "start";
-    okBtn->m_properties[PROP_TEXT] = _("Start Race");
+    okBtn->m_text = _("Start Race");
     okBtn->x = m_area.getWidth()/2 - 200;
     okBtn->y = y3;
     okBtn->w = 400;
@@ -80,9 +84,9 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     
     // ---- Track title
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
-    IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( stringw(trackName).c_str(),
-                                                                  area_top, false, true, // border, word warp
-                                                                  m_irrlicht_window);
+    IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( trackName.c_str(),
+                                                               area_top, false, true, // border, word warp
+                                                               m_irrlicht_window);
     a->setTabStop(false);
 
     // ---- High Scores & track info
@@ -115,8 +119,6 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     std::string name;
     float time;
     
-    char buffer[128];
-    
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
     {
@@ -135,9 +137,13 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
         
         core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
 
+        irr::core::stringw line;
+        
         // Check if this entry is filled or still empty
         if (n < amount)
         {
+            char buffer[256];
+            
             highscores->getEntry(n, kart_name, name, &time);
             sprintf(buffer, "%s : %.2f s\n", name.c_str(), time);
                         
@@ -149,15 +155,16 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
                 ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
+            line = buffer;
         }
         else
         {
             //I18N: for empty highscores entries
-            sprintf(buffer, "%s\n", _("(Empty)"));
+            line = _("(Empty)");
+            line += "\n";
         }
         
-        text = buffer;
-        m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), entry_area,
+        m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( line.c_str(), entry_area,
                                                                        false , true , // border, word warp
                                                                         m_irrlicht_window);
         
@@ -168,8 +175,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const char* trac
     core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-    sprintf(buffer, _("Track by %s"), track->getDesigner().c_str());
-    text = buffer;
+    text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
 
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
                                                                   creator_info_area, false , true , // border, word warp

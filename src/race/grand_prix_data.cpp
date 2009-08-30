@@ -28,6 +28,7 @@
 #include "lisp/lisp.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 GrandPrixData::GrandPrixData(const std::string filename)
 {
@@ -45,7 +46,10 @@ GrandPrixData::GrandPrixData(const std::string filename)
             throw std::runtime_error("No supertuxkart-grand-prix node");
         }
 
-        lisp->get      ("name",        m_name        );
+        std::string temp_name;
+        lisp->get      ("name",        temp_name     );
+        m_name = _(temp_name.c_str());
+        
         lisp->get      ("description", m_description );
         lisp->get      ("item",        m_item_style);
         lisp->getVector("tracks",      m_tracks      );
@@ -72,7 +76,7 @@ bool GrandPrixData::checkConsistency()
         catch(std::exception& e)
         {
             (void)e;
-            fprintf(stderr, "Grand Prix '%s': Track '%s' does not exist!\n",
+            fprintf(stderr, "Grand Prix '%ls': Track '%s' does not exist!\n",
                 m_name.c_str(), m_tracks[i].c_str());
             fprintf(stderr, "This Grand Prix will not be available.\n");
             return false;

@@ -50,6 +50,7 @@ using namespace irr;
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 const float Track::NOHIT           = -99999.9f;
 
@@ -211,7 +212,10 @@ void Track::loadTrackInfo(const std::string &filename)
         o<<"Can't load track '"<<filename<<"', no track element.";
         throw std::runtime_error(o.str());
     }
-    root->get("name",                  &m_name);
+    std::string temp_name;
+    root->get("name",                  &temp_name);
+    m_name = _(temp_name.c_str());
+    
     root->get("description",           &m_description);
     root->get("designer",              &m_designer);
     root->get("version",               &m_version);

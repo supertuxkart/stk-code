@@ -108,17 +108,17 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
-    std::string     m_name;
-    bool            m_use_fog;
-    float           m_fog_density;
-    float           m_fog_start;
-    float           m_fog_end;
-    core::vector3df m_sun_position;
-    video::SColorf  m_ambient_color;
-    video::SColorf  m_specular_color;
-    video::SColorf  m_diffuse_color;
-    video::SColorf  m_sky_color;
-    video::SColor   m_fog_color;
+    irr::core::stringw  m_name;
+    bool                m_use_fog;
+    float               m_fog_density;
+    float               m_fog_start;
+    float               m_fog_end;
+    core::vector3df     m_sun_position;
+    video::SColorf      m_ambient_color;
+    video::SColorf      m_specular_color;
+    video::SColorf      m_diffuse_color;
+    video::SColorf      m_sky_color;
+    video::SColor       m_fog_color;
 
     /** The texture for the mini map, which is displayed in the race gui. */
     video::ITexture         *m_mini_map;
@@ -173,8 +173,7 @@ public:
     const std::string& getIdent          () const {return m_ident;              }
 
     /** Returns the name of the track, which is e.g. displayed on the screen. */
-
-    const std::string& getName           () const {return m_name;               }
+    const irr::core::stringw& getName           () const {return m_name;               }
 
     /** Returns all groups this track belongs to. */
     const std::vector<std::string>

@@ -283,7 +283,7 @@ private:
 
 public:
 
-    std::string m_warning;
+    irr::core::stringw m_warning;
     int         CheckAndCreateDir();
     
          UserConfig();
@@ -296,10 +296,9 @@ public:
     void  saveConfig()                    { saveConfig(m_filename);     }
     void  saveConfig(const std::string& filename);
 
-    const std::string
-         &getWarning()                     { return m_warning;  }
-    void  resetWarning()                   { m_warning="";      }
-    void  setWarning(std::string& warning) { m_warning=warning; }
+    const irr::core::stringw& getWarning()        { return m_warning;  }
+    void  resetWarning()                          { m_warning="";      }
+    void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
     
 };
 

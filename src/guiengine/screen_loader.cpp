@@ -169,7 +169,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(y,              PROP_Y);
                 READ_PROPERTY(layout,         PROP_LAYOUT);
                 READ_PROPERTY(align,          PROP_ALIGN);
-                READ_PROPERTY(text,           PROP_TEXT);
+
                 READ_PROPERTY(icon,           PROP_ICON);
                 READ_PROPERTY(text_align,     PROP_TEXT_ALIGN);
                 READ_PROPERTY(min_value,      PROP_MIN_VALUE);
@@ -179,11 +179,33 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_width,      PROP_MAX_WIDTH);
                 READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
 #undef READ_PROPERTY
-
+                                
+                const char* text = xml->getAttributeValue( "text" );
+                if (text != NULL)
+                {
+                    widget.m_text = text; //_(text);
+                }
+                
+  /*
                 if (widget.m_properties[PROP_TEXT].size() > 0)
                 {
+
+                    std::cout << "Raw print : ";
+                    for (wchar_t* ptr = utf16; *ptr != 0; ptr++)
+                    {
+                        std::cout << (*ptr & 0xFF) << " / " << ((*ptr >> 8) & 0xFF) << " / ";
+                    }
+                    std::cout << "\nIrr strinw print : ";
+
+                    stringc irrstrc = irrstr.c_str();
+                    for (u32 n=0; n<irrstrc.size(); n++)
+                    {
+                        std::cout << irrstrc[n] << " (" << (int)irrstrc[n] << ") ";
+                    }
+                    std::cout << std::endl;
+                    
                     widget.m_properties[PROP_TEXT] = _(widget.m_properties[PROP_TEXT].c_str());
-                }
+                }*/
                 
                 /* a new div starts here, continue parsing with this new div as new parent */
                 if( widget.m_type == WTYPE_DIV || widget.m_type == WTYPE_RIBBON)

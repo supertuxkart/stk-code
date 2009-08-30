@@ -115,7 +115,7 @@ namespace KartSelectionScreen
             
             playerIDLabel = new LabelWidget();
             
-            playerIDLabel->m_properties[PROP_TEXT] = 
+            playerIDLabel->m_text = 
                 //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
                 StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str()); 
             
@@ -158,7 +158,8 @@ namespace KartSelectionScreen
             
             // Init kart model
             std::string& default_kart = UserConfigParams::m_default_kart;
-            KartModel* kartModel = kart_properties_manager->getKart(default_kart)->getKartModel();
+            const KartProperties* props = kart_properties_manager->getKart(default_kart);
+            KartModel* kartModel = props->getKartModel();
             
             this->modelView->addModel( kartModel->getModel() );
             this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
@@ -167,7 +168,7 @@ namespace KartSelectionScreen
             this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             
             kartName = new LabelWidget();
-            kartName->m_properties[PROP_TEXT] = default_kart;
+            kartName->m_text = props->getName();
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
             kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", playerID);
             kartName->x = kart_name_x;
@@ -207,8 +208,8 @@ namespace KartSelectionScreen
             playerID = newPlayerID;
             
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-            std::string newLabel = StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str());
-            playerIDLabel->setText( newLabel.c_str() ); 
+            irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str());
+            playerIDLabel->setText( newLabel ); 
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
         }
         
@@ -414,7 +415,7 @@ class KartHoverListener : public DynamicRibbonHoverListener
     {
     public:
         void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
-                                const std::string& selectionText, const int playerID)
+                                const irr::core::stringw& selectionText, const int playerID)
         {
             ModelViewWidget* w3 = g_player_karts[playerID].modelView;
             assert( w3 != NULL );
@@ -633,7 +634,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
                     icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                    w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
                     break;
                 }
             }
@@ -646,7 +647,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
                 {
                     std::string icon_path = file_manager->getDataDir() ;
                     icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                    w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+                    w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
                 }
             }
             

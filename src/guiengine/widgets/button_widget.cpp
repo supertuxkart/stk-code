@@ -27,7 +27,7 @@ ButtonWidget::ButtonWidget()
 void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    stringw  message = m_properties[PROP_TEXT].c_str();
+    stringw&  message = m_text;
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), message.c_str(), L"");
     
     id = m_element->getID();
@@ -35,8 +35,9 @@ void ButtonWidget::add()
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
-void ButtonWidget::setLabel(const char* label)
+void ButtonWidget::setLabel(irr::core::stringw label)
 {
-    m_element->setText( stringw(label).c_str() );
+    m_element->setText( label.c_str() );
+    m_text = label;
 }
 

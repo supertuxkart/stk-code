@@ -32,6 +32,7 @@
 //#include "lisp/lisp.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 float KartProperties::UNDEFINED = -99.9f;
 
@@ -203,7 +204,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 void KartProperties::getAllData(const XMLNode * root)
 {
     root->get("version", &m_version);
-    root->get("name", &m_name);
+    
+    std::string temp_name;
+    root->get("name", &temp_name);
+    m_name = _(temp_name.c_str());
+    
     root->get("icon-file", &m_icon_file);
     root->get("shadow-file", &m_shadow_file);
 
@@ -333,7 +338,11 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     // Only load the kart_model data if the .kart file has the appropriate
     if(m_version>=1)
         m_kart_model.loadInfo(lisp);
-    lisp->get("name",                       m_name);
+    
+    std::string temp_name;
+    lisp->get("name",                       temp_name);
+    m_name = _(temp_name.c_str());
+    
     lisp->get("icon-file",                  m_icon_file);
     lisp->get("shadow-file",                m_shadow_file);
     Vec3 c;

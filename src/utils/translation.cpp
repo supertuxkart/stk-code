@@ -44,7 +44,8 @@ Translations::Translations() {
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
     textdomain (PACKAGE);
-    bind_textdomain_codeset(PACKAGE, "iso-8859-1");
+    printf("gettext codeset : %s \n", bind_textdomain_codeset(PACKAGE, "UTF-16"));
 #endif
+        
 }   // Translations
 

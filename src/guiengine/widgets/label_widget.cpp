@@ -28,7 +28,7 @@ void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
-    stringw  message = m_properties[PROP_TEXT].c_str();
+    stringw& message = m_text;
     
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if(m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
@@ -50,5 +50,5 @@ void LabelWidget::setText(stringw newText)
     IGUIStaticText* irrwidget = Widget::getIrrlichtElement<IGUIStaticText>();   
     irrwidget->setText(newText.c_str());
     
-    m_properties[PROP_TEXT] = stringc(newText.c_str()).c_str();
+    m_text = newText;
 }

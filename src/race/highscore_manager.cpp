@@ -104,7 +104,7 @@ void HighscoreManager::Load()
         if (!node->get("file-version",v) || v<(int)CURRENT_HSCORE_FILE_VERSION)
         {
             fprintf(stderr, "Highscore file format too old, a new one will be created.\n");
-            std::string warning = _("The highscore file was too old,\nall highscores have been erased.");
+            irr::core::stringw warning = _("The highscore file was too old,\nall highscores have been erased.");
             user_config->setWarning( warning );
             
             // since we haven't had the chance to load the current scores yet,

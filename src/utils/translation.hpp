@@ -28,7 +28,7 @@
 #  include <libintl.h>
 #endif
 
-#  define _(String) gettext(String)
+#  define _(String) (wchar_t*)gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) gettext_noop (String)
 // libintl defines its own fprintf, which doesn't work for me :(
@@ -36,7 +36,7 @@
 #    undef fprintf
 #  endif
 #else
-#  define _(String) (String)
+#  define _(String) (L##String)
 #  define gettext_noop(String) String
 #  define N_(String) String
 #endif

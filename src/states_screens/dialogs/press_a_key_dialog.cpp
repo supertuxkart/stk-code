@@ -28,7 +28,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
     LabelWidget* widget = new LabelWidget();
-    widget->m_properties[PROP_TEXT] = _("Press a key");
+    widget->m_text = _("Press a key");
     widget->m_properties[PROP_TEXT_ALIGN] = "center";
     widget->x = 0;
     widget->y = 0;
@@ -45,7 +45,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         
     ButtonWidget* widget2 = new ButtonWidget();
     widget2->m_properties[PROP_ID] = "cancel";
-    widget2->m_properties[PROP_TEXT] = _("Press ESC to cancel");
+    widget2->m_text = _("Press ESC to cancel");
     widget2->x = 15;
     widget2->y = m_area.getHeight() - textHeight - 12;
     widget2->w = m_area.getWidth() - 30;

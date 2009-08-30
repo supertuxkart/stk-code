@@ -85,7 +85,7 @@ namespace GUIEngine
         const std::string& getSelectionIDString(const int playerID);
         
         /** Returns the user-visible text of the selection */
-        const std::string& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_properties[PROP_TEXT]; }
+        const stringw& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_text; }
         
         /** Sets the ID of the selected item within the ribbon */
         void setSelection(const int i, const int playerID) { m_selection[playerID] = i; updateSelection(); }
@@ -97,7 +97,7 @@ namespace GUIEngine
             (especially used in scrolling ribbons, when scrolling occurs by renaming
             items - note that this statis ribbon doesn't support scrolling, only
             superclasses/wrappers of this do.) */
-        void setLabel(const int id, std::string new_name);
+        void setLabel(const int id, irr::core::stringw new_name);
         
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);

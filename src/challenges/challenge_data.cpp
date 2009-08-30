@@ -29,6 +29,7 @@
 #include "race/grand_prix_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/translation.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
 {
@@ -194,7 +195,8 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
     case UNLOCK_GP:         addUnlockGPReward        (data[0]        );      break;
     case UNLOCK_MODE:       if(1<data.size())
                             {
-                                addUnlockModeReward  (data[0], data[1]);
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockModeReward  (data[0], user_name);
                                 break;
                             }
                             else
@@ -202,14 +204,16 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
                             break;
     case UNLOCK_DIFFICULTY: if(1<data.size())
                             {
-                                addUnlockDifficultyReward(data[0], data[1]);
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockDifficultyReward(data[0], user_name);
                             }
                             else
                                 fprintf(stderr, "Difficult name missing.\n");
                             break;
     case UNLOCK_KART:       if(1<data.size())
                             {
-                                addUnlockKartReward(data[0], data[1]);
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockKartReward(data[0], user_name);
                             }
                             else
                                 fprintf(stderr, "Kart name missing.\n");

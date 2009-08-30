@@ -51,7 +51,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const int max_rows)
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::add()
 {
-    m_has_label = (m_properties[PROP_TEXT] == "bottom");
+    m_has_label = (m_text == "bottom");
     m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
     
     // ----- add dynamic label at bottom
@@ -213,7 +213,7 @@ void DynamicRibbonWidget::setSubElements()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            if(m_properties[PROP_TEXT] == "all") icon->m_properties[PROP_TEXT] = " ";
+            if (m_text == "all") icon->m_text = " ";
             
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
             
@@ -227,7 +227,7 @@ void DynamicRibbonWidget::setSubElements()
     
  }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::addItem( std::string user_name, std::string code_name, std::string image_file )
+void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file )
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
@@ -257,13 +257,13 @@ const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
     return nothing;
 }
 // -----------------------------------------------------------------------------
-const std::string& DynamicRibbonWidget::getSelectionText(const int playerID)
+const irr::core::stringw& DynamicRibbonWidget::getSelectionText(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
-    if(row != NULL) return row->getSelectionText(playerID);
+    if (row != NULL) return row->getSelectionText(playerID);
     
-    static const std::string nothing = "";
+    static const irr::core::stringw nothing = "";
     return nothing;
 }
 // -----------------------------------------------------------------------------
@@ -574,7 +574,7 @@ void DynamicRibbonWidget::updateItemDisplay()
                 button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
                 
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
-                icon->m_properties[PROP_TEXT] = m_items[icon_id].m_user_name;
+                icon->m_text                  = m_items[icon_id].m_user_name;
                 
                 row.setLabel(i, m_items[icon_id].m_user_name);
             }

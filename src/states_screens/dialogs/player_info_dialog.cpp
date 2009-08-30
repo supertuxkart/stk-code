@@ -21,6 +21,7 @@
 #include "guiengine/widget.hpp"
 #include "states_screens/options_screen.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -48,7 +49,7 @@ void PlayerInfoDialog::showRegularDialog()
     {
         textCtrl = new TextBoxWidget();
         textCtrl->m_properties[PROP_ID] = "renameplayer";
-        textCtrl->m_properties[PROP_TEXT] = m_player->getName();
+        textCtrl->m_text = m_player->getName();
         textCtrl->x = 50;
         textCtrl->y = y1 - textHeight/2;
         textCtrl->w = m_area.getWidth()-100;
@@ -62,10 +63,11 @@ void PlayerInfoDialog::showRegularDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "renameplayer";
-        //I18N: In the player info dialog
-        widget->m_properties[PROP_TEXT] = _("Rename");
         
-        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        //I18N: In the player info dialog
+        widget->m_text = _("Rename");
+        
+        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
         widget->y = y2;
@@ -78,9 +80,9 @@ void PlayerInfoDialog::showRegularDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancel";
-        widget->m_properties[PROP_TEXT] = _("Cancel");
+        widget->m_text = _("Cancel");
         
-        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
         widget->y = y3;
@@ -96,9 +98,9 @@ void PlayerInfoDialog::showRegularDialog()
         widget->m_properties[PROP_ID] = "removeplayer";
         
         //I18N: In the player info dialog
-        widget->m_properties[PROP_TEXT] = _("Remove");
+        widget->m_text = _("Remove");
         
-        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
         widget->y = y4;
@@ -121,12 +123,12 @@ void PlayerInfoDialog::showConfirmDialog()
     const int buttonHeight = textHeight + 10;
     
     
-    char message[256];
-    //I18N: In the player info dialog (when deleting)
-    sprintf(message, _("Do you really want to delete player '%s' ?"), m_player->getName());
+    irr::core::stringw message = 
+        //I18N: In the player info dialog (when deleting)
+        StringUtils::insertValues( _("Do you really want to delete player '%s' ?"), m_player->getName());
     
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
-    IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( stringw(message).c_str(),
+    IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
                                                               area_left, false /* border */, true /* word wrap */,
                                                               m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
@@ -134,10 +136,11 @@ void PlayerInfoDialog::showConfirmDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
-        //I18N: In the player info dialog (when deleting)
-        widget->m_properties[PROP_TEXT] = _("Confirm Remove");
         
-        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        //I18N: In the player info dialog (when deleting)
+        widget->m_text = _("Confirm Remove");
+        
+        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
         widget->y = m_area.getHeight()/2;
@@ -151,10 +154,11 @@ void PlayerInfoDialog::showConfirmDialog()
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "cancelremove";
-        //I18N: In the player info dialog (when deleting)
-        widget->m_properties[PROP_TEXT] = _("Cancel Remove");
         
-        const int textWidth = font->getDimension( stringw(widget->m_properties[PROP_TEXT].c_str()).c_str() ).Width + 40;
+        //I18N: In the player info dialog (when deleting)
+        widget->m_text = _("Cancel Remove");
+        
+        const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
         widget->y = m_area.getHeight()*3/4;

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include "io/xml_node.hpp"
-
+#include <irrString.h>
 
 struct KeyBinding
 {
@@ -35,8 +35,8 @@ class DeviceConfig
     public:
 
         std::string getName()           const { return m_name; };
-        std::string getBindingAsString  (const PlayerAction action) const;
-        std::string toString            ();
+        irr::core::stringw getBindingAsString  (const PlayerAction action) const;
+        irr::core::stringw toString     ();
 
         void        serialize           (std::ofstream& stream);
         bool        deserializeAction   (irr::io::IrrXMLReader* xml);
@@ -88,7 +88,7 @@ class GamepadConfig : public DeviceConfig
 
     public:
 
-        std::string toString            ();
+        irr::core::stringw toString     ();
         int         getAxisCount()      const { return m_axis_count; };
         int         getButtonCount()    const { return m_button_count; };
         void        serialize           (std::ofstream& stream);

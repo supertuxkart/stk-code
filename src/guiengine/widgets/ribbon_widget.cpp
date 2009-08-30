@@ -95,7 +95,7 @@ void RibbonWidget::add()
             rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0,
                                           widget_x + one_button_space/2-2,  h);
             
-            stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
+            stringw& message = m_children[i].m_text;
             
             if(m_children[i].m_type == WTYPE_BUTTON)
             {
@@ -143,7 +143,7 @@ void RibbonWidget::add()
         }
         else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
-            const bool has_label = m_children[i].m_properties[PROP_TEXT].size() > 0;
+            const bool has_label = m_children[i].m_text.size() > 0;
             
             // how much space to keep for the label under the button
             const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
@@ -169,7 +169,7 @@ void RibbonWidget::add()
                                     (int)((button_y + m_children[i].h)*zoom) + 5 /* leave 5 pixels between button and label */,
                                     widget_x + (int)(one_button_space/2.0f), h);
                 
-                stringw  message = m_children[i].m_properties[PROP_TEXT].c_str();
+                stringw& message = m_children[i].m_text;
                 IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), subsize, false, true, btn);
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
@@ -335,13 +335,14 @@ bool RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int p
     return true;
 }
 // -----------------------------------------------------------------------------
-void RibbonWidget::setLabel(const int id, std::string new_name)
+void RibbonWidget::setLabel(const int id, irr::core::stringw new_name)
 {
     if (m_labels.size() == 0) return; // ignore this call for ribbons without labels
     
     assert(id >= 0);
     assert(id < m_labels.size());
-    m_labels[id].setText( stringw(new_name.c_str()).c_str() );
+    m_labels[id].setText( new_name.c_str() );
+    m_text = new_name;
 }
 // -----------------------------------------------------------------------------
 int RibbonWidget::findItemNamed(const char* internalName)

@@ -353,7 +353,7 @@ int handleCmdLine(int argc, char **argv)
                 const Track *track = track_manager->getTrack(i);
                 if (!unlock_manager->isLocked(track->getIdent()))
                 {
-                    fprintf ( stdout, "\t%10s: %s\n",
+                    fprintf ( stdout, "\t%10s: %ls\n",
                               track->getIdent().c_str(),
                               track->getName().c_str());
                 }
@@ -367,7 +367,7 @@ int handleCmdLine(int argc, char **argv)
             for (unsigned int i = 0; NULL != kart_properties_manager->getKartById(i); i++)
             {
                 const KartProperties* KP= kart_properties_manager->getKartById(i);
-                fprintf (stdout, "\t%10s: %s\n", KP->getIdent().c_str(), KP->getName().c_str());
+                fprintf (stdout, "\t%10s: %ls\n", KP->getIdent().c_str(), KP->getName().c_str());
             }
             fprintf ( stdout, "\n" );
         }

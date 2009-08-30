@@ -137,6 +137,31 @@ namespace StringUtils
         return result;
     }   // split
 
+    /** Same as above, but for wide strings */
+    std::vector<irr::core::stringw> split(const irr::core::stringw& s, char c)
+    {
+        std::vector<irr::core::stringw> result;
+        
+        irr::s32 start = 0;
+        while (start < (irr::s32)s.size())
+        {
+            irr::s32 i = s.findNext(c, start);
+            if (i != -1)
+            {
+                result.push_back( s.subString(start, i-start) );
+                start = i+1;
+            } 
+            else
+            {
+                result.push_back( s.subString(start, s.size()-start) );
+                return result;
+                //start = i+1;
+            }
+        }
+        return result;
+    }   // split
+    
+    
     // ------------------------------------------------------------------------
     /** Splits a : separated string (like PATH) into its individual components.
      *  It especially handles Windows-style paths (c:/mydir1:d:/mydir2)

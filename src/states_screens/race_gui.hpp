@@ -45,9 +45,9 @@ public:
     */
     struct KartIconDisplayInfo
     {
-        std::string time;
+        irr::core::stringw time;
         float r, g, b;
-        std::string special_title;
+        irr::core::stringw special_title;
         /** Current lap of this kart, or -1 if irrelevant
         */
         int lap;
@@ -57,16 +57,16 @@ private:
     class TimedMessage
     {
      public:
-        std::string   m_message;            // message to display
-        float         m_remaining_time;     // time remaining before removing this message from screen
-        video::SColor m_color;              // color of message
-        int           m_font_size;          // size
-        const Kart   *m_kart;
+        irr::core::stringw m_message;            // message to display
+        float              m_remaining_time;     // time remaining before removing this message from screen
+        video::SColor      m_color;              // color of message
+        int                m_font_size;          // size
+        const Kart        *m_kart;
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
-        TimedMessage(const std::string &message, 
+        TimedMessage(const irr::core::stringw &message, 
                      const Kart *kart, float time, int size, 
                      const video::SColor &color)
         {
@@ -166,7 +166,7 @@ public:
     void render();
     void update(float dt);
     Camera *addCamera(unsigned int index, Kart *kart);
-    void addMessage(const std::string &m, const Kart *kart, float time, 
+    void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
                     int fonst_size, 
                     const video::SColor &color=video::SColor(255, 255, 0, 255));
 

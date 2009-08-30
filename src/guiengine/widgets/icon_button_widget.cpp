@@ -66,7 +66,7 @@ void IconButtonWidget::add()
     }
     
     // ---- label if any
-    stringw  message = m_properties[PROP_TEXT].c_str();
+    stringw& message = m_text;
     if (message.size() > 0)
     {
         widget_size += position2d<s32>(0, widget_size.getHeight());

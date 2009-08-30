@@ -274,10 +274,10 @@ void ItemManager::setStyle()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The grand prix '%s' contains an invalid item style '%s'.\n",
+            fprintf(stderr, "The grand prix '%ls' contains an invalid item style '%s'.\n",
                     race_manager->getGrandPrix()->getName().c_str(),
                     race_manager->getItemStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
+            fprintf(stderr, "Please fix the file 'l%s'.\n",
                     race_manager->getGrandPrix()->getFilename().c_str());
         }
     }
@@ -289,7 +289,7 @@ void ItemManager::setStyle()
         }
         catch(std::runtime_error)
         {
-            fprintf(stderr, "The track '%s' contains an invalid item style '%s'.\n",
+            fprintf(stderr, "The track '%ls' contains an invalid item style '%s'.\n",
                     RaceManager::getTrack()->getName().c_str(), 
                     RaceManager::getTrack()->getItemStyle().c_str());
             fprintf(stderr, "Please fix the file '%s'.\n",

@@ -37,7 +37,7 @@ ModelViewWidget::~ModelViewWidget()
 void ModelViewWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    stringw  message = m_properties[PROP_TEXT].c_str();
+    //stringw& message = m_text;
     
     IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, m_parent, getNewNoFocusID());
     m_element = btn;

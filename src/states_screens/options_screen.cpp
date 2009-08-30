@@ -35,6 +35,7 @@
 
 
 #include <iostream>
+#include <sstream>
 
 using namespace GUIEngine;
 
@@ -235,39 +236,39 @@ namespace OptionsScreen
 
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_up");
-            btn->setLabel( config->getBindingAsString(PA_ACCEL).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_ACCEL) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_down");
-            btn->setLabel( config->getBindingAsString(PA_BRAKE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_BRAKE) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_left");
-            btn->setLabel( config->getBindingAsString(PA_LEFT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_LEFT) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_right");
-            btn->setLabel( config->getBindingAsString(PA_RIGHT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_RIGHT) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_fire");
-            btn->setLabel( config->getBindingAsString(PA_FIRE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_FIRE) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_nitro");
-            btn->setLabel( config->getBindingAsString(PA_NITRO).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_NITRO) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_drift");
-            btn->setLabel( config->getBindingAsString(PA_DRIFT).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_DRIFT) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_rescue");
-            btn->setLabel( config->getBindingAsString(PA_RESCUE).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_RESCUE) );
         }
         {
             ButtonWidget* btn = getCurrentScreen()->getWidget<ButtonWidget>("binding_look_back");
-            btn->setLabel( config->getBindingAsString(PA_LOOK_BACK).c_str() );
+            btn->setLabel( config->getBindingAsString(PA_LOOK_BACK) );
         }
 
     }
@@ -290,10 +291,14 @@ namespace OptionsScreen
                     // Don't display the configuration if a matching device is not available
                     if (config->isInUse())
                     {
-                        std::string name = config->getName();
-                        char internal_name[32];
-                        sprintf(internal_name, "gamepad%i", i);
-                        devices->addItem(name,internal_name, file_manager->getDataDir() + "/gui/gamepad.png");
+                        const irr::core::stringw name = config->getName().c_str();
+                        
+                        std::ostringstream gpname;
+                        gpname << "gamepad" << i;
+                        const std::string internal_name = gpname.str();
+                        
+                        const std::string iconpath = file_manager->getDataDir() + "/gui/gamepad.png";
+                        devices->addItem(name, internal_name, iconpath);
                     }
                 }
 

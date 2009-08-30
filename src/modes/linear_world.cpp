@@ -251,9 +251,11 @@ void LinearWorld::newLap(unsigned int kart_index)
                                    2.0f, 40, video::SColor(255, 100, 210, 100));
             std::string s = StringUtils::timeToString(time_per_lap);
 
-            std::ostringstream m_fastest_lap_message;
-            m_fastest_lap_message << s << ": " << kart->getName();
-            m_race_gui->addMessage(m_fastest_lap_message.str(), NULL,
+            irr::core::stringw m_fastest_lap_message;
+            m_fastest_lap_message += (s + ": ").c_str();
+            m_fastest_lap_message += kart->getName();
+                        
+            m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                    2.0f, 40, video::SColor(255, 100, 210, 100));
         } // end if new fastest lap
     }
@@ -357,9 +359,9 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
            raceHasLaps())
         {  // Display for 5 seconds
             std::string str;
-            if(position==1)
+            if(position == 1)
             {
-                str = " "+StringUtils::timeToString(getTimeAtLapForKart(kart->getWorldKartId()));
+                str = " " + StringUtils::timeToString( getTimeAtLapForKart(kart->getWorldKartId()) );
             }
             else
             {
@@ -368,9 +370,9 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
                                 ? getTimeAtLapForKart(kart->getWorldKartId())
                                 : getTime())
                            - time_of_leader;
-                str="+"+StringUtils::timeToString(timeBehind);
+                str = "+" + StringUtils::timeToString(timeBehind);
             }
-            rank_info.time = str;
+            rank_info.time = irr::core::stringw(str.c_str());
         }
         else
         {

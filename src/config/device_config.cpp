@@ -2,15 +2,15 @@
 
 //==== D E V I C E C O N F I G =================================================
 
-std::string DeviceConfig::getBindingAsString (const PlayerAction action) const
+irr::core::stringw DeviceConfig::getBindingAsString (const PlayerAction action) const
 {
-    std::string returnString = "";
+    irr::core::stringw returnString = "";
 
     if ((action < PA_COUNT) && (action >= 0))
     {
-        returnString = returnString.append( Input::getInputAsString(m_bindings[action].type, 
-                                                                    m_bindings[action].id,
-                                                                    m_bindings[action].dir) );
+        returnString += Input::getInputAsString(m_bindings[action].type, 
+                                                m_bindings[action].id,
+                                                m_bindings[action].dir);
     }
 
     return returnString;
@@ -18,17 +18,17 @@ std::string DeviceConfig::getBindingAsString (const PlayerAction action) const
 
 //------------------------------------------------------------------------------
 
-std::string DeviceConfig::toString ()
+irr::core::stringw DeviceConfig::toString ()
 {
-    std::string returnString = "";
+    irr::core::stringw returnString = "";
     for (int n = 0; n < PA_COUNT; n++)
     {
-        returnString = returnString.append(KartActionStrings[n]);
-        returnString = returnString.append(": ");
-        returnString = returnString.append(Input::getInputAsString(m_bindings[n].type, 
-                                                                   m_bindings[n].id,
-                                                                   m_bindings[n].dir));
-        returnString = returnString.append("\n");
+        returnString += KartActionStrings[n].c_str();
+        returnString += ": ";
+        returnString += Input::getInputAsString(m_bindings[n].type, 
+                                                m_bindings[n].id,
+                                                m_bindings[n].dir);
+        returnString += "\n";
     }
     return returnString;
 }
@@ -263,11 +263,11 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml)
 
 //------------------------------------------------------------------------------
 
-std::string GamepadConfig::toString ()
+irr::core::stringw GamepadConfig::toString ()
 {
-    std::string returnString = "";
-    returnString = returnString.append(getName());
-    returnString = returnString.append("\n");
-    returnString = returnString.append(DeviceConfig::toString());
+    irr::core::stringw returnString = "";
+    returnString += getName().c_str();
+    returnString += "\n";
+    returnString += DeviceConfig::toString();
     return returnString;
 }

@@ -21,6 +21,7 @@
 #define HEADER_INPUT_HPP
 
 #include <string>
+#include <irrString.h>
 
 const int DEADZONE_MOUSE       =  150;
 const int DEADZONE_MOUSE_SENSE =  200;
@@ -88,7 +89,7 @@ struct Input
 		// Nothing to do.
 	}
     
-    static std::string getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir=AD_NEUTRAL);
+    static irr::core::stringw getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir=AD_NEUTRAL);
 
 };
 

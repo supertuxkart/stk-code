@@ -24,12 +24,13 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <irrString.h>
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
     of races that has to be completed one after the other */
 class GrandPrixData
 {
-    std::string m_name;         // The name of the grand prix - might be translated!
+    irr::core::stringw m_name;  // The name of the grand prix - might be translated!
     std::string m_id;           // Internal name of the grand prix, not translated
     std::string m_filename;     // Original filename, only for error handling needed
     std::string m_description;  // Description for this track
@@ -47,7 +48,7 @@ public:
     /** Load the GrandPrixData from the given filename */
                        GrandPrixData  (const std::string filename);
                        GrandPrixData  ()       {}; // empty for initialising
-    const std::string& getName        ()        const { return m_name;          }
+    const irr::core::stringw& getName ()        const { return m_name;          }
     const std::string& getId          ()        const { return m_id;            }
     const std::string& getDescription ()        const { return m_description;   }
     const std::string& getItemStyle   ()        const { return m_item_style; }

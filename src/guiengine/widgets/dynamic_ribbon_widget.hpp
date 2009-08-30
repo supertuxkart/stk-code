@@ -40,13 +40,13 @@ namespace GUIEngine
     public:
         virtual ~DynamicRibbonHoverListener() {}
         virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
-                                        const std::string& selectionText, const int playerID) = 0;
+                                        const irr::core::stringw& selectionText, const int playerID) = 0;
     };
     
     /** The description of an item added to a DynamicRibbonWidget */
     struct ItemDescription
     {
-        std::string m_user_name;
+        irr::core::stringw m_user_name;
         std::string m_code_name;
         std::string m_sshot_file;
     };
@@ -150,7 +150,7 @@ namespace GUIEngine
         
         /** Dynamically add an item to the ribbon's list of items (will not be visible until you
          call 'updateItemDisplay' or 'add') */
-        void addItem( std::string user_name, std::string code_name, std::string image_file );
+        void addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file );
         
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
@@ -173,7 +173,7 @@ namespace GUIEngine
         const std::string& getSelectionIDString(const int playerID);
         
         /** Get the user-visible text of the selected item */
-        const std::string& getSelectionText(const int playerID);
+        const irr::core::stringw& getSelectionText(const int playerID);
         
         /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
             ID ranges from {0} to {number of items added through 'addItem' - 1} */

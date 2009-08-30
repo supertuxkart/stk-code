@@ -62,7 +62,7 @@ private:
 
     // Display and gui
     // ---------------
-    std::string m_name;               /**< The human readable Name of the kart
+    irr::core::stringw m_name;       /**< The human readable Name of the kart
                                        *   driver. */
     std::string m_ident;              /**< The computer readable-name of the
                                        *   kart driver. */
@@ -174,16 +174,16 @@ public:
     void  getAllData        (const XMLNode * root);
     void  checkAllSet(const std::string &filename);
 
-    float getMaxSteerAngle          (float speed) const;
-    Material*     getIconMaterial   () const {return m_icon_material;            }
+    float getMaxSteerAngle           (float speed) const;
+    Material*     getIconMaterial    () const {return m_icon_material;            }
     /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModel      () const {return &m_kart_model;              }
-    const std::string& getName      () const {return m_name;                     }
-    const std::string& getIdent     () const {return m_ident;                    }
-    const std::string& getShadowFile() const {return m_shadow_file;              }
-    const std::string& getIconFile  () const {return m_icon_file;                }
+    KartModel*    getKartModel       () const {return &m_kart_model;              }
+    const irr::core::stringw& getName() const {return m_name;                     }
+    const std::string& getIdent      () const {return m_ident;                    }
+    const std::string& getShadowFile () const {return m_shadow_file;              }
+    const std::string& getIconFile   () const {return m_icon_file;                }
     const int          getCustomSfxId (SFXManager::CustomSFX type) 
-                                       const {return m_custom_sfx_id[type];      }
+                                       const  {return m_custom_sfx_id[type];      }
 
     /** Returns the version of the .kart file. */
     int   getVersion                () const {return m_version;                  }

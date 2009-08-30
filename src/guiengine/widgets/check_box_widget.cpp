@@ -29,7 +29,7 @@ CheckBoxWidget::CheckBoxWidget()
 void CheckBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    stringw message = m_properties[PROP_TEXT].c_str();
+    //stringw& message = m_text;
     //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
     
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");

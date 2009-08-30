@@ -28,9 +28,9 @@ using namespace irr;
 
 // -----------------------------------------------------------------------------
 
-std::string Input::getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir)
+irr::core::stringw Input::getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir)
 {
-    std::string s;
+    irr::core::stringw s;
     
     switch (type)
     {

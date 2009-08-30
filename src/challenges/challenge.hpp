@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <irrlicht.h>
 
 class XMLNode;
 
@@ -36,7 +37,7 @@ enum REWARD_TYPE
 struct UnlockableFeature
 {
     std::string name; // internal name
-    std::string user_name; // not all types of feature have one
+    irr::core::stringw user_name; // not all types of feature have one
     REWARD_TYPE type;
 };
 
@@ -64,14 +65,14 @@ public:
     void  setId(const std::string& s)             { m_Id = s;                     }
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
-                              const std::string &user_mode_name);
+                              const irr::core::stringw &user_mode_name);
     void  addUnlockGPReward(const std::string &gp_name);
     void  addUnlockDifficultyReward(const std::string &internal_name, 
-                                    const std::string &user_name);
+                                    const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
-                              const std::string &user_name);
+                              const irr::core::stringw &user_name);
     
-    const std::string getUnlockedMessage() const;
+    const irr::core::stringw getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
     void  setChallengeDescription(const std::string& d) 

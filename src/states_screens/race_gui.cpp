@@ -264,7 +264,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
 
         y = 20 + ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
 
-        if(info[i].time.length()>0)
+        if (info[i].time.size() > 0)
         {
             static video::SColor color = video::SColor(255, (int)(255*info[i].r),
                                                        (int)(255*info[i].g), 
@@ -274,7 +274,7 @@ void RaceGUI::drawPlayerIcons (const KartIconDisplayInfo* info)
             font->draw(s.c_str(), pos, color);
         }
         
-        if(info[i].special_title.length() >0)
+        if (info[i].special_title.size() > 0)
         {
             static video::SColor color = video::SColor(255, 255, 0, 0);
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
@@ -561,7 +561,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart, int offset_x, int offset_y,
  *  certain amount of time (unless time<0, then the message is displayed
  *  once).
  **/
-void RaceGUI::addMessage(const std::string &msg, const Kart *kart, float time, 
+void RaceGUI::addMessage(const irr::core::stringw &msg, const Kart *kart, float time, 
                          int font_size, const video::SColor &color)
 {
     m_messages.push_back(TimedMessage(msg, kart, time, font_size, color));

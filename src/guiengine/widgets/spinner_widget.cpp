@@ -210,7 +210,7 @@ void SpinnerWidget::setValue(const int new_value)
 {
     m_value = new_value;
     
-    if(m_graphical)
+    if (m_graphical)
     {
         std::ostringstream icon;
         icon << file_manager->getDataDir() << "/"  << m_properties[PROP_ICON];
@@ -218,14 +218,14 @@ void SpinnerWidget::setValue(const int new_value)
         //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
-    else if(m_labels.size() > 0)
+    else if (m_labels.size() > 0)
     {
         m_children[1].m_element->setText( stringw(m_labels[new_value].c_str()).c_str() );
     }
-    else if(m_properties[PROP_TEXT].size() > 0)
+    else if (m_text.size() > 0)
     {
-        std::string text = StringUtils::insertValues(_(m_properties[PROP_TEXT].c_str()), m_value);
-        m_children[1].m_element->setText( stringw(text.c_str()).c_str() );
+        stringw text = StringUtils::insertValues(m_text.c_str(), m_value);
+        m_children[1].m_element->setText( text.c_str() );
     }
     else
     {
