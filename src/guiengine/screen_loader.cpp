@@ -19,6 +19,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
+#include "utils/translation.hpp"
 #include <irrlicht.h>
 #include <iostream>
 #include <irrXML.h>
@@ -179,6 +180,11 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
 #undef READ_PROPERTY
 
+                if (widget.m_properties[PROP_TEXT].size() > 0)
+                {
+                    widget.m_properties[PROP_TEXT] = _(widget.m_properties[PROP_TEXT].c_str());
+                }
+                
                 /* a new div starts here, continue parsing with this new div as new parent */
                 if( widget.m_type == WTYPE_DIV || widget.m_type == WTYPE_RIBBON)
                     parseScreenFileDiv( xml, append_to[append_to.size()-1].m_children );
