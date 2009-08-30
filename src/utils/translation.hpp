@@ -36,7 +36,7 @@
 #    undef fprintf
 #  endif
 #else
-#  define _(String) (L##String)
+#  define _(String) w_gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) String
 #endif

@@ -43,6 +43,8 @@ Translations::Translations() {
     setlocale(LC_MESSAGES, "");
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
+    //bind_textdomain_codeset(PACKAGE, "UTF-8");
+    bind_textdomain_codeset(PACKAGE, "iso-8859-1");
     textdomain (PACKAGE);
 #endif
         
@@ -53,9 +55,21 @@ wchar_t out_buffer[BUFFER_SIZE];
 
 wchar_t* w_gettext(const char* original)
 {
+#if ENABLE_NLS
     const char* original_t = gettext(original);
+#else
+    const char* original_t = original;
+#endif
     
-    mbstowcs(out_buffer, original_t, BUFFER_SIZE);
-    
+    int index = 0;
+    for (const char* c=original_t; *c != 0; c++)
+    {
+        out_buffer[index] = (wchar_t)(unsigned char)*c;
+        index++;
+    }
+    out_buffer[index] = 0;
+                                    
+    //mbstowcs(out_buffer, original_t, BUFFER_SIZE);
+
     return out_buffer;
 }
