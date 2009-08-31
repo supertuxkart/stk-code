@@ -46,25 +46,25 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
     m_track_ident = trackIdent;
 
-    // ---- Lap count spinner
-    SpinnerWidget* spinner = new SpinnerWidget();
-    spinner->x = m_area.getWidth()/2 - 200;
-    spinner->y = y2;
-    spinner->w = 400;
-    spinner->h = y3 - y2 - 15;
-    spinner->setParent(m_irrlicht_window);
+    // ---- Lap count m_spinner
+    m_spinner = new SpinnerWidget();
+    m_spinner->x = m_area.getWidth()/2 - 200;
+    m_spinner->y = y2;
+    m_spinner->w = 400;
+    m_spinner->h = y3 - y2 - 15;
+    m_spinner->setParent(m_irrlicht_window);
     
-    spinner->m_properties[PROP_MIN_VALUE] = "1";
-    spinner->m_properties[PROP_MAX_VALUE] = "99";
+    m_spinner->m_properties[PROP_MIN_VALUE] = "1";
+    m_spinner->m_properties[PROP_MAX_VALUE] = "99";
     
     //I18N: In the track setup screen (number of laps choice, where %i is the number)
-    spinner->m_text = _("%i laps");
+    m_spinner->m_text = _("%i laps");
     
-    m_children.push_back(spinner);
-    spinner->add();
-    spinner->setValue(3);
-    spinner->getIrrlichtElement()->setTabStop(true);
-    spinner->getIrrlichtElement()->setTabGroup(false);
+    m_children.push_back(m_spinner);
+    m_spinner->add();
+    m_spinner->setValue(3);
+    m_spinner->getIrrlichtElement()->setTabStop(true);
+    m_spinner->getIrrlichtElement()->setTabGroup(false);
 
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
@@ -200,7 +200,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
 // ------------------------------------------------------------------------------------------------------
 
 // FIXME : this probably doesn't belong here
-void startGame(const std::string trackIdent)
+void startGame(const std::string trackIdent, const int num_laps)
 {
     ModalDialog::dismiss();
     
@@ -215,7 +215,7 @@ void startGame(const std::string trackIdent)
     StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
     race_manager->setTrack(trackIdent.c_str());
-    race_manager->setNumLaps( 3 );
+    race_manager->setNumLaps( num_laps );
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );
     network_manager->setupPlayerKartInfo();
@@ -226,10 +226,15 @@ void startGame(const std::string trackIdent)
     
 void TrackInfoDialog::onEnterPressedInternal()
 {
-    startGame(m_track_ident);
+    const int num_laps = m_spinner->getValue();
+    startGame(m_track_ident, num_laps);
 }
     
 void TrackInfoDialog::processEvent(std::string& eventSource)
 {
-    if (eventSource == "start" ) startGame(m_track_ident);
+    if (eventSource == "start" )
+    {
+        const int num_laps = m_spinner->getValue();
+        startGame(m_track_ident, num_laps);
+    }
 }
