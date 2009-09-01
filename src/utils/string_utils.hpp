@@ -102,7 +102,7 @@ namespace StringUtils
     
     // ------------------------------------------------------------------------
     /** Same as above but for wide-strings */
-    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<std::string>& all_vals);
+    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals);
     
     // ------------------------------------------------------------------------
     // Note: the order in which the templates are specified is important, since
@@ -166,13 +166,12 @@ namespace StringUtils
                                     const T2 &v2, const T3 &v3, const T4 &v4,
                                     const T5 &v5)
     {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v4; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v5; all_vals.push_back(dummy.str());
+        std::vector<irr::core::stringw> all_vals;
+        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v2) ); 
+        all_vals.push_back( irr::core::stringw(v3) ); 
+        all_vals.push_back( irr::core::stringw(v4) ); 
+        all_vals.push_back( irr::core::stringw(v5) ); 
         return insertValues(s, all_vals);
     }
     
@@ -182,12 +181,11 @@ namespace StringUtils
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
                                     const T2 &v2, const T3 &v3, const T4 &v4)
     {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v4; all_vals.push_back(dummy.str());
+        std::vector<irr::core::stringw> all_vals;
+        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v2) ); 
+        all_vals.push_back( irr::core::stringw(v3) ); 
+        all_vals.push_back( irr::core::stringw(v4) ); 
         return insertValues(s, all_vals);
     }
     
@@ -197,24 +195,23 @@ namespace StringUtils
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
                                     const T2 &v2, const T3 &v3)
     {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v3; all_vals.push_back(dummy.str());
+        std::vector<irr::core::stringw> all_vals;
+        irr::core::stringw dummy;
+        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v2) ); 
+        all_vals.push_back( irr::core::stringw(v3) ); 
         return insertValues(s, all_vals);
     }
-    
+        
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
     template <class T1, class T2>
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
                              const T2 &v2)
     {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
-        dummy << v2; all_vals.push_back(dummy.str()); dummy.str("");
+        std::vector<irr::core::stringw> all_vals;
+        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v2) ); 
         return insertValues(s, all_vals);
     }
     
@@ -223,9 +220,8 @@ namespace StringUtils
     template <class T1>
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1)
     {
-        std::vector<std::string> all_vals;
-        std::ostringstream dummy;
-        dummy << v1; all_vals.push_back(dummy.str()); dummy.str("");
+        std::vector<irr::core::stringw> all_vals;
+        all_vals.push_back( irr::core::stringw(v1) ); 
         return insertValues(s, all_vals);
     }
     

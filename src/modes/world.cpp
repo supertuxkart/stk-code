@@ -445,9 +445,9 @@ void World::removeKart(int kart_number)
         }
         else
         {
-            irr::core::stringw s = _("'%s' has\nbeen eliminated.");
-            m_race_gui->addMessage(StringUtils::insertValues(s, kart->getName().c_str()), // FIXME : insertValues can't handle wide strings
-                                   *i, 2.0f, 60);
+            m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has\nbeen eliminated."),
+                                                             kart->getName().c_str()),
+                                                             *i, 2.0f, 60);
         }
     }   // for i in kart
     if(kart->isPlayerKart())

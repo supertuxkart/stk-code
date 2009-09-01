@@ -108,32 +108,32 @@ const irr::core::stringw Challenge::getUnlockedMessage() const
                     Track* track = track_manager->getTrack( m_feature[n].name );
                     message = StringUtils::insertValues(
                         _("New track '%s'\nnow available"), 
-                        track->getName().c_str() ); // FIXME : insertValues can't handle wide strings
+                        track->getName().c_str() );
                     break;
                 }
             case UNLOCK_MODE:
                 message = StringUtils::insertValues( 
                     _("New game mode\n'%s'\nnow available"), 
-                    m_feature[n].user_name.c_str()); // FIXME : insertValues can't handle wide strings
+                    m_feature[n].user_name.c_str());
                 break;
             case UNLOCK_GP:
             {
                 const irr::core::stringw& gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
                 message = StringUtils::insertValues(
                     _("New Grand Prix '%s'\nnow available"),
-                    gp_user_name.c_str()); // FIXME : insertValues can't handle wide strings
+                    gp_user_name.c_str());
                 break;
             }
             case UNLOCK_DIFFICULTY:
                 message = StringUtils::insertValues(
                     _("New difficulty\n'%s'\nnow available"), 
-                    m_feature[n].user_name.c_str()); // FIXME : insertValues can't handle wide strings
+                    m_feature[n].user_name.c_str());
                 break;
             case UNLOCK_KART:
                 const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
                 message = StringUtils::insertValues(
                     _("New kart\n'%s'\nnow available"),
-                    kp->getName().c_str()); // FIXME : insertValues can't handle wide strings
+                    kp->getName().c_str());
                 break;
         }   // switch
         unlocked_message += message;

@@ -25,7 +25,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <exception>
-#include <assert>
+#include <assert.h>
 
 namespace StringUtils
 {
@@ -292,7 +292,7 @@ namespace StringUtils
     }
     
     // ------------------------------------------------------------------------
-    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<std::string>& all_vals)
+    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals)
     {
         try
         {

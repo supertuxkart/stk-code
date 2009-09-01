@@ -110,14 +110,14 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
             const int new_score = race_manager->getKartScore(order[i]);
             
             kart_results_line = StringUtils::insertValues( L"#%i. %s (%i + %i = %i)",
-                                                          current_kart->getPosition(), kart_name.c_str(), // FIXME: insertValues & wide strings
+                                                          current_kart->getPosition(), kart_name.c_str(),
                                                           prev_score, (new_score - prev_score), new_score);
         }
         else
         {
             std::wcout << kart_name.c_str() << std::endl;
 
-            kart_results_line = StringUtils::insertValues( L"%i. %s %s", // FIXME: insertValues & wide strings
+            kart_results_line = StringUtils::insertValues( L"%i. %s %s",
                                                           current_kart->getPosition(), kart_name.c_str(), sTime);
         }
         
