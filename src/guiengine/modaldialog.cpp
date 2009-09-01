@@ -32,12 +32,24 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 #else
     const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 #endif
+
     const int w = (int)(frame_size.Width*percentWidth);
     const int h = (int)(frame_size.Height*percentHeight);
+    
+    assert(frame_size.Width > 0);
+    assert(frame_size.Height > 0);
+    assert(frame_size.Width < 99999);
+    assert(frame_size.Height < 99999);
+    
+    assert(w > 0);
+    assert(h > 0);
+    assert(w <= frame_size.Width);
+    assert(h <= frame_size.Height);
+    
     m_area = core::rect< s32 >( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
                                dimension2d< s32 >(w, h) );
     
-    if(modalWindow != NULL) delete modalWindow;
+    if (modalWindow != NULL) delete modalWindow;
     modalWindow = this;
     
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );

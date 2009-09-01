@@ -25,6 +25,7 @@
 #include "input/input_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
 
@@ -191,7 +192,8 @@ void render(float elapsed_time)
     
      // ---- menu drawing
     // draw background image and sections
-    if(!g_state_manager->isGameState())
+    const bool gui_state = !g_state_manager->isGameState();
+    if (gui_state)
     {
         g_skin->drawBgImage();
         g_skin->renderSections();
@@ -201,11 +203,44 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- some menus may need updating
-    if(!g_state_manager->isGameState())
+    if (!g_state_manager->isGameState())
     {
         g_state_manager->onUpdate(elapsed_time);
     }
 
 }
+// -----------------------------------------------------------------------------    
+Widget* getWidget(const char* name)
+{
+    // if a modal dialog is shown, search within it too
+    if (ModalDialog::isADialogActive())
+    {
+        Widget* widgetWithinDialog = Screen::getWidget(name, &(ModalDialog::getCurrent()->m_children));
+        if (widgetWithinDialog != NULL) return widgetWithinDialog;
+    }
+    
+    Screen* screen = getCurrentScreen();
+    
+    if (screen == NULL) return NULL;
+    
+    return Screen::getWidget(name,  &screen->m_widgets);
+}
+// -----------------------------------------------------------------------------    
+Widget* getWidget(const int id)
+{
+    // if a modal dialog is shown, search within it too
+    if (ModalDialog::isADialogActive())
+    {        
+        Widget* widgetWithinDialog = Screen::getWidget(id, &(ModalDialog::getCurrent()->m_children));
+        if (widgetWithinDialog != NULL) return widgetWithinDialog;
+    }
+    
+    Screen* screen = getCurrentScreen();
+    
+    if (screen == NULL) return NULL;
+    
+    return Screen::getWidget(id,  &screen->m_widgets);
+}
 
+        
 }

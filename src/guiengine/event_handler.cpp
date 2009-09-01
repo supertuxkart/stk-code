@@ -75,7 +75,7 @@ bool EventHandler::onGUIEvent(const SEvent& event)
             case EGET_CHECKBOX_CHANGED:
             case EGET_LISTBOX_SELECTED_AGAIN:
             {
-                Widget* w = GUIEngine::getCurrentScreen()->getWidget(id);
+                Widget* w = GUIEngine::getWidget(id);
                 if(w == NULL) break;
                 
                 // FIXME: don't hardcode player 0
@@ -83,7 +83,7 @@ bool EventHandler::onGUIEvent(const SEvent& event)
             }    
             case EGET_ELEMENT_HOVERED:
             {
-                Widget* w = GUIEngine::getCurrentScreen()->getWidget(id);
+                Widget* w = GUIEngine::getWidget(id);
                 if(w == NULL) break;
                 
                 // select ribbons on hover
@@ -115,7 +115,7 @@ bool EventHandler::onGUIEvent(const SEvent& event)
                  */
             case EGET_ELEMENT_FOCUSED:
             {
-                Widget* el = GUIEngine::getCurrentScreen()->getWidget(id);
+                Widget* el = GUIEngine::getWidget(id);
                 if (el == NULL) break;
                 
                 // FIXME: don't hardcode player 0
@@ -208,7 +208,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
                 IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
                 if (el == NULL) break;
                             
-                w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+                w = GUIEngine::getWidget( el->getID() );
             }
             else
             {
@@ -244,7 +244,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             {
                 IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
                 if(el == NULL) break;
-                w = GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+                w = GUIEngine::getWidget( el->getID() );
             }
             else
             {
@@ -287,7 +287,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             if (pressedDown)
             {
                 IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
-                Widget* w = GUIEngine::getCurrentScreen()->getWidget( element->getID() );
+                Widget* w = GUIEngine::getWidget( element->getID() );
                 if(w == NULL) break;
                 onWidgetActivated( w, playerID );
             }
@@ -327,7 +327,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         if (widget != NULL) el = widget->m_element;
     }
     
-    Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+    Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
     
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
@@ -359,7 +359,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     if (el != NULL && el->getTabGroup() != NULL &&
         el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
     {
-        Widget* w = GUIEngine::getCurrentScreen()->getWidget( closest->getID() );
+        Widget* w = GUIEngine::getWidget( closest->getID() );
 
         if (playerID == 0)
         {
@@ -413,7 +413,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         if (widget != NULL) el = widget->m_element;
     }
         
-    Widget* w = (el == NULL) ? NULL : GUIEngine::getCurrentScreen()->getWidget( el->getID() );
+    Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
     
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
@@ -450,7 +450,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         }
         else
         {
-            Widget* w = GUIEngine::getCurrentScreen()->getWidget( closest->getID() );
+            Widget* w = GUIEngine::getWidget( closest->getID() );
             w->setFocusForPlayer(playerID);
         }
     }

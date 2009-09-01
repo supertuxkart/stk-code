@@ -242,6 +242,9 @@ namespace GUIEngine
     void render(float dt);
     
     void transmitEvent(Widget* widget, std::string& name);
+    
+    Widget* getWidget(const char* name);
+    Widget* getWidget(const int id);
 }
 
 #endif

@@ -147,7 +147,7 @@ void MainLoop::run()
         {
             // Busy wait if race_manager is active (i.e. creating of world is done)
             // till all clients have reached this state.
-            if(network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
+            if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
             updateRace(dt);
             music_on = false; 
         }   // if race is active

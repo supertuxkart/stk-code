@@ -231,6 +231,7 @@
 		9551CBD60FC1BB7600DB481B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F4231E0E26E44800692113 /* Cocoa.framework */; };
 		9551CBD70FC1BB7600DB481B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95F423120E26E3DC00692113 /* OpenGL.framework */; };
 		9551CBDA0FC1BB9200DB481B /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9551CBD90FC1BB9200DB481B /* AGL.framework */; };
+		9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */; };
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		955DE88D1004273B006A4F3C /* checkline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8891004273B006A4F3C /* checkline.cpp */; };
@@ -389,6 +390,8 @@
 		9551C9F80FC1B87600DB481B /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = SOURCE_ROOT; wrapsLines = 1; };
 		9551CA100FC1BB6400DB481B /* SuperTuxKart-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SuperTuxKart-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9551CBD90FC1BB9200DB481B /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
+		9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_over_dialog.hpp; path = ../../states_screens/dialogs/race_over_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_over_dialog.cpp; path = ../../states_screens/dialogs/race_over_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88110042701006A4F3C /* check_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_manager.cpp; path = ../../tracks/check_manager.cpp; sourceTree = SOURCE_ROOT; };
 		955DE88210042701006A4F3C /* check_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_manager.hpp; path = ../../tracks/check_manager.hpp; sourceTree = SOURCE_ROOT; };
 		955DE8871004273B006A4F3C /* check_structure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_structure.cpp; path = ../../tracks/check_structure.cpp; sourceTree = SOURCE_ROOT; };
@@ -1242,6 +1245,8 @@
 				9583323C101243ED00C5137E /* press_a_key_dialog.hpp */,
 				9583323D101243ED00C5137E /* track_info_dialog.cpp */,
 				9583323E101243ED00C5137E /* track_info_dialog.hpp */,
+				9551DB33104CABFC001C53E5 /* race_over_dialog.cpp */,
+				9551DB32104CABFC001C53E5 /* race_over_dialog.hpp */,
 			);
 			name = dialogs;
 			path = ../../states_screens/dialogs;
@@ -2474,6 +2479,7 @@
 				952A1550103F66D600B1895D /* water_splash.cpp in Sources */,
 				952A1554103F68D000B1895D /* profile_world.cpp in Sources */,
 				9524739610497C75000C197E /* dynamic_ribbon_widget.cpp in Sources */,
+				9551DB34104CABFC001C53E5 /* race_over_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

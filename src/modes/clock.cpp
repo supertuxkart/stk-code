@@ -21,6 +21,7 @@
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
 #include "network/network_manager.hpp"
+#include "states_screens/dialogs/race_over_dialog.hpp"
 
 //-----------------------------------------------------------------------------
 TimedRace::TimedRace()
@@ -132,6 +133,9 @@ void TimedRace::update(const float dt)
             if(m_auxiliary_timer < stk_config->m_delay_finish_time) break;
             
             m_phase = FINISH_PHASE;
+            
+            new RaceOverDialog(0.6f, 0.6f);
+            
             break;            
         }
         case FINISH_PHASE:

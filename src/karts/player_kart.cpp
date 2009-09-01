@@ -323,7 +323,6 @@ void PlayerKart::raceFinished(float time)
     // will most likely not be at the starting line at the end of the race
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         m_camera->setMode(Camera::CM_FINAL);
-    // TODO : race ending menu
     
     RaceGUI* m=RaceManager::getWorld()->getRaceGUI();
     if(m)

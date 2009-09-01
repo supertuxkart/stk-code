@@ -321,23 +321,11 @@ void Screen::manualRemoveWidget(Widget* w)
 
 Widget* Screen::getWidget(const char* name)
 {
-    return getWidget(name, NULL);
+    return getWidget(name, &m_widgets);
 }
 // -----------------------------------------------------------------------------
 Widget* Screen::getWidget(const char* name, ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL)
-    {
-       within_vector = &m_widgets;
-     
-        // if a modal dialog is shown, search within it too
-        if(ModalDialog::isADialogActive())
-        {
-            Widget* widgetWithinDialog = getWidget(name, &(ModalDialog::getCurrent()->m_children));
-            if(widgetWithinDialog != NULL) return widgetWithinDialog;
-        }
-    }
-    
     const unsigned short widgets_amount = within_vector->size();
     
     for(int n=0; n<widgets_amount; n++)
@@ -358,18 +346,6 @@ Widget* Screen::getWidget(const char* name, ptr_vector<Widget>* within_vector)
 // -----------------------------------------------------------------------------
 Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL)
-    {
-        within_vector = &m_widgets;
-    
-        // if a modal dialog is shown, search within it too
-        if(ModalDialog::isADialogActive())
-        {
-            Widget* widgetWithinDialog = getWidget(id, &(ModalDialog::getCurrent()->m_children));
-            if(widgetWithinDialog != NULL) return widgetWithinDialog;
-        }
-    }
-    
     const unsigned short widgets_amount = within_vector->size();
     
     for(int n=0; n<widgets_amount; n++)
@@ -413,7 +389,7 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
 // -----------------------------------------------------------------------------
 Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL) within_vector = &m_widgets;
+    if (within_vector == NULL) within_vector = &m_widgets;
     
     for(int i = within_vector->size()-1; i >= 0; i--)
     {

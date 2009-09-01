@@ -53,12 +53,13 @@ namespace GUIEngine
         
         bool m_loaded;
         std::string m_filename;
-        ptr_vector<Widget, HOLD> m_widgets;
         void loadFromFile();
 
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
     public:
+        ptr_vector<Widget, HOLD> m_widgets;
+
         // current mouse position, read-only...
         int m_mouse_x, m_mouse_y;
         
@@ -79,8 +80,8 @@ namespace GUIEngine
             return dynamic_cast<T*>( getWidget(name) );
         }
         
-        Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
-        Widget* getWidget(const int id, ptr_vector<Widget>* within_vector=NULL);
+        static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
+        static Widget* getWidget(const int id, ptr_vector<Widget>* within_vector);
         
         Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
         Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);

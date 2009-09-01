@@ -912,7 +912,7 @@ void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool
 /** recusrive function to render all sections (recursion allows to easily travesre the tree of children and sub-children) */
 void Skin::renderSections(ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
+    if (within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
     
     const unsigned short widgets_amount = within_vector->size();
     
@@ -948,7 +948,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     //const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();
     
-    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    Widget* widget = GUIEngine::getWidget(id);
     if(widget == NULL) return;
     
     const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
@@ -966,14 +966,15 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     
     const int id = element->getID();
+    //if (id == -1) return;
     
-    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
+    Widget* widget = GUIEngine::getWidget(id);
     
     //std::cout << "3D Pane " << id << " : ";
-    //if(widget == NULL) std::cout << "NULL\n";
+    //if(widget == NULL) std::cout << "widget=NULL\n";
     //else std::cout << widget->m_properties[PROP_ID].c_str() << std::endl;
     
-    if(widget == NULL) return;
+    if (widget == NULL) return;
     
     const WidgetType type = widget->m_type;
     
@@ -1024,7 +1025,7 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    if(element->getType()==gui::EGUIET_EDIT_BOX)
+    if (element->getType()==gui::EGUIET_EDIT_BOX)
     {
         // TODO : make configurable in skin file
         GUIEngine::getDriver()->draw2DRectangle( SColor(100, 150, 150, 150), rect );
@@ -1032,15 +1033,15 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     }
     
     const int id = element->getID();
-    Widget* widget = GUIEngine::getCurrentScreen()->getWidget(id);
-    
-    if(widget == NULL) return;
+    Widget* widget = GUIEngine::getWidget(id);
+        
+    if (widget == NULL) return;
     
     const WidgetType type = widget->m_type;
     
     const bool focused = GUIEngine::getGUIEnv()->getFocus() == element;
     
-    if(type == WTYPE_LIST)
+    if (type == WTYPE_LIST)
     {
         drawList(rect, widget, focused);
     }
@@ -1052,7 +1053,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 }
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{
+{    
     // fade out background
     // TODO : make configurable in skin file
     GUIEngine::getDriver()->draw2DRectangle( SColor(150, 255, 255, 255),

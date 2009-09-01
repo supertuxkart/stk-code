@@ -30,6 +30,7 @@
 #include "config/user_config.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -555,7 +556,8 @@ void IrrDriver::update(float dt)
             }
         }
 
-        if(race_manager->raceIsActive())
+        const bool inRace = race_manager->raceIsActive();
+        if (inRace)
         {
             if(UserConfigParams::m_bullet_debug) 
                 renderBulletDebugView();
@@ -565,8 +567,12 @@ void IrrDriver::update(float dt)
                 RaceManager::getWorld()->render();   // renders e.g. race gui
             }
         }
-        else   // GUI is active
+        
+       // GUI is active
+        if (!inRace || GUIEngine::ModalDialog::isADialogActive())
+        {
             GUIEngine::render(dt);
+        }
 
         // draw FPS if enabled
         if ( UserConfigParams::m_display_fps ) displayFPS();
