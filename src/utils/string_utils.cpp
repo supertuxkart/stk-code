@@ -25,6 +25,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <exception>
+#include <assert>
 
 namespace StringUtils
 {
