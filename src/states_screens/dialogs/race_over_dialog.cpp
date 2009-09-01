@@ -89,7 +89,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         
         const Kart *current_kart = RaceManager::getKart(order[i]);
         const stringw& kart_name = current_kart->getName();
-        
+                
         char sTime[20];
         sTime[0]=0;
         
@@ -128,7 +128,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         
         const int icon_size = textHeight;
         core::rect< s32 > entry_area(10 + icon_size, lines_from_y+line_h*i, m_area.getWidth(), lines_from_y+line_h*(i+1));
-        core::rect< s32 > icon_area(5, lines_from_y + line_h*i, 5+icon_size, lines_from_y+icon_size);
+        core::rect< s32 > icon_area(5, lines_from_y + line_h*i, 5+icon_size, lines_from_y+ line_h*i + icon_size);
 
         std::wcout << kart_results_line.c_str() << std::endl;
         
