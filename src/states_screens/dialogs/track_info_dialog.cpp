@@ -223,13 +223,13 @@ void startGame(const std::string trackIdent, const int num_laps)
     
     race_manager->startNew();
 }
-    
+// ------------------------------------------------------------------------------------------------------
 void TrackInfoDialog::onEnterPressedInternal()
 {
     const int num_laps = m_spinner->getValue();
     startGame(m_track_ident, num_laps);
 }
-    
+// ------------------------------------------------------------------------------------------------------   
 void TrackInfoDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "start" )

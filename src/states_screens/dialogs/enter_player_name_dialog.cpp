@@ -26,12 +26,6 @@ using namespace GUIEngine;
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    //core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/2);
-    //IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText( stringw(_("Enter the new player's name")).c_str(),
-    //                                                              area_top, false /* border */, true /* word wrap */,
-    //                                                              m_irrlicht_window);
-   // label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-  
     LabelWidget* widget = new LabelWidget();
     
     //I18N: In the 'add new player' dialog

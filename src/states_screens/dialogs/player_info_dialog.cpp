@@ -33,6 +33,7 @@ PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const f
     
     showRegularDialog();
 }
+// ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::showRegularDialog()
 {
     clearWindow();
@@ -112,7 +113,7 @@ void PlayerInfoDialog::showRegularDialog()
     }
     
 }
-    
+// ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::showConfirmDialog()
 {
     clearWindow();
@@ -128,6 +129,9 @@ void PlayerInfoDialog::showConfirmDialog()
         StringUtils::insertValues( _("Do you really want to delete player '%s' ?"), m_player->getName());
     
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
+    
+    // When there is no need to tab through / click on images/labels, we can add directly
+    // irrlicht labels (more complicated uses require the use of our widget set)
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
                                                               area_left, false /* border */, true /* word wrap */,
                                                               m_irrlicht_window);
@@ -172,10 +176,11 @@ void PlayerInfoDialog::showConfirmDialog()
     }
     
 }
-    
+// ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::onEnterPressedInternal()
 {
 }
+// ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "renameplayer")

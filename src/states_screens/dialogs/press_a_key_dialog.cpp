@@ -55,6 +55,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     m_children.push_back(widget2);
     widget2->add();
 }
+// ------------------------------------------------------------------------------------------------------
 void PressAKeyDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
