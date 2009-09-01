@@ -437,27 +437,18 @@ void btKart::updateVehicle( btScalar step )
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact != m_wheelInfo[i+1].m_raycastInfo.m_isInContact)
         {
             int wheel_air_index = i;
+            int wheel_ground_index = i+1;
+            
             if (m_wheelInfo[i].m_raycastInfo.m_isInContact)
+            {
                 wheel_air_index = i+1;
+                wheel_ground_index = i;
+            }
 
             btWheelInfo& wheel_air = m_wheelInfo[wheel_air_index];
+            btWheelInfo& wheel_ground = m_wheelInfo[wheel_ground_index];
 
-            wheel_air.m_raycastInfo.m_isInContact = true;
-
-            wheel_air.m_raycastInfo.m_groundObject     = &s_fixedObject;//todo for driving on dynamic/movable objects!;
-
-            btScalar maxSuspensionLength =wheel_air.getSuspensionRestLength()+ wheel_air.m_maxSuspensionTravelCm*btScalar(0.01);
-            wheel_air.m_raycastInfo.m_suspensionLength = maxSuspensionLength;
-            
-            //extra fix to suspension
-            btVector3 chassis_velocity_at_contactPoint;
-            btVector3 relpos = wheel_air.m_raycastInfo.m_contactPointWS-getRigidBody()->getCenterOfMassPosition();
-
-            chassis_velocity_at_contactPoint = getRigidBody()->getVelocityInLocalPoint(relpos);
-
-            btScalar projVel = wheel_air.m_raycastInfo.m_contactNormalWS.dot( chassis_velocity_at_contactPoint );
-
-            wheel_air.m_suspensionRelativeVelocity = projVel;
+            wheel_air.m_raycastInfo = wheel_ground.m_raycastInfo;
         }
     }   // for i=0; i<m_wheelInfo.size(); i+=2
 
