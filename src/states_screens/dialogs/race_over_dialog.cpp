@@ -17,6 +17,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
@@ -25,6 +26,8 @@
 #include "states_screens/dialogs/race_over_dialog.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+using namespace GUIEngine;
 
 RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {
@@ -35,51 +38,42 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     //const int h = m_area.getHeight();
     
     IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    const int text_height = font->getDimension(L"X").Height;
     
+    const int button_h = text_height + 6;
+    const int margin_between_buttons = 12;
+    const int buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
     
     if (unlock_manager->getUnlockedFeatures().size()>0)
     {
         // TODO: unlocked features
     }
     
-    core::rect< s32 > area(0, 0, m_area.getWidth()*2/3, textHeight);
+    // ---- Ranking
+    core::rect< s32 > area(0, 0, m_area.getWidth()*2/3, text_height);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Race Results"),
                                                               area, false, false, // border, word warp
                                                               m_irrlicht_window);
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
-        // TODO: offer to continue GP
-        // _("Continue Grand Prix")
-    }
-    else
-    {
-        // TODO: offer to go back to menu
-        // _("Back to the main menu")
-    }
-    
-    // TODO : _("Race in this track again")
-    
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
-    {
-        // TODO
-        // _("Setup New Race")
-    }
-    
-    // _("Race results")
-   //  const unsigned int MAX_STR_LEN = 60;
+
     const unsigned int num_karts = race_manager->getNumKarts();
     
     int*  order = new int [num_karts];
     RaceManager::getWorld()->raceResultOrder( order );
     
     const bool display_time = (RaceManager::getWorld()->getClockMode() == CHRONO);
+
+    int line_h = text_height + 15;
+    const int lines_from_y = text_height + 15;
     
-    const int line_h = textHeight + 15;
-    const int lines_from_y = textHeight + 15;
+    // make things more compact if we're missing space
+    while (lines_from_y + (int)num_karts*line_h > buttons_y_from) // cheap way to avoid calculating the required size with proper maths
+    {
+        line_h *= 0.9;
+    }
+    
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
     for (unsigned int i = 0; i < num_karts; ++i)
     {
@@ -124,7 +118,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
         ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
         
-        const int icon_size = textHeight;
+        const int icon_size = text_height;
         core::rect< s32 > entry_area(10 + icon_size, lines_from_y+line_h*i, m_area.getWidth()*2/3, lines_from_y+line_h*(i+1));
         core::rect< s32 > icon_area(5, lines_from_y + line_h*i, 5+icon_size, lines_from_y+ line_h*i + icon_size);
 
@@ -144,11 +138,11 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
 
     delete[] order;
     
-
+    // ---- Highscores
     const HighscoreEntry *hs = RaceManager::getWorld()->getHighscores();
     if (hs != NULL)
     {
-        core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), textHeight);
+        core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);
         IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( _("Highscores"),
                                                                         hsarea, false, false, // border, word warp
                                                                         m_irrlicht_window);
@@ -168,23 +162,71 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
             const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
             sprintf(timebuffer, "%2d:%02d.%01d", MINS, SECS, TENTHS);
                         
-            const int line_from = lines_from_y + textHeight*(i*3);
+            const int line_from = lines_from_y + text_height*(i*3);
             
             stringw playerName = name.c_str();
             
             core::rect< s32 > linearea(m_area.getWidth()*2/3, line_from,
-                                       m_area.getWidth(), line_from + textHeight);
+                                       m_area.getWidth(), line_from + text_height);
             GUIEngine::getGUIEnv()->addStaticText( playerName.c_str(),
                                                    linearea, false, false, // border, word warp
                                                    m_irrlicht_window);
-            core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + textHeight,
-                                       m_area.getWidth(), line_from + textHeight*2);
+            core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + text_height,
+                                       m_area.getWidth(), line_from + text_height*2);
             GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer).c_str(),
                                                   linearea2, false, false, // border, word warp
                                                   m_irrlicht_window);
         } // next score
     } // end if hs != NULL
 
+
+    
+    // ---- Buttons at the bottom
+    // TODO: make these buttons work
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
+    {
+        ButtonWidget* new_race_btn = new ButtonWidget();
+        new_race_btn->m_properties[PROP_ID] = "newracebtn";
+        new_race_btn->x = 15;
+        new_race_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*3;
+        new_race_btn->w = m_area.getWidth() - 30;
+        new_race_btn->h = button_h;
+        new_race_btn->m_text = _("Setup New Race");
+        new_race_btn->setParent(m_irrlicht_window);
+        m_children.push_back(new_race_btn);
+        new_race_btn->add();
+    }
+    
+    ButtonWidget* race_again_btn = new ButtonWidget();
+    race_again_btn->m_properties[PROP_ID] = "raceagainbtn";
+    race_again_btn->x = 15;
+    race_again_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+    race_again_btn->w = m_area.getWidth() - 30;
+    race_again_btn->h = button_h;
+    race_again_btn->m_text = _("Race in this track again");
+    race_again_btn->setParent(m_irrlicht_window);
+    m_children.push_back(race_again_btn);
+    race_again_btn->add();
+    
+    ButtonWidget* whats_next_btn = new ButtonWidget();
+    whats_next_btn->m_properties[PROP_ID] = "nextbtn";
+    whats_next_btn->x = 15;
+    whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
+    whats_next_btn->w = m_area.getWidth() - 30;
+    whats_next_btn->h = button_h;
+    whats_next_btn->setParent(m_irrlicht_window);
+    
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        whats_next_btn->m_text = _("Continue Grand Prix");
+    }
+    else
+    {
+        whats_next_btn->m_text = _("Back to the main menu");
+    }
+    m_children.push_back(whats_next_btn);
+    whats_next_btn->add();
+        
 }
 
 void RaceOverDialog::onEnterPressedInternal()
