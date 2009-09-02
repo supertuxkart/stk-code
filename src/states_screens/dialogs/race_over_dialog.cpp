@@ -24,6 +24,7 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -209,7 +210,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     race_again_btn->add();
     
     ButtonWidget* whats_next_btn = new ButtonWidget();
-    whats_next_btn->m_properties[PROP_ID] = "nextbtn";
     whats_next_btn->x = 15;
     whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
     whats_next_btn->w = m_area.getWidth() - 30;
@@ -219,10 +219,12 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         whats_next_btn->m_text = _("Continue Grand Prix");
+        whats_next_btn->m_properties[PROP_ID] = "continuegp";
     }
     else
     {
         whats_next_btn->m_text = _("Back to the main menu");
+        whats_next_btn->m_properties[PROP_ID] = "backtomenu";
     }
     m_children.push_back(whats_next_btn);
     whats_next_btn->add();
@@ -235,4 +237,112 @@ void RaceOverDialog::onEnterPressedInternal()
 
 void RaceOverDialog::processEvent(std::string& eventSource)
 {
+    if (eventSource == "raceagainbtn")
+    {
+        ModalDialog::dismiss();
+        network_manager->setState(NetworkManager::NS_MAIN_MENU);
+        RaceManager::getWorld()->unpause();
+        race_manager->rerunRace();
+    }
+    else if (eventSource == "newracebtn")
+    {
+        ModalDialog::dismiss();
+        RaceManager::getWorld()->unpause();
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToMenu("main.stkgui");
+        StateManager::get()->pushMenu("karts.stkgui");
+    }
+    else if (eventSource == "backtomenu")
+    {
+        ModalDialog::dismiss();
+        RaceManager::getWorld()->unpause();
+        race_manager->exitRace();
+        StateManager::get()->resetAndGoToMenu("main.stkgui");
+    }
+    else if (eventSource == "continuegp")
+    {
+        ModalDialog::dismiss();
+        RaceManager::getWorld()->unpause();
+        race_manager->next();
+    }
+    
 }
+
+
+ //-----------------------------------------------------------------------------
+ /** This is used on the client and server to display a message while waiting
+ *  in a barrier for clients and server to ack the display.
+ */
+/*
+ TODO : port this code back
+ 
+void RaceResultsGUI::update(float dt)
+{
+    BaseGUI::update(dt);
+    // If an item is selected (for the first time), change the text
+    // so that the user has feedback about his selection.
+    if(m_selected_widget!=WTOK_NONE && m_first_time)
+    {
+        m_first_time = false;
+        // User feedback on first selection: display message, and on the
+        // server remove unnecessary widgets.
+        widget_manager->setWgtText(WTOK_CONTINUE, _("Synchronising."));
+        if(network_manager->getMode()==NetworkManager::NW_SERVER)
+        {
+            widget_manager->hideWgt(WTOK_RESTART_RACE);
+            widget_manager->hideWgt(WTOK_SETUP_NEW_RACE);
+        }
+    }   // m_selected_token defined and not first time
+    
+    // Wait till the barrier is finished. On the server this is the case when
+    // the state ie MAIN_MENU, on the client when it is wait_for_available_characters.
+    if(network_manager->getMode() !=NetworkManager::NW_NONE         &&
+       network_manager->getState()!=NetworkManager::NS_MAIN_MENU    &&
+       network_manager->getState()!=NetworkManager::NS_RACE_RESULT_BARRIER_OVER )
+        return;
+    
+    // Send selected menu to all clients
+    if(m_selected_widget!=WTOK_NONE &&
+       network_manager->getMode()==NetworkManager::NW_SERVER)
+    {
+        network_manager->sendRaceResultAck(m_selected_widget);
+    }
+    
+    switch(m_selected_widget)
+    {
+        case WTOK_CONTINUE:
+            // Gets called when:
+            // 1) something was unlocked
+            // 2) a Grand Prix is run
+            // 3) "back to the main menu" otherwise
+            RaceManager::getWorld()->unpause();
+            widget_manager->setWgtText(WTOK_CONTINUE, _("Loading race..."));
+            race_manager->next();
+            break;
+        case WTOK_RESTART_RACE:
+            network_manager->setState(NetworkManager::NS_MAIN_MENU);
+            RaceManager::getWorld()->unpause();
+            menu_manager->popMenu();
+            race_manager->rerunRace();
+            break;
+        case WTOK_SETUP_NEW_RACE:
+            RaceManager::getWorld()->unpause();
+            race_manager->exit_race();
+            if(network_manager->getMode()==NetworkManager::NW_CLIENT)
+            {
+                network_manager->setState(NetworkManager::NS_WAIT_FOR_AVAILABLE_CHARACTERS);
+                menu_manager->pushMenu(MENUID_CHARSEL_P1);
+            }
+            else
+            {
+                menu_manager->pushMenu(MENUID_GAMEMODE);
+            }
+            break;
+            
+        default:
+            break;
+    }
+    
+}   // update
+
+*/

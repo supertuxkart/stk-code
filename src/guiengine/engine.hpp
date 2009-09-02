@@ -232,6 +232,8 @@ namespace GUIEngine
     
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
     void cleanUp();
+    
+    // FIXME : goes in abstract state manager ?
     void switchToScreen(const char* );
     void clear();
     void cleanForGame();
