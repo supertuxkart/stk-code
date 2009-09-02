@@ -43,7 +43,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         // TODO: unlocked features
     }
     
-    core::rect< s32 > area(0, 0, m_area.getWidth(), textHeight);
+    core::rect< s32 > area(0, 0, m_area.getWidth()*2/3, textHeight);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Race Results"),
                                                               area, false, false, // border, word warp
                                                               m_irrlicht_window);
@@ -115,8 +115,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         }
         else
         {
-            std::wcout << kart_name.c_str() << std::endl;
-
             kart_results_line = StringUtils::insertValues( L"%i. %s %s",
                                                           current_kart->getPosition(), kart_name.c_str(), sTime);
         }
@@ -127,10 +125,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
         
         const int icon_size = textHeight;
-        core::rect< s32 > entry_area(10 + icon_size, lines_from_y+line_h*i, m_area.getWidth(), lines_from_y+line_h*(i+1));
+        core::rect< s32 > entry_area(10 + icon_size, lines_from_y+line_h*i, m_area.getWidth()*2/3, lines_from_y+line_h*(i+1));
         core::rect< s32 > icon_area(5, lines_from_y + line_h*i, 5+icon_size, lines_from_y+ line_h*i + icon_size);
 
-        std::wcout << kart_results_line.c_str() << std::endl;
+        // std::wcout << kart_results_line.c_str() << std::endl;
         
         GUIEngine::getGUIEnv()->addStaticText( kart_results_line.c_str(), entry_area,
                                                                        false , true , // border, word warp
@@ -139,45 +137,54 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
         img->setImage(kart_icon_texture);
         img->setScaleImage(true);
         img->setTabStop(false);
+        img->setUseAlphaChannel(true);
         
         kart_id++;
     }
 
     delete[] order;
     
-    /*
+
     const HighscoreEntry *hs = RaceManager::getWorld()->getHighscores();
     if (hs != NULL)
     {
-        w_prev=widget_manager->addTextWgt( WTOK_HIGHSCORES, 5, 7, _("Highscores") );
-        widget_manager->hideWgtRect(WTOK_HIGHSCORES);
-        w_prev->setPosition(WGT_DIR_FROM_RIGHT, 0.01f, NULL, WGT_DIR_FROM_TOP, 0.01f, NULL);
+        core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), textHeight);
+        IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( _("Highscores"),
+                                                                        hsarea, false, false, // border, word warp
+                                                                        m_irrlicht_window);
+        highscores->setTabStop(false);
+        highscores->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         
         unsigned int num_scores = hs->getNumberEntries();
-        char *highscores = new char[num_scores * MAX_STR_LEN];
-        
-        for(unsigned int i=0; i<num_scores; i++)
-        {
+                
+        char timebuffer[64];
+        for (unsigned int i=0; i<num_scores; i++)
+        {            
             std::string kart_name, name;
             float T;
             hs->getEntry(i, kart_name, name, &T);
             const int   MINS   = (int) floor ( T / 60.0 ) ;
             const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
             const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-            sprintf((char*)( highscores + MAX_STR_LEN * i ),
-                    "%s: %3d:%02d.%01d", name.c_str(), MINS, SECS, TENTHS);
+            sprintf(timebuffer, "%2d:%02d.%01d", MINS, SECS, TENTHS);
+                        
+            const int line_from = lines_from_y + textHeight*(i*3);
             
-            Widget *w=widget_manager->addTextWgt(WTOK_FIRST_HIGHSCORE + i, 5, 7,
-                                                 (char*)( highscores+MAX_STR_LEN*i ) );
-            w->setPosition(WGT_DIR_FROM_RIGHT, 0.05f, NULL, WGT_DIR_UNDER_WIDGET, 0, w_prev);
-            w_prev=w;
+            stringw playerName = name.c_str();
+            
+            core::rect< s32 > linearea(m_area.getWidth()*2/3, line_from,
+                                       m_area.getWidth(), line_from + textHeight);
+            GUIEngine::getGUIEnv()->addStaticText( playerName.c_str(),
+                                                   linearea, false, false, // border, word warp
+                                                   m_irrlicht_window);
+            core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + textHeight,
+                                       m_area.getWidth(), line_from + textHeight*2);
+            GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer).c_str(),
+                                                  linearea2, false, false, // border, word warp
+                                                  m_irrlicht_window);
         } // next score
-        
-        widget_manager->sameWidth(WTOK_HIGHSCORES, WTOK_FIRST_HIGHSCORE+num_scores-1);
-        
-        bottom_of_list = (num_scores > num_karts) ? w_prev : bottom_of_list;
     } // end if hs != NULL
-    */
+
 }
 
 void RaceOverDialog::onEnterPressedInternal()

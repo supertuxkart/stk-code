@@ -134,6 +134,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
         m_kart_icons[n]->setImage(texture);
         m_kart_icons[n]->setScaleImage(true);
         m_kart_icons[n]->setTabStop(false);
+        m_kart_icons[n]->setUseAlphaChannel(true);
         
         core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
 

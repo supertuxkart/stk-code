@@ -134,7 +134,7 @@ void TimedRace::update(const float dt)
             
             m_phase = FINISH_PHASE;
             
-            new RaceOverDialog(0.6f, 0.6f);
+            new RaceOverDialog(0.6f, 0.9f);
             
             break;            
         }
