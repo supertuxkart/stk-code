@@ -236,7 +236,7 @@ public:
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
     bool         allPlayerFinished()      const {return 
                                            m_num_finished_players==m_player_karts.size();}
-    int          raceIsActive()           const { return m_active_race;                  }
+    bool         raceIsActive()           const { return m_active_race;                  }
     const std::vector<std::string>&
                  getRandomKartList()      const { return m_random_kart_list;             }
     void         setRandomKartList(const std::vector<std::string>& rkl)

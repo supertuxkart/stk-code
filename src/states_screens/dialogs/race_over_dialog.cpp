@@ -72,7 +72,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     // make things more compact if we're missing space
     while (lines_from_y + (int)num_karts*line_h > buttons_y_from) // cheap way to avoid calculating the required size with proper maths
     {
-        line_h *= 0.9;
+        line_h = (int)(line_h*0.9f);
     }
     
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped

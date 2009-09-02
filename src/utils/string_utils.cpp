@@ -151,6 +151,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid warning message about unused variable
             fprintf(stderr, "Fatal error in split(std::string) : %s @ line %i\n", __FILE__, __LINE__);
             printf("Splitting %s\n", s.c_str());
             
@@ -198,6 +199,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid warning about unused variable
             fprintf(stderr, "Fatal error in split(stringw) : %s @ line %i\n", __FILE__, __LINE__);
             exit(1);
         }
@@ -251,6 +253,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid warning about unused variable
             fprintf(stderr, "Fatal error in splitPath : %s @ line %i\n", __FILE__, __LINE__);
             exit(1);
         }
@@ -286,6 +289,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid warning about unused variable
             fprintf(stderr,"Fatal error in insertValues(std::string) : %s @ line %i\n", __FILE__, __LINE__);
             exit(1);
         }
@@ -320,6 +324,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
+            (void)e;  // avoid warning about unused variable
             fprintf(stderr,"Fatal error in insertValues(stringw) : %s @ line %i\n", __FILE__, __LINE__);
             exit(1);
         }
