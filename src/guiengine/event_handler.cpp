@@ -52,7 +52,7 @@ bool EventHandler::OnEvent (const SEvent &event)
     else
     {
         // FIXME : it's a bit unclean that all input events go trough the gui module
-        const bool blockPropagation = input_manager->input(event);
+        const bool blockPropagation = input_manager->input(event) && !ModalDialog::isADialogActive();
         return blockPropagation;
     }
     
@@ -84,10 +84,10 @@ bool EventHandler::onGUIEvent(const SEvent& event)
             case EGET_ELEMENT_HOVERED:
             {
                 Widget* w = GUIEngine::getWidget(id);
-                if(w == NULL) break;
+                if (w == NULL) break;
                 
                 // select ribbons on hover
-                if(w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
+                if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
                 {
                     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
                     if(ribbon == NULL) break;
