@@ -319,7 +319,8 @@ namespace KartSelectionScreen
                            kart_name_h);
             
         }
-        
+// disabled but some events were disptached twice (e.g. spinner clicks)
+#if 0
         virtual bool transmitEvent(Widget* w, std::string& originator, const int playerID)
         {
             std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
@@ -352,7 +353,7 @@ namespace KartSelectionScreen
          
             return true; // continue propagating the event
         }
-        
+#endif
         void setSize(const int x, const int y, const int w, const int h)
         {
             this->x = x;

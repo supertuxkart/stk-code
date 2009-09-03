@@ -260,7 +260,10 @@ void RibbonWidget::focused(const int playerID)
     
     if (m_children.size() < 1) return; // empty ribbon
     
-    if (m_focus == NULL) m_focus = m_children.get(m_selection[playerID]);
+    if (m_focus == NULL && m_selection[playerID] != -1)
+    {
+        m_focus = m_children.get(m_selection[playerID]);
+    }
     
     if (m_event_handler != NULL)
     {
