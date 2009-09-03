@@ -117,6 +117,7 @@ case "${host}" in
 
    save_LIBS=$LIBS
    AC_SEARCH_LIBS(glNewList, [ GL GLcore MesaGL ])
+   AC_SEARCH_LIBS(gluLookAt, GLU)
    opengl_LIBS="$LIBS"
    LIBS=$save_LIBS
    if test "x$ac_cv_search_glNewList" = "x-lGLcore"; then
