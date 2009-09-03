@@ -257,6 +257,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/press_a_key_dialog.cpp \
  states_screens/dialogs/race_over_dialog.cpp \
  states_screens/dialogs/race_over_dialog.hpp \
+ states_screens/dialogs/race_paused_dialog.hpp \
+ states_screens/dialogs/race_paused_dialog.cpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
  states_screens/kart_selection.cpp \

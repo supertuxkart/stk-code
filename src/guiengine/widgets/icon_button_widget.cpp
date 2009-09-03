@@ -32,6 +32,7 @@ void IconButtonWidget::add()
 {
     // ---- Icon
     ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+    assert(texture != NULL);
     const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
     /*
      if(w < texture_w) ... ;

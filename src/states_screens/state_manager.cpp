@@ -38,6 +38,7 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
+#include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -469,9 +470,9 @@ void StateManager::escapePressed()
     // In-game
     else if(m_game_mode)
     {
-        // TODO : show in-game menu
-        resetAndGoToMenu("main.stkgui");
-        input_manager->setMode(InputManager::MENU);
+        new RacePausedDialog(0.6f, 0.4f);
+        //resetAndGoToMenu("main.stkgui");
+        //input_manager->setMode(InputManager::MENU);
     }
     // In menus
     else

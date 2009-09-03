@@ -993,7 +993,8 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_ICON_BUTTON)
     {
         if(!focused) return; /* don't draw any border in this case */
-        else drawButton(widget, rect, pressed /* pressed */, true /* focused */);
+        // else drawButton(widget, rect, pressed /* pressed */, true /* focused */);
+        // TODO : draw focus for icon buttons
     }
     else if(type == WTYPE_BUTTON)
     {
