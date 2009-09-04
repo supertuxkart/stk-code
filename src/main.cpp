@@ -227,8 +227,10 @@ int handleCmdLine(int argc, char **argv)
 {
     int n;
     char s[80];
+
     for(int i=1; i<argc; i++)
     {
+
         if(!strcmp(argv[i], "--gamepad-debug"))
         {
             UserConfigParams::m_gamepad_debug=true;
@@ -457,7 +459,9 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--kartdir")  && i+1<argc ) i++;
         else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if ( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
-        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {}
+        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {
+            i++;
+        }
         else if ( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
         else
         {
