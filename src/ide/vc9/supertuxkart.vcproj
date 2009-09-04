@@ -820,6 +820,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\track_info_dialog.cpp"
 						>
 					</File>
@@ -1535,6 +1539,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\race_over_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
 						>
 					</File>
 					<File
