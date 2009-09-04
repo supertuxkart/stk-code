@@ -470,7 +470,7 @@ void StateManager::escapePressed()
     // In-game
     else if(m_game_mode)
     {
-        new RacePausedDialog(0.6f, 0.4f);
+        new RacePausedDialog(0.8f, 0.6f);
         //resetAndGoToMenu("main.stkgui");
         //input_manager->setMode(InputManager::MENU);
     }

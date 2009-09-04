@@ -982,19 +982,47 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     // does not have widgets for everything we need. so at render time, we just check
     // which type this button represents and render accordingly
     
-    if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
+    if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
     {
         drawRibbonChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }
-    else if(widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_SPINNER)
+    else if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_SPINNER)
     {
         drawSpinnerChild(rect, widget, pressed /* pressed */, focused /* focused */);
     }
-    else if(type == WTYPE_ICON_BUTTON)
+    else if (type == WTYPE_ICON_BUTTON)
     {
-        if(!focused) return; /* don't draw any border in this case */
-        // else drawButton(widget, rect, pressed /* pressed */, true /* focused */);
-        // TODO : draw focus for icon buttons
+        if (focused)
+        {
+            int grow = 45;
+            static float glow_effect = 0;
+            
+            
+            const float dt = GUIEngine::getLatestDt();
+            glow_effect += dt*3;
+            if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+            grow = (int)(45 + 10*sin(glow_effect));
+            
+            
+            const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
+            const int glow_center_y = rect.LowerRightCorner.Y;
+            
+            ITexture* tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].getImage();
+            const int texture_w = tex_ficonhighlight->getSize().Width;
+            const int texture_h = tex_ficonhighlight->getSize().Height;
+            
+            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+            
+            
+            const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                               glow_center_y - 25 - grow/2,
+                                                               glow_center_x + 45 + grow,
+                                                               glow_center_y + 25 + grow/2);
+            
+            GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, source_area,
+                                                0 /* no clipping */, 0, true /* alpha */);
+            
+        }
     }
     else if(type == WTYPE_BUTTON)
     {

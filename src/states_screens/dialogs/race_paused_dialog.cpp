@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <string>
@@ -27,35 +28,107 @@ using namespace GUIEngine;
 
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {
+    /*
+#ifdef IRR_SVN
+    const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#else
+    const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+#endif
+    const int screen_w = (int)(frame_size.Width*percentWidth);
+    const int screen_h = (int)(frame_size.Height*percentHeight);
+        */
     IGUIFont* font = GUIEngine::getFont();
     const int text_height = font->getDimension(L"X").Height;
     
+    const int icon_size = (m_area.getHeight() - text_height - 150) / 2;
+    
+    // ---- Caption
     core::rect< s32 > area(0, 0, m_area.getWidth(), text_height);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Paused"),
                                                                     area, false, false, // border, word warp
                                                                     m_irrlicht_window);
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    
-    ITexture* back_texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/back.png").c_str() ) ;
-    const int tex_w = back_texture->getSize().Width;
-    const int tex_h = back_texture->getSize().Height;
 
+    // ---- Back button
     IconButtonWidget* back_btn = new IconButtonWidget();
     back_btn->m_properties[PROP_ID] = "backbtn";
     back_btn->m_properties[PROP_ICON] = "gui/back.png";
     //I18N: In the 'paused' screen
     back_btn->m_text = L"Back to Race";
-    back_btn->x = m_area.getWidth() / 2 - tex_w / 2;
+    back_btn->x = m_area.getWidth() / 2 - icon_size / 2;
     back_btn->y = text_height;
-    back_btn->w = tex_w;
-    back_btn->h = tex_h;
+    back_btn->w = icon_size;
+    back_btn->h = icon_size;
     back_btn->setParent(m_irrlicht_window);
     m_children.push_back(back_btn);
     back_btn->add();
     GUIEngine::getGUIEnv()->setFocus( back_btn->getIrrlichtElement() );
     
+    // ---- Choice ribbon
+    RibbonWidget* choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+    choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
+
+    choice_ribbon->x = 0;
+    choice_ribbon->y = text_height + icon_size + 50;
+    choice_ribbon->w = m_area.getWidth();
+    choice_ribbon->h = icon_size + text_height*2;
+    choice_ribbon->setParent(m_irrlicht_window);
     
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_QUICK_RACE)
+    {
+        IconButtonWidget* ribbon_item = new IconButtonWidget();
+        ribbon_item->m_properties[PROP_ID] = "newrace";
+        ribbon_item->m_properties[PROP_ICON] = "gui/main_race.png";
+        ribbon_item->m_properties[PROP_WIDTH] = "128";
+        ribbon_item->m_properties[PROP_HEIGHT] = "128";
+        //I18N: In the 'paused' screen
+        ribbon_item->m_text = L"Setup New Race";
+        choice_ribbon->m_children.push_back(ribbon_item);
+    }
+    {
+        IconButtonWidget* ribbon_item = new IconButtonWidget();
+        ribbon_item->m_properties[PROP_ID] = "restart";
+        ribbon_item->m_properties[PROP_ICON] = "gui/restart.png";
+        ribbon_item->m_properties[PROP_WIDTH] = "128";
+        ribbon_item->m_properties[PROP_HEIGHT] = "128";
+        //I18N: In the 'paused' screen
+        ribbon_item->m_text = L"Restart Race";
+        choice_ribbon->m_children.push_back(ribbon_item);
+    }
+    {
+        IconButtonWidget* ribbon_item = new IconButtonWidget();
+        ribbon_item->m_properties[PROP_ID] = "options";
+        ribbon_item->m_properties[PROP_ICON] = "gui/main_options.png";
+        ribbon_item->m_properties[PROP_WIDTH] = "128";
+        ribbon_item->m_properties[PROP_HEIGHT] = "128";
+        //I18N: In the 'paused' screen
+        ribbon_item->m_text = L"Options";
+        choice_ribbon->m_children.push_back(ribbon_item);
+    }
+    {
+        IconButtonWidget* ribbon_item = new IconButtonWidget();
+        ribbon_item->m_properties[PROP_ID] = "help";
+        ribbon_item->m_properties[PROP_ICON] = "gui/main_help.png";
+        ribbon_item->m_properties[PROP_WIDTH] = "128";
+        ribbon_item->m_properties[PROP_HEIGHT] = "128";
+        //I18N: In the 'paused' screen
+        ribbon_item->m_text = L"Help";
+        choice_ribbon->m_children.push_back(ribbon_item);
+    }
+    {
+        IconButtonWidget* ribbon_item = new IconButtonWidget();
+        ribbon_item->m_properties[PROP_ID] = "exit";
+        ribbon_item->m_properties[PROP_ICON] = "gui/main_quit.png";
+        ribbon_item->m_properties[PROP_WIDTH] = "128";
+        ribbon_item->m_properties[PROP_HEIGHT] = "128";
+        //I18N: In the 'paused' screen
+        ribbon_item->m_text = L"Exit Race";
+        choice_ribbon->m_children.push_back(ribbon_item);
+    }
+    
+    m_children.push_back(choice_ribbon);
+    choice_ribbon->add();   
 }
 
 /*

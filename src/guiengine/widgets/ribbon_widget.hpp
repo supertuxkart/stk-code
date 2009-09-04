@@ -49,9 +49,7 @@ namespace GUIEngine
         
         /** The type of this ribbon (toolbar, combo, tabs) */
         RibbonType m_ribbon_type;
-        
-        void add();
-        
+                
         /** Each item within the ribbon holds a flag saying whether it is selected or not.
             This method updates the flag in all of this ribbon's children. Called everytime
             selection changes.*/
@@ -75,6 +73,8 @@ namespace GUIEngine
         RibbonWidget(const RibbonType type=RIBBON_COMBO);
         virtual ~RibbonWidget() {}
         
+        void add();
+
         /** Returns the type of this ribbon (see guiengine/engine.hpp for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         

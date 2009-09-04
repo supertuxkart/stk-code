@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/my_button.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
@@ -39,15 +40,17 @@ void IconButtonWidget::add()
      if(h < texture_h) ... ;
      */
     rect<s32> widget_size;
-    if(clickable)
+    if (clickable)
     {
         widget_size = rect<s32>(x, y, x + w, y + h);
-        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
-        m_element = btn;
+
+        MyGUIButton* btn = new MyGUIButton(GUIEngine::getGUIEnv(), m_parent,  getNewID(), widget_size, true);
+        //IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
-        //btn->setDrawBorder(false);
+        btn->setDrawBorder(false);
         btn->setTabStop(true);
+        m_element = btn;
     }
     else
     {

@@ -184,7 +184,9 @@ namespace GUIEngine
         Widget* m_event_handler;
         
         
-        /** Coordinates of the widget */
+        /** Coordinates of the widget once added (the difference between those x/h and PROP_WIDTH/PROP_HEIGHT is
+            that the props are read in raw form from the XML file; PROP_WIDTH can then be e.g. "10%" and w,
+            once the widget is added, will be e.g. 80.) */
         int x, y, w, h;
         
         /** Whether to show a bounding box around this widget (used for sections) */
