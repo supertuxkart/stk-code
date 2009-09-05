@@ -88,7 +88,7 @@ public:
     
     void   update(float dt);
     
-	Input &getSensedInput();
+	//Input &getSensedInput();
 };
 
 extern InputManager *input_manager;

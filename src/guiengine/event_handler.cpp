@@ -391,7 +391,18 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     else
     {        
         // select the last widget
-        Widget* w = GUIEngine::getCurrentScreen()->getLastWidget();
+        Widget* w = NULL;
+        
+        if (ModalDialog::isADialogActive())
+        {
+            // TODO : select last widget in modal dialogs
+        }
+        else
+        {
+            Screen* screen = GUIEngine::getCurrentScreen();
+            if (screen == NULL) return;
+            w = screen->getLastWidget();
+        }
         
         if (w != NULL)
         {
@@ -464,7 +475,19 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     else
     {
         // select the first widget
-        Widget* w = GUIEngine::getCurrentScreen()->getFirstWidget();                    
+        Widget* w = NULL;
+        
+        if (ModalDialog::isADialogActive())
+        {
+            // TODO : select first widget in modal dialogs
+        }
+        else
+        {
+            Screen* screen = GUIEngine::getCurrentScreen();
+            if (screen == NULL) return;
+            w = screen->getFirstWidget();  
+        }
+        
         if(w != NULL)
         {
             if (playerID == 0)

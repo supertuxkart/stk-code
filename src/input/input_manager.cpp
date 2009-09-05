@@ -157,8 +157,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     // 3) the new event has the preferred type : TODO - reimplement
     // The latter is necessary since some gamepads have analog
     // buttons that can return two different events when pressed
-    bool store_new = abs(value) > m_max_sensed_input         ||
-    m_max_sensed_type  == Input::IT_NONE;
+    bool store_new = (abs(value) > m_max_sensed_input         ||
+                      m_max_sensed_type  == Input::IT_NONE) && abs(value) > Input::MAX_VALUE/2;
     
     // don't store if we're trying to do something like bindings keyboard keys on a gamepad
     if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
@@ -518,6 +518,7 @@ bool InputManager::input(const SEvent& event)
  *
  * It is wrong to call it when not in input sensing mode anymore.
  */
+/*
 Input &InputManager::getSensedInput()
 {
     assert (m_mode == INPUT_SENSE_KEYBOARD ||
@@ -528,7 +529,7 @@ Input &InputManager::getSensedInput()
 
     return *m_sensed_input;
 }   // getSensedInput
-
+*/
 //-----------------------------------------------------------------------------
 /** Queries the input driver whether it is in the given expected mode.
  */
