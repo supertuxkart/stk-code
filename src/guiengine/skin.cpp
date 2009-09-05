@@ -1095,9 +1095,7 @@ core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawT
     GUIEngine::getDriver()->draw2DRectangle( color,
                                             core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
     
-    // draw frame (since it's transluscent, draw many times to get opacity)
-    // TODO : make configurable in skin file
-    drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
+    // draw frame
     drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
     
     return rect;
