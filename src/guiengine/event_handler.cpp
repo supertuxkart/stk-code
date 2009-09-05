@@ -170,6 +170,7 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
         while (parent->m_event_handler != NULL && parent->m_event_handler != parent)
         {
             parent->transmitEvent(w, w->m_properties[PROP_ID], playerID);
+            
             parent = parent->m_event_handler;
         }
         
@@ -177,6 +178,12 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
          parent event handler says so */
         if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID))
         {
+            // notify modal dialog too
+            if (ModalDialog::isADialogActive())
+            {
+                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID])) return false;
+            }
+            
             transmitEvent(parent, parent->m_properties[PROP_ID]);
         }
     }

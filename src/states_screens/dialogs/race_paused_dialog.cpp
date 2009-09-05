@@ -22,6 +22,7 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
+#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -218,28 +219,38 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
         ModalDialog::dismiss();
         return true;
     }
-    else if (eventSource == "exit")
+    else if (eventSource == "choiceribbon")
     {
-        ModalDialog::dismiss();
-        StateManager::get()->resetAndGoToMenu("main.stkgui");
-        input_manager->setMode(InputManager::MENU);
-        return true;
-    }
-    else if (eventSource == "help")
-    {
-        // TODO
-    }
-    else if (eventSource == "options")
-    {
-        // TODO
-    }
-    else if (eventSource == "restart")
-    {
-        // TODO
-    }
-    else if (eventSource == "newrace")
-    {
-        // TODO
+        // FIXME : don't hardcode player 0
+        const int playerId = 0;
+        const std::string& selection = m_choice_ribbon->getSelectionIDString(playerId);
+        if (selection == "exit")
+        {
+            ModalDialog::dismiss();
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToMenu("main.stkgui");
+            input_manager->setMode(InputManager::MENU);
+            return true;
+        }
+        else if (selection == "help")
+        {
+            // TODO
+        }
+        else if (selection == "options")
+        {
+            // TODO
+        }
+        else if (selection == "restart")
+        {
+            ModalDialog::dismiss();
+            network_manager->setState(NetworkManager::NS_MAIN_MENU);
+            RaceManager::getWorld()->unpause();
+            race_manager->rerunRace();
+        }
+        else if (selection == "newrace")
+        {
+            // TODO
+        }
     }
     return false;
 }

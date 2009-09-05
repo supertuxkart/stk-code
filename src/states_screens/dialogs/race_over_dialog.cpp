@@ -19,6 +19,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
+#include "input/input_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
@@ -260,6 +261,7 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         RaceManager::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToMenu("main.stkgui");
+        input_manager->setMode(InputManager::MENU);
         return true;
     }
     else if (eventSource == "continuegp")

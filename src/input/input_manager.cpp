@@ -29,9 +29,6 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "states_screens/options_screen.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "states_screens/state_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -43,7 +40,9 @@
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-
+#include "states_screens/options_screen.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "states_screens/state_manager.hpp"
 InputManager *input_manager;
 
 //-----------------------------------------------------------------------------
@@ -316,7 +315,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         }
 
         // ... when in-game
-        if(StateManager::get()->isGameState())
+        if (StateManager::get()->isGameState() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
             PlayerKart* pk;
@@ -341,7 +340,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         else
         {
             // reset timer when released
-            if( abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON) )
+            if (abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON))
             {
                 if(type == Input::IT_STICKBUTTON) std::cout << "resetting because type == Input::IT_STICKBUTTON\n";
                 else std::cout << "resetting for another reason\n";
@@ -351,9 +350,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             }
 
             // menu input
-            if(!m_timer_in_use)
+            if (!m_timer_in_use)
             {
-                if(abs(value) > Input::MAX_VALUE*2/3)
+                if (abs(value) > Input::MAX_VALUE*2/3)
                 {
                     m_timer_in_use = true;
                     m_timer = 0.25;
