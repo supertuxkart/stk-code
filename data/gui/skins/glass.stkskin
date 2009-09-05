@@ -1,4 +1,8 @@
 <!--
+
+Glass skin by Marianne Gagnon, released under creative-commons BY-SA 3.0+
+Except background.jpg, by elisee
+
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
 have non-stretchable borders (you cannot choose which one you must use, it's hardcoded
@@ -130,26 +134,26 @@ when the border that intersect at this corner are enabled.
 <!-- Lists are always in neutral state for now -->
 <element type="list" image="glass/glass_section.png"
     left_border="15" right_border="15" top_border="15" bottom_border="15"
-    hborder_out_portion="0.5" vborder_out_portion="1.0f" />
+    hborder_out_portion="0.5" vborder_out_portion="1.0" />
     
 <element type="listitem" state="focused" image="glass/glasssgauge_fill.png"
     left_border="0" right_border="0" top_border="0" bottom_border="0"
-    hborder_out_portion="0.0" vborder_out_portion="0.0f" />
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
     
 <element type="listitem" state="down" image="glass/glassbutton.png"
     left_border="80" right_border="80" top_border="0" bottom_border="36"
-    hborder_out_portion="1.0" vborder_out_portion="1.0f"
+    hborder_out_portion="1.0" vborder_out_portion="1.0"
     areas="body" />
 
 <!-- Stateless -->
 <element type="section" image="glass/glass_section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
-      hborder_out_portion="1.0" vborder_out_portion="0.2f" />
+      hborder_out_portion="1.0" vborder_out_portion="0.2" />
   
 <!-- Stateless -->
-<element type="window" image="glass/glass_section.png"
-      left_border="15" right_border="15" top_border="15" bottom_border="15"
-      hborder_out_portion="1.0" vborder_out_portion="0.2f" />
+<element type="window" image="glass/dialog.png"
+      left_border="7" right_border="7" top_border="50" bottom_border="50"
+      hborder_out_portion="1.0" vborder_out_portion="0.2" />
           
 <!--                   Colors                  -->
 <color type="text" state="neutral" r="0" g="0" b="0" />
@@ -157,5 +161,10 @@ when the border that intersect at this corner are enabled.
 <!-- For highlighted items, e.g. in list -->
 <color type="text" state="focused" r="255" g="255" b="255" />
 
+<!-- Color used to fade out background when a dialog is shown -->
+<color type="dialog_background" state="neutral" a="100" r="255" g="255" b="255" />
+
+<!-- Text field color -->
+<color type="text_field" state="neutral" a="100" r="150" g="150" b="150" />
 
 </skin>
