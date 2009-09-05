@@ -54,7 +54,9 @@ public:
     ptr_vector<Widget> m_children;
     
     virtual ~ModalDialog();
-    virtual void processEvent(std::string& eventSource){}
+    
+    /** Returns whether to block event propagation */
+    virtual bool processEvent(std::string& eventSource){ return false; }
     
     static void dismiss();
     static void onEnterPressed();

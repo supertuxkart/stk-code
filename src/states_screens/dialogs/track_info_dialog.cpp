@@ -231,11 +231,13 @@ void TrackInfoDialog::onEnterPressedInternal()
     startGame(m_track_ident, num_laps);
 }
 // ------------------------------------------------------------------------------------------------------   
-void TrackInfoDialog::processEvent(std::string& eventSource)
+bool TrackInfoDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "start" )
     {
         const int num_laps = m_spinner->getValue();
         startGame(m_track_ident, num_laps);
+        return true;
     }
+    return false;
 }

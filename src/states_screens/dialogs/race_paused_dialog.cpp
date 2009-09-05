@@ -19,8 +19,11 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <string>
@@ -28,6 +31,8 @@ using namespace GUIEngine;
 
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {
+    RaceManager::getWorld()->pause();
+    
     IGUIFont* font = GUIEngine::getFont();
     const int text_height = font->getDimension(L"X").Height;
     
@@ -40,7 +45,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
                                                                     m_irrlicht_window);
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-
+    
     // ---- Back button
     IconButtonWidget* back_btn = new IconButtonWidget();
     back_btn->m_properties[PROP_ID] = "backbtn";
@@ -57,14 +62,14 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     GUIEngine::getGUIEnv()->setFocus( back_btn->getIrrlichtElement() );
     
     // ---- Choice ribbon
-    RibbonWidget* choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
-    choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
-
-    choice_ribbon->x = 0;
-    choice_ribbon->y = text_height*2 + icon_size + 50;
-    choice_ribbon->w = m_area.getWidth();
-    choice_ribbon->h = icon_size + text_height;
-    choice_ribbon->setParent(m_irrlicht_window);
+    m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
+    m_choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
+    
+    m_choice_ribbon->x = 0;
+    m_choice_ribbon->y = text_height*2 + icon_size + 50;
+    m_choice_ribbon->w = m_area.getWidth();
+    m_choice_ribbon->h = icon_size + text_height;
+    m_choice_ribbon->setParent(m_irrlicht_window);
     
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_QUICK_RACE)
     {
@@ -75,7 +80,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
         ribbon_item->m_text = L"Setup New Race";
-        choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
@@ -85,7 +90,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
         ribbon_item->m_text = L"Restart Race";
-        choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
@@ -95,7 +100,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
         ribbon_item->m_text = L"Options";
-        choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
@@ -105,7 +110,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
         ribbon_item->m_text = L"Help";
-        choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
@@ -115,11 +120,11 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
         ribbon_item->m_text = L"Exit Race";
-        choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     
-    m_children.push_back(choice_ribbon);
-    choice_ribbon->add();   
+    m_children.push_back(m_choice_ribbon);
+    m_choice_ribbon->add();   
 }
 
 /*
@@ -178,7 +183,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
  111         break;
  112     }
  113 }
-*/
+ */
 
 /*
  void RaceMenu::handle(GameAction ga, int value)
@@ -198,15 +203,49 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
  130         break;
  131     }
  */
-/*
- resetAndGoToMenu("main.stkgui");
- input_manager->setMode(InputManager::MENU);
- */
 
 void RacePausedDialog::onEnterPressedInternal()
 {
 }
 
-void RacePausedDialog::processEvent(std::string& eventSource)
+bool RacePausedDialog::processEvent(std::string& eventSource)
 {
+    std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << ")\n";
+    
+    if (eventSource == "backbtn")
+    {
+        // unpausing is done in the destructor so nothing more to do here
+        ModalDialog::dismiss();
+        return true;
+    }
+    else if (eventSource == "exit")
+    {
+        ModalDialog::dismiss();
+        StateManager::get()->resetAndGoToMenu("main.stkgui");
+        input_manager->setMode(InputManager::MENU);
+        return true;
+    }
+    else if (eventSource == "help")
+    {
+        // TODO
+    }
+    else if (eventSource == "options")
+    {
+        // TODO
+    }
+    else if (eventSource == "restart")
+    {
+        // TODO
+    }
+    else if (eventSource == "newrace")
+    {
+        // TODO
+    }
+    return false;
 }
+
+RacePausedDialog::~RacePausedDialog()
+{
+    RaceManager::getWorld()->unpause();
+}
+

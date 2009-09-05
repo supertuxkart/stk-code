@@ -20,17 +20,23 @@
 
 #include "guiengine/modaldialog.hpp"
 
+namespace GUIEngine
+{
+    class RibbonWidget;
+}
 
 class RacePausedDialog : public GUIEngine::ModalDialog
 {
+    GUIEngine::RibbonWidget* m_choice_ribbon;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
     RacePausedDialog(const float percentWidth, const float percentHeight);  
+    virtual ~RacePausedDialog();
     
     void onEnterPressedInternal();
-    void processEvent(std::string& eventSource);
+    bool processEvent(std::string& eventSource);
 };
 
 #endif

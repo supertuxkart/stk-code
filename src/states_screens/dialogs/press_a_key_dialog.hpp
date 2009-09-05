@@ -28,7 +28,7 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     PressAKeyDialog(const float percentWidth, const float percentHeight);
-    void processEvent(std::string& eventSource);
+    bool processEvent(std::string& eventSource);
 };
 
 #endif

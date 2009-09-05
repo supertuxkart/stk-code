@@ -153,10 +153,10 @@ bool EventHandler::onGUIEvent(const SEvent& event)
 
 bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if (ModalDialog::isADialogActive() && w->m_event_handler == NULL)
+    if (ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]);
-        return false;
+        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID])) return false;
+        if (w->m_event_handler == NULL) return false;
     }
     
     std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;

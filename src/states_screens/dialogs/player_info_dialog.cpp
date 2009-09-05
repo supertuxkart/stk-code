@@ -181,7 +181,7 @@ void PlayerInfoDialog::onEnterPressedInternal()
 {
 }
 // ------------------------------------------------------------------------------------------------------
-void PlayerInfoDialog::processEvent(std::string& eventSource)
+bool PlayerInfoDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "renameplayer")
     {
@@ -200,11 +200,12 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         ModalDialog::dismiss();
         
         dismiss();
-        return;
+        return true;
     }
     else if(eventSource == "removeplayer")
     {
         showConfirmDialog();
+        return true;
     }
     else if(eventSource == "confirmremove")
     {
@@ -216,12 +217,12 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
         ModalDialog::dismiss();
-        
-        return;
+        return true;
     }
     else if(eventSource == "cancelremove")
     {
         showRegularDialog();
+        return true;
     }
     else if(eventSource == "cancel")
     {   
@@ -231,8 +232,7 @@ void PlayerInfoDialog::processEvent(std::string& eventSource)
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
         
         ModalDialog::dismiss();
-        
-        return;
+        return true;
     }
-    
+    return false;
 }

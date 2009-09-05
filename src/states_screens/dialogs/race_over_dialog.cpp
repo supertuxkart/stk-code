@@ -235,7 +235,7 @@ void RaceOverDialog::onEnterPressedInternal()
 {
 }
 
-void RaceOverDialog::processEvent(std::string& eventSource)
+bool RaceOverDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "raceagainbtn")
     {
@@ -243,6 +243,7 @@ void RaceOverDialog::processEvent(std::string& eventSource)
         network_manager->setState(NetworkManager::NS_MAIN_MENU);
         RaceManager::getWorld()->unpause();
         race_manager->rerunRace();
+        return true;
     }
     else if (eventSource == "newracebtn")
     {
@@ -251,6 +252,7 @@ void RaceOverDialog::processEvent(std::string& eventSource)
         race_manager->exitRace();
         StateManager::get()->resetAndGoToMenu("main.stkgui");
         StateManager::get()->pushMenu("karts.stkgui");
+        return true;
     }
     else if (eventSource == "backtomenu")
     {
@@ -258,14 +260,16 @@ void RaceOverDialog::processEvent(std::string& eventSource)
         RaceManager::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToMenu("main.stkgui");
+        return true;
     }
     else if (eventSource == "continuegp")
     {
         ModalDialog::dismiss();
         RaceManager::getWorld()->unpause();
         race_manager->next();
+        return true;
     }
-    
+    return false;
 }
 
 
