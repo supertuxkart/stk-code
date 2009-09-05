@@ -35,14 +35,15 @@ void IconButtonWidget::add()
     ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
     assert(texture != NULL);
     const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
-    /*
-     if(w < texture_w) ... ;
-     if(h < texture_h) ... ;
-     */
+
+    // irrlicht widgets don't support scaling while keeping aspect ratio
+    // so, happily, let's implement it ourselves
+    const int x_gap = (int)((float)w - (float)texture_w * (float)h / texture_h);
+    
     rect<s32> widget_size;
     if (clickable)
     {
-        widget_size = rect<s32>(x, y, x + w, y + h);
+        widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
 
         MyGUIButton* btn = new MyGUIButton(GUIEngine::getGUIEnv(), m_parent,  getNewID(), widget_size, true);
         //IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
@@ -54,17 +55,12 @@ void IconButtonWidget::add()
     }
     else
     {
-        // irrlicht widgets don't support scaling while keeping aspect ratio
-        // so, happily, let's implement it ourselves
-        const int x_gap = (int)((float)w - (float)texture_w * (float)h / texture_h);
-        
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
         
         IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, m_parent, getNewNoFocusID());
         m_element = btn;
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
-        //btn->setDrawBorder(false);
         btn->setTabStop(false);
         btn->setScaleImage(true);
     }
@@ -73,7 +69,8 @@ void IconButtonWidget::add()
     stringw& message = m_text;
     if (message.size() > 0)
     {
-        widget_size += position2d<s32>(0, widget_size.getHeight());
+        widget_size = rect<s32>(x, y + h, x + w, y + h*2);
+
         label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
         label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         label->setTabStop(false);

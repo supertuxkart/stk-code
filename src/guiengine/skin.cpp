@@ -969,10 +969,14 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     //if (id == -1) return;
     
     Widget* widget = GUIEngine::getWidget(id);
-    
-    //std::cout << "3D Pane " << id << " : ";
-    //if(widget == NULL) std::cout << "widget=NULL\n";
-    //else std::cout << widget->m_properties[PROP_ID].c_str() << std::endl;
+
+    /*
+    std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str()) << std::endl;
+    if (widget == NULL) std::cout << "Null widget: ID=" << id << " type=" << element->getTypeName() <<
+        " x=" << rect.UpperLeftCorner.X <<
+        " y=" << rect.UpperLeftCorner.Y << 
+        " w=" << rect.getWidth() << " h=" << rect.getHeight() << std::endl;
+    */
     
     if (widget == NULL) return;
     

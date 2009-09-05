@@ -28,15 +28,6 @@ using namespace GUIEngine;
 
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {
-    /*
-#ifdef IRR_SVN
-    const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-#else
-    const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-#endif
-    const int screen_w = (int)(frame_size.Width*percentWidth);
-    const int screen_h = (int)(frame_size.Height*percentHeight);
-        */
     IGUIFont* font = GUIEngine::getFont();
     const int text_height = font->getDimension(L"X").Height;
     
@@ -56,9 +47,9 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     back_btn->m_properties[PROP_ICON] = "gui/back.png";
     //I18N: In the 'paused' screen
     back_btn->m_text = L"Back to Race";
-    back_btn->x = m_area.getWidth() / 2 - icon_size / 2;
+    back_btn->x = m_area.getWidth() / 2 - icon_size;
     back_btn->y = text_height;
-    back_btn->w = icon_size;
+    back_btn->w = icon_size*2; // width larger to leave room for text
     back_btn->h = icon_size;
     back_btn->setParent(m_irrlicht_window);
     m_children.push_back(back_btn);
