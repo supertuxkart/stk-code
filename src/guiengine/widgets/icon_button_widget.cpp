@@ -49,7 +49,7 @@ void IconButtonWidget::add()
         //IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
-        btn->setDrawBorder(false);
+        //btn->setDrawBorder(false);
         btn->setTabStop(true);
         m_element = btn;
     }

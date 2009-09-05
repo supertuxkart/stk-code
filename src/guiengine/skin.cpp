@@ -966,9 +966,9 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     
     const int id = element->getID();
-    //if (id == -1) return;
     
-    Widget* widget = GUIEngine::getWidget(id);
+    Widget* widget = NULL;
+    if (id != -1) widget = GUIEngine::getWidget(id);
 
     /*
     std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str()) << std::endl;
