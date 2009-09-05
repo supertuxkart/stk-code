@@ -64,6 +64,7 @@ void IconButtonWidget::add()
         btn->setTabStop(false);
         btn->setScaleImage(true);
     }
+    id = m_element->getID();
     
     // ---- label if any
     stringw& message = m_text;

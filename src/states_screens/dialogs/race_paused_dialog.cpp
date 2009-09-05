@@ -48,7 +48,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     //I18N: In the 'paused' screen
     back_btn->m_text = L"Back to Race";
     back_btn->x = m_area.getWidth() / 2 - icon_size;
-    back_btn->y = text_height;
+    back_btn->y = text_height*2;
     back_btn->w = icon_size*2; // width larger to leave room for text
     back_btn->h = icon_size;
     back_btn->setParent(m_irrlicht_window);
@@ -61,9 +61,9 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     choice_ribbon->m_properties[PROP_ID] = "choiceribbon";
 
     choice_ribbon->x = 0;
-    choice_ribbon->y = text_height + icon_size + 50;
+    choice_ribbon->y = text_height*2 + icon_size + 50;
     choice_ribbon->w = m_area.getWidth();
-    choice_ribbon->h = icon_size + text_height*2;
+    choice_ribbon->h = icon_size + text_height;
     choice_ribbon->setParent(m_irrlicht_window);
     
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_QUICK_RACE)
