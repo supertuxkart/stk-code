@@ -40,8 +40,8 @@
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/options_screen.hpp"
 #include "states_screens/kart_selection.hpp"
+#include "states_screens/options_screen.hpp"
 #include "states_screens/state_manager.hpp"
 InputManager *input_manager;
 
@@ -506,8 +506,9 @@ bool InputManager::input(const SEvent& event)
     }
 #endif
     
-    // block events in all modes but initial menus (except in text boxes to allow typing)
-    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox;
+    // block events in all modes but initial menus (except in text boxes to allow typing, and exceptm in modal dialogs in-game)
+    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox &&
+            (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->isGameState());
 }
 
 //-----------------------------------------------------------------------------

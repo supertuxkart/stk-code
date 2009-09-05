@@ -52,7 +52,7 @@ bool EventHandler::OnEvent (const SEvent &event)
     else
     {
         // FIXME : it's a bit unclean that all input events go trough the gui module
-        const bool blockPropagation = input_manager->input(event) && !ModalDialog::isADialogActive();
+        const bool blockPropagation = input_manager->input(event);
         return blockPropagation;
     }
     
