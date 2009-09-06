@@ -60,7 +60,9 @@
                            width="100%" square_items="false"
                            align="center" child_width="128" child_height="128" max_height="150" />
         
-        <button id="apply_resolution" width="20%" height="30"
+        <spacer height="10" width="10"/>
+
+        <button id="apply_resolution" width="40%" height="30"
                 I18N="In the video settings menu" text="Apply video changes" />
         
     </box>
@@ -69,6 +71,7 @@
     
 </div>
 
-<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+<button id="back" x="20" y="-40" width="250" height="35" align="left"
+        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
 
 </stkgui>

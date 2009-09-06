@@ -45,6 +45,7 @@
 
 </div>
 
-<button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+<button id="back" x="20" y="-40" width="250" height="35" align="left"
+        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
 
 </stkgui>
