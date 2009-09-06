@@ -244,7 +244,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
 
 void Screen::addWidgets()
 {
-    if(!m_loaded) loadFromFile();
+    if (!m_loaded) loadFromFile();
     
     addWidgetsRecursively( m_widgets );
 

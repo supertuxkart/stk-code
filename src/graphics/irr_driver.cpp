@@ -509,7 +509,7 @@ void IrrDriver::displayFPS()
     const int fps       = m_device->getVideoDriver()->getFPS();
 
     // Min and max info tracking, per mode, so user can check game vs menus
-    bool current_state     = StateManager::get()->isGameState();
+    bool current_state     = StateManager::get()->getGameState() == GUIEngine::GAME;
     static bool prev_state = false;
     static int min         = 999; // Absurd values for start will print first time
     static int max         = 0;   // but no big issue, maybe even "invisible"
@@ -545,7 +545,7 @@ void IrrDriver::update(float dt)
     m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
 
     {    // just to mark the beding/end scene block
-        if(!StateManager::get()->isGameState())
+        if (StateManager::get()->getGameState() != GUIEngine::GAME)
         {
             // this code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
@@ -569,7 +569,7 @@ void IrrDriver::update(float dt)
         }
         
        // GUI is active
-        if (!inRace || GUIEngine::ModalDialog::isADialogActive())
+        //if (!inRace || GUIEngine::ModalDialog::isADialogActive())
         {
             GUIEngine::render(dt);
         }

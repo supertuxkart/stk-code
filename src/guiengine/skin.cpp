@@ -946,7 +946,7 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
 
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    if(GUIEngine::getStateManager()->isGameState()) return; // ignore in game mode
+    if (GUIEngine::getStateManager()->getGameState() == GUIEngine::GAME) return; // ignore in game mode
     
     //const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();
@@ -1088,12 +1088,17 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     //    GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
 }
 
-core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{    
+void Skin::drawBGFadeColor()
+{
     // fade out background
     SColor& color = SkinConfig::m_colors["dialog_background::neutral"];
     GUIEngine::getDriver()->draw2DRectangle( color,
                                             core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+}
+
+core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+{    
+    drawBGFadeColor();
     
     // draw frame
     drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);

@@ -32,6 +32,7 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/options_screen.hpp"
@@ -54,7 +55,7 @@ const std::string g_teardown_event = "tearDown";
 
 AbstractStateManager::AbstractStateManager()
 {
-    m_game_mode = false;
+    m_game_mode = MENU;
 }
 
 #if 0
@@ -75,12 +76,12 @@ void AbstractStateManager::enterGameState()
 {
     m_menu_stack.clear();
     m_menu_stack.push_back("race");
-    m_game_mode = true;
+    m_game_mode = GAME;
     cleanForGame();
     input_manager->setMode(InputManager::INGAME);
 }
 
-bool AbstractStateManager::isGameState()
+GameState AbstractStateManager::getGameState()
 {
     return m_game_mode;
 }
@@ -93,25 +94,38 @@ bool AbstractStateManager::isGameState()
 
 void AbstractStateManager::pushMenu(std::string name)
 {
+    // currently, only a single in-game menu is supported
+    assert(m_game_mode != INGAME_MENU);
+    
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    if (m_menu_stack.size() > 0 && m_game_mode != GAME) eventCallback(NULL, g_teardown_event);
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
-    m_game_mode = false;
+    if (m_game_mode == GAME)
+    {
+        m_game_mode = INGAME_MENU;
+        RaceManager::getWorld()->pause();
+    }
+    else
+    {
+        m_game_mode = MENU;
+    }
     switchToScreen(name.c_str());
     
     // Send init event to new menu
     eventCallback(NULL, g_init_event);
 }
+
 void AbstractStateManager::replaceTopMostMenu(std::string name)
 {
+    assert(m_game_mode != GAME);
+    
     // Send tear-down event to previous menu
     if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack[m_menu_stack.size()-1] = name;
-    m_game_mode = false;
     switchToScreen(name.c_str());
     
     // Send init event to new menu
@@ -120,6 +134,8 @@ void AbstractStateManager::replaceTopMostMenu(std::string name)
 
 void AbstractStateManager::reshowTopMostMenu()
 {
+    assert(m_game_mode != GAME);
+    
     // Send tear-down event to previous menu
     if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
     
@@ -131,22 +147,38 @@ void AbstractStateManager::reshowTopMostMenu()
 
 void AbstractStateManager::popMenu()
 {
+    assert(m_game_mode != GAME);
+    
     // Send tear-down event to menu
     eventCallback(NULL, g_teardown_event);
     m_menu_stack.pop_back();
     
-    if(m_menu_stack.size() == 0)
+    if (m_menu_stack.size() == 0)
     {
         main_loop->abort();
         return;
     }
-    
-    m_game_mode = m_menu_stack[m_menu_stack.size()-1] == "race";
-    
+        
     std::cout << "-- switching to screen " << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
-    switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
-    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN); // No assign mode on menus by default
-    eventCallback(NULL, g_init_event);
+    
+    if (m_menu_stack[m_menu_stack.size()-1] == "race")
+    {
+        m_menu_stack.push_back("race");
+        if (m_game_mode == INGAME_MENU)
+        {
+            RaceManager::getWorld()->unpause();
+        }
+        m_game_mode = GAME;
+        cleanForGame();
+        input_manager->setMode(InputManager::INGAME);
+    }
+    else
+    {
+        m_game_mode = MENU;
+        switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
+        input_manager->getDeviceList()->setAssignMode(NO_ASSIGN); // No assign mode on menus by default
+        eventCallback(NULL, g_init_event);
+    }
 }
 
 void AbstractStateManager::resetAndGoToMenu(std::string name)
@@ -155,7 +187,7 @@ void AbstractStateManager::resetAndGoToMenu(std::string name)
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.clear();
     m_menu_stack.push_back(name);
-    m_game_mode = false;
+    m_game_mode = MENU;
     sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
     switchToScreen(name.c_str());
     eventCallback(NULL, g_init_event);

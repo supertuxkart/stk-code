@@ -468,7 +468,7 @@ void StateManager::escapePressed()
         ModalDialog::dismiss();
     }
     // In-game
-    else if(m_game_mode)
+    else if(m_game_mode == GAME)
     {
         new RacePausedDialog(0.8f, 0.6f);
         //resetAndGoToMenu("main.stkgui");

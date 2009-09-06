@@ -235,6 +235,9 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
         else if (selection == "help")
         {
             // TODO
+            dismiss();
+            StateManager::get()->pushMenu("help1.stkgui");
+            return true;
         }
         else if (selection == "options")
         {

@@ -8,6 +8,13 @@ namespace GUIEngine
 {
     class Widget;
 
+    enum GameState
+    {
+        MENU,
+        GAME,
+        INGAME_MENU
+    };
+    
 /**
   * Abstract base class you must override from to use the GUI engine
   */
@@ -17,7 +24,7 @@ protected:
     /**
       * Whether we are in game mode
       */
-    bool m_game_mode;
+    GameState m_game_mode;
     
     /**
      * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
@@ -33,7 +40,9 @@ public:
     void popMenu();
     void resetAndGoToMenu(std::string name);
     void enterGameState();
-    bool isGameState();
+    
+    GameState getGameState();
+    
     void reshowTopMostMenu();
 
     /*  ***********************************

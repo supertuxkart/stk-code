@@ -244,6 +244,7 @@ namespace GUIEngine
 
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
         void drawBgImage();
+        void drawBGFadeColor();
         
         // irrlicht's callbacks
         virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);

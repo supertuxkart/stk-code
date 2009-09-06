@@ -191,11 +191,22 @@ void render(float elapsed_time)
     GUIEngine::dt = elapsed_time;
     
      // ---- menu drawing
+    
     // draw background image and sections
-    const bool gui_state = !g_state_manager->isGameState();
-    if (gui_state)
+    
+    const GameState gamestate = g_state_manager->getGameState();
+    
+    if (gamestate == MENU)
     {
         g_skin->drawBgImage();
+    }
+    else if (gamestate == INGAME_MENU)
+    {
+        g_skin->drawBGFadeColor();
+    }
+    
+    if (gamestate != GAME)
+    {
         g_skin->renderSections();
     }
     
@@ -203,7 +214,7 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- some menus may need updating
-    if (!g_state_manager->isGameState())
+    if (gamestate != GAME)
     {
         g_state_manager->onUpdate(elapsed_time);
     }

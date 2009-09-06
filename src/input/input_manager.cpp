@@ -246,7 +246,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
 
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
-    if (!StateManager::get()->isGameState() && type == Input::IT_KEYBOARD && m_mode == MENU &&
+    if (StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD && m_mode == MENU &&
         m_device_manager->playerAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
@@ -315,7 +315,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
         }
 
         // ... when in-game
-        if (StateManager::get()->isGameState() && !GUIEngine::ModalDialog::isADialogActive())
+        if (StateManager::get()->getGameState() == GUIEngine::GAME && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
             PlayerKart* pk;
@@ -508,7 +508,7 @@ bool InputManager::input(const SEvent& event)
     
     // block events in all modes but initial menus (except in text boxes to allow typing, and exceptm in modal dialogs in-game)
     return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox &&
-            (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->isGameState());
+        (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME);
 }
 
 //-----------------------------------------------------------------------------

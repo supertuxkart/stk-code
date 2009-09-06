@@ -1,10 +1,11 @@
 
-#include "states_screens/state_manager.hpp"
 #include "config/device_config.hpp"
+#include "guiengine/abstract_state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/state_manager.hpp"
 
 
 InputDevice::InputDevice()
@@ -88,7 +89,7 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player)
 {
     KeyBinding bind;
-    if(!StateManager::get()->isGameState()) return; // ignore this while in menus
+    if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
 
     PlayerKart* pk = player->getKart();
     if (pk == NULL)
