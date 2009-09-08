@@ -52,7 +52,7 @@ private:
 
     void setDefaultSuccessors();
     void load         (const std::string &filename);
-    void createMesh();
+    void createMesh(bool show_invisible=true);
 public:
     static const int UNKNOWN_SECTOR;
 

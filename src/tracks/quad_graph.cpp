@@ -162,7 +162,7 @@ void QuadGraph::setDefaultSuccessors()
 /** Creates a mesh for this graph. The mesh is not added to a scene node and 
  *  is stored in m_mesh.
  */
-void QuadGraph::createMesh()
+void QuadGraph::createMesh(bool show_invisible)
 {
     // The debug track will not be lighted or culled.
     video::SMaterial m;
@@ -172,17 +172,26 @@ void QuadGraph::createMesh()
     m_mesh_buffer     = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
 
-    video::SColor     c(255, 255, 0, 0);    
-    unsigned int      n     = m_all_quads->getNumberOfQuads();
+    // Count the number of quads to display (some quads might be invisible
+    unsigned int  n = 0;
+    for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+        if(show_invisible || !m_all_quads->getQuad(i).isInvisible())
+            n++;
+
     // Four vertices for each of the n-1 remaining quads
     video::S3DVertex *new_v = new video::S3DVertex[n*4];
     // Each quad consists of 2 triangles with 3 elements, so 
     // we need 2*3 indices for each quad.
     irr::u16         *ind   = new irr::u16[n*6];
+    video::SColor     c(255, 255, 0, 0);    
 
     // Now add all quads
-    for(unsigned int i=0; i<n; i++)
+    int i=0;
+    for(unsigned int count=0; count<m_all_quads->getNumberOfQuads(); count++)
     {
+        // Ignore invisible quads
+        if(!show_invisible && m_all_quads->getQuad(count).isInvisible())
+            continue;
         // Swap the colours from red to blue and back
         c.setRed (i%2 ? 255 : 0); 
         c.setBlue(i%2 ? 0 : 255);
@@ -198,6 +207,7 @@ void QuadGraph::createMesh()
         ind[6*i+3] = 4*i;  // second triangle: vertex 0, 1, 3
         ind[6*i+4] = 4*i+2;
         ind[6*i+5] = 4*i+3;
+        i++;
     }   // for i=1; i<m_all_quads
     
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
@@ -455,8 +465,8 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
     m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
     m_scaling.setY(dimension.Width/(bb_max.getY()-bb_min.getY()));
     return texture;
-
 }   // drawMiniMap
+
 //-----------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map 
      *  texture.

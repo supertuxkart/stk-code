@@ -83,7 +83,9 @@ void QuadSet::load(const std::string &filename) {
         getPoint(xml_node, "p1", &p1);
         getPoint(xml_node, "p2", &p2);
         getPoint(xml_node, "p3", &p3);
-        Quad* q=new Quad(p0,p1,p2,p3);
+        bool invisible=false;
+        xml_node->get("invisible", &invisible);
+        Quad* q=new Quad(p0,p1,p2,p3, invisible);
         m_all_quads.push_back(q);
         m_max.max(p0);m_max.max(p1);m_max.max(p2);m_max.max(p3);
         m_min.min(p0);m_min.min(p1);m_min.min(p2);m_min.min(p3);

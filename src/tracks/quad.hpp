@@ -40,10 +40,14 @@ private:
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
     float m_min_height;
-    float sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const;
 
+    /** Set to true if this quad should not be shown in the minimap. */
+    bool  m_invisible;
+
+    float sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const;
 public:
-         Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
+         Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
+              bool invis=false);
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     bool pointInQuad(const Vec3& p) const;
     void transform(const btTransform &t, Quad *result) const;
@@ -56,5 +60,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the minimum height of a quad. */
     float       getMinHeight() const { return m_min_height; }    
+    // ------------------------------------------------------------------------
+    /** Returns true of this quad is invisible, i.e. not to be shown in 
+     *  the minimap. */
+    bool        isInvisible() const { return m_invisible; }
 };   // class Quad
 #endif
