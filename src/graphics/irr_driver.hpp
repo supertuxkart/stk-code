@@ -145,13 +145,13 @@ public:
         video::IVideoDriver        *m_video_driver;
         
     public:
-        #ifdef IRR_SVN
+#ifdef IRR_SVN
         RTTProvider(const core::dimension2du &dimension, 
-                         const std::string &name);
-        #else
+                    const std::string &name);
+#else
         RTTProvider(const core::dimension2di &dimension, 
-                         const std::string &name);
-        #endif   
+                    const std::string &name);
+#endif   
         
         ~RTTProvider();
         
@@ -159,7 +159,8 @@ public:
                            std::vector<Vec3>& mesh_location);
         
         /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
-        video::ITexture* renderToTexture(float angle=-1);
+        video::ITexture* renderToTexture(float angle=-1,
+                                         bool is_2d_render=false);
         
         void tearDownRTTScene();
         

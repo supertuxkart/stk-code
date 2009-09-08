@@ -624,13 +624,16 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 /** Begins a rendering to a texture.
  *  \param dimension The size of the texture. 
  *  \param name Name of the texture.
+ *  \param dont_do_set_render_target This is a fix for the problem that 2d
+ *         rendering doesn't work if setRenderTarget is called here, but 3d
+ *         rendering doesn't work if it's not called here :(
  */
 #ifdef IRR_SVN
 IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
-                              const std::string &name)
+                                    const std::string &name)
 #else
 IrrDriver::RTTProvider::RTTProvider(const core::dimension2di &dimension, 
-                                         const std::string &name)
+                                    const std::string &name)
 #endif
 {
     m_video_driver = irr_driver->getVideoDriver();
@@ -642,12 +645,14 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2di &dimension,
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
-}
+}   // RTTProvider
+
 // ----------------------------------------------------------------------------
 IrrDriver::RTTProvider::~RTTProvider()
 {
     tearDownRTTScene();
-}
+}   // ~RTTProvider
+
 // ----------------------------------------------------------------------------
 /** Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
  *  object inside the GUI. If there are multiple meshes, the first mesh is considered
@@ -660,7 +665,7 @@ IrrDriver::RTTProvider::~RTTProvider()
  *         positioned.
  */
 void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
-                              std::vector<Vec3>& mesh_location)
+                                           std::vector<Vec3>& mesh_location)
 {     
     m_rtt_main_node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0));
     assert(m_rtt_main_node != NULL);
@@ -711,8 +716,9 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
     // Detach the note from the scene so we can render it independently
     m_rtt_main_node->setVisible(false);
     m_light->setVisible(false);
-}
+}   // setupRTTScene
 
+// ----------------------------------------------------------------------------
 void IrrDriver::RTTProvider::tearDownRTTScene()
 {
     //if (m_rtt_main_node != NULL) m_rtt_main_node->drop();
@@ -723,16 +729,22 @@ void IrrDriver::RTTProvider::tearDownRTTScene()
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
-}
+}   // tearDownRTTScene
 
+// ----------------------------------------------------------------------------
 /**
  * Performs the actual render-to-texture
  *  \param target The texture to render the meshes to.
  *  \param angle (Optional) heading for all meshes.
  */
-ITexture* IrrDriver::RTTProvider::renderToTexture(float angle)
+ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
+                                                  bool is_2d_render)
 {
-    m_video_driver->setRenderTarget(m_render_target_texture);  
+    // Rendering a 2d only model (using direct opengl rendering)
+    // does not work if setRenderTarget is called here again.
+    // And rendering 3d only works if it is called here :(
+    if(!is_2d_render)
+        m_video_driver->setRenderTarget(m_render_target_texture);  
     
     if (angle != -1 && m_rtt_main_node != NULL) m_rtt_main_node->setRotation( core::vector3df(0, angle, 0) );
     
