@@ -432,7 +432,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
 #endif
 {
     IrrDriver::RTTProvider rttProvider(dimension, name);
-    createMesh();   
+    createMesh(false);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
