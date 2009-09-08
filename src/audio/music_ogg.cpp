@@ -28,6 +28,7 @@
 #  include <AL/al.h>
 #endif
 
+#include "audio/sound_manager.hpp"
 #include "config/user_config.hpp"
 
 MusicOggStream::MusicOggStream()
@@ -280,11 +281,8 @@ void MusicOggStream::update()
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
     char pcm[m_buffer_size];
-#if defined(WORDS_BIGENDIAN)
-    int  isBigEndian = 1;
-#else
-    int  isBigEndian = 0;
-#endif
+    const int isBigEndian = (IS_LITTLE_ENDIAN ? 0 : 1);
+
     int  size = 0;
     int  portion;
     int  result;

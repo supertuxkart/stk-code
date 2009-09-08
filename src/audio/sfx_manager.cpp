@@ -140,21 +140,14 @@ void SFXManager::loadSfx()
     loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE   );
 }   // loadSfx
 //----------------------------------------------------------------------------
-
-// the ogg loader needs to know about endianness so do a simple test.
-// 0 : little endian
-// 1 : big endian
-// I'm doing it at runtime rather than at compile-time to be friendly with
-// cross-compilation (universal binaries on mac, namely)
-static const int endianness_test = 0x01000000;
-static const char* endianness_test_ptr = (const char*)&endianness_test;
-// in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
-static const int ogg_endianness = endianness_test_ptr[0];
-
-// Load a vorbis file into an OpenAL buffer
-// based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
+/** Load a vorbis file into an OpenAL buffer
+    based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
+ */
 bool loadVorbisBuffer(const char *name, ALuint buffer)
 {
+    const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
+
+    
     bool success = false;
     FILE *file;
     vorbis_info *info;

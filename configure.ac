@@ -29,7 +29,6 @@ AC_PROG_CPP
 AC_PROG_CXX
 
 # This macro defines WORDS_BIGENDIAN if building for a big endian machine.
-# This is required by ov_read (Ogg Vorbis)
 AC_C_BIGENDIAN
 
 

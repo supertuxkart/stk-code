@@ -38,6 +38,19 @@
 
 SoundManager* sound_manager= NULL;
 
+
+// the ogg loader needs to know about endianness so do a simple test.
+// 0 : little endian
+// 1 : big endian
+// I'm doing it at runtime rather than at compile-time to be friendly with
+// cross-compilation (universal binaries on mac, namely)
+static const int endianness_test = 0x01000000;
+static const char* endianness_test_ptr = (const char*)&endianness_test;
+
+// in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
+bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
+
+
 SoundManager::SoundManager()
 {
     m_current_music= NULL;
