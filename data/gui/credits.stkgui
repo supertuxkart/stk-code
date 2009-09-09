@@ -2,7 +2,7 @@
 
     <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
     
-        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo.png"/>
+        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo_slim.png"/>
         
         <label I18N="Title in credits screen" text="Credits" width="100%" />
         

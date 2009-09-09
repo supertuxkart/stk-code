@@ -1,12 +1,10 @@
 <stkgui>
 
-    <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+    <div x="5%" y="0" width="90%" height="98%" layout="vertical-row" >
     
-        <icon id="logo" align="center" proportion="3" width="100%" icon="gui/logo.png"/>
+        <icon id="logo" align="center" proportion="8" width="100%" icon="gui/logo.png"/>
         
-        <spacer proportion="1" width="10"/>
-        
-        <buttonbar id="menu_toprow" proportion="2" width="75%" align="center">
+        <buttonbar id="menu_toprow" proportion="3" width="75%" align="center">
             <icon-button id="new" width="128" height="128" icon="gui/main_race.png"
                     I18N="Main menu button" text="Race"/>
             <icon-button id="network" width="128" height="128" icon="gui/main_network.png"
@@ -18,7 +16,7 @@
         
         <spacer width="10" proportion="1"/>
         
-        <buttonbar id="menu_bottomrow" proportion="2" width="85%" align="center">
+        <buttonbar id="menu_bottomrow" proportion="3" width="85%" align="center">
             <icon-button id="options" width="128" height="128" icon="gui/main_options.png"
                     I18N="Main menu button"  text="Options"/>
             <icon-button id="help" width="128" height="128" icon="gui/main_help.png"
