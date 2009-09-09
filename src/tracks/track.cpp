@@ -241,7 +241,24 @@ void Track::loadTrackInfo(const std::string &filename)
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
-        
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    {
+        const XMLNode *mode=root->getNode(i);
+        if(mode->getName()!="mode") continue;
+        TrackMode tm;
+        mode->get("name",  &tm.m_name      );
+        mode->get("quads", &tm.m_quad_name );
+        mode->get("graph", &tm.m_graph_name);
+        mode->get("scene", &tm.m_scene     );
+        m_all_modes.push_back(tm);
+    }
+    // If no mode is specified, add a default mode.
+    if(m_all_modes.size()==0)
+    {
+        TrackMode tm;
+        m_all_modes.push_back(tm);
+    }
+
     if(m_groups.size()==0)
         m_groups.push_back("standard");
     // if both camera position and rotation are defined,
@@ -252,44 +269,7 @@ void Track::loadTrackInfo(const std::string &filename)
                                     &m_camera_final_hpr)     !=1;
     m_camera_final_hpr.degreeToRad();
 
-    m_sky_type = SKY_NONE;
-    const XMLNode *xml_node = root->getNode("sky-dome");
-    if(xml_node)
-    {
-        m_sky_type            = SKY_DOME;
-        m_sky_vert_segments   = 16;
-        m_sky_hori_segments   = 16;
-        m_sky_sphere_percent  = 1.0f;
-        m_sky_texture_percent = 1.0f;
-        std::string s;
-        xml_node->get("texture",          &s                   );
-        m_sky_textures.push_back(s);
-        xml_node->get("vertical",        &m_sky_vert_segments  );
-        xml_node->get("horizontal",      &m_sky_hori_segments  );
-        xml_node->get("sphere-percent",  &m_sky_sphere_percent );
-        xml_node->get("texture-percent", &m_sky_texture_percent);
-
-    }   // if sky-dome
-    xml_node = root->getNode("sky-box");
-    if(xml_node)
-    {
-        std::string s;
-        xml_node->get("texture", &s);
-        m_sky_textures = StringUtils::split(s, ' ');
-        if(m_sky_textures.size()!=6)
-        {
-            fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
-                    (int)m_sky_textures.size());
-            fprintf(stderr, "in '%s'.\n", filename.c_str());
-
-        }
-        else
-        {
-            m_sky_type = SKY_BOX;
-        }
-    }   // if sky-box
-
-    xml_node = root->getNode("curves");
+    const XMLNode *xml_node = root->getNode("curves");
 	if(xml_node)
 		loadCurves(*xml_node);
 
@@ -347,9 +327,10 @@ void Track::startMusic() const
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph()
+void Track::loadQuadGraph(unsigned int mode_id)
 {
-    m_quad_graph = new QuadGraph(m_root+"/quads.xml", m_root+"/graph.xml");
+    m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
+                                 m_root+"/"+m_all_modes[mode_id].m_graph_name);
     m_mini_map   = m_quad_graph->makeMiniMap(RaceManager::getWorld()->getRaceGUI()->getMiniMapSize(), 
                                              "minimap::"+m_ident);
     if(m_quad_graph->getNumNodes()==0)
@@ -610,7 +591,7 @@ void Track::createWater(const XMLNode &node)
  *  Track is the first model to be loaded, so at this stage the root scene node 
  * is empty.
  */
-void Track::loadTrackModel()
+void Track::loadTrackModel(unsigned int mode_id)
 {
     item_manager->setStyle();
 
@@ -618,7 +599,7 @@ void Track::loadTrackModel()
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    loadQuadGraph();
+    loadQuadGraph(mode_id);
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
@@ -635,7 +616,7 @@ void Track::loadTrackModel()
     }
 
     // Start building the scene graph
-    std::string path = m_root+"/scene.xml";
+    std::string path = m_root+"/"+m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
     // Make sure that we have a track (which is used for raycasts to 
@@ -714,6 +695,10 @@ void Track::loadTrackModel()
 		{
 			m_check_manager = new CheckManager(*node);
 		}
+        else if(name=="sky-dome" || name=="sky-box")
+        {
+            handleSky(*node, path);
+        }
         else
         {
             fprintf(stderr, "Warning: element '%s' not found.\n",
@@ -793,6 +778,44 @@ void Track::loadTrackModel()
     if(UserConfigParams::m_track_debug)
         m_quad_graph->createDebugMesh();
 }   // loadTrackModel
+
+//-----------------------------------------------------------------------------
+void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
+{
+    if(xml_node.getName()=="sky-dome")
+    {
+        m_sky_type            = SKY_DOME;
+        m_sky_vert_segments   = 16;
+        m_sky_hori_segments   = 16;
+        m_sky_sphere_percent  = 1.0f;
+        m_sky_texture_percent = 1.0f;
+        std::string s;
+        xml_node.get("texture",          &s                   );
+        m_sky_textures.push_back(s);
+        xml_node.get("vertical",        &m_sky_vert_segments  );
+        xml_node.get("horizontal",      &m_sky_hori_segments  );
+        xml_node.get("sphere-percent",  &m_sky_sphere_percent );
+        xml_node.get("texture-percent", &m_sky_texture_percent);
+
+    }   // if sky-dome
+    else if(xml_node.getName()=="sky-box")
+    {
+        std::string s;
+        xml_node.get("texture", &s);
+        m_sky_textures = StringUtils::split(s, ' ');
+        if(m_sky_textures.size()!=6)
+        {
+            fprintf(stderr, "A skybox needs 6 textures, but %d are specified\n",
+                    (int)m_sky_textures.size());
+            fprintf(stderr, "in '%s'.\n", filename.c_str());
+
+        }
+        else
+        {
+            m_sky_type = SKY_BOX;
+        }
+    }   // if sky-box
+}   // handleSky
 
 //-----------------------------------------------------------------------------
 void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 

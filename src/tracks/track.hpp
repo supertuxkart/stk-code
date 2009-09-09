@@ -108,6 +108,23 @@ private:
     /** If a sky dome is used, percentage of the texture to be used. */
     float                    m_sky_texture_percent;
 
+    /** A simple class to keep information about a track mode. */
+    class TrackMode
+    {
+    public:
+        std::string m_name;        /**< Name / description of this mode. */
+        std::string m_quad_name;   /**< Name of the quad file to use.    */
+        std::string m_graph_name;  /**< Name of the graph file to use.   */
+        std::string m_scene;       /**< Name of the scene file to use.   */
+        /** Default constructor, sets default names for all fields. */
+        TrackMode() : m_name("default"),         m_quad_name("quads.xml"),
+                      m_graph_name("graph.xml"), m_scene("scene.xml")   {};
+    };   // TrackMode
+
+    /** List of all modes for a track. */
+    std::vector<TrackMode> m_all_modes;
+
+    /** Name of the track to display. */
     irr::core::stringw  m_name;
     bool                m_use_fog;
     float               m_fog_density;
@@ -135,7 +152,7 @@ private:
     void  loadTrackInfo(const std::string &filename);
     void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                       int bNeedHeight);
-    void  loadQuadGraph();
+    void  loadQuadGraph(unsigned int mode_id);
     void  convertTrackToBullet(const scene::IMesh *mesh);
     bool                     loadMainTrack(const XMLNode &node);
     void                     createWater(const XMLNode &node);
@@ -143,6 +160,7 @@ private:
                               std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+    void handleSky(const XMLNode &root, const std::string &filename);
 
 public:
     
@@ -158,7 +176,7 @@ public:
     /** Returns the texture with the mini map for this track. */
     const video::ITexture*getMiniMap     () const { return m_mini_map; }
     const Vec3&        trackToSpatial    (const int SECTOR) const;
-    void               loadTrackModel    ();
+    void               loadTrackModel    (unsigned int mode_id=0);
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
     float              getGravity        () const {return m_gravity;            }
@@ -225,6 +243,11 @@ public:
     /** Returns the full path of a given file inside this track directory. */
     std::string        getTrackFile(const std::string &s) const 
                                 { return m_root+"/"+s; }
+    /** Returns the number of modes available for this track. */
+    unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    /** Returns the name of the i-th. mode. */
+    const std::string &getModeName(unsigned int i) const 
+                                                { return m_all_modes[i].m_name;}
 };   // class Track
 
 #endif
