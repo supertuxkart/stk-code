@@ -54,8 +54,8 @@ void CheckStructure::reset(const Track &track)
 		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
 		m_previous_position.push_back(xyz);
         
-        // Deactivate all lap counters, activate everything else
-        m_is_active.push_back(m_check_type!=CT_NEW_LAP);
+        // Activate all checkline
+        m_is_active.push_back(true);
 	}   // for i<getNumKarts
 }   // reset
 

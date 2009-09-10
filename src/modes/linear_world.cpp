@@ -65,7 +65,7 @@ void LinearWorld::init()
                                                m_kart[n]->getXYZ(),
                                                info.m_track_sector );
 
-        info.m_race_lap             = 0;
+        info.m_race_lap             = -1;
         info.m_lap_start_time       = 0;
         info.m_time_at_last_lap     = 99999.9f;
 
@@ -111,7 +111,7 @@ void LinearWorld::restartRace()
         m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
                                                m_kart[n]->getXYZ(),
                                                info.m_track_sector );
-        info.m_race_lap             = 0;
+        info.m_race_lap             = -1;
         info.m_lap_start_time       = -0;
         info.m_time_at_last_lap     = 99999.9f;
 
@@ -148,7 +148,8 @@ void LinearWorld::update(float delta)
         kart_info.m_on_road = kart_info.m_track_sector != QuadGraph::UNKNOWN_SECTOR;
         if(kart_info.m_on_road)
         {
-            kart_info.m_last_valid_sector = kart_info.m_track_sector;
+            kart_info.m_last_valid_sector   = kart_info.m_track_sector;
+            kart_info.m_last_valid_race_lap = kart_info.m_race_lap;
         }
         else
         {
@@ -206,9 +207,7 @@ void LinearWorld::update(float delta)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Is called by check structures if a kart starts a new lap. Note that the
- *  new check structure does not trigger a new lap the first time a kart
- *  crosses the starting line!
+/** Is called by check structures if a kart starts a new lap.
  *  \param kart_index Index of the kart.
  */
 void LinearWorld::newLap(unsigned int kart_index)
@@ -220,7 +219,8 @@ void LinearWorld::newLap(unsigned int kart_index)
     // will begin another countdown).
     if(kart_info.m_race_lap+1 <= race_manager->getNumLaps())
     {
-        setTimeAtLapForKart(getTime(), kart->getWorldKartId() );
+        assert(kart->getWorldKartId()==kart_index);
+        setTimeAtLapForKart(getTime(), kart_index );
         kart_info.m_race_lap++ ;
     }
     // Race finished
@@ -244,7 +244,8 @@ void LinearWorld::newLap(unsigned int kart_index)
         }
 
         // if new fastest lap
-        if(time_per_lap < getFastestLapTime() && raceHasLaps())
+        if(time_per_lap < getFastestLapTime() && raceHasLaps() &&
+            kart_info.m_race_lap>0)
         {
             setFastestLap(kart, time_per_lap);
             m_race_gui->addMessage(_("New fastest lap"), NULL,
@@ -535,7 +536,8 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
         if(m_kart[j]->hasFinishedRace()) { p++; continue; }
 
         /* has done more or less lapses */
-        int other_laps = getLapForKart(m_kart[j]->getWorldKartId());
+        assert(j==m_kart[j]->getWorldKartId());
+        int other_laps = getLapForKart(j);
         if (other_laps !=  my_laps)
         {
             if(other_laps > my_laps) p++; // Other kart has more lapses
@@ -544,7 +546,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
         // Now both karts have the same number of lapses. Test progression.
         // A kart is ahead if it's driven further, or driven the same
         // distance, but started further to the back.
-        float other_progression = getDistanceDownTrackForKart(m_kart[j]->getWorldKartId());
+        float other_progression = getDistanceDownTrackForKart(j);
         if(other_progression > my_progression ||
             (other_progression == my_progression &&
             m_kart[j]->getInitialPosition() > kart->getInitialPosition()) )
