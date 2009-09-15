@@ -24,6 +24,8 @@
 #include <vector>
 #include <stdio.h>
 
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "challenges/challenge_data.hpp"
 #include "io/file_manager.hpp"
@@ -42,6 +44,8 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager=this;
 
+    m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
+    
     // Read challenges from .../data
     // -----------------------------
     std::set<std::string> result;
@@ -219,6 +223,11 @@ void UnlockManager::save()
     challenge_file << "</challenges>\n\n";
     challenge_file.close();
 }   // save
+
+void UnlockManager::playLockSound() const
+{
+    m_locked_sound->play();
+}
 
 //-----------------------------------------------------------------------------
 void UnlockManager::computeActive()

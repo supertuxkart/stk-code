@@ -26,10 +26,12 @@
 #include <fstream>
 
 class XMLNode;
+class SFXBase;
 
 class UnlockManager
 {
 private:
+    SFXBase    *m_locked_sound;
     typedef std::map<std::string, Challenge*> AllChallengesType;
     AllChallengesType             m_all_challenges;
     std::map<std::string, bool>   m_locked_features;
@@ -55,6 +57,10 @@ public:
     void       lockFeature       (Challenge* challenge);
     bool       isLocked          (const std::string& feature);
     void       check             () const;
+    
+    /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
+    void       playLockSound() const;
+    
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;

@@ -22,6 +22,7 @@
 
 #include "main_loop.hpp"
 #include "audio/sound_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -182,15 +183,31 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
             w2->addItem( _("Snaky Competition\nAll blows allowed, so catch weapons and make clever use of them!"),
                         "normal",
                         file_manager->getDataDir() + "/gui/mode_normal.png");
+            
             w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
                         "timetrial",
                         file_manager->getDataDir() + "/gui/mode_tt.png");
-            w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
-                        "ftl",
-                        file_manager->getDataDir() + "/gui/mode_ftl.png");
-            w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
-                        "3strikes",
-                        file_manager->getDataDir() + "/gui/mode_3strikes.png");
+            
+            if (unlock_manager->isLocked("followtheleader"))
+            {
+                w2->addItem( _("Locked!\nFulfill challenges to gain access to locked areas"),
+                            "locked",
+                            file_manager->getDataDir() + "textures/gui_lock.png");
+            }
+            else
+            {
+                w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
+                            "ftl",
+                            file_manager->getDataDir() + "/gui/mode_ftl.png");
+            }
+            
+            if (race_manager->getNumPlayers() > 1)
+            {
+                w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
+                            "3strikes",
+                            file_manager->getDataDir() + "/gui/mode_3strikes.png");
+            }
+            
             getCurrentScreen()->m_inited = true;
         }
         w2->updateItemDisplay();
@@ -240,8 +257,13 @@ void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
         }
         else if (selectedMode == "3strikes")
         {
-            // TODO - 3 strikes battle mode selection
+            // TODO - 3 strikes battle track selection
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        }
+        else if (selectedMode == "locked")
+        {
+            std::cout << "Requesting sound to be played\n";
+            unlock_manager->playLockSound();
         }
     }
     else if(name == "aikartamount")
@@ -308,43 +330,33 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
         DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("tracks");
         assert( w != NULL );
 
-        if(!getCurrentScreen()->m_inited)
+        if (!getCurrentScreen()->m_inited)
         {
-            /*
-            const std::vector<std::string>&
-            getAllGroups()      const { return m_all_groups;    }
-            size_t        getNumberOfTracks() const { return m_tracks.size(); }
-            Track        *getTrack(size_t id) const { return m_tracks[id];    }
-            Track        *getTrack(const std::string& ident) const;
-            void          unavailable(const std::string &ident);
-            void          setUnavailableTracks(const std::vector<std::string> &tracks);
-            bool          isAvailable(unsigned int n) const {return m_track_avail[n];}
-             */
-            
             const int trackAmount = track_manager->getNumberOfTracks();
+            bool hasLockedTracks = false;
             for (int n=0; n<trackAmount; n++)
             {
                 Track* curr = track_manager->getTrack(n);
+                if (unlock_manager->isLocked(curr->getIdent()))
+                {
+                    hasLockedTracks = true;
+                    continue;
+                }
                 w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile());
             }
             
-            /*
-            w->addItem("Track 1","t1","gui/track1.png");
-            w->addItem("Track 2","t2","gui/track2.png");
-            w->addItem("Track 3","t3","gui/track3.png");
-            w->addItem("Track 4","t4","gui/track4.png");
-            w->addItem("Track 5","t5","gui/track5.png");
-            w->addItem("Track 6","t6","gui/track6.png");
-            w->addItem("Track 7","t7","gui/track7.png");
-            w->addItem("Track 8","t8","gui/track8.png");
-             */
+            if (hasLockedTracks)
+            {
+                w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");
+            }
+            
             getCurrentScreen()->m_inited = true;
         }
         w->updateItemDisplay();
 
     }
     // -- track seelction screen
-    if(name == "tracks")
+    if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if(w2 != NULL)
@@ -360,7 +372,7 @@ void StateManager::menuEventTracks(Widget* widget, const std::string& name)
             }
         }
     }
-    else if(name == "gps")
+    else if (name == "gps")
     {
         RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
         if(w != NULL)
@@ -416,6 +428,11 @@ void StateManager::eventCallback(Widget* widget, const std::string& name)
 {
     std::cout << "event!! " << name.c_str() << std::endl;
 
+    if (name == "lock")
+    {
+        unlock_manager->playLockSound();
+    }
+    
     Screen* topScreen = getCurrentScreen();
     if (topScreen == NULL) return;
     const std::string& screen_name = topScreen->getName();

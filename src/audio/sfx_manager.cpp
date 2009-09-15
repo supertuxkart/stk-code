@@ -117,6 +117,7 @@ void SFXManager::loadSfx()
     }
     loadSingleSfx(lisp, "ugh",           SOUND_UGH            );
     loadSingleSfx(lisp, "skid",          SOUND_SKID           );
+    loadSingleSfx(lisp, "locked",        SOUND_LOCKED         );
 	loadSingleSfx(lisp, "bowling_roll",  SOUND_BOWLING_ROLL   );
 	loadSingleSfx(lisp, "bowling_strike",SOUND_BOWLING_STRIKE );
     loadSingleSfx(lisp, "winner",        SOUND_WINNER         );
