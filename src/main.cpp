@@ -100,6 +100,10 @@ void cmdLineHelp (char* invocation)
     "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
     "       --trackdir DIR     A directory from which additional tracks are loaded.\n"
+    "       --renderer NUM     Choose the renderer. Valid renderers are:"
+    "                          (Default: 0, OpenGL: 1, Direct3D9: 2, \n"
+    "                           Direct3D8: 3, Software: 4, \n"
+    "                           Burning's Software: 5, Null device: 6).\n"
     // should not be used by unaware users:u
     // "  --profile            Enable automatic driven profile mode for 20 seconds.\n"
     // "  --profile=n          Enable automatic driven profile mode for n seconds.\n"
@@ -171,6 +175,12 @@ int handleCmdLinePreliminary(int argc, char **argv)
             UserConfigParams::m_fullscreen = false;
         }
 #endif
+        else if( !strcmp(argv[i], "--renderer") && (i+1 < argc)  )
+        {
+            std::cout << "You chose renderer " << atoi(argv[i+1]) << std::endl;
+            UserConfigParams::m_renderer = atoi(argv[i+1]);
+            i++;
+        }
         else if ( (!strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
              && i+1<argc)
         {
@@ -455,14 +465,13 @@ int handleCmdLine(int argc, char **argv)
         }
         // these commands are already processed in handleCmdLinePreliminary, but repeat this
         // just so that we don't get error messages about unknown commands
-        else if( !strcmp(argv[i], "--trackdir") && i+1<argc ) i++;
-        else if( !strcmp(argv[i], "--kartdir")  && i+1<argc ) i++;
-        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
-        else if ( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
-        else if ( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {
-            i++;
-        }
-        else if ( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
+        else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
+        else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
+        else if( !strcmp(argv[i], "--renderer")  && i+1<argc ) { i++; }
+        else if( !strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s")) {i++;}
+        else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
+        else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
+        else if( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
         else
         {
             fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );

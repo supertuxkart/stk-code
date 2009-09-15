@@ -93,15 +93,36 @@ void IrrDriver::initDevice()
         firstTime = false;
     } // end if firstTime
     
+
+
+
+    int numDrivers = 5;
+
+    // Test if user has chosen a driver or if we should try all to find a woring
+    // one.
+    if( UserConfigParams::m_renderer != 0 )
+    {
+        numDrivers = 1;
+    }
+
     // ---- open device
     // Try different drivers: start with opengl, then DirectX
-    for(int driver_type=0; driver_type<3; driver_type++)
+    for(int driver_type=0; driver_type<numDrivers; driver_type++)
     {
-        video::E_DRIVER_TYPE type = driver_type==0
-                                  ? video::EDT_OPENGL
-                                  : (driver_type==1
-                                    ? video::EDT_DIRECT3D9
-                                    : video::EDT_DIRECT3D8);
+
+        video::E_DRIVER_TYPE type;
+
+        // Test if user has chosen a driver or if we should try all to find a
+        // woring one.
+        if( UserConfigParams::m_renderer != 0 )
+        {
+            // Get the correct type.
+            type = getEngineDriverType( UserConfigParams::m_renderer );
+        } else {
+            // Get the correct type.
+            type = getEngineDriverType( driver_type );
+        }
+
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for(int bits=32; bits>15; bits -=8)
         {
@@ -129,7 +150,15 @@ void IrrDriver::initDevice()
         exit(-1);
     }
 
-    m_device->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS,true);
+    m_device->getVideoDriver()->setTextureCreationFlag(
+                                                    video::ETCF_CREATE_MIP_MAPS,
+                                                    true);
+//     m_device->getVideoDriver()->setTextureCreationFlag(
+//                                                     video::ETCF_OPTIMIZED_FOR_SPEED ,
+//                                                     true);
+//     m_device->getVideoDriver()->setTextureCreationFlag(
+//                                                     video::ETCF_ALWAYS_16_BIT ,
+//                                                     true);
 
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
@@ -140,6 +169,54 @@ void IrrDriver::initDevice()
     const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     m_race_font     = m_gui_env->getFont(font.c_str());
 }
+
+
+//-----------------------------------------------------------------------------
+video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
+{
+    video::E_DRIVER_TYPE type;
+    std::string rendererName = "";
+
+    // Choose the driver type.
+    switch(index)
+    {
+        // TODO Change default renderer dependen on operating system?
+        // Direct3D9 for Windows and OpenGL for Unix like systems?
+        case 0:
+            type = video::EDT_OPENGL;
+            rendererName = "OpenGL";
+            break;
+        case 1:
+            type = video::EDT_OPENGL;
+            rendererName = "OpenGL";
+            break;
+        case 2:
+            type = video::EDT_DIRECT3D9;
+            rendererName = "Direct3D9";
+            break;
+        case 3:
+            type = video::EDT_DIRECT3D8;
+            rendererName = "Direct3D8";
+            break;
+        case 4:
+            type = video::EDT_SOFTWARE;
+            rendererName = "Software";
+            break;
+        case 5:
+            type = video::EDT_BURNINGSVIDEO;
+            rendererName = "Burning's Video Software";
+            break;
+        default:
+            type = video::EDT_NULL;
+            rendererName = "Null Device";
+    }
+
+    // Ouput which render will be tried.
+    std::cout << "Trying " << rendererName << " rendering." << std::endl;
+
+    return type;
+}
+
 
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()

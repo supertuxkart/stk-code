@@ -54,6 +54,7 @@ private:
 
     void renderBulletDebugView();
     void displayFPS();
+    video::E_DRIVER_TYPE getEngineDriverType(int index);
 public:
                           IrrDriver();
                          ~IrrDriver();

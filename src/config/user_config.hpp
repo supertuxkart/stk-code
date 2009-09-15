@@ -227,6 +227,11 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps", &m_video_group, "Maximum fps, should be at least 60") );
 
+    // Renderer type (OpenGL, Direct3D9, Direct3D8, Software, etc)
+    PARAM_PREFIX IntUserConfigParam         m_renderer
+            PARAM_DEFAULT(  IntUserConfigParam(0, "renderer", &m_video_group,
+                                               "Type of the renderer.") );
+
     // ---- Debug
     PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT( BoolUserConfigParam(false, "gamepad_debug") );
     PARAM_PREFIX IntUserConfigParam         m_track_debug       PARAM_DEFAULT( IntUserConfigParam(false, "track_debug") );
