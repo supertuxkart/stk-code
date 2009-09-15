@@ -71,9 +71,10 @@ void GraphNode::addSuccessor(unsigned int to)
     const Quad &this_quad = m_all_quads->getQuad(m_index);
     // to is the graph node, so we have to use m_all_nodes to get the right quad
     const Quad &next_quad = m_all_nodes->getQuad(to);
+    core::vector2df d2=m_lower_center-m_all_nodes->getNode(to).getLowerCenter();
 
     Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
-    m_distance_to_next.push_back(diff.length());
+    m_distance_to_next.push_back(d2.getLength());
     
     float theta = -atan2(diff.getX(), diff.getY());
     m_angle_to_next.push_back(theta);
@@ -82,10 +83,14 @@ void GraphNode::addSuccessor(unsigned int to)
     float distance_to_next = (   this_quad[2].distance(this_quad[1])
                                + this_quad[3].distance(this_quad[0]) ) *0.5f;
     // The distance from start for the successor node 
-    m_all_nodes->getNode(to).m_distance_from_start =
-        std::max(m_all_nodes->getNode(to).m_distance_from_start, 
-                 m_distance_from_start+distance_to_next);
+    if(to!=0)
+    {
+        m_all_nodes->getNode(to).m_distance_from_start =
+            std::max(m_all_nodes->getNode(to).m_distance_from_start, 
+                     m_distance_from_start+distance_to_next);
+    }
 }   // addSuccessor
+
 // ----------------------------------------------------------------------------
 /** Returns the distance a point has from this quad in forward and sidewards
  *  direction, i.e. how far forwards the point is from the beginning of the 

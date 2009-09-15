@@ -35,11 +35,13 @@ const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph::QuadGraph(const std::string &quad_file_name, 
                      const std::string graph_file_name)
 {
-    m_node        = NULL;
-    m_mesh        = NULL;
-    m_mesh_buffer = NULL;
-    m_lap_length  = 0;
-    m_all_quads   = new QuadSet(quad_file_name);
+    m_node                 = NULL;
+    m_mesh                 = NULL;
+    m_mesh_buffer          = NULL;
+    m_lap_length           = 0;
+    m_offset_for_startline = 0;
+    m_all_quads            = new QuadSet(quad_file_name);
+    m_quad_filename        = quad_file_name;
     GraphNode::m_all_quads = m_all_quads;
     GraphNode::m_all_nodes = this;
     load(graph_file_name);
@@ -54,6 +56,29 @@ QuadGraph::~QuadGraph()
         delete m_all_nodes[i];
     }
 }   // ~QuadGraph
+
+// -----------------------------------------------------------------------------
+/** Sets the offset from the middle point of the lap counting line to the
+ *  beginning of quad 0. All reported values for distance along track will use
+ *  this offset. As a result a kart on the start line will have distance 0,
+ *  and a kart just before the start line will have a getDistanceFromStart()
+ *  which is the length of the track.
+ */
+void QuadGraph::setStartCoordinate(const Vec3 &start_point)
+{
+    int sector=UNKNOWN_SECTOR;
+    findRoadSector(start_point, &sector);
+    if(sector==UNKNOWN_SECTOR)
+    {
+        fprintf(stderr, 
+                "Start line not on quads in file '%s'. Lap counting might not work.\n",
+                m_quad_filename.c_str());
+        return;
+    }
+    Vec3 xyz;
+    spatialToTrack(&xyz, start_point, sector);
+    m_offset_for_startline = xyz.getY();
+}   // setStartCoordinate
 
 // -----------------------------------------------------------------------------
 /** Loads a quad graph from a file.
@@ -72,6 +97,8 @@ void QuadGraph::load(const std::string &filename)
             m_all_nodes.push_back(new GraphNode(i));
         // Then set the default loop:
         setDefaultSuccessors();
+        m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
+                     + m_all_nodes[m_all_nodes.size()-1]->getDistanceToSuccessor(0);
         return;
     }
 
@@ -283,7 +310,10 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
     }
 
     getNode(sector).getDistances(xyz, dst);
-
+    float y=dst->getY();
+    y=y-m_offset_for_startline;
+    if(y<0) y+=m_lap_length;
+    dst->setY(y);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------

@@ -108,7 +108,10 @@ public:
                                { return m_distance_from_start;           }
     // -------------------------------------------------------------------
     /** Returns the width of the part for this quad. */
-    float        getPathWidth() const  { return m_width;                }
+    float        getPathWidth() const  { return m_width;                 }
+    // -------------------------------------------------------------------
+    /** Returns the center point of the lower edge of this graph node. */
+    const core::vector2df& getLowerCenter() const {return m_lower_center;}
 };   // GraphNode
 
 #endif

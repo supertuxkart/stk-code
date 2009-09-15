@@ -50,6 +50,14 @@ private:
     /** Scaling for mini map, only x and y components are used. */
     Vec3                     m_scaling;
 
+    /** This is the track coordinate for the start line. This offset is
+     *  added to the Y value of spatialToTrack. It guarantees that the
+     *  start line is always at track coordinates 0 (for Y).            */
+    float                    m_offset_for_startline;
+
+    /** Stores the filename - just used for error messages. */
+    std::string              m_quad_filename;
+
     void setDefaultSuccessors();
     void load         (const std::string &filename);
     void createMesh(bool show_invisible=true);
@@ -83,6 +91,7 @@ public:
                                         =video::SColor(127, 255, 255, 255) );
 #endif
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
+    void         setStartCoordinate(const Vec3 &start_point);
 
     /** Returns the number of nodes in the graph. */
     unsigned int getNumNodes() const { return m_all_nodes.size();         } 
@@ -113,6 +122,7 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
+    // ----------------------------------------------------------------------
 };   // QuadGraph
 
 #endif
