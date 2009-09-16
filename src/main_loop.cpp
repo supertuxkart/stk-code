@@ -91,7 +91,7 @@ float MainLoop::getLimitedDt()
     }
     dt *= 0.001f;
     return dt;
-}
+}   // getLimitedDt
 
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.

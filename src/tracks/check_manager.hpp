@@ -32,7 +32,7 @@ class CheckManager
 private:
 	std::vector<CheckStructure*> m_all_checks;
 public:
-	     CheckManager(const XMLNode &node);
+	     CheckManager(const XMLNode &node, Track *track);
 	void update(float dt);
 	void reset(const Track &track);
     void activateNewLapChecks(int kart_index);

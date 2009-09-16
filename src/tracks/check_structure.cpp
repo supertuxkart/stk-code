@@ -34,10 +34,14 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
         m_check_type = CT_NEW_LAP;
     else if(type=="reset-new-lap")
         m_check_type = CT_RESET_NEW_LAP;
+    else if(type=="ambient-light")
+        m_check_type = CT_AMBIENT_SPHERE;
     else
     {
         printf("Unknown check structure '%s' - ignored.\n", type.c_str());
     }
+    m_active_at_reset=true;
+    node.get("active", &m_active_at_reset);
 }   // CheckStructure
 
 // ----------------------------------------------------------------------------
@@ -55,7 +59,7 @@ void CheckStructure::reset(const Track &track)
 		m_previous_position.push_back(xyz);
         
         // Activate all checkline
-        m_is_active.push_back(true);
+        m_is_active.push_back(m_active_at_reset);
 	}   // for i<getNumKarts
 }   // reset
 

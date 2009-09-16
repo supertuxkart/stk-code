@@ -81,9 +81,9 @@ Track::Track(std::string filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-    if(m_quad_graph)            delete m_quad_graph;
-	if(m_check_manager)         delete m_check_manager;
-    if(m_mini_map)              irr_driver->removeTexture(m_mini_map);
+    if(m_quad_graph)    delete m_quad_graph;
+	if(m_check_manager) delete m_check_manager;
+    if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
 }   // ~Track
 
 //-----------------------------------------------------------------------------
@@ -93,6 +93,7 @@ Track::~Track()
  */
 void Track::reset()
 {
+    m_ambient_color = m_default_ambient_color;
 	if(m_animation_manager)
 		m_animation_manager->reset();
     if(m_check_manager)
@@ -201,7 +202,7 @@ void Track::loadTrackInfo(const std::string &filename)
     m_sun_position      = core::vector3df(0.4f, 0.4f, 0.4f);
     m_sky_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
     m_fog_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f).toSColor();
-    m_ambient_color     = video::SColorf(0.5f, 0.5f, 0.5f, 1.0f);
+    m_default_ambient_color = video::SColor(255, 120, 120, 120);
     m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
     XMLNode *root       = file_manager->createXMLTree(m_filename);
@@ -504,6 +505,8 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
  */
 void Track::update(float dt)
 {
+    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
+
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         m_animated_textures[i]->update(dt);
@@ -693,7 +696,7 @@ void Track::loadTrackModel(unsigned int mode_id)
 		}
 		else if(name=="checks")
 		{
-			m_check_manager = new CheckManager(*node);
+			m_check_manager = new CheckManager(*node, this);
 		}
         else if(name=="sky-dome" || name=="sky-box")
         {
@@ -746,7 +749,7 @@ void Track::loadTrackModel(unsigned int mode_id)
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
+    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
 
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position, 
                                                                video::SColorf(1.0f,1.0f,1.0f));

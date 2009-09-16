@@ -53,7 +53,7 @@ public:
      *  structure at the rhoughly halfway mark of the track karts have to
      *  drive there first before a new lap will be counted.
      */
-    enum CheckType {CT_NEW_LAP, CT_RESET_NEW_LAP};
+    enum CheckType {CT_NEW_LAP, CT_RESET_NEW_LAP, CT_AMBIENT_SPHERE};
 
 protected:
 	/** Stores the previous position of all karts. This is needed to detect
@@ -69,6 +69,8 @@ private:
 
     /** The type of this checkline. */
     CheckType         m_check_type;
+    /** True if this check structure should be activated at a reset. */
+    bool              m_active_at_reset;
 public:
                 CheckStructure(CheckManager *check_manager, const XMLNode &node);
     virtual    ~CheckStructure() {};
@@ -84,6 +86,9 @@ public:
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
     virtual void activateNewLapCheck(int kart_index);
+    virtual Vec3 getCenterPoint() const=0;
+    /** Returns the type of this check structure. */
+    CheckType getType() const { return m_check_type; }
 };   // CheckStructure
 
 #endif

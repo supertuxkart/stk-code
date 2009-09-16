@@ -131,7 +131,8 @@ private:
     float               m_fog_start;
     float               m_fog_end;
     core::vector3df     m_sun_position;
-    video::SColorf      m_ambient_color;
+    video::SColor       m_default_ambient_color;
+    video::SColor       m_ambient_color;
     video::SColorf      m_specular_color;
     video::SColorf      m_diffuse_color;
     video::SColorf      m_sky_color;
@@ -220,9 +221,9 @@ public:
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const
-    { *min = &m_aabb_min; *max = &m_aabb_max; }
+                       { *min = &m_aabb_min; *max = &m_aabb_max; }
     /** Returns the graph of quads, mainly for the AI. */
-    const QuadGraph&   getQuadGraph() const { return *m_quad_graph; }
+    QuadGraph&         getQuadGraph() const { return *m_quad_graph; }
 
     /** Returns 'a' angle for quad n. This angle is used to position a kart
      *  after a rescue, and to detect wrong directions. This function will
@@ -248,6 +249,12 @@ public:
     /** Returns the name of the i-th. mode. */
     const std::string &getModeName(unsigned int i) const 
                                                 { return m_all_modes[i].m_name;}
+    /** Returns the default ambient color. */
+    const video::SColor &getDefaultAmbientColor() const
+                                                { return m_default_ambient_color;}
+    /** Sets the current ambient color. */
+    void   setAmbientColor(const video::SColor &color)
+                                                { m_ambient_color = color; }
 };   // class Track
 
 #endif

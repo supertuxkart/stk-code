@@ -23,9 +23,11 @@
 
 #include "io/xml_node.hpp"
 #include "tracks/checkline.hpp"
+#include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_structure.hpp"
+#include "tracks/track.hpp"
 
-CheckManager::CheckManager(const XMLNode &node)
+CheckManager::CheckManager(const XMLNode &node, Track *track)
 {
 	for(unsigned int i=0; i<node.getNumNodes(); i++)
 	{
@@ -33,8 +35,18 @@ CheckManager::CheckManager(const XMLNode &node)
 		const std::string &type = check_node->getName();
 		if(type=="checkline")
 		{
-			m_all_checks.push_back(new Checkline(this, *check_node));
-		}
+            Checkline *cl = new Checkline(this, *check_node);
+			m_all_checks.push_back(cl);
+            if(cl->getType()==CheckStructure::CT_NEW_LAP)
+            {
+                track->getQuadGraph().setStartCoordinate(cl->getCenterPoint());
+            }
+		}   // checkline
+        else if(type=="check-sphere")
+        {
+            AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node);
+            m_all_checks.push_back(cs);
+        }   // checksphere
 	}   // for i<node.getNumNodes
 }   // CheckManager
 

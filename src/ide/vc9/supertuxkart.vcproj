@@ -609,11 +609,19 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\ambient_light_sphere.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\bezier_curve.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\tracks\check_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_sphere.cpp"
 					>
 				</File>
 				<File
@@ -1327,11 +1335,19 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\ambient_light_sphere.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\bezier_curve.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\tracks\check_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_sphere.hpp"
 					>
 				</File>
 				<File

@@ -269,10 +269,14 @@ supertuxkart_SOURCES = \
  states_screens/race_gui.hpp \
  states_screens/state_manager.cpp  \
  states_screens/state_manager.hpp \
+ tracks/ambient_light_sphere.cpp \
+ tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
  tracks/bezier_curve.hpp \
  tracks/check_manager.cpp \
  tracks/check_manager.hpp \
+ tracks/check_sphere.cpp \
+ tracks/check_sphere.hpp \
  tracks/check_structure.cpp \
  tracks/check_structure.hpp \
  tracks/checkline.cpp \

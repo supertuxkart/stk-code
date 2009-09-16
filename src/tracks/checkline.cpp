@@ -52,6 +52,16 @@ void Checkline::reset(const Track &track)
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** Returns the center point of this checkline.
+ */
+Vec3 Checkline::getCenterPoint() const
+{
+    core::vector2df c=m_line.getMiddle();
+    Vec3 xyz(c.X, c.Y, m_min_height);
+    return xyz;
+}   // getCenterPoint
+
+// ----------------------------------------------------------------------------
 /** True if going from old_pos to new_pos crosses this checkline. This function
  *  is called from update (of the checkline structure).
  *  \param old_pos  Position in previous frame.
