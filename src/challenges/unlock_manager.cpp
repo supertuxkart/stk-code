@@ -128,6 +128,7 @@ UnlockManager::UnlockManager()
 UnlockManager::~UnlockManager()
 {
     save();
+    sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
 
 //-----------------------------------------------------------------------------
