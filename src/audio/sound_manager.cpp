@@ -188,8 +188,18 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
     MusicInformation* mi = m_allMusic[basename];
     if(!mi)
     {
-        mi = new MusicInformation(filename);
-        m_allMusic[basename] = mi;
+        try
+        {
+            mi = new MusicInformation(filename);
+            m_allMusic[basename] = mi;
+        }
+        catch (std::exception &e)
+        {
+            (void)e;
+            printf("Can't open music file '%s'.\n", filename);
+            return NULL;
+        }
+
     }
     mi->volumeMusic(m_masterGain);
     return mi;
