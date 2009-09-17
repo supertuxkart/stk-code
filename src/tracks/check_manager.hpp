@@ -35,7 +35,9 @@ public:
 	     CheckManager(const XMLNode &node, Track *track);
 	void update(float dt);
 	void reset(const Track &track);
-    void activateNewLapChecks(int kart_index);
+    /** Returns the nth. check structure. */
+    CheckStructure *getCheckStructure(unsigned int n) 
+                                                { return m_all_checks[n]; }
 };   // CheckManager
 
 #endif

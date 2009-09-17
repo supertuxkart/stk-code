@@ -1,4 +1,4 @@
-//  $Id: checkline.hpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: check_line.hpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHECKLINE_HPP
-#define HEADER_CHECKLINE_HPP
+#ifndef HEADER_CHECK_LINE_HPP
+#define HEADER_CHECK_LINE_HPP
 
 #include "irrlicht.h"
 using namespace irr;
@@ -35,7 +35,7 @@ class CheckManager;
  *  easy checking of checklines, and should be sufficient for most check 
  *  structure. 
  */
-class Checkline : public CheckStructure
+class CheckLine : public CheckStructure
 {
 private:
 	/** The line that is tested for being crossed. */
@@ -49,12 +49,12 @@ private:
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
 public:
-	             Checkline(CheckManager *check_manager, const XMLNode &node);
-    virtual     ~Checkline() {};
+	             CheckLine(CheckManager *check_manager, const XMLNode &node);
+    virtual     ~CheckLine() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);
     virtual Vec3 getCenterPoint() const;
-};   // ChecklineManager
+};   // CheckLine
 
 #endif
 

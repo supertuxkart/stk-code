@@ -46,21 +46,25 @@ class CheckManager;
 class CheckStructure
 {
 public:
-    /** Different types of check structures: one which triggers couting a new 
-     *  lap, and one which resets all lap counters. This is used to avoid
-     *  shortcuts: a new lap is only counted if a reset_new_lap check 
-     *  structure was triggered in between. So by adding a single reset
-     *  structure at the rhoughly halfway mark of the track karts have to
-     *  drive there first before a new lap will be counted.
+    /** Different types of check structures: 
+     *  ACTIVATE: Activates another check structure (independent of
+     *            the state that check structure is in)
+     *  TOGGLE:   Switches (or inverts) the state of another check structure.
+     *  NEW_LAP:  On crossing a new lap is counted.
+     *  AMBIENT_SPHERE: Modifies the ambient color.
+     *  A combination of an activate and new_lap line are used to
+     *  avoid shortcuts: a new_lap line is deactivated after crossing it, and
+     *  you have to cross a corresponding activate structure to re-activate it,
+     *  enabling you to count the lap again.
      */
-    enum CheckType {CT_NEW_LAP, CT_RESET_NEW_LAP, CT_AMBIENT_SPHERE};
+    enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_AMBIENT_SPHERE};
 
 protected:
 	/** Stores the previous position of all karts. This is needed to detect
      *  when e.g. a check point is reached the first time, or a checkline is
      *  crossed. */
     std::vector<Vec3> m_previous_position;
-    /** Stores if this check structure is active (for a given kart). USed e.g.
+    /** Stores if this check structure is active (for a given kart). Used e.g.
      *  in lap counting. */
     std::vector<bool> m_is_active;
 private:
@@ -71,6 +75,10 @@ private:
     CheckType         m_check_type;
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
+
+    /** If this is a CT_ACTIVATE or CT_SWITCH type, this will contain
+     *  the index of the corresponding check structure that is triggered. */
+    int               m_activate_check_index;
 public:
                 CheckStructure(CheckManager *check_manager, const XMLNode &node);
     virtual    ~CheckStructure() {};
@@ -85,7 +93,6 @@ public:
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)=0;
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
-    virtual void activateNewLapCheck(int kart_index);
     virtual Vec3 getCenterPoint() const=0;
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }

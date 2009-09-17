@@ -27,18 +27,27 @@
 CheckStructure::CheckStructure(CheckManager *check_manager, 
                                const XMLNode &node)
 {
-    m_check_manager = check_manager;
+    m_check_manager      = check_manager;
     std::string type;
     node.get("type", &type);
     if(type=="new-lap")
         m_check_type = CT_NEW_LAP;
-    else if(type=="reset-new-lap")
-        m_check_type = CT_RESET_NEW_LAP;
+    else if(type=="activate")
+        m_check_type = CT_ACTIVATE;
+    else if(type=="toggle")
+        m_check_type = CT_TOGGLE;
     else if(type=="ambient-light")
         m_check_type = CT_AMBIENT_SPHERE;
     else
     {
         printf("Unknown check structure '%s' - ignored.\n", type.c_str());
+    }
+    m_activate_check_index = -1;
+    node.get("other-id", &m_activate_check_index);
+    if( (m_check_type==CT_TOGGLE || m_check_type==CT_ACTIVATE) &&
+        m_activate_check_index==-1)
+    {
+        printf("Unknown other-id in checkline.\n");
     }
     m_active_at_reset=true;
     node.get("active", &m_active_at_reset);
@@ -92,19 +101,18 @@ void CheckStructure::trigger(unsigned int kart_index)
     case CT_NEW_LAP : RaceManager::getWorld()->newLap(kart_index); 
                       m_is_active[kart_index] = false;
                       break;
-    case CT_RESET_NEW_LAP : 
-                      m_check_manager->activateNewLapChecks(kart_index);
-                      break;
+    case CT_ACTIVATE: {
+                          CheckStructure *cs=
+                            m_check_manager->getCheckStructure(m_activate_check_index);
+                          cs->m_is_active[kart_index] = true;
+                          break;
+                      }
+    case CT_TOGGLE:   {
+                          CheckStructure *cs=
+                            m_check_manager->getCheckStructure(m_activate_check_index);
+                          cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
+                          break;
+                      }
     default:          break;
     }   // switch m_check_type
 }   // trigger
-
-// ----------------------------------------------------------------------------
-/** If this check structure is a new-lap check, activate it again.
- *  \param kart_index Index of the kart for which the lap check is activated.
- */
-void CheckStructure::activateNewLapCheck(int kart_index)
-{
-    if(m_check_type==CT_NEW_LAP)
-        m_is_active[kart_index] = true;
-}   // resetNewLap

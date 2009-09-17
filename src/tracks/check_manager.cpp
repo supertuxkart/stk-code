@@ -22,7 +22,7 @@
 #include <string>
 
 #include "io/xml_node.hpp"
-#include "tracks/checkline.hpp"
+#include "tracks/check_line.hpp"
 #include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/track.hpp"
@@ -33,9 +33,9 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
 	{
 		const XMLNode *check_node = node.getNode(i);
 		const std::string &type = check_node->getName();
-		if(type=="checkline")
+		if(type=="check-line")
 		{
-            Checkline *cl = new Checkline(this, *check_node);
+            CheckLine *cl = new CheckLine(this, *check_node);
 			m_all_checks.push_back(cl);
             if(cl->getType()==CheckStructure::CT_NEW_LAP)
             {
@@ -70,13 +70,3 @@ void CheckManager::update(float dt)
 		(*i)->update(dt);
 }   // update
 
-// ----------------------------------------------------------------------------
-/** Called when a reset-new-lap check is triggered. It re-activates all new
- *  lap checks.
- */
-void CheckManager::activateNewLapChecks(int kart_index)
-{
-    std::vector<CheckStructure*>::iterator i;
-	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
-        (*i)->activateNewLapCheck(kart_index);
-}   // resetNewLaps

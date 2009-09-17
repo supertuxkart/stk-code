@@ -1,4 +1,4 @@
-//  $Id: checkline.cpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: check_line.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tracks/checkline.hpp"
+#include "tracks/check_line.hpp"
 
 #include <string>
 
@@ -29,7 +29,7 @@
  *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
  */
-Checkline::Checkline(CheckManager *check_manager, const XMLNode &node) 
+CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node) 
          : CheckStructure(check_manager, node)
 {
     m_previous_sign.resize(race_manager->getNumKarts());
@@ -38,10 +38,10 @@ Checkline::Checkline(CheckManager *check_manager, const XMLNode &node)
 	node.get("p2", &p2);
 	node.get("min-height", &m_min_height);
     m_line.setLine(p1, p2);
-}   // Checkline
+}   // CheckLine
 
 // ----------------------------------------------------------------------------
-void Checkline::reset(const Track &track)
+void CheckLine::reset(const Track &track)
 {
     CheckStructure::reset(track);
     for(unsigned int i=0; i<m_previous_sign.size(); i++)
@@ -54,7 +54,7 @@ void Checkline::reset(const Track &track)
 // ----------------------------------------------------------------------------
 /** Returns the center point of this checkline.
  */
-Vec3 Checkline::getCenterPoint() const
+Vec3 CheckLine::getCenterPoint() const
 {
     core::vector2df c=m_line.getMiddle();
     Vec3 xyz(c.X, c.Y, m_min_height);
@@ -69,7 +69,7 @@ Vec3 Checkline::getCenterPoint() const
  *  \param indx     Index of the kart, can be used to store kart specific
  *                  additional data.
  */
-bool Checkline::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
+bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
 {
     core::vector2df p=new_pos.toIrrVector2d();
     bool sign = m_line.getPointOrientation(p)>=0;

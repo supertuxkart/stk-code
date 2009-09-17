@@ -279,8 +279,8 @@ supertuxkart_SOURCES = \
  tracks/check_sphere.hpp \
  tracks/check_structure.cpp \
  tracks/check_structure.hpp \
- tracks/checkline.cpp \
- tracks/checkline.hpp \
+ tracks/check_line.cpp \
+ tracks/check_line.hpp \
  tracks/graph_node.cpp\
  tracks/graph_node.hpp\
  tracks/quad.cpp \

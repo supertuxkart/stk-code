@@ -617,6 +617,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_line.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_manager.cpp"
 					>
 				</File>
@@ -626,10 +630,6 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\check_structure.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tracks\checkline.cpp"
 					>
 				</File>
 				<File
@@ -1343,6 +1343,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\tracks\check_line.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\check_manager.hpp"
 					>
 				</File>
@@ -1352,10 +1356,6 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\check_structure.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\tracks\checkline.hpp"
 					>
 				</File>
 				<File
