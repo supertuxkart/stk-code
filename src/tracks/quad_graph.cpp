@@ -202,8 +202,10 @@ void QuadGraph::createMesh(bool show_invisible)
     // Count the number of quads to display (some quads might be invisible
     unsigned int  n = 0;
     for(unsigned int i=0; i<m_all_quads->getNumberOfQuads(); i++)
+    {
         if(show_invisible || !m_all_quads->getQuad(i).isInvisible())
             n++;
+    }
 
     // Four vertices for each of the n-1 remaining quads
     video::S3DVertex *new_v = new video::S3DVertex[n*4];
@@ -258,7 +260,7 @@ void QuadGraph::createDebugMesh()
     // Now colour the quads red/blue/red ...
     video::SColor     c(255, 255, 0, 0);    
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    for(unsigned int i=0; m_mesh_buffer->getVertexCount(); i++)
+    for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
     {
         // Swap the colours from red to blue and back
         c.setRed (i%2 ? 255 : 0); 
