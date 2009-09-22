@@ -6,7 +6,9 @@ Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
 
 background in glass skin : under CC-BY-SA by 'elisee'
 
-difficulty_*.png, released under Creative-Commons BY-SA 3, By Constantin Pelikan
+Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
+
+main_*.png icons, released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
 
 logo.png is released under GPL
 
