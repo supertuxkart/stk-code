@@ -377,7 +377,7 @@ void Track::createPhysicsModel()
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
-//* Convert the ssg track tree into its physics equivalents.
+//* Convert the graohics track into its physics equivalents.
 void Track::convertTrackToBullet(const scene::IMesh *mesh)
 {
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {

@@ -28,19 +28,19 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
                                const XMLNode &node)
 {
     m_check_manager      = check_manager;
-    std::string type;
-    node.get("type", &type);
-    if(type=="new-lap")
+    std::string kind;
+    node.get("kind", &kind);
+    if(kind=="lap")
         m_check_type = CT_NEW_LAP;
-    else if(type=="activate")
+    else if(kind=="activate")
         m_check_type = CT_ACTIVATE;
-    else if(type=="toggle")
+    else if(kind=="toggle")
         m_check_type = CT_TOGGLE;
-    else if(type=="ambient-light")
+    else if(kind=="ambient-light")
         m_check_type = CT_AMBIENT_SPHERE;
     else
     {
-        printf("Unknown check structure '%s' - ignored.\n", type.c_str());
+        printf("Unknown check structure '%s' - ignored.\n", kind.c_str());
     }
     m_activate_check_index = -1;
     node.get("other-id", &m_activate_check_index);
