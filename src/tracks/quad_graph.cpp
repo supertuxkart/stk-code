@@ -142,6 +142,17 @@ void QuadGraph::load(const std::string &filename)
                 m_all_nodes[i]->addSuccessor(i!=to ? i+1 : from);
             }
         }
+        else if(xml_node->getName()=="edge-line")
+        {
+            // A line:
+            unsigned int from, to;
+            xml_node->get("from", &from);
+            xml_node->get("to", &to);
+            for(unsigned int i=from; i<to; i++)
+            {
+                m_all_nodes[i]->addSuccessor(i+1);
+            }
+        }
         else if(xml_node->getName()=="edge")
         {
             // Adds a single edge to the graph:
