@@ -128,7 +128,9 @@ UnlockManager::UnlockManager()
 UnlockManager::~UnlockManager()
 {
     save();
-    sfx_manager->deleteSFX(m_locked_sound);
+    
+    // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
+    // sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
 
 //-----------------------------------------------------------------------------

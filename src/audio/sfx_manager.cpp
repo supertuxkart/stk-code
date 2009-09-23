@@ -71,12 +71,15 @@ SFXManager::~SFXManager()
     {
         delete (*i);
     }   // for i in m_all_sfx
+    m_all_sfx.clear();
 
     //the unbuffer all of the buffers
     for(unsigned int ii = 0; ii != m_sfx_buffers.size(); ii++)
     {
         alDeleteBuffers(1, &(m_sfx_buffers[ii]));
     } 
+    
+    sfx_manager = NULL;
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
@@ -352,12 +355,14 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 {
     std::vector<SFXBase*>::iterator i;
     i=std::find(m_all_sfx.begin(), m_all_sfx.end(), sfx);
-    delete sfx;
+
     if(i==m_all_sfx.end())
     {
         fprintf(stderr, "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
         return;
     }
+    
+    delete sfx;
 
     m_all_sfx.erase(i);
 
