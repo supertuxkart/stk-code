@@ -139,7 +139,7 @@ namespace GUIEngine
     
     void Credits::render(const float elapsed_time)
     {
-        time_before_next_step -= elapsed_time;
+        time_before_next_step -= elapsed_time*0.8f; // multiply by 0.8 to slow it down a bit as a whole
 
         const bool before_first_elem = (m_curr_element == -1);
         const bool after_last_elem = (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
@@ -149,7 +149,7 @@ namespace GUIEngine
         video::SColor color( 255 /* a */, 0 /* r */, 0 /* g */ , 75 /* b */ );
         
         // manage fade-in
-        if(before_first_elem)
+        if (before_first_elem)
         {
             int alpha = 255 - (int)(time_before_next_step/TIME_SECTION_FADE * 255);
             if(alpha < 0) alpha = 0;
@@ -157,7 +157,7 @@ namespace GUIEngine
             color.setAlpha( alpha );
         }
         // manage fade-out
-        else if(after_last_elem)
+        else if (after_last_elem)
         {
             int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 255);
             if(alpha < 0) alpha = 0;
@@ -169,12 +169,12 @@ namespace GUIEngine
                                    true /* center h */, true /* center v */ );
         
         // draw entries
-        if(!before_first_elem && !after_last_elem)
+        if (!before_first_elem && !after_last_elem)
         {
             int text_offset  = 0;
             
             // fade in
-            if(time_before_next_step < 0.3f)
+            if (time_before_next_step < 0.3f)
             {
                 const float fade_in = time_before_next_step / 0.3f;
                 
@@ -186,7 +186,7 @@ namespace GUIEngine
                 text_offset = (int)((1.0f - fade_in) * 100);
             }
             // fade out
-            else if(time_before_next_step >= m_time_element - 0.3f)
+            else if (time_before_next_step >= m_time_element - 0.3f)
             {
                 const float fade_out = (time_before_next_step - (m_time_element - 0.3f)) / 0.3f;
                 
