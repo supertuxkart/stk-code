@@ -250,6 +250,7 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
             network_manager->setState(NetworkManager::NS_MAIN_MENU);
             RaceManager::getWorld()->unpause();
             race_manager->rerunRace();
+            return true;
         }
         else if (selection == "newrace")
         {
