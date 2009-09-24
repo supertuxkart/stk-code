@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//                2009 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -166,21 +167,9 @@ const Vec3& Track::trackToSpatial(const int sector) const
 btTransform Track::getStartTransform(unsigned int pos) const
 {
 
-    Vec3 orig;
-    
-    if(isArena())
-    {
-        assert(pos < m_start_positions.size());
-        orig.setX( m_start_positions[pos][0] );
-        orig.setY( m_start_positions[pos][1] );
-        orig.setZ( m_start_positions[pos][2] );
-    }
-    else
-    {        
-        orig.setX( pos<m_start_x.size() ? m_start_x[pos] : ((pos%2==0)?1.5f:-1.5f) );
-        orig.setY( pos<m_start_y.size() ? m_start_y[pos] : -1.5f*pos-1.5f          );
-        orig.setZ( pos<m_start_z.size() ? m_start_z[pos] : 1.0f                    );
-    }
+    Vec3 orig = pos<m_start_positions.size() 
+              ? m_start_positions[pos]
+              : Vec3( (pos%2==0)?1.5f:-1.5f,  -1.5f*pos-1.5f, 1.0f);
     btTransform start;
     start.setOrigin(orig);
     start.setRotation(btQuaternion(btVector3(0, 0, 1), 
@@ -226,10 +215,6 @@ void Track::loadTrackInfo(const std::string &filename)
     root->get("item",                  &m_item_style);
     root->get("screenshot",            &m_screenshot);
     root->get("sky-color",             &m_sky_color);
-    root->get("start-x",               &m_start_x);
-    root->get("start-y",               &m_start_y);
-    root->get("start-z",               &m_start_z);
-    root->get("start-heading",         &m_start_heading);
     root->get("use-fog",               &m_use_fog);
     root->get("fog-color",             &m_fog_color);
     root->get("fog-density",           &m_fog_density);
@@ -343,10 +328,13 @@ void Track::loadQuadGraph(unsigned int mode_id)
 }   // loadQuadGraph
 
 // -----------------------------------------------------------------------------
-//* Convert the ssg track tree into its physics equivalents.
-void Track::createPhysicsModel()
+/** Convert the track tree into its physics equivalents.
+ *  \param main_track_count The number of meshes that are already converted
+ *         when the main track was converted. Only the additional meshes
+ *         added later still need to be converted.
+ */
+void Track::createPhysicsModel(unsigned int main_track_count)
 {
-    
     // Remove the temporary track rigid body, and then convert all objects
     // (i.e. the track and all additional objects) into a new rigid body
     // and convert this again. So this way we have an optimised track
@@ -367,9 +355,9 @@ void Track::createPhysicsModel()
     }
 
     m_track_mesh->removeBody();
-    for(unsigned int i=1; i<m_all_meshes.size(); i++)
+    for(unsigned int i=main_track_count; i<m_all_meshes.size(); i++)
     {
-        convertTrackToBullet(m_all_meshes[i]);
+        convertTrackToBullet(m_all_meshes[i], m_all_nodes[i]);
     }
     m_track_mesh->createBody();
     m_non_collision_mesh->createBody(btCollisionObject::CF_NO_CONTACT_RESPONSE);
@@ -377,9 +365,18 @@ void Track::createPhysicsModel()
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
-//* Convert the graohics track into its physics equivalents.
-void Track::convertTrackToBullet(const scene::IMesh *mesh)
+/** Convert the graohics track into its physics equivalents.
+ *  \param mesh The mesh to convert.
+ *  \param node The scene node.
+ */
+void Track::convertTrackToBullet(const scene::IMesh *mesh,
+                                 const scene::ISceneNode *node)
 {
+    const core::vector3df &pos = node->getPosition();
+    const core::vector3df &hpr = node->getRotation();
+    core::matrix4 mat;
+    mat.setRotationDegrees(hpr);
+    mat.setTranslation(pos);
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
@@ -405,7 +402,9 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
         for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
             for(unsigned int k=0; k<3; k++) {
                 int indx=mbIndices[j+k];
-                vertices[k] = Vec3(mbVertices[indx].Pos);
+                core::vector3df v = mbVertices[indx].Pos;
+                mat.transformVect(v);
+                vertices[k] = Vec3(v);
             }   // for k
             if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
                                          vertices[2], material     );
@@ -418,43 +417,74 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh)
  *  scene might use raycast on this track model to determine the actual
  *  height of the terrain.
  */
-bool Track::loadMainTrack(const XMLNode &xml_node)
+bool Track::loadMainTrack(const XMLNode &root)
 {
+    const XMLNode *track_node= root.getNode("track");
     std::string model_name;
-    xml_node.get("model", &model_name);
+    track_node->get("model", &model_name);
     std::string full_path = m_root+"/"+model_name;
     scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
     if(!mesh)
     {
         fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
-                xml_node.getName().c_str(), model_name.c_str());
+                track_node->getName().c_str(), model_name.c_str());
         exit(-1);
     }
 
     m_all_meshes.push_back(mesh);
+    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+    core::vector3df xyz(0,0,0);
+    track_node->getXYZ(&xyz);
+    core::vector3df hpr(0,0,0);
+    track_node->getHPR(&hpr);
+    scene_node->setPosition(xyz);
+    scene_node->setRotation(hpr);
+    handleAnimatedTextures(scene_node, *track_node);
+    m_all_nodes.push_back(scene_node);
 
     MeshTools::minMax3D(mesh, &m_aabb_min, &m_aabb_max);
     RaceManager::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
+
+    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    {
+        const XMLNode *n=track_node->getNode(i);
+        assert(n->getName()=="object");
+        model_name="";
+        n->get("model", &model_name);
+        full_path = m_root+"/"+model_name;
+        scene::IAnimatedMesh *a_mesh = irr_driver->getAnimatedMesh(full_path);
+        if(!a_mesh)
+        {
+            fprintf(stderr, "Warning: object model '%s' not found, ignored.\n",
+                    full_path.c_str());
+            continue;
+        }
+        m_all_meshes.push_back(a_mesh);
+        scene::ISceneNode *scene_node = irr_driver->addAnimatedMesh(a_mesh);
+        core::vector3df xyz(0,0,0);
+        n->get("xyz", &xyz);
+        core::vector3df hpr(0,0,0);
+        n->get("hpr", &hpr);
+        scene_node->setPosition(xyz);
+        scene_node->setRotation(hpr);
+        handleAnimatedTextures(scene_node, *n);
+        m_all_nodes.push_back(scene_node);
+    }   // for i
+
     // This will (at this stage) only convert the main track model.
-    convertTrackToBullet(mesh);
+    for(unsigned int i=0; i<m_all_meshes.size(); i++)
+    //for(unsigned int i=0; i<1; i++)
+    {
+        convertTrackToBullet(m_all_meshes[i], m_all_nodes[i]);
+    }
     if (m_track_mesh == NULL)
     {
         fprintf(stderr, "ERROR: m_track_mesh == NULL, cannot loadMainTrack\n");
-        return false;
+        exit(-1);
     }
     
     m_track_mesh->createBody();
 
-
-    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
-    core::vector3df xyz(0,0,0);
-    xml_node.getXYZ(&xyz);
-    core::vector3df hpr(0,0,0);
-    xml_node.getHPR(&hpr);
-    scene_node->setPosition(xyz);
-    scene_node->setRotation(hpr);
-    handleAnimatedTextures(scene_node, xml_node);
-    m_all_nodes.push_back(scene_node);
     scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
     scene_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
 
@@ -463,7 +493,8 @@ bool Track::loadMainTrack(const XMLNode &xml_node)
 
 // ----------------------------------------------------------------------------
 /** Handles animated textures.
- *  \param node The node containing the data for the animated notion.
+ *  \param node The scene node for which animated textures are handled.
+ *  \param xml The node containing the data for the animated notion.
  */
 void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 {
@@ -631,8 +662,9 @@ void Track::loadTrackModel(unsigned int mode_id)
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
-    const XMLNode *node = root->getNode("track");
-    loadMainTrack(*node);
+    loadMainTrack(*root);
+    unsigned int main_track_count = m_all_meshes.size();
+
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -686,9 +718,12 @@ void Track::loadTrackModel(unsigned int mode_id)
         }
         else if (name=="start")
         {
-            core::vector3df xyz(0,0,0);
+            Vec3 xyz(0,0,0);
             node->getXYZ(&xyz);
-            m_start_positions.push_back(Vec3(xyz.X, xyz.Y, xyz.Z));
+            m_start_positions.push_back(xyz);
+            float h=0;
+            node->get("h", &h);
+            m_start_heading.push_back(h);
         }
 		else if(name=="animations")
 		{
@@ -777,7 +812,7 @@ void Track::loadTrackModel(unsigned int mode_id)
     }
     
     // Note: the physics world for irrlicht is created in loadMainTrack
-    createPhysicsModel();
+    createPhysicsModel(main_track_count);
     if(UserConfigParams::m_track_debug)
         m_quad_graph->createDebugMesh();
 }   // loadTrackModel

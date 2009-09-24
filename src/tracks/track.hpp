@@ -56,7 +56,10 @@ private:
     std::string              m_ident;
     std::string              m_screenshot;
     std::vector<MusicInformation*> m_music;
-    std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
+    /** Start heading of karts (if specified in the scene file). */
+    std::vector<float>       m_start_heading;
+    /** Start positions of karts (if specified in the scene file). */
+    std::vector<Vec3>        m_start_positions;
     std::string              m_item_style;
     std::string              m_description;
     std::string              m_designer;
@@ -150,23 +153,21 @@ private:
     /** Checkline manager. */
     CheckManager             *m_check_manager;
 
-    void  loadTrackInfo(const std::string &filename);
-    void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
-                      int bNeedHeight);
-    void  loadQuadGraph(unsigned int mode_id);
-    void  convertTrackToBullet(const scene::IMesh *mesh);
-    bool                     loadMainTrack(const XMLNode &node);
-    void                     createWater(const XMLNode &node);
-    void  getMusicInformation(std::vector<std::string>&             filenames, 
-                              std::vector<MusicInformation*>& m_music   );
+    void loadTrackInfo(const std::string &filename);
+    void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
+                     int bNeedHeight);
+    void loadQuadGraph(unsigned int mode_id);
+    void convertTrackToBullet(const scene::IMesh *mesh,
+                              const scene::ISceneNode*node);
+    bool loadMainTrack(const XMLNode &node);
+    void createWater(const XMLNode &node);
+    void getMusicInformation(std::vector<std::string>&  filenames, 
+                             std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
     void handleSky(const XMLNode &root, const std::string &filename);
 
 public:
-    
-    /** Start positions for arenas (unused in linear races) */
-    std::vector<Vec3>   m_start_positions;
 
     static const float NOHIT;
 
@@ -215,7 +216,7 @@ public:
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
-    void               createPhysicsModel();
+    void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
@@ -255,6 +256,13 @@ public:
     /** Sets the current ambient color. */
     void   setAmbientColor(const video::SColor &color)
                                                 { m_ambient_color = color; }
+    /** Get the number of start positions defined in the scene file. */
+    unsigned int getNumberOfStartPositions() const 
+                                           { return m_start_positions.size(); }
+    /** Returns the i-th. start position. */
+    const Vec3 &getStartPosition(unsigned int i) {return m_start_positions[i];}
+    /** Returns the heading of the i-th. start position. */
+    const float getStartHeading(unsigned int i) {return m_start_heading[i]; }
 };   // class Track
 
 #endif
