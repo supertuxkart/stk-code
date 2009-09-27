@@ -224,7 +224,7 @@ namespace KartSelectionScreen
             
             modelView->update(0);
             
-            // TODO : only fill list on first add
+            playerName->clearLabels();
             const int playerAmount = UserConfigParams::m_all_players.size();
             for(int n=0; n<playerAmount; n++)
             {

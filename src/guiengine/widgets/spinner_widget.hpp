@@ -46,10 +46,13 @@ namespace GUIEngine
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
         virtual void move(const int x, const int y, const int w, const int h);
-        
-        void setValue(const int new_value);
+                
         void addLabel(std::string label);
+        void clearLabels();
+        
         void add();
+        void setValue(const int new_value);
+
         bool isGauge()  const { return m_gauge; }
         int  getValue() const { return m_value; }
         int  getMax()   const { return m_max;   }

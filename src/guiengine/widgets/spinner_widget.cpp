@@ -200,6 +200,11 @@ bool SpinnerWidget::transmitEvent(Widget* w, std::string& originator, const int 
     return true;
 }
 // -----------------------------------------------------------------------------
+void SpinnerWidget::clearLabels()
+{
+    m_labels.clear();
+}
+// -----------------------------------------------------------------------------
 void SpinnerWidget::addLabel(std::string label)
 {
     m_labels.push_back(label);
