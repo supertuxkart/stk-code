@@ -60,7 +60,7 @@ namespace GUIEngine
         bool leftPressed(const int playerID=0);
         bool mouseHovered(Widget* child);
         bool transmitEvent(Widget* w, std::string& originator, const int playerID=0);
-        void focused(const int playerID);
+        bool focused(const int playerID);
         
         ptr_vector<IGUIStaticText, REF> m_labels;
         

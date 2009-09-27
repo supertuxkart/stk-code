@@ -254,11 +254,11 @@ bool RibbonWidget::leftPressed(const int playerID)
     return m_ribbon_type != RIBBON_TOOLBAR;
 }
 // -----------------------------------------------------------------------------
-void RibbonWidget::focused(const int playerID)
+bool RibbonWidget::focused(const int playerID)
 {    
     Widget::focused(playerID);
     
-    if (m_children.size() < 1) return; // empty ribbon
+    if (m_children.size() < 1) return false; // empty ribbon
     
     if (m_focus == NULL && m_selection[playerID] != -1)
     {
@@ -272,6 +272,8 @@ void RibbonWidget::focused(const int playerID)
         // FIXME : unclean, children ribbons shouldn't need to know about their parent
         ((DynamicRibbonWidget*)m_event_handler)->onRowChange( this, playerID );
     }
+    
+    return false;
 }
 // -----------------------------------------------------------------------------
 bool RibbonWidget::mouseHovered(Widget* child)

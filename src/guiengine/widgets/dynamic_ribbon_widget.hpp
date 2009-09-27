@@ -124,7 +124,7 @@ namespace GUIEngine
         void propagateSelection();
         
         /** Callback called widget is focused */
-        void focused(const int playerID);
+        bool focused(const int playerID);
                 
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();

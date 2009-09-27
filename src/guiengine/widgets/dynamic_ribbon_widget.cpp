@@ -416,7 +416,7 @@ bool DynamicRibbonWidget::mouseHovered(Widget* child)
     return false;
 }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::focused(const int playerID)
+bool DynamicRibbonWidget::focused(const int playerID)
 {
     Widget::focused(playerID);
     updateLabel();
@@ -427,6 +427,8 @@ void DynamicRibbonWidget::focused(const int playerID)
         m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
                                                 getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
     }
+    
+    return false;
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)

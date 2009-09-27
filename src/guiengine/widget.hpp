@@ -128,8 +128,8 @@ namespace GUIEngine
             Returns 'true' if main event handler should be notified of a change. */
         virtual bool mouseHovered(Widget* child) { return false; }
         
-        /** override in children if you need to know when the widget is focused */
-        virtual void focused(const int playerID) { isWithinATextBox = false; }
+        /** override in children if you need to know when the widget is focused. return whether to block event */
+        virtual bool focused(const int playerID) { isWithinATextBox = false; return false; }
         
         /**
           * The XML loader stored coords in their raw string form inside this widget.

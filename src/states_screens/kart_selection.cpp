@@ -48,7 +48,6 @@ namespace KartSelectionScreen
     class PlayerKartWidget;
     
     // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
-    // FIXME : delete these objects when leaving the screen (especially when using escape)
     ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
 #if 0
@@ -56,13 +55,30 @@ namespace KartSelectionScreen
 #pragma mark PlayerKartWidget
 #endif
     
+    class PlayerNameSpinner : public SpinnerWidget
+    {
+        int playerID;
+        
+        virtual bool focused(const int playerID) ;
+        
+    public:
+        PlayerNameSpinner(const int playerID)
+        {
+            PlayerNameSpinner::playerID = playerID;
+        }
+        void setID(const int playerID)
+        {
+            PlayerNameSpinner::playerID = playerID;
+        }
+    };
+
     class PlayerKartWidget : public Widget
     {
         float x_speed, y_speed, w_speed, h_speed;
 
     public:
         LabelWidget* playerIDLabel;
-        SpinnerWidget* playerName;
+        PlayerNameSpinner* playerName;
         ModelViewWidget* modelView;
         LabelWidget* kartName;
         
@@ -126,7 +142,7 @@ namespace KartSelectionScreen
             //playerID->setParent(this);
             m_children.push_back(playerIDLabel);
             
-            playerName = new SpinnerWidget();
+            playerName = new PlayerNameSpinner(playerID);
             playerName->x = player_name_x;
             playerName->y = player_name_y;
             playerName->w = player_name_w;
@@ -209,6 +225,7 @@ namespace KartSelectionScreen
             irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str());
             playerIDLabel->setText( newLabel ); 
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
+            playerName->setID(playerID);
         }
         
         virtual void add()
@@ -485,7 +502,7 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer;
     if (firstPlayer)
-        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());//, rightarea.m_reserved_id);
     else
         newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
     
@@ -794,5 +811,47 @@ void renumberKarts()
     printf("OK\n");
 
 }
+
+#if 0
+#pragma mark -
+#endif
+    
+    // FIXME : clean this mess, this file should not contain so many classes
+bool PlayerNameSpinner::focused(const int playerID) 
+{
+    std::cout << "Player name spinner " << this->playerID << " focused by " << playerID << std::endl;
+        
+    // since this screen is multiplayer, redirect focus to the right widget
+    if (this->playerID != playerID)
+    {
+        const int amount = g_player_karts.size();
+        for (int n=0; n<amount; n++)
+        {
+            if (g_player_karts[n].playerID == playerID)
+            {
+                std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->playerID  <<
+                            " (ID " << m_element->getID() <<
+                            ") to spinner " << n << " (ID " << g_player_karts[n].playerName->m_element->getID() << ")" << std::endl;
+                
+                int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
+                
+                g_player_karts[n].playerName->setFocusForPlayer(playerID);
+                
+                int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
+                
+                std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
+                
+                return true; // block event
+            }
+        }
+        assert(false);
+    }
+    else
+    {
+        std::cout << "--> right spinner nothing to do\n";
+        return false;
+    }
+}
+    
 
 }
