@@ -101,13 +101,6 @@ namespace GUIEngine
         friend class Skin;
         friend class DynamicRibbonWidget;
         
-        /**
-          * These methods provide new unique IDs each time you call them.
-          * Since IDs are used to determine tabbing order, "non-tabbable"
-          * objects are being given very different IDs so that they don't interfere.
-          */
-        int getNewID();
-        int getNewNoFocusID();
         
         /**
           * Can be used in children to indicate whether a widget is selected or not
@@ -273,6 +266,13 @@ namespace GUIEngine
         
         void requestFocus();
 
+        /**
+         * These methods provide new unique IDs each time you call them.
+         * Since IDs are used to determine tabbing order, "non-tabbable"
+         * objects are being given very different IDs so that they don't interfere.
+         */
+        static int getNewID();
+        static int getNewNoFocusID();
         
         /**
          * Override in children to possibly receive updates (you may need to register to

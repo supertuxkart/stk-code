@@ -262,6 +262,7 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
     {
         if (widgets[n].m_type == WTYPE_DIV)
         {
+            widgets[n].add(); // Will do nothing, but will maybe reserve an ID
             addWidgetsRecursively(widgets[n].m_children, &widgets[n]);
         }
         else

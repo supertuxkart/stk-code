@@ -234,7 +234,9 @@ namespace KartSelectionScreen
             
             // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
             if (m_irrlicht_widget_ID != -1) playerName->m_reserved_id = m_irrlicht_widget_ID;
+            else playerName->m_reserved_id = Widget::getNewNoFocusID();
             playerName->add();
+            playerName->getIrrlichtElement()->setTabStop(false);
             
             modelView->add();
             kartName->add();
@@ -500,12 +502,16 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayer;
-    //if (firstPlayer)
-    //    newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
-    //else
-    //    newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
+    if (firstPlayer)
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
+    else
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
     
-    newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
+    //FIXME : currently, only player 0's spinner is focusable - and it dispatches focus to one of
+    // the others as needed. But if player 0 leaves, it will be impossible for remaining players
+    // to select their ident
+    
+    //newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
     
     getCurrentScreen()->manualAddWidget(newPlayer);
     newPlayer->add();
@@ -820,7 +826,7 @@ void renumberKarts()
 // FIXME : clean this mess, this file should not contain so many classes
 GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID) 
 {
-    //std::cout << "Player name spinner " << this->playerID << " focused by " << playerID << std::endl;
+    std::cout << "Player name spinner " << this->playerID << " focused by " << playerID << std::endl;
         
     // since this screen is multiplayer, redirect focus to the right widget
     if (this->playerID != playerID)
@@ -830,15 +836,15 @@ GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID)
         {
             if (g_player_karts[n].playerID == playerID)
             {
-                //std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->playerID  <<
-                //            " (ID " << m_element->getID() <<
-                //            ") to spinner " << n << " (ID " << g_player_karts[n].playerName->m_element->getID() << ")" << std::endl;
-                //int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
+                std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->playerID  <<
+                            " (ID " << m_element->getID() <<
+                            ") to spinner " << n << " (ID " << g_player_karts[n].playerName->m_element->getID() << ")" << std::endl;
+                int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
                 
                 g_player_karts[n].playerName->setFocusForPlayer(playerID);
                 
-                //int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
-                //std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
+                int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
+                std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
                 
                 return GUIEngine::EVENT_BLOCK;
             }
@@ -847,7 +853,7 @@ GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID)
     }
     else
     {
-        //std::cout << "--> right spinner nothing to do\n";
+        std::cout << "--> right spinner nothing to do\n";
         return GUIEngine::EVENT_LET;
     }
 }

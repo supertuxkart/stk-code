@@ -34,6 +34,8 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+const bool ID_DEBUG = false;
+
 /**
  * Small utility to read config file info from a XML file.
  */
@@ -507,7 +509,7 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     
     SColor* colorptr = NULL;
     
-    if (w->r != -1 && w->g != -1 && w->b != -1)
+    if (w->r != -1 && w->g != -1 && w->b != -1 || ID_DEBUG)
     {
         SColor thecolor(255, w->r, w->g, w->b);
         colorptr = new SColor[4]();
@@ -515,6 +517,13 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
         colorptr[1] = thecolor;
         colorptr[2] = thecolor;
         colorptr[3] = thecolor;
+    }
+    if (ID_DEBUG)
+    {
+        colorptr[0].setAlpha(100);
+        colorptr[1].setAlpha(100);
+        colorptr[2].setAlpha(100);
+        colorptr[3].setAlpha(100);
     }
     
     if ((areas & BoxRenderParams::LEFT) != 0)
@@ -961,8 +970,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     {
         // list selection background
         drawListSelection(rect, widget, focused);
-    }
-    
+    }  
 }
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
 {
@@ -1046,6 +1054,14 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     else if(type == WTYPE_CHECKBOX)
     {
         drawCheckBox(rect, widget, focused);
+    }
+    
+    if (ID_DEBUG && id != -1)
+    {
+        irr::core::stringw idstring;
+        idstring += id;
+        SColor color(255, 255, 0, 0);
+        GUIEngine::getFont()->draw(idstring.c_str(), rect, color, true, true);
     }
 }
 
