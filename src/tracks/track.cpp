@@ -448,6 +448,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
+        // The have already been handled
+        if(n->getName()=="animated-texture") continue;
         assert(n->getName()=="object");
         model_name="";
         n->get("model", &model_name);
