@@ -329,7 +329,10 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     else
     {
         Widget* widget = g_focus_for_player[playerID];
-        if (widget != NULL) el = widget->m_element;
+        if (widget != NULL)
+        {
+            el = widget->m_element;
+        }
     }
     
     Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
@@ -358,6 +361,13 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         
         if (stay_within_list) return;
         else list->setSelected(-1);
+    }
+    
+    if (w->m_tab_up_root != -1) el = GUIEngine::getWidget( w->m_tab_up_root )->getIrrlichtElement();
+    if (el == NULL)
+    {
+        std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
+        return;
     }
     
     // find closest widget
@@ -431,6 +441,8 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         
     Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
     
+    std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
+    
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
     // components
@@ -457,9 +469,18 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         else list->setSelected(-1);
     }
     
+    if (w->m_tab_down_root != -1) el = GUIEngine::getWidget( w->m_tab_down_root )->getIrrlichtElement();
+    if (el == NULL)
+    {
+        std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
+        return;
+    }
+    
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
+        std::cout << "!!! Player " << playerID << " navigating to " << closest->getID() << std::endl;
+
         if (playerID == 0)
         {
             GUIEngine::getGUIEnv()->setFocus(closest);
@@ -472,6 +493,8 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     }
     else
     {
+        std::cout << "!!! Player " << playerID << " cannot navigating down, no next widget found;\n";
+
         // select the first widget
         Widget* w = NULL;
         

@@ -80,6 +80,9 @@ Widget::Widget(bool reserve_id)
     m_parent = NULL;
     m_reserve_id = reserve_id;
     
+    m_tab_down_root = -1;
+    m_tab_up_root = -1;
+    
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;

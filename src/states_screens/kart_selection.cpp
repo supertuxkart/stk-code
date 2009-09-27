@@ -139,6 +139,7 @@ namespace KartSelectionScreen
             playerIDLabel->y = player_id_y;
             playerIDLabel->w = player_id_w;
             playerIDLabel->h = player_id_h;
+            
             //playerID->setParent(this);
             m_children.push_back(playerIDLabel);
             
@@ -147,6 +148,12 @@ namespace KartSelectionScreen
             playerName->y = player_name_y;
             playerName->w = player_name_w;
             playerName->h = player_name_h;
+            
+            if (irrlichtWidgetID == -1)
+            {
+                // FIXME : don't rely so hard on player 0 being the "root" ?
+                playerName->m_tab_down_root = g_player_karts[0].playerName->getIrrlichtElement()->getID();
+            }
             
             spinnerID = StringUtils::insertValues("@p%i_spinner", playerID);
             
@@ -235,6 +242,7 @@ namespace KartSelectionScreen
             // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
             if (m_irrlicht_widget_ID != -1) playerName->m_reserved_id = m_irrlicht_widget_ID;
             else playerName->m_reserved_id = Widget::getNewNoFocusID();
+            
             playerName->add();
             playerName->getIrrlichtElement()->setTabStop(false);
             
@@ -510,9 +518,7 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     //FIXME : currently, only player 0's spinner is focusable - and it dispatches focus to one of
     // the others as needed. But if player 0 leaves, it will be impossible for remaining players
     // to select their ident
-    
-    //newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
-    
+        
     getCurrentScreen()->manualAddWidget(newPlayer);
     newPlayer->add();
 

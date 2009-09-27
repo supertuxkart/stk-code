@@ -178,6 +178,11 @@ namespace GUIEngine
         Widget* m_event_handler;
         
         
+        /** Instead of searching for widget IDs smaller/greater than that of this object, navigation
+            through widgets will start from these IDs (if they are set). */
+        int m_tab_down_root;
+        int m_tab_up_root;
+        
         /** Coordinates of the widget once added (the difference between those x/h and PROP_WIDTH/PROP_HEIGHT is
             that the props are read in raw form from the XML file; PROP_WIDTH can then be e.g. "10%" and w,
             once the widget is added, will be e.g. 80.) */
