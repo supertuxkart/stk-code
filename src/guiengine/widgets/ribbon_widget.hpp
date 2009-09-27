@@ -56,11 +56,11 @@ namespace GUIEngine
         void updateSelection();
         
         /** Callbacks */
-        bool rightPressed(const int playerID=0);
-        bool leftPressed(const int playerID=0);
-        bool mouseHovered(Widget* child);
-        bool transmitEvent(Widget* w, std::string& originator, const int playerID=0);
-        bool focused(const int playerID);
+        EventPropagation rightPressed(const int playerID=0);
+        EventPropagation leftPressed(const int playerID=0);
+        EventPropagation mouseHovered(Widget* child);
+        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
+        EventPropagation focused(const int playerID);
         
         ptr_vector<IGUIStaticText, REF> m_labels;
         

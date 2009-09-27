@@ -22,6 +22,7 @@
 #include <irrlicht.h>
 #include <map>
 
+#include "guiengine/event_handler.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
@@ -120,16 +121,16 @@ namespace GUIEngine
           * Returns 'true' if main event handler should be notified of a change.
           * Override in children to be notified of left/right events.
           */
-        virtual bool rightPressed(const int playerID) { return false; }
-        virtual bool leftPressed(const int playerID) { return false; }
+        virtual EventPropagation rightPressed(const int playerID) { return EVENT_BLOCK; }
+        virtual EventPropagation leftPressed(const int playerID) { return EVENT_BLOCK; }
         
         /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
             Returns 'true' if main event handler should be notified of a change. */
-        virtual bool mouseHovered(Widget* child) { return false; }
+        virtual EventPropagation mouseHovered(Widget* child) { return EVENT_BLOCK; }
         
         /** override in children if you need to know when the widget is focused. return whether to block event */
-        virtual bool focused(const int playerID) { isWithinATextBox = false; return false; }
+        virtual EventPropagation focused(const int playerID) { isWithinATextBox = false; return EVENT_LET; }
         
         /**
           * The XML loader stored coords in their raw string form inside this widget.
@@ -283,7 +284,7 @@ namespace GUIEngine
          this call. Must return whether main (GUI engine user) event callback should be notified or not.
          Note that in the case of a hierarchy of widgets (with m_event_handler), only the topmost widget
          of the chain decides whether the main handler is notified; return value is not read for others. */
-        virtual bool transmitEvent(Widget* w, std::string& originator, const int playerID) { return true; }
+        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID) { return EVENT_LET; }
         
         /**
          * Create and add the irrLicht widget(s) associated with this object.

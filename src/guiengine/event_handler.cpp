@@ -25,6 +25,7 @@
 #include "input/input_manager.hpp"
 
 using GUIEngine::EventHandler;
+using GUIEngine::EventPropagation;
 
 // -----------------------------------------------------------------------------
 
@@ -47,13 +48,13 @@ bool EventHandler::OnEvent (const SEvent &event)
          event.EventType != EET_JOYSTICK_INPUT_EVENT)
        )
     {
-        return onGUIEvent(event);
+        return onGUIEvent(event) == EVENT_BLOCK;
     }
     else
     {
         // FIXME : it's a bit unclean that all input events go trough the gui module
-        const bool blockPropagation = input_manager->input(event);
-        return blockPropagation;
+        const EventPropagation blockPropagation = input_manager->input(event);
+        return blockPropagation == EVENT_BLOCK;
     }
     
     // to shut up a warning. gcc is too stupid too see the code will never get here
@@ -62,7 +63,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 
 // -----------------------------------------------------------------------------
 
-bool EventHandler::onGUIEvent(const SEvent& event)
+EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 {    
     if (event.EventType == EET_GUI_EVENT)
     {
@@ -90,10 +91,9 @@ bool EventHandler::onGUIEvent(const SEvent& event)
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
                 {
                     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
-                    if(ribbon == NULL) break;
-                    if(ribbon->mouseHovered(w))
-                        transmitEvent(ribbon, ribbon->m_properties[PROP_ID]);
-                    if(ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
+                    if (ribbon == NULL) break;
+                    if (ribbon->mouseHovered(w) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID]);
+                    if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
                     getGUIEnv()->setFocus(ribbon->m_element);
                 }
                 else
@@ -146,17 +146,17 @@ bool EventHandler::onGUIEvent(const SEvent& event)
      EGET_ELEMENT_FOCUS_LOST, EGET_ELEMENT_FOCUSED, EGET_ELEMENT_HOVERED, EGET_ELEMENT_LEFT,
      EGET_ELEMENT_CLOSED,
      */
-    return false;        
+    return EVENT_LET;        
 }
 
 // -----------------------------------------------------------------------------
 
-bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
+EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
     if (ModalDialog::isADialogActive())
     {
-        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID])) return false;
-        if (w->m_event_handler == NULL) return false;
+        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID])) return EVENT_LET;
+        if (w->m_event_handler == NULL) return EVENT_LET;
     }
     
     std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
@@ -176,12 +176,12 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
         
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
-        if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID))
+        if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
         {
             // notify modal dialog too
             if (ModalDialog::isADialogActive())
             {
-                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID])) return false;
+                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID])) return EVENT_LET;
             }
             
             transmitEvent(parent, parent->m_properties[PROP_ID]);
@@ -189,7 +189,7 @@ bool EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
     }
     else transmitEvent(w, w->m_properties[PROP_ID]);
     
-    return true;
+    return EVENT_BLOCK;
 }
 
 // -----------------------------------------------------------------------------
@@ -237,8 +237,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             }
             
             
-            if (widget_to_call->leftPressed(playerID))
-                transmitEvent(w, w->m_properties[PROP_ID]);
+            if (widget_to_call->leftPressed(playerID) == EVENT_LET) transmitEvent(w, w->m_properties[PROP_ID]);
         }
             break;
             
@@ -271,8 +270,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
-            if (widget_to_call->rightPressed(playerID))
-                transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
+            if (widget_to_call->rightPressed(playerID) == EVENT_LET) transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
         }
             
             break;

@@ -59,7 +59,7 @@ namespace KartSelectionScreen
     {
         int playerID;
         
-        virtual bool focused(const int playerID) ;
+        virtual EventPropagation focused(const int playerID) ;
         
     public:
         PlayerNameSpinner(const int playerID)
@@ -502,9 +502,9 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     // FIXME : player ID needs to be synced with active player list
     PlayerKartWidget* newPlayer;
     if (firstPlayer)
-        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());//, rightarea.m_reserved_id);
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
     else
-        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size());
+        newPlayer = new PlayerKartWidget(aplayer, &rightarea, g_player_karts.size(), rightarea.m_reserved_id);
     
     getCurrentScreen()->manualAddWidget(newPlayer);
     newPlayer->add();
@@ -816,8 +816,8 @@ void renumberKarts()
 #pragma mark -
 #endif
     
-    // FIXME : clean this mess, this file should not contain so many classes
-bool PlayerNameSpinner::focused(const int playerID) 
+// FIXME : clean this mess, this file should not contain so many classes
+GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID) 
 {
     std::cout << "Player name spinner " << this->playerID << " focused by " << playerID << std::endl;
         
@@ -841,7 +841,7 @@ bool PlayerNameSpinner::focused(const int playerID)
                 
                 std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
                 
-                return true; // block event
+                return GUIEngine::EVENT_BLOCK;
             }
         }
         assert(false);
@@ -849,7 +849,7 @@ bool PlayerNameSpinner::focused(const int playerID)
     else
     {
         std::cout << "--> right spinner nothing to do\n";
-        return false;
+        return GUIEngine::EVENT_LET;
     }
 }
     

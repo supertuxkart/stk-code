@@ -34,7 +34,7 @@ namespace GUIEngine
     class CheckBoxWidget : public Widget
     {
         bool m_state;
-        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
+        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         
     public:
         CheckBoxWidget();

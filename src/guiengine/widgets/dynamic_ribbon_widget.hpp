@@ -124,7 +124,7 @@ namespace GUIEngine
         void propagateSelection();
         
         /** Callback called widget is focused */
-        bool focused(const int playerID);
+        EventPropagation focused(const int playerID);
                 
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void setSubElements();
@@ -138,8 +138,8 @@ namespace GUIEngine
         /** Callbacks */
         void onRowChange(RibbonWidget* row, const int playerID);
         void add();
-        bool mouseHovered(Widget* child);
-        bool transmitEvent(Widget* w, std::string& originator, const int playerID);
+        EventPropagation mouseHovered(Widget* child);
+        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         
     public:
         DynamicRibbonWidget(const bool combo=false, const int max_rows=4);
@@ -160,10 +160,10 @@ namespace GUIEngine
         void registerHoverListener(DynamicRibbonHoverListener* listener);
         
         /** Called when right key is pressed */
-        bool rightPressed(const int playerID);
+        EventPropagation rightPressed(const int playerID);
         
         /** Called when left key is pressed */
-        bool leftPressed(const int playerID);
+        EventPropagation leftPressed(const int playerID);
         
         /** Updates icons/labels given current items and scrolling offset, taking care of resizing
             the dynamic ribbon if the number of items changed */

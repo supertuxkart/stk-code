@@ -25,6 +25,7 @@
 #include <irrlicht.h>
 #include <map>
 
+#include "guiengine/event_handler.hpp"
 #include "input/input.hpp"
 
 class DeviceManager;
@@ -79,7 +80,7 @@ public:
 	// void   initGamePadDevices();
     
 	//void   input();
-    bool   input(const irr::SEvent& event);
+    GUIEngine::EventPropagation   input(const irr::SEvent& event);
     
     DeviceManager* getDeviceList() { return m_device_manager; }
     

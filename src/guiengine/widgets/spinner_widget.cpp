@@ -177,27 +177,27 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 }
 
 // -----------------------------------------------------------------------------
-bool SpinnerWidget::rightPressed(const int playerID)
+EventPropagation SpinnerWidget::rightPressed(const int playerID)
 {
     std::cout  << "Right pressed\n";
     if (m_value+1 <= m_max) setValue(m_value+1);
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-bool SpinnerWidget::leftPressed(const int playerID)
+EventPropagation SpinnerWidget::leftPressed(const int playerID)
 {
     std::cout  << "Left pressed\n";
     if (m_value-1 >= m_min) setValue(m_value-1);
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-bool SpinnerWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     if (originator == "left") leftPressed(playerID);
     else if (originator == "right") rightPressed(playerID);
     
     GUIEngine::getGUIEnv()->setFocus(m_element);
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
 void SpinnerWidget::clearLabels()

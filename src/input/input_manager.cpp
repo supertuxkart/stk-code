@@ -45,6 +45,10 @@
 #include "states_screens/state_manager.hpp"
 InputManager *input_manager;
 
+using GUIEngine::EventPropagation;
+using GUIEngine::EVENT_LET;
+using GUIEngine::EVENT_BLOCK;
+
 //-----------------------------------------------------------------------------
 /** Initialise input
  */
@@ -381,7 +385,7 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
  *
  * Returns whether to halt the event's propagation here
  */
-bool InputManager::input(const SEvent& event)
+EventPropagation InputManager::input(const SEvent& event)
 {
 
     //const bool programaticallyGenerated = (event.UserEvent.UserData1 == 666 && event.UserEvent.UserData1 == 999);
@@ -417,7 +421,7 @@ bool InputManager::input(const SEvent& event)
         if (gp == NULL)
         {
             // Prevent null pointer crash
-            return true;
+            return EVENT_BLOCK;
         }
 
         for(int i=0; i<gp->m_button_count; i++)
@@ -440,7 +444,7 @@ bool InputManager::input(const SEvent& event)
             printf("Level %d: %s\n",
                 event.LogEvent.Level,event.LogEvent.Text);
         }
-        return true;
+        return EVENT_BLOCK;
     }
     else if(event.EventType == EET_KEY_INPUT_EVENT)
     {
@@ -452,14 +456,14 @@ bool InputManager::input(const SEvent& event)
             if (key == KEY_ESCAPE)
             {
                 StateManager::get()->escapePressed();
-                return true;
+                return EVENT_BLOCK;
             }
             // 'backspace' in a text control must never be mapped, since user can be in a text
             // area trying to erase text (and if it's mapped to rescue that would dismiss the
             // dialog instead of erasing a single letter)
             if (key == KEY_BACK && GUIEngine::isWithinATextBox)
             {
-                return false;
+                return EVENT_LET;
             }
 
             input(Input::IT_KEYBOARD, 0, key,
@@ -478,7 +482,7 @@ bool InputManager::input(const SEvent& event)
         else
         {
             input(Input::IT_KEYBOARD, 0, key, 0, 0, programaticallyGenerated);
-            return true; // Don't propagate key up events
+            return EVENT_BLOCK; // Don't propagate key up events
         }
     }
 #if 0 // in case we ever use mouse in-game...
@@ -507,8 +511,15 @@ bool InputManager::input(const SEvent& event)
 #endif
     
     // block events in all modes but initial menus (except in text boxes to allow typing, and exceptm in modal dialogs in-game)
-    return getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox &&
-        (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME);
+    if (getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox &&
+        (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
+    {
+        return EVENT_BLOCK;
+    }
+    else
+    {
+        return EVENT_LET;
+    }
 }
 
 //-----------------------------------------------------------------------------

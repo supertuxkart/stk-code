@@ -324,7 +324,7 @@ void DynamicRibbonWidget::registerHoverListener(DynamicRibbonHoverListener* list
     m_hover_listeners.push_back(listener);
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::rightPressed(const int playerID)
+EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
 {
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
@@ -341,12 +341,12 @@ bool DynamicRibbonWidget::rightPressed(const int playerID)
         }
     }
     
-    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
     
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::leftPressed(const int playerID)
+EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
 {
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
@@ -363,22 +363,22 @@ bool DynamicRibbonWidget::leftPressed(const int playerID)
     }
     
     
-    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return false;
+    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
     
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
+EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     if (originator=="left")
     {
         scroll(-1);
-        return false;
+        return EVENT_BLOCK;
     }
     if (originator=="right")
     {
         scroll(1);
-        return false;
+        return EVENT_BLOCK;
     }
     
     // find selection in current ribbon
@@ -392,10 +392,10 @@ bool DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, cons
         }
     }
     
-    return true;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::mouseHovered(Widget* child)
+EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child)
 {
     updateLabel();
     propagateSelection();
@@ -413,10 +413,10 @@ bool DynamicRibbonWidget::mouseHovered(Widget* child)
         }
     }
     
-    return false;
+    return EVENT_BLOCK;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::focused(const int playerID)
+EventPropagation DynamicRibbonWidget::focused(const int playerID)
 {
     Widget::focused(playerID);
     updateLabel();
@@ -428,7 +428,7 @@ bool DynamicRibbonWidget::focused(const int playerID)
                                                 getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
     }
     
-    return false;
+    return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)
