@@ -857,12 +857,10 @@ GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID)
         }
         assert(false);
     }
-    else
-    {
-        std::cout << "--> right spinner nothing to do\n";
-        return GUIEngine::EVENT_LET;
-    }
-}
+
+    std::cout << "--> right spinner nothing to do\n";
+    return GUIEngine::EVENT_LET;
+}   // focused
     
 
 }
