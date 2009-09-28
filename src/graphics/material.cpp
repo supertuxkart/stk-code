@@ -114,14 +114,12 @@ void Material::init(unsigned int index)
 //-----------------------------------------------------------------------------
 void Material::install(bool is_full_path)
 {
-    // FIXME: do we actually still need the texture here? Irrlicht should
-    // cache them anyway.
     // Avoid irrlicht warning about not being able to load texture.
     m_texture = irr_driver->getTexture(file_manager->getTextureFile(m_texname));
 
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
-}   // isntall
+}   // install
 
 //-----------------------------------------------------------------------------
 /** Sets the appropriate flags in an irrlicht SMaterial.
@@ -140,5 +138,8 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->MaterialType = video::EMT_SPHERE_MAP;
     else if(m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    if(m_clamp_tex)
+        m->setFlag(video::EMF_TEXTURE_WRAP, video::ETC_CLAMP);
+    
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
