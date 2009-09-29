@@ -174,7 +174,7 @@ rubber-band-duration is the duration a rubber band acts.
 <general-kart-defaults 
     wheel-base="1.2"
     heightCOG="0.2"
-    time-full-steer="0.25"
+    time-full-steer="0.2"
     time-full-steer-ai="0.1"
     corn-f ="4"
     corn-r="4"
@@ -191,8 +191,8 @@ rubber-band-duration is the duration a rubber band acts.
     slipstream-add-power="3"
 
     brake-factor="11.0"
-    min-speed-radius="0 6.64"
-    max-speed-radius="15 21.5"
+    min-speed-radius="0 3"
+    max-speed-radius="10 15.0"
     engine-power="400 400 300"
     max-speed="32.22 28 25"
     mass="225"
