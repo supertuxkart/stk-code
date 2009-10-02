@@ -27,7 +27,19 @@
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
            bool invisible)
  {
-     m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
+     if(sideOfLine2D(p0, p2, p1)>0 ||
+         sideOfLine2D(p0, p2, p3)<0)
+     {
+         printf("Warning: quad has wrong orientation: p0=%f %f %f p1=%f %f %f\n",
+                p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
+         printf("The quad will be swapped, nevertheless test for correctness -\n");
+         printf("quads must be counter-clockwise oriented.\n");
+         m_p[0]=p1; m_p[1]=p0; m_p[2]=p3; m_p[3]=p2;
+     }
+     else
+     {
+        m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
+     }
      m_center = 0.25f*(p0+p1+p2+p3);
      m_min_height = std::min ( std::min(p0.getZ(), p1.getZ()),
                                std::min(p0.getZ(), p1.getZ())  );
