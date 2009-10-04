@@ -30,8 +30,13 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : CutScene(CUTSCENE_NAME)
 
 void FeatureUnlockedCutScene::prepare()
 {
+    angle = 0.0f;
+    
     sky = irr_driver->addSkyDome(file_manager->getTextureFile("lscales.png"), 16 /* hori_res */, 16 /* vert_res */,
-                           15.0f /* texture_percent */,  1.3f /* sphere_percent */);
+                           1.0f /* texture_percent */,  2.0f /* sphere_percent */);
+    
+    camera = irr_driver->addCamera();
+    
     /*
     for (unsigned int i=0; i<sky->getMaterialCount(); i++)
     {
@@ -49,13 +54,20 @@ void FeatureUnlockedCutScene::prepare()
 void FeatureUnlockedCutScene::terminate()
 {
     printf("+++++++ FeatureUnlockedCutScene:Terminate +++++++++\n");
+    
     irr_driver->removeNode(sky);
     sky = NULL;
+    
+    irr_driver->removeCamera(camera);
+    camera = NULL;
 }
 
 void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* driver)
 {
-    sky->render();
+    angle += dt*2;
+    if (angle > 360) angle -= 360;
+    sky->setRotation( core::vector3df(0, angle, 0) );
+
     const int w = irr_driver->getFrameSize().Width;
     const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 0 ,0);
