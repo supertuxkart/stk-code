@@ -74,6 +74,8 @@ supertuxkart_SOURCES = \
  graphics/water_splash.cpp \
  guiengine/abstract_state_manager.cpp \
  guiengine/abstract_state_manager.hpp \
+ guiengine/cutscene.cpp \
+ guiengine/cutscene.hpp \
  guiengine/engine.cpp \
  guiengine/engine.hpp \
  guiengine/event_handler.hpp \
@@ -247,6 +249,8 @@ supertuxkart_SOURCES = \
  replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
+ states_screens/credits.cpp \
+ states_screens/credits.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
  states_screens/dialogs/enter_player_name_dialog.hpp \
  states_screens/dialogs/player_info_dialog.hpp \
@@ -259,8 +263,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/race_over_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.cpp \
- states_screens/credits.cpp \
- states_screens/credits.hpp \
+ states_screens/feature_unlocked.cpp \
+ states_screens/feature_unlocked.hpp \
  states_screens/kart_selection.cpp \
  states_screens/kart_selection.hpp \
  states_screens/options_screen.cpp \
