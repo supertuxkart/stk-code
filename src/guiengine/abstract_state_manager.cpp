@@ -36,23 +36,12 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/options_screen.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/credits.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
-
-/**
-* Name of the event sent when constructing a menu
-*/
-const std::string g_init_event = "init";
-
-/**
- * Name of the event sent when destructing a menu
- */
-const std::string g_teardown_event = "tearDown";
 
 AbstractStateManager::AbstractStateManager()
 {
@@ -99,7 +88,7 @@ void AbstractStateManager::pushMenu(std::string name)
     assert(m_game_mode != INGAME_MENU);
     
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0 && m_game_mode != GAME) eventCallback(NULL, g_teardown_event);
+    if (m_menu_stack.size() > 0 && m_game_mode != GAME) getCurrentScreen()->tearDown();
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
@@ -113,39 +102,54 @@ void AbstractStateManager::pushMenu(std::string name)
         m_game_mode = MENU;
     }
     switchToScreen(name.c_str());
-    
-    // Send init event to new menu
-    eventCallback(NULL, g_init_event);
 }
 
 void AbstractStateManager::pushCutScene(std::string name)
 {
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0 && m_game_mode != GAME) eventCallback(NULL, g_teardown_event);
+    if (m_menu_stack.size() > 0 && m_game_mode != GAME) getCurrentScreen()->tearDown();
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
 
     m_game_mode = CUTSCENE;
     GUIEngine::switchToScreen(name.c_str());
-    
-    // Send init event to new cutscene
-    eventCallback(NULL, g_init_event);
 }
 
-void AbstractStateManager::replaceTopMostMenu(std::string name)
+void AbstractStateManager::pushScreen(Screen* screen)
+{
+    if (screen->getScreenType() == SCREEN_TYPE_MENU)
+    {
+        pushMenu(screen->getName());
+    }
+    else if(screen->getScreenType() == SCREEN_TYPE_CUTSCENE)
+    {
+        pushCutScene(screen->getName());
+    }
+    else
+    {
+        assert(false);
+    }
+    screen->init();
+}
+
+void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 {
     assert(m_game_mode != GAME);
+ 
+    // FIXME : handle cutscenes ?
+    
+    std::string name = screen->getName();
     
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack[m_menu_stack.size()-1] = name;
     switchToScreen(name.c_str());
     
     // Send init event to new menu
-    eventCallback(NULL, g_init_event);
+    getCurrentScreen()->init();
 }
 
 void AbstractStateManager::reshowTopMostMenu()
@@ -153,12 +157,12 @@ void AbstractStateManager::reshowTopMostMenu()
     assert(m_game_mode != GAME);
     
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0) eventCallback(NULL, g_teardown_event);
+    if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
     
     switchToScreen( m_menu_stack[m_menu_stack.size()-1].c_str() );
     
     // Send init event to new menu
-    eventCallback(NULL, g_init_event);
+    getCurrentScreen()->init();
 }
 
 void AbstractStateManager::popMenu()
@@ -166,8 +170,7 @@ void AbstractStateManager::popMenu()
     assert(m_game_mode != GAME);
     
     // Send tear-down event to menu
-    if (m_game_mode == CUTSCENE) ((CutScene*)GUIEngine::getCurrentScreen())->terminate();
-    else eventCallback(NULL, g_teardown_event);
+    getCurrentScreen()->tearDown();
     m_menu_stack.pop_back();
     
     if (m_menu_stack.size() == 0)
@@ -194,12 +197,16 @@ void AbstractStateManager::popMenu()
         m_game_mode = MENU;
         switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
         input_manager->getDeviceList()->setAssignMode(NO_ASSIGN); // No assign mode on menus by default
-        eventCallback(NULL, g_init_event);
+        getCurrentScreen()->init();
     }
 }
 
-void AbstractStateManager::resetAndGoToMenu(std::string name)
+void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
+    std::string name = screen->getName();
+    
+    // FIXME: handle cutscenes ?
+    
     race_manager->exitRace();
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.clear();
@@ -207,6 +214,6 @@ void AbstractStateManager::resetAndGoToMenu(std::string name)
     m_game_mode = MENU;
     sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
     switchToScreen(name.c_str());
-    eventCallback(NULL, g_init_event);
+    getCurrentScreen()->init();
 }
 

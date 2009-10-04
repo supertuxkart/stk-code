@@ -35,7 +35,6 @@
 #include "io/file_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/options_screen.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
@@ -124,306 +123,6 @@ void StateManager::resetActivePlayers()
     m_active_players.clearWithoutDeleting();
 }
 
-#if 0
-#pragma mark -
-#pragma mark Callbacks
-#endif
-
-// -------------------------------------------------------------------------
-/**
- * Callback handling events from the main menu
- */
-void StateManager::menuEventMain(Widget* widget, const std::string& name)
-{
-    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
-    if(ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
-    std::string selection = ribbon->getSelectionIDString(GUI_PLAYER_ID);
-
-
-    if (selection == "network")
-    {
-        printf("+++++ FeatureUnlockedCutScene::show() +++++\n");
-        // FIXME : remove, temporary test
-        FeatureUnlockedCutScene::show();
-    }
-    
-    if (selection == "new")
-    {
-        pushMenu("karts.stkgui");
-    }
-    else if (selection == "options")
-    {
-        StateManager::pushMenu("options_av.stkgui");
-    }
-    else if (selection == "quit")
-    {
-        main_loop->abort();
-        return;
-    }
-    else if (selection == "about")
-    {
-        pushMenu("credits.stkgui");
-    }
-    else if (selection == "help")
-    {
-        pushMenu("help1.stkgui");
-    }
-}
-
-// -------------------------------------------------------------------------
-/**
- * Callback handling events from the race setup menu
- */
-void StateManager::menuEventRaceSetup(Widget* widget, const std::string& name)
-{
-    if(name == "init")
-    {
-        RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("difficulty");
-        assert( w != NULL );
-        w->setSelection( race_manager->getDifficulty(), GUI_PLAYER_ID );
-        
-        SpinnerWidget* kartamount = getCurrentScreen()->getWidget<SpinnerWidget>("aikartamount");
-        kartamount->setValue( race_manager->getNumKarts() - race_manager->getNumPlayers() );
-        
-        DynamicRibbonWidget* w2 = getCurrentScreen()->getWidget<DynamicRibbonWidget>("gamemode");
-        assert( w2 != NULL );
-        
-        if(!getCurrentScreen()->m_inited)
-        {
-            w2->addItem( _("Snaky Competition\nAll blows allowed, so catch weapons and make clever use of them!"),
-                        "normal",
-                        file_manager->getDataDir() + "/gui/mode_normal.png");
-            
-            w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
-                        "timetrial",
-                        file_manager->getDataDir() + "/gui/mode_tt.png");
-            
-            if (unlock_manager->isLocked("followtheleader"))
-            {
-                w2->addItem( _("Locked!\nFulfill challenges to gain access to locked areas"),
-                            "locked",
-                            file_manager->getDataDir() + "textures/gui_lock.png");
-            }
-            else
-            {
-                w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
-                            "ftl",
-                            file_manager->getDataDir() + "/gui/mode_ftl.png");
-            }
-            
-            if (race_manager->getNumPlayers() > 1)
-            {
-                w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
-                            "3strikes",
-                            file_manager->getDataDir() + "/gui/mode_3strikes.png");
-            }
-            
-            getCurrentScreen()->m_inited = true;
-        }
-        w2->updateItemDisplay();
-        
-    }
-    else if(name == "difficulty")
-    {
-        RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-        assert(w != NULL);
-        const std::string& selection = w->getSelectionIDString(GUI_PLAYER_ID);
-
-        if(selection == "novice")
-        {
-            UserConfigParams::m_difficulty = RaceManager::RD_EASY;
-            race_manager->setDifficulty(RaceManager::RD_EASY);
-        }
-        else if(selection == "intermediate")
-        {
-            UserConfigParams::m_difficulty = RaceManager::RD_MEDIUM;
-            race_manager->setDifficulty(RaceManager::RD_MEDIUM);
-        }
-        else if(selection == "expert")
-        {
-            UserConfigParams::m_difficulty = RaceManager::RD_HARD;
-            race_manager->setDifficulty(RaceManager::RD_HARD);
-        }
-    }
-    else if(name == "gamemode")
-    {
-        DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
-        const std::string selectedMode = w->getSelectionIDString(GUI_PLAYER_ID);
-        
-        if (selectedMode == "normal")
-        {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);
-            pushMenu("tracks.stkgui");
-        }
-        else if (selectedMode == "timetrial")
-        {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-            pushMenu("tracks.stkgui");
-        }
-        else if (selectedMode == "ftl")
-        {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
-            pushMenu("tracks.stkgui");
-        }
-        else if (selectedMode == "3strikes")
-        {
-            // TODO - 3 strikes battle track selection
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
-        }
-        else if (selectedMode == "locked")
-        {
-            std::cout << "Requesting sound to be played\n";
-            unlock_manager->playLockSound();
-        }
-    }
-    else if(name == "aikartamount")
-    {
-        SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
-        
-        race_manager->setNumKarts( race_manager->getNumPlayers() + w->getValue() );
-    }
-    /*
-     289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
-     290         UserConfigParams::setDefaultNumDifficulty(m_difficulty);
-
-     // if there is no AI, there's no point asking the player for the amount of karts.
-     299     // It will always be the same as the number of human players
-     300     if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
-     301     {
-     302         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-     303         // Don't change the default number of karts in user_config
-     304     }
-     305     else
-     306     {
-     307         race_manager->setNumKarts(m_num_karts);
-     308         UserConfigParams::setDefaultNumKarts(race_manager->getNumKarts());
-     309     }
-
-     311     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
-     312         RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
-     313     {
-     314         race_manager->setNumLaps( m_num_laps );
-     315         UserConfigParams::setDefaultNumLaps(m_num_laps);
-     316     }
-     317     // Might still be set from a previous challenge
-     318     race_manager->setCoinTarget(0);
-
-     input_manager->setMode(InputManager::INGAME);
-
-     race_manager->setLocalKartInfo(0, argv[i+1]);
-
-     race_manager->setDifficulty(RaceManager::RD_EASY);
-     race_manager->setDifficulty(RaceManager::RD_HARD);
-     race_manager->setDifficulty(RaceManager::RD_HARD);
-
-     race_manager->setTrack(argv[i+1]);
-
-     UserConfigParams::setDefaultNumKarts(stk_config->m_max_karts);
-     race_manager->setNumKarts(UserConfigParams::getDefaultNumKarts() );
-
-     UserConfigParams::getDefaultNumKarts()
-
-     StateManager::enterGameState();
-     race_manager->startNew();
-     */
-
-}
-
-// -------------------------------------------------------------------------
-/**
- * Callback handling events from the track menu
- */
-void StateManager::menuEventTracks(Widget* widget, const std::string& name)
-{
-    if(name == "init")
-    {
-        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("tracks");
-        assert( w != NULL );
-
-        if (!getCurrentScreen()->m_inited)
-        {
-            const int trackAmount = track_manager->getNumberOfTracks();
-            bool hasLockedTracks = false;
-            for (int n=0; n<trackAmount; n++)
-            {
-                Track* curr = track_manager->getTrack(n);
-                if (unlock_manager->isLocked(curr->getIdent()))
-                {
-                    hasLockedTracks = true;
-                    continue;
-                }
-                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile());
-            }
-            
-            if (hasLockedTracks)
-            {
-                w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");
-            }
-            
-            getCurrentScreen()->m_inited = true;
-        }
-        w->updateItemDisplay();
-
-    }
-    // -- track seelction screen
-    if (name == "tracks")
-    {
-        DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if(w2 != NULL)
-        {
-            std::cout << "Clicked on track " << w2->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
-            
-            Track* clickedTrack = track_manager->getTrack(w2->getSelectionIDString(GUI_PLAYER_ID));
-            if (clickedTrack != NULL)
-            {
-                ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                
-                new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
-            }
-        }
-    }
-    else if (name == "gps")
-    {
-        RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-        if(w != NULL)
-            std::cout << "Clicked on GrandPrix " << w->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
-    }
-
-}
-
-
-// -----------------------------------------------------------------------------
-/**
- * Callback handling events from the options menus
- */
-void StateManager::menuEventHelp(Widget* widget, const std::string& name)
-{
-    if(name == "init")
-    {
-        RibbonWidget* w = getCurrentScreen()->getWidget<RibbonWidget>("category");
-        
-        if(w != NULL)
-        {
-            const std::string& screen_name = getCurrentScreen()->getName();
-            if(screen_name == "help1.stkgui") w->select( "page1", GUI_PLAYER_ID );
-            else if(screen_name == "help2.stkgui") w->select( "page2", GUI_PLAYER_ID );
-            else if(screen_name == "help3.stkgui") w->select( "page3", GUI_PLAYER_ID );
-        }
-    }
-    // -- options
-    else if(name == "category")
-    {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
-
-        if(selection == "page1") replaceTopMostMenu("help1.stkgui");
-        else if(selection == "page2") replaceTopMostMenu("help2.stkgui");
-        else if(selection == "page3") replaceTopMostMenu("help3.stkgui");
-    }
-    else if(name == "back")
-    {
-        escapePressed();
-    }
-}
 
 
 // -------------------------------------------------------------------------
@@ -434,6 +133,7 @@ void StateManager::menuEventHelp(Widget* widget, const std::string& name)
  * name 'init' and widget set to NULL will be fired, so the screen can be filled
  * with the right values or so.
  */
+/*
 void StateManager::eventCallback(Widget* widget, const std::string& name)
 {
     std::cout << "event!! " << name.c_str() << std::endl;
@@ -478,7 +178,7 @@ void StateManager::eventCallback(Widget* widget, const std::string& name)
     else
         std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
 
-}
+}*/
 
 void StateManager::escapePressed()
 {
@@ -508,13 +208,4 @@ void StateManager::escapePressed()
     }
 }
 
-
-void StateManager::onUpdate(float elapsed_time)
-{
-    // FIXME : don't hardcode?
-    if (getCurrentScreen()->getName() == "credits.stkgui")
-        Credits::getInstance()->render(elapsed_time);
-    else if (getCurrentScreen()->getName() == "karts.stkgui")
-        KartSelectionScreen::kartSelectionUpdate(elapsed_time);
-}
 

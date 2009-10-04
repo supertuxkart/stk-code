@@ -24,7 +24,6 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
-#include "states_screens/state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -33,6 +32,8 @@
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "states_screens/race_setup_screen.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
@@ -43,8 +44,6 @@ InputDevice* player_1_device = NULL;
 
 using namespace GUIEngine;
 
-namespace KartSelectionScreen
-{
     class PlayerKartWidget;
     
     // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
@@ -479,15 +478,19 @@ KartHoverListener* karthoverListener = NULL;
 
 #if 0
 #pragma mark -
-#pragma mark Functions
+#pragma mark KartSelectionScreen
 #endif
     
+KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
+{
+}
+
 // Return true if event was handled successfully
-bool playerJoin(InputDevice* device, bool firstPlayer)
+bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
     std::cout << "playerJoin() ==========\n";
 
-    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
         std::cerr << "playerJoin(): Called outside of kart selection screen.\n";
@@ -501,7 +504,7 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
 
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
-    Widget rightarea = *getCurrentScreen()->getWidget("playerskarts");
+    Widget rightarea = *this->getWidget("playerskarts");
     rightarea.x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
     // ---- Create new active player
@@ -519,14 +522,14 @@ bool playerJoin(InputDevice* device, bool firstPlayer)
     // the others as needed. But if player 0 leaves, it will be impossible for remaining players
     // to select their ident
         
-    getCurrentScreen()->manualAddWidget(newPlayer);
+    this->manualAddWidget(newPlayer);
     newPlayer->add();
 
     g_player_karts.push_back(newPlayer);
     
     // ---- Divide screen space among all karts
     const int amount = g_player_karts.size();
-    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    Widget* fullarea = this->getWidget("playerskarts");
     const int splitWidth = fullarea->w / amount;
     
     for (int n=0; n<amount; n++)
@@ -545,11 +548,11 @@ PlayerKartWidget* removedWidget = NULL;
 
 // -----------------------------------------------------------------------------
 // Return true if event was handled succesfully
-bool playerQuit(ActivePlayer* player)
+bool KartSelectionScreen::playerQuit(ActivePlayer* player)
 {    
     int playerID = -1;
     
-    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL )
     {
         std::cout << "playerQuit() called outside of kart selection screen.\n";
@@ -590,14 +593,14 @@ bool playerQuit(ActivePlayer* player)
     removedWidget = g_player_karts.remove(playerID);
     StateManager::get()->removeActivePlayer(playerID);
     renumberKarts();    
-    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    Widget* fullarea = this->getWidget("playerskarts");
     removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h, 0, 0);
     return true;
 }
     
 // -----------------------------------------------------------------------------
     
-void kartSelectionUpdate(float delta)
+void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*) 
 {
     const int amount = g_player_karts.size();
     for (int n=0; n<amount; n++)
@@ -612,7 +615,7 @@ void kartSelectionUpdate(float delta)
        if (removedWidget->w == 0 || removedWidget->h == 0)
        {
            // destruct when too small (for "disappear" effects)
-           GUIEngine::getCurrentScreen()->manualRemoveWidget(removedWidget);
+           this->manualRemoveWidget(removedWidget);
            delete removedWidget;
            removedWidget = NULL;
        }
@@ -620,111 +623,114 @@ void kartSelectionUpdate(float delta)
 }
 
 // -----------------------------------------------------------------------------
+void KartSelectionScreen::tearDown()
+{
+    //g_player_karts.clearWithoutDeleting();
+    g_player_karts.clearAndDeleteAll();
+}
+    
+// ----------------------------------------------------------------------------- 
+void KartSelectionScreen::init()
+{
+    // FIXME: Reload previous kart selection screen state
+    g_player_karts.clearAndDeleteAll();
+    StateManager::get()->resetActivePlayers();
+    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
+    
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    
+    if (karthoverListener == NULL)
+    {
+        karthoverListener = new KartHoverListener();
+        w->registerHoverListener(karthoverListener);
+    }
+    
+    //Widget* area = this->getWidget("playerskarts");
+    
+    if (!this->m_inited)
+    {            
+        // Build kart list
+        std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
+        const int kart_amount = group.size();
+        
+        // add Tux (or whatever default kart) first
+        std::string& default_kart = UserConfigParams::m_default_kart;
+        for(int n=0; n<kart_amount; n++)
+        {
+            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+            if (prop->getIdent() == default_kart)
+            {
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+                break;
+            }
+        }
+        
+        // add others
+        for(int n=0; n<kart_amount; n++)
+        {
+            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+            if (prop->getIdent() != default_kart)
+            {
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+            }
+        }
+        
+        this->m_inited = true;
+    }
+    
+    /*
+     
+     TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
+     when players return to the kart selection screen, it will appear as
+     it did when they left (at least when returning from the track menu).
+     Rebuilding the screen is a little tricky.
+     
+     */
+    
+    if (g_player_karts.size() > 0)
+    {
+        // FIXME: trying to rebuild the screen
+        for (int n = 0; n < g_player_karts.size(); n++)
+        {
+            PlayerKartWidget *pkw;
+            pkw = g_player_karts.get(n);
+            this->manualAddWidget(pkw);
+            pkw->add();
+        }
+        
+    }
+    else // For now this is what will happen
+    {
+        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
+        w->updateItemDisplay();
+    }
+    
+    // Player 0 select first kart (Tux)
+    w->setSelection(0, 0);
+    w->m_rows[0].requestFocus();
+    
+    this->m_inited = true;
+}
+    
+// -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
-void menuEventKarts(Widget* widget, const std::string& name)
+void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name)
 {
-    if(name == "tearDown")
+    if (name == "kartgroups")
     {
-        //g_player_karts.clearWithoutDeleting();
-        g_player_karts.clearAndDeleteAll();
-    }
-    else if(name == "init")
-    {
-        // FIXME: Reload previous kart selection screen state
-        g_player_karts.clearAndDeleteAll();
-        StateManager::get()->resetActivePlayers();
-        input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
-       
-        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
-        assert( w != NULL );
-        
-        if (karthoverListener == NULL)
-        {
-            karthoverListener = new KartHoverListener();
-            w->registerHoverListener(karthoverListener);
-        }
-        
-        //Widget* area = getCurrentScreen()->getWidget("playerskarts");
-        
-        if (!getCurrentScreen()->m_inited)
-        {            
-            // Build kart list
-            std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
-            const int kart_amount = group.size();
-            
-            // add Tux (or whatever default kart) first
-            std::string& default_kart = UserConfigParams::m_default_kart;
-            for(int n=0; n<kart_amount; n++)
-            {
-                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-                if (prop->getIdent() == default_kart)
-                {
-                    std::string icon_path = file_manager->getDataDir() ;
-                    icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                    w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-                    break;
-                }
-            }
-            
-            // add others
-            for(int n=0; n<kart_amount; n++)
-            {
-                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-                if (prop->getIdent() != default_kart)
-                {
-                    std::string icon_path = file_manager->getDataDir() ;
-                    icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                    w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-                }
-            }
-            
-            getCurrentScreen()->m_inited = true;
-        }
-        
-        /*
-
-            TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
-            when players return to the kart selection screen, it will appear as
-            it did when they left (at least when returning from the track menu).
-            Rebuilding the screen is a little tricky.
-
-        */
-
-        if (g_player_karts.size() > 0)
-        {
-            // FIXME: trying to rebuild the screen
-            for (int n = 0; n < g_player_karts.size(); n++)
-            {
-                PlayerKartWidget *pkw;
-                pkw = g_player_karts.get(n);
-                getCurrentScreen()->manualAddWidget(pkw);
-                pkw->add();
-            }
-
-        }
-        else // For now this is what will happen
-        {
-            playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
-            w->updateItemDisplay();
-        }
-        
-        // Player 0 select first kart (Tux)
-        w->setSelection(0, 0);
-        w->m_rows[0].requestFocus();
-        
-        getCurrentScreen()->m_inited = true;
-    } // end if init
-    
-    else if (name == "kartgroups")
-    {
-        RibbonWidget* tabs = getCurrentScreen()->getWidget<RibbonWidget>("kartgroups");
+        RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
         assert(tabs != NULL);
 
         std::string selection = tabs->getSelectionIDString(GUI_PLAYER_ID);
 
-        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
+        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
         w->clearItems();
         
         // TODO : preserve selection of karts for all players
@@ -762,7 +768,7 @@ void menuEventKarts(Widget* widget, const std::string& name)
     }
     else if (name == "karts")
     {
-        DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
+        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
         assert( w != NULL );
         
         ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
@@ -800,17 +806,17 @@ void menuEventKarts(Widget* widget, const std::string& name)
         //Return to assign mode
         input_manager->getDeviceList()->setAssignMode(ASSIGN);
 
-        StateManager::get()->pushMenu("racesetup.stkgui");
+        StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
     }
 }
 
 // -----------------------------------------------------------------------------
     
-void renumberKarts()
+void KartSelectionScreen::renumberKarts()
 {
-    DynamicRibbonWidget* w = getCurrentScreen()->getWidget<DynamicRibbonWidget>("karts");
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    Widget* fullarea = getCurrentScreen()->getWidget("playerskarts");
+    Widget* fullarea = this->getWidget("playerskarts");
     const int splitWidth = fullarea->w / g_player_karts.size();
 
     printf("Renumbering karts...");
@@ -862,5 +868,3 @@ GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID)
     return GUIEngine::EVENT_LET;
 }   // focused
     
-
-}

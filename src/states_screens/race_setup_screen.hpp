@@ -1,7 +1,5 @@
-//  $Id: font.cpp 3625 2009-06-21 01:10:43Z auria $
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 
+//  Copyright (C) 2009 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,29 +15,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <string>
+#ifndef HEADER_RACE_SETUP_SCREEN_HPP
+#define HEADER_RACE_SETUP_SCREEN_HPP
+
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine
-{
-    class Widget;
-}
-class InputDevice;
-class ActivePlayer;
+namespace GUIEngine { class Widget; }
 
-class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<KartSelectionScreen>
+class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<RaceSetupScreen>
 {
-    friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
-    KartSelectionScreen();
+    friend class GUIEngine::ScreenSingleton<RaceSetupScreen>;
+    
+    RaceSetupScreen();
     
 public:
-    bool playerJoin(InputDevice* device, bool firstPlayer);
-    bool playerQuit(ActivePlayer* player);
-    void kartSelectionUpdate(float delta);
-    void renumberKarts();
-    
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
     void init();
     void tearDown();
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
-    void onUpdate(float dt, irr::video::IVideoDriver*);
 };
+
+#endif

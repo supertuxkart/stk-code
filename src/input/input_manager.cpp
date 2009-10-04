@@ -41,7 +41,7 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "states_screens/options_screen.hpp"
+#include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
 InputManager *input_manager;
 
@@ -223,7 +223,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     if( abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
        m_sensed_input->btnID == btnID)
     {
-        OptionsScreen::gotSensedInput(m_sensed_input);
+        OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
     }
 }
 
@@ -287,8 +287,10 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
             if ((player != NULL) && (action == PA_RESCUE))
             {
                 // returns true if the event was handled
-                if (KartSelectionScreen::playerQuit( player ))
+                if (KartSelectionScreen::getInstance()->playerQuit( player ))
+                {
                     return; // we're done here
+                }
             }
 
             /* The way this is currently structured, any time an event is
@@ -312,7 +314,9 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
                         device = m_device_manager->getGamePadFromIrrID(deviceID);
 
                     if (device != NULL)
-                        KartSelectionScreen::playerJoin( device, false );
+                    {
+                        KartSelectionScreen::getInstance()->playerJoin( device, false );
+                    }
                 }
                 return; // we're done here, ignore devices that aren't associated with players
             }

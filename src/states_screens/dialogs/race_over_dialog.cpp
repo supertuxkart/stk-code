@@ -25,6 +25,8 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -251,8 +253,8 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         ModalDialog::dismiss();
         RaceManager::getWorld()->unpause();
         race_manager->exitRace();
-        StateManager::get()->resetAndGoToMenu("main.stkgui");
-        StateManager::get()->pushMenu("karts.stkgui");
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
         return true;
     }
     else if (eventSource == "backtomenu")
@@ -260,7 +262,7 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         ModalDialog::dismiss();
         RaceManager::getWorld()->unpause();
         race_manager->exitRace();
-        StateManager::get()->resetAndGoToMenu("main.stkgui");
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         input_manager->setMode(InputManager::MENU);
         return true;
     }

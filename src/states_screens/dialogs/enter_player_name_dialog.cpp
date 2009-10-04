@@ -18,7 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
-#include "states_screens/options_screen.hpp"
+#include "states_screens/options_screen_players.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -99,8 +99,10 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         
     // ---- Otherwise, accept entered name
     stringw playerName = textCtrl->getText();
-    if(playerName.size() > 0)
-        OptionsScreen::gotNewPlayerName( playerName );
+    if (playerName.size() > 0)
+    {
+        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
+    }
     
     // irrLicht is too stupid to remove focus from deleted widgets
     // so do it by hand

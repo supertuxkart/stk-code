@@ -24,10 +24,12 @@
 
 #include "irrlicht.h"
 
+#include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
 
+// FIXME : don't use 'using namespace' in header!!!!
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -39,7 +41,32 @@ using namespace gui;
 namespace GUIEngine
 {
    
+    template<typename SCREEN>
+    class ScreenSingleton
+    {
+    public:
+
+        static SCREEN* getInstance()
+        {
+            static SCREEN* singleton = NULL;
+            
+            if (singleton == NULL)
+            {
+                singleton = new SCREEN();
+                GUIEngine::addScreenToList(singleton);
+            }
+            
+            return singleton;
+        }
+    };
+    
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
+    
+    enum ScreenType
+    {
+        SCREEN_TYPE_MENU,
+        SCREEN_TYPE_CUTSCENE
+    };
     
     /**
       * Represents a single screen. Mainly responsible of its children widgets; Screen lays them
@@ -57,6 +84,7 @@ namespace GUIEngine
 
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        
     public:
         ptr_vector<Widget, HOLD> m_widgets;
 
@@ -91,12 +119,29 @@ namespace GUIEngine
         virtual void addWidgets();
         virtual void calculateLayout();
         
+        virtual ScreenType getScreenType() { return SCREEN_TYPE_MENU; }
+        
         void manualAddWidget(Widget* w);
         void manualRemoveWidget(Widget* w);
 
         const std::string& getName() const { return m_filename; }
         
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
+        
+        
+        virtual void init() = 0;
+        virtual void tearDown() = 0;
+        
+        /**
+         * will be called everytime sometimes happens.
+         * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
+         * name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
+         * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
+         * being left, allowing for setup/clean-up.
+         */
+        virtual void eventCallback(Widget* widget, const std::string& name) = 0;
+        
+        virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
     };
     
 }

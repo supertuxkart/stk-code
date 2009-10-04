@@ -36,8 +36,7 @@ public:
     
     CutScene(const char* name);
     
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*)=0;
-    virtual void terminate()=0;
+    virtual ScreenType getScreenType() { return SCREEN_TYPE_CUTSCENE; }
 };
     
 }

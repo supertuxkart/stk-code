@@ -19,7 +19,7 @@
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
-#include "states_screens/options_screen.hpp"
+#include "states_screens/options_screen_players.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -183,13 +183,13 @@ void PlayerInfoDialog::onEnterPressedInternal()
 // ------------------------------------------------------------------------------------------------------
 bool PlayerInfoDialog::processEvent(std::string& eventSource)
 {
-    if(eventSource == "renameplayer")
+    if (eventSource == "renameplayer")
     {
         // accept entered name
         stringw playerName = textCtrl->getText();
-        if(playerName.size() > 0)
+        if (playerName.size() > 0)
         {
-            OptionsScreen::gotNewPlayerName( playerName, m_player );
+            OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName, m_player );
         }
         
         // irrLicht is too stupid to remove focus from deleted widgets
@@ -202,14 +202,14 @@ bool PlayerInfoDialog::processEvent(std::string& eventSource)
         dismiss();
         return true;
     }
-    else if(eventSource == "removeplayer")
+    else if (eventSource == "removeplayer")
     {
         showConfirmDialog();
         return true;
     }
-    else if(eventSource == "confirmremove")
+    else if (eventSource == "confirmremove")
     {
-        OptionsScreen::deletePlayer( m_player );
+        OptionsScreenPlayers::getInstance()->deletePlayer( m_player );
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand

@@ -15,27 +15,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_HELP_SCREEN_3_HPP
+#define HEADER_HELP_SCREEN_3_HPP
 
-#ifndef __HEADER_OPTIONS_SCREEN_HPP__
-#define __HEADER_OPTIONS_SCREEN_HPP__
+#include "guiengine/screen.hpp"
 
-#include <string>
-#include "irrlicht.h"
+namespace GUIEngine { class Widget; }
 
-namespace GUIEngine
+class HelpScreen3 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<HelpScreen3>
 {
-    class Widget;
-}
-
-struct Input;
-
-namespace OptionsScreen
-{
-    void menuEventOptions(GUIEngine::Widget* widget, const std::string& name);
+    friend class GUIEngine::ScreenSingleton<HelpScreen3>;
     
-    void gotSensedInput(Input* sensedInput);
-    void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
-    void deletePlayer(PlayerProfile* player);
-}
+    HelpScreen3();
+    
+public:
+    
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    void init();
+    void tearDown();
+};
 
 #endif

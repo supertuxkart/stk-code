@@ -24,6 +24,9 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/help_screen_1.hpp"
+#include "states_screens/options_screen_av.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -228,20 +231,20 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
         {
             ModalDialog::dismiss();
             race_manager->exitRace();
-            StateManager::get()->resetAndGoToMenu("main.stkgui");
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             input_manager->setMode(InputManager::MENU);
             return true;
         }
         else if (selection == "help")
         {
             dismiss();
-            StateManager::get()->pushMenu("help1.stkgui");
+            StateManager::get()->pushScreen(HelpScreen1::getInstance());
             return true;
         }
         else if (selection == "options")
         {
             dismiss();
-            StateManager::get()->pushMenu("options_av.stkgui");
+            StateManager::get()->pushScreen(OptionsScreenAV::getInstance());
             return true;
         }
         else if (selection == "restart")

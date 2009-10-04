@@ -49,7 +49,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -64,6 +63,8 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -625,7 +626,7 @@ int main(int argc, char *argv[] )
 
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushMenu("main.stkgui");
+            StateManager::get()->pushScreen(MainMenuScreen::getInstance());
         }
         else 
         {

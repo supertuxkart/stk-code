@@ -2,13 +2,15 @@
 #define HEADER_FEATURE_UNLOCKED_HPP
 
 #include "guiengine/cutscene.hpp"
+#include "guiengine/screen.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 
-class FeatureUnlockedCutScene : public GUIEngine::CutScene
+class FeatureUnlockedCutScene : public GUIEngine::CutScene, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
+    friend class GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>;
+    
     FeatureUnlockedCutScene();
-    void prepare();
     
     /** sky angle, 0-360 */
     float m_angle;
@@ -26,10 +28,13 @@ class FeatureUnlockedCutScene : public GUIEngine::CutScene
     irr::scene::ISceneNode* m_key;
     irr::scene::ILightSceneNode* m_light;
 public:
-    static void show();
-  
+
     void onUpdate(float dt, irr::video::IVideoDriver*);
-    void terminate();
+    
+    void init();
+    void tearDown();
+    
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
 };
 
 #endif

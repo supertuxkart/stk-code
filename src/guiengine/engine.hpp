@@ -229,7 +229,7 @@ namespace GUIEngine
     float getLatestDt();
     
     /** Add a cutscene to the list of screens known by the gui engine */
-    void addCutScene(CutScene* cutscene);
+    void addScreenToList(Screen* screen);
     
     // Widgets that need to be notified at every frame can add themselves there
     extern ptr_vector<Widget, REF> needsUpdate;

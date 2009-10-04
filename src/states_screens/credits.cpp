@@ -17,6 +17,7 @@
 
 
 #include "states_screens/credits.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <fstream>
 
@@ -67,12 +68,12 @@ namespace GUIEngine
             }
         };
     
-    CreditsSection* Credits::getCurrentSection()
+    CreditsSection* CreditsScreen::getCurrentSection()
     {
         return m_sections.get(m_sections.size()-1);
     }
     
-    Credits::Credits()
+    CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
     {
         reset();
         
@@ -81,14 +82,14 @@ namespace GUIEngine
         std::ifstream file( creditsfile.c_str() ) ;
         stringw line;
         std::string getline;
-        while( std::getline( file, getline ) )
+        while (std::getline( file, getline ))
         {
             line = getline.c_str();
             line = line.trim();
             
             if(line.size() < 1) continue; // empty line
             
-            if(line[0] == '=' && line[line.size()-1] == '=')
+            if (line[0] == '=' && line[line.size()-1] == '=')
             {
                 line = stringw( line.subString(1, line.size()-2).c_str() );
                 line = line.trim();
@@ -97,7 +98,7 @@ namespace GUIEngine
                 //std::cout << "Section : " << (char*)(cversion.c_str()) << std::endl;
                 m_sections.push_back( new CreditsSection(line)  );
             }
-            else if(line[0] == '-')
+            else if (line[0] == '-')
             {
                 line = stringw( line.subString(1, line.size()-1).c_str() );
                 line = line.trim();
@@ -119,7 +120,7 @@ namespace GUIEngine
         
     }
     
-    void Credits::setArea(const int x, const int y, const int w, const int h)
+    void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
     {
         this->x = x;
         this->y = y;
@@ -129,7 +130,7 @@ namespace GUIEngine
         m_section_rect = core::rect< s32 >( x, y, x+w, y+h/6 );
     }
 
-    void Credits::reset()
+    void CreditsScreen::reset()
     {
         m_curr_section = 0;
         m_curr_element = -1;
@@ -137,7 +138,7 @@ namespace GUIEngine
         m_time_element = 2.5f;
     }
     
-    void Credits::render(const float elapsed_time)
+    void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
     {
         time_before_next_step -= elapsed_time*0.8f; // multiply by 0.8 to slow it down a bit as a whole
 
@@ -251,11 +252,25 @@ namespace GUIEngine
          */
     }
     
-    static Credits* singleton = NULL;
-    Credits* Credits::getInstance()
+    void CreditsScreen::init()
     {
-        if(singleton == NULL) singleton = new Credits();
+        Widget* w = getWidget<Widget>("animated_area");
+        assert(w != NULL);
         
-        return singleton;
+        reset();
+        setArea(w->x, w->y, w->w, w->h);
     }
+    
+    void CreditsScreen::tearDown()
+    {
+    }
+    
+    void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name)
+    {
+        if(name == "back")
+        {
+            StateManager::get()->escapePressed();
+        }
+    }
+    
 } // end namespace

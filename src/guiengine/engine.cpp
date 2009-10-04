@@ -115,9 +115,11 @@ void switchToScreen(const char* screen_name)
     // screen not found in list of existing ones, so let's create it
     if (g_current_screen == NULL)
     {
-        GUIEngine::Screen* new_screen = new GUIEngine::Screen(screen_name);
-        g_loaded_screens.push_back(new_screen);
-        g_current_screen = new_screen;
+        assert(false);
+        return;
+        //GUIEngine::Screen* new_screen = new GUIEngine::Screen(screen_name);
+        //g_loaded_screens.push_back(new_screen);
+        //g_current_screen = new_screen;
     }
     
     
@@ -125,7 +127,7 @@ void switchToScreen(const char* screen_name)
     g_current_screen->addWidgets();
 }
 // -----------------------------------------------------------------------------
-void addCutScene(CutScene* cutscene)
+void addScreenToList(Screen* cutscene)
 {
     g_loaded_screens.push_back(cutscene);
 }
@@ -189,7 +191,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
 void transmitEvent(Widget* widget, std::string& name)
 {
     assert(g_state_manager != NULL);
-    g_state_manager->eventCallback(widget, name);
+    getCurrentScreen()->eventCallback(widget, name);
 }
     
 // -----------------------------------------------------------------------------    
@@ -221,17 +223,7 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- some menus may need updating
-    if (gamestate != GAME)
-    {
-        g_state_manager->onUpdate(elapsed_time);
-        
-        if (gamestate == CUTSCENE)
-        {
-            ((CutScene*)getCurrentScreen())->onUpdate(elapsed_time, g_driver);
-        }
-    }
-
-
+    getCurrentScreen()->onUpdate(elapsed_time, g_driver);
 }
 // -----------------------------------------------------------------------------    
 Widget* getWidget(const char* name)

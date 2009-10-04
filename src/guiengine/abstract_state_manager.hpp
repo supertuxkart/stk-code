@@ -7,6 +7,7 @@
 namespace GUIEngine
 {
     class Widget;
+    class Screen;
 
     enum GameState
     {
@@ -32,16 +33,18 @@ protected:
      */
     std::vector<std::string> m_menu_stack;
     
+    void pushMenu(std::string name);
+    void pushCutScene(std::string name);
+    
 public:
     AbstractStateManager();
     virtual ~AbstractStateManager() { }
     
-    void pushMenu(std::string name);
-    void pushCutScene(std::string name);
-    
-    void replaceTopMostMenu(std::string name);
+    void pushScreen(Screen* screen);
+
+    void replaceTopMostScreen(Screen* screen);
     void popMenu();
-    void resetAndGoToMenu(std::string name);
+    void resetAndGoToScreen(Screen* screen);
     void enterGameState();
     
     GameState getGameState();
@@ -56,20 +59,7 @@ public:
       * callback called whenever escape was pressed (or any similar cancel operation)
       */
     virtual void escapePressed() = 0;
-    
-    /**
-      * Called every frame, to allow updating animations if there is any need.
-      */
-    virtual void onUpdate(float elpased_time) = 0;
-    
-    /**
-     * will be called everytime sometimes happens.
-     * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
-     * name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
-     * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
-     * being left, allowing for setup/clean-up.
-     */
-    virtual void eventCallback(Widget* widget, const std::string& name) = 0;
+
 };
 
 }

@@ -11,6 +11,7 @@
 #include <SColor.h>
 
 static const char* CUTSCENE_NAME = "feature_unlocked";
+/*
 static FeatureUnlockedCutScene* singleton = NULL;
 
 void FeatureUnlockedCutScene::show()
@@ -25,13 +26,13 @@ void FeatureUnlockedCutScene::show()
     
     StateManager::get()->pushCutScene(CUTSCENE_NAME);
 }
-
+*/
 
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() : CutScene(CUTSCENE_NAME)
 {
 }
 
-void FeatureUnlockedCutScene::prepare()
+void FeatureUnlockedCutScene::init()
 {
     m_angle = 0.0f;
     
@@ -97,9 +98,9 @@ void FeatureUnlockedCutScene::prepare()
     }   // for i<getMaterialCount
      */
 }
-void FeatureUnlockedCutScene::terminate()
+void FeatureUnlockedCutScene::tearDown()
 {
-    printf("+++++++ FeatureUnlockedCutScene:Terminate +++++++++\n");
+    printf("+++++++ FeatureUnlockedCutScene:tearDown +++++++++\n");
     
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
@@ -158,3 +159,6 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                true/* center h */, true /* center v */ );
 }
 
+void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name)
+{
+}
