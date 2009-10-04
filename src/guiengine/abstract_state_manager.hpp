@@ -12,6 +12,7 @@ namespace GUIEngine
     {
         MENU,
         GAME,
+        CUTSCENE,
         INGAME_MENU
     };
     
@@ -36,6 +37,8 @@ public:
     virtual ~AbstractStateManager() { }
     
     void pushMenu(std::string name);
+    void pushCutScene(std::string name);
+    
     void replaceTopMostMenu(std::string name);
     void popMenu();
     void resetAndGoToMenu(std::string name);

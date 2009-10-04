@@ -44,6 +44,9 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
+// FIXME : remove, temporary test
+#include "states_screens/feature_unlocked.hpp"
+
 using namespace GUIEngine;
 
 StateManager* state_manager_singleton = NULL;
@@ -137,15 +140,22 @@ void StateManager::menuEventMain(Widget* widget, const std::string& name)
     std::string selection = ribbon->getSelectionIDString(GUI_PLAYER_ID);
 
 
-    if(selection == "new")
+    if (selection == "network")
+    {
+        printf("+++++ FeatureUnlockedCutScene::show() +++++\n");
+        // FIXME : remove, temporary test
+        FeatureUnlockedCutScene::show();
+    }
+    
+    if (selection == "new")
     {
         pushMenu("karts.stkgui");
     }
-    else if(selection == "options")
+    else if (selection == "options")
     {
         StateManager::pushMenu("options_av.stkgui");
     }
-    else if(selection == "quit")
+    else if (selection == "quit")
     {
         main_loop->abort();
         return;

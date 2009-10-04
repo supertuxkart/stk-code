@@ -622,7 +622,8 @@ void IrrDriver::update(float dt)
     m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
 
     {    // just to mark the beding/end scene block
-        if (StateManager::get()->getGameState() != GUIEngine::GAME)
+        GUIEngine::GameState state = StateManager::get()->getGameState();
+        if (state != GUIEngine::GAME)
         {
             // this code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
@@ -636,13 +637,19 @@ void IrrDriver::update(float dt)
         const bool inRace = race_manager->raceIsActive();
         if (inRace)
         {
-            if(UserConfigParams::m_bullet_debug) 
+            if (UserConfigParams::m_bullet_debug) 
+            {
                 renderBulletDebugView();
+            }
             else
             {
                 m_scene_manager->drawAll();
-                RaceManager::getWorld()->render();   // renders e.g. race gui
             }
+        }
+        else if (state == GUIEngine::CUTSCENE)
+        {
+            // render 3D stuff in cutscene mode too
+            m_scene_manager->drawAll();
         }
         
        // GUI is active

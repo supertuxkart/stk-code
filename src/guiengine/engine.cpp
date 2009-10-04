@@ -23,9 +23,10 @@
 
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
-#include "guiengine/screen.hpp"
+#include "guiengine/cutscene.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
 
@@ -96,7 +97,7 @@ void switchToScreen(const char* screen_name)
     
     // clean what was left by the previous screen
     g_env->clear();
-    if(g_current_screen != NULL) g_current_screen->elementsWereDeleted();
+    if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
     g_current_screen = NULL;
     Widget::resetIDCounters();
     
@@ -104,14 +105,15 @@ void switchToScreen(const char* screen_name)
     const int screen_amount = g_loaded_screens.size();
     for(int n=0; n<screen_amount; n++)
     {
-        if(g_loaded_screens[n].getName() == screen_name)
+        if (g_loaded_screens[n].getName() == screen_name)
         {
             g_current_screen = g_loaded_screens.get(n);
             break;
         }
     }
+    
     // screen not found in list of existing ones, so let's create it
-    if(g_current_screen == NULL)
+    if (g_current_screen == NULL)
     {
         GUIEngine::Screen* new_screen = new GUIEngine::Screen(screen_name);
         g_loaded_screens.push_back(new_screen);
@@ -121,6 +123,11 @@ void switchToScreen(const char* screen_name)
     
     // show screen
     g_current_screen->addWidgets();
+}
+// -----------------------------------------------------------------------------
+void addCutScene(CutScene* cutscene)
+{
+    g_loaded_screens.push_back(cutscene);
 }
 // -----------------------------------------------------------------------------
 /** to be called after e.g. a resolution switch */
@@ -205,7 +212,7 @@ void render(float elapsed_time)
         g_skin->drawBGFadeColor();
     }
     
-    if (gamestate != GAME)
+    if (gamestate == MENU || gamestate == INGAME_MENU)
     {
         g_skin->renderSections();
     }
@@ -217,7 +224,13 @@ void render(float elapsed_time)
     if (gamestate != GAME)
     {
         g_state_manager->onUpdate(elapsed_time);
+        
+        if (gamestate == CUTSCENE)
+        {
+            ((CutScene*)getCurrentScreen())->onUpdate(elapsed_time, g_driver);
+        }
     }
+
 
 }
 // -----------------------------------------------------------------------------    

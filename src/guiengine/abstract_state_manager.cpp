@@ -25,6 +25,7 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/cutscene.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
@@ -117,6 +118,21 @@ void AbstractStateManager::pushMenu(std::string name)
     eventCallback(NULL, g_init_event);
 }
 
+void AbstractStateManager::pushCutScene(std::string name)
+{
+    // Send tear-down event to previous menu
+    if (m_menu_stack.size() > 0 && m_game_mode != GAME) eventCallback(NULL, g_teardown_event);
+    
+    input_manager->setMode(InputManager::MENU);
+    m_menu_stack.push_back(name);
+
+    m_game_mode = CUTSCENE;
+    GUIEngine::switchToScreen(name.c_str());
+    
+    // Send init event to new cutscene
+    eventCallback(NULL, g_init_event);
+}
+
 void AbstractStateManager::replaceTopMostMenu(std::string name)
 {
     assert(m_game_mode != GAME);
@@ -150,7 +166,8 @@ void AbstractStateManager::popMenu()
     assert(m_game_mode != GAME);
     
     // Send tear-down event to menu
-    eventCallback(NULL, g_teardown_event);
+    if (m_game_mode == CUTSCENE) ((CutScene*)GUIEngine::getCurrentScreen())->terminate();
+    else eventCallback(NULL, g_teardown_event);
     m_menu_stack.pop_back();
     
     if (m_menu_stack.size() == 0)

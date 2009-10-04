@@ -217,6 +217,7 @@ namespace GUIEngine
     extern Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht;
     
     class Screen;
+    class CutScene;
     class Widget;
     
     extern IrrlichtDevice* getDevice();
@@ -227,13 +228,16 @@ namespace GUIEngine
     
     float getLatestDt();
     
+    /** Add a cutscene to the list of screens known by the gui engine */
+    void addCutScene(CutScene* cutscene);
+    
     // Widgets that need to be notified at every frame can add themselves there
     extern ptr_vector<Widget, REF> needsUpdate;
     
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
     void cleanUp();
     
-    // FIXME : goes in abstract state manager ?
+    /** Low-level mean to change current screen. Use a state manager instead to get higher-level functionnality. */
     void switchToScreen(const char* );
     void clear();
     void cleanForGame();

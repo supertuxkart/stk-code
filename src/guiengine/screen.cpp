@@ -49,6 +49,14 @@ Screen::Screen(const char* file)
     m_inited = false;
 }
 
+Screen::Screen()
+{
+    m_mouse_x = 0;
+    m_mouse_y = 0;
+    m_loaded = false;
+    m_inited = false;
+}
+
 #if 0
 #pragma mark -
 #pragma mark Load/Init

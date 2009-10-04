@@ -24,6 +24,7 @@
 
 #include "irrlicht.h"
 
+#include "guiengine/widget.hpp"
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -37,7 +38,6 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    class Widget;
    
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     
@@ -68,7 +68,9 @@ namespace GUIEngine
           */
         bool m_inited;
         
+        Screen(); /**< creates a dummy incomplete object; only use to override behaviour in sub-class */
         Screen(const char* filename);
+        virtual ~Screen(){}
         bool operator ==(const char* filename) const { return m_filename == filename; }
         
         /** returns an object by name, or NULL if not found */
@@ -86,8 +88,8 @@ namespace GUIEngine
         Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
         Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
         
-        void addWidgets();
-        void calculateLayout();
+        virtual void addWidgets();
+        virtual void calculateLayout();
         
         void manualAddWidget(Widget* w);
         void manualRemoveWidget(Widget* w);
