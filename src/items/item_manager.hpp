@@ -66,7 +66,8 @@ public:
     scene::IMesh*  getItemModel    (Item::ItemType type)
                                       {return m_item_mesh[type];}
     scene::IMesh*  getOtherModel   (const std::string modelName)
-                                      {return m_all_meshes[modelName];}
+                                      {assert(m_all_meshes.count(modelName) == 1);
+                                       return m_all_meshes[modelName];}
 };
 
 extern ItemManager* item_manager;
