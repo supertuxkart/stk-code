@@ -122,7 +122,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     if (m_angle > 360) m_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_angle, 0) );
 
-    const float KEY_Y = 6.8;
+    const float KEY_Y = 6.8f;
     const float KEY_FINAL_DIST = 15;
     
     if (m_key_pos > KEY_FINAL_DIST) m_key_pos -= dt*5;
@@ -139,7 +139,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     
     m_camera->setPosition( core::vector3df(cos((1.0f-m_key_angle)*M_PI/4 + M_PI/4)*70.0f,
                                            30.0f,
-                                           sin((1.0f-m_key_angle)*M_PI_2/4 + M_PI/4)*70.0f) );
+                                           sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
     //m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->updateAbsolutePosition();
