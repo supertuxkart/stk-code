@@ -18,33 +18,10 @@
 
 #include "states_screens/state_manager.hpp"
 
-#include <vector>
-
-#include "main_loop.hpp"
-#include "audio/sound_manager.hpp"
-#include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/engine.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
-#include "input/device_manager.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "input/input_manager.hpp"
-#include "input/input_device.hpp"
-#include "io/file_manager.hpp"
-#include "network/network_manager.hpp"
-#include "race/race_manager.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "states_screens/credits.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
-
-// FIXME : remove, temporary test
-#include "states_screens/feature_unlocked.hpp"
 
 using namespace GUIEngine;
 
@@ -122,63 +99,6 @@ void StateManager::resetActivePlayers()
     }
     m_active_players.clearWithoutDeleting();
 }
-
-
-
-// -------------------------------------------------------------------------
-/**
- * All widget events will be dispatched to this function; arguments are
- * a pointer to the widget from which the event originates, and its internal
- * name. There is one exception : right after showing a new screen, an event with
- * name 'init' and widget set to NULL will be fired, so the screen can be filled
- * with the right values or so.
- */
-/*
-void StateManager::eventCallback(Widget* widget, const std::string& name)
-{
-    std::cout << "event!! " << name.c_str() << std::endl;
-
-    if (name == "lock")
-    {
-        unlock_manager->playLockSound();
-    }
-    
-    Screen* topScreen = getCurrentScreen();
-    if (topScreen == NULL) return;
-    const std::string& screen_name = topScreen->getName();
-
-    if( screen_name == "main.stkgui" )
-        menuEventMain(widget, name);
-    else if( screen_name == "karts.stkgui" )
-        KartSelectionScreen::menuEventKarts(widget, name);
-    else if( screen_name == "racesetup.stkgui" )
-        menuEventRaceSetup(widget, name);
-    else if( screen_name == "tracks.stkgui" )
-        menuEventTracks(widget, name);
-    else if( screen_name == "options_av.stkgui" || screen_name == "options_input.stkgui" || screen_name == "options_players.stkgui")
-        OptionsScreen::menuEventOptions(widget, name);
-    else if( screen_name == "help1.stkgui" || screen_name == "help2.stkgui" || screen_name == "help3.stkgui")
-        menuEventHelp(widget, name);
-    else if( screen_name == "credits.stkgui" )
-    {
-        if(name == "init")
-        {
-            Widget* w = getCurrentScreen()->getWidget<Widget>("animated_area");
-            assert(w != NULL);
-        
-            Credits* credits = Credits::getInstance();
-            credits->reset();
-            credits->setArea(w->x, w->y, w->w, w->h);
-        }
-        else if(name == "back")
-        {
-            StateManager::escapePressed();
-        }
-    }
-    else
-        std::cerr << "Warning, unknown menu " << screen_name << " in event callback\n";
-
-}*/
 
 void StateManager::escapePressed()
 {

@@ -20,11 +20,13 @@
 #include "guiengine/widget.hpp"
 #include "main_loop.hpp"
 #include "states_screens/credits.hpp"
-#include "states_screens/feature_unlocked.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/options_screen_av.hpp"
 #include "states_screens/state_manager.hpp"
+
+// FIXME : remove, temporary test
+#include "states_screens/feature_unlocked.hpp"
 
 using namespace GUIEngine;
 

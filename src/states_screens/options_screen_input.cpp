@@ -19,21 +19,11 @@
 #include "states_screens/options_screen_av.hpp"
 #include "states_screens/options_screen_players.hpp"
 
-
-#include "audio/sound_manager.hpp"
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
-#include "config/player.hpp"
-#include "config/device_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"
-#include "states_screens/dialogs/enter_player_name_dialog.hpp"
-#include "states_screens/dialogs/player_info_dialog.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 

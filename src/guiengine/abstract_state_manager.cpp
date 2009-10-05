@@ -22,23 +22,12 @@
 
 #include "main_loop.hpp"
 #include "audio/sound_manager.hpp"
-#include "config/player.hpp"
-#include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
-#include "guiengine/cutscene.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "states_screens/credits.hpp"
-#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
