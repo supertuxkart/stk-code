@@ -223,7 +223,10 @@ void render(float elapsed_time)
     g_env->drawAll();
     
     // ---- some menus may need updating
-    getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+    if (gamestate != GAME)
+    {
+        getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+    }
 }
 // -----------------------------------------------------------------------------    
 Widget* getWidget(const char* name)
