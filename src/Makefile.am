@@ -265,14 +265,32 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/race_paused_dialog.cpp \
  states_screens/feature_unlocked.cpp \
  states_screens/feature_unlocked.hpp \
+ states_screens/help_screen_1.cpp \
+ states_screens/help_screen_1.hpp \
+ states_screens/help_screen_2.cpp \
+ states_screens/help_screen_2.hpp \
+ states_screens/help_screen_3.cpp \
+ states_screens/help_screen_3.hpp \
  states_screens/kart_selection.cpp \
  states_screens/kart_selection.hpp \
+ states_screens/main_menu_screen.cpp \
+ states_screens/main_menu_screen.hpp \
  states_screens/options_screen.cpp \
  states_screens/options_screen.hpp \
+ states_screens/options_screen_av.cpp \
+ states_screens/options_screen_av.hpp \
+ states_screens/options_screen_input.cpp \
+ states_screens/options_screen_input.hpp \
+ states_screens/options_screen_players.cpp \
+ states_screens/options_screen_players.hpp \
  states_screens/race_gui.cpp \
  states_screens/race_gui.hpp \
+ states_screens/race_setup_screen.cpp \
+ states_screens/race_setup_screen.hpp \
  states_screens/state_manager.cpp  \
  states_screens/state_manager.hpp \
+ states_screens/tracks_screen.cpp \
+ states_screens/tracks_screen.hpp \
  tracks/ambient_light_sphere.cpp \
  tracks/ambient_light_sphere.hpp \
  tracks/bezier_curve.cpp \
