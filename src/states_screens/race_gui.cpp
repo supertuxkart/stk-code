@@ -614,8 +614,12 @@ void RaceGUI::drawMusicDescription()
 
     // Draw text
     core::stringw thetext(s.c_str());
-    
+
+#ifdef IRR_SVN
+    core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
+#else
     core::dimension2d< s32 > textSize = font->getDimension(thetext.c_str());
+#endif
     const int textWidth = textSize.Width;
     
     core::rect<s32> pos((UserConfigParams::m_width >> 1) + 32, text_y,
