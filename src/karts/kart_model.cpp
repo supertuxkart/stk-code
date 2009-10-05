@@ -46,7 +46,7 @@ KartModel::KartModel()
     m_wheel_filename[0] = "wheel-front-right.3ds";
     m_wheel_filename[1] = "wheel-front-left.3ds";
     m_wheel_filename[2] = "wheel-rear-right.3ds";
-    m_wheel_filename[3] = "wheel-rear-left.a3ds";
+    m_wheel_filename[3] = "wheel-rear-left.3ds";
     m_mesh              = NULL;
     m_af_left           = -1;
     m_af_straight       = -1;
