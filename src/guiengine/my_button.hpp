@@ -92,7 +92,13 @@ class MyGUIButton : public IGUIButton
         
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
-        
+
+		//! Sets if the button should scale the button images to fit
+        virtual void setScaleImage(bool scaleImage=true) {};
+
+		//! Checks whether the button scales the used images
+        virtual bool isScalingImage() const { return true; }
+
 	private:
         
 		struct ButtonSprite
