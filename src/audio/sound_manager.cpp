@@ -196,7 +196,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
         catch (std::exception &e)
         {
             (void)e;
-            printf("Can't open music file '%s'.\n", filename);
+            printf("Can't open music file '%s'.\n", filename.c_str());
             return NULL;
         }
 
