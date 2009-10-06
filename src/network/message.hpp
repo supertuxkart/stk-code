@@ -20,11 +20,13 @@
 #ifndef HEADER_MESSAGE_HPP
 #define HEADER_MESSAGE_HPP
 
-#include <stdio.h>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <assert.h>
 #include "btBulletDynamicsCommon.h"
+
+using std::memcpy;
 
 #include "enet/enet.h"
 
