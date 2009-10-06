@@ -20,6 +20,7 @@
 #ifndef HEADER_MESSAGE_HPP
 #define HEADER_MESSAGE_HPP
 
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <assert.h>
