@@ -79,7 +79,7 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     video::ITexture *makeMiniMap(const core::dimension2du &where,
                                  const std::string &name, 
                                  const video::SColor &fill_color

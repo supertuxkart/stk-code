@@ -806,7 +806,7 @@ void Track::loadTrackModel(unsigned int mode_id)
 
     if(m_use_fog)
     {
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
 #else
         irr_driver->getVideoDriver()->setFog(m_fog_color, true, m_fog_start, m_fog_end, m_fog_density);

@@ -127,7 +127,7 @@ void IrrDriver::initDevice()
         for(int bits=32; bits>15; bits -=8)
         {
             m_device = createDevice(type,
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
 #else
@@ -712,7 +712,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
  *         rendering doesn't work if setRenderTarget is called here, but 3d
  *         rendering doesn't work if it's not called here :(
  */
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
 IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension, 
                                     const std::string &name)
 #else

@@ -171,7 +171,7 @@ public:
                     const video::SColor &color=video::SColor(255, 255, 0, 255));
 
     /** Returns the size of the texture on which to render the minimap to. */
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     const core::dimension2du getMiniMapSize() const 
                   { return core::dimension2du(m_map_width, m_map_height); }
 #else

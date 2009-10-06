@@ -81,7 +81,7 @@ void RaceGUI::createMarkerTexture()
     while(npower2<n) npower2*=2;
 
     int radius     = (m_marker_rendered_size>>1)-1;
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size * npower2, 
                                                           m_marker_rendered_size), 
                                      "RaceGUI::markers");
@@ -430,7 +430,7 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
     if(speed_ratio>1) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     core::dimension2du bar_size    = bar_texture->getOriginalSize();
 #else
     core::dimension2di bar_size    = bar_texture->getOriginalSize();
@@ -615,7 +615,7 @@ void RaceGUI::drawMusicDescription()
     // Draw text
     core::stringw thetext(s.c_str());
 
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
 #else
     core::dimension2d< s32 > textSize = font->getDimension(thetext.c_str());

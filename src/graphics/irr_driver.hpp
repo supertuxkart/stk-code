@@ -63,7 +63,7 @@ public:
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     /** Returns the frame size. */
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     const core::dimension2d<u32> getFrameSize() const 
                        { return m_video_driver->getCurrentRenderTargetSize(); }
 #else
@@ -146,7 +146,7 @@ public:
         video::IVideoDriver        *m_video_driver;
         
     public:
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         RTTProvider(const core::dimension2du &dimension, 
                     const std::string &name);
 #else

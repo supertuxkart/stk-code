@@ -27,7 +27,7 @@ static ModalDialog* modalWindow = NULL;
 
 ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 {
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 #else
     const core::dimension2d<s32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();

@@ -95,7 +95,7 @@ void ModelViewWidget::update(float delta)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name );
 #else
         m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< s32 >(512, 512), name );

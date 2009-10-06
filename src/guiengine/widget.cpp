@@ -205,7 +205,7 @@ void Widget::readCoords(Widget* parent)
     unsigned int parent_w, parent_h, parent_x, parent_y;
     if(parent == NULL)
     {
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 #else
         core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -266,7 +266,7 @@ void Widget::readCoords(Widget* parent)
     if (m_text.size() > 0)
     {
         IGUIFont* font = GUIEngine::getFont();
-#ifdef IRR_SVN
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         core::dimension2d< u32 > dim = font->getDimension( m_text.c_str() );
 #else
         core::dimension2d< s32 > dim = font->getDimension( m_text.c_str() );
