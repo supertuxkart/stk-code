@@ -214,7 +214,10 @@ dnl FIXME: this program when run prints out two lines (version numbers) to stdou
 echo "checking for irrlicht libraries."
 save_LIBS=$LIBS
 LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
-AC_TRY_RUN([
+
+case "${host}" in
+*-*-linux* )
+  AC_TRY_RUN([
    #  include "irrlicht.h"
    int main() {
    irr::createDevice(irr::video::EDT_NULL);
@@ -222,8 +225,23 @@ AC_TRY_RUN([
    }
   ],
       ,
-irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+  irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
     )
+  ;;
+*darwin*|*macosx*)
+  AC_TRY_RUN([
+   #  include "irrlicht.h"
+   int main() {
+   irr::createDevice(irr::video::EDT_NULL);
+   return 0;
+   }
+  ],
+      ,
+  irrlicht_LIBS="$irrlicht_LIBS"
+    )
+  ;;
+esac
+
 LIBS=$save_LIBS
 
 dnl ======================================================
