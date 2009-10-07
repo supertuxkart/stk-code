@@ -1,4 +1,4 @@
-
+#ifdef HAVE_GLUT
 #include "GLDebugDrawer.h"
 #include "LinearMath/btPoint3.h"
 
@@ -75,4 +75,4 @@ void	GLDebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector3& 
 
 
 
-
+#endif

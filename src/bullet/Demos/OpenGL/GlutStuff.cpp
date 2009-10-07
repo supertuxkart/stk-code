@@ -1,3 +1,4 @@
+#ifdef HAVE_GLUT
 /*
 Bullet Continuous Collision Detection and Physics Library
 Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
@@ -97,3 +98,4 @@ int glutmain(int argc, char **argv,int width,int height,const char* title,DemoAp
     glutMainLoop();
     return 0;
 }
+#endif
