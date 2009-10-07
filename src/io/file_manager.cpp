@@ -135,7 +135,9 @@ FileManager::FileManager()
     pushTextureSearchPath(m_root_dir+"/data/textures");
     pushModelSearchPath  (m_root_dir+"/data/models"  );
     pushMusicSearchPath  (m_root_dir+"/data/music"   );
-    m_file_system->addFolderFileArchive("data/models");
+    m_file_system->addFolderFileArchive("data/models", 
+                                        /*ignoreCase*/false, 
+                                        /*ignorePaths*/false);
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
     {
@@ -198,14 +200,18 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
-    m_file_system->addFolderFileArchive(path.c_str());
+    m_file_system->addFolderFileArchive(path.c_str(), 
+                                        /*ignoreCase*/false, 
+                                        /*ignorePaths*/false);
 }   // pushModelSearchPath
 
 //-----------------------------------------------------------------------------
 void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
-    m_file_system->addFolderFileArchive(path.c_str());
+    m_file_system->addFolderFileArchive(path.c_str(), 
+                                        /*ignoreCase*/false, 
+                                        /*ignorePaths*/false);
 }   // pushTextureSearchPath
 
 //-----------------------------------------------------------------------------
