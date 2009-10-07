@@ -43,8 +43,14 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     
     assert(w > 0);
     assert(h > 0);
+
+#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     assert((unsigned int)w <= frame_size.Width);
     assert((unsigned int)h <= frame_size.Height);
+#else
+    assert(w <= frame_size.Width);
+    assert(h <= frame_size.Height);
+#endif
     
     m_area = core::rect< s32 >( position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
                                dimension2d< s32 >(w, h) );
