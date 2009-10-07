@@ -63,15 +63,6 @@ else
     SUMMARY="$SUMMARY\nDisabled compiler optimizations."
 fi
 
-AC_ARG_ENABLE(irrlicht, [AS_HELP_STRING(--enable-irrlicht,
-                                     [enable irrlicht compilation (still early pre-alpha)])],,
-              enable_irrlicht=false)
-if test x$enable_irrlicht = xyes; then
-    AC_DEFINE([HAVE_IRRLICHT], [1],  [enable irrlicht compilation])
-    SUMMARY="$SUMMARY\nCompiling for irrlicht - be warned, pre-alpha!!"
-fi
-
-
 dnl ===================
 dnl Checks for programs.
 dnl ===================
@@ -188,88 +179,52 @@ LIBS=$save_LIBS
 AC_LANG_PUSH(C++)
 
 
-dnl =======================
-dnl check for SDL libraries
-dnl =======================
-dnl Potentially sdl-config could be used, but apparently that might not
-dnl exist on all platforms, so doing the 'classical' test is safer :(
-case "${host}" in
-*)
-   dnl default unix style machines
-
-   dnl check for libraries
-   save_LIBS=$LIBS 
-   AC_SEARCH_LIBS(SDL_Init, SDL, have_SDL_lib=yes)
-   sdl_LIBS="$LIBS"
-   LIBS=$save_LIBS
-
-   dnl check for header files
-   AC_CHECK_HEADER(SDL/SDL.h, have_SDL_hdr=yes)
-   
-   if test x$have_SDL_hdr != xyes -o x$have_SDL_lib != xyes; then
-      AC_MSG_ERROR([Install SDL first...])
-   fi
-
-    AC_TRY_RUN([
-    #  include <SDL/SDL.h>
-       int main() {
-       if ( SDL_VERSION_ATLEAST(1,2,10)) {
-          return 0;
-        }
-       return -1;
-       }
-     ],
-      :,
-        AC_MSG_WARN([Your SDL version uses deprecated
-    headers. Please update to version 1.2.10 or higher if possible.
-    Currently this doesn't affects the game at all.])
-    )
-
-esac
-
-
 dnl ===============================
 dnl Check for irrlicht (if enabled)
 dnl ===============================
-if test x$enable_irrlicht = xyes; then
-   AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
-                                   [specify the prefix path to irrlicht])])
-   if test "x$with_irrlicht" != "x" ; then
-      CPPFLAGS="${CPPFLAGS} -I$with_irrlicht/include"
+AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
+                                  [specify the prefix path to irrlicht])])
+if test "x$with_irrlicht" != "x" ; then
+   CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include"
+   AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+   if test x$have_irrlicht_hdr != xyes; then
+      AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
    fi
+else
+   CPPFLAGS_save=CPPFLAGS
+   CPPFLAGS="${CPPFLAGS} -I /usr/local/include/irrlicht"
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
    if test x$have_irrlicht_hdr != xyes; then
       AC_MSG_ERROR([Can't find irrlicht installation, use --with-irrlicht...])
    fi
-   case "${host}" in
-   *-*-linux* )
-   irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
-   ;;
-   *darwin*|*macosx*)
-   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
-   ;;
-   esac
-
-   dnl Test if we need Xxf86vm. For now assume that if any problems
-   dnl occur with this simple program, it must be caused by this
-   dnl missing library. FIXME: better tests should be done here!!
-   dnl FIXME: this program when run prints out two lines (version numbers) to stdout
-   echo "checking for irrlicht libraries."
-   save_LIBS=$LIBS
-   LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
-   AC_TRY_RUN([
-      #  include "irrlicht.h"
-      int main() {
-      irr::createDevice(irr::video::EDT_NULL);
-      return 0;
-      }
-     ],
-        ,
-	irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
-    )
-   LIBS=$save_LIBS
-
 fi
+case "${host}" in
+*-*-linux* )
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
+  ;;
+*darwin*|*macosx*)
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
+  ;;
+esac
+
+dnl Test if we need Xxf86vm. For now assume that if any problems
+dnl occur with this simple program, it must be caused by this
+dnl missing library. FIXME: better tests should be done here!!
+dnl FIXME: this program when run prints out two lines (version numbers) to stdout
+echo "checking for irrlicht libraries."
+save_LIBS=$LIBS
+LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
+AC_TRY_RUN([
+   #  include "irrlicht.h"
+   int main() {
+   irr::createDevice(irr::video::EDT_NULL);
+   return 0;
+   }
+  ],
+      ,
+irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+    )
+LIBS=$save_LIBS
 
 dnl ======================================================
 dnl Try to supply the SVN revision number for the compiler
