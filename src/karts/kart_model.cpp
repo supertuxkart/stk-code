@@ -146,7 +146,7 @@ void KartModel::loadModels(const KartProperties &kart_properties)
     {
         m_z_offset = m_kart_height*0.5f;
     }
-}   // load
+}   // loadModels
 
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model
