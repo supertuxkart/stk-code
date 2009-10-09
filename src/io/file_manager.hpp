@@ -50,6 +50,7 @@ private:
                                  const;
     void makePath               (std::string& path, const std::string& dir,
                                  const std::string& fname) const;
+    io::path createAbsoluteFilename(const std::string &f);
 
 public:
                     FileManager();
@@ -89,8 +90,8 @@ public:
     void       pushModelSearchPath  (const std::string& path);
     void       pushMusicSearchPath  (const std::string& path)
                                     { m_music_search_path.push_back(path);  }
-    void       popTextureSearchPath () {m_texture_search_path.pop_back();   }
-    void       popModelSearchPath   () {m_model_search_path.pop_back();     }
+    void       popTextureSearchPath ();
+    void       popModelSearchPath   ();
     void       popMusicSearchPath   () {m_music_search_path.pop_back();     }
 
 };

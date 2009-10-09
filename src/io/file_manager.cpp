@@ -132,10 +132,10 @@ FileManager::FileManager()
 
     TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
     KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
-    pushTextureSearchPath(m_root_dir+"/data/textures");
-    pushModelSearchPath  (m_root_dir+"/data/models"  );
-    pushMusicSearchPath  (m_root_dir+"/data/music"   );
-    m_file_system->addFolderFileArchive("data/models", 
+    pushTextureSearchPath(m_root_dir+"/data/textures/");
+    pushModelSearchPath  (m_root_dir+"/data/models/"  );
+    pushMusicSearchPath  (m_root_dir+"/data/music/"   );
+    m_file_system->addFileArchive("data/models/", 
                                         /*ignoreCase*/false, 
                                         /*ignorePaths*/false);
     // Add more paths from the STK_MUSIC_PATH environment variable
@@ -197,22 +197,51 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
 }   // getXMLTree
 
 //-----------------------------------------------------------------------------
+/** In order to add and later remove paths we have to specify the absolute
+ *  filename (and replace '\' with '/' on windows).
+ */
+io::path FileManager::createAbsoluteFilename(const std::string &f)
+{
+    io::path abs_path=m_file_system->getAbsolutePath(f.c_str());
+    abs_path=m_file_system->flattenFilename(abs_path);
+    return abs_path;
+}   // createAbsoluteFilename
+
+//-----------------------------------------------------------------------------
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
-    m_file_system->addFolderFileArchive(path.c_str(), 
-                                        /*ignoreCase*/false, 
-                                        /*ignorePaths*/false);
+    m_file_system->addFileArchive(createAbsoluteFilename(path),
+                                  /*ignoreCase*/false, 
+                                  /*ignorePaths*/false,
+                                  io::EFAT_FOLDER);
 }   // pushModelSearchPath
 
 //-----------------------------------------------------------------------------
 void FileManager::pushTextureSearchPath(const std::string& path)
 {
     m_texture_search_path.push_back(path);
-    m_file_system->addFolderFileArchive(path.c_str(), 
-                                        /*ignoreCase*/false, 
-                                        /*ignorePaths*/false);
+    m_file_system->addFileArchive(createAbsoluteFilename(path),
+                                  /*ignoreCase*/false, 
+                                  /*ignorePaths*/false,
+                                  io::EFAT_FOLDER);
 }   // pushTextureSearchPath
+
+//-----------------------------------------------------------------------------
+void FileManager::popTextureSearchPath()
+{
+    std::string dir = m_texture_search_path.back();
+    m_texture_search_path.pop_back();
+    m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+}   // popTextureSearchPath
+
+//-----------------------------------------------------------------------------
+void FileManager::popModelSearchPath()
+{
+    std::string dir = m_model_search_path.back();
+    m_model_search_path.pop_back();
+    m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+}   // popModelSearchPath
 
 //-----------------------------------------------------------------------------
 bool FileManager::findFile(std::string& full_path,
