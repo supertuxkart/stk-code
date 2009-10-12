@@ -130,22 +130,6 @@ FileManager::FileManager()
     fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
 
-    TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
-    KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
-    pushTextureSearchPath(m_root_dir+"/data/textures/");
-    pushModelSearchPath  (m_root_dir+"/data/models/"  );
-    pushMusicSearchPath  (m_root_dir+"/data/music/"   );
-    m_file_system->addFileArchive("data/models/", 
-                                        /*ignoreCase*/false, 
-                                        /*ignorePaths*/false);
-    // Add more paths from the STK_MUSIC_PATH environment variable
-    if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
-    {
-        std::string path=getenv("SUPERTUXKART_MUSIC_PATH");
-        std::vector<std::string> dirs = StringUtils::splitPath(path);
-        for(int i=0;i<(int)dirs.size(); i++)
-            pushMusicSearchPath(dirs[i]);
-    }
 }  // FileManager
 
 //-----------------------------------------------------------------------------
@@ -167,6 +151,22 @@ void FileManager::setDevice(IrrlichtDevice *device)
     m_device->grab();  // To make sure that the device still exists while
                        // file_manager has a pointer to the file system.
     m_file_system  = m_device->getFileSystem();
+    TrackManager::addTrackSearchDir(m_root_dir+"/data/tracks");
+    KartPropertiesManager::addKartSearchDir(m_root_dir+"/data/karts");
+    pushTextureSearchPath(m_root_dir+"/data/textures/");
+    pushModelSearchPath  (m_root_dir+"/data/models/"  );
+    pushMusicSearchPath  (m_root_dir+"/data/music/"   );
+    m_file_system->addFileArchive("data/models/", 
+                                        /*ignoreCase*/false, 
+                                        /*ignorePaths*/false);
+    // Add more paths from the STK_MUSIC_PATH environment variable
+    if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
+    {
+        std::string path=getenv("SUPERTUXKART_MUSIC_PATH");
+        std::vector<std::string> dirs = StringUtils::splitPath(path);
+        for(int i=0;i<(int)dirs.size(); i++)
+            pushMusicSearchPath(dirs[i]);
+    }
 }   // reInit
 
 //-----------------------------------------------------------------------------
