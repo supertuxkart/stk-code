@@ -29,7 +29,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
-
+#include "modes/world.hpp"
 
 namespace GUIEngine
 {
@@ -226,6 +226,10 @@ void render(float elapsed_time)
     if (gamestate != GAME)
     {
         getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+    }
+    else
+    {
+        RaceManager::getWorld()->getRaceGUI()->render();
     }
 }
 // -----------------------------------------------------------------------------    
