@@ -24,7 +24,6 @@
 #define HEADER_CAKE_HPP
 
 #include "irrlicht.h"
-using namespace irr;
 
 #include "items/flyable.hpp"
 
