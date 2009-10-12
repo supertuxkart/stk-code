@@ -29,15 +29,6 @@
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
 
-// FIXME : don't use 'using namespace' in header!!!!
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-
-
 namespace GUIEngine
 {
    

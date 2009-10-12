@@ -22,6 +22,9 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace irr;
+using namespace irr::core;
+using namespace irr::gui;
 
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)

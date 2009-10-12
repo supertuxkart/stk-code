@@ -19,6 +19,9 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
+using namespace irr::video;
+using namespace irr::core;
+using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 IconButtonWidget::IconButtonWidget(const bool clickable)

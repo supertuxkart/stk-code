@@ -31,6 +31,9 @@
 #include "guiengine/widget.hpp"
 #include "modes/world.hpp"
 
+using namespace irr::gui;
+using namespace irr::video;
+
 namespace GUIEngine
 {
     Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
@@ -39,7 +42,7 @@ namespace GUIEngine
     Skin* g_skin = NULL;
     IGUIFont* g_font;
     IrrlichtDevice* g_device;
-    irr::video::IVideoDriver* g_driver;
+    IVideoDriver* g_driver;
     
     ptr_vector<Screen, HOLD> g_loaded_screens;
     Screen* g_current_screen = NULL;

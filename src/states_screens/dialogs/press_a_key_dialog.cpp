@@ -23,6 +23,7 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace irr::gui;
 
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)

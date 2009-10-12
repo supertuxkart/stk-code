@@ -25,9 +25,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     /** A spinner or gauge widget (to select numbers / percentages). See guiengine/engine.hpp for a detailed overview */

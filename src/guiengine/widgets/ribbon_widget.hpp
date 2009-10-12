@@ -25,9 +25,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
 
@@ -62,7 +59,7 @@ namespace GUIEngine
         EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
         EventPropagation focused(const int playerID);
         
-        ptr_vector<IGUIStaticText, REF> m_labels;
+        ptr_vector<irr::gui::IGUIStaticText, REF> m_labels;
         
     public:
         
@@ -85,7 +82,7 @@ namespace GUIEngine
         const std::string& getSelectionIDString(const int playerID);
         
         /** Returns the user-visible text of the selection */
-        const stringw& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_text; }
+        const irr::core::stringw& getSelectionText(const int playerID) { return m_children[m_selection[playerID]].m_text; }
         
         /** Sets the ID of the selected item within the ribbon */
         void setSelection(const int i, const int playerID) { m_selection[playerID] = i; updateSelection(); }

@@ -32,6 +32,9 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::video;
 
 RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {

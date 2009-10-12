@@ -20,6 +20,8 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 #ifndef round
 #  define round(x)  (floor(x+0.5f))

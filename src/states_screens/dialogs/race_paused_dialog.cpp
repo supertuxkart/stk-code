@@ -32,6 +32,8 @@
 
 #include <string>
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {

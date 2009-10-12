@@ -40,6 +40,10 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 
+using namespace irr::core;
+using namespace irr::scene;
+using namespace irr::video;
+
 IrrDriver *irr_driver = NULL;
 
 IrrDriver::IrrDriver()

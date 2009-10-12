@@ -34,6 +34,8 @@
 #include <sstream>
 
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 {

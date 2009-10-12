@@ -22,6 +22,8 @@
 #include <sstream>
 
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 #ifndef round
 #  define round(x)  (floor(x+0.5f))

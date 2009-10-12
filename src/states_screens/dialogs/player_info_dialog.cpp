@@ -25,7 +25,8 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
-
+using namespace irr::gui;
+using namespace irr::core;
 
 PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {

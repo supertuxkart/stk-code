@@ -27,6 +27,8 @@
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
 
+using namespace irr::gui;
+
 // -----------------------------------------------------------------------------
 
 EventHandler::EventHandler()

@@ -26,9 +26,6 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     /**
@@ -64,7 +61,7 @@ namespace GUIEngine
         
         /** Used for ribbon grids that have a label at the bottom */
         bool m_has_label;
-        IGUIStaticText* m_label;
+        irr::gui::IGUIStaticText* m_label;
         int m_label_height;
         
         /** Used to keep track of item count changes */

@@ -22,13 +22,6 @@
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-
 /**
  Here lies the skin handling. It loads images and their sizing from a XML file.
  Since the irrLicht way of handling skin is quite "boxy" and results in games
@@ -116,30 +109,30 @@ namespace GUIEngine
         
         // see comments in Skin::drawBoxFromStretchableTexture for explaination of
         // what these are
-        core::rect<s32> dest_area_left;
-        core::rect<s32> dest_area_center;
-        core::rect<s32> dest_area_right;
+        irr::core::rect<irr::s32> dest_area_left;
+        irr::core::rect<irr::s32> dest_area_center;
+        irr::core::rect<irr::s32> dest_area_right;
         
-        core::rect<s32> dest_area_top;
-        core::rect<s32> dest_area_bottom;
+        irr::core::rect<irr::s32> dest_area_top;
+        irr::core::rect<irr::s32> dest_area_bottom;
         
-        core::rect<s32> dest_area_top_left;
-        core::rect<s32> dest_area_top_right;
-        core::rect<s32> dest_area_bottom_left;
-        core::rect<s32> dest_area_bottom_right;
+        irr::core::rect<irr::s32> dest_area_top_left;
+        irr::core::rect<irr::s32> dest_area_top_right;
+        irr::core::rect<irr::s32> dest_area_bottom_left;
+        irr::core::rect<irr::s32> dest_area_bottom_right;
         
         // y flip
-        core::rect<s32> dest_area_left_yflip;
-        core::rect<s32> dest_area_center_yflip;
-        core::rect<s32> dest_area_right_yflip;
+        irr::core::rect<irr::s32> dest_area_left_yflip;
+        irr::core::rect<irr::s32> dest_area_center_yflip;
+        irr::core::rect<irr::s32> dest_area_right_yflip;
         
-        core::rect<s32> dest_area_top_yflip;
-        core::rect<s32> dest_area_bottom_yflip;
+        irr::core::rect<irr::s32> dest_area_top_yflip;
+        irr::core::rect<irr::s32> dest_area_bottom_yflip;
         
-        core::rect<s32> dest_area_top_left_yflip;
-        core::rect<s32> dest_area_top_right_yflip;
-        core::rect<s32> dest_area_bottom_left_yflip;
-        core::rect<s32> dest_area_bottom_right_yflip;   
+        irr::core::rect<irr::s32> dest_area_top_left_yflip;
+        irr::core::rect<irr::s32> dest_area_top_right_yflip;
+        irr::core::rect<irr::s32> dest_area_bottom_left_yflip;
+        irr::core::rect<irr::s32> dest_area_bottom_right_yflip;   
         
         short r, g, b;
         
@@ -162,11 +155,11 @@ namespace GUIEngine
     /** class containing render params for the 'drawBoxFromStretchableTexture' function */
     class BoxRenderParams
     {
-        ITexture* image;
+        irr::video::ITexture* image;
         bool y_flip_set;
 
     public:
-        ITexture* getImage() { return image; }
+        irr::video::ITexture* getImage() { return image; }
         
         int left_border, right_border, top_border, bottom_border;
         bool preserve_h_aspect_ratios;
@@ -184,62 +177,62 @@ namespace GUIEngine
         static const int TOP = 8;
         static const int BOTTOM = 16;
         
-        core::rect<s32> source_area_left;
-        core::rect<s32> source_area_center;
-        core::rect<s32> source_area_right;
+        irr::core::rect<irr::s32> source_area_left;
+        irr::core::rect<irr::s32> source_area_center;
+        irr::core::rect<irr::s32> source_area_right;
         
-        core::rect<s32> source_area_top;
-        core::rect<s32> source_area_bottom;
+        irr::core::rect<irr::s32> source_area_top;
+        irr::core::rect<irr::s32> source_area_bottom;
         
-        core::rect<s32> source_area_top_left;
-        core::rect<s32> source_area_top_right;
-        core::rect<s32> source_area_bottom_left;
-        core::rect<s32> source_area_bottom_right; 
+        irr::core::rect<irr::s32> source_area_top_left;
+        irr::core::rect<irr::s32> source_area_top_right;
+        irr::core::rect<irr::s32> source_area_bottom_left;
+        irr::core::rect<irr::s32> source_area_bottom_right; 
         
         
         // y-flipped coords
-        core::rect<s32> source_area_left_yflip;
-        core::rect<s32> source_area_center_yflip;
-        core::rect<s32> source_area_right_yflip;
+        irr::core::rect<irr::s32> source_area_left_yflip;
+        irr::core::rect<irr::s32> source_area_center_yflip;
+        irr::core::rect<irr::s32> source_area_right_yflip;
         
-        core::rect<s32> source_area_top_yflip;
-        core::rect<s32> source_area_bottom_yflip;
+        irr::core::rect<irr::s32> source_area_top_yflip;
+        irr::core::rect<irr::s32> source_area_bottom_yflip;
         
-        core::rect<s32> source_area_top_left_yflip;
-        core::rect<s32> source_area_top_right_yflip;
-        core::rect<s32> source_area_bottom_left_yflip;
-        core::rect<s32> source_area_bottom_right_yflip; 
+        irr::core::rect<irr::s32> source_area_top_left_yflip;
+        irr::core::rect<irr::s32> source_area_top_right_yflip;
+        irr::core::rect<irr::s32> source_area_bottom_left_yflip;
+        irr::core::rect<irr::s32> source_area_bottom_right_yflip; 
         
         BoxRenderParams();
-        void setTexture(ITexture* image);
+        void setTexture(irr::video::ITexture* image);
         void calculateYFlipIfNeeded();
     };
     
-    class Skin : public IGUISkin
+    class Skin : public irr::gui::IGUISkin
     {
-        IGUISkin* m_fallback_skin;
+        irr::gui::IGUISkin* m_fallback_skin;
         
 
-        ITexture* bg_image;
+        irr::video::ITexture* bg_image;
         
 
-        void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest, BoxRenderParams& params);
+        void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const irr::core::rect< irr::s32 > &dest, BoxRenderParams& params);
         
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
-        void process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed);
-        void drawButton(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused);
-        void drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-        void drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-        void drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-        void drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused);
-        void drawGauge(const core::rect< s32 > &rect, Widget* widget, bool focused);
-        void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget, bool focused);
-        void drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused);
-        void drawList(const core::rect< s32 > &rect, Widget* widget, bool focused);
-        void drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused);
+        void process3DPane(irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const bool pressed);
+        void drawButton(Widget* w, const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool focused);
+        void drawRibbon(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
+        void drawRibbonChild(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
+        void drawSpinnerChild(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
+        void drawSpinnerBody(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
+        void drawGauge(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawGaugeFill(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawCheckBox(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawList(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
 
     public:
-        Skin(IGUISkin* fallback_skin);
+        Skin(irr::gui::IGUISkin* fallback_skin);
         ~Skin();
 
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
@@ -247,29 +240,29 @@ namespace GUIEngine
         void drawBGFadeColor();
         
         // irrlicht's callbacks
-        virtual void 	draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &pos, const core::rect< s32 > *clip);
-        virtual void 	draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual void 	draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual void 	draw3DMenuPane (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual void 	draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual void 	draw3DTabBody (IGUIElement *element, bool border, bool background, const core::rect< s32 > &rect, const core::rect< s32 > *clip, s32 tabHeight=-1, gui::EGUI_ALIGNMENT alignment=EGUIA_UPPERLEFT);
-        virtual void 	draw3DTabButton (IGUIElement *element, bool active, const core::rect< s32 > &rect, const core::rect< s32 > *clip, gui::EGUI_ALIGNMENT alignment=EGUIA_UPPERLEFT);
-        virtual void 	draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual core::rect< s32 > 	draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip);
-        virtual void 	drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon, const core::position2di position, u32 starttime, u32 currenttime, bool loop=false, const core::rect< s32 > *clip=NULL);
-        virtual video::SColor 	getColor (EGUI_DEFAULT_COLOR color) const;
-        virtual const wchar_t * 	getDefaultText (EGUI_DEFAULT_TEXT text) const;
-        virtual IGUIFont * 	getFont (EGUI_DEFAULT_FONT which=EGDF_DEFAULT) const ;
-        virtual u32 	getIcon (EGUI_DEFAULT_ICON icon) const ;
-        virtual s32 	getSize (EGUI_DEFAULT_SIZE size) const ;
-        virtual IGUISpriteBank * 	getSpriteBank () const ;
+        virtual void 	draw2DRectangle (irr::gui::IGUIElement *element, const irr::video::SColor &color, const irr::core::rect< irr::s32 > &pos, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	draw3DButtonPanePressed (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	draw3DButtonPaneStandard (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	draw3DMenuPane (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	draw3DSunkenPane (irr::gui::IGUIElement *element, irr::video::SColor bgcolor, bool flat, bool fillBackGround, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	draw3DTabBody (irr::gui::IGUIElement *element, bool border, bool background, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::s32 tabHeight=-1, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
+        virtual void 	draw3DTabButton (irr::gui::IGUIElement *element, bool active, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
+        virtual void 	draw3DToolBar (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual irr::core::rect< irr::s32 > 	draw3DWindowBackground (irr::gui::IGUIElement *element, bool drawTitleBar, irr::video::SColor titleBarColor, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void 	drawIcon (irr::gui::IGUIElement *element, irr::gui::EGUI_DEFAULT_ICON icon, const irr::core::position2di position, irr::u32 starttime, irr::u32 currenttime, bool loop=false, const irr::core::rect< irr::s32 > *clip=NULL);
+        virtual irr::video::SColor 	getColor (irr::gui::EGUI_DEFAULT_COLOR color) const;
+        virtual const wchar_t* 	getDefaultText (irr::gui::EGUI_DEFAULT_TEXT text) const;
+        virtual irr::gui::IGUIFont* 	getFont (irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT) const ;
+        virtual irr::u32 	getIcon (irr::gui::EGUI_DEFAULT_ICON icon) const ;
+        virtual irr::s32 	getSize (irr::gui::EGUI_DEFAULT_SIZE size) const ;
+        virtual irr::gui::IGUISpriteBank * 	getSpriteBank () const ;
         //virtual EGUI_SKIN_TYPE 	getType () const;
-        virtual void 	setColor (EGUI_DEFAULT_COLOR which, video::SColor newColor);
-        virtual void 	setDefaultText (EGUI_DEFAULT_TEXT which, const wchar_t *newText);
-        virtual void 	setFont (IGUIFont *font, EGUI_DEFAULT_FONT which=EGDF_DEFAULT);
-        virtual void 	setIcon (EGUI_DEFAULT_ICON icon, u32 index);
-        virtual void 	setSize (EGUI_DEFAULT_SIZE which, s32 size);
-        virtual void 	setSpriteBank (IGUISpriteBank *bank);
+        virtual void 	setColor (irr::gui::EGUI_DEFAULT_COLOR which, irr::video::SColor newColor);
+        virtual void 	setDefaultText (irr::gui::EGUI_DEFAULT_TEXT which, const wchar_t* newText);
+        virtual void 	setFont (irr::gui::IGUIFont *font, irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT);
+        virtual void 	setIcon (irr::gui::EGUI_DEFAULT_ICON icon, irr::u32 index);
+        virtual void 	setSize (irr::gui::EGUI_DEFAULT_SIZE which, irr::s32 size);
+        virtual void 	setSpriteBank (irr::gui::IGUISpriteBank *bank);
         
     };
 }

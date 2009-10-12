@@ -18,6 +18,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 LabelWidget::LabelWidget()
 {

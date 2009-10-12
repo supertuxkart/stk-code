@@ -10,6 +10,10 @@
 
 #include <SColor.h>
 
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::video;
+
 static const char* CUTSCENE_NAME = "feature_unlocked";
 /*
 static FeatureUnlockedCutScene* singleton = NULL;

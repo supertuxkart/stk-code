@@ -34,6 +34,8 @@
 #include "irrlicht.h"
 
 using namespace irr::gui;
+using namespace irr::video;
+using namespace irr::core;
 using namespace GUIEngine;
 
 

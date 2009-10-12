@@ -25,6 +25,8 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::video;
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {

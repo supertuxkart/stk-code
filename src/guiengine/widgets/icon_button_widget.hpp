@@ -25,9 +25,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     /** A button widget with an icon and optionnaly a label beneath (from its properties in base class Widget)
@@ -35,7 +32,7 @@ namespace GUIEngine
     class IconButtonWidget : public Widget
     {
         bool clickable;
-        IGUIStaticText* label;
+        irr::gui::IGUIStaticText* label;
     public:
         IconButtonWidget(const bool clickable=true);
         virtual ~IconButtonWidget() {}

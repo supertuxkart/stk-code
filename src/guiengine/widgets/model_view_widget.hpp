@@ -26,10 +26,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
-
 namespace GUIEngine
 {
     /** A model view widget. See guiengine/engine.hpp for a detailed overview */

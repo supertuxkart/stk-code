@@ -204,14 +204,6 @@ being left, allowing for setup/clean-up.
 #include "guiengine/widgets.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-
-
 namespace GUIEngine
 {
     extern Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht;
@@ -221,9 +213,9 @@ namespace GUIEngine
     class Widget;
     
     extern IrrlichtDevice* getDevice();
-    extern IGUIEnvironment* getGUIEnv();
-    extern IVideoDriver* getDriver();
-    extern IGUIFont* getFont();
+    extern irr::gui::IGUIEnvironment* getGUIEnv();
+    extern irr::video::IVideoDriver* getDriver();
+    extern irr::gui::IGUIFont* getFont();
     extern AbstractStateManager* getStateManager();
     
     float getLatestDt();

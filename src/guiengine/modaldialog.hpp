@@ -40,7 +40,7 @@ class ModalDialog : public SkinWidgetContainer
 {
 protected:
     irr::gui::IGUIWindow* m_irrlicht_window;
-    core::rect< s32 > m_area;
+    irr::core::rect< irr::s32 > m_area;
     
     /**
      * Creates a modal dialog with given percentage of screen width and height

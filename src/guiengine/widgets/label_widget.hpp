@@ -25,9 +25,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     /** A simple label widget. See guiengine/engine.hpp for a detailed overview. */
@@ -40,7 +37,7 @@ namespace GUIEngine
         void add();
         
         /** Change the text in the label */
-        void setText(stringw newText);
+        void setText(irr::core::stringw newText);
     };
 }
 

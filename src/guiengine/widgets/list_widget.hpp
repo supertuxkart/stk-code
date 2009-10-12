@@ -25,9 +25,6 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     /** A vertical list widget with text entries. See guiengine/engine.hpp for a detailed overview */

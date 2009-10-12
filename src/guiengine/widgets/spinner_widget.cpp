@@ -24,6 +24,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::video;
 
 // -----------------------------------------------------------------------------
 SpinnerWidget::SpinnerWidget(const bool gauge)

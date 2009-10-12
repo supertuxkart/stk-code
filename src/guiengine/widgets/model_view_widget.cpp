@@ -19,6 +19,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 using namespace GUIEngine;
+using namespace irr::core;
+using namespace irr::gui;
 
 ModelViewWidget::ModelViewWidget()
 {

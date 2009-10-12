@@ -21,13 +21,6 @@
 #include "irrlicht.h"
 #include "input/input.hpp"
 
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-
 namespace GUIEngine
 {
 
@@ -48,9 +41,9 @@ namespace GUIEngine
   * mainly through AbstractStateManager, and also to widgets (this class is some kind of bridge between
   * the base irrLicht GUI engine and the STK layer on top of it)
   */
-class EventHandler : public IEventReceiver
+    class EventHandler : public irr::IEventReceiver
 {
-    EventPropagation onGUIEvent(const SEvent& event);
+    EventPropagation onGUIEvent(const irr::SEvent& event);
     EventPropagation onWidgetActivated(Widget* w, const int playerID);
     void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
     void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
@@ -63,7 +56,7 @@ public:
       * All irrLicht events will go through this (input as well GUI; input events are
       * immediately delegated to the input module, GUI events are processed here)
       */
-    bool OnEvent (const SEvent &event);
+    bool OnEvent (const irr::SEvent &event);
     
     /**
       * When the input module is done processing an input and mapped it to an action,

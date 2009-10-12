@@ -28,9 +28,6 @@
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
-using namespace irr;
-using namespace gui;
-
 namespace GUIEngine
 {
     
@@ -135,7 +132,7 @@ namespace GUIEngine
         /**
          * An irrlicht parent (most often used to put widgets in dialogs)
          */
-        IGUIElement* m_parent;
+        irr::gui::IGUIElement* m_parent;
         
         /**
          * Receives as string the raw property value retrieved from XML file.
@@ -150,7 +147,7 @@ namespace GUIEngine
         /**
          * IrrLicht widget created to represent this object.
          */
-        IGUIElement* m_element;
+        irr::gui::IGUIElement* m_element;
         
         
         // FIXME... i forgot the m_ everywhere ... XD
@@ -225,9 +222,9 @@ namespace GUIEngine
             #endif
         }
 
-        IGUIElement* getIrrlichtElement() { return m_element; }
+        irr::gui::IGUIElement* getIrrlichtElement() { return m_element; }
 
-        void setParent(IGUIElement* parent);
+        void setParent(irr::gui::IGUIElement* parent);
         
         /**
           * If this widget has any children, they go here. Children can be either
@@ -245,7 +242,7 @@ namespace GUIEngine
         
         /** PROP_TEXT is a special case : since it can be transalted it can't go in the map above, which
             uses narrow strings */
-        stringw m_text;
+        irr::core::stringw m_text;
         
         static void resetIDCounters();
         
