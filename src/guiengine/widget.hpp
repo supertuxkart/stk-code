@@ -207,21 +207,21 @@ namespace GUIEngine
           */
         template<typename T> T* getIrrlichtElement()
         {
-            #if defined(WIN32) || defined(NDEBUG)
-                return static_cast<T*>(m_element);
-            #else
-                T* out = dynamic_cast<T*>(m_element);
-                return out;
-            #endif
+        #if HAVE_RTT
+            T* out = dynamic_cast<T*>(m_element);
+            return out;
+        #else
+            return static_cast<T*>(m_element);
+        #endif
         }
 
         template<typename T> const T* getIrrlichtElement() const
         {
-            #if defined(WIN32) || defined(NDEBUG)
-                return static_cast<T*>(m_element);
-            #else
+            #if HAVE_RTT
                 T* out = dynamic_cast<T*>(m_element);
                 return out;
+            #else
+                return static_cast<T*>(m_element);
             #endif
         }
 
