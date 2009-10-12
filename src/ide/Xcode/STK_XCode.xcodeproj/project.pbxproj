@@ -247,7 +247,6 @@
 		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
 		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
 		958330CE10122B4A00C5137E /* modaldialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B610122B4A00C5137E /* modaldialog.cpp */; };
-		958330CF10122B4A00C5137E /* my_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B810122B4A00C5137E /* my_button.cpp */; };
 		958330D010122B4A00C5137E /* screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BA10122B4A00C5137E /* screen.cpp */; };
 		958330D110122B4A00C5137E /* screen_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BC10122B4A00C5137E /* screen_loader.cpp */; };
 		958330D210122B4A00C5137E /* skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330BD10122B4A00C5137E /* skin.cpp */; };
@@ -434,8 +433,6 @@
 		958330B510122B4A00C5137E /* event_handler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = event_handler.hpp; path = ../../guiengine/event_handler.hpp; sourceTree = SOURCE_ROOT; };
 		958330B610122B4A00C5137E /* modaldialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = modaldialog.cpp; path = ../../guiengine/modaldialog.cpp; sourceTree = SOURCE_ROOT; };
 		958330B710122B4A00C5137E /* modaldialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = modaldialog.hpp; path = ../../guiengine/modaldialog.hpp; sourceTree = SOURCE_ROOT; };
-		958330B810122B4A00C5137E /* my_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = my_button.cpp; path = ../../guiengine/my_button.cpp; sourceTree = SOURCE_ROOT; };
-		958330B910122B4A00C5137E /* my_button.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = my_button.hpp; path = ../../guiengine/my_button.hpp; sourceTree = SOURCE_ROOT; };
 		958330BA10122B4A00C5137E /* screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen.cpp; path = ../../guiengine/screen.cpp; sourceTree = SOURCE_ROOT; };
 		958330BB10122B4A00C5137E /* screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = screen.hpp; path = ../../guiengine/screen.hpp; sourceTree = SOURCE_ROOT; };
 		958330BC10122B4A00C5137E /* screen_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = screen_loader.cpp; path = ../../guiengine/screen_loader.cpp; sourceTree = SOURCE_ROOT; };
@@ -1240,8 +1237,6 @@
 				958330B510122B4A00C5137E /* event_handler.hpp */,
 				958330B610122B4A00C5137E /* modaldialog.cpp */,
 				958330B710122B4A00C5137E /* modaldialog.hpp */,
-				958330B810122B4A00C5137E /* my_button.cpp */,
-				958330B910122B4A00C5137E /* my_button.hpp */,
 				958330BA10122B4A00C5137E /* screen.cpp */,
 				958330BB10122B4A00C5137E /* screen.hpp */,
 				958330BC10122B4A00C5137E /* screen_loader.cpp */,
@@ -2504,7 +2499,6 @@
 				958330CC10122B4A00C5137E /* engine.cpp in Sources */,
 				958330CD10122B4A00C5137E /* event_handler.cpp in Sources */,
 				958330CE10122B4A00C5137E /* modaldialog.cpp in Sources */,
-				958330CF10122B4A00C5137E /* my_button.cpp in Sources */,
 				958330D010122B4A00C5137E /* screen.cpp in Sources */,
 				958330D110122B4A00C5137E /* screen_loader.cpp in Sources */,
 				958330D210122B4A00C5137E /* skin.cpp in Sources */,

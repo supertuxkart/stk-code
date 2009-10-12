@@ -119,7 +119,9 @@ void RibbonWidget::add()
                 int same_id = getNewNoFocusID();
                 subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, same_id, L"", L"");
                 
-                MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, same_id, icon_part, true);
+                //MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, same_id, icon_part, true);
+                IGUIButton* icon = GUIEngine::getGUIEnv()->addButton(icon_part, subbtn, same_id, L"");
+                icon->setScaleImage(true);
                 icon->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
                 icon->setUseAlphaChannel(true);
                 icon->setDrawBorder(false);
@@ -156,7 +158,9 @@ void RibbonWidget::add()
             rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y,
                                           widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
             
-            subbtn = new MyGUIButton(GUIEngine::getGUIEnv(), btn, getNewNoFocusID(), subsize, true);
+            //subbtn = new MyGUIButton(GUIEngine::getGUIEnv(), btn, getNewNoFocusID(), subsize, true);
+            subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, getNewNoFocusID(), L"");
+            subbtn->setScaleImage(true);
             
             m_children[i].m_element = subbtn;
             subbtn->setUseAlphaChannel(true);

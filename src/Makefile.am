@@ -81,8 +81,6 @@ supertuxkart_SOURCES = \
  guiengine/event_handler.hpp \
  guiengine/modaldialog.cpp \
  guiengine/modaldialog.hpp \
- guiengine/my_button.cpp \
- guiengine/my_button.hpp \
  guiengine/screen_loader.cpp \
  guiengine/screen.cpp \
  guiengine/screen.hpp \

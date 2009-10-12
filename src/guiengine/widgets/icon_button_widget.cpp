@@ -45,10 +45,11 @@ void IconButtonWidget::add()
     {
         widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
 
-        MyGUIButton* btn = new MyGUIButton(GUIEngine::getGUIEnv(), m_parent,  getNewID(), widget_size, true);
-        //IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
+        //MyGUIButton* btn = new MyGUIButton(GUIEngine::getGUIEnv(), m_parent,  getNewID(), widget_size, true);
+        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
         btn->setUseAlphaChannel(true);
         btn->setImage(texture);
+        btn->setScaleImage(true);
         //btn->setDrawBorder(false);
         btn->setTabStop(true);
         m_element = btn;
