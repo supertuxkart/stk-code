@@ -30,7 +30,6 @@ using namespace gui;
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/my_button.hpp"
 #include "guiengine/screen.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
