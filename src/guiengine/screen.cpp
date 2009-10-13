@@ -47,6 +47,7 @@ Screen::Screen(const char* file)
     m_loaded = false;
     loadFromFile();
     m_inited = false;
+    m_render_3d = false;
 }
 
 Screen::Screen()
@@ -55,6 +56,7 @@ Screen::Screen()
     m_mouse_y = 0;
     m_loaded = false;
     m_inited = false;
+    m_render_3d = false;
 }
 
 #if 0

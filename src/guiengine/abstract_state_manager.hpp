@@ -13,7 +13,6 @@ namespace GUIEngine
     {
         MENU,
         GAME,
-        CUTSCENE,
         INGAME_MENU
     };
     
@@ -34,7 +33,6 @@ protected:
     std::vector<std::string> m_menu_stack;
     
     void pushMenu(std::string name);
-    void pushCutScene(std::string name);
     
 public:
     AbstractStateManager();

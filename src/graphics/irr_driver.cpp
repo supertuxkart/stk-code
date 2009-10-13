@@ -31,6 +31,7 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -650,7 +651,8 @@ void IrrDriver::update(float dt)
                 m_scene_manager->drawAll();
             }
         }
-        else if (state == GUIEngine::CUTSCENE)
+        
+        if (GUIEngine::getCurrentScreen()->needs3D())
         {
             // render 3D stuff in cutscene mode too
             m_scene_manager->drawAll();

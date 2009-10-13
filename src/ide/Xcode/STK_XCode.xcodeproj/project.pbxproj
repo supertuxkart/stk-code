@@ -267,7 +267,6 @@
 		95C77D6F106958E10080838E /* check_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D6D106958E10080838E /* check_sphere.cpp */; };
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
-		95D233F51078203900625256 /* cutscene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D233F41078203900625256 /* cutscene.cpp */; };
 		95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2343E1078227A00625256 /* feature_unlocked.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
@@ -861,8 +860,6 @@
 		95CB476A0FF30EF400413BAE /* bezier_curve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bezier_curve.hpp; path = ../../tracks/bezier_curve.hpp; sourceTree = SOURCE_ROOT; };
 		95CB476B0FF30EF400413BAE /* bezier_curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bezier_curve.cpp; path = ../../tracks/bezier_curve.cpp; sourceTree = SOURCE_ROOT; };
 		95D1F5F60FC8C3E300FF6968 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../../input/input.cpp; sourceTree = SOURCE_ROOT; };
-		95D233F31078203900625256 /* cutscene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cutscene.hpp; path = ../../guiengine/cutscene.hpp; sourceTree = SOURCE_ROOT; };
-		95D233F41078203900625256 /* cutscene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cutscene.cpp; path = ../../guiengine/cutscene.cpp; sourceTree = SOURCE_ROOT; };
 		95D2343D1078227A00625256 /* feature_unlocked.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = feature_unlocked.hpp; path = ../../states_screens/feature_unlocked.hpp; sourceTree = SOURCE_ROOT; };
 		95D2343E1078227A00625256 /* feature_unlocked.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = feature_unlocked.cpp; path = ../../states_screens/feature_unlocked.cpp; sourceTree = SOURCE_ROOT; };
 		95D464880FA37B1B00F50CA2 /* libIrrlicht.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libIrrlicht.a; path = /usr/local/lib/libIrrlicht.a; sourceTree = "<absolute>"; };
@@ -1229,8 +1226,6 @@
 			children = (
 				9583319810123B0200C5137E /* abstract_state_manager.cpp */,
 				9583319710123B0200C5137E /* abstract_state_manager.hpp */,
-				95D233F41078203900625256 /* cutscene.cpp */,
-				95D233F31078203900625256 /* cutscene.hpp */,
 				958330B210122B4A00C5137E /* engine.cpp */,
 				958330B310122B4A00C5137E /* engine.hpp */,
 				958330B410122B4A00C5137E /* event_handler.cpp */,
@@ -2541,7 +2536,6 @@
 				95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */,
 				95C77D66106958A50080838E /* check_line.cpp in Sources */,
 				95C77D6F106958E10080838E /* check_sphere.cpp in Sources */,
-				95D233F51078203900625256 /* cutscene.cpp in Sources */,
 				95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */,
 				9522F125107948AD0067ECF5 /* main_menu_screen.cpp in Sources */,
 				9522F15B107949780067ECF5 /* race_setup_screen.cpp in Sources */,

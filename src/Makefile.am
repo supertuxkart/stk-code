@@ -74,8 +74,6 @@ supertuxkart_SOURCES = \
  graphics/water_splash.cpp \
  guiengine/abstract_state_manager.cpp \
  guiengine/abstract_state_manager.hpp \
- guiengine/cutscene.cpp \
- guiengine/cutscene.hpp \
  guiengine/engine.cpp \
  guiengine/engine.hpp \
  guiengine/event_handler.hpp \

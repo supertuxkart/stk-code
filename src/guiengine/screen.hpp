@@ -53,12 +53,6 @@ namespace GUIEngine
     
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     
-    enum ScreenType
-    {
-        SCREEN_TYPE_MENU,
-        SCREEN_TYPE_CUTSCENE
-    };
-    
     /**
       * Represents a single screen. Mainly responsible of its children widgets; Screen lays them
       * out, asks them to add themselves, asks them to remove themselves, etc.
@@ -75,6 +69,9 @@ namespace GUIEngine
 
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        
+        /** Will be called to determine if the 3D scene must be rendered when at this screen. */
+        bool m_render_3d;
         
     public:
         ptr_vector<Widget, HOLD> m_widgets;
@@ -109,9 +106,7 @@ namespace GUIEngine
         
         virtual void addWidgets();
         virtual void calculateLayout();
-        
-        virtual ScreenType getScreenType() { return SCREEN_TYPE_MENU; }
-        
+                
         void manualAddWidget(Widget* w);
         void manualRemoveWidget(Widget* w);
 
@@ -119,6 +114,9 @@ namespace GUIEngine
         
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
         
+        /** Will be called to determine if the 3D scene must be rendered when at this screen */
+        bool needs3D() { return m_render_3d; }
+        void setNeeds3D(bool needs3D) { m_render_3d = needs3D; }
         
         virtual void init() = 0;
         virtual void tearDown() = 0;

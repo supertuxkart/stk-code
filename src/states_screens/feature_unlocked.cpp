@@ -14,26 +14,9 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-static const char* CUTSCENE_NAME = "feature_unlocked";
-/*
-static FeatureUnlockedCutScene* singleton = NULL;
-
-void FeatureUnlockedCutScene::show()
+FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.stkgui")
 {
-    if (singleton == NULL)
-    {
-        singleton = new FeatureUnlockedCutScene();
-        addCutScene(singleton);
-    }
-    
-    singleton->prepare();
-    
-    StateManager::get()->pushCutScene(CUTSCENE_NAME);
-}
-*/
-
-FeatureUnlockedCutScene::FeatureUnlockedCutScene() : CutScene(CUTSCENE_NAME)
-{
+    setNeeds3D(true);
 }
 
 void FeatureUnlockedCutScene::init()

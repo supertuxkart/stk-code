@@ -23,7 +23,6 @@
 
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
-#include "guiengine/cutscene.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
@@ -38,49 +37,27 @@ namespace GUIEngine
 {
     Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
     
-    IGUIEnvironment* g_env;
-    Skin* g_skin = NULL;
-    IGUIFont* g_font;
-    IrrlichtDevice* g_device;
-    IVideoDriver* g_driver;
-    
-    ptr_vector<Screen, HOLD> g_loaded_screens;
-    Screen* g_current_screen = NULL;
+    namespace Private
+    {
+        IGUIEnvironment* g_env;
+        Skin* g_skin = NULL;
+        IGUIFont* g_font;
+        IrrlichtDevice* g_device;
+        IVideoDriver* g_driver;
+        Screen* g_current_screen = NULL;
+        AbstractStateManager* g_state_manager = NULL;
+    }
+    using namespace Private;
+        
     ptr_vector<Widget, REF> needsUpdate;
+    ptr_vector<Screen, HOLD> g_loaded_screens;
 
-    AbstractStateManager* g_state_manager = NULL;
-    
     float dt = 0;
     
     float getLatestDt()
     {
         return dt;
     }
-// -----------------------------------------------------------------------------
-IrrlichtDevice* getDevice()
-{
-    return g_device;
-}
-// -----------------------------------------------------------------------------
-IGUIFont* getFont()
-{
-    return g_font;
-}
-// -----------------------------------------------------------------------------
-IVideoDriver* getDriver()
-{
-    return g_driver;
-}
-// -----------------------------------------------------------------------------
-IGUIEnvironment* getGUIEnv()
-{
-    return g_env;
-}
-// -----------------------------------------------------------------------------
-AbstractStateManager* getStateManager()
-{
-    return g_state_manager;
-}
 // -----------------------------------------------------------------------------  
 void clear()
 {
@@ -143,11 +120,6 @@ void reshowCurrentScreen()
     //g_current_screen->addWidgets();
 }
 // -----------------------------------------------------------------------------
-Screen* getCurrentScreen()
-{
-    return g_current_screen;
-}
-// -----------------------------------------------------------------------------
 void cleanUp()
 {
     if(g_skin != NULL) delete g_skin;
@@ -208,7 +180,7 @@ void render(float elapsed_time)
     
     const GameState gamestate = g_state_manager->getGameState();
     
-    if (gamestate == MENU)
+    if (gamestate == MENU && !GUIEngine::getCurrentScreen()->needs3D())
     {
         g_skin->drawBgImage();
     }

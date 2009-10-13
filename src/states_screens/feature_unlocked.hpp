@@ -1,12 +1,11 @@
 #ifndef HEADER_FEATURE_UNLOCKED_HPP
 #define HEADER_FEATURE_UNLOCKED_HPP
 
-#include "guiengine/cutscene.hpp"
 #include "guiengine/screen.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 
-class FeatureUnlockedCutScene : public GUIEngine::CutScene, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
+class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
     friend class GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>;
     

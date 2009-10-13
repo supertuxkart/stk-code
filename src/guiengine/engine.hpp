@@ -212,11 +212,24 @@ namespace GUIEngine
     class CutScene;
     class Widget;
     
-    extern IrrlichtDevice* getDevice();
-    extern irr::gui::IGUIEnvironment* getGUIEnv();
-    extern irr::video::IVideoDriver* getDriver();
-    extern irr::gui::IGUIFont* getFont();
-    extern AbstractStateManager* getStateManager();
+    // In an attempt to make getters as fast as possible by possibly allowing inlining
+    namespace Private
+    {
+        extern irr::gui::IGUIEnvironment* g_env;
+        extern Skin* g_skin;
+        extern irr::gui::IGUIFont* g_font;
+        extern IrrlichtDevice* g_device;
+        extern irr::video::IVideoDriver* g_driver;
+        extern Screen* g_current_screen;
+        extern AbstractStateManager* g_state_manager;
+    }
+    
+    inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }
+    inline irr::gui::IGUIEnvironment* getGUIEnv()        { return Private::g_env;            }
+    inline irr::video::IVideoDriver*  getDriver()        { return Private::g_driver;         }
+    inline irr::gui::IGUIFont*        getFont()          { return Private::g_font;           }
+    inline Screen*                    getCurrentScreen() { return Private::g_current_screen; }
+    inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
     
     float getLatestDt();
     
@@ -234,7 +247,6 @@ namespace GUIEngine
     void clear();
     void cleanForGame();
     
-    Screen* getCurrentScreen();
     void reshowCurrentScreen();
     
     void render(float dt);
