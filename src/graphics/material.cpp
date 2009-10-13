@@ -138,8 +138,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->MaterialType = video::EMT_SPHERE_MAP;
     else if(m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    if(m_clamp_tex)
-        m->setFlag(video::EMF_TEXTURE_WRAP, video::ETC_CLAMP);
     
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
