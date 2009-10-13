@@ -50,7 +50,7 @@ namespace GUIEngine
     using namespace Private;
         
     ptr_vector<Widget, REF> needsUpdate;
-    ptr_vector<Screen, HOLD> g_loaded_screens;
+    ptr_vector<Screen, REF> g_loaded_screens;
 
     float dt = 0;
     
@@ -122,9 +122,12 @@ void reshowCurrentScreen()
 // -----------------------------------------------------------------------------
 void cleanUp()
 {
-    if(g_skin != NULL) delete g_skin;
+    if (g_skin != NULL) delete g_skin;
     g_skin = NULL;
-    g_loaded_screens.clearAndDeleteAll();
+    for (int i=0; i<g_loaded_screens.size(); i++)
+    {
+        g_loaded_screens[i].forgetWhatWasLoaded();
+    }
     
     g_current_screen = NULL;
     needsUpdate.clearWithoutDeleting();

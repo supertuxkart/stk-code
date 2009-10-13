@@ -123,7 +123,11 @@ void AbstractStateManager::reshowTopMostMenu()
     assert(m_game_mode != GAME);
     
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
+    if (m_menu_stack.size() > 0) 
+    {
+        Screen* currScreen = getCurrentScreen();
+        if (currScreen != NULL) getCurrentScreen()->tearDown();
+    }
     
     switchToScreen( m_menu_stack[m_menu_stack.size()-1].c_str() );
     

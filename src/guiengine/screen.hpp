@@ -35,11 +35,17 @@ namespace GUIEngine
     template<typename SCREEN>
     class ScreenSingleton
     {
-    public:
-
-        static SCREEN* getInstance()
+        // Weird code to work around C++ (making it easy to use)
+        // Used to create, get and delete singleton instance
+        static SCREEN* singletonOperate(bool deleteInstance=false)
         {
             static SCREEN* singleton = NULL;
+            
+            if (deleteInstance && singleton != NULL)
+            {
+                singleton = NULL;
+                return NULL;
+            }
             
             if (singleton == NULL)
             {
@@ -49,6 +55,19 @@ namespace GUIEngine
             
             return singleton;
         }
+        
+    public:
+
+        ~ScreenSingleton()
+        {
+            singletonOperate(true);
+        }
+        
+        static SCREEN* getInstance()
+        {
+            return singletonOperate();
+        }
+        
     };
     
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
@@ -83,6 +102,10 @@ namespace GUIEngine
           * screens that may use it to perform some operations only once. initialized to false.
           */
         bool m_inited;
+        
+        /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
+            (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
+        void forgetWhatWasLoaded();
         
         Screen(); /**< creates a dummy incomplete object; only use to override behaviour in sub-class */
         Screen(const char* filename);

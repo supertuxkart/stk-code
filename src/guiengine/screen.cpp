@@ -59,6 +59,12 @@ Screen::Screen()
     m_render_3d = false;
 }
 
+void Screen::forgetWhatWasLoaded()
+{
+    m_loaded = false;
+    m_widgets.clearAndDeleteAll();
+}
+
 #if 0
 #pragma mark -
 #pragma mark Load/Init
