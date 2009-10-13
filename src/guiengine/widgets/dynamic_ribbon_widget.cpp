@@ -563,11 +563,11 @@ void DynamicRibbonWidget::updateItemDisplay()
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
-            IGUIButton* button = dynamic_cast<IGUIButton*>(icon->m_element);
+            IGUIButton* button = icon->getIrrlichtElement<IGUIButton>();
             assert(button != NULL);
             
             int col_scroll = i + m_scroll_offset;
-            while(col_scroll > max_scroll) col_scroll -= max_scroll+1;
+            while (col_scroll > max_scroll) col_scroll -= max_scroll+1;
             
             icon_id = (col_scroll)*row_amount + n;
             
