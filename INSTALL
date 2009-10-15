@@ -7,8 +7,7 @@ General
 First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
-  * Irrlicht 1.5 
-  * SDL 1.2 or later
+  * Irrlicht 1.6
   * OpenAL
 
 Unpack the files from the tarball like this:
@@ -38,7 +37,7 @@ See the --help output of configure for further options.
 
 SVN STK on Ubuntu
 -----------------
-Here are the compilation instructions for the current svn(2009-09-21) of
+Here are the compilation instructions for the current svn(2009-10-15) of
 Super Tux Kart originally contributed by Damien for Ubuntu Edgy, and updated
 to 9.04 version:
 
@@ -49,12 +48,8 @@ libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
 do a:
 $ svn checkout https://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/main/branches/irrlicht
 
-Get irrlicht-1.5.zip and unzip it, then replace versions with newer ones:
-$ cp irrlicht/irrlicht_1.5_update/include/IVideoDriver.h irrlicht-1.5/include/
-$ cp irrlicht/irrlicht_1.5_update/source/Irrlicht/COpenGLDriver.* irrlicht-1.5/source/Irrlicht/
-
-Compile irrlicht:
-$ cd irrlicht-1.5/source/Irrlicht/
+Get irrlicht-1.6.zip and unzip it, compile irrlicht:
+$ cd irrlicht-1.6/source/Irrlicht/
 $ make
 $ cd ../../..
 $ pwd
@@ -62,7 +57,7 @@ $ pwd
 
 then we can move to stk, remember to replace the output of pwd below:
 $ cd trunk
-$ ./autogen.sh && ./configure --enable-irrlicht --with-irrlicht=/some/path/irrlicht-1.5/ && make
+$ ./autogen.sh && ./configure --enable-irrlicht --with-irrlicht=/some/path/irrlicht-1.6/ && make
 and if all went well:
 $ src/supertuxkart
 
