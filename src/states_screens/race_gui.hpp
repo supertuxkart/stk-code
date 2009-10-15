@@ -136,7 +136,8 @@ private:
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
                               const core::vector2df &center,
-                              core::array<core::vector2df> *v);
+                              const video::SColor &color,
+                              video::S3DVertex *v, unsigned short int *index);
 
     /* Display informat on screen */
     void drawStatusText        ();

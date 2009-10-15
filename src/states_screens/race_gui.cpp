@@ -114,15 +114,17 @@ void RaceGUI::createMarkerTexture()
         core::vector2df center((float)((m_marker_rendered_size>>1)+i*m_marker_rendered_size), 
                                (float)(m_marker_rendered_size>>1)                   );
         int count = kp->getShape();
-        core::array<core::vector2df> vertices;
-        createRegularPolygon(count, (float)radius, center,&vertices);
+        //core::array<core::vector2df> vertices;
+        video::S3DVertex *vertices = new video::S3DVertex[count+1];
+        unsigned short int *index                 = new unsigned short int[count+1];
+        video::SColor color        = kp->getColor();
+        createRegularPolygon(count, (float)radius, center, color, 
+                             vertices, index);
 
-        video::SColor color = kp->getColor();
-        core::array<video::SColor> colors;
-        colors.push_back(color);
-#ifdef IRRLICHT_HAS_SUPERTUXKART_POLYGON
-        irr_driver->getVideoDriver()->draw2DPolygon(vertices, &colors);
-#endif
+        irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
+            index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+        delete vertices;
+        delete index;
     }
 
     m_marker = rttProvider.renderToTexture(-1, /*is_2d_render*/true);
@@ -138,16 +140,19 @@ void RaceGUI::createMarkerTexture()
  */
 void RaceGUI::createRegularPolygon(unsigned int n, float radius, 
                                    const core::vector2df &center,
-                                   core::array<core::vector2df> *v)
+                                   const video::SColor &color,
+                                   video::S3DVertex *v, unsigned short int *index)
 {
     float f = 2*M_PI/(float)n;
     for (unsigned int i=0; i<n; i++)
     {
         float p = i*f;
         core::vector2df X = center + core::vector2df(sin(p)*radius, -cos(p)*radius);
-        v->push_back(X);
+        v[i].Pos.X = X.X;
+        v[i].Pos.Y = X.Y;
+        v[i].Color = color;
+        index[i]   = i;
     }
-
 }   // createRegularPolygon
 
 //-----------------------------------------------------------------------------
@@ -435,36 +440,48 @@ void RaceGUI::drawSpeed(Kart* kart, int offset_x, int offset_y,
 #else
     core::dimension2di bar_size    = bar_texture->getOriginalSize();
 #endif
-    core::array<core::vector2di> tex_coords;        // texture coordinates
-    core::array<core::vector2df> bar_vertices;      // screen coordinates
+    video::S3DVertex vertices[4];
 
-    tex_coords.push_back(core::vector2di(bar_size.Width, bar_size.Height));
-    bar_vertices.push_back(core::vector2df((float)meter_pos.LowerRightCorner.X, 
-                                           (float)meter_pos.LowerRightCorner.Y));
-    tex_coords.push_back(core::vector2di(0,bar_size.Height));
-    bar_vertices.push_back(core::vector2df((float)meter_pos.UpperLeftCorner.X, 
-                                           (float)meter_pos.LowerRightCorner.Y));
-
+    vertices[0].TCoords = core::vector2df(1.0f, 1.0f);
+    vertices[0].Pos = core::vector3df((float)meter_pos.LowerRightCorner.X,
+                                      (float)meter_pos.LowerRightCorner.Y,
+                                      0);
+    vertices[1].TCoords = core::vector2df(0, 1.0f);
+    vertices[1].Pos = core::vector3df((float)meter_pos.UpperLeftCorner.X, 
+                                      (float)meter_pos.LowerRightCorner.Y, 0);
+    unsigned int count;
     if(speed_ratio<=0.5f)
     {
-        core::vector2di v0(0, bar_size.Height-(int)(2*(speed_ratio)*bar_size.Height));
-        tex_coords.push_back(v0);
-        bar_vertices.push_back(core::vector2df((float)meter_pos.UpperLeftCorner.X, 
-                                               (float)meter_pos.LowerRightCorner.Y-speed_ratio*2*meter_height));
+        count = 3;
+        vertices[2].TCoords = core::vector2df(0, 1-2*speed_ratio);
+        vertices[2].Pos = core::vector3df((float)meter_pos.UpperLeftCorner.X, 
+                                          (float)meter_pos.LowerRightCorner.Y-speed_ratio*2*meter_height,
+                                          0);
     }
     else
     {
-        tex_coords.push_back(core::vector2di(0, 0));
-        bar_vertices.push_back(core::vector2df((float)offset_x, 
-                                               (float)(UserConfigParams::m_height-offset_y-meter_height)));
-
-        core::vector2di v0((int)(2*(speed_ratio-0.5f)*bar_size.Width), 0);
-        tex_coords.push_back(v0);
-        bar_vertices.push_back(core::vector2df(offset_x+2*(speed_ratio-0.5f)*meter_width, 
-                                               (float)(UserConfigParams::m_height-offset_y-meter_height)));
+        count = 4;
+        vertices[2].TCoords = core::vector2df(0,0);
+        vertices[2].Pos = core::vector3df((float)offset_x, 
+                                          (float)(UserConfigParams::m_height-offset_y-meter_height),
+                                          0);
+        vertices[3].TCoords = core::vector2df(2*speed_ratio-1.0f, 0);
+        vertices[3].Pos = core::vector3df(offset_x+2*(speed_ratio-0.5f)*meter_width, 
+                                          (float)(UserConfigParams::m_height-offset_y-meter_height),
+                                           0);
     }
-#ifdef IRRLICHT_HAS_SUPERTUXKART_POLYGON
-    irr_driver->getVideoDriver()->draw2DPolygon(bar_vertices, NULL, bar_texture, true, &tex_coords);
+    short int index[4];
+    for(unsigned int i=0; i<count; i++)
+    {
+        index[i]=i;
+        vertices[i].Color = video::SColor(255, 255, 255, 255);
+    }
+    video::SMaterial m;
+    m.setTexture(0, m_speed_bar_icon->getTexture());
+    irr_driver->getVideoDriver()->setMaterial(m);
+#ifdef DOES_NOT_WORK_ATM
+    irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
+        index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 #endif
 } // drawSpeed
 
