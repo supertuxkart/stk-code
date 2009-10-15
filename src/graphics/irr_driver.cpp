@@ -652,9 +652,9 @@ void IrrDriver::update(float dt)
             }
         }
         
-        if (GUIEngine::getCurrentScreen()->needs3D())
+        if (inRace || GUIEngine::getCurrentScreen()->needs3D())
         {
-            // render 3D stuff in cutscene mode too
+            // render 3D stuff in cutscenes too
             m_scene_manager->drawAll();
         }
         
