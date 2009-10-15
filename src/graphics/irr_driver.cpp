@@ -155,20 +155,23 @@ void IrrDriver::initDevice()
         exit(-1);
     }
 
-    m_device->getVideoDriver()->setTextureCreationFlag(
-                                                    video::ETCF_CREATE_MIP_MAPS,
-                                                    true);
-//     m_device->getVideoDriver()->setTextureCreationFlag(
-//                                                     video::ETCF_OPTIMIZED_FOR_SPEED ,
-//                                                     true);
-//     m_device->getVideoDriver()->setTextureCreationFlag(
-//                                                     video::ETCF_ALWAYS_16_BIT ,
-//                                                     true);
 
     // Stores the new file system pointer.
     file_manager->setDevice(m_device);
     m_device->setWindowCaption(L"SuperTuxKart");
     m_scene_manager = m_device->getSceneManager();
+    // Force creation of mipmaps even if the mipmaps flag in a b3d file
+    // does not set the 'enable mipmap' flag.
+    m_scene_manager->getParameters()->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
+    m_device->getVideoDriver()->setTextureCreationFlag(
+                                                    video::ETCF_CREATE_MIP_MAPS,
+                                                    true);
+    //m_device->getVideoDriver()->setTextureCreationFlag(
+    //                                                   video::ETCF_OPTIMIZED_FOR_SPEED ,
+    //                                                   true);
+    //m_device->getVideoDriver()->setTextureCreationFlag(
+    //                                                   video::ETCF_ALWAYS_16_BIT ,
+    //                                                   true);
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
     const std::string &font = file_manager->getFontFile("DomesticManners.xml");
