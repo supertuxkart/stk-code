@@ -1,3 +1,8 @@
+SuperTuxkart 0.6.2a (October 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: STK would crash while trying to save the config file
+          on Windows Vista.
+
 SuperTuxkart 0.6.2 (July 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Bugfix: battle mode would not display track groups.

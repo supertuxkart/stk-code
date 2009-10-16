@@ -1,6 +1,11 @@
-SuperTuxKart 0.6.2 (July 2009)
+SuperTuxKart 0.6.2a (October 2009)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Bugfix: game could crash in rare circumstances.
+* Bugfix: STK would crash while trying to save the config file
+          on Windows Vista.
+
+SuperTuxKart 0.6.2 (July 2009)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Bugfix: Game could crash in rare circumstances.
 * Bugfix: Restarting a GP (with the in-race menu ESC) would
           not subtract already allocated points.
 * Bugfix: A race could be finished with an invalid shortcut.
