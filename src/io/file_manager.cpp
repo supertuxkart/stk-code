@@ -32,6 +32,9 @@
      //   Some portabilty defines
 #  endif
 #  define CONFIGDIR       "."
+#elif defined(__APPLE__)
+#  include <unistd.h>
+#  define CONFIGDIR       "Library/Application Support/SuperTuxKart"
 #else
 #  include <unistd.h>
 #  define CONFIGDIR       ".supertuxkart"
@@ -349,7 +352,6 @@ std::string FileManager::getHomeDir() const
         DIRNAME=s.str();
     }
     else DIRNAME=".";
-
 #else
     if(getenv("HOME")!=NULL)
     {
@@ -357,7 +359,13 @@ std::string FileManager::getHomeDir() const
     }
     else
     {
+    #ifdef __APPLE__
+        fprintf(stderr, "Home directory is undefined, this should NOT happen!\n");
+        // Fall back to system-wide app data (rather than user-specific data), but should not happen anyway.
+        DIRNAME = "";
+    #else
         DIRNAME = ".";
+    #endif
     }
     DIRNAME += "/";
     DIRNAME += CONFIGDIR;
