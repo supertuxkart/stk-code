@@ -262,9 +262,15 @@ std::string FileManager::getHomeDir() const
 {
     std::string DIRNAME;
 #ifdef WIN32
-    // For now the old windows config way is used: store a config file
-    // in the current directory (in other OS a special subdirectory is created)
-    DIRNAME=".";
+    // Try to use the APPDATA directory to store config files and highscore
+    // lists. If not defined, used the current directory.
+    std::ostringstream s;
+    if(getenv("APPDATA")!=NULL)
+    {
+        s<<getenv("APPDATA")<<"/supertuxkart/";
+        DIRNAME=s.str();
+    }
+    else DIRNAME=".";
 #else
     if(getenv("HOME")!=NULL)
     {
