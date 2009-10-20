@@ -77,13 +77,13 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     std::string s;
     if(!root->get("name", &s) ) error("name");
-    setName(s);
+    setName( _(s.c_str()) );
 
     if(!root->get("id", &s) ) error("id");
     setId(s);
 
     if(!root->get("description", &s) ) error("description");
-    setChallengeDescription(s);
+    setChallengeDescription( _(s.c_str()) );
 
     if(!root->get("karts", &m_num_karts)  ) error("karts");
 

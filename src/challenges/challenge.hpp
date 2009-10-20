@@ -49,19 +49,17 @@ private:
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
     std::string              m_Id;                    // short, internal name for this challenge
-    std::string              m_Name;                  // name used in menu for this challenge
-    std::string              m_challenge_description; // Message the user gets when the feature is not yet unlocked
+    irr::core::stringw       m_Name;                  // name used in menu for this challenge
+    irr::core::stringw       m_challenge_description; // Message the user gets when the feature is not yet unlocked
     std::vector<UnlockableFeature> m_feature;         // Features to unlock
     std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
              Challenge(const std::string &id, const std::string &name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
-    const std::string
-         &getId() const                           { return m_Id;                  }
-    const std::string
-         &getName() const                         { return m_Name;                }
-    void  setName(const std::string& s)           { m_Name = s;                   }
+    const std::string &getId() const              { return m_Id;                  }
+    const irr::core::stringw &getName() const     { return m_Name;                }
+    void  setName(const irr::core::stringw & s)   { m_Name = s;                   }
     void  setId(const std::string& s)             { m_Id = s;                     }
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
@@ -75,9 +73,9 @@ public:
     const irr::core::stringw getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
-    void  setChallengeDescription(const std::string& d) 
+    void  setChallengeDescription(const irr::core::stringw& d) 
                                                  {m_challenge_description=d;      }
-    const std::string& 
+    const irr::core::stringw& 
           getChallengeDescription() const        {return m_challenge_description; }
     void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
     bool  isSolved() const                       {return m_state==CH_SOLVED;      }

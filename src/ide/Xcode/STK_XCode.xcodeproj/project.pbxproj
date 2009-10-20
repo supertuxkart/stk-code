@@ -21,6 +21,7 @@
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
 		9507E9DB0FC1CDD500BD2B92 /* Vorbis.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FB0FC1B63C00DB481B /* Vorbis.framework */; };
+		951B7D19108E52C900BC03AE /* challenges.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951B7D18108E52C900BC03AE /* challenges.cpp */; };
 		951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 951BC65C0FFAF290006B5FF1 /* ipo.cpp */; };
 		9522F125107948AD0067ECF5 /* main_menu_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F124107948AD0067ECF5 /* main_menu_screen.cpp */; };
 		9522F15B107949780067ECF5 /* race_setup_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9522F15A107949780067ECF5 /* race_setup_screen.cpp */; };
@@ -327,6 +328,8 @@
 		9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../bullet/Demos/OpenGL/RenderTexture.cpp; sourceTree = SOURCE_ROOT; };
 		9507E9510FC1C8C200BD2B92 /* RenderTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTexture.h; path = games/supertuxkart/src/bullet/Demos/OpenGL/RenderTexture.h; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = stk.icns; sourceTree = SOURCE_ROOT; };
+		951B7D17108E52C900BC03AE /* challenges.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenges.hpp; path = ../../states_screens/challenges.hpp; sourceTree = SOURCE_ROOT; };
+		951B7D18108E52C900BC03AE /* challenges.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges.cpp; path = games/supertuxkart/src/states_screens/challenges.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		951BC65C0FFAF290006B5FF1 /* ipo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipo.cpp; path = ../../animations/ipo.cpp; sourceTree = SOURCE_ROOT; };
 		951BC65D0FFAF290006B5FF1 /* ipo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ipo.hpp; path = ../../animations/ipo.hpp; sourceTree = SOURCE_ROOT; };
 		951C357D0FC05BF400A48379 /* quad_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad_set.hpp; path = ../../tracks/quad_set.hpp; sourceTree = SOURCE_ROOT; };
@@ -1250,6 +1253,8 @@
 			isa = PBXGroup;
 			children = (
 				95833236101243ED00C5137E /* dialogs */,
+				951B7D18108E52C900BC03AE /* challenges.cpp */,
+				951B7D17108E52C900BC03AE /* challenges.hpp */,
 				958330C210122B4A00C5137E /* credits.cpp */,
 				958330C310122B4A00C5137E /* credits.hpp */,
 				95D2343E1078227A00625256 /* feature_unlocked.cpp */,
@@ -2546,6 +2551,7 @@
 				9522F1EF107961560067ECF5 /* options_screen_av.cpp in Sources */,
 				9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */,
 				9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */,
+				951B7D19108E52C900BC03AE /* challenges.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

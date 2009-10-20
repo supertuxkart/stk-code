@@ -19,6 +19,7 @@
 
 #include "guiengine/widget.hpp"
 #include "main_loop.hpp"
+#include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/help_screen_1.hpp"
@@ -77,6 +78,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name)
     else if (selection == "help")
     {
         StateManager::get()->pushScreen(HelpScreen1::getInstance());
+    }
+    else if (selection == "challenges")
+    {
+        StateManager::get()->pushScreen(ChallengesScreen::getInstance());
     }
     
 }
