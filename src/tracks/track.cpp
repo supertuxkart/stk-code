@@ -528,6 +528,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 void Track::update(float dt)
 {
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
+    m_light->getLightData().AmbientColor  = m_ambient_color;
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
