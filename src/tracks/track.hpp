@@ -134,11 +134,11 @@ private:
     float               m_fog_start;
     float               m_fog_end;
     core::vector3df     m_sun_position;
-    video::SColor       m_default_ambient_color;
     video::SColor       m_ambient_color;
-    video::SColorf      m_specular_color;
-    video::SColorf      m_diffuse_color;
-    video::SColorf      m_sky_color;
+    video::SColor       m_default_ambient_color;
+    video::SColor       m_sun_ambient_color;
+    video::SColor       m_sun_specular_color;
+    video::SColor       m_sun_diffuse_color;
     video::SColor       m_fog_color;
 
     /** The texture for the mini map, which is displayed in the race gui. */

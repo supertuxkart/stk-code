@@ -183,18 +183,17 @@ btTransform Track::getStartTransform(unsigned int pos) const
 void Track::loadTrackInfo(const std::string &filename)
 {
     // Default values
-    m_use_fog           = false;
-    m_fog_density       = 1.0f/100.0f;
-    m_fog_start         = 0.0f;
-    m_fog_end           = 1000.0f;
-    m_gravity           = 9.80665f;
-    m_sun_position      = core::vector3df(0.4f, 0.4f, 0.4f);
-    m_sky_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f);
-    m_fog_color         = video::SColorf(0.3f, 0.7f, 0.9f, 1.0f).toSColor();
+    m_use_fog               = false;
+    m_fog_density           = 1.0f/100.0f;
+    m_fog_start             = 0.0f;
+    m_fog_end               = 1000.0f;
+    m_gravity               = 9.80665f;
+    m_fog_color             = video::SColor( 77, 179, 230, 255);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
-    m_specular_color    = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_diffuse_color     = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);    
-    XMLNode *root       = file_manager->createXMLTree(m_filename);
+    m_sun_ambient_color     = video::SColor(255, 120, 120, 120);
+    m_sun_specular_color    = video::SColor(255, 255, 255, 255);
+    m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
+    XMLNode *root           = file_manager->createXMLTree(m_filename);
         
     if(!root || root->getName()!="track")
     {
@@ -214,16 +213,6 @@ void Track::loadTrackInfo(const std::string &filename)
     getMusicInformation(filenames, m_music);
     root->get("item",                  &m_item_style);
     root->get("screenshot",            &m_screenshot);
-    root->get("sky-color",             &m_sky_color);
-    root->get("use-fog",               &m_use_fog);
-    root->get("fog-color",             &m_fog_color);
-    root->get("fog-density",           &m_fog_density);
-    root->get("fog-start",             &m_fog_start);
-    root->get("fog-end",               &m_fog_end);
-    root->get("sun-position",          &m_sun_position);
-    root->get("sun-ambient",           &m_ambient_color);
-    root->get("sun-specular",          &m_specular_color);
-    root->get("sun-diffuse",           &m_diffuse_color);
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
@@ -735,6 +724,19 @@ void Track::loadTrackModel(unsigned int mode_id)
 		{
 			m_check_manager = new CheckManager(*node, this);
 		}
+        else if(name=="sun")
+        {
+            node->get("xyz",           &m_sun_position );
+            node->get("ambient-color", &m_default_ambient_color);
+            node->get("sun-color",     &m_sun_ambient_color);
+            node->get("sun-specular",  &m_sun_specular_color);
+            node->get("sun-diffuse",   &m_sun_diffuse_color);
+            node->get("fog",           &m_use_fog);
+            node->get("fog-color",     &m_fog_color);
+            node->get("fog-density",   &m_fog_density);
+            node->get("fog-start",     &m_fog_start);
+            node->get("fog-end",       &m_fog_end);
+        }
         else if(name=="sky-dome" || name=="sky-box")
         {
             handleSky(*node, path);
@@ -788,14 +790,14 @@ void Track::loadTrackModel(unsigned int mode_id)
 
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
 
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position, 
-                                                               video::SColorf(1.0f,1.0f,1.0f));
+    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position,
+                                                               m_sun_ambient_color);
     m_light->setLightType(video::ELT_DIRECTIONAL);
     m_light->setRotation( core::vector3df(180, 45, 45) );
+    m_light->getLightData().AmbientColor  = m_sun_ambient_color;
+    m_light->getLightData().DiffuseColor  = m_sun_diffuse_color;
+    m_light->getLightData().SpecularColor = m_sun_specular_color;
 
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    
     /*
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, m_sun_position);
     video::SLight light;
