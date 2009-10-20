@@ -41,7 +41,7 @@ namespace GUIEngine
   * mainly through AbstractStateManager, and also to widgets (this class is some kind of bridge between
   * the base irrLicht GUI engine and the STK layer on top of it)
   */
-    class EventHandler : public irr::IEventReceiver
+class EventHandler : public irr::IEventReceiver
 {
     EventPropagation onGUIEvent(const irr::SEvent& event);
     EventPropagation onWidgetActivated(Widget* w, const int playerID);

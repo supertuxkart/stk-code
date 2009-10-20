@@ -81,14 +81,14 @@ EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
     textCtrl->getIrrlichtElement()->remove();
 }
-bool EnterPlayerNameDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
     {
         dismiss();
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
-    return false;
+    return GUIEngine::EVENT_LET;
 }
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {

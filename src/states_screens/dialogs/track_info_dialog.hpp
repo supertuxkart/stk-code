@@ -42,7 +42,7 @@ public:
     TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
                     irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
     void onEnterPressedInternal();
-    bool processEvent(std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(std::string& eventSource);
 };
 
 #endif

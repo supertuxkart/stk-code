@@ -41,7 +41,7 @@ public:
     PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
     void onEnterPressedInternal();
-    bool processEvent(std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(std::string& eventSource);
 };
   
 

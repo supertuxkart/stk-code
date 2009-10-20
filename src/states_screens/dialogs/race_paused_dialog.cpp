@@ -214,7 +214,7 @@ void RacePausedDialog::onEnterPressedInternal()
 {
 }
 
-bool RacePausedDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSource)
 {
     std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << ")\n";
     
@@ -222,7 +222,7 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
     {
         // unpausing is done in the destructor so nothing more to do here
         ModalDialog::dismiss();
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "choiceribbon")
     {
@@ -235,19 +235,19 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             input_manager->setMode(InputManager::MENU);
-            return true;
+            return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")
         {
             dismiss();
             StateManager::get()->pushScreen(HelpScreen1::getInstance());
-            return true;
+            return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "options")
         {
             dismiss();
             StateManager::get()->pushScreen(OptionsScreenAV::getInstance());
-            return true;
+            return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "restart")
         {
@@ -255,14 +255,14 @@ bool RacePausedDialog::processEvent(std::string& eventSource)
             network_manager->setState(NetworkManager::NS_MAIN_MENU);
             RaceManager::getWorld()->unpause();
             race_manager->rerunRace();
-            return true;
+            return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "newrace")
         {
-            // TODO
+            return GUIEngine::EVENT_BLOCK;
         }
     }
-    return false;
+    return GUIEngine::EVENT_LET;
 }
 
 RacePausedDialog::~RacePausedDialog()

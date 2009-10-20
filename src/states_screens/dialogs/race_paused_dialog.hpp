@@ -36,7 +36,7 @@ public:
     virtual ~RacePausedDialog();
     
     void onEnterPressedInternal();
-    bool processEvent(std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(std::string& eventSource);
 };
 
 #endif

@@ -241,7 +241,7 @@ void RaceOverDialog::onEnterPressedInternal()
 {
 }
 
-bool RaceOverDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "raceagainbtn")
     {
@@ -249,7 +249,7 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         network_manager->setState(NetworkManager::NS_MAIN_MENU);
         RaceManager::getWorld()->unpause();
         race_manager->rerunRace();
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "newracebtn")
     {
@@ -258,7 +258,7 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "backtomenu")
     {
@@ -267,16 +267,16 @@ bool RaceOverDialog::processEvent(std::string& eventSource)
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         input_manager->setMode(InputManager::MENU);
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "continuegp")
     {
         ModalDialog::dismiss();
         RaceManager::getWorld()->unpause();
         race_manager->next();
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
-    return false;
+    return GUIEngine::EVENT_LET;
 }
 
 

@@ -20,6 +20,7 @@
 
 #include "irrlicht.h"
 #include "utils/ptr_vector.hpp"
+#include "guiengine/event_handler.hpp"
 #include "guiengine/skin.hpp"
 
 class PlayerProfile;
@@ -55,8 +56,8 @@ public:
     
     virtual ~ModalDialog();
     
-    /** Returns whether to block event propagation */
-    virtual bool processEvent(std::string& eventSource){ return false; }
+    /** Returns whether to block event propagation (usually, you will want to block events you processed) */
+    virtual EventPropagation processEvent(std::string& eventSource){ return EVENT_LET; }
     
     static void dismiss();
     static void onEnterPressed();

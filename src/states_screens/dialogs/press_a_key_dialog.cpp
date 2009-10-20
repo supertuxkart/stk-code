@@ -57,13 +57,13 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     widget2->add();
 }
 // ------------------------------------------------------------------------------------------------------
-bool PressAKeyDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation PressAKeyDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
     {
         input_manager->setMode(InputManager::MENU);
         dismiss();
-        return true;
+        return GUIEngine::EVENT_BLOCK;
     }
-    return false;
+    return GUIEngine::EVENT_LET;
 }

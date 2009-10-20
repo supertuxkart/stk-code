@@ -79,7 +79,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             case EGET_LISTBOX_SELECTED_AGAIN:
             {
                 Widget* w = GUIEngine::getWidget(id);
-                if(w == NULL) break;
+                if (w == NULL) break;
                 
                 // FIXME: don't hardcode player 0
                 return onWidgetActivated(w, 0);
@@ -157,7 +157,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
 {
     if (ModalDialog::isADialogActive())
     {
-        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID])) return EVENT_LET;
+        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
         if (w->m_event_handler == NULL) return EVENT_LET;
     }
     
@@ -295,7 +295,8 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             {
                 IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
                 Widget* w = GUIEngine::getWidget( element->getID() );
-                if(w == NULL) break;
+                if (w == NULL) break;
+                // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
             }
             
