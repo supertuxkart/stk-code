@@ -183,7 +183,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             // notify modal dialog too
             if (ModalDialog::isADialogActive())
             {
-                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID])) return EVENT_LET;
+                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
             }
             
             transmitEvent(parent, parent->m_properties[PROP_ID]);

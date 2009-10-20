@@ -25,8 +25,9 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/options_screen_av.hpp"
+#include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/options_screen_av.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -229,6 +230,10 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
         // FIXME : don't hardcode player 0
         const int playerId = 0;
         const std::string& selection = m_choice_ribbon->getSelectionIDString(playerId);
+        
+        std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << " : " << selection << ")\n";
+
+        
         if (selection == "exit")
         {
             ModalDialog::dismiss();
@@ -259,6 +264,11 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
         }
         else if (selection == "newrace")
         {
+            ModalDialog::dismiss();
+            RaceManager::getWorld()->unpause();
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
             return GUIEngine::EVENT_BLOCK;
         }
     }
