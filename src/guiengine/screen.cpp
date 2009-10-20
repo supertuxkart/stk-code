@@ -304,16 +304,16 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
  */
 void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL) within_vector = &m_widgets;
+    if (within_vector == NULL) within_vector = &m_widgets;
     const unsigned short widgets_amount = within_vector->size();
     
-    for(int n=0; n<widgets_amount; n++)
+    for (int n=0; n<widgets_amount; n++)
     {
         Widget& widget = (*within_vector)[n];
         
-        widget.m_element = NULL;
+        widget.elementRemoved();
         
-        if(widget.m_children.size() > 0)
+        if (widget.m_children.size() > 0)
         {
             elementsWereDeleted( &(widget.m_children) );
         }

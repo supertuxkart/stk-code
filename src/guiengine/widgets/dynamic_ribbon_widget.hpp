@@ -151,7 +151,7 @@ namespace GUIEngine
         
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
-        void clearItems(bool widgetsToo=false);
+        void clearItems();
         
         /** Register a listener to be notified of selection changes within the ribbon */
         void registerHoverListener(DynamicRibbonHoverListener* listener);
@@ -180,6 +180,11 @@ namespace GUIEngine
         const std::vector<ItemDescription>& getItems() const { return m_items; }
         
         void setSelection(int item_id, const int playerID);
+        
+        /**
+         * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
+         */
+        virtual void elementRemoved();
     };
     
 }

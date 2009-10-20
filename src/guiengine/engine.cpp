@@ -62,6 +62,7 @@ namespace GUIEngine
 void clear()
 {
     g_env->clear();
+    if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
     g_current_screen = NULL;
 }
 // -----------------------------------------------------------------------------  

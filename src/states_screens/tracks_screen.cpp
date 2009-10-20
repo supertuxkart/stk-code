@@ -66,7 +66,9 @@ void TracksScreen::init()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
     
-
+    // Re-build track list everytime (accounts for locking changes, etc.)
+    w->clearItems();
+    
     const int trackAmount = track_manager->getNumberOfTracks();
     bool hasLockedTracks = false;
     for (int n=0; n<trackAmount; n++)
@@ -90,11 +92,4 @@ void TracksScreen::init()
 
 void TracksScreen::tearDown()
 {
-    // List is rebuilt everytime (for instance, locking might change, etc.)
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert(w != NULL);
-    
-    // FIXME : the 'true' argument to force deleting references to irrLicht widgets is an ugly hack
-    // Ideally the widget should find out by itself and take care of that.
-    w->clearItems(true);
 }

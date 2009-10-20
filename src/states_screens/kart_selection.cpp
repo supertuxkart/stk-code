@@ -627,11 +627,6 @@ void KartSelectionScreen::tearDown()
 {
     //g_player_karts.clearWithoutDeleting();
     g_player_karts.clearAndDeleteAll();
-    
-    // List is rebuilt everytime.
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-    assert(w != NULL);
-    w->clearItems(true);
 }
     
 // ----------------------------------------------------------------------------- 
@@ -653,6 +648,7 @@ void KartSelectionScreen::init()
               
     // Build kart list
     // (it is built everytikme, to account for .g. locking)
+    w->clearItems();
     std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
     const int kart_amount = group.size();
     

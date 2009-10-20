@@ -293,6 +293,11 @@ namespace GUIEngine
          * Call after Widget was read from XML file and laid out.
          */
         virtual void add();
+        
+        /**
+          * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
+          */
+        virtual void elementRemoved() { m_element = NULL; }
     };
 
     

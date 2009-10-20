@@ -243,16 +243,18 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     m_items.push_back(desc);
 }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::clearItems(bool widgetsToo)
+void DynamicRibbonWidget::clearItems()
 {
     m_items.clear();
-    if (widgetsToo)
-    {
-        m_children.clearWithoutDeleting();
-        m_rows.clearWithoutDeleting();
-    }
-    m_previous_item_count = 0;
 }
+
+void DynamicRibbonWidget::elementRemoved()
+{
+    Widget::elementRemoved();
+    m_previous_item_count = 0;
+    m_rows.clearWithoutDeleting();
+}
+
 
 #if 0
 #pragma mark -
