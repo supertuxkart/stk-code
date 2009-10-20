@@ -137,8 +137,8 @@ void Camera::reset()
  */
 void Camera::setInitialTransform()
 {
-    m_position = Vec3(0,0,0);
     m_target   = m_kart->getXYZ();
+    m_position = m_target - Vec3(0,50,-25);
     m_temp_position = m_position;
     m_temp_target = m_target;
 }   // updateKartPosition
