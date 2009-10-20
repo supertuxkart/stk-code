@@ -553,7 +553,7 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     int playerID = -1;
     
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-    if (w == NULL )
+    if (w == NULL)
     {
         std::cout << "playerQuit() called outside of kart selection screen.\n";
         return false;
@@ -627,6 +627,11 @@ void KartSelectionScreen::tearDown()
 {
     //g_player_karts.clearWithoutDeleting();
     g_player_karts.clearAndDeleteAll();
+    
+    // List is rebuilt everytime.
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    assert(w != NULL);
+    w->clearItems(true);
 }
     
 // ----------------------------------------------------------------------------- 
@@ -645,42 +650,38 @@ void KartSelectionScreen::init()
         karthoverListener = new KartHoverListener();
         w->registerHoverListener(karthoverListener);
     }
+              
+    // Build kart list
+    // (it is built everytikme, to account for .g. locking)
+    std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
+    const int kart_amount = group.size();
     
-    //Widget* area = this->getWidget("playerskarts");
+    // add Tux (or whatever default kart) first
+    std::string& default_kart = UserConfigParams::m_default_kart;
+    for(int n=0; n<kart_amount; n++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+        if (prop->getIdent() == default_kart)
+        {
+            std::string icon_path = file_manager->getDataDir() ;
+            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+            std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
+            break;
+        }
+    }
     
-    if (!this->m_inited)
-    {            
-        // Build kart list
-        std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
-        const int kart_amount = group.size();
-        
-        // add Tux (or whatever default kart) first
-        std::string& default_kart = UserConfigParams::m_default_kart;
-        for(int n=0; n<kart_amount; n++)
+    // add others
+    for(int n=0; n<kart_amount; n++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+        if (prop->getIdent() != default_kart)
         {
-            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            if (prop->getIdent() == default_kart)
-            {
-                std::string icon_path = file_manager->getDataDir() ;
-                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-                break;
-            }
+            std::string icon_path = file_manager->getDataDir() ;
+            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+            std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
         }
-        
-        // add others
-        for(int n=0; n<kart_amount; n++)
-        {
-            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            if (prop->getIdent() != default_kart)
-            {
-                std::string icon_path = file_manager->getDataDir() ;
-                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-            }
-        }
-        
-        this->m_inited = true;
     }
     
     /*
@@ -713,8 +714,6 @@ void KartSelectionScreen::init()
     // Player 0 select first kart (Tux)
     w->setSelection(0, 0);
     w->m_rows[0].requestFocus();
-    
-    this->m_inited = true;
 }
     
 // -----------------------------------------------------------------------------

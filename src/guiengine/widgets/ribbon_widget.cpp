@@ -360,8 +360,12 @@ void RibbonWidget::setLabel(const int id, irr::core::stringw new_name)
 int RibbonWidget::findItemNamed(const char* internalName)
 {    
     const int size = m_children.size();
+    
+    printf("Ribbon : Looking for %s among %i items\n", internalName, size);
+    
     for (int n=0; n<size; n++)
     {
+        printf("     Ribbon : Looking for %s in item %i : %s\n", internalName, n, m_children[n].m_properties[PROP_ID].c_str());
         if (m_children[n].m_properties[PROP_ID] == internalName) return n;
     }
     return -1;

@@ -148,4 +148,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
 
 void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name)
 {
+    if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
 }

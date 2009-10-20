@@ -53,6 +53,8 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const int max_rows)
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::add()
 {
+    //printf("****DynamicRibbonWidget::add()****\n");
+
     m_has_label = (m_text == "bottom");
     m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
     
@@ -140,6 +142,8 @@ void DynamicRibbonWidget::add()
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::setSubElements()
 {
+    //printf("****DynamicRibbonWidget::setSubElements()****\n");
+    
     // ---- Clean-up what was previously there
     for (int i=0; i<m_children.size(); i++)
     {
@@ -239,9 +243,15 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     m_items.push_back(desc);
 }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::clearItems()
+void DynamicRibbonWidget::clearItems(bool widgetsToo)
 {
     m_items.clear();
+    if (widgetsToo)
+    {
+        m_children.clearWithoutDeleting();
+        m_rows.clearWithoutDeleting();
+    }
+    m_previous_item_count = 0;
 }
 
 #if 0
@@ -594,6 +604,8 @@ void DynamicRibbonWidget::updateItemDisplay()
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::setSelection(int item_id)
 {
+    //printf("****DynamicRibbonWidget::setSelection()****\n");
+
     if (m_rows.size() > 1)
     {
         std::cout << "\n/!\\ Warning, DynamicRibbonWidget::setSelection only makes sense on 1-row ribbons " <<
@@ -621,6 +633,8 @@ void DynamicRibbonWidget::setSelection(int item_id)
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::setSelection(int item_id, const int playerID)
 {
+    //printf("****DynamicRibbonWidget::setSelection()****\n");
+
     m_selected_item[playerID] = item_id;
     
 
@@ -631,6 +645,7 @@ void DynamicRibbonWidget::setSelection(int item_id, const int playerID)
     
     for (int r=0; r<m_row_amount; r++)
     {
+        //printf("Looking for %s in row %i\n", name.c_str(), r);
         id = m_rows[r].findItemNamed(name.c_str());
         if (id > -1)
         {

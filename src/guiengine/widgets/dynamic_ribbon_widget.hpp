@@ -151,7 +151,7 @@ namespace GUIEngine
         
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
-        void clearItems();
+        void clearItems(bool widgetsToo=false);
         
         /** Register a listener to be notified of selection changes within the ribbon */
         void registerHoverListener(DynamicRibbonHoverListener* listener);

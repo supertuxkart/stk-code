@@ -53,6 +53,7 @@ void initGUI()
 
 void AbstractStateManager::enterGameState()
 {
+    if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.push_back("race");
     m_game_mode = GAME;
