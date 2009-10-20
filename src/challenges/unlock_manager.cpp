@@ -348,3 +348,18 @@ bool UnlockManager::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
+//-----------------------------------------------------------------------------
+const std::vector<const Challenge*>   UnlockManager::getUnlockedFeatures()
+{    
+    std::vector<const Challenge*>  out;
+    
+    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
+        i!=m_all_challenges.end();  i++)
+    {
+        if (i->second->isSolved()) out.push_back(i->second);
+    }
+    
+    return out;
+}
+
+

@@ -51,7 +51,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     const int margin_between_buttons = 12;
     const int buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
     
-    if (unlock_manager->getUnlockedFeatures().size()>0)
+    if (unlock_manager->getRecentlyUnlockedFeatures().size()>0)
     {
         // TODO: unlocked features
     }

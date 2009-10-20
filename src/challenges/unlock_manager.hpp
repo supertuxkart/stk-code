@@ -47,9 +47,15 @@ public:
     void       save              ();
     std::vector<const Challenge*> 
                getActiveChallenges();
+    
+    /** Returns the list of recently unlocked features (e.g. call at the end of a
+        race to know if any features were unlocked) */
     const std::vector<const Challenge*> 
-               getUnlockedFeatures() {return m_unlocked_features;}
+               getRecentlyUnlockedFeatures() {return m_unlocked_features;}
 
+    const std::vector<const Challenge*>   getUnlockedFeatures();
+
+    
     void       clearUnlocked     () {m_unlocked_features.clear(); }
     void       raceFinished      ();
     void       grandPrixFinished ();
