@@ -245,6 +245,8 @@ supertuxkart_SOURCES = \
  replay/replay_recorder.hpp \
  robots/default_robot.cpp \
  robots/default_robot.hpp \
+ states_screens/challenges.cpp \
+ states_screens/challenges.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
