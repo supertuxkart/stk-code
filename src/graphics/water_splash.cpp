@@ -36,7 +36,7 @@ WaterSplash::WaterSplash(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
     m_node->setPosition(core::vector3df(-m_kart->getKartWidth()*0.35f, 
                                         m_particle_size*0.25f, 
                                         -m_kart->getKartLength()*0.5f));
-    Material *m= material_manager->getMaterial("water_light.png");
+    Material *m= material_manager->getMaterial("water-splash.png");
     m->setMaterialProperties(&(m_node->getMaterial(0)));
     m_node->setMaterialTexture(0, m->getTexture());
 
