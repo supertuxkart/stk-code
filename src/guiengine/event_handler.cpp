@@ -161,7 +161,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         if (w->m_event_handler == NULL) return EVENT_LET;
     }
     
-    std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
+    //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
     
     Widget* parent = w->m_event_handler;
     if (w->m_event_handler != NULL)

@@ -97,9 +97,19 @@ namespace GUIEngine
         {
             StateManager::get()->escapePressed();
         }
-        else if (name == "locked")
+        else if (name == "challenges")
         {
-            unlock_manager->playLockSound();
+            DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
+            assert( w != NULL );
+            
+            // FIXME : don't hardcode player 0?
+            const int playerID = 0;
+            std::string selection = w->getSelectionIDString( playerID );
+            
+            if (selection == "locked")
+            {
+                unlock_manager->playLockSound();
+            }
         }
     }
     
