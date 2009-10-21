@@ -53,10 +53,15 @@ public:
     const std::vector<const Challenge*> 
                getRecentlyUnlockedFeatures() {return m_unlocked_features;}
 
+    /** Clear the list of recently unlocked challenges */
+    void       clearUnlocked     () {m_unlocked_features.clear(); }
+    
+    /** Returns a complete list of all solved challenges */
     const std::vector<const Challenge*>   getUnlockedFeatures();
 
+    /** Returns the list of currently inaccessible (locked) challenges */
+    const std::vector<const Challenge*>   getLockedChallenges();
     
-    void       clearUnlocked     () {m_unlocked_features.clear(); }
     void       raceFinished      ();
     void       grandPrixFinished ();
     void       unlockFeature     (Challenge* c, bool do_save=true);

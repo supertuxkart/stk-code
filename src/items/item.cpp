@@ -40,6 +40,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node             = irr_driver->addMesh(mesh);
     // If lighting would be enabled certain items (esp. bananas)
     // don't look smooth, so for now generally disable lighting
+    // FIXME : re-export models with normals instead
     m_node->setMaterialFlag(video::EMF_LIGHTING, false);
     m_node->setPosition(xyz.toIrrVector());
     m_node->grab();

@@ -20,6 +20,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/translation.hpp"
 
 #include <fstream>
 
@@ -53,17 +54,20 @@ namespace GUIEngine
         // Re-build track list everytime (accounts for locking changes, etc.)
         w->clearItems();
         
-        const std::vector<const Challenge*>& challenges = unlock_manager->getActiveChallenges();
+        const std::vector<const Challenge*>& activeChallenges = unlock_manager->getActiveChallenges();
         const std::vector<const Challenge*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
+        const std::vector<const Challenge*>& lockedChallenges = unlock_manager->getLockedChallenges();
         
-        const int challengeAmount = challenges.size();
+        const int activeChallengeAmount = activeChallenges.size();
         const int solvedChallengeAmount = solvedChallenges.size();
+        const int lockedChallengeAmount = lockedChallenges.size();
+        
         char buffer[64];
-        for (int n=0; n<challengeAmount; n++)
+        for (int n=0; n<activeChallengeAmount; n++)
         {
             // TODO : temporary icon until we have a 'unsolved challenge' icon
             sprintf(buffer, "challenge%i", n);
-            w->addItem(challenges[n]->getName() + L"\n" + challenges[n]->getChallengeDescription(),
+            w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
                        buffer, file_manager->getTextureFile("speedback.png"));
         }
         for (int n=0; n<solvedChallengeAmount; n++)
@@ -72,6 +76,13 @@ namespace GUIEngine
             sprintf(buffer, "solved%i", n);
             w->addItem(solvedChallenges[n]->getName(), buffer, file_manager->getTextureFile("cup_gold.png"));
         }
+        for (int n=0; n<lockedChallengeAmount; n++)
+        {
+            w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
+                       file_manager->getTextureFile("gui_lock.png"));
+        }
+        
+        
         
         w->updateItemDisplay();  
     }
@@ -82,9 +93,13 @@ namespace GUIEngine
     
     void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name)
     {
-        if(name == "back")
+        if (name == "back")
         {
             StateManager::get()->escapePressed();
+        }
+        else if (name == "locked")
+        {
+            unlock_manager->playLockSound();
         }
     }
     

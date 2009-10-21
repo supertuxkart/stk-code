@@ -444,7 +444,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         
     Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
     
-    std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
+    //std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
     
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
@@ -482,7 +482,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
-        std::cout << "!!! Player " << playerID << " navigating to " << closest->getID() << std::endl;
+       // std::cout << "!!! Player " << playerID << " navigating to " << closest->getID() << std::endl;
 
         if (playerID == 0)
         {
@@ -496,7 +496,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     }
     else
     {
-        std::cout << "!!! Player " << playerID << " cannot navigating down, no next widget found;\n";
+        //std::cout << "!!! Player " << playerID << " cannot navigating down, no next widget found;\n";
 
         // select the first widget
         Widget* w = NULL;

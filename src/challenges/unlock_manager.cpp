@@ -361,5 +361,18 @@ const std::vector<const Challenge*>   UnlockManager::getUnlockedFeatures()
     
     return out;
 }
+//-----------------------------------------------------------------------------
+const std::vector<const Challenge*>   UnlockManager::getLockedChallenges()
+{    
+    std::vector<const Challenge*>  out;
+    
+    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
+        i!=m_all_challenges.end();  i++)
+    {
+        if (!i->second->isSolved() && !i->second->isActive()) out.push_back(i->second);
+    }
+    
+    return out;
+}
 
 
