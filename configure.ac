@@ -205,6 +205,8 @@ case "${host}" in
 *darwin*|*macosx*)
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
   ;;
+*freebsd*)
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
 esac
 
 dnl Test if we need Xxf86vm. For now assume that if any problems
@@ -240,6 +242,8 @@ case "${host}" in
   irrlicht_LIBS="$irrlicht_LIBS"
     )
   ;;
+*freebsd*)
+   LDFLAGS="$LDFLAGS -lpthread"
 esac
 
 LIBS=$save_LIBS
@@ -331,27 +335,6 @@ ENETTREE="src/enet"
 # Check for gettext
 CHECK_GETTEXT(external)
 
-dnl =======================================================
-dnl Add special compiler flags for SDL on certain platforms
-dnl =======================================================
-case "${host}" in
-*darwin*|*macosx*)
-  dnl SDL on Macs needs to link in SDLmain, since it includes the
-  dnl actual main program (on Macs #include "SDL/SDL.h" renames
-  dnl main into SDL_main, which then gets called from the new
-  dnl main program included in SDLmain. This is necessary to 
-  dnl install a proper framework for SDL).
-  dnl This can't be done earlier, since all SDL tests program
-  dnl from configure do NOT include SDL/SDL.h, therefore the 
-  dnl main program gets not replaced, and then getting an linking
-  dnl error about main defined twice :((
-  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
-  if test x$have_sdl_config != xno; then
-    LDFLAGS="$LDFLAGS `sdl-config --libs`"
-    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
-  fi
-esac
-
 # =========================
 # subst bars in Makefile.am
 # =========================
@@ -362,7 +345,6 @@ AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(oggvorbis_LIBS)
 AC_SUBST(glut_LIBS)
-AC_SUBST(sdl_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)
 
