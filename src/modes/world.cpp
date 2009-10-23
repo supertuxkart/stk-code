@@ -326,7 +326,6 @@ void World::update(float dt)
     // Clear race state so that new information can be stored
     race_state->clear();
 
-    m_track->update(dt);
     if(network_manager->getMode()!=NetworkManager::NW_CLIENT &&
         !history->dontDoPhysics())
     {
@@ -339,6 +338,20 @@ void World::update(float dt)
         // Update all karts that are not eliminated
         if(!m_kart[i]->isEliminated()) m_kart[i]->update(dt) ;
     }
+    // The order of updates is rather important: if track update would
+    // be called before kart update, then the check manager (called from
+    // track update) will be using the old kart position to determine
+    // e.g. if a kart has started a new line. But linear world (from
+    // which this is called in case of a race) will be using the new
+    // position of the karts to determine the driveline quad a kart
+    // is on. So if a kart just arrived at quad 0 (meaning the distance
+    // along the track goes from close-to-lap-length to close-to-zero),
+    // the order of karts will be incorrect, since this kart will not
+    // have started the next lap. While this will only last for one
+    // frame (since in the next frame the check manager will detect
+    // the new lap), it causes an unwanted display of icons in the
+    // icon display.
+    m_track->update(dt);
 
     projectile_manager->update(dt);
     m_race_gui->update(dt);
