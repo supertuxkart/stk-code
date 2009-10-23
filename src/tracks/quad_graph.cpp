@@ -23,6 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "tracks/check_line.hpp"
 #include "tracks/quad_set.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
@@ -64,8 +65,9 @@ QuadGraph::~QuadGraph()
  *  and a kart just before the start line will have a getDistanceFromStart()
  *  which is the length of the track.
  */
-void QuadGraph::setStartCoordinate(const Vec3 &start_point)
+void QuadGraph::setStartCoordinate(const CheckLine &cl)
 {
+    Vec3 start_point=cl.getCenterPoint();
     int sector=UNKNOWN_SECTOR;
     findRoadSector(start_point, &sector);
     if(sector==UNKNOWN_SECTOR)

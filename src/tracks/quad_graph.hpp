@@ -26,6 +26,8 @@
 #include "tracks/graph_node.hpp"
 #include "tracks/quad_set.hpp"
 
+class CheckLine;
+
 /** This class stores a graph of quads. */
 class QuadGraph {
     
@@ -91,7 +93,7 @@ public:
                                         =video::SColor(127, 255, 255, 255) );
 #endif
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
-    void         setStartCoordinate(const Vec3 &start_point);
+    void         setStartCoordinate(const CheckLine &cl);
 
     /** Returns the number of nodes in the graph. */
     unsigned int getNumNodes() const { return m_all_nodes.size();         } 
