@@ -780,7 +780,7 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
-    m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_light->getLightData().DiffuseColor = irr::video::SColorf(0.5f, 0.5f, 0.5f, 0.5f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     
     m_rtt_main_node->setMaterialFlag(EMF_GOURAUD_SHADING , true);
