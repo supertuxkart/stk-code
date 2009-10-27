@@ -364,12 +364,13 @@ void DefaultRobot::handleSteering(float dt)
      */
     //Reaction to being outside of the road
     if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5f >
-        m_quad_graph->getNode(m_track_node).getPathWidth() )
+       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth() )
     {
         steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter(), 
                                    dt );
 
 #ifdef AI_DEBUG
+        m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
 #endif
