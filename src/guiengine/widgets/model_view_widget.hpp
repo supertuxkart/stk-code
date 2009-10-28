@@ -31,6 +31,15 @@ namespace GUIEngine
     /** A model view widget. See guiengine/engine.hpp for a detailed overview */
     class ModelViewWidget : public Widget
     {
+        enum RotationMode
+        {
+            ROTATE_OFF,
+            ROTATE_CONTINUOUSLY,
+            ROTATE_TO
+        };
+        RotationMode m_rotation_mode;
+        float m_rotation_speed;
+        float m_rotation_target;
         
         ptr_vector<scene::IMesh, REF> m_models;
         std::vector<Vec3> m_model_location;
@@ -48,6 +57,15 @@ namespace GUIEngine
         void clearModels();
         void addModel(irr::scene::IMesh* mesh, const Vec3& location = Vec3(0,0,0));
         void update(float delta);
+        
+        /** Disables any model rotation */
+        void setRotateOff();
+        
+        /** Makes the model rotate at given speed (in degrees per second) */
+        void setRotateContinuously(float speed);
+        
+        /** Rotate to 'targetAngle' in degrees at given speed (in degrees per second) */
+        void setRotateTo(float targetAngle, float speed);
     };
     
 }

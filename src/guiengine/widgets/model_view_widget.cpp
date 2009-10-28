@@ -26,6 +26,7 @@ ModelViewWidget::ModelViewWidget()
 {
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
+    m_rotation_mode = ROTATE_OFF;
 }
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
@@ -90,8 +91,26 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
-    angle += delta*35;
-    if (angle > 360) angle -= 360;
+    if (m_rotation_mode == ROTATE_CONTINUOUSLY)
+    {
+        angle += delta*m_rotation_speed;
+        if (angle > 360) angle -= 360;
+    }
+    else if (m_rotation_mode == ROTATE_TO)
+    {
+        // TODO : doesn't handle warp-arounds, which may be faster (e.g. we're at 300 and target is 10, better use warp-around)
+        if (angle < m_rotation_target) 
+        {
+            angle += delta*m_rotation_speed;
+        }
+        else
+        {
+            angle -= delta*m_rotation_speed;
+        }
+        
+        // stop rotating when target reached
+        if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
+    }
     
     if (m_rtt_provider == NULL)
     {
@@ -107,5 +126,22 @@ void ModelViewWidget::update(float delta)
     
     m_texture = m_rtt_provider->renderToTexture(angle);
     ((IGUIImage*)m_element)->setImage(m_texture);
+}
+
+
+void ModelViewWidget::setRotateOff()
+{
+    m_rotation_mode = ROTATE_OFF;
+}
+void ModelViewWidget::setRotateContinuously(float speed)
+{
+    m_rotation_mode = ROTATE_CONTINUOUSLY;
+    m_rotation_speed = speed;
+}
+void ModelViewWidget::setRotateTo(float targetAngle, float speed)
+{
+    m_rotation_mode = ROTATE_TO;
+    m_rotation_speed = speed;
+    m_rotation_target = targetAngle;
 }
 

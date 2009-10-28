@@ -189,6 +189,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             this->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
             this->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
             this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+            this->modelView->setRotateContinuously( 35.0f );
             
             kartName = new LabelWidget();
             kartName->m_text = props->getName();
@@ -282,19 +283,25 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             stringw playerNameString = playerName->getStringValue();
             playerIDLabel->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
             
+            m_children.remove(playerName);
             playerName->getIrrlichtElement()->remove();
             playerName->elementRemoved();
             
+            modelView->setRotateTo(30.0f, 150.0f);
             
             player_id_w *= 2;
             player_name_w = 0;
             
-            /*
-            LabelWidget* playerIDLabel;
-            PlayerNameSpinner* playerName;
-            ModelViewWidget* modelView;
-            LabelWidget* kartName;
-            */
+            irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("green_check.png").c_str() ) ;
+            const int check_size = 128; // TODO: reduce size on smaller resolutions?
+            const int check_x = model_x + model_w - check_size;
+            const int check_y = model_y + model_h - check_size;
+            core::rect< s32 > green_check_area(check_x, check_y, check_x + check_size, check_y + check_size);
+            irr::gui::IGUIImage* greenCheckWidget = GUIEngine::getGUIEnv()->addImage( green_check_area );
+            greenCheckWidget->setImage(texture);
+            greenCheckWidget->setScaleImage(true);
+            greenCheckWidget->setTabStop(false);
+            greenCheckWidget->setUseAlphaChannel(true);
         }
         bool isReady()
         {
