@@ -103,8 +103,6 @@ void AbstractStateManager::pushScreen(Screen* screen)
 void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 {
     assert(m_game_mode != GAME);
- 
-    // FIXME : handle cutscenes ?
     
     std::string name = screen->getName();
     

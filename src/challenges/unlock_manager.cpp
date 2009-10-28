@@ -263,9 +263,11 @@ void UnlockManager::computeActive()
             {
                 fprintf(stderr,"Challenge prerequisite '%s' of '%s' not found - ignored\n",
                         pre->c_str(), i->first.c_str());
-                continue;
+                //continue;
+                allSolved=false;
+                break;
             }
-            if(!p->isSolved())
+            else if(!p->isSolved())
             {
                 allSolved=false;
                 break;

@@ -56,7 +56,7 @@ void DynamicRibbonWidget::add()
     //printf("****DynamicRibbonWidget::add()****\n");
 
     m_has_label = (m_text == "bottom");
-    m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode
+    m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode (what if label is multiline?)
     
     // ----- add dynamic label at bottom
     if (m_has_label)

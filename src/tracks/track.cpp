@@ -192,7 +192,7 @@ void Track::loadTrackInfo(const std::string &filename)
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
     m_sun_ambient_color     = video::SColor(255, 120, 120, 120);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
-    m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
+    m_sun_diffuse_color     = video::SColor(128, 128, 128, 128); 
     XMLNode *root           = file_manager->createXMLTree(m_filename);
         
     if(!root || root->getName()!="track")

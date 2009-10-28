@@ -662,7 +662,7 @@ void KartSelectionScreen::init()
             std::string icon_path = file_manager->getDataDir() ;
             icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
             w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-            std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
+            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
             break;
         }
     }
@@ -676,7 +676,7 @@ void KartSelectionScreen::init()
             std::string icon_path = file_manager->getDataDir() ;
             icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
             w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
-            std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
+            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
         }
     }
     
