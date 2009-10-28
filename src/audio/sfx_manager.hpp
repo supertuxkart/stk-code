@@ -117,6 +117,11 @@ public:
     
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
+    
+    /** Positional sound is cool, but creating a new object just to play a simple
+        menu sound is not. This function allows for 'quick sounds' in a single call.*/
+    static void              quickSound(SFXType soundType);
+
 };
 
 extern SFXManager* sfx_manager;

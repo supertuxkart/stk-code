@@ -22,6 +22,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <map>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -445,3 +446,26 @@ const std::string SFXManager::getErrorString(int err)
 }   // getErrorString
 
 //-----------------------------------------------------------------------------
+void SFXManager::quickSound(SFXType soundType)
+{
+    static std::map<SFXType, SFXBase*> allSounds;
+    
+    std::map<SFXType, SFXBase*>::iterator sound = allSounds.find(soundType);
+    
+    if (sound == allSounds.end())
+    {
+        // sound not yet in our list
+        SFXBase* newSound = sfx_manager->newSFX(soundType);
+        newSound->play();
+        allSounds[soundType] = newSound;
+    }
+    else
+    {
+        (*sound).second->play();
+    }
+    
+    //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
+    // m_locked_sound->play();
+}
+
+

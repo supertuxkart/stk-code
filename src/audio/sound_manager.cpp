@@ -222,4 +222,3 @@ void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
     alListenerfv(AL_ORIENTATION, m_listenerVec);
 }
-

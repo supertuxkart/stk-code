@@ -287,6 +287,8 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             playerName->getIrrlichtElement()->remove();
             playerName->elementRemoved();
             
+            SFXManager::quickSound( SFXManager::SOUND_WEE );
+            
             modelView->setRotateTo(30.0f, 150.0f);
             
             player_id_w *= 2;
