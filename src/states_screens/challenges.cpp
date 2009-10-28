@@ -91,7 +91,7 @@ namespace GUIEngine
     {
     }
     
-    void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name)
+    void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
     {
         if (name == "back")
         {

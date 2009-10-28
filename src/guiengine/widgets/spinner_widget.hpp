@@ -31,7 +31,7 @@ namespace GUIEngine
     class SpinnerWidget : public Widget
     {
         int m_value, m_min, m_max;
-        std::vector<std::string> m_labels;
+        std::vector<irr::core::stringw> m_labels;
         bool m_graphical;
         bool m_gauge;
         
@@ -44,9 +44,10 @@ namespace GUIEngine
         virtual ~SpinnerWidget() {}
         virtual void move(const int x, const int y, const int w, const int h);
                 
-        void addLabel(std::string label);
+        void addLabel(irr::core::stringw label);
         void clearLabels();
-        
+        irr::core::stringw getStringValue() const;
+
         void add();
         void setValue(const int new_value);
 

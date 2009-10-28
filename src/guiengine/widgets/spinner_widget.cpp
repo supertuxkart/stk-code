@@ -208,7 +208,7 @@ void SpinnerWidget::clearLabels()
     m_labels.clear();
 }
 // -----------------------------------------------------------------------------
-void SpinnerWidget::addLabel(std::string label)
+void SpinnerWidget::addLabel(stringw label)
 {
     m_labels.push_back(label);
     m_min = 0;
@@ -230,7 +230,7 @@ void SpinnerWidget::setValue(const int new_value)
     }
     else if (m_labels.size() > 0)
     {
-        m_children[1].m_element->setText( stringw(m_labels[new_value].c_str()).c_str() );
+        m_children[1].m_element->setText(m_labels[new_value].c_str() );
     }
     else if (m_text.size() > 0)
     {
@@ -241,4 +241,21 @@ void SpinnerWidget::setValue(const int new_value)
     {
         m_children[1].m_element->setText( stringw(m_value).c_str() );
     }
+}
+
+stringw SpinnerWidget::getStringValue() const
+{
+    if (m_labels.size() > 0)
+    {
+        return stringw(m_labels[m_value].c_str()).c_str();
+    }
+    else if (m_text.size() > 0)
+    {
+        stringw text = StringUtils::insertValues(m_text.c_str(), m_value);
+        return text;
+    }
+    else
+    {
+        assert(false);
+    }    
 }

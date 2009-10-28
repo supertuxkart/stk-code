@@ -33,7 +33,7 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 }
 
 
-void TracksScreen::eventCallback(Widget* widget, const std::string& name)
+void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     // -- track seelction screen
     if (name == "tracks")

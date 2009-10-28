@@ -34,7 +34,7 @@ class OptionsScreenAV : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenAV>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
         
     void init();
     void tearDown();

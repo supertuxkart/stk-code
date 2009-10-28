@@ -146,7 +146,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                true/* center h */, true /* center v */ );
 }
 
-void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name)
+void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "back")
     {

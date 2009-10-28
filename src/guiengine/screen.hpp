@@ -151,7 +151,7 @@ namespace GUIEngine
          * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
          * being left, allowing for setup/clean-up.
          */
-        virtual void eventCallback(Widget* widget, const std::string& name) = 0;
+        virtual void eventCallback(Widget* widget, const std::string& name, const int playerID) = 0;
         
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
     };

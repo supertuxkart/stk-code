@@ -29,7 +29,7 @@ class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     RaceSetupScreen();
     
 public:
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     void init();
     void tearDown();
 };

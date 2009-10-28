@@ -43,11 +43,12 @@
 InputDevice* player_1_device = NULL;
 
 using namespace GUIEngine;
+using irr::core::stringw;
 
-    class PlayerKartWidget;
+class PlayerKartWidget;
     
-    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
-    ptr_vector<PlayerKartWidget, REF> g_player_karts;
+// ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
 #if 0
 #pragma mark -
@@ -74,7 +75,8 @@ using namespace GUIEngine;
     class PlayerKartWidget : public Widget
     {
         float x_speed, y_speed, w_speed, h_speed;
-
+        bool m_ready;
+        
     public:
         LabelWidget* playerIDLabel;
         PlayerNameSpinner* playerName;
@@ -105,7 +107,8 @@ using namespace GUIEngine;
             y_speed = 1.0f;
             w_speed = 1.0f;
             h_speed = 1.0f;
-
+            m_ready = false;
+            
             m_irrlicht_widget_ID = irrlichtWidgetID;
 
             this->playerID = playerID;
@@ -209,7 +212,7 @@ using namespace GUIEngine;
             
             if (modelView->getIrrlichtElement() != NULL)
                 modelView->getIrrlichtElement()->remove();
-            
+
             if (kartName->getIrrlichtElement() != NULL)
                 kartName->getIrrlichtElement()->remove();
             
@@ -270,6 +273,32 @@ using namespace GUIEngine;
             y_speed = abs( this->y - y ) / 300.0f;
             w_speed = abs( this->w - w ) / 300.0f;
             h_speed = abs( this->h - h ) / 300.0f;
+        }
+        
+        void markAsReady()
+        {
+            m_ready = true;
+            
+            stringw playerNameString = playerName->getStringValue();
+            playerIDLabel->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
+            
+            playerName->getIrrlichtElement()->remove();
+            playerName->elementRemoved();
+            
+            
+            player_id_w *= 2;
+            player_name_w = 0;
+            
+            /*
+            LabelWidget* playerIDLabel;
+            PlayerNameSpinner* playerName;
+            ModelViewWidget* modelView;
+            LabelWidget* kartName;
+            */
+        }
+        bool isReady()
+        {
+            return m_ready;
         }
         
         void onUpdate(float delta)
@@ -389,7 +418,7 @@ using namespace GUIEngine;
             
             // -- sizes
             player_id_w = w;
-            player_id_h = 25;
+            player_id_h = 25; // FIXME : don't hardcode font size
             
             player_name_h = 40;
             player_name_w = std::min(400, w);
@@ -712,11 +741,58 @@ void KartSelectionScreen::init()
     w->m_rows[0].requestFocus();
 }
     
+void KartSelectionScreen::allPlayersDone()
+{        
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    
+    ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
+    
+    // ---- Print selection (for debugging purposes)
+    std::cout << "==========\n" << players.size() << " players :\n";
+    for(int n=0; n<players.size(); n++)
+    {
+        std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << " on " << players[n].getDevice()->m_name << std::endl;
+    }
+    std::cout << "==========\n";
+    
+    // ---- Give player info to race manager
+    race_manager->setNumPlayers( players.size() );
+    race_manager->setNumLocalPlayers( players.size() );
+    
+    // ---- Manage 'random kart' selection(s)
+    RandomGenerator random;
+    
+    //g_player_karts.clearAndDeleteAll();      
+    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
+    for (int n = 0; n < g_player_karts.size(); n++)
+    {
+        std::string selection = g_player_karts[n].m_kartInternalName;
+        
+        if (selection == "gui/track_random.png")
+        {
+            // FIXME: in multiplayer game, if two players select' random' make sure they don't select
+            // the same kart or an already selected kart
+            const std::vector<ItemDescription>& items = w->getItems();
+            const int randomID = random.get(items.size());
+            selection = items[randomID].m_code_name;
+        }
+        // std::cout << "selection=" << selection.c_str() << std::endl;
+        
+        race_manager->setLocalKartInfo(n, selection);
+    }
+    
+    // ---- Return to assign mode
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    
+    StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+}
+
 // -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
-void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name)
+void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "kartgroups")
     {
@@ -763,45 +839,21 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name)
     }
     else if (name == "karts")
     {
-        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-        assert( w != NULL );
+        g_player_karts[playerID].markAsReady();
         
-        ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
-        std::cout << "==========\n" << players.size() << " players :\n";
-        for(int n=0; n<players.size(); n++)
+        // check if all players are ready
+        bool allPlayersReady = true;
+        const int amount = g_player_karts.size();
+        for (int n=0; n<amount; n++)
         {
-            std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << " on " << players[n].getDevice()->m_name << std::endl;
-        }
-        std::cout << "==========\n";
-        
-        race_manager->setNumPlayers( players.size() );
-        race_manager->setNumLocalPlayers( players.size() );
-        
-        RandomGenerator random;
-        
-        //g_player_karts.clearAndDeleteAll();      
-        //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
-        for (int n = 0; n < g_player_karts.size(); n++)
-        {
-            std::string selection = g_player_karts[n].m_kartInternalName;
-            
-            if (selection == "gui/track_random.png")
+            if (!g_player_karts[n].isReady())
             {
-                // FIXME: in multiplayer game, if two players select' random' make sure they don't select
-                // the same kart or an already selected kart
-                const std::vector<ItemDescription>& items = w->getItems();
-                const int randomID = random.get(items.size());
-                selection = items[randomID].m_code_name;
+                allPlayersReady = false;
+                break;
             }
-            // std::cout << "selection=" << selection.c_str() << std::endl;
-            
-            race_manager->setLocalKartInfo(n, selection);
         }
-
-        //Return to assign mode
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-
-        StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+        
+        if (allPlayersReady) allPlayersDone();
     }
 }
 

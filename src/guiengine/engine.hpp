@@ -251,7 +251,7 @@ namespace GUIEngine
     
     void render(float dt);
     
-    void transmitEvent(Widget* widget, std::string& name);
+    void transmitEvent(Widget* widget, std::string& name, const int playerID);
     
     Widget* getWidget(const char* name);
     Widget* getWidget(const int id);

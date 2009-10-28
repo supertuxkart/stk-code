@@ -113,8 +113,7 @@ void OptionsScreenPlayers::tearDown()
 }
 
 // -----------------------------------------------------------------------------
-// main call (from StateManager); dispatches the call to a specialissed function as needed
-void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name)
+void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {    
     if (name == "options_choice")
     {

@@ -44,7 +44,7 @@ void MainMenuScreen::tearDown()
 {
 }
 
-void MainMenuScreen::eventCallback(Widget* widget, const std::string& name)
+void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return; // only interesting stuff in main menu is the ribbons

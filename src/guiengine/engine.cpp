@@ -167,10 +167,10 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
 }
 // -----------------------------------------------------------------------------
 /** transmit event to user event callback (out of encapsulated GUI module) */
-void transmitEvent(Widget* widget, std::string& name)
+void transmitEvent(Widget* widget, std::string& name, const int playerID)
 {
     assert(g_state_manager != NULL);
-    getCurrentScreen()->eventCallback(widget, name);
+    getCurrentScreen()->eventCallback(widget, name, playerID);
 }
     
 // -----------------------------------------------------------------------------    

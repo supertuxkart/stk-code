@@ -28,7 +28,7 @@ HelpScreen2::HelpScreen2() : Screen("help2.stkgui")
 }
 
 
-void HelpScreen2::eventCallback(Widget* widget, const std::string& name)
+void HelpScreen2::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")
     {

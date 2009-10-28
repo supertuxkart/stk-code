@@ -126,7 +126,8 @@ void OptionsScreenInput::init()
     
     // trigger displaying bindings for default selected device
     const std::string name2("devices");
-    eventCallback(devices, name2);
+    const int playerID = 0; // FIXME : don't hardcode player ID
+    eventCallback(devices, name2, playerID);
 }
 
 // -----------------------------------------------------------------------------
@@ -234,8 +235,7 @@ void OptionsScreenInput::tearDown()
 }
 
 // -----------------------------------------------------------------------------
-// main call (from StateManager); dispatches the call to a specialissed function as needed
-void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name)
+void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     //const std::string& screen_name = this->getName();
     

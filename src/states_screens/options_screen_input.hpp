@@ -38,7 +38,7 @@ class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSin
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     void gotSensedInput(Input* sensedInput);
     

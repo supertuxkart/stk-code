@@ -31,7 +31,7 @@ RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
 }
 
 
-void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name)
+void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "difficulty")
     {

@@ -265,7 +265,7 @@ namespace GUIEngine
     {
     }
     
-    void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name)
+    void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
     {
         if(name == "back")
         {

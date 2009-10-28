@@ -94,7 +94,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 {
                     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
                     if (ribbon == NULL) break;
-                    if (ribbon->mouseHovered(w) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID]);
+                    const int playerID = 0; // FIXME : don't hardcode player 0
+                    if (ribbon->mouseHovered(w) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
                     getGUIEnv()->setFocus(ribbon->m_element);
                 }
@@ -186,10 +187,10 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
                 if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
             }
             
-            transmitEvent(parent, parent->m_properties[PROP_ID]);
+            transmitEvent(parent, parent->m_properties[PROP_ID], playerID);
         }
     }
-    else transmitEvent(w, w->m_properties[PROP_ID]);
+    else transmitEvent(w, w->m_properties[PROP_ID], playerID);
     
     return EVENT_BLOCK;
 }
@@ -239,9 +240,12 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             }
             
             
-            if (widget_to_call->leftPressed(playerID) == EVENT_LET) transmitEvent(w, w->m_properties[PROP_ID]);
+            if (widget_to_call->leftPressed(playerID) == EVENT_LET)
+            {
+                transmitEvent(w, w->m_properties[PROP_ID], playerID);
+            }
         }
-            break;
+        break;
             
         case PA_RIGHT:
         {
@@ -272,10 +276,12 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
-            if (widget_to_call->rightPressed(playerID) == EVENT_LET) transmitEvent(widget_to_call, w->m_properties[PROP_ID]);
+            if (widget_to_call->rightPressed(playerID) == EVENT_LET)
+            {
+                transmitEvent(widget_to_call, w->m_properties[PROP_ID], playerID);
+            }
         }
-            
-            break;
+        break;
             
         case PA_ACCEL:
             navigateUp(playerID, type, pressedDown);
@@ -286,8 +292,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             break;
             
         case PA_RESCUE:
-            if(pressedDown)
-                GUIEngine::getStateManager()->escapePressed();
+            if (pressedDown) GUIEngine::getStateManager()->escapePressed();
             break;
             
         case PA_FIRE:

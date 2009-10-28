@@ -36,7 +36,7 @@ class OptionsScreenPlayers : public GUIEngine::Screen, public GUIEngine::ScreenS
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenPlayers>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);

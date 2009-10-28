@@ -135,7 +135,7 @@ void OptionsScreenAV::init()
 }
 
 // -----------------------------------------------------------------------------
-void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name)
+void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "options_choice")
     {

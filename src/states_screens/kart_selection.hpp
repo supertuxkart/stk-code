@@ -32,14 +32,29 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     KartSelectionScreen();
     
-public:
-    bool playerJoin(InputDevice* device, bool firstPlayer);
-    bool playerQuit(ActivePlayer* player);
-    void kartSelectionUpdate(float delta);
-    void renumberKarts();
+    /** Called when all players selected their kart */
+    void allPlayersDone();
     
+    /** Called when number/order of karts changed, so that all will keep an up-to-date ID */
+    void renumberKarts();
+
+public:
+    
+    /** Called when a player hits 'fire' on his device to join the game */
+    bool playerJoin(InputDevice* device, bool firstPlayer);
+    
+    /** Called when a player hits 'rescue' on his device to leave the game */
+    bool playerQuit(ActivePlayer* player);
+    
+    /** Standard 'Screen' callback before screen is entered */
     void init();
+    
+    /** Standard 'Screen' callback before screen is left */
     void tearDown();
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+    
+    /** Standard 'Screen' callback when an event occurs*/
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    
+    /** Standard 'Screen' callback every frame */
     void onUpdate(float dt, irr::video::IVideoDriver*);
 };
