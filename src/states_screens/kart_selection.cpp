@@ -397,7 +397,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             if (originator == spinnerID)
             {
                 std::cout << "Identity changed for player " << playerID
-                << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
+                          << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
                 m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
                 
                 return EVENT_LET; // do not continue propagating the event
@@ -837,16 +837,18 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "karts")
     {
         // make sure no other player selected the same identity
+        //std::cout << "\n\n\\\\\\\\ Kart Selected ////\n";
+        //std::cout << "Making sure no other player has ident " << g_player_karts[playerID].getAssociatedPlayer()->getProfile()->getName() << std::endl;
         const int amount = g_player_karts.size();
         for (int n=0; n<amount; n++)
         {
             if (n == playerID) continue; // don't check a kart against itself
             
             if (g_player_karts[n].isReady() &&
-                g_player_karts[n].getAssociatedPlayer() == g_player_karts[playerID].getAssociatedPlayer())
+                g_player_karts[n].getAssociatedPlayer()->getProfile() == g_player_karts[playerID].getAssociatedPlayer()->getProfile())
             {
                 // TODO : do something
-                printf("*** You can't select this identity, someone already took it!! ***\n");
+                printf("\n***\n*** You can't select this identity, someone already took it!! ***\n***\n\n");
                 return;
             }
         }
@@ -866,10 +868,10 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             
             // check if a non-yet-ready player took the same name (if a ready player has, we won't even get here)
             if (!g_player_karts[n].isReady() &&
-                g_player_karts[n].getAssociatedPlayer() == g_player_karts[playerID].getAssociatedPlayer())
+                g_player_karts[n].getAssociatedPlayer()->getProfile() == g_player_karts[playerID].getAssociatedPlayer()->getProfile())
             {
                 // TODO : do something
-                printf("*** Someone else can't select this identity, you just took it!! ***\n");
+                printf("\n***\n*** Someone else can't select this identity, you just took it!! ***\n***\n\n");
                 return;
             }
         }
