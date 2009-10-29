@@ -38,6 +38,10 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     /** Called when number/order of karts changed, so that all will keep an up-to-date ID */
     void renumberKarts();
 
+    /** Checks identities chosen by players, making sure no duplicates are used.
+        \return Whether all choices are ok */
+    bool validateIdentChoices();
+    
 public:
     
     /** Called when a player hits 'fire' on his device to join the game */

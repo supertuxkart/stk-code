@@ -57,18 +57,52 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
     
     class PlayerNameSpinner : public SpinnerWidget
     {
-        int playerID;
+        int m_playerID;
+        bool m_incorrect;
+        irr::gui::IGUIImage* m_red_mark_widget;
         
-        virtual EventPropagation focused(const int playerID) ;
+        virtual EventPropagation focused(const int m_playerID) ;
         
     public:
         PlayerNameSpinner(const int playerID)
         {
-            PlayerNameSpinner::playerID = playerID;
+            m_playerID        = playerID;
+            m_incorrect       = false;
+            m_red_mark_widget = NULL;
         }
-        void setID(const int playerID)
+        void setID(const int m_playerID)
         {
-            PlayerNameSpinner::playerID = playerID;
+            PlayerNameSpinner::m_playerID = m_playerID;
+        }
+        
+        /** Add a red mark on the spinner to mean "invalid choice" */
+        void markAsIncorrect()
+        {
+            if (m_incorrect) return; // already flagged as incorrect
+            
+            m_incorrect = true;
+            
+            irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("red_mark.png").c_str() ) ;
+            const int mark_size = h;
+            const int mark_x = w - mark_size*2;
+            const int mark_y = 0;
+            core::rect< s32 > red_mark_area(mark_x, mark_y, mark_x + mark_size, mark_y + mark_size);
+            m_red_mark_widget = GUIEngine::getGUIEnv()->addImage( red_mark_area, /* parent */ m_element );
+            m_red_mark_widget->setImage(texture);
+            m_red_mark_widget->setScaleImage(true);
+            m_red_mark_widget->setTabStop(false);
+            m_red_mark_widget->setUseAlphaChannel(true);
+        }
+        
+        /** Remove any red mark set with 'markAsIncorrect' */
+        void markAsCorrect()
+        {
+            if (m_incorrect)
+            {
+                m_red_mark_widget->remove();
+                m_red_mark_widget = NULL;
+                m_incorrect = false;
+            }
         }
     };
 
@@ -85,7 +119,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
         
         ActivePlayer* m_associatedPlayer;
 
-        int playerID;
+        int m_playerID;
         std::string spinnerID;
         
         int player_id_x, player_id_y, player_id_w, player_id_h;
@@ -100,7 +134,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
         std::string deviceName;
         std::string m_kartInternalName;
         
-        PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int playerID, const int irrlichtWidgetID=-1) : Widget()
+        PlayerKartWidget(ActivePlayer* associatedPlayer, Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
         {
             m_associatedPlayer = associatedPlayer;
             x_speed = 1.0f;
@@ -111,8 +145,8 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             
             m_irrlicht_widget_ID = irrlichtWidgetID;
 
-            this->playerID = playerID;
-            this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", playerID);
+            this->m_playerID = m_playerID;
+            this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
             
             setSize(area->x, area->y, area->w, area->h);
             target_x = x;
@@ -133,10 +167,10 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             
             playerIDLabel->m_text = 
                 //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-                StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str()); 
+                StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str()); 
             
             playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
-            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
+            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
             playerIDLabel->x = player_id_x;
             playerIDLabel->y = player_id_y;
             playerIDLabel->w = player_id_w;
@@ -145,7 +179,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             //playerID->setParent(this);
             m_children.push_back(playerIDLabel);
             
-            playerName = new PlayerNameSpinner(playerID);
+            playerName = new PlayerNameSpinner(m_playerID);
             playerName->x = player_name_x;
             playerName->y = player_name_y;
             playerName->w = player_name_w;
@@ -158,7 +192,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
                 playerName->m_tab_down_root = g_player_karts[0].playerName->getIrrlichtElement()->getID();
             }
             
-            spinnerID = StringUtils::insertValues("@p%i_spinner", playerID);
+            spinnerID = StringUtils::insertValues("@p%i_spinner", m_playerID);
             
             const int playerAmount = UserConfigParams::m_all_players.size();
             playerName->m_properties[PROP_MIN_VALUE] = "0";
@@ -173,7 +207,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             modelView->y = model_y;
             modelView->w = model_w;
             modelView->h = model_h;
-            modelView->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", playerID);
+            modelView->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", m_playerID);
             //modelView->setParent(this);
             m_children.push_back(modelView);
             
@@ -192,7 +226,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             kartName = new LabelWidget();
             kartName->m_text = props->getName();
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
-            kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", playerID);
+            kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
             kartName->x = kart_name_x;
             kartName->y = kart_name_y;
             kartName->w = kart_name_w;
@@ -227,13 +261,13 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
                 assert(false);
             }
             
-            playerID = newPlayerID;
+            m_playerID = newPlayerID;
             
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-            irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), playerID + 1, deviceName.c_str());
+            irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
             playerIDLabel->setText( newLabel ); 
-            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", playerID);
-            playerName->setID(playerID);
+            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
+            playerName->setID(m_playerID);
         }
         
         virtual void add()
@@ -387,7 +421,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             
         }
 
-        virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int playerID)
+        virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
         {
             //std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
 
@@ -396,7 +430,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             // update player profile when spinner changed
             if (originator == spinnerID)
             {
-                std::cout << "Identity changed for player " << playerID
+                std::cout << "Identity changed for player " << m_playerID
                           << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
                 m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
                 
@@ -786,6 +820,53 @@ void KartSelectionScreen::allPlayersDone()
 }
 
 // -----------------------------------------------------------------------------
+bool KartSelectionScreen::validateIdentChoices()
+{
+    bool ok = true;
+    
+    const int amount = g_player_karts.size();
+    
+    // reset all marks, we'll re-add them n ext if errors are still there
+    for (int n=0; n<amount; n++)
+    {
+        g_player_karts[n].playerName->markAsCorrect();
+    }
+    
+    for (int n=0; n<amount; n++)
+    {        
+        for (int m=n+1; m<amount; m++)
+        {            
+            // check if 2 players took the same name
+            if (g_player_karts[n].getAssociatedPlayer()->getProfile() == g_player_karts[m].getAssociatedPlayer()->getProfile())
+            {
+                printf("\n***\n*** Someone else can't select this identity, you just took it!! ***\n***\n\n");
+                
+                // two players took the same name. check if one is ready
+                if (!g_player_karts[n].isReady() && g_player_karts[m].isReady())
+                {
+                    // player m is ready, so player n should not choose this name
+                    g_player_karts[n].playerName->markAsIncorrect();
+                }
+                else if (g_player_karts[n].isReady() && !g_player_karts[m].isReady())
+                {
+                    // player n is ready, so player m should not choose this name
+                    g_player_karts[m].playerName->markAsIncorrect();
+                }
+                else if (g_player_karts[n].isReady() && g_player_karts[m].isReady())
+                {
+                    // it should be impossible for two players to confirm they're ready with the same name
+                    assert(false);
+                }
+                
+                ok = false;
+            }
+        } // end for
+    }
+    
+    return ok;
+}
+
+// -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
@@ -847,8 +928,12 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             if (g_player_karts[n].isReady() &&
                 g_player_karts[n].getAssociatedPlayer()->getProfile() == g_player_karts[playerID].getAssociatedPlayer()->getProfile())
             {
-                // TODO : do something
                 printf("\n***\n*** You can't select this identity, someone already took it!! ***\n***\n\n");
+                
+                //SFXType sound;
+                //SOUND_UGH SOUND_CRASH SOUND_USE_ANVIL SOUND_EXPLOSION SOUND_MOVE_MENU SOUND_SELECT_MENU
+                sfx_manager->quickSound( SFXManager::SOUND_USE_ANVIL );
+                
                 return;
             }
             
@@ -856,26 +941,21 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             assert(g_player_karts[n].getAssociatedPlayer() != g_player_karts[playerID].getAssociatedPlayer());
         }
         
+        // Mark this player as ready to start
         g_player_karts[playerID].markAsReady();
         
-        // check if all players are ready, and make sure no other player selected the same identity
+        // validate choices to notify player of duplicates
+        const bool ok = validateIdentChoices();
+        if (!ok) return;
+        
+        // check if all players are ready
         bool allPlayersReady = true;
         for (int n=0; n<amount; n++)
-        {
-            if (n == playerID) continue; // don't check a kart against itself
-            
+        {            
             if (!g_player_karts[n].isReady())
             {
                 allPlayersReady = false;
-            }
-            
-            // check if a non-yet-ready player took the same name (if a ready player has, we won't even get here)
-            if (!g_player_karts[n].isReady() &&
-                g_player_karts[n].getAssociatedPlayer()->getProfile() == g_player_karts[playerID].getAssociatedPlayer()->getProfile())
-            {
-                // TODO : do something
-                printf("\n***\n*** Someone else can't select this identity, you just took it!! ***\n***\n\n");
-                return;
+                break;
             }
         }
         
@@ -889,6 +969,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         {
             g_player_karts[n].transmitEvent(widget, name, playerID);
         }
+        
+        // those events may mean that a player selection changed, so validate again
+        validateIdentChoices();
     }
 }
 
@@ -920,17 +1003,17 @@ void KartSelectionScreen::renumberKarts()
 // FIXME : clean this mess, this file should not contain so many classes
 GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID) 
 {
-    std::cout << "Player name spinner " << this->playerID << " focused by " << playerID << std::endl;
+    std::cout << "Player name spinner " << this->m_playerID << " focused by " << playerID << std::endl;
         
     // since this screen is multiplayer, redirect focus to the right widget
-    if (this->playerID != playerID)
+    if (this->m_playerID != playerID)
     {
         const int amount = g_player_karts.size();
         for (int n=0; n<amount; n++)
         {
-            if (g_player_karts[n].playerID == playerID)
+            if (g_player_karts[n].m_playerID == playerID)
             {
-                std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->playerID  <<
+                std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->m_playerID  <<
                             " (ID " << m_element->getID() <<
                             ") to spinner " << n << " (ID " << g_player_karts[n].playerName->m_element->getID() << ")" << std::endl;
                 int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
