@@ -851,6 +851,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 printf("\n***\n*** You can't select this identity, someone already took it!! ***\n***\n\n");
                 return;
             }
+            
+            // If two PlayerKart entries are associated to the same ActivePlayer, something went wrong
+            assert(g_player_karts[n].getAssociatedPlayer() != g_player_karts[playerID].getAssociatedPlayer());
         }
         
         g_player_karts[playerID].markAsReady();
