@@ -127,17 +127,26 @@ void Material::install(bool is_full_path)
  */
 void  Material::setMaterialProperties(video::SMaterial *m) const
 {
-    if(m_transparency)
+    if (m_transparency)
         // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
         // scene_manager->getParameters()->setAttribute(
         //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
         // updates of the Z buffer of the material. Since the _REF 
         // approach is faster (and looks better imho), this is used for now.
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-    else if(m_sphere_map)
-        m->MaterialType = video::EMT_SPHERE_MAP;
-    else if(m_alpha_blending)
+    else if (m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     
+    if (m_sphere_map)
+        m->MaterialType = video::EMT_SPHERE_MAP;
+    
+    if (!m_lighting)
+    {
+        //m->setFlag( video::EMF_LIGHTING, false );
+        m->AmbientColor = video::SColor(255, 255, 255, 255);
+        m->DiffuseColor = video::SColor(255, 255, 255, 255);
+        m->EmissiveColor = video::SColor(255, 255, 255, 255);
+        m->SpecularColor = video::SColor(255, 255, 255, 255);
+    }
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
