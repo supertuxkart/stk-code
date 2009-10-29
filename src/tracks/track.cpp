@@ -143,7 +143,7 @@ void Track::cleanup()
     }
     m_physical_objects.clear();
 
-    irr_driver->removeNode(m_light);
+    irr_driver->removeNode(m_sun);
 
     delete m_non_collision_mesh;
     m_non_collision_mesh = new TriangleMesh();
@@ -188,11 +188,12 @@ void Track::loadTrackInfo(const std::string &filename)
     m_fog_start             = 0.0f;
     m_fog_end               = 1000.0f;
     m_gravity               = 9.80665f;
-    m_fog_color             = video::SColor( 77, 179, 230, 255);
+                              /* ARGB */
+    m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
-    m_sun_ambient_color     = video::SColor(255, 120, 120, 120);
+    //m_sun_ambient_color     = video::SColor(255, 255, 255, 255);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
-    m_sun_diffuse_color     = video::SColor(128, 128, 128, 128); 
+    m_sun_diffuse_color     = video::SColor(255, 255, 255, 255); 
     XMLNode *root           = file_manager->createXMLTree(m_filename);
         
     if(!root || root->getName()!="track")
@@ -528,7 +529,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 void Track::update(float dt)
 {
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-    m_light->getLightData().AmbientColor  = m_ambient_color;
+    //m_sun->getLightData().AmbientColor  = m_ambient_color;
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
@@ -729,7 +730,7 @@ void Track::loadTrackModel(unsigned int mode_id)
         {
             node->get("xyz",           &m_sun_position );
             node->get("ambient-color", &m_default_ambient_color);
-            node->get("sun-color",     &m_sun_ambient_color);
+            //node->get("sun-color",     &m_sun_ambient_color);
             node->get("sun-specular",  &m_sun_specular_color);
             node->get("sun-diffuse",   &m_sun_diffuse_color);
             node->get("fog",           &m_use_fog);
@@ -789,15 +790,22 @@ void Track::loadTrackModel(unsigned int mode_id)
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 
+    // ---- Set ambient color
+    m_ambient_color = m_default_ambient_color;
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position,
-                                                               m_sun_ambient_color);
-    m_light->setLightType(video::ELT_DIRECTIONAL);
-    m_light->setRotation( core::vector3df(180, 45, 45) );
-    m_light->getLightData().AmbientColor  = m_sun_ambient_color;
-    m_light->getLightData().DiffuseColor  = m_sun_diffuse_color;
-    m_light->getLightData().SpecularColor = m_sun_specular_color;
+    
+    // ---- Create sun (non-ambient directional light)
+    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position,
+                                                               m_sun_diffuse_color);
+    m_sun->setLightType(video::ELT_DIRECTIONAL);
+    m_sun->setRotation( core::vector3df(180, 45, 45) ); // TODO: make sun orientation configurable
+    
+    // We should NOT give the sun an ambient color, we already have a scene-wide ambient color.
+    // No need for two ambient colors.
+    //m_sun->getLightData().AmbientColor  = m_sun_ambient_color;
+    
+    //m_sun->getLightData().DiffuseColor  = m_sun_diffuse_color;
+    m_sun->getLightData().SpecularColor = m_sun_specular_color;
 
     /*
     m_light = irr_driver->getSceneManager()->addLightSceneNode(0, m_sun_position);
@@ -807,7 +815,8 @@ void Track::loadTrackModel(unsigned int mode_id)
     m_light->setLightData(light);
      */
 
-    if(m_use_fog)
+    // ---- Fog
+    if (m_use_fog)
     {
 #if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
@@ -818,8 +827,7 @@ void Track::loadTrackModel(unsigned int mode_id)
     
     // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel(main_track_count);
-    if(UserConfigParams::m_track_debug)
-        m_quad_graph->createDebugMesh();
+    if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

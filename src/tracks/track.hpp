@@ -70,7 +70,7 @@ private:
     std::vector<std::string> m_groups;
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
-    scene::ILightSceneNode  *m_light;
+    scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
     bool                     m_has_final_camera;
@@ -136,7 +136,7 @@ private:
     core::vector3df     m_sun_position;
     video::SColor       m_ambient_color;
     video::SColor       m_default_ambient_color;
-    video::SColor       m_sun_ambient_color;
+    //video::SColor       m_sun_ambient_color;
     video::SColor       m_sun_specular_color;
     video::SColor       m_sun_diffuse_color;
     video::SColor       m_fog_color;
