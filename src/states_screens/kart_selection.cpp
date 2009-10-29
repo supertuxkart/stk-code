@@ -150,6 +150,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             playerName->y = player_name_y;
             playerName->w = player_name_w;
             playerName->h = player_name_h;
+            playerName->m_event_handler = this;
             
             if (irrlichtWidgetID == -1)
             {
@@ -163,11 +164,8 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             playerName->m_properties[PROP_MIN_VALUE] = "0";
             playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
             playerName->m_properties[PROP_ID] = spinnerID;
-            //playerName->setParent(this);
+            //playerName->m_event_handler = this;
             m_children.push_back(playerName);
-            
-            
-            playerName->m_event_handler = this;
             
             modelView = new ModelViewWidget();
             
@@ -263,6 +261,11 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             
         }
                 
+        ActivePlayer* getAssociatedPlayer()
+        {
+            return m_associatedPlayer;
+        }
+        
         void move(const int x, const int y, const int w, const int h)
         {
             target_x = x;
@@ -383,41 +386,26 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
                            kart_name_h);
             
         }
-// disabled but some events were disptached twice (e.g. spinner clicks)
-#if 0
-        virtual bool transmitEvent(Widget* w, std::string& originator, const int playerID)
-        {
-            std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
-            Widget* topmost = w;
-            /* Find topmost parent. Stop looping if a widget event handler's is itself, to not fall
-             in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-             notified of clicks onto themselves so they can toggle their state. )
-             */
-            while (topmost->m_event_handler != NULL && topmost->m_event_handler != topmost)
-            {
-                // transmit events to all listeners in the chain
-                std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
-                if (!topmost->transmitEvent(w, originator, playerID)) return false;
-                topmost = topmost->m_event_handler;
-                
-                std::string name = topmost->m_properties[PROP_ID];
-                
-                if (name == spinnerID)
-                {
-                    m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
-                    
-                    // transmit events to all listeners in the chain
-                    std::cout << "transmitting event to widget " << topmost->m_type << std::endl;
-                    if (!topmost->transmitEvent(w, originator, playerID)) return false;
-                    
-                    return false; // do not continue propagating the event
-                }
 
+        virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int playerID)
+        {
+            //std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
+
+            std::string name = w->m_properties[PROP_ID];
+            
+            // update player profile when spinner changed
+            if (originator == spinnerID)
+            {
+                std::cout << "Identity changed for player " << playerID
+                << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
+                m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
+                
+                return EVENT_LET; // do not continue propagating the event
             }
-         
-            return true; // continue propagating the event
+
+            return EVENT_LET; // continue propagating the event
         }
-#endif
+
         void setSize(const int x, const int y, const int w, const int h)
         {
             this->x = x;
@@ -848,21 +836,54 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "karts")
     {
-        g_player_karts[playerID].markAsReady();
-        
-        // check if all players are ready
-        bool allPlayersReady = true;
+        // make sure no other player selected the same identity
         const int amount = g_player_karts.size();
         for (int n=0; n<amount; n++)
         {
+            if (n == playerID) continue; // don't check a kart against itself
+            
+            if (g_player_karts[n].isReady() &&
+                g_player_karts[n].getAssociatedPlayer() == g_player_karts[playerID].getAssociatedPlayer())
+            {
+                // TODO : do something
+                printf("*** You can't select this identity, someone already took it!! ***\n");
+                return;
+            }
+        }
+        
+        g_player_karts[playerID].markAsReady();
+        
+        // check if all players are ready, and make sure no other player selected the same identity
+        bool allPlayersReady = true;
+        for (int n=0; n<amount; n++)
+        {
+            if (n == playerID) continue; // don't check a kart against itself
+            
             if (!g_player_karts[n].isReady())
             {
                 allPlayersReady = false;
-                break;
+            }
+            
+            // check if a non-yet-ready player took the same name (if a ready player has, we won't even get here)
+            if (!g_player_karts[n].isReady() &&
+                g_player_karts[n].getAssociatedPlayer() == g_player_karts[playerID].getAssociatedPlayer())
+            {
+                // TODO : do something
+                printf("*** Someone else can't select this identity, you just took it!! ***\n");
+                return;
             }
         }
         
         if (allPlayersReady) allPlayersDone();
+    }
+    else
+    {
+        // Transmit to all subwindows, maybe *they* care about this event
+        const int amount = g_player_karts.size();
+        for (int n=0; n<amount; n++)
+        {
+            g_player_karts[n].transmitEvent(widget, name, playerID);
+        }
     }
 }
 

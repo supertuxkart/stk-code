@@ -182,15 +182,21 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 // -----------------------------------------------------------------------------
 EventPropagation SpinnerWidget::rightPressed(const int playerID)
 {
-    std::cout  << "Right pressed\n";
+    //std::cout  << "Right pressed\n";
     if (m_value+1 <= m_max) setValue(m_value+1);
+    
+    GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
 EventPropagation SpinnerWidget::leftPressed(const int playerID)
 {
-    std::cout  << "Left pressed\n";
+    //std::cout  << "Left pressed\n";
     if (m_value-1 >= m_min) setValue(m_value-1);
+    
+    GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
