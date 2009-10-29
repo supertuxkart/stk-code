@@ -209,18 +209,20 @@ int XMLNode::get(const std::string &attribute, video::SColor *color) const
     if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()<3 || v.size()>4) return 0;
-    if(v.size()==3)
+    if (v.size()<3 || v.size()>4) return 0;
+    if (v.size()==3)
     {
         color->setRed  (atoi(v[0].c_str()));
         color->setGreen(atoi(v[1].c_str()));
         color->setBlue (atoi(v[2].c_str()));
     }
     else
-        color->set(atoi(v[0].c_str()),
+    {
+        color->set(atoi(v[3].c_str()), // irrLicht expects ARGB, and we use RGBA in XML files
+                   atoi(v[0].c_str()),
                    atoi(v[1].c_str()),
-                   atoi(v[2].c_str()),
-                   atoi(v[3].c_str()));
+                   atoi(v[2].c_str()));
+    }
     return 1;
 }   // get(SColor)
 
@@ -232,10 +234,10 @@ int XMLNode::get(const std::string &attribute, video::SColorf *color) const
 
     std::vector<std::string> v = StringUtils::split(s,' ');
     if(v.size()!=4) return 0;
-    color->set((float)atof(v[0].c_str()),
+    color->set((float)atof(v[3].c_str()),  // set takes ARGB, but we use RGBA
+               (float)atof(v[0].c_str()),
                (float)atof(v[1].c_str()),
-               (float)atof(v[2].c_str()),
-               (float)atof(v[3].c_str()));
+               (float)atof(v[2].c_str()));
     return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------
