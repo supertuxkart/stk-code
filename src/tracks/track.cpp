@@ -795,10 +795,10 @@ void Track::loadTrackModel(unsigned int mode_id)
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
     
     // ---- Create sun (non-ambient directional light)
-    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, m_sun_position,
+    m_sun = irr_driver->getSceneManager()->addLightSceneNode(NULL, core::vector3df(0,0,0),
                                                                m_sun_diffuse_color);
     m_sun->setLightType(video::ELT_DIRECTIONAL);
-    m_sun->setRotation( core::vector3df(180, 45, 45) ); // TODO: make sun orientation configurable
+    m_sun->setRotation( core::vector3df(180, 45, 45) ); // TODO: make sun orientation configurable (calculate from m_sun_position)
     
     // We should NOT give the sun an ambient color, we already have a scene-wide ambient color.
     // No need for two ambient colors.
