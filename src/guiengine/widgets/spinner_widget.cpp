@@ -263,5 +263,7 @@ stringw SpinnerWidget::getStringValue() const
     else
     {
         assert(false);
-    }    
+    }  
+    /** To avoid compiler warnings about missing return statements. */
+    return "";
 }
