@@ -26,9 +26,17 @@ namespace GUIEngine
 }
 class InputDevice;
 class ActivePlayer;
+class PlayerKartWidget;
+class KartHoverListener;
 
 class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<KartSelectionScreen>
 {
+    friend class KartHoverListener;
+    friend class PlayerNameSpinner;
+    
+    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+    ptr_vector<PlayerKartWidget, REF> m_kart_widgets;
+    
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     KartSelectionScreen();
     
