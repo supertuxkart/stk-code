@@ -371,7 +371,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         else list->setSelected(-1);
     }
     
-    if (w->m_tab_up_root != -1) el = GUIEngine::getWidget( w->m_tab_up_root )->getIrrlichtElement();
+    if (w != NULL && w->m_tab_up_root != -1) el = GUIEngine::getWidget( w->m_tab_up_root )->getIrrlichtElement();
     if (el == NULL)
     {
         std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
@@ -477,7 +477,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         else list->setSelected(-1);
     }
     
-    if (w->m_tab_down_root != -1)
+    if (w != NULL && w->m_tab_down_root != -1)
     {
         Widget* down = GUIEngine::getWidget( w->m_tab_down_root );
         assert(down != NULL);
