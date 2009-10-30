@@ -604,36 +604,7 @@ void DynamicRibbonWidget::updateItemDisplay()
     } // next row
 }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::setSelection(int item_id)
-{
-    //printf("****DynamicRibbonWidget::setSelection()****\n");
-
-    if (m_rows.size() > 1)
-    {
-        std::cout << "\n/!\\ Warning, DynamicRibbonWidget::setSelection only makes sense on 1-row ribbons " <<
-                     "(since there can't logically be a permanent with more than one row)\n\n";
-        return;
-    }
-    
-    // FIXME: don't hardcode player 0 ?
-    const int PLAYER_ID = 0;
-    
-    m_selected_item[PLAYER_ID] = item_id;
-    if (m_selected_item[PLAYER_ID] >= (int)m_items.size()) m_selected_item[PLAYER_ID] -= m_items.size();
-    
-    // scroll so selection is visible
-    m_scroll_offset = m_selected_item[PLAYER_ID]; // works because in this case there is a single row
-    updateItemDisplay();
-    
-    // set selection
-    RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
-    int id = m_selected_item[PLAYER_ID] - m_scroll_offset;
-    if (id < 0) id += m_items.size();
-    ribbon->setSelection(id, PLAYER_ID);
-}
-
-// -----------------------------------------------------------------------------
-void DynamicRibbonWidget::setSelection(int item_id, const int playerID)
+bool DynamicRibbonWidget::setSelection(int item_id, const int playerID)
 {
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
@@ -659,12 +630,26 @@ void DynamicRibbonWidget::setSelection(int item_id, const int playerID)
     if (row == -1)
     {
         std::cerr << "DynamicRibbonWidget::setSelection cannot find item " << item_id << " (" << name.c_str() << ")\n";
-        return;
+        return false;
     }
     
-    std::cout << "Player " << playerID << " has kart " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
+    //std::cout << "Player " << playerID << " has item " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
     m_rows[row].setSelection(id, playerID);
     m_rows[row].setFocusForPlayer(playerID);
 
     propagateSelection();
+    return true;
+}
+// -----------------------------------------------------------------------------
+bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID)
+{
+    const int item_count = m_items.size();
+    for (int n=0; n<item_count; n++)
+    {
+        if (m_items[n].m_code_name == item_codename)
+        {
+            return setSelection(n, playerID);
+        }
+    }
+    return false;
 }

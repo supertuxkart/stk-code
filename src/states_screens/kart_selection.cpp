@@ -497,43 +497,64 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
 #endif
     
 class KartHoverListener : public DynamicRibbonHoverListener
+{
+    KartSelectionScreen* m_parent;
+public:
+    KartHoverListener(KartSelectionScreen* parent)
     {
-    public:
-        void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
-                                const irr::core::stringw& selectionText, const int playerID)
+        m_parent = parent;
+    }
+    
+    void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
+                            const irr::core::stringw& selectionText, const int playerID)
+    {
+        // Don't allow changing the selection after confirming it
+        if (g_player_karts[playerID].isReady())
         {
-            ModelViewWidget* w3 = g_player_karts[playerID].modelView;
-            assert( w3 != NULL );
+            // discard events sent when putting back to the right kart
+            if (selectionID == g_player_karts[playerID].m_kartInternalName) return;
             
-            if (selectionID == "gui/track_random.png")
-            {
-                scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
-                w3->clearModels();
-                w3->addModel( model, Vec3(0.0f, 0.0f, -12.0f) );
-                w3->update(0);
-                g_player_karts[playerID].kartName->setText( _("Random Kart") );
-            }
-            else
-            {
-                //printf("%s\n", selectionID.c_str());
-                const KartProperties* kart = kart_properties_manager->getKart(selectionID);
-                if (kart == NULL) return;
-                KartModel* kartModel = kart->getKartModel();
-                
-                w3->clearModels();
-                w3->addModel( kartModel->getModel() );
-                w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-                w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-                w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-                w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-                w3->update(0);
-
-                g_player_karts[playerID].kartName->setText( selectionText.c_str() );
-            }
-
-            g_player_karts[playerID].setKartInternalName(selectionID);
+            DynamicRibbonWidget* w = m_parent->getWidget<DynamicRibbonWidget>("karts");
+            assert(w != NULL);
+            
+            w->setSelection(g_player_karts[playerID].m_kartInternalName, playerID);
+            return;
         }
-    };
+        
+        // Update the displayed model
+        ModelViewWidget* w3 = g_player_karts[playerID].modelView;
+        assert( w3 != NULL );
+        
+        if (selectionID == "gui/track_random.png")
+        {
+            // Random kart
+            scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
+            w3->clearModels();
+            w3->addModel( model, Vec3(0.0f, 0.0f, -12.0f) );
+            w3->update(0);
+            g_player_karts[playerID].kartName->setText( _("Random Kart") );
+        }
+        else
+        {
+            //printf("%s\n", selectionID.c_str());
+            const KartProperties* kart = kart_properties_manager->getKart(selectionID);
+            if (kart == NULL) return;
+            KartModel* kartModel = kart->getKartModel();
+            
+            w3->clearModels();
+            w3->addModel( kartModel->getModel() );
+            w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+            w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+            w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+            w3->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+            w3->update(0);
+
+            g_player_karts[playerID].kartName->setText( selectionText.c_str() );
+        }
+
+        g_player_karts[playerID].setKartInternalName(selectionID);
+    }
+};
 KartHoverListener* karthoverListener = NULL;
 
 #if 0
@@ -702,7 +723,7 @@ void KartSelectionScreen::init()
     
     if (karthoverListener == NULL)
     {
-        karthoverListener = new KartHoverListener();
+        karthoverListener = new KartHoverListener(this);
         w->registerHoverListener(karthoverListener);
     }
               

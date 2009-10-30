@@ -126,7 +126,8 @@ void OptionsScreenAV::init()
             {
                 //std::cout << "************* Detected right resolution!!! " << n << "\n";
                 // that's the current one
-                res->setSelection(n);
+                const int playerID = 0; // FIXME: don't hardcode player 0 ?
+                res->setSelection(n, playerID);
                 break;
             }
         }  // end for

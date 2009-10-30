@@ -138,6 +138,7 @@ namespace GUIEngine
         EventPropagation mouseHovered(Widget* child);
         EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         
+
     public:
         DynamicRibbonWidget(const bool combo=false, const int max_rows=4);
         
@@ -172,14 +173,17 @@ namespace GUIEngine
         /** Get the user-visible text of the selected item */
         const irr::core::stringw& getSelectionText(const int playerID);
         
-        /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
-            ID ranges from {0} to {number of items added through 'addItem' - 1} */
-        void setSelection(int item_id);
-        
         /** Returns a read-only list of items added to this ribbon */
         const std::vector<ItemDescription>& getItems() const { return m_items; }
         
-        void setSelection(int item_id, const int playerID);
+        /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
+         ID ranges from {0} to {number of items added through 'addItem' - 1}
+         \return Whether setting the selection was successful (whether the item exists) */
+        bool setSelection(int item_id, const int playerID);
+        
+        /** Select an item from its codename.
+            \return Whether setting the selection was successful (whether the item exists) */
+        bool setSelection(const std::string item_codename, const int playerID);
         
         /**
          * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
