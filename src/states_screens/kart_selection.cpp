@@ -55,6 +55,10 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
 #pragma mark PlayerKartWidget
 #endif
     
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+
+    /** A small extension to the spinner widget to add features like player ID management or badging */
     class PlayerNameSpinner : public SpinnerWidget
     {
         int m_playerID;
@@ -106,29 +110,44 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
         }
     };
 
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+
+    /** A widget representing the kart selection for a player (i.e. the player's number, name, the kart view, the kart's name) */
     class PlayerKartWidget : public Widget
-    {
-        float x_speed, y_speed, w_speed, h_speed;
+    {        
+        /** Whether this player confirmed their selection */
         bool m_ready;
         
+        /** widget coordinates */
+        int player_id_x, player_id_y, player_id_w, player_id_h;
+        int player_name_x, player_name_y, player_name_w, player_name_h;
+        int model_x, model_y, model_w, model_h;
+        int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
+        
+        /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is reserved, widget will not be
+            in the regular tabbing order */
+        int m_irrlicht_widget_ID;
+        
+        /** For animation purposes (see method 'move') */
+        int target_x, target_y, target_w, target_h;
+        float x_speed, y_speed, w_speed, h_speed;
+
+        /** Object representing this player */
+        ActivePlayer* m_associatedPlayer;
+        int m_playerID;
+
+        /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
+        std::string spinnerID;
+        
     public:
+        /** Sub-widgets created by this widget */
         LabelWidget* playerIDLabel;
         PlayerNameSpinner* playerName;
         ModelViewWidget* modelView;
         LabelWidget* kartName;
         
-        ActivePlayer* m_associatedPlayer;
-
-        int m_playerID;
-        std::string spinnerID;
         
-        int player_id_x, player_id_y, player_id_w, player_id_h;
-        int player_name_x, player_name_y, player_name_w, player_name_h;
-        int model_x, model_y, model_w, model_h;
-        int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-        int m_irrlicht_widget_ID;
-        
-        int target_x, target_y, target_w, target_h;
 
         LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
         std::string deviceName;
@@ -154,6 +173,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             target_w = w;
             target_h = h;
             
+            // ---- Player ID label
             if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
             {
                 deviceName += "keyboard";
@@ -179,6 +199,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             //playerID->setParent(this);
             m_children.push_back(playerIDLabel);
             
+            // ---- Player identity spinner
             playerName = new PlayerNameSpinner(m_playerID);
             playerName->x = player_name_x;
             playerName->y = player_name_y;
@@ -201,6 +222,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             //playerName->m_event_handler = this;
             m_children.push_back(playerName);
             
+            // ----- Kart model view
             modelView = new ModelViewWidget();
             
             modelView->x = model_x;
@@ -223,6 +245,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
             this->modelView->setRotateContinuously( 35.0f );
             
+            // ---- Kart name label
             kartName = new LabelWidget();
             kartName->m_text = props->getName();
             kartName->m_properties[PROP_TEXT_ALIGN] = "center";
@@ -252,6 +275,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             getCurrentScreen()->manualRemoveWidget(this);
         }
         
+        /** Called when players are renumbered (changes the player ID) */
         void setPlayerID(const int newPlayerID)
         {
             if (StateManager::get()->getActivePlayers().get(newPlayerID) != m_associatedPlayer)
@@ -270,6 +294,13 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             playerName->setID(m_playerID);
         }
         
+        /** Returns the ID of this player */
+        int getPlayerID() const
+        {
+            return m_playerID;
+        }
+        
+        /** Add the widgets to the current screen */
         virtual void add()
         {
             playerIDLabel->add();
@@ -294,12 +325,21 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             }
             
         }
-                
+        
+        /** Get the associated ActivePlayer object*/
         ActivePlayer* getAssociatedPlayer()
         {
             return m_associatedPlayer;
         }
         
+        /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
+        //const std::string& getSpinnerID() const
+        //{
+        //    return spinnerID;
+        //}
+        
+        /** Starts a 'move/resize' animation, by simply passing destination coords. The animation
+            will then occur on each call to 'onUpdate'. */
         void move(const int x, const int y, const int w, const int h)
         {
             target_x = x;
@@ -313,6 +353,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             h_speed = abs( this->h - h ) / 300.0f;
         }
         
+        /** Call when player confirmed his identity and kart */
         void markAsReady()
         {
             m_ready = true;
@@ -342,11 +383,14 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             greenCheckWidget->setTabStop(false);
             greenCheckWidget->setUseAlphaChannel(true);
         }
+        
+        /** \return Whether this player confirmed his kart and indent selection */
         bool isReady()
         {
             return m_ready;
         }
         
+        /** Updates the animation (moving/shrinking/etc.) */
         void onUpdate(float delta)
         {
             if (target_x == x && target_y == y && target_w == w && target_h == h) return;
@@ -421,6 +465,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             
         }
 
+        /** Event callback */
         virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
         {
             //std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
@@ -440,6 +485,7 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             return EVENT_LET; // continue propagating the event
         }
 
+        /** Sets the size of the widget as a whole, and placed children widgets inside itself */
         void setSize(const int x, const int y, const int w, const int h)
         {
             this->x = x;
@@ -485,6 +531,8 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
             kart_name_x = x;
             kart_name_y = y + h - kart_name_h;
         }
+        
+        /** Sets which kart was selected for this player */
         void setKartInternalName(const std::string& whichKart)
         {
             m_kartInternalName = whichKart;
@@ -495,7 +543,9 @@ ptr_vector<PlayerKartWidget, REF> g_player_karts;
 #pragma mark -
 #pragma mark KartHoverListener
 #endif
-    
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+  
 class KartHoverListener : public DynamicRibbonHoverListener
 {
     KartSelectionScreen* m_parent;
@@ -562,10 +612,12 @@ KartHoverListener* karthoverListener = NULL;
 #pragma mark KartSelectionScreen
 #endif
     
+// -----------------------------------------------------------------------------
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
 }
 
+// -----------------------------------------------------------------------------
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
@@ -628,7 +680,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 PlayerKartWidget* removedWidget = NULL;
 
 // -----------------------------------------------------------------------------
-// Return true if event was handled succesfully
+// Returns true if event was handled succesfully
 bool KartSelectionScreen::playerQuit(ActivePlayer* player)
 {    
     int playerID = -1;
@@ -643,11 +695,10 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     // If last player quits, return to main menu
     if (g_player_karts.size() <= 1) return false;
 
-    std::cout << "playerQuit() ==========\n";
-
+    // Find the player ID associated to this player
     for (int n=0; n<g_player_karts.size(); n++)
     {
-        if (g_player_karts[n].m_associatedPlayer == player)
+        if (g_player_karts[n].getAssociatedPlayer() == player)
         {
             playerID = n;
             break;
@@ -658,7 +709,8 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
         std::cout << "void playerQuit(ActivePlayer* player) : cannot find passed player\n";
         return false;
     }
-    
+    std::cout << "playerQuit( " << playerID << " )\n";
+
     // Just a cheap way to check if there is any discrepancy 
     // between g_player_karts and the active player array
     assert( g_player_karts.size() == StateManager::get()->activePlayerCount() );
@@ -671,11 +723,20 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     }
     GUIEngine::g_focus_for_player[playerID] = NULL;
     
+    // keep the removed kart a while, for the 'disappear' animation to take place
     removedWidget = g_player_karts.remove(playerID);
+    
+    // Tell the StateManager to remove this player
     StateManager::get()->removeActivePlayer(playerID);
+    
+    // Karts count changed, maybe order too, so renumber them
     renumberKarts();    
+    
+    // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
+    // and will stop when the widget has disappeared)
     Widget* fullarea = this->getWidget("playerskarts");
     removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h, 0, 0);
+    
     return true;
 }
     
@@ -683,24 +744,26 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     
 void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*) 
 {
+    // Dispatch the onUpdate event to each kart, so they can perform their animation if any
     const int amount = g_player_karts.size();
     for (int n=0; n<amount; n++)
     {
         g_player_karts[n].onUpdate(delta);
     }
     
-   if (removedWidget != NULL)
-   {
-       removedWidget->onUpdate(delta);
+    // When a kart widget is removed, it's a kept a while, for the disappear animation to take place
+    if (removedWidget != NULL)
+    {
+        removedWidget->onUpdate(delta);
        
-       if (removedWidget->w == 0 || removedWidget->h == 0)
-       {
-           // destruct when too small (for "disappear" effects)
-           this->manualRemoveWidget(removedWidget);
-           delete removedWidget;
-           removedWidget = NULL;
-       }
-   }
+        if (removedWidget->w == 0 || removedWidget->h == 0)
+        {
+            // destruct when too small (for "disappear" effects)
+            this->manualRemoveWidget(removedWidget);
+            delete removedWidget;
+            removedWidget = NULL;
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -1032,7 +1095,7 @@ GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID)
         const int amount = g_player_karts.size();
         for (int n=0; n<amount; n++)
         {
-            if (g_player_karts[n].m_playerID == playerID)
+            if (g_player_karts[n].getPlayerID() == playerID)
             {
                 std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->m_playerID  <<
                             " (ID " << m_element->getID() <<
