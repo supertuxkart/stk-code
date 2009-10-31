@@ -406,6 +406,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     }
     else
     {        
+        std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
         // select the last widget
         Widget* w = NULL;
         
@@ -480,6 +481,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (w != NULL && w->m_tab_down_root != -1)
     {
         Widget* down = GUIEngine::getWidget( w->m_tab_down_root );
+        //std::cout << "navigateDown : setting root to " << w->m_tab_down_root << std::endl;
         assert(down != NULL);
         el = down->getIrrlichtElement();
     }
@@ -492,8 +494,9 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
-       // std::cout << "!!! Player " << playerID << " navigating to " << closest->getID() << std::endl;
+        //std::cout << "!!! Player " << playerID << " navigating down to " << closest->getID() << std::endl;
 
+        // FIXME : remove the special case for player 0
         if (playerID == 0)
         {
             GUIEngine::getGUIEnv()->setFocus(closest);
@@ -506,6 +509,12 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     }
     else
     {
+        std::cout << "EventHandler::navigateDown : warp around, selecting the first widget\n";
+        //if (el == NULL) std::cout << "    because el is null\n";
+        //else if (el->getTabGroup() == NULL) std::cout << "    because el's tab group is null\n";
+        //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known next\n"; 
+
+        
         //std::cout << "!!! Player " << playerID << " cannot navigating down, no next widget found;\n";
 
         // select the first widget

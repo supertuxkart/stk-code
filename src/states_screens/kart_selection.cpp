@@ -48,17 +48,55 @@ using irr::core::stringw;
 class PlayerKartWidget;
     
 /** Currently, navigation for multiple players at the same time is implemented in
-    a somewhat clunky way. The first player is considered "root player", and we keep
-    the ID of his spinner here. Then, the widgets of all other players will use this root
-    ID as base for navigation (players > 0 will navigate to the spinner of player 0, 
-    which will then dispatch the focus to the right one). FIXME indeed */
+    a somewhat clunky way. An invisible "dispatcher" widget is added above kart
+    icons. When a player moves up, he focuses the dispatcher, which in turn moves
+    the selection to the appropriate spinner. "tabbing roots" are used to make
+    navigation back down possible. (FIXME: maybe find a cleaner way?) */
 int g_root_id;
+
+class FocusDispatcher : public Widget
+{
+    KartSelectionScreen* m_parent;
+    int m_reserved_id;
+public:
+    FocusDispatcher(KartSelectionScreen* parent)
+    {
+        //m_type = WTYPE_LABEL;
+        m_type = WTYPE_BUTTON;
+        m_parent = parent;
+        m_reserved_id = -1;
+        
+        x = 0;
+        y = 0;
+        w = 1;
+        h = 1;
+    }
     
-#if 0
-#pragma mark -
-#pragma mark PlayerKartWidget
-#endif
+    void setRootID(const int reservedID)
+    {
+        m_reserved_id = reservedID;
+    }
     
+    virtual void add()
+    {
+        assert(m_reserved_id != -1);
+        core::rect<s32> widget_size = core::rect<s32>(x, y, x + w, y + h);
+        
+        //gui::IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(L" ", widget_size, false, false, NULL, m_reserved_id);
+        m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL, m_reserved_id, L"Dispatcher", L"");
+        
+        id = m_element->getID();
+        m_element->setTabStop(true);
+        m_element->setTabGroup(false);
+        m_element->setTabOrder(id);
+        m_element->setVisible(false);
+    }
+    
+    virtual EventPropagation focused(const int playerID);
+};
+    
+FocusDispatcher* g_dispatcher = NULL;
+
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
@@ -70,7 +108,7 @@ int g_root_id;
         irr::gui::IGUIImage* m_red_mark_widget;
         KartSelectionScreen* m_parent;
         
-        virtual EventPropagation focused(const int m_playerID) ;
+        //virtual EventPropagation focused(const int m_playerID) ;
         
     public:
         PlayerNameSpinner(KartSelectionScreen* parent, const int playerID)
@@ -215,7 +253,6 @@ int g_root_id;
             
             if (irrlichtWidgetID == -1)
             {
-                // FIXME : don't rely so hard on player 0 being the "root" ?
                 playerName->m_tab_down_root = g_root_id;
             }
             
@@ -621,6 +658,7 @@ KartHoverListener* karthoverListener = NULL;
 // -----------------------------------------------------------------------------
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
+    g_dispatcher = new FocusDispatcher(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -650,29 +688,33 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     const int id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
     ActivePlayer *aplayer = StateManager::get()->getActivePlayer(id);
     
+    // ---- Create focus dispatcher
+    if (firstPlayer)
+    {
+        g_dispatcher->setRootID(kartsArea.m_reserved_id);
+        g_dispatcher->add();
+        m_widgets.push_back(g_dispatcher);
+
+        // We keep the ID of the "root" widget, see comment at top
+        g_root_id = kartsArea.m_reserved_id;
+        std::cout << "++++ root ID : " << g_root_id << std::endl;
+    }
+    
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayer;
+    /*
     if (firstPlayer)
     {
         newPlayer = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size(), kartsArea.m_reserved_id);
     }
     else
-    {
+    {*/
         newPlayer = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
-    }
+    /*
+    }*/
     
-    //FIXME : currently, only player 0's spinner is focusable - and it dispatches focus to one of
-    // the others as needed. But if player 0 leaves, it will be impossible for remaining players
-    // to select their ident
-        
     this->manualAddWidget(newPlayer);
     newPlayer->add();
-
-    // We keep the ID of the "root" player, see comment at top
-    if (firstPlayer)
-    {
-        g_root_id = newPlayer->playerName->getIrrlichtElement()->getID();
-    }
     
     m_kart_widgets.push_back(newPlayer);
     
@@ -1100,37 +1142,33 @@ void KartSelectionScreen::renumberKarts()
 #if 0
 #pragma mark -
 #endif
-    
-// FIXME : clean this mess, this file should not contain so many classes
-GUIEngine::EventPropagation PlayerNameSpinner::focused(const int playerID) 
-{
-    std::cout << "Player name spinner " << this->m_playerID << " focused by " << playerID << std::endl;
-        
-    // since this screen is multiplayer, redirect focus to the right widget
-    if (this->m_playerID != playerID)
-    {
-        const int amount = m_parent->m_kart_widgets.size();
-        for (int n=0; n<amount; n++)
-        {
-            if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
-            {
-                std::cout << "--> Redirecting focus for player " << playerID << " from spinner " << this->m_playerID  <<
-                            " (ID " << m_element->getID() <<
-                            ") to spinner " << n << " (ID " << m_parent->m_kart_widgets[n].playerName->m_element->getID() << ")" << std::endl;
-                int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
-                
-                m_parent->m_kart_widgets[n].playerName->setFocusForPlayer(playerID);
-                
-                int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
-                std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
-                
-                return GUIEngine::EVENT_BLOCK;
-            }
-        }
-        assert(false);
-    }
 
-    std::cout << "--> right spinner nothing to do\n";
-    return GUIEngine::EVENT_LET;
-}   // focused
+// FIXME : clean this mess, this file should not contain so many classes spread all over the place
+EventPropagation FocusDispatcher::focused(const int playerID)
+{ 
+    std::cout << "FocusDispatcher focused by player " << playerID << std::endl;
     
+    // since this screen is multiplayer, redirect focus to the right widget
+    const int amount = m_parent->m_kart_widgets.size();
+    for (int n=0; n<amount; n++)
+    {
+        if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
+        {
+            std::cout << "--> Redirecting focus for player " << playerID << " from FocusDispatcher "  <<
+            " (ID " << m_element->getID() <<
+            ") to spinner " << n << " (ID " << m_parent->m_kart_widgets[n].playerName->getIrrlichtElement()->getID() << ")" << std::endl;
+            int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
+            
+            m_parent->m_kart_widgets[n].playerName->setFocusForPlayer(playerID);
+            
+            int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
+            std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
+            
+            return GUIEngine::EVENT_BLOCK;
+        }
+    }
+    
+    assert(false);
+    return GUIEngine::EVENT_LET;        
+}
+

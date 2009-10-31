@@ -33,6 +33,7 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
+    friend class FocusDispatcher;
     
     // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
     ptr_vector<PlayerKartWidget, REF> m_kart_widgets;

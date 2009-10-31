@@ -397,7 +397,8 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
             if(w != NULL) return w;
         }
         
-        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
+        if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||
+            within_vector->get(i)->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */) continue;
         
         return within_vector->get(i);
     }
@@ -419,7 +420,8 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
             if(w != NULL) return w;
         }
         
-        if(within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1) continue;
+        if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||
+            within_vector->get(i)->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */) continue;
         
         return within_vector->get(i);
     }
