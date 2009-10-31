@@ -298,8 +298,19 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
         case PA_FIRE:
             if (pressedDown)
             {
-                IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
-                Widget* w = GUIEngine::getWidget( element->getID() );
+                Widget* w = NULL;
+                
+                // FIXME: remove special case for player 0
+                if (playerID == 0)
+                {
+                    IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
+                    if (element == NULL) break;
+                    w = GUIEngine::getWidget( element->getID() );
+                }
+                else
+                {
+                    w = GUIEngine::g_focus_for_player[playerID];
+                }
                 if (w == NULL) break;
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
