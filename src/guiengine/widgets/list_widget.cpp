@@ -41,6 +41,7 @@ void ListWidget::clear()
     list->clear();
 }
 // -----------------------------------------------------------------------------
+/* // Doesn't work, I would need to override CGUIListBox, but this class is private
 bool ListWidget::OnEvent (const SEvent &event)
 {
     // block input events, we will handle them (vertical navigation) ourselves
@@ -55,6 +56,7 @@ bool ListWidget::OnEvent (const SEvent &event)
         return false;
     }
 }
+ */
 // -----------------------------------------------------------------------------
 void ListWidget::addItem(const char* item)
 {

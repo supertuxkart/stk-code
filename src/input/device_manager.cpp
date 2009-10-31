@@ -159,7 +159,6 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 
 InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
                                               int btnID,
-                                              const bool progGen,
                                               ActivePlayer **player,
                                               PlayerAction *action )
 {
@@ -184,7 +183,6 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int btnID,
                                              int axisDir,
                                              int value,
-                                             const bool progGen,
                                              ActivePlayer **player,
                                              PlayerAction *action )
 {
@@ -217,7 +215,6 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     int btnID,
                                     int axisDir,
                                     int value,
-                                    const bool programaticallyGenerated,
                                     ActivePlayer** player /* out */,
                                     PlayerAction* action /* out */ )
 {
@@ -227,11 +224,11 @@ bool DeviceManager::translateInput( Input::InputType type,
     switch (type)
     {
         case Input::IT_KEYBOARD:
-            device = mapKeyboardInput(deviceID, btnID, programaticallyGenerated, player, action);
+            device = mapKeyboardInput(deviceID, btnID, player, action);
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
-            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, programaticallyGenerated, player, action);
+            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, player, action);
             break;
         default:
             break;

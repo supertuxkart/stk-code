@@ -70,10 +70,10 @@ private:
 	*/
 	int    m_mouse_val_x, m_mouse_val_y;
     
-    void   input(Input::InputType, int, int, int, int, const bool programaticallyGenerated);
+    void   dispatchInput(Input::InputType, int, int, int, int);
     void   handleStaticAction(int id0, int value);
     void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
-    void  inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value);
+    void   inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value);
 public:
 	       InputManager();
           ~InputManager();

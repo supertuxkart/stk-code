@@ -30,13 +30,11 @@ private:
                                         int btnID,
                                         int axisDir,
                                         int value,
-                                        const bool progGen,
                                         ActivePlayer **player,
                                         PlayerAction *action );
 
     InputDevice *mapKeyboardInput     ( int deviceID,
                                         int btnID,
-                                        const bool progGen,
                                         ActivePlayer **player,
                                         PlayerAction *action );
 
@@ -83,7 +81,6 @@ public:
                          int btnID,
                          int axisDir,
                          int value,
-                         const bool programaticallyGenerated,
                          ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );
 

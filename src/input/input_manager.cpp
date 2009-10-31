@@ -240,13 +240,11 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::input(Input::InputType type, int deviceID, int btnID, int axisDirection, int value,
-                         const bool programaticallyGenerated)
+void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID, int axisDirection, int value)
 {
     ActivePlayer*   player = NULL;
     PlayerAction    action;
-    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection,
-                                                          value, programaticallyGenerated, &player, &action);
+    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value, &player, &action);
 
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
@@ -391,14 +389,10 @@ void InputManager::input(Input::InputType type, int deviceID, int btnID, int axi
  */
 EventPropagation InputManager::input(const SEvent& event)
 {
-
-    //const bool programaticallyGenerated = (event.UserEvent.UserData1 == 666 && event.UserEvent.UserData1 == 999);
-    const bool programaticallyGenerated = false; //event.EventType == EET_KEY_INPUT_EVENT && (event.KeyInput.Char == 666);
-    
     if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
-        for(int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
+        for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
         {
             int value = event.JoystickEvent.Axis[axis_id];
 
@@ -407,17 +401,17 @@ EventPropagation InputManager::input(const SEvent& event)
             if(value == -32768) continue; // ignore bogus values given by irrlicht
 #endif
 
-            if(UserConfigParams::m_gamepad_debug)
+            if (UserConfigParams::m_gamepad_debug)
             {
                 printf("axis motion: gamepad_id=%d axis=%d value=%d\n",
                        event.JoystickEvent.Joystick, axis_id, value);
             }
 
             // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
-            if(value < 0)
-                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value, programaticallyGenerated);
+            if (value < 0)
+                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value);
             else
-                input(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value, programaticallyGenerated);
+                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
 
         GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
@@ -433,28 +427,30 @@ EventPropagation InputManager::input(const SEvent& event)
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 
             // Only report button events when the state of the button changes
-            if((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
-                input(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0,
-                      isButtonPressed ? Input::MAX_VALUE : 0, programaticallyGenerated);
+            if ((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
+            {
+                dispatchInput(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0,
+                              isButtonPressed ? Input::MAX_VALUE : 0);
+            }
             gp->setButtonPressed(i, isButtonPressed);
         }
 
     }
-    else if(event.EventType == EET_LOG_TEXT_EVENT)
+    else if (event.EventType == EET_LOG_TEXT_EVENT)
     {
         // Ignore 'normal' messages
-        if(event.LogEvent.Level>0)
+        if (event.LogEvent.Level>0)
         {
             printf("Level %d: %s\n",
                 event.LogEvent.Level,event.LogEvent.Text);
         }
         return EVENT_BLOCK;
     }
-    else if(event.EventType == EET_KEY_INPUT_EVENT)
+    else if (event.EventType == EET_KEY_INPUT_EVENT)
     {
         const int key = event.KeyInput.Key;
 
-        if(event.KeyInput.PressedDown)
+        if (event.KeyInput.PressedDown)
         {
             // escape is a little special
             if (key == KEY_ESCAPE)
@@ -470,7 +466,7 @@ EventPropagation InputManager::input(const SEvent& event)
                 return EVENT_LET;
             }
 
-            input(Input::IT_KEYBOARD, 0, key,
+            dispatchInput(Input::IT_KEYBOARD, 0, key,
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config
                   // assume that the unicode value is 0, it does not work
@@ -480,12 +476,12 @@ EventPropagation InputManager::input(const SEvent& event)
                   // we pass the 0 here artifically so that keyboard handling
                   // works.
                   0,  // FIXME: was ev.key.keysym.unicode,
-                  Input::MAX_VALUE, programaticallyGenerated);
+                  Input::MAX_VALUE);
 
         }
         else
         {
-            input(Input::IT_KEYBOARD, 0, key, 0, 0, programaticallyGenerated);
+            dispatchInput(Input::IT_KEYBOARD, 0, key, 0, 0);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
