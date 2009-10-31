@@ -179,11 +179,11 @@ namespace GUIEngine
         /** Select an item from its numerical ID. Only for [1-row] combo ribbons.
          ID ranges from {0} to {number of items added through 'addItem' - 1}
          \return Whether setting the selection was successful (whether the item exists) */
-        bool setSelection(int item_id, const int playerID);
+        bool setSelection(int item_id, const int playerID, const bool focusIt);
         
         /** Select an item from its codename.
             \return Whether setting the selection was successful (whether the item exists) */
-        bool setSelection(const std::string item_codename, const int playerID);
+        bool setSelection(const std::string item_codename, const int playerID, const bool focusIt);
         
         /**
          * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.

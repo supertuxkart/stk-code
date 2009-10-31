@@ -59,7 +59,9 @@ void PlayerInfoDialog::showRegularDialog()
         textCtrl->setParent(m_irrlicht_window);
         m_children.push_back(textCtrl);
         textCtrl->add();
-        GUIEngine::getGUIEnv()->setFocus( textCtrl->getIrrlichtElement() );
+        
+        const int playerID = 0; // FIXME: don't hardcode player ID
+        textCtrl->setFocusForPlayer( playerID );
     }
     
     {
@@ -172,8 +174,9 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->setParent(m_irrlicht_window);
         m_children.push_back(widget);
         widget->add();
-        GUIEngine::getGUIEnv()->setFocus( widget->getIrrlichtElement() );
-
+        
+        const int playerID = 0; // FIXME: don't hardcode player ID
+        widget->setFocusForPlayer( playerID );
     }
     
 }

@@ -111,7 +111,7 @@ void OptionsScreenAV::init()
         
         res->updateItemDisplay();
         
-        // ---- select curernt resolution every time
+        // ---- select current resolution every time
         const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
         const int amount = modes.size();
         for(int n=0; n<amount; n++)
@@ -127,7 +127,7 @@ void OptionsScreenAV::init()
                 //std::cout << "************* Detected right resolution!!! " << n << "\n";
                 // that's the current one
                 const int playerID = 0; // FIXME: don't hardcode player 0 ?
-                res->setSelection(n, playerID);
+                res->setSelection(n, playerID, false);
                 break;
             }
         }  // end for

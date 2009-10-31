@@ -70,7 +70,7 @@ ModalDialog::~ModalDialog()
     
     m_irrlicht_window->remove();
     
-    if(modalWindow == this) modalWindow = NULL;
+    if (modalWindow == this) modalWindow = NULL;
 }
 
 void ModalDialog::clearWindow()

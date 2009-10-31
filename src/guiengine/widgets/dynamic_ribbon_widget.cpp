@@ -298,33 +298,18 @@ RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w) const
 // -----------------------------------------------------------------------------
 RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID) const
 {    
-    if (playerID == 0)
+
+    const int row_amount = m_rows.size();
+    for(int n=0; n<row_amount; n++)
     {
-        const int row_amount = m_rows.size();
-        for(int n=0; n<row_amount; n++)
+        const RibbonWidget* row = &m_rows[n];
+        if (GUIEngine::isFocusedForPlayer(row, playerID))
         {
-            const RibbonWidget* row = &m_rows[n];
-            if(row != NULL)
-            {
-                if( GUIEngine::getGUIEnv()->hasFocus(row->m_element) ||
-                   m_element->isMyChild( GUIEngine::getGUIEnv()->getFocus() ) ) return (RibbonWidget*)row;
-            }
+            return (RibbonWidget*)row;
         }
     }
-    else
-    {
-        const int row_amount = m_rows.size();
-        for(int n=0; n<row_amount; n++)
-        {
-            const RibbonWidget* row = &m_rows[n];
-            if (row == GUIEngine::g_focus_for_player[playerID])
-            {
-                return (RibbonWidget*)row;
-            }
-        }
         
-    }
-    
+
     return NULL;
 }
 
@@ -354,9 +339,12 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
                                                     getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
+    std::cout << "rightpressed (dynamic ribbon)\n";
     
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
     
+    std::cout << "     rightpressed returning EVENT_LET\n";
+
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
@@ -604,7 +592,7 @@ void DynamicRibbonWidget::updateItemDisplay()
     } // next row
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::setSelection(int item_id, const int playerID)
+bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt)
 {
     //printf("****DynamicRibbonWidget::setSelection()****\n");
 
@@ -635,20 +623,20 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID)
     
     //std::cout << "Player " << playerID << " has item " << item_id << " (" << name.c_str() << ") in row " << row << std::endl;
     m_rows[row].setSelection(id, playerID);
-    m_rows[row].setFocusForPlayer(playerID);
+    if (focusIt) m_rows[row].setFocusForPlayer(playerID);
 
     propagateSelection();
     return true;
 }
 // -----------------------------------------------------------------------------
-bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID)
+bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt)
 {
     const int item_count = m_items.size();
     for (int n=0; n<item_count; n++)
     {
         if (m_items[n].m_code_name == item_codename)
         {
-            return setSelection(n, playerID);
+            return setSelection(n, playerID, focusIt);
         }
     }
     return false;

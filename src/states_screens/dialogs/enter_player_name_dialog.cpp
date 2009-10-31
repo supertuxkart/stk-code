@@ -60,7 +60,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->setParent(m_irrlicht_window);
     m_children.push_back(textCtrl);
     textCtrl->add();
-    GUIEngine::getGUIEnv()->setFocus( textCtrl->getIrrlichtElement() );
+    textCtrl->setFocusForPlayer(0); // FIXME : don't hardcode player 0 ?
     
     // TODO : add Ok button
 
@@ -93,7 +93,8 @@ GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(std::string& eve
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
-    if( GUIEngine::getGUIEnv()->hasFocus(cancelButton->getIrrlichtElement()) )
+    const int playerID = 0; // FIXME: don't ahrdcode player 0?
+    if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
     {
         std::string fakeEvent = "cancel";
         processEvent(fakeEvent);

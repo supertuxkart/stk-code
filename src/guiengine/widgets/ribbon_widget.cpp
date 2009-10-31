@@ -37,7 +37,7 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     m_selection[0] = 0; // only player 0 has a selection by default
     
     m_ribbon_type = type;
-    m_focus = NULL;
+    m_mouse_focus = NULL;
     updateSelection();
     m_type = WTYPE_RIBBON;
 }
@@ -235,10 +235,19 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         else m_selection[playerID] = 0;
     }
     updateSelection();
-    if (playerID == 0) m_focus = m_children.get(m_selection[playerID]);
     
-    if (m_ribbon_type != RIBBON_TOOLBAR) return EVENT_LET;
-    else return EVENT_BLOCK;
+    // FIXME: don't hardcode player ID 0
+    if (playerID == 0) m_mouse_focus = m_children.get(m_selection[playerID]);
+    
+    if (m_ribbon_type != RIBBON_TOOLBAR)
+    {
+        //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+        return EVENT_LET;
+    }
+    else
+    {
+        return EVENT_BLOCK;
+    }
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::leftPressed(const int playerID)
@@ -255,10 +264,18 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     }
     updateSelection();
     
-    if (playerID == 0) m_focus = m_children.get(m_selection[playerID]);
+    // FIXME: don't hardcode player ID
+    if (playerID == 0) m_mouse_focus = m_children.get(m_selection[playerID]);
     
-    if (m_ribbon_type != RIBBON_TOOLBAR) return EVENT_LET;
-    else return EVENT_BLOCK;
+    if (m_ribbon_type != RIBBON_TOOLBAR)
+    {
+        //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+        return EVENT_LET;
+    }
+    else
+    {
+        return EVENT_BLOCK;
+    }
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::focused(const int playerID)
@@ -267,14 +284,15 @@ EventPropagation RibbonWidget::focused(const int playerID)
     
     if (m_children.size() < 1) return EVENT_LET; // empty ribbon
     
-    if (m_focus == NULL && m_selection[playerID] != -1)
+    // FIXME: don't hardcode player ID 0
+    if (m_mouse_focus == NULL && m_selection[playerID] != -1  && playerID == 0)
     {
-        m_focus = m_children.get(m_selection[playerID]);
+        m_mouse_focus = m_children.get(m_selection[playerID]);
     }
     
     if (m_event_handler != NULL)
     {
-        if (playerID == 0) GUIEngine::getGUIEnv()->setFocus(m_focus->m_element);
+        //m_focus->setFocusForPlayer( playerID );
                 
         // FIXME : unclean, children ribbons shouldn't need to know about their parent
         ((DynamicRibbonWidget*)m_event_handler)->onRowChange( this, playerID );
@@ -287,7 +305,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child)
 {
     const int subbuttons_amount = m_children.size();
     
-    m_focus = child;
+    m_mouse_focus = child;
     
     for (int i=0; i<subbuttons_amount; i++)
     {
@@ -323,7 +341,7 @@ void RibbonWidget::updateSelection()
     }
     
     // FIXME: don't hardcode player 0
-    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_focus = m_children.get(m_selection[0]);
+    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_mouse_focus = m_children.get(m_selection[0]);
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
@@ -342,7 +360,7 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator,
     updateSelection();
     
     // bring focus back to enclosing ribbon widget
-    GUIEngine::getGUIEnv()->setFocus(m_element);
+    this->setFocusForPlayer( playerID );
     
     return EVENT_LET;
 }

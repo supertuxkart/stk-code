@@ -82,7 +82,8 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);
     
-    GUIEngine::getGUIEnv()->setFocus( okBtn->getIrrlichtElement() );
+    const int playerID = 0; // FIXME: don't hardcode
+    okBtn->setFocusForPlayer( playerID );
     
     // ---- Track title
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);

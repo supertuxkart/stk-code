@@ -35,8 +35,7 @@ using namespace irr::video;
 
 namespace GUIEngine
 {
-    Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
-    
+
     namespace Private
     {
         IGUIEnvironment* g_env;
@@ -46,9 +45,10 @@ namespace GUIEngine
         IVideoDriver* g_driver;
         Screen* g_current_screen = NULL;
         AbstractStateManager* g_state_manager = NULL;
+        Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
     }
     using namespace Private;
-        
+   
     ptr_vector<Widget, REF> needsUpdate;
     ptr_vector<Screen, REF> g_loaded_screens;
 
@@ -58,6 +58,34 @@ namespace GUIEngine
     {
         return dt;
     }
+    
+    Widget* getFocusForPlayer(const int playerID)
+    {
+        assert(playerID >= 0);
+        assert(playerID < MAX_PLAYER_COUNT);
+        
+        return g_focus_for_player[playerID];
+    }
+    void focusNothingForPlayer(const int playerID)
+    {
+        Widget* focus = getFocusForPlayer(playerID);
+        if (focus != NULL) focus->unsetFocusForPlayer(playerID);
+        
+        g_focus_for_player[playerID] = NULL;
+    }
+    bool isFocusedForPlayer(const Widget* w, const int playerID)
+    {
+        assert(w != NULL);
+        assert(playerID >= 0);
+        assert(playerID < MAX_PLAYER_COUNT);
+        
+        // If no focus
+        if (g_focus_for_player[playerID] == NULL) return false;
+        
+        // otherwise check if the focus is the given widget
+        return g_focus_for_player[playerID]->isSameIrrlichtWidgetAs(w);
+    }
+        
 // -----------------------------------------------------------------------------  
 void clear()
 {

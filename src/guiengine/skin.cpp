@@ -600,7 +600,15 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     bool mark_selected = widget->isSelected();
     bool always_show_selection = false;
     
-    const bool parent_focused = GUIEngine::getGUIEnv()->getFocus() == widget->m_event_handler->m_element;
+    const int playerID = 0; // FIXME : don't hardcode player 0 ?
+    
+    IGUIElement* focusedElem = NULL;
+    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    {
+        focusedElem = GUIEngine::getFocusForPlayer(playerID)->getIrrlichtElement();
+    }
+    
+    const bool parent_focused = (focusedElem == widget->m_event_handler->m_element);
     
     RibbonWidget* parentRibbon = (RibbonWidget*)widget->m_event_handler;
     RibbonType type = parentRibbon->getRibbonType();
@@ -658,7 +666,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             if(w->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
         }
         
-        const bool mark_focused = focused || (parent_focused && w != NULL && w->m_focus == widget) ||
+        const bool mark_focused = focused || (parent_focused && w != NULL && w->m_mouse_focus == widget) ||
                                   (mark_selected && !always_show_selection && parent_focused);
         
         
@@ -780,8 +788,13 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
 {
     if (!focused)
     {
-        IGUIElement* focused_widget = GUIEngine::getGUIEnv()->getFocus();
+        IGUIElement* focused_widget = NULL;
         
+        const int playerID = 0;
+        if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+        {
+            focused_widget = GUIEngine::getFocusForPlayer(playerID)->getIrrlichtElement();
+        }
         if (focused_widget != NULL && widget->m_children.size()>2)
         {
             if (widget->m_children[0].id == focused_widget->getID() ||
@@ -957,13 +970,13 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
 {
     if (GUIEngine::getStateManager()->getGameState() == GUIEngine::GAME) return; // ignore in game mode
     
-    //const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
     const int id = element->getID();
     
     Widget* widget = GUIEngine::getWidget(id);
-    if(widget == NULL) return;
+    if (widget == NULL) return;
     
-    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
+    const int playerID = 0; // FIXME: don't hardcode player 0?
+    const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
     
     const WidgetType type = widget->m_type;
     if(type == WTYPE_LIST)
@@ -973,13 +986,16 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     }  
 }
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
-{
-    const bool focused = GUIEngine::getGUIEnv()->hasFocus(element);
-    
+{    
     const int id = element->getID();
     
     Widget* widget = NULL;
     if (id != -1) widget = GUIEngine::getWidget(id);
+
+    if (widget == NULL) return;
+    
+    const int playerID = 0; // FIXME: don't hardcode player 0?
+    const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
 
     /*
     std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str()) << std::endl;
@@ -1091,7 +1107,15 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     
     const WidgetType type = widget->m_type;
     
-    const bool focused = GUIEngine::getGUIEnv()->getFocus() == element;
+    const int playerID = 0; // FIXME : don't hardcode player 0 ?
+    
+    IGUIElement* focusedElem = NULL;
+    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    {
+        focusedElem = GUIEngine::getFocusForPlayer(playerID)->getIrrlichtElement();
+    }
+    
+    const bool focused = (focusedElem == element);
     
     if (type == WTYPE_LIST)
     {

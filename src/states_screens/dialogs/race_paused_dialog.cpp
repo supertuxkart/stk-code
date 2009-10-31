@@ -66,7 +66,9 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     back_btn->setParent(m_irrlicht_window);
     m_children.push_back(back_btn);
     back_btn->add();
-    GUIEngine::getGUIEnv()->setFocus( back_btn->getIrrlichtElement() );
+    
+    const int playerID = 0; // FIXME: don't hardcode player ID
+    back_btn->setFocusForPlayer( playerID );
     
     // ---- Choice ribbon
     m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);

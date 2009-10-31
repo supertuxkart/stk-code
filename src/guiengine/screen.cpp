@@ -264,9 +264,13 @@ void Screen::addWidgets()
     
     addWidgetsRecursively( m_widgets );
 
+    //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
+    
     // select the first widget
     Widget* w = getFirstWidget();
-    if(w != NULL) GUIEngine::getGUIEnv()->setFocus( w->m_element );
+    //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
+    if (w != NULL) w->setFocusForPlayer( 0 ); // FIXME: don't hardcode player ID 0
+    else std::cerr << "Couldn't select first widget, NULL was returned\n";
 }
 // -----------------------------------------------------------------------------
 void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)

@@ -223,7 +223,8 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     
     // re-select the previous button
     ButtonWidget* btn = this->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-    if(btn != NULL) GUIEngine::getGUIEnv()->setFocus( btn->getIrrlichtElement() );
+    const int playerID = 0; // FIXME: don't hardcode player ID
+    if(btn != NULL) btn->setFocusForPlayer(playerID);
     
     // save new binding to file
     input_manager->getDeviceList()->serialize();

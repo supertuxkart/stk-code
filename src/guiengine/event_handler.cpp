@@ -97,12 +97,13 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     const int playerID = 0; // FIXME : don't hardcode player 0
                     if (ribbon->mouseHovered(w) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
-                    getGUIEnv()->setFocus(ribbon->m_element);
+                    ribbon->setFocusForPlayer(playerID);
                 }
                 else
                 {
                     // focus on hover for other widgets
-                    getGUIEnv()->setFocus(w->m_element);
+                    const int playerID = 0; // FIXME: don't hardcode player 0 ?
+                    w->setFocusForPlayer(playerID);
                 }
                 
                 break;
@@ -116,11 +117,13 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                  break;
                  }
                  */
-            case EGET_ELEMENT_FOCUSED:
+            case EGET_ELEMENT_FOCUSED: // FIXME: is this still used with the new focus implementation?
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
                 
+                std::cout << "==== irrlicht widget focused : " << w->m_properties[PROP_ID] << std::endl;
+
                 // FIXME: don't hardcode player 0
                 return w->focused(0);
                 
@@ -210,21 +213,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
     {
         case PA_LEFT:
         {
-            Widget* w = NULL;
-            
-            // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
-            if (playerID == 0)
-            {
-                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-                if (el == NULL) break;
-                            
-                w = GUIEngine::getWidget( el->getID() );
-            }
-            else
-            {
-                w = GUIEngine::g_focus_for_player[playerID];
-            }
-            
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
             if (w == NULL) break;
                         
             Widget* widget_to_call = w;
@@ -235,34 +224,24 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the left press. */
             while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                widget_to_call->leftPressed(playerID);
+                if (widget_to_call->leftPressed(playerID) == EVENT_LET)
+                {
+                    transmitEvent(w, w->m_properties[PROP_ID], playerID);
+                }
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
             
             if (widget_to_call->leftPressed(playerID) == EVENT_LET)
             {
-                transmitEvent(w, w->m_properties[PROP_ID], playerID);
+                transmitEvent(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
             }
         }
         break;
             
         case PA_RIGHT:
         {
-            Widget* w = NULL;
-            
-            // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
-            if (playerID == 0)
-            {
-                IGUIElement *el = GUIEngine::getGUIEnv()->getFocus();
-                if(el == NULL) break;
-                w = GUIEngine::getWidget( el->getID() );
-            }
-            else
-            {
-                w = GUIEngine::g_focus_for_player[playerID];
-            }
-            
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
             if (w == NULL) break;
             
             Widget* widget_to_call = w;
@@ -272,13 +251,16 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
              On the way, also notify everyone in the chain of the right press */
             while (widget_to_call->m_event_handler != NULL && widget_to_call->m_event_handler != widget_to_call)
             {
-                widget_to_call->rightPressed(playerID);
+                if (widget_to_call->rightPressed(playerID) == EVENT_LET)
+                {
+                    transmitEvent(widget_to_call, w->m_properties[PROP_ID], playerID);
+                }
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
             if (widget_to_call->rightPressed(playerID) == EVENT_LET)
             {
-                transmitEvent(widget_to_call, w->m_properties[PROP_ID], playerID);
+                transmitEvent(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
             }
         }
         break;
@@ -298,19 +280,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
         case PA_FIRE:
             if (pressedDown)
             {
-                Widget* w = NULL;
-                
-                // FIXME: remove special case for player 0
-                if (playerID == 0)
-                {
-                    IGUIElement* element = GUIEngine::getGUIEnv()->getFocus();
-                    if (element == NULL) break;
-                    w = GUIEngine::getWidget( element->getID() );
-                }
-                else
-                {
-                    w = GUIEngine::g_focus_for_player[playerID];
-                }
+                Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
@@ -338,23 +308,11 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
 
 void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
 {
+    std::cout << "Naviagte up!\n";
     IGUIElement *el = NULL, *first=NULL, *closest=NULL;
     
-    // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
-    if (playerID == 0)
-    {
-        el = GUIEngine::getGUIEnv()->getFocus();
-    }
-    else
-    {
-        Widget* widget = g_focus_for_player[playerID];
-        if (widget != NULL)
-        {
-            el = widget->m_element;
-        }
-    }
-    
-    Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
+    Widget* w = GUIEngine::getFocusForPlayer(playerID);
+    if (w != NULL) el = w->getIrrlichtElement();
     
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
@@ -365,7 +323,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         assert(list != NULL);
         
         const bool stay_within_list = list->getSelected() > 0;
-        
+        /*
         if (type == Input::IT_STICKMOTION)
         {
             // simulate a key press
@@ -376,33 +334,40 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
             wrapper.KeyInput = evt;
             wrapper.EventType = EET_KEY_INPUT_EVENT;
             GUIEngine::getDevice()->postEventFromUser(wrapper);
-        }
+        }*/
         
-        if (stay_within_list) return;
-        else list->setSelected(-1);
+        if (stay_within_list)
+        {
+            list->setSelected(list->getSelected()-1);
+            return;
+        }
+        else
+        {
+            list->setSelected(-1);
+        }
     }
     
-    if (w != NULL && w->m_tab_up_root != -1) el = GUIEngine::getWidget( w->m_tab_up_root )->getIrrlichtElement();
-    if (el == NULL)
+    if (w != NULL && w->m_tab_up_root != -1)
     {
-        std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
-        return;
+        Widget* up = GUIEngine::getWidget( w->m_tab_up_root );
+        assert( up != NULL );
+        el = up->getIrrlichtElement();
+        
+        if (el == NULL)
+        {
+            std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
+            return;
+        }
     }
+
     
     // find closest widget
     if (el != NULL && el->getTabGroup() != NULL &&
         el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
     {
+        std::cout << "Navigating up to " << closest->getID() << std::endl;
         Widget* w = GUIEngine::getWidget( closest->getID() );
-
-        if (playerID == 0)
-        {
-            GUIEngine::getGUIEnv()->setFocus(closest);
-        }
-        else if (w != NULL)
-        {
-            w->setFocusForPlayer(playerID);
-        }
+        w->setFocusForPlayer(playerID);
         
         // when focusing a list by going up, select the last item of the list
         if (w != NULL && w->m_type == WTYPE_LIST)
@@ -418,6 +383,10 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     else
     {        
         std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
+        //if (el == NULL) std::cout << "    because el is null\n";
+        //else if (el->getTabGroup() == NULL) std::cout << "    because el's tab group is null\n";
+        //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known previous\n"; 
+        
         // select the last widget
         Widget* w = NULL;
         
@@ -432,13 +401,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
             w = screen->getLastWidget();
         }
         
-        if (w != NULL)
-        {
-            if (playerID == 0)
-                GUIEngine::getGUIEnv()->setFocus( w->m_element );
-            else
-                w->setFocusForPlayer(playerID);
-        }
+        if (w != NULL) w->setFocusForPlayer(playerID);
     }
 }
 
@@ -446,21 +409,12 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
 
 void EventHandler::navigateDown(const int playerID, Input::InputType type, const bool pressedDown)
 {
+    std::cout << "Naviagte down!\n";
+
     IGUIElement *el = NULL, *first = NULL, *closest = NULL;
     
-    // TODO : unify player 0 and players > 0 focus navigation to eliminate this kind of branching
-    if (playerID == 0)
-    {
-        el = GUIEngine::getGUIEnv()->getFocus();
-    }
-    else
-    {
-        Widget* widget = GUIEngine::g_focus_for_player[playerID];
-        if (widget != NULL) el = widget->m_element;
-    }
-        
-    Widget* w = (el == NULL) ? NULL : GUIEngine::getWidget( el->getID() );
-    
+    Widget* w = GUIEngine::getFocusForPlayer(playerID);
+    if (w != NULL) el = w->getIrrlichtElement();
     //std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
     
     // list widgets are a bit special, because up/down keys are also used
@@ -473,6 +427,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         
         const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
         
+        /*
         if (type == Input::IT_STICKMOTION)
         {
             // simulate a key press
@@ -483,39 +438,51 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
             wrapper.KeyInput = evt;
             wrapper.EventType = EET_KEY_INPUT_EVENT;
             GUIEngine::getDevice()->postEventFromUser(wrapper);
+        }*/
+            
+        if (stay_within_list)
+        {
+            list->setSelected(list->getSelected()+1);
+            return;
         }
-        
-        if (stay_within_list) return;
-        else list->setSelected(-1);
+        else
+        {
+            list->setSelected(-1);
+        }
     }
     
     if (w != NULL && w->m_tab_down_root != -1)
     {
+        //std::cout << " w->m_tab_down_root=" <<  w->m_tab_down_root << std::endl;
         Widget* down = GUIEngine::getWidget( w->m_tab_down_root );
         //std::cout << "navigateDown : setting root to " << w->m_tab_down_root << std::endl;
         assert(down != NULL);
         el = down->getIrrlichtElement();
+        
+        if (el == NULL)
+        {
+            std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
+            return;
+        }
     }
-    if (el == NULL)
-    {
-        std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
-        return;
-    }
+
     
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
-        //std::cout << "!!! Player " << playerID << " navigating down to " << closest->getID() << std::endl;
+        //std::cout << "Navigating down to " << closest->getID() << std::endl;
 
-        // FIXME : remove the special case for player 0
-        if (playerID == 0)
+        Widget* w = GUIEngine::getWidget( closest->getID() );
+        assert( w != NULL );
+        w->setFocusForPlayer(playerID);
+        
+        // another list exception : when entering a list, select the first item
+        if (w->m_type == WTYPE_LIST)
         {
-            GUIEngine::getGUIEnv()->setFocus(closest);
-        }
-        else
-        {
-            Widget* w = GUIEngine::getWidget( closest->getID() );
-            w->setFocusForPlayer(playerID);
+            IGUIListBox* list = (IGUIListBox*)(w->m_element);
+            assert(list != NULL);
+
+            list->setSelected(0);
         }
     }
     else
@@ -542,13 +509,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
             w = screen->getFirstWidget();  
         }
         
-        if(w != NULL)
-        {
-            if (playerID == 0)
-                GUIEngine::getGUIEnv()->setFocus( w->m_element );
-            else
-                w->setFocusForPlayer(playerID);
-        }
+        if (w != NULL)  w->setFocusForPlayer(playerID);
     }
 }
 

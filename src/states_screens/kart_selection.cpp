@@ -303,10 +303,9 @@ FocusDispatcher* g_dispatcher = NULL;
         
         ~PlayerKartWidget()
         {
-            if (GUIEngine::g_focus_for_player[m_playerID] == this)
+            if (GUIEngine::getFocusForPlayer(m_playerID) == this)
             {
-                unsetFocusForPlayer(m_playerID);
-                GUIEngine::g_focus_for_player[m_playerID] = NULL;
+                GUIEngine::focusNothingForPlayer(m_playerID);
             }
 
             if (playerIDLabel->getIrrlichtElement() != NULL)
@@ -334,12 +333,14 @@ FocusDispatcher* g_dispatcher = NULL;
                 assert(false);
             }
             
-            Widget* focus = GUIEngine::g_focus_for_player[m_playerID];
-            if (focus != NULL) focus->unsetFocusForPlayer(m_playerID);
-            GUIEngine::g_focus_for_player[m_playerID] = NULL;
+            // Remove current focus, but rembmer it
+            Widget* focus = GUIEngine::getFocusForPlayer(m_playerID);
+            GUIEngine::focusNothingForPlayer(m_playerID);
 
+            // Change the player ID
             m_playerID = newPlayerID;
             
+            // restore previous focus, but with new player ID
             if (focus != NULL) focus->setFocusForPlayer(m_playerID);
 
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
@@ -626,7 +627,7 @@ public:
             DynamicRibbonWidget* w = m_parent->getWidget<DynamicRibbonWidget>("karts");
             assert(w != NULL);
             
-            w->setSelection(m_parent->m_kart_widgets[playerID].m_kartInternalName, playerID);
+            w->setSelection(m_parent->m_kart_widgets[playerID].m_kartInternalName, playerID, true);
             return;
         }
         
@@ -746,8 +747,10 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     // ---- Focus a kart for this player
     const int playerID = amount-1;
-    w->setSelection(playerID, playerID);
-    
+    if (!firstPlayer)
+    {
+        w->setSelection(playerID, playerID, true);
+    }
     return true;
 }
 
@@ -790,11 +793,7 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     assert( m_kart_widgets.size() == StateManager::get()->activePlayerCount() );
 
     // unset selection of this player
-    if (GUIEngine::g_focus_for_player[playerID] != NULL)
-    {
-        GUIEngine::g_focus_for_player[playerID]->unsetFocusForPlayer(playerID);
-    }
-    GUIEngine::g_focus_for_player[playerID] = NULL;
+    GUIEngine::focusNothingForPlayer(playerID);
     
     // keep the removed kart a while, for the 'disappear' animation to take place
     removedWidget = m_kart_widgets.remove(playerID);
@@ -926,8 +925,7 @@ void KartSelectionScreen::init()
     }
     
     // Player 0 select first kart (Tux)
-    w->setSelection(0, 0);
-    w->m_rows[0].requestFocus();
+    w->setSelection(0, 0, true);
 }
 
 // -----------------------------------------------------------------------------
@@ -1077,14 +1075,10 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
         {
-            if (GUIEngine::g_focus_for_player[n] != NULL)
-            {
-                GUIEngine::g_focus_for_player[n]->unsetFocusForPlayer(n);
-            }
-            GUIEngine::g_focus_for_player[n] = NULL;
+            GUIEngine::focusNothingForPlayer(n);
             
             const std::string& selection = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selection, n ))
+            if (!w->setSelection( selection, n, true ))
             {
                 std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
                 // For now, select a random kart in this case (TODO : maybe do something better? )
@@ -1093,7 +1087,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 if (count > 0)
                 {
                     const int randomID = random.get( count );
-                    w->setSelection( randomID, n );
+                    w->setSelection( randomID, n, true );
                 }
                 else
                 {
@@ -1201,12 +1195,12 @@ EventPropagation FocusDispatcher::focused(const int playerID)
             std::cout << "--> Redirecting focus for player " << playerID << " from FocusDispatcher "  <<
             " (ID " << m_element->getID() <<
             ") to spinner " << n << " (ID " << m_parent->m_kart_widgets[n].playerName->getIrrlichtElement()->getID() << ")" << std::endl;
-            int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
+            //int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
             
             m_parent->m_kart_widgets[n].playerName->setFocusForPlayer(playerID);
             
-            int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
-            std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
+            //int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
+            //std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
             
             return GUIEngine::EVENT_BLOCK;
         }

@@ -185,7 +185,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     //std::cout  << "Right pressed\n";
     if (m_value+1 <= m_max) setValue(m_value+1);
     
-    GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
     
     return EVENT_LET;
 }
@@ -195,7 +195,7 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     //std::cout  << "Left pressed\n";
     if (m_value-1 >= m_min) setValue(m_value-1);
     
-    GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
+    //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
     
     return EVENT_LET;
 }
@@ -205,7 +205,7 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator
     if (originator == "left") leftPressed(playerID);
     else if (originator == "right") rightPressed(playerID);
     
-    GUIEngine::getGUIEnv()->setFocus(m_element);
+    this->setFocusForPlayer( playerID );
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------

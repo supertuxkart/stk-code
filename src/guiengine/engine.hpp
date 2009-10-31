@@ -205,14 +205,31 @@ being left, allowing for setup/clean-up.
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
-{
-    extern Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht;
-    
+{    
     class Screen;
     class CutScene;
     class Widget;
     
+    /** Returns the widget currently focused by given player, or NULL if none.
+        Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+        needs, so we use ours. (i.e. always call these functions are never those
+        in IGUIEnvironment) */
+    Widget* getFocusForPlayer(const int playerID);
+
+    /** Focuses nothing for given player (removes any selection for this player).
+     Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+     needs, so we use ours. (i.e. always call these functions are never those
+     in IGUIEnvironment) */
+    void focusNothingForPlayer(const int playerID);
+
+    /** Returns whether given the widget is currently focused by given player.
+     Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+     needs, so we use ours. (i.e. always call these functions are never those
+     in IGUIEnvironment) */
+    bool isFocusedForPlayer(const Widget*w, const int playerID);
+    
     // In an attempt to make getters as fast as possible by possibly allowing inlining
+    // These fields should never be accessed outside of the GUI engine.
     namespace Private
     {
         extern irr::gui::IGUIEnvironment* g_env;
@@ -222,6 +239,7 @@ namespace GUIEngine
         extern irr::video::IVideoDriver* g_driver;
         extern Screen* g_current_screen;
         extern AbstractStateManager* g_state_manager;
+        extern Widget* g_focus_for_player[MAX_PLAYER_COUNT];
     }
     
     inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }

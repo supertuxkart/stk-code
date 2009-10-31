@@ -85,7 +85,6 @@ Widget::Widget(bool reserve_id)
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
-        GUIEngine::g_focus_for_player[n] = false;
     }
     
     m_reserved_id = -1;
@@ -99,7 +98,7 @@ void Widget::add()
         m_reserved_id = getNewID();
     }
 }
-    
+
 // -----------------------------------------------------------------------------
 /**
   * \param playerID ID of the player you want to set/unset focus for, starting from 0
@@ -109,23 +108,16 @@ void Widget::add()
 void Widget::setFocusForPlayer(const int playerID)
 {    
     // Unset focus flag on previous widget that had focus
-    if (GUIEngine::g_focus_for_player[playerID] != NULL)
+    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {
-        GUIEngine::g_focus_for_player[playerID]->m_player_focus[playerID] = false;
+        GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
     }
     
     m_player_focus[playerID] = true;
-    GUIEngine::g_focus_for_player[playerID] = this;
-    
-    // Player 0 uses irrLicht focus - FIXME : unify focus handling to remove this branching
-    if (playerID == 0)
-    {
-        requestFocus();
-    }
-    else
-    {
-        this->focused(playerID);
-    }
+    GUIEngine::Private::g_focus_for_player[playerID] = this;
+
+    // Callback
+    this->focused(playerID);
 }
     
 void Widget::unsetFocusForPlayer(const int playerID)
@@ -141,11 +133,6 @@ bool Widget::isFocusedForPlayer(const int playerID)
     return m_player_focus[playerID];
 }
     
-
-void Widget::requestFocus()
-{
-    GUIEngine::getGUIEnv()->setFocus(m_element);
-}
 
 /**
  * Receives as string the raw property value retrieved from XML file.

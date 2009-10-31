@@ -108,8 +108,9 @@ namespace GUIEngine
         
         /**
           * called when left/right keys pressed and focus is on widget. 
-          * Returns 'true' if main event handler should be notified of a change.
-          * Override in children to be notified of left/right events.
+          * Returns 'EVENT_LET' if user's event handler should be notified of a change.
+          * Override in children to be notified of left/right events and/or make
+          * the event propagate to the user's event handler.
           */
         virtual EventPropagation rightPressed(const int playerID) { return EVENT_BLOCK; }
         virtual EventPropagation leftPressed(const int playerID) { return EVENT_BLOCK; }
@@ -163,6 +164,8 @@ namespace GUIEngine
         bool m_player_focus[MAX_PLAYER_COUNT];
 
         bool m_reserve_id;
+        
+        friend void GUIEngine::focusNothingForPlayer(const int playerID);
         
     public:
         /**
@@ -256,6 +259,7 @@ namespace GUIEngine
          */
         bool isFocusedForPlayer(const int playerID);
         
+        /** Internal method, do not call it. Call the functions in GUIEngine instead to unset focus. */
         void unsetFocusForPlayer(const int playerID);
         
         /**
@@ -266,8 +270,8 @@ namespace GUIEngine
         
         bool isSelected() const { return m_selected; }
         
-        void requestFocus();
-
+        bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
+        
         /**
          * These methods provide new unique IDs each time you call them.
          * Since IDs are used to determine tabbing order, "non-tabbable"
