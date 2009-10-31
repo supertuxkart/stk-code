@@ -303,6 +303,12 @@ FocusDispatcher* g_dispatcher = NULL;
         
         ~PlayerKartWidget()
         {
+            if (GUIEngine::g_focus_for_player[m_playerID] == this)
+            {
+                unsetFocusForPlayer(m_playerID);
+                GUIEngine::g_focus_for_player[m_playerID] = NULL;
+            }
+
             if (playerIDLabel->getIrrlichtElement() != NULL)
                 playerIDLabel->getIrrlichtElement()->remove();
             
@@ -328,8 +334,14 @@ FocusDispatcher* g_dispatcher = NULL;
                 assert(false);
             }
             
+            Widget* focus = GUIEngine::g_focus_for_player[m_playerID];
+            if (focus != NULL) focus->unsetFocusForPlayer(m_playerID);
+            GUIEngine::g_focus_for_player[m_playerID] = NULL;
+
             m_playerID = newPlayerID;
             
+            if (focus != NULL) focus->setFocusForPlayer(m_playerID);
+
             //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
             irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
             playerIDLabel->setText( newLabel ); 
@@ -788,7 +800,7 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     StateManager::get()->removeActivePlayer(playerID);
     
     // Karts count changed, maybe order too, so renumber them
-    renumberKarts();    
+    renumberKarts();
     
     // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
     // and will stop when the widget has disappeared)
