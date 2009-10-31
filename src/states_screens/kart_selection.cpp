@@ -786,7 +786,6 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     assert( m_kart_widgets.size() == StateManager::get()->activePlayerCount() );
 
     // unset selection of this player
-    // FIXME: will only work if the player that quits is the last of the list
     if (GUIEngine::g_focus_for_player[playerID] != NULL)
     {
         GUIEngine::g_focus_for_player[playerID]->unsetFocusForPlayer(playerID);
@@ -799,7 +798,8 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     // Tell the StateManager to remove this player
     StateManager::get()->removeActivePlayer(playerID);
     
-    // Karts count changed, maybe order too, so renumber them
+    // Karts count changed, maybe order too, so renumber them. Also takes
+    // care of updating selections.
     renumberKarts();
     
     // Tell the removed widget to perform the shrinking animation (which will be updated in onUpdate,
