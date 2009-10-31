@@ -592,6 +592,10 @@ FocusDispatcher* g_dispatcher = NULL;
         {
             m_kartInternalName = whichKart;
         }
+        const std::string& getKartInternalName() const
+        {
+            return m_kartInternalName;
+        }
     };
     
 #if 0
@@ -1068,7 +1072,35 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         }
         
         w->updateItemDisplay();
-
+        
+        // update players selections
+        const int num_players = m_kart_widgets.size();
+        for (int n=0; n<num_players; n++)
+        {
+            if (GUIEngine::g_focus_for_player[n] != NULL)
+            {
+                GUIEngine::g_focus_for_player[n]->unsetFocusForPlayer(n);
+            }
+            GUIEngine::g_focus_for_player[n] = NULL;
+            
+            const std::string& selection = m_kart_widgets[n].getKartInternalName();
+            if (!w->setSelection( selection, n ))
+            {
+                std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
+                // For now, select a random kart in this case (TODO : maybe do something better? )
+                RandomGenerator random;
+                const int count = w->getItems().size();
+                if (count > 0)
+                {
+                    const int randomID = random.get( count );
+                    w->setSelection( randomID, n );
+                }
+                else
+                {
+                    std::cerr << "WARNING : kart selection screen has 0 items in the ribbon\n";
+                }
+            }
+        }
     }
     else if (name == "karts")
     {
