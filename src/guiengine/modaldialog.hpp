@@ -59,6 +59,13 @@ public:
     /** Returns whether to block event propagation (usually, you will want to block events you processed) */
     virtual EventPropagation processEvent(std::string& eventSource){ return EVENT_LET; }
     
+    bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
+    
+    irr::gui::IGUIWindow* getIrrlichtElement()
+    {
+        return m_irrlicht_window;
+    }
+    
     static void dismiss();
     static void onEnterPressed();
     static ModalDialog* getCurrent();

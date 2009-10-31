@@ -460,12 +460,16 @@ EventPropagation InputManager::input(const SEvent& event)
             }
             // 'backspace' in a text control must never be mapped, since user can be in a text
             // area trying to erase text (and if it's mapped to rescue that would dismiss the
-            // dialog instead of erasing a single letter)
+            // dialog instead of erasing a single letter). Same for spacebar.
             if (key == KEY_BACK && GUIEngine::isWithinATextBox)
             {
                 return EVENT_LET;
             }
-
+            if (key == KEY_SPACE && GUIEngine::isWithinATextBox)
+            {
+                return EVENT_LET;
+            }
+            
             dispatchInput(Input::IT_KEYBOARD, 0, key,
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config

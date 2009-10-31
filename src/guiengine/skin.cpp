@@ -1092,14 +1092,7 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 }
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{
-    if (element->getType()==gui::EGUIET_EDIT_BOX)
-    {
-        SColor& color = SkinConfig::m_colors["text_field::neutral"];
-        GUIEngine::getDriver()->draw2DRectangle( color, rect );
-        return;
-    }
-    
+{    
     const int id = element->getID();
     Widget* widget = GUIEngine::getWidget(id);
         
@@ -1117,7 +1110,30 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     
     const bool focused = (focusedElem == element);
     
-    if (type == WTYPE_LIST)
+    if (element->getType()==gui::EGUIET_EDIT_BOX)
+    {
+        SColor& color = SkinConfig::m_colors["text_field::neutral"];
+        SColor& colorFocus = SkinConfig::m_colors["text_field::focused"];
+        
+        if (focused)
+        {
+            core::rect< s32 > borderArea = rect;
+            borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
+            borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
+            GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
+            
+            core::rect< s32 > innerArea = rect;
+            innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
+            innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
+            GUIEngine::getDriver()->draw2DRectangle( color, innerArea );
+        }
+        else
+        {
+            GUIEngine::getDriver()->draw2DRectangle( color, rect );
+        }
+        return;
+    }
+    else if (type == WTYPE_LIST)
     {
         drawList(rect, widget, focused);
     }

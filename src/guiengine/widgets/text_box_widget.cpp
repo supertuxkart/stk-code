@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 using namespace GUIEngine;
 using namespace irr::core;
@@ -37,6 +38,7 @@ void TextBoxWidget::add()
     id = m_element->getID();
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
+    m_element->setTabStop(true);
 }
 // -----------------------------------------------------------------------------
 stringw TextBoxWidget::getText() const
@@ -45,5 +47,27 @@ stringw TextBoxWidget::getText() const
     assert(textCtrl != NULL);
     
     return stringw(textCtrl->getText());
+}
+// -----------------------------------------------------------------------------
+EventPropagation TextBoxWidget::focused(const int playerID)
+{
+    assert(playerID == 0); // No support for multiple players in text areas!
+    
+    // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
+    GUIEngine::getGUIEnv()->setFocus(m_element);
+    isWithinATextBox = true;
+    return EVENT_LET;
+}
+// -----------------------------------------------------------------------------
+void TextBoxWidget::unfocused(const int playerID)
+{
+    assert(playerID == 0); // No support for multiple players in text areas!
+
+    // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
+    // below is a cheap way to unset the irrLicht focus from the widget (nope, 'removeFocus' from
+    // IGUIEnv doesn't work reliably, not sure why)
+    // currently, text boxes are only used in modal dialogs, so I shift the focus to the dialog
+    assert( ModalDialog::isADialogActive() );
+    GUIEngine::getGUIEnv()->setFocus( ModalDialog::getCurrent()->getIrrlichtElement() );
 }
 

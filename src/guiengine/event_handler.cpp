@@ -89,6 +89,9 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
                 
+                // When a modal dialog is shown, don't select widgets out of the dialog
+                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w)) break;
+                
                 // select ribbons on hover
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
                 {
@@ -117,7 +120,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                  break;
                  }
                  */
-            case EGET_ELEMENT_FOCUSED: // FIXME: is this still used with the new focus implementation?
+                /*
+            case EGET_ELEMENT_FOCUSED: // is this still used with the new focus implementation?
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
@@ -128,7 +132,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 return w->focused(0);
                 
                 break;
-            }
+            }*/
             case EGET_EDITBOX_ENTER:
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.

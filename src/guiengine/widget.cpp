@@ -122,6 +122,7 @@ void Widget::setFocusForPlayer(const int playerID)
     // Unset focus flag on previous widget that had focus
     if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {
+        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID);
         GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
     }
     
@@ -134,6 +135,7 @@ void Widget::setFocusForPlayer(const int playerID)
     
 void Widget::unsetFocusForPlayer(const int playerID)
 {
+    if (m_player_focus[playerID]) this->unfocused(playerID);
     m_player_focus[playerID] = false;
 }
 

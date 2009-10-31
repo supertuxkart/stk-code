@@ -165,6 +165,7 @@ when the border that intersect at this corner are enabled.
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
 
 <!-- Text field color -->
-<color type="text_field" state="neutral" a="100" r="150" g="150" b="150" />
+<color type="text_field" state="neutral" a="255" r="215" g="215" b="215" />
+<color type="text_field" state="focused" a="255" r="0" g="150" b="0" />
 
 </skin>

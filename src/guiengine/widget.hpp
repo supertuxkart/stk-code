@@ -123,6 +123,9 @@ namespace GUIEngine
         /** override in children if you need to know when the widget is focused. return whether to block event */
         virtual EventPropagation focused(const int playerID) { isWithinATextBox = false; return EVENT_LET; }
         
+        /** override in children if you need to know when the widget is unfocused. */
+        virtual void unfocused(const int playerID) { }
+        
         /**
           * The XML loader stored coords in their raw string form inside this widget.
           * This method parses the strings. Most notably, expands coords relative to parent

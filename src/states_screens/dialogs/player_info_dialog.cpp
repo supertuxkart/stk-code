@@ -59,9 +59,6 @@ void PlayerInfoDialog::showRegularDialog()
         textCtrl->setParent(m_irrlicht_window);
         m_children.push_back(textCtrl);
         textCtrl->add();
-        
-        const int playerID = 0; // FIXME: don't hardcode player ID
-        textCtrl->setFocusForPlayer( playerID );
     }
     
     {
@@ -115,6 +112,8 @@ void PlayerInfoDialog::showRegularDialog()
         widget->add();
     }
     
+    const int playerID = 0; // FIXME: don't hardcode player ID
+    textCtrl->setFocusForPlayer( playerID );
 }
 // ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::showConfirmDialog()
