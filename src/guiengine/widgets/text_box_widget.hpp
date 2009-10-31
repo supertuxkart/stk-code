@@ -34,7 +34,7 @@ namespace GUIEngine
         TextBoxWidget();
         ~TextBoxWidget()
         {
-            isWithinATextBox = false;   
+            setWithinATextBox(false);
         }
         
         void add();

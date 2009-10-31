@@ -203,7 +203,7 @@ void transmitEvent(Widget* widget, std::string& name, const int playerID)
     
 // -----------------------------------------------------------------------------    
 void render(float elapsed_time)
-{
+{    
     GUIEngine::dt = elapsed_time;
     
      // ---- menu drawing

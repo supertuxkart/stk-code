@@ -461,11 +461,11 @@ EventPropagation InputManager::input(const SEvent& event)
             // 'backspace' in a text control must never be mapped, since user can be in a text
             // area trying to erase text (and if it's mapped to rescue that would dismiss the
             // dialog instead of erasing a single letter). Same for spacebar.
-            if (key == KEY_BACK && GUIEngine::isWithinATextBox)
+            if (key == KEY_BACK && GUIEngine::isWithinATextBox())
             {
                 return EVENT_LET;
             }
-            if (key == KEY_SPACE && GUIEngine::isWithinATextBox)
+            if (key == KEY_SPACE && GUIEngine::isWithinATextBox())
             {
                 return EVENT_LET;
             }
@@ -515,7 +515,7 @@ EventPropagation InputManager::input(const SEvent& event)
 #endif
     
     // block events in all modes but initial menus (except in text boxes to allow typing, and exceptm in modal dialogs in-game)
-    if (getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox &&
+    if (getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
     {
         return EVENT_BLOCK;

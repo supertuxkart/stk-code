@@ -74,7 +74,8 @@ namespace GUIEngine
         PROP_SQUARE
     };
     
-    static bool isWithinATextBox = false;
+    bool isWithinATextBox();
+    void setWithinATextBox(bool in);
     
     /**
       * The nearly-abstract base of all widgets (not fully abstract since a bare Widget
@@ -121,7 +122,7 @@ namespace GUIEngine
         virtual EventPropagation mouseHovered(Widget* child) { return EVENT_BLOCK; }
         
         /** override in children if you need to know when the widget is focused. return whether to block event */
-        virtual EventPropagation focused(const int playerID) { isWithinATextBox = false; return EVENT_LET; }
+        virtual EventPropagation focused(const int playerID) { setWithinATextBox(false); return EVENT_LET; }
         
         /** override in children if you need to know when the widget is unfocused. */
         virtual void unfocused(const int playerID) { }

@@ -55,7 +55,7 @@ EventPropagation TextBoxWidget::focused(const int playerID)
     
     // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
     GUIEngine::getGUIEnv()->setFocus(m_element);
-    isWithinATextBox = true;
+    setWithinATextBox(true);
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
@@ -63,6 +63,8 @@ void TextBoxWidget::unfocused(const int playerID)
 {
     assert(playerID == 0); // No support for multiple players in text areas!
 
+    setWithinATextBox(false);
+    
     // special case : to work, the text box must receive "irrLicht focus", STK focus is not enough
     // below is a cheap way to unset the irrLicht focus from the widget (nope, 'removeFocus' from
     // IGUIEnv doesn't work reliably, not sure why)

@@ -42,6 +42,17 @@ using namespace gui;
 
 namespace GUIEngine
 {
+    
+    static bool g_is_within_a_text_box = false;
+    bool isWithinATextBox()
+    {
+        return g_is_within_a_text_box;
+    }
+    void setWithinATextBox(bool in)
+    {
+        g_is_within_a_text_box = in;
+    }
+    
 // -----------------------------------------------------------------------------
 Widget::Widget(bool reserve_id)
 {
