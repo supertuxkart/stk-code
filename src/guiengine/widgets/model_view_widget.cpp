@@ -109,9 +109,9 @@ void ModelViewWidget::update(float delta)
         }
         
         // slow down when getting close
-        if (fabsf(angle - m_rotation_target) < m_rotation_speed*5.0f)
+        if (fabsf(angle - m_rotation_target) < m_rotation_speed*7.0f && fabsf(angle - m_rotation_target) > m_rotation_speed*2.0f)
         {
-            m_rotation_speed = std::max(m_rotation_speed*0.9f, fabsf(angle - m_rotation_target));
+            m_rotation_speed = std::max(m_rotation_speed*0.9f, 25.0f);
         }
         
         // stop rotating when target reached
