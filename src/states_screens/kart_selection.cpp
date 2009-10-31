@@ -1075,7 +1075,8 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
         {
-            GUIEngine::focusNothingForPlayer(n);
+            // player 0 is the one that can change the groups, leave his focus on the tabs
+            if (n > 0) GUIEngine::focusNothingForPlayer(n);
             
             const std::string& selection = m_kart_widgets[n].getKartInternalName();
             if (!w->setSelection( selection, n, true ))
@@ -1087,14 +1088,14 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 if (count > 0)
                 {
                     const int randomID = random.get( count );
-                    w->setSelection( randomID, n, true );
+                    w->setSelection( randomID, n, n > 0 ); // preserve selection for players > 0 (player 0 is the one that can change the groups)
                 }
                 else
                 {
                     std::cerr << "WARNING : kart selection screen has 0 items in the ribbon\n";
                 }
             }
-        }
+        } // end for
     }
     else if (name == "karts")
     {
