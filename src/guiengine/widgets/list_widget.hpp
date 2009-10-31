@@ -35,6 +35,8 @@ namespace GUIEngine
         
         SkinWidgetContainer m_selection_skin_info;
         
+        virtual bool OnEvent (const SEvent &event);
+        
         void add();
         void addItem(const char* item);
         

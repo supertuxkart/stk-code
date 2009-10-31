@@ -50,6 +50,11 @@ void ModelViewWidget::add()
     
     //m_element = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter_2);
     
+    /*
+     TODO: remove this unclean thing, I think irrlicht provides this feature:
+        virtual void IGUIElement::OnPostRender (u32 timeMs)
+        \brief animate the element and its children. 
+     */
     GUIEngine::needsUpdate.push_back(this);
     
     angle = 0;

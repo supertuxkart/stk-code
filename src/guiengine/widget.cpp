@@ -42,27 +42,6 @@ using namespace gui;
 
 namespace GUIEngine
 {
-    
-// -----------------------------------------------------------------------------
-static unsigned int id_counter = 0;
-static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
-
-int Widget::getNewID()
-{
-    return id_counter++;
-}
-int Widget::getNewNoFocusID()
-{
-    return id_counter_2++;
-}
-/** When switching to a new screen, this function will be called to reset ID counters
- * (so we start again from ID 0, and don't grow to big numbers) */
-void Widget::resetIDCounters()
-{
-    id_counter = 0;
-    id_counter_2 = 1000;
-}
-    
 // -----------------------------------------------------------------------------
 Widget::Widget(bool reserve_id)
 {
@@ -89,7 +68,40 @@ Widget::Widget(bool reserve_id)
     
     m_reserved_id = -1;
 }
+
+Widget::~Widget()
+{
+    // If any player focused this widget, unset that focus
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    {
+        if (m_player_focus[n])
+        {
+            GUIEngine::focusNothingForPlayer(n);
+        }
+    }
     
+}
+    
+// -----------------------------------------------------------------------------
+static unsigned int id_counter = 0;
+static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
+
+int Widget::getNewID()
+{
+    return id_counter++;
+}
+int Widget::getNewNoFocusID()
+{
+    return id_counter_2++;
+}
+/** When switching to a new screen, this function will be called to reset ID counters
+ * (so we start again from ID 0, and don't grow to big numbers) */
+void Widget::resetIDCounters()
+{
+    id_counter = 0;
+    id_counter_2 = 1000;
+}
+
 // -----------------------------------------------------------------------------
 void Widget::add()
 {

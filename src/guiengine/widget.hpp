@@ -200,7 +200,7 @@ namespace GUIEngine
         int m_reserved_id;
         
         Widget(bool reserve_id = false);
-        virtual ~Widget() {}
+        virtual ~Widget();
         
         /**
           * Get the underlying irrLicht GUI element, casted to the right type.

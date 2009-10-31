@@ -41,6 +41,21 @@ void ListWidget::clear()
     list->clear();
 }
 // -----------------------------------------------------------------------------
+bool ListWidget::OnEvent (const SEvent &event)
+{
+    // block input events, we will handle them (vertical navigation) ourselves
+    if (event.EventType == EET_KEY_INPUT_EVENT ||
+        event.EventType == EET_JOYSTICK_INPUT_EVENT ||
+        event.EventType == EET_MOUSE_INPUT_EVENT)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+// -----------------------------------------------------------------------------
 void ListWidget::addItem(const char* item)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
