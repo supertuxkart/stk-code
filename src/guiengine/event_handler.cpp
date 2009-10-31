@@ -282,7 +282,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             break;
             
         case PA_FIRE:
-            if (pressedDown)
+            if (pressedDown && !isWithinATextBox)
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);
                 if (w == NULL) break;
