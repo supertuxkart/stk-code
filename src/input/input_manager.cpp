@@ -389,7 +389,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
  */
 EventPropagation InputManager::input(const SEvent& event)
 {
-    if(event.EventType == EET_JOYSTICK_INPUT_EVENT)
+    if (event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Axes - FIXME, instead of checking all of them, ask the bindings which ones to poll
         for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
@@ -470,6 +470,8 @@ EventPropagation InputManager::input(const SEvent& event)
                 return EVENT_LET;
             }
             
+            const bool wasInTextBox = GUIEngine::isWithinATextBox();
+            
             dispatchInput(Input::IT_KEYBOARD, 0, key,
                   // FIXME: not sure why this happens: with plib the unicode
                   // value is 0. Since all values defined in user_config
@@ -481,6 +483,12 @@ EventPropagation InputManager::input(const SEvent& event)
                   // works.
                   0,  // FIXME: was ev.key.keysym.unicode,
                   Input::MAX_VALUE);
+            
+            // if this action took us into a text box, don't let event continue (FIXME not the cleanest solution)
+            if (!wasInTextBox && GUIEngine::isWithinATextBox())
+            {
+                return EVENT_BLOCK;
+            }
 
         }
         else
@@ -514,7 +522,7 @@ EventPropagation InputManager::input(const SEvent& event)
     }
 #endif
     
-    // block events in all modes but initial menus (except in text boxes to allow typing, and exceptm in modal dialogs in-game)
+    // block events in all modes but initial menus (except in text boxes to allow typing, and except in modal dialogs in-game)
     if (getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
     {
