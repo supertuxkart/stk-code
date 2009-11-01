@@ -78,4 +78,12 @@ std::string ListWidget::getSelectionName() const
     assert(list != NULL);
     return stringc( list->getListItem( list->getSelected() ) ).c_str();
 }
+// -----------------------------------------------------------------------------
+void ListWidget::unfocused(const int playerID)
+{
+    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+
+    // remove selection when leaving list
+    list->setSelected(-1);
+}
 

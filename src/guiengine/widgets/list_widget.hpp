@@ -38,6 +38,8 @@ namespace GUIEngine
         void add();
         void addItem(const char* item);
         
+        virtual void unfocused(const int playerID);
+
         int getSelection() const;
         std::string getSelectionName() const;
         void clear();
