@@ -136,11 +136,6 @@ void InputManager::handleStaticAction(int key, int value)
             //irrDriver->toggleFullscreen(false);   // 0: do not reset textures
             // Fall through to put the game into pause mode.
 #endif
-        case KEY_ESCAPE:
-            // TODO - show race menu
-            // RaceManager::getWorld()->pause();
-             //menu_manager->pushMenu(MENUID_RACEMENU);
-            break;
         case KEY_F10:
             history->Save();
             break;
