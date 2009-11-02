@@ -311,7 +311,7 @@ FocusDispatcher* g_dispatcher = NULL;
             if (playerIDLabel->getIrrlichtElement() != NULL)
                 playerIDLabel->getIrrlichtElement()->remove();
             
-            if (playerName->getIrrlichtElement() != NULL)
+            if (playerName != NULL && playerName->getIrrlichtElement() != NULL)
                 playerName->getIrrlichtElement()->remove();
             
             if (modelView->getIrrlichtElement() != NULL)
@@ -388,12 +388,6 @@ FocusDispatcher* g_dispatcher = NULL;
             return m_associatedPlayer;
         }
         
-        /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
-        //const std::string& getSpinnerID() const
-        //{
-        //    return spinnerID;
-        //}
-        
         /** Starts a 'move/resize' animation, by simply passing destination coords. The animation
             will then occur on each call to 'onUpdate'. */
         void move(const int x, const int y, const int w, const int h)
@@ -422,6 +416,7 @@ FocusDispatcher* g_dispatcher = NULL;
             m_children.remove(playerName);
             playerName->getIrrlichtElement()->remove();
             playerName->elementRemoved();
+            playerName = NULL;
             
             SFXManager::quickSound( SFXManager::SOUND_WEE );
             
@@ -990,11 +985,15 @@ bool KartSelectionScreen::validateIdentChoices()
     // reset all marks, we'll re-add them n ext if errors are still there
     for (int n=0; n<amount; n++)
     {
-        m_kart_widgets[n].playerName->markAsCorrect();
+        // first check if the player name widget is still there, it won't be for those that confirmed
+        if (m_kart_widgets[n].playerName != NULL) m_kart_widgets[n].playerName->markAsCorrect();
         
         // verify internal consistency in debug mode
-        assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
+        if (m_kart_widgets[n].playerName != NULL)
+        {
+            assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                    UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
+        }
     }
     
     for (int n=0; n<amount; n++)
