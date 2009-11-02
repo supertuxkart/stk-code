@@ -249,7 +249,7 @@ FocusDispatcher* g_dispatcher = NULL;
             playerName->y = player_name_y;
             playerName->w = player_name_w;
             playerName->h = player_name_h;
-            playerName->m_event_handler = this;
+            //playerName->m_event_handler = this;
             
             if (irrlichtWidgetID == -1)
             {
@@ -412,6 +412,8 @@ FocusDispatcher* g_dispatcher = NULL;
         /** Call when player confirmed his identity and kart */
         void markAsReady()
         {
+            if (m_ready) return; // already ready
+            
             m_ready = true;
             
             stringw playerNameString = playerName->getStringValue();
@@ -524,9 +526,11 @@ FocusDispatcher* g_dispatcher = NULL;
         /** Event callback */
         virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
         {
-            //std::cout << "= kart selection :: transmitEvent " << originator << "=\n";
+            //std::cout << "= kart selection :: transmitEvent " << originator << " =\n";
 
             std::string name = w->m_properties[PROP_ID];
+            
+            //std::cout << "    (checking if that's me: I am " << spinnerID << ")\n";
             
             // update player profile when spinner changed
             if (originator == spinnerID)
@@ -987,6 +991,10 @@ bool KartSelectionScreen::validateIdentChoices()
     for (int n=0; n<amount; n++)
     {
         m_kart_widgets[n].playerName->markAsCorrect();
+        
+        // verify internal consistency in debug mode
+        assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
     }
     
     for (int n=0; n<amount; n++)
@@ -997,7 +1005,9 @@ bool KartSelectionScreen::validateIdentChoices()
             if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[m].getAssociatedPlayer()->getProfile())
             {
                 printf("\n***\n*** Someone else can't select this identity, you just took it!! ***\n***\n\n");
-                
+                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+
                 // two players took the same name. check if one is ready
                 if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
                 {
