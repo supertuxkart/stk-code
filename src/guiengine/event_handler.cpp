@@ -83,7 +83,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 const int playerID = input_manager->getPlayerKeyboardID();
-                return onWidgetActivated(w, playerID);
+                if (playerID != -1) return onWidgetActivated(w, playerID);
+                else break;
             }    
             case EGET_ELEMENT_HOVERED:
             {
@@ -91,7 +92,14 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (w == NULL) break;
                 
                 // When a modal dialog is shown, don't select widgets out of the dialog
-                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w)) break;
+                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
+                {
+                    // check for parents too before discarding event
+                    if (w->m_event_handler != NULL)
+                    {
+                        if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler)) break;
+                    }
+                }
                 
                 // select ribbons on hover
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
