@@ -60,8 +60,7 @@ private:
      *  axis which was pushed the furthest when sensing input. */
     int              m_max_sensed_input;
     Input::InputType m_max_sensed_type;
-	//ActionMap       *m_action_map;
-	//GamePadDevice      **m_stick_infos;
+
 	InputDriverMode  m_mode;
 	
 	/* Helper values to store and track the relative mouse movements. If these
@@ -89,7 +88,8 @@ public:
     
     void   update(float dt);
     
-	//Input &getSensedInput();
+    /** Returns the ID of the player that plays with the keyboard, or -1 if none */
+    int    getPlayerKeyboardID() const;
 };
 
 extern InputManager *input_manager;

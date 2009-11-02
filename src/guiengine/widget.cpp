@@ -63,7 +63,7 @@ Widget::Widget(bool reserve_id)
     id = -1;
     m_element = NULL;
     m_type = WTYPE_NONE;
-    m_selected = false;
+    
     m_event_handler = NULL;
     m_show_bounding_box = false;
     m_parent = NULL;
@@ -75,6 +75,7 @@ Widget::Widget(bool reserve_id)
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
+        m_selected[n] = false;
     }
     
     m_reserved_id = -1;

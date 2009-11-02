@@ -397,13 +397,12 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& orig
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child)
+EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int playerID)
 {
+    std::cout << "DynamicRibbonWidget::mouseHovered " << playerID << std::endl;
+
     updateLabel();
     propagateSelection();
-    
-    // FIXME: don't hardcode player 0
-    const int playerID = 0;
     
     if (getSelectedRibbon(playerID) != NULL)
     {

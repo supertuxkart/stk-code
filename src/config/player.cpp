@@ -30,11 +30,13 @@ InputDevice* ActivePlayer::getDevice() const
 
 void ActivePlayer::setDevice(InputDevice* device)
 {
+    // unset player from previous device he was assigned to, if any
     if (m_device != NULL) m_device->setPlayer(NULL);
     
     m_device = device;
     
-    if(device != NULL) device->setPlayer(this);
+    // inform the devce of its new owner
+    if (device != NULL) device->setPlayer(this);
 }
 
 PlayerKart* ActivePlayer::getKart()

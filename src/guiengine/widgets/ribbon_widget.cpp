@@ -18,6 +18,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 
 #include "guiengine/engine.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 using namespace GUIEngine;
 using namespace irr::core;
@@ -206,7 +207,7 @@ void RibbonWidget::add()
 }
 
 // -----------------------------------------------------------------------------
-void RibbonWidget::select(std::string item, const int playerID)
+void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_children.size();
     
@@ -214,7 +215,7 @@ void RibbonWidget::select(std::string item, const int playerID)
     {
         if (m_children[i].m_properties[PROP_ID] == item)
         {
-            m_selection[playerID] = i;
+            m_selection[mousePlayerID] = i;
             updateSelection();
             return;
         }
@@ -236,8 +237,14 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     }
     updateSelection();
     
-    // FIXME: don't hardcode player ID 0
-    if (playerID == 0) m_mouse_focus = m_children.get(m_selection[playerID]);
+    if (m_ribbon_type == RIBBON_COMBO)
+    {
+        const int mousePlayerID = input_manager->getPlayerKeyboardID();
+        if (playerID == mousePlayerID)
+        {
+            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
+        }
+    }
     
     if (m_ribbon_type != RIBBON_TOOLBAR)
     {
@@ -264,8 +271,14 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     }
     updateSelection();
     
-    // FIXME: don't hardcode player ID
-    if (playerID == 0) m_mouse_focus = m_children.get(m_selection[playerID]);
+    if (m_ribbon_type == RIBBON_COMBO)
+    {
+        const int mousePlayerID = input_manager->getPlayerKeyboardID();
+        if (playerID == mousePlayerID)
+        {
+            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
+        }
+    }
     
     if (m_ribbon_type != RIBBON_TOOLBAR)
     {
@@ -284,10 +297,13 @@ EventPropagation RibbonWidget::focused(const int playerID)
     
     if (m_children.size() < 1) return EVENT_LET; // empty ribbon
     
-    // FIXME: don't hardcode player ID 0
-    if (m_mouse_focus == NULL && m_selection[playerID] != -1  && playerID == 0)
+    if (m_ribbon_type == RIBBON_COMBO)
     {
-        m_mouse_focus = m_children.get(m_selection[playerID]);
+        const int mousePlayerID = input_manager->getPlayerKeyboardID();
+        if (m_mouse_focus == NULL && m_selection[playerID] != -1  && playerID == mousePlayerID)
+        {
+            m_mouse_focus = m_children.get(m_selection[playerID]);
+        }
     }
     
     if (m_event_handler != NULL)
@@ -301,22 +317,31 @@ EventPropagation RibbonWidget::focused(const int playerID)
     return EVENT_LET;
 }
 // -----------------------------------------------------------------------------
-EventPropagation RibbonWidget::mouseHovered(Widget* child)
+EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayerID)
 {
+    std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
     const int subbuttons_amount = m_children.size();
     
-    m_mouse_focus = child;
-    
-    for (int i=0; i<subbuttons_amount; i++)
+    if (m_ribbon_type == RIBBON_COMBO)
     {
-        if (m_children.get(i) == child)
+        std::cout << "SETTING m_mouse_focus\n";
+        m_mouse_focus = child;
+    }
+    
+    // In toolbar ribbons, hovering selects
+    if (m_ribbon_type == RIBBON_TOOLBAR)
+    {
+        for (int i=0; i<subbuttons_amount; i++)
         {
-            // FIXME: don't hardcode player 0 there?
-            if (m_selection[0] == i) return EVENT_BLOCK; // was already selected, don't send another event
-            if (m_ribbon_type == RIBBON_TOOLBAR) m_selection[0] = i; // don't change selection on hover for others
-            break;
+            if (m_children.get(i) == child)
+            {
+                if (m_selection[mousePlayerID] == i) return EVENT_BLOCK; // was already selected, don't send another event
+                m_selection[mousePlayerID] = i; // don't change selection on hover for others
+                break;
+            }
         }
     }
+    
     updateSelection();
     return EVENT_BLOCK;
 }
@@ -334,14 +359,37 @@ void RibbonWidget::updateSelection()
 {
     const int subbuttons_amount = m_children.size();
     
-    for (int i=0; i<subbuttons_amount; i++)
+    // FIXME: m_selection, m_selected, m_mouse_focus... what a mess...
+    
+    //std::cout << "----\n";
+    // Update selection flags for mouse player
+    for (int p=0; p<MAX_PLAYER_COUNT; p++)
     {
-        // Player 0 selection
-        m_children[i].m_selected = (i == m_selection[0]);
+        for (int i=0; i<subbuttons_amount; i++)
+        {
+            m_children[i].m_selected[p] = (i == m_selection[p]);
+            
+            /*
+            if (m_children[i].m_selected[p])
+                std::cout << "m_children[" << i << "].m_selected[" << p << "] = " << m_children[i].m_selected[p] << std::endl;
+            if (p == 0 && m_children.get(i) == m_mouse_focus)
+                std::cout << "m_children[" << i << "] is mouse focus" << std::endl;
+             */
+        }
     }
     
-    // FIXME: don't hardcode player 0
-    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_TOOLBAR) m_mouse_focus = m_children.get(m_selection[0]);
+    // Update the 'mouse focus' if necessary
+    /*
+    if (subbuttons_amount > 0 && m_ribbon_type == RIBBON_COMBO)
+    {
+        const int mousePlayerID = input_manager->getPlayerKeyboardID();
+        if (mousePlayerID != -1 && m_selection[mousePlayerID] != -1)
+        {
+            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
+            std::cout << "RESET mouse focus\n";
+        }
+    }
+     */
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)

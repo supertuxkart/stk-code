@@ -133,10 +133,10 @@ namespace GUIEngine
         int m_selected_item[MAX_PLAYER_COUNT];
         
         /** Callbacks */
-        void onRowChange(RibbonWidget* row, const int playerID);
-        void add();
-        EventPropagation mouseHovered(Widget* child);
-        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        virtual void onRowChange(RibbonWidget* row, const int playerID);
+        virtual void add();
+        virtual EventPropagation mouseHovered(Widget* child, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         
 
     public:

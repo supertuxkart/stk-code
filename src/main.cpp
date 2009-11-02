@@ -633,7 +633,7 @@ int main(int argc, char *argv[] )
             InputDevice *device;
 
             // Use keyboard by default in --no-start-screen
-            device = input_manager->getDeviceList()->getKeyboard(0);
+            device = input_manager->getDeviceList()->getKeyboard();
 
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );

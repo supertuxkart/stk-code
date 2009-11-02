@@ -97,16 +97,20 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 {
                     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
                     if (ribbon == NULL) break;
-                    const int playerID = 0; // FIXME : don't hardcode player 0
-                    if (ribbon->mouseHovered(w) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
-                    if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w);
+                    const int playerID = input_manager->getPlayerKeyboardID();
+                    if (playerID == -1) break;
+                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
                 }
                 else
                 {
                     // focus on hover for other widgets
-                    const int playerID = 0; // FIXME: don't hardcode player 0 ?
-                    w->setFocusForPlayer(playerID);
+                    const int playerID = input_manager->getPlayerKeyboardID();
+                    if (playerID != -1)
+                    {
+                        w->setFocusForPlayer(playerID);
+                    }
                 }
                 
                 break;

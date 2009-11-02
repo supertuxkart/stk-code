@@ -221,7 +221,22 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
     }
 }
-
+//-----------------------------------------------------------------------------
+int InputManager::getPlayerKeyboardID() const
+{
+    // In no-assign mode, just return the GUI player ID (devices not assigned yet)
+    if (m_device_manager->playerAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
+    
+    // Otherwise, after devices are assigned, we can check the ID
+    if (m_device_manager->getKeyboard() != NULL)
+    {
+        if (m_device_manager->getKeyboard()->getPlayer() != NULL)
+        {
+            return m_device_manager->getKeyboard()->getPlayer()->m_id;
+        }
+    }
+    return -1;
+}
 //-----------------------------------------------------------------------------
 /** Handles the conversion from some input to a GameAction and its distribution
  * to the currently active menu.
@@ -302,9 +317,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 {
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
-                        device = m_device_manager->getKeyboard(0);
+                    {
+                        device = m_device_manager->getKeyboard();
+                    }
                     else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+                    {
                         device = m_device_manager->getGamePadFromIrrID(deviceID);
+                    }
 
                     if (device != NULL)
                     {

@@ -22,6 +22,11 @@ void InputDevice::setPlayer(ActivePlayer* owner)
     m_player = owner;
 }
 
+#if 0
+#pragma mark -
+#pragma mark Keyboard
+#endif
+
 // -----------------------------------------------------------------------------
 KeyboardDevice::KeyboardDevice(KeyboardConfig *configuration)
 {
@@ -48,7 +53,7 @@ bool KeyboardDevice::hasBinding(const int id, PlayerAction* action)
 
 #if 0
 #pragma mark -
-#pragma mark gamepad
+#pragma mark Gamepad
 #endif
 
 

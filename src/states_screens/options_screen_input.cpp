@@ -161,7 +161,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     {
         std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
         
-        KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard(0);
+        KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard();
         keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
         
         // refresh display
@@ -273,7 +273,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         }
         else if(selection == "keyboard")
         {
-            updateInputButtons( input_manager->getDeviceList()->getKeyboard(0)->getConfiguration() );
+            updateInputButtons( input_manager->getDeviceList()->getKeyboard()->getConfiguration() );
         }
         else
         {

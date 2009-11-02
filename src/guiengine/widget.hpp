@@ -105,7 +105,7 @@ namespace GUIEngine
           * - in widgets where it makes sense (e.g. ribbon children) and where the
           * irrLicht widget can not directly contain this state
           */
-        bool m_selected;
+        bool m_selected[MAX_PLAYER_COUNT];
         
         /**
           * called when left/right keys pressed and focus is on widget. 
@@ -119,7 +119,7 @@ namespace GUIEngine
         /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
             Returns 'true' if main event handler should be notified of a change. */
-        virtual EventPropagation mouseHovered(Widget* child) { return EVENT_BLOCK; }
+        virtual EventPropagation mouseHovered(Widget* child, const int playerID) { return EVENT_BLOCK; }
         
         /** override in children if you need to know when the widget is focused. return whether to block event */
         virtual EventPropagation focused(const int playerID) { setWithinATextBox(false); return EVENT_LET; }
@@ -272,7 +272,7 @@ namespace GUIEngine
         virtual void move(const int x, const int y, const int w, const int h);
         
         
-        bool isSelected() const { return m_selected; }
+        bool isSelected(const int playerID) const { return m_selected[playerID]; }
         
         bool isSameIrrlichtWidgetAs(const Widget* ref) const { return m_element == ref->m_element; }
         

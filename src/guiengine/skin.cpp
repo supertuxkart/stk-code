@@ -597,11 +597,11 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool 
 
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    bool mark_selected = widget->isSelected();
-    bool always_show_selection = false;
-    
     const int playerID = 0; // FIXME : don't hardcode player 0 ?
-    
+
+    bool mark_selected = widget->isSelected(playerID);
+    bool always_show_selection = false;
+        
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {

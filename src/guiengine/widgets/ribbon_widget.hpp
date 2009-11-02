@@ -53,18 +53,18 @@ namespace GUIEngine
         void updateSelection();
         
         /** Callbacks */
-        EventPropagation rightPressed(const int playerID=0);
-        EventPropagation leftPressed(const int playerID=0);
-        EventPropagation mouseHovered(Widget* child);
-        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
-        EventPropagation focused(const int playerID);
+        virtual EventPropagation rightPressed(const int playerID=0);
+        virtual EventPropagation leftPressed(const int playerID=0);
+        virtual EventPropagation mouseHovered(Widget* child, const int playerID);
+        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID=0);
+        virtual EventPropagation focused(const int playerID);
         
         ptr_vector<irr::gui::IGUIStaticText, REF> m_labels;
         
     public:
         
-        /** Contains which element within the ribbon is currently focused (used by the skin to
-            show mouse hovers over items that are not selected) */
+        /** Contains which element within the ribbon is currently focused by player 0 (used by the skin to
+            show mouse hovers over items that are not selected). Only used for COMBO ribbons. */
         Widget* m_mouse_focus;
         
         RibbonWidget(const RibbonType type=RIBBON_COMBO);

@@ -45,7 +45,7 @@ namespace GUIEngine
         IVideoDriver* g_driver;
         Screen* g_current_screen = NULL;
         AbstractStateManager* g_state_manager = NULL;
-        Widget* g_focus_for_player[MAX_PLAYER_COUNT]; // unused for player 0, player 0's focus is tracked by irrlicht
+        Widget* g_focus_for_player[MAX_PLAYER_COUNT];
     }
     using namespace Private;
    

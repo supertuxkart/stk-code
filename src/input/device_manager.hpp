@@ -63,7 +63,7 @@ public:
     GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     PlayerAssignMode    playerAssignMode() const            { return m_assign_mode; }
-    KeyboardDevice*     getKeyboard(const int i)            { return m_keyboard; }
+    KeyboardDevice*     getKeyboard()                       { return m_keyboard; }
     PlayerAssignMode    getAssignMode()                     { return m_assign_mode; }
     GamePadDevice*      getGamePadFromIrrID(const int i);
     InputDevice*        getLatestUsedDevice();

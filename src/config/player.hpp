@@ -69,7 +69,7 @@ class ActivePlayer
     PlayerProfile* m_player;
     InputDevice* m_device;
 public:
-    // ID of this player within the lsit of active players
+    /** ID of this player within the list of active players */
     int m_id;
     
     ActivePlayer(PlayerProfile* player, InputDevice* device);
