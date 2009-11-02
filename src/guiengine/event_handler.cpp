@@ -81,8 +81,9 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
                 
-                // FIXME: don't hardcode player 0
-                return onWidgetActivated(w, 0);
+                // These events are only triggered by keyboard/mouse (or so I hope...)
+                const int playerID = input_manager->getPlayerKeyboardID();
+                return onWidgetActivated(w, playerID);
             }    
             case EGET_ELEMENT_HOVERED:
             {
