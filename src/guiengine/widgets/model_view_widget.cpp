@@ -103,8 +103,26 @@ void ModelViewWidget::update(float delta)
     }
     else if (m_rotation_mode == ROTATE_TO)
     {
-        // TODO : doesn't handle warp-arounds, which may be faster (e.g. we're at 300 and target is 10, better use warp-around)
-        if (angle < m_rotation_target) 
+        // check if we should rotate clockwise or counter-clockwise to reach the target faster
+        // (taking warp-arounds into account)
+        const int angle_distance_from_end = 360 - angle;
+        const int target_distance_from_end = 360 - angle;
+
+        int distance_with_positive_rotation;
+        int distance_with_negative_rotation;
+        
+        if (angle < m_rotation_target)
+        {
+            distance_with_positive_rotation = m_rotation_target - angle;
+            distance_with_negative_rotation = angle + target_distance_from_end;
+        }
+        else
+        {
+            distance_with_positive_rotation = angle_distance_from_end + m_rotation_target;
+            distance_with_negative_rotation = angle - m_rotation_target;
+        }
+        
+        if (distance_with_positive_rotation < distance_with_negative_rotation) 
         {
             angle += delta*m_rotation_speed;
         }
