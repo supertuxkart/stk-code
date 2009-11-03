@@ -347,7 +347,8 @@ FocusDispatcher* g_dispatcher = NULL;
             irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
             playerIDLabel->setText( newLabel ); 
             playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
-            playerName->setID(m_playerID);
+            
+            if (playerName != NULL) playerName->setID(m_playerID);
         }
         
         /** Returns the ID of this player */
@@ -503,10 +504,14 @@ FocusDispatcher* g_dispatcher = NULL;
                                 player_id_y,
                                 player_id_w,
                                 player_id_h);
-            playerName->move(player_name_x,
-                             player_name_y,
-                             player_name_w,
-                             player_name_h );
+            
+            if (playerName != NULL)
+            {
+                playerName->move(player_name_x,
+                                 player_name_y,
+                                 player_name_w,
+                                 player_name_h );
+            }
             modelView->move(model_x,
                             model_y,
                             model_w,
@@ -521,6 +526,8 @@ FocusDispatcher* g_dispatcher = NULL;
         /** Event callback */
         virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
         {
+            if (m_ready) return EVENT_LET; // if it's declared ready, there is really nothing to process
+            
             //std::cout << "= kart selection :: transmitEvent " << originator << " =\n";
 
             std::string name = w->m_properties[PROP_ID];
@@ -533,8 +540,6 @@ FocusDispatcher* g_dispatcher = NULL;
                 std::cout << "Identity changed for player " << m_playerID
                           << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
                 m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
-                
-                return EVENT_LET; // do not continue propagating the event
             }
 
             return EVENT_LET; // continue propagating the event
@@ -986,13 +991,13 @@ bool KartSelectionScreen::validateIdentChoices()
     for (int n=0; n<amount; n++)
     {
         // first check if the player name widget is still there, it won't be for those that confirmed
-        if (m_kart_widgets[n].playerName != NULL) m_kart_widgets[n].playerName->markAsCorrect();
-        
-        // verify internal consistency in debug mode
         if (m_kart_widgets[n].playerName != NULL)
         {
+            m_kart_widgets[n].playerName->markAsCorrect();
+            
+            // verify internal consistency in debug mode
             assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                    UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
+                   UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
         }
     }
     
