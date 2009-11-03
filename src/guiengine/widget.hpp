@@ -169,7 +169,7 @@ namespace GUIEngine
 
         bool m_reserve_id;
         
-        friend void GUIEngine::focusNothingForPlayer(const int playerID);
+        friend void focusNothingForPlayer(const int playerID);
         
     public:
         /**
