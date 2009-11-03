@@ -67,8 +67,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_children.push_back(back_btn);
     back_btn->add();
     
-    const int playerID = 0; // FIXME: don't hardcode player ID
-    back_btn->setFocusForPlayer( playerID );
+    back_btn->setFocusForPlayer( GUI_PLAYER_ID );
     
     // ---- Choice ribbon
     m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
@@ -229,9 +228,7 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
     }
     else if (eventSource == "choiceribbon")
     {
-        // FIXME : don't hardcode player 0
-        const int playerId = 0;
-        const std::string& selection = m_choice_ribbon->getSelectionIDString(playerId);
+        const std::string& selection = m_choice_ribbon->getSelectionIDString(GUI_PLAYER_ID);
         
         std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << " : " << selection << ")\n";
 

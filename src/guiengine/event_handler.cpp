@@ -311,19 +311,6 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
                 // FIXME : consider returned value?
                 onWidgetActivated( w, playerID );
             }
-            
-            /*
-             // simulate a 'enter' key press
-             irr::SEvent::SKeyInput evt;
-             evt.PressedDown = pressedDown;
-             evt.Key = KEY_SPACE;  // FIXME : what if keyboard bindings are not set to use this key?
-             evt.Char = 666; // My magic code to know it's a fake event (FIXME : ugly, but irrlicht doesn't seem to offer better)
-             irr::SEvent wrapper;
-             wrapper.KeyInput = evt;
-             
-             wrapper.EventType = EET_KEY_INPUT_EVENT;
-             GUIEngine::getDevice()->postEventFromUser(wrapper);
-             */
             break;
         default:
             return;

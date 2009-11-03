@@ -28,6 +28,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 using namespace irr;
@@ -266,10 +267,10 @@ void Screen::addWidgets()
 
     //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
     
-    // select the first widget
+    // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
-    if (w != NULL) w->setFocusForPlayer( 0 ); // FIXME: don't hardcode player ID 0
+    if (w != NULL) w->setFocusForPlayer( GUI_PLAYER_ID );
     else std::cerr << "Couldn't select first widget, NULL was returned\n";
 }
 // -----------------------------------------------------------------------------

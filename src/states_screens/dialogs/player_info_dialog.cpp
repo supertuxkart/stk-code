@@ -19,8 +19,9 @@
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
+#include "states_screens/options_screen_players.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -112,8 +113,7 @@ void PlayerInfoDialog::showRegularDialog()
         widget->add();
     }
     
-    const int playerID = 0; // FIXME: don't hardcode player ID
-    textCtrl->setFocusForPlayer( playerID );
+    textCtrl->setFocusForPlayer( GUI_PLAYER_ID );
 }
 // ------------------------------------------------------------------------------------------------------
 void PlayerInfoDialog::showConfirmDialog()
@@ -174,8 +174,7 @@ void PlayerInfoDialog::showConfirmDialog()
         m_children.push_back(widget);
         widget->add();
         
-        const int playerID = 0; // FIXME: don't hardcode player ID
-        widget->setFocusForPlayer( playerID );
+        widget->setFocusForPlayer( GUI_PLAYER_ID );
     }
     
 }

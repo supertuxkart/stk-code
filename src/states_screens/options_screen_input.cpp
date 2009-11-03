@@ -126,8 +126,7 @@ void OptionsScreenInput::init()
     
     // trigger displaying bindings for default selected device
     const std::string name2("devices");
-    const int playerID = 0; // FIXME : don't hardcode player ID
-    eventCallback(devices, name2, playerID);
+    eventCallback(devices, name2, GUI_PLAYER_ID);
 }
 
 // -----------------------------------------------------------------------------
@@ -223,8 +222,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     
     // re-select the previous button
     ButtonWidget* btn = this->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-    const int playerID = 0; // FIXME: don't hardcode player ID
-    if(btn != NULL) btn->setFocusForPlayer(playerID);
+    if(btn != NULL) btn->setFocusForPlayer(GUI_PLAYER_ID);
     
     // save new binding to file
     input_manager->getDeviceList()->serialize();
