@@ -254,6 +254,8 @@ void DynamicRibbonWidget::elementRemoved()
     Widget::elementRemoved();
     m_previous_item_count = 0;
     m_rows.clearWithoutDeleting();
+    m_left_widget = NULL;
+    m_right_widget = NULL;
 }
 
 
