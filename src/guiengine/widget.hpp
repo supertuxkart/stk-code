@@ -168,9 +168,7 @@ namespace GUIEngine
         bool m_player_focus[MAX_PLAYER_COUNT];
 
         bool m_reserve_id;
-        
-        friend void focusNothingForPlayer(const int playerID);
-        
+                
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
