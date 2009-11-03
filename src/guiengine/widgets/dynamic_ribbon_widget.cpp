@@ -72,9 +72,10 @@ void DynamicRibbonWidget::add()
     // FIXME? these arrow buttons are outside of the widget's boundaries
     if (m_left_widget != NULL)
     {
-        // FIXME - do proper memory management, find why it crashes when i try to clean-up
-        //delete m_left_widget;
-        //delete m_right_widget;
+        m_left_widget->elementRemoved();
+        m_right_widget->elementRemoved();
+        delete m_left_widget;
+        delete m_right_widget;
     }
     m_left_widget = new Widget();
     m_right_widget = new Widget();

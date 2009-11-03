@@ -319,7 +319,7 @@ EventPropagation RibbonWidget::focused(const int playerID)
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayerID)
 {
-    std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
+    //std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
     const int subbuttons_amount = m_children.size();
     
     if (m_ribbon_type == RIBBON_COMBO)
