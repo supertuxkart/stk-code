@@ -104,7 +104,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 // select ribbons on hover
                 if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
                 {
-                    RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(w->m_event_handler);
+                    RibbonWidget* ribbon = (RibbonWidget*)(w->m_event_handler);
                     if (ribbon == NULL) break;
                     const int playerID = input_manager->getPlayerKeyboardID();
                     if (playerID == -1) break;
@@ -332,7 +332,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     // components
     if (w != NULL && w->m_type == WTYPE_LIST)
     {
-        IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+        IGUIListBox* list = (IGUIListBox*)(w->m_element);
         assert(list != NULL);
         
         const bool stay_within_list = list->getSelected() > 0;
@@ -385,7 +385,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         // when focusing a list by going up, select the last item of the list
         if (w != NULL && w->m_type == WTYPE_LIST)
         {
-            IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+            IGUIListBox* list = (IGUIListBox*)(w->m_element);
             assert(list != NULL);
             
             list->setSelected( list->getItemCount()-1 );
@@ -435,7 +435,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     // components
     if (w != NULL && w->m_type == WTYPE_LIST)
     {
-        IGUIListBox* list = dynamic_cast<IGUIListBox*>(w->m_element);
+        IGUIListBox* list = w->getIrrlichtElement<IGUIListBox>();
         assert(list != NULL);
         
         const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
