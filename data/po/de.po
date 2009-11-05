@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Supertuxkart 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-01-19 03:13+0100\n"
-"PO-Revision-Date: 2009-01-19 03:13+0100\n"
-"Last-Translator: Constantin Pelikan <constantin.pelikan@rub.de>\n"
+"PO-Revision-Date: 2009-11-05 19:53+0100\n"
+"Last-Translator: Christoph <c.kahrs@gmx.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: src/gui/config_display.cpp:395
 #, c-format
 msgid "%dx%d Blacklisted"
-msgstr "%dx%d zur schwarzen Liste hinzugefügt"
+msgstr "%dx%d wurde zur schwarzen Liste hinzugefügt"
 
 #: src/modes/world.cpp:418
 #, c-format
@@ -134,7 +134,7 @@ msgstr ""
 
 #: src/gui/network_gui.cpp:179
 msgid "Can't connect to server"
-msgstr "Verbindung zu Server gescheitert"
+msgstr "Verbindung zum Server gescheitert"
 
 #: data/tracks/canyon/canyon.track:4
 msgid "Canyon"
@@ -155,7 +155,7 @@ msgstr "Stadt"
 
 #: src/gui/config_display.cpp:104
 msgid "Clear from Blacklist"
-msgstr "Aus der schwarzen Liste löschen"
+msgstr "Von der schwarzen Liste löschen"
 
 #: data/tracks/crescentcrossing/crescentcrossing.challenge:5
 msgid "Collect Nitro in Math Class"
@@ -163,7 +163,7 @@ msgstr "Sammle Nitro im Klassenzimmer"
 
 #: data/grandprix/tothemoonandback.challenge:5
 msgid "Collect the Pharaohs Treasure"
-msgstr "Sammle den Schatz des Pharao's"
+msgstr "Sammle den Schatz des Pharaos"
 
 #: src/gui/help_page_one.cpp:123
 msgid ""
@@ -192,15 +192,15 @@ msgstr "Auflösung bestätigen"
 #: src/gui/display_res_confirm.cpp:110
 #, c-format
 msgid "Confirm Resolution Within %d Seconds"
-msgstr "Auflösung innerhalb %d Sekunden bestätigen"
+msgstr "Auflösung innerhalb von %d Sekunden bestätigen"
 
 #: src/gui/display_res_confirm.cpp:51
 msgid "Confirm Resolution Within 5 Seconds"
-msgstr "Auflösung innerhalb 5 Sekunden bestätigen"
+msgstr "Auflösung innerhalb von 5 Sekunden bestätigen"
 
 #: src/gui/network_gui.cpp:56
 msgid "Connect to server"
-msgstr "Zu Server verbinden"
+msgstr "Mit dem Server verbinden"
 
 #: src/gui/network_gui.cpp:155
 msgid "Connected:"
@@ -343,13 +343,13 @@ msgid ""
 msgstr ""
 "Sammle mindestens 6 Nitro-Punkte\n"
 "in drei Runden in\n"
-"Oliver's Mathe-Klasse\n"
+"Olivers Mathe-Klasse\n"
 "in weniger als 52 Sekunden."
 
 #. I18N: name of controls, like in "fire missile"
 #: src/gui/player_controls.cpp:74
 msgid "Fire"
-msgstr "Schiessen"
+msgstr "Schießen"
 
 #: data/grandprix/penguinplayground.grandprix:5
 msgid "First grand prix, easy to get started"
@@ -363,7 +363,7 @@ msgstr "Folge dem Leader"
 
 #: data/tracks/city/city.challenge:5
 msgid "Follow the Leader in the Jungle"
-msgstr "Folge dem Leader in den Jungel"
+msgstr "Folge dem Leader in den Dschungel"
 
 #: data/grandprix/atworldsend.challenge:5
 msgid ""
@@ -371,7 +371,7 @@ msgid ""
 "Desert Island"
 msgstr ""
 "Folge dem Leader auf einer\n"
-"Wüen-Insel"
+"Wüsten-Insel"
 
 #: src/gui/help_page_three.cpp:70
 msgid ""
@@ -380,8 +380,8 @@ msgid ""
 " Beware : going in front of the leader will get you eliminated too!"
 msgstr ""
 "Folge dem Leader: bleibe auf dem zweiten Platz, da der Letzte\n"
-"disqualifiziert wird, wenn der Zaehler Null erreicht.\n"
-" Vorsicht: Wer vor dem Leader faehrt wird auch disqualifiziert!"
+"disqualifiziert wird, wenn der Zähler Null erreicht.\n"
+" Vorsicht: Wer vor dem Leader fährt wird auch disqualifiziert!"
 
 #: src/gui/help_page_one.cpp:69
 msgid "Force your rivals bite *your* dust!"
@@ -434,7 +434,7 @@ msgid ""
 "most points wins (shortest time in case of a tie!)          "
 msgstr ""
 "Grand Prix: Hol dir Siegespunkte auf einer Reihe von Strecken.\n"
-"Die meisten Punkte gewinnen. Bei Gleichstand zählt die Zeit."
+"Die meisten Punkte gewinnen, bei Gleichstand zählt die Zeit."
 
 #: src/gui/race_menu.cpp:49
 #: src/gui/main_menu.cpp:75
@@ -451,7 +451,7 @@ msgid ""
 "you need to complete a challenge to unlock it."
 msgstr ""
 "Wenn du einen Knopf mit einem Schloss wie dem rechts siehst,\n"
-"musst du eine Herausforderung erfüllen, um es zu öffnen."
+"musst du eine Herausforderung meistern, um es zu öffnen."
 
 #: src/gui/config_display.cpp:94
 msgid "Increase Resolution"
@@ -566,7 +566,7 @@ msgstr "Nitro"
 #: src/gui/grand_prix_select.cpp:63
 #: src/gui/grand_prix_select.cpp:69
 msgid "No Grand Prix selected"
-msgstr "Kein Grand Prix gewählt"
+msgstr "Kein Grand Prix ausgewählt"
 
 #: src/gui/race_options.cpp:327
 #: src/gui/race_options.cpp:330
@@ -592,7 +592,7 @@ msgstr "Alte Einstellungsdatei gefunden, prüfe die Tastenbelegungen"
 
 #: data/tracks/olivermath/olivermath.track:4
 msgid "Oliver's Math Class"
-msgstr "Oliver's Mathestunde"
+msgstr "Olivers Mathestunde"
 
 #: data/tracks/beach/beach.track:4
 msgid "On the Beach"
@@ -614,7 +614,7 @@ msgstr "Pause"
 
 #: src/gui/race_gui.cpp:865
 msgid "Penalty time!!"
-msgstr "Strafzeit!!"
+msgstr "Strafzeit!"
 
 #: data/grandprix/penguinplayground.grandprix:4
 msgid "Penguin Playground"
@@ -660,7 +660,7 @@ msgid ""
 "Plunger - throw straight to pull an opponent back,\n"
 "or throw while looking back to make one lose sight!"
 msgstr ""
-"Stössel - Wirf ihn vorwaerts um einen Gegner zurückzuhalten,\n"
+"Stößel - Wirf ihn vorwärts um einen Gegner zurückzuhalten,\n"
 "oder wirf ihn während du zurück blickst, um einem Gegner die Sicht zu versperren."
 
 #: data/tracks/prehistoric/prehistoric.track:4
@@ -724,7 +724,7 @@ msgstr "Rennstrecke"
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/gui/race_gui.cpp:816
 msgid "Ready!"
-msgstr "Achtung!"
+msgstr "Auf die Plätze!"
 
 #: src/gui/player_controls.cpp:72
 msgid "Rescue"
@@ -749,7 +749,7 @@ msgstr "Zweiter Grand Prix"
 
 #: src/gui/network_gui.cpp:52
 msgid "Select network mode"
-msgstr "Waehle Netzwerkmodus"
+msgstr "Wähle Netzwerkmodus"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/gui/race_gui.cpp:826
@@ -839,7 +839,7 @@ msgid ""
 "Options->Player Config menu."
 msgstr ""
 "Die aktuellen Tastenzuweisungen können im Menü\n"
-"Optionen->Spieler Konfiguration eingesehen/geändert werden."
+"Optionen->Spieler Konfiguration eingesehen und verändert werden."
 
 #: src/highscore_manager.cpp:108
 msgid ""
@@ -873,7 +873,7 @@ msgstr "Gegen die Zeit"
 
 #: src/gui/help_page_three.cpp:63
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "Zeitrennen: Enthält keine Bonis; es kommt ausschliesslich auf dein Können an!"
+msgstr "Zeitrennen: Enthält keine Bonis; es kommt ausschließlich auf dein Können an!"
 
 #: src/gui/help_page_two.cpp:58
 msgid "To help you win, there are certain powerups you can grab:"
@@ -913,12 +913,12 @@ msgstr "Zwei Spieler"
 
 #: src/modes/linear_world.cpp:658
 msgid "WRONG WAY!"
-msgstr "Falsche Richtung!"
+msgstr "FALSCHE RICHTUNG!"
 
 #: src/gui/char_sel.cpp:126
 #: src/gui/network_gui.cpp:162
 msgid "Waiting for clients"
-msgstr "Warte auf Clients"
+msgstr "Warte auf Mitspieler"
 
 #: src/gui/char_sel.cpp:124
 #: src/gui/network_gui.cpp:118
