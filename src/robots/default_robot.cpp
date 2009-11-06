@@ -363,8 +363,8 @@ void DefaultRobot::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5f >
-       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth() )
+    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() ))  >
+       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
     {
         steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter(), 
                                    dt );
