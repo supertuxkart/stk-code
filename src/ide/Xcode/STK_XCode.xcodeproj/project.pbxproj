@@ -280,6 +280,7 @@
 		95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */; };
 		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
 		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
+		95FB16DB10A7796800645974 /* new_ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95FB16DA10A7796800645974 /* new_ai.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1058,6 +1059,8 @@
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		95FB16D910A7796800645974 /* new_ai.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = new_ai.hpp; path = ../../robots/new_ai.hpp; sourceTree = SOURCE_ROOT; };
+		95FB16DA10A7796800645974 /* new_ai.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = new_ai.cpp; path = ../../robots/new_ai.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1936,6 +1939,8 @@
 			children = (
 				95C2B1AB0F296545000D3E5D /* default_robot.cpp */,
 				95C2B1AC0F296545000D3E5D /* default_robot.hpp */,
+				95FB16DA10A7796800645974 /* new_ai.cpp */,
+				95FB16D910A7796800645974 /* new_ai.hpp */,
 			);
 			name = robots;
 			path = ../../robots;
@@ -2552,6 +2557,7 @@
 				9522F1F0107961560067ECF5 /* options_screen_input.cpp in Sources */,
 				9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */,
 				951B7D19108E52C900BC03AE /* challenges.cpp in Sources */,
+				95FB16DB10A7796800645974 /* new_ai.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
