@@ -271,7 +271,7 @@ public:
     void           updatedWeight    ();
     void           forceRescue      ();
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
-    const irr::core::stringw& getName() const {return m_kart_properties->getName();}
+    virtual const irr::core::stringw& getName() const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     virtual bool    isPlayerKart    () const {return false;                        }
     // addMessages gets called by world to add messages to the gui

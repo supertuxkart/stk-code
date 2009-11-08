@@ -45,6 +45,7 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "robots/default_robot.hpp"
+#include "robots/new_ai.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -188,10 +189,17 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 
     const int NUM_ROBOTS = 1;
 
-    switch(m_random.get(NUM_ROBOTS))
+    // For now: instead of random switching, use each
+    // robot in turns: switch(m_random.get(NUM_ROBOTS))
+    static int turn=1;
+    turn=1-turn;
+    switch(turn)
     {
         case 0:
             currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
+            break;
+        case 1:
+            currentRobot = new NewAI(kart_name, position, init_pos, m_track);
             break;
         default:
             std::cerr << "Warning: Unknown robot, using default." << std::endl;
