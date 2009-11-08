@@ -238,6 +238,15 @@ void Camera::update(float dt)
 
     m_camera->setPosition(m_temp_position.toIrrVector());
     m_camera->setTarget(m_temp_target.toIrrVector());
+    // The following settings give a debug camera which shows the track from
+    // high above the kart straight down.
+#undef DEBUG_CAMERA
+#ifdef DEBUG_CAMERA
+    core::vector3df xyz = RaceManager::getKart(0)->getXYZ().toIrrVector();
+    m_camera->setTarget(xyz);
+    xyz.Y = xyz.Y+30;
+    m_camera->setPosition(xyz);
+#endif
 
     if(race_manager->getNumLocalPlayers() < 2)
         sound_manager->positionListener(m_temp_position, m_temp_target - m_temp_position);
