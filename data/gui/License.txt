@@ -1,24 +1,15 @@
-All images in this directory come from the Tango icon project are Public Domain (http://tango.freedesktop.org)
+All icons come from Open Game Art (art by onyum.com, comissionned by Bart Kelsey)
 
 Except :
 
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
 
-background in glass skin : under CC-BY-SA by 'elisee'
-
-Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
-
 main_*.png icons, released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
 
-logo.png is released under GPL
+difficulty_*.png icons, released under Creative-Commons BY-SA 3, By Conso (Constantin Pelikan)
 
-main_race.png created by Andreas Bilng (c) 2008, with Tuxicon by Enrico Billing (c) 2008
-    released under Creative Commons Attribution-Share Alike 3.0 Germany [http://creativecommons.org/licenses/by-sa/3.0/de/deed.en]
- 
-mode_normal.png released under CC-BY-SA 3.0, based on work by MiniBjorn
 
-FIXME - track*.png are temporary and should be [re]moved
+====
 
-FIXME - mode_ftl.png has an unclear license, it combines a GPL kart and a CC kart. How does those licenses deal with this?
-
-track_random.png released under public domain, by Auria
+Glass Skin by Auria, under CC-BY-SA 3+
+except background, under CC-BY-SA, by 'elisee'

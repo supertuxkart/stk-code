@@ -65,10 +65,9 @@ namespace GUIEngine
         char buffer[64];
         for (int n=0; n<activeChallengeAmount; n++)
         {
-            // TODO : temporary icon until we have a 'unsolved challenge' icon
             sprintf(buffer, "challenge%i", n);
             w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
-                       buffer, file_manager->getTextureFile("speedback.png"));
+                       buffer, file_manager->getGUIDir() + "/challenge.png");
         }
         for (int n=0; n<solvedChallengeAmount; n++)
         {
