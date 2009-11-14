@@ -13,7 +13,6 @@
 DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
-    m_keyboard = NULL;
     m_assign_mode = NO_ASSIGN;
 }
 
@@ -42,7 +41,7 @@ bool DeviceManager::initialize()
         m_keyboard_configs.push_back(new KeyboardConfig());
         created = true;
     }
-    m_keyboard = new KeyboardDevice(m_keyboard_configs.get(0));
+    m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(0)));
     // TODO: Detect keyboard presence, if there is no keyboard, this should be false
     m_keyboard_configs.get(0)->setInUse(true);
 
@@ -86,13 +85,16 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
     m_assign_mode = assignMode;
     
     // when going back to no-assign mode, do some cleanup
-    if(assignMode == NO_ASSIGN)
+    if (assignMode == NO_ASSIGN)
     {
-        for(int i=0; i < m_gamepads.size(); i++)
+        for (int i=0; i < m_gamepads.size(); i++)
         {
             m_gamepads[i].setPlayer(NULL);
         }
-        m_keyboard->setPlayer(NULL);
+        for (int i=0; i < m_keyboards.size(); i++)
+        {
+            m_keyboards[i].setPlayer(NULL);
+        }
     }
 }
 // -----------------------------------------------------------------------------
@@ -148,7 +150,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id, GamepadConfig **config
 // -----------------------------------------------------------------------------
 void DeviceManager::addKeyboard(KeyboardDevice* d)
 {
-    m_keyboard = d;
+    m_keyboards.push_back(d);
 }
 // -----------------------------------------------------------------------------
 void DeviceManager::addGamepad(GamePadDevice* d)
@@ -157,24 +159,28 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 }
 // -----------------------------------------------------------------------------
 
-InputDevice *DeviceManager::mapKeyboardInput( int deviceID,
+InputDevice* DeviceManager::mapKeyboardInput( int deviceID,
                                               int btnID,
                                               ActivePlayer **player,
                                               PlayerAction *action )
 {
-    KeyboardDevice *keyboard = m_keyboard;
-
-    if (keyboard->hasBinding(btnID, action))
+    const int keyboard_amount = m_keyboards.size();
+    for (int n=0; n<keyboard_amount; n++)
     {
-        if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
-        {
-            *player = NULL;
-        }
-        else *player = keyboard->m_player;
-    }
-    else keyboard = NULL; // If no appropriate bind was found, return NULL
+        KeyboardDevice *keyboard = m_keyboards.get(n);
 
-    return keyboard;
+        if (keyboard->hasBinding(btnID, action))
+        {
+            if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
+            {
+                *player = NULL;
+            }
+            else *player = keyboard->m_player;
+            return keyboard;
+        }
+    }
+    
+    return NULL; // no appropriate binding found
 }
 //-----------------------------------------------------------------------------
 
@@ -245,7 +251,7 @@ InputDevice* DeviceManager::getLatestUsedDevice()
     
     if (m_latest_used_device == NULL )
     {    
-        return m_keyboard;
+        return m_keyboards.get(0); // FIXME: is this right?
     }
     
     return m_latest_used_device;
@@ -380,20 +386,27 @@ void DeviceManager::serialize()
     configfile.close(); 
     printf("Serialization complete.\n\n");
 }
+                    
+// -----------------------------------------------------------------------------
 
+KeyboardDevice* DeviceManager::getKeyboardFromBtnID(const int btnID)
+{
+    const int keyboard_amount = m_keyboards.size();
+    for (int n=0; n<keyboard_amount; n++)
+    {
+        if (m_keyboards[n].getConfiguration()->hasBindingFor(btnID)) return m_keyboards.get(n);
+    }
+    
+    return NULL;
+}
 
 // -----------------------------------------------------------------------------
 
 void DeviceManager::shutdown()
 {
     m_gamepads.clearAndDeleteAll();
+    m_keyboards.clearAndDeleteAll();
     m_gamepad_configs.clearAndDeleteAll();
     m_keyboard_configs.clearAndDeleteAll();
     m_latest_used_device = NULL;
-    if (m_keyboard != NULL)
-    {
-        delete m_keyboard;
-        m_keyboard = NULL;
-    }
 }
-

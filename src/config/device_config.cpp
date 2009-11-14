@@ -271,3 +271,14 @@ irr::core::stringw GamepadConfig::toString ()
     returnString += DeviceConfig::toString();
     return returnString;
 }
+
+//------------------------------------------------------------------------------
+
+bool DeviceConfig::hasBindingFor(const int buttonID) const
+{
+    for (int n=0; n<PA_COUNT; n++)
+    {
+        if (m_bindings[n].id == buttonID) return true;
+    }
+    return false;
+}

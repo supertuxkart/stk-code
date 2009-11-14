@@ -26,7 +26,8 @@
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -96,13 +97,26 @@ void OptionsScreenInput::init()
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
     
-    if(!this->m_inited)
-    {
-        devices->addItem("Keyboard","keyboard", file_manager->getDataDir() + "/gui/keyboard.png");
+    if (!this->m_inited)
+    {        
+        const int keyboard_config_count = input_manager->getDeviceList()->getKeyboardConfigAmount();
+
+        for (int i=0; i<keyboard_config_count; i++)
+        {
+            KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
+            
+            std::ostringstream kbname;
+            kbname << "keyboard" << i;
+            const std::string internal_name = kbname.str();
+            
+            
+            devices->addItem(StringUtils::insertValues(_("Keyboard %i"), i), internal_name,
+                             file_manager->getDataDir() + "/gui/keyboard.png");
+        }
         
         const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
         
-        for(int i = 0; i < gpad_config_count; i++)
+        for (int i = 0; i < gpad_config_count; i++)
         {
             GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
             // Don't display the configuration if a matching device is not available
@@ -142,17 +156,19 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     
     std::string deviceID = devices->getSelectionIDString(GUI_PLAYER_ID);
     
-    const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && deviceID== "keyboard";
+    const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && deviceID.find("keyboard") != std::string::npos;
     const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
                            sensedInput->type == Input::IT_STICKBUTTON) &&
-    deviceID.find("gamepad") != std::string::npos;
+    					   deviceID.find("gamepad") != std::string::npos;
     
-    if(!keyboard && !gamepad) return;
-    if(gamepad)
+    if (!keyboard && !gamepad) return;
+    if (gamepad)
     {
-        if(sensedInput->type != Input::IT_STICKMOTION &&
-           sensedInput->type != Input::IT_STICKBUTTON)
+        if (sensedInput->type != Input::IT_STICKMOTION &&
+            sensedInput->type != Input::IT_STICKBUTTON)
+        {
             return; // that kind of input does not interest us
+        }
     }
     
     
@@ -160,8 +176,12 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     {
         std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
         
-        KeyboardDevice* keyboard = input_manager->getDeviceList()->getKeyboard();
-        keyboard->getConfiguration()->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
+        // extract keyboard ID from name
+        int configID = -1;
+        sscanf( devices->getSelectionIDString(GUI_PLAYER_ID).c_str(), "keyboard%i", &configID );
+        
+        KeyboardConfig* keyboard = input_manager->getDeviceList()->getKeyboardConfig(configID);
+        keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
         
         // refresh display
         init();
@@ -169,41 +189,23 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     else if (gamepad)
     {
         std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to gamepad #" << sensedInput->deviceID << " : ";
-        if(sensedInput->type == Input::IT_STICKMOTION)
+        if (sensedInput->type == Input::IT_STICKMOTION)
         {
             std::cout << "axis " << sensedInput->btnID << " direction " <<
             (sensedInput->axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n\n";
         }
-        else if(sensedInput->type == Input::IT_STICKBUTTON)
+        else if (sensedInput->type == Input::IT_STICKBUTTON)
         {
             std::cout << "button " << sensedInput->btnID << "\n\n";
         }
         else
+        {
             std::cout << "Sensed unknown gamepad event type??\n";
+        }
         
+        // extract gamepad ID from name
         int configID = -1;
         sscanf( devices->getSelectionIDString(GUI_PLAYER_ID).c_str(), "gamepad%i", &configID );
-        
-        /*
-         if(sscanf( devices->getSelectionIDString().c_str(), "gamepad%i", &gamepadID ) != 1 ||
-         gamepadID >= input_manager->getDeviceList()->getGamePadAmount())
-         {
-         if(gamepadID >= input_manager->getDeviceList()->getGamePadAmount() || gamepadID == -1 )
-         {
-         std::cerr << "gamepad ID does not exist (or failed to read it) : " << gamepadID << "\n";
-         gamepadID = sensedInput->deviceID;
-         }
-         
-         if(input_manager->getDeviceList()->getGamepadConfig(gamepadID)->m_index != sensedInput->deviceID)
-         {
-         // should not happen, but let's try to be bulletproof...
-         std::cerr << "The key that was pressed is not on the gamepad we're trying to configure! ID in list=" << gamepadID <<
-         " which has irrID " << input_manager->getDeviceList()->getGamePad(gamepadID)->m_index <<
-         " and we got input from " << sensedInput->deviceID << "\n";
-         }
-         
-         }
-         */
         
         GamepadConfig* config =  input_manager->getDeviceList()->getGamepadConfig(configID);
         config->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
@@ -256,22 +258,31 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         assert(devices != NULL);
         
         const std::string& selection = devices->getSelectionIDString(GUI_PLAYER_ID);
-        if( selection.find("gamepad") != std::string::npos )
+        if (selection.find("gamepad") != std::string::npos)
         {
             int i = -1, read = 0;
             read = sscanf( selection.c_str(), "gamepad%i", &i );
-            if(read == 1 && i != -1)
+            if (read == 1 && i != -1)
             {
                 updateInputButtons( input_manager->getDeviceList()->getGamepadConfig(i) );
             }
             else
             {
-                std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
+                std::cerr << "Cannot read internal gamepad input device ID : " << selection.c_str() << std::endl;
             }
         }
-        else if(selection == "keyboard")
+        else if (selection.find("keyboard") != std::string::npos)
         {
-            updateInputButtons( input_manager->getDeviceList()->getKeyboard()->getConfiguration() );
+            int i = -1, read = 0;
+            read = sscanf( selection.c_str(), "keyboard%i", &i );
+            if (read == 1 && i != -1)
+            {
+            	updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
+            }
+            else
+            {
+                std::cerr << "Cannot read internal keyboard input device ID : " << selection.c_str() << std::endl;
+            }
         }
         else
         {
@@ -331,7 +342,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         new PressAKeyDialog(0.4f, 0.4f);
         
         std::string selection = devices->getSelectionIDString(GUI_PLAYER_ID);
-        if (selection == "keyboard")
+        if (selection.find("keyboard") != std::string::npos)
         {
             input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
         }

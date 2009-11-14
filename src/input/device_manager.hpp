@@ -16,7 +16,7 @@ class DeviceManager
 {
 private:
 
-    KeyboardDevice                     *m_keyboard;
+    ptr_vector<KeyboardDevice, HOLD>    m_keyboards;
     ptr_vector<GamePadDevice, HOLD>     m_gamepads;
     ptr_vector<KeyboardConfig, HOLD>    m_keyboard_configs;
     ptr_vector<GamepadConfig, HOLD>     m_gamepad_configs;
@@ -52,18 +52,27 @@ public:
 
 
     DeviceManager();
-    
-    void clearGamepads() { m_gamepads.clearAndDeleteAll(); }
-    void clearKeyboard() {delete m_keyboard;}
-    void addKeyboard(KeyboardDevice* d);
+        
+    // ---- Gamepads ----
     void addGamepad(GamePadDevice* d);
-    
     int getGamePadAmount() const                            { return m_gamepads.size(); }
     int getGamePadConfigAmount() const                      { return m_gamepad_configs.size(); }
     GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
+    void clearGamepads() { m_gamepads.clearAndDeleteAll();  }
+
+    // ---- Keyboard(s) ----
+    void addKeyboard(KeyboardDevice* d);
+    int getKeyboardConfigAmount() const                     { return m_keyboard_configs.size(); }
+    KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
+    KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
+    void clearKeyboard() { m_keyboards.clearAndDeleteAll(); }
+
     PlayerAssignMode    playerAssignMode() const            { return m_assign_mode; }
-    KeyboardDevice*     getKeyboard()                       { return m_keyboard; }
+
+
+    /** Returns the keyboard that has a binding for this button, or NULL if none */
+    KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
     PlayerAssignMode    getAssignMode()                     { return m_assign_mode; }
     GamePadDevice*      getGamePadFromIrrID(const int i);
     InputDevice*        getLatestUsedDevice();

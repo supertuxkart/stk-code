@@ -228,11 +228,12 @@ int InputManager::getPlayerKeyboardID() const
     if (m_device_manager->playerAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
     
     // Otherwise, after devices are assigned, we can check the ID
-    if (m_device_manager->getKeyboard() != NULL)
+    // FIXME: don't hardcode keyboard 0, there may be multiple keyboard configs
+    if (m_device_manager->getKeyboard(0) != NULL)
     {
-        if (m_device_manager->getKeyboard()->getPlayer() != NULL)
+        if (m_device_manager->getKeyboard(0)->getPlayer() != NULL)
         {
-            return m_device_manager->getKeyboard()->getPlayer()->m_id;
+            return m_device_manager->getKeyboard(0)->getPlayer()->m_id;
         }
     }
     return -1;
@@ -318,7 +319,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
-                        device = m_device_manager->getKeyboard();
+                        device = m_device_manager->getKeyboardFromBtnID(btnID);
                     }
                     else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
                     {
