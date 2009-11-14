@@ -639,7 +639,7 @@ public:
         ModelViewWidget* w3 = m_parent->m_kart_widgets[playerID].modelView;
         assert( w3 != NULL );
         
-        if (selectionID == "gui/track_random.png")
+        if (selectionID == "randomkart")
         {
             // Random kart
             scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
@@ -901,6 +901,9 @@ void KartSelectionScreen::init()
         }
     }
     
+    // add random
+    w->addItem(_("Random Kart"), "randomkart", file_manager->getGUIDir()+"/random_kart.png");
+    
     /*
      
      TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
@@ -961,7 +964,7 @@ void KartSelectionScreen::allPlayersDone()
     {
         std::string selection = m_kart_widgets[n].m_kartInternalName;
         
-        if (selection == "gui/track_random.png")
+        if (selection == "randomkart")
         {
             // FIXME: in multiplayer game, if two players select' random' make sure they don't select
             // the same kart or an already selected kart

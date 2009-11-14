@@ -17,6 +17,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widget.hpp"
+#include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
@@ -39,16 +40,24 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if(w2 != NULL)
+        if (w2 != NULL)
         {
-            std::cout << "Clicked on track " << w2->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
+            const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
+            std::cout << "Clicked on track " << selection.c_str() << std::endl;
             
-            Track* clickedTrack = track_manager->getTrack(w2->getSelectionIDString(GUI_PLAYER_ID));
-            if (clickedTrack != NULL)
+            if (selection == "random_track")
             {
-                ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                
-                new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
+                // TODO
+            }
+            else
+            {
+                Track* clickedTrack = track_manager->getTrack(selection);
+                if (clickedTrack != NULL)
+                {
+                    ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                    
+                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
+                }
             }
         }
     }
@@ -81,7 +90,8 @@ void TracksScreen::init()
         }
         w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile());
     }
-    
+    w->addItem(_("Random Track"), "random_track", file_manager->getGUIDir() + "/track_random.png");
+
     if (hasLockedTracks)
     {
         w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");

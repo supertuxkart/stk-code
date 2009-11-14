@@ -215,7 +215,7 @@ void DynamicRibbonWidget::setSubElements()
         for(int i=0; i<m_col_amount; i++)
         {
             IconButtonWidget* icon = new IconButtonWidget();
-            icon->m_properties[PROP_ICON]="gui/track_random.png";
+            icon->m_properties[PROP_ICON]="gui/main_help.png";
             
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
@@ -586,9 +586,9 @@ void DynamicRibbonWidget::updateItemDisplay()
             }
             else
             {
-                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) );
-                icon->m_properties[PROP_ID] = "gui/track_random.png";
+                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/main_help.png").c_str() ) );
+                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/main_help.png").c_str() ) );
+                icon->m_properties[PROP_ID] = "gui/main_help.png";
             }
         } // next column
     } // next row

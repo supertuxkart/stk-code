@@ -105,7 +105,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
     
-    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/track_random.png").c_str() ) ;
+    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
 
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
