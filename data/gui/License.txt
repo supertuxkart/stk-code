@@ -1,11 +1,13 @@
 All icons come from Open Game Art (art by onyum.com, comissionned by Bart Kelsey)
 * options_players & random_kart were tweaked by Marianne Gagnon
 
+
 Except :
+main_*.png icons, released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
+
+mode_tt, released under Creative-Commons BY-SA 3, incorporatings artwork from yeKcim and onyum.com
 
 Logo and Logo_slim : under CC-BY-SA 3.0+ by 'rastapax'
-
-main_*.png icons, released under Creative-Commons BY-SA 3, By yeKcim (Anthony Carré)
 
 difficulty_*.png icons, released under Creative-Commons BY-SA 3, By Conso (Constantin Pelikan)
 
