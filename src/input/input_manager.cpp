@@ -264,21 +264,21 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
     {
         action = PA_FIRST;
 
-        if(btnID == KEY_UP)         action = PA_ACCEL;
-        else if(btnID == KEY_DOWN)  action = PA_BRAKE;
-        else if(btnID == KEY_LEFT)  action = PA_LEFT;
-        else if(btnID == KEY_RIGHT) action = PA_RIGHT;
-        else if(btnID == KEY_SPACE) action = PA_FIRE;
+        if      (btnID == KEY_UP)    action = PA_ACCEL;
+        else if (btnID == KEY_DOWN)  action = PA_BRAKE;
+        else if (btnID == KEY_LEFT)  action = PA_LEFT;
+        else if (btnID == KEY_RIGHT) action = PA_RIGHT;
+        else if (btnID == KEY_SPACE) action = PA_FIRE;
 
         if(btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive()) GUIEngine::ModalDialog::onEnterPressed();
         
-        if(action != PA_FIRST)
+        if (action != PA_FIRST)
         {
             action_found = true;
             player = 0;
         }
     }
-
+    
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
@@ -290,7 +290,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
     {
         // If we're in the kart menu awaiting new players, do special things
         // when a device presses fire or rescue
-        if( m_device_manager->getAssignMode() == DETECT_NEW )
+        if (m_device_manager->getAssignMode() == DETECT_NEW)
         {
             // Player is unjoining
             if ((player != NULL) && (action == PA_RESCUE))
@@ -319,6 +319,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
+                        //std::cout << "==== New Player Joining with Key " << btnID << " ====" << std::endl;
                         device = m_device_manager->getKeyboardFromBtnID(btnID);
                     }
                     else if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)

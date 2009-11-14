@@ -41,10 +41,15 @@ bool DeviceManager::initialize()
         m_keyboard_configs.push_back(new KeyboardConfig());
         created = true;
     }
-    m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(0)));
-    // TODO: Detect keyboard presence, if there is no keyboard, this should be false
-    m_keyboard_configs.get(0)->setInUse(true);
-
+    
+    const int keyboard_amount = m_keyboard_configs.size();
+    for (int n=0; n<keyboard_amount; n++)
+    {
+        m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
+        // TODO: Detect keyboard presence, if there is no keyboard, this should be false
+        m_keyboard_configs.get(n)->setInUse(n == 0);
+    }
+    
     printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
