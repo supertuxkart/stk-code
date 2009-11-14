@@ -1057,6 +1057,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         w->clearItems();
         
         // TODO : preserve selection of karts for all players
+        // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
         
         if (selection == "all")
         {
@@ -1085,6 +1086,8 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
             }
         }
+        // add random
+        w->addItem(_("Random Kart"), "randomkart", file_manager->getGUIDir()+"/random_kart.png");
         
         w->updateItemDisplay();
         
