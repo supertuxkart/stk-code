@@ -34,14 +34,7 @@ public:
     Kart(kart_name, position, init_pos) {}
 
     bool  isPlayerKart() const {return false;}
-    virtual const irr::core::stringw& getName() const 
-    {
-        // Static to avoid returning the address of a temporary
-        // string.
-        static irr::core::stringw name = Kart::getName()+"(auto)";
-        return name;
-    }   // getName
-};
+};   // AutoKart
 
 #endif
 

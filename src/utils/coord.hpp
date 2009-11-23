@@ -23,7 +23,6 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "utils/constants.hpp"
 #include "utils/vec3.hpp"
 
 /** A class that stores a translation and rotation. It is used to convert
@@ -37,19 +36,6 @@ private:
     /** Rotation as Eulerian HPR value. */
     Vec3       m_hpr;
 
-    //sgCoord    m_coord;
-
-    /** Sets the sgCoord data structures (and converts radians to degrees). */
-    /*
-    void setSgCoord()
-    {
-        sgSetCoord(&m_coord, m_xyz.toFloat(), m_hpr.toFloat());
-        // Convert hpr in radians to degrees, which sg needs.
-        for(int i=0; i<3; i++)
-        {
-            m_coord.hpr[i] = RAD_TO_DEGREE(m_coord.hpr[i]);
-        }
-    }*/
 
 public:
     /** Constructor.

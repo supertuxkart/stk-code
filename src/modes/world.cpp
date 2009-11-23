@@ -317,16 +317,6 @@ void World::resetAllKarts()
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------
-/** Called during rendering. In this function direct calls to the graphics
- *  are possible, e.g. using an irrlicht font object to directly print to
- *  the screen, ...
- */
-void World::render()
-{
-    m_race_gui->render();
-}   // render
-
-//-----------------------------------------------------------------------------
 void World::update(float dt)
 {
     if(history->replayHistory()) dt=history->getNextDelta();
@@ -362,7 +352,6 @@ void World::update(float dt)
     m_track->update(dt);
 
     projectile_manager->update(dt);
-    m_race_gui->update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------

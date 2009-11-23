@@ -489,7 +489,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
 
     // Add the camera:
     // ---------------
-    scene::ICameraSceneNode *camera = irr_driver->addCamera();
+    scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     Vec3 bb_min, bb_max;
     m_all_quads->getBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
@@ -505,7 +505,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
     video::ITexture *texture = rttProvider.renderToTexture();
     
     cleanupDebugMesh();
-    irr_driver->removeCamera(camera);
+    irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
     m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
     m_scaling.setY(dimension.Width/(bb_max.getY()-bb_min.getY()));

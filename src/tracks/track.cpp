@@ -50,6 +50,7 @@ using namespace irr;
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 

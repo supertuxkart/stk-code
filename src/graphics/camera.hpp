@@ -58,8 +58,6 @@ private:
     float       m_target_speed;     // The speed at which the camera changes targets
     float       m_rotation_range;   // Factor of the effects of steering in camera aim
 
-    float       m_x, m_y, m_w, m_h; 
-
     const Kart *m_kart;             // The kart that the camera follows
 
 private:
@@ -69,10 +67,13 @@ public:
         ~Camera            ();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
-    void setScreenPosition (int pos);
     void reset             ();
     void setInitialTransform();
     void update            (float dt);
+    scene::ICameraSceneNode *getCameraSceneNode() 
+    {
+        return m_camera;
+    }
 } ;
 
 #endif

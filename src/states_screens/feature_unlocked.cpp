@@ -26,7 +26,7 @@ void FeatureUnlockedCutScene::init()
     m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("lscales.png"), 16 /* hori_res */, 16 /* vert_res */,
                            1.0f /* texture_percent */,  2.0f /* sphere_percent */);
     
-    m_camera = irr_driver->addCamera();
+    m_camera = irr_driver->addCameraSceneNode();
     m_camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
@@ -92,7 +92,7 @@ void FeatureUnlockedCutScene::tearDown()
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
     
-    irr_driver->removeCamera(m_camera);
+    irr_driver->removeCameraSceneNode(m_camera);
     m_camera = NULL;
     
     irr_driver->removeNode(m_chest);

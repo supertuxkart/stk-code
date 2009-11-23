@@ -128,7 +128,6 @@ public:
     
     virtual         ~World();
     virtual void    update(float delta);
-    virtual void    render();
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool    isRaceOver() = 0;
     virtual void    restartRace();

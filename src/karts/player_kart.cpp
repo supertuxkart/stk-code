@@ -24,6 +24,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
 #include "items/item.hpp"
 #include "modes/world.hpp"
@@ -39,7 +40,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = RaceManager::getWorld()->getRaceGUI()->addCamera(player_index, this);
+    m_camera       = irr_driver->addCamera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
@@ -54,6 +55,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
 //-----------------------------------------------------------------------------
 PlayerKart::~PlayerKart()
 {
+    irr_driver->removeCamera(m_camera);
     sfx_manager->deleteSFX(m_bzzt_sound);
     sfx_manager->deleteSFX(m_wee_sound );
     sfx_manager->deleteSFX(m_ugh_sound );

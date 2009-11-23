@@ -30,7 +30,6 @@ using namespace irr;
 
 #include "config/player.hpp"
 
-class Camera;
 class InputMap;
 class Kart;
 class Material;
@@ -130,43 +129,43 @@ private:
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
 
-    /** The list of all cameras. */
-    std::vector<Camera*> m_cameras;
-
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
                               const core::vector2df &center,
                               const video::SColor &color,
                               video::S3DVertex *v, unsigned short int *index);
 
-    /* Display informat on screen */
-    void drawStatusText        ();
+    /* Display informat for one player on the screen. */
     void drawEnergyMeter       (Kart *player_kart,
-                                int   offset_x, int   offset_y,
-                                float ratio_x,  float ratio_y  );
-    void drawPowerupIcons  (Kart* player_kart,
-                                int   offset_x, int   offset_y,
-                                float ratio_x,  float ratio_y  );
+                                const core::recti &viewport, 
+                                const core::vector2df &scaling);
+    void drawPowerupIcons      (Kart* player_kart,
+                                const core::recti &viewport, 
+                                const core::vector2df &scaling);
     void drawAllMessages       (Kart* player_kart,
-                                int   offset_x, int   offset_y,
-                                float ratio_x,  float ratio_y  );
-    void drawPlayerIcons       (const KartIconDisplayInfo* info);
-    void oldDrawPlayerIcons    ();
-    void drawMiniMap           ();
-    void drawTimer             ();
-    void drawMusicDescription  ();
+                                const core::recti &viewport, 
+                                const core::vector2df &scaling);
+    void drawSpeed             (Kart* kart, const core::recti &viewport, 
+                                const core::vector2df &scaling);
+    void drawLap               (const KartIconDisplayInfo* info, Kart* kart,
+                                const core::recti &viewport, 
+                                const core::vector2df &scaling);
+    void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
+    /** Display items that are shown once only (for all karts). */
+    void drawGlobalMiniMap     ();
+    void drawGlobalTimer       ();
+    void drawGlobalMusicDescription();
     void cleanupMessages       (const float dt);
-    void drawSpeed                (Kart* kart, int offset_x, int offset_y,
-                                   float ratio_x, float ratio_y           );
-    void drawLap                  (const KartIconDisplayInfo* info, Kart* kart, int offset_x,
-                                   int offset_y, float ratio_x, float ratio_y  );
+    void drawGlobalReadySetGo  ();
+    void displayPenaltyMessages();
 public:
 
          RaceGUI();
         ~RaceGUI();
-    void render();
-    void update(float dt);
-    Camera *addCamera(unsigned int index, Kart *kart);
+    void renderGlobal(float dt);
+    void renderPlayerView(unsigned int player_id, const core::recti &viewport,
+                          const core::vector2df &scaling);
+    
     void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
                     int fonst_size, 
                     const video::SColor &color=video::SColor(255, 255, 0, 255));

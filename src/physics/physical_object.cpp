@@ -30,6 +30,7 @@ using namespace irr;
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/constants.hpp"
 #include "utils/coord.hpp"
 #include "utils/string_utils.hpp"
 

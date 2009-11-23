@@ -236,9 +236,10 @@ void render(float elapsed_time)
     }
     else
     {
-        RaceManager::getWorld()->getRaceGUI()->render();
+        RaceManager::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
-}
+}   // render
+
 // -----------------------------------------------------------------------------    
 Widget* getWidget(const char* name)
 {

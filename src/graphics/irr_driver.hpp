@@ -29,6 +29,9 @@
 #include "irrlicht.h"
 using namespace irr;
 
+class Camera;
+class Kart;
+
 struct VideoMode
 {
     int width, height;
@@ -48,13 +51,28 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
 
+    /** The list of all cameras. */
+    std::vector<Camera*> m_stk_cameras;
+
+    /** The list of viewports for all cameras. */
+    std::vector<core::recti>     m_viewports;
+
+    /** The scaling necessary for each axis for each camera. */
+    std::vector<core::vector2df> m_scaling;
+
+    /** Field of view for camera. */
+    std::vector<float>           m_fov;
+
+    /** Aspect ratio for camera. */
+    std::vector<float>           m_aspect;
     
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
-    void renderBulletDebugView();
-    void displayFPS();
-    video::E_DRIVER_TYPE getEngineDriverType(int index);
+    void                  renderBulletDebugView();
+    void                  displayFPS();
+    void                  setupViewports();
+    video::E_DRIVER_TYPE  getEngineDriverType(int index);
 public:
                           IrrDriver();
                          ~IrrDriver();
@@ -102,8 +120,10 @@ public:
     scene::IAnimatedMeshSceneNode
                          *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
-                         *addCamera();
-    void                  removeCamera(scene::ICameraSceneNode *camera);
+                         *addCameraSceneNode();
+    Camera               *addCamera(unsigned int index, Kart *kart);
+    void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
+    void                  removeCamera(Camera *camera);
     void                  update(float dt);
     
     void                  changeResolution();

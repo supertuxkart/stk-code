@@ -20,6 +20,7 @@
 #define HEADER_DEFAULT_HPP
 
 #include "karts/auto_kart.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/vec3.hpp"
 
 /* third coord won't be used */
@@ -194,8 +195,12 @@ public:
     virtual void crashed     (Kart *k) {if(k) m_collided = true;};
     virtual const irr::core::stringw& getName() const 
     {
-        // Static to avoid returning the address of a temporary string
-        static irr::core::stringw name=m_kart_properties->getName()+"(default)";
+        // Static to avoid returning the address of a temporary stringq
+        static irr::core::stringw name=m_kart_properties->getName();
+        // Add the name of the AI in case of profile mode, to make it
+        // easier to compare AIs
+        if(ProfileWorld::isProfileMode())
+            name+="(default)";
         return name;
     }
 };
