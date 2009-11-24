@@ -951,9 +951,11 @@ float NewAI::findNonCrashingAngle()
     }
     Vec3 middle=(final_left+final_right)*0.5f;
     float steer_angle=steerToPoint(middle, 1/60.0f);
+#ifdef AI_DEBUG
     m_debug_left->setPosition(final_left.toIrrVector());
     m_debug_right->setPosition(final_right.toIrrVector());
     m_debug_sphere->setPosition(middle.toIrrVector());
+#endif
     return steer_angle;
 }   // findNonCrashingAngle
 
