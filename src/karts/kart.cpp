@@ -1250,8 +1250,10 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         m_water_splash_system->setCreationRate(f);
     }
     if(m_nitro)
+        // fabs(speed) is important, otherwise the negative number will
+        // become a huge unsigned number in the particle scene node!
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
-                                 ? (10.0f + getSpeed()*20.0f) : 0);
+                                 ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
