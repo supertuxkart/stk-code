@@ -157,14 +157,12 @@ private:
     void drawGlobalMusicDescription();
     void cleanupMessages       (const float dt);
     void drawGlobalReadySetGo  ();
-    void displayPenaltyMessages();
 public:
 
          RaceGUI();
         ~RaceGUI();
     void renderGlobal(float dt);
-    void renderPlayerView(unsigned int player_id, const core::recti &viewport,
-                          const core::vector2df &scaling);
+    void renderPlayerView(unsigned int player_id);
     
     void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
                     int fonst_size, 

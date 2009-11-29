@@ -495,39 +495,6 @@ scene::ICameraSceneNode *IrrDriver::addCameraSceneNode()
      return m_scene_manager->addCameraSceneNode();
  }   // addCameraSceneNode
 
-//-----------------------------------------------------------------------------
-/** Adds a camera (as in STK Camera object, not an irrlicht camera). The number
- *  of cameras determines e.g. if split screen is used.
- */
-Camera *IrrDriver::addCamera(unsigned int index, Kart *kart)
-{
-    Camera *camera = new Camera(index, kart);
-    m_stk_cameras.push_back(camera);
-    m_viewports.push_back(core::recti());
-    m_scaling.push_back(core::vector2df());
-    m_fov.push_back(DEGREE_TO_RAD*75.0f);
-    m_aspect.push_back(((float)UserConfigParams::m_width)/UserConfigParams::m_height);
-    setupViewports();
-    return camera;
-}   // addCamera
-
-// ----------------------------------------------------------------------------
-void IrrDriver::removeCamera(Camera *camera)
-{
-    unsigned index;
-    for(index=0; index<m_stk_cameras.size(); index++)
-    {
-        if(m_stk_cameras[index]==camera) break;
-    }
-    assert(index!=m_stk_cameras.size());
-    m_stk_cameras.erase(m_stk_cameras.begin()+index);
-    m_viewports.erase(m_viewports.begin()+index);
-    m_scaling.erase(m_scaling.begin()+index);
-    m_fov.erase(m_fov.begin()+index);
-    m_aspect.erase(m_aspect.begin()+index);
-    removeCameraSceneNode(camera->getCameraSceneNode());
-}   // removeCamera
-
 // ----------------------------------------------------------------------------
 /** Removes a camera. This can't be done with removeNode() since the camera
  *  can be marked as active, meaning a drop will not delete it. While this
@@ -550,88 +517,6 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename)
 {
     return m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
 }   // getTexture
-
-// ----------------------------------------------------------------------------
-/** Determines the viewports and scaling for the cameras.
- */
-void IrrDriver::setupViewports()
-{
-    assert(m_stk_cameras.size()==m_viewports.size());
-    switch(m_stk_cameras.size())
-    {
-    case 1: m_viewports[0] = core::recti(0, 0, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height);
-            m_scaling[0]   = core::vector2df(1.0f, 1.0f);
-            break;
-    case 2: m_viewports[0] = core::recti(0, 0, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height>>1);
-            m_scaling[0]   = core::vector2df(1.0f, 0.5f);
-            m_aspect[0]   *= 2.0f;
-            m_fov[0]       = DEGREE_TO_RAD*85.0f;
-            m_viewports[1] = core::recti(0, UserConfigParams::m_height>>1, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height);
-            m_scaling[1]   = core::vector2df(1.0f, 0.5f);
-            m_aspect[1]   *= 2.0f;
-            m_fov[1]       = DEGREE_TO_RAD*85.0f;
-            break;
-    case 3: m_viewports[0] = core::recti(0, 0, 
-                                         UserConfigParams::m_width>>1, 
-                                         UserConfigParams::m_height>>1);
-            m_scaling[0]   = core::vector2df(0.5f, 0.5f);
-            m_fov[1]       = DEGREE_TO_RAD*50.0f;
-            m_viewports[1] = core::recti(UserConfigParams::m_width>>1, 
-                                         0, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height>>1);
-            m_scaling[1]   = core::vector2df(0.5f, 0.5f);
-            m_fov[1]       = DEGREE_TO_RAD*50.0f;
-            m_viewports[2] = core::recti(0, UserConfigParams::m_height>>1, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height);
-            m_scaling[2]   = core::vector2df(1.0f, 0.5f);
-            m_fov[1]       = DEGREE_TO_RAD*85.0f;
-            m_aspect[2]   *= 2.0f;
-            break;
-    case 4: m_viewports[0] = core::recti(0, 0, 
-                                         UserConfigParams::m_width>>1, 
-                                         UserConfigParams::m_height>>1);
-            m_scaling[0]   = core::vector2df(0.5f, 0.5f);
-            m_fov[0]       = DEGREE_TO_RAD*50.0f;
-            m_viewports[1] = core::recti(UserConfigParams::m_width>>1, 
-                                         0, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height>>1);
-            m_scaling[1]   = core::vector2df(0.5f, 0.5f);
-            m_fov[1]       = DEGREE_TO_RAD*50.0f;
-            m_viewports[2] = core::recti(0, UserConfigParams::m_height>>1, 
-                                         UserConfigParams::m_width>>1, 
-                                         UserConfigParams::m_height);
-            m_scaling[2]   = core::vector2df(0.5f, 0.5f);
-            m_fov[2]       = DEGREE_TO_RAD*50.0f;
-            m_viewports[3] = core::recti(UserConfigParams::m_width>>1,
-                                         UserConfigParams::m_height>>1, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height);
-            m_scaling[3]   = core::vector2df(0.5f, 0.5f);
-            m_fov[3]       = DEGREE_TO_RAD*50.0f;
-            break;
-    default:fprintf(stderr, "Incorrect number of players: '%d' - assuming 1.\n",
-                    m_stk_cameras.size());
-            m_viewports[0] = core::recti(0, 0, 
-                                         UserConfigParams::m_width, 
-                                         UserConfigParams::m_height);
-            m_scaling[0]   = core::vector2df(1.0f, 1.0f);
-            break;
-    }   // switch
-    for(unsigned int i=0; i<m_stk_cameras.size(); i++)
-    {
-        m_stk_cameras[i]->getCameraSceneNode()->setFOV(m_fov[i]);
-        m_stk_cameras[i]->getCameraSceneNode()->setAspectRatio(m_aspect[i]);
-    }
-}   // setupViewports
 
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
@@ -742,11 +627,6 @@ void IrrDriver::displayFPS()
  */
 void IrrDriver::update(float dt)
 {
-    // First update all cameras
-    std::vector<Camera*>::iterator i;
-    for(i=m_stk_cameras.begin(); i!=m_stk_cameras.end(); i++)
-        (*i)->update(dt);
-
     if(!m_device->run()) return;
     
     m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
@@ -774,21 +654,22 @@ void IrrDriver::update(float dt)
             else
             {
                 RaceGUI *rg = RaceManager::getWorld()->getRaceGUI();
-                for(unsigned int i=0; i<m_stk_cameras.size(); i++)
+                for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
                 {
-                    m_scene_manager->setActiveCamera(m_stk_cameras[i]->getCameraSceneNode());
-                    m_video_driver->setViewPort(m_viewports[i]);
+                    PlayerKart *pk=RaceManager::getWorld()->getLocalPlayerKart(i);
+                    pk->activateCamera();
                     m_scene_manager->drawAll();
+
                 }
                 // To draw the race gui we set the viewport back to the full
                 // screen. 
                 m_video_driver->setViewPort(core::recti(0, 0,
                                                         UserConfigParams::m_width,
                                                         UserConfigParams::m_height));
-                for(unsigned int i=0; i<m_stk_cameras.size(); i++)
+                for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
                 {
-                    rg->renderPlayerView(i, m_viewports[i], m_scaling[i]);
-                }  // for i <m_stk_cameras.size()
+                    rg->renderPlayerView(i);
+                }  // for i<getNumLocalPlayers
             }   // !bullet_debug
         }
         else

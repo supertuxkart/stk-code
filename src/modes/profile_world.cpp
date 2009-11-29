@@ -87,7 +87,9 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     {
         // The pointer to the camera does not have to be stored, since it
         // the camera for robots is not modified.
-        irr_driver->addCamera(index, newkart);
+        // FIXME: this is broken now, where do we store the camera in case
+        // of profile mode???
+        new Camera(index, newkart);
     }
     //m_local_player_karts[index] = static_cast<PlayerKart*>(newkart);
     //m_player_karts[index]       = static_cast<PlayerKart*>(newkart);

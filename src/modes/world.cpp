@@ -118,7 +118,7 @@ void World::init()
         const std::string& kart_ident = race_manager->getKartIdent(i);
         int local_player_id           = race_manager->getKartLocalPlayerId(i);
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
-        Kart* newkart = this->createKart(kart_ident, i, local_player_id,  
+        Kart* newkart = createKart(kart_ident, i, local_player_id,  
                                    global_player_id, init_pos);
         m_kart.push_back(newkart);
         newkart->setWorldKartId(m_kart.size()-1);
@@ -142,7 +142,7 @@ void World::init()
  *  \param index Index of the kart.
  *  \param local_player_id If the kart is a player kart this is the index of
  *         this player on the local machine.
- *  \param global_player_id If the akrt is a player kart this is the index of
+ *  \param global_player_id If the kart is a player kart this is the index of
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */

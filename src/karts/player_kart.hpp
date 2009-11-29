@@ -23,6 +23,7 @@
 #define HEADER_PLAYERKART_HPP
 
 #include "config/player.hpp"
+#include "graphics/camera.hpp"
 #include "karts/kart.hpp"
 
 class SFXBase;
@@ -34,19 +35,19 @@ class Camera;
 class PlayerKart : public Kart
 {
 private:
-    int     m_steer_val, m_steer_val_l, m_steer_val_r;
-    int     m_prev_accel;
-    bool    m_prev_brake;
+    int           m_steer_val, m_steer_val_l, m_steer_val_r;
+    int           m_prev_accel;
+    bool          m_prev_brake;
 
     ActivePlayer *m_player;
     float         m_penalty_time;
     Camera       *m_camera;
 
-    SFXBase *m_bzzt_sound;
-    SFXBase *m_wee_sound;
-    SFXBase *m_ugh_sound;
-    SFXBase *m_grab_sound;
-    SFXBase *m_full_sound;
+    SFXBase      *m_bzzt_sound;
+    SFXBase      *m_wee_sound;
+    SFXBase      *m_ugh_sound;
+    SFXBase      *m_grab_sound;
+    SFXBase      *m_full_sound;
 
     void steer(float, int);
 public:
@@ -55,7 +56,6 @@ public:
                               const btTransform& init_pos, 
                               unsigned int player_index);
                   ~PlayerKart        ();
-    int            earlyStartPenalty () { return m_penalty_time>0;        }
     ActivePlayer  *getPlayer         () { return m_player;                }
     PlayerProfile *getPlayerProfile  () { return m_player->getProfile();  }
     void           update            (float);
@@ -69,6 +69,12 @@ public:
     Camera*        getCamera         () {return m_camera;}
     void           reset             ();
     void           resetInputState   ();
+    /** Sets viewport etc. for the camera of this kart. */
+    void           activateCamera    () {m_camera->activate(); }
+    /** Returns the viewport of the camera of this kart. */
+    const core::recti& getViewport() const {return m_camera->getViewport(); }
+    /** Returns the scaling in x/y direction for the camera of this kart. */
+    const core::vector2df& getScaling() const {return m_camera->getScaling(); }
 };
 
 #endif

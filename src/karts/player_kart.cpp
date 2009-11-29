@@ -33,6 +33,13 @@
 #include "utils/constants.hpp"
 #include "utils/translation.hpp"
 
+/** The constructor for a player kart.
+ *  \param kart_name Name of the kart.
+ *  \param position The starting position (1 to n).
+ *  \param player The player to which this kart belongs.
+ *  \param init_pos The start coordinates and heading of the kart.
+ *  \param player_index  Index of the player akrt.
+ */
 PlayerKart::PlayerKart(const std::string& kart_name, int position, 
                        ActivePlayer *player, const btTransform& init_pos, 
                        unsigned int player_index) :
@@ -40,7 +47,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = irr_driver->addCamera(player_index, this);
+    m_camera       = new Camera(player_index, this);
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
@@ -53,9 +60,11 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
 }   // PlayerKart
 
 //-----------------------------------------------------------------------------
+/** Destructor for a player kart.
+ */
 PlayerKart::~PlayerKart()
 {
-    irr_driver->removeCamera(m_camera);
+    delete m_camera;
     sfx_manager->deleteSFX(m_bzzt_sound);
     sfx_manager->deleteSFX(m_wee_sound );
     sfx_manager->deleteSFX(m_ugh_sound );
@@ -64,6 +73,8 @@ PlayerKart::~PlayerKart()
 }   // ~PlayerKart
 
 //-----------------------------------------------------------------------------
+/** Resets the player kart for a new or restarted race.
+ */
 void PlayerKart::reset()
 {
     m_steer_val_l  = 0;
@@ -170,6 +181,8 @@ void PlayerKart::action(PlayerAction action, int value)
 }   // action
 
 //-----------------------------------------------------------------------------
+/** Handles steering for a player kart.
+ */
 void PlayerKart::steer(float dt, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
@@ -216,8 +229,11 @@ void PlayerKart::steer(float dt, int steer_val)
 }   // steer
 
 //-----------------------------------------------------------------------------
+/** Updates the player kart, called once each timestep.
+ */
 void PlayerKart::update(float dt)
 {
+    m_camera->update(dt);
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.
@@ -232,10 +248,15 @@ void PlayerKart::update(float dt)
             if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
                 m_penalty_time=1.0;
+                RaceGUI* m=RaceManager::getWorld()->getRaceGUI();
+                if(m)
+                {
+                    m->addMessage(_("Penalty time!!"),
+                                  this, 2.0f, 60);
+                }
                 m_bzzt_sound->play();
-            }
-            // A warning gets displayed in RaceGUI
-        }
+            }   // if penalty_time = 0
+        }   // if key pressed
         else
         {
             // The call to update is necessary here (even though the kart
@@ -243,9 +264,9 @@ void PlayerKart::update(float dt)
             // the camera gets the wrong position. 
             Kart::update(dt);
         }
-        
         return;
-    }
+    }   // if isStartPhase
+
     if(m_penalty_time>0.0)
     {
         m_penalty_time-=dt;
@@ -258,27 +279,17 @@ void PlayerKart::update(float dt)
             Kart::beep();
     }
 
-    if(m_controls.m_look_back)
-    {
-        m_camera->setMode(Camera::CM_REVERSE);
-    }
-    else
-    {
-        m_camera->setMode(Camera::CM_NORMAL);
-    }
+    m_camera->setMode(m_controls.m_look_back ? Camera::CM_REVERSE
+                                             : Camera::CM_NORMAL);
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
     if ( m_controls.m_rescue )
     {
-        //m_beep_sound->play();
         forceRescue();
         m_controls.m_rescue=false;
     }
-    // FIXME: This is the code previously done in Kart::update (for player 
-    //        karts). Does this mean that there are actually two sounds played
-    //        when rescue? beep above and bzzt her???
     if (isRescue() && m_attachment.getType() != ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();
@@ -287,6 +298,8 @@ void PlayerKart::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Marks the kart as having had a crash.
+ */
 void PlayerKart::crashed(Kart *kart)
 {
     Kart::crashed(kart);

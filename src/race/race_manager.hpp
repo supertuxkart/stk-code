@@ -27,9 +27,10 @@
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
 
-class World;
-class Track;
 class Kart;
+class PlayerKart;
+class Track;
+class World;
 
 /** The race manager has two functions:
  *  1) it stores information about the race the user selected (e.g. number
@@ -178,7 +179,7 @@ public:
     static World* getWorld() {return m_world;}
     static void setWorld(World* world);
     static Track* getTrack();
-    static Kart* getPlayerKart(const unsigned int n);
+    static PlayerKart* getPlayerKart(const unsigned int n);
     static Kart* getKart(const unsigned int n);
     
 public:

@@ -35,6 +35,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_mode     = CM_NORMAL;
     m_index    = camera_index;
     m_camera   = irr_driver->addCameraSceneNode();
+    setupCamera();
     m_distance = kart->getKartProperties()->getCameraDistance() * 0.5f;
     m_kart     = kart;
     m_angle_up = 0.0f;
@@ -56,10 +57,80 @@ Camera::Camera(int camera_index, const Kart* kart)
  */
 Camera::~Camera()
 {
-    irr_driver->removeCamera(this);
+    irr_driver->removeCameraSceneNode(m_camera);
 }   // ~Camera
 
 //-----------------------------------------------------------------------------
+/** Sets up the viewport, aspect ratio, field of view, and scaling for this
+ *  camera.
+ */
+void Camera::setupCamera()
+{
+    m_aspect = (float)(UserConfigParams::m_width)/UserConfigParams::m_height;
+    switch(race_manager->getNumLocalPlayers())
+    {
+    case 1: m_viewport = core::recti(0, 0, 
+                                     UserConfigParams::m_width, 
+                                     UserConfigParams::m_height);
+            m_scaling  = core::vector2df(1.0f, 1.0f);
+            m_fov      = DEGREE_TO_RAD*75.0f;
+            break;
+    case 2: m_viewport = core::recti(0, 
+                                     m_index==0 ? 0 
+                                                : UserConfigParams::m_height>>1,
+                                     UserConfigParams::m_width, 
+                                     m_index==0 ? UserConfigParams::m_height>>1
+                                                : UserConfigParams::m_height);
+            m_scaling  = core::vector2df(1.0f, 0.5f);
+            m_aspect  *= 2.0f;
+            m_fov      = DEGREE_TO_RAD*85.0f;
+            break;
+    case 3: if(m_index<2)
+            {
+                m_viewport = core::recti(m_index==0 ? 0 
+                                                    : UserConfigParams::m_width>>1,
+                                         0, 
+                                         m_index==0 ? UserConfigParams::m_width>>1 
+                                                    : UserConfigParams::m_width, 
+                                         UserConfigParams::m_height>>1);
+                m_scaling  = core::vector2df(0.5f, 0.5f);
+                m_fov      = DEGREE_TO_RAD*50.0f;
+            }
+            else
+            {
+                m_viewport = core::recti(0, UserConfigParams::m_height>>1, 
+                                         UserConfigParams::m_width, 
+                                         UserConfigParams::m_height);
+                m_scaling  = core::vector2df(1.0f, 0.5f);
+                m_fov      = DEGREE_TO_RAD*85.0f;
+                m_aspect  *= 2.0f;
+            }
+            break;
+    case 4: m_viewport = core::recti(m_index%2==0 ? 0
+                                                  : UserConfigParams::m_width>>1,
+                                     m_index<2    ? 0 
+                                                  : UserConfigParams::m_width>>1,
+                                     m_index%2==0 ? UserConfigParams::m_width>>1
+                                                  : UserConfigParams::m_width, 
+                                     m_index<2    ? UserConfigParams::m_height>>1
+                                                  : UserConfigParams::m_height);
+            m_scaling  = core::vector2df(0.5f, 0.5f);
+            m_fov      = DEGREE_TO_RAD*50.0f;
+            break;
+    default:fprintf(stderr, "Incorrect number of players: '%d' - assuming 1.\n",
+                    race_manager->getNumLocalPlayers());
+            m_viewport = core::recti(0, 0, 
+                                     UserConfigParams::m_width, 
+                                     UserConfigParams::m_height);
+            m_scaling  = core::vector2df(1.0f, 1.0f);
+            m_fov      = DEGREE_TO_RAD*75.0f;
+            break;
+    }   // switch
+    m_camera->setFOV(m_fov);
+    m_camera->setAspectRatio(m_aspect);
+}   // setupCamera
+
+// ----------------------------------------------------------------------------
 void Camera::setMode(Mode mode)
 {
     m_mode = mode;
@@ -205,3 +276,15 @@ void Camera::update(float dt)
 
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Sets viewport etc. for this camera. Called from irr_driver just before
+ *  rendering the view for this kart.
+ */
+void Camera::activate()
+{
+    irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
+    sm->setActiveCamera(m_camera);
+    sm->setAmbientLight(m_ambient_light);
+    irr_driver->getVideoDriver()->setViewPort(m_viewport);
+
+}   // activate

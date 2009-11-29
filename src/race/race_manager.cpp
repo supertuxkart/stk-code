@@ -52,7 +52,7 @@ Track* RaceManager::getTrack()
 {
     return m_world->getTrack();
 }
-Kart* RaceManager::getPlayerKart(const unsigned int n)
+PlayerKart* RaceManager::getPlayerKart(const unsigned int n)
 {
     return m_world->getPlayerKart(n);
 }

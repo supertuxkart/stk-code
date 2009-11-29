@@ -192,7 +192,6 @@ void Track::loadTrackInfo(const std::string &filename)
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
-    //m_sun_ambient_color     = video::SColor(255, 255, 255, 255);
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
     m_sun_diffuse_color     = video::SColor(255, 255, 255, 255); 
     XMLNode *root           = file_manager->createXMLTree(m_filename);
@@ -530,7 +529,6 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 void Track::update(float dt)
 {
     irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-    //m_sun->getLightData().AmbientColor  = m_ambient_color;
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {

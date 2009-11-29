@@ -22,6 +22,7 @@
 #include <string>
 #include <stdio.h>
 
+#include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
@@ -47,8 +48,12 @@ AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager,
 void AmbientLightSphere::update(float dt)
 {
     CheckStructure::update(dt);
+    race_manager->getNumLocalPlayers();
+    
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
+        Kart *kart=race_manager->getKart(i);
+        if(!kart->isPlayerKart()) continue;
         if(isInside(i))
         {
             float d2=getDistance2ForKart(i);
@@ -64,7 +69,7 @@ void AmbientLightSphere::update(float dt)
                 const video::SColor &def = track->getDefaultAmbientColor();
                 color = m_ambient_color.getInterpolated(def, f);
             }
-            track->setAmbientColor(color);
+            ((PlayerKart*)kart)->getCamera()->setAmbientLight(color);
         }   // if active
     }   // for i<num_karts
 }   // update

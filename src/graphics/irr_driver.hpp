@@ -50,21 +50,6 @@ private:
     video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
-
-    /** The list of all cameras. */
-    std::vector<Camera*> m_stk_cameras;
-
-    /** The list of viewports for all cameras. */
-    std::vector<core::recti>     m_viewports;
-
-    /** The scaling necessary for each axis for each camera. */
-    std::vector<core::vector2df> m_scaling;
-
-    /** Field of view for camera. */
-    std::vector<float>           m_fov;
-
-    /** Aspect ratio for camera. */
-    std::vector<float>           m_aspect;
     
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;

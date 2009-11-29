@@ -172,14 +172,6 @@ void RaceGUI::renderGlobal(float dt)
         drawGlobalReadySetGo();
     }
 
-    // The penalty message needs to be displayed for up to one second
-    // after the start of the race, otherwise it disappears if 
-    // "Go" is displayed and the race starts
-    if(RaceManager::getWorld()->isStartPhase() || 
-       RaceManager::getWorld()->getTime()<1.0f)
-    {
-        displayPenaltyMessages();
-    }
     // Timer etc. are not displayed unless the game is actually started.
     if(!RaceManager::getWorld()->isRacePhase()) return;
 
@@ -202,20 +194,21 @@ void RaceGUI::renderGlobal(float dt)
  *  \param viewport Viewport to use (already set in the camera).
  *  \param scaling Scaling to use.
  */
-void RaceGUI::renderPlayerView(unsigned int player_id, 
-                               const core::recti &viewport, 
-                               const core::vector2df &scaling)
+void RaceGUI::renderPlayerView(unsigned int player_id)
 {
+    PlayerKart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(player_id);
+    const core::recti &viewport    = player_kart->getViewport();
+    const core::vector2df &scaling = player_kart->getScaling();
+    drawAllMessages     (player_kart, viewport, scaling);
     if(!RaceManager::getWorld()->isRacePhase()) return;
 
     RaceGUI::KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
 
-    Kart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(player_id);
     drawPowerupIcons    (player_kart, viewport, scaling);
     drawEnergyMeter     (player_kart, viewport, scaling);
     drawSpeed           (player_kart, viewport, scaling);
     drawLap             (info, player_kart, viewport, scaling);
-    drawAllMessages     (player_kart, viewport, scaling);
+
     if(player_kart->hasViewBlockedByPlunger())
     {
         int offset_x = viewport.UpperLeftCorner.X;
@@ -369,15 +362,18 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart,
     int nSize=(int)(64.0f*std::min(scaling.X, scaling.Y));
     int x1 = (int)((UserConfigParams::m_width/2-32) * scaling.X) 
            + viewport.UpperLeftCorner.X;
-    int y1 = UserConfigParams::m_height - viewport.LowerRightCorner.Y 
-           + (int)(20 * scaling.Y)+nSize;
+    //int y1 = UserConfigParams::m_height - viewport.LowerRightCorner.Y 
+    //       + (int)(20 * scaling.Y)+nSize;
+    int y1 = viewport.UpperLeftCorner.Y 
+           + (int)(20 * scaling.Y);
 
     video::ITexture *t=powerup->getIcon()->getTexture();
     core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        core::rect<s32> pos(x1+i*30, y1-nSize, x1+i*30+nSize, y1);
+        int x2=(int)(x1+i*std::min(scaling.X, scaling.Y)*30);
+        core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, NULL, 
                                                   NULL, true);
     }   // for i
@@ -392,7 +388,7 @@ void RaceGUI::drawEnergyMeter (Kart *player_kart,
     float state = (float)(player_kart->getEnergy()) / MAX_ITEMS_COLLECTED;
     int x = (int)((UserConfigParams::m_width-24) * scaling.X) + viewport.UpperLeftCorner.X;
     //int y = (int)(250 * scaling.Y) + viewport.UpperLeftCorner.Y;
-    int y = UserConfigParams::m_height - (int)(250 * scaling.Y) - viewport.UpperLeftCorner.Y;
+    int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
     int w = (int)(16 * scaling.X);
     int h = (int)(UserConfigParams::m_height/4 * scaling.Y);
     float coin_target = (float)race_manager->getCoinTarget();
@@ -456,15 +452,15 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
     int meter_height       = (int)(SPEEDWIDTH*minRatio);
     core::vector2di offset = viewport.UpperLeftCorner;
     offset.X              += (int)((UserConfigParams::m_width-10)*scaling.X) - meter_width;
-    offset.Y              += (int)(10*scaling.Y);
+    offset.Y               = viewport.LowerRightCorner.Y-(int)(10*scaling.Y);
 
     // First draw the meter (i.e. the background which contains the numbers etc.
     // -------------------------------------------------------------------------
     video::IVideoDriver *video = irr_driver->getVideoDriver();
     const core::rect<s32> meter_pos(offset.X,
-                                    UserConfigParams::m_height-offset.Y-meter_height, 
+                                    offset.Y-meter_height, 
                                     offset.X+meter_width, 
-                                    UserConfigParams::m_height-offset.Y);
+                                    offset.Y);
     video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0), 
                                                meter_texture->getOriginalSize());
@@ -476,9 +472,9 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         core::rect<s32> pos(offset.X-(int)(30*minRatio), 
-                            UserConfigParams::m_height-(offset.Y-(int)(10*minRatio)),
+                            offset.Y-(int)(10*minRatio),
                             offset.X-(int)(30*minRatio), 
-                            UserConfigParams::m_height-(offset.Y-(int)(10*minRatio)) );
+                            offset.Y-(int)(10*minRatio) );
         irr_driver->getRaceFont()->draw(core::stringw("!").c_str(), pos, color);
     }
 
@@ -519,11 +515,11 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
         count = 4;
         vertices[2].TCoords = core::vector2df(0,0);
         vertices[2].Pos = core::vector3df((float)offset.X, 
-            (float)(UserConfigParams::m_height-offset.Y-meter_height),
+            (float)(offset.Y-meter_height),
             0);
         vertices[3].TCoords = core::vector2df(2*speed_ratio-1.0f, 0);
         vertices[3].Pos = core::vector3df(offset.X+2*(speed_ratio-0.5f)*meter_width, 
-            (float)(UserConfigParams::m_height-offset.Y-meter_height),
+            (float)(offset.Y-meter_height),
             0);
     }
     short int index[4];
@@ -557,28 +553,30 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart,
     core::recti pos;
     pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
                            + (int)(0.15f*UserConfigParams::m_width*scaling.X);
-    pos.UpperLeftCorner.Y  = UserConfigParams::m_height - viewport.LowerRightCorner.Y;
-    //pos.UpperLeftCorner.Y += (int)(UserConfigParams::m_height*5/6*minRatio);
-    pos.UpperLeftCorner.Y += (int)(40*minRatio);
-    pos.LowerRightCorner   = pos.UpperLeftCorner;
+    pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
     gui::IGUIFont* font    = irr_driver->getRaceFont();
+    int font_height        = (int)(60*scaling.Y);
     if(kart->hasFinishedRace())
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         //I18N: Shown at the end of a race
         core::stringw s=_("Finished");
+        pos.UpperLeftCorner.Y -= 2*font_height;
+        pos.LowerRightCorner   = pos.UpperLeftCorner;
         font->draw(s.c_str(), pos, color);
     }
     else
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         core::stringw s = _("Lap");
+        pos.UpperLeftCorner.Y -= 3*font_height;
+        pos.LowerRightCorner   = pos.UpperLeftCorner;
         font->draw(core::stringw(_("Lap")).c_str(), pos, color);
     
         char str[256];
         sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
-        pos.UpperLeftCorner.Y  += (int)(40*scaling.Y);
-        pos.LowerRightCorner.Y += (int)(40*scaling.Y);
+        pos.UpperLeftCorner.Y  += font_height;
+        pos.LowerRightCorner.Y += font_height;
         font->draw(core::stringw(str).c_str(), pos, color);
     }
 } // drawLap
@@ -612,10 +610,11 @@ void RaceGUI::drawAllMessages(Kart* player_kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
-    int y;
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
-    y = (int)(scaling.Y*164+viewport.UpperLeftCorner.Y);
+    int y = (int)(scaling.Y*164 + UserConfigParams::m_height 
+                                - viewport.LowerRightCorner.Y );
+    int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)>>1;
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
@@ -626,8 +625,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart,
         // Display only messages for all karts, or messages for this kart
         if( msg.m_kart && msg.m_kart!=player_kart) continue;
 
-        core::rect<s32> pos(UserConfigParams::m_width>>1, y,
-                            UserConfigParams::m_width>>1, y);
+        core::rect<s32> pos(x, y, x, y);
         irr_driver->getRaceFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
                                         pos, msg.m_color, true, true);
         y+=40;        
@@ -767,28 +765,3 @@ void RaceGUI::drawGlobalReadySetGo()
          break;
     }   // switch
 }   // drawGlobalReadySetGo
-
-// ----------------------------------------------------------------------------
-void RaceGUI::displayPenaltyMessages()
-{
-    // The penalty message needs to be displayed for up to one second
-    // after the start of the race, otherwise it disappears if 
-    // "Go" is displayed and the race starts
-    const unsigned int num_players = race_manager->getNumLocalPlayers();
-    if(RaceManager::getWorld()->isStartPhase() || RaceManager::getWorld()->getTime()<1.0f)
-    {
-        for(unsigned int i=0; i<num_players; i++)
-        {
-            if(RaceManager::getWorld()->getLocalPlayerKart(i)->earlyStartPenalty())
-            {
-                static video::SColor color = video::SColor(255, 179, 6, 6);
-                // FIXME: the position should take split screen into account!
-                core::rect<s32> pos(UserConfigParams::m_width>>1, (UserConfigParams::m_height>>1)-40,
-                                    UserConfigParams::m_width>>1, (UserConfigParams::m_height>>1)-40);
-                gui::IGUIFont* font = irr_driver->getRaceFont();
-                core::stringw s=_("Penalty time!!");
-                font->draw(s.c_str(), pos, color, true, true);
-            }   // if penalty
-        }  // for i < getNum_players
-    }  // if not RACE_PHASE
-}   // displayPenaltyMessage

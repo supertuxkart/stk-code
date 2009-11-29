@@ -41,35 +41,92 @@ public:
     };
 
 private:
-    scene::ICameraSceneNode 
-               *m_camera;
-    Mode        m_mode;             // Camera's mode
-    Vec3        m_position;         // The ultimate position which the camera wants to obtain
-    Vec3        m_temp_position;    // The position the camera currently has
-    Vec3        m_target;           // The ultimate target which the camera wants to obtain
-    Vec3        m_temp_target;      // The target the camera currently has
+    /** The camera scene node. */
+    scene::ICameraSceneNode *m_camera;
 
-    int         m_index;
+    /** Camera's mode. */
+    Mode            m_mode;
 
-    float       m_distance;         // Distance between the camera and the kart
-    float       m_angle_up;         // Angle between the ground and the camera (with the kart as the vertex of the angle)
-    float       m_angle_around;     // Angle around the kart (should actually match the rotation of the kart)
-    float       m_position_speed;   // The speed at which the camera changes position
-    float       m_target_speed;     // The speed at which the camera changes targets
-    float       m_rotation_range;   // Factor of the effects of steering in camera aim
+    /** The index of this camera which is the index of the kart it is 
+     *  attached to. */
+    unsigned int    m_index;
 
-    const Kart *m_kart;             // The kart that the camera follows
+    /**  The ultimate position which the camera wants to obtain. */
+    Vec3            m_position;
 
-private:
-    
+    /** The position the camera currently has. */
+    Vec3            m_temp_position;
+
+    /** The ultimate target which the camera wants to obtain. */
+    Vec3            m_target;
+
+    /** The target the camera currently has. */
+    Vec3            m_temp_target;
+
+    /** Current ambient light for this camera. */
+    video::SColor   m_ambient_light;
+
+    /** Distance between the camera and the kart. */
+    float           m_distance;
+
+    /** Angle between the ground and the camera (with the kart as the 
+     *  vertex of the angle). */
+    float           m_angle_up;
+
+    /** Angle around the kart (should actually match the rotation of the kart). */
+    float           m_angle_around;
+
+    /** The speed at which the camera changes position. */
+    float           m_position_speed;
+
+    /** The speed at which the camera changes targets. */
+    float           m_target_speed;
+
+    /** Factor of the effects of steering in camera aim. */
+    float           m_rotation_range;
+
+    /** The kart that the camera follows. */
+    const Kart     *m_kart;
+
+    /** The list of viewports for this cameras. */
+    core::recti     m_viewport;
+
+    /** The scaling necessary for each axis. */
+    core::vector2df m_scaling;
+
+    /** Field of view for the camera. */
+    float           m_fov;
+
+    /** Aspect ratio for camera. */
+    float           m_aspect;
+
+    void setupCamera();
+
 public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
+    /** Returns the camera index (or player kart index, which is the same). */
+    int  getIndex() const  {return m_index;}
     void reset             ();
     void setInitialTransform();
+    void activate();
     void update            (float dt);
+
+    /** Sets the ambient light for this camera. */
+    void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
+
+    /** Returns the current ambient light. */
+    const video::SColor &getAmbientLight() const {return m_ambient_light; }
+
+    /** Returns the viewport of this camera. */
+    const core::recti& getViewport() const {return m_viewport; }
+
+    /** Returns the scaling in x/y direction for this camera. */
+    const core::vector2df& getScaling() const {return m_scaling; }
+
+    /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() 
     {
         return m_camera;

@@ -134,9 +134,9 @@ private:
     float               m_fog_start;
     float               m_fog_end;
     core::vector3df     m_sun_position;
+    /** The current ambient color for each kart. */
     video::SColor       m_ambient_color;
     video::SColor       m_default_ambient_color;
-    //video::SColor       m_sun_ambient_color;
     video::SColor       m_sun_specular_color;
     video::SColor       m_sun_diffuse_color;
     video::SColor       m_fog_color;
@@ -253,9 +253,9 @@ public:
     /** Returns the default ambient color. */
     const video::SColor &getDefaultAmbientColor() const
                                                 { return m_default_ambient_color;}
-    /** Sets the current ambient color. */
-    void   setAmbientColor(const video::SColor &color)
-                                                { m_ambient_color = color; }
+    /** Sets the current ambient color for a kart with index k. */
+    void   setAmbientColor(const video::SColor &color,
+                           unsigned int k);
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
                                            { return m_start_positions.size(); }
