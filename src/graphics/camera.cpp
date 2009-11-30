@@ -40,6 +40,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_kart     = kart;
     m_angle_up = 0.0f;
     m_angle_around = 0.0f;
+    m_ambient_light = RaceManager::getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
