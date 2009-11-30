@@ -58,7 +58,7 @@
 Kart::Kart (const std::string& kart_name, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
-       Moveable(), m_attachment(this), m_powerup(this)
+       Moveable(), m_powerup(this), m_attachment(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
