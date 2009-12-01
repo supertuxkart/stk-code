@@ -388,15 +388,13 @@ void RaceManager::exitRace()
         // TODO - Grand Prix ending
         // menu_manager->switchToGrandPrixEnding();
     }
-    else
-    {
-        // FIXME - back to main menu
-        // menu_manager->switchToMainMenu();
-    }
+
     delete m_world;
     m_world        = NULL;
     m_track_number = 0;
     m_active_race  = false;    
+    
+    StateManager::get()->resetActivePlayers();
 }   // exitRace
 
 //-----------------------------------------------------------------------------

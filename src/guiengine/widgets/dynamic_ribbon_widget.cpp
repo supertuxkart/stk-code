@@ -342,11 +342,12 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
                                                     getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
-    std::cout << "rightpressed (dynamic ribbon)\n";
+    //std::cout << "rightpressed (dynamic ribbon)\n";
     
+    assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
     
-    std::cout << "     rightpressed returning EVENT_LET\n";
+    //std::cout << "     rightpressed returning EVENT_LET\n";
 
     return EVENT_LET;
 }
@@ -367,7 +368,7 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
         }
     }
     
-    
+    assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
     
     return EVENT_LET;

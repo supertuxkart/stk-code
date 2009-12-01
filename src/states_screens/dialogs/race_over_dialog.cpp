@@ -266,7 +266,6 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSourc
         RaceManager::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        input_manager->setMode(InputManager::MENU);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "continuegp")

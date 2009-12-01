@@ -173,8 +173,9 @@ void AbstractStateManager::popMenu()
 void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
     std::string name = screen->getName();
-        
-    race_manager->exitRace();
+
+    assert(!race_manager->raceIsActive());
+    
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.clear();
     m_menu_stack.push_back(name);

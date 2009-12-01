@@ -238,7 +238,6 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
             ModalDialog::dismiss();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            input_manager->setMode(InputManager::MENU);
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "help")
