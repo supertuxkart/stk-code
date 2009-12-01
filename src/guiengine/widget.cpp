@@ -94,6 +94,21 @@ Widget::~Widget()
     
 }
     
+void Widget::elementRemoved()
+{
+    m_element = NULL;
+    
+    // If any player focused this widget, unset that focus
+    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    {
+        if (m_player_focus[n])
+        {
+            GUIEngine::focusNothingForPlayer(n);
+        }
+    }
+    
+}
+
 // -----------------------------------------------------------------------------
 static unsigned int id_counter = 0;
 static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked

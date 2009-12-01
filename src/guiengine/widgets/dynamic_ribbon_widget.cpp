@@ -327,7 +327,7 @@ void DynamicRibbonWidget::registerHoverListener(DynamicRibbonHoverListener* list
 }
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
-{
+{    
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
@@ -342,7 +342,7 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
                                                     getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
         }
     }
-    //std::cout << "rightpressed (dynamic ribbon)\n";
+    //std::cout << "rightpressed (dynamic ribbon) " << m_properties[PROP_ID] << "\n";
     
     assert(m_rows.size() >= 1);
     if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
@@ -353,7 +353,7 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
 }
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
-{
+{    
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {

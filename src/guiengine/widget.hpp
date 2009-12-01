@@ -92,6 +92,7 @@ namespace GUIEngine
     class Widget : public SkinWidgetContainer
     {
     protected:
+
         friend class EventHandler;
         friend class RibbonWidget;
         friend class Screen;
@@ -303,7 +304,7 @@ namespace GUIEngine
         /**
           * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
           */
-        virtual void elementRemoved() { m_element = NULL; }
+        virtual void elementRemoved();
     };
 
     
