@@ -107,6 +107,12 @@ void RaceGUI::createMarkerTexture()
     // draw2DPolygon() between render() and end(), avoiding the
     // call to camera->render()
     camera->render();
+    // We have to reset the material here, since otherwise the last
+    // set material (i.e from the kart selection screen) will be used
+    // when rednering to the texture.
+    video::SMaterial m;
+    m.setTexture(0, NULL);
+    irr_driver->getVideoDriver()->setMaterial(m);
     for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
     {
         const std::string& kart_ident = race_manager->getKartIdent(i);
@@ -116,7 +122,7 @@ void RaceGUI::createMarkerTexture()
         int count = kp->getShape();
         //core::array<core::vector2df> vertices;
         video::S3DVertex *vertices = new video::S3DVertex[count+1];
-        unsigned short int *index                 = new unsigned short int[count+1];
+        unsigned short int *index  = new unsigned short int[count+1];
         video::SColor color        = kp->getColor();
         createRegularPolygon(count, (float)radius, center, color, 
                              vertices, index);
