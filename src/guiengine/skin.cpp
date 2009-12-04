@@ -293,11 +293,7 @@ void Skin::drawBgImage()
         
         source_area = core::rect<s32>(0, 0, texture_w, texture_h);
         
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-#else
-        core::dimension2d<s32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-#endif
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
         
@@ -627,11 +623,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         
         
         // automatically guess from position on-screen if tabs go up or down
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         const bool vertical_flip = (unsigned int)rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
-#else
-        const bool vertical_flip = rect.UpperLeftCorner.Y < GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
-#endif
         params->vertical_flip = vertical_flip;
         
         core::rect< s32 > rect2 = rect;

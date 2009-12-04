@@ -528,8 +528,6 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
  */
 void Track::update(float dt)
 {
-    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         m_animated_textures[i]->update(dt);
@@ -817,11 +815,7 @@ void Track::loadTrackModel(unsigned int mode_id)
     // ---- Fog
     if (m_use_fog)
     {
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
         irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
-#else
-        irr_driver->getVideoDriver()->setFog(m_fog_color, true, m_fog_start, m_fog_end, m_fog_density);
-#endif
     }
     
     // Note: the physics world for irrlicht is created in loadMainTrack

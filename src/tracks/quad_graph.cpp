@@ -466,15 +466,9 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 /** Draws the mini map on the screen.
  *  \param where the top left and lower right corner for the mini map.
  */
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
 video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                         const std::string &name,
                                         const video::SColor &fill_color)
-#else
-video::ITexture *QuadGraph::makeMiniMap(const core::dimension2di &dimension,
-                                        const std::string &name,
-                                        const video::SColor &fill_color)
-#endif
 {
     IrrDriver::RTTProvider rttProvider(dimension, name);
     createMesh(false);

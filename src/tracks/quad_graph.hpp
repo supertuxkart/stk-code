@@ -81,17 +81,10 @@ public:
                                      const int curr_sector=UNKNOWN_SECTOR,
                                      std::vector<int> *all_sectors=NULL
                                      ) const;
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     video::ITexture *makeMiniMap(const core::dimension2du &where,
                                  const std::string &name, 
                                  const video::SColor &fill_color
                                         =video::SColor(127, 255, 255, 255) );
-#else
-    video::ITexture *makeMiniMap(const core::dimension2di &where,
-                                 const std::string &name, 
-                                 const video::SColor &fill_color
-                                        =video::SColor(127, 255, 255, 255) );
-#endif
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         setStartCoordinate(const CheckLine &cl);
 

@@ -81,15 +81,9 @@ void RaceGUI::createMarkerTexture()
     while(npower2<n) npower2*=2;
 
     int radius     = (m_marker_rendered_size>>1)-1;
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size * npower2, 
                                                           m_marker_rendered_size), 
                                      "RaceGUI::markers");
-#else
-    IrrDriver::RTTProvider rttProvider(core::dimension2di(m_marker_rendered_size * npower2, 
-                                                          m_marker_rendered_size), 
-                                     "RaceGUI::markers");
-#endif
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH((float)(m_marker_rendered_size*npower2), 
@@ -493,11 +487,7 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
     if(speed_ratio>1) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     core::dimension2du bar_size    = bar_texture->getOriginalSize();
-#else
-    core::dimension2di bar_size    = bar_texture->getOriginalSize();
-#endif
     video::S3DVertex vertices[4];
 
     vertices[0].TCoords = core::vector2df(1.0f, 1.0f);
@@ -697,11 +687,7 @@ void RaceGUI::drawGlobalMusicDescription()
     // Draw text
     core::stringw thetext(s.c_str());
 
-#if IRRLICHT_VERSION_MAJOR > 1 || IRRLICHT_VERSION_MINOR >= 6
     core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
-#else
-    core::dimension2d< s32 > textSize = font->getDimension(thetext.c_str());
-#endif
     const int textWidth = textSize.Width;
     
     core::rect<s32> pos((UserConfigParams::m_width >> 1) + 32, text_y,
