@@ -490,7 +490,6 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 void World::restartRace()
 {
     TimedRace::reset();
-	m_track->reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -504,6 +503,7 @@ void World::restartRace()
 
     // Start music from beginning
     sound_manager->stopMusic();
+	m_track->reset();
     m_track->startMusic();
 
     // Enable SFX again
