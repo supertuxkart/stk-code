@@ -189,13 +189,22 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_env->setSkin(g_skin);
 	//g_skin = g_env->getSkin();
     
-    // TODO: adapt font size depending on resolution
+    // font size is resolution-dependent.
+    // normal text will range from 0.8, in 640x* resolutions (won't scale below that) to
+    // 1.0, in 1024x* resolutions, and linearly up
+    // normal text will range from 0.2, in 640x* resolutions (won't scale below that) to
+    // 0.4, in 1024x* resolutions, and linearly up
+    const int screen_width = irr_driver->getFrameSize().Width;
+    const float normal_text_scale = 0.8f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+    const float title_text_scale = 0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+
     ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/okolaks.xml").c_str());
+    sfont->setScale(normal_text_scale);
+    sfont->setKerningHeight(-10);
     g_font = sfont;
-    //g_font = g_env->getFont( (file_manager->getGUIDir() + "/okolaks.xml").c_str() );
     
     ScalableFont* sfont2 = new ScalableFont(g_env, (file_manager->getGUIDir() + "/title_font.xml").c_str());
-	sfont2->setScale(0.3f);
+	sfont2->setScale(title_text_scale);
     sfont2->setKerningWidth(-18);
     g_title_font = sfont2;
     
