@@ -54,11 +54,31 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {
-        if(m_materials[i]->getTexFname()==image)
+        if (m_materials[i]->getTexFname()==image)
+        {
             m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
+        }
     }   // for i
 }   // setAllMaterialFlags
-
+//-----------------------------------------------------------------------------
+void MaterialManager::setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const
+{
+    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    {
+        irr::video::SMaterial& material = mb->getMaterial();
+        if (material.getTexture(0) == NULL)
+        {
+            //material.AmbientColor = video::SColor(255, 50, 50, 50);
+            //material.DiffuseColor = video::SColor(255, 150, 150, 150);
+            material.EmissiveColor = video::SColor(255, 0, 0, 0);
+            material.SpecularColor = video::SColor(255, 0, 0, 0);
+            //material.Shininess = 0.0f;
+            material.ColorMaterial = irr::video::ECM_DIFFUSE  ;
+            material.MaterialType = irr::video::EMT_SOLID;
+        }
+    }   // for i
+    
+}
 //-----------------------------------------------------------------------------
 int MaterialManager::addEntity(Material *m)
 {

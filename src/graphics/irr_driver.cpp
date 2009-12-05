@@ -315,6 +315,7 @@ void IrrDriver::setAllMaterialFlags(scene::IAnimatedMesh *mesh) const
             if(!t) continue;
             material_manager->setAllMaterialFlags(t, mb);
         }   // for j<MATERIAL_MAX_TEXTURES
+        material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
 
