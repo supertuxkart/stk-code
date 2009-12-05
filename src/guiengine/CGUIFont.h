@@ -31,6 +31,8 @@ namespace gui
 class ScalableFont : public IGUIFontBitmap
 {
     float m_scale;
+    bool m_shadow;
+    irr::video::SColor m_shadow_color;
 public:
 
 	//! constructor
@@ -69,6 +71,8 @@ public:
 	//! set an Pixel Offset on Drawing ( scale position on width )
 	virtual s32 getKerningWidth(const wchar_t* thisLetter=0, const wchar_t* previousLetter=0) const;
 	virtual s32 getKerningHeight() const;
+
+    void setShadow(irr::video::SColor col);
 
 	//! gets the sprite bank
 	virtual IGUISpriteBank* getSpriteBank() const;

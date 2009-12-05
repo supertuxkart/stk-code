@@ -28,6 +28,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 	#endif
     
     m_scale = 1.0f;
+    m_shadow = false;
 
 	if (Environment)
 	{
@@ -57,8 +58,12 @@ ScalableFont::~ScalableFont()
 	if (SpriteBank)
 		SpriteBank->drop();
 }
-
-
+void ScalableFont::setShadow(irr::video::SColor col)
+{
+    m_shadow = true;
+    m_shadow_color = col;
+}
+    
 //! loads a font file from xml
 bool ScalableFont::load(io::IXMLReader* xml)
 {
@@ -486,6 +491,19 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 {
 	if (!Driver)
 		return;
+    
+    if (m_shadow)
+    {
+        m_shadow = false; // avoid infinite recursion
+        
+        core::rect<s32> shadowpos = position;
+        shadowpos.LowerRightCorner.X += 2;
+        shadowpos.LowerRightCorner.Y += 2;
+
+        draw(text, shadowpos, m_shadow_color, hcenter, vcenter, clip);
+        
+        m_shadow = true; // set back
+    }
     
     //color = video::SColor(255,255,255,255);
 
