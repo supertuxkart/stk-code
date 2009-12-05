@@ -31,7 +31,7 @@ namespace GUIEngine
     class LabelWidget : public Widget
     {
     public:
-        LabelWidget();
+        LabelWidget(bool title=false);
         virtual ~LabelWidget() {}
         
         void add();

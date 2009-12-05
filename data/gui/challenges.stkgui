@@ -2,7 +2,7 @@
 
     <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
             
-        <label I18N="Title for challenges screen" text="Challenges : Trophy Room" text_align="center" width="100%" />
+        <header I18N="Title for challenges screen" text="Challenges : Trophy Room" text_align="center" width="100%" />
         
         <box id="animated_area" width="100%" proportion="1" layout="vertical-row">
         

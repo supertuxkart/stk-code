@@ -148,14 +148,15 @@ namespace GUIEngine
         
         // ---- section name
         video::SColor color( 255 /* a */, 0 /* r */, 0 /* g */ , 75 /* b */ );
-        
+        video::SColor white_color( 255, 255, 255, 255 );
+
         // manage fade-in
         if (before_first_elem)
         {
             int alpha = 255 - (int)(time_before_next_step/TIME_SECTION_FADE * 255);
             if(alpha < 0) alpha = 0;
             else if(alpha > 255) alpha = 255;
-            color.setAlpha( alpha );
+            white_color.setAlpha( alpha );
         }
         // manage fade-out
         else if (after_last_elem)
@@ -163,10 +164,10 @@ namespace GUIEngine
             int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 255);
             if(alpha < 0) alpha = 0;
             else if(alpha > 255) alpha = 255;
-            color.setAlpha( alpha );
+            white_color.setAlpha( alpha );
         }
         
-        GUIEngine::getFont()->draw(m_sections[m_curr_section].m_name.c_str(), m_section_rect, color,
+        GUIEngine::getTitleFont()->draw(m_sections[m_curr_section].m_name.c_str(), m_section_rect, white_color,
                                    true /* center h */, true /* center v */ );
         
         // draw entries

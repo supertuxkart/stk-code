@@ -119,6 +119,10 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 {
                     append_to.push_back(new LabelWidget());
                 }
+                else if (!strcmp("header", xml->getNodeName()))
+                {
+                    append_to.push_back(new LabelWidget(true));
+                }
                 else if (!strcmp("spacer", xml->getNodeName()))
                 {
                     append_to.push_back(new Widget());

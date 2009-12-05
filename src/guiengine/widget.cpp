@@ -62,6 +62,7 @@ Widget::Widget(bool reserve_id)
     h = -1;
     id = -1;
     m_element = NULL;
+    m_title_font = false;
     m_type = WTYPE_NONE;
     
     m_event_handler = NULL;
@@ -283,12 +284,12 @@ void Widget::readCoords(Widget* parent)
             texture_h = texture->getSize().Height;
         }
     }
-
-    // ---- if this widget has a label, get text length. this can helpful determine its optimal size
+    
+    // ---- if this widget has a label, get text size. this can helpful determine its optimal size
     int label_w = -1, label_h = -1;
     if (m_text.size() > 0)
     {
-        IGUIFont* font = GUIEngine::getFont();
+        IGUIFont* font = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
         core::dimension2d< u32 > dim = font->getDimension( m_text.c_str() );
         label_w = dim.Width;
         // FIXME - won't work with multiline labels. thus, for now, when multiple
@@ -317,7 +318,7 @@ void Widget::readCoords(Widget* parent)
             if(abs_h > -1) this->h = abs_h;
             else if(percent_h > -1) this->h = parent_h*percent_h/100;
         }
-        else if(texture_h > -1 && label_h > -1) this->h = texture_h + label_h;
+        else if(texture_h > -1 && label_h > -1) this->h = texture_h + label_h; // label + icon
         else if(texture_h > -1) this->h = texture_h;
         else if(label_h > -1) this->h = label_h;
     }
@@ -349,8 +350,7 @@ void Widget::readCoords(Widget* parent)
     {
         const int max_height = atoi( this->m_properties[PROP_MAX_HEIGHT].c_str() );
         if(this->h > max_height) this->h = max_height;
-    }
-
+    }    
 }
 
 void Widget::setParent(IGUIElement* parent)

@@ -21,9 +21,10 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-LabelWidget::LabelWidget()
+LabelWidget::LabelWidget(bool title)
 {
     m_type = WTYPE_LABEL;
+    m_title_font = title;
 }
 // -----------------------------------------------------------------------------
 void LabelWidget::add()
@@ -41,6 +42,12 @@ void LabelWidget::add()
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
     
+    if (m_title_font)
+    {
+        irrwidget->setOverrideColor( video::SColor(255,255,255,255) );
+        irrwidget->setOverrideFont( GUIEngine::getTitleFont() );
+    }
+            
     id = m_element->getID();
     //m_element->setTabOrder(id);
     m_element->setTabStop(false);

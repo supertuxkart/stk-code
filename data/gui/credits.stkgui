@@ -4,7 +4,7 @@
     
         <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo_slim.png"/>
         
-        <label I18N="Title in credits screen" text="Credits" width="100%" />
+        <header I18N="Title in credits screen" text="Credits" width="100%" />
         
         <box id="animated_area" width="100%" proportion="10">
         

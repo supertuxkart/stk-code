@@ -54,6 +54,7 @@
 		952A1554103F68D000B1895D /* profile_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 952A1552103F68D000B1895D /* profile_world.cpp */; };
 		953789730FC7829100DD1F8E /* graph_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789720FC7829100DD1F8E /* graph_node.cpp */; };
 		953789820FC7831400DD1F8E /* quad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953789810FC7831400DD1F8E /* quad.cpp */; };
+		953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */; };
 		954E4C2D0FF98B6F0047FE3E /* animation_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C250FF98B6E0047FE3E /* animation_base.cpp */; };
 		954E4C2E0FF98B6F0047FE3E /* animation_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C270FF98B6E0047FE3E /* animation_manager.cpp */; };
 		954E4C2F0FF98B6F0047FE3E /* billboard_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 954E4C290FF98B6E0047FE3E /* billboard_animation.cpp */; };
@@ -399,6 +400,8 @@
 		953789720FC7829100DD1F8E /* graph_node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = graph_node.cpp; path = ../../tracks/graph_node.cpp; sourceTree = SOURCE_ROOT; };
 		953789800FC7831400DD1F8E /* quad.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = quad.hpp; path = ../../tracks/quad.hpp; sourceTree = SOURCE_ROOT; };
 		953789810FC7831400DD1F8E /* quad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quad.cpp; path = ../../tracks/quad.cpp; sourceTree = SOURCE_ROOT; };
+		953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CGUIFont.cpp; path = ../../guiengine/CGUIFont.cpp; sourceTree = SOURCE_ROOT; };
+		953C3CCD10CAF4150025F78A /* CGUIFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CGUIFont.h; path = ../../guiengine/CGUIFont.h; sourceTree = SOURCE_ROOT; };
 		953EAAAD0F30A4220000D57D /* terrain_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = terrain_info.hpp; path = ../../tracks/terrain_info.hpp; sourceTree = SOURCE_ROOT; };
 		953EAAAE0F30A4220000D57D /* terrain_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = terrain_info.cpp; path = ../../tracks/terrain_info.cpp; sourceTree = SOURCE_ROOT; };
 		953EAAB00F30A4410000D57D /* triangle_mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = triangle_mesh.hpp; path = ../../physics/triangle_mesh.hpp; sourceTree = SOURCE_ROOT; };
@@ -1230,6 +1233,8 @@
 		958330B110122B4A00C5137E /* guiengine */ = {
 			isa = PBXGroup;
 			children = (
+				953C3CC910CAF3EE0025F78A /* CGUIFont.cpp */,
+				953C3CCD10CAF4150025F78A /* CGUIFont.h */,
 				9583319810123B0200C5137E /* abstract_state_manager.cpp */,
 				9583319710123B0200C5137E /* abstract_state_manager.hpp */,
 				958330B210122B4A00C5137E /* engine.cpp */,
@@ -2558,6 +2563,7 @@
 				9522F1F1107961560067ECF5 /* options_screen_players.cpp in Sources */,
 				951B7D19108E52C900BC03AE /* challenges.cpp in Sources */,
 				95FB16DB10A7796800645974 /* new_ai.cpp in Sources */,
+				953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

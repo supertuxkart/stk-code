@@ -23,6 +23,7 @@
 
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
+#include "guiengine/CGUIFont.h"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
@@ -41,6 +42,8 @@ namespace GUIEngine
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
         IGUIFont* g_font;
+        IGUIFont* g_title_font;
+
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;
         Screen* g_current_screen = NULL;
@@ -185,8 +188,19 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_skin = new Skin(g_env->getSkin());
     g_env->setSkin(g_skin);
 	//g_skin = g_env->getSkin();
-	g_font = g_env->getFont( (file_manager->getGUIDir() + "/okolaks.xml").c_str() );
-	if (g_font) g_skin->setFont(g_font);
+    
+    // TODO: adapt font size depending on resolution
+    ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/okolaks.xml").c_str());
+    g_font = sfont;
+    //g_font = g_env->getFont( (file_manager->getGUIDir() + "/okolaks.xml").c_str() );
+    
+    ScalableFont* sfont2 = new ScalableFont(g_env, (file_manager->getGUIDir() + "/title_font.xml").c_str());
+	sfont2->setScale(0.3f);
+    sfont2->setKerningWidth(-18);
+    g_title_font = sfont2;
+    
+
+	if (g_font != NULL) g_skin->setFont(g_font);
     
 	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
     

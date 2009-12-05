@@ -100,7 +100,9 @@ namespace GUIEngine
         friend class Skin;
         friend class DynamicRibbonWidget;
         
-        
+        /** When true, this widget shall use a bigger and more colourful font */
+        bool m_title_font;
+
         /**
           * Can be used in children to indicate whether a widget is selected or not
           * - in widgets where it makes sense (e.g. ribbon children) and where the
