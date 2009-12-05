@@ -2,8 +2,10 @@
 
 <font type="bitmap">
 
-	<Texture index="0" filename="okolaks0.png" hasAlpha="false" />
+	<Texture index="0" filename="okolaks0.png" hasAlpha="true" />
 	<Texture index="1" filename="okolaks1.png" hasAlpha="false" />
+	<Texture index="2" filename="okolaks2.png" hasAlpha="false" />
+	<Texture index="3" filename="okolaks3.png" hasAlpha="false" />
 
 	<c c="" r="0, 0, 1, 33" o="11" />
 	<c c="" r="2, 0, 3, 33" o="11" />
