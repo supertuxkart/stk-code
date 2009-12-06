@@ -396,6 +396,7 @@ void RaceManager::exitRace()
     
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
+    input_manager->setMasterPlayerOnly(false);
 }   // exitRace
 
 //-----------------------------------------------------------------------------

@@ -59,6 +59,7 @@ InputManager::InputManager() : m_sensed_input(0), m_mode(BOOTSTRAP),
     m_device_manager->initialize();
 
     m_timer_in_use = false;
+    m_master_player_only = false;
     m_timer = 0;
 
 }
@@ -380,6 +381,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     m_timer = 0.25;
                 }
                 int playerID = (player == NULL ? 0 : player->m_id);
+                
+                // If only the master player can act, and this player is not the master, ignore his input
+                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0) return;
                 GUIEngine::EventHandler::get()->processAction(action, abs(value), type, playerID);
             }
         }
@@ -390,7 +394,11 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         handleStaticAction( btnID, value );
     }
 }   // input
-
+//-----------------------------------------------------------------------------
+void InputManager::setMasterPlayerOnly(bool enabled)
+{
+    m_master_player_only = enabled;
+}
 //-----------------------------------------------------------------------------
 /**
  * Called on keyboard events [indirectly] by irrLicht

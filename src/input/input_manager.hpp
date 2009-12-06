@@ -63,6 +63,9 @@ private:
 
 	InputDriverMode  m_mode;
 	
+    /** When at true, only the master player can play with menus */
+    bool m_master_player_only;
+    
 	/* Helper values to store and track the relative mouse movements. If these
 	* values exceed the deadzone value the input is reported to the game. This
   	* makes the mouse behave like an analog axis on a gamepad/joystick.
@@ -85,6 +88,9 @@ public:
     
 	void   setMode(InputDriverMode);		
 	bool   isInMode(InputDriverMode);
+    
+    /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
+    void   setMasterPlayerOnly(bool enabled);
     
     void   update(float dt);
     
