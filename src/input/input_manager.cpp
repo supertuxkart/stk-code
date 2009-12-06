@@ -604,58 +604,60 @@ void InputManager::setMode(InputDriverMode new_mode)
     {
         case MENU:
             switch (m_mode)
-        {
-            case INGAME:
-                // Leaving ingame mode.
+            {
+                case INGAME:
+                    // Leaving ingame mode.
 
-                //if (m_action_map)
-                //    delete m_action_map;
+                    //if (m_action_map)
+                    //    delete m_action_map;
 
-                // Reset the helper values for the relative mouse movement
-                // supresses to the notification of them as an input.
-                m_mouse_val_x = m_mouse_val_y = 0;
+                    // Reset the helper values for the relative mouse movement
+                    // supresses to the notification of them as an input.
+                    m_mouse_val_x = m_mouse_val_y = 0;
 
-                irr_driver->showPointer();
+                    irr_driver->showPointer();
+                    m_device_manager->setAssignMode(NO_ASSIGN);
 
-                // Fall through expected.
-            case BOOTSTRAP:
-                // Leaving boot strap mode.
+                    // Fall through expected.
+                case BOOTSTRAP:
+                    // Leaving boot strap mode.
 
-                // Installs the action map for the menu.
-                //  m_action_map = UserConfigParams::newMenuActionMap();
+                    // Installs the action map for the menu.
+                    //  m_action_map = UserConfigParams::newMenuActionMap();
 
-                m_mode = MENU;
+                    m_mode = MENU;
+                    m_device_manager->setAssignMode(NO_ASSIGN);
 
-                break;
-            case INPUT_SENSE_KEYBOARD:
-            case INPUT_SENSE_GAMEPAD:
-                // Leaving input sense mode.
+                    break;
+                case INPUT_SENSE_KEYBOARD:
+                case INPUT_SENSE_GAMEPAD:
+                    // Leaving input sense mode.
 
-                irr_driver->showPointer();
-                m_sensed_input_on_all_axes.clear();
+                    irr_driver->showPointer();
+                    m_sensed_input_on_all_axes.clear();
 
-                // The order is deliberate just in case someone starts to make
-                // STK multithreaded: m_sensed_input must not be 0 when
-                // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
-                m_mode = MENU;
+                    // The order is deliberate just in case someone starts to make
+                    // STK multithreaded: m_sensed_input must not be 0 when
+                    // mode == INPUT_SENSE_PREFER_{AXIS,BUTTON}.
+                    m_mode = MENU;
 
-                delete m_sensed_input;
-                m_sensed_input = 0;
+                    delete m_sensed_input;
+                    m_sensed_input = 0;
 
-                break;
-            case LOWLEVEL:
-                // Leaving lowlevel mode.
-                irr_driver->showPointer();
+                    break;
+                case LOWLEVEL:
+                    // Leaving lowlevel mode.
+                    irr_driver->showPointer();
 
-                m_mode = MENU;
+                    m_mode = MENU;
 
-                break;
-            default:
-                ;
-                // Something is broken.
-                //assert (false);
-        }
-
+                    break;
+                default:
+                    ;
+                    // Something is broken.
+                    //assert (false);
+            }
+            
             break;
         case INGAME:
             // We must be in menu mode now in order to switch.

@@ -318,7 +318,7 @@ void RaceManager::exitRace()
 {
     // Only display the grand prix result screen if all tracks 
     // were finished, and not when a race is aborted.
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
+    if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
         // calculate the rank of each kart
         const unsigned int NUM_KARTS = race_manager->getNumKarts();
@@ -328,14 +328,14 @@ void RaceManager::exitRace()
         double *race_time = new double[NUM_KARTS];
         // Ignore the first kart if it's a follow-the-leader race.
         int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
-        for( unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id )
+        for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
         {
             position[kart_id]  = kart_id;
             scores[kart_id]    = race_manager->getKartScore(kart_id);
             race_time[kart_id] = race_manager->getOverallTime(kart_id);
         }
         
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             // fill values for leader
             position[0]  = -1;
@@ -395,6 +395,7 @@ void RaceManager::exitRace()
     m_active_race  = false;    
     
     StateManager::get()->resetActivePlayers();
+    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
 }   // exitRace
 
 //-----------------------------------------------------------------------------
