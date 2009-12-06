@@ -87,7 +87,6 @@ void Camera::setupCamera()
             m_fov      = DEGREE_TO_RAD*65.0f;
             break;
     case 3: 
-            /*
             if(m_index<2)
             {
                 m_viewport = core::recti(m_index==0 ? 0 
@@ -108,15 +107,15 @@ void Camera::setupCamera()
                 m_fov      = DEGREE_TO_RAD*65.0f;
                 m_aspect  *= 2.0f;
             }
-            break;*/
-    case 4: m_viewport = core::recti(m_index%2==0 ? 0
-                                                  : UserConfigParams::m_width>>1,
-                                     m_index<2    ? 0 
-                                                  : UserConfigParams::m_width>>1,
-                                     m_index%2==0 ? UserConfigParams::m_width>>1
-                                                  : UserConfigParams::m_width, 
-                                     m_index<2    ? UserConfigParams::m_height>>1
-                                                  : UserConfigParams::m_height);
+            break;
+    case 4:
+            const int x1 = (m_index%2==0 ? 0 : UserConfigParams::m_width>>1);
+            const int y1 = (m_index<2    ? 0 : UserConfigParams::m_height>>1);
+            const int x2 = (m_index%2==0 ? UserConfigParams::m_width>>1  : UserConfigParams::m_width);
+            const int y2 = (m_index<2    ? UserConfigParams::m_height>>1 : UserConfigParams::m_height);
+            m_viewport = core::recti(x1, y1, x2, y2);
+            std::cout << "Viewport : " << m_viewport.UpperLeftCorner.X << ", " << m_viewport.UpperLeftCorner.Y << "; size : "
+                      << m_viewport.getWidth() << "x" << m_viewport.getHeight() << "\n";
             m_scaling  = core::vector2df(0.5f, 0.5f);
             m_fov      = DEGREE_TO_RAD*50.0f;
             break;
@@ -126,7 +125,7 @@ void Camera::setupCamera()
                                      UserConfigParams::m_width, 
                                      UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*65.0f;
+            m_fov      = DEGREE_TO_RAD*75.0f;
             break;
     }   // switch
     m_camera->setFOV(m_fov);
