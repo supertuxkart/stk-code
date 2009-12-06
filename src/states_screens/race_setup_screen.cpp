@@ -154,7 +154,8 @@ void RaceSetupScreen::init()
     
     if (!m_inited)
     {
-        w2->addItem( _("Snaky Competition\nAll blows allowed, so catch weapons and make clever use of them!"),
+        // FIXME: find a nice name than 'regular race' -.-
+        w2->addItem( _("Regular Race\nAll blows allowed, so catch weapons and make clever use of them!"),
                     "normal",
                     file_manager->getDataDir() + "/gui/mode_normal.png");
         

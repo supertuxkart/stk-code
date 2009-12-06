@@ -15,7 +15,7 @@
     </tabs>
     
     <box proportion="1" width="100%" layout="vertical-row">
-        <label align="center" text="SuperTuxKart features several game modes (TO BE UPDATED FOR NEW GUI LAYOUT!!)"/>
+        <label align="center" text="SuperTuxKart features several game modes"/>
         
         <spacer height="25" width="10"/>
         
@@ -24,7 +24,7 @@
             <spacer width="25" height="25"/>
             <label proportion="1" height="100%" align="left" word_wrap="true"
                    I18N="In the help menu" 
-                   text="Regular Race (TODO - find a better name :( ) - all blows allowed, so catch weapons and make clever use of them!"/>
+                   text="Regular Race - all blows allowed, so catch weapons and make clever use of them!"/>
         </div>
         
         <div width="100%" proportion="1" layout="horizontal-row">
