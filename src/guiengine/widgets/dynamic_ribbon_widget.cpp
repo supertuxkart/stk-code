@@ -403,7 +403,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& orig
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int playerID)
 {
-    std::cout << "DynamicRibbonWidget::mouseHovered " << playerID << std::endl;
+    //std::cout << "DynamicRibbonWidget::mouseHovered " << playerID << std::endl;
 
     updateLabel();
     propagateSelection();

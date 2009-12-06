@@ -327,7 +327,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayer
     
     if (m_ribbon_type == RIBBON_COMBO)
     {
-        std::cout << "SETTING m_mouse_focus\n";
+        //std::cout << "SETTING m_mouse_focus\n";
         m_mouse_focus = child;
     }
     
