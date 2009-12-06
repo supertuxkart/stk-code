@@ -821,6 +821,19 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     Widget* fullarea = this->getWidget("playerskarts");
     removedWidget->move( removedWidget->x + removedWidget->w/2, fullarea->y + fullarea->h, 0, 0);
     
+    // check if all players are ready
+    bool allPlayersReady = true;
+    const int amount = m_kart_widgets.size();
+    for (int n=0; n<amount; n++)
+    {            
+        if (!m_kart_widgets[n].isReady())
+        {
+            allPlayersReady = false;
+            break;
+        }
+    }
+    if (allPlayersReady) allPlayersDone();
+    
     return true;
 }
     
