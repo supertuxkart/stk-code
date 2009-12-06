@@ -84,9 +84,11 @@ void Camera::setupCamera()
                                                 : UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 0.5f);
             m_aspect  *= 2.0f;
-            m_fov      = DEGREE_TO_RAD*85.0f;
+            m_fov      = DEGREE_TO_RAD*65.0f;
             break;
-    case 3: if(m_index<2)
+    case 3: 
+            /*
+            if(m_index<2)
             {
                 m_viewport = core::recti(m_index==0 ? 0 
                                                     : UserConfigParams::m_width>>1,
@@ -103,10 +105,10 @@ void Camera::setupCamera()
                                          UserConfigParams::m_width, 
                                          UserConfigParams::m_height);
                 m_scaling  = core::vector2df(1.0f, 0.5f);
-                m_fov      = DEGREE_TO_RAD*85.0f;
+                m_fov      = DEGREE_TO_RAD*65.0f;
                 m_aspect  *= 2.0f;
             }
-            break;
+            break;*/
     case 4: m_viewport = core::recti(m_index%2==0 ? 0
                                                   : UserConfigParams::m_width>>1,
                                      m_index<2    ? 0 
@@ -124,7 +126,7 @@ void Camera::setupCamera()
                                      UserConfigParams::m_width, 
                                      UserConfigParams::m_height);
             m_scaling  = core::vector2df(1.0f, 1.0f);
-            m_fov      = DEGREE_TO_RAD*75.0f;
+            m_fov      = DEGREE_TO_RAD*65.0f;
             break;
     }   // switch
     m_camera->setFOV(m_fov);
