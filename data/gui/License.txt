@@ -13,6 +13,7 @@ difficulty_*.png icons, released under Creative-Commons BY-SA 3, By Conso (Const
 
 Okolaks font by Gluk, released under Open Font License
 
+title_font, by Marianne Gagnon (Auria), released under CC-BY-SA 3+
 
 ====
 

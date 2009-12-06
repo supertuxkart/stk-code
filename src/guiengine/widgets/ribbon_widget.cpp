@@ -240,9 +240,10 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        if (playerID == mousePlayerID)
+        const int MASTER_PLAYER = 0; // FIXME: unclean
+        if (playerID == mousePlayerID || playerID == MASTER_PLAYER)
         {
-            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
+            m_mouse_focus = m_children.get(m_selection[playerID]);
         }
     }
     
@@ -274,9 +275,10 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        if (playerID == mousePlayerID)
+        const int MASTER_PLAYER = 0; // FIXME: unclean
+        if (playerID == mousePlayerID || playerID == MASTER_PLAYER)
         {
-            m_mouse_focus = m_children.get(m_selection[mousePlayerID]);
+            m_mouse_focus = m_children.get(m_selection[playerID]);
         }
     }
     
@@ -300,7 +302,8 @@ EventPropagation RibbonWidget::focused(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        if (m_mouse_focus == NULL && m_selection[playerID] != -1  && playerID == mousePlayerID)
+        const int MASTER_PLAYER = 0; // FIXME: unclean
+        if (m_mouse_focus == NULL && m_selection[playerID] != -1  && (playerID == mousePlayerID || playerID == MASTER_PLAYER))
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
         }
