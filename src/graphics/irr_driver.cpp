@@ -365,7 +365,7 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
-/** Creates a quad mesh buffer and adds it to the scene graph.
+/** Creates a quad mesh buffer and adds it to the scene graph. (FIXME: wrong docs? I don't think it does)
  */
 scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
                                         bool create_one_quad)
@@ -402,6 +402,59 @@ scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
     buffer->drop();
     return mesh;
 }   // createQuadMesh
+
+/** Creates a quad mesh buffer
+ */
+scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h)
+{
+    scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
+    
+    video::S3DVertex v1;
+    v1.Pos    = core::vector3df(0,0,0);
+    v1.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0); // I hope normals are ok...
+    v1.TCoords = core::vector2d<f32>(0,1);
+    
+    video::S3DVertex v2;
+    v2.Pos    = core::vector3df(w,0,0);
+    v2.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
+    v2.TCoords = core::vector2d<f32>(1,1);
+    
+    video::S3DVertex v3;
+    v3.Pos    = core::vector3df(w,h,0);
+    v3.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
+    v3.TCoords = core::vector2d<f32>(1,0);
+    
+    video::S3DVertex v4;
+    v4.Pos    = core::vector3df(0,h,0);
+    v4.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
+    v4.TCoords = core::vector2d<f32>(0,0);
+    
+    
+    // Add the vertices
+    // ----------------
+    buffer->Vertices.push_back(v1);
+    buffer->Vertices.push_back(v2);
+    buffer->Vertices.push_back(v3);
+    buffer->Vertices.push_back(v4);
+    
+    // Define the indices for the triangles
+    // ------------------------------------
+    buffer->Indices.push_back(0);
+    buffer->Indices.push_back(1);
+    buffer->Indices.push_back(2);
+    
+    buffer->Indices.push_back(0);
+    buffer->Indices.push_back(2);
+    buffer->Indices.push_back(3);
+
+    if (material) buffer->Material = *material;
+    SMesh *mesh       = new SMesh();
+    mesh->addMeshBuffer(buffer);
+    mesh->recalculateBoundingBox();
+    buffer->drop();
+    return mesh;
+}   // createQuadMesh
+
 
 // ----------------------------------------------------------------------------
 /** Removes a scene node from the scene.

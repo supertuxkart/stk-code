@@ -29,6 +29,9 @@
 
 // FIXME : remove, temporary test
 #include "states_screens/feature_unlocked.hpp"
+#include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
+
 
 using namespace GUIEngine;
 
@@ -54,12 +57,23 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
     if (selection == "network")
     {
-        printf("+++++ FeatureUnlockedCutScene::show() +++++\n");
         // FIXME : remove, temporary test
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
-        // the passed kart will not be modified, that's why I allow myself to use const_cast
-        scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
-        StateManager::get()->pushScreen(scene);
+        
+        static int i = 0;
+        i++;
+        
+        if (i % 2 == 0)
+        {
+        	// the passed kart will not be modified, that's why I allow myself to use const_cast
+        	scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
+        	StateManager::get()->pushScreen(scene);
+        }
+        else
+        {
+        	scene->setUnlockedPicture( GUIEngine::getDriver()->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
+        	StateManager::get()->pushScreen(scene);
+        }
     }
     
     if (selection == "new")

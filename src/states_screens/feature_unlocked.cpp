@@ -107,6 +107,13 @@ void FeatureUnlockedCutScene::init()
     else if (m_unlocked_thing_picture != NULL)
     {
         // TODO
+        video::SMaterial m;
+        m.BackfaceCulling = false;
+        m.setTexture(0, m_unlocked_thing_picture);
+        
+        scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m, 1.0, 0.75);
+        m_root_gift_node   = irr_driver->addMesh(mesh);
+
     }
     else
     {
