@@ -136,14 +136,14 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
 
     static const int w = irr_driver->getFrameSize().Width;
     static const int h = irr_driver->getFrameSize().Height;
-    const irr::video::SColor color(255, 255, 0 ,0);
+    const irr::video::SColor color(255, 255, 255, 255);
     
     static int test_y = 0;
     
-    GUIEngine::getFont()->draw(_("Feature Unlocked"),
-                               core::rect< s32 >( 0, test_y, w, h/10 ),
-                               color,
-                               true/* center h */, true /* center v */ );
+    GUIEngine::getTitleFont()->draw(_("Feature Unlocked"),
+                                    core::rect< s32 >( 0, test_y, w, h/10 ),
+                                    color,
+                                    true/* center h */, true /* center v */ );
 }
 
 void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
