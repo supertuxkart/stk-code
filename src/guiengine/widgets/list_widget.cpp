@@ -84,6 +84,6 @@ void ListWidget::unfocused(const int playerID)
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
 
     // remove selection when leaving list
-    list->setSelected(-1);
+    if (list != NULL) list->setSelected(-1);
 }
 

@@ -50,11 +50,16 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     modalWindow = this;
     
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );
+    
+    GUIEngine::getSkin()->m_dialog = true;
+    GUIEngine::getSkin()->m_dialog_size = 0.0f;
 }
-
 
 ModalDialog::~ModalDialog()
 {
+    GUIEngine::getSkin()->m_dialog = false;
+    GUIEngine::getSkin()->m_dialog_size = 0.0f;
+
     // irrLicht is to stupid to remove focus from deleted widgets
     // so do it by hand
     GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );

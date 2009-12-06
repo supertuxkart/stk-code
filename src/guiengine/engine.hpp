@@ -252,7 +252,8 @@ namespace GUIEngine
     inline irr::gui::IGUIFont*        getTitleFont()     { return Private::g_title_font;     }
     inline Screen*                    getCurrentScreen() { return Private::g_current_screen; }
     inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
-    
+    inline Skin*                      getSkin()          { return Private::g_skin;           }
+
     float getLatestDt();
     
     /** Add a cutscene to the list of screens known by the gui engine */

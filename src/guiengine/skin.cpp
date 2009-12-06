@@ -265,6 +265,9 @@ Skin::Skin(IGUISkin* fallback_skin)
     m_fallback_skin = fallback_skin;
     m_fallback_skin->grab();
     assert(fallback_skin != NULL); 
+    
+    m_dialog = false;
+    m_dialog_size = 0.0f;
 }
 
 Skin::~Skin()
@@ -581,10 +584,30 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
 
 void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
-    if(focused)
-        drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::focused"]);
+    // if within an appearing dialog, grow
+    if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL && w->m_parent->getType() == gui::EGUIET_WINDOW)
+    {
+        core::rect< s32 > sized_rect = rect;
+        core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+        const float size = sin(m_dialog_size*M_PI_2);
+
+        sized_rect.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
+        sized_rect.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
+        sized_rect.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+        
+        if (focused)
+            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::focused"]);
+        else
+            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::neutral"]);
+    }
     else
-        drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::neutral"]);
+    {
+        if (focused)
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::focused"]);
+        else
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::neutral"]);
+    }
 }
 
 void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
@@ -1112,16 +1135,43 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             core::rect< s32 > borderArea = rect;
             borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
             borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
-            GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
             
-            core::rect< s32 > innerArea = rect;
+            // if within an appearing dialog, grow
+            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+            {
+                core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+                const float size = sin(m_dialog_size*M_PI_2);
+                
+                borderArea.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
+                borderArea.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
+                borderArea.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
+                borderArea.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+            }
+            GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
+
+            core::rect< s32 > innerArea = borderArea;
             innerArea.UpperLeftCorner += position2d< s32 >( 2, 2 );
             innerArea.LowerRightCorner -= position2d< s32 >( 2, 2 );
             GUIEngine::getDriver()->draw2DRectangle( color, innerArea );
         }
         else
         {
-            GUIEngine::getDriver()->draw2DRectangle( color, rect );
+            // if within an appearing dialog, grow
+            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+            {
+                core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+                const float size = sin(m_dialog_size*M_PI_2);
+                core::rect< s32 > sizedRect;
+                sizedRect.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
+                sizedRect.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
+                sizedRect.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
+                sizedRect.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+                GUIEngine::getDriver()->draw2DRectangle( color, sizedRect );
+            }
+            else
+            {
+            	GUIEngine::getDriver()->draw2DRectangle( color, rect );
+            }
         }
         return;
     }
@@ -1139,17 +1189,37 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
 void Skin::drawBGFadeColor()
 {
     // fade out background
-    SColor& color = SkinConfig::m_colors["dialog_background::neutral"];
+    SColor color = SkinConfig::m_colors["dialog_background::neutral"];
+    if (m_dialog_size < 1.0f) color.setAlpha( color.getAlpha()*m_dialog_size );
     GUIEngine::getDriver()->draw2DRectangle( color,
-                                            core::rect< s32 >(position2d< s32 >(0,0) , GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+                                            core::rect< s32 >(position2d< s32 >(0,0) ,
+                                            GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }
 
 core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawTitleBar, video::SColor titleBarColor, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
-{    
+{
     drawBGFadeColor();
     
     // draw frame
-    drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
+    if (m_dialog_size < 1.0f)
+    {
+        core::rect< s32 > sized_rect = rect;
+        core::position2d<s32> center = sized_rect.getCenter();
+        const int w = sized_rect.getWidth();
+        const int h = sized_rect.getHeight();
+        const float size = sin(m_dialog_size*M_PI_2);
+        sized_rect.UpperLeftCorner.X = (int)(center.X - (w/2.0f)*size);
+        sized_rect.UpperLeftCorner.Y = (int)(center.Y - (h/2.0f)*size);
+        sized_rect.LowerRightCorner.X = (int)(center.X + (w/2.0f)*size);
+        sized_rect.LowerRightCorner.Y = (int)(center.Y + (h/2.0f)*size);
+        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), sized_rect, SkinConfig::m_render_params["window::neutral"]);
+        
+        m_dialog_size += GUIEngine::getLatestDt()*5;
+    }
+    else
+    {
+    	drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
+    }
     
     return rect;
 }

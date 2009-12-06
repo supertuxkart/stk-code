@@ -232,6 +232,10 @@ namespace GUIEngine
         void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
 
     public:
+        // dirty way to have dialogs that zoom in
+        bool m_dialog;
+        float m_dialog_size;
+        
         Skin(irr::gui::IGUISkin* fallback_skin);
         ~Skin();
 
