@@ -77,7 +77,6 @@ void FeatureUnlockedCutScene::init()
         
         m_key->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
         
-        // FIXME : doesn't work
         m_key->getMaterial(n).MaterialType = video::EMT_SPHERE_MAP;
     }
     
@@ -144,6 +143,12 @@ void FeatureUnlockedCutScene::tearDown()
     m_chest = NULL;
     m_chest_top = NULL;
     m_key = NULL;
+    
+    if (m_root_gift_node != NULL)
+    {
+        irr_driver->removeNode(m_root_gift_node);
+        m_root_gift_node = NULL;
+    }
 }
 
 void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* driver)
