@@ -1,12 +1,19 @@
 <?xml version="1.0"?>
+<!-- 
+u = underhang
+o = overhang
+i = texno
+-->
 
 <font type="bitmap">
 
 	<Texture index="0" filename="okolaks0.png" hasAlpha="true" />
-	<Texture index="1" filename="okolaks1.png" hasAlpha="false" />
-	<Texture index="2" filename="okolaks2.png" hasAlpha="false" />
-	<Texture index="3" filename="okolaks3.png" hasAlpha="false" />
-
+    <Texture index="1" filename="okolaks1.png" hasAlpha="false" />
+    <!--
+    <Texture index="2" filename="okolaks2.png" hasAlpha="false" />
+    <Texture index="3" filename="okolaks3.png" hasAlpha="false" />
+    -->
+    
 	<c c="" r="0, 0, 1, 33" o="11" />
 	<c c="" r="2, 0, 3, 33" o="11" />
 	<c c="" r="4, 0, 5, 33" o="11" />
@@ -619,6 +626,9 @@
 	<c c="Ḁ" r="469, 476, 482, 509" u="1" o="1" />
 	<c c="ḁ" r="483, 476, 496, 509" u="1" o="1" />
 	<c c="Ḃ" r="497, 476, 510, 509" u="1" o="1" />
+	
+
+
 	<c c="ḃ" i="1" r="0, 0, 13, 33" u="1" o="1" />
 	<c c="Ḅ" i="1" r="14, 0, 27, 33" u="1" o="1" />
 	<c c="ḅ" i="1" r="28, 0, 41, 33" u="1" o="1" />
@@ -880,4 +890,6 @@
 	<c c="ﬄ" i="1" r="396, 204, 419, 237" />
 	<c c="ﬅ" i="1" r="420, 204, 435, 237" />
 	<c c="ﬆ" i="1" r="436, 204, 456, 237" u="1" />
+	
+
 </font>
