@@ -18,7 +18,9 @@
 
 #include "states_screens/state_manager.hpp"
 
+#include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
@@ -98,6 +100,11 @@ void StateManager::resetActivePlayers()
         m_active_players[i].setDevice(NULL);
     }
     m_active_players.clearWithoutDeleting();
+}
+
+bool StateManager::throttleFPS()
+{
+    return m_game_mode != GUIEngine::GAME  &&  GUIEngine::getCurrentScreen()->throttleFPS;
 }
 
 void StateManager::escapePressed()

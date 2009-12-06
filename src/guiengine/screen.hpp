@@ -93,6 +93,8 @@ namespace GUIEngine
         bool m_render_3d;
         
     public:
+        bool throttleFPS;
+        
         ptr_vector<Widget, HOLD> m_widgets;
 
         // current mouse position, read-only...

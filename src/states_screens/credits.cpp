@@ -77,6 +77,8 @@ namespace GUIEngine
     {
         reset();
         
+        throttleFPS = false;
+        
         std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
 
         std::ifstream file( creditsfile.c_str() ) ;

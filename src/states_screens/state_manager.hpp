@@ -44,6 +44,7 @@ class StateManager : public GUIEngine::AbstractStateManager
     
     void updateActivePlayerIDs();
 
+    
 public:
     ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
     ActivePlayer* getActivePlayer(const int id);
@@ -58,6 +59,8 @@ public:
 
     int activePlayerCount();
     void resetActivePlayers();
+    
+    bool throttleFPS();
     
     void escapePressed();
     

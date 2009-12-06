@@ -18,6 +18,7 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
 {
     setNeeds3D(true);
     
+    throttleFPS = false;
     m_unlocked_kart = NULL;
     m_unlocked_thing_picture = NULL;
 }

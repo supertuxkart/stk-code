@@ -42,6 +42,8 @@ using namespace GUIEngine;
 
 Screen::Screen(const char* file)
 {
+    throttleFPS = true;
+    
     m_mouse_x = 0;
     m_mouse_y = 0;
     this->m_filename = file;
