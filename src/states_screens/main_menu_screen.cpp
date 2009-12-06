@@ -18,6 +18,7 @@
 #include "states_screens/main_menu_screen.hpp"
 
 #include "guiengine/widget.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
@@ -55,7 +56,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         printf("+++++ FeatureUnlockedCutScene::show() +++++\n");
         // FIXME : remove, temporary test
-        StateManager::get()->pushScreen(FeatureUnlockedCutScene::getInstance());
+        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        // the passed kart will not be modified, that's why I allow myself to use const_cast
+        scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
+        StateManager::get()->pushScreen(scene);
     }
     
     if (selection == "new")

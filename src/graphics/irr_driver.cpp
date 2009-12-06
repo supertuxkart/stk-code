@@ -252,6 +252,7 @@ void IrrDriver::changeResolution()
     item_manager            -> removeTextures();
     kart_properties_manager -> removeTextures();
     powerup_manager         -> removeTextures();
+    GUIEngine::clear();
     GUIEngine::cleanUp();
 
     m_device->closeDevice();

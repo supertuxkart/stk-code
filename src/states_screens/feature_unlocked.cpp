@@ -17,11 +17,30 @@ using namespace irr::video;
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.stkgui")
 {
     setNeeds3D(true);
+    
+    m_unlocked_kart = NULL;
+    m_unlocked_thing_picture = NULL;
+}
+
+void FeatureUnlockedCutScene::setUnlockedKart(KartProperties* unlocked_kart)
+{
+    assert(unlocked_kart != NULL);
+    m_unlocked_kart = unlocked_kart;
+    m_unlocked_thing_picture = NULL;
+}
+
+void FeatureUnlockedCutScene::setUnlockedPicture(irr::video::ITexture* picture)
+{
+    assert(picture != NULL);
+
+    m_unlocked_kart = NULL;
+    m_unlocked_thing_picture = picture;
 }
 
 void FeatureUnlockedCutScene::init()
 {
-    m_angle = 0.0f;
+    m_sky_angle = 0.0f;
+    m_global_time = 0.0f;
     
     m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("lscales.png"), 16 /* hori_res */, 16 /* vert_res */,
                            1.0f /* texture_percent */,  2.0f /* sphere_percent */);
@@ -71,6 +90,30 @@ void FeatureUnlockedCutScene::init()
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     
+    if (m_unlocked_kart != NULL)
+    {
+        KartModel* kartModel = m_unlocked_kart->getKartModel();
+        
+        scene::ISceneNode* kart_node = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getModel());
+
+        for (int n=0; n<4; n++)
+        {
+            scene::ISceneNode* wheel = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getWheelModel(n), kart_node);
+            wheel->setPosition( kartModel->getWheelGraphicsPosition(n).toIrrVector() );
+            wheel->updateAbsolutePosition();
+        }
+        
+        m_root_gift_node = kart_node;
+    }
+    else if (m_unlocked_thing_picture != NULL)
+    {
+        // TODO
+    }
+    else
+    {
+        std::cerr << "There is nothing in the chest!!!\n";
+    }
+    
     /*
     for (unsigned int i=0; i<sky->getMaterialCount(); i++)
     {
@@ -105,9 +148,11 @@ void FeatureUnlockedCutScene::tearDown()
 
 void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* driver)
 {
-    m_angle += dt*2;
-    if (m_angle > 360) m_angle -= 360;
-    m_sky->setRotation( core::vector3df(0, m_angle, 0) );
+    m_global_time += dt;
+    
+    m_sky_angle += dt*2;
+    if (m_sky_angle > 360) m_sky_angle -= 360;
+    m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
     const float KEY_Y = 6.8f;
     const float KEY_FINAL_DIST = 15;
@@ -120,20 +165,69 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     // distance at which the key finishes rotating
     const float KEY_ROTATION_TO = KEY_FINAL_DIST + 10.0f;
     
+    //const float CHEST_OPEN_FROM = KEY_ROTATION_TO + 1.0f;
+    //const float CHEST_OPEN_TO = KEY_ROTATION_TO + 8.0f;
+
     m_key_angle = 1.0f - (m_key_pos - KEY_ROTATION_TO) / (KEY_ROTATION_FROM - KEY_ROTATION_TO);
     if (m_key_angle < 0.0f) m_key_angle = 0.0f;
     else if (m_key_angle > 1.0f) m_key_angle = 1.0f;
-    
-    m_camera->setPosition( core::vector3df(cos((1.0f-m_key_angle)*M_PI/4 + M_PI/4)*70.0f,
-                                           30.0f,
-                                           sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
-    //m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
-    m_camera->updateAbsolutePosition();
+
     
     //printf("m_key_angle = %f\n", m_key_angle);
     m_key->setRotation( core::vector3df(0, m_key_angle*90.0f, -m_key_angle*90.0f) );
 
+	const int GIFT_EXIT_FROM = 7.0f;
+    const int GIFT_EXIT_TO = 20.0f;
+        
+    if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
+    {
+        const double chest_top_angle = ((double)(m_global_time - GIFT_EXIT_FROM)*3/(double)GIFT_EXIT_TO)*110.0;
+        m_chest_top->setRotation( core::vector3df( 360-std::min(110.0, chest_top_angle), 0, 0 ));
+        if (chest_top_angle < 110.0) 
+        {
+        	core::vector3df chestpos = m_chest_top->getPosition();
+			chestpos.Y += dt*6;
+        	m_chest_top->setPosition(chestpos);
+        }
+        
+        core::vector3df pos = m_root_gift_node->getPosition();
+        pos.Y = sin( (m_global_time - GIFT_EXIT_FROM)*M_PI*1.5/GIFT_EXIT_TO  )*50;
+        pos.X += 5*dt;
+        pos.Z += 5*dt;
+
+        m_root_gift_node->setPosition(pos);
+        
+        core::vector3df scale = m_root_gift_node->getScale();
+        scale.X += 2*dt;
+        scale.Y += 2*dt;
+        scale.Z += 2*dt;
+        m_root_gift_node->setScale(scale);
+        
+        
+        core::vector3df campos = m_camera->getPosition();
+        campos.X += 5*dt;
+        campos.Z += 5*dt;
+        
+        m_camera->setPosition(campos);
+    }
+    else if (m_global_time < GIFT_EXIT_FROM)
+    {
+        m_camera->setPosition( core::vector3df(cos((1.0f-m_key_angle)*M_PI/4 + M_PI/4)*70.0f,
+                                               30.0f,
+                                               sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
+    }
+    
+    if (m_root_gift_node != NULL)
+    {
+    	m_camera->setTarget( m_root_gift_node->getPosition() + core::vector3df(0.0f, 10.0f, 0.0f) );
+    	m_camera->updateAbsolutePosition();
+    }
+    else
+    {
+        m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
+    	m_camera->updateAbsolutePosition();
+    }
+    
     static const int w = irr_driver->getFrameSize().Width;
     static const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
