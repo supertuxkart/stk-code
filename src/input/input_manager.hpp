@@ -92,6 +92,9 @@ public:
     /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
     void   setMasterPlayerOnly(bool enabled);
     
+    /** Returns whether only the master player should be allowed to perform changes in menus */
+    bool	masterPlayerOnly() const;
+    
     void   update(float dt);
     
     /** Returns the ID of the player that plays with the keyboard, or -1 if none */

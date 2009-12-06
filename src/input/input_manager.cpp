@@ -399,6 +399,11 @@ void InputManager::setMasterPlayerOnly(bool enabled)
 {
     m_master_player_only = enabled;
 }
+/** Returns whether only the master player should be allowed to perform changes in menus */
+bool InputManager::masterPlayerOnly() const
+{
+	return m_device_manager->getAssignMode() == ASSIGN && m_master_player_only;
+}
 //-----------------------------------------------------------------------------
 /**
  * Called on keyboard events [indirectly] by irrLicht

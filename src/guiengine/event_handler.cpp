@@ -83,7 +83,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 const int playerID = input_manager->getPlayerKeyboardID();
-                if (playerID != -1) return onWidgetActivated(w, playerID);
+                if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                else if (playerID != -1) return onWidgetActivated(w, playerID);
                 else break;
             }    
             case EGET_ELEMENT_HOVERED:
@@ -108,6 +109,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (ribbon == NULL) break;
                     const int playerID = input_manager->getPlayerKeyboardID();
                     if (playerID == -1) break;
+                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                    
                     if (ribbon->mouseHovered(w, playerID) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
@@ -116,6 +119,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 {
                     // focus on hover for other widgets
                     const int playerID = input_manager->getPlayerKeyboardID();
+                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
                     if (playerID != -1)
                     {
                         w->setFocusForPlayer(playerID);
