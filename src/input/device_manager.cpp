@@ -246,7 +246,13 @@ bool DeviceManager::translateInput( Input::InputType type,
     };
 
     // Return true if input was successfully translated to an action and player
-    if (device != NULL) m_latest_used_device = device;
+    if (device != NULL && abs(value) > Input::MAX_VALUE/2)
+    {
+        //std::cout<< "========== Setting latest device " << (device->getType() == DT_KEYBOARD ? "keyboard" : "gamepad")
+        //	<< " #" << deviceID << " button=" << btnID << " value=" << value << " ==========\n";
+
+        m_latest_used_device = device;
+    }
     return (device != NULL);
 }
 //-----------------------------------------------------------------------------
@@ -254,8 +260,9 @@ InputDevice* DeviceManager::getLatestUsedDevice()
 {
     // If none, probably the user clicked or used enter; give keyboard by default
     
-    if (m_latest_used_device == NULL )
-    {    
+    if (m_latest_used_device == NULL)
+    {   
+        std::cout<< "========== No latest device, returning keyboard ==========\n";
         return m_keyboards.get(0); // FIXME: is this right?
     }
     
