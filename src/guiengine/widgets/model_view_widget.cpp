@@ -122,21 +122,20 @@ void ModelViewWidget::update(float delta)
             distance_with_negative_rotation = (int)(angle - m_rotation_target);
         }
         
+        //std::cout << "distance_with_positive_rotation=" << distance_with_positive_rotation <<
+        //" distance_with_negative_rotation=" << distance_with_negative_rotation << " angle="<< angle  <<std::endl;
+        
         if (distance_with_positive_rotation < distance_with_negative_rotation) 
         {
-            angle += delta*m_rotation_speed;
+            angle += delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
         else
         {
-            angle -= delta*m_rotation_speed;
+            angle -= delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
-        
-        // slow down when getting close
-        if (fabsf(angle - m_rotation_target) < m_rotation_speed*7.0f && fabsf(angle - m_rotation_target) > m_rotation_speed*2.0f)
-        {
-            m_rotation_speed = std::max(m_rotation_speed*0.9f, 25.0f);
-        }
-        
+        if (angle > 360) angle -= 360;
+        if (angle < 0) angle += 360;
+
         // stop rotating when target reached
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
