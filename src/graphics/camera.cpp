@@ -86,7 +86,7 @@ void Camera::setupCamera()
             m_aspect  *= 2.0f;
             m_fov      = DEGREE_TO_RAD*65.0f;
             break;
-    case 3: 
+    case 3:
             /*
             if(m_index<2)
             {
@@ -110,6 +110,7 @@ void Camera::setupCamera()
             }
             break;*/
     case 4:
+            { // g++ 4.3 whines about the variables in switch/case if not {}-wrapped (???)
             const int x1 = (m_index%2==0 ? 0 : UserConfigParams::m_width>>1);
             const int y1 = (m_index<2    ? 0 : UserConfigParams::m_height>>1);
             const int x2 = (m_index%2==0 ? UserConfigParams::m_width>>1  : UserConfigParams::m_width);
@@ -119,6 +120,7 @@ void Camera::setupCamera()
                       << m_viewport.getWidth() << "x" << m_viewport.getHeight() << "\n";
             m_scaling  = core::vector2df(0.5f, 0.5f);
             m_fov      = DEGREE_TO_RAD*50.0f;
+            }
             break;
     default:fprintf(stderr, "Incorrect number of players: '%d' - assuming 1.\n",
                     race_manager->getNumLocalPlayers());
