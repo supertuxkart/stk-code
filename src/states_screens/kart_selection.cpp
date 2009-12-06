@@ -781,6 +781,13 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
     {
         if (m_kart_widgets[n].getAssociatedPlayer() == player)
         {
+            // Check that this player has not already confirmed, then they can't back out
+            if (m_kart_widgets[n].isReady())
+            {
+                sfx_manager->quickSound( SFXManager::SOUND_USE_ANVIL );
+                return true;
+            }
+            
             playerID = n;
             break;
         }
