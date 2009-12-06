@@ -333,10 +333,11 @@ void Widget::readCoords(Widget* parent)
     }
     if(this->w > (int)parent_w)
     {
+        // scale down while keeping aspect ratio (don't do this for text widgets though...)
         float ratio = (float)parent_w/this->w;
 
         this->w = (int)(this->w*ratio);
-        this->h = (int)(this->h*ratio);
+        if (m_type != WTYPE_LABEL) this->h = (int)(this->h*ratio);
     }
 
     // ------ check for given max size
