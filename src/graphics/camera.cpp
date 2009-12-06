@@ -87,6 +87,7 @@ void Camera::setupCamera()
             m_fov      = DEGREE_TO_RAD*65.0f;
             break;
     case 3: 
+            /*
             if(m_index<2)
             {
                 m_viewport = core::recti(m_index==0 ? 0 
@@ -107,7 +108,7 @@ void Camera::setupCamera()
                 m_fov      = DEGREE_TO_RAD*65.0f;
                 m_aspect  *= 2.0f;
             }
-            break;
+            break;*/
     case 4:
             const int x1 = (m_index%2==0 ? 0 : UserConfigParams::m_width>>1);
             const int y1 = (m_index<2    ? 0 : UserConfigParams::m_height>>1);

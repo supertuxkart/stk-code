@@ -28,6 +28,7 @@ using namespace irr;
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
@@ -55,6 +56,12 @@ RaceGUI::RaceGUI()
     m_map_left             =  10;
     m_map_bottom           =  10;
 
+    // special case : when 3 players play, use available 4th space for such things
+    if (race_manager->getNumLocalPlayers() == 3)
+    {
+        m_map_left = UserConfigParams::m_width - m_map_width;
+    }
+    
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");    
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
@@ -165,6 +172,15 @@ void RaceGUI::renderGlobal(float dt)
 {
     cleanupMessages(dt);
 
+    // Special case : when 3 players play, use 4th window to display such stuff (but we must clear it)
+    if (race_manager->getNumLocalPlayers() == 3 && !GUIEngine::ModalDialog::isADialogActive())
+    {
+        static video::SColor black = video::SColor(255,0,0,0);
+        irr_driver->getVideoDriver()->draw2DRectangle(black,
+                                                      core::rect<s32>(UserConfigParams::m_width/2, UserConfigParams::m_height/2,
+                                                                      UserConfigParams::m_width, UserConfigParams::m_height));
+    }
+    
     assert(RaceManager::getWorld() != NULL);
     if(RaceManager::getWorld()->getPhase() >= READY_PHASE &&
        RaceManager::getWorld()->getPhase() <= GO_PHASE      )
@@ -246,6 +262,13 @@ void RaceGUI::drawGlobalTimer()
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
     core::rect<s32> pos(UserConfigParams::m_width-120, 10, 
                         UserConfigParams::m_width,     50);
+    
+    // special case : when 3 players play, use available 4th space for such things
+    if (race_manager->getNumLocalPlayers() == 3)
+    {
+        pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
+    }
+    
     gui::IGUIFont* font = irr_driver->getRaceFont();
     font->draw(sw.c_str(), pos, time_color);
 }   // DRAWGLOBALTimer
@@ -262,6 +285,7 @@ void RaceGUI::drawGlobalMiniMap()
     
     int upper_y = UserConfigParams::m_height-m_map_bottom-m_map_height;
     int lower_y = UserConfigParams::m_height-m_map_bottom;
+    
     core::rect<s32> dest(m_map_left,               upper_y, 
                          m_map_left + m_map_width, lower_y);
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
@@ -294,6 +318,16 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     assert(RaceManager::getWorld() != NULL);
 
     int x = 5;
+    int y_base = 20;
+    
+    // Special case : when 3 players play, use 4th window to display such stuff
+    if (race_manager->getNumLocalPlayers() == 3)
+    {
+        x = UserConfigParams::m_width/2 + 5;
+        y_base = UserConfigParams::m_height/2 + 20;
+    }
+
+    
     int y;
     int ICON_WIDTH=40;
     int ICON_PLAYER_WIDTH=50;
@@ -311,7 +345,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         if(kart->isEliminated()) continue;
         const int position = kart->getPosition();
 
-        y = 20 + ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
+        y = y_base + ( (position == -1 ? i : position-1)*(ICON_PLAYER_WIDTH+2));
 
         if (info[i].time.size() > 0)
         {
