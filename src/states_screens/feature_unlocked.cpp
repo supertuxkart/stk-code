@@ -189,13 +189,13 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     //printf("m_key_angle = %f\n", m_key_angle);
     m_key->setRotation( core::vector3df(0, m_key_angle*90.0f, -m_key_angle*90.0f) );
 
-	const int GIFT_EXIT_FROM = 7.0f;
-    const int GIFT_EXIT_TO = 20.0f;
+	const int GIFT_EXIT_FROM = 7;
+    const int GIFT_EXIT_TO = 20;
         
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
     {
         const double chest_top_angle = ((double)(m_global_time - GIFT_EXIT_FROM)*3/(double)GIFT_EXIT_TO)*110.0;
-        m_chest_top->setRotation( core::vector3df( 360-std::min(110.0, chest_top_angle), 0, 0 ));
+        m_chest_top->setRotation( core::vector3df( 360.0f-(float)std::min(110.0, chest_top_angle), 0, 0 ));
         if (chest_top_angle < 110.0) 
         {
         	core::vector3df chestpos = m_chest_top->getPosition();
@@ -204,7 +204,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
         }
         
         core::vector3df pos = m_root_gift_node->getPosition();
-        pos.Y = sin( (m_global_time - GIFT_EXIT_FROM)*M_PI*1.5/GIFT_EXIT_TO  )*50;
+        pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.5/GIFT_EXIT_TO)  )*50.0f;
         pos.X += 5*dt;
         pos.Z += 5*dt;
 

@@ -297,6 +297,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\guiengine\CGUIFont.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\guiengine\engine.cpp"
 					>
 				</File>
@@ -980,6 +984,10 @@
 				>
 				<File
 					RelativePath="..\..\guiengine\abstract_state_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\guiengine\CGUIFont.h"
 					>
 				</File>
 				<File

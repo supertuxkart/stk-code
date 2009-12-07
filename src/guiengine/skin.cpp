@@ -589,12 +589,12 @@ void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool press
     {
         core::rect< s32 > sized_rect = rect;
         core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float size = sin(m_dialog_size*M_PI_2);
+        const float size = sin(m_dialog_size*M_PI*0.5f);
 
-        sized_rect.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
-        sized_rect.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
-        sized_rect.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
-        sized_rect.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+        sized_rect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
+        sized_rect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
+        sized_rect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
         
         if (focused)
             drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::focused"]);
@@ -1140,12 +1140,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-                const float size = sin(m_dialog_size*M_PI_2);
+                const float size = sin(m_dialog_size*M_PI*0.5f);
                 
-                borderArea.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
-                borderArea.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
-                borderArea.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
-                borderArea.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+                borderArea.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
+                borderArea.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
+                borderArea.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
+                borderArea.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
             }
             GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
 
@@ -1160,12 +1160,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-                const float size = sin(m_dialog_size*M_PI_2);
+                const float size = sin(m_dialog_size*M_PI*0.5f);
                 core::rect< s32 > sizedRect;
-                sizedRect.UpperLeftCorner.X  = center.X + (int)(rect.UpperLeftCorner.X - center.X)*size;
-                sizedRect.UpperLeftCorner.Y  = center.Y + (int)(rect.UpperLeftCorner.Y - center.Y)*size;
-                sizedRect.LowerRightCorner.X = center.X + (int)(rect.LowerRightCorner.X - center.X)*size;
-                sizedRect.LowerRightCorner.Y = center.Y + (int)(rect.LowerRightCorner.Y - center.Y)*size;
+                sizedRect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
+                sizedRect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
+                sizedRect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
+                sizedRect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
                 GUIEngine::getDriver()->draw2DRectangle( color, sizedRect );
             }
             else
@@ -1190,7 +1190,7 @@ void Skin::drawBGFadeColor()
 {
     // fade out background
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
-    if (m_dialog_size < 1.0f) color.setAlpha( color.getAlpha()*m_dialog_size );
+    if (m_dialog_size < 1.0f) color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
     GUIEngine::getDriver()->draw2DRectangle( color,
                                             core::rect< s32 >(position2d< s32 >(0,0) ,
                                             GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
@@ -1207,7 +1207,7 @@ core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawT
         core::position2d<s32> center = sized_rect.getCenter();
         const int w = sized_rect.getWidth();
         const int h = sized_rect.getHeight();
-        const float size = sin(m_dialog_size*M_PI_2);
+        const float size = sin(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X = (int)(center.X - (w/2.0f)*size);
         sized_rect.UpperLeftCorner.Y = (int)(center.Y - (h/2.0f)*size);
         sized_rect.LowerRightCorner.X = (int)(center.X + (w/2.0f)*size);

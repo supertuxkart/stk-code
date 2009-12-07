@@ -572,7 +572,7 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 			offsets.push_back(offset);
 		}
 
-		offset.X += (area.width + area.overhang + GlobalKerningWidth) * m_scale;
+		offset.X += (int)((area.width + area.overhang + GlobalKerningWidth) * m_scale);
 	}
 
 	//SpriteBank->draw2DSpriteBatch(indices, offsets, clip, color);
