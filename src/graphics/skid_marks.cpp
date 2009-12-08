@@ -62,6 +62,7 @@ void SkidMarks::reset()
     }
     m_left.clear();
     m_right.clear();
+    m_nodes.clear();
     m_skid_marking = false;
     m_current      = -1;
 }   // reset
