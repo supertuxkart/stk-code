@@ -85,9 +85,14 @@ void GraphNode::addSuccessor(unsigned int to)
     // The distance from start for the successor node 
     if(to!=0)
     {
-        m_all_nodes->getNode(to).m_distance_from_start =
-            std::max(m_all_nodes->getNode(to).m_distance_from_start, 
-                     m_distance_from_start+distance_to_next);
+        // Do not change an existing, already set distance on another
+        // node (since this would mean that we then have to change all
+        // other nodes following that node, too).
+        if(m_all_nodes->getNode(to).m_distance_from_start==0)
+        {
+            m_all_nodes->getNode(to).m_distance_from_start =
+                        m_distance_from_start+distance_to_next;
+        }
     }
 }   // addSuccessor
 
