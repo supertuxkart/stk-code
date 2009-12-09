@@ -776,6 +776,9 @@ float Kart::handleNitro(float dt)
  */
 float Kart::handleSlipstream(float dt)
 {
+    // If this kart is too slow for slipstreaming taking effect, do nothing
+    if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) return 0;
+
     m_slipstream_original_area->transform(getTrans(), m_slipstream_area);
 
     // Note: there is a slight inconsistency here: Karts are updated one
@@ -784,7 +787,8 @@ float Kart::handleSlipstream(float dt)
     // slipstream area of that kart, but for karts not yet updated the
     // old position will be used. The differences should not be noticable,
     // and simplifies the update process (which would otherwise have to be
-    // done in two stages).
+    // done in two stages). Besides, the same problem exists everywhere
+    // in the kart update process.
     unsigned int n     = race_manager->getNumKarts();
     bool is_sstreaming = false;
     for(unsigned int i=0; i<n; i++)
@@ -793,6 +797,13 @@ float Kart::handleSlipstream(float dt)
         // Don't test for slipstream with itself.
         if(kart==this) continue;
 
+        // If the kart we are testing against is too slow, no need to test
+        // slipstreaming. Note: We compare the speed of the other kart 
+        // against the minimum slipstream kart of this kart - not entirely
+        // sure if this makes sense, but it makes it easier to give karts
+        // different slipstream properties.
+        if(kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
+            continue;
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
         Vec3 delta = getXYZ() - kart->getXYZ();
@@ -808,13 +819,11 @@ float Kart::handleSlipstream(float dt)
 
     float add_power = 0;
 
-
     if(m_slipstream_time >0 && !is_sstreaming)
     {
         // Kart is using slipstream advantage
         add_power         = getMaxPower() * m_kart_properties->getSlipstreamAddPower();
         m_slipstream_time = std::max(m_slipstream_time - dt, 0.0f);
-        printf("Add power %f, t=%f for '%s'\n", m_slipstream_time, add_power, getIdent().c_str());
     }
     else if(is_sstreaming)
     {

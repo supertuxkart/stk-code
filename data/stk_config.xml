@@ -123,6 +123,7 @@ skid-visual: Additional graphical rotation of kart.
 slipstrea slipstream-length: How far behind a kart slipstream works
 slipstream-time: How many seconds of sstream give  maximum benefit
 slipstream-add-power: Additional power due to sstreaming. 1 = +100%
+slipstream-min-speed: Minimum speed necessary for slipstream to take effect.
 
 min-speed-radius and max-speed-radius define the smallest turn radius at
 lowest speed (4.64 m at speed 0) and at high speed (13.5 m at speed 12 m/s).
@@ -189,6 +190,7 @@ rubber-band-duration is the duration a rubber band acts.
     slipstream-length="5"
     slipstream-time="5"
     slipstream-add-power="3"
+    slipstream-min-speed="15"
 
     brake-factor="11.0"
     min-speed-radius="0 3"

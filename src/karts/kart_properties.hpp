@@ -139,6 +139,8 @@ private:
     float m_slipstream_time;          /**< Time after which sstream has maxium
                                        *   benefit. */
     float m_slipstream_add_power;     /**< Additional power due to sstreaming. */
+    float m_slipstream_min_speed;     /**< Minimum speed for slipstream to take
+                                       *   effect. */
     float m_skid_max;                 /**< Maximal increase of steering when
                                        *   skidding. */
     float m_skid_increase;            /**< Skidding is multiplied by this when
@@ -240,6 +242,8 @@ public:
     float getSlipstreamTime         () const {return m_slipstream_time;          }
     /** Returns additional power due to slipstreaming. */
     float getSlipstreamAddPower     () const {return m_slipstream_add_power;     }
+    /** Returns the minimum slipstream speed. */
+    float getSlipstreamMinSpeed     () const {return m_slipstream_min_speed;     }
     /** Returns the maximum factor by which the steering angle can be increased. */
     float getMaxSkid                () const {return m_skid_max;                 }
     /** Returns the factor by which m_skidding is multiplied when the kart is

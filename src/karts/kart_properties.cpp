@@ -71,7 +71,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_camera_max_accel = m_camera_max_brake =
         m_slipstream_length = m_slipstream_time = m_slipstream_add_power =
-        m_camera_distance = UNDEFINED;
+        m_slipstream_min_speed = m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -241,6 +241,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("slipstream-length", &m_slipstream_length);
     root->get("slipstream-time", &m_slipstream_time);
     root->get("slipstream-add-power", &m_slipstream_add_power);
+    root->get("slipstream-min-speed", &m_slipstream_min_speed);
     root->get("brake-factor", &m_brake_factor);
 
     std::vector<float> v;
@@ -449,6 +450,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("slipstream-length",         m_slipstream_length        );
     lisp->get("slipstream-time",           m_slipstream_time          );
     lisp->get("slipstream-add-power",      m_slipstream_add_power     );
+    lisp->get("slipstream-min-speed",      m_slipstream_min_speed     );
 
     lisp->getVector("groups",              m_groups                   );
 
@@ -540,7 +542,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_visual,               "skid-visual"                );
     CHECK_NEG(m_slipstream_length,         "slipstream-length"          );
     CHECK_NEG(m_slipstream_time,           "slipstream-time"            );
-    CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"        );
+    CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"       );
+    CHECK_NEG(m_slipstream_min_speed,      "slipstream-min-speed"       );
 
     CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
     CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
