@@ -164,7 +164,7 @@ public:
     
     /** Called to determine whether this race mode uses bonus boxes.
       */
-    virtual bool enableBonusBoxes(){ return true; }
+    virtual bool haveBonusBoxes(){ return true; }
     
     /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it.

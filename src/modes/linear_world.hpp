@@ -96,7 +96,7 @@ public:
     virtual bool raceHasLaps(){ return true; }
     virtual void newLap(unsigned int kart_index);
 
-    virtual bool enableBonusBoxes(){ return true; }
+    virtual bool haveBonusBoxes(){ return true; }
     
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */

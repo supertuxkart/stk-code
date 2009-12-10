@@ -25,13 +25,15 @@
 #include "modes/world.hpp"
 #include "states_screens/race_gui.hpp"
 
-struct BattleInfo
-{
-    int m_lives;
-};
 
 class ThreeStrikesBattle : public World
 {
+private:
+    struct BattleInfo
+    {
+        int m_lives;
+    };
+
     RaceGUI::KartIconDisplayInfo* m_kart_display_info;
     
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
@@ -53,7 +55,6 @@ public:
     virtual void enterRaceOverState(const bool delay=false);
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    //virtual bool enableBonusBoxes();
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }

@@ -867,7 +867,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 {
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX && 
-       !RaceManager::getWorld()->enableBonusBoxes()) 
+       !RaceManager::getWorld()->haveBonusBoxes()) 
         return;
 
     Vec3 loc(xyz);
