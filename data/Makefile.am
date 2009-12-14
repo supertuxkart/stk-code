@@ -1,6 +1,6 @@
 # data/
 
-SUBDIRS    = fonts items karts models music po sfx textures tracks grandprix
+SUBDIRS    = fonts gui items karts models music po sfx textures tracks grandprix
 pkgdatadir = $(datadir)/games/$(PACKAGE)/data
 
 dist_pkgdata_DATA = \
