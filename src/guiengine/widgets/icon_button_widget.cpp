@@ -91,9 +91,10 @@ void IconButtonWidget::setImage(const char* path_to_texture)
     m_texture_h = m_texture->getSize().Height;
 }
 // -----------------------------------------------------------------------------
-void IconButtonWidget::setLabel(std::string new_label)
+void IconButtonWidget::setLabel(stringw new_label)
 {
+    // FIXME: does not update m_text. Is this a behaviour we want?
     if (m_label == NULL) return;
     
-    m_label->setText( stringw(new_label.c_str()).c_str() );
+    m_label->setText( new_label.c_str() );
 }

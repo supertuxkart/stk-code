@@ -46,7 +46,7 @@ namespace GUIEngine
         virtual void add();
         
         /** Change the text label if there is a label (label won't be added if there initially wasn't one) */
-        void setLabel(std::string new_label);
+        void setLabel(irr::core::stringw new_label);
         
         /** Change the texture used for this icon. The path is relative to the data directory, just like PROP_ICON. */
         void setImage(const char* path_to_texture);

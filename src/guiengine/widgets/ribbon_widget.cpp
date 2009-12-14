@@ -144,6 +144,7 @@ void RibbonWidget::add()
             
             m_children[i].m_element = subbtn;
         }
+        // ---- non-tabs ribbons
         else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
             // how much space to keep for the label under the button
@@ -172,6 +173,8 @@ void RibbonWidget::add()
             m_children[i].w = image_w*zoom;
             m_children[i].h = image_h*zoom;
 
+            std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
+            
             
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();

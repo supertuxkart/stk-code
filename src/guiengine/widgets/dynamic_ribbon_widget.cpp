@@ -580,9 +580,13 @@ void DynamicRibbonWidget::updateItemDisplay()
                 icon->setImage( item_icon.c_str() );
                 
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
+                icon->setLabel(m_items[icon_id].m_user_name);
                 icon->m_text                  = m_items[icon_id].m_user_name;
                 icon->m_lock_badge            = m_items[icon_id].m_locked;
                 
+                std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
+                
+                // if the ribbon has no "ribbon-wide" label, call will do nothing
                 row.setLabel(i, m_items[icon_id].m_user_name);
             }
             else
