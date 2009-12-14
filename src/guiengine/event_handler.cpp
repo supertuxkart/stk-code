@@ -81,6 +81,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
                 
+                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
+                
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 const int playerID = input_manager->getPlayerKeyboardID();
                 if (input_manager->masterPlayerOnly() && playerID != 0) break;
@@ -91,6 +93,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
+                
+                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
                 
                 // When a modal dialog is shown, don't select widgets out of the dialog
                 if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))

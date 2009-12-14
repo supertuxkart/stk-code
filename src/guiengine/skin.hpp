@@ -230,6 +230,7 @@ namespace GUIEngine
         void drawCheckBox(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawList(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawIconButton(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
 
     public:
         // dirty way to have dialogs that zoom in

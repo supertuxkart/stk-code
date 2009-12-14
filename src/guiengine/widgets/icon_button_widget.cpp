@@ -26,47 +26,33 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 IconButtonWidget::IconButtonWidget(const bool clickable)
 {
-    IconButtonWidget::clickable = clickable;
-    label = NULL;
+    m_clickable = clickable;
+    m_label = NULL;
     m_type = WTYPE_ICON_BUTTON;
+    m_texture = NULL;
+    m_focusable = clickable;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
 {
     // ---- Icon
-    ITexture* texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
-    assert(texture != NULL);
-    const int texture_w = texture->getSize().Width, texture_h = texture->getSize().Height;
+    m_texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+    assert(m_texture != NULL);
+    m_texture_w = m_texture->getSize().Width;
+    m_texture_h = m_texture->getSize().Height;
 
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
-    const int x_gap = (int)((float)w - (float)texture_w * (float)h / texture_h);
+    const int x_gap = (int)((float)w - (float)m_texture_w * (float)h / m_texture_h);
     
-    rect<s32> widget_size;
-    if (clickable)
-    {
-        widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
+    rect<s32> widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
+    //std::cout << "Creating a IGUIButton " << widget_size.UpperLeftCorner.X << ", " << widget_size.UpperLeftCorner.Y <<
+    //" : " << widget_size.getWidth() << "x" << widget_size.getHeight() << std::endl;
+    
+    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, (m_clickable ? getNewID() : getNewNoFocusID()), L"");
 
-        //MyGUIButton* btn = new MyGUIButton(GUIEngine::getGUIEnv(), m_parent,  getNewID(), widget_size, true);
-        IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
-        btn->setUseAlphaChannel(true);
-        btn->setImage(texture);
-        btn->setScaleImage(true);
-        //btn->setDrawBorder(false);
-        btn->setTabStop(true);
-        m_element = btn;
-    }
-    else
-    {
-        widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
-        
-        IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, m_parent, getNewNoFocusID());
-        m_element = btn;
-        btn->setUseAlphaChannel(true);
-        btn->setImage(texture);
-        btn->setTabStop(false);
-        btn->setScaleImage(true);
-    }
+    btn->setTabStop(m_clickable);
+    m_element = btn;
     id = m_element->getID();
     
     // ---- label if any
@@ -75,40 +61,39 @@ void IconButtonWidget::add()
     {
         widget_size = rect<s32>(x, y + h, x + w, y + h*2);
 
-        label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
-        label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
-        label->setTabStop(false);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
+        m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
+        m_label->setTabStop(false);
     }
     
     // ---- IDs
     id = m_element->getID();
-    if(clickable) m_element->setTabOrder(id);
+    if (m_clickable) m_element->setTabOrder(id);
     m_element->setTabGroup(false);
-    
-    /*
-     IGUISpriteBank* sprite_bank = GUIEngine::getGUIEnv()->getSkin()->getSpriteBank();
-     // GUIEngine::getDriver()->makeColorKeyTexture(GUIEngine::getDriver()->getTexture("irrlichtlogo2.png"), position2di(0,0));
-     sprite_bank->addTexture( GUIEngine::getDriver()->getTexture("irrlichtlogo2.png") );
-     
-     SGUISprite sprite;
-     sprite.frameTime = 3000;
-     SGUISpriteFrame frame;
-     core::array<core::rect<s32> >& rectangles = sprite_bank->getPositions();
-     rectangles.push_back(rect<s32>(0,0,128,128));
-     frame.rectNumber = rectangles.size()-1;
-     frame.textureNumber = sprite_bank->getTextureCount() - 1;
-     sprite.Frames.push_back(frame);
-     sprite_bank->getSprites().push_back(sprite);
-     
-     button->setSpriteBank(sprite_bank);
-     button->setSprite(EGBS_BUTTON_UP, sprite_bank->getSprites().size()-1);
-     button->setSprite(EGBS_BUTTON_DOWN, sprite_bank->getSprites().size()-1);
-     */
+}
+// -----------------------------------------------------------------------------
+/** \precondition At the moment, the new texture must have the same aspct ratio as the previous one since the object will not
+  *               be modified to fit a different aspect ratio
+  */
+void IconButtonWidget::setImage(const char* path_to_texture)
+{
+    m_properties[PROP_ICON] = path_to_texture;
+    m_texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
+
+    if (m_texture == NULL)
+    {
+        // texture not found, try with absolute path
+        m_texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+    }
+    assert(m_texture != NULL);
+
+    m_texture_w = m_texture->getSize().Width;
+    m_texture_h = m_texture->getSize().Height;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabel(std::string new_label)
 {
-    if (label == NULL) return;
+    if (m_label == NULL) return;
     
-    label->setText( stringw(new_label.c_str()).c_str() );
+    m_label->setText( stringw(new_label.c_str()).c_str() );
 }

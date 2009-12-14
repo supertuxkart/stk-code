@@ -391,17 +391,19 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
 // -----------------------------------------------------------------------------
 Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
 {
-    if(within_vector == NULL) within_vector = &m_widgets;
+    if (within_vector == NULL) within_vector = &m_widgets;
     
-    for(int i = 0; i < within_vector->size(); i++)
+    for (int i = 0; i < within_vector->size(); i++)
     {
+        if (!within_vector->get(i)->m_focusable) continue;
+        
         // if container, also checks children
-        if(within_vector->get(i)->m_children.size() > 0 &&
-           within_vector->get(i)->m_type != WTYPE_RIBBON &&
-           within_vector->get(i)->m_type != WTYPE_SPINNER)
+        if (within_vector->get(i)->m_children.size() > 0 &&
+            within_vector->get(i)->m_type != WTYPE_RIBBON &&
+            within_vector->get(i)->m_type != WTYPE_SPINNER)
         {
             Widget* w = getFirstWidget(&within_vector->get(i)->m_children);
-            if(w != NULL) return w;
+            if (w != NULL) return w;
         }
         
         if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||
@@ -416,15 +418,17 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
 {
     if (within_vector == NULL) within_vector = &m_widgets;
     
-    for(int i = within_vector->size()-1; i >= 0; i--)
+    for (int i = within_vector->size()-1; i >= 0; i--)
     {
+        if (!within_vector->get(i)->m_focusable) continue;
+        
         // if container, also checks children
-        if(within_vector->get(i)->m_children.size() > 0 &&
-           within_vector->get(i)->m_type != WTYPE_RIBBON &&
-           within_vector->get(i)->m_type != WTYPE_SPINNER)
+        if (within_vector->get(i)->m_children.size() > 0 &&
+            within_vector->get(i)->m_type != WTYPE_RIBBON &&
+            within_vector->get(i)->m_type != WTYPE_SPINNER)
         {
             Widget* w = getLastWidget(&within_vector->get(i)->m_children);
-            if(w != NULL) return w;
+            if (w != NULL) return w;
         }
         
         if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||

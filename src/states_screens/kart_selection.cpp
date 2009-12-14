@@ -900,8 +900,7 @@ void KartSelectionScreen::init()
         const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
         if (prop->getIdent() == default_kart)
         {
-            std::string icon_path = file_manager->getDataDir() ;
-            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
             w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
             //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
             break;
@@ -914,15 +913,14 @@ void KartSelectionScreen::init()
         const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
         if (prop->getIdent() != default_kart)
         {
-            std::string icon_path = file_manager->getDataDir() ;
-            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
             w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
             //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
         }
     }
     
     // add random
-    w->addItem(_("Random Kart"), "randomkart", file_manager->getGUIDir()+"/random_kart.png");
+    w->addItem(_("Random Kart"), "randomkart", "/gui/random_kart.png");
     
     /*
      
@@ -1090,8 +1088,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
                 
-                std::string icon_path = file_manager->getDataDir() ;
-                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
             }
         }
@@ -1104,13 +1101,12 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
                 
-                std::string icon_path = file_manager->getDataDir() ;
-                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
             }
         }
         // add random
-        w->addItem(_("Random Kart"), "randomkart", file_manager->getGUIDir()+"/random_kart.png");
+        w->addItem(_("Random Kart"), "randomkart", "/gui/random_kart.png");
         
         w->updateItemDisplay();
         

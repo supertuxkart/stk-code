@@ -74,7 +74,7 @@ void RibbonWidget::add()
     
     int free_h_space = w - total_needed_space;
     
-    int biggest_y = 0;
+    //int biggest_y = 0;
     const int button_y = 10;
     float global_zoom = 1;
     
@@ -85,27 +85,26 @@ void RibbonWidget::add()
     const int one_button_space = (int)round((float)w / (float)subbuttons_amount);
     
     // ---- add children
-    for(int i=0; i<subbuttons_amount; i++)
+    for (int i=0; i<subbuttons_amount; i++)
     {
         
         const int widget_x = one_button_space*(i+1) - one_button_space/2;
         
-        IGUIButton * subbtn;
-        
-        if(/*m_children[i].m_type == WTYPE_BUTTON*/ getRibbonType() == RIBBON_TABS)
+        if (getRibbonType() == RIBBON_TABS)
         {
+            IGUIButton * subbtn;
             rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0,
                                           widget_x + one_button_space/2-2,  h);
             
             stringw& message = m_children[i].m_text;
             
-            if(m_children[i].m_type == WTYPE_BUTTON)
+            if (m_children[i].m_type == WTYPE_BUTTON)
             {
                 subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, getNewNoFocusID(), message.c_str(), L"");
                 subbtn->setTabStop(false);
                 subbtn->setTabGroup(false);
             }
-            else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
+            else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
             {
                 rect<s32> icon_part = rect<s32>(15,
                                                 0,
@@ -145,34 +144,46 @@ void RibbonWidget::add()
             
             m_children[i].m_element = subbtn;
         }
-        else if(m_children[i].m_type == WTYPE_ICON_BUTTON)
+        else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
-            const bool has_label = m_children[i].m_text.size() > 0;
-            
             // how much space to keep for the label under the button
+            const bool has_label = m_children[i].m_text.size() > 0;
             const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
+            
+            // For now, the image stretches to keep the aspect ratio of the widget (FIXME, doesn't work)
+            //float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
+            
+            // size of the image
+            video::ITexture* image = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
+            float image_h = image->getSize().Height;
+            float image_w = image->getSize().Width;
+            //float image_w = image_h*imageRatio;
+
             // if button too high to fit, scale down
             float zoom = global_zoom;
-            while(button_y + m_children[i].h*zoom + needed_space_under_button > h) zoom -= 0.01f;
+            while (button_y + image_h*zoom + needed_space_under_button > h) zoom -= 0.01f;
             
             // ---- add bitmap button part
-            const float image_w = m_children[i].w*zoom;
-            rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y,
-                                          widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
+            //rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y,
+            //                              widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
             
-            //subbtn = new MyGUIButton(GUIEngine::getGUIEnv(), btn, getNewNoFocusID(), subsize, true);
-            subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn, getNewNoFocusID(), L"");
-            subbtn->setScaleImage(true);
+            m_children[i].x = widget_x - (int)(image_w*zoom/2.0f);
+            m_children[i].y = button_y;
+            m_children[i].w = image_w*zoom;
+            m_children[i].h = image_h*zoom;
+
             
-            m_children[i].m_element = subbtn;
-            subbtn->setUseAlphaChannel(true);
-            subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+            m_children.get(i)->m_parent = btn;
+            m_children.get(i)->add();
+            //subbtn->setUseAlphaChannel(true);
+            //subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
             
             // ---- label part
-            if(has_label)
+            /*
+            if (has_label)
             {
                 subsize = rect<s32>(widget_x - one_button_space/2,
-                                    (int)((button_y + m_children[i].h)*zoom) + 5 /* leave 5 pixels between button and label */,
+                                    (int)((button_y + m_children[i].h)*zoom) + 5, // leave 5 pixels between button and label
                                     widget_x + (int)(one_button_space/2.0f), h);
                 
                 stringw& message = m_children[i].m_text;
@@ -186,9 +197,9 @@ void RibbonWidget::add()
                 const int final_y = subsize.getHeight() + label->getTextHeight();
                 if(final_y > biggest_y) biggest_y = final_y;
             }
-            
-            subbtn->setTabStop(false);
-            subbtn->setTabGroup(false);
+            */
+            //subbtn->setTabStop(false);
+            //subbtn->setTabGroup(false);
         }
         else
         {
@@ -196,7 +207,7 @@ void RibbonWidget::add()
         }
         
         
-        m_children[i].id = subbtn->getID();
+        //m_children[i].id = subbtn->getID();
         m_children[i].m_event_handler = this;
     }// next sub-button
     

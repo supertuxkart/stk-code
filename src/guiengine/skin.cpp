@@ -589,12 +589,12 @@ void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool press
     {
         core::rect< s32 > sized_rect = rect;
         core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float size = sin(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
-        sized_rect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
-        sized_rect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
-        sized_rect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
-        sized_rect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
+        sized_rect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*texture_size);
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size);
+        sized_rect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*texture_size);
+        sized_rect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*texture_size);
         
         if (focused)
             drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::focused"]);
@@ -633,13 +633,13 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     RibbonType type = parentRibbon->getRibbonType();
     
     /* tab-bar ribbons */
-    if(type == RIBBON_TABS)
+    if (type == RIBBON_TABS)
     {
         BoxRenderParams* params;
         
-        if(mark_selected && (focused || parent_focused))
+        if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["tab::focused"];
-        else if(mark_selected)
+        else if (mark_selected)
             params = &SkinConfig::m_render_params["tab::down"];
         else
             params = &SkinConfig::m_render_params["tab::neutral"];
@@ -794,6 +794,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         {
             drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
         }
+        
+        drawIconButton(rect, widget, pressed, focused);
 
     } // end if icon ribbons
     
@@ -901,6 +903,50 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
     }
     
 }
+
+void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
+{
+    if (focused)
+    {
+        int grow = 45;
+        static float glow_effect = 0;
+        
+        
+        const float dt = GUIEngine::getLatestDt();
+        glow_effect += dt*3;
+        if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+            grow = (int)(45 + 10*sin(glow_effect));
+            
+            
+            const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
+            const int glow_center_y = rect.LowerRightCorner.Y;
+            
+            ITexture* tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].getImage();
+            const int texture_w = tex_ficonhighlight->getSize().Width;
+            const int texture_h = tex_ficonhighlight->getSize().Height;
+            
+            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
+            
+            
+            const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
+                                                               glow_center_y - 25 - grow/2,
+                                                               glow_center_x + 45 + grow,
+                                                               glow_center_y + 25 + grow/2);
+            
+            GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, source_area,
+                                                0 /* no clipping */, 0, true /* alpha */);
+    }
+    
+    IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
+    //std::cout << "Drawing icon button '" << icon_widget->m_properties[PROP_ID] << "' : " << icon_widget->m_texture->getName().c_str() << "; size : " <<
+    //				icon_widget->m_texture_w << "," << icon_widget->m_texture_h << 
+    //				" --> " << rect.UpperLeftCorner.X << ", " << rect.UpperLeftCorner.Y << "  " << rect.getWidth() << "x" << rect.getHeight() << "\n";
+    GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, rect,
+                                        core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
+                                        0 /* no clipping */, 0, true /* alpha */);
+    
+}
+        
 
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
 { 
@@ -1030,45 +1076,15 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     
     if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
     {
-        drawRibbonChild(rect, widget, pressed /* pressed */, focused /* focused */);
+        drawRibbonChild(rect, widget, pressed, focused);
     }
     else if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_SPINNER)
     {
-        drawSpinnerChild(rect, widget, pressed /* pressed */, focused /* focused */);
+        drawSpinnerChild(rect, widget, pressed, focused);
     }
     else if (type == WTYPE_ICON_BUTTON)
     {
-        if (focused)
-        {
-            int grow = 45;
-            static float glow_effect = 0;
-            
-            
-            const float dt = GUIEngine::getLatestDt();
-            glow_effect += dt*3;
-            if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-            grow = (int)(45 + 10*sin(glow_effect));
-            
-            
-            const int glow_center_x = rect.UpperLeftCorner.X + rect.getWidth()/2;
-            const int glow_center_y = rect.LowerRightCorner.Y;
-            
-            ITexture* tex_ficonhighlight = SkinConfig::m_render_params["focusHalo::neutral"].getImage();
-            const int texture_w = tex_ficonhighlight->getSize().Width;
-            const int texture_h = tex_ficonhighlight->getSize().Height;
-            
-            core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
-            
-            
-            const core::rect< s32 > rect2 =  core::rect< s32 >(glow_center_x - 45 - grow,
-                                                               glow_center_y - 25 - grow/2,
-                                                               glow_center_x + 45 + grow,
-                                                               glow_center_y + 25 + grow/2);
-            
-            GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, source_area,
-                                                0 /* no clipping */, 0, true /* alpha */);
-            
-        }
+        drawIconButton(rect, widget, pressed, focused);
     }
     else if(type == WTYPE_BUTTON)
     {
@@ -1093,6 +1109,30 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         idstring += id;
         SColor color(255, 255, 0, 0);
         GUIEngine::getFont()->draw(idstring.c_str(), rect, color, true, true);
+    }
+    
+    if (widget->m_lock_badge || widget->m_okay_badge)
+    {
+        // TODO
+        video::ITexture* texture = NULL;
+        
+        if (widget->m_lock_badge) texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
+        else if (widget->m_okay_badge) texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
+        else { assert(false); return; }
+        const core::dimension2d<u32>& texture_size = texture->getSize();
+        const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
+        const int h = std::min( rect.getHeight()/2 , (int)(texture_size.Height) );
+        int w = aspectRatio*h;
+        
+        const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
+        
+        const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X,
+                                                           rect.LowerRightCorner.Y - h,
+                                                           rect.UpperLeftCorner.X + w,
+                                                           rect.LowerRightCorner.Y);
+        
+        GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,
+                                            0 /* no clipping */, 0, true /* alpha */);
     }
 }
 
@@ -1140,12 +1180,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-                const float size = sin(m_dialog_size*M_PI*0.5f);
+                const float texture_size = sin(m_dialog_size*M_PI*0.5f);
                 
-                borderArea.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
-                borderArea.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
-                borderArea.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
-                borderArea.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
+                borderArea.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*texture_size);
+                borderArea.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size);
+                borderArea.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*texture_size);
+                borderArea.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*texture_size);
             }
             GUIEngine::getDriver()->draw2DRectangle( colorFocus, borderArea );
 
@@ -1160,12 +1200,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
-                const float size = sin(m_dialog_size*M_PI*0.5f);
+                const float texture_size = sin(m_dialog_size*M_PI*0.5f);
                 core::rect< s32 > sizedRect;
-                sizedRect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*size);
-                sizedRect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*size);
-                sizedRect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*size);
-                sizedRect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*size);
+                sizedRect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*texture_size);
+                sizedRect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size);
+                sizedRect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*texture_size);
+                sizedRect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*texture_size);
                 GUIEngine::getDriver()->draw2DRectangle( color, sizedRect );
             }
             else
@@ -1207,11 +1247,11 @@ core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawT
         core::position2d<s32> center = sized_rect.getCenter();
         const int w = sized_rect.getWidth();
         const int h = sized_rect.getHeight();
-        const float size = sin(m_dialog_size*M_PI*0.5f);
-        sized_rect.UpperLeftCorner.X = (int)(center.X - (w/2.0f)*size);
-        sized_rect.UpperLeftCorner.Y = (int)(center.Y - (h/2.0f)*size);
-        sized_rect.LowerRightCorner.X = (int)(center.X + (w/2.0f)*size);
-        sized_rect.LowerRightCorner.Y = (int)(center.Y + (h/2.0f)*size);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        sized_rect.UpperLeftCorner.X = (int)(center.X - (w/2.0f)*texture_size);
+        sized_rect.UpperLeftCorner.Y = (int)(center.Y - (h/2.0f)*texture_size);
+        sized_rect.LowerRightCorner.X = (int)(center.X + (w/2.0f)*texture_size);
+        sized_rect.LowerRightCorner.Y = (int)(center.Y + (h/2.0f)*texture_size);
         drawBoxFromStretchableTexture( ModalDialog::getCurrent(), sized_rect, SkinConfig::m_render_params["window::neutral"]);
         
         m_dialog_size += GUIEngine::getLatestDt()*5;
@@ -1309,9 +1349,9 @@ u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const
     return 0;
 }
 
-s32 Skin::getSize (EGUI_DEFAULT_SIZE size) const 
+s32 Skin::getSize (EGUI_DEFAULT_SIZE texture_size) const 
 {
-    return m_fallback_skin->getSize(size);
+    return m_fallback_skin->getSize(texture_size);
 }
 
 IGUISpriteBank* Skin::getSpriteBank () const 
@@ -1341,9 +1381,9 @@ void Skin::setIcon (EGUI_DEFAULT_ICON icon, u32 index)
     m_fallback_skin->setIcon(icon, index);
 }
 
-void Skin::setSize (EGUI_DEFAULT_SIZE which, s32 size)
+void Skin::setSize (EGUI_DEFAULT_SIZE which, s32 texture_size)
 {
-    m_fallback_skin->setSize(which, size);
+    m_fallback_skin->setSize(which, texture_size);
     //printf("setting size\n");
 }
 

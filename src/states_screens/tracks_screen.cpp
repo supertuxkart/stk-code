@@ -79,24 +79,33 @@ void TracksScreen::init()
     w->clearItems();
     
     const int trackAmount = track_manager->getNumberOfTracks();
-    bool hasLockedTracks = false;
+    //bool hasLockedTracks = false;
     for (int n=0; n<trackAmount; n++)
     {
         Track* curr = track_manager->getTrack(n);
+        /*
         if (unlock_manager->isLocked(curr->getIdent()))
         {
             hasLockedTracks = true;
             continue;
         }
-        w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile());
+         */
+        if (unlock_manager->isLocked(curr->getIdent()))
+        {
+            w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
+        }
+        else
+        {
+             w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
+        }
     }
-    w->addItem(_("Random Track"), "random_track", file_manager->getGUIDir() + "/track_random.png");
-
+    w->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
+/*
     if (hasLockedTracks)
     {
         w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");
     }
-    
+    */
     w->updateItemDisplay();    
 }
 

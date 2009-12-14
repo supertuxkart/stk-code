@@ -64,6 +64,7 @@ Widget::Widget(bool reserve_id)
     m_element = NULL;
     m_title_font = false;
     m_type = WTYPE_NONE;
+    m_focusable = true;
     
     m_event_handler = NULL;
     m_show_bounding_box = false;
@@ -80,6 +81,9 @@ Widget::Widget(bool reserve_id)
     }
     
     m_reserved_id = -1;
+    
+    m_lock_badge = false;
+    m_okay_badge = false;
 }
 
 Widget::~Widget()

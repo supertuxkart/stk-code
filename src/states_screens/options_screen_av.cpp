@@ -88,16 +88,11 @@ void OptionsScreenAV::init()
                 
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
                 
-                if( ABOUT_EQUAL( ratio, (5.0f/4.0f) ) )
-                    res->addItem(name, name, file_manager->getDataDir() + "/gui/screen54.png");
-                else if( ABOUT_EQUAL( ratio, (4.0f/3.0f) ) )
-                    res->addItem(name, name, file_manager->getDataDir() + "/gui/screen43.png");
-                else if( ABOUT_EQUAL( ratio, (16.0f/10.0f) ) )
-                    res->addItem(name, name, file_manager->getDataDir() + "/gui/screen1610.png");
-                else if( ABOUT_EQUAL( ratio, (5.0f/3.0f) ) )
-                    res->addItem(name, name, file_manager->getDataDir() + "/gui/screen53.png");
-                else if( ABOUT_EQUAL( ratio, (3.0f/2.0f) ) )
-                    res->addItem(name, name, file_manager->getDataDir() + "/gui/screen32.png");
+                if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))   res->addItem(name, name, "/gui/screen54.png");
+                else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))   res->addItem(name, name, "/gui/screen43.png");
+                else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))  res->addItem(name, name, "/gui/screen1610.png");
+                else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))   res->addItem(name, name, "/gui/screen53.png");
+                else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))   res->addItem(name, name, "/gui/screen32.png");
                 else
                 {
                     std::cout << "Unknown screen size ratio : " << ratio << std::endl;

@@ -196,6 +196,15 @@ namespace GUIEngine
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
         
+        /** Show a 'locked' badge on this widget */
+        bool m_lock_badge;
+        
+        /** Show a 'good' badge on this widget */
+        bool m_okay_badge;
+        
+        /** Set to false if widget is something that should not receieve focus */
+        bool m_focusable;
+        
         /** Used in two cases :
             1) For 'placeholder' divisions; at the time the layout is created, there is nothing to
                place there yet, but we know there eventually will. So in this case pass 'true' to the

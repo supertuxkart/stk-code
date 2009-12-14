@@ -67,7 +67,7 @@ namespace GUIEngine
         {
             sprintf(buffer, "challenge%i", n);
             w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
-                       buffer, file_manager->getGUIDir() + "/challenge.png");
+                       buffer, "/gui/challenge.png");
         }
         for (int n=0; n<solvedChallengeAmount; n++)
         {

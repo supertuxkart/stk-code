@@ -31,16 +31,25 @@ namespace GUIEngine
         See guiengine/engine.hpp for a detailed overview */
     class IconButtonWidget : public Widget
     {
-        bool clickable;
-        irr::gui::IGUIStaticText* label;
+        friend class Skin;
+        
+        bool m_clickable;
+        irr::gui::IGUIStaticText* m_label;
+        irr::video::ITexture* m_texture;
+        int m_texture_w, m_texture_h;
     public:
+        
         IconButtonWidget(const bool clickable=true);
         virtual ~IconButtonWidget() {}
         
-        void add();
+        /** Callback called when this widget needs to be added (see base class Widget) */
+        virtual void add();
         
         /** Change the text label if there is a label (label won't be added if there initially wasn't one) */
         void setLabel(std::string new_label);
+        
+        /** Change the texture used for this icon. The path is relative to the data directory, just like PROP_ICON. */
+        void setImage(const char* path_to_texture);
     };
 }
 

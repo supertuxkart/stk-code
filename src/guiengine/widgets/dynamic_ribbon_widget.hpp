@@ -46,6 +46,7 @@ namespace GUIEngine
         irr::core::stringw m_user_name;
         std::string m_code_name;
         std::string m_sshot_file;
+        bool m_locked;
     };
     
     /** A dynamic ribbon (builds upon RibbonWidget, adding dynamic contents creation and sizing, scrolling, multiple-row
@@ -147,8 +148,14 @@ namespace GUIEngine
         ptr_vector<RibbonWidget, REF> m_rows;
         
         /** Dynamically add an item to the ribbon's list of items (will not be visible until you
-         call 'updateItemDisplay' or 'add') */
-        void addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file );
+          * call 'updateItemDisplay' or 'add').
+          *
+          * \param user_name   The name that will shown to the user (may be translated)
+          * \param code_name   The non-translated internal name used to uniquely identify this item.
+          * \param image_name  A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
+          * \param locked      Whether to add a lock icon to this item (does nop actual locing, only adds an icon)
+          */
+        void addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file, const bool locked=false );
         
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */

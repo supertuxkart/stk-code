@@ -220,11 +220,11 @@ void DynamicRibbonWidget::setSubElements()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            if (m_text == "all") icon->m_text = " ";
+            
+            if (m_text == "all") icon->m_text = " "; // FIXME: what's that??
             
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
             
-            icon->m_type = WTYPE_ICON_BUTTON;
             ribbon->m_children.push_back( icon );
         }
         m_children.push_back( ribbon );
@@ -234,12 +234,14 @@ void DynamicRibbonWidget::setSubElements()
     
  }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file )
+void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
+                                   const std::string& image_file, const bool locked )
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
     desc.m_code_name = code_name;
     desc.m_sshot_file = image_file;
+    desc.m_locked = locked;
     
     m_items.push_back(desc);
 }
@@ -248,7 +250,7 @@ void DynamicRibbonWidget::clearItems()
 {
     m_items.clear();
 }
-
+// -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
 {
     Widget::elementRemoved();
@@ -566,8 +568,6 @@ void DynamicRibbonWidget::updateItemDisplay()
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
-            IGUIButton* button = icon->getIrrlichtElement<IGUIButton>();
-            assert(button != NULL);
             
             int col_scroll = i + m_scroll_offset;
             while (col_scroll > max_scroll) col_scroll -= max_scroll+1;
@@ -576,20 +576,19 @@ void DynamicRibbonWidget::updateItemDisplay()
             
             if (icon_id < item_amount)
             {
-                std::string track_sshot = m_items[icon_id].m_sshot_file;
-                button->setImage( GUIEngine::getDriver()->getTexture(  track_sshot.c_str() ));
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( track_sshot.c_str()) );
+                std::string item_icon = m_items[icon_id].m_sshot_file;
+                icon->setImage( item_icon.c_str() );
                 
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
                 icon->m_text                  = m_items[icon_id].m_user_name;
+                icon->m_lock_badge            = m_items[icon_id].m_locked;
                 
                 row.setLabel(i, m_items[icon_id].m_user_name);
             }
             else
             {
-                button->setImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/main_help.png").c_str() ) );
-                button->setPressedImage( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/main_help.png").c_str() ) );
-                icon->m_properties[PROP_ID] = "gui/main_help.png";
+                icon->setImage( "/gui/main_help.png" );
+                icon->m_properties[PROP_ID] = "?";
             }
         } // next column
     } // next row

@@ -156,31 +156,26 @@ void RaceSetupScreen::init()
     {
         // FIXME: find a nice name than 'regular race' -.-
         w2->addItem( _("Regular Race\nAll blows allowed, so catch weapons and make clever use of them!"),
-                    "normal",
-                    file_manager->getDataDir() + "/gui/mode_normal.png");
+                    "normal", "/gui/mode_normal.png");
         
         w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
-                    "timetrial",
-                    file_manager->getDataDir() + "/gui/mode_tt.png");
+                    "timetrial", "/gui/mode_tt.png");
         
         if (unlock_manager->isLocked("followtheleader"))
         {
-            w2->addItem( _("Locked!\nFulfill challenges to gain access to locked areas"),
-                        "locked",
-                        file_manager->getDataDir() + "textures/gui_lock.png");
+            w2->addItem( _("Locked : solve active challenges to gain access to more!"),
+                        "locked", "/gui/mode_ftl.png", true);
         }
         else
         {
             w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
-                        "ftl",
-                        file_manager->getDataDir() + "/gui/mode_ftl.png");
+                        "ftl", "/gui/mode_ftl.png", false);
         }
         
         if (race_manager->getNumPlayers() > 1)
         {
             w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
-                        "3strikes",
-                        file_manager->getDataDir() + "/gui/mode_3strikes.png");
+                        "3strikes", "/gui/mode_3strikes.png");
         }
         
         m_inited = true;

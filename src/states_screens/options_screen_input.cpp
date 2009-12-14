@@ -103,15 +103,14 @@ void OptionsScreenInput::init()
 
         for (int i=0; i<keyboard_config_count; i++)
         {
-            KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
+            //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
             
             std::ostringstream kbname;
             kbname << "keyboard" << i;
             const std::string internal_name = kbname.str();
             
             
-            devices->addItem(StringUtils::insertValues(_("Keyboard %i"), i), internal_name,
-                             file_manager->getDataDir() + "/gui/keyboard.png");
+            devices->addItem(StringUtils::insertValues(_("Keyboard %i"), i), internal_name, "/gui/keyboard.png");
         }
         
         const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
@@ -128,8 +127,7 @@ void OptionsScreenInput::init()
                 gpname << "gamepad" << i;
                 const std::string internal_name = gpname.str();
                 
-                const std::string iconpath = file_manager->getDataDir() + "/gui/gamepad.png";
-                devices->addItem(name, internal_name, iconpath);
+                devices->addItem(name, internal_name, "/gui/gamepad.png");
             }
         }
         
