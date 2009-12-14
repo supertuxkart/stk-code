@@ -73,11 +73,12 @@ supertuxkart_SOURCES = \
  graphics/water_splash.hpp \
  graphics/water_splash.cpp \
  guiengine/CGUIFont.cpp \
- guiengine/CGUIFont.hpp \
+ guiengine/CGUIFont.h \
  guiengine/abstract_state_manager.cpp \
  guiengine/abstract_state_manager.hpp \
  guiengine/engine.cpp \
  guiengine/engine.hpp \
+ guiengine/event_handler.cpp \
  guiengine/event_handler.hpp \
  guiengine/modaldialog.cpp \
  guiengine/modaldialog.hpp \
@@ -88,7 +89,7 @@ supertuxkart_SOURCES = \
  guiengine/skin.hpp \
  guiengine/widget.cpp \
  guiengine/widget.hpp \
- guiengine/event_handler.cpp \
+ guiengine/widgets.hpp \
  guiengine/widgets/button_widget.cpp \
  guiengine/widgets/button_widget.hpp \
  guiengine/widgets/check_box_widget.cpp \
