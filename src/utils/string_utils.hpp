@@ -227,6 +227,17 @@ namespace StringUtils
     
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
+    template <class T1, class T2, class T3, class T4, class T5>
+    irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1,
+                                    const T2 &v2, const T3 &v3, const T4 &v4,
+                                    const T5 &v5)
+    {
+        irr::core::stringw s(chars);
+        return insertValues(s, v1, v2, v3, v4, v5);
+    }
+    
+    // ------------------------------------------------------------------------
+    /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3>
     irr::core::stringw insertValues(const wchar_t* chars, const T1 &v1,
                                     const T2 &v2, const T3 &v3)
