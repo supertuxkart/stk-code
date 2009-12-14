@@ -27,6 +27,8 @@
 
 #include "utils/translation.hpp"
 
+#include <locale.h>
+
 #include "io/file_manager.hpp"
 
 Translations* translations=NULL;
