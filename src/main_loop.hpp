@@ -29,7 +29,8 @@
 #  include <GL/gl.h>
 #endif
 
-#include <SDL/SDL_types.h>
+typedef unsigned long Uint32;
+
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
@@ -41,15 +42,13 @@ private:
     int      m_frame_count;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
-    GLuint   m_title_screen_texture;
-    GLuint   m_bg_texture;
-
+    float    getLimitedDt();
+    void     updateRace(float dt);
 public:
          MainLoop();
         ~MainLoop();
     void run();
     void abort();
-    void loadBackgroundImages();
 };   // MainLoop
 
 extern MainLoop* main_loop;

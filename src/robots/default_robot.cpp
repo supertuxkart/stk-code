@@ -22,48 +22,92 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #undef AI_DEBUG
 
-#ifdef AI_DEBUG
-#define SHOW_FUTURE_PATH //If defined, it will put a bunch of spheres when it
-//checks for crashes with the outside of the track.
-#define ERASE_PATH   //If not defined, the spheres drawn in the future path
-//won't be erased the next time the function is called.
-#define SHOW_NON_CRASHING_POINT //If defined, draws a green sphere where the
-//n farthest non-crashing point is.
-#define _WINSOCKAPI_
-#include <plib/ssgAux.h>
-#endif
+#include "robots/default_robot.hpp"
 
-#include "default_robot.hpp"
+#ifdef AI_DEBUG
+#  include "irrlicht.h"
+   using namespace irr;
+#endif
 
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
 #include <iostream>
-#include "race_manager.hpp"
-#include "graphics/scene.hpp"
+
+#ifdef AI_DEBUG
+#include "graphics/irr_driver.hpp"
+#endif
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
-#include "robots/track_info.hpp"
+#include "race/race_manager.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-const TrackInfo *DefaultRobot::m_track_info = NULL;
-int DefaultRobot::m_num_of_track_info_instances = 0;
-
 DefaultRobot::DefaultRobot(const std::string& kart_name,
                            int position, const btTransform& init_pos, 
-                           const Track *track ) :
+                           const Track *track) :
     AutoKart( kart_name, position, init_pos )
 {
-    if(m_num_of_track_info_instances==0)
-    {
-        m_track_info = new TrackInfo(track);
-        m_num_of_track_info_instances++;
-    }
-    reset();
     m_kart_length = m_kart_properties->getKartModel()->getLength();
     m_kart_width  = m_kart_properties->getKartModel()->getWidth();
     m_track = RaceManager::getTrack();
+    m_quad_graph  = &m_track->getQuadGraph();
+    m_next_node_index.reserve(m_quad_graph->getNumNodes());
+    m_successor_index.reserve(m_quad_graph->getNumNodes());
+
+    // Initialise the fields with -1
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        m_next_node_index.push_back(-1);
+        m_successor_index.push_back(-1);
+    }
+    // For now pick one part on random, which is not adjusted during the run
+    std::vector<unsigned int> next;
+    int count=0;
+    int current_node=0;
+    while (1)
+    {
+        next.clear();
+        m_quad_graph->getSuccessors(current_node, next);
+        int indx = rand() % next.size();
+        m_successor_index[current_node] = indx;
+        m_next_node_index[current_node] = next[indx];
+        current_node = next[indx];
+        if(current_node==0) break;
+        count++;
+        if(count>(int)m_quad_graph->getNumNodes())
+        {
+            fprintf(stderr, "AI can't find a loop going back to node 0, aborting.\n");
+            exit(-1);
+        }
+    };
+
+    const unsigned int look_ahead=10;
+    // Now compute for each node in the graph the list of the next 'look_ahead'
+    // graph nodes. This is the list of node that is tested in checkCrashes.
+    // If the look_ahead is too big, the AI can skip loops (see 
+    // QuadGraph::findRoadSector for details), if it's too short the AI won't
+    // find too good a driveline. Note that in general this list should
+    // be computed recursively, but since the AI for now is using only 
+    // (randomly picked) path this is fine
+    m_all_look_aheads.reserve(m_quad_graph->getNumNodes());
+    for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
+    {
+        std::vector<int> l;
+        int current = i;
+        for(unsigned int j=0; j<look_ahead; j++)
+        {
+            int next = m_next_node_index[current];
+            if(next==-1) break;
+            l.push_back(m_next_node_index[current]);
+            current = m_next_node_index[current];
+        }   // for j<look_ahead
+        m_all_look_aheads.push_back(l);
+    }
+    // Reset must be called after m_quad_graph etc. is set up        
+    reset();
+
     m_world = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
     assert(m_world != NULL);
     
@@ -107,6 +151,9 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
         break;
     }
 
+#ifdef AI_DEBUG
+    m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
+#endif
 }   // DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -115,12 +162,9 @@ DefaultRobot::DefaultRobot(const std::string& kart_name,
  */
 DefaultRobot::~DefaultRobot()
 {
-    m_num_of_track_info_instances--;
-
-    if(m_num_of_track_info_instances==0)
-    {
-        delete m_track_info;
-    }
+#ifdef AI_DEBUG
+    irr_driver->removeNode(m_debug_sphere);
+#endif
 }   // ~DefaultRobot
 
 //-----------------------------------------------------------------------------
@@ -131,7 +175,23 @@ void DefaultRobot::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls.m_look_back = false;
     m_controls.m_nitro     = false;
-    m_track_sector = m_world->m_kart_info[ getWorldKartId() ].m_track_sector;
+
+    // Update the current node:
+    if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
+    {
+        int old_node = m_track_node;
+        m_quad_graph->findRoadSector(getXYZ(), &m_track_node, 
+                                     &m_all_look_aheads[m_track_node]);
+        // IF the AI is off track (or on a branch of the track it did not
+        // select to be on), keep the old position.
+        if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
+            m_next_node_index[m_track_node]==-1)
+            m_track_node = old_node;
+    }
+    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+    {
+        m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
+    }
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
     {
@@ -150,21 +210,7 @@ void DefaultRobot::update(float dt)
     //Detect if we are going to crash with the track and/or kart
     int steps = 0;
 
-    // This should not happen (anymore :) ), but it keeps the game running
-    // in case that m_future_sector becomes undefined.
-    if(m_future_sector == Track::UNKNOWN_SECTOR )
-    {
-#ifdef DEBUG
-        fprintf(stderr,"DefaultRobot: m_future_sector is undefined.\n");
-        fprintf(stderr,"This shouldn't happen, but can be ignored.\n");
-#endif
-        forceRescue();
-        m_future_sector = 0;
-    }
-    else
-    {
-        steps = calcSteps();
-    }
+    steps = calcSteps();
 
     computeNearestKarts();
     checkCrashes( steps, getXYZ() );
@@ -192,7 +238,7 @@ void DefaultRobot::update(float dt)
                                     / (getSpeed()-m_kart_ahead->getSpeed());
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
-            float steer_angle = steerToPoint(m_kart_ahead->getXYZ().toFloat(), 
+            float steer_angle = steerToPoint(m_kart_ahead->getXYZ(), 
                                              dt);
             setSteering(steer_angle, dt);
             commands_set = true;
@@ -245,19 +291,21 @@ void DefaultRobot::handleBraking()
         return;
     }
         
-    const float MIN_SPEED = m_track->getWidth()[m_track_sector];
-    KartInfo &kart_info  = m_world->m_kart_info[ getWorldKartId() ];
+    const float MIN_SPEED = 5.0f;
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if ( m_crashes.m_road && kart_info.m_on_road && getVelocityLC().getY() > MIN_SPEED)
+    if (m_crashes.m_road && getVelocityLC().getY() > MIN_SPEED && 
+        m_world->isOnRoad(getWorldKartId()) )
     {
-        float kart_ang_diff = m_track->m_angle[m_track_sector] -
-                              RAD_TO_DEGREE(getHPR().getHeading());
+        float kart_ang_diff = 
+            m_quad_graph->getAngleToNext(m_track_node,
+                                         m_successor_index[m_track_node])
+          - getHPR().getHeading();
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
-        const float MIN_TRACK_ANGLE = 20.0f;
+        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD*20.0f;
         const float CURVE_INSIDE_PERC = 0.25f;
 
         //Brake only if the road does not goes somewhat straight.
@@ -267,8 +315,9 @@ void DefaultRobot::handleBraking()
             //if the curve angle is bigger than what the kart can steer, brake
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
-            if(!(m_world->getDistanceToCenterForKart(getWorldKartId()) > m_track->getWidth()[m_track_sector] *
-                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE(getMaxSteerAngle())))
+            if(!(m_world->getDistanceToCenterForKart(getWorldKartId()) 
+                 > m_quad_graph->getNode(m_track_node).getPathWidth() *
+                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE*getMaxSteerAngle()))
             {
                 m_controls.m_brake = false;
                 return;
@@ -276,8 +325,9 @@ void DefaultRobot::handleBraking()
         }
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
-            if(!(m_world->getDistanceToCenterForKart( getWorldKartId() ) < m_track->getWidth()[m_track_sector] *
-                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE(getMaxSteerAngle())))
+            if(!(m_world->getDistanceToCenterForKart( getWorldKartId() ) 
+                < m_quad_graph->getNode(m_track_node).getPathWidth() *
+                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE*getMaxSteerAngle()))
             {
                 m_controls.m_brake = false;
                 return;
@@ -305,21 +355,22 @@ void DefaultRobot::handleBraking()
 //-----------------------------------------------------------------------------
 void DefaultRobot::handleSteering(float dt)
 {
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
-    const size_t NEXT_SECTOR = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE 
-                             ? m_track_sector + 1 : 0;
+    const int next = m_next_node_index[m_track_node];
+    
     float steer_angle = 0.0f;
 
     /*The AI responds based on the information we just gathered, using a
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() )) + 0.5f >
-        m_track->getWidth()[m_track_sector] )
+    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() ))  >
+       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
     {
-        steer_angle = steerToPoint( m_track->m_driveline[NEXT_SECTOR], dt );
+        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter(), 
+                                   dt );
 
 #ifdef AI_DEBUG
+        m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
 #endif
@@ -331,12 +382,12 @@ void DefaultRobot::handleSteering(float dt)
         //-1 = left, 1 = right, 0 = no crash.
         if( m_start_kart_crash_direction == 1 )
         {
-            steer_angle = steerToAngle( NEXT_SECTOR, -M_PI*0.5f );
+            steer_angle = steerToAngle(next, -M_PI*0.5f );
             m_start_kart_crash_direction = 0;
         }
         else if(m_start_kart_crash_direction == -1)
         {
-            steer_angle = steerToAngle( NEXT_SECTOR, M_PI*0.5f);
+            steer_angle = steerToAngle(next, M_PI*0.5f);
             m_start_kart_crash_direction = 0;
         }
         else
@@ -344,12 +395,12 @@ void DefaultRobot::handleSteering(float dt)
             if(m_world->getDistanceToCenterForKart( getWorldKartId() ) >
                m_world->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
-                steer_angle = steerToAngle( NEXT_SECTOR, -M_PI*0.5f );
+                steer_angle = steerToAngle(next, -M_PI*0.5f );
                 m_start_kart_crash_direction = 1;
             }
             else
             {
-                steer_angle = steerToAngle( NEXT_SECTOR, M_PI*0.5f );
+                steer_angle = steerToAngle(next, M_PI*0.5f );
                 m_start_kart_crash_direction = -1;
             }
         }
@@ -368,20 +419,23 @@ void DefaultRobot::handleSteering(float dt)
         {
         case FT_FAREST_POINT:
             {
-                sgVec2 straight_point;
-                findNonCrashingPoint( straight_point );
+                Vec3 straight_point;
+                findNonCrashingPoint(&straight_point);
+#ifdef AI_DEBUG
+                m_debug_sphere->setPosition(straight_point.toIrrVector());
+#endif
                 steer_angle = steerToPoint(straight_point, dt);
             }
             break;
 
         case FT_PARALLEL:
-            steer_angle = steerToAngle( NEXT_SECTOR, 0.0f );
+            steer_angle = steerToAngle(next, 0.0f );
             break;
 
         case FT_AVOID_TRACK_CRASH:
             if( m_crashes.m_road )
             {
-                steer_angle = steerToAngle( m_track_sector, 0.0f );
+                steer_angle = steerToAngle(m_track_node, 0.0f );
             }
             else steer_angle = 0.0f;
 
@@ -574,7 +628,7 @@ void DefaultRobot::handleAcceleration( const float DELTA )
         //Find if any player is ahead of this kart
         bool player_winning = false;
         for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-            if( m_race_position > RaceManager::getPlayerKart(i)->getPosition() )
+            if( getPosition() > RaceManager::getPlayerKart(i)->getPosition() )
             {
                 player_winning = true;
                 break;
@@ -715,7 +769,8 @@ void DefaultRobot::handleNitroAndZipper()
 //-----------------------------------------------------------------------------
 float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
 {
-    float angle = m_track->m_angle[SECTOR];
+    float angle = m_quad_graph->getAngleToNext(SECTOR,
+                                               m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - getHPR().getHeading();
@@ -737,12 +792,12 @@ float DefaultRobot::steerToAngle(const size_t SECTOR, const float ANGLE)
  *  \param point Point to steer towards.
  *  \param dt    Time step.
  */
-float DefaultRobot::steerToPoint(const sgVec2 point, float dt)
+float DefaultRobot::steerToPoint(const Vec3 &point, float dt)
 {
     // No sense steering if we are not driving.
     if(getSpeed()==0) return 0.0f;
-    const float dx        = point[0] - getXYZ().getX();
-    const float dy        = point[1] - getXYZ().getY();
+    const float dx        = point.getX() - getXYZ().getX();
+    const float dy        = point.getY() - getXYZ().getY();
     /** Angle from the kart position to the point in world coordinates. */
     float theta           = -atan2(dx, dy);
 
@@ -789,34 +844,25 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
     //each other, but the first step is twice as big as other steps to avoid
     //having karts too close in any direction. The crash with the track can
     //tell when a kart is going to get out of the track so it steers.
-
-    Vec3 vel_normal;
-    //in this func we use it as a 2d-vector, but later on it is passed
-    //to m_track->findRoadSector, there it is used as a 3d-vector
-    //to find distance to plane, so z must be initialized to zero
-    Vec3 step_coord;
-    float kart_distance;
-
-    step_coord.setZ(0.0);
-
     m_crashes.clear();
 
     const size_t NUM_KARTS = race_manager->getNumKarts();
 
     //Protection against having vel_normal with nan values
     const Vec3 &VEL = getVelocity();
-    vel_normal.setValue(VEL.getX(), VEL.getY(), 0.0);
-    float len=vel_normal.length();
+    Vec3 vel_normal(VEL.getX(), VEL.getY(), 0.0);
+    float speed=vel_normal.length();
     // If the velocity is zero, no sense in checking for crashes in time
-    if(len==0) return;
+    if(speed==0) return;
 
     // Time it takes to drive for m_kart_length units.
-    float dt = m_kart_length / len; 
-    vel_normal/=len;
+    float dt = m_kart_length / speed; 
+    vel_normal/=speed;
 
+    int current_node = m_track_node;
     for(int i = 1; STEPS > i; ++i)
     {
-        step_coord = pos + vel_normal* m_kart_length * float(i);
+        Vec3 step_coord = pos + vel_normal* m_kart_length * float(i);
 
         /* Find if we crash with any kart, as long as we haven't found one
          * yet
@@ -828,70 +874,28 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
                 const Kart* kart = RaceManager::getKart(j);
                 if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
                 const Kart *other_kart = RaceManager::getKart(j);
+                // Ignore karts ahead that are faster than this kart.
+                if(getVelocityLC().getY() < other_kart->getVelocityLC().getY())
+                    continue;
                 Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
-                kart_distance = (step_coord - other_kart_xyz).length_2d();
+                float kart_distance = (step_coord - other_kart_xyz).length_2d();
 
-                if( kart_distance < m_kart_length &&
-                    getVelocityLC().getY() > other_kart->getVelocityLC().getY())
+                if( kart_distance < m_kart_length)
                     m_crashes.m_kart = j;
             }
         }
 
         /*Find if we crash with the drivelines*/
-        m_track->findRoadSector(step_coord, &m_sector);
+        if(current_node!=QuadGraph::UNKNOWN_SECTOR &&
+            m_next_node_index[current_node]!=-1)
+            m_quad_graph->findRoadSector(step_coord, &current_node,
+                        /* sectors to test*/ &m_all_look_aheads[current_node]);
 
-#undef SHOW_FUTURE_PATH
-#ifdef SHOW_FUTURE_PATH
-
-        ssgaSphere *sphere = new ssgaSphere;
-
-#ifdef ERASE_PATH
-        static ssgaSphere *last_sphere = 0;
-
-        if( last_sphere ) scene->remove( last_sphere );
-
-        last_sphere = sphere;
-#endif
-
-        sgVec3 center;
-        center[0] = step_coord[0];
-        center[1] = step_coord[1];
-        center[2] = pos[2];
-        sphere->setCenter( center );
-        sphere->setSize( m_kart_properties->getKartModel()->getLength() );
-        if( m_sector == Track::UNKNOWN_SECTOR )
+        if( current_node == QuadGraph::UNKNOWN_SECTOR)
         {
-            sgVec4 colour;
-            colour[0] = colour[3] = 255;
-            colour[1] = colour[2] = 0;
-            sphere->setColour(colour);
-        }
-        else if( i == 1 )
-        {
-            sgVec4 colour;
-            colour[0] = colour[1] = colour[2] = 0;
-            colour[3] = 255;
-            sphere->setColour( colour );
-        }
-        scene->add( sphere );
-#endif
-
-        m_future_location[0] = step_coord[0]; 
-        m_future_location[1] = step_coord[1];
-
-        if( m_sector == Track::UNKNOWN_SECTOR )
-        {
-            m_future_sector = m_track->findOutOfRoadSector( step_coord,
-                Track::RS_DONT_KNOW, m_future_sector );
             m_crashes.m_road = true;
-            break;
+            return;
         }
-        else
-        {
-            m_future_sector = m_sector;
-        }
-
-
     }
 }   // checkCrashes
 
@@ -901,12 +905,9 @@ void DefaultRobot::checkCrashes( const int STEPS, const Vec3& pos )
  *  the two edges of the track is closest to the next curve after wards,
  *  and return the position of that edge.
  */
-void DefaultRobot::findNonCrashingPoint( sgVec2 result )
-{
-    const unsigned int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
-    
-    unsigned int sector = (unsigned int)m_track_sector + 1 < DRIVELINE_SIZE 
-                        ? m_track_sector + 1 : 0;
+void DefaultRobot::findNonCrashingPoint(Vec3 *result)
+{    
+    unsigned int sector = m_next_node_index[m_track_node];
     int target_sector;
 
     Vec3 direction;
@@ -919,10 +920,10 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
     {
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_sector = sector + 1 < DRIVELINE_SIZE ? sector + 1 : 0;
+        target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_track->m_driveline[target_sector] - getXYZ();
+        direction = m_quad_graph->getQuad(target_sector).getCenter() - getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_length );
@@ -939,41 +940,16 @@ void DefaultRobot::findNonCrashingPoint( sgVec2 result )
         {
             step_coord = getXYZ()+direction*m_kart_length * float(i);
 
-            m_track->spatialToTrack( step_track_coord, step_coord,
-                sector );
-
-            distance = step_track_coord[0] > 0.0f ? step_track_coord[0]
-                       : -step_track_coord[0];
+            m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
+                                                   sector );
+ 
+            distance = fabsf(step_track_coord[0]);
 
             //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_width * 0.5f > m_track->getWidth()[sector] )
+            if ( distance + m_kart_width * 0.5f 
+                 > m_quad_graph->getNode(sector).getPathWidth() )
             {
-                sgCopyVec2( result, m_track->m_driveline[sector] );
-
-#ifdef SHOW_NON_CRASHING_POINT
-                ssgaSphere *sphere = new ssgaSphere;
-
-                static ssgaSphere *last_sphere = 0;
-
-                if(last_sphere) scene->remove( last_sphere );
-
-                last_sphere = sphere;
-
-                sgVec3 center;
-                center[0] = result[0];
-                center[1] = result[1];
-                center[2] = getXYZ().getZ();
-                sphere->setCenter( center );
-                sphere->setSize( 0.5f );
-
-                sgVec4 colour;
-                colour[1] = colour[3] = 255;
-                colour[0] = colour[2] = 0;
-                sphere->setColour( colour );
-
-                scene->add( sphere );
-#endif
-
+                *result = m_quad_graph->getQuad(sector).getCenter();
                 return;
             }
         }
@@ -986,13 +962,8 @@ void DefaultRobot::reset()
 {
     m_time_since_last_shot       = 0.0f;
     m_start_kart_crash_direction = 0;
-    m_sector                     = Track::UNKNOWN_SECTOR;
-    m_inner_curve                = 0;
     m_curve_target_speed         = getMaxSpeedOnTerrain();
     m_curve_angle                = 0.0;
-    m_future_location[0]         = 0.0;
-    m_future_location[1]         = 0.0;
-    m_future_sector              = 0;
     m_time_till_start            = -1.0f;
     m_crash_time                 = 0.0f;
     m_collided                   = false;
@@ -1001,6 +972,14 @@ void DefaultRobot::reset()
     m_distance_ahead             = 0.0f;
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
+    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
+    m_quad_graph->findRoadSector(getXYZ(), &m_track_node);
+    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+    {
+        fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
+                getIdent().c_str());
+        m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
+    }
 
     AutoKart::reset();
 }   // reset
@@ -1029,15 +1008,20 @@ int DefaultRobot::calcSteps()
 
     //Increase the steps depending on the width, if we steering hard,
     //mostly for curves.
+#if 0
+    // FIXME: I don't understand this: if we are steering hard, we check
+    //        for more steps if we hit another kart?? If we steer hard,
+    //        the approximation used (pos + velocity*dt) will be even
+    //        worse, since it doesn't take steering into account.
     if( fabsf(m_controls.m_steer) > 0.95 )
     {
         const int WIDTH_STEPS = 
-            (int)( m_track->getWidth()[m_future_sector] 
+            (int)( m_quad_graph->getNode(m_future_sector).getPathWidth()
                    /( m_kart_length * 2.0 ) );
 
         steps += WIDTH_STEPS;
     }
-
+#endif
     return steps;
 }   // calcSteps
 
@@ -1083,83 +1067,6 @@ void DefaultRobot::setSteering(float angle, float dt)
 }   // setSteering
 
 //-----------------------------------------------------------------------------
-/** Finds the approximate radius of a track's curve. It needs two arguments,
- *  the number of the drivepoint that marks the beginning of the curve, and
- *  the number of the drivepoint that marks the ending of the curve.
- *
- *  Based on that you can construct any circle out of 3 points in it, we use
- *  the two arguments to use the drivelines as the first and last point; the
- *  middle sector is averaged.
- */
-float DefaultRobot::getApproxRadius(const int START, const int END) const
-{
-    const int MIDDLE = (START + END) / 2;
-
-    //If the START and END sectors are very close, their average will be one
-    //of them, and using twice the same point just generates a huge radius
-    //(too big to be of any use) but it also can generate a division by zero,
-    //so here is some special handling for that case.
-    if (MIDDLE == START || MIDDLE == END ) return 99999.0f;
-
-    float X1, Y1, X2, Y2, X3, Y3;
-
-    //The next line is just to avoid compiler warnings.
-    X1 = X2 = X3 = Y1 = Y2 = Y3 = 0.0;
-
-
-    if(m_inner_curve == -1)
-    {
-        X1 = m_track->m_left_driveline[START][0];
-        Y1 = m_track->m_left_driveline[START][1];
-
-        X2 = m_track->m_left_driveline[MIDDLE][0];
-        Y2 = m_track->m_left_driveline[MIDDLE][1];
-
-        X3 = m_track->m_left_driveline[END][0];
-        Y3 = m_track->m_left_driveline[END][1];
-    }
-    else if (m_inner_curve == 0)
-    {
-        X1 = m_track->m_driveline[START][0];
-        Y1 = m_track->m_driveline[START][1];
-
-        X2 = m_track->m_driveline[MIDDLE][0];
-        Y2 = m_track->m_driveline[MIDDLE][1];
-
-        X3 = m_track->m_driveline[END][0];
-        Y3 = m_track->m_driveline[END][1];
-    }
-    else if (m_inner_curve == 1)
-    {
-        X1 = m_track->m_right_driveline[START][0];
-        Y1 = m_track->m_right_driveline[START][1];
-
-        X2 = m_track->m_right_driveline[MIDDLE][0];
-        Y2 = m_track->m_right_driveline[MIDDLE][1];
-
-        X3 = m_track->m_right_driveline[END][0];
-        Y3 = m_track->m_right_driveline[END][1];
-    }
-
-    const float A = X2 - X1;
-    const float B = Y2 - Y1;
-    const float C = X3 - X1;
-    const float D = Y3 - Y1;
-
-    const float E = A * ( X1 + X2) + B * (Y1 + Y2);
-    const float F = C * ( X1 + X3) + D * (Y1 + Y3);
-
-    const float G = 2.0f * ( A*( Y3-Y2 ) - B*( X3 - X2 ) );
-
-    const float pX = ( D*E - B*F) / G;
-    const float pY = ( A*F - C*E) / G;
-
-    const float radius = sqrt( ( X1 - pX) * ( X1 - pX) + (Y1 - pY) * (Y1 - pY) );
-
-    return radius;
-}   // getApproxRadius
-
-//-----------------------------------------------------------------------------
 /**FindCurve() gathers info about the closest sectors ahead: the curve
  * angle, the direction of the next turn, and the optimal speed at which the
  * curve can be travelled at it's widest angle.
@@ -1168,20 +1075,19 @@ float DefaultRobot::getApproxRadius(const int START, const int END) const
  */
 void DefaultRobot::findCurve()
 {
-    const int DRIVELINE_SIZE = (unsigned int)m_track->m_driveline.size();
     float total_dist = 0.0f;
-    int next_hint    = m_track_sector;
     int i;
-
-    for(i = m_track_sector; total_dist < getVelocityLC().getY(); i = next_hint)
+    for(i = m_track_node; total_dist < getVelocityLC().getY(); 
+        i = m_next_node_index[i])
     {
-        next_hint = i + 1 < DRIVELINE_SIZE ? i + 1 : 0;
-        total_dist += sgDistanceVec2(m_track->m_driveline[i], m_track->m_driveline[next_hint]);
+        total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);
     }
 
 
-    m_curve_angle = normalizeAngle(m_track->m_angle[i] - m_track->m_angle[m_track_sector]);
-    m_inner_curve = m_curve_angle > 0.0 ? -1 : 1;
+    m_curve_angle = 
+        normalizeAngle(m_quad_graph->getAngleToNext(i, m_successor_index[i])
+                      -m_quad_graph->getAngleToNext(m_track_node, 
+                                                    m_successor_index[m_track_node]) );
     
     m_curve_target_speed = getMaxSpeedOnTerrain();
 }   // findCurve

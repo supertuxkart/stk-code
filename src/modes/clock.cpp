@@ -17,27 +17,27 @@
 
 #include "modes/clock.hpp"
 
-#include "stk_config.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/stk_config.hpp"
 #include "network/network_manager.hpp"
+#include "states_screens/dialogs/race_over_dialog.hpp"
 
 //-----------------------------------------------------------------------------
 TimedRace::TimedRace()
 {
-    m_mode = CHRONO;
-    m_time = 0.0f;
+    m_mode            = CHRONO;
+    m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
-    m_phase = SETUP_PHASE;
-    m_previous_phase = SETUP_PHASE;  // initialise it just in case
-    
-    // for profiling AI
-    m_phase = user_config->m_profile ? RACE_PHASE : SETUP_PHASE;
+    m_phase           = SETUP_PHASE;
+    m_previous_phase  = SETUP_PHASE;  // initialise it just in case
+    m_phase           = SETUP_PHASE;
     
     // FIXME - is it a really good idea to reload and delete the sound every race??
-    m_prestart_sound = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
-    m_start_sound    = sfx_manager->newSFX(SFXManager::SOUND_START);
-}
+    m_prestart_sound  = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
+    m_start_sound     = sfx_manager->newSFX(SFXManager::SOUND_START);
+}   // TimedRace
+
 //-----------------------------------------------------------------------------
 void TimedRace::reset()
 {
@@ -45,19 +45,22 @@ void TimedRace::reset()
     m_auxiliary_timer = 0.0f;
     m_phase = READY_PHASE; // FIXME - unsure
     m_previous_phase      = SETUP_PHASE;
-}
+}   // reset
+
 //-----------------------------------------------------------------------------
 TimedRace::~TimedRace()
 {
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
-}
+}   // ~TimedRace
+
 //-----------------------------------------------------------------------------
 void TimedRace::setClockMode(const ClockType mode, const float initial_time)
 {
     m_mode = mode;
     m_time = initial_time;
-}
+}   // setClockMode
+
 //-----------------------------------------------------------------------------
 void TimedRace::enterRaceOverState(const bool delay)
 {
@@ -73,7 +76,8 @@ void TimedRace::enterRaceOverState(const bool delay)
     
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
         network_manager->sendRaceResults();
-}
+}   // enterRaceOverState
+
 //-----------------------------------------------------------------------------
 void TimedRace::update(const float dt)
 {
@@ -129,6 +133,9 @@ void TimedRace::update(const float dt)
             if(m_auxiliary_timer < stk_config->m_delay_finish_time) break;
             
             m_phase = FINISH_PHASE;
+            
+            new RaceOverDialog(0.6f, 0.9f);
+            
             break;            
         }
         case FINISH_PHASE:

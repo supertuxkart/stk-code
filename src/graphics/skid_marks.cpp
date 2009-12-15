@@ -19,25 +19,25 @@
 
 #include "graphics/skid_marks.hpp"
 
-#include "scene.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
 #include "physics/btKart.hpp"
 #include "utils/coord.hpp"
 
 float SkidMarks::m_avoid_z_fighting  = 0.0f;
-const float SkidMarks::m_start_alpha = 0.5f;
+const int SkidMarks::m_start_alpha = 128;
 
 /** Initialises empty skid marks. */
 SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 {
-    m_width        = width;
-    m_skid_state   = new ssgSimpleState();
-    m_skid_state->ref();
-    m_skid_state->enable(GL_BLEND);
-    m_skid_state->setMaterial(GL_SPECULAR, 0.0f, 0.0f, 0.0f, 1.0f);
-    m_skid_state->setShininess(0.0f);
-    m_skid_marking = false;
-    m_current      = -1;
+    m_width                   = width;
+    m_material                = new video::SMaterial();
+    m_material->MaterialType  = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+    m_material->AmbientColor  = video::SColor(128, 16, 16, 16);
+    m_material->DiffuseColor  = video::SColor(128, 16, 16, 16);
+    m_material->Shininess     = 0;
+    m_skid_marking            = false;
+    m_current                 = -1;
 }   // SkidMark
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 SkidMarks::~SkidMarks()
 {
     reset();  // remove all skid marks
-    ssgDeRefDelete(m_skid_state);
+    delete m_material;
 }   // ~SkidMarks
 
 //-----------------------------------------------------------------------------
@@ -53,13 +53,17 @@ SkidMarks::~SkidMarks()
  */
 void SkidMarks::reset()
 {
-    for(unsigned int i=0; i<m_left.size(); i++)
+    for(unsigned int i=0; i<m_nodes.size(); i++)
     {
-        stk_scene->remove(m_left[i]);
-        stk_scene->remove(m_right[i]);
+        irr_driver->removeNode(m_nodes[i]);
+        irr_driver->removeMesh(m_meshes[i]);
+        delete m_left[i];
+        delete m_right[i];
     }
     m_left.clear();
     m_right.clear();
+    m_nodes.clear();
+    m_meshes.clear();
     m_skid_marking = false;
     m_current      = -1;
 }   // reset
@@ -71,8 +75,8 @@ void SkidMarks::reset()
  */
 void SkidMarks::update(float dt)
 {
-    float f = dt/stk_config->m_skid_fadeout_time;
-    for(int i=0; i<m_current; i++)
+    float f = dt/stk_config->m_skid_fadeout_time*m_start_alpha;
+    for(unsigned int i=0; i<m_left.size(); i++)
     {
         m_left[i]->fade(f);
         m_right[i]->fade(f);
@@ -101,8 +105,10 @@ void SkidMarks::update(float dt)
             delta.length2()<0.0001)
         {
             m_skid_marking = false;
-            m_left[m_current]->makeDList();
-            m_right[m_current]->makeDList();
+            // The vertices and indices will not change anymore (till these
+            // skid mark quads are deleted)
+            m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
+            m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
             return;
         }
 
@@ -116,12 +122,19 @@ void SkidMarks::update(float dt)
                                 raycast_left.m_contactPointWS + delta);
         m_right[m_current]->add(raycast_right.m_contactPointWS-delta,
                                 raycast_right.m_contactPointWS);
-
+        // Adjust the boundary box of the mesh to include the 
+        // adjusted aabb of its buffers.
+        core::aabbox3df aabb=m_meshes[m_current]->getBoundingBox();
+        aabb.addInternalBox(m_left[m_current]->getAABB());
+        aabb.addInternalBox(m_right[m_current]->getAABB());
+        m_meshes[m_current]->setBoundingBox(aabb);
         return;
     }
+
     // Currently no skid marking
     // -------------------------
-    if((!m_kart.getControls().m_drift) || (fabsf(m_kart.getControls().m_steer) < 0.001f)) return;   // no skidmarking
+    if((!m_kart.getControls().m_drift) || 
+        (fabsf(m_kart.getControls().m_steer) < 0.001f)) return;   // no skidmarking
         
     // not turning enough, don't draw skidmarks if kart is going straight ahead
     // this is even stricter for Ai karts, since they tend to use LOTS of skidding
@@ -151,109 +164,124 @@ void SkidMarks::update(float dt)
 
     SkidMarkQuads *smq_left = new SkidMarkQuads(raycast_left.m_contactPointWS,
                                          raycast_left.m_contactPointWS + delta,
-                                         m_skid_state, m_avoid_z_fighting);
-    stk_scene->add(smq_left);
+                                         m_material, m_avoid_z_fighting);
+    scene::SMesh *new_mesh = new scene::SMesh();
+    new_mesh->addMeshBuffer(smq_left);
 
     m_avoid_z_fighting += 0.001f;
     if(m_avoid_z_fighting>0.01f) m_avoid_z_fighting = 0.0f;
     SkidMarkQuads *smq_right = new SkidMarkQuads(raycast_right.m_contactPointWS
                                                   - delta,
                                                   raycast_right.m_contactPointWS,
-                                                  m_skid_state,
+                                                  m_material,
                                                   m_avoid_z_fighting);
-    stk_scene->add(smq_right);
+    new_mesh->addMeshBuffer(smq_right);
+    scene::ISceneNode *new_node = irr_driver->addMesh(new_mesh);
+
     m_current++;
     if(m_current>=stk_config->m_max_skidmarks)
         m_current = 0;
     if(m_current>=(int)m_left.size())
     {
-        m_left. push_back(smq_left );
-        m_right.push_back(smq_right);
+        m_left. push_back (smq_left );
+        m_right.push_back (smq_right);
+        m_meshes.push_back(new_mesh);
+        m_nodes.push_back (new_node);
     }
     else
     {
-        stk_scene->remove(m_left [m_current]);
-        stk_scene->remove(m_right[m_current]);
-        m_left [m_current] = smq_left;
-        m_right[m_current] = smq_right;
+        irr_driver->removeNode(m_nodes[m_current]);
+        // Not necessary to delete m_nodes: removeNode
+        // deletes the node since its refcount reaches zero.
+        delete m_meshes[m_current];
+        delete m_left  [m_current];
+        delete m_right [m_current];
+
+        m_left  [m_current] = smq_left;
+        m_right [m_current] = smq_right;
+        m_meshes[m_current] = new_mesh;
+        m_nodes [m_current] = new_node;
     }
 
-
     m_skid_marking = true;
-
+    // More triangles are added each frame, so for now leave it
+    // to stream.
+    m_left[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
+    m_right[m_current]->setHardwareMappingHint(scene::EHM_STREAM);
 }   // update
 
 //=============================================================================
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left, const Vec3 &right,
-                                        ssgSimpleState *state, float z_offset)
-        : ssgVtxTable(GL_QUAD_STRIP,
-                      new ssgVertexArray,
-                      new ssgNormalArray,
-                      new ssgTexCoordArray,
-                      new ssgColourArray )
+                                        video::SMaterial *material, 
+                                        float z_offset)
+                         : scene::SMeshBuffer()
 {
     m_z_offset = z_offset;
     m_fade_out = 0.0f;
-    // If only one colours and/or normal is specified, it is used for
-    // all fertices in the table.
-    sgVec4 colour;
-    sgSetVec4(colour, 0.00f, 0.00f, 0.00f, SkidMarks::m_start_alpha);
-    colours->add(colour);
-    sgVec3 normal;
-    sgSetVec3(normal, 0, 0, 1);
-    normals->add(normal);
-    
-    setState(state);
-    m_aabb_min = Vec3(10000);
-    m_aabb_max = Vec3(-10000);
+
+    Material   = *material;
+    m_aabb     = core::aabbox3df(left.toIrrVector());
     add(left, right);
+
 }   // SkidMarkQuads
-
-
-//-----------------------------------------------------------------------------
-/** Fades the current skid marks. 
- *  \param f fade factor.
- */
-void SkidMarks::SkidMarkQuads::fade(float f)
-{
-    m_fade_out += f;
-    // Only actually change the alpha value every 0.1. Otherwise we can't use
-    // display lists, which makes skid marks too slow
-    if(m_fade_out>0.1f)
-    {
-        float *c=colours->get(0);
-        c[3] -= m_fade_out;
-        if(c[3]<0.0f) c[3]=0.0f;
-        makeDList();
-        m_fade_out = 0.0f;
-    }
-}   // fade
-
-//-----------------------------------------------------------------------------
-void SkidMarks::SkidMarkQuads::recalcBSphere()
-{
-    Vec3 diff = m_aabb_max - m_aabb_min;
-    bsphere.setRadius(diff.length()*0.5f);
-    Vec3 center = (m_aabb_min + m_aabb_max)*0.5f;
-    bsphere.setCenter(center.toFloat());
-}   // recalcBSphere
 
 //-----------------------------------------------------------------------------
 void SkidMarks::SkidMarkQuads::add(const Vec3 &left, const Vec3 &right)
 {
     // The skid marks must be raised slightly higher, otherwise it blends
     // too much with the track.
-    sgVec3 l;
-    sgCopyVec3(l, left.toFloat());
-    l[2]+=0.01f+m_z_offset;
-    sgVec3 r;
-    sgCopyVec3(r, right.toFloat());
-    r[2]+=0.01f;
-    vertices->add(l);
-    vertices->add(r);
-    // Adjust the axis-aligned boundary boxes.
-    m_aabb_min.min(left);m_aabb_min.min(right);
-    m_aabb_max.max(left);m_aabb_max.max(right);
+    int n = Vertices.size();
 
-    dirtyBSphere();
+    video::S3DVertex v;
+    v.Color = Material.DiffuseColor;
+    v.Color.setAlpha(m_start_alpha);
+    v.Pos = left.toIrrVector();
+    v.Pos.Y += m_z_offset;
+    v.Normal = core::vector3df(0, 1, 0);
+    Vertices.push_back(v);
+    v.Pos = right.toIrrVector();
+    v.Pos.Y += m_z_offset;
+    Vertices.push_back(v);
+    // Out of the box Irrlicht only supports triangle meshes and not
+    // triangle strips. Since this is a strip it would be more efficient
+    // to use a special triangle strip scene node.
+    if(n>=2)
+    {
+        Indices.push_back(n-2);
+        Indices.push_back(n  );
+        Indices.push_back(n-1);
+        Indices.push_back(n-1);
+        Indices.push_back(n  );
+        Indices.push_back(n+1);
+    }
+    // Adjust the axis-aligned boundary boxes.
+    m_aabb.addInternalPoint(left.toIrrVector() );
+    m_aabb.addInternalPoint(right.toIrrVector());
+    setBoundingBox(m_aabb);
+    
+    setDirty();
 }   // add
+
+// ----------------------------------------------------------------------------
+/** Fades the current skid marks. 
+ *  \param f fade factor.
+ */
+void SkidMarks::SkidMarkQuads::fade(float f)
+{
+    m_fade_out += f;
+    // Changing the alpha value is quite expensive, so it's only done
+    // about 10 times till 0 is reached. 
+    if(m_fade_out*10>SkidMarks::m_start_alpha)
+    {
+        video::SColor &c=Material.DiffuseColor;
+        int a=c.getAlpha();
+        a -= a<m_fade_out ? a : (int)m_fade_out;
+        c.setAlpha(a);
+        for(unsigned int i=0; i<Vertices.size(); i++)
+        {
+            Vertices[i].Color.setAlpha(a);
+        }
+        m_fade_out = 0.0f;
+    }
+}   // fade
+

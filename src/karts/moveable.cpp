@@ -20,10 +20,10 @@
 
 #include "karts/moveable.hpp"
 
-#include "material_manager.hpp"
-#include "material.hpp"
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "utils/coord.hpp"
 
@@ -32,12 +32,10 @@ Moveable::Moveable()
     m_body            = 0;
     m_motion_state    = 0;
     m_first_time      = true;
-#ifdef HAVE_IRRLICHT
-    m_mesh            = 0;
-#else
-    m_model_transform = new ssgTransform();
-    m_model_transform->ref();
-#endif
+    m_mesh            = NULL;
+    m_animated_mesh   = NULL;
+    m_node            = NULL;
+    m_animated_node   = NULL;
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -46,21 +44,48 @@ Moveable::~Moveable()
     // The body is being removed from the world in kart/projectile
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
-    // FIXME LEAK: what about model? ssgDeRefDelete(m_model_transform)
+    if(m_node) irr_driver->removeNode(m_node);
+    if(m_animated_node) irr_driver->removeNode(m_animated_node);
+    if(m_mesh) irr_driver->removeMesh(m_mesh);
+    if(m_animated_mesh) irr_driver->removeMesh(m_animated_mesh);
 }   // ~Moveable
+
+//-----------------------------------------------------------------------------
+/** Sets this model to be non-animated.
+ *  \param n The scene node.
+ */
+void Moveable::setNode(scene::ISceneNode *n)
+{
+    m_node          = n; 
+    m_animated_node = NULL;
+}   // setNode
+
+//-----------------------------------------------------------------------------
+/** Sets this model to be animated.
+ *  \param n The animated scene node.
+ */
+void Moveable::setAnimatedNode(scene::IAnimatedMeshSceneNode *n)
+{
+    m_node          = NULL; 
+    m_animated_node = n;
+}   // setAnimatedNode
 
 //-----------------------------------------------------------------------------
 void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
 {
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
-    sgCoord c=Coord(xyz, hpr).toSgCoord();
-#ifdef HAVE_IRRLICHT
-    m_root->setPosition(xyz.toIrrVector());
-    m_root->setRotation(hpr.toIrrHPR());
-#else
-    m_model_transform->setTransform(&c);
-#endif
+    //sgCoord c=Coord(xyz, hpr).toSgCoord();
+    if(m_node)
+    {
+        m_node->setPosition(xyz.toIrrVector());
+        m_node->setRotation(hpr.toIrrHPR());
+    }
+    else if(m_animated_node)
+    {
+        m_animated_node->setPosition(xyz.toIrrVector());
+        m_animated_node->setRotation(hpr.toIrrHPR());
+    }
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------
@@ -81,8 +106,32 @@ void Moveable::reset()
 void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC = getVelocity()*getTrans().getBasis();
+    m_velocityLC = getVelocity()*m_transform.getBasis();
+    // The following code would synchronise bullet to irrlicht rotations, but
+    // heading etc. might not be 'correct', e.g. a 180 degree heading rotation
+    // would be reported as 180 degree roll and pitch, and 0 degree heading.
+    // So to get heading, pitch etc. the way needed elsewhere (camera etc),
+    // we would still have to rotate unit vectors and compute heading etc.
+    // with atan.
+    //btQuaternion q = m_transform.getRotation();
+    //core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
+    //core::vector3df r;
+    //qirr.toEuler(r);
+    // Note: toIrrHPR mixes the axis back etc., so the assignments below
+    // mean that getIrrHPR returns exactly (r.x,r.y,r.z)*RAD_TO_DEGREE
+    //m_hpr.setX(-r.Y);
+    //m_hpr.setY(-r.X);
+    //m_hpr.setZ(-r.Z);
+
+
     m_hpr.setHPR(m_transform.getBasis());
+    // roll is not set correctly, I assume due to a different HPR order.
+    // So we compute the proper roll (by taking the angle between the up
+    // vector and the rotated up vector).
+    Vec3 up(0,0,1);
+    Vec3 roll_vec = m_transform.getBasis()*up;
+    float roll = atan2(roll_vec.getX(), roll_vec.getZ());
+    m_hpr.setRoll(roll);
 
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;

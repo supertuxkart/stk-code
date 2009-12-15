@@ -22,6 +22,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <map>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "vorbis/codec.h"
+#include <vorbis/vorbisfile.h>
 
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
@@ -32,9 +39,9 @@
 #endif
 
 #include "audio/sfx_openal.hpp"
-#include "user_config.hpp"
-#include "file_manager.hpp"
-#include "race_manager.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
 
 SFXManager* sfx_manager= NULL;
 
@@ -44,12 +51,16 @@ SFXManager::SFXManager()
 {
     // The sound manager initialises OpenAL
     m_initialized = sound_manager->initialized();
+    m_masterGain = 1.0f;
     m_sfx_buffers.resize(NUM_SOUNDS);
     m_sfx_positional.resize(NUM_SOUNDS);
     m_sfx_rolloff.resize(NUM_SOUNDS);
     m_sfx_gain.resize(NUM_SOUNDS);
     if(!m_initialized) return;
+    
     loadSfx();
+    setMasterSFXVolume( UserConfigParams::m_sfx_volume );
+    
 }  // SoundManager
 
 //-----------------------------------------------------------------------------
@@ -61,18 +72,21 @@ SFXManager::~SFXManager()
     {
         delete (*i);
     }   // for i in m_all_sfx
+    m_all_sfx.clear();
 
     //the unbuffer all of the buffers
     for(unsigned int ii = 0; ii != m_sfx_buffers.size(); ii++)
     {
         alDeleteBuffers(1, &(m_sfx_buffers[ii]));
     } 
+    
+    sfx_manager = NULL;
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
 bool SFXManager::sfxAllowed()
 {
-    if(!user_config->doSFX() || !m_initialized) 
+    if(!UserConfigParams::m_sfx || !m_initialized) 
         return false;
     else
         return true;
@@ -82,6 +96,7 @@ bool SFXManager::sfxAllowed()
  */
 void SFXManager::loadSfx()
 {
+    // TODO : implement as XML
     const lisp::Lisp* root = 0;
     std::string sfx_config_name = file_manager->getSFXFile("sfx.config");
     try
@@ -106,6 +121,7 @@ void SFXManager::loadSfx()
     }
     loadSingleSfx(lisp, "ugh",           SOUND_UGH            );
     loadSingleSfx(lisp, "skid",          SOUND_SKID           );
+    loadSingleSfx(lisp, "locked",        SOUND_LOCKED         );
 	loadSingleSfx(lisp, "bowling_roll",  SOUND_BOWLING_ROLL   );
 	loadSingleSfx(lisp, "bowling_strike",SOUND_BOWLING_STRIKE );
     loadSingleSfx(lisp, "winner",        SOUND_WINNER         );
@@ -129,9 +145,155 @@ void SFXManager::loadSfx()
     loadSingleSfx(lisp, "engine_large",  SOUND_ENGINE_LARGE   );
 }   // loadSfx
 //----------------------------------------------------------------------------
-void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
-                               const char *name, SFXType item)
+/** Load a vorbis file into an OpenAL buffer
+    based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
+ */
+bool loadVorbisBuffer(const char *name, ALuint buffer)
 {
+    const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
+
+    
+    bool success = false;
+    FILE *file;
+    vorbis_info *info;
+    OggVorbis_File oggFile;
+    
+    if (alIsBuffer(buffer) == AL_FALSE)
+    {
+        printf("Error, bad OpenAL buffer");
+        return false;
+    }
+    
+    file = fopen(name, "rb");
+    
+    if (file)
+    {
+        if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) == 0)
+        {
+            info = ov_info(&oggFile, -1);
+            
+            long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
+            
+            char *data = (char *) malloc(len);
+            
+            if (data)
+            {
+                int bs = -1;
+                long todo = len;
+                char *bufpt = data;
+                
+                while (todo)
+                {
+                    int read = ov_read(&oggFile, bufpt, todo, ogg_endianness, 2, 1, &bs);
+                    todo -= read;
+                    bufpt += read;
+                }
+                
+                alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, data, len, info->rate);
+                success = true;
+                
+                free(data);
+            }
+            else
+                printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
+            
+            ov_clear(&oggFile);
+        }
+        else
+        {
+            fclose(file);
+            printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
+        }
+    }
+    else
+        printf("LoadVorbisBuffer() - couldn't open file!");
+    
+    
+    return success;
+}
+/*
+
+getCustomTagName(int id)
+
+
+    Uses CustomSFX as input (see sfx_manager.hpp) and returns associated config
+    string tag.  Used when loading custom sfx in KartProperties::getAllData().
+
+    TODO: Fix this to take advantage of some string array initialization trick
+          I'm just too stupid with C++ to figure it out.  The switch code is
+          less then ideal.
+*/
+
+const char *SFXManager::getCustomTagName(int id)
+{
+    switch (id)
+    {
+        case CUSTOM_HORN:    return "horn-sound";       // Replaces horn
+        case CUSTOM_CRASH:   return "crash-sound";      // Played when colliding with another kart
+        case CUSTOM_WIN:     return "win-sound";        // Played when racer wins (not yet implemented)
+        case CUSTOM_EXPLODE: return "explode-sound";    // Played when kart explodes
+        case CUSTOM_GOO:     return "goo-sound";        // Played when driving through goo
+        case CUSTOM_PASS:    return "pass-sound";       // Played when passing another kart (not yet implemented)
+        case CUSTOM_ZIPPER:  return "zipper-sound";     // Played when kart hits zipper
+        case CUSTOM_NAME:    return "name-sound";       // Introduction "I'm Tux!" (not yet implemented)
+        case CUSTOM_ATTACH:  return "attach-sound";     // Played when something is attached to kart
+        case CUSTOM_SHOOT:   return "shoot-sound";      // Played when weapon is used
+    };
+    return "";
+} // getCustomTagName
+
+/*
+
+addSingleSfx()
+
+    Introduces a mechanism by which one can load sound effects beyond the basic
+    enumerated types.  This will be used when loading custom sound effects for
+    individual karts (character voices) so that we can avoid creating an
+    enumeration for each effect, for each kart.
+
+    sfxFile must be an absolute pathname, so get that straight first.
+
+*/
+int SFXManager::addSingleSfx(std::string    sfxFile,
+                             int            positional,
+                             float          rolloff,
+                             float          gain)
+/* Returns sfx ID or -1 on error*/
+{
+    int         sfxID;
+
+    m_sfx_buffers.push_back(0);
+    sfxID = m_sfx_buffers.size() - 1;
+
+    /* FIXME: Check for existance of file before resizing vectors */
+
+    m_sfx_rolloff.push_back(rolloff);
+    m_sfx_positional.push_back(positional);
+    m_sfx_gain.push_back(gain);
+
+    alGenBuffers(1, &(m_sfx_buffers[sfxID]));
+    if (!checkError("generating a buffer")) return -1;
+
+    if (!loadVorbisBuffer(sfxFile.c_str(), m_sfx_buffers[sfxID]))
+    {
+        printf("Failed to load sound effect %s\n", sfxFile.c_str());
+    }
+
+    // debugging
+    /*printf("addSingleSfx() id:%d sfxFile:%s\n", sfxID, sfxFile.c_str());*/
+
+    return sfxID;
+} // addSingleSFX
+
+void SFXManager::loadSingleSfx(const lisp::Lisp* lisp, 
+                               const char *name, int item)
+{
+    if (item < 0 || item >= (int)m_sfx_gain.size())
+    {
+        printf("loadSingleSfx: Invalid SFX ID.\n");
+        return;
+    }
+
     const lisp::Lisp* sfxLisp = lisp->getLisp(name);
     std::string wav; float rolloff = 0.1f; float gain = 1.0f; int positional = 0;
 
@@ -145,53 +307,15 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
     m_sfx_gain[item] = gain;
 
     std::string path = file_manager->getSFXFile(wav);
+    printf("Loading SFX %s\n", path.c_str());
 
     alGenBuffers(1, &(m_sfx_buffers[item]));
     if (!checkError("generating a buffer")) return;
 
-    ALenum format = 0;
-    Uint32 size = 0;
-    Uint8* data = NULL;
-    SDL_AudioSpec spec;
-
-    if( SDL_LoadWAV( path.c_str(), &spec, &data, &size ) == NULL)
+    if(!loadVorbisBuffer(path.c_str(), m_sfx_buffers[item]))
     {
-        fprintf(stdout, "SDL_LoadWAV() failed to load %s\n", path.c_str());
-        return;
+        printf("Could not load sound effect %s\n", name);
     }
-
-    switch( spec.format )
-    {
-        case AUDIO_U8:
-        case AUDIO_S8:
-            format = ( spec.channels == 2 ) ? AL_FORMAT_STEREO8
-                                            : AL_FORMAT_MONO8;
-            break;
-        case AUDIO_U16LSB:
-        case AUDIO_S16LSB:
-        case AUDIO_U16MSB:
-        case AUDIO_S16MSB:
-            format = ( spec.channels == 2 ) ? AL_FORMAT_STEREO16
-                                            : AL_FORMAT_MONO16;
-            
-#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER==SDL_BIG_ENDIAN
-            // swap bytes around for big-endian systems
-            for(unsigned int n=0; n<size-1; n+=2)
-            {
-                Uint8 temp = data[n+1];
-                data[n+1] = data[n];
-                data[n] = temp;
-            }
-#endif
-            
-            break;
-    }   // switch( spec.format )
-
-    alBufferData(m_sfx_buffers[item], format, data, size, spec.freq);
-    if (!checkError("buffering data")) return;
-
-    SDL_FreeWAV(data);
-
 }   // loadSingleSfx
 
 //----------------------------------------------------------------------------
@@ -201,13 +325,23 @@ void SFXManager::loadSingleSfx(const lisp::Lisp* lisp,
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase *SFXManager::newSFX(SFXType id)
+SFXBase *SFXManager::newSFX(int id)
 {
     bool positional = false;
+
+    if (id < 0 || id >= (int)m_sfx_gain.size())
+    {
+        printf("newSFX: Invalid SFX ID %d.\n", id);
+        return NULL;
+    }
+
     if(race_manager->getNumLocalPlayers() < 2)
         positional = m_sfx_positional[id]!=0;
 
-    SFXBase *p=new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
+    SFXBase *p = new SFXOpenAL(m_sfx_buffers[id], positional, m_sfx_rolloff[id], m_sfx_gain[id]);
+    // debugging
+    /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
+    p->volume(m_masterGain);
     m_all_sfx.push_back(p);
     return p;
 }   // newSFX
@@ -222,12 +356,14 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 {
     std::vector<SFXBase*>::iterator i;
     i=std::find(m_all_sfx.begin(), m_all_sfx.end(), sfx);
-    delete sfx;
+
     if(i==m_all_sfx.end())
     {
         fprintf(stderr, "SFXManager::deleteSFX : Warning: sfx not found in list.\n");
         return;
     }
+    
+    delete sfx;
 
     m_all_sfx.erase(i);
 
@@ -261,7 +397,7 @@ void SFXManager::resumeAll()
     }   // for i in m_all_sfx
 }   // resumeAll
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool SFXManager::checkError(const std::string &context)
 {
     // Check (and clear) the error flag
@@ -275,6 +411,24 @@ bool SFXManager::checkError(const std::string &context)
     }
     return true;
 }   // checkError
+
+//-----------------------------------------------------------------------------
+void SFXManager::setMasterSFXVolume(float gain)
+{
+    if(gain > 1.0)
+        gain = 1.0f;
+    if(gain < 0.0f)
+        gain = 0.0f;
+
+    m_masterGain = gain;
+
+    for(std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
+        i!=m_all_sfx.end(); i++)
+    {
+        (*i)->volume(m_masterGain);
+    }   // for i in m_all_sfx
+
+}   // setMasterSFXVolume
 
 //-----------------------------------------------------------------------------
 const std::string SFXManager::getErrorString(int err)
@@ -292,3 +446,26 @@ const std::string SFXManager::getErrorString(int err)
 }   // getErrorString
 
 //-----------------------------------------------------------------------------
+void SFXManager::quickSound(SFXType soundType)
+{
+    static std::map<SFXType, SFXBase*> allSounds;
+    
+    std::map<SFXType, SFXBase*>::iterator sound = allSounds.find(soundType);
+    
+    if (sound == allSounds.end())
+    {
+        // sound not yet in our list
+        SFXBase* newSound = sfx_manager->newSFX(soundType);
+        newSound->play();
+        allSounds[soundType] = newSound;
+    }
+    else
+    {
+        (*sound).second->play();
+    }
+    
+    //     m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
+    // m_locked_sound->play();
+}
+
+

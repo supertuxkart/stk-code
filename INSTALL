@@ -7,8 +7,7 @@ General
 First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
-  * PLIB version 1.8.4 or later
-  * SDL 1.2 or later
+  * Irrlicht 1.6
   * OpenAL
 
 Unpack the files from the tarball like this:
@@ -36,27 +35,42 @@ location, use the "--prefix" option of configure, e.g. --prefix=/usr
 See the --help output of configure for further options.
 
 
-SVN STK on Ubuntu Edgy
-----------------------
-Here are the compilation instructions for the current svn(05 oct. 2006) of
-Super Tux Kart on Ubuntu Edgy, contributed by Damien:
+SVN STK on Ubuntu
+-----------------
+Here are the compilation instructions for the current svn(2009-10-15) of
+Super Tux Kart originally contributed by Damien for Ubuntu Edgy, and updated
+to 9.04 version:
 
 install following packages:
-# apt-get install libopenal-dev libmikmod2-dev plib1.8.4-dev
+# apt-get install libtool libxxf86vm-dev libopenal-dev
 libglu1-mesa-dev subversion autoconf automake1.9 g++ gcc
 
 do a:
-$ svn checkout http://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/trunk/supertuxkart
+$ svn checkout https://supertuxkart.svn.sourceforge.net/svnroot/supertuxkart/main/branches/irrlicht
 
-then:
+Get irrlicht-1.6.zip and unzip it, compile irrlicht:
+$ cd irrlicht-1.6/source/Irrlicht/
+$ make
+$ cd ../../..
+$ pwd
+/some/path/
+
+then we can move to stk, remember to replace the output of pwd below:
 $ cd trunk
-$ ./autogen.sh && ./configure && make
-and if all went well:
+$ ./autogen.sh && ./configure --enable-irrlicht --with-irrlicht=/some/path/irrlicht-1.6/ && make
+and if all went well run the game:
 $ src/supertuxkart
 
 tested with g++ 3.3 and 4.1 , both succeeded.
 
 If you want to install the game system-wide, do 'make install'.
+
+To update the source from inside trunk directory, one simple command:
+$ svn up
+and then, in most cases, just rebuild:
+$ make
+with the exception of changes to any Makefile.am, in which case:
+$ ./autogen.sh && ./configure --enable-irrlicht --with-irrlicht=/some/path/irrlicht-1.6/ && make
 
 
 But it didn't work!
@@ -71,15 +85,12 @@ http://supertuxkart.sourceforge.net/
 
 
 Also, the most common (by FAR) reason for problems is that your OpenGL/Mesa
-is incorrectly installed - so before you complain to any of the PLIB or
+is incorrectly installed - so before you complain to any of the Irrlicht or
 Supertuxkart mailing lists, first try running one of the example programs
 that comes with your OpenGL implementation - or one of the Mesa or GLUT
 sample programs.
 
-If you those examples run OK - then go to the PLIB home page and download
-the PLIB examples.
-
-If THOSE run correctly - but Supertuxkart doesn't then please get in touch 
-with the SupertuxKart mailing list and we'll do our best to get you up and 
+If THOSE run correctly - but Supertuxkart doesn't then please get in touch
+with the SupertuxKart mailing list and we'll do our best to get you up and
 racing.
 

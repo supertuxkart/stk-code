@@ -17,15 +17,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef HAVE_IRRLICHT
-
 #ifndef HEADER_IRR_DRIVER_HPP
 #define HEADER_IRR_DRIVER_HPP
 
 #include <string>
+#include <vector>
+
+#include "utils/ptr_vector.hpp"
+#include "utils/vec3.hpp"
 
 #include "irrlicht.h"
 using namespace irr;
+
+class Camera;
+class Kart;
+
+struct VideoMode
+{
+    int width, height;
+};
 
 class IrrDriver : public IEventReceiver
 {
@@ -36,13 +46,33 @@ private:
     scene::ISceneManager       *m_scene_manager;
     /** Irrlicht gui environment. */
     gui::IGUIEnvironment       *m_gui_env;
+    /** Irrlicht video driver. */
+    video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
+    
+    void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
+    std::vector<VideoMode> m_modes;
 
+    void                  renderBulletDebugView();
+    void                  displayFPS();
+    void                  setupViewports();
+    video::E_DRIVER_TYPE  getEngineDriverType(int index);
 public:
                           IrrDriver();
                          ~IrrDriver();
+    void                 initDevice();
+    
+    /** Returns a list of all video modes supports by the graphics card. */
+    const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
+    /** Returns the frame size. */
+    const core::dimension2d<u32> getFrameSize() const 
+                       { return m_video_driver->getCurrentRenderTargetSize(); }
+    /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
+    /** Returns the irrlicht video driver. */
+    video::IVideoDriver  *getVideoDriver()  const { return m_video_driver;  }
+    /** Returns the irrlicht scene manager. */
     scene::ISceneManager *getSceneManager() const { return m_scene_manager; }
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
@@ -50,20 +80,93 @@ public:
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     bool                  OnEvent(const irr::SEvent &event);
+    void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
+    scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 
+                                         bool create_one_quad=false);
+    scene::IMesh 		 *createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h);
+    scene::ISceneNode    *addWaterNode(scene::IMesh *mesh, float wave_height,
+                                       float wave_speed, float wave_length);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
+    scene::IParticleSystemSceneNode
+                         *addParticleNode(bool default_emitter=true);
+    scene::ISceneNode    *addSkyDome(const std::string &texture, int hori_res,
+                                     int vert_res, float texture_percent, 
+                                     float sphere_percent);
+    scene::ISceneNode    *addSkyBox(const std::vector<std::string> &texture_names);
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMesh(scene::IMesh *mesh);
-    scene::ISceneNode    *addAnimatedMesh(scene::IAnimatedMesh *mesh);
+    void                  removeTexture(video::ITexture *t);
+    scene::IAnimatedMeshSceneNode
+                         *addAnimatedMesh(scene::IAnimatedMesh *mesh);
     scene::ICameraSceneNode 
-                         *addCamera();
+                         *addCameraSceneNode();
+    Camera               *addCamera(unsigned int index, Kart *kart);
+    void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
+    void                  removeCamera(Camera *camera);
     void                  update(float dt);
+    
+    void                  changeResolution();
+    void showPointer();
+    void hidePointer();
+    /** Returns the current real time, which might not be 0 at start of the
+     *  application. Value in msec.
+     */
+    unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
+    
+
+    void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
+                        const core::vector2df &c, 
+                        const video::ITexture *texture = NULL,
+                        const video::SColor *ca=NULL,  const video::SColor *cb=NULL,
+                        const video::SColor *cc=NULL);
+    
+    // --------------------- RTT --------------------
+    /**
+      * Class that provides RTT (currently, only when no other 3D rendering in the main scene is required)
+      * Provides an optional 'setupRTTScene' method to make it quick and easy to prepare rendering of 3D objects
+      * but you can also manually set the scene/camera. If you use the factory 'setupRTTScene', cleanup can be
+      * done through 'tearDownRTTScene' (destructor will also do this). If you set it up manually, you need
+      * to clean it up manually.
+      */
+    class RTTProvider
+    {
+        /** A pointer to texture on which a scene is rendered. Only used
+         *  in between beginRenderToTexture() and endRenderToTexture calls. */
+        video::ITexture            *m_render_target_texture;
+        
+        /** Main node of the RTT scene */
+        scene::ISceneNode          *m_rtt_main_node;
+        
+        scene::ICameraSceneNode    *m_camera;
+        
+        scene::ILightSceneNode     *m_light;
+        
+        /** Irrlicht video driver. */
+        video::IVideoDriver        *m_video_driver;
+        
+    public:
+        RTTProvider(const core::dimension2du &dimension, 
+                    const std::string &name);
+        
+        ~RTTProvider();
+        
+        void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
+                           std::vector<Vec3>& mesh_location);
+        
+        /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
+        video::ITexture* renderToTexture(float angle=-1,
+                                         bool is_2d_render=false);
+        
+        void tearDownRTTScene();
+        
+    };
+    
+
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;
 
 #endif   // HEADER_IRR_DRIVER_HPP
-
-#endif   // HAVE_IRRLICHT
 

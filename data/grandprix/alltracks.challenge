@@ -1,18 +1,16 @@
-;; -*- mode: lisp -*-
+<?xml version="1.0"?>
 
-(challenge
- (id            "worldsend")
- (name          _("Win the At World's End\nGrand Prix"))
- (description   _("Come first in the At World's End\nGrand Prix with 3 'Racer'\nLevel AI karts."))
- (unlock-gp    "alltracks")
- (depend-on    "islandfollow")
- (major        "grandprix")
- (minor        "quickrace")
- (gp           "atworldsend")
- (difficulty   "hard")
- (karts        4)
- (position     1)
-)
-
-;; EOF ;;
+<challenge
+    id="worldsend"
+    name=_("Win the At World's End\nGrand Prix")
+    description=_("Come first in the At World's End\nGrand Prix with 3 'Racer'\nLevel AI karts.")
+    unlock-gp="alltracks"
+    depend-on="islandfollow"
+    major="grandprix"
+    minor="quickrace"
+    gp="atworldsend"
+    difficulty="hard"
+    karts="4"
+    position="1"
+/>
 

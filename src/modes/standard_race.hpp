@@ -27,19 +27,20 @@
 class StandardRace : public LinearWorld
 {
 public:
-    StandardRace();
+             StandardRace();
     virtual ~StandardRace();
     
     // clock events
     virtual void onGo();
+    virtual bool isRaceOver();
     virtual void terminateRace();
     
     // overriding World methods
     virtual void update(float delta);
     virtual void restartRace();
     virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    virtual bool enableBonusBoxes();
-    virtual std::string getInternalCode() const;
+    virtual bool haveBonusBoxes();
+    virtual std::string getIdent() const;
 };
 
 #endif

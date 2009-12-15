@@ -23,34 +23,42 @@
 /** This class is used together with the pluger to display a rubber band from
  *  the shooting kart to the plunger.
  */
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 
 #include "utils/vec3.hpp"
 class Kart;
 class Plunger;
 
-class RubberBand : public ssgVtxTable
+class RubberBand
 {
 private:
     enum {RB_TO_PLUNGER,         /**< Rubber band is attached to plunger.    */
           RB_TO_KART,            /**< Rubber band is attached to a kart hit. */
           RB_TO_TRACK}           /**< Rubber band is attached to track.      */
-                    m_attached_state;
+                        m_attached_state;
     /** True if plunger was fired backwards. */
-    bool            m_is_backward; 
+    bool                m_is_backward; 
     /** If rubber band is attached to track, the coordinates. */
-    Vec3            m_hit_position;
+    Vec3                m_hit_position;
     /** The plunger the rubber band is attached to. */
-    Plunger        *m_plunger;
+    Plunger            *m_plunger;
     /** The kart who shot this plunger. */
-    const Kart     &m_owner;
+    const Kart         &m_owner;
+
+    /** The scene node for the rubber band. */
+    scene::ISceneNode  *m_node;
+    /** The mesh of the rubber band. */
+    scene::IMesh       *m_mesh;
+    /** The mesh buffer containing the actual vertices of the rubber band. */
+    scene::IMeshBuffer *m_buffer;
+
     /** The kart a plunger might have hit. */
-    Kart           *m_hit_kart;
-    /** State for rubber band. */
-    ssgSimpleState *m_state;
+    Kart               *m_hit_kart;
+    /** Stores the end of the rubber band (i.e. the side attached to the 
+     *  plunger. */
+    Vec3                m_end_position;
 
     void checkForHit(const Vec3 &k, const Vec3 &p);
+    void updatePosition();
 
 public:
          RubberBand(Plunger *plunger, const Kart &kart);

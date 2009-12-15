@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Physics improvements and linear intersection algorithm by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -19,73 +22,72 @@
 
 #include "items/plunger.hpp"
 
-#include "race_manager.hpp"
-#include "graphics/scene.hpp"
+#include "graphics/irr_driver.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
-#include "physics/moving_physics.hpp"
+#include "physics/physical_object.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 {
+    const float gravity = 0.0f;
+
     float y_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getY();
-    
+    float up_velocity = 0.0f;
+    float plunger_speed = 2 * m_speed;
+
     // if the kart is looking backwards, release from the back
     m_reverse_mode = kart->getControls().m_look_back;
-    
+
     // find closest kart in front of the current one
     const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
     getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */, m_reverse_mode);
-    
+
     btTransform trans = kart->getTrans();
-    
+
     btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
     btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
                                 thisKartDirMatrix[1][1],
                                 thisKartDirMatrix[2][1]);
-    
-    float heading=atan2(-thisKartDirVector.getX(), thisKartDirVector.getY());
+
+    float heading=atan2f(-thisKartDirVector.getX(), thisKartDirVector.getY());
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
     if(closest_kart != NULL && kartDistSquared < 30*30)
     {
-        btVector3 closestKartLoc = closest_kart->getTrans().getOrigin();
-        
-        if(!m_reverse_mode) // substracting speeds doesn't work backwards, since both speeds go in opposite directions
-        {
-            // FIXME - this approximation will be wrong if both karts' directions are not colinear
-            const float time = sqrt(kartDistSquared) / (m_speed - closest_kart->getSpeed());
-            
-            // calculate the approximate location of the aimed kart in 'time' seconds
-            closestKartLoc += time*closest_kart->getVelocity();
-        }
-        
-        // calculate the angle at which the projectile should be thrown
-        // to hit the aimed kart
-        float projectileAngle=atan2(-(closestKartLoc.getX() - kart->getTrans().getOrigin().getX()),
-                                    closestKartLoc.getY() - kart->getTrans().getOrigin().getY() );
-        
-        // apply transformation to the bullet object
+        float fire_angle     = 0.0f;
+        float time_estimated = 0.0f;
+        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
+                                       plunger_speed, gravity, y_offset,
+                                       &fire_angle, &up_velocity, &time_estimated);
+
+        // apply transformation to the bullet object (without pitch)
         btMatrix3x3 m;
-        m.setEulerZYX(pitch, 0.0f, projectileAngle);
+        m.setEulerZYX(0.0f, 0.0f, fire_angle);
         trans.setBasis(m);
-        
-        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, false, &trans );
+
+        m_initial_velocity = btVector3(0.0f, plunger_speed, up_velocity);
+
+        createPhysics(y_offset, m_initial_velocity,
+                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, false, &trans );
     }
     else
     {
         trans = kart->getKartHeading();
 
-        createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
-                      new btCylinderShape(0.5f*m_extend), 0.0f /* gravity */, false /* rotates */, m_reverse_mode, &trans );
+        createPhysics(y_offset, btVector3(pitch, plunger_speed, 0.0f),
+                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
     }
-    
+
+    //adjust height according to terrain
+    setAdjustZVelocity(true);
+
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
@@ -93,7 +95,6 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     else
     {
         m_rubber_band = new RubberBand(this, *kart);
-        m_rubber_band->ref();
     }
     m_keep_alive = -1;
 }   // Plunger
@@ -101,16 +102,12 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
 // -----------------------------------------------------------------------------
 Plunger::~Plunger()
 {
-    m_rubber_band->removeFromScene();
-    ssgDeRefDelete(m_rubber_band);
+    if(m_rubber_band)
+        m_rubber_band->removeFromScene();
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------
-#ifdef HAVE_IRRLICHT
 void Plunger::init(const lisp::Lisp* lisp, scene::IMesh *plunger_model)
-#else
-void Plunger::init(const lisp::Lisp* lisp, ssgEntity *plunger_model)
-#endif
 {
     Flyable::init(lisp, plunger_model, POWERUP_PLUNGER);
 }   // init
@@ -126,12 +123,6 @@ void Plunger::update(float dt)
         {
             setHasHit();
             projectile_manager->notifyRemove();
-#ifdef HAVE_IRRLICHT
-#else
-            ssgTransform *m = getModelTransform();
-            m->removeAllKids();
-            stk_scene->remove(m);
-#endif
         }
         if(m_rubber_band != NULL) m_rubber_band->update(dt);
         return;
@@ -140,19 +131,8 @@ void Plunger::update(float dt)
     // Else: update the flyable and rubber band
     Flyable::update(dt);
     if(m_rubber_band != NULL) m_rubber_band->update(dt);
-    
+
     if(getHoT()==Track::NOHIT) return;
-    float hat = getTrans().getOrigin().getZ()-getHoT();
-    
-    // Use the Height Above Terrain to set the Z velocity.
-    // HAT is clamped by min/max height. This might be somewhat
-    // unphysical, but feels right in the game.
-    hat = std::max(std::min(hat, m_max_height) , m_min_height);
-    float delta = m_average_height - hat;
-    btVector3 v=getVelocity();
-    v.setZ( m_st_force_updown[POWERUP_PLUNGER]*delta);
-    setVelocity(v);
-    
 }   // update
 
 // -----------------------------------------------------------------------------
@@ -161,9 +141,9 @@ void Plunger::update(float dt)
  *  Instead it stays around (though not as a graphical or physical object)
  *  till the rubber band expires.
  *  \param kart Pointer to the kart hit (NULL if not a kart).
- *  \param mp  Pointer to MovingPhysics object if hit (NULL otherwise).
+ *  \param obj  Pointer to PhysicalObject object if hit (NULL otherwise).
  */
-void Plunger::hit(Kart *kart, MovingPhysics *mp)
+void Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return;
 
@@ -178,10 +158,7 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
         Vec3 hell(0, 0, -10000);
-#ifdef HAVE_IRRLICHT
-#else
-        getModelTransform()->setTransform(hell.toFloat());
-#endif
+        getNode()->setPosition(hell.toIrrVector());
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
@@ -191,21 +168,22 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
-        Vec3 hell(0, 0, -10000);
-#ifdef HAVE_IRRLICHT
-#else
-        getModelTransform()->setTransform(hell.toFloat());
-#endif
+        scene::ISceneNode *node = getNode();
+        if(node)
+        {
+            Vec3 hell(0, 0, -10000);
+            getNode()->setPosition(hell.toIrrVector());
+        }
         RaceManager::getWorld()->getPhysics()->removeBody(getBody());
-        
+
         if(kart)
         {
             m_rubber_band->hit(kart);
             return;
         }
-        else if(mp)
+        else if(obj)
         {
-            Vec3 pos(mp->getBody()->getWorldTransform().getOrigin());
+            Vec3 pos(obj->getBody()->getWorldTransform().getOrigin());
             m_rubber_band->hit(NULL, &pos);
         }
         else
@@ -217,7 +195,7 @@ void Plunger::hit(Kart *kart, MovingPhysics *mp)
 
 // -----------------------------------------------------------------------------
 /** Called when the plunger hits the track. In this case, notify the rubber
- *  band, and remove the plunger (but keep it alive). 
+ *  band, and remove the plunger (but keep it alive).
  */
 void Plunger::hitTrack()
 {

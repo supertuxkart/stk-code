@@ -19,7 +19,7 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
-#include "replay_base.hpp"
+#include "replay/replay_base.hpp"
 
 
 const std::string ReplayBase::REPLAY_FOLDER = "replay";

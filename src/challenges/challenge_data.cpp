@@ -21,14 +21,15 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "grand_prix_data.hpp"
-#include "grand_prix_manager.hpp"
 #include "karts/kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/translation.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
 {
@@ -44,20 +45,18 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_gp_id       = "";
     m_energy      = -1;
 
-    lisp::Parser parser;
-    const lisp::Lisp* const ROOT = parser.parse(filename);
-
-    const lisp::Lisp* const lisp = ROOT->getLisp("challenge");
-    if(!lisp)
+    XMLNode *root = new XMLNode( filename );
+//    if(!root || root->getName()!="challenges")
+    if(!root || root->getName()!="challenge")
     {
-        delete ROOT;
+        delete root;
         std::ostringstream msg;
         msg << "Couldn't load challenge '" << filename << "': no challenge node.";
         throw std::runtime_error(msg.str());
     }
 
     std::string mode;
-    lisp->get("major", mode);
+    root->get("major", &mode);
 
     if(mode=="grandprix")
         m_major = RaceManager::MAJOR_MODE_GRAND_PRIX;
@@ -66,7 +65,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     else
         error("major");
 
-    lisp->get("minor", mode);
+    root->get("minor", &mode);
     if(mode=="timetrial")
         m_minor = RaceManager::MINOR_MODE_TIME_TRIAL;
     else if(mode=="quickrace")
@@ -75,21 +74,26 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_minor = RaceManager::MINOR_MODE_FOLLOW_LEADER;
     else
         error("minor");
+
     std::string s;
-    if(!lisp->get("name", s)             ) error("name");
-    setName(s);
-    if(!lisp->get("id", s)               ) error("id");
+    if(!root->get("name", &s) ) error("name");
+    setName( _(s.c_str()) );
+
+    if(!root->get("id", &s) ) error("id");
     setId(s);
-    if(!lisp->get("description", s)      ) error("description");
-    setChallengeDescription(s); 
-    if(!lisp->get("karts", m_num_karts)  ) error("karts");
+
+    if(!root->get("description", &s) ) error("description");
+    setChallengeDescription( _(s.c_str()) );
+
+    if(!root->get("karts", &m_num_karts)  ) error("karts");
+
     // Position is optional except in GP and FTL
-    if(!lisp->get("position", m_position) &&
+    if(!root->get("position", &m_position) &&
        //RaceManager::getWorld()->areKartsOrdered() ) // FIXME - order and optional are not the same thing
         (m_minor==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
          m_major==RaceManager::MAJOR_MODE_GRAND_PRIX))
                                            error("position");
-    lisp->get("difficulty", s);
+    root->get("difficulty", &s);
     if(s=="easy")
         m_difficulty = RaceManager::RD_EASY;
     else if(s=="medium")
@@ -99,32 +103,35 @@ ChallengeData::ChallengeData(const std::string& filename)
     else
         error("difficulty");
 
-    lisp->get("time",       m_time       );  // one of time/position
-    lisp->get("position",   m_position   );  // must be set
+    root->get("time", &m_time );  // one of time/position
+
+    root->get("position", &m_position );  // must be set
     if(m_time<0 && m_position<0) error("position/time");
-    lisp->get("energy", m_energy     ); // This is optional
+
+    root->get("energy", &m_energy ); // This is optional
     if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
-        if(!lisp->get("track",  m_track_name )) error("track");
-        if(!lisp->get("laps",   m_num_laps   ) && 
+        if(!root->get("track",  &m_track_name )) error("track");
+        if(!root->get("laps",   &m_num_laps   ) && 
            m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
            error("laps");
     }
     else   // GP
     {
-        if(!lisp->get("gp",   m_gp_id )) error("gp");
+        if(!root->get("gp",   &m_gp_id )) error("gp");
     }
 
-    getUnlocks(lisp, "unlock-track",      UNLOCK_TRACK);
-    getUnlocks(lisp, "unlock-gp",         UNLOCK_GP   );
-    getUnlocks(lisp, "unlock-mode",       UNLOCK_MODE );
-    getUnlocks(lisp, "unlock-difficulty", UNLOCK_DIFFICULTY);
-    getUnlocks(lisp, "unlock-kart",       UNLOCK_KART);
+    getUnlocks(root, "unlock-track",      UNLOCK_TRACK);
+    getUnlocks(root, "unlock-gp",         UNLOCK_GP   );
+    getUnlocks(root, "unlock-mode",       UNLOCK_MODE );
+    getUnlocks(root, "unlock-difficulty", UNLOCK_DIFFICULTY);
+    getUnlocks(root, "unlock-kart",       UNLOCK_KART);
 
-    std::vector<std::string> vec;
-    lisp->getVector("depend-on", vec);
-    for(unsigned int i=0; i<vec.size(); i++) addDependency(vec[i]);
-    delete ROOT;
+    std::vector< std::string > deps;
+    root->get("depend-on", &deps);
+    for(unsigned int i=0; i<deps.size(); i++) addDependency(deps[i]);
+
+    delete root;
 
 }   // ChallengeData
 
@@ -134,11 +141,10 @@ void ChallengeData::error(const char *id) const
     std::ostringstream msg;
     msg << "Undefined or incorrect value for '" << id 
         << "' in challenge file '" << m_filename << "'.";
-#ifndef HAVE_IRRLICHT
     // FIXME: disable this till all tracks are converted
-    throw std::runtime_error(msg.str());
-#endif
+    // FIXME throw std::runtime_error(msg.str());
 }   // error
+
 // ----------------------------------------------------------------------------
 /** Checks if this challenge is valid, i.e. contains a valid track or a valid
  *  GP. If incorrect data are found, STK is aborted with an error message. 
@@ -168,48 +174,52 @@ void ChallengeData::check() const
 
 // ----------------------------------------------------------------------------
 
-
-void ChallengeData::getUnlocks(const lisp::Lisp *lisp, const char* type, 
+void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
                                REWARD_TYPE reward)
 {
-    std::vector<std::string> v;
-    v.clear();
+    std:: string attrib;
+    root->get(type, &attrib);
+    if( attrib . empty() ) return;
 
-    lisp->getVector(type, v);
-    for(unsigned int i=0; i<v.size(); i++)
+    std:: vector< std:: string > data;
+    std:: size_t space = attrib.find_first_of(' ');
+    data.push_back( attrib.substr(0, space) );
+    if( space != std:: string:: npos )
     {
-        switch(reward)
-        {
-        case UNLOCK_TRACK:      addUnlockTrackReward     (v[i]        );      break;
-        case UNLOCK_GP:         addUnlockGPReward        (v[i]        );      break;
-        case UNLOCK_MODE:       if(i+1<v.size())
-                                {
-                                    addUnlockModeReward  (v[i], v[i+1]); 
-                                    i++; break;
-                                }
-                                else
-                                    fprintf(stderr, "Unlock mode name missing.\n");
-                                break;
-        case UNLOCK_DIFFICULTY: if(i+1<v.size())
-                                {
-                                    addUnlockDifficultyReward(v[i], v[i+1]); 
-                                    i++;
-                                }
-                                else
-                                    fprintf(stderr, "Difficult name missing.\n");
-                                break;
-        case UNLOCK_KART:       if(i+1<v.size())
-                                {
-                                    addUnlockKartReward(v[i], v[i+1]); 
-                                    i++;
-                                }
-                                else
-                                    fprintf(stderr, "Kart name missing.\n");
-                                break;
-        }   // switch
+        data.push_back( attrib.substr(space, std:: string:: npos) );
     }
+
+    switch(reward)
+    {
+    case UNLOCK_TRACK:      addUnlockTrackReward     (data[0]        );      break;
+    case UNLOCK_GP:         addUnlockGPReward        (data[0]        );      break;
+    case UNLOCK_MODE:       if(1<data.size())
+                            {
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockModeReward  (data[0], user_name);
+                                break;
+                            }
+                            else
+                                fprintf(stderr, "Unlock mode name missing.\n");
+                            break;
+    case UNLOCK_DIFFICULTY: if(1<data.size())
+                            {
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockDifficultyReward(data[0], user_name);
+                            }
+                            else
+                                fprintf(stderr, "Difficult name missing.\n");
+                            break;
+    case UNLOCK_KART:       if(1<data.size())
+                            {
+                                irr::core::stringw user_name = _(data[1].c_str());
+                                addUnlockKartReward(data[0], user_name);
+                            }
+                            else
+                                fprintf(stderr, "Kart name missing.\n");
+                            break;
+    }   // switch
 }   // getUnlocks
-    
 // ----------------------------------------------------------------------------
 void ChallengeData::setRace() const
 {
@@ -222,6 +232,7 @@ void ChallengeData::setRace() const
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts);
         race_manager->setNumPlayers(1);
+        race_manager->setNumLocalPlayers(1);
         race_manager->setCoinTarget(m_energy);
     }
     else   // GP
@@ -232,7 +243,7 @@ void ChallengeData::setRace() const
         race_manager->setDifficulty(m_difficulty);
         race_manager->setNumKarts(m_num_karts);
         race_manager->setNumPlayers(1);
-        //race_manager->setGrandPrix();
+        race_manager->setNumLocalPlayers(1);
     }
 }   // setRace
 

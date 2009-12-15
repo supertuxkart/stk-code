@@ -17,94 +17,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="irrlicht-debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;$(IRR_INCLUDE)&quot;"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT"
-				GeneratePreprocessedFile="0"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				FloatingPointExceptions="false"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib Irrlicht.lib ws2_32.lib"
-				OutputFile="./../../../$(ProjectName)_irr_d.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;$(IRR_LIB)&quot;"
-				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="libcmt.lib"
-				GenerateDebugInformation="true"
-				GenerateMapFile="false"
-				MapFileName=""
-				MapExports="false"
-				SubSystem="1"
-				LinkTimeCodeGeneration="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
-				Profile="false"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -130,8 +42,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include"
-				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;$(IRR_INCLUDE)&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;_CRTDBG_MAP_ALLOC;IRR_SVN"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -153,10 +65,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;$(IRR_LIB)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
@@ -218,8 +130,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include"
-				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;$(IRR_INCLUDE)&quot;"
+				PreprocessorDefinitions="HAVE_OPENAL;HAVE_OGGVORBIS;NDEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;BT_NO_PROFILE;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;IRR_SVN"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -237,10 +149,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib sg.lib ssg.lib ul.lib ssgAux.lib fnt.lib intl.lib ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib SDL.lib SDLmain.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;$(IRR_LIB)&quot;"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -249,6 +161,94 @@
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="irr1.6|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../../../src;../../../src/bullet/src;&quot;$(STK_INCLUDE)&quot;;../../../src/enet/include;&quot;C:\cygwin\home\jh235117\local\irrlicht-1.6\include&quot;"
+				PreprocessorDefinitions="BT_NO_PROFILE;HAVE_OPENAL;HAVE_OGGVORBIS;_DEBUG;_CONSOLE;WIN32;NOMINMAX;VERSION=\&quot;SVN\&quot;;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DEBUG;PACKAGE=\&quot;supertuxkart\&quot;;HAVE_GETTEXT;ENABLE_NLS;HAVE_GLUT;HAVE_IRRLICHT;_CRTDBG_MAP_ALLOC;IRR_SVN"
+				GeneratePreprocessedFile="0"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				FloatingPointExceptions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib"
+				OutputFile="./../../../$(ProjectName)_d16.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;C:\cygwin\home\jh235117\local\irrlicht-1.6\lib\Win32-visualstudio&quot;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="libcmt.lib"
+				GenerateDebugInformation="true"
+				GenerateMapFile="false"
+				MapFileName=""
+				MapExports="false"
+				SubSystem="1"
+				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+				Profile="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -282,50 +282,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\actionmap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\callback_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\explosion.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\file_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_data.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscore_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscores.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\history.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\isect.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\loader.cpp"
-				>
-			</File>
-			<File
 				RelativePath="../../../src\main.cpp"
 				>
 			</File>
@@ -333,157 +289,89 @@
 				RelativePath="..\..\main_loop.cpp"
 				>
 			</File>
-			<File
-				RelativePath="../../../src\material.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\race_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sdldrv.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\static_ssg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\stk_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\user_config.cpp"
-				>
-			</File>
 			<Filter
-				Name="gui"
+				Name="guiengine"
 				>
 				<File
-					RelativePath="../../../src\gui\base_gui.cpp"
+					RelativePath="..\..\guiengine\abstract_state_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\challenges_menu.cpp"
+					RelativePath="..\..\guiengine\CGUIFont.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\char_sel.cpp"
+					RelativePath="..\..\guiengine\engine.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_controls.cpp"
+					RelativePath="..\..\guiengine\event_handler.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_display.cpp"
+					RelativePath="..\..\guiengine\modaldialog.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_sound.cpp"
+					RelativePath="..\..\guiengine\screen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\credits_menu.cpp"
+					RelativePath="..\..\guiengine\screen_loader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\display_res_confirm.cpp"
+					RelativePath="..\..\guiengine\skin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\feature_unlocked.cpp"
+					RelativePath="..\..\guiengine\widget.cpp"
 					>
 				</File>
-				<File
-					RelativePath="../../../src\gui\font.cpp"
+				<Filter
+					Name="widgets"
 					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\game_mode.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_ending.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_select.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_one.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_three.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_two.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\main_menu.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\menu_manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\network_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_players.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\options.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\player_controls.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_menu.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\race_options.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_results_gui.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\start_race_feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\track_sel.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\widget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\widget_manager.cpp"
-					>
-				</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\button_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\check_box_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\dynamic_ribbon_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\icon_button_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\label_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\list_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\model_view_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\spinner_widget.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\text_box_widget.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lisp"
@@ -513,7 +401,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\robots\track_info.cpp"
+					RelativePath="..\..\robots\new_ai.cpp"
 					>
 				</File>
 			</Filter>
@@ -538,10 +426,6 @@
 				>
 				<File
 					RelativePath="..\..\utils\random_generator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\utils\ssg_help.cpp"
 					>
 				</File>
 				<File
@@ -594,6 +478,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\linear_world.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\profile_world.cpp"
 					>
 				</File>
 				<File
@@ -677,7 +565,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\physics\moving_physics.cpp"
+					RelativePath="..\..\physics\physical_object.cpp"
 					>
 				</File>
 				<File
@@ -725,7 +613,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\explosion.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material_manager.cpp"
 					>
 				</File>
 				<File
@@ -741,14 +641,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\particle_system.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\scene.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\graphics\shadow.cpp"
 					>
 				</File>
@@ -758,6 +650,10 @@
 				</File>
 				<File
 					RelativePath="..\..\graphics\smoke.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\water_splash.cpp"
 					>
 				</File>
 			</Filter>
@@ -805,6 +701,46 @@
 				Name="tracks"
 				>
 				<File
+					RelativePath="..\..\tracks\ambient_light_sphere.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\bezier_curve.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_line.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_sphere.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_structure.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\graph_node.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad_graph.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad_set.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\tracks\terrain_info.cpp"
 					>
 				</File>
@@ -841,13 +777,197 @@
 				Name="io"
 				>
 				<File
-					RelativePath="..\..\io\xml_node.cpp"
+					RelativePath="..\..\io\file_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\io\xml_reader.cpp"
+					RelativePath="..\..\io\xml_node.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="input"
+				>
+				<File
+					RelativePath="..\..\input\device_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="race"
+				>
+				<File
+					RelativePath="..\..\race\grand_prix_data.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\grand_prix_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscore_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscores.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\history.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\race_manager.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="config"
+				>
+				<File
+					RelativePath="..\..\config\device_config.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\player.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\stk_config.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\user_config.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="animations"
+				>
+				<File
+					RelativePath="..\..\animations\animation_base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\animation_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\billboard_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\ipo.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\three_d_animation.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="states_screen"
+				>
+				<File
+					RelativePath="..\..\states_screens\challenges.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\credits.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\feature_unlocked.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_1.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_2.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_3.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\kart_selection.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\main_menu_screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_av.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_input.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_players.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_gui.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_setup_screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\state_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\tracks_screen.cpp"
+					>
+				</File>
+				<Filter
+					Name="dialogs"
+					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\player_info_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\press_a_key_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\race_over_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\track_info_dialog.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -856,248 +976,92 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="../../../src\callback.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\callback_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\constants.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\explosion.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\file_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_data.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\grand_prix_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\gui\help_page_one.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\gui\help_page_two.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\herring_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscore_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\highscores.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\history.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\input.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\isect.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\loader.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\main_loop.hpp"
 				>
 			</File>
-			<File
-				RelativePath="../../../src\material.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\material_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\no_copy.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\player.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\position.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\race_manager.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\sdldrv.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\ssg_help.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\static_ssg.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\stk_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="../../../src\user_config.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\user_pointer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\vec3.hpp"
-				>
-			</File>
 			<Filter
-				Name="gui"
+				Name="guiengine"
 				>
 				<File
-					RelativePath="../../../src\gui\base_gui.hpp"
+					RelativePath="..\..\guiengine\abstract_state_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\challenges_menu.hpp"
+					RelativePath="..\..\guiengine\CGUIFont.h"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\char_sel.hpp"
+					RelativePath="..\..\guiengine\engine.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_controls.hpp"
+					RelativePath="..\..\guiengine\event_handler.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_display.hpp"
+					RelativePath="..\..\guiengine\modaldialog.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\config_sound.hpp"
+					RelativePath="..\..\guiengine\screen.hpp"
 					>
 				</File>
 				<File
-					RelativePath="../../../src\gui\credits_menu.hpp"
+					RelativePath="..\..\guiengine\skin.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\display_res_confirm.hpp"
+					RelativePath="..\..\guiengine\widget.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\gui\feature_unlocked.hpp"
+					RelativePath="..\..\guiengine\widgets.hpp"
 					>
 				</File>
-				<File
-					RelativePath="../../../src\gui\font.hpp"
+				<Filter
+					Name="widgets"
 					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\game_mode.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_ending.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\grand_prix_select.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_one.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_three.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\help_page_two.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\main_menu.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\menu_manager.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\network_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\num_players.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\options.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\player_controls.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_menu.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\race_options.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\race_results_gui.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\gui\start_race_feedback.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\gui\track_sel.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\widget.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\widget_manager.hpp"
-					>
-				</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\button_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\check_box_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\dynamic_ribbon_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\icon_button_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\label_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\list_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\model_view_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\ribbon_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\spinner_widget.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\guiengine\widgets\text_box_widget.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lisp"
@@ -1127,7 +1091,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\robots\track_info.hpp"
+					RelativePath="..\..\robots\new_ai.hpp"
 					>
 				</File>
 			</Filter>
@@ -1239,11 +1203,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\utils\random_generator.hpp"
+					RelativePath="..\..\utils\no_copy.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\utils\ssg_help.hpp"
+					RelativePath="..\..\utils\ptr_vector.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\utils\random_generator.hpp"
 					>
 				</File>
 				<File
@@ -1304,6 +1272,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\linear_world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\profile_world.hpp"
 					>
 				</File>
 				<File
@@ -1391,11 +1363,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\physics\physical_object.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\physics.hpp"
 					>
 				</File>
 				<File
 					RelativePath="..\..\physics\triangle_mesh.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\physics\user_pointer.hpp"
 					>
 				</File>
 			</Filter>
@@ -1443,7 +1423,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\explosion.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\irr_driver.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\graphics\material_manager.hpp"
 					>
 				</File>
 				<File
@@ -1459,14 +1451,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\graphics\particle_system.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\graphics\scene.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\graphics\shadow.hpp"
 					>
 				</File>
@@ -1478,10 +1462,54 @@
 					RelativePath="..\..\graphics\smoke.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\graphics\water_splash.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="tracks"
 				>
+				<File
+					RelativePath="..\..\tracks\ambient_light_sphere.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\bezier_curve.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_line.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_sphere.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\check_structure.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\graph_node.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad_graph.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\quad_set.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\..\tracks\terrain_info.hpp"
 					>
@@ -1523,13 +1551,197 @@
 				Name="io"
 				>
 				<File
-					RelativePath="..\..\io\xml_node.hpp"
+					RelativePath="..\..\io\file_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\io\xml_reader.hpp"
+					RelativePath="..\..\io\xml_node.hpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="input"
+				>
+				<File
+					RelativePath="..\..\input\device_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_device.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\input\input_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="race"
+				>
+				<File
+					RelativePath="..\..\race\grand_prix_data.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\grand_prix_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscore_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\highscores.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\history.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\race\race_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="config"
+				>
+				<File
+					RelativePath="..\..\config\device_config.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\player.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\stk_config.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\config\user_config.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="animations"
+				>
+				<File
+					RelativePath="..\..\animations\animation_base.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\animation_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\billboard_animation.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\ipo.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\animations\three_d_animation.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="states_screens"
+				>
+				<File
+					RelativePath="..\..\states_screens\challenges.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\credits.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\feature_unlocked.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_1.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_2.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\help_screen_3.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\kart_selection.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\main_menu_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_av.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_input.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_players.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_gui.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\race_setup_screen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\state_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\tracks_screen.hpp"
+					>
+				</File>
+				<Filter
+					Name="dialogs"
+					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\player_info_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\press_a_key_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\race_over_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\race_paused_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\track_info_dialog.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

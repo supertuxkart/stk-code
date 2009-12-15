@@ -1,0 +1,19 @@
+<stkgui>
+
+    <div x="5%" y="2%" width="90%" height="96%" layout="vertical-row" >
+    
+        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo_slim.png"/>
+        
+        <header I18N="Title in credits screen" text="Credits" width="100%" />
+        
+        <box id="animated_area" width="100%" proportion="10">
+        
+        </box>
+    
+        <spacer width="50" height="45" /> 
+    
+    </div>
+    
+    <button id="back" x="20" y="-40" width="250" height="35" align="left" text="Back to main menu"/>
+
+</stkgui>

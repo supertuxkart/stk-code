@@ -27,16 +27,14 @@
 #else
 #  include <AL/al.h>
 #endif
-// This include is important, otherwise SDL_BYTEORDER is undefined, and as a
-// result big endian will be used!
-#include <SDL/SDL_endian.h>
 
-#include "user_config.hpp"
+#include "audio/sound_manager.hpp"
+#include "config/user_config.hpp"
 
 MusicOggStream::MusicOggStream()
 {
     //m_oggStream= NULL;
-    m_soundBuffers[0]= m_soundBuffers[1]= 0;
+    m_soundBuffers[0] = m_soundBuffers[1]= 0;
     m_soundSource= 0;
     m_pausedMusic= true;
 }   // MusicOggStream
@@ -283,11 +281,8 @@ void MusicOggStream::update()
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
     char pcm[m_buffer_size];
-#if defined(WORDS_BIGENDIAN) || SDL_BYTEORDER == SDL_BIG_ENDIAN
-    int  isBigEndian = 1;
-#else
-    int  isBigEndian = 0;
-#endif
+    const int isBigEndian = (IS_LITTLE_ENDIAN ? 0 : 1);
+
     int  size = 0;
     int  portion;
     int  result;

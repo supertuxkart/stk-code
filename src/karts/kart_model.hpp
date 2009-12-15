@@ -22,17 +22,14 @@
 
 #include <string>
 
-#define _WINSOCKAPI_
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#else
-#include <plib/ssg.h>
-#endif
 
-#include "no_copy.hpp"
 #include "lisp/lisp.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+
+class KartProperties;
 
 /** This class stores a 3D kart model. It takes especially care of attaching
  *  the wheels, which are loaded as separate objects. The wheels can turn
@@ -42,13 +39,19 @@ using namespace irr;
 class KartModel
 {
 private:
-#ifdef HAVE_IRRLICHT
+    /** The frames in which the animation points to the left, straight
+     *  ahead, and to the right. */
+    int m_af_left, m_af_straight, m_af_right;
+
+    /** Animation speed. */
+    float m_animation_speed;
+
     /** The mesh of the model. */
-    scene::IMesh *m_mesh;
-#else
-    /** The transform node/root of the kart model. */
-    ssgTransform *m_root;
-#endif
+    scene::IAnimatedMesh *m_mesh;
+
+    /** This is a pointer to the scene node of the kart this model belongs
+     *  to. It is necessary to adjust animations. */
+    scene::IAnimatedMeshSceneNode *m_node;
 
     /** Value used to indicate undefined entries. */
     static float UNDEFINED;
@@ -56,16 +59,11 @@ private:
     /** Name of the 3d model file. */
     std::string   m_model_filename;
 
-#ifdef HAVE_IRRLICHT
     /** The four wheel models. */
     scene::IMesh      *m_wheel_model[4];
 
     /** The four scene nodes the wheels are attached to */
     scene::ISceneNode *m_wheel_node[4];
-#else
-    /** The four wheel models. */
-    ssgEntity    *m_wheel_model[4];
-#endif
 
     /** Filename of the wheel models. */
     std::string   m_wheel_filename[4];
@@ -92,15 +90,6 @@ private:
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
 
-#ifdef HAVE_IRRLICHT
-    /** The transform for the wheels, used to rotate the wheels and display
-     *  the suspension in the race.      */
-#else
-    /** The transform for the wheels, used to rotate the wheels and display
-     *  the suspension in the race.      */
-    ssgTransform *m_wheel_transform[4]; 
-#endif
-
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
     float m_kart_height;              /**< Height of kart. */
@@ -114,13 +103,12 @@ public:
          KartModel();
         ~KartModel();
     void loadInfo(const lisp::Lisp* lisp);
-    void loadModels(const std::string &kart_ident);
-#ifdef HAVE_IRRLICHT
-    void attachModel(scene::ISceneNode **node);
-#else
-    ssgTransform *getRoot() const { return m_root; }
-#endif
+    void loadModels(const KartProperties &kart_properties);
+    void attachModel(scene::IAnimatedMeshSceneNode **node);
+    scene::IAnimatedMesh* getModel() const { return m_mesh; }
 
+    scene::IMesh* getWheelModel(const int wheelID) const { return m_wheel_model[wheelID]; }
+    
     /** Returns the position of a wheel relative to the kart. 
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
      *           right, 3 = rear left.  */
@@ -146,8 +134,8 @@ public:
     /** Returns the amount a kart has to be moved down so that the bottom of
      *  the kart is at z=0. */
     float getZOffset                () const {return m_z_offset;                 }
-    void  adjustWheels(float rotation, float steer,
-                       const float suspension[4]);
+    void  update(float rotation, float visual_steer,
+                 float steer, const float suspension[4]);
     void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
 };   // KartModel

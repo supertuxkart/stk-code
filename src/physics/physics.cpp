@@ -19,12 +19,11 @@
 
 #include "physics/physics.hpp"
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "tracks/track.hpp"
-#include "utils/ssg_help.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -44,14 +43,14 @@ Physics::Physics() : btSequentialImpulseConstraintSolver()
 void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 {
     m_axis_sweep     = new btAxisSweep3(world_min, world_max);
-    m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher, 
-                                                    m_axis_sweep, 
+    m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher,
+                                                    m_axis_sweep,
                                                    this,
                                                    m_collision_conf);
-    m_dynamics_world->setGravity(btVector3(0.0f, 0.0f, 
+    m_dynamics_world->setGravity(btVector3(0.0f, 0.0f,
                                            -RaceManager::getTrack()->getGravity()));
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug)
+    if(UserConfigParams::m_bullet_debug)
       {
         m_debug_drawer = new GLDebugDrawer();
         m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
@@ -64,7 +63,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 Physics::~Physics()
 {
 #ifdef HAVE_GLUT
-    if(user_config->m_bullet_debug) delete m_debug_drawer;
+    if(UserConfigParams::m_bullet_debug) delete m_debug_drawer;
 #endif
     delete m_dynamics_world;
     delete m_axis_sweep;
@@ -135,9 +134,9 @@ void Physics::update(float dt)
             {
                 p->a->getPointerFlyable()->hitTrack();
             }
-            else if(p->b->is(UserPointer::UP_MOVING_PHYSICS))
+            else if(p->b->is(UserPointer::UP_PHYSICAL_OBJECT))
             {
-                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerMovingPhysics());
+                p->a->getPointerFlyable()->hit(NULL, p->b->getPointerPhysicalObject());
 
             }
             else if(p->b->is(UserPointer::UP_KART))   // projectile hit kart
@@ -152,6 +151,17 @@ void Physics::update(float dt)
         }
     }  // for all p in m_all_collisions
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Project all karts downwards onto the surface below.
+ *  Used in setting the starting positions of all the karts.
+ */
+
+bool Physics::projectKartDownwards(const Kart *k)
+{
+    btVector3 hell(0, 0, -10000);
+    return k->getVehicle()->projectVehicleToSurface(hell, true /*allow translation*/);
+} //projectKartsDownwards
 
 //-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which means
@@ -179,16 +189,25 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
         }
         else  // only A has a bomb, move it to B (unless it was from B)
         {
-            if(attachmentA->getPreviousOwner()!=kartB) 
+            if(attachmentA->getPreviousOwner()!=kartB)
             {
                 attachmentA->moveBombFromTo(kartA, kartB);
+                // Play appropriate SFX
+                kartB->playCustomSFX(SFXManager::CUSTOM_ATTACH);
             }
         }
     }
     else if(attachmentB->getType()==ATTACH_BOMB &&
-        attachmentB->getPreviousOwner()!=kartA) 
+        attachmentB->getPreviousOwner()!=kartA)
     {
         attachmentB->moveBombFromTo(kartB, kartA);
+        kartA->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+    }
+    else
+    {
+        // No bombs exchanged, no explosions, tell the other driver to move it!
+        kartA->playCustomSFX(SFXManager::CUSTOM_CRASH);
+        kartB->playCustomSFX(SFXManager::CUSTOM_CRASH);
     }
 }   // KartKartCollision
 
@@ -206,28 +225,28 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
 btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                              btPersistentManifold** manifold,int numManifolds,
                              btTypedConstraint** constraints,int numConstraints,
-                             const btContactSolverInfo& info, 
+                             const btContactSolverInfo& info,
                              btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,
                              btDispatcher* dispatcher) {
     btScalar returnValue=
-        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies, manifold, 
-                                                        numManifolds, constraints, 
-                                                        numConstraints, info, 
+        btSequentialImpulseConstraintSolver::solveGroup(bodies, numBodies, manifold,
+                                                        numManifolds, constraints,
+                                                        numConstraints, info,
                                                         debugDrawer, stackAlloc,
                                                         dispatcher);
     int currentNumManifolds = m_dispatcher->getNumManifolds();
-    // We can't explode a rocket in a loop, since a rocket might collide with 
-    // more than one object, and/or more than once with each object (if there 
+    // We can't explode a rocket in a loop, since a rocket might collide with
+    // more than one object, and/or more than once with each object (if there
     // is more than one collision point). So keep a list of rockets that will
     // be exploded after the collisions
     std::vector<Moveable*> rocketsToExplode;
     for(int i=0; i<currentNumManifolds; i++)
-    {               
+    {
         btPersistentManifold* contactManifold = m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
 
         btCollisionObject* objA = static_cast<btCollisionObject*>(contactManifold->getBody0());
         btCollisionObject* objB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-        
+
         int numContacts = contactManifold->getNumContacts();
         if(!numContacts) continue;   // no real collision
 
@@ -240,8 +259,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         if(!upA || !upB) continue;
         // 1) object A is a track
         // =======================
-        if(upA->is(UserPointer::UP_TRACK)) 
-        { 
+        if(upA->is(UserPointer::UP_TRACK))
+        {
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
                 m_all_collisions.push_back(upB, upA);
             else if(upB->is(UserPointer::UP_KART))
@@ -270,17 +289,17 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         // =========================
         else if(upA->is(UserPointer::UP_FLYABLE))
         {
-            if(upB->is(UserPointer::UP_TRACK         ) ||   // 3.1) projectile hits track
-               upB->is(UserPointer::UP_FLYABLE       ) ||   // 3.2) projectile hits projectile
-               upB->is(UserPointer::UP_MOVING_PHYSICS) ||   // 3.3) projectile hits projectile
-               upB->is(UserPointer::UP_KART          )   )  // 3.4) projectile hits kart
+            if(upB->is(UserPointer::UP_TRACK          ) ||   // 3.1) projectile hits track
+               upB->is(UserPointer::UP_FLYABLE        ) ||   // 3.2) projectile hits projectile
+               upB->is(UserPointer::UP_PHYSICAL_OBJECT) ||   // 3.3) projectile hits projectile
+               upB->is(UserPointer::UP_KART           )   )  // 3.4) projectile hits kart
             {
                 m_all_collisions.push_back(upA, upB);
             }
-        } 
-        else if(upA->is(UserPointer::UP_MOVING_PHYSICS))
+        }
+        else if(upA->is(UserPointer::UP_PHYSICAL_OBJECT))
         {
-            if(upB->is(UserPointer::UP_FLYABLE)) 
+            if(upB->is(UserPointer::UP_FLYABLE))
             {
                 m_all_collisions.push_back(upB, upA);
             }
@@ -295,8 +314,6 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
-    if(!user_config->m_bullet_debug) return;
-
     int num_objects = m_dynamics_world->getNumCollisionObjects();
     for(int i=0; i<num_objects; i++)
     {
@@ -306,9 +323,14 @@ void Physics::draw()
         float m[16];
         btVector3 wireColor(1,0,0);
         btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
-        if(myMotion) 
+        if(myMotion)
         {
             myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
+            // Karts need culling GL_FRONT (not sure why), otherwise they appear to
+            // rotate incorrectly due to incorrect culling
+            UserPointer *up = (UserPointer*)body->getUserPointer();
+            if(up->is(UserPointer::UP_KART))
+                glCullFace(GL_FRONT);
             debugDraw(m, obj->getCollisionShape(), wireColor);
         }
     }  // for i

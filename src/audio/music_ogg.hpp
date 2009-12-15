@@ -17,8 +17,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_MUSICOGG_H
-#define HEADER_MUSICOGG_H
+#ifndef HEADER_MUSICOGG_HPP
+#define HEADER_MUSICOGG_HPP
 
 #include <string>
 #include <iostream>
@@ -81,4 +81,4 @@ private:
     static const int m_buffer_size = 11025*4;//one full second of audio at 44100 samples per second
 };
 
-#endif // HEADER_MUSICOGG_H
+#endif // HEADER_MUSICOGG_HPP

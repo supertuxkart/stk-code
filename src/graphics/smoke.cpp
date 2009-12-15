@@ -1,8 +1,7 @@
-
-//  $Id: dust_cloud.cpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: smoke.cpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2009  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,83 +17,83 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "smoke.hpp"
-#include "material_manager.hpp"
+#include "graphics/smoke.hpp"
+
+#include "graphics/material_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "physics/btKart.hpp"
 #include "utils/constants.hpp"
 
-Smoke::Smoke(Kart* kart)
-        : ParticleSystem(200, 0.0f, true, 0.75f),
-        m_kart(kart)
+Smoke::Smoke(Kart* kart) : m_kart(kart), m_particle_size(0.33f)
 {
-#ifdef DEBUG
-    setName("smoke");
-#endif
-    bsphere.setCenter(0, 0, 0);
-    bsphere.setRadius(1000.0f);
-    dirtyBSphere();
+    m_node = irr_driver->addParticleNode();
+    // Note: the smoke system is NOT child of the kart, since bullet
+    // gives the position of the wheels on the ground in world coordinates.
+    // So it's easier not to move the particle system with the kart, and set 
+    // the position directly from the wheel coordinates.
+    m_node->setPosition(core::vector3df(-m_kart->getKartWidth()*0.35f, 
+                                        m_particle_size*0.25f, 
+                                        -m_kart->getKartLength()*0.5f));
+    Material *m= material_manager->getMaterial("smoke.png");
+    m->setMaterialProperties(&(m_node->getMaterial(0)));
+    m_node->setMaterialTexture(0, m->getTexture());
 
-    m_smokepuff = new ssgSimpleState ();
-#ifndef HAVE_IRRLICHT
-    m_smokepuff->setTexture(material_manager->getMaterial("smoke.rgb")->getState()->getTexture());
-#endif
-    m_smokepuff -> setTranslucent    () ;
-    m_smokepuff -> enable            ( GL_TEXTURE_2D ) ;
-    m_smokepuff -> setShadeModel     ( GL_SMOOTH ) ;
-    m_smokepuff -> disable           ( GL_CULL_FACE ) ;
-    m_smokepuff -> enable            ( GL_BLEND ) ;
-    m_smokepuff -> disable           ( GL_ALPHA_TEST ) ;
-    m_smokepuff -> enable            ( GL_LIGHTING ) ;
-    m_smokepuff -> setColourMaterial ( GL_EMISSION ) ;
-    m_smokepuff -> setMaterial       ( GL_AMBIENT, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_DIFFUSE, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setMaterial       ( GL_SPECULAR, 0, 0, 0, 1 ) ;
-    m_smokepuff -> setShininess      (  0 ) ;
-    m_smokepuff->ref();
+    m_emitter = m_node->createPointEmitter(core::vector3df(0, 0, 0),   // velocity in m/ms
+                                           5, 10,
+                                           video::SColor(255,0,0,0),
+                                           video::SColor(255,255,255,255),
+                                           300, 500,
+                                           20  // max angle
+                                           );
+    m_emitter->setMinStartSize(core::dimension2df(m_particle_size/1.5f, m_particle_size/1.5f));
+    m_emitter->setMaxStartSize(core::dimension2df(m_particle_size*1.5f, m_particle_size*1.5f));
+    m_node->setEmitter(m_emitter); // this grabs the emitter
+    m_emitter->drop();             // so we can drop our references
 
-    setState(m_smokepuff);
+    scene::IParticleFadeOutAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 255, 0, 0), 500);
+    m_node->addAffector(af);
+    af->drop();
 
 }   // KartParticleSystem
 
 //-----------------------------------------------------------------------------
+/** Destructor, removes
+ */
 Smoke::~Smoke()
 {
-    ssgDeRefDelete(m_smokepuff);
+    irr_driver->removeNode(m_node);
 }   // ~Smoke
+
 //-----------------------------------------------------------------------------
 void Smoke::update(float t)
 {
-    ParticleSystem::update(t);
+    // No particles to emit, no need to change the speed
+    if(m_emitter->getMinParticlesPerSecond()==0)
+        return;
+    static int left=1;
+    left = 1-left;
+    const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(2+left);
+    Vec3 c=wi.m_raycastInfo.m_contactPointWS;
+
+    // FIXME: the X position is not yet always accurate.
+    m_node->setPosition(core::vector3df(c.getX()+ m_particle_size*0.25f * (left?+1:-1),
+                                        c.getZ()+m_particle_size*0.25f,
+                                        c.getY()));
+
+    // There seems to be no way to randomise the velocity for particles,
+    // so we have to do this manually, by changing the default velocity.
+    // Irrlicht expects velocity (called 'direction') in m/ms!!
+    Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*0.002f,
+             sin(DEGREE_TO_RAD*(rand()%180))*0.002f,
+             sin(DEGREE_TO_RAD*(rand()%100))*0.002f);
+    m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
 //-----------------------------------------------------------------------------
-void Smoke::particle_create(int, Particle *p)
+void Smoke::setCreationRate(float f)
 {
-    sgSetVec4(p->m_col, 1, 1, 1, 1 ); /* initially white */
-    sgSetVec3(p->m_vel, 0, 0, 0 );
-    sgSetVec3(p->m_acc, 0, 0, 2.0f ); /* Gravity */
-    p->m_size         = 0.5f;
-    p->m_time_to_live = 0.4f;
-
-    // Change from left to right wheel and back for each new particle
-    static int wheel_number = 2;
-    wheel_number            = 5 - wheel_number;
-    Vec3 xyz=m_kart->getVehicle()->getWheelInfo(wheel_number).m_raycastInfo.m_contactPointWS;
-
-    sgCopyVec3 (p->m_pos, xyz.toFloat());
-    p->m_vel[0] += cos(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[1] += sin(DEGREE_TO_RAD(rand()%180));
-    p->m_vel[2] += sin(DEGREE_TO_RAD(rand()%100));
-
-    bsphere.setCenter ( xyz.getX(), xyz.getY(), xyz.getZ() ) ;
-}   // particle_create
-
-//-----------------------------------------------------------------------------
-void Smoke::particle_update(float delta, int,
-                            Particle * particle)
-{
-    particle->m_size    -= delta*.2f;
-    particle->m_col[3]  -= delta * 2.0f;
-}  // particle_update
-
+    m_emitter->setMinParticlesPerSecond(int(f));
+    m_emitter->setMaxParticlesPerSecond(int(f));
+}   // setCreationRate

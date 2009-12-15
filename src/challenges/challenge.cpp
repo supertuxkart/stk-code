@@ -19,10 +19,13 @@
 
 #include "challenges/challenge.hpp"
 
-#include "race_manager.hpp"
-#include "grand_prix_manager.hpp"
+#include <iostream>
+
+#include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -40,7 +43,7 @@ void Challenge::addUnlockTrackReward(const std::string &track_name)
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
-                                    const std::string &user_mode_name)
+                                    const irr::core::stringw &user_mode_name)
 {
     UnlockableFeature feature;
     feature.name = internal_mode_name;
@@ -53,14 +56,18 @@ void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
 void Challenge::addUnlockGPReward(const std::string &gp_name)
 {
     UnlockableFeature feature;
-    feature.name = _(gp_name.c_str());
+    
+    // FIXME : why are we translation an internal name here??
+    //feature.name = _(gp_name.c_str());
+    feature.name = gp_name.c_str();
+    
     feature.type = UNLOCK_GP;
     m_feature.push_back(feature);
 }
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockDifficultyReward(const std::string &internal_name, 
-                                          const std::string &user_name)
+                                          const irr::core::stringw &user_name)
 {
     UnlockableFeature feature;
     feature.name = internal_name;
@@ -71,7 +78,7 @@ void Challenge::addUnlockDifficultyReward(const std::string &internal_name,
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockKartReward(const std::string &internal_name, 
-                                    const std::string &user_name)
+                                    const irr::core::stringw &user_name)
 {
     UnlockableFeature feature;
     feature.name = internal_name;
@@ -81,9 +88,9 @@ void Challenge::addUnlockKartReward(const std::string &internal_name,
 }
 
 //-----------------------------------------------------------------------------
-const std::string Challenge::getUnlockedMessage() const
+const irr::core::stringw Challenge::getUnlockedMessage() const
 {
-    std::string unlocked_message;
+    irr::core::stringw unlocked_message;
 
     const unsigned int amount = (unsigned int)m_feature.size();
     for(unsigned int n=0; n<amount; n++)
@@ -91,7 +98,7 @@ const std::string Challenge::getUnlockedMessage() const
         // add line break if we are showing multiple messages
         if(n>0) unlocked_message+='\n';
 
-        std::string message;
+        irr::core::stringw message;
 
         // write message depending on feature type
         switch(m_feature[n].type)
@@ -99,34 +106,34 @@ const std::string Challenge::getUnlockedMessage() const
             case UNLOCK_TRACK:
                 {    // {} avoids compiler warning
                     Track* track = track_manager->getTrack( m_feature[n].name );
-                    message = StringUtils::insert_values(
+                    message = StringUtils::insertValues(
                         _("New track '%s'\nnow available"), 
-                        _(track->getName()) );
+                        track->getName().c_str() );
                     break;
                 }
             case UNLOCK_MODE:
-                message = StringUtils::insert_values( 
+                message = StringUtils::insertValues( 
                     _("New game mode\n'%s'\nnow available"), 
-                    m_feature[n].user_name);
+                    m_feature[n].user_name.c_str());
                 break;
             case UNLOCK_GP:
             {
-                std::string gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
-                message = StringUtils::insert_values(
+                const irr::core::stringw& gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
+                message = StringUtils::insertValues(
                     _("New Grand Prix '%s'\nnow available"),
-                    gp_user_name);
+                    gp_user_name.c_str());
                 break;
             }
             case UNLOCK_DIFFICULTY:
-                message = StringUtils::insert_values(
+                message = StringUtils::insertValues(
                     _("New difficulty\n'%s'\nnow available"), 
-                    m_feature[n].user_name);
+                    m_feature[n].user_name.c_str());
                 break;
             case UNLOCK_KART:
                 const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
-                message = StringUtils::insert_values(
+                message = StringUtils::insertValues(
                     _("New kart\n'%s'\nnow available"),
-                    kp->getName());
+                    kp->getName().c_str());
                 break;
         }   // switch
         unlocked_message += message;
@@ -137,26 +144,31 @@ const std::string Challenge::getUnlockedMessage() const
 
 //-----------------------------------------------------------------------------
 /** Loads the state for a challenge object (esp. m_state), and calls the
- *  virtual function loadState for additional information
+ *  virtual function loadAdditionalInfo for additional information
  */
-void Challenge::load(const lisp::Lisp* config)
+void Challenge::load(const XMLNode* challengesNode)
 {
-    const lisp::Lisp* subnode= config->getLisp(getId());
-    if(!subnode) return;
-
+    const XMLNode* node = challengesNode->getNode( getId() );
+    if(node == NULL) return;
+    
     // See if the challenge is solved (it's activated later from the
     // unlock_manager).
-    bool finished=false;
-    subnode->get("solved", finished);
+    bool finished=false;    
+    node->get("solved", &finished);
     m_state = finished ? CH_SOLVED : CH_INACTIVE;
-    if(!finished) loadState(subnode);
+    
+    if(m_state == CH_SOLVED)
+    {
+        std::cout << "Solved challenge!! " << getId().c_str() << std::endl;
+    }
+    
+    if(!finished) loadAdditionalInfo(node);
 }   // load
 
 //-----------------------------------------------------------------------------
-void Challenge::save(lisp::Writer* writer)
+void Challenge::save(std::ofstream& writer)
 {
-    writer->beginList(getId());
-    writer->write("solved", isSolved());
-    if(!isSolved()) saveState(writer);
-    writer->endList(getId());
+    writer << "        <" << getId() << " solved=\"" << (isSolved() ? "true" : "false") << "\"";
+    if(!isSolved()) saveAdditionalInfo(writer);
+    writer << " />\n";
 }   // save

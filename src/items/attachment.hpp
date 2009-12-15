@@ -17,10 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_ATTACHMENT_H
-#define HEADER_ATTACHMENT_H
+#ifndef HEADER_ATTACHMENT_HPP
+#define HEADER_ATTACHMENT_HPP
 
-#include "stk_config.hpp"
+#include "config/stk_config.hpp"
 #include "utils/random_generator.hpp"
 
 class Kart;
@@ -48,7 +48,9 @@ private:
     Kart           *m_kart;            // kart the attachment is attached to
     float           m_time_left;       // time left till attachment expires
     float           m_initial_speed;   // for parachutes only
-    ssgSelector    *m_holder;          // where the attachment is put on the kart
+    /** Scene node of the attachment, which will be attached to the kart's
+     *  scene node. */
+    scene::ISceneNode *m_node;
     Kart           *m_previous_owner;  // used by bombs so that it's not passed
                                        // back to previous owner
     RandomGenerator m_random;

@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REPLAYBUFFERS_H
-#define HEADER_REPLAYBUFFERS_H
+#ifndef HEADER_REPLAYBUFFERS_HPP
+#define HEADER_REPLAYBUFFERS_HPP
 
 #ifdef HAVE_GHOST_REPLAY
 
 
 #include <cstdio>
 
-#include "replay_buffer_tpl.hpp"
+#include "replay/replay_buffer_tpl.hpp"
 
 struct ReplayKartState;
 struct ReplayFrame;
@@ -74,5 +74,5 @@ private:
 
 #endif // HAVE_GHOST_REPLAY
 
-#endif // HEADER_REPLAYBUFFERS_H
+#endif // HEADER_REPLAYBUFFERS_HPP
 

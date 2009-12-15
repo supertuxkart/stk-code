@@ -1,4 +1,4 @@
-//  $Id: xml_reader.hpp 694 2006-08-29 07:42:36Z hiker $
+//  $Id: xml_node.hpp 694 2006-08-29 07:42:36Z hiker $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009 Joerg Henrichs
@@ -17,7 +17,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef HAVE_IRRLICHT
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
@@ -33,25 +32,37 @@ class XMLNode
 {
 private:
     /** Name of this element. */
-    std::string                         m_name;
+    std::string                          m_name;
     /** List of all attributes. */
     std::map<std::string, core::stringw> m_attributes;
+    /** List of all sub nodes. */
+    std::vector<XMLNode *>               m_nodes;
+    void readXML(io::IXMLReader *xml);
 public:
-         XMLNode(const std::string &name, io::IXMLReader *xml);
+         XMLNode(io::IXMLReader *xml);
+         XMLNode(const std::string &filename);
+        ~XMLNode();
     const std::string &getName() const {return m_name; }
+    const XMLNode     *getNode(const std::string &name) const;
+    const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;
+    const XMLNode     *getNode(unsigned int i) const;
+    unsigned int       getNumNodes() const {return m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, int *value) const;
+    int get(const std::string &attribute, unsigned int *value) const;
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;
+	int get(const std::string &attribute, core::vector2df *value) const;
     int get(const std::string &attribute, core::vector3df *value) const;
     int get(const std::string &attribute, video::SColorf *value) const;
+    int get(const std::string &attribute, video::SColor *value) const;
     int get(const std::string &attribute, std::vector<std::string> *value) const;
     int get(const std::string &attribute, std::vector<float> *value) const;
     int get(const std::string &attribute, std::vector<int> *value) const;
     int get(core::vector3df *value) const;
     int getXYZ(core::vector3df *value) const;
-    int getXYZ(Vec3 *value) const;
+    int getXYZ(Vec3 *vaslue) const;
     int getHPR(core::vector3df *value) const;
     int getHPR(Vec3 *value) const;
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
@@ -63,5 +74,4 @@ public:
     static bool hasR(int b) { return (b&4)==4; }
 };   // XMLNode
 
-#endif
 #endif

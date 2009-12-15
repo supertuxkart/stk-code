@@ -2,8 +2,8 @@
 
 (tuxkart-collectable
  (name  "parachute")
- (model "parachute.ac")
- (icon  "parachute.rgb")
+ (mesh  "parachute.b3d")
+ (icon  "parachute.png")
 )
 
 ;; EOF ;;

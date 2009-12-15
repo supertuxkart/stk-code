@@ -19,11 +19,11 @@
 
 #ifdef HAVE_GHOST_REPLAY
 
+#include "replay/replay_buffers.hpp"
+
 #include <cassert>
 
-
-#include "replay_base.hpp"
-#include "replay_buffers.hpp"
+#include "replay/replay_base.hpp"
 
 #define REPLAY_SAVE_STATISTIC
 

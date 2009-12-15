@@ -31,11 +31,8 @@
 #  include <AL/al.h>
 #endif
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
-
-#include "file_manager.hpp"
-#include "user_config.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 
 SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) : SFXBase()
 {
@@ -43,6 +40,7 @@ SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) 
     m_soundSource = 0;
     m_ok          = false;
     m_positional  = false;
+    m_defaultGain = gain;
 
     alGenSources(1, &m_soundSource );
     if(!SFXManager::checkError("generating a source")) return;
@@ -52,7 +50,7 @@ SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) 
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff      );
-    alSourcef (m_soundSource, AL_GAIN,            gain         );
+    alSourcef (m_soundSource, AL_GAIN,            m_defaultGain);
     if(positional)
        alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
     else
@@ -88,6 +86,18 @@ void SFXOpenAL::speed(float factor)
     alSourcef(m_soundSource,AL_PITCH,factor);
     SFXManager::checkError("changing the speed");
 }   // speed
+
+//-----------------------------------------------------------------------------
+/** Changes the volume of a sound effect.
+ *  \param gain Volume adjustment between 0.0 (mute) and 1.0 (full volume).
+ */
+void SFXOpenAL::volume(float gain)
+{
+    if(!m_ok) return;
+
+    alSourcef(m_soundSource, AL_GAIN, m_defaultGain * gain);
+    SFXManager::checkError("setting volume");
+}   // volume
 
 //-----------------------------------------------------------------------------
 /** Loops this sound effect.

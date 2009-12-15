@@ -20,26 +20,26 @@
 #ifndef HEADER_NITRO_HPP
 #define HEADER_NITRO_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
-#include "particle_system.hpp"
+#include "irrlicht.h"
+using namespace irr;
 
 class Kart;
 
-class Nitro: public ParticleSystem
+class Nitro
 {
 private:
     /** The kart to which this smoke belongs. */
     Kart           *m_kart;
-    /** The texture to use. */
-    ssgSimpleState *m_nitro_fire;
-
+    /** Irrlicht's particle systems. */
+    scene::IParticleSystemSceneNode *m_node;
+    /** The emitter. Access to this is needed to adjust the number of
+     *  particles per second. */
+    scene::IParticleEmitter         *m_emitter;
 public:
                  Nitro          (Kart* kart);
-                ~Nitro          ();
-    virtual void update         (float t                                        );
-    virtual void particle_create(int index, Particle* p                         );
-    virtual void particle_update(float deltaTime, int index, Particle *p        );
+    virtual     ~Nitro          ();
+    virtual void update         (float t);
+    void         setCreationRate(float f);
 };
 #endif
 

@@ -19,17 +19,17 @@
 
 #include "items/powerup.hpp"
 
-#include "user_config.hpp"
-#include "race_manager.hpp"
-#include "stk_config.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
@@ -118,6 +118,9 @@ Material *Powerup::getIcon()
 //-----------------------------------------------------------------------------
 void Powerup::use()
 {
+    // Play custom kart sound when collectible is used
+    if (m_type != POWERUP_NOTHING && m_type != POWERUP_ZIPPER) m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
+
 	// FIXME - for some collectibles, set() is never called
 	if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
 	

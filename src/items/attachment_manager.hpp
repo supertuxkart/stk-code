@@ -19,16 +19,18 @@
 #ifndef HEADER_ATTACHMENT_MANAGER_HPP
 #define HEADER_ATTACHMENT_MANAGER_HPP
 
-#include <plib/ssg.h>
+#include "irrlicht.h"
 #include "items/attachment.hpp"
 
 class AttachmentManager
 {
 private:
-    ssgEntity *m_attachments[ATTACH_MAX];
+    scene::IMesh *m_attachments[ATTACH_MAX];
 public:
     AttachmentManager() {};
-    ssgEntity *getModel         (attachmentType type) {return m_attachments[type];}
+    /** Returns the mest for a certain attachment.
+     *  \param type Type of the attachment needed. */
+    scene::IMesh *getMesh(attachmentType type) const {return m_attachments[type]; }
     void       removeTextures   ();
     void       loadModels       ();
 };

@@ -19,10 +19,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_PLAYERKART_H
-#define HEADER_PLAYERKART_H
+#ifndef HEADER_PLAYERKART_HPP
+#define HEADER_PLAYERKART_HPP
 
-#include "player.hpp"
+#include "config/player.hpp"
+#include "graphics/camera.hpp"
 #include "karts/kart.hpp"
 
 class SFXBase;
@@ -34,40 +35,46 @@ class Camera;
 class PlayerKart : public Kart
 {
 private:
-    int     m_steer_val, m_steer_val_l, m_steer_val_r;
-    int     m_prev_accel;
-    bool    m_prev_brake;
+    int           m_steer_val, m_steer_val_l, m_steer_val_r;
+    int           m_prev_accel;
+    bool          m_prev_brake;
 
-    Player *m_player;
-    float   m_penalty_time;
-    Camera *m_camera;
+    ActivePlayer *m_player;
+    float         m_penalty_time;
+    Camera       *m_camera;
 
-    SFXBase *m_bzzt_sound;
-    SFXBase *m_wee_sound;
-    SFXBase *m_ugh_sound;
-    SFXBase *m_grab_sound;
-    SFXBase *m_full_sound;
+    SFXBase      *m_bzzt_sound;
+    SFXBase      *m_wee_sound;
+    SFXBase      *m_ugh_sound;
+    SFXBase      *m_grab_sound;
+    SFXBase      *m_full_sound;
 
     void steer(float, int);
 public:
-                 PlayerKart(const std::string& kart_name,
-                            int position, Player *_player,
-                            const btTransform& init_pos, int player_index);
-                ~PlayerKart        ();
-    int          earlyStartPenalty () {return m_penalty_time>0; }
-    Player      *getPlayer         () {return m_player;        }
-    void         update            (float);
-    void         action            (KartAction action, int value);
-    void         handleZipper      ();
-    void         collectedItem     (const Item &item, int add_info=-1);
-    virtual void crashed           (Kart *k);
-    virtual void setPosition       (int p);
-    virtual void raceFinished      (float time);
-    virtual void doingShortcut     ();
-    bool         isPlayerKart      () const {return true;}
-    Camera*      getCamera         () {return m_camera;}
-    void         reset             ();
-    void         resetInputState   ();
+                   PlayerKart(const std::string& kart_name,
+                              int position, ActivePlayer *_player,
+                              const btTransform& init_pos, 
+                              unsigned int player_index);
+                  ~PlayerKart        ();
+    ActivePlayer  *getPlayer         () { return m_player;                }
+    PlayerProfile *getPlayerProfile  () { return m_player->getProfile();  }
+    void           update            (float);
+    void           action            (PlayerAction action, int value);
+    void           handleZipper      ();
+    void           collectedItem     (const Item &item, int add_info=-1);
+    virtual void   crashed           (Kart *k);
+    virtual void   setPosition       (int p);
+    virtual void   raceFinished      (float time);
+    bool           isPlayerKart      () const {return true;}
+    Camera*        getCamera         () {return m_camera;}
+    void           reset             ();
+    void           resetInputState   ();
+    /** Sets viewport etc. for the camera of this kart. */
+    void           activateCamera    () {m_camera->activate(); }
+    /** Returns the viewport of the camera of this kart. */
+    const core::recti& getViewport() const {return m_camera->getViewport(); }
+    /** Returns the scaling in x/y direction for the camera of this kart. */
+    const core::vector2df& getScaling() const {return m_camera->getScaling(); }
 };
 
 #endif

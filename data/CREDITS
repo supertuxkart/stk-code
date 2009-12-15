@@ -1,68 +1,52 @@
-Super TuxKart - SVN
-=================
-Visit us at http://supertuxkart.sourceforge.net
+= Super TuxKart =
+A Libre Karting Game Featuring Tux & Friends
+- Version SVN
+- Visit us at http://supertuxkart.sf.net
 
 
-SuperTuxKart Administrators:
-----------------------------
+= SuperTuxKart Administrators =
 
 Joerg Henrichs (hiker)
 - Project leader
-- Programming
+- Lead Programming
+- Windows Packaging
 
 Marianne Gagnon (Auria)
+- Lead Programming
 - Art director
-- Programming
+- Mac OS X Packager
 
 Constantin Pelikan (conso)
+- Add-ons administrator
 - Art director
-- Add-on package administrator
 
 
-Additional Programming
-----------------------
+= Additional Programming =
 
 Stephen Dunn
 - Work on Audio
 
-Damien
-- Ogg vorbis support
-
-Yann Leprince (sciyann)
-- Improved build system
-- Bug fixes
-
-Patrick Ammann
-- OpenAL support
-- Bug fixes
-- Code cleanup
-
-Paul Elms (scifly)
-- Change resoluton GUI
-- Bug fixes
-
-Robert Schuster
-- User settings updates
-- Input handling improvements
-- SDL port
-- Bug fixes
+Bug fixes & misc contributions
+- Damien
+- Yann Leprince (sciyann)
+- Robert Schuster
+- Patrick Ammann
+- Paul Elms (scifly)
+- Xapantu
 
 
-Visual art
-----------
+David
+- Work on flying items
+
+= Visual art =
 
 Minibjorn
-- Powerups and baddies : Bowling Ball, Cake, Plunger, Bubblegum, Anchor, Bomb, Gift-box, Nitro-tank (models + icons)
+- Powerups and baddies (models + icons)
+-     (Bowling Ball, Cake, Plunger, Bubblegum,
+-     Anchor, Bomb, Gift-box, Nitro-tank)
 - Fire and smoke particles
 - Puffy kart
 - Various textures
-
-The BurningWell image collection
-
-Tobias Beyrer
-- Wilber kart
-- elePHPant kart
-- main menu background (with modifications by Auria and MiniBjorn)
 
 Thomas Oppl
 - 'Canyon' track
@@ -70,205 +54,188 @@ Thomas Oppl
 - New 'racetrack' track
 - New banana model
 
-Benjamin Arnaudet
-- GNU Kart
+Cheleb
+- Nolok kart
+- Pidgin kart
 
-MacIO
-- Cave X arena
+Tobias Beyrer
+- Wilber kart
+- elePHPant kart
 
+GUI Icons
+- onyum.com, commissioned by OpenGameArt.org/Bart Kelsey
+- yeKcim (Anthony Carré)
 
 Ivar ten Cate (Varivar)
 - Old mine track
 - Tux Tollway track
 
-Canarix, Andy (Needer)
-- 2D art
-
-Startrack improvements:
-    Canarix, Andy (Needer)
-    Conso
-    Paul Elms (scifly)
-
-Marianne Gagnon (Auria)
-- 'SnowTux peak' track (Based on previous track 'Geeko peak' from original TuxKart)
-- 'Shifting sands', 'Around the Lighthouse' and 'On the beach' track improvements
-- 'Amazonian Journey' track
-- 'Fort Magma' track (based on previous track 'BSOD castle' from original TuxKart) (modified by conso)
-- 'Crescent Crossing' track (Based on previous track 'little volcano' from GOTM contributors)
-- New icon
-
-Frederico de Oliveira Linhares
-- Hexley the platypus character (modified and arranged with modified Wilber-kart by conso)
-
-Johannes Sjolund
-- 'The Island' track (with modifications by Wayne Dennis (Pixel_2ACF3))
-
-Christian Framing 
-- Updated EvilTux kart
+Other art contributions
+- Benjamin Arnaudet : GNU kart
+- MacIO : Cave X arena
+- abejones : Adiumy kart
+- Christian Framing (Updated EvilTux kart)
+- Andy (Needer)
+- Paul Elms (scifly)
+- Rudy85 : Character animations
 
 Robert Howie
 - Skyline Track  (with modifications by conso)
+
+Elisee
+- Checker background
+
+Marianne Gagnon (Auria)
+- 'SnowTux peak' (Based on older 'Geeko peak')
+- 'Shifting sands' improvements
+- 'Around the Lighthouse' improvements
+- 'On the beach' improvements
+- 'Amazonian Journey' track
+- 'Fort Magma' (based on older 'BSOD castle')
+- 'Crescent Crossing' (Based on older 'little volcano')
+- New icon
+
+Frederico de Oliveira Linhares
+- Hexley kart character (modified
+- to use Wilber-kart by conso)
+
+Johannes Sjolund
+- 'The Island' track (with modifications
+- by Wayne Dennis (Pixel_2ACF3))
 
 Canis Lupus
 - Snow Mountain track
 - XR591 track (with modifications by conso)
 
-Music
------
+Other media sources
+- BurningWell : public domain photos
+- Extreme Tux Racer
+- The Glest Jungle Set
 
-Weirwood
-- 'Kart grand prix' song
-
-Lukas Siewert (Dr.Sternhagel)
-- 'Caribbean music' song
-
-Magne Djupvik
-- 'Penguin Party' song
-
-Paul Esra Martin (P@ule)
-- 'G4M fan track' song
-
-Marianne Gagnon (Auria)
-- Jungle song
-
-Matt Thomas
-- Boom-boom-boom song
-
-Chris Leutwyler (kronobil)
-- Old mine song
-- Snowy track song
-
-Other music (not specifically created for STK):
-- Brad Sucks for 'Out of it' (modified by conso)
-- ChillCarrier for 'Druckverlust'
-- Deff Syndicate for 'hip hop 1'
-- Alessandro Bottura for 'MayDay Mayhem' (modified by conso)
-- Speedsound for 'Sky Vibe - High Frequency'
-- Daniel Bautista for 'Symphony No. 5' (modified by conso)
-- TheDeadRocks for 'GreenSecretFromAmazonia', 'EasyJob', 'OneMillionDollar'
-
-SFX
----
-
-Stephan Wiefling
-- Menu sounds
-
-Misc sound effects :
-- Daveincamas
-- Radio Mall
-- BLASTWAVEFX 02344
-- smcameron
-- SmiertSpionem
-- Battle For Wesnoth
-- FreqMan
-- Pogotron
-- roscoetoon
-- han1
-- lonemonk
-
-The TORCS project for their engine sound
+= Music =
 
 The Dead Rocks
--Easy Job
--Green Secret from Amazonia
--One Million dollar
+- 'GreenSecretFromAmazonia'
+- 'EasyJob'
+- 'OneMillionDollar'
 
+Misc songs
+- Weirwood : 'Kart grand prix'
+- Magne Djupvik : 'Penguin Party'
+- Paul Esra Martin (P@ule) 'G4M fan track'
+- Marianne Gagnon (Auria) : 'Jungle song'
+- Matt Thomas : 'Boom-boom-boom song'
+- Lukas Siewert (Dr.Sternhagel) : 'Caribbean music'
+- Chris Leutwyler (kronobil) : 'Old mine'
 
-Stephen Dunn, based on work by morgantj
-- Engine sound
+Misc songs
+- Chris Leutwyler (kronobil) : 'Snowy track'
+- Brad Sucks - 'Out of it'
+- ChillCarrier - 'Druckverlust'
+- Deff Syndicate - 'hip hop 1'
+- Alessandro Bottura - 'MayDay Mayhem'
+- Speedsound - 'Sky Vibe Hi Frequency'
+- Daniel Bautista - 'Symphony No. 5'
 
-Atheal Washington and Stephen Dunn
-- Skidding sound
+= Sound Effects =
 
-Translations
-------------
-German: Dominique Leuenberger (dimstar), Stefan von Halenbach, Constantin Pelikan
-French: Marianne Gagnon (Auria), Yann Leprince (sciyann)
-Dutch:  Frans van Rijn (Asciimonster)
-Spanish: David Ballesteros Mayo (Dividio), Samuel (netocp-1)
-Italian: Vincenzo (Gigugin)
-Swedish: Niklas Grahn (Respit)
-Romanian: Marina Muncescu
-Portugese: Flávio Zavan (nebososo)
-Irish: Aaron Kearns
-Finnish : Kristian Laakkonen
-Galician : Adrián Chaves Fernández, Proxecto Trasno
-Polish:  Patryk Wychowaniec (patryk1303)
-Czech: Ondřej Hruška (Prasisko)
-Catalan : Albert Juhé Lluveras (Aljullu)
+Sound effects
+- Daveincamas, Radio Mall, BLASTWAVEFX 02344
+- smcameron, SmiertSpionem, lonemonk, han1
+- Pogotron, roscoetoon, FreqMan
+- Stephan Wiefling : Menu sounds
 
-Mac OS X port
--------------
+Sound effects
+- Stephen Dunn & morgantj : engine sound
+- Stephen Dunn & Atheal Washington : skidding
+- Battle For Wesnoth
+- The TORCS project
 
-Marianne Gagnon (Auria)
-  with additional and/or past involvement from
-  Cherryprice, Nuke, Florian, JPenguin, TinGamer, Xeno74
+= Translations =
+
+German
+- Dominique Leuenberger (dimstar)
+- Stefan von Halenbach
+- Constantin Pelikan
+
+French
+- Marianne Gagnon (Auria)
+- Yann Leprince (sciyann)
+
+Spanish
+- David Ballesteros Mayo (Dividio)
+- Samuel (netocp-1)
+
+Galician
+- Adrián Chaves Fernández
+- Proxecto Trasno
+
+More translations
+- Dutch : Frans van Rijn (Asciimonster)
+- Italian : Vincenzo (Gigugin)
+- Swedish : Niklas Grahn (Respit)
+- Romanian : Marina Muncescu
+- Portugese : Flávio Zavan (nebososo)
+- Danish : Joe Dalton
+
+More translations
+- Irish : Aaron Kearns
+- Finnish : Kristian Laakkonen
+- Polish : Patryk Wychowaniec (patryk1303 / p98)
+- Czech : Ondřej Hruška (Prasisko)
+- Catalan : Albert Juhé Lluveras (Aljullu)
+- Slovenian : mufic
+
+= Misc =
+
+Website
+- Tom Jenkins : skin and layout
+- Remy le Guen (Vivelefrat)
+- Sebastian Rode
+- Hiker, Auria, Conso
 
 Testing
--------
+- Canarix
+- JPenguin
+- The Games4Mac Forum Community
+- (http://community.games4mac.de)
 
-Canarix, JPenguin
+Donations
+- Markus Liukka
+- Michael Roessner (http://www.retrax.de)
+- Phelippeau Rudy (rudy251079)
+- Carl Olsson
+- Tux_penguin
+- OpenGameArt.org
 
-The friendly people at the Games4Mac Forum
-Website: http://community.games4mac.de
+= Previous contributors =
 
+No more active
+- Eduardo Hernandez Munoz (Coz) : Former Admin
+- Sam Clarke : Windows Installer
+- Hans "the farmer" Dzaack : Physics tuning
+- Maik Semder (Ikework) : Bug fixes
 
-Webmasters
-----------
-
-Constantin Pelikan (conso)
-- General improvements
-
-Remy le Guen (Vivelefrat)
-- Website improvements
-
-Sebastian Rode
-- STK description on the website
-
-
-Misc
-----
-
-Hans Dzaack (Hans the farmer)
-- Physics tuning
-
-Markus Liukka
-- Donator
-
-Michael Roessner
-Website: http://www.retrax.de
-- Donator
-
-Sam Clarke
-- Windows Installer
-
-Previous contributors (version 0.5 and earlier):
-------------------------------------------------
-Eduardo Hernandez Munoz (Coz) (former Co-admin)
-
-Maik Semder (Ikework)
-- Bug fixes
-
-Canarix
-- Original user interface
-
-Game of the Month, STK version 0.0.0 :
-    See http://happypenguin.org/forums/viewforum.php?f=21
-    Caleb Sawtell
-    Craig Keogh
-    Ingo Ruhnke
-    Jacob Persson
-    James Gregory
-    Matthias Braun
-    Oliver Jeeves
-    Pascal Giard
-    Paul Carley
-    Ricardo Cruz
-    Willian Padovani Germano
+Game of the Month (STK version 0.0)
+- Craig Keogh, Ingo Ruhnke, Jacob Persson
+- James Gregory, Pascal Giard
+- Matthias Braun, Oliver Jeeves
+- Paul Carley, Ricardo Cruz, Caleb Sawtell
+- Willian Padovani Germano, James Gregory
 
 Original Tuxkart
-------------------
+- Steve Baker (http://www.sjbaker.org/)
+- Oliver Baker
 
-Steve Baker, Oliver Baker
-Website: http://www.sjbaker.org/
-- Everything except the music
+= Thanks for Playing! =
+Do not hesistate to contribute!
+- Give feedback
+- Participate on the community
+- Donate
+- Make art
+- Code a feature
+-
+-
+-
+-
+-

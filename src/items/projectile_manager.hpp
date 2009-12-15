@@ -17,13 +17,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PROJECTILEMANAGER_H
-#define HEADER_PROJECTILEMANAGER_H
+#ifndef HEADER_PROJECTILEMANAGER_HPP
+#define HEADER_PROJECTILEMANAGER_HPP
 
 #include <vector>
-#include <plib/ssg.h>
-#include "items/powerup_manager.hpp"
+#include "irrlicht.h"
+
 #include "audio/sfx_manager.hpp"
+#include "items/powerup_manager.hpp"
 
 class Vec3;
 class Kart;
@@ -44,7 +45,7 @@ private:
     // being shown
     Explosions       m_active_explosions;
 
-    ssgSelector*     m_explosion_model;
+    scene::IMesh    *m_explosion_model;
     bool             m_something_was_hit;
     bool             m_explosion_ended;
     void             updateClient(float dt);
@@ -55,9 +56,9 @@ public:
     /** Notifies the projectile manager that something needs to be removed. */
     void             notifyRemove     () {m_something_was_hit=true; }
     void             FinishedExplosion() {m_explosion_ended =true;  }
-    ssgSelector*     getExplosionModel()
+    scene::IMesh*     getExplosionModel()
     {
-        return (ssgSelector*)m_explosion_model->clone();
+        return m_explosion_model;
     }
     unsigned int     getNumProjectiles() const {return m_active_explosions.size();}
     int              getProjectileId  (const std::string ident);

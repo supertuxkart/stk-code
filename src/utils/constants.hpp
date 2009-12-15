@@ -37,16 +37,6 @@
 
 #define KILOMETERS_PER_HOUR  (KILOMETER/HOUR)
 
-// Zipper related constants:
-// =========================
-#define ZIPPER_ANGLE          45.0
-#define ZIPPER_TIME           1.0f   /* Seconds */
-#define ZIPPER_VELOCITY      (100.0f * KILOMETERS_PER_HOUR )
-
-// Traffic (not used at this time)
-// ===============================
-#define TRAFFIC_VELOCITY        ( 20.0f * KILOMETERS_PER_HOUR )
-
 /* M$ compilers don't define M_PI... */
 
 #ifndef M_PI
@@ -54,7 +44,10 @@
 #endif
 
 #define NINETY_DEGREE_RAD  (M_PI/2.0f)
-#define DEGREE_TO_RAD(x)          ((x)*M_PI/180.0f)
-#define RAD_TO_DEGREE(x)          ((x)*180.0f/M_PI)
-#endif
+#define DEGREE_TO_RAD      (M_PI/180.0f)
+#define RAD_TO_DEGREE      (180.0f/M_PI)
 
+const int MAX_PLAYER_COUNT = 4;
+
+
+#endif

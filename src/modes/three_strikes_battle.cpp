@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gui/race_gui.hpp"
+#include "states_screens/race_gui.hpp"
 #include "audio/sound_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -39,7 +39,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
     }
  
     const unsigned int kart_amount = m_kart.size();
-    m_kart_display_info = new KartIconDisplayInfo[kart_amount];
+    m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
@@ -51,12 +51,14 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         // no positions in this mode
         m_kart[n]->setPosition(-1);
     }// next kart
-}
+}   // ThreeStrikesBattle
+
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     delete[] m_kart_display_info;
-}
+}   // ~ThreeStrikesBattle
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::onGo()
 {
@@ -67,8 +69,9 @@ void ThreeStrikesBattle::onGo()
     {
         m_kart[i]->resetBrakes();
     }
-}
+}   // onGo
 //-----------------------------------------------------------------------------
+
 void ThreeStrikesBattle::terminateRace()
 {
     updateKartRanks();
@@ -84,7 +87,8 @@ void ThreeStrikesBattle::terminateRace()
     }   // for i
     
     World::terminateRace();
-}
+}   // terminateRace
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
@@ -103,18 +107,31 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
         removeKart(kart_id);
     }
     
-    // almost over, use fast music
-    if(getCurrentNumKarts()==2 && m_faster_music_active==false)  
+    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    int num_karts_many_lives = 0;
+ 
+    for( unsigned int n = 0; n < NUM_KARTS; ++n )
+    {
+        if (m_kart_info[n].m_lives > 1)
+            num_karts_many_lives++;
+    }
+    
+    // when almost over, use fast music
+    if (num_karts_many_lives<=1 && !m_faster_music_active)
     {
         sound_manager->switchToFastMusic();
         m_faster_music_active = true;
     }
-}
+}   // kartHit
+
 //-----------------------------------------------------------------------------
-std::string ThreeStrikesBattle::getInternalCode() const
+/** Returns the internal identifier for this race.
+ */
+std::string ThreeStrikesBattle::getIdent() const
 {
-    return "BATTLE_3_STRIKES";
-}
+    return STRIKES_IDENT;
+}   // getIdent
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::updateKartRanks()
 {
@@ -160,25 +177,26 @@ void ThreeStrikesBattle::updateKartRanks()
         m_kart[ karts_list[n] ]->setPosition( n+1 );
     }
     delete [] karts_list;
-}
-//-----------------------------------------------------------------------------
-void ThreeStrikesBattle::update(float delta)
-{
-    World::update(delta);
+}   // updateKartRank
 
-    // check if over
-    if(getCurrentNumKarts()==1 || getCurrentNumPlayers()==0)
-    {
-        // Add the results for the remaining kart
-        for(int i=0; i<(int)race_manager->getNumKarts(); i++)
-            if(!m_kart[i]->isEliminated()) 
-                race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
-    
-        if(!RaceManager::getWorld()->isFinishPhase())
-            TimedRace::enterRaceOverState();
-        return;
-    }
-}
+//-----------------------------------------------------------------------------
+void ThreeStrikesBattle::enterRaceOverState(const bool delay)
+{
+    World::enterRaceOverState(delay);
+    // Add the results for the remaining kart
+    for(int i=0; i<(int)race_manager->getNumKarts(); i++)
+        if(!m_kart[i]->isEliminated()) 
+            race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
+}   // enterRaceOverState
+
+//-----------------------------------------------------------------------------
+/** The battle is over if only one kart is left, or no player kart.
+ */
+bool ThreeStrikesBattle::isRaceOver()
+{
+    return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
+}   // isRaceOver
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()
 {
@@ -193,15 +211,15 @@ void ThreeStrikesBattle::restartRace()
         // no positions in this mode
         m_kart[n]->setPosition(-1);
     }// next kart
-}
-//void ThreeStrikesBattle::getDefaultCollectibles(int& collectible_type, int& amount)
+}   // restartRace
+
 //-----------------------------------------------------------------------------
-KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* caller)
+RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 {
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        KartIconDisplayInfo& rank_info = m_kart_display_info[i];
+        RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
         
         // reset color
         rank_info.lap = -1;
@@ -237,12 +255,13 @@ KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo(const RaceGUI* call
     }
     
     return m_kart_display_info;
-}
+}   // getKartDisplayInfo
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     // find closest point to drop kart on
-    const int start_spots_amount = RaceManager::getTrack()->m_start_positions.size();
+    const int start_spots_amount = RaceManager::getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
     int smallest_distance_found = -1, closest_id_found = -1;
@@ -254,8 +273,9 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
-        const int dist_n = abs((int)(kart_x - RaceManager::getTrack()->m_start_positions[n][0])) +
-                           abs((int)(kart_y - RaceManager::getTrack()->m_start_positions[n][1]));
+        const Vec3 &v=RaceManager::getTrack()->getStartPosition(n);
+        const int dist_n = abs((int)(kart_x - v.getX())) +
+                           abs((int)(kart_y - v.getY()));
         if(dist_n < smallest_distance_found || closest_id_found == -1)
         {
             closest_id_found = n;
@@ -264,24 +284,41 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     }
     
     assert(closest_id_found != -1);
-    
-    kart->setXYZ( Vec3(RaceManager::getTrack()->m_start_positions[closest_id_found]) );
+    const Vec3 &v=RaceManager::getTrack()->getStartPosition(closest_id_found);
+    kart->setXYZ( Vec3(v) );
     
     // FIXME - implement correct heading
-    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */ );
+    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
+                         RaceManager::getTrack()->getStartHeading(closest_id_found));
     kart->setRotation(heading);
-    
-    // A certain epsilon is added here to the Z coordinate (0.1), in case
-    // that the points are somewhat under the track. Otherwise, the
-    // kart will be placed a little bit under the track, triggering
-    // a rescue, ...
+
+    //position kart from same height as in World::resetAllKarts
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()+0.1f));
+    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()));
     pos.setRotation( btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */) );
-    
+
     body->setCenterOfMassTransform(pos);
+
+    //project kart to surface of track
+    bool kart_over_ground = m_physics->projectKartDownwards(kart);
+
+    if (kart_over_ground)
+    {
+        //add vertical offset so that the kart starts off above the track
+        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+                                kart->getKartHeight();
+        body->translate(btVector3(0, 0, vertical_offset));
+    }
+    else
+    {
+        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
+                (kart->getIdent().c_str()), m_track->getIdent().c_str());
+    }
     
-}
+    //add hit to kart
+    kartHit(kart->getWorldKartId());
+}   // moveKartAfterRescue
+
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::raceResultOrder( int* order )
 {
@@ -295,13 +332,16 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
         assert(pos < (int)num_karts);
         order[pos] = kart_id;
     }
-}
+}   // raceResultOrder
+
 //-----------------------------------------------------------------------------
 bool ThreeStrikesBattle::acceptPowerup(const int type) const
 {
     // these powerups don't make much sense in battle mode
-    if(type == POWERUP_PARACHUTE || type == POWERUP_ANVIL || type == POWERUP_ZIPPER) return false;
+    if(type == POWERUP_PARACHUTE || type == POWERUP_ANVIL ||
+       type == POWERUP_BUBBLEGUM || type == POWERUP_ZIPPER)
+       return false;
     
     return true;
-}
+}   // acceptPowerup
 

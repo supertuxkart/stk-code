@@ -1,0 +1,13 @@
+The files in this directory should replace the corresponding
+files in an irrlicht-1.5 distribution. They add a new function
+draw2DPolygon (with different parameters than the existing 
+function with the same name). The new function is used to
+draw the speedometer, and the track display with the kart
+symbols on it.
+
+If an unpatched version of irrlicht is used, STK will still
+compile, but the above mentioned elements will be missing.
+
+We hope that this function (or a similar one) will be 
+included in the next irrlicht release, making the use of
+a patched version unnecessary.

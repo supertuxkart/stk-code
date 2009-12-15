@@ -18,8 +18,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "items/attachment_manager.hpp"
-#include "file_manager.hpp"
-#include "loader.hpp"
+
+#include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 
 AttachmentManager *attachment_manager = 0;
 
@@ -44,19 +45,11 @@ struct  initAttachmentType {attachmentType attachment; const char *file;};
 
 initAttachmentType iat[]=
 {
-#ifdef HAVE_IRRLICHT
     {ATTACH_PARACHUTE,   "parachute.b3d"},
     {ATTACH_BOMB,        "bomb.b3d"},
-    {ATTACH_ANVIL,       "anvil.b3d"},
-    {ATTACH_TINYTUX,     "tinytux_magnet.b3d"},
+    {ATTACH_ANVIL,       "anchor.b3d"},
+    {ATTACH_TINYTUX,     "anchor.b3d"},
     {ATTACH_MAX,         ""},
-#else
-    {ATTACH_PARACHUTE,   "parachute.ac"},
-    {ATTACH_BOMB,        "bomb.ac"},
-    {ATTACH_ANVIL,       "anvil.ac"},
-    {ATTACH_TINYTUX,     "tinytux_magnet.ac"},
-    {ATTACH_MAX,         ""},
-#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -64,9 +57,8 @@ void AttachmentManager::removeTextures()
 {
     for(int i=0; iat[i].attachment!=ATTACH_MAX; i++)
     {
-        ssgDeRefDelete(m_attachments[iat[i].attachment]);
+        // FIXME: free attachment textures
     }   // for
-    callback_manager->clear(CB_ATTACHMENT);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
@@ -76,11 +68,8 @@ void AttachmentManager::loadModels()
     {
         // FIXME LEAK: these models are not removed (unimportant, since they
         // have to be in memory till the end of the game.
-#ifdef HAVE_IRRLICHT
-#else
-        m_attachments[iat[i].attachment]=loader->load(iat[i].file, CB_ATTACHMENT);
-        m_attachments[iat[i].attachment]->ref();
-#endif
+        std::string full_path = file_manager->getModelFile(iat[i].file);
+        m_attachments[iat[i].attachment]=irr_driver->getMesh(full_path);
     }   // for
 }   // reInit
 

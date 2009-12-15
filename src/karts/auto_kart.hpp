@@ -18,21 +18,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_AUTOKART_H
-#define HEADER_AUTOKART_H
+#ifndef HEADER_AUTOKART_HPP
+#define HEADER_AUTOKART_HPP
+
+#include "irrlicht.h"
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 
 class AutoKart : public Kart
 {
-    public:
-        AutoKart(const std::string& kart_name, int position,
-                 const btTransform& init_pos) :
-           Kart(kart_name, position, init_pos) {}
+public:
+    AutoKart(const std::string& kart_name, int position,
+        const btTransform& init_pos) :
+    Kart(kart_name, position, init_pos) {}
 
-        bool  isPlayerKart() const {return false;}
-};
+    bool  isPlayerKart() const {return false;}
+};   // AutoKart
 
 #endif
 

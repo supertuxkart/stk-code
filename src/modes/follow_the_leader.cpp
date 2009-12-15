@@ -15,12 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "user_config.hpp"
+#include "modes/follow_the_leader.hpp"
+
 #include "audio/sound_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "gui/menu_manager.hpp"
+#include "config/user_config.hpp"
+#include "states_screens/race_gui.hpp"
 #include "items/powerup_manager.hpp"
-#include "modes/follow_the_leader.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
 
@@ -28,7 +29,6 @@
 FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals = stk_config->m_leader_intervals;
-    LinearWorld::init();
     m_use_highscores   = false;  // disable high scores
 	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }
@@ -84,14 +84,23 @@ void FollowTheLeaderRace::countdownReachedZero()
     
     // The follow the leader race is over if there is only one kart left,
     // or if all players have gone
-    if(getCurrentNumKarts()==2 || getCurrentNumPlayers()==0)
+    if(isRaceOver())
     {
         // Note: LinearWorld::terminateRace adds the scores for all remaining
         // karts in the race.
-        TimedRace::enterRaceOverState();
+        enterRaceOverState();
         return;
     }
 }
+//-----------------------------------------------------------------------------
+/** The follow the leader race is over if there is only one kart left,
+ *  or if all players have gone.
+ */
+bool FollowTheLeaderRace::isRaceOver()
+{
+    return getCurrentNumKarts()==2 || getCurrentNumPlayers()==0;
+}   // isRaceOver
+
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::onGo()
 {
@@ -127,16 +136,19 @@ void FollowTheLeaderRace::restartRace()
 	m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
 	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+}   // restartRace
+
+//-----------------------------------------------------------------------------
+/** Returns the internal identifier for this kind of race. 
+ */
+std::string FollowTheLeaderRace::getIdent() const
+{
+    return FTL_IDENT;
 }
 //-----------------------------------------------------------------------------
-std::string FollowTheLeaderRace::getInternalCode() const
+RaceGUI::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 {
-    return "FOLLOW_LEADER";
-}
-//-----------------------------------------------------------------------------
-KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo(const RaceGUI* caller)
-{
-    LinearWorld::getKartsDisplayInfo(caller);
+    LinearWorld::getKartsDisplayInfo();
     m_kart_display_info[0].special_title = _("Leader");
     return m_kart_display_info;
 }

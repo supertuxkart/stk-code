@@ -18,122 +18,62 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/moving_texture.hpp"
+#include "io/xml_node.hpp"
 
-#include "modes/world.hpp"
-#include "utils/constants.hpp"
-#include "utils/string_utils.hpp"
-
-MovingTexture::MovingTexture(char *data, ssgBranch *branch)
+/** Constructor for an animated texture.
+ *  \param matrix The texture matrix to modify.
+ *  \param node An XML node containing dx and dy attributes to set the 
+ *         speed of the animation.
+ */
+MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
+             : m_matrix(matrix)
 {
-    m_branch = branch;
-    branch->setUserData(new ssgBase());
-    branch->setName("MovingTexture");
+    m_dx = 0.0f;
+    m_dy = 0.0f;
+    core::vector3df v = m_matrix->getTranslation();
+    m_x = v.X;
+    m_y = v.Y;
 
-    m_branch->ref();
-    m_phase  = 0.0f;
-    m_mode   = MODE_FORWARD;
-    m_cycle  = 30.0f;
-    sgSetCoord(&m_now,   0, 0, 0, 0, 0, 0 ) ;
-    sgSetCoord(&m_delta, 0, 0, 0, 0, 0, 0 ) ;
-    parseData(data);
-
-
+    node.get("dx", &m_dx);
+    node.get("dy", &m_dy);
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
+/** Constructor for an animated texture, specifying the speed of the animation
+ *  directly.
+ *  \param matrix The texture matrix to modify.
+ *  \param dx Speed of the animation in X direction.
+ *  \param dy Speed of the animation in Y direction.
+ */
+MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
+             : m_matrix(matrix)
+{
+    m_dx = dx;
+    m_dy = dy;
+    core::vector3df v = m_matrix->getTranslation();
+    m_x = v.X;
+    m_y = v.Y;
+}   // Moving Texture
+
+//-----------------------------------------------------------------------------
+/** Destructor for an animated texture.
+ */
 MovingTexture::~MovingTexture()
 {
-    ssgDeRefDelete(m_branch);
-
 }   // ~MovingTexture
 
 //-----------------------------------------------------------------------------
-void MovingTexture::parseData(char *data)
-{
-    char *s = data;
-
-    // convert to uppercase
-    while(*s!='\0')
-    {
-        if( *s>='a' && *s<='z' ) *s = *s - 'a' + 'A' ;
-        s++;
-    }
-    s = data;
-
-    while ( s != NULL && *s != '\0' )
-    {
-        while ( *s > ' '                ) s++ ;     /* Skip previous token */
-        while ( *s <= ' ' && *s != '\0' ) s++ ;     /* Skip spaces         */
-
-        if ( *s == '\0' ) break ;
-
-        float f ;
-
-        if ( sscanf ( s,  "H=%f", & f ) == 1 ) m_delta.hpr[0] = f ; else
-        if ( sscanf ( s,  "P=%f", & f ) == 1 ) m_delta.hpr[1] = f ; else
-        if ( sscanf ( s,  "R=%f", & f ) == 1 ) m_delta.hpr[2] = f ; else
-        if ( sscanf ( s,  "X=%f", & f ) == 1 ) m_delta.xyz[0] = f ; else
-        if ( sscanf ( s,  "Y=%f", & f ) == 1 ) m_delta.xyz[1] = f ; else
-        if ( sscanf ( s,  "Z=%f", & f ) == 1 ) m_delta.xyz[2] = f ; else
-        if ( sscanf ( s,  "C=%f", & f ) == 1 ) m_cycle        = f ; else
-        if ( sscanf ( s,  "M=%f", & f ) == 1 ) m_mode         = (int) f ; else
-        if ( sscanf ( s,  "O=%f", & f ) == 1 ) m_phase        = f ; else
-            fprintf ( stderr, "Unrecognised @autodcs string: '%s'\n", data );
-    }   // while s!=NULL&&s!='\0'
-}   // parseData
-
-//-----------------------------------------------------------------------------
+/** Updates the transform of an animated texture.
+ *  \param dt Time step size.
+ */
 void MovingTexture::update(float dt)
 {
-    sgCoord add;
+    m_x = m_x + dt*m_dx;
+    m_y = m_y + dt*m_dy;
+    if(m_x>1.0f) m_x = fmod(m_x, 1.0f);
+    if(m_y>1.0f) m_y = fmod(m_y, 1.0f);
 
-
-    float timer = RaceManager::getWorld()->getTime() + m_phase ;
-
-    if ( m_cycle != 0.0 && m_mode != MODE_FORWARD )
-    {
-        if ( m_mode == MODE_SHUTTLE )
-        {
-            const float CTIMER = fmod ( timer, m_cycle ) ;
-
-            if ( CTIMER > m_cycle / 2.0f )
-                timer = m_cycle - CTIMER ;
-            else
-                timer = CTIMER ;
-        }
-        else
-        {
-            if ( m_mode == MODE_SINESHUTTLE )
-                timer = sin ( timer * 2.0f * M_PI / m_cycle ) * m_cycle / 2.0f ;
-            else
-                timer = fmod ( timer, m_cycle ) ;
-        }
-    }   // m_mode!=MODE_FORWARD
-
-    sgCopyCoord(&add, &m_delta  );
-    sgScaleVec3(add.xyz, dt);
-    sgScaleVec3(add.hpr, dt);
-
-    sgAddVec3(m_now.xyz, add.xyz);
-    sgAddVec3(m_now.hpr, add.hpr);
-
-    /*
-      To avoid roundoff problems with very large values
-      accumulated after long runs all rotations
-      can be modulo-360 degrees.
-    */
-
-    m_now.hpr[0] = fmod ( m_now.hpr[0], 360.0f);
-    m_now.hpr[1] = fmod ( m_now.hpr[1], 360.0f);
-    m_now.hpr[2] = fmod ( m_now.hpr[2], 360.0f);
-
-    if ( m_branch->isAKindOf(ssgTypeTexTrans()) )
-    {
-        m_now.xyz[0] = fmod( m_now.xyz[0], 1.0f);
-        m_now.xyz[1] = fmod( m_now.xyz[1], 1.0f);
-        m_now.xyz[2] = fmod( m_now.xyz[2], 1.0f);
-    }
-    ((ssgBaseTransform *) m_branch) -> setTransform(&m_now);
+    m_matrix->setTextureTranslate(m_x, m_y);
 }   // update
 
 

@@ -3,7 +3,7 @@
 (tuxkart-collectable
  (name  "magnet")
  (model "magnet.ac")
- (icon  "magnet.rgb")
+ (icon  "magnet.png")
 )
 
 ;; EOF ;;

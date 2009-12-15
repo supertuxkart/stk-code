@@ -107,10 +107,10 @@ namespace lisp
                         << ": No string inside translation.";
                     throw std::runtime_error(msg.str());
                 }
-                const char* trans=_(next->m_v.m_string);
-                const size_t LEN = strlen(trans) + 1;
+                irr::core::stringc trans=irr::core::stringc(_(next->m_v.m_string));
+                const size_t LEN = trans.size() + 1;
                 result->m_v.m_string = new char[LEN];
-                memcpy(result->m_v.m_string, trans, LEN);
+                memcpy(result->m_v.m_string, trans.c_str(), LEN);
                 delete next;
                 break;
            }

@@ -27,22 +27,27 @@
 #  endif
 #  include <GL/gl.h>
 #endif
-#include <plib/sg.h>
-#include <plib/ssg.h>
-#ifdef HAVE_IRRLICHT
-#include "irrlicht.h"
-using namespace irr;
-#endif
+
 #include <string>
 #include <vector>
+
+#include "irrlicht.h"
+using namespace irr;
+
 #include "LinearMath/btTransform.h"
-#include "material.hpp"
 #include "audio/music_information.hpp"
+#include "graphics/material.hpp"
 #include "items/item.hpp"
+#include "tracks/quad_graph.hpp"
 #include "utils/vec3.hpp"
 
 class TriangleMesh;
+class MovingTexture;
 class XMLNode;
+class PhysicalObject;
+class BezierCurve;
+class AnimationManager;
+class CheckManager;
 
 class Track
 {
@@ -50,172 +55,160 @@ private:
     float                    m_gravity;
     std::string              m_ident;
     std::string              m_screenshot;
-    std::string              m_top_view;
     std::vector<MusicInformation*> m_music;
-    std::vector<float>       m_start_x, m_start_y, m_start_z, m_start_heading;
+    /** Start heading of karts (if specified in the scene file). */
+    std::vector<float>       m_start_heading;
+    /** Start positions of karts (if specified in the scene file). */
+    std::vector<Vec3>        m_start_positions;
     std::string              m_item_style;
     std::string              m_description;
     std::string              m_designer;
+    /** The full filename of the config (xml) file. */
     std::string              m_filename;
+    /** The base dir of all files of this track. */
+    std::string              m_root;
     std::vector<std::string> m_groups;
-#ifdef HAVE_IRRLICHT
     std::vector<scene::ISceneNode*> m_all_nodes;
     std::vector<scene::IMesh*>      m_all_meshes;
-    scene::ILightSceneNode  *m_light;
-#else
-    ssgBranch               *m_model;
-#endif
+    scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
     bool                     m_has_final_camera;
     Vec3                     m_camera_final_position;
     Vec3                     m_camera_final_hpr;
+    /** Minimum coordinates of this track. */
+    Vec3                     m_aabb_min;
+    /** Maximum coordinates of this track. */
+    Vec3                     m_aabb_max;
     bool                     m_is_arena;
     int                      m_version;
-#ifdef HAVE_IRRLICHT
-    bool                     loadMainTrack(const XMLNode &node);
-#endif
-public:
-    enum RoadSide{ RS_DONT_KNOW = -1, RS_LEFT = 0, RS_RIGHT = 1 };
 
-    //An enum is not used for the QUAD_TRI_* constants because of limitations
-    //of the conversion between enums and ints.
-    static const int QUAD_TRI_NONE;
-    static const int QUAD_TRI_FIRST;
-    static const int QUAD_TRI_SECOND;
+    /** The graph used to connect the quads. */
+    QuadGraph               *m_quad_graph;
 
-    static const int UNKNOWN_SECTOR;
+    /** The type of sky to be used for the track. */
+    enum {SKY_NONE, SKY_BOX, 
+          SKY_DOME}          m_sky_type;
 
-    struct SegmentTriangle
+    /** A list of the textures for the sky to use. It contains one texture
+     *  in case of a dome, and 6 textures for a box. */
+    std::vector<std::string> m_sky_textures;
+
+    /** The list of all animated textures. */
+    std::vector<MovingTexture*> m_animated_textures;
+
+    /** List of all physical objects. */
+    std::vector<PhysicalObject*> m_physical_objects;
+
+    /** If a sky dome is used, the number of horizontal segments 
+     *  the sphere should be divided in. */
+    int                      m_sky_hori_segments;
+    /** If a sky dome is used, the number of vertical segments 
+     *  the sphere should be divided in. */
+    int                      m_sky_vert_segments;
+    /** If a sky dome is used, percentage of the sphere to be used. */
+    float                    m_sky_sphere_percent;
+    /** If a sky dome is used, percentage of the texture to be used. */
+    float                    m_sky_texture_percent;
+
+    /** A simple class to keep information about a track mode. */
+    class TrackMode
     {
-        int segment;
-        int triangle;
+    public:
+        std::string m_name;        /**< Name / description of this mode. */
+        std::string m_quad_name;   /**< Name of the quad file to use.    */
+        std::string m_graph_name;  /**< Name of the graph file to use.   */
+        std::string m_scene;       /**< Name of the scene file to use.   */
+        /** Default constructor, sets default names for all fields. */
+        TrackMode() : m_name("default"),         m_quad_name("quads.xml"),
+                      m_graph_name("graph.xml"), m_scene("scene.xml")   {};
+    };   // TrackMode
 
-        SegmentTriangle
-        (
-            int _segment,
-            int _triangle
-        ) : segment(_segment), triangle(_triangle) {};
-    };
+    /** List of all modes for a track. */
+    std::vector<TrackMode> m_all_modes;
 
-    std::string     m_name;
-    bool            m_use_fog;
-    float           m_fog_density;
-    float           m_fog_start;
-    float           m_fog_end;
-#ifdef HAVE_IRRLICHT
-    core::vector3df m_sun_position;
-    video::SColorf  m_ambient_color;
-    video::SColorf  m_specular_color;
-    video::SColorf  m_diffuse_color;
-    video::SColorf  m_sky_color;
-    video::SColorf  m_fog_color;
-#else
-    sgVec4          m_sky_color;
-    sgVec4          m_fog_color;
-    sgVec3          m_sun_position;   /** Position of the sun */
-    sgVec4          m_ambient_col;
-    sgVec4          m_specular_col;
-    sgVec4          m_diffuse_col;
-#endif
+    /** Name of the track to display. */
+    irr::core::stringw  m_name;
+    bool                m_use_fog;
+    float               m_fog_density;
+    float               m_fog_start;
+    float               m_fog_end;
+    core::vector3df     m_sun_position;
+    /** The current ambient color for each kart. */
+    video::SColor       m_ambient_color;
+    video::SColor       m_default_ambient_color;
+    video::SColor       m_sun_specular_color;
+    video::SColor       m_sun_diffuse_color;
+    video::SColor       m_fog_color;
 
-    //FIXME: Maybe the next 4 vectors should be inside an struct and be used
-    //from a vector of structs?
-    //FIXME: should the driveline be set as a sgVec2?
-    std::vector<Vec3>    m_driveline;
-    /** Same as drivelines, but with stk_config->m_offroad_tolerance applied
-     *  to widen the road (to make shortcut detection less severe). */
-    std::vector<Vec3>    m_dl_with_tolerance_left;
-    std::vector<Vec3>    m_dl_with_tolerance_right;
-    std::vector<SGfloat> m_distance_from_start;
-    std::vector<SGfloat> m_path_width;
-    std::vector<SGfloat> m_angle;
-    
-    /** Start positions for arenas (unused in linear races) */
-    std::vector<Vec3>   m_start_positions;
-    
-	//Left and Right drivelines for overhead map rendering.
-	//(Should probably be private as they are only used internally right now)
-    std::vector<Vec3> m_left_driveline;
-    std::vector<Vec3> m_right_driveline;
+    /** The texture for the mini map, which is displayed in the race gui. */
+    video::ITexture         *m_mini_map;
 
-    Vec3 m_driveline_min;
-    Vec3 m_driveline_max;
+    /** List of all bezier curves in the track - for e.g. camera, ... */
+    std::vector<BezierCurve*> m_all_curves;
 
+    /** Animation manager. */
+    AnimationManager         *m_animation_manager;
 
-    float m_total_distance;
+    /** Checkline manager. */
+    CheckManager             *m_check_manager;
+
+    void loadTrackInfo(const std::string &filename);
+    void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
+                     int bNeedHeight);
+    void loadQuadGraph(unsigned int mode_id);
+    void convertTrackToBullet(const scene::IMesh *mesh,
+                              const scene::ISceneNode*node);
+    bool loadMainTrack(const XMLNode &node);
+    void createWater(const XMLNode &node);
+    void getMusicInformation(std::vector<std::string>&  filenames, 
+                             std::vector<MusicInformation*>& m_music   );
+    void loadCurves(const XMLNode &node);
+    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+    void handleSky(const XMLNode &root, const std::string &filename);
+
+public:
+
     static const float NOHIT;
 
-    float m_track_2d_width,  // Width and heigth of the 2d display of the track
-          m_track_2d_height;
-    float m_scale_x,        // Scaling to fit track into the size determined by
-          m_scale_y;        // track2dWidth/Heightheigth
-    bool m_do_stretch;      // 2d track display might be stretched to fit better
-
-                       Track             (std::string filename,float w=100,
-                                          float h=100, bool stretch=1);
+                       Track             (std::string filename);
                       ~Track             ();
     bool               isArena           () const { return m_is_arena; }
     void               cleanup           ();
-    void               addDebugToScene   (int type                    ) const;
-    void               draw2Dview        (float x_offset,
-                                          float y_offset              ) const;
-    void               drawScaled2D      (float x, float y, float w,
-                                          float h                     ) const;
-
-    void               findRoadSector    (const Vec3& XYZ, int *sector,
-                                          bool with_tolerance=false) const;
-    int                findOutOfRoadSector(const Vec3& XYZ,
-                                           const RoadSide SIDE,
-                                           const int CURR_SECTOR
-                                           ) const;
-    int                spatialToTrack    (Vec3& dst,
-                                          const Vec3& POS,
-                                          const int SECTOR            ) const;
+    /** Returns the texture with the mini map for this track. */
+    const video::ITexture*getMiniMap     () const { return m_mini_map; }
     const Vec3&        trackToSpatial    (const int SECTOR) const;
-    void               loadTrackModel    ();
-    bool               isShortcut        (const int OLDSEC, const int NEWSEC) const;
+    void               loadTrackModel    (unsigned int mode_id=0);
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
-#ifdef HAVE_IRRLICHT
-#else
-    ssgBranch*         getModel          () const {return m_model;              }
-#endif
     float              getGravity        () const {return m_gravity;            }
+
     /** Returns the version of the .track file. */
     int                getVersion        () const {return m_version;            }
-    float              getTrackLength    () const {return m_total_distance;     }
+
+    /** Returns the length of the main driveline. */
+    float              getTrackLength    () const {return m_quad_graph->getLapLength(); }
+
+    /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;              }
-    const char*        getName           () const {return m_name.c_str();       }
+
+    /** Returns the name of the track, which is e.g. displayed on the screen. */
+    const irr::core::stringw& getName           () const {return m_name;               }
+
+    /** Returns all groups this track belongs to. */
     const std::vector<std::string>
                        getGroups         () const {return m_groups;             }
+
+    /** Starts the music for this track. */
     void               startMusic        () const;
+
+    /** Returns the filename of this track. */
     const std::string& getFilename       () const {return m_filename;           }
-#ifdef HAVE_IRRLICHT
-    const core::vector3df& getSunPos     () const {return m_sun_position;       }
-    const video::SColorf& getAmbientCol  () const {return m_ambient_color;      }
-    const video::SColorf& getDiffuseCol  () const {return m_diffuse_color;      }
-    const video::SColorf& getSpecularCol () const {return m_specular_color;     }
-    const video::SColorf& getFogColor    () const {return m_fog_color;          }
-    const video::SColorf& getSkyColor    () const {return m_sky_color;          }
-#else
-    const sgVec3& getSunPos              () const {return m_sun_position;       }
-    const sgVec4& getAmbientCol          () const {return m_ambient_col;        }
-    const sgVec4& getDiffuseCol          () const {return m_diffuse_col;        }
-    const sgVec4& getSpecularCol         () const {return m_specular_col;       }
-    const sgVec4& getFogColor            () const {return m_fog_color;          }
-    const sgVec4& getSkyColor            () const {return m_sky_color;          }
-#endif
-    const bool&   useFog                 () const {return m_use_fog;            }
-    const float&  getFogDensity          () const {return m_fog_density;        }
-    const float&  getFogStart            () const {return m_fog_start;          }
-    const float&  getFogEnd              () const {return m_fog_end;            }
+
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
-    const std::string& getTopviewFile    () const {return m_top_view;           }
     const std::string& getScreenshotFile () const {return m_screenshot;         }
-    const std::vector<SGfloat>& getWidth () const {return m_path_width;         }
-    const std::string& getItemStyle   () const {return m_item_style;      }
+    const std::string& getItemStyle      () const {return m_item_style;         }
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}
     const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }
@@ -223,37 +216,53 @@ public:
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;
     float              getTerrainHeight(const Vec3 &pos) const;
-    void               createPhysicsModel();
-    void               glVtx             (sgVec2 v, float x_offset, float y_offset) const
-    {
-        glVertex2f(
-            x_offset+(v[0]-m_driveline_min[0])*m_scale_x,
-            y_offset+(v[1]-m_driveline_min[1])*m_scale_y);
-    }
+    void               createPhysicsModel(unsigned int main_track_count);
+    void               update(float dt);
+    void               reset();
+    void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+    /** Sets pointer to the aabb of this track. */
+    void               getAABB(const Vec3 **min, const Vec3 **max) const
+                       { *min = &m_aabb_min; *max = &m_aabb_max; }
+    /** Returns the graph of quads, mainly for the AI. */
+    QuadGraph&         getQuadGraph() const { return *m_quad_graph; }
 
-private:
-    void  loadTrack(const std::string &filename);
-#ifdef HAVE_IRRLICHT
-    void  itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
-                      int bNeedHeight);
-#else
-    void  itemCommand(sgVec3 *xyz, int item_type, int bNeedHeight);
-#endif
-    void  loadDriveline();
-    void  readDrivelineFromFile(std::vector<Vec3>& line,
-                                const std::string& file_ext);
-#ifdef HAVE_IRRLICHT
-    void  convertTrackToBullet(const scene::IMesh *mesh);
-#else
-    void  convertTrackToBullet(ssgEntity *track, sgMat4 m);
-#endif
-    float pointSideToLine(const Vec3& L1, const Vec3& L2,
-                          const Vec3& P ) const;
-    int   pointInQuad(const Vec3& A, const Vec3& B,
-                      const Vec3& C, const Vec3& D, const Vec3& POINT ) const;
-    void  getMusicInformation(std::vector<std::string>&             filenames, 
-                              std::vector<MusicInformation*>& m_music   );
-}
-;   // class Track
+    /** Returns 'a' angle for quad n. This angle is used to position a kart
+     *  after a rescue, and to detect wrong directions. This function will
+     *  always return the angle towards the first successor, i.e. the angle
+     *  in the direction of the default way on the track.
+     *  \param n Number of the quad for which the angle is asked. 
+     */
+    float              getAngle(int n) const 
+                                { return m_quad_graph->getAngleToNext(n, 0);    }
+    /** Returns the 2d coordinates of a point when drawn on the mini map 
+     *  texture.
+     *  \param xyz Coordinates of the point to map.
+     *  \param draw_at The coordinates in pixel on the mini map of the point,
+     *         only the first two coordinates will be used.
+     */
+    void               mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
+                                { m_quad_graph->mapPoint2MiniMap(xyz, draw_at); }
+    /** Returns the full path of a given file inside this track directory. */
+    std::string        getTrackFile(const std::string &s) const 
+                                { return m_root+"/"+s; }
+    /** Returns the number of modes available for this track. */
+    unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    /** Returns the name of the i-th. mode. */
+    const std::string &getModeName(unsigned int i) const 
+                                                { return m_all_modes[i].m_name;}
+    /** Returns the default ambient color. */
+    const video::SColor &getDefaultAmbientColor() const
+                                                { return m_default_ambient_color;}
+    /** Sets the current ambient color for a kart with index k. */
+    void   setAmbientColor(const video::SColor &color,
+                           unsigned int k);
+    /** Get the number of start positions defined in the scene file. */
+    unsigned int getNumberOfStartPositions() const 
+                                           { return m_start_positions.size(); }
+    /** Returns the i-th. start position. */
+    const Vec3 &getStartPosition(unsigned int i) {return m_start_positions[i];}
+    /** Returns the heading of the i-th. start position. */
+    const float getStartHeading(unsigned int i) {return m_start_heading[i]; }
+};   // class Track
 
 #endif

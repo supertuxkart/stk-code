@@ -36,6 +36,7 @@ private:
     ALuint       m_soundSource;   // Sources are points emitting sound.
     bool         m_ok;
     bool         m_positional;
+    float        m_defaultGain;
 public:
                                   SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain);
     virtual                      ~SFXOpenAL();
@@ -46,6 +47,7 @@ public:
     virtual void                  resume();
     virtual void                  speed(float factor);
     virtual void                  position(const Vec3 &position);
+    virtual void                  volume(float gain);
     virtual SFXManager::SFXStatus getStatus();
 	
 };   // SFXOpenAL

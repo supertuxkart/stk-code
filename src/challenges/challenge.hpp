@@ -22,10 +22,10 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <irrlicht.h>
 
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
+class XMLNode;
 
 enum REWARD_TYPE
    {UNLOCK_TRACK,
@@ -37,7 +37,7 @@ enum REWARD_TYPE
 struct UnlockableFeature
 {
     std::string name; // internal name
-    std::string user_name; // not all types of feature have one
+    irr::core::stringw user_name; // not all types of feature have one
     REWARD_TYPE type;
 };
 
@@ -49,35 +49,33 @@ private:
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}         m_state;  // challenge was solved
     std::string              m_Id;                    // short, internal name for this challenge
-    std::string              m_Name;                  // name used in menu for this challenge
-    std::string              m_challenge_description; // Message the user gets when the feature is not yet unlocked
+    irr::core::stringw       m_Name;                  // name used in menu for this challenge
+    irr::core::stringw       m_challenge_description; // Message the user gets when the feature is not yet unlocked
     std::vector<UnlockableFeature> m_feature;         // Features to unlock
     std::vector<std::string> m_prerequisites;         // what needs to be done before accessing this challenge
 public:
              Challenge(const std::string &id, const std::string &name);
              Challenge() {m_Id=""; m_Name="";m_state=CH_INACTIVE;}
     virtual ~Challenge() {};
-    const std::string
-         &getId() const                           { return m_Id;                  }
-    const std::string
-         &getName() const                         { return m_Name;                }
-    void  setName(const std::string& s)           { m_Name = s;                   }
+    const std::string &getId() const              { return m_Id;                  }
+    const irr::core::stringw &getName() const     { return m_Name;                }
+    void  setName(const irr::core::stringw & s)   { m_Name = s;                   }
     void  setId(const std::string& s)             { m_Id = s;                     }
     void  addUnlockTrackReward(const std::string &track_name);
     void  addUnlockModeReward(const std::string &internal_mode_name, 
-                              const std::string &user_mode_name);
+                              const irr::core::stringw &user_mode_name);
     void  addUnlockGPReward(const std::string &gp_name);
     void  addUnlockDifficultyReward(const std::string &internal_name, 
-                                    const std::string &user_name);
+                                    const irr::core::stringw &user_name);
     void  addUnlockKartReward(const std::string &internal_name,
-                              const std::string &user_name);
+                              const irr::core::stringw &user_name);
     
-    const std::string getUnlockedMessage() const;
+    const irr::core::stringw getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
-    void  setChallengeDescription(const std::string& d) 
+    void  setChallengeDescription(const irr::core::stringw& d) 
                                                  {m_challenge_description=d;      }
-    const std::string& 
+    const irr::core::stringw& 
           getChallengeDescription() const        {return m_challenge_description; }
     void  addDependency(const std::string id)    {m_prerequisites.push_back(id);  }
     bool  isSolved() const                       {return m_state==CH_SOLVED;      }
@@ -86,13 +84,13 @@ public:
     void  setActive()                            {m_state = CH_ACTIVE;            }
     const std::vector<std::string>& 
           getPrerequisites() const               {return m_prerequisites;         }
-    void  load(const lisp::Lisp* config);
-    void  save(lisp::Writer* writer);
+    void  load(const XMLNode* config);
+    void  save(std::ofstream& writer);
 
     // These functions are meant for customisation, e.g. load/save
     // additional state information specific to the challenge
-    virtual void loadState(const lisp::Lisp* config) {};
-    virtual void saveState(lisp::Writer* writer)     {};
+    virtual void loadAdditionalInfo(const XMLNode* config) {};
+    virtual void saveAdditionalInfo(std::ofstream& writer)     {};
 
     // These functions are called when a race/gp is finished. It allows
     // the challenge to unlock features (when returning true), otherwise

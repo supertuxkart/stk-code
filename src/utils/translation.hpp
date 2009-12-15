@@ -17,12 +17,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef TRANSLATION_H
-#define TRANSLATION_H
+#ifndef TRANSLATION_HPP
+#define TRANSLATION_HPP
 
 #if ENABLE_NLS
+
+#ifdef __APPLE__
+#  include <libintl/libintl.h>
+#else
 #  include <libintl.h>
-#  define _(String) gettext(String)
+#endif
+
+#  define _(String) w_gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) gettext_noop (String)
 // libintl defines its own fprintf, which doesn't work for me :(
@@ -30,7 +36,7 @@
 #    undef fprintf
 #  endif
 #else
-#  define _(String) (String)
+#  define _(String) w_gettext(String)
 #  define gettext_noop(String) String
 #  define N_(String) String
 #endif
@@ -40,6 +46,8 @@ class Translations
 public:
     Translations();
 };
+
+wchar_t* w_gettext(const char* original);
 
 extern Translations* translations;
 #endif

@@ -17,9 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "race_info_message.hpp"
-#include "grand_prix_manager.hpp"
-#include "race_manager.hpp"
+#include "network/race_info_message.hpp"
+
+#include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 
 RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info) 
                : Message(Message::MT_RACE_INFO) 

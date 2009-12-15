@@ -18,11 +18,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_KART_H
-#define HEADER_KART_H
+#ifndef HEADER_KART_HPP
+#define HEADER_KART_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 #include "btBulletDynamicsCommon.h"
 
 #include "items/attachment.hpp"
@@ -34,13 +32,16 @@
 #include "tracks/terrain_info.hpp"
 
 class SkidMarks;
+class Shadow;
 class Item;
 class Smoke;
+class WaterSplash;
 class Nitro;
 class SFXBase;
 class btUprightConstraint;
 class btKart;
-class btRaycastVehicle::btVehicleTuning;
+class btVehicleTuning;
+class Quad;
 
 class Kart : public TerrainInfo, public Moveable
 {
@@ -49,14 +50,14 @@ private:
     unsigned int m_world_kart_id;      // index of kart in world
     float        m_skidding;           ///< Accumulated skidding factor.
 
-protected:
-    Attachment   m_attachment;
-    Powerup      m_powerup;
-    int          m_race_position;      // current race position (1-numKarts)
     int          m_initial_position;   // initial position of kart
-
-    KartControl  m_controls;           // The position of the karts controls
-
+    int          m_race_position;      // current race position (1-numKarts)
+protected:       // Used by the AI atm
+    KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
+    Powerup      m_powerup;
+    float        m_zipper_time_left;   /**<Zipper time left. */
+    Attachment   m_attachment;
+private:
     float        m_max_speed;          // maximum speed of the kart, computed from
     /** Depending on terrain a certain reduction to the maximum speed applies.
      *  This reduction is accumulated in m_max_speed_reduction. */
@@ -64,11 +65,11 @@ protected:
     float        m_power_reduction;
     float        m_max_gear_rpm;       /**<Maximum engine rpm's for the current gear*/
     float        m_max_speed_reverse_ratio;
-    float        m_zipper_time_left;   /**<Zipper time left. */
     float        m_bounce_back_time;   /**<A short time after a collision acceleration
                                         *  is disabled to allow the karts to bounce back*/
 
-    // physics parameters, storing it saves time
+    // Bullet physics parameters
+    // -------------------------
     btRaycastVehicle::btVehicleTuning 
                             *m_tuning;
     btCompoundShape          m_kart_chassis;
@@ -76,18 +77,23 @@ protected:
     btKart                  *m_vehicle;
     btUprightConstraint     *m_uprightConstraint;
 
-private:
-                       /** The amount of energy collected by hitting coins. */
+     /** The amount of energy collected by hitting coins. */
     float         m_collected_energy;
-    ssgTransform *m_shadow;  /**<The shadow of the kart. */
+
+    // Graphical effects
+    // -----------------
+    /** The shadow of a kart. */
+    Shadow       *m_shadow;
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool          m_shadow_enabled;
-    Smoke        *m_smoke_system;    /**<Smoke from skidding. */
+    /** Smoke from skidding. */
+    Smoke        *m_smoke_system;
+    /** Water splash when driving in water. */
+    WaterSplash  *m_water_splash_system;
 
-    /** Fire when using a nitro. */
+    /** Graphical effect when using a nitro. */
     Nitro        *m_nitro;
-
     float         m_wheel_rotation;
     /** For each wheel it stores the suspension length after the karts are at 
      *  the start position, i.e. the suspension will be somewhat compressed.
@@ -97,6 +103,17 @@ private:
 
     /** The skidmarks object for this kart. */
     SkidMarks    *m_skidmarks;
+
+    // Variables for slipstreaming
+    // ---------------------------
+    /** The quad inside which another kart is considered to be slipstreaming.
+     *  This value is current area, i.e. takes the kart position into account. */
+    Quad         *m_slipstream_area;
+    /** This is slipstream area if the kart is at 0,0,0 without rotation. From 
+     *  this value m_slipstream_area is computed by applying the kart transform. */
+    Quad         *m_slipstream_original_area;
+    /** The time a kart was in slipstream. */
+    float         m_slipstream_time;
 
     float         m_finish_time;
     bool          m_finished_race;
@@ -109,12 +126,16 @@ private:
     bool          m_rescue;
     bool          m_eliminated;
 
-    SFXBase      *m_engine_sound;
+    std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
+    SFXBase      *m_engine_sound;
     SFXBase      *m_crash_sound;
     SFXBase      *m_skid_sound;
     SFXBase      *m_goo_sound;
     float         m_time_last_crash;
+
+    float         handleSlipstream(float dt);
+    void          updatePhysics(float dt);
 
 protected:
     float                 m_rescue_pitch, m_rescue_roll;
@@ -176,24 +197,22 @@ public:
     bool           hasFinishedRace     () const { return  m_finished_race;       }
     void           endRescue           ();
     void           getClosestKart      (float *cdist, int *closest);
-    void           updatePhysics       (float dt);
 
     bool           hasViewBlockedByPlunger() const
                                                 { return m_view_blocked_by_plunger > 0; }
     void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 10; }
     
-   /**
-       returns a bullet transform object located at the kart's position
+   /** Returns a bullet transform object located at the kart's position
        and oriented in the direction the kart is going. Can be useful
        e.g. to calculate the starting point and direction of projectiles
     */
-   btTransform    getKartHeading      (const float customPitch=-1);
+   btTransform     getKartHeading      (const float customPitch=-1);
 
     
     // Functions to access the current kart properties (which might get changed,
     // e.g. mass increase or air_friction increase depending on attachment etc.)
     // -------------------------------------------------------------------------
-    const Vec3    &getColor         () const {return m_kart_properties->getColor();}
+    const video::SColor &getColor   () const {return m_kart_properties->getColor();}
     float          getMass          () const
     {
         return m_kart_properties->getMass()
@@ -203,6 +222,7 @@ public:
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
     float          getBrakeFactor   () const {return m_kart_properties->getBrakeFactor();}
     float          getFrictionSlip  () const {return m_kart_properties->getFrictionSlip();}
+    float          getSkidding      () const {return m_skidding;}
     float          getMaxSteerAngle () const
                        {return m_kart_properties->getMaxSteerAngle(getSpeed());}
     const Vec3&    getGravityCenterShift   () const
@@ -225,6 +245,9 @@ public:
     /** Returns the height of the kart. */
     float          getKartHeight    () const 
                    {return m_kart_properties->getKartModel()->getHeight();     }
+    /** Returns the width of the kart. */
+    float          getKartWidth    () const 
+                   {return m_kart_properties->getKartModel()->getWidth();      }
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           createPhysics    ();
@@ -248,13 +271,9 @@ public:
     void           updatedWeight    ();
     void           forceRescue      ();
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
-    const std::string& getName      () const {return m_kart_properties->getName();}
+    virtual const irr::core::stringw& getName() const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
     virtual bool    isPlayerKart    () const {return false;                        }
-    /** Called by world in case of the kart taking a shortcut. The player kart
-     *  will display a message in this case, default behaviour is to do nothing.
-     */
-    virtual void    doingShortcut() {};
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
     virtual void   collectedItem    (const Item &item, int random_attachment);
@@ -265,6 +284,7 @@ public:
     virtual void   update           (float dt);
     virtual void   raceFinished     (float time);
     void           beep             ();
+    bool           playCustomSFX    (unsigned int type);
 };
 
 

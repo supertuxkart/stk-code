@@ -17,16 +17,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "rubber_band.hpp"
+#include "items/rubber_band.hpp"
 
-#include "material_manager.hpp"
-#include "race_manager.hpp"
-#include "graphics/scene.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "race/race_manager.hpp"
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
@@ -36,38 +36,22 @@
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
-RubberBand::RubberBand(Plunger *plunger, const Kart &kart)
-          : ssgVtxTable(GL_QUADS, new ssgVertexArray,
-                        new ssgNormalArray,
-                        new ssgTexCoordArray,
-                        new ssgColourArray ), 
-            m_plunger(plunger), m_owner(kart)
+RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
+            m_plunger(plunger), m_owner(kart)   
 {
-#ifdef DEBUG
-    setName("rubber_band");
-#endif
-
-    // The call to update defines the actual coordinates, only the entries are added for now.
-    vertices->add(0, 0, 0); vertices->add(0, 0, 0);
-    vertices->add(0, 0, 0); vertices->add(0, 0, 0);
+    video::SColor color(77, 179, 0, 0);
+    video::SMaterial m;
+    m.AmbientColor    = color;
+    m.DiffuseColor    = color;
+    m.EmissiveColor   = color;
+    m.BackfaceCulling = false;
+    m_mesh           = irr_driver->createQuadMesh(&m, /*create_one_quad*/ true);
+    m_buffer         = m_mesh->getMeshBuffer(0);
     m_attached_state = RB_TO_PLUNGER;
-    update(0);
+    assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 
-    sgVec3 norm;
-    sgSetVec3(norm, 1/sqrt(2.0f), 0, 1/sqrt(2.0f));
-    normals->add(norm);normals->add(norm);
-    normals->add(norm);normals->add(norm);
-
-    sgVec4 colour;
-    sgSetVec4(colour, 0.7f, 0.0f, 0.0f, 0.3f);
-    colours->add(colour);colours->add(colour);
-    colours->add(colour);colours->add(colour);
-    m_state = new ssgSimpleState();
-    m_state->disable(GL_CULL_FACE);
-    setState(m_state);
-    //setState(material_manager->getMaterial("chrome.rgb")->getState());
-
-    stk_scene->add(this);
+    updatePosition();
+    m_node = irr_driver->addMesh(m_mesh);
 }   // RubberBand
 
 // ----------------------------------------------------------------------------
@@ -76,8 +60,43 @@ RubberBand::RubberBand(Plunger *plunger, const Kart &kart)
  */
 void RubberBand::removeFromScene()
 {
-    stk_scene->remove(this);
+    irr_driver->removeNode(m_node);
+    irr_driver->removeMesh(m_mesh);
 }   // removeFromScene
+
+// ----------------------------------------------------------------------------
+/** Updates the position of the rubber band. It especially sets the
+ *  end position of the rubber band, i.e. the side attached to the plunger,
+ *  track, or kart hit.
+ */
+void RubberBand::updatePosition()
+{
+    const Vec3 &k = m_owner.getXYZ();
+
+    // Get the position to which the band is attached
+    // ----------------------------------------------
+    switch(m_attached_state)
+    {
+    case RB_TO_KART:    m_end_position = m_hit_kart->getXYZ(); break;
+    case RB_TO_TRACK:   m_end_position = m_hit_position;       break;
+    case RB_TO_PLUNGER: m_end_position = m_plunger->getXYZ();
+                        checkForHit(k, m_end_position);        break;
+    }   // switch(m_attached_state);
+
+    // Update the rubber band positions
+    // --------------------------------
+    // Todo: make height dependent on length (i.e. rubber band gets
+    // thinner). And call explosion if the band is too long.
+    const float hh=.1f;  // half height of the band
+    const Vec3 &p=m_end_position;  // for shorter typing
+    irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
+    v[0].Pos.X = p.getX()-hh; v[0].Pos.Z=p.getY(); v[0].Pos.Y = p.getZ()-hh;
+    v[1].Pos.X = p.getX()+hh; v[1].Pos.Z=p.getY(); v[1].Pos.Y = p.getZ()+hh;
+    v[2].Pos.X = k.getX()+hh; v[2].Pos.Z=k.getY(); v[2].Pos.Y = k.getZ()+hh;
+    v[3].Pos.X = k.getX()-hh; v[3].Pos.Z=k.getY(); v[3].Pos.Y = k.getZ()-hh;
+    m_buffer->recalculateBoundingBox();
+    m_mesh->setBoundingBox(m_buffer->getBoundingBox());
+}   // updatePosition
 
 // ----------------------------------------------------------------------------
 /** Updates the rubber band. It takes the new position of the kart and the
@@ -97,38 +116,12 @@ void RubberBand::update(float dt)
         return;
     }
 
-    Vec3 p;
+    updatePosition();
     const Vec3 &k = m_owner.getXYZ();
-
-    // Get the position to which the band is attached
-    // ----------------------------------------------
-    switch(m_attached_state)
-    {
-    case RB_TO_KART:    p = m_hit_kart->getXYZ(); break;
-    case RB_TO_TRACK:   p = m_hit_position;       break;
-    case RB_TO_PLUNGER: p = m_plunger->getXYZ();
-                        checkForHit(k, p);        break;
-    }   // switch(m_attached_state);
-
-    // Draw the rubber band
-    // --------------------
-    // Todo: make height dependent on length (i.e. rubber band gets
-    // thinner). And call explosion if the band is too long.
-    const float hh=.1f;  // half height of the band
-  
-    float *f = vertices->get(0);
-    f[0] = p.getX()-hh; f[1] = p.getY(); f[2] = p.getZ()-hh;
-    f = vertices->get(1);
-    f[0] = p.getX()+hh; f[1] = p.getY(); f[2] = p.getZ()+hh;
-    f = vertices->get(2);
-    f[0] = k.getX()+hh; f[1] = k.getY(); f[2] = k.getZ()+hh;
-    f = vertices->get(3);
-    f[0] = k.getX()-hh; f[1] = k.getY(); f[2] = k.getZ()-hh;
-    dirtyBSphere();
 
     // Check for rubber band snapping
     // ------------------------------
-    float l = (p-k).length2();
+    float l = (m_end_position-k).length2();
     float max_len = m_owner.getKartProperties()->getRubberBandMaxLength();
     if(l>max_len*max_len)
     {
@@ -143,7 +136,7 @@ void RubberBand::update(float dt)
     if(m_attached_state!=RB_TO_PLUNGER)
     {
         float force = m_owner.getKartProperties()->getRubberBandForce();
-        Vec3 diff   = p-k;
+        Vec3 diff   = m_end_position-k;
         
         // detach rubber band if kart gets very close to hit point
         if(m_attached_state==RB_TO_TRACK && diff.length2() < 10*10)

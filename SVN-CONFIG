@@ -1,10 +1,10 @@
-Please, make sure your SVN client uses something that matches the
-following config. Specially the autoprops part, that way new files
-will be added with the right settings. Default config for command line
-svn is in ~/.subversion/config. If you use SVN for multiple projects
-simultaneously, remember you can use different configs, at least in
-cmd line (via --config-dir and for example ~/.subversion/supertuxkart/
-with a new config file inside).
+# Please, make sure your SVN client uses something that matches the
+# following config. Specially the autoprops part, that way new files
+# will be added with the right settings. Default config for command line
+# svn is in ~/.subversion/config. If you use SVN for multiple projects
+# simultaneously, remember you can use different configs, at least in
+# cmd line (via --config-dir and for example ~/.subversion/supertuxkart/
+# with a new config file inside).
 
 [miscellany]
 global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store
@@ -31,4 +31,4 @@ Makefile = svn:eol-style=native;svn:keywords=Author Date Id Revision
 *.pdf = svn:mime-type=application/pdf
 SConstruct = svn:eol-style=native;svn:keywords=Author Date Id Revision
 *.xml = svn:eol-style=native;svn:mime-type=text/xml
-*.py = svn:eol-style=native;svn:executable;svn:keywords=Author Date Id Revision
+*.py = svn:eol-style=native;svn:keywords=Author Date Id Revision

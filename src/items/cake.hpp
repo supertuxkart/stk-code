@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Physics improvements and linear intersection algorithm by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -20,31 +23,23 @@
 #ifndef HEADER_CAKE_HPP
 #define HEADER_CAKE_HPP
 
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
-using namespace irr;
-#endif
 
-#include "flyable.hpp"
+#include "items/flyable.hpp"
 
 class Cake : public Flyable
 {
 private:
     static float m_st_max_distance;    // maximum distance for a missile to be attracted
     static float m_st_max_distance_squared;
+    static float m_gravity;
 
     btVector3    m_initial_velocity;
-    //float        steerTowards(btTransform& trans, btVector3& target);
-
     Kart*        m_target;            // which kart is targeted by this
                                       // projectile (NULL if none)
 public:
     Cake (Kart *kart);
-#ifdef HAVE_IRRLICHT
     static  void init     (const lisp::Lisp* lisp, scene::IMesh *cake_model);
-#else
-    static  void init     (const lisp::Lisp* lisp, ssgEntity* cake_model);
-#endif
     virtual void update   (float dt);
     virtual void hitTrack ()                      { hit(NULL);               }
     // Kinematic objects are not allowed to have a velocity (assertion in 

@@ -19,26 +19,31 @@
 
 #include "karts/kart_properties_manager.hpp"
 
-#include <stdexcept>
 #include <algorithm>
 #include <ctime>
+#include <stdio.h>
+#include <stdexcept>
 
-#include "file_manager.hpp"
-#include "stk_config.hpp"
-#include "user_config.hpp"
-#include "callback_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/string_utils.hpp"
 
 KartPropertiesManager *kart_properties_manager=0;
 
+std::vector<std::string> KartPropertiesManager::m_kart_search_path;
+
+/** Constructor, only clears internal data structures. */
 KartPropertiesManager::KartPropertiesManager()
 {
     m_all_groups.clear();
 }   // KartPropertiesManager
 
 //-----------------------------------------------------------------------------
+/** Destructor. Removes all allocated data.
+ */
 KartPropertiesManager::~KartPropertiesManager()
 {
     for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
@@ -52,6 +57,17 @@ KartPropertiesManager::~KartPropertiesManager()
 }   // ~KartPropertiesManager
 
 //-----------------------------------------------------------------------------
+/** Adds a directory from which karts are loaded. The kart manager checks if
+ *  either this directory itself contains a kart, and if any subdirectory 
+ *  contains a kart.
+ *  \param dir The directory to add. 
+ */
+void KartPropertiesManager::addKartSearchDir(const std::string &s)
+{
+    m_kart_search_path.push_back(s);
+}   // addKartSearchDir
+
+//-----------------------------------------------------------------------------
 void KartPropertiesManager::removeTextures()
 {
     for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
@@ -60,71 +76,82 @@ void KartPropertiesManager::removeTextures()
         delete *i;
     }
     m_karts_properties.clear();
-    callback_manager->clear(CB_KART);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::loadKartData(bool dont_load_models)
+/** Loads all kart properties and models.
+ */
+void KartPropertiesManager::loadAllKarts()
 {
-    std::set<std::string> result;
-    file_manager->listFiles(result, file_manager->getKartDir(), 
-                            /*is_full_path*/ true);
-
-    // Find out which characters are available and load them
-    for(std::set<std::string>::iterator i = result.begin();
-            i != result.end(); ++i)
+    m_all_kart_dirs.clear();
+    for(std::vector<std::string>::const_iterator dir=m_kart_search_path.begin();
+        dir!=m_kart_search_path.end(); dir++)
     {
-        std::string kart_file;
-        try
-        {
-#ifdef HAVE_IRRLICHT
-            kart_file = file_manager->getKartFile((*i)+".irrkart");
-#else
-            kart_file = file_manager->getKartFile((*i)+".kart");
-#endif
-        }
-        catch (std::exception& e)
-        {
-            (void)e;   // remove warning about unused variable
-            continue;
-        }
-        FILE *f=fopen(kart_file.c_str(),"r");
-        if(!f) continue;
-        fclose(f);
-        KartProperties* kp = new KartProperties();
-        kp->load(kart_file, "tuxkart-kart", dont_load_models);
+        // First check if there is a kart in the current directory
+        // -------------------------------------------------------
+        if(loadKart(*dir)) continue;
 
-        // If the version of the kart file is not supported,
-        // ignore this .kart file
-        if(kp->getVersion()<stk_config->m_min_kart_version ||
-            kp->getVersion()>stk_config->m_max_kart_version)
+        // If not, check each subdir of this directory.
+        // --------------------------------------------
+        std::set<std::string> result;
+        file_manager->listFiles(result, *dir, /*is_full_path*/ true);
+        for(std::set<std::string>::const_iterator subdir=result.begin();
+            subdir!=result.end(); subdir++)
         {
-            fprintf(stderr, "Warning: kart '%s' is not supported by this binary, ignored.\n",
-                    kp->getIdent().c_str());
-            delete kp;
-            continue;
-        }
-
-        m_karts_properties.push_back(kp);
-        m_kart_available.push_back(true);
-        const std::vector<std::string>& groups=kp->getGroups();
-        for(unsigned int g=0; g<groups.size(); g++)
-        {
-            if(m_groups.find(groups[g])==m_groups.end())
-            {
-                m_all_groups.push_back(groups[g]);
-            }
-            m_groups[groups[g]].push_back(m_karts_properties.size()-1);
-        }
+            loadKart(*dir+"/"+*subdir);
+        }   // for all files in the currently handled directory
     }   // for i
+}   // loadAllKarts
+
+//-----------------------------------------------------------------------------
+/** Loads a single kart and (if not disabled) the oorresponding 3d model.
+ *  \param filename Full path to the kart config file.
+ */
+bool KartPropertiesManager::loadKart(const std::string &dir)
+{
+    std::string config_filename=dir+"/kart.xml";
+    FILE *f=fopen(config_filename.c_str(), "r");
+    if(!f) return false;
+    fclose(f);
+
+    KartProperties* kart_properties = new KartProperties(config_filename);
+
+    // If the version of the kart file is not supported,
+    // ignore this .kart file
+    if( kart_properties->getVersion()<stk_config->m_min_kart_version ||
+        kart_properties->getVersion()>stk_config->m_max_kart_version)
+    {
+        fprintf(stderr, "Warning: kart '%s' is not supported by this binary, ignored.\n",
+                kart_properties->getIdent().c_str());
+        delete kart_properties;
+        return false;
+    }
+
+    m_karts_properties.push_back(kart_properties);
+    m_kart_available.push_back(true);
+    const std::vector<std::string>& groups=kart_properties->getGroups();
+    for(unsigned int g=0; g<groups.size(); g++)
+    {
+        if(m_groups.find(groups[g])==m_groups.end())
+        {
+            m_all_groups.push_back(groups[g]);
+        }
+        m_groups[groups[g]].push_back(m_karts_properties.size()-1);
+    }
+    m_all_kart_dirs.push_back(dir);
+    return true;
 }   // loadKartData
 
 //-----------------------------------------------------------------------------
 const int KartPropertiesManager::getKartId(const std::string &ident) const
 {
+    std::cout << "======\n";
+    std::cout << "Searching for kart " << ident.c_str() << std::endl;
+    
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
     {
+        std::cout << " -- " << (*i)->getIdent().c_str() << std::endl;
         if ((*i)->getIdent() == ident)
             return i-m_karts_properties.begin();
     }
@@ -144,6 +171,7 @@ const KartProperties* KartPropertiesManager::getKart(const std::string &ident) c
             return *i;
     }
 
+    printf("Could not find a kart named %s\n", ident.c_str());
     return NULL;
 }   // getKart
 
@@ -269,7 +297,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     // -----------------------------------------
     std::vector<bool> used;
     used.resize(getNumberOfKarts(), false);
-
+    
     std::vector<std::string> all_karts;
     for(unsigned int i=0; i<existing_karts.size(); i++)
     {
@@ -279,7 +307,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
 
     // Add karts from the current group
     // --------------------------------
-    std::vector<int> karts = getKartsInGroup(user_config->m_kart_group);
+    std::vector<int> karts = getKartsInGroup(UserConfigParams::m_kart_group);
     std::vector<int>::iterator k;
     // Remove karts that are already used or generally not available
     // (i.e. locked or not available on all clients)

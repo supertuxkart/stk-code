@@ -17,15 +17,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REPLAYPLAYER_H
-#define HEADER_REPLAYPLAYER_H
+#ifndef HEADER_REPLAYPLAYER_HPP
+#define HEADER_REPLAYPLAYER_HPP
 
 #ifdef HAVE_GHOST_REPLAY
 
 #include <vector>
-#include <plib/ssg.h>
-
-#include "replay_base.hpp"
+#include "replay/replay_base.hpp"
 
 
 class KartProperties;
@@ -85,5 +83,5 @@ private:
 
 #endif // HAVE_GHOST_REPLAY
 
-#endif // HEADER_REPLAYPLAYER_H
+#endif // HEADER_REPLAYPLAYER_HPP
 

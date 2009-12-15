@@ -22,11 +22,7 @@
 
 #include <string>
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/sg.h>
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
-#endif
 #include "utils/vec3.hpp"
 
 namespace lisp
@@ -112,25 +108,29 @@ namespace lisp
             return get(name.c_str(), val);
         }
 
-        bool get(const char* name, sgVec4& val) const
-            {
-                const Lisp* lisp = getLisp(name);
-                if(!lisp)
-                    return false;
 
-                lisp = lisp->getCdr();
-                if(!lisp)
+        bool get(const char* name, float* val, int num) const
+        {
+            const Lisp* lisp = getLisp(name);
+            if(!lisp)
+                return false;
+            
+            lisp = lisp->getCdr();
+            if(!lisp)
+                return false;
+            for(int i = 0; i < num && lisp; ++i)
+            {
+                const Lisp* m_car = lisp->getCar();
+                if(!m_car)
                     return false;
-                for(int i = 0; i < 4 && lisp; ++i)
-                {
-                    const Lisp* m_car = lisp->getCar();
-                    if(!m_car)
-                        return false;
-                    m_car->get(val[i]);
-                    lisp = lisp->getCdr();
-                }
-                return true;
+                m_car->get(val[i]);
+                lisp = lisp->getCdr();
             }
+            return true;
+        }
+
+
+        /*
         bool get(const char* name, sgVec3& val) const
             {
                 const Lisp* lisp = getLisp(name);
@@ -150,7 +150,8 @@ namespace lisp
                 }
                 return true;
             }
-#ifdef HAVE_IRRLICHT
+         */
+        
         bool get(const char* name, core::vector3df& val) const
             {
                 const Lisp* lisp = getLisp(name);
@@ -175,7 +176,7 @@ namespace lisp
 
                 return true;
             }
-#endif
+
         bool get(const char* name, Vec3& val) const
             {
                 const Lisp* lisp = getLisp(name);

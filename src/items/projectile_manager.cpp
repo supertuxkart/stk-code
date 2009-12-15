@@ -17,47 +17,33 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
-#include "loader.hpp"
 #include "items/projectile_manager.hpp"
+
+#include "graphics/explosion.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
-#include "explosion.hpp"
-#include "graphics/scene.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
+#include "network/network_manager.hpp"
+#include "network/race_state.hpp"
 
-static ssgSelector *find_selector ( ssgBranch *b );
+//static ssgSelector *find_selector ( ssgBranch *b );
 
 ProjectileManager *projectile_manager=0;
 
 void ProjectileManager::loadData()
 {
-#ifdef HAVE_IRRLICHT
-#else
-    // Load the explosion model and find the actual selector branch in it.
-    // Only the explosion model is loaded here, see powerup_manager.
-    m_explosion_model = find_selector((ssgBranch*)loader->load("explode.ac",
-                                   CB_EXPLOSION) );
-    m_explosion_model->ref();
-    if ( m_explosion_model == NULL )
-    {
-        fprintf ( stderr, "explode.ac doesn't have an 'explosion' object.\n" ) ;
-        exit ( 1 ) ;
-    }
-#endif
 }   // loadData
 
 //-----------------------------------------------------------------------------
 void ProjectileManager::removeTextures()
 {
     cleanup();
-    ssgDeRefDelete(m_explosion_model);
+    //ssgDeRefDelete(m_explosion_model);
     // Only the explosion is here, all other models are actually managed
     // by powerup_manager.
-    callback_manager->clear(CB_EXPLOSION);
+    //callback_manager->clear(CB_EXPLOSION);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
@@ -66,20 +52,15 @@ void ProjectileManager::cleanup()
     for(Projectiles::iterator i = m_active_projectiles.begin();
         i != m_active_projectiles.end(); ++i)
     {
-#ifdef HAVE_IRRLICHT
-#else
-        ssgTransform *m = (*i)->getModelTransform();
-        m->removeAllKids();
-#endif
         delete *i;
     }
     m_active_projectiles.clear();
     for(Explosions::iterator i  = m_active_explosions.begin();
         i != m_active_explosions.end(); ++i)
     {
-        stk_scene->remove((ssgTransform*)*i);
-        ssgDeRefDelete(*i);
+    // FIXME: still to do
     }
+
     m_active_explosions.clear();
 }   // cleanup
 
@@ -127,9 +108,9 @@ void ProjectileManager::update(float dt)
         while(e!=m_active_explosions.end())
         {
             if(!(*e)->hasEnded()) { e++; continue;}
-            Explosion *exp=*e;
+            //Explosion *exp=*e;
             Explosions::iterator eNext=m_active_explosions.erase(e);
-            ssgDeRefDelete(exp);  // reduce refcount and free object
+            //ssgDeRefDelete(exp);  // reduce refcount and free object
             e=eNext;
         }   // while e!=m_active_explosions.end()
     }   // if m_explosion_ended
@@ -216,6 +197,7 @@ Explosion* ProjectileManager::newExplosion(const Vec3& coord, const int explosio
 /** A general function which is only needed here, but
  *  it's not really a method, so I'll leave it here.
  */
+/*
 static ssgSelector *find_selector ( ssgBranch *b )
 {
     if ( b == NULL )
@@ -237,3 +219,4 @@ static ssgSelector *find_selector ( ssgBranch *b )
 
     return NULL ;
 }   // find_selector
+*/

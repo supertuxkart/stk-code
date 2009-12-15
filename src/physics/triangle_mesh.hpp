@@ -21,8 +21,9 @@
 #define HEADER_TRIANGLE_MESH_HPP
 
 #include <vector>
-#include "user_pointer.hpp"
 #include "btBulletDynamicsCommon.h"
+
+#include "physics/user_pointer.hpp"
 
 class Material;
 

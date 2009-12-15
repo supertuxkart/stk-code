@@ -17,14 +17,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network_manager.hpp"
+#include "network/network_manager.hpp"
 
-#include "stk_config.hpp"
-#include "user_config.hpp"
-#include "race_manager.hpp"
-#include "gui/menu_manager.hpp"
-#include "gui/char_sel.hpp"
-#include "gui/race_results_gui.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "network/connect_message.hpp"
@@ -38,6 +34,7 @@
 #include "network/character_confirm_message.hpp"
 #include "network/race_result_message.hpp"
 #include "network/race_result_ack_message.hpp"
+#include "race/race_manager.hpp"
 
 NetworkManager* network_manager = 0;
 
@@ -81,7 +78,7 @@ bool NetworkManager::initServer()
 {
      ENetAddress address;
      address.host = ENET_HOST_ANY;
-     address.port = user_config->m_server_port;
+     address.port = UserConfigParams::m_server_port;
 
      m_host = enet_host_create (& address     /* the address to bind the server host to */, 
                                 stk_config->m_max_karts /* number of connections */,
@@ -124,8 +121,8 @@ bool NetworkManager::initClient()
     ENetEvent event;
     ENetPeer *peer;
 
-    enet_address_set_host (& address, user_config->m_server_address.c_str());
-    address.port = user_config->m_server_port;
+    enet_address_set_host (& address, UserConfigParams::m_server_address.c_str());
+    address.port = UserConfigParams::m_server_port;
 
     /* Initiate the connection, allocating the two channels 0 and 1. */
     peer = enet_host_connect (m_host, &address, 2);    
@@ -147,7 +144,7 @@ bool NetworkManager::initClient()
         enet_peer_reset (peer);
 
         fprintf(stderr, "Connection to '%s:%d' failed.\n",
-                user_config->m_server_address.c_str(), user_config->m_server_port);
+                UserConfigParams::m_server_address.c_str(), (int)UserConfigParams::m_server_port);
         return false;
     }
     m_server = peer;
@@ -251,9 +248,12 @@ void NetworkManager::handleMessageAtServer(ENetEvent *event)
 
             int kart_id = kart_properties_manager->getKartId(ki.getKartName());
             kart_properties_manager->testAndSetKart(kart_id);
+            // TODO - character selection screen in networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
                 menu->updateAvailableCharacters();
+             */
             
             // Broadcast the information about a selected kart to all clients
             CharacterConfirmMessage ccm(ki.getKartName(), hostid);
@@ -318,9 +318,12 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
         {
             CharacterConfirmMessage m(event->packet);
             kart_properties_manager->selectKartName(m.getKartName());
+            // TODO - karts selection screen in networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
                 menu->updateAvailableCharacters();
+             */
             break;
         }
     case NS_WAIT_FOR_KART_CONFIRMATION:
@@ -330,9 +333,11 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
 
             // If the current menu is the character selection menu,
             // update the menu so that the newly taken character is removed.
+            // TODO - kart selection screen and networking
+            /*
             CharSel *menu = dynamic_cast<CharSel*>(menu_manager->getCurrentMenu());
             if(menu)
-                menu->updateAvailableCharacters();
+                menu->updateAvailableCharacters();*/
             // Check if we received a message about the kart we just selected.
             // If so, the menu needs to progress, otherwise a different kart
             // must be selected by the current player.
@@ -376,9 +381,11 @@ void NetworkManager::handleMessageAtClient(ENetEvent *event)
     case NS_RACE_RESULT_BARRIER:
         {
             RaceResultAckMessage message(event->packet);
+            // TODO - race results menu in networking
+            /*
             RaceResultsGUI *menu = dynamic_cast<RaceResultsGUI*>(menu_manager->getCurrentMenu());
             if(menu)
-                menu->setSelectedWidget(message.getSelectedMenu());
+                menu->setSelectedWidget(message.getSelectedMenu());*/
             m_state = NS_RACE_RESULT_BARRIER_OVER;
             break;
         }
@@ -527,6 +534,10 @@ void NetworkManager::worldLoaded()
 */
 void NetworkManager::setupPlayerKartInfo()
 {
+    // Not sure if this should be here, but without it extra uncontrolled
+    // human players accumulate after each race.
+    m_kart_info.clear();
+
     // Get the local kart info
     for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
         m_kart_info.push_back(race_manager->getLocalKartInfo(i));

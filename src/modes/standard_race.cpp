@@ -17,21 +17,19 @@
 
 #include "modes/standard_race.hpp"
 
-#include "user_config.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "gui/menu_manager.hpp"
+#include "config/user_config.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
 {
     TimedRace::setClockMode(CHRONO);
-    LinearWorld::init();
-}
+}   // StandardRace
 
 //-----------------------------------------------------------------------------
 StandardRace::~StandardRace()
 {
-}
+}   // ~StandardRace
     
 #if 0
 #pragma mark -
@@ -48,12 +46,13 @@ void StandardRace::onGo()
     {
         m_kart[i]->resetBrakes();
     }
-}
+}   // onGo
+
 //-----------------------------------------------------------------------------
 void StandardRace::terminateRace()
 {
     LinearWorld::terminateRace();
-}
+}   // terminateRace
 
 #if 0
 #pragma mark -
@@ -64,7 +63,8 @@ void StandardRace::terminateRace()
 void StandardRace::restartRace()
 {
     LinearWorld::restartRace();
-}
+}   // restartRace
+
 //-----------------------------------------------------------------------------
 void StandardRace::update(float delta)
 {    
@@ -74,20 +74,27 @@ void StandardRace::update(float delta)
     // All karts are finished
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
     {
-        TimedRace::enterRaceOverState();
-	    if(user_config->m_profile<0) printProfileResultAndExit();
+        enterRaceOverState();
         unlock_manager->raceFinished();
     }   // if all karts are finished
     
     // All player karts are finished, but computer still racing
     // ===========================================================
-    else if(race_manager->allPlayerFinished())
+    else if(isRaceOver())
     {
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
-        TimedRace::enterRaceOverState(true /* delay */);
+        enterRaceOverState(true /* delay */);
     }
-}
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Returns tru if the race is finished, i.e. all player karts are finished.
+ */
+bool StandardRace::isRaceOver()
+{
+    return race_manager->allPlayerFinished();
+}   // isRaceOver
 
 //-----------------------------------------------------------------------------
 void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
@@ -99,18 +106,25 @@ void StandardRace::getDefaultCollectibles(int& collectible_type, int& amount)
         amount = race_manager->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
-}
+}   // getDefaultCollectibles
+
 //-----------------------------------------------------------------------------
-bool StandardRace::enableBonusBoxes()
+/** Returns if this mode supports bonus boxes or not.
+ */
+bool StandardRace::haveBonusBoxes()
 {
     // in time trial mode, don't use bonus boxes
     return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
-}
+}   // haveBonusBoxes
+
 //-----------------------------------------------------------------------------
-std::string StandardRace::getInternalCode() const
+/** Returns an identifier for this race. 
+ */
+std::string StandardRace::getIdent() const
 {
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
-        return "STD_TIMETRIAL";
+        return IDENT_TTRIAL;
     else
-        return "STANDARD";
-}
+        return IDENT_STD;
+    
+}   // getIdent

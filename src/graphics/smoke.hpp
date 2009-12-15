@@ -1,7 +1,7 @@
 //  $Id: dust_cloud.hpp 1681 2008-04-09 13:52:48Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2009  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,28 +17,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SMOKE_H
-#define HEADER_SMOKE_H
+#ifndef HEADER_SMOKE_HPP
+#define HEADER_SMOKE_HPP
 
-#define _WINSOCKAPI_
-#include <plib/sg.h>
-#include "particle_system.hpp"
+#include "irrlicht.h"
+using namespace irr;
 
 class Kart;
 
-class Smoke : public ParticleSystem
+class Smoke
 {
 private:
     /** The kart to which this smoke belongs. */
-    Kart           *m_kart;
-    /** The texture to use. */
-    ssgSimpleState *m_smokepuff;
+    const Kart                      *m_kart;
+    /** Irrlicht's particle systems. */
+    scene::IParticleSystemSceneNode *m_node; /* left wheel */
+    /** The emitters. Access to these is needed to adjust the number of
+     *  particles per second. */
+    scene::IParticleEmitter         *m_emitter;
+    /** Size of the particles. */
+    const float                      m_particle_size;
 public:
                  Smoke          (Kart* kart);
-                ~Smoke          ();
-    virtual void update         (float t                                        );
-    virtual void particle_create(int index, Particle* p                         );
-    virtual void particle_update(float deltaTime, int index, Particle *p        );
+    virtual     ~Smoke          ();
+    virtual void update         (float t);
+    void         setCreationRate(float f);
 };
 #endif
 

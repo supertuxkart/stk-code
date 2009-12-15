@@ -26,8 +26,6 @@
 #else
 #  include <AL/al.h>
 #endif
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
 
 #include "lisp/lisp.hpp"
 #include "utils/vec3.hpp"
@@ -47,10 +45,34 @@ public:
     {
         SOUND_UGH,  SOUND_SKID, SOUND_BOWLING_ROLL, SOUND_BOWLING_STRIKE, SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
 		SOUND_SHOT, SOUND_GOO, SOUND_WEE, SOUND_EXPLOSION, SOUND_BZZT, SOUND_BEEP, SOUND_BACK_MENU, SOUND_USE_ANVIL,
-        SOUND_USE_PARACHUTE, SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL,
+        SOUND_USE_PARACHUTE, SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL, SOUND_LOCKED,
         SOUND_PRESTART, SOUND_START, SOUND_ENGINE_SMALL, SOUND_ENGINE_LARGE,
         NUM_SOUNDS
     };
+
+
+    /*
+        Entries for custom SFX sounds.  These are unique for each kart.
+        eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
+    */
+    enum CustomSFX
+    {
+        CUSTOM_HORN,    // Replaces default horn
+        CUSTOM_CRASH,   // Played when colliding with another kart
+        CUSTOM_WIN,     // Played when racer wins
+        CUSTOM_EXPLODE, // Played when struck by bowling ball or dynamite
+        CUSTOM_GOO,     // Played when driving through goo
+        CUSTOM_PASS,    // Played when passing another kart
+        CUSTOM_ZIPPER,  // Played when kart hits zipper
+        CUSTOM_NAME,    // Introduction "I'm Tux!"
+        CUSTOM_ATTACH,  // Played when something is attached to kart (Uh-Oh)
+        CUSTOM_SHOOT,   // Played when weapon is used
+        NUM_CUSTOMS
+    };
+
+    // LISP (or in the future xml) tag for each custom sound
+    const char *getCustomTagName(int id);
+
 
     /** Status of a sound effect. */
     enum SFXStatus
@@ -68,20 +90,38 @@ private:
     std::vector<float>        m_sfx_gain;
     std::vector<SFXBase*>     m_all_sfx;
     bool                      m_initialized;
+    float                     m_masterGain;
+
     void                      loadSfx();
+
     void                      loadSingleSfx(const lisp::Lisp *lisp, 
                                             const  char *name, 
-                                            SFXType type);
+                                            int type);
+
 public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    SFXBase                 *newSFX(SFXType id);
+    int                       addSingleSfx( std::string    filename,
+                                            int            positional,
+                                            float          rolloff,
+                                            float          gain);
+
+    SFXBase                 *newSFX(int id);
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();
+    
+    void                     setMasterSFXVolume(float gain);
+    float                    getMasterSFXVolume() const { return m_masterGain; }
+    
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
+    
+    /** Positional sound is cool, but creating a new object just to play a simple
+        menu sound is not. This function allows for 'quick sounds' in a single call.*/
+    static void              quickSound(SFXType soundType);
+
 };
 
 extern SFXManager* sfx_manager;

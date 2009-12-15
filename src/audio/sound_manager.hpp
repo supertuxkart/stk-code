@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SOUNDMANAGER_H
-#define HEADER_SOUNDMANAGER_H
+#ifndef HEADER_SOUNDMANAGER_HPP
+#define HEADER_SOUNDMANAGER_HPP
 
 #include <map>
 #include <vector>
@@ -30,6 +30,8 @@
 #include "audio/music_information.hpp"
 
 class Vec3;
+
+extern bool IS_LITTLE_ENDIAN;
 
 class SoundManager
 {
@@ -63,7 +65,10 @@ public:
                                                      m_current_music->resumeMusic();   }
     void                    switchToFastMusic() {if(m_current_music)
                                                     m_current_music->switchToFastMusic();}
+    
     void                    setMasterMusicVolume(float gain);
+    float                   getMasterMusicVolume() const { return m_masterGain; }
+    
     MusicInformation       *getCurrentMusic() {return m_current_music; }    
     MusicInformation       *getMusicInformation(const std::string& filename);
     void                    loadMusicFromOneDir(const std::string& dir);
@@ -73,5 +78,5 @@ public:
 
 extern SoundManager* sound_manager;
 
-#endif // HEADER_SOUNDMANAGER_H
+#endif // HEADER_SOUNDMANAGER_HPP
 

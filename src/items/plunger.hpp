@@ -3,6 +3,9 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2007 Joerg Henrichs
 //
+//  Physics improvements and linear intersection algorithm by
+//  by David Mikos. Copyright (C) 2009.
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -20,15 +23,13 @@
 #ifndef HEADER_MISSILE_HPP
 #define HEADER_MISSILE_HPP
 
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#endif
-#include "flyable.hpp"
+#include "items/flyable.hpp"
 
 class RubberBand;
 class Kart;
-class MovingPhysics;
+class PhysicalObject;
 
 class Plunger : public Flyable
 {
@@ -37,23 +38,20 @@ private:
     RubberBand  *m_rubber_band;
     /** Timer to keep the plunger alive while the rubber band is working. */
     float        m_keep_alive;
+    btVector3    m_initial_velocity;
 
     bool m_reverse_mode;
 public:
                  Plunger(Kart *kart);
                 ~Plunger();
-#ifdef HAVE_IRRLICHT
-                static  void init(const lisp::Lisp* lisp, scene::IMesh* missile);
-#else
-    static  void init     (const lisp::Lisp* lisp, ssgEntity* missile);
-#endif
+    static  void init(const lisp::Lisp* lisp, scene::IMesh* missile);
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps. 
      */
     void         setKeepAlive(float t) {m_keep_alive = t;}
     virtual void update   (float dt);
     virtual void hitTrack ();
-    virtual void hit      (Kart *kart, MovingPhysics *mp=NULL);
+    virtual void hit      (Kart *kart, PhysicalObject *obj=NULL);
 
     /** A plunger does not explode if it is removed. */
     virtual bool needsExplosion() const {return false;}

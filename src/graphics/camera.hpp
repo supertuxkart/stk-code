@@ -23,12 +23,9 @@
 #define HEADER_CAMERA_HPP
 
 #include "utils/vec3.hpp"
-#ifdef HAVE_IRRLICHT
 #include "irrlicht.h"
 using namespace irr;
-#else
-class ssgContext;
-#endif
+
 class Kart;
 
 class Camera
@@ -36,45 +33,104 @@ class Camera
 public:
     enum Mode {
         CM_NORMAL,        // Normal camera mode
-        CM_CLOSEUP,       // Normal camera, closer to kart
-        CM_DRIFTING,      // FIXME: drifting behind when accelerating = not yet implemented
+        CM_CLOSEUP,       // Closer to kart
+        CM_REVERSE,       // Looking backwards
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
         CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY
     };
-protected:
-#ifdef HAVE_IRRLICHT
-    scene::ICameraSceneNode 
-               *m_camera;
-#else
-    ssgContext *m_context;
-#endif
-    Vec3        m_xyz;                  // current position of camera
-    Vec3        m_hpr;                  // heading, pitch, roll of camera
-    const Kart *m_kart;                 // the kart the camera is attached to
-    Mode        m_mode;                 // CM_ value, see above
-    int         m_index;                /**<Index of camera. */
-    float       m_x, m_y, m_w, m_h;     // window to us
-    float       m_current_speed;        // current speed of camera
-    float       m_last_pitch;           // for tiling the camera when going downhill
-    float       m_distance;             // distance between camera and kart
-    Vec3        m_velocity;             // camera velocity for final mode
-    Vec3        m_angular_velocity;     // camera angular velocity for final mode
-    float       m_final_time;           // time when final camera mode started
 
 private:
-    void  finalCamera     (float dt);   // handle the final camera
-    
+    /** The camera scene node. */
+    scene::ICameraSceneNode *m_camera;
+
+    /** Camera's mode. */
+    Mode            m_mode;
+
+    /** The index of this camera which is the index of the kart it is 
+     *  attached to. */
+    unsigned int    m_index;
+
+    /**  The ultimate position which the camera wants to obtain. */
+    Vec3            m_position;
+
+    /** The position the camera currently has. */
+    Vec3            m_temp_position;
+
+    /** The ultimate target which the camera wants to obtain. */
+    Vec3            m_target;
+
+    /** The target the camera currently has. */
+    Vec3            m_temp_target;
+
+    /** Current ambient light for this camera. */
+    video::SColor   m_ambient_light;
+
+    /** Distance between the camera and the kart. */
+    float           m_distance;
+
+    /** Angle between the ground and the camera (with the kart as the 
+     *  vertex of the angle). */
+    float           m_angle_up;
+
+    /** Angle around the kart (should actually match the rotation of the kart). */
+    float           m_angle_around;
+
+    /** The speed at which the camera changes position. */
+    float           m_position_speed;
+
+    /** The speed at which the camera changes targets. */
+    float           m_target_speed;
+
+    /** Factor of the effects of steering in camera aim. */
+    float           m_rotation_range;
+
+    /** The kart that the camera follows. */
+    const Kart     *m_kart;
+
+    /** The list of viewports for this cameras. */
+    core::recti     m_viewport;
+
+    /** The scaling necessary for each axis. */
+    core::vector2df m_scaling;
+
+    /** Field of view for the camera. */
+    float           m_fov;
+
+    /** Aspect ratio for camera. */
+    float           m_aspect;
+
+    void setupCamera();
+
 public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();
     void setMode           (Mode mode_);    /** Set the camera to the given mode */
     Mode getMode();
-    void setScreenPosition (int pos);
+    /** Returns the camera index (or player kart index, which is the same). */
+    int  getIndex() const  {return m_index;}
     void reset             ();
     void setInitialTransform();
+    void activate();
     void update            (float dt);
-    void apply             ();
+
+    /** Sets the ambient light for this camera. */
+    void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
+
+    /** Returns the current ambient light. */
+    const video::SColor &getAmbientLight() const {return m_ambient_light; }
+
+    /** Returns the viewport of this camera. */
+    const core::recti& getViewport() const {return m_viewport; }
+
+    /** Returns the scaling in x/y direction for this camera. */
+    const core::vector2df& getScaling() const {return m_scaling; }
+
+    /** Returns the camera scene node. */
+    scene::ICameraSceneNode *getCameraSceneNode() 
+    {
+        return m_camera;
+    }
 } ;
 
 #endif

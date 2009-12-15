@@ -17,82 +17,31 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "items/item_manager.hpp"
+
 #include <stdexcept>
 #include <string>
 #include <sstream>
 
-#include "user_config.hpp"
-#include "file_manager.hpp"
-#include "loader.hpp"
-#include "material_manager.hpp"
-#include "material.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "items/item_manager.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
+#include "io/file_manager.hpp"
 #include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
-/** Simple shadow class, only used here for default items. */
-class Shadow
-{
-    ssgBranch *sh ;
-
-public:
-    Shadow ( float x1, float x2, float y1, float y2 ) ;
-    ssgEntity *getRoot () { return sh ; }
-}
-;   // Shadow
+ItemManager* item_manager;
 
 //-----------------------------------------------------------------------------
-Shadow::Shadow ( float x1, float x2, float y1, float y2 )
-{
-    ssgVertexArray   *va = new ssgVertexArray   () ; sgVec3 v ;
-    ssgNormalArray   *na = new ssgNormalArray   () ; sgVec3 n ;
-    ssgColourArray   *ca = new ssgColourArray   () ; sgVec4 c ;
-    ssgTexCoordArray *ta = new ssgTexCoordArray () ; sgVec2 t ;
-
-    sgSetVec4 ( c, 0.0f, 0.0f, 0.0f, 1.0f ) ; ca->add(c) ;
-    sgSetVec3 ( n, 0.0f, 0.0f, 1.0f ) ; na->add(n) ;
-
-    sgSetVec3 ( v, x1, y1, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y1, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x1, y2, 0.10f ) ; va->add(v) ;
-    sgSetVec3 ( v, x2, y2, 0.10f ) ; va->add(v) ;
-
-    sgSetVec2 ( t, 0.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 0.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 0.0f, 1.0f ) ; ta->add(t) ;
-    sgSetVec2 ( t, 1.0f, 1.0f ) ; ta->add(t) ;
-
-    sh = new ssgBranch ;
-    sh -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-
-    sh -> setName ( "Shadow" ) ;
-
-    ssgVtxTable *gs = new ssgVtxTable ( GL_TRIANGLE_STRIP, va, na, ta, ca ) ;
-
-    gs -> clrTraversalMaskBits ( SSGTRAV_ISECT|SSGTRAV_HOT ) ;
-    gs -> setState ( fuzzy_gst ) ;
-    sh -> addKid ( gs ) ;
-    sh -> ref () ; /* Make sure it doesn't get deleted by mistake */
-}   // Shadow
-
-//=============================================================================
-ItemManager* item_manager;
-#ifdef HAVE_IRRLICHT
 typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
-#else
-typedef std::map<std::string,ssgEntity*>::const_iterator CI_type;
-#endif
 
 ItemManager::ItemManager()
 {
-#ifdef HAVE_IRRLICHT
     m_all_meshes.clear();
-#else
-    m_all_models.clear();
-#endif
     // The actual loading is done in loadDefaultItems
 }   // ItemManager
 
@@ -106,26 +55,16 @@ void ItemManager::removeTextures()
     }
     m_all_items.clear();
 
-#ifdef HAVE_IRRLICHT
     for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
     {
         i->second->drop();
     }
     m_all_meshes.clear();
-#else
-    for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-    {
-        i->second->deRef();
-    }
-    m_all_models.clear();
-#endif
-    callback_manager->clear(CB_ITEM);
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
 ItemManager::~ItemManager()
 {
-#ifdef HAVE_IRRLICHT
     for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
     {
         // FIXME: What about this plib comment:
@@ -135,16 +74,6 @@ ItemManager::~ItemManager()
         i->second->drop();
     }
     m_all_meshes.clear();
-#else
-    for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-    {
-        // We can't use ssgDeRefDelete here, since then the object would be
-        // freed, and when m_all_models is deleted, we have invalid memory
-        // accesses.
-        i->second->deRef();
-    }
-    m_all_models.clear();
-#endif
 }   // ~ItemManager
 
 //-----------------------------------------------------------------------------
@@ -159,26 +88,14 @@ void ItemManager::loadDefaultItems()
                             /*make_full_path*/true);
     for(std::set<std::string>::iterator i  = files.begin();
             i != files.end();  ++i)
-        {
-#ifdef HAVE_IRRLICHT
-            // FIXME: We should try to check the extension, 
-            // i.e. load only .3ds files
-            scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
-            if(!mesh) continue;
-            std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
-            m_all_meshes[shortName] = mesh;
-            mesh->grab();
-#else
-            if(!StringUtils::has_suffix(*i, ".ac")) continue;
-            ssgEntity*  h         = loader->load(*i, CB_ITEM, 
-                                                 /*optimise*/true, 
-                                                 /*full_path*/true);
-            std::string shortName = StringUtils::basename(StringUtils::without_extension(*i));
-            h->ref();
-            h->setName(shortName.c_str());
-            m_all_models[shortName] = h;
-#endif
-        }   // for i
+    {
+        if(StringUtils::getExtension(*i)!="b3d") continue;
+        scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
+        if(!mesh) continue;
+        std::string shortName = StringUtils::getBasename(StringUtils::removeExtension(*i));
+        m_all_meshes[shortName] = mesh;
+        mesh->grab();
+    }   // for i
 
     setDefaultItemStyle();
 }   // loadDefaultItems
@@ -198,13 +115,8 @@ void ItemManager::setDefaultItemStyle()
     std::ostringstream msg;
     for(int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
-#ifdef HAVE_IRRLICHT
         m_item_mesh[i] = m_all_meshes[DEFAULT_NAMES[i]];
         if(!m_item_mesh[i])
-#else
-        m_item_model[i] = m_all_models[DEFAULT_NAMES[i]];
-        if(!m_item_model[i])
-#endif
         {
             msg << "Item model '" << DEFAULT_NAMES[i] 
                 << "' is missing (see item_manager)!\n";
@@ -215,11 +127,7 @@ void ItemManager::setDefaultItemStyle()
     if(bError)
     {
         fprintf(stderr, "The following models are available:\n");
-#ifdef HAVE_IRRLICHT
         for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
-#else
-        for(CI_type i=m_all_models.begin(); i!=m_all_models.end(); ++i)
-#endif
         {
             if(i->second)
             {
@@ -228,11 +136,8 @@ void ItemManager::setDefaultItemStyle()
                     i->first.c_str());
             }  // if i->second
         }
-#ifndef HAVE_IRRLICHT
-        // For now disable this, irrlicht does not yet load any items.
         throw std::runtime_error(msg.str());
         exit(-1);
-#endif
     }   // if bError
 
 }   // setDefaultItemStyle
@@ -242,21 +147,12 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
                            const Vec3 &normal, Kart *parent)
 {
     Item* h;
-#ifdef HAVE_IRRLICHT
     if(type == Item::ITEM_BUBBLEGUM)
         h = new BubbleGumItem(type, xyz, normal, m_item_mesh[type], 
                               m_all_items.size());
     else
         h = new Item(type, xyz, normal, m_item_mesh[type],
                      m_all_items.size());
-#else
-    if(type == Item::ITEM_BUBBLEGUM)
-        h = new BubbleGumItem(type, xyz, normal, m_item_model[type], 
-                              m_all_items.size());
-    else
-        h = new Item(type, xyz, normal, m_item_model[type],
-                     m_all_items.size());
-#endif
     if(parent != NULL) h->setParent(parent);
     
     m_all_items.push_back(h);
@@ -270,7 +166,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
 {
     Item *item=m_all_items[item_id];
-    item->isCollected();
+    item->collected();
     kart->collectedItem(*item, add_info);
 }   // collectedItem
 
@@ -300,9 +196,7 @@ void ItemManager::cleanup()
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-#ifndef HAVE_IRRLICHT
         delete *i;
-#endif
     }
     m_all_items.clear();
 
@@ -319,13 +213,13 @@ void ItemManager::cleanup()
         // FIXME: This should go in a system-wide configuration file,
         //        and only one of this and the hard-coded settings in
         //        setDefaultItemStyle are necessary!!!
-        loadItemStyle(user_config->m_item_style);
+        loadItemStyle(UserConfigParams::m_item_style);
     }
     catch(std::runtime_error)
     {
         fprintf(stderr,"The item style '%s' in your configuration file does not exist.\nIt is ignored.\n",
-                user_config->m_item_style.c_str());
-        user_config->m_item_style="";
+                UserConfigParams::m_item_style.c_str());
+        UserConfigParams::m_item_style="";
     }
 
     try
@@ -342,8 +236,8 @@ void ItemManager::cleanup()
 }   // cleanup
 
 //-----------------------------------------------------------------------------
-/** Remove all item instances, and the track specific models. This is used
- * just before a new track is loaded and a race is started
+/** Resets all items and removes bubble gum that is stuck on the track.
+ *  This is necessary in case that a race is restarted.
  */
 void ItemManager::reset()
 {
@@ -365,6 +259,44 @@ void ItemManager::reset()
         }
     }  // for i
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Sets the selected item style to be used in the track. The style depends on
+ *  either the GP or the track selected.
+ */
+void ItemManager::setStyle()
+{
+    if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        try
+        {
+            item_manager->loadItemStyle(race_manager->getItemStyle());
+        }
+        catch(std::runtime_error)
+        {
+            fprintf(stderr, "The grand prix '%ls' contains an invalid item style '%s'.\n",
+                    race_manager->getGrandPrix()->getName().c_str(),
+                    race_manager->getItemStyle().c_str());
+            fprintf(stderr, "Please fix the file 'l%s'.\n",
+                    race_manager->getGrandPrix()->getFilename().c_str());
+        }
+    }
+    else
+    {
+        try
+        {
+            item_manager->loadItemStyle(RaceManager::getTrack()->getItemStyle());
+        }
+        catch(std::runtime_error)
+        {
+            fprintf(stderr, "The track '%ls' contains an invalid item style '%s'.\n",
+                    RaceManager::getTrack()->getName().c_str(), 
+                    RaceManager::getTrack()->getItemStyle().c_str());
+            fprintf(stderr, "Please fix the file '%s'.\n",
+                    RaceManager::getTrack()->getFilename().c_str());
+        }
+    }
+}   // setStyle
 
 //-----------------------------------------------------------------------------
 void ItemManager::update(float delta)
@@ -409,10 +341,6 @@ void ItemManager::setItem(const lisp::Lisp *item_node,
     item_node->get(colour, name);
     if(name.size()>0)
     {
-#ifdef HAVE_IRRLICHT
         m_item_mesh[type]=m_all_meshes[name];
-#else
-        m_item_model[type]=m_all_models[name];
-#endif
     }
 }   // setItem

@@ -30,18 +30,31 @@
 #  include <AL/alc.h>
 #endif
 
-#include "user_config.hpp"
-#include "file_manager.hpp"
 #include "audio/music_ogg.hpp"
 #include "audio/sfx_openal.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
 SoundManager* sound_manager= NULL;
 
+
+// the ogg loader needs to know about endianness so do a simple test.
+// 0 : little endian
+// 1 : big endian
+// I'm doing it at runtime rather than at compile-time to be friendly with
+// cross-compilation (universal binaries on mac, namely)
+static const int endianness_test = 0x01000000;
+static const char* endianness_test_ptr = (const char*)&endianness_test;
+
+// in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
+bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
+
+
 SoundManager::SoundManager()
 {
     m_current_music= NULL;
-    setMasterMusicVolume(0.7f);
+    setMasterMusicVolume(UserConfigParams::m_music_volume);
 
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
@@ -108,8 +121,8 @@ void SoundManager::loadMusicFromOneDir(const std::string& dir)
                             /*make_full_path*/ true);
     for(std::set<std::string>::iterator i = files.begin(); i != files.end(); ++i)
     {
-        if(StringUtils::extension(*i)!="music") continue;
-        m_allMusic[StringUtils::basename(*i)] = new MusicInformation(*i);
+        if(StringUtils::getExtension(*i)!="music") continue;
+        m_allMusic[StringUtils::getBasename(*i)] = new MusicInformation(*i);
     }   // for i
 } // loadMusicFromOneDir
 
@@ -138,7 +151,7 @@ void SoundManager::startMusic(MusicInformation* mi)
     stopMusic();
     m_current_music = mi;
     
-    if(!mi || !user_config->doMusic() || !m_initialized) return;
+    if(!mi || !UserConfigParams::m_music || !m_initialized) return;
     
     mi->volumeMusic(m_masterGain);
     mi->startMusic();
@@ -160,6 +173,8 @@ void SoundManager::setMasterMusicVolume(float gain)
 
     m_masterGain = gain;
     if(m_current_music) m_current_music->volumeMusic(m_masterGain);
+    
+    UserConfigParams::m_music_volume = m_masterGain;
 }
 
 //-----------------------------------------------------------------------------
@@ -169,12 +184,22 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
     {
         return NULL;
     }
-    const std::string basename = StringUtils::basename(filename);
+    const std::string basename = StringUtils::getBasename(filename);
     MusicInformation* mi = m_allMusic[basename];
     if(!mi)
     {
-        mi = new MusicInformation(filename);
-        m_allMusic[basename] = mi;
+        try
+        {
+            mi = new MusicInformation(filename);
+            m_allMusic[basename] = mi;
+        }
+        catch (std::exception &e)
+        {
+            (void)e;
+            printf("Can't open music file '%s'.\n", filename.c_str());
+            return NULL;
+        }
+
     }
     mi->volumeMusic(m_masterGain);
     return mi;
@@ -183,7 +208,7 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 //----------------------------------------------------------------------------
 void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
 {
-    if(!user_config->doSFX() || !m_initialized) return;
+    if(!UserConfigParams::m_sfx || !m_initialized) return;
 
     //forward vector
     m_listenerVec[0] = front.getX(); 
@@ -197,4 +222,3 @@ void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
     alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
     alListenerfv(AL_ORIENTATION, m_listenerVec);
 }
-

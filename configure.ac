@@ -29,7 +29,6 @@ AC_PROG_CPP
 AC_PROG_CXX
 
 # This macro defines WORDS_BIGENDIAN if building for a big endian machine.
-# This is required by ov_read (Ogg Vorbis)
 AC_C_BIGENDIAN
 
 
@@ -40,11 +39,6 @@ dnl ===========================
 dnl Check for `configure' flags
 dnl ===========================
 SUMMARY="\nSummary of optional components:\n==============================="
-
-if test "x$with_plib" != "x" ; then
-   echo "plib prefix is $with_plib"
-   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
-fi
 
 AC_ARG_ENABLE(debug, [AS_HELP_STRING(--enable-debug,
                                      [enable debugging info])])
@@ -68,15 +62,6 @@ if test x$enable_optimization = xyes; then
 else
     SUMMARY="$SUMMARY\nDisabled compiler optimizations."
 fi
-
-AC_ARG_ENABLE(irrlicht, [AS_HELP_STRING(--enable-irrlicht,
-                                     [enable irrlicht compilation (still early pre-alpha)])],,
-              enable_irrlicht=false)
-if test x$enable_irrlicht = xyes; then
-    AC_DEFINE([HAVE_IRRLICHT], [1],  [enable irrlicht compilation])
-    SUMMARY="$SUMMARY\nCompiling for irrlicht - be warned, pre-alpha!!"
-fi
-
 
 dnl ===================
 dnl Checks for programs.
@@ -117,7 +102,6 @@ case "${host}" in
 
    save_LIBS=$LIBS
    AC_SEARCH_LIBS(glNewList, [ GL GLcore MesaGL ])
-   AC_SEARCH_LIBS(gluLookAt, GLU)
    opengl_LIBS="$LIBS"
    LIBS=$save_LIBS
    if test "x$ac_cv_search_glNewList" = "x-lGLcore"; then
@@ -195,124 +179,74 @@ LIBS=$save_LIBS
 AC_LANG_PUSH(C++)
 
 
-# ==============================================
-# Check for "plib" without which we cannot go on
-# ==============================================
-# specify the plib location
-AC_ARG_WITH(plib, [AS_HELP_STRING(--with-plib=PREFIX,
-                                  [specify the prefix path to plib])])
-if test "x$with_plib" != "x" ; then
-   echo "plib prefix is $with_plib"
-   EXTRA_DIRS="${EXTRA_DIRS} $with_plib"
-fi
-
-AC_CHECK_HEADER(plib/ul.h)
-if test "x$ac_cv_header_plib_ul_h" != "xyes"; then
-    AC_MSG_ERROR([[cannot find useable plib installation. You need to install plib 1.8.4 or newer.]])
-fi
-
-AC_MSG_CHECKING([for plib 1.8.4 or newer])
-AC_TRY_RUN([
-#  include <plib/ul.h>
- 
-#  define MIN_PLIB_VERSION 184
-   int main() {
-   if ( PLIB_VERSION < MIN_PLIB_VERSION ) {
-      return -1;
-    }
-   return 0;
-   }
- ],
-  AC_MSG_RESULT(yes),
-  [ AC_MSG_RESULT(wrong version);
-    AC_MSG_ERROR([plib 1.8.4 or later is needed. Please intall it first.])],
-  AC_MSG_RESULT(yes)
-)
-
-
-
-dnl =======================
-dnl check for SDL libraries
-dnl =======================
-dnl Potentially sdl-config could be used, but apparently that might not
-dnl exist on all platforms, so doing the 'classical' test is safer :(
-case "${host}" in
-*)
-   dnl default unix style machines
-
-   dnl check for libraries
-   save_LIBS=$LIBS 
-   AC_SEARCH_LIBS(SDL_Init, SDL, have_SDL_lib=yes)
-   sdl_LIBS="$LIBS"
-   LIBS=$save_LIBS
-
-   dnl check for header files
-   AC_CHECK_HEADER(SDL/SDL.h, have_SDL_hdr=yes)
-   
-   if test x$have_SDL_hdr != xyes -o x$have_SDL_lib != xyes; then
-      AC_MSG_ERROR([Install SDL first...])
-   fi
-
-    AC_TRY_RUN([
-    #  include <SDL/SDL.h>
-       int main() {
-       if ( SDL_VERSION_ATLEAST(1,2,10)) {
-          return 0;
-        }
-       return -1;
-       }
-     ],
-      :,
-        AC_MSG_WARN([Your SDL version uses deprecated
-    headers. Please update to version 1.2.10 or higher if possible.
-    Currently this doesn't affects the game at all.])
-    )
-
-esac
-
-
 dnl ===============================
 dnl Check for irrlicht (if enabled)
 dnl ===============================
-if test x$enable_irrlicht = xyes; then
-   AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
-                                   [specify the prefix path to irrlicht])])
-   if test "x$with_irrlicht" != "x" ; then
-      CPPFLAGS="${CPPFLAGS} -I$with_irrlicht/include"
+AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
+                                  [specify the prefix path to irrlicht])])
+if test "x$with_irrlicht" != "x" ; then
+   CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include"
+   AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+   if test x$have_irrlicht_hdr != xyes; then
+      AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
    fi
+else
+   CPPFLAGS_save=CPPFLAGS
+   CPPFLAGS="${CPPFLAGS} -I /usr/local/include/irrlicht"
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
    if test x$have_irrlicht_hdr != xyes; then
       AC_MSG_ERROR([Can't find irrlicht installation, use --with-irrlicht...])
    fi
-   case "${host}" in
-   *-*-linux* )
-   irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
-   ;;
-   *darwin*|*macosx*)
-   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
-   ;;
-   esac
-
-   dnl Test if we need Xxf86vm. For now assume that if any problems
-   dnl occur with this simple program, it must be caused by this
-   dnl missing library. FIXME: better tests should be done here!!
-   dnl FIXME: this program when run prints out two lines (version numbers) to stdout
-   echo "checking for irrlicht libraries."
-   save_LIBS=$LIBS
-   LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
-   AC_TRY_RUN([
-      #  include "irrlicht.h"
-      int main() {
-      irr::createDevice(irr::video::EDT_NULL);
-      return 0;
-      }
-     ],
-        ,
-	irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
-    )
-   LIBS=$save_LIBS
-
 fi
+case "${host}" in
+*-*-linux* )
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
+  ;;
+*darwin*|*macosx*)
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
+  ;;
+*freebsd*)
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
+esac
+
+dnl Test if we need Xxf86vm. For now assume that if any problems
+dnl occur with this simple program, it must be caused by this
+dnl missing library. FIXME: better tests should be done here!!
+dnl FIXME: this program when run prints out two lines (version numbers) to stdout
+echo "checking for irrlicht libraries."
+save_LIBS=$LIBS
+LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
+
+case "${host}" in
+*-*-linux* )
+  AC_TRY_RUN([
+   #  include "irrlicht.h"
+   int main() {
+   irr::createDevice(irr::video::EDT_NULL);
+   return 0;
+   }
+  ],
+      ,
+  irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+    )
+  ;;
+*darwin*|*macosx*)
+  AC_TRY_RUN([
+   #  include "irrlicht.h"
+   int main() {
+   irr::createDevice(irr::video::EDT_NULL);
+   return 0;
+   }
+  ],
+      ,
+  irrlicht_LIBS="$irrlicht_LIBS"
+    )
+  ;;
+*freebsd*)
+   LDFLAGS="$LDFLAGS -lpthread"
+esac
+
+LIBS=$save_LIBS
 
 dnl ======================================================
 dnl Try to supply the SVN revision number for the compiler
@@ -322,21 +256,6 @@ if test x$have_svnversion != xno; then
   SVNVERSION="`svnversion $srcdir`"
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
-
-AC_MSG_CHECKING([for gcc -fno-regmove option ])
-
-dnl =========================
-dnl test regmove compiler bug
-dnl =========================
-dnl Test if -fno-regmove is supported, since -fregmove (which is part of -O2 on
-dnl g++) triggers an optimisation problem with static_ssg:
-ORIGCXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -fno-regmove"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-                  AC_MSG_RESULT(yes); NOREGMOVE=-fno-regmove,
-                  AC_MSG_RESULT(no);  NOREGMOVE="")
-CXXFLAGS="$ORIGCXXFLAGS"
-AC_SUBST(NOREGMOVE)
 
 dnl ==============================================
 dnl Glut (optional), used by bullet debugging only
@@ -416,27 +335,6 @@ ENETTREE="src/enet"
 # Check for gettext
 CHECK_GETTEXT(external)
 
-dnl =======================================================
-dnl Add special compiler flags for SDL on certain platforms
-dnl =======================================================
-case "${host}" in
-*darwin*|*macosx*)
-  dnl SDL on Macs needs to link in SDLmain, since it includes the
-  dnl actual main program (on Macs #include "SDL/SDL.h" renames
-  dnl main into SDL_main, which then gets called from the new
-  dnl main program included in SDLmain. This is necessary to 
-  dnl install a proper framework for SDL).
-  dnl This can't be done earlier, since all SDL tests program
-  dnl from configure do NOT include SDL/SDL.h, therefore the 
-  dnl main program gets not replaced, and then getting an linking
-  dnl error about main defined twice :((
-  AC_CHECK_PROGS(have_sdl_config,[sdl-config],"no")
-  if test x$have_sdl_config != xno; then
-    LDFLAGS="$LDFLAGS `sdl-config --libs`"
-    CXXFLAGS="$CXXFLAGS `sdl-config --cflags`"
-  fi
-esac
-
 # =========================
 # subst bars in Makefile.am
 # =========================
@@ -447,7 +345,6 @@ AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(oggvorbis_LIBS)
 AC_SUBST(glut_LIBS)
-AC_SUBST(sdl_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)
 
@@ -459,6 +356,7 @@ AC_CONFIG_FILES([                   \
  data/Makefile                      \
  data/fonts/Makefile                \
  data/grandprix/Makefile            \
+ data/gui/Makefile                  \
  data/items/Makefile                \
  data/karts/Makefile                \
  data/models/Makefile               \

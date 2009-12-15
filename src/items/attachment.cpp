@@ -17,12 +17,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
-
-#include "stk_config.hpp"
-#include "user_config.hpp"
 #include "items/attachment.hpp"
+
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
@@ -30,41 +29,29 @@
 #include "network/network_manager.hpp"
 #include "utils/constants.hpp"
 
-Attachment::Attachment(Kart* _kart)
+Attachment::Attachment(Kart* kart)
 {
     m_type           = ATTACH_NOTHING;
     m_time_left      = 0.0;
-    m_kart           = _kart;
+    m_kart           = kart;
     m_previous_owner = NULL;
-#ifdef HAVE_IRRLICHT
-#else
-    m_holder         = new ssgSelector();
-    m_kart->getModelTransform()->addKid(m_holder);
 
-    for(int i=ATTACH_FIRST; i<ATTACH_MAX; i++)
-    {
-        ssgEntity *p=attachment_manager->getModel((attachmentType)i);
-        m_holder->addKid(p);
-    }
-    m_holder->select(0);
-#endif
+    m_node           = NULL;
 }   // Attachment
 
 //-----------------------------------------------------------------------------
 Attachment::~Attachment()
 {
-#ifndef HAVE_IRRLICHT
-    ssgDeRefDelete(m_holder);
-#endif
+    if(m_node)
+        irr_driver->removeNode(m_node);
 }   // ~Attachment
 
 //-----------------------------------------------------------------------------
 void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
-#ifndef HAVE_IRRLICHT
-    m_holder->selectStep(type);
-#endif
+    m_node           = irr_driver->addMesh(attachment_manager->getMesh(type));
+    m_node->setParent(m_kart->getNode());
     m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;
@@ -76,6 +63,7 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
         m_initial_speed = m_kart->getSpeed();
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
     }
+
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -87,10 +75,11 @@ void Attachment::clear()
 {
     m_type=ATTACH_NOTHING; 
     m_time_left=0.0;
-#ifdef HAVE_IRRLICHT
-#else
-    m_holder->select(0);
-#endif
+    if(m_node)
+    {
+        irr_driver->removeNode(m_node);
+        m_node = NULL;
+    }
 
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to
@@ -101,7 +90,6 @@ void Attachment::clear()
 // -----------------------------------------------------------------------------
 void Attachment::hitBanana(const Item &item, int new_attachment)
 {
-    if(user_config->m_profile) return;
     float leftover_time   = 0.0f;
     
     switch(getType())   // If there already is an attachment, make it worse :)
@@ -124,6 +112,10 @@ void Attachment::hitBanana(const Item &item, int new_attachment)
         leftover_time     = m_time_left;
         break;
     default:
+        // There is no attachment currently, but there will be one
+        // so play the character sound ("Uh-Oh")
+        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+
         if(new_attachment==-1)
             new_attachment = m_random.get(3);
     }   // switch
@@ -170,6 +162,7 @@ void Attachment::moveBombFromTo(Kart *from, Kart *to)
     to->setAttachmentType(ATTACH_BOMB,
                           from->getAttachment()->getTimeLeft()+
                           stk_config->m_bomb_time_increase, from);
+
     from->getAttachment()->clear();
 }   // moveBombFromTo
 

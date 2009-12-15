@@ -21,22 +21,20 @@
 #define HEADER_WORLD_HPP
 
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/ssg.h>
 
-#include "highscores.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
-#include "physics/physics.hpp"
 #include "modes/clock.hpp"
 #include "network/network_kart.hpp"
+#include "physics/physics.hpp"
+#include "race/highscores.hpp"
+#include "states_screens/race_gui.hpp"
 #include "utils/random_generator.hpp"
 
 class SFXBase;
-struct KartIconDisplayInfo;
-class RaceGUI;
 class btRigidBody;
 class Track;
+class RaceGUI;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
@@ -66,7 +64,7 @@ class Track;
  *  be passed into the world constructor, and world just calls functions in
  *  this object.
  *  \todo The handling of the FollowTheLeader mode should probably be changed
- *        as well. Currently the leader kart is anormal AI kart (so it is 
+ *        as well. Currently the leader kart is a normal AI kart (so it is 
  *        included in the number of karts selected), and this causes some 
  *        unnecessary handling of special cases everywhere (e.g. score 
  *        counting will subtract one from the rank, since the kart on position
@@ -100,37 +98,42 @@ protected:
     bool        m_faster_music_active; // true if faster music was activated
 
     /** Whether highscores should be used for this kind of race.
-        * True by default, change to false in a child class to disable.
+     *  True by default, change to false in a child class to disable.
     */
     bool        m_use_highscores;
     
     void  updateHighscores  ();
-    void  loadTrack         ();
     void  resetAllKarts     ();
     void  removeKart        (int kart_number);
     Kart* loadRobot         (const std::string& kart_name, int position,
                              const btTransform& init_pos);
-    void  printProfileResultAndExit();
     void  estimateFinishTimes();
-    
+
+    virtual Kart *createKart(const std::string &kart_ident, int index, 
+                             int local_player_id, int global_player_id,
+                             const btTransform &init_pos);
+protected:
+    /** Pointer to the track. The track is managed by world. */
     Track* m_track;
     
+    /** Pointer to the race GUI. The race GUI is handedl by world. */
+    RaceGUI *m_race_gui;
     
 public:
-    /** debug text that will be overlaid to the screen */
-    std::string m_debug_text[10];
-    
     World();
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
-    void init();
+    virtual void init();
     
     virtual         ~World();
     virtual void    update(float delta);
+    /** Returns true if the race is over. Must be defined by all modes. */
+    virtual bool    isRaceOver() = 0;
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
-    
+    /** Returns a pointer to the race gui. */
+    RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     PlayerKart     *getPlayerKart(int player)   const { return m_player_karts[player];      }
     unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
     PlayerKart     *getLocalPlayerKart(int n)   const { return m_local_player_karts[n];     }
@@ -161,12 +164,12 @@ public:
     
     /** Called to determine whether this race mode uses bonus boxes.
       */
-    virtual bool enableBonusBoxes(){ return true; }
+    virtual bool haveBonusBoxes(){ return true; }
     
-    /** Each game mode should have a unique internal code. Override
+    /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it.
       */
-    virtual std::string getInternalCode() const = 0;
+    virtual std::string getIdent() const = 0;
         
     virtual bool useFastMusicNearEnd() const { return true; }
     
@@ -188,7 +191,7 @@ public:
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode
       */
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller) = 0;
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo() = 0;
     
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.
@@ -198,6 +201,11 @@ public:
     /** Called when it is needed to know whether this kind of race involves counting laps.
       */
     virtual bool raceHasLaps() = 0;
+
+    /** Called whenever a kart starts a new lap. Meaningless (and won't be 
+     *  called) in non-laped races.
+     */
+    virtual void newLap(unsigned int kart_index) {}
     
     /** Called when a kart was hit by a projectile
      */

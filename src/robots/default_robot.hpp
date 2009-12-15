@@ -16,14 +16,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DEFAULT_H
-#define HEADER_DEFAULT_H
+#ifndef HEADER_DEFAULT_HPP
+#define HEADER_DEFAULT_HPP
 
 #include "karts/auto_kart.hpp"
+#include "modes/profile_world.hpp"
+#include "utils/vec3.hpp"
+
+/* third coord won't be used */
 
 class Track;
 class LinearWorld;
-class TrackInfo;
+class QuadGraph;
+class irr::scene::ISceneNode;
 
 class DefaultRobot : public AutoKart
 {
@@ -101,15 +106,12 @@ private:
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-    int   m_future_sector;
-    sgVec2 m_future_location;
 
     float m_time_till_start; //Used to simulate a delay at the start of the
                              //race, since human players don't accelerate
                              //at the same time and rarely repeat the a
                              //previous timing.
 
-    int m_inner_curve;//-1 left, 1 = right, 0 = center
     float m_curve_target_speed;
     float m_curve_angle;
 
@@ -118,10 +120,26 @@ private:
 
     /** Keep a pointer to world. */
     LinearWorld *m_world;
-    /** Cache kart_info.m_track_sector. */
-    int   m_track_sector;
-
+    /** The current node the kart is on. This can be different from the value
+     *  in LinearWorld, since it takes the chosen path of the AI into account
+     *  (e.g. the closest point in LinearWorld might be on a branch not
+     *  chosen by the AI). */
+    int   m_track_node;
+    /** The graph of qudas of this track. */
+    const QuadGraph *m_quad_graph;
     
+    /** Which of the successors of a node was selected by the AI. */
+    std::vector<int> m_successor_index;
+    /** For each node in the graph this list contains the chosen next node.
+     *  For normal lap track without branches we always have 
+     *  m_next_node_index[i] = (i+1) % size;
+     *  but if a branch is possible, the AI will select one option here. 
+     *  If the node is not used, m_next_node_index will be -1. */
+    std::vector<int> m_next_node_index;
+    /** For each graph node this list contains a list of the next X
+     *  graph nodes. */
+    std::vector<std::vector<int> > m_all_look_aheads;
+
     float m_time_since_stuck;
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
@@ -131,21 +149,16 @@ private:
 
     /** Cache width of kart. */
     float m_kart_width;
-    /** All AIs share the track info object, so that its information needs 
-     *  only to be computed once. */
-    static const TrackInfo *m_track_info;
-    /** This counts how many AIs have a pointer to the TrackInfo object. If
-     *  this number reaches zero, the shared TrackInfo object is 
-     *  deallocated. */
-    static int m_num_of_track_info_instances;
+
+    /** For debugging purpose: a sphere indicating where the AI 
+     *  is targeting at. */
+    irr::scene::ISceneNode *m_debug_sphere;
 
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
      *  different AI levels.
      */
     float m_skidding_threshold;
-
-    int  m_sector;
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
@@ -163,15 +176,14 @@ private:
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const sgVec2 point, float dt);
+    float steerToPoint(const Vec3 &point, float dt);
 
     void  checkCrashes(const int STEPS, const Vec3& pos);
-    void  findNonCrashingPoint(sgVec2 result);
+    void  findNonCrashingPoint(Vec3 *result);
 
     float normalizeAngle(float angle);
     int   calcSteps();
     void  setSteering(float angle, float dt);
-    float getApproxRadius(const int START, const int END) const;
     void  findCurve();
 
 public:
@@ -181,6 +193,16 @@ public:
     void         update      (float delta) ;
     void         reset       ();
     virtual void crashed     (Kart *k) {if(k) m_collided = true;};
+    virtual const irr::core::stringw& getName() const 
+    {
+        // Static to avoid returning the address of a temporary stringq
+        static irr::core::stringw name=m_kart_properties->getName();
+        // Add the name of the AI in case of profile mode, to make it
+        // easier to compare AIs
+        if(ProfileWorld::isProfileMode())
+            name+="(default)";
+        return name;
+    }
 };
 
 #endif

@@ -20,44 +20,48 @@
 #ifndef THREE_STRIKES_HPP
 #define THREE_STRIKES_HPP
 
-#include "modes/world.hpp"
 #include <string>
 
-struct KartIconDisplayInfo;
+#include "modes/world.hpp"
+#include "states_screens/race_gui.hpp"
 
-struct BattleInfo
-{
-    int m_lives;
-};
 
 class ThreeStrikesBattle : public World
 {
-    KartIconDisplayInfo* m_kart_display_info;
+private:
+    struct BattleInfo
+    {
+        int m_lives;
+    };
+
+    RaceGUI::KartIconDisplayInfo* m_kart_display_info;
     
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
     */
     std::vector<BattleInfo> m_kart_info;
     
 public:
+
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
     
     // clock events
     virtual void onGo();
+    virtual bool isRaceOver();
     virtual void terminateRace();
     
     // overriding World methods
-    virtual void update(float delta);
     virtual void restartRace();
+    virtual void enterRaceOverState(const bool delay=false);
+
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    //virtual bool enableBonusBoxes();
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
     virtual bool acceptPowerup(const int type) const;
     
-    virtual std::string getInternalCode() const;
+    virtual std::string getIdent() const;
     
     virtual void kartHit(const int kart_id);
     

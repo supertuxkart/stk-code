@@ -17,16 +17,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "unlock_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 
 #include <set>
 #include <string>
+#include <vector>
 #include <stdio.h>
 
-#include "race_manager.hpp"
-#include "file_manager.hpp"
-#include "user_config.hpp"
+#include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "challenges/challenge_data.hpp"
+#include "io/file_manager.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "race/race_manager.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
 UnlockManager* unlock_manager=0;
@@ -39,6 +44,8 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager=this;
 
+    m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
+    
     // Read challenges from .../data
     // -----------------------------
     std::set<std::string> result;
@@ -46,63 +53,56 @@ UnlockManager::UnlockManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::has_suffix(*i, ".challenge")) 
+        if (StringUtils::hasSuffix(*i, ".challenge")) 
             addChallenge(file_manager->getConfigFile(*i));
     }   // for i
 
     // Read challenges from .../data/tracks/*
     // --------------------------------------
-    std::set<std::string> dirs;
-    file_manager->listFiles(dirs, file_manager->getTrackDir(), /*is_full_path*/ true);
-    for(std::set<std::string>::iterator dir = dirs.begin(); dir != dirs.end(); dir++)
+    const std::vector<std::string> *all_track_dirs = track_manager->getAllTrackDirs();
+    for(std::vector<std::string>::const_iterator dir=all_track_dirs->begin();
+        dir!=all_track_dirs->end(); dir++)
     {
-        if(*dir=="." || *dir=="..") continue;
-        std::string config_file;
-        try
+        std::set<std::string> all_files;
+        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        for(std::set<std::string>::iterator file=all_files.begin(); 
+            file!=all_files.end(); file++)
         {
-            // getTrackFile appends dir, so it's opening: *dir/*dir.track
-            config_file = file_manager->getTrackFile((*dir)+".track");
-        }
-        catch (std::exception& e)
-        {
-            (void)e;   // remove warning about unused variable
-            continue;
-        }
-        // Check for a challenge file
-        std::string challenge_file = 
-            StringUtils::without_extension(config_file)+".challenge";
-        FILE *f=fopen(challenge_file.c_str(), "r");
-        if(f)
-        {
-            fclose(f);
-            addChallenge(new ChallengeData(challenge_file));
-        }
-    }   // for dirs
+            if(!StringUtils::hasSuffix(*file,".challenge")) continue;
+            std::string filename=*dir+"/"+*file;
+            FILE *f=fopen(filename.c_str(), "r");
+            if(f)
+            {
+                fclose(f);
+                addChallenge(new ChallengeData(filename));
+            }   // if file
+        }   // for file in files
+    }   // for dir in all_track_dirs
 
     // Load challenges from .../data/karts
     // -----------------------------------
-    file_manager->listFiles(dirs, file_manager->getKartDir(), 
-                            /*is_full_path*/ true);
+    const std::vector<std::string> *all_kart_dirs = 
+        kart_properties_manager->getAllKartDirs();
 
     // Find out which characters are available and load them
-    for(std::set<std::string>::iterator i  = dirs.begin();
-                                        i != dirs.end();  i++)
+    for(std::vector<std::string>::const_iterator dir  = all_kart_dirs->begin();
+                                                 dir != all_kart_dirs->end();  dir++)
     {
-        std::string challenge_file;
-        try
+        std::set<std::string> all_files;
+        file_manager->listFiles(all_files, *dir, /*is_full_path*/ true);
+        for(std::set<std::string>::iterator file=all_files.begin(); 
+            file!=all_files.end(); file++)
         {
-            challenge_file = file_manager->getKartFile((*i)+".challenge");
-        }
-        catch (std::exception& e)
-        {
-            (void)e;   // remove warning about unused variable
-            continue;
-        }
-        FILE *f=fopen(challenge_file.c_str(),"r");
-        if(!f) continue;
-        fclose(f);
-        addChallenge(new ChallengeData(challenge_file));
-    }   // for i
+            if(!StringUtils::hasSuffix(*file,".challenge")) continue;
+            std::string filename=*dir+"/"+*file;
+            FILE *f=fopen(filename.c_str(), "r");
+            if(f)
+            {
+                fclose(f);
+                addChallenge(new ChallengeData(filename));
+            }   // if file
+        }   // for file in files
+    }   // for dir in all_karts_dirs
 
     // Challenges from .../data/grandprix
     // ----------------------------------
@@ -110,26 +110,41 @@ UnlockManager::UnlockManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::has_suffix(*i, ".challenge")) 
+        if (StringUtils::hasSuffix(*i, ".challenge")) 
             addChallenge(file_manager->getConfigFile("grandprix/"+*i));
     }   // for i
 
     // Hard coded challenges can be added here.
 
     computeActive();
-
+    load();
+    // Disable challenges that can not be done - e.g. due to missing tracks...
+    check();
 }   // UnlockManager
+
+//-----------------------------------------------------------------------------
+/** Saves the challenge status.
+ */
+UnlockManager::~UnlockManager()
+{
+    save();
+    
+    // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
+    // sfx_manager->deleteSFX(m_locked_sound);
+}   // ~UnlockManager
 
 //-----------------------------------------------------------------------------
 void UnlockManager::addChallenge(Challenge *c)
 {
     m_all_challenges[c->getId()]=c;
 }   // addChallenge
+
 //-----------------------------------------------------------------------------
 void UnlockManager::addChallenge(const std::string& filename)
 {
     addChallenge(new ChallengeData(filename));
 }   // addChallenge
+
 //-----------------------------------------------------------------------------
 /** Checks if all challenges are valid, i.e. contain a valid track or GP. 
  *  If not, STK is aborted with an error message.
@@ -167,25 +182,55 @@ Challenge* UnlockManager::getChallenge(const std::string& id)
 //-----------------------------------------------------------------------------
 /** This is called from user_config when reading the config file
 */
-void UnlockManager::load(const lisp::Lisp* config)
+void UnlockManager::load()
 {
+    const std::string filename=file_manager->getChallengeFile("challenges.xml");
+    XMLNode* root = file_manager->createXMLTree(filename);
+    if(!root || root->getName() != "challenges")
+    {
+        std::cerr << "Challenge file '" << filename << "' will be created." 
+                  << std::endl;
+        return;
+    }
+    
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
     {
-        i->second->load(config);
+        i->second->load(root);
     }
     computeActive();
 }   // load
 
 //-----------------------------------------------------------------------------
-void UnlockManager::save(lisp::Writer* writer)
+void UnlockManager::save()
 {
-    for(AllChallengesType::iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
+    std::ofstream challenge_file;
+    std::string filename = file_manager->getChallengeFile("challenges.xml");
+    challenge_file.open(filename.c_str());
+
+    if(!challenge_file.is_open())
     {
-        i->second->save(writer);
-    }   // for i in m_all_challenges
+        std::cerr << "Failed to open " << filename << " for writing, challenges won't be saved\n";
+        return;
+    }
+
+    challenge_file << "<?xml version=\"1.0\"?>\n";
+    challenge_file << "<challenges>\n";
+    
+    for(AllChallengesType::iterator i = m_all_challenges.begin(); 
+                                    i!= m_all_challenges.end();  i++)
+    {
+        i->second->save(challenge_file);
+    }
+    
+    challenge_file << "</challenges>\n\n";
+    challenge_file.close();
 }   // save
+
+void UnlockManager::playLockSound() const
+{
+    m_locked_sound->play();
+}
 
 //-----------------------------------------------------------------------------
 void UnlockManager::computeActive()
@@ -218,9 +263,11 @@ void UnlockManager::computeActive()
             {
                 fprintf(stderr,"Challenge prerequisite '%s' of '%s' not found - ignored\n",
                         pre->c_str(), i->first.c_str());
-                continue;
+                //continue;
+                allSolved=false;
+                break;
             }
-            if(!p->isSolved())
+            else if(!p->isSolved())
             {
                 allSolved=false;
                 break;
@@ -274,7 +321,7 @@ void UnlockManager::lockFeature(Challenge* challenge)
 
 //-----------------------------------------------------------------------------
 
-void UnlockManager::unlockFeature(Challenge* c, bool save)
+void UnlockManager::unlockFeature(Challenge* c, bool do_save)
 {
     const unsigned int amount = (unsigned int)c->getFeatures().size();
     for(unsigned int n=0; n<amount; n++)
@@ -295,7 +342,7 @@ void UnlockManager::unlockFeature(Challenge* c, bool save)
     c->setSolved();  // reset isActive flag
     
     // Save the new unlock information
-    if(save) user_config->saveConfig();
+    if(do_save) save();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
@@ -303,3 +350,31 @@ bool UnlockManager::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
+//-----------------------------------------------------------------------------
+const std::vector<const Challenge*>   UnlockManager::getUnlockedFeatures()
+{    
+    std::vector<const Challenge*>  out;
+    
+    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
+        i!=m_all_challenges.end();  i++)
+    {
+        if (i->second->isSolved()) out.push_back(i->second);
+    }
+    
+    return out;
+}
+//-----------------------------------------------------------------------------
+const std::vector<const Challenge*>   UnlockManager::getLockedChallenges()
+{    
+    std::vector<const Challenge*>  out;
+    
+    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
+        i!=m_all_challenges.end();  i++)
+    {
+        if (!i->second->isSolved() && !i->second->isActive()) out.push_back(i->second);
+    }
+    
+    return out;
+}
+
+

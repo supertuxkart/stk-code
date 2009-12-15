@@ -22,8 +22,8 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "user_config.hpp"
 #include "audio/music_ogg.hpp"
+#include "config/user_config.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "tracks/track.hpp"
@@ -45,11 +45,11 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_gain            = 1.0f;
     m_adjustedGain    = 1.0f;
 
-    if(StringUtils::extension(filename)!="music")
+    if(StringUtils::getExtension(filename)!="music")
     {
         // Create information just from ogg file
         // -------------------------------------
-        m_title           = StringUtils::without_extension(StringUtils::basename(filename));
+        m_title           = StringUtils::removeExtension(StringUtils::getBasename(filename));
         m_normal_filename = filename;
         return;
     }
@@ -87,7 +87,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_adjustedGain = m_gain;
 
     // Get the path from the filename and add it to the ogg filename
-    std::string path=StringUtils::path(filename);
+    std::string path=StringUtils::getPath(filename);
     m_normal_filename=path+"/"+m_normal_filename;
 
     // Get the path from the filename and add it to the ogg filename
@@ -120,7 +120,7 @@ void MusicInformation::startMusic()
 
     // First load the 'normal' music
     // -----------------------------
-    if(StringUtils::extension(m_normal_filename)!="ogg")
+    if(StringUtils::getExtension(m_normal_filename)!="ogg")
     {
         fprintf(stderr, "WARNING: music file %s format not recognized.\n", 
                 m_normal_filename.c_str());
@@ -147,7 +147,7 @@ void MusicInformation::startMusic()
         return;   // no fast music
     }
 
-    if(StringUtils::extension(m_fast_filename)!="ogg")
+    if(StringUtils::getExtension(m_fast_filename)!="ogg")
     {
         fprintf(stderr, 
                 "WARNING: music file %s format not recognized, fast music is ignored\n", 

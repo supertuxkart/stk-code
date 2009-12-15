@@ -18,13 +18,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "utils/string_utils.hpp"
+
+#include "math.h"
 #include <algorithm>
 #include <cstring>
-#include "string_utils.hpp"
+#include <stdio.h>
+#include <exception>
+#include <assert.h>
 
 namespace StringUtils
 {
-    bool has_suffix(const std::string& lhs, const std::string rhs)
+    bool hasSuffix(const std::string& lhs, const std::string rhs)
     {
         if (lhs.length() < rhs.length())
             return false;
@@ -33,10 +38,12 @@ namespace StringUtils
             // g++ versions (at least 2.95.3), which have a wrong template. To
             // avoid this issue, a more C-traditional way is used.
             return strcmp(lhs.c_str()+(lhs.length()-rhs.length()), rhs.c_str())==0;
-    }
-
-//--------------------------i---------------------------------------------------
-    std::string path(const std::string& filename)
+    }   // hasSuffix
+    
+    //--------------------------i-----------------------------------------------
+    /** Returns the path of a filename, i.e. everything till the last '/'.
+     */
+    std::string getPath(const std::string& filename)
     {
         for(int i = int(filename.size()) - 1; i >= 0; --i)
         {
@@ -46,10 +53,12 @@ namespace StringUtils
             }
         }
         return "";
-    }
-
-//-----------------------------------------------------------------------------
-    std::string basename(const std::string& filename)
+    }   // getPath
+    
+    //-------------------------------------------------------------------------
+    /** Returns the basename of a filename, i.e. everything after the last "/".
+     */
+    std::string getBasename(const std::string& filename)
     {
         for(int i = int(filename.size()) - 1; i >= 0; --i)
         {
@@ -59,10 +68,12 @@ namespace StringUtils
             }
         }
         return filename;
-    }
-
-//-----------------------------------------------------------------------------
-    std::string without_extension(const std::string& filename)
+    }   // getBasename
+    
+    //-------------------------------------------------------------------------
+    /** Removes the extension, i.e. everything after the last ".".
+     */
+    std::string removeExtension(const std::string& filename)
     {
         for(int i = int(filename.size()) - 1; i >= 0; --i)
         {
@@ -72,10 +83,12 @@ namespace StringUtils
             }
         }
         return filename;
-    }
-
-//-----------------------------------------------------------------------------
-    std::string extension(const std::string& filename)
+    }   // removeExtension
+    
+    //-------------------------------------------------------------------------
+    /** Returns the extension, i.e. everything after the last "."
+     */
+    std::string getExtension(const std::string& filename)
     {
         for(int i = int(filename.size()) - 1; i >= 0; --i)
         {
@@ -85,48 +98,254 @@ namespace StringUtils
             }
         }
         return filename;
-    }
-
-//-----------------------------------------------------------------------------
-    std::string upcase (const std::string& str)
+    }   // getExtension
+    
+    //-------------------------------------------------------------------------
+    /** Returns a string converted to upper case.
+     */
+    std::string toUpperCase(const std::string& str)
     {
         std::string name = str;
         std::transform(name.begin(), name.end(), name.begin(), ::toupper);
         return name;
-    }
-
-//-----------------------------------------------------------------------------
-    std::string downcase (const std::string& str)
-    {
-        std::string name = str;
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        return name;
-    }
-//-----------------------------------------------------------------------------
-// Splits a string into substrings separated by a certain character, and 
-// returns a std::vector of all those substring. E.g.:
-//  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
-    std::vector<std::string> split(const std::string& s, char c)
+    }   // toUpperCase
+    
+    //-----------------------------------------------------------------------------
+    /** Splits a string into substrings separated by a certain character, and 
+     *  returns a std::vector of all those substring. E.g.:
+     *  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
+     *  \param s The string to split.
+     *  \param c The character  by which the string is split.
+     */
+    std::vector<std::string> split(const std::string& s, char c, bool keepSplitChar)
     {
         std::vector<std::string> result;
-    
-        std::string::size_type start=0;
-        while(start!=std::string::npos)
+        
+        try
         {
-            std::string::size_type i=s.find(c, start);
-            if(i!=std::string::npos)
+            std::string::size_type start=0;
+            while(start!=std::string::npos)
             {
-                result.push_back(std::string(s,start, i-start));
-                start=i+1;
-            } 
-            else
-            {
-                result.push_back(std::string(s,start));
-                start = i;
+                std::string::size_type i=s.find(c, start);
+                if (i!=std::string::npos)
+                {
+                    if (keepSplitChar)
+                    {
+                        int from = start-1;
+                        if (from < 0) from = 0;
+
+                        result.push_back(std::string(s, from, i-from));
+                    }
+                    else result.push_back(std::string(s,start, i-start));
+                    
+                    start=i+1;
+                } 
+                else
+                {
+                    if (keepSplitChar) result.push_back(std::string(s,start-1));
+                    else result.push_back(std::string(s,start));
+                    start = i;
+                }
             }
+            return result;
         }
-        return result;
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid warning message about unused variable
+            fprintf(stderr, "Fatal error in split(std::string) : %s @ line %i\n", __FILE__, __LINE__);
+            printf("Splitting %s\n", s.c_str());
+            
+            for (int n=0; n<(int)result.size(); n++)
+            {
+                printf("Split : %s\n", result[n].c_str());
+            }
+            
+            exit(1);
+        }
+    }   // split
+    
+    /** Same as above, but for wide strings */
+    std::vector<irr::core::stringw> split(const irr::core::stringw& s, char c, bool keepSplitChar)
+    {
+        try
+        {
+            std::vector<irr::core::stringw> result;
+            
+            irr::s32 start = 0;
+            while (start < (irr::s32)s.size())
+            {
+                irr::s32 i = s.findNext(c, start);
+                if (i != -1)
+                {
+                    if (keepSplitChar)
+                    {
+                        int from = start-1;
+                        if (from < 0) from = 0;
+                        result.push_back( s.subString(from, i-from) );
+                    }
+                    else result.push_back( s.subString(start, i-start) );
+                    start = i+1;
+                } 
+                else
+                {
+                    if (keepSplitChar) result.push_back( s.subString(start - 1, s.size()-start + 1) );
+                    else result.push_back( s.subString(start, s.size()-start) );
+                    
+                    return result;
+                    //start = i+1;
+                }
+            }
+            return result;
+        }
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid warning about unused variable
+            fprintf(stderr, "Fatal error in split(stringw) : %s @ line %i\n", __FILE__, __LINE__);
+            exit(1);
+        }
+    }   // split
+    
+    
+    // ------------------------------------------------------------------------
+    /** Splits a : separated string (like PATH) into its individual components.
+     *  It especially handles Windows-style paths (c:/mydir1:d:/mydir2)
+     *  correctly, and removes a trailing "/" which can cause a problem with
+     *  windows' stat function.
+     *  \param path The string to split.
+     */
+    std::vector<std::string> splitPath(const std::string& path)
+    {
+        try
+        {
+            std::vector<std::string> dirs=StringUtils::split(path,':');
+            for(int i=(int)dirs.size()-1; i>=0; i--)
+            {
+                // Remove '/' at the end of paths, since this can cause
+                // problems with windows when using stat()
+                while(dirs[i].size()>=1 && dirs[i][dirs[i].size()-1]=='/')
+                {
+                    dirs[i]=dirs[i].substr(0, dirs[i].size()-1);
+                }
+                // remove empty entries
+                if(dirs[i].size()==0)
+                {
+                    dirs.erase(dirs.begin()+i);
+                    continue;
+                }
+            }   // for i
+#ifdef WIN32
+            // Handle filenames like d:/dir, which becomes ["d","/dir"]
+            for(int i=(int)dirs.size()-1; i>=0; i--)
+            {
+                if(dirs[i].size()>1) continue;
+                if(i==dirs.size()-1)    // last element
+                {
+                    dirs[i]+=":";      // turn "c" back into "c:"
+                }
+                else
+                {
+                    dirs[i]+=":"+dirs[i+1]; // restore "d:/dir" back
+                    dirs.erase(dirs.begin()+i+1);
+                }
+            }   // for i
+#endif
+            return dirs;
+        }
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid warning about unused variable
+            fprintf(stderr, "Fatal error in splitPath : %s @ line %i\n", __FILE__, __LINE__);
+            exit(1);
+        }
+    }   // splitPath
+    
+    // ------------------------------------------------------------------------
+    std::string insertValues(const std::string &s, std::vector<std::string>& all_vals)
+    {
+        try
+        {
+            std::vector<std::string> sv = StringUtils::split(s, '%', true);
+            std::string new_string="";
+            const unsigned int item_count = sv.size();
+            for (unsigned int i=0; i<item_count; i++)
+            {
+                if(sv[i][0] != '%')
+                {
+                    new_string += sv[i];
+                }
+                else
+                {
+                    if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    {
+                        assert(all_vals.size() > 0);
+                        new_string += all_vals[0]+sv[i].substr(2);
+                        all_vals.erase(all_vals.begin());
+                    }
+                    else
+                        new_string+=sv[i];
+                }
+            }
+            return new_string;
+        }
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid warning about unused variable
+            fprintf(stderr,"Fatal error in insertValues(std::string) : %s @ line %i\n", __FILE__, __LINE__);
+            exit(1);
+        }
     }
+    
+    // ------------------------------------------------------------------------
+    irr::core::stringw insertValues(const irr::core::stringw &s, std::vector<irr::core::stringw>& all_vals)
+    {
+        try
+        {
+            std::vector<irr::core::stringw> sv = StringUtils::split(s, '%', true);
+            irr::core::stringw new_string="";
+            for (unsigned int i=0; i<sv.size(); i++)
+            {
+                if(sv[i][0] != '%')
+                {
+                    new_string += sv[i];
+                }
+                else
+                {
+                    if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i')
+                    {
+                        new_string += all_vals[0].c_str();
+                        new_string += sv[i].subString(2, sv[i].size()-2);
+                        all_vals.erase(all_vals.begin());
+                    }
+                    else
+                        new_string+=sv[i];
+                }
+            }
+            return new_string;
+        }
+        catch (std::exception& e)
+        {
+            (void)e;  // avoid warning about unused variable
+            fprintf(stderr,"Fatal error in insertValues(stringw) : %s @ line %i\n", __FILE__, __LINE__);
+            exit(1);
+        }
+    }
+    
+    
+    // ------------------------------------------------------------------------
+    /** Converts a time in seconds into a string of the form mm:ss:hh (minutes,
+     *  seconds, 1/100 seconds.
+     *  \param time Time in seconds.
+     */
+    std::string timeToString(float time)
+    {
+        int min     = (int) floor ( time / 60.0 ) ;
+        int sec     = (int) floor ( time - (double) ( 60 * min ) ) ;
+        int tenths  = (int) floor ( 10.0f * (time - (double)(sec + 60* min)));
+        char s[9];
+        sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
+        return std::string(s);
+    }   // timeToString
+    
 } // namespace StringUtils
 
 /* EOF */

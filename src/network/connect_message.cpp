@@ -26,8 +26,10 @@
 #  include <unistd.h>
 #endif
 
-#include "user_config.hpp"
+#include "config/user_config.hpp"
+#include "config/player.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 
 // ----------------------------------------------------------------------------
@@ -70,7 +72,7 @@ void ConnectMessage::setId()
 {
     char hostname[256];
     gethostname(hostname, 255);
-    const std::string& id=user_config->m_player[0].getName();
+    const std::string& id = StateManager::get()->getActivePlayer(0)->getProfile()->getName();
     std::ostringstream o;
     o << id << '@' << hostname;
     m_id = o.str();

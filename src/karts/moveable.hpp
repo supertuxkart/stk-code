@@ -21,17 +21,12 @@
 #ifndef HEADER_MOVEABLE_HPP
 #define HEADER_MOVEABLE_HPP
 
-#define _WINSOCKAPI_
-#ifdef HAVE_IRRLICHT
-#  include "irrlicht.h"
-   using namespace irr;
-#else
-#  include <plib/ssg.h>
-#endif
+#include "irrlicht.h"
+using namespace irr;
 #include "btBulletDynamicsCommon.h"
 
-#include "user_pointer.hpp"
 #include "physics/kart_motion_state.hpp"
+#include "physics/user_pointer.hpp"
 #include "utils/vec3.hpp"
 
 class Material;
@@ -50,28 +45,23 @@ private:
     Vec3             m_hpr;
 
 protected:
-    UserPointer      m_user_pointer;
-#ifdef HAVE_IRRLICHT
+    UserPointer            m_user_pointer;
     scene::IAnimatedMesh  *m_animated_mesh;
     scene::IMesh          *m_mesh;
-    scene::ISceneNode     *m_root;
-#else
-    ssgTransform    *m_model_transform; /**<The transform the model is attached to. */
-#endif
-    int              m_first_time ;
-    btRigidBody     *m_body;
-    KartMotionState *m_motion_state;
+    scene::ISceneNode     *m_node;
+    scene::IAnimatedMeshSceneNode
+                          *m_animated_node;
+    int                    m_first_time ;
+    btRigidBody           *m_body;
+    KartMotionState       *m_motion_state;
 
 public:
                   Moveable();
     virtual      ~Moveable();
-#ifdef HAVE_IRRLICHT
     scene::ISceneNode 
-                 *getRoot()                    {return m_root;              }
-    void          setRoot(scene::ISceneNode *n){m_root = n;                 }
-#else
-    ssgTransform *getModelTransform()          {return m_model_transform;   }
-#endif
+                 *getNode() const { return m_node ? m_node : m_animated_node; }
+    void          setNode(scene::ISceneNode *n);
+    void          setAnimatedNode(scene::IAnimatedMeshSceneNode *n);
     virtual const btVector3 
                  &getVelocity()   const        {return m_body->getLinearVelocity();}
     const btVector3

@@ -19,11 +19,13 @@
 #define _follow_the_leader_hpp_
 
 #include "modes/linear_world.hpp"
+#include "states_screens/race_gui.hpp"
 
 class FollowTheLeaderRace : public LinearWorld
 {
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
+    
     FollowTheLeaderRace();
     virtual ~FollowTheLeaderRace();
     
@@ -35,10 +37,11 @@ public:
     // overriding World methods
     virtual void update(float delta);
     virtual void restartRace();
-    virtual std::string getInternalCode() const;
+    virtual std::string getIdent() const;
     virtual bool useFastMusicNearEnd() const { return false; }
-    virtual KartIconDisplayInfo* getKartsDisplayInfo(const RaceGUI* caller);
+    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     
+    virtual bool isRaceOver();
     virtual bool raceHasLaps(){ return false; }
     
     /** Called by the race result GUI at the end of the race to know the final order

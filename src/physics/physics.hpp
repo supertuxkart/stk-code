@@ -22,14 +22,12 @@
 
 #include <set>
 #include <vector>
-#define _WINSOCKAPI_
-#include <plib/sg.h>
 
 #include "btBulletDynamicsCommon.h"
 #include "bullet/Demos/OpenGL/GLDebugDrawer.h"
 #include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
-#include "user_pointer.hpp"
+#include "physics/user_pointer.hpp"
 
 class Vec3;
 class Kart;
@@ -108,10 +106,11 @@ public:
     btDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}
     void  debugDraw        (float m[16], btCollisionShape *s, const btVector3 color);
+    bool  projectKartDownwards(const Kart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,
-                                const btContactSolverInfo& info, 
+                                const btContactSolverInfo& info,
                                 btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,
                                 btDispatcher* dispatcher);
 };

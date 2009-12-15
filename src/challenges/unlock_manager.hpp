@@ -17,43 +17,61 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_UNLOCK_MANAGER_H
-#define HEADER_UNLOCK_MANAGER_H
+#ifndef HEADER_UNLOCK_MANAGER_HPP
+#define HEADER_UNLOCK_MANAGER_HPP
 
 #include <map>
 
 #include "challenges/challenge.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
+#include <fstream>
+
+class XMLNode;
+class SFXBase;
 
 class UnlockManager
 {
 private:
+    SFXBase    *m_locked_sound;
     typedef std::map<std::string, Challenge*> AllChallengesType;
     AllChallengesType             m_all_challenges;
     std::map<std::string, bool>   m_locked_features;
     std::vector<const Challenge*> m_unlocked_features;
     Challenge *getChallenge      (const std::string& id);
     void       computeActive     ();
+    void       load              ();
 public:
-               UnlockManager    ();
-    void       addChallenge     (Challenge *c);
-    void       addChallenge     (const std::string& filename);
-    void       load             (const lisp::Lisp*);
-    void       save             (lisp::Writer* writer);
+               UnlockManager     ();
+              ~UnlockManager     ();
+    void       addChallenge      (Challenge *c);
+    void       addChallenge      (const std::string& filename);
+    void       save              ();
     std::vector<const Challenge*> 
                getActiveChallenges();
+    
+    /** Returns the list of recently unlocked features (e.g. call at the end of a
+        race to know if any features were unlocked) */
     const std::vector<const Challenge*> 
-               getUnlockedFeatures() {return m_unlocked_features;}
+               getRecentlyUnlockedFeatures() {return m_unlocked_features;}
 
-    void       clearUnlocked      () {m_unlocked_features.clear(); }
-    void       raceFinished       ();
-    void       grandPrixFinished  ();
-    void       unlockFeature      (Challenge* c, bool save=true);
-    void       lockFeature        (Challenge* challenge);
-    bool       isLocked           (const std::string& feature);
-    void       check              () const;
+    /** Clear the list of recently unlocked challenges */
+    void       clearUnlocked     () {m_unlocked_features.clear(); }
+    
+    /** Returns a complete list of all solved challenges */
+    const std::vector<const Challenge*>   getUnlockedFeatures();
+
+    /** Returns the list of currently inaccessible (locked) challenges */
+    const std::vector<const Challenge*>   getLockedChallenges();
+    
+    void       raceFinished      ();
+    void       grandPrixFinished ();
+    void       unlockFeature     (Challenge* c, bool do_save=true);
+    void       lockFeature       (Challenge* challenge);
+    bool       isLocked          (const std::string& feature);
+    void       check             () const;
+    
+    /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
+    void       playLockSound() const;
+    
 };   // UnlockManager
 
 extern UnlockManager* unlock_manager;

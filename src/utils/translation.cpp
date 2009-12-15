@@ -18,8 +18,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "translation.hpp"
-#include "file_manager.hpp"
+// Note: the irrlicht include is only here (and esp. before including 
+//       translation.hpp, which contradicts our style rule) to avoid the 
+//        warning message  "  'swprintf' : macro redefinition"
+//       This happens if libintl.h is included before irrlicht.h (since
+//       both files redefine swprintf).
+#include "irrlicht.h"
+
+#include "utils/translation.hpp"
+
+#include <locale.h>
+
+#include "io/file_manager.hpp"
 
 Translations* translations=NULL;
 
@@ -35,8 +45,33 @@ Translations::Translations() {
     setlocale(LC_MESSAGES, "");
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
-    textdomain (PACKAGE);
+    //bind_textdomain_codeset(PACKAGE, "UTF-8");
     bind_textdomain_codeset(PACKAGE, "iso-8859-1");
+    textdomain (PACKAGE);
 #endif
+        
 }   // Translations
 
+const int BUFFER_SIZE = 512;
+wchar_t out_buffer[BUFFER_SIZE];
+
+wchar_t* w_gettext(const char* original)
+{
+#if ENABLE_NLS
+    const char* original_t = gettext(original);
+#else
+    const char* original_t = original;
+#endif
+    
+    int index = 0;
+    for (const char* c=original_t; *c != 0; c++)
+    {
+        out_buffer[index] = (wchar_t)(unsigned char)*c;
+        index++;
+    }
+    out_buffer[index] = 0;
+                                    
+    //mbstowcs(out_buffer, original_t, BUFFER_SIZE);
+
+    return out_buffer;
+}

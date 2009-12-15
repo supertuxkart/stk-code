@@ -17,12 +17,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHARACTER_SELECTED_MESSAGE_H
-#define HEADER_CHARACTER_SELECTED_MESSAGE_H
+#ifndef HEADER_CHARACTER_SELECTED_MESSAGE_HPP
+#define HEADER_CHARACTER_SELECTED_MESSAGE_HPP
 
 #include "network/message.hpp"
-#include "race_manager.hpp"
 #include "network/remote_kart_info.hpp"
+#include "race/race_manager.hpp"
 
 /** This message is send contains information about selected karts. It is send
  *  from the client to the server to indicate a selected kart, and from the

@@ -1,0 +1,34 @@
+<stkgui>
+
+<div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
+
+    <header width="100%" I18N="Section in track selection screen" text="Grand Prix"
+            align="center" text_align="center" />
+
+    <buttonbar id="gps" height="175" width="100%" align="center" square_items="true">
+        <icon-button id="gp1" width="171" height="128" icon="gui/track_random.png" text="Penguin Playground"/>
+        <icon-button id="gp2" width="171" height="128" icon="gui/track_random.png" text="Snag Drive"/>
+        <icon-button id="gp3" width="171" height="128" icon="gui/track_random.png" text="To the Moon and Back"/>
+        <icon-button id="gp4" width="171" height="128" icon="gui/track_random.png" text="At World's End"/>
+    </buttonbar>
+    
+    <header width="100%" I18N="Section in track selection screen" text="All Tracks"
+            align="center" text_align="center" />
+    
+    <box proportion="1" width="100%" layout="vertical-row">
+        <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true" 
+            I18N="Ignore" text="bottom" align="center" child_width="160" child_height="120" />
+        <spacer width="20" height="13" />
+    </box>
+
+    <tabs width="100%" height="25" id="trackgroups">
+        <button id="standard" I18N="track group" text="Standard"/>
+        <button id="addons" I18N="track group" text="Add-Ons"/>
+        <button id="all" I18N="track group" text="All"/>
+    </tabs>
+
+    <spacer width="20" height="13" />
+    
+</div>
+
+</stkgui>

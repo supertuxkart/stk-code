@@ -18,7 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "utils/vec3.hpp"
-#include "constants.hpp"
+
+#include "utils/constants.hpp"
 
 void Vec3::setHPR(const btMatrix3x3& m)
 {
@@ -39,7 +40,7 @@ void Vec3::setHPR(const btMatrix3x3& m)
 
     setY(asin(CLAMPTO1(m.getRow(2).getY())));
 
-    SGfloat cp = cos(getY());
+    float cp = cos(getY());
 
     /* If pointing nearly vertically up - then heading is ill-defined */
 
@@ -77,9 +78,9 @@ void Vec3::setHPR(const btMatrix3x3& m)
 // ----------------------------------------------------------------------------
 void Vec3::degreeToRad()
 {
-    m_x=DEGREE_TO_RAD(m_x);      
-    m_y=DEGREE_TO_RAD(m_y);      
-    m_z=DEGREE_TO_RAD(m_z);
+    m_x=DEGREE_TO_RAD*m_x;
+    m_y=DEGREE_TO_RAD*m_y;      
+    m_z=DEGREE_TO_RAD*m_z;
 }   // degreeToRad
 
 // ----------------------------------------------------------------------------
@@ -108,12 +109,11 @@ void Vec3::setPitchRoll(const Vec3 &normal)
  *  FIXME: this function should be inlined, but while debugging it's
  *  easier (compile-time wise) to modify it here :)
  */
-#ifdef HAVE_IRRLICHT
 const core::vector3df Vec3::toIrrHPR() const
 {
-    core::vector3df r(RAD_TO_DEGREE( getY()),
-                      RAD_TO_DEGREE(-getX()),
-                      RAD_TO_DEGREE(-getZ()) );
+    core::vector3df r(RAD_TO_DEGREE*(-getY()),     // pitch
+                      RAD_TO_DEGREE*(-getX()),     // heading
+                      RAD_TO_DEGREE*(-getZ()) );   // roll
     return r;
 
 }  // toIrrHPR
@@ -123,4 +123,10 @@ const core::vector3df Vec3::toIrrVector() const
     core::vector3df v(m_x, m_z, m_y);
     return v;
 }   // toIrrVector
-#endif
+// ----------------------------------------------------------------------------
+/** Returns the X and Y component as an irrlicht 2d vector. */
+const core::vector2df Vec3::toIrrVector2d() const
+{
+    core::vector2df v(m_x, m_y);
+    return v;
+}   // toIrrVector2d
