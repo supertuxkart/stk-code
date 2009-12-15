@@ -152,6 +152,9 @@ void FeatureUnlockedCutScene::tearDown()
     m_chest_top = NULL;
     m_key = NULL;
     
+    irr_driver->removeNode(m_light);
+    m_light = NULL;
+    
     if (m_root_gift_node != NULL)
     {
         irr_driver->removeNode(m_root_gift_node);
