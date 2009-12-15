@@ -53,7 +53,7 @@ Nitro::Nitro(Kart* kart) : m_kart(kart)
     m_node->setEmitter(m_emitter); // this grabs the emitter
     m_emitter->drop();             // so we can drop our reference
 
-    scene::IParticleAffector *af = m_node->createFadeOutParticleAffector();
+    scene::IParticleAffector *af = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0), 2500);
     m_node->addAffector(af);
     af->drop();
 }   // KartParticleSystem
