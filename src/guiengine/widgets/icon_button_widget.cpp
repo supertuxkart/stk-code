@@ -24,13 +24,13 @@ using namespace irr::core;
 using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
-IconButtonWidget::IconButtonWidget(const bool clickable)
+IconButtonWidget::IconButtonWidget(const bool tab_stop, const bool focusable)
 {
-    m_clickable = clickable;
+    m_tab_stop = tab_stop;
     m_label = NULL;
     m_type = WTYPE_ICON_BUTTON;
     m_texture = NULL;
-    m_focusable = clickable;
+    m_focusable = focusable;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -49,9 +49,9 @@ void IconButtonWidget::add()
     //std::cout << "Creating a IGUIButton " << widget_size.UpperLeftCorner.X << ", " << widget_size.UpperLeftCorner.Y <<
     //" : " << widget_size.getWidth() << "x" << widget_size.getHeight() << std::endl;
     
-    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, (m_clickable ? getNewID() : getNewNoFocusID()), L"");
+    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, (m_tab_stop ? getNewID() : getNewNoFocusID()), L"");
 
-    btn->setTabStop(m_clickable);
+    btn->setTabStop(m_tab_stop);
     m_element = btn;
     id = m_element->getID();
     
@@ -68,7 +68,7 @@ void IconButtonWidget::add()
     
     // ---- IDs
     id = m_element->getID();
-    if (m_clickable) m_element->setTabOrder(id);
+    if (m_tab_stop) m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
 // -----------------------------------------------------------------------------
@@ -87,6 +87,18 @@ void IconButtonWidget::setImage(const char* path_to_texture)
     }
     assert(m_texture != NULL);
 
+    m_texture_w = m_texture->getSize().Width;
+    m_texture_h = m_texture->getSize().Height;
+}
+// -----------------------------------------------------------------------------
+/** \precondition At the moment, the new texture must have the same aspct ratio as the previous one since the object will not
+ *                be modified to fit a different aspect ratio
+ */
+void IconButtonWidget::setImage(ITexture* texture)
+{
+    m_texture = texture;
+    assert(m_texture != NULL);
+    
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
 }

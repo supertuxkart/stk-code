@@ -69,6 +69,12 @@ void RibbonWidget::add()
             continue;
         }
         
+        // ribbon children must not be keyboard navigatable, the parent ribbon takes care of that
+        if (m_children[i].m_type == WTYPE_ICON_BUTTON)
+        {
+            ((IconButtonWidget*)m_children.get(i))->m_tab_stop = false;
+        }
+        
         total_needed_space += m_children[i].w;
     }
     
@@ -173,7 +179,7 @@ void RibbonWidget::add()
             m_children[i].w = image_w*zoom;
             m_children[i].h = image_h*zoom;
 
-            std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
+            //std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
             
             
             m_children.get(i)->m_parent = btn;

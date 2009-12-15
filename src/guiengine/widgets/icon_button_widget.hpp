@@ -33,13 +33,14 @@ namespace GUIEngine
     {
         friend class Skin;
         
-        bool m_clickable;
         irr::gui::IGUIStaticText* m_label;
         irr::video::ITexture* m_texture;
         int m_texture_w, m_texture_h;
     public:
-        
-        IconButtonWidget(const bool clickable=true);
+        /** Whether to make the widget included in keyboard navigation order when adding */
+        bool m_tab_stop;
+
+        IconButtonWidget(const bool tab_stop=true, const bool focusable=true);
         virtual ~IconButtonWidget() {}
         
         /** Callback called when this widget needs to be added (see base class Widget) */
@@ -50,6 +51,9 @@ namespace GUIEngine
         
         /** Change the texture used for this icon. The path is relative to the data directory, just like PROP_ICON. */
         void setImage(const char* path_to_texture);
+        
+        /** Change the texture used for this icon. */
+        void setImage(irr::video::ITexture* texture);
     };
 }
 

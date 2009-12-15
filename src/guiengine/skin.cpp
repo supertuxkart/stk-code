@@ -937,11 +937,20 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
                                                 0 /* no clipping */, 0, true /* alpha */);
     }
     
+    core::rect< s32 > sized_rect = rect;
+    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+    {
+        core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        
+        sized_rect.UpperLeftCorner.X  = center.X + (int)((rect.UpperLeftCorner.X - center.X)*texture_size);
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size);
+        sized_rect.LowerRightCorner.X = center.X + (int)((rect.LowerRightCorner.X - center.X)*texture_size);
+        sized_rect.LowerRightCorner.Y = center.Y + (int)((rect.LowerRightCorner.Y - center.Y)*texture_size);
+    }
+    
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
-    //std::cout << "Drawing icon button '" << icon_widget->m_properties[PROP_ID] << "' : " << icon_widget->m_texture->getName().c_str() << "; size : " <<
-    //				icon_widget->m_texture_w << "," << icon_widget->m_texture_h << 
-    //				" --> " << rect.UpperLeftCorner.X << ", " << rect.UpperLeftCorner.Y << "  " << rect.getWidth() << "x" << rect.getHeight() << "\n";
-    GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, rect,
+    GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
                                         core::rect<s32>(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h),
                                         0 /* no clipping */, 0, true /* alpha */);
     

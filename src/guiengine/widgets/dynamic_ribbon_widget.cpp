@@ -212,9 +212,9 @@ void DynamicRibbonWidget::setSubElements()
         ribbon->m_event_handler = this;
         
         // add columns
-        for(int i=0; i<m_col_amount; i++)
+        for (int i=0; i<m_col_amount; i++)
         {
-            IconButtonWidget* icon = new IconButtonWidget();
+            IconButtonWidget* icon = new IconButtonWidget(false, true);
             icon->m_properties[PROP_ICON]="gui/main_help.png";
             
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)

@@ -187,12 +187,19 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
 
     
     // ---- Track screenshot
+    IconButtonWidget* screenshotWidget = new IconButtonWidget(false, false);
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
-    IGUIImage* screenshotWidget = GUIEngine::getGUIEnv()->addImage( area_right, m_irrlicht_window );
-    screenshotWidget->setImage(screenshot);
-    screenshotWidget->setScaleImage(true);
-    screenshotWidget->setTabStop(false);
-
+    screenshotWidget->x = area_right.UpperLeftCorner.X;
+    screenshotWidget->y = area_right.UpperLeftCorner.Y;
+    screenshotWidget->w = area_right.getWidth();
+    screenshotWidget->h = area_right.getHeight();
+    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; // temporary icon, will replace it just after
+    
+    //screenshotWidget->setScaleImage(true);
+    //screenshotWidget->setTabStop(false);
+    screenshotWidget->setParent(m_irrlicht_window);
+    screenshotWidget->add();
+    //screenshotWidget->setImage(screenshot);
 
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
