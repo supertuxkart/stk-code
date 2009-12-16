@@ -60,16 +60,16 @@ CheckStructure::CheckStructure(CheckManager *check_manager,
  */
 void CheckStructure::reset(const Track &track)
 {
-	m_previous_position.clear();
+    m_previous_position.clear();
     m_is_active.clear();
-	for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
-	{
-		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
-		m_previous_position.push_back(xyz);
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    {
+        const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
+        m_previous_position.push_back(xyz);
         
         // Activate all checkline
         m_is_active.push_back(m_active_at_reset);
-	}   // for i<getNumKarts
+    }   // for i<getNumKarts
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -78,16 +78,16 @@ void CheckStructure::reset(const Track &track)
  */
 void CheckStructure::update(float dt)
 {
-	for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
-	{
-		const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
+    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    {
+        const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
         // Only check active checklines.
         if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {
             trigger(i);
         }
         m_previous_position[i] = xyz;
-	}   // for i<getNumKarts
+    }   // for i<getNumKarts
 }   // update
 
 // ----------------------------------------------------------------------------
