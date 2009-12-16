@@ -237,14 +237,6 @@ void Track::loadTrackInfo(const std::string &filename)
 
     if(m_groups.size()==0)
         m_groups.push_back("standard");
-    // if both camera position and rotation are defined,
-    // set the flag that the track has final camera position
-    m_has_final_camera  = root->get("camera-final-position", 
-                                    &m_camera_final_position)!=1;
-    m_has_final_camera &= root->get("camera-final-hpr",
-                                    &m_camera_final_hpr)     !=1;
-    m_camera_final_hpr.degreeToRad();
-
     const XMLNode *xml_node = root->getNode("curves");
 	if(xml_node)
 		loadCurves(*xml_node);
@@ -614,9 +606,13 @@ void Track::createWater(const XMLNode &node)
  *  animations, items, ... It  is called from world during initialisation. 
  *  Track is the first model to be loaded, so at this stage the root scene node 
  * is empty.
+ *  \param mode_id Which of the modes of a track to use. This determines which
+ *         scene, quad, and graph file to load.
  */
 void Track::loadTrackModel(unsigned int mode_id)
 {
+    m_has_final_camera = false;
+    m_is_arena         = false;
     item_manager->setStyle();
 
     // Load the graph only now: this function is called from world, after
@@ -740,6 +736,10 @@ void Track::loadTrackModel(unsigned int mode_id)
         {
             handleSky(*node, path);
         }
+        else if (name=="camera")
+        {
+            handleCamera(*node);
+        }
         else
         {
             fprintf(stderr, "Warning: element '%s' not found.\n",
@@ -862,8 +862,26 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 }   // handleSky
 
 //-----------------------------------------------------------------------------
+/** Reads the final camera position.
+ *  \param root The XML node with the camera node.
+ */
+void Track::handleCamera(const XMLNode &root)
+{
+    m_has_final_camera  = true;
+    root.get("final-position", &m_camera_final_position);
+    root.get("final-hpr",      &m_camera_final_hpr     );
+    m_camera_final_hpr.degreeToRad();
+}   // handleCamera
+
+//-----------------------------------------------------------------------------
+/** Handle creation and placement of an item.
+ *  \param xyz The position of the item.
+ *  \param type The item type.
+ *  \param need_height True if the item Z position should be determined based on
+ *         the track topology.
+ */
 void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
-                        int bNeedHeight)
+                        int need_height)
 {
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX && 
@@ -872,7 +890,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 
     Vec3 loc(xyz);
     // if only 2d coordinates are given, let the item fall from very high
-    if(bNeedHeight)
+    if(need_height)
     {
         loc.setZ(1000);
         loc.setZ(getTerrainHeight(loc));

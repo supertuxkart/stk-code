@@ -278,9 +278,9 @@ void PlayerKart::update(float dt)
         if (m_powerup.getType()==POWERUP_NOTHING) 
             Kart::beep();
     }
-
-    m_camera->setMode(m_controls.m_look_back ? Camera::CM_REVERSE
-                                             : Camera::CM_NORMAL);
+    if(m_camera->getMode()!=Camera::CM_FINAL)
+        m_camera->setMode(m_controls.m_look_back ? Camera::CM_REVERSE
+                                                 : Camera::CM_NORMAL);
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end

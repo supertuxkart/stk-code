@@ -51,35 +51,16 @@ private:
      *  attached to. */
     unsigned int    m_index;
 
-    /**  The ultimate position which the camera wants to obtain. */
-    Vec3            m_position;
-
-    /** The position the camera currently has. */
-    Vec3            m_temp_position;
-
-    /** The ultimate target which the camera wants to obtain. */
-    Vec3            m_target;
-
-    /** The target the camera currently has. */
-    Vec3            m_temp_target;
-
     /** Current ambient light for this camera. */
     video::SColor   m_ambient_light;
 
     /** Distance between the camera and the kart. */
     float           m_distance;
 
-    /** Angle between the ground and the camera (with the kart as the 
-     *  vertex of the angle). */
-    float           m_angle_up;
-
-    /** Angle around the kart (should actually match the rotation of the kart). */
-    float           m_angle_around;
-
     /** The speed at which the camera changes position. */
     float           m_position_speed;
 
-    /** The speed at which the camera changes targets. */
+    /** The speed at which the camera target changes position. */
     float           m_target_speed;
 
     /** Factor of the effects of steering in camera aim. */
@@ -100,8 +81,21 @@ private:
     /** Aspect ratio for camera. */
     float           m_aspect;
 
-    void setupCamera();
+    /** Linear velocity of the camera, only used for end camera. */
+    core::vector3df m_lin_velocity;
 
+    /** Velocity of the target of the camera, only used for end camera. */
+    core::vector3df m_target_velocity;
+
+    /** Counts the time for the end camera only, to indicate when
+     *  the end camera should stop moving. */
+    float           m_final_time;
+
+    void setupCamera();
+    void smoothMoveCamera(float dt, const Vec3 &wanted_position,
+                          const Vec3 &wanted_target);
+    void computeNormalCameraPosition(Vec3 *wanted_position,
+                                     Vec3 *wanted_target);
 public:
          Camera            (int camera_index, const Kart* kart);
         ~Camera            ();

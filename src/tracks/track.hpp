@@ -73,14 +73,20 @@ private:
     scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
+    /** True if the track/scene has a final camera position. */
     bool                     m_has_final_camera;
+    /** The final xyz coordinates of the camera. */
     Vec3                     m_camera_final_position;
+    /** The final hpr rotation of the camera. */
     Vec3                     m_camera_final_hpr;
     /** Minimum coordinates of this track. */
     Vec3                     m_aabb_min;
     /** Maximum coordinates of this track. */
     Vec3                     m_aabb_max;
+    /** True if this track is an arena. */
     bool                     m_is_arena;
+    /** The version of this track. A certain STK version will only support
+     *  certain track versions. */
     int                      m_version;
 
     /** The graph used to connect the quads. */
@@ -166,6 +172,7 @@ private:
     void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
     void handleSky(const XMLNode &root, const std::string &filename);
+    void handleCamera(const XMLNode &root);
 
 public:
 
