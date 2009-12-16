@@ -162,8 +162,8 @@ void RibbonWidget::add()
             
             // size of the image
             video::ITexture* image = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
-            float image_h = image->getSize().Height;
-            float image_w = image->getSize().Width;
+            float image_h = (float)image->getSize().Height;
+            float image_w = (float)image->getSize().Width;
             //float image_w = image_h*imageRatio;
 
             // if button too high to fit, scale down
@@ -176,8 +176,8 @@ void RibbonWidget::add()
             
             m_children[i].x = widget_x - (int)(image_w*zoom/2.0f);
             m_children[i].y = button_y;
-            m_children[i].w = image_w*zoom;
-            m_children[i].h = image_h*zoom;
+            m_children[i].w = (int)(image_w*zoom);
+            m_children[i].h = (int)(image_h*zoom);
 
             //std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
             

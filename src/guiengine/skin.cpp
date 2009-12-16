@@ -1141,7 +1141,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         const core::dimension2d<u32>& texture_size = texture->getSize();
         const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
         const int h = std::min( rect.getHeight()/2 , (int)(texture_size.Height) );
-        int w = aspectRatio*h;
+        int w = (int)(aspectRatio*h);
         
         const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
         
