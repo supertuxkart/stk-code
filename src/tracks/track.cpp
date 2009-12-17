@@ -74,9 +74,9 @@ Track::Track(std::string filename)
     m_has_final_camera     = false;
     m_is_arena             = false;
     m_quad_graph           = NULL;
-	m_animation_manager    = NULL;
-	m_check_manager        = NULL;
-    loadTrackInfo(m_filename);
+    m_animation_manager    = NULL;
+    m_check_manager        = NULL;
+    loadTrackInfo();
 }   // Track
 
 //-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ Track::Track(std::string filename)
 Track::~Track()
 {
     if(m_quad_graph)    delete m_quad_graph;
-	if(m_check_manager) delete m_check_manager;
+        if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
 }   // ~Track
 
@@ -96,8 +96,8 @@ Track::~Track()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-	if(m_animation_manager)
-		m_animation_manager->reset();
+        if(m_animation_manager)
+                m_animation_manager->reset();
     if(m_check_manager)
         m_check_manager->reset(*this);
     item_manager->reset();
@@ -181,7 +181,7 @@ btTransform Track::getStartTransform(unsigned int pos) const
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
-void Track::loadTrackInfo(const std::string &filename)
+void Track::loadTrackInfo()
 {
     // Default values
     m_use_fog               = false;
@@ -199,7 +199,7 @@ void Track::loadTrackInfo(const std::string &filename)
     if(!root || root->getName()!="track")
     {
         std::ostringstream o;
-        o<<"Can't load track '"<<filename<<"', no track element.";
+        o<<"Can't load track '"<<m_filename<<"', no track element.";
         throw std::runtime_error(o.str());
     }
     std::string temp_name;
@@ -238,10 +238,10 @@ void Track::loadTrackInfo(const std::string &filename)
     if(m_groups.size()==0)
         m_groups.push_back("standard");
     const XMLNode *xml_node = root->getNode("curves");
-	if(xml_node)
-		loadCurves(*xml_node);
+        if(xml_node)
+                loadCurves(*xml_node);
 
-	// Set the correct paths
+        // Set the correct paths
     m_screenshot = m_root+"/"+m_screenshot;
     delete root;
 
@@ -250,11 +250,11 @@ void Track::loadTrackInfo(const std::string &filename)
 //-----------------------------------------------------------------------------
 void Track::loadCurves(const XMLNode &node)
 {
-	for(unsigned int i=0; i<node.getNumNodes(); i++)
-	{
-		const XMLNode *curve = node.getNode(i);
-		m_all_curves.push_back(new BezierCurve(*curve));
-	}   // for i<node.getNumNodes
+        for(unsigned int i=0; i<node.getNumNodes(); i++)
+        {
+                const XMLNode *curve = node.getNode(i);
+                m_all_curves.push_back(new BezierCurve(*curve));
+        }   // for i<node.getNumNodes
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
@@ -375,7 +375,12 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
         if(t) {
             std::string image = std::string(t->getName().c_str());
             material=material_manager->getMaterial(StringUtils::getBasename(image));
+            // Zipper are converted to non-collision mesh, since otherwise
+            // the road becomes 'bumpy' if the meshes are not 100% correctly
+            // aligned.
             if(material->isZipper()) tmesh = m_non_collision_mesh;
+            // Materials to be ignored are not converted into bullet meshes.
+            if(material->isIgnore()) continue;
         } 
 
         u16 *mbIndices = mb->getIndices();
@@ -528,10 +533,10 @@ void Track::update(float dt)
     {
         m_physical_objects[i]->update(dt);
     }
-	if(m_animation_manager)
-		m_animation_manager->update(dt);
-	if(m_check_manager)
-		m_check_manager->update(dt);
+        if(m_animation_manager)
+                m_animation_manager->update(dt);
+        if(m_check_manager)
+                m_check_manager->update(dt);
     item_manager->update(dt);
 
 }   // update
@@ -711,14 +716,14 @@ void Track::loadTrackModel(unsigned int mode_id)
             node->get("h", &h);
             m_start_heading.push_back(h);
         }
-		else if(name=="animations")
-		{
-			m_animation_manager = new AnimationManager(*this, *node);
-		}
-		else if(name=="checks")
-		{
-			m_check_manager = new CheckManager(*node, this);
-		}
+        else if(name=="animations")
+        {
+            m_animation_manager = new AnimationManager(*this, *node);
+        }
+        else if(name=="checks")
+        {
+            m_check_manager = new CheckManager(*node, this);
+        }
         else if(name=="sun")
         {
             node->get("xyz",           &m_sun_position );
