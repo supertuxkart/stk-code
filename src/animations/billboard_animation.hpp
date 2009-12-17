@@ -33,9 +33,9 @@ class BillboardAnimation : public AnimationBase
 private:
 
 public:
-	BillboardAnimation(const Track &track, const XMLNode &node, float fps);
+    BillboardAnimation(const Track &track, const XMLNode &node, float fps);
     virtual ~BillboardAnimation(){}
-	virtual void update(float dt);
+    virtual void update(float dt);
 
 };   // BillboardAnimation
 

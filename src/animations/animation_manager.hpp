@@ -31,13 +31,13 @@ class XMLNode;
 class AnimationManager
 {
 private:
-	std::vector<AnimationBase*> m_all_animations;
+    std::vector<AnimationBase*> m_all_animations;
 
 public:
-	     AnimationManager(const Track &track, const XMLNode &node);
+         AnimationManager(const Track &track, const XMLNode &node);
         ~AnimationManager();
-	void update(float dt);
-	void reset();
+    void update(float dt);
+    void reset();
 };   // AnimationManager
 
 #endif
