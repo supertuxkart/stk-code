@@ -214,13 +214,17 @@ void DynamicRibbonWidget::setSubElements()
         // add columns
         for (int i=0; i<m_col_amount; i++)
         {
-            IconButtonWidget* icon = new IconButtonWidget(false, true);
+            // stretch the *texture* within the widget (and the widget has the right aspect ratio)
+            // (Yeah, that's complicated, but screenshots are saved compressed horizontally so it's hard to be clean)
+            IconButtonWidget* icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_STRETCH, false, true);
             icon->m_properties[PROP_ICON]="gui/main_help.png";
             
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            
+            icon->w = atoi(icon->m_properties[PROP_WIDTH].c_str());
+            icon->h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
+
             if (m_text == "all") icon->m_text = " "; // FIXME: what's that??
             
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;

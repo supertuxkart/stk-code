@@ -158,13 +158,13 @@ void RibbonWidget::add()
             const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
             
             // For now, the image stretches to keep the aspect ratio of the widget (FIXME, doesn't work)
-            //float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
+            float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
             
             // size of the image
             video::ITexture* image = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
             float image_h = (float)image->getSize().Height;
-            float image_w = (float)image->getSize().Width;
-            //float image_w = image_h*imageRatio;
+            //float image_w = (float)image->getSize().Width;
+            float image_w = image_h*imageRatio;
 
             // if button too high to fit, scale down
             float zoom = global_zoom;
@@ -174,18 +174,29 @@ void RibbonWidget::add()
             //rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y,
             //                              widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
             
+            // backup and restore position in case the same object is added multiple times (FIXME: unclean)
+            int old_x = m_children[i].x;
+            int old_y = m_children[i].y;
+            int old_w = m_children[i].w;
+            int old_h = m_children[i].h;
+            
             m_children[i].x = widget_x - (int)(image_w*zoom/2.0f);
             m_children[i].y = button_y;
             m_children[i].w = (int)(image_w*zoom);
             m_children[i].h = (int)(image_h*zoom);
 
+            
             //std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
-            
-            
+
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();
             //subbtn->setUseAlphaChannel(true);
             //subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+            
+            m_children[i].x = old_x;
+            m_children[i].y = old_y;
+            m_children[i].w = old_w;
+            m_children[i].h = old_h;
             
             // ---- label part
             /*

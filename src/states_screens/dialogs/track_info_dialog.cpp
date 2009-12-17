@@ -187,7 +187,9 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
 
     
     // ---- Track screenshot
-    IconButtonWidget* screenshotWidget = new IconButtonWidget(false, false);
+    // stretch the *texture* within the widget (and the widget has the right aspect ratio)
+    // (Yeah, that's complicated, but screenshots are saved compressed horizontally so it's hard to be clean)
+    IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_STRETCH, false, false);
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     screenshotWidget->x = area_right.UpperLeftCorner.X;
     screenshotWidget->y = area_right.UpperLeftCorner.Y;

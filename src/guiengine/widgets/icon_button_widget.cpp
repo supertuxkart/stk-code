@@ -24,13 +24,14 @@ using namespace irr::core;
 using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
-IconButtonWidget::IconButtonWidget(const bool tab_stop, const bool focusable)
+IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop, const bool focusable)
 {
     m_tab_stop = tab_stop;
     m_label = NULL;
     m_type = WTYPE_ICON_BUTTON;
     m_texture = NULL;
     m_focusable = focusable;
+    m_scale_mode = scale_mode;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
@@ -43,7 +44,12 @@ void IconButtonWidget::add()
 
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
-    const int x_gap = (int)((float)w - (float)m_texture_w * (float)h / m_texture_h);
+    int x_gap = 0;
+    
+    if (m_scale_mode == SCALE_MODE_KEEP_ASPECT_RATIO)
+    {
+        x_gap = (int)((float)w - (float)m_texture_w * (float)h / m_texture_h);
+    }
     
     rect<s32> widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
     //std::cout << "Creating a IGUIButton " << widget_size.UpperLeftCorner.X << ", " << widget_size.UpperLeftCorner.Y <<

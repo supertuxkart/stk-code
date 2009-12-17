@@ -31,16 +31,29 @@ namespace GUIEngine
         See guiengine/engine.hpp for a detailed overview */
     class IconButtonWidget : public Widget
     {
+    public:
+        enum ScaleMode
+        {
+            SCALE_MODE_STRETCH,
+            SCALE_MODE_KEEP_ASPECT_RATIO
+        };
+        
+    protected:
         friend class Skin;
         
         irr::gui::IGUIStaticText* m_label;
         irr::video::ITexture* m_texture;
         int m_texture_w, m_texture_h;
+        
+        ScaleMode m_scale_mode;
     public:
+        
+
+        
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
-        IconButtonWidget(const bool tab_stop=true, const bool focusable=true);
+        IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_ASPECT_RATIO, const bool tab_stop=true, const bool focusable=true);
         virtual ~IconButtonWidget() {}
         
         /** Callback called when this widget needs to be added (see base class Widget) */

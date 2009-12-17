@@ -109,7 +109,8 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 }
                 else if (!strcmp("icon", xml->getNodeName()))
                 {
-                    append_to.push_back(new IconButtonWidget(false, false));
+                    append_to.push_back(new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_ASPECT_RATIO,
+                                                             false, false));
                 }
                 else if (!strcmp("checkbox", xml->getNodeName()))
                 {
