@@ -33,6 +33,8 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     void init();
     void tearDown();
+    
+    void setFocusOnTrack(const std::string& trackName);
 };
 
 #endif

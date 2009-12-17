@@ -17,6 +17,7 @@
 
 
 #include "guiengine/engine.hpp"
+#include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -26,6 +27,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -195,7 +197,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->y = area_right.UpperLeftCorner.Y;
     screenshotWidget->w = area_right.getWidth();
     screenshotWidget->h = area_right.getHeight();
-    std::cout << screenshotWidget->x << ", " << screenshotWidget->y << " : " << screenshotWidget->w << ", " << screenshotWidget->h << std::endl;
+    //std::cout << screenshotWidget->x << ", " << screenshotWidget->y << " : " << screenshotWidget->w << ", " << screenshotWidget->h << std::endl;
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; // temporary icon, will replace it just after
     
     //screenshotWidget->setScaleImage(true);
@@ -207,6 +209,18 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    
+}
+
+TrackInfoDialog::~TrackInfoDialog()
+{
+    // Place focus back on selected track, in case the dialog was cancelled and we're back to
+    // the track selection screen after
+    Screen* curr_screen = GUIEngine::getCurrentScreen();
+    if (curr_screen->getName() == "tracks.stkgui")
+    {
+        ((TracksScreen*)curr_screen)->setFocusOnTrack(m_track_ident);
+    }
     
 }
 

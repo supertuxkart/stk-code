@@ -112,3 +112,12 @@ void TracksScreen::init()
 void TracksScreen::tearDown()
 {
 }
+
+void TracksScreen::setFocusOnTrack(const std::string& trackName)
+{
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( w != NULL );
+    
+    // FIXME: don't hardcode player 0?
+    w->setSelection(trackName, 0, true); 
+}

@@ -40,7 +40,9 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
-                    irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);    
+                    irr::video::ITexture* screenshot, const float percentWidth, const float percentHeight);
+    virtual ~TrackInfoDialog();
+    
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(std::string& eventSource);
 };
