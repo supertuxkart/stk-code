@@ -426,6 +426,8 @@ FocusDispatcher* g_dispatcher = NULL;
             player_id_w *= 2;
             player_name_w = 0;
             
+            modelView->m_okay_badge = true;
+            /*
             irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("green_check.png").c_str() ) ;
             const int check_size = 128; // TODO: reduce size on smaller resolutions?
             const int check_x = model_x + model_w - check_size;
@@ -436,6 +438,7 @@ FocusDispatcher* g_dispatcher = NULL;
             greenCheckWidget->setScaleImage(true);
             greenCheckWidget->setTabStop(false);
             greenCheckWidget->setUseAlphaChannel(true);
+             */
         }
         
         /** \return Whether this player confirmed his kart and indent selection */

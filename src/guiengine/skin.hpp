@@ -243,7 +243,8 @@ namespace GUIEngine
         void renderSections(ptr_vector<Widget>* within_vector=NULL);
         void drawBgImage();
         void drawBGFadeColor();
-        
+        void drawBadgeOn(const Widget* widget, const irr::core::rect<irr::s32>& rect);
+
         // irrlicht's callbacks
         virtual void 	draw2DRectangle (irr::gui::IGUIElement *element, const irr::video::SColor &color, const irr::core::rect< irr::s32 > &pos, const irr::core::rect< irr::s32 > *clip);
         virtual void 	draw3DButtonPanePressed (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);

@@ -1101,7 +1101,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawSpinnerChild(rect, widget, pressed, focused);
     }
-    else if (type == WTYPE_ICON_BUTTON)
+    else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
     {
         drawIconButton(rect, widget, pressed, focused);
     }
@@ -1121,6 +1121,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     {
         drawCheckBox(rect, widget, focused);
     }
+
     
     if (ID_DEBUG && id != -1)
     {
@@ -1132,27 +1133,43 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     
     if (widget->m_lock_badge || widget->m_okay_badge)
     {
-        // TODO
-        video::ITexture* texture = NULL;
-        
-        if (widget->m_lock_badge) texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
-        else if (widget->m_okay_badge) texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
-        else { assert(false); return; }
-        const core::dimension2d<u32>& texture_size = texture->getSize();
-        const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
-        const int h = std::min( rect.getHeight()/2 , (int)(texture_size.Height) );
-        int w = (int)(aspectRatio*h);
-        
-        const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
-        
-        const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X,
-                                                           rect.LowerRightCorner.Y - h,
-                                                           rect.UpperLeftCorner.X + w,
-                                                           rect.LowerRightCorner.Y);
-        
-        GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,
-                                            0 /* no clipping */, 0, true /* alpha */);
+        drawBadgeOn(widget, rect);
     }
+}
+
+void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
+{
+    video::ITexture* texture = NULL;
+    float max_icon_size = 0.35f;
+    
+    if (widget->m_lock_badge)
+    {
+        texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
+        max_icon_size = 0.5f; // Lock badge can be quite big
+    }
+    else if (widget->m_okay_badge)
+    {
+        texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
+    }
+    else
+    {
+        assert(false);
+        return;
+    }
+    const core::dimension2d<u32>& texture_size = texture->getSize();
+    const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
+    const int h = std::min( (int)(rect.getHeight()*max_icon_size), (int)(texture_size.Height) );
+    int w = (int)(aspectRatio*h);
+    
+    const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
+    
+    const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X,
+                                                       rect.LowerRightCorner.Y - h,
+                                                       rect.UpperLeftCorner.X + w,
+                                                       rect.LowerRightCorner.Y);
+    
+    GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,
+                                        0 /* no clipping */, 0, true /* alpha */);
 }
 
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)

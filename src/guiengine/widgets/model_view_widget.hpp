@@ -23,13 +23,13 @@
 #include <irrlicht.h>
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
 {
     /** A model view widget. See guiengine/engine.hpp for a detailed overview */
-    class ModelViewWidget : public Widget
+    class ModelViewWidget : public IconButtonWidget
     {
         enum RotationMode
         {

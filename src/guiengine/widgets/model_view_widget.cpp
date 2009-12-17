@@ -22,11 +22,14 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ModelViewWidget::ModelViewWidget()
+ModelViewWidget::ModelViewWidget() : IconButtonWidget(false, false)
 {
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
+    
+    // so that the base class doesn't complain there is no icon defined
+    m_properties[PROP_ICON]="gui/main_help.png";
 }
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
@@ -39,17 +42,11 @@ ModelViewWidget::~ModelViewWidget()
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
-    //stringw& message = m_text;
+    // so that the base class doesn't complain there is no icon defined
+    m_properties[PROP_ICON]="gui/main_help.png";
     
-    IGUIImage* btn = GUIEngine::getGUIEnv()->addImage(widget_size, m_parent, getNewNoFocusID());
-    m_element = btn;
-    btn->setUseAlphaChannel(true);
-    btn->setTabStop(false);
-    btn->setScaleImage(true);
-    
-    //m_element = GUIEngine::getGUIEnv()->addMeshViewer(widget_size, NULL, ++id_counter_2);
-    
+    IconButtonWidget::add();
+
     /*
      TODO: remove this unclean thing, I think irrlicht provides this feature:
         virtual void IGUIElement::OnPostRender (u32 timeMs)
@@ -59,10 +56,6 @@ void ModelViewWidget::add()
     
     angle = 0;
     
-    id = m_element->getID();
-    //m_element->setTabOrder(id);
-    m_element->setTabGroup(false);
-    m_element->setTabStop(false);
 }   // add
 
 // -----------------------------------------------------------------------------
@@ -149,7 +142,9 @@ void ModelViewWidget::update(float delta)
     }
     
     m_texture = m_rtt_provider->renderToTexture(angle);
-    ((IGUIImage*)m_element)->setImage(m_texture);
+    setImage(m_texture);
+    //getIrrlichtElement<IGUIButton>()->setImage(m_texture);
+    //getIrrlichtElement<IGUIButton>()->setPressedImage(m_texture);
 }
 
 
