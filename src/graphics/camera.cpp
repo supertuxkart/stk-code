@@ -264,11 +264,6 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
  */
 void Camera::update(float dt)
 {
-    printf("cam: %f %f %f\n",
-        m_camera->getRotation().X,
-        m_camera->getRotation().Y,
-        m_camera->getRotation().Z);
-
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
 
@@ -331,7 +326,6 @@ void Camera::update(float dt)
             m_final_time +=dt;
             if(m_final_time < stk_config->m_final_camera_time)
             {
-                const Track* track=RaceManager::getTrack();
                 core::vector3df new_pos = m_camera->getPosition()+m_lin_velocity*dt;
                 m_camera->setPosition(new_pos);
                 core::vector3df new_target = m_camera->getTarget()+m_target_velocity*dt;
