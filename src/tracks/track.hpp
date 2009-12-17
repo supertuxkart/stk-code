@@ -159,7 +159,7 @@ private:
     /** Checkline manager. */
     CheckManager             *m_check_manager;
 
-    void loadTrackInfo(const std::string &filename);
+    void loadTrackInfo();
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
                      int bNeedHeight);
     void loadQuadGraph(unsigned int mode_id);
