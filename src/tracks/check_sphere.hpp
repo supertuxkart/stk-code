@@ -47,7 +47,7 @@ private:
      *  This saves some computations. */
     std::vector<float> m_distance2;
 public:
-	             CheckSphere(CheckManager *check_manager, const XMLNode &node);
+                 CheckSphere(CheckManager *check_manager, const XMLNode &node);
     virtual     ~CheckSphere() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
                              int kart_id);

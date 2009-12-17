@@ -38,18 +38,18 @@ class CheckManager;
 class CheckLine : public CheckStructure
 {
 private:
-	/** The line that is tested for being crossed. */
+    /** The line that is tested for being crossed. */
     core::line2df   m_line;
 
-	/** The minimum height of the checkline. */
-	float           m_min_height;
+    /** The minimum height of the checkline. */
+    float           m_min_height;
 
     /** Stores the sign (i.e. side) of the previous line to save some 
      *  computations. True if the value is >=0, i.e. the point is on
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
 public:
-	             CheckLine(CheckManager *check_manager, const XMLNode &node);
+                 CheckLine(CheckManager *check_manager, const XMLNode &node);
     virtual     ~CheckLine() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);

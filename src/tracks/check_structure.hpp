@@ -60,7 +60,7 @@ public:
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_AMBIENT_SPHERE};
 
 protected:
-	/** Stores the previous position of all karts. This is needed to detect
+    /** Stores the previous position of all karts. This is needed to detect
      *  when e.g. a check point is reached the first time, or a checkline is
      *  crossed. */
     std::vector<Vec3> m_previous_position;

@@ -46,7 +46,7 @@ private:
      *  inner radius. */
     video::SColor m_ambient_color;
 public:
-	              AmbientLightSphere(CheckManager *check_manager, 
+                  AmbientLightSphere(CheckManager *check_manager, 
                                      const XMLNode &node);
     virtual      ~AmbientLightSphere() {};
     virtual void  update(float dt);

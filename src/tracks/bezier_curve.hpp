@@ -31,29 +31,29 @@ class XMLNode;
 class BezierCurve
 {
 private:
-	/** A data structure to store one bezier control point and
-	 *  the two handles. */
-	struct BezierData
-	{
-		/** The control point. */
-		Vec3 m_control_point;
-		/** First handle, i.e. the one towards the previous point. */
-		Vec3 m_handle1;
-		/** Second handle, i.e. the one towards the next point. */
-		Vec3 m_handle2;
-	};   // BezierData
+    /** A data structure to store one bezier control point and
+     *  the two handles. */
+    struct BezierData
+    {
+        /** The control point. */
+        Vec3 m_control_point;
+        /** First handle, i.e. the one towards the previous point. */
+        Vec3 m_handle1;
+        /** Second handle, i.e. the one towards the next point. */
+        Vec3 m_handle2;
+    };   // BezierData
 
-	/** Overall duration. */
-	float m_time;
+    /** Overall duration. */
+    float m_time;
 
-	/** Vector with all control points and handles. */
-	std::vector<BezierData> m_all_data;
+    /** Vector with all control points and handles. */
+    std::vector<BezierData> m_all_data;
 public:
- 	BezierCurve(const XMLNode &node);
-	Vec3 getXYZ(float t) const;
-	Vec3 getHPR(float t) const;
+    BezierCurve(const XMLNode &node);
+    Vec3 getXYZ(float t) const;
+    Vec3 getHPR(float t) const;
 
-	/** Returns the number of points in this bezier curve. */
-	unsigned int getNumPoints() const {return m_all_data.size(); }
+    /** Returns the number of points in this bezier curve. */
+    unsigned int getNumPoints() const {return m_all_data.size(); }
 };   // BezierCurve
 #endif
