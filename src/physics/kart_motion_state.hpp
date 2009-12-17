@@ -30,7 +30,7 @@
 class KartMotionState : public btMotionState
 {
 private:
-    btTransform	m_center_of_mass;
+    btTransform m_center_of_mass;
 
 public:
     /** Constructor.

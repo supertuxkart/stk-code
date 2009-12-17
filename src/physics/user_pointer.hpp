@@ -36,8 +36,8 @@ class ThreeDAnimation;
 class UserPointer
 {
 public:
-	/** List of all possibles STK objects that are represented in the
-	 *  physics. */
+    /** List of all possibles STK objects that are represented in the
+     *  physics. */
     enum   UserPointerType {UP_UNDEF, UP_KART, UP_FLYABLE, UP_TRACK,
                             UP_PHYSICAL_OBJECT, UP_ANIMATION};
 private:
@@ -50,7 +50,7 @@ public:
     Flyable*        getPointerFlyable()        const {return (Flyable*)m_pointer;        }
     Kart*           getPointerKart()           const {return (Kart*)m_pointer;           }
     PhysicalObject *getPointerPhysicalObject() const {return (PhysicalObject*)m_pointer; }
-	ThreeDAnimation*getPointerAnimation()      const {return (ThreeDAnimation*)m_pointer;}
+    ThreeDAnimation*getPointerAnimation()      const {return (ThreeDAnimation*)m_pointer;}
     void            set(PhysicalObject* p) { m_user_pointer_type=UP_PHYSICAL_OBJECT;
                                              m_pointer          =p;           }
     void            set(Kart* p)           { m_user_pointer_type=UP_KART;
@@ -59,7 +59,7 @@ public:
                                              m_pointer          =p;           }
     void            set(TriangleMesh* p)   { m_user_pointer_type=UP_TRACK;
                                              m_pointer          =p;           }
-	void            set(ThreeDAnimation* p){ m_user_pointer_type=UP_ANIMATION;
+    void            set(ThreeDAnimation* p){ m_user_pointer_type=UP_ANIMATION;
                                              m_pointer          =p;           }
                     UserPointer()          { zero();                          }
     void            zero()                 { m_user_pointer_type=UP_UNDEF;
