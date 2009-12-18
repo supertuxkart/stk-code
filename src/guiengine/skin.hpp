@@ -246,29 +246,29 @@ namespace GUIEngine
         void drawBadgeOn(const Widget* widget, const irr::core::rect<irr::s32>& rect);
 
         // irrlicht's callbacks
-        virtual void 	draw2DRectangle (irr::gui::IGUIElement *element, const irr::video::SColor &color, const irr::core::rect< irr::s32 > &pos, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	draw3DButtonPanePressed (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	draw3DButtonPaneStandard (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	draw3DMenuPane (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	draw3DSunkenPane (irr::gui::IGUIElement *element, irr::video::SColor bgcolor, bool flat, bool fillBackGround, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	draw3DTabBody (irr::gui::IGUIElement *element, bool border, bool background, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::s32 tabHeight=-1, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
-        virtual void 	draw3DTabButton (irr::gui::IGUIElement *element, bool active, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
-        virtual void 	draw3DToolBar (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual irr::core::rect< irr::s32 > 	draw3DWindowBackground (irr::gui::IGUIElement *element, bool drawTitleBar, irr::video::SColor titleBarColor, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
-        virtual void 	drawIcon (irr::gui::IGUIElement *element, irr::gui::EGUI_DEFAULT_ICON icon, const irr::core::position2di position, irr::u32 starttime, irr::u32 currenttime, bool loop=false, const irr::core::rect< irr::s32 > *clip=NULL);
-        virtual irr::video::SColor 	getColor (irr::gui::EGUI_DEFAULT_COLOR color) const;
-        virtual const wchar_t* 	getDefaultText (irr::gui::EGUI_DEFAULT_TEXT text) const;
-        virtual irr::gui::IGUIFont* 	getFont (irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT) const ;
-        virtual irr::u32 	getIcon (irr::gui::EGUI_DEFAULT_ICON icon) const ;
-        virtual irr::s32 	getSize (irr::gui::EGUI_DEFAULT_SIZE size) const ;
-        virtual irr::gui::IGUISpriteBank * 	getSpriteBank () const ;
-        //virtual EGUI_SKIN_TYPE 	getType () const;
-        virtual void 	setColor (irr::gui::EGUI_DEFAULT_COLOR which, irr::video::SColor newColor);
-        virtual void 	setDefaultText (irr::gui::EGUI_DEFAULT_TEXT which, const wchar_t* newText);
-        virtual void 	setFont (irr::gui::IGUIFont *font, irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT);
-        virtual void 	setIcon (irr::gui::EGUI_DEFAULT_ICON icon, irr::u32 index);
-        virtual void 	setSize (irr::gui::EGUI_DEFAULT_SIZE which, irr::s32 size);
-        virtual void 	setSpriteBank (irr::gui::IGUISpriteBank *bank);
+        virtual void    draw2DRectangle (irr::gui::IGUIElement *element, const irr::video::SColor &color, const irr::core::rect< irr::s32 > &pos, const irr::core::rect< irr::s32 > *clip);
+        virtual void    draw3DButtonPanePressed (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void    draw3DButtonPaneStandard (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void    draw3DMenuPane (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void    draw3DSunkenPane (irr::gui::IGUIElement *element, irr::video::SColor bgcolor, bool flat, bool fillBackGround, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void    draw3DTabBody (irr::gui::IGUIElement *element, bool border, bool background, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::s32 tabHeight=-1, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
+        virtual void    draw3DTabButton (irr::gui::IGUIElement *element, bool active, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
+        virtual void    draw3DToolBar (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual irr::core::rect< irr::s32 >     draw3DWindowBackground (irr::gui::IGUIElement *element, bool drawTitleBar, irr::video::SColor titleBarColor, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+        virtual void    drawIcon (irr::gui::IGUIElement *element, irr::gui::EGUI_DEFAULT_ICON icon, const irr::core::position2di position, irr::u32 starttime, irr::u32 currenttime, bool loop=false, const irr::core::rect< irr::s32 > *clip=NULL);
+        virtual irr::video::SColor  getColor (irr::gui::EGUI_DEFAULT_COLOR color) const;
+        virtual const wchar_t*  getDefaultText (irr::gui::EGUI_DEFAULT_TEXT text) const;
+        virtual irr::gui::IGUIFont*     getFont (irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT) const ;
+        virtual irr::u32    getIcon (irr::gui::EGUI_DEFAULT_ICON icon) const ;
+        virtual irr::s32    getSize (irr::gui::EGUI_DEFAULT_SIZE size) const ;
+        virtual irr::gui::IGUISpriteBank *  getSpriteBank () const ;
+        //virtual EGUI_SKIN_TYPE    getType () const;
+        virtual void    setColor (irr::gui::EGUI_DEFAULT_COLOR which, irr::video::SColor newColor);
+        virtual void    setDefaultText (irr::gui::EGUI_DEFAULT_TEXT which, const wchar_t* newText);
+        virtual void    setFont (irr::gui::IGUIFont *font, irr::gui::EGUI_DEFAULT_FONT which=irr::gui::EGDF_DEFAULT);
+        virtual void    setIcon (irr::gui::EGUI_DEFAULT_ICON icon, irr::u32 index);
+        virtual void    setSize (irr::gui::EGUI_DEFAULT_SIZE which, irr::s32 size);
+        virtual void    setSpriteBank (irr::gui::IGUISpriteBank *bank);
         
     };
 }

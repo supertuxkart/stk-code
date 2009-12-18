@@ -30,7 +30,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals = stk_config->m_leader_intervals;
     m_use_highscores   = false;  // disable high scores
-	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,9 +133,9 @@ void FollowTheLeaderRace::update(float delta)
 void FollowTheLeaderRace::restartRace()
 {
     LinearWorld::restartRace();
-	m_leader_intervals.clear();
+    m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
-	TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -167,11 +167,11 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
         order[kart_id]     = kart_id;
         scores[kart_id]    = race_manager->getKartScore(kart_id);
         race_time[kart_id] = race_manager->getOverallTime(kart_id);
-		
-		// check this kart is not in front of leader. If it is, give a score of 0
-		if(m_kart_info[kart_id].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(kart_id) >
-		   m_kart_info[0].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(0))
-			scores[kart_id] = 0;
+        
+        // check this kart is not in front of leader. If it is, give a score of 0
+        if(m_kart_info[kart_id].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(kart_id) >
+           m_kart_info[0].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(0))
+            scores[kart_id] = 0;
     }
     
     //Bubblesort
@@ -192,7 +192,7 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
             }
         }
     } while(!sorted);
-	
+    
     for(unsigned int i=1; i<NUM_KARTS; i++)
         RaceManager::getKart(order[i])->setPosition(i);
     

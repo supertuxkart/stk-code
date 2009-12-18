@@ -43,7 +43,7 @@ MusicOggStream::MusicOggStream()
 MusicOggStream::~MusicOggStream()
 {
     if(stopMusic() == false)
-	    fprintf(stderr, "WARNING: problems while stopping music.\n");
+        fprintf(stderr, "WARNING: problems while stopping music.\n");
 }   // ~MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ void MusicOggStream::update()
         if(!active)
         {
             // no more data. Seek to beginning (causes the sound to loop)
-	        ov_time_seek(&m_oggStream, 0);
+            ov_time_seek(&m_oggStream, 0);
             active = streamIntoBuffer(buffer);//now there really should be data
             //fprintf(stdout,"Music buffer under-run.\n");
         }
@@ -266,7 +266,7 @@ void MusicOggStream::update()
         alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
         if (state != AL_PLAYING)
         {
-	        fprintf(stderr,"WARNING: Music not playing when it should be. Source state: %d\n", state);
+            fprintf(stderr,"WARNING: Music not playing when it should be. Source state: %d\n", state);
             alGetSourcei(m_soundSource, AL_BUFFERS_PROCESSED, &processed);
             alSourcePlay(m_soundSource);
         }

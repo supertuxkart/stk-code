@@ -35,7 +35,7 @@ extern bool IS_LITTLE_ENDIAN;
 
 class SoundManager
 {
-private:		
+private:        
     MusicInformation        *m_current_music;
 
     /** If the sound could not be initialized, e.g. if the player doesn't has

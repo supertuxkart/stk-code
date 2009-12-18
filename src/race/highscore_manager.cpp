@@ -71,7 +71,7 @@ void HighscoreManager::Load()
 {
 
     const lisp::Lisp* root = 0;
-	std::exception err;
+    std::exception err;
 
     try
     {

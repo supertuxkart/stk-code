@@ -62,10 +62,10 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
     int flag = getBody()->getCollisionFlags();
     flag = flag & (~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
     getBody()->setCollisionFlags(flag);
-	
-	// should not live forever, auto-destruct after 20 seconds
-	m_max_lifespan = 20;
-	
+    
+    // should not live forever, auto-destruct after 20 seconds
+    m_max_lifespan = 20;
+    
 }   // Bowling
 
 // -----------------------------------------------------------------------------

@@ -34,9 +34,9 @@ CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node)
 {
     m_previous_sign.resize(race_manager->getNumKarts());
     core::vector2df p1, p2;
-	node.get("p1", &p1);
-	node.get("p2", &p2);
-	node.get("min-height", &m_min_height);
+    node.get("p1", &p1);
+    node.get("p2", &p2);
+    node.get("min-height", &m_min_height);
     m_line.setLine(p1, p2);
 }   // CheckLine
 

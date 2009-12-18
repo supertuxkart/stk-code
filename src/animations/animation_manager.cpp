@@ -27,20 +27,20 @@
 
 AnimationManager::AnimationManager(const Track &track, const XMLNode &node)
 {
-	for(unsigned int i=0; i<node.getNumNodes(); i++)
-	{
-		const XMLNode *anim_node = node.getNode(i);
-		std::string type = anim_node->getName();
-		float fps=25;
-		anim_node->get("fps", &fps);
-		if(type=="anim_billboard")
-			m_all_animations.push_back(new BillboardAnimation(track, *anim_node, fps));
-		else if(type=="animations-IPO")
-			m_all_animations.push_back(new ThreeDAnimation(track, *anim_node, fps));
-		else
-			fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
-				    type.c_str());
-	}   // for i<node.getNumNodes
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *anim_node = node.getNode(i);
+        std::string type = anim_node->getName();
+        float fps=25;
+        anim_node->get("fps", &fps);
+        if(type=="anim_billboard")
+            m_all_animations.push_back(new BillboardAnimation(track, *anim_node, fps));
+        else if(type=="animations-IPO")
+            m_all_animations.push_back(new ThreeDAnimation(track, *anim_node, fps));
+        else
+            fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
+                    type.c_str());
+    }   // for i<node.getNumNodes
 }   // AnimationManager
 
 // ----------------------------------------------------------------------------
@@ -49,9 +49,9 @@ AnimationManager::AnimationManager(const Track &track, const XMLNode &node)
  */
 AnimationManager::~AnimationManager()
 {
-	std::vector<AnimationBase*>::iterator i;
-	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
-		delete *i;
+    std::vector<AnimationBase*>::iterator i;
+    for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+        delete *i;
     m_all_animations.clear();
 }   // ~AnimationManager
 
@@ -60,9 +60,9 @@ AnimationManager::~AnimationManager()
  */
 void AnimationManager::reset()
 {
-	std::vector<AnimationBase*>::iterator i;
-	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
-		(*i)->reset();
+    std::vector<AnimationBase*>::iterator i;
+    for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+        (*i)->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void AnimationManager::reset()
  */
 void AnimationManager::update(float dt)
 {
-	std::vector<AnimationBase*>::iterator i;
-	for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
-		(*i)->update(dt);
+    std::vector<AnimationBase*>::iterator i;
+    for(i=m_all_animations.begin(); i!=m_all_animations.end(); i++)
+        (*i)->update(dt);
 }   // update

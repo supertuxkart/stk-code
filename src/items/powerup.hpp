@@ -36,7 +36,7 @@ private:
     SFXBase                   *m_sound_use;
     PowerupType                m_type;
     int                        m_number;
-	
+    
 protected:
     Kart*                      m_owner;
 

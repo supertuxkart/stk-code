@@ -163,13 +163,13 @@ int handleCmdLinePreliminary(int argc, char **argv)
         {
             // Check that current res is not blacklisted
             std::ostringstream o;
-    		o << UserConfigParams::m_width << "x" << UserConfigParams::m_height;
-    		std::string res = o.str();
+            o << UserConfigParams::m_width << "x" << UserConfigParams::m_height;
+            std::string res = o.str();
             if (std::find(UserConfigParams::m_blacklist_res.begin(), 
                           UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())         
-            	UserConfigParams::m_fullscreen = true;
-          	else 
-          		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+                UserConfigParams::m_fullscreen = true;
+            else 
+                fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
         }
         else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
         {
@@ -189,19 +189,19 @@ int handleCmdLinePreliminary(int argc, char **argv)
             int width, height;
             if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
             {
-            	std::ostringstream o;
-    			o << width << "x" << height;
-    			std::string res = o.str();
+                std::ostringstream o;
+                o << width << "x" << height;
+                std::string res = o.str();
                 if (!UserConfigParams::m_fullscreen || std::find(UserConfigParams::m_blacklist_res.begin(), 
                                                             UserConfigParams::m_blacklist_res.end(),res) == UserConfigParams::m_blacklist_res.end())
                 {
-                	UserConfigParams::m_prev_width = UserConfigParams::m_width = width;
-               		UserConfigParams::m_prev_height = UserConfigParams::m_height = height;
-                	fprintf ( stdout, "You choose to be in %dx%d.\n", (int)UserConfigParams::m_width,
+                    UserConfigParams::m_prev_width = UserConfigParams::m_width = width;
+                    UserConfigParams::m_prev_height = UserConfigParams::m_height = height;
+                    fprintf ( stdout, "You choose to be in %dx%d.\n", (int)UserConfigParams::m_width,
                              (int)UserConfigParams::m_height );
-               	}
-               	else
-               		fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
+                }
+                else
+                    fprintf ( stdout, "Resolution %s has been blacklisted, so it is not available!\n", res.c_str());
                 i++;
             }
             else
@@ -301,8 +301,8 @@ int handleCmdLine(int argc, char **argv)
             }
             else
             {
-	            fprintf(stdout, "Kart '%s' not found, ignored.\n",
-		                argv[i+1]);
+                fprintf(stdout, "Kart '%s' not found, ignored.\n",
+                        argv[i+1]);
             }
         }
         else if( (!strcmp(argv[i], "--mode") && i+1<argc ))

@@ -193,19 +193,19 @@ namespace lisp
 
             case '_': // can be begin translation
                 try
-		{
-		    nextChar();
-		    if(*m_c == '(')
-		    {
-		      nextChar();
-		      return TOKEN_TRANSLATION;
-		    }
-		    m_token_string[m_token_length++] = '_';
-		    // Fall through to symbol handling
-		}  
+        {
+            nextChar();
+            if(*m_c == '(')
+            {
+              nextChar();
+              return TOKEN_TRANSLATION;
+            }
+            m_token_string[m_token_length++] = '_';
+            // Fall through to symbol handling
+        }  
                 catch(EOFException& )
                 {
-		}
+        }
             default:
                 if(isdigit(*m_c) || *m_c == '-')
                 {

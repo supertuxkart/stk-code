@@ -29,25 +29,25 @@
 
 CheckManager::CheckManager(const XMLNode &node, Track *track)
 {
-	for(unsigned int i=0; i<node.getNumNodes(); i++)
-	{
-		const XMLNode *check_node = node.getNode(i);
-		const std::string &type = check_node->getName();
-		if(type=="check-line")
-		{
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *check_node = node.getNode(i);
+        const std::string &type = check_node->getName();
+        if(type=="check-line")
+        {
             CheckLine *cl = new CheckLine(this, *check_node);
-			m_all_checks.push_back(cl);
+            m_all_checks.push_back(cl);
             if(cl->getType()==CheckStructure::CT_NEW_LAP)
             {
                 track->getQuadGraph().setStartCoordinate(*cl);
             }
-		}   // checkline
+        }   // checkline
         else if(type=="check-sphere")
         {
             AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node);
             m_all_checks.push_back(cs);
         }   // checksphere
-	}   // for i<node.getNumNodes
+    }   // for i<node.getNumNodes
 }   // CheckManager
 
 // ----------------------------------------------------------------------------
@@ -55,8 +55,8 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
 void CheckManager::reset(const Track &track)
 {
     std::vector<CheckStructure*>::iterator i;
-	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
-		(*i)->reset(track);
+    for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+        (*i)->reset(track);
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -65,8 +65,8 @@ void CheckManager::reset(const Track &track)
  */
 void CheckManager::update(float dt)
 {
-	std::vector<CheckStructure*>::iterator i;
-	for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
-		(*i)->update(dt);
+    std::vector<CheckStructure*>::iterator i;
+    for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
+        (*i)->update(dt);
 }   // update
 

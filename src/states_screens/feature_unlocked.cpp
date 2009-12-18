@@ -192,7 +192,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     //printf("m_key_angle = %f\n", m_key_angle);
     m_key->setRotation( core::vector3df(0, m_key_angle*90.0f, -m_key_angle*90.0f) );
 
-	const int GIFT_EXIT_FROM = 7;
+    const int GIFT_EXIT_FROM = 7;
     const int GIFT_EXIT_TO = 20;
         
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
@@ -201,9 +201,9 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
         m_chest_top->setRotation( core::vector3df( 360.0f-(float)std::min(110.0, chest_top_angle), 0, 0 ));
         if (chest_top_angle < 110.0) 
         {
-        	core::vector3df chestpos = m_chest_top->getPosition();
-			chestpos.Y += dt*6;
-        	m_chest_top->setPosition(chestpos);
+            core::vector3df chestpos = m_chest_top->getPosition();
+            chestpos.Y += dt*6;
+            m_chest_top->setPosition(chestpos);
         }
         
         core::vector3df pos = m_root_gift_node->getPosition();
@@ -235,13 +235,13 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     
     if (m_root_gift_node != NULL)
     {
-    	m_camera->setTarget( m_root_gift_node->getPosition() + core::vector3df(0.0f, 10.0f, 0.0f) );
-    	m_camera->updateAbsolutePosition();
+        m_camera->setTarget( m_root_gift_node->getPosition() + core::vector3df(0.0f, 10.0f, 0.0f) );
+        m_camera->updateAbsolutePosition();
     }
     else
     {
         m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
-    	m_camera->updateAbsolutePosition();
+        m_camera->updateAbsolutePosition();
     }
     
     static const int w = irr_driver->getFrameSize().Width;

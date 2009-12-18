@@ -54,40 +54,40 @@ struct Input
     int btnID; // or axis ID for gamepads axes
     int axisDirection;
 
-	Input()
-		: type(IT_NONE), deviceID(0), btnID(0), axisDirection(0)
-	{
-		// Nothing to do.
-	}
-	
-	/** Creates an Input instance which represents an arbitrary way of getting
-	 * game input using a type specifier and 3 integers.
-	 *
-	 * Meaning of the 3 integers for each InputType:
-	 * IT_NONE: This means nothing. In certain cases this is regarded as an
-	 * unset binding.
-	 * IT_KEYBOARD: id0 is a irrLicht value.
-	 * IT_STICKMOTION: id0 - stick index, id1 - axis index, id2 - axis direction
-	 * (negative, positive). You can assume that axis 0 is the X-Axis where the
+    Input()
+        : type(IT_NONE), deviceID(0), btnID(0), axisDirection(0)
+    {
+        // Nothing to do.
+    }
+    
+    /** Creates an Input instance which represents an arbitrary way of getting
+     * game input using a type specifier and 3 integers.
+     *
+     * Meaning of the 3 integers for each InputType:
+     * IT_NONE: This means nothing. In certain cases this is regarded as an
+     * unset binding.
+     * IT_KEYBOARD: id0 is a irrLicht value.
+     * IT_STICKMOTION: id0 - stick index, id1 - axis index, id2 - axis direction
+     * (negative, positive). You can assume that axis 0 is the X-Axis where the
      * negative direction is to the left and that axis 1 is the Y-Axis with the
-	 * negative direction being upwards.
-	 * IT_STICKBUTTON: id0 - stick index, id1 - button index. Button 0 and 1 are
-	 * usually reached most easily.
-	 * IT_STICKHAT: This is not yet implemented.
-	 * IT_MOUSEMOTION: id0 - axis index (0 -> X, 1 -> Y). Mouse wheel is
-	 * represented as buttons!
-	 * IT_MOUSEBUTTON: id0 - button number (1 -> left, 2 -> middle, 3 -> right,
-	 * ...) 
-	 *
-	 * Note: For joystick bindings that are actice in the menu the joystick's
-	 * index should be zero. The binding will react to all joysticks connected
-	 * to the system.
-	 */
-	Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0) 
-		: type(ntype), deviceID(deviceID), btnID(btnID), axisDirection(axisDirection)
-	{
-		// Nothing to do.
-	}
+     * negative direction being upwards.
+     * IT_STICKBUTTON: id0 - stick index, id1 - button index. Button 0 and 1 are
+     * usually reached most easily.
+     * IT_STICKHAT: This is not yet implemented.
+     * IT_MOUSEMOTION: id0 - axis index (0 -> X, 1 -> Y). Mouse wheel is
+     * represented as buttons!
+     * IT_MOUSEBUTTON: id0 - button number (1 -> left, 2 -> middle, 3 -> right,
+     * ...) 
+     *
+     * Note: For joystick bindings that are actice in the menu the joystick's
+     * index should be zero. The binding will react to all joysticks connected
+     * to the system.
+     */
+    Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0) 
+        : type(ntype), deviceID(deviceID), btnID(btnID), axisDirection(axisDirection)
+    {
+        // Nothing to do.
+    }
     
     static irr::core::stringw getInputAsString(const Input::InputType type, const int id, const Input::AxisDirection dir=AD_NEUTRAL);
 
@@ -97,15 +97,15 @@ enum PlayerAction
 {
     PA_FIRST = -1,
     
-	PA_LEFT = 0,
-	PA_RIGHT,
-	PA_ACCEL,
-	PA_BRAKE,
-	PA_NITRO,
-	PA_DRIFT,
-	PA_RESCUE,
-	PA_FIRE,
-	PA_LOOK_BACK,
+    PA_LEFT = 0,
+    PA_RIGHT,
+    PA_ACCEL,
+    PA_BRAKE,
+    PA_NITRO,
+    PA_DRIFT,
+    PA_RESCUE,
+    PA_FIRE,
+    PA_LOOK_BACK,
     
     PA_COUNT
 };
@@ -122,41 +122,41 @@ static std::string KartActionStrings[PA_COUNT] = {std::string("left"),
 
 enum StaticAction
 {
-	// Below this are synthetic game actions which are never triggered through
-	// an input device.
-	GA_NULL,				// Nothing dummy entry.
-	GA_SENSE_CANCEL,		// Input sensing canceled.
-	GA_SENSE_COMPLETE,		// Input sensing successfully finished.
-	
-	// Below this point are the game actions which can happen while in menu
-	// mode.
-		
-	GA_ENTER,				// Enter menu, acknowledge, ...
-	GA_LEAVE,				// Leave a menu.
-	
-	GA_CLEAR_MAPPING,		// Clear an input mapping.
-	
-	GA_INC_SCROLL_SPEED,
-	GA_INC_SCROLL_SPEED_FAST,
-	GA_DEC_SCROLL_SPEED,
-	GA_DEC_SCROLL_SPEED_FAST,
-	
-	GA_CURSOR_UP,
-	GA_CURSOR_DOWN,
-	GA_CURSOR_LEFT,
-	GA_CURSOR_RIGHT,
-	
+    // Below this are synthetic game actions which are never triggered through
+    // an input device.
+    GA_NULL,                // Nothing dummy entry.
+    GA_SENSE_CANCEL,        // Input sensing canceled.
+    GA_SENSE_COMPLETE,      // Input sensing successfully finished.
+    
+    // Below this point are the game actions which can happen while in menu
+    // mode.
+        
+    GA_ENTER,               // Enter menu, acknowledge, ...
+    GA_LEAVE,               // Leave a menu.
+    
+    GA_CLEAR_MAPPING,       // Clear an input mapping.
+    
+    GA_INC_SCROLL_SPEED,
+    GA_INC_SCROLL_SPEED_FAST,
+    GA_DEC_SCROLL_SPEED,
+    GA_DEC_SCROLL_SPEED_FAST,
+    
+    GA_CURSOR_UP,
+    GA_CURSOR_DOWN,
+    GA_CURSOR_LEFT,
+    GA_CURSOR_RIGHT,
+    
 
-	GA_TOGGLE_FULLSCREEN,	// Switch between windowed/fullscreen mode
-	GA_LEAVE_RACE,			// Switch from race to menu.
-	
-	GA_DEBUG_ADD_MISSILE,
-	GA_DEBUG_ADD_BOWLING,
-	GA_DEBUG_ADD_HOMING,
-	GA_DEBUG_TOGGLE_FPS,
-	GA_DEBUG_TOGGLE_WIREFRAME,
-	GA_DEBUG_HISTORY
-	
+    GA_TOGGLE_FULLSCREEN,   // Switch between windowed/fullscreen mode
+    GA_LEAVE_RACE,          // Switch from race to menu.
+    
+    GA_DEBUG_ADD_MISSILE,
+    GA_DEBUG_ADD_BOWLING,
+    GA_DEBUG_ADD_HOMING,
+    GA_DEBUG_TOGGLE_FPS,
+    GA_DEBUG_TOGGLE_WIREFRAME,
+    GA_DEBUG_HISTORY
+    
 };
 
 

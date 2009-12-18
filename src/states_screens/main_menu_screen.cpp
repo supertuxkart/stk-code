@@ -65,14 +65,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         
         if (i % 2 == 0)
         {
-        	// the passed kart will not be modified, that's why I allow myself to use const_cast
-        	scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
-        	StateManager::get()->pushScreen(scene);
+            // the passed kart will not be modified, that's why I allow myself to use const_cast
+            scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
+            StateManager::get()->pushScreen(scene);
         }
         else
         {
-        	scene->setUnlockedPicture( GUIEngine::getDriver()->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
-        	StateManager::get()->pushScreen(scene);
+            scene->setUnlockedPicture( GUIEngine::getDriver()->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
+            StateManager::get()->pushScreen(scene);
         }
     }
     

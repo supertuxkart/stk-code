@@ -53,7 +53,7 @@ public:
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, bool *value) const;
     int get(const std::string &attribute, Vec3 *value) const;
-	int get(const std::string &attribute, core::vector2df *value) const;
+    int get(const std::string &attribute, core::vector2df *value) const;
     int get(const std::string &attribute, core::vector3df *value) const;
     int get(const std::string &attribute, video::SColorf *value) const;
     int get(const std::string &attribute, video::SColor *value) const;

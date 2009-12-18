@@ -49,7 +49,7 @@ public:
     virtual void                  position(const Vec3 &position);
     virtual void                  volume(float gain);
     virtual SFXManager::SFXStatus getStatus();
-	
+    
 };   // SFXOpenAL
 
 #endif // HEADER_SFX_OPENAL_HPP

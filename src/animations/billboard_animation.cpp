@@ -23,7 +23,7 @@ class XMLNode;
 
 /** A 2d billboard animation. */
 BillboardAnimation::BillboardAnimation(const Track &track_name, 
-									   const XMLNode &node, float fps) 
+                                       const XMLNode &node, float fps) 
                   : AnimationBase(node, fps)
 {
 }   // BillboardAnimation
@@ -33,9 +33,9 @@ BillboardAnimation::BillboardAnimation(const Track &track_name,
  *  \param dt Time since last call. */
 void BillboardAnimation::update(float dt)
 {
-	// FIXME: not implemented yet.
-	core::vector3df xyz(0, 0, 0);
-	core::vector3df hpr(0, 0, 0);
-	AnimationBase::update(dt, &xyz, &hpr);
+    // FIXME: not implemented yet.
+    core::vector3df xyz(0, 0, 0);
+    core::vector3df hpr(0, 0, 0);
+    AnimationBase::update(dt, &xyz, &hpr);
 
 }   // update

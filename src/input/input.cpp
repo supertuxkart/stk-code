@@ -49,113 +49,113 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             case KEY_RBUTTON :
                 s = "right mouse button";
                 break;
-            case KEY_CANCEL :	
+            case KEY_CANCEL :   
                 s = "cancel";
                 break;
-            case KEY_MBUTTON :	
+            case KEY_MBUTTON :  
                 s = "middle mouse button";
                 break;
-            case KEY_XBUTTON1 :	
+            case KEY_XBUTTON1 : 
                 s = "X1 mouse button";
                 break;
-            case KEY_XBUTTON2 :	
+            case KEY_XBUTTON2 : 
                 s = "X2 mouse button";
                 break;
-            case KEY_BACK :	
+            case KEY_BACK : 
                 s = "backspace";
                 break;
-            case KEY_TAB :	
+            case KEY_TAB :  
                 s = "tab";
                 break;
-            case KEY_CLEAR :	
+            case KEY_CLEAR :    
                 s = "clear";
                 break;
-            case KEY_RETURN :	
+            case KEY_RETURN :   
                 s = "return";
                 break;
             case KEY_SHIFT :
                 s = "shift";
                 break;
-            case KEY_CONTROL :	
+            case KEY_CONTROL :  
                 s = "control";
                 break;
-            case KEY_MENU :	
+            case KEY_MENU : 
                 s = "alt/menu";
                 break;
             case KEY_PAUSE :
                 s = "pause";
                 break;
-            case KEY_CAPITAL :	
+            case KEY_CAPITAL :  
                 s = "caps lock";
                 break;
-            case KEY_KANA :	
+            case KEY_KANA : 
                 s = "kana";
                 break;
-            //case KEY_HANGUEL :	
+            //case KEY_HANGUEL :    
             //case KEY_HANGUL :
             //    s = "hangul";
                 break;
-            case KEY_JUNJA :	
+            case KEY_JUNJA :    
                 s = "junja";
                 break;
-            case KEY_FINAL :	
+            case KEY_FINAL :    
                 s = "final";
                 break;
-            //case KEY_HANJA :	
+            //case KEY_HANJA :  
             //    s = "hanja";
             //    break;
-            //case KEY_KANJI :	
+            //case KEY_KANJI :  
             //    s = "kanji";
             //    break;
-            case KEY_ESCAPE :	
+            case KEY_ESCAPE :   
                 s = "escape";
                 break;
-            case KEY_CONVERT :	
+            case KEY_CONVERT :  
                 s = "convert";
                 break;
-            case KEY_NONCONVERT :	
+            case KEY_NONCONVERT :   
                 s = "nonconvert";
                 break;
-            case KEY_ACCEPT :	
+            case KEY_ACCEPT :   
                 s = "accept";
                 break;
-            case KEY_MODECHANGE :	
+            case KEY_MODECHANGE :   
                 s = "modechange";
                 break;
-            case KEY_SPACE :	
+            case KEY_SPACE :    
                 s = "space";
                 break;
-            case KEY_PRIOR :	
+            case KEY_PRIOR :    
                 s = "page up";
                 break;
-            case KEY_NEXT :	
+            case KEY_NEXT : 
                 s = "page down";
                 break;
             case KEY_END :
                 s = "end";
                 break;
-            case KEY_HOME :	
+            case KEY_HOME : 
                 s = "home";
                 break;
-            case KEY_LEFT :	
+            case KEY_LEFT : 
                 s = "left";
                 break;
-            case KEY_UP :	
+            case KEY_UP :   
                 s = "up";
                 break;
             case KEY_RIGHT :
                 s = "right";
                 break;
-            case KEY_DOWN :	
+            case KEY_DOWN : 
                 s = "down";
                 break;
-            case KEY_SELECT :	
+            case KEY_SELECT :   
                 s = "select";
                 break;
-            case KEY_PRINT :	
+            case KEY_PRINT :    
                 s = "print";
                 break;
-            case KEY_EXECUT :	
+            case KEY_EXECUT :   
                 s = "exec";
                 break;
             case KEY_SNAPSHOT :
@@ -164,142 +164,142 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             case KEY_INSERT :
                 s = "insert";
                 break;
-            case KEY_DELETE :	
+            case KEY_DELETE :   
                 s = "delete";
                 break;
-            case KEY_HELP :	
+            case KEY_HELP : 
                 s = "help";
                 break;
-            case KEY_KEY_0 :	
+            case KEY_KEY_0 :    
                 s = "0";
                 break;
-            case KEY_KEY_1 :	
+            case KEY_KEY_1 :    
                 s = "1";
                 break;
             case KEY_KEY_2 :
                 s = "2";
                 break;
-            case KEY_KEY_3 :	
+            case KEY_KEY_3 :    
                 s = "3";
                 break;
             case KEY_KEY_4 :
                 s = "4";
                 break;
-            case KEY_KEY_5 :	
+            case KEY_KEY_5 :    
                 s = "5";
                 break;
-            case KEY_KEY_6 :	
+            case KEY_KEY_6 :    
                 s = "6";
                 break;
-            case KEY_KEY_7 :	
+            case KEY_KEY_7 :    
                 s = "7";
                 break;
-            case KEY_KEY_8 :	
+            case KEY_KEY_8 :    
                 s = "8";
                 break;
-            case KEY_KEY_9 :	
+            case KEY_KEY_9 :    
                 s = "9";
                 break;
-            case KEY_KEY_A :	
+            case KEY_KEY_A :    
                 s = "A";
                 break;
-            case KEY_KEY_B :	
+            case KEY_KEY_B :    
                 s = "B";
                 break;
-            case KEY_KEY_C :	
+            case KEY_KEY_C :    
                 s = "C";
                 break;
-            case KEY_KEY_D :	
+            case KEY_KEY_D :    
                 s = "D";
                 break;
-            case KEY_KEY_E :	
+            case KEY_KEY_E :    
                 s = "E";
                 break;
-            case KEY_KEY_F :	
+            case KEY_KEY_F :    
                 s = "F";
                 break;
-            case KEY_KEY_G :	
+            case KEY_KEY_G :    
                 s = "G";
                 break;
             case KEY_KEY_H :
                 s = "H";
                 break;
-            case KEY_KEY_I :	
+            case KEY_KEY_I :    
                 s = "I";
                 break;
-            case KEY_KEY_J :	
+            case KEY_KEY_J :    
                 s = "J";
                 break;
-            case KEY_KEY_K :	
+            case KEY_KEY_K :    
                 s = "K";
                 break;
-            case KEY_KEY_L :	
+            case KEY_KEY_L :    
                 s = "L";
                 break;
-            case KEY_KEY_M :	
+            case KEY_KEY_M :    
                 s = "M";
                 break;
-            case KEY_KEY_N :	
+            case KEY_KEY_N :    
                 s = "N";
                 break;
-            case KEY_KEY_O :	
+            case KEY_KEY_O :    
                 s = "O";
                 break;
-            case KEY_KEY_P :	
+            case KEY_KEY_P :    
                 s = "P";
                 break;
-            case KEY_KEY_Q :	
+            case KEY_KEY_Q :    
                 s = "Q";
                 break;
-            case KEY_KEY_R :	
+            case KEY_KEY_R :    
                 s = "R";
                 break;
-            case KEY_KEY_S :	
+            case KEY_KEY_S :    
                 s = "S";
                 break;
-            case KEY_KEY_T :	
+            case KEY_KEY_T :    
                 s = "T";
                 break;
-            case KEY_KEY_U :	
+            case KEY_KEY_U :    
                 s = "U";
                 break;
-            case KEY_KEY_V :	
+            case KEY_KEY_V :    
                 s = "V";
                 break;
-            case KEY_KEY_W :	
+            case KEY_KEY_W :    
                 s = "W";
                 break;
             case KEY_KEY_X :
                 s = "X";
                 break;
-            case KEY_KEY_Y :	
+            case KEY_KEY_Y :    
                 s = "Y";
                 break;
-            case KEY_KEY_Z :	
+            case KEY_KEY_Z :    
                 s = "Z";
                 break;
-            case KEY_LWIN :	
+            case KEY_LWIN : 
                 s = "Left Logo";
                 break;
-            case KEY_RWIN :	
+            case KEY_RWIN : 
                 s = "Right Logo";
                 break;
-            case KEY_APPS :	
+            case KEY_APPS : 
                 s = "apps";
                 break;
-            case KEY_SLEEP :	
+            case KEY_SLEEP :    
                 s = "sleep";
                 break;
-            case KEY_NUMPAD0 :	
+            case KEY_NUMPAD0 :  
                 s = "numpad 0";
                 break;
-            case KEY_NUMPAD1 :	
+            case KEY_NUMPAD1 :  
                 s = "numpad 1";
                 break;
-            case KEY_NUMPAD2 :	
+            case KEY_NUMPAD2 :  
                 s = "numpad 2";
                 break;
-            case KEY_NUMPAD3 :	
+            case KEY_NUMPAD3 :  
                 s = "numpad 3";
                 break;
             case KEY_NUMPAD4 :
@@ -308,133 +308,133 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             case KEY_NUMPAD5 :
                 s = "numpad 5";
                 break;
-            case KEY_NUMPAD6 :	
+            case KEY_NUMPAD6 :  
                 s = "numpad 6";
                 break;
-            case KEY_NUMPAD7 :	
+            case KEY_NUMPAD7 :  
                 s = "numpad 7";
                 break;
-            case KEY_NUMPAD8 :	
+            case KEY_NUMPAD8 :  
                 s = "numpad 8";
                 break;
-            case KEY_NUMPAD9 :	
+            case KEY_NUMPAD9 :  
                 s = "numpad 9";
                 break;
-            case KEY_MULTIPLY :	
+            case KEY_MULTIPLY : 
                 s = "*";
                 break;
-            case KEY_ADD :	
+            case KEY_ADD :  
                 s = "+";
                 break;
-            case KEY_SEPARATOR :	
+            case KEY_SEPARATOR :    
                 s = "separator";
                 break;
-            case KEY_SUBTRACT :	
+            case KEY_SUBTRACT : 
                 s = "- (subtract)";
                 break;
-            case KEY_DECIMAL :	
+            case KEY_DECIMAL :  
                 s = "decimal";
                 break;
-            case KEY_DIVIDE :	
+            case KEY_DIVIDE :   
                 s = "/ (divide)";
                 break;
-            case KEY_F1 :	
+            case KEY_F1 :   
                 s = "F1";
                 break;
-            case KEY_F2 :	
+            case KEY_F2 :   
                 s = "F2";
                 break;
-            case KEY_F3 :	
+            case KEY_F3 :   
                 s = "F3";
                 break;
-            case KEY_F4 :	
+            case KEY_F4 :   
                 s = "F4";
                 break;
-            case KEY_F5 :	
+            case KEY_F5 :   
                 s = "F5";
                 break;
-            case KEY_F6 :	
+            case KEY_F6 :   
                 s = "F6";
                 break;
-            case KEY_F7 :	
+            case KEY_F7 :   
                 s = "F7";
                 break;
-            case KEY_F8 :	
+            case KEY_F8 :   
                 s = "F8";
                 break;
             case KEY_F9 :
                 s = "F9";
                 break;
-            case KEY_F10 :	
+            case KEY_F10 :  
                 s = "F10";
                 break;
-            case KEY_F11 :	
+            case KEY_F11 :  
                 s = "F11";
                 break;
-            case KEY_F12 :	
+            case KEY_F12 :  
                 s = "F12";
                 break;
-            case KEY_F13 :	
+            case KEY_F13 :  
                 s = "F13";
                 break;
-            case KEY_F14 :	
+            case KEY_F14 :  
                 s = "F14";
                 break;
-            case KEY_F15 :	
+            case KEY_F15 :  
                 s = "F15";
                 break;
-            case KEY_F16 :	
+            case KEY_F16 :  
                 s = "F16";
                 break;
-            case KEY_F17 :	
+            case KEY_F17 :  
                 s = "F17";
                 break;
-            case KEY_F18 :	
+            case KEY_F18 :  
                 s = "F18";
                 break;
-            case KEY_F19 :	
+            case KEY_F19 :  
                 s = "F19";
                 break;
-            case KEY_F20 :	
+            case KEY_F20 :  
                 s = "F20";
                 break;
-            case KEY_F21 :	
+            case KEY_F21 :  
                 s = "F21";
                 break;
             case KEY_F22 :
                 s = "F22";
                 break;
-            case KEY_F23 :	
+            case KEY_F23 :  
                 s = "F23";
                 break;
-            case KEY_F24 :	
+            case KEY_F24 :  
                 s = "F24";
                 break;
-            case KEY_NUMLOCK :	
+            case KEY_NUMLOCK :  
                 s = "num lock";
                 break;
-            case KEY_SCROLL :	
+            case KEY_SCROLL :   
                 s = "scroll lock";
                 break;
             case KEY_LSHIFT :
                 s = "left shift";
                 break;
-            case KEY_RSHIFT :	
+            case KEY_RSHIFT :   
                 s = "right shift";
                 break;
-            case KEY_LCONTROL :	
+            case KEY_LCONTROL : 
                 s = "left control";
                 break;
-            case KEY_RCONTROL :	
+            case KEY_RCONTROL : 
                 s = "right control";
                 break;
-            case KEY_LMENU :	
+            case KEY_LMENU :    
                 s = "left menu";
                 break;
-            case KEY_RMENU :	
+            case KEY_RMENU :    
                 s = "right menu";
                 break;
-            case KEY_PLUS :	
+            case KEY_PLUS : 
                 s = "+";
                 break;
             case KEY_COMMA :
@@ -446,7 +446,7 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             case KEY_PERIOD :
                 s = ".";
                 break;
-            case KEY_ATTN :	
+            case KEY_ATTN : 
                 s = "attn";
                 break;
             case KEY_CRSEL :
@@ -455,16 +455,16 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             case KEY_EXSEL :
                 s = "exsel";
                 break;
-            case KEY_EREOF :	
+            case KEY_EREOF :    
                 s = "ereof";
                 break;
-            case KEY_PLAY :	
+            case KEY_PLAY : 
                 s = "play";
                 break;
             case KEY_ZOOM :
                 s = "zoom";
                 break;
-            case KEY_PA1 :	
+            case KEY_PA1 :  
                 s = "pa1";
                 break;
             case KEY_OEM_CLEAR:

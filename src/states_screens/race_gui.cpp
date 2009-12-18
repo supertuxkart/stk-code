@@ -295,7 +295,7 @@ void RaceGUI::drawGlobalMiniMap()
     {
         const Kart *kart = RaceManager::getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
-    	const Vec3& xyz = kart->getXYZ();
+        const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         // int marker_height = m_marker->getOriginalSize().Height;

@@ -157,7 +157,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && deviceID.find("keyboard") != std::string::npos;
     const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
                            sensedInput->type == Input::IT_STICKBUTTON) &&
-    					   deviceID.find("gamepad") != std::string::npos;
+                           deviceID.find("gamepad") != std::string::npos;
     
     if (!keyboard && !gamepad) return;
     if (gamepad)
@@ -275,7 +275,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             read = sscanf( selection.c_str(), "keyboard%i", &i );
             if (read == 1 && i != -1)
             {
-            	updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
+                updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
             }
             else
             {

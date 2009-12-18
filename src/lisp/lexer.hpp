@@ -31,7 +31,7 @@ namespace lisp
             TOKEN_EOF,
             TOKEN_OPEN_PAREN,
             TOKEN_CLOSE_PAREN,
-	    TOKEN_TRANSLATION,
+        TOKEN_TRANSLATION,
             TOKEN_SYMBOL,
             TOKEN_STRING,
             TOKEN_INTEGER,

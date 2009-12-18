@@ -48,7 +48,7 @@ void LabelWidget::add()
         irrwidget->setOverrideFont( GUIEngine::getTitleFont() );
     }
     //irrwidget->setBackgroundColor( video::SColor(255,255,0,0) );
-	//irrwidget->setDrawBackground(true);
+    //irrwidget->setDrawBackground(true);
     
     id = m_element->getID();
     //m_element->setTabOrder(id);

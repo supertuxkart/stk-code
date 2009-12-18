@@ -249,7 +249,7 @@ bool DeviceManager::translateInput( Input::InputType type,
     if (device != NULL && abs(value) > Input::MAX_VALUE/2)
     {
         //std::cout<< "========== Setting latest device " << (device->getType() == DT_KEYBOARD ? "keyboard" : "gamepad")
-        //	<< " #" << deviceID << " button=" << btnID << " value=" << value << " ==========\n";
+        //  << " #" << deviceID << " button=" << btnID << " value=" << value << " ==========\n";
 
         m_latest_used_device = device;
     }

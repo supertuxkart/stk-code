@@ -946,16 +946,16 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
         sized_rect.UpperLeftCorner.Y  = center.Y + (int)(((int)rect.UpperLeftCorner.Y - (int)center.Y)*texture_size);
         
         //std::cout << "y is " << center.Y << " + (" << rect.UpperLeftCorner.Y << " - " << center.Y << ")*" << texture_size << " = " 
-        //	<< center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size) << std::endl;
+        //  << center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size) << std::endl;
         
         sized_rect.LowerRightCorner.X = center.X + (int)(((int)rect.LowerRightCorner.X - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y = center.Y + (int)(((int)rect.LowerRightCorner.Y - (int)center.Y)*texture_size);
         
         /*
         std::cout << texture_size << " : " << rect.UpperLeftCorner.X << ", " << rect.UpperLeftCorner.Y << " : " <<
-        		rect.LowerRightCorner.X << ", " << rect.LowerRightCorner.Y << " ---> " <<
-        		sized_rect.UpperLeftCorner.X << ", " << sized_rect.UpperLeftCorner.Y << " : " <<
-        		sized_rect.LowerRightCorner.X << ", " << sized_rect.LowerRightCorner.Y << std::endl;
+                rect.LowerRightCorner.X << ", " << rect.LowerRightCorner.Y << " ---> " <<
+                sized_rect.UpperLeftCorner.X << ", " << sized_rect.UpperLeftCorner.Y << " : " <<
+                sized_rect.LowerRightCorner.X << ", " << sized_rect.LowerRightCorner.Y << std::endl;
          */
     }
     
@@ -1246,7 +1246,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             }
             else
             {
-            	GUIEngine::getDriver()->draw2DRectangle( color, rect );
+                GUIEngine::getDriver()->draw2DRectangle( color, rect );
             }
         }
         return;
@@ -1294,7 +1294,7 @@ core::rect< s32 > Skin::draw3DWindowBackground (IGUIElement *element, bool drawT
     }
     else
     {
-    	drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
+        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect, SkinConfig::m_render_params["window::neutral"]);
     }
     
     return rect;
@@ -1327,27 +1327,27 @@ void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon, const core::p
 video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const 
 {
     /*
-     EGDC_3D_DARK_SHADOW 	Dark shadow for three-dimensional display elements.
-     EGDC_3D_SHADOW 	Shadow color for three-dimensional display elements (for edges facing away from the light source).
-     EGDC_3D_FACE 	Face color for three-dimensional display elements and for dialog box backgrounds.
-     EGDC_3D_HIGH_LIGHT 	Highlight color for three-dimensional display elements (for edges facing the light source.).
-     EGDC_3D_LIGHT 	Light color for three-dimensional display elements (for edges facing the light source.).
-     EGDC_ACTIVE_BORDER 	Active window border.
-     EGDC_ACTIVE_CAPTION 	Active window title bar text.
-     EGDC_APP_WORKSPACE 	Background color of multiple document interface (MDI) applications.
-     EGDC_BUTTON_TEXT 	Text on a button.
-     EGDC_GRAY_TEXT 	Grayed (disabled) text.
-     EGDC_HIGH_LIGHT 	Item(s) selected in a control.
-     EGDC_HIGH_LIGHT_TEXT 	Text of item(s) selected in a control.
-     EGDC_INACTIVE_BORDER 	Inactive window border.
-     EGDC_INACTIVE_CAPTION 	Inactive window caption.
-     EGDC_TOOLTIP 	Tool tip text color.
-     EGDC_TOOLTIP_BACKGROUND 	Tool tip background color.
-     EGDC_SCROLLBAR 	Scrollbar gray area.
-     EGDC_WINDOW 	Window background.
-     EGDC_WINDOW_SYMBOL 	Window symbols like on close buttons, scroll bars and check boxes.
-     EGDC_ICON 	Icons in a list or tree.
-     EGDC_ICON_HIGH_LIGHT 	Selected icons in a list or tree. 
+     EGDC_3D_DARK_SHADOW    Dark shadow for three-dimensional display elements.
+     EGDC_3D_SHADOW     Shadow color for three-dimensional display elements (for edges facing away from the light source).
+     EGDC_3D_FACE   Face color for three-dimensional display elements and for dialog box backgrounds.
+     EGDC_3D_HIGH_LIGHT     Highlight color for three-dimensional display elements (for edges facing the light source.).
+     EGDC_3D_LIGHT  Light color for three-dimensional display elements (for edges facing the light source.).
+     EGDC_ACTIVE_BORDER     Active window border.
+     EGDC_ACTIVE_CAPTION    Active window title bar text.
+     EGDC_APP_WORKSPACE     Background color of multiple document interface (MDI) applications.
+     EGDC_BUTTON_TEXT   Text on a button.
+     EGDC_GRAY_TEXT     Grayed (disabled) text.
+     EGDC_HIGH_LIGHT    Item(s) selected in a control.
+     EGDC_HIGH_LIGHT_TEXT   Text of item(s) selected in a control.
+     EGDC_INACTIVE_BORDER   Inactive window border.
+     EGDC_INACTIVE_CAPTION  Inactive window caption.
+     EGDC_TOOLTIP   Tool tip text color.
+     EGDC_TOOLTIP_BACKGROUND    Tool tip background color.
+     EGDC_SCROLLBAR     Scrollbar gray area.
+     EGDC_WINDOW    Window background.
+     EGDC_WINDOW_SYMBOL     Window symbols like on close buttons, scroll bars and check boxes.
+     EGDC_ICON  Icons in a list or tree.
+     EGDC_ICON_HIGH_LIGHT   Selected icons in a list or tree. 
      */
     
     switch(color)
@@ -1368,7 +1368,7 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
     
 }
 
-const wchar_t* 	Skin::getDefaultText (EGUI_DEFAULT_TEXT text) const 
+const wchar_t*  Skin::getDefaultText (EGUI_DEFAULT_TEXT text) const 
 {
     return L"SuperTuxKart";
 }
@@ -1395,7 +1395,7 @@ IGUISpriteBank* Skin::getSpriteBank () const
     return m_fallback_skin->getSpriteBank();
 }
 
-//EGUI_SKIN_TYPE 	getType () const
+//EGUI_SKIN_TYPE    getType () const
 
 void Skin::setColor (EGUI_DEFAULT_COLOR which, video::SColor newColor)
 {

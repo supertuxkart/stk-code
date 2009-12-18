@@ -81,7 +81,7 @@ void Item::update(float delta)
             Vec3 hell(m_coord.getXYZ());
 
             hell.setZ( (m_time_till_return>1.0f) ? -1000000.0f 
-		       : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
+               : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
             m_node->setPosition(hell.toIrrVector());
         }
         else

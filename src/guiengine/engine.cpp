@@ -179,7 +179,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
         g_focus_for_player[n] = NULL;
     }
     
-	/*
+    /*
      To make the g_font a little bit nicer, we load an external g_font
      and set it as the new default g_font in the g_skin.
      To keep the standard g_font for tool tip text, we set it to
@@ -187,7 +187,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
      */
     g_skin = new Skin(g_env->getSkin());
     g_env->setSkin(g_skin);
-	//g_skin = g_env->getSkin();
+    //g_skin = g_env->getSkin();
     
     // font size is resolution-dependent.
     // normal text will range from 0.8, in 640x* resolutions (won't scale below that) to
@@ -204,14 +204,14 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_font = sfont;
     
     ScalableFont* sfont2 = new ScalableFont(g_env, (file_manager->getGUIDir() + "/title_font.xml").c_str());
-	sfont2->setScale(title_text_scale);
+    sfont2->setScale(title_text_scale);
     sfont2->setKerningWidth(-18);
     g_title_font = sfont2;
     
 
-	if (g_font != NULL) g_skin->setFont(g_font);
+    if (g_font != NULL) g_skin->setFont(g_font);
     
-	//g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
+    //g_skin->setFont(g_env->getBuiltInFont(), EGDF_TOOLTIP);
     
     // set event receiver
     g_device->setEventReceiver(EventHandler::get());

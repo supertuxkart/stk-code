@@ -49,8 +49,8 @@ NetworkManager::NetworkManager()
 
      if (enet_initialize () != 0)
      {
-	  fprintf (stderr, "An error occurred while initializing ENet.\n");
-	  exit(-1);
+      fprintf (stderr, "An error occurred while initializing ENet.\n");
+      exit(-1);
      }
 }   // NetworkManager
 
@@ -212,7 +212,7 @@ void NetworkManager::handleDisconnection(ENetEvent *event)
         return;
     }
     fprintf(stderr, "%x:%d disconnected (host id %d).\n", event->peer->address.host,
-	    event->peer->address.port, (int)(long)event->peer->data );
+        event->peer->address.port, (int)(long)event->peer->data );
     m_num_clients--;
 }   // handleDisconnection
 

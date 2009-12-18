@@ -44,7 +44,7 @@ public:
     enum SFXType
     {
         SOUND_UGH,  SOUND_SKID, SOUND_BOWLING_ROLL, SOUND_BOWLING_STRIKE, SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
-		SOUND_SHOT, SOUND_GOO, SOUND_WEE, SOUND_EXPLOSION, SOUND_BZZT, SOUND_BEEP, SOUND_BACK_MENU, SOUND_USE_ANVIL,
+        SOUND_SHOT, SOUND_GOO, SOUND_WEE, SOUND_EXPLOSION, SOUND_BZZT, SOUND_BEEP, SOUND_BACK_MENU, SOUND_USE_ANVIL,
         SOUND_USE_PARACHUTE, SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL, SOUND_LOCKED,
         SOUND_PRESTART, SOUND_START, SOUND_ENGINE_SMALL, SOUND_ENGINE_LARGE,
         NUM_SOUNDS
@@ -81,7 +81,7 @@ public:
         SFX_INITIAL = 3
     };
 
-private:		
+private:        
     /** The buffers for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
     std::vector<ALuint>       m_sfx_buffers;

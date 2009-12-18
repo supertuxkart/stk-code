@@ -299,7 +299,7 @@ void World::resetAllKarts()
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-			    (int)(i-m_kart.begin()), m_track->getIdent().c_str());
+                (int)(i-m_kart.begin()), m_track->getIdent().c_str());
                     exit(-1);
                 }
                 all_finished=false;
@@ -503,7 +503,7 @@ void World::restartRace()
 
     // Start music from beginning
     sound_manager->stopMusic();
-	m_track->reset();
+    m_track->reset();
     m_track->startMusic();
 
     // Enable SFX again

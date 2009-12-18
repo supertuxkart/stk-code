@@ -586,7 +586,7 @@ void IrrDriver::renderBulletDebugView()
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    /*	light_position is NOT default value	*/
+    /*  light_position is NOT default value */
     GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
     GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
 
@@ -856,7 +856,7 @@ void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh,
         m_rtt_main_node->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
     }
     
-    m_camera =	irr_driver->getSceneManager()->addCameraSceneNode();
+    m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
     
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );

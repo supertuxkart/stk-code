@@ -55,7 +55,7 @@ bool ReplayRecorder::initRecorder( unsigned int number_karts, size_t number_prea
 
 bool ReplayRecorder::pushFrame()
 {
-	// we dont record the startphase ..
+    // we dont record the startphase ..
     assert( RaceManager::getWorld()->getPhase() != World::START_PHASE );
     assert( RaceManager::getWorld()->getNumKarts() == m_ReplayBuffers.getNumberKarts() );
 

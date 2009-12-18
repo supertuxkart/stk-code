@@ -48,12 +48,12 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     // give a speed proportional to kart speed
     m_speed = kart->getSpeed() * m_speed / 23.0f;
     if (kart->getSpeed() < 0)
-	m_speed /= 3.6f; //when going backwards, decrease speed of cake by less
+    m_speed /= 3.6f; //when going backwards, decrease speed of cake by less
 
     m_speed += 16.0f;
 
     if (m_speed < 1.0f)
-	m_speed = 1.0f;
+    m_speed = 1.0f;
 
     btTransform trans = kart->getTrans();
 

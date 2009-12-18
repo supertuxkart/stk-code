@@ -37,8 +37,8 @@ public:
     static  void init(const lisp::Lisp* lisp, scene::IMesh *bowling);
     virtual void update(float dt);
     
-	int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }
-	
+    int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }
+    
 };   // Bowling
 
 #endif

@@ -23,39 +23,39 @@
 
 BezierCurve::BezierCurve(const XMLNode &node)
 {
-	for(unsigned int i=0; i<node.getNumNodes(); i++)
-	{
-		const XMLNode *p = node.getNode(i);
-		BezierData b;
-		p->get("c",  &b.m_control_point);
-		p->get("h1", &b.m_handle1);
-		p->get("h2", &b.m_handle2);
-		m_all_data.push_back(b);
-	}   // for i<node.getNumNodes()
+    for(unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *p = node.getNode(i);
+        BezierData b;
+        p->get("c",  &b.m_control_point);
+        p->get("h1", &b.m_handle1);
+        p->get("h2", &b.m_handle2);
+        m_all_data.push_back(b);
+    }   // for i<node.getNumNodes()
 }   // BezierCurve
 
 // ----------------------------------------------------------------------------
 Vec3 BezierCurve::getXYZ(float t) const
 {
-	unsigned int i=int(t);   // FIXME: have to figure out which point we want here
-	if(i>=m_all_data.size()-1) return m_all_data[i].m_control_point;
+    unsigned int i=int(t);   // FIXME: have to figure out which point we want here
+    if(i>=m_all_data.size()-1) return m_all_data[i].m_control_point;
 
-	const BezierData &p0 = m_all_data[i];
-	const BezierData &p1 = m_all_data[i+1];
+    const BezierData &p0 = m_all_data[i];
+    const BezierData &p1 = m_all_data[i+1];
 
-	Vec3 c = 3*(p0.m_handle2-p0.m_control_point);
-	Vec3 b = 3*(p1.m_handle1-p0.m_handle2)-c;
-	Vec3 a = p1.m_control_point - p0.m_control_point - c - b;
+    Vec3 c = 3*(p0.m_handle2-p0.m_control_point);
+    Vec3 b = 3*(p1.m_handle1-p0.m_handle2)-c;
+    Vec3 a = p1.m_control_point - p0.m_control_point - c - b;
 
-	t = t-i;
-	Vec3 r = a*t*t*t + b*t*t + c*t + p0.m_control_point;
-	return r;
+    t = t-i;
+    Vec3 r = a*t*t*t + b*t*t + c*t + p0.m_control_point;
+    return r;
 }   // getXYZ
 // ----------------------------------------------------------------------------
 Vec3 BezierCurve::getHPR(float t) const
 {
-	// FIXME: not yet implemented
-	Vec3 hpr;
-	return hpr;
+    // FIXME: not yet implemented
+    Vec3 hpr;
+    return hpr;
 }   // getHPR
 

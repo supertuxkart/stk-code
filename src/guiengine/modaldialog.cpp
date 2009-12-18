@@ -49,7 +49,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     if (modalWindow != NULL) delete modalWindow;
     modalWindow = this;
     
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
     
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
@@ -79,7 +79,7 @@ void ModalDialog::clearWindow()
     m_children.clearAndDeleteAll();   
     
     m_irrlicht_window->remove();
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow  	( m_area, true /* modal */ );
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow   ( m_area, true /* modal */ );
     
     /*
     const core::list<IGUIElement*>& remainingChildren = m_irrlicht_window->getChildren();

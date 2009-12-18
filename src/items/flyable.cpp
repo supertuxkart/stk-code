@@ -60,9 +60,9 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     m_mass              = mass;
     m_adjust_z_velocity = true;
 
-	m_time_since_thrown = 0;
-	m_owner_has_temporary_immunity = true;
-	m_max_lifespan = -1;
+    m_time_since_thrown = 0;
+    m_owner_has_temporary_immunity = true;
+    m_max_lifespan = -1;
 
     // Add the graphical model
     setNode(irr_driver->addMesh(m_st_model[type]));
@@ -240,8 +240,8 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
 //-----------------------------------------------------------------------------
 void Flyable::update(float dt)
 {
-	m_time_since_thrown += dt;
-	if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);
+    m_time_since_thrown += dt;
+    if(m_max_lifespan > -1 && m_time_since_thrown > m_max_lifespan) hit(NULL);
 
     if(m_exploded) return;
 
@@ -301,7 +301,7 @@ void Flyable::updateFromServer(const FlyableInfo &f, float dt)
  */
 bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 {
-	return m_owner_has_temporary_immunity &&
+    return m_owner_has_temporary_immunity &&
            kart_hit == m_owner            &&
            m_time_since_thrown < 2.0f;
 }   // isOwnerImmunity
@@ -309,15 +309,15 @@ bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 // -----------------------------------------------------------------------------
 void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
-	// the owner of this flyable should not be hit by his own flyable
-	if(m_exploded || isOwnerImmunity(kart_hit)) return;
+    // the owner of this flyable should not be hit by his own flyable
+    if(m_exploded || isOwnerImmunity(kart_hit)) return;
 
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.
     // The manager will create the appropriate explosion object.
     projectile_manager->notifyRemove();
 
-	m_exploded=true;
+    m_exploded=true;
 
     if(!needsExplosion()) return;
 

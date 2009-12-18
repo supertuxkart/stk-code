@@ -39,7 +39,7 @@ AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager,
 {
     m_ambient_color = video::SColor(255, 0, 255, 0);   // green
     m_inner_radius2 = 1;
-	node.get("inner-radius", &m_inner_radius2);
+    node.get("inner-radius", &m_inner_radius2);
     m_inner_radius2 *= m_inner_radius2;   // store the squared value
     node.get("color", &m_ambient_color);
 }   // AmbientLightSphere

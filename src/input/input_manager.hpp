@@ -53,7 +53,7 @@ public:
     
 private:
 
-	Input          *m_sensed_input;
+    Input          *m_sensed_input;
     DeviceManager  *m_device_manager;
     
     /** Stores the maximum sensed input values. This allows to select the
@@ -61,39 +61,39 @@ private:
     int              m_max_sensed_input;
     Input::InputType m_max_sensed_type;
 
-	InputDriverMode  m_mode;
-	
+    InputDriverMode  m_mode;
+    
     /** When at true, only the master player can play with menus */
     bool m_master_player_only;
     
-	/* Helper values to store and track the relative mouse movements. If these
-	* values exceed the deadzone value the input is reported to the game. This
-  	* makes the mouse behave like an analog axis on a gamepad/joystick.
-	*/
-	int    m_mouse_val_x, m_mouse_val_y;
+    /* Helper values to store and track the relative mouse movements. If these
+    * values exceed the deadzone value the input is reported to the game. This
+    * makes the mouse behave like an analog axis on a gamepad/joystick.
+    */
+    int    m_mouse_val_x, m_mouse_val_y;
     
     void   dispatchInput(Input::InputType, int, int, int, int);
     void   handleStaticAction(int id0, int value);
     void   handlePlayerAction(PlayerAction pa, const int playerNo,  int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value);
 public:
-	       InputManager();
+           InputManager();
           ~InputManager();
-	// void   initGamePadDevices();
+    // void   initGamePadDevices();
     
-	//void   input();
+    //void   input();
     GUIEngine::EventPropagation   input(const irr::SEvent& event);
     
     DeviceManager* getDeviceList() { return m_device_manager; }
     
-	void   setMode(InputDriverMode);		
-	bool   isInMode(InputDriverMode);
+    void   setMode(InputDriverMode);        
+    bool   isInMode(InputDriverMode);
     
     /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
     void   setMasterPlayerOnly(bool enabled);
     
     /** Returns whether only the master player should be allowed to perform changes in menus */
-    bool	masterPlayerOnly() const;
+    bool    masterPlayerOnly() const;
     
     void   update(float dt);
     

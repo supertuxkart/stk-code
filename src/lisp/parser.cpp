@@ -97,7 +97,7 @@ namespace lisp
             }
         case Lexer::TOKEN_TRANSLATION:
            {
-	            result = new Lisp(Lisp::TYPE_STRING);
+                result = new Lisp(Lisp::TYPE_STRING);
                 m_token = m_lexer->getNextToken();
                 Lisp* next=read();
                 if(next->getType()!=Lisp::TYPE_STRING)

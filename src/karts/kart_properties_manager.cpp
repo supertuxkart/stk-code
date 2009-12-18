@@ -232,7 +232,7 @@ int KartPropertiesManager::getKartByGroup(const std::string& group, int n) const
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
     {
-		std::vector<std::string> groups=(*i)->getGroups();
+        std::vector<std::string> groups=(*i)->getGroups();
         if (std::find(groups.begin(), groups.end(), group)==groups.end()) continue;
         if(count==n) return (int)(i-m_karts_properties.begin());
         count=count+1;

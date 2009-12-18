@@ -174,7 +174,7 @@ SFXManager::SFXStatus SFXOpenAL::getStatus()
 {
     if(!sfx_manager->sfxAllowed()||!m_ok) return SFXManager::SFX_UNKNOWN;
 
-	int state = 0;
+    int state = 0;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
     switch(state)
     {

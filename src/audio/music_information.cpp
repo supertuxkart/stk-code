@@ -132,7 +132,7 @@ void MusicInformation::startMusic()
     {
         delete m_normal_music;
         m_normal_music=0;
-	    fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
+        fprintf(stderr, "WARNING: Unabled to load music %s, not supported or not found.\n", 
                 m_normal_filename.c_str());
         return;
     }
@@ -160,7 +160,7 @@ void MusicInformation::startMusic()
     {
         delete m_fast_music;
         m_fast_music=0;
-	    fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
+        fprintf(stderr, "WARNING: Unabled to load fast music %s, not supported or not found.\n", 
                 m_fast_filename.c_str());
         return;
     }
