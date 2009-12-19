@@ -19,7 +19,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/arenas_screen.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -29,21 +29,20 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;
 
-TracksScreen::TracksScreen() : Screen("tracks.stkgui")
+ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
 }
 
 
-void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    // -- track seelction screen
     if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (w2 != NULL)
         {
             const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
-            std::cout << "Clicked on track " << selection.c_str() << std::endl;
+            std::cout << "Clicked on arena " << selection.c_str() << std::endl;
             
             if (selection == "random_track")
             {
@@ -61,16 +60,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             }
         }
     }
-    else if (name == "gps")
-    {
-        RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-        if(w != NULL)
-            std::cout << "Clicked on GrandPrix " << w->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
-    }
     
 }
 
-void TracksScreen::init()
+void ArenasScreen::init()
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
@@ -83,15 +76,8 @@ void TracksScreen::init()
     for (int n=0; n<trackAmount; n++)
     {
         Track* curr = track_manager->getTrack(n);
-        if (curr->isArena()) continue;
-        
-        /*
-        if (unlock_manager->isLocked(curr->getIdent()))
-        {
-            hasLockedTracks = true;
-            continue;
-        }
-         */
+        if (!curr->isArena()) continue;
+
         if (unlock_manager->isLocked(curr->getIdent()))
         {
             w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
@@ -101,21 +87,15 @@ void TracksScreen::init()
              w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
         }
     }
-    w->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
-/*
-    if (hasLockedTracks)
-    {
-        w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");
-    }
-    */
+    w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
     w->updateItemDisplay();    
 }
 
-void TracksScreen::tearDown()
+void ArenasScreen::tearDown()
 {
 }
 
-void TracksScreen::setFocusOnTrack(const std::string& trackName)
+void ArenasScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );

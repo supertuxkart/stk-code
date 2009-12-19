@@ -19,6 +19,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/arenas_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -77,8 +78,8 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         }
         else if (selectedMode == "3strikes")
         {
-            // TODO - 3 strikes battle track selection
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == "locked")
         {

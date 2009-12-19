@@ -266,6 +266,8 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/race_over_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.cpp \
+ states_screens/arenas_screen.cpp \
+ states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \
  states_screens/feature_unlocked.hpp \
  states_screens/help_screen_1.cpp \
