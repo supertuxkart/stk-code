@@ -24,6 +24,7 @@
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/dialogs/add_device_dialog.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -238,7 +239,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
 {
     //const std::string& screen_name = this->getName();
     
-    if(name == "options_choice")
+    if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
         
@@ -246,7 +247,11 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         else if (selection == "players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
         else if (selection == "controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
-    else if(name == "back")
+    else if (name == "add_device")
+    {
+        new AddDeviceDialog();
+    }
+    else if (name == "back")
     {
         StateManager::get()->escapePressed();
     }

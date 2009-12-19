@@ -246,6 +246,7 @@
 		955DE88310042701006A4F3C /* check_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE88110042701006A4F3C /* check_manager.cpp */; };
 		955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 955DE8871004273B006A4F3C /* check_structure.cpp */; };
 		956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541B910DD5F0A00C83E99 /* arenas_screen.cpp */; };
+		956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541DF10DD628C00C83E99 /* add_device_dialog.cpp */; };
 		956D36A710095035007FCB95 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956D36A610095035007FCB95 /* player.cpp */; };
 		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
 		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
@@ -435,6 +436,8 @@
 		955DE8881004273B006A4F3C /* check_structure.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_structure.hpp; path = ../../tracks/check_structure.hpp; sourceTree = SOURCE_ROOT; };
 		956541B910DD5F0A00C83E99 /* arenas_screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arenas_screen.cpp; path = games/supertuxkart/src/states_screens/arenas_screen.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 		956541BA10DD5F0A00C83E99 /* arenas_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = arenas_screen.hpp; path = games/supertuxkart/src/states_screens/arenas_screen.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		956541DF10DD628C00C83E99 /* add_device_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = add_device_dialog.cpp; path = ../../states_screens/dialogs/add_device_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		956541E010DD628C00C83E99 /* add_device_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = add_device_dialog.hpp; path = ../../states_screens/dialogs/add_device_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = ../../config/player.cpp; sourceTree = SOURCE_ROOT; };
 		958330B210122B4A00C5137E /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../guiengine/engine.cpp; sourceTree = SOURCE_ROOT; };
 		958330B310122B4A00C5137E /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = engine.hpp; path = ../../guiengine/engine.hpp; sourceTree = SOURCE_ROOT; };
@@ -1304,6 +1307,8 @@
 		95833236101243ED00C5137E /* dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				956541DF10DD628C00C83E99 /* add_device_dialog.cpp */,
+				956541E010DD628C00C83E99 /* add_device_dialog.hpp */,
 				95833237101243ED00C5137E /* enter_player_name_dialog.cpp */,
 				95833238101243ED00C5137E /* enter_player_name_dialog.hpp */,
 				95833239101243ED00C5137E /* player_info_dialog.cpp */,
@@ -2570,6 +2575,7 @@
 				95FB16DB10A7796800645974 /* new_ai.cpp in Sources */,
 				953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */,
 				956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */,
+				956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

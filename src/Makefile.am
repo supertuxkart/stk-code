@@ -254,6 +254,8 @@ supertuxkart_SOURCES = \
  states_screens/challenges.hpp \
  states_screens/credits.cpp \
  states_screens/credits.hpp \
+ states_screens/dialogs/add_device_dialog.cpp \
+ states_screens/dialogs/add_device_dialog.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
  states_screens/dialogs/enter_player_name_dialog.hpp \
  states_screens/dialogs/player_info_dialog.hpp \
