@@ -6,11 +6,13 @@
     
     <spacer proportion="1" width="25"/>
     
-    <div layout="horizontal-row" width="100%" height="75" align="center">
+    <div layout="horizontal-row" width="100%" height="50" align="center">
         <label proportion="1" height="100%"
                 I18N="In race setup menu" text="Number of AI karts" text_align="right" />
         <spacer width="50" height="25"/>
-        <spinner id="aikartamount" proportion="3" height="100%" min_value="0" max_value="8" icon="gui/karts%i.png"/>
+        <!--
+        <spinner id="aikartamount" proportion="3" height="100%" min_value="0" max_value="8" icon="gui/karts%i.png"/> -->
+        <spinner id="aikartamount" proportion="1" height="100%" min_value="0" max_value="8"/>
     </div>
     
     <spacer proportion="2" width="25"/>
