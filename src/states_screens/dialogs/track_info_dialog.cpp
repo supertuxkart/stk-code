@@ -197,11 +197,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->y = area_right.UpperLeftCorner.Y;
     screenshotWidget->w = area_right.getWidth();
     screenshotWidget->h = area_right.getHeight();
-    //std::cout << screenshotWidget->x << ", " << screenshotWidget->y << " : " << screenshotWidget->w << ", " << screenshotWidget->h << std::endl;
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; // temporary icon, will replace it just after
-    
-    //screenshotWidget->setScaleImage(true);
-    //screenshotWidget->setTabStop(false);
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();
     screenshotWidget->setImage(screenshot);

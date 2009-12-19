@@ -234,7 +234,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     }
     m_children.push_back(whats_next_btn);
     whats_next_btn->add();
-        
+    
+    whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
 }
 
 void RaceOverDialog::onEnterPressedInternal()
