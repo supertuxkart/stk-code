@@ -2,8 +2,8 @@
 
 <challenge
     id="energyshiftingsands"
-    name=_("Collect the Pharaohs Treasure")
-    description=_("Finish with at least 9 nitro \npoints on 3 laps of Shifting Sands\nin under 2:20 minutes.")
+    name="_(Collect the Pharaohs Treasure)"
+    description="_(Finish with at least 9 nitro \npoints on 3 laps of Shifting Sands\nin under 2:20 minutes.)"
     unlock-gp="tothemoonandback"
     depend-on="energymathclass racetracktime"
     major="single"

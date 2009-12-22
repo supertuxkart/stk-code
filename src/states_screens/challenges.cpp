@@ -66,6 +66,7 @@ namespace GUIEngine
         for (int n=0; n<activeChallengeAmount; n++)
         {
             sprintf(buffer, "challenge%i", n);
+            std::cout << "// Adding challenge " << buffer << " : <" << activeChallenges[n]->getId().c_str() << ">\n";
             w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
                        buffer, "/gui/challenge.png");
         }
@@ -74,11 +75,15 @@ namespace GUIEngine
             // TODO : add bronze/silver/gold difficulties to challenges
             sprintf(buffer, "solved%i", n);
             w->addItem(solvedChallenges[n]->getName(), buffer, file_manager->getTextureFile("cup_gold.png"));
+            std::cout << "// Adding challenge " << buffer << " : <" << solvedChallenges[n]->getId().c_str() << ">\n";
+
         }
         for (int n=0; n<lockedChallengeAmount; n++)
         {
             w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
                        file_manager->getGUIDir() + "/challenge.png", true);
+            std::cout << "// Adding locked challenge <" << lockedChallenges[n]->getId().c_str() << ">\n";
+
         }
         
         
