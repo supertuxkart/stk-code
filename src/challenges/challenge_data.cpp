@@ -22,11 +22,13 @@
 #include <sstream>
 
 #include "karts/kart.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -35,7 +37,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 {
     m_filename    = filename;
     m_major       = RaceManager::MAJOR_MODE_SINGLE;
-    m_minor       = RaceManager::MINOR_MODE_QUICK_RACE;
+    m_minor       = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_difficulty  = RaceManager::RD_EASY;
     m_num_laps    = -1;
     m_num_karts   = -1;
@@ -69,7 +71,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     if(mode=="timetrial")
         m_minor = RaceManager::MINOR_MODE_TIME_TRIAL;
     else if(mode=="quickrace")
-        m_minor = RaceManager::MINOR_MODE_QUICK_RACE;
+        m_minor = RaceManager::MINOR_MODE_NORMAL_RACE;
     else if(mode=="followtheleader")
         m_minor = RaceManager::MINOR_MODE_FOLLOW_LEADER;
     else
@@ -184,44 +186,42 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
 {
     std:: string attrib;
     root->get(type, &attrib);
-    if( attrib . empty() ) return;
+    if (attrib . empty()) return;
 
-    std:: vector< std:: string > data;
-    std:: size_t space = attrib.find_first_of(' ');
-    data.push_back( attrib.substr(0, space) );
-    if( space != std:: string:: npos )
-    {
-        data.push_back( attrib.substr(space, std:: string:: npos) );
-    }
+    //std:: vector< std:: string > data;
+    //std:: size_t space = attrib.find_first_of(' ');
+    //data.push_back( attrib.substr(0, space) );
+    //if( space != std:: string:: npos )
+    //{
+    //    data.push_back( attrib.substr(space, std:: string:: npos) );
+    //}
 
     switch(reward)
     {
-    case UNLOCK_TRACK:      addUnlockTrackReward     (data[0]        );      break;
-    case UNLOCK_GP:         addUnlockGPReward        (data[0]        );      break;
-    case UNLOCK_MODE:       if(1<data.size())
+    case UNLOCK_TRACK:      addUnlockTrackReward     (attrib        );
+                            break;
+            
+    case UNLOCK_GP:         addUnlockGPReward        (attrib        );
+                            break;
+            
+    case UNLOCK_MODE:       addUnlockModeReward      (attrib, RaceManager::getNameOf(attrib.c_str()));
+                            break;
+            
+    case UNLOCK_DIFFICULTY:
                             {
-                                irr::core::stringw user_name = _(data[1].c_str());
-                                addUnlockModeReward  (data[0], user_name);
+                            irr::core::stringw user_name = "?"; // TODO
+                            addUnlockDifficultyReward(attrib, user_name);
+                            break;
+                            }
+    case UNLOCK_KART:       const KartProperties* prop = kart_properties_manager->getKart(attrib);
+                            if (prop == NULL)
+                            {
+                                std::cerr << "Challenge refers to kart " << attrib <<
+                                             ", which is unknown. Ignoring challenge.\n";
                                 break;
                             }
-                            else
-                                fprintf(stderr, "Unlock mode name missing.\n");
-                            break;
-    case UNLOCK_DIFFICULTY: if(1<data.size())
-                            {
-                                irr::core::stringw user_name = _(data[1].c_str());
-                                addUnlockDifficultyReward(data[0], user_name);
-                            }
-                            else
-                                fprintf(stderr, "Difficult name missing.\n");
-                            break;
-    case UNLOCK_KART:       if(1<data.size())
-                            {
-                                irr::core::stringw user_name = _(data[1].c_str());
-                                addUnlockKartReward(data[0], user_name);
-                            }
-                            else
-                                fprintf(stderr, "Kart name missing.\n");
+                            irr::core::stringw user_name = prop->getName();
+                            addUnlockKartReward(attrib, user_name);
                             break;
     }   // switch
 }   // getUnlocks

@@ -15,15 +15,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <irrlicht.h>
+
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
-#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "utils/translation.hpp"
+
+#include "states_screens/race_setup_screen.hpp"
+
 
 using namespace GUIEngine;
 
@@ -63,7 +67,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         
         if (selectedMode == "normal")
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_QUICK_RACE);
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
             StateManager::get()->pushScreen( TracksScreen::getInstance() );
         }
         else if (selectedMode == "timetrial")
@@ -155,12 +159,15 @@ void RaceSetupScreen::init()
     
     if (!m_inited)
     {
-        // FIXME: find a nice name than 'regular race' -.-
-        w2->addItem( _("Regular Race\nAll blows allowed, so catch weapons and make clever use of them!"),
-                    "normal", "/gui/mode_normal.png");
+        irr::core::stringw name1 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_NORMAL_RACE)) +
+                                    L"\n" +
+                                    _("All blows allowed, so catch weapons and make clever use of them!");
+        w2->addItem( name1, "normal", "/gui/mode_normal.png");
         
-        w2->addItem( _("Time Trial\nContains no powerups, so only your driving skills matter!"),
-                    "timetrial", "/gui/mode_tt.png");
+        irr::core::stringw name2 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) +
+                                    L"\n" +
+                                    _("Contains no powerups, so only your driving skills matter!");
+        w2->addItem( name2, "timetrial", "/gui/mode_tt.png");
         
         if (unlock_manager->isLocked("followtheleader"))
         {
@@ -169,14 +176,18 @@ void RaceSetupScreen::init()
         }
         else
         {
-            w2->addItem( _("Follow the Leader\nrun for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"),
-                        "ftl", "/gui/mode_ftl.png", false);
+            irr::core::stringw name3 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) +
+                            L"\n" +
+                            _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
+            w2->addItem(name3, "ftl", "/gui/mode_ftl.png", false);
         }
         
         if (race_manager->getNumPlayers() > 1)
         {
-            w2->addItem( _("3-Strikes Battle\nonly in multiplayer games. Hit others with weapons until they lose all their lives."),
-                        "3strikes", "/gui/mode_3strikes.png");
+            irr::core::stringw name4 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) +
+                            L"\n" +
+                            _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
+            w2->addItem( name4, "3strikes", "/gui/mode_3strikes.png");
         }
         
         m_inited = true;

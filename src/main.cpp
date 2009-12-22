@@ -529,7 +529,7 @@ void initRest()
     race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-    race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
+    race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty((RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
     // race_manager->setDifficulty(RaceManager::RD_HARD);
 
@@ -697,7 +697,7 @@ int main(int argc, char *argv[] )
             // Profiling
             // =========
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-            race_manager->setMinorMode (RaceManager::MINOR_MODE_QUICK_RACE);
+            race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
             race_manager->setDifficulty(RaceManager::RD_HARD);
             network_manager->setupPlayerKartInfo();
             race_manager->startNew();

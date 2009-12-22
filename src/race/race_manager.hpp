@@ -26,6 +26,7 @@
 
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
+#include "utils/translation.hpp"
 
 class Kart;
 class PlayerKart;
@@ -82,7 +83,7 @@ public:
       */
     enum MinorRaceModeType
     {
-        MINOR_MODE_QUICK_RACE    = LINEAR_RACE(0, true),
+        MINOR_MODE_NORMAL_RACE   = LINEAR_RACE(0, true),
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
         
@@ -99,12 +100,37 @@ public:
     {
         switch (mode)
         {
-            case MINOR_MODE_QUICK_RACE:     return IDENT_STD;
+            case MINOR_MODE_NORMAL_RACE:    return IDENT_STD;
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:  return FTL_IDENT;
             case MINOR_MODE_3_STRIKES:      return STRIKES_IDENT;
             default: assert(false); return NULL;
         }
+    }
+    static const wchar_t* getNameOf(const MinorRaceModeType mode)
+    {
+        switch (mode)
+        {
+            //I18N: Game mode
+            case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
+            //I18N: Game mode
+            case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
+            //I18N: Game mode
+            case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
+            //I18N: Game mode
+            case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            default: assert(false); return NULL;
+        }
+    }
+    static const wchar_t* getNameOf(const char* name)
+    {
+        if (strcmp(name, IDENT_STD) == 0) return getNameOf(MINOR_MODE_NORMAL_RACE);
+        else if (strcmp(name, IDENT_TTRIAL) == 0) return getNameOf(MINOR_MODE_TIME_TRIAL);
+        else if (strcmp(name, FTL_IDENT) == 0) return getNameOf(MINOR_MODE_FOLLOW_LEADER);
+        else if (strcmp(name, STRIKES_IDENT) == 0) return getNameOf(MINOR_MODE_3_STRIKES);
+
+        assert(0);
+        return NULL;
     }
     
 #undef LINEAR_RACE

@@ -79,7 +79,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_choice_ribbon->h = icon_size + text_height;
     m_choice_ribbon->setParent(m_irrlicht_window);
     
-    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_QUICK_RACE)
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_NORMAL_RACE)
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
         ribbon_item->m_properties[PROP_ID] = "newrace";
@@ -143,7 +143,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
  50     widget_manager->addTextButtonWgt( WTOK_HELP, 50, 7, _("Help") );
  51     widget_manager->addTextButtonWgt( WTOK_RESTART_RACE, 50, 7, _("Restart Race") );
  52 
- 53     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_QUICK_RACE)
+ 53     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_NORMAL_RACE)
  54     {
  55         widget_manager->addTextButtonWgt( WTOK_SETUP_NEW_RACE, 50, 7,
  56             _("Setup New Race") );

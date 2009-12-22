@@ -69,7 +69,7 @@ RaceManager::RaceManager()
     m_num_karts          = UserConfigParams::m_num_karts;
     m_difficulty         = RD_HARD;
     m_major_mode         = MAJOR_MODE_SINGLE;
-    m_minor_mode         = MINOR_MODE_QUICK_RACE;
+    m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_track_number       = 0;
     m_active_race        = false;
     m_score_for_position = stk_config->m_scores;
@@ -257,7 +257,7 @@ void RaceManager::startNextRace()
         m_world = new ProfileWorld();
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
         m_world = new FollowTheLeaderRace();
-    else if(m_minor_mode==MINOR_MODE_QUICK_RACE || 
+    else if(m_minor_mode==MINOR_MODE_NORMAL_RACE || 
             m_minor_mode==MINOR_MODE_TIME_TRIAL)    
         m_world = new StandardRace();
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     

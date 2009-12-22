@@ -2,9 +2,9 @@
 
 <challenge
     id="penguinplaygroundgp"
-    name="_(&quot;Win Penguin Playground Grand\nPrix&quot;)"
-    description="_(&quot;Win Penguin Playground Grand\nPrix with 3 &apos;Racer&apos; Level AI karts.&quot;)"
-    unlock-mode="followtheleader _(Follow the Leader)"
+    name="Win Penguin Playground Grand\nPrix"
+    description="Win Penguin Playground Grand\nPrix with 3 &apos;Racer&apos; Level AI karts."
+    unlock-mode="FOLLOW_LEADER"
     major="grandprix"
     minor="quickrace"
     gp="penguinplayground"
