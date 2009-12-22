@@ -98,7 +98,7 @@ void TracksScreen::init()
         }
         else
         {
-             w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
+            w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
         }
     }
     w->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
