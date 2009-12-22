@@ -160,13 +160,14 @@ void RaceSetupScreen::init()
     if (!m_inited)
     {
         irr::core::stringw name1 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_NORMAL_RACE)) +
-                                    L"\n" +
-                                    _("All blows allowed, so catch weapons and make clever use of them!");
+                                    L"\n";
+        name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
+        
         w2->addItem( name1, "normal", "/gui/mode_normal.png");
         
         irr::core::stringw name2 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) +
-                                    L"\n" +
-                                    _("Contains no powerups, so only your driving skills matter!");
+                                    L"\n";
+        name2 += _("Contains no powerups, so only your driving skills matter!");
         w2->addItem( name2, "timetrial", "/gui/mode_tt.png");
         
         if (unlock_manager->isLocked("followtheleader"))
@@ -177,16 +178,16 @@ void RaceSetupScreen::init()
         else
         {
             irr::core::stringw name3 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) +
-                            L"\n" +
-                            _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
+                            L"\n";
+            name3 += _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
             w2->addItem(name3, "ftl", "/gui/mode_ftl.png", false);
         }
         
         if (race_manager->getNumPlayers() > 1)
         {
             irr::core::stringw name4 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) +
-                            L"\n" +
-                            _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
+                            L"\n";
+            name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
             w2->addItem( name4, "3strikes", "/gui/mode_3strikes.png");
         }
         
