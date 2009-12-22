@@ -44,6 +44,9 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 
 void MainMenuScreen::init()
 {
+    // on most circumstances, the RaceManager will take care of foing this.
+    // but e.g. if the player clicks on new game then backs, this needs to happen here
+    StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
     input_manager->setMasterPlayerOnly(false);
 }
