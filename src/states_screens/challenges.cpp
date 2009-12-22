@@ -81,7 +81,7 @@ namespace GUIEngine
         for (int n=0; n<lockedChallengeAmount; n++)
         {
             w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
-                       file_manager->getGUIDir() + "/challenge.png", true);
+                       "/gui/challenge.png", true);
             std::cout << "// Adding locked challenge <" << lockedChallenges[n]->getId().c_str() << ">\n";
 
         }
