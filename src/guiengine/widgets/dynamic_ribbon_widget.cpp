@@ -553,7 +553,7 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
         }
     }
     
-    m_label->setText( L"Random" );
+    m_label->setText( L"Unknown Item" );
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::updateItemDisplay()
