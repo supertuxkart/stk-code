@@ -959,7 +959,6 @@ void KartSelectionScreen::init()
 // -----------------------------------------------------------------------------
 void KartSelectionScreen::allPlayersDone()
 {        
-    // FIXME: cancel this when leaving back to main menu
     input_manager->setMasterPlayerOnly(true);
     
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
@@ -1001,7 +1000,7 @@ void KartSelectionScreen::allPlayersDone()
         race_manager->setLocalKartInfo(n, selection);
     }
     
-    // ---- Return to assign mode
+    // ---- Switch to assign mode
     input_manager->getDeviceList()->setAssignMode(ASSIGN);
     
     StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );

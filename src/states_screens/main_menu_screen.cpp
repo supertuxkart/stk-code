@@ -20,6 +20,8 @@
 #include "guiengine/widget.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "states_screens/challenges.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -42,6 +44,8 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 
 void MainMenuScreen::init()
 {
+    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
+    input_manager->setMasterPlayerOnly(false);
 }
 
 void MainMenuScreen::tearDown()
