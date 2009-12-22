@@ -141,6 +141,9 @@ void ChallengeData::error(const char *id) const
     std::ostringstream msg;
     msg << "Undefined or incorrect value for '" << id 
         << "' in challenge file '" << m_filename << "'.";
+    
+    std::cerr << "ChallengeData : " << msg.str() << std::endl;
+    
     // FIXME: disable this till all tracks are converted
     // FIXME throw std::runtime_error(msg.str());
 }   // error
