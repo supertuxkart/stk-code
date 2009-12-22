@@ -31,8 +31,7 @@ class Explosion
 private:
     SFXBase*       m_explode_sound;
     float          m_remaining_time;
-    scene::IParticleSystemSceneNode 
-                  *m_node;
+    scene::IParticleSystemSceneNode   *m_node;
 
 public:
          Explosion(const Vec3& coord, const int explosion_sound);

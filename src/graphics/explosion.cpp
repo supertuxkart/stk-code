@@ -35,21 +35,26 @@ Explosion::Explosion(const Vec3& coord, const int explosion_sound)
     Material *m = material_manager->getMaterial("explode.png");
     m_node->setMaterialTexture(0, m->getTexture());
     m->setMaterialProperties(&(m_node->getMaterial(0)));
-    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
+    //m->setMaterialProperties(SMaterial());
+    m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     scene::IParticleEmitter* em = m_node->createPointEmitter();
-    em->setDirection(core::vector3df(0.0f,0.0006f,0.0f));  // velocity in m/ms(!!)
-    em->setMinParticlesPerSecond(1);
-    em->setMaxParticlesPerSecond(5);
-    em->setMinStartSize(core::dimension2df(0.1f, 0.1f));
-    em->setMaxStartSize(core::dimension2df(0.5f, 0.5f));
+    em->setDirection(core::vector3df(0.0f,0.0013f,0.0f));  // velocity in m/ms(!!)
+    em->setMinParticlesPerSecond(5);
+    em->setMaxParticlesPerSecond(12);
+    em->setMinStartSize(core::dimension2df(0.6f, 0.6f));
+    em->setMaxStartSize(core::dimension2df(1.5f, 1.5f));
     m_node->setEmitter(em); // this grabs the emitter
     em->drop(); // so we can drop it here without deleting it
 
-    scene::IParticleAffector* paf = m_node->createFadeOutParticleAffector();
-    m_node->addAffector(paf); // same goes for the affector
-    paf->drop();
+    scene::IParticleAffector* fade_out_affector = m_node->createFadeOutParticleAffector(video::SColor(0, 120, 0, 0), 1500 /* fade out time */);
+    m_node->addAffector(fade_out_affector); // same goes for the affector
+    fade_out_affector->drop();
 
+    scene::IParticleAffector* scale_affector = m_node->createScaleParticleAffector(core::dimension2df(2.0f, 2.0f));
+    m_node->addAffector(scale_affector); // same goes for the affector
+    scale_affector->drop();
+    
     //scene::IParticleAffector *paf = 
     //    m_node->createGravityAffector(Vec3(0, 0, -5).toIrrVector());
     //m_node->addAffector(paf);
@@ -82,14 +87,21 @@ void Explosion::update(float dt)
     m_remaining_time -=dt;
 
     // Do nothing more if the animation is still playing
-    if(m_remaining_time>0) return;
-
+    if (m_remaining_time>0) return;
+    
     // Otherwise check that the sfx has finished, otherwise the
     // sfx will get aborted 'in the middle' when this explosion
     // object is removed.
-    if(m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
+    //if (m_explode_sound->getStatus() == SFXManager::SFX_PLAYING)
+    //{
+    //    m_remaining_time = 0;
+    //}
+    //else
+    if (m_remaining_time > -1.5f)
     {
-        m_remaining_time = 0;
+        // Stop the emitter and wait a little while for all particles to have time to fade out
+        m_node->getEmitter()->setMinParticlesPerSecond(0);
+        m_node->getEmitter()->setMaxParticlesPerSecond(0);
     }
     else
     {

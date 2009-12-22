@@ -77,6 +77,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     std::string s;
     if(!root->get("name", &s) ) error("name");
+    std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
     setName( _(s.c_str()) );
 
     if(!root->get("id", &s) ) error("id");
@@ -84,6 +85,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     if(!root->get("description", &s) ) error("description");
     setChallengeDescription( _(s.c_str()) );
+    std::cout << "    // Challenge description = <" << s.c_str() << ">\n";
 
     if(!root->get("karts", &m_num_karts)  ) error("karts");
 
