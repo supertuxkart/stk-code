@@ -371,7 +371,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
             m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
 
             // debugging
-            printf("%s custom sfx %s:\t %s\n", getIdent().c_str(), sfx_manager->getCustomTagName(i), tempFile.c_str());
+            //printf("%s custom sfx %s:\t %s\n", getIdent().c_str(), sfx_manager->getCustomTagName(i), tempFile.c_str());
         }
         else
         {
