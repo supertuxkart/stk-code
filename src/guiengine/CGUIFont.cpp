@@ -81,7 +81,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
 				u32 i = (u32)xml->getAttributeValueAsInt(L"index");
 				core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
 
-                std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
+                //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
 
                 
 				while (i+1 > SpriteBank->getTextureCount())
