@@ -187,6 +187,7 @@ void DynamicRibbonWidget::setSubElements()
     }
     
     // ---- add rows
+    int added_item_count = 0;
     for (int n=0; n<m_row_amount; n++)
     {
         RibbonWidget* ribbon;
@@ -230,6 +231,10 @@ void DynamicRibbonWidget::setSubElements()
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
             
             ribbon->m_children.push_back( icon );
+            added_item_count++;
+            
+            // stop adding columns when we have enough items
+            if (added_item_count >= item_count) break; 
         }
         m_children.push_back( ribbon );
         m_rows.push_back( ribbon );
@@ -444,6 +449,11 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)
 {
+    if (row->m_selection[playerID] >= row->m_children.size())
+    {
+        row->m_selection[playerID] = row->m_children.size()-1;
+    }
+    
     updateLabel(row);
     
     const int listenerAmount = m_hover_listeners.size();
@@ -513,7 +523,7 @@ void DynamicRibbonWidget::propagateSelection()
             RibbonWidget* ribbon = m_rows.get(n);
             if (ribbon != selected_ribbon)
             {
-                ribbon->m_selection[p] = relative_selection;
+                ribbon->m_selection[p] = std::min(relative_selection, ribbon->m_children.size()-1);
                 ribbon->updateSelection();
             }
         }
@@ -568,7 +578,8 @@ void DynamicRibbonWidget::updateItemDisplay()
     {
         RibbonWidget& row = m_rows[n];
         
-        for (int i=0; i<m_col_amount; i++)
+        const int items_in_row = row.m_children.size();
+        for (int i=0; i<items_in_row; i++)
         {
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);

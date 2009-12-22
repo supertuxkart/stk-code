@@ -78,7 +78,7 @@ namespace GUIEngine
         for (int n=0; n<lockedChallengeAmount; n++)
         {
             w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
-                       file_manager->getTextureFile("gui_lock.png"));
+                       file_manager->getGUIDir() + "/challenge.png", true);
         }
         
         
