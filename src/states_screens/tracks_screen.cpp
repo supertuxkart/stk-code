@@ -49,6 +49,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 // TODO
             }
+            else if (selection == "locked")
+            {
+                unlock_manager->playLockSound();
+            }
             else
             {
                 Track* clickedTrack = track_manager->getTrack(selection);
