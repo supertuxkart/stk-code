@@ -381,6 +381,11 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         }
     }
 
+    // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
+    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(el))
+    {
+        el = NULL;
+    }
     
     // find closest widget
     if (el != NULL && el->getTabGroup() != NULL &&
@@ -413,7 +418,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         
         if (ModalDialog::isADialogActive())
         {
-            // TODO : select last widget in modal dialogs
+            w = ModalDialog::getCurrent()->getLastWidget();
         }
         else
         {
@@ -487,6 +492,11 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         }
     }
 
+    // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
+    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(el))
+    {
+        el = NULL;
+    }
     
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
@@ -521,7 +531,8 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         
         if (ModalDialog::isADialogActive())
         {
-            // TODO : select first widget in modal dialogs
+            std::cout <<  "w = ModalDialog::getCurrent()->getFirstWidget();\n";
+            w = ModalDialog::getCurrent()->getFirstWidget();
         }
         else
         {

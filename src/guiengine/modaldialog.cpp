@@ -115,4 +115,36 @@ void ModalDialog::onEnterPressedInternal()
 {
 }
     
+Widget* ModalDialog::getLastWidget()
+{
+    const int childrenCount = m_children.size();
+    
+    for (int i=childrenCount-1; i>=0; i--)
+    {
+        if (m_children[i].getIrrlichtElement() == NULL || m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
+            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */)
+        {
+            continue;
+        }
+        return m_children.get(i);
+
+    }
+    return NULL;
+}
+Widget* ModalDialog::getFirstWidget()
+{
+    const int childrenCount = m_children.size();
+    
+    for (int i=0; i<childrenCount; i++)
+    {
+        if (m_children[i].getIrrlichtElement() == NULL || m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
+            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */)
+        {
+            continue;
+        }
+        return m_children.get(i);
+    }
+    return NULL;
+}
+    
 }

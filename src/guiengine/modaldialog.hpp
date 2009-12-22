@@ -60,7 +60,11 @@ public:
     virtual EventPropagation processEvent(std::string& eventSource){ return EVENT_LET; }
     
     bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
-    
+    bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
+
+    Widget* getFirstWidget();
+    Widget* getLastWidget();
+
     irr::gui::IGUIWindow* getIrrlichtElement()
     {
         return m_irrlicht_window;
