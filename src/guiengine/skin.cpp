@@ -696,10 +696,10 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
             
             const float outgrow = 0.35f; // make slightly bigger than the icon it's on
-            const int rectHeight = rect.getHeight() * (1.0f + outgrow);
-            const int rectWidth = rectHeight * aspectRatio;
+            const int rectHeight = (int)(rect.getHeight() * (1.0f + outgrow));
+            const int rectWidth = (int)(rectHeight * aspectRatio);
             const int x_gap = (rect.getWidth() - rectWidth)/2;
-            const int y_shift_up = rect.getHeight() * (outgrow/2.0f);
+            const int y_shift_up = (int)(rect.getHeight() * (outgrow/2.0f));
             
             core::rect< s32 > rect2( position2d< s32 >(rect.UpperLeftCorner.X + x_gap,
                                                       rect.UpperLeftCorner.Y - y_shift_up),
