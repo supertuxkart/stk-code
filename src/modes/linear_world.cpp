@@ -223,6 +223,12 @@ void LinearWorld::newLap(unsigned int kart_index)
         setTimeAtLapForKart(getTime(), kart_index );
         kart_info.m_race_lap++ ;
     }
+    // Last lap message (kart_index's assert in previous block already)
+    if(kart_info.m_race_lap+1 == race_manager->getNumLaps())
+    {
+        m_race_gui->addMessage(_("Final lap!"), m_kart[kart_index],
+                               3.0f, 40, video::SColor(255, 100, 100, 210));
+    }
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
@@ -255,7 +261,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             irr::core::stringw m_fastest_lap_message;
             m_fastest_lap_message += (s + ": ").c_str();
             m_fastest_lap_message += kart->getName();
-                        
+
             m_race_gui->addMessage(m_fastest_lap_message, NULL,
                                    2.0f, 40, video::SColor(255, 100, 210, 100));
         } // end if new fastest lap
