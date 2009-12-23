@@ -2,7 +2,7 @@
 
 <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
-    <header width="100%" height="25" text="Race Setup" align="center" text_align="center" />
+    <header width="100%" text="Race Setup" align="center" text_align="center" />
     
     <spacer proportion="1" width="25"/>
     
