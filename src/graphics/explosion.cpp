@@ -27,30 +27,37 @@
 #include "items/projectile_manager.hpp"
 #include "utils/vec3.hpp"
 
+const float explosion_time = 1.5f;
+const float burst_time = 0.1f;
+
 Explosion::Explosion(const Vec3& coord, const int explosion_sound)
 {
-    m_remaining_time = 0.1f; // short emision time, explosion, not constant flame
+    m_remaining_time = burst_time; // short emision time, explosion, not constant flame
     m_node = irr_driver->addParticleNode();
     m_node->setPosition(coord.toIrrVector());
-    Material *m = material_manager->getMaterial("explode.png");
+    Material* m = material_manager->getMaterial("explode.png");
     m_node->setMaterialTexture(0, m->getTexture());
     m->setMaterialProperties(&(m_node->getMaterial(0)));
-    m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    m_node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
 
     scene::IParticleEmitter* em = m_node->createSphereEmitter(core::vector3df(0.0f,0.0f,0.0f), 0.5f,
                                                               core::vector3df(0.0f,0.005f,0.0f), // velocity in m/ms
                                                               600, 900, // min max particles per sec
                                                               video::SColor(0, 0, 0, 0), video::SColor(0, 0, 0, 0), // min max colour
-                                                              1000, 1500, // min max life ms
+                                                              (burst_time + explosion_time)*1000.0f,
+                                                              (burst_time + explosion_time)*1000.0f, // min max life ms
                                                               90, // max angle
                                                               core::dimension2df(0.3f, 0.3f), core::dimension2df(0.75f, 0.75f) // min max start size
                                                               );
     m_node->setEmitter(em); // this grabs the emitter
     em->drop(); // so we can drop it here without deleting it
 
-    scene::IParticleAffector* fade_out_affector = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0), 10000 /* fade out time */);
+    /*
+     // doesn't work; instead we'll be doing it by hand below
+    scene::IParticleAffector* fade_out_affector = m_node->createFadeOutParticleAffector(video::SColor(0, 0, 0, 0), 10000);
     m_node->addAffector(fade_out_affector); // same goes for the affector
     fade_out_affector->drop();
+    */
 
     scene::IParticleAffector* scale_affector = m_node->createScaleParticleAffector(core::dimension2df(3.0f, 3.0f));
     m_node->addAffector(scale_affector); // same goes for the affector
@@ -85,8 +92,27 @@ void Explosion::init(const Vec3& coord)
 //-----------------------------------------------------------------------------
 void Explosion::update(float dt)
 {
-    m_remaining_time -=dt;
-
+    m_remaining_time -= dt;
+    
+    if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
+    {
+        
+        const float intensity = 255-(m_remaining_time/-explosion_time)*255;
+        m_node->getMaterial(0).AmbientColor.setGreen(intensity);
+        m_node->getMaterial(0).DiffuseColor.setGreen(intensity);
+        m_node->getMaterial(0).EmissiveColor.setGreen(intensity);
+        
+        m_node->getMaterial(0).AmbientColor.setBlue(intensity);
+        m_node->getMaterial(0).DiffuseColor.setBlue(intensity);
+        m_node->getMaterial(0).EmissiveColor.setBlue(intensity);
+        
+        m_node->getMaterial(0).AmbientColor.setRed(intensity);
+        m_node->getMaterial(0).DiffuseColor.setRed(intensity);
+        m_node->getMaterial(0).EmissiveColor.setRed(intensity);
+         
+    }
+    
+    
     // Do nothing more if the animation is still playing
     if (m_remaining_time>0) return;
 
@@ -98,7 +124,7 @@ void Explosion::update(float dt)
     //    m_remaining_time = 0;
     //}
     //else
-    if (m_remaining_time > -1.5f)
+    if (m_remaining_time > -explosion_time)
     {
         // Stop the emitter and wait a little while for all particles to have time to fade out
         m_node->getEmitter()->setMinParticlesPerSecond(0);
