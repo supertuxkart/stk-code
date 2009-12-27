@@ -165,7 +165,6 @@ void AbstractStateManager::popMenu()
     {
         m_game_mode = MENU;
         switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
-        input_manager->getDeviceList()->setAssignMode(NO_ASSIGN); // No assign mode on menus by default
         getCurrentScreen()->init();
     }
 }

@@ -10,6 +10,8 @@
 #include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 
+#define INPUT_MODE_DEBUG 0
+
 DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
@@ -88,6 +90,12 @@ bool DeviceManager::initialize()
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
 {
     m_assign_mode = assignMode;
+    
+#if INPUT_MODE_DEBUG
+    if (assignMode == NO_ASSIGN) std::cout << "====== DeviceManager::setAssignMode(NO_ASSIGN) ======\n";
+    if (assignMode == ASSIGN) std::cout << "====== DeviceManager::setAssignMode(ASSIGN) ======\n";
+    if (assignMode == DETECT_NEW) std::cout << "====== DeviceManager::setAssignMode(DETECT_NEW) ======\n";
+#endif
     
     // when going back to no-assign mode, do some cleanup
     if (assignMode == NO_ASSIGN)
@@ -262,7 +270,7 @@ InputDevice* DeviceManager::getLatestUsedDevice()
     
     if (m_latest_used_device == NULL)
     {   
-        std::cout<< "========== No latest device, returning keyboard ==========\n";
+        //std::cout<< "========== No latest device, returning keyboard ==========\n";
         return m_keyboards.get(0); // FIXME: is this right?
     }
     

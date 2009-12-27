@@ -49,6 +49,8 @@ using GUIEngine::EventPropagation;
 using GUIEngine::EVENT_LET;
 using GUIEngine::EVENT_BLOCK;
 
+#define INPUT_MODE_DEBUG 0
+
 //-----------------------------------------------------------------------------
 /** Initialise input
  */
@@ -397,6 +399,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
 //-----------------------------------------------------------------------------
 void InputManager::setMasterPlayerOnly(bool enabled)
 {
+#if INPUT_MODE_DEBUG
+    std::cout << "====== InputManager::setMasterPlayerOnly(" << enabled << ") ======\n";
+#endif
     m_master_player_only = enabled;
 }
 /** Returns whether only the master player should be allowed to perform changes in menus */
@@ -616,6 +621,9 @@ void InputManager::setMode(InputDriverMode new_mode)
     switch (new_mode)
     {
         case MENU:
+#if INPUT_MODE_DEBUG
+            std::cout << "====== InputManager::setMode(MENU) ======\n";
+#endif
             switch (m_mode)
             {
                 case INGAME:
@@ -673,6 +681,9 @@ void InputManager::setMode(InputDriverMode new_mode)
             
             break;
         case INGAME:
+#if INPUT_MODE_DEBUG
+            std::cout << "====== InputManager::setMode(INGAME) ======\n";
+#endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
@@ -689,6 +700,9 @@ void InputManager::setMode(InputDriverMode new_mode)
             break;
         case INPUT_SENSE_KEYBOARD:
         case INPUT_SENSE_GAMEPAD:
+#if INPUT_MODE_DEBUG
+            std::cout << "====== InputManager::setMode(INPUT_SENSE_*) ======\n";
+#endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
@@ -705,6 +719,9 @@ void InputManager::setMode(InputDriverMode new_mode)
 
             break;
         case LOWLEVEL:
+#if INPUT_MODE_DEBUG
+            std::cout << "====== InputManager::setMode(LOWLEVEL) ======\n";
+#endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
