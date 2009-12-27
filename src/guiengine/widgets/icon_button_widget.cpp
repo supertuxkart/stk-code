@@ -65,7 +65,10 @@ void IconButtonWidget::add()
     stringw& message = m_text;
     if (message.size() > 0)
     {
-        widget_size = rect<s32>(x, y + h, x + w, y + h*2);
+        //std::cout << "Adding label of icon widget, m_properties[PROP_EXTEND_LABEL] = " << m_properties[PROP_EXTEND_LABEL] << std::endl;
+        const int label_extra_size = ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
+                                       0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
+        widget_size = rect<s32>(x - label_extra_size/2, y + h, x + w + label_extra_size/2, y + h*2);
 
         m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);

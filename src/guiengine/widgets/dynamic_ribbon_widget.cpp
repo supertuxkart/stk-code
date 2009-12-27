@@ -175,11 +175,11 @@ void DynamicRibbonWidget::setSubElements()
     
     // ajust column amount to not add more items slot than we actually need
     const int item_count = m_items.size();
-    std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
+    //std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
     if (m_row_amount*m_col_amount > item_count)
     {
         m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
-        std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
+        //std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
     
         

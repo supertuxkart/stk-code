@@ -20,6 +20,8 @@
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -72,7 +74,8 @@ void RibbonWidget::add()
         // ribbon children must not be keyboard navigatable, the parent ribbon takes care of that
         if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
-            ((IconButtonWidget*)m_children.get(i))->m_tab_stop = false;
+            IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
+            icon->m_tab_stop = false;
         }
         
         total_needed_space += m_children[i].w;
@@ -116,6 +119,7 @@ void RibbonWidget::add()
                                                 0,
                                                 subsize.getHeight()+15,
                                                 subsize.getHeight());
+                // label at the *right* of the icon (for tabs)
                 rect<s32> label_part = rect<s32>(subsize.getHeight()+15,
                                                  0,
                                                  subsize.getWidth()-15,
@@ -184,9 +188,12 @@ void RibbonWidget::add()
             m_children[i].y = button_y;
             m_children[i].w = (int)(image_w*zoom);
             m_children[i].h = (int)(image_h*zoom);
-
             
             //std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
+
+            IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
+            //std::cout << "Setting PROP_EXTEND_LABEL to " << (one_button_space - icon->w) << std::endl;
+            icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_space - icon->w);
 
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();

@@ -179,6 +179,10 @@ PROP_SQUARE             "square_items"
 Valid on Ribbons or RibbonGrids. Can be "true" (omitting it means "false"). Indicates whether the contents
 use rectangular icons (this will affect the type of focus/highlighting used)
 
+PROP_EXTEND_LABEL       "extend_label"
+How many pixels the label is allowed to expand beyond the boundaries of the widget itself. Currently only
+allowed on icon widgets,
+ 
 +--------------------------+
 + Using the Engine in Code +
 +--------------------------+
