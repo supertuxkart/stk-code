@@ -228,7 +228,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 int InputManager::getPlayerKeyboardID() const
 {
     // In no-assign mode, just return the GUI player ID (devices not assigned yet)
-    if (m_device_manager->playerAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
+    if (m_device_manager->getAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
     
     // Otherwise, after devices are assigned, we can check the ID
     // FIXME: don't hardcode keyboard 0, there may be multiple keyboard configs
@@ -262,8 +262,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
 
     // in menus, some keyboard keys are standard (before each player selected his device)
     // FIXME: should enter always work to accept for a player using keyboard?
-    if (StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD && m_mode == MENU &&
-        m_device_manager->playerAssignMode() == NO_ASSIGN)
+    if (!action_found && StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD &&
+        m_mode == MENU && m_device_manager->getAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
 
@@ -273,7 +273,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         else if (btnID == KEY_RIGHT) action = PA_RIGHT;
         else if (btnID == KEY_SPACE) action = PA_FIRE;
 
-        if(btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive()) GUIEngine::ModalDialog::onEnterPressed();
+        if (btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
+        {
+            GUIEngine::ModalDialog::onEnterPressed();
+        }
         
         if (action != PA_FIRST)
         {
@@ -364,6 +367,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         // ... when in menus
         else
         {
+
             // reset timer when released
             if (abs(value) == 0 && (/*type == Input::IT_KEYBOARD ||*/ type == Input::IT_STICKBUTTON))
             {
@@ -390,7 +394,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
             }
         }
     }
-    else if(type == Input::IT_KEYBOARD)
+    else if (type == Input::IT_KEYBOARD)
     {
         // keyboard press not handled by device manager / bindings. Check static bindings...
         handleStaticAction( btnID, value );
@@ -557,7 +561,7 @@ EventPropagation InputManager::input(const SEvent& event)
 #endif
     
     // block events in all modes but initial menus (except in text boxes to allow typing, and except in modal dialogs in-game)
-    if (getDeviceList()->playerAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
+    if (getDeviceList()->getAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
     {
         return EVENT_BLOCK;

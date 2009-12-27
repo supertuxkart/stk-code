@@ -44,11 +44,19 @@ public:
 class KeyboardDevice : public InputDevice
 {
 public:
-    bool hasBinding(const int id, PlayerAction* action);
+
+    
     KeyboardDevice();
     KeyboardDevice(KeyboardConfig *configuration);
     
-    /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false */
+    /**
+     * Checks if this key belongs to this device. if yes, sets action and returns true; otherwise returns false
+     *
+     * \param      id      ID of the key that was pressed   
+     * \param[out] action  The action associated to this input (only check this value if method returned true)
+     */
+    bool hasBinding(const int id, PlayerAction* action);
+    
 };
 
 class GamePadDevice : public InputDevice
@@ -63,17 +71,22 @@ public:
     int                   m_axis_count;
     int                   m_button_count;
         
-
-    /** checks if this key belongs to this belongs. if yes, sets action and returns true; otherwise returns false.
-     The 'player' id passed is simply to know where to send 'axis reset's when necessary*/
-    bool hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action);
-
     GamePadDevice(const int irrIndex, const std::string name, const int axis_number, const int btnAmount, GamepadConfig *configuration);
+    ~GamePadDevice();
     
     bool isButtonPressed(const int i);
     void setButtonPressed(const int i, bool isButtonPressed);
     
-    ~GamePadDevice();
+    /**
+     * Checks if this key belongs to this device. if yes, sets action and returns true; otherwise returns false.
+     *
+     * \param      player  Only passed to know where to send 'axis reset's when necessary
+     * \param      id      ID of the key that was pressed or of the axis that was triggered (depending on
+     *                     the value of the 'type' parameter)
+     * \param[out] action  The action associated to this input (only check this value if method returned true)
+     */
+    bool hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action);
+
 };
 
 

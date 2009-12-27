@@ -51,7 +51,7 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
 bool DeviceConfig::getAction  ( Input::InputType    type,
                                 const int           id,
                                 const int           value,
-                                PlayerAction*       action )
+                                PlayerAction*       action /* out */ )
 {
     bool success = false;
     int  n;

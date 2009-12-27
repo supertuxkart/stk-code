@@ -172,23 +172,29 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 }
 // -----------------------------------------------------------------------------
 
-InputDevice* DeviceManager::mapKeyboardInput( int deviceID,
-                                              int btnID,
-                                              ActivePlayer **player,
-                                              PlayerAction *action )
+InputDevice* DeviceManager::mapKeyboardInput( int btnID,
+                                              ActivePlayer **player /* out */,
+                                              PlayerAction *action /* out */ )
 {
     const int keyboard_amount = m_keyboards.size();
+    
+    //std::cout << "mapKeyboardInput " << btnID << " to " << keyboard_amount << " keyboards\n";
+    
     for (int n=0; n<keyboard_amount; n++)
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
         if (keyboard->hasBinding(btnID, action))
         {
+            //std::cout << "   binding found in keyboard #"  << (n+1) << "; action is " << KartActionStrings[*action] << "\n";
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
                 *player = NULL;
             }
-            else *player = keyboard->m_player;
+            else
+            {
+                *player = keyboard->m_player;
+            }
             return keyboard;
         }
     }
@@ -202,8 +208,8 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int btnID,
                                              int axisDir,
                                              int value,
-                                             ActivePlayer **player,
-                                             PlayerAction *action )
+                                             ActivePlayer **player /* out */,
+                                             PlayerAction *action /* out */)
 {
     GamePadDevice  *gPad = getGamePadFromIrrID(deviceID);
 
@@ -227,8 +233,6 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 }
 //-----------------------------------------------------------------------------
 
-// Formerly mapInputToPlayerAndAction(), broken down to be more readable
-
 bool DeviceManager::translateInput( Input::InputType type,
                                     int deviceID,
                                     int btnID,
@@ -243,7 +247,7 @@ bool DeviceManager::translateInput( Input::InputType type,
     switch (type)
     {
         case Input::IT_KEYBOARD:
-            device = mapKeyboardInput(deviceID, btnID, player, action);
+            device = mapKeyboardInput(btnID, player, action);
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
@@ -253,6 +257,12 @@ bool DeviceManager::translateInput( Input::InputType type,
             break;
     };
 
+    /*
+    if (device != NULL)
+    {
+        std::cout << "   binding found; action is " << KartActionStrings[*action] << "\n";
+    }*/
+    
     // Return true if input was successfully translated to an action and player
     if (device != NULL && abs(value) > Input::MAX_VALUE/2)
     {

@@ -53,7 +53,7 @@ public:
     bool        getAction           (Input::InputType       type, 
                                      const int              id,
                                      const int              value,
-                                     PlayerAction*          action);
+                                     PlayerAction*          action /* out */);
     KeyBinding  getBinding          (int i) {return m_bindings[i];}
     
     bool hasBindingFor(const int buttonID) const;

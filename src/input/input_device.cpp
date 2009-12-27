@@ -44,7 +44,7 @@ KeyboardDevice::KeyboardDevice()
 }
 
 // -----------------------------------------------------------------------------
-bool KeyboardDevice::hasBinding(const int id, PlayerAction* action)
+bool KeyboardDevice::hasBinding(const int id, PlayerAction* action /* out */)
 {
     return m_configuration->getAction(Input::IT_KEYBOARD, id, 0, action);
 }
