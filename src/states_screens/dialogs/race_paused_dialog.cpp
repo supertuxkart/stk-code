@@ -40,19 +40,25 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
 {
     RaceManager::getWorld()->pause();
     
-    IGUIFont* font = GUIEngine::getFont();
+    IGUIFont* font = GUIEngine::getTitleFont();
     const int text_height = font->getDimension(L"X").Height;
+    
+    IGUIFont* titlefont = GUIEngine::getTitleFont();
+    const int title_height = font->getDimension(L"X").Height;
+    
     
     const int icon_size = (m_area.getHeight() - text_height - 150) / 2;
     
     // ---- Caption
-    core::rect< s32 > area(0, 0, m_area.getWidth(), text_height);
+    core::rect< s32 > area(0, 0, m_area.getWidth(), title_height);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Paused"),
                                                                     area, false, false, // border, word warp
                                                                     m_irrlicht_window);
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    
+    caption->setOverrideFont(titlefont);
+    caption->setOverrideColor(video::SColor(255,255,255,255));
+
     // ---- Back button
     IconButtonWidget* back_btn = new IconButtonWidget();
     back_btn->m_properties[PROP_ID] = "backbtn";
