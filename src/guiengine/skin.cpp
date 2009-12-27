@@ -856,9 +856,26 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
         widget->g = -1;
         widget->b = -1;
     }
+        
+    core::rect< s32 > sized_rect = rect;
+    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+    {
+        core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
+        sized_rect.UpperLeftCorner.X  = center.X + (int)(((int)rect.UpperLeftCorner.X - (int)center.X)*texture_size);
+        sized_rect.UpperLeftCorner.Y  = center.Y + (int)(((int)rect.UpperLeftCorner.Y - (int)center.Y)*texture_size);
+        
+        //std::cout << "y is " << center.Y << " + (" << rect.UpperLeftCorner.Y << " - " << center.Y << ")*" << texture_size << " = " 
+        //  << center.Y + (int)((rect.UpperLeftCorner.Y - center.Y)*texture_size) << std::endl;
+        
+        sized_rect.LowerRightCorner.X = center.X + (int)(((int)rect.LowerRightCorner.X - (int)center.X)*texture_size);
+        sized_rect.LowerRightCorner.Y = center.Y + (int)(((int)rect.LowerRightCorner.Y - (int)center.Y)*texture_size);
+    }
+
+    drawBoxFromStretchableTexture(widget, sized_rect, params);
+
     
-    drawBoxFromStretchableTexture(widget, rect, params);
-    
+    // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     if (w->isGauge())
     {
