@@ -56,7 +56,16 @@ void DynamicRibbonWidget::add()
     //printf("****DynamicRibbonWidget::add()****\n");
 
     m_has_label = (m_text == "bottom");
-    m_label_height = m_has_label ? 25 : 0; // FIXME : get height from font, don't hardcode (what if label is multiline?)
+    
+    if (m_has_label)
+    {
+        // FIXME - won't work with multiline labels.
+        m_label_height = GUIEngine::getFont()->getDimension( L"X" ).Height;
+    }
+    else
+    {
+        m_label_height = 0;
+    }
     
     // ----- add dynamic label at bottom
     if (m_has_label)
