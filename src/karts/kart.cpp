@@ -34,6 +34,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/smoke.hpp"
+#include "graphics/stars.hpp"
 #include "graphics/water_splash.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
@@ -75,6 +76,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_shadow_enabled       = false;
     m_shadow               = NULL;
     m_smoke_system         = NULL;
+    m_stars_effect         = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
     m_skidmarks            = NULL;
@@ -278,6 +280,7 @@ Kart::~Kart()
     if(m_nitro)               delete m_nitro;
 
     delete m_shadow;
+    delete m_stars_effect;
 
     if(m_skidmarks) delete m_skidmarks ;
 
@@ -511,6 +514,8 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(sign_c * float(rand()%32*5),
                                                                    sign_d * float(rand()%32*5),
                                                                    sign_e * float(rand()%32*5)));
+        
+        m_stars_effect->showFor(6.0f);
     }
     else  // only affected by a distant explosion
     {
@@ -533,6 +538,7 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         float sign_a = (sign_bits & (0x1 << 8)) ? 1.0f : -1.0f;
         getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, 0, sign_a * float(rand()%32*5)));
     }
+    
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
@@ -1152,6 +1158,9 @@ void Kart::updatePhysics (float dt)
        ,getHPR().getHeading()
        );
 #endif
+    
+    // update star effect (call will do nothing if stars are not activated)
+    m_stars_effect->update(dt);
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
@@ -1195,7 +1204,8 @@ void Kart::loadData()
 
     m_shadow = new Shadow(file_manager->getKartFile(m_kart_properties->getShadowFile(),
                                                     getIdent()                         ),
-                          m_animated_node);
+                                                    m_animated_node);
+    m_stars_effect = new Stars(m_animated_node);
 }   // loadData
 
 //-----------------------------------------------------------------------------

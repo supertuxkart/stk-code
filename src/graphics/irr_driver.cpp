@@ -365,6 +365,17 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 }   // addMesh
 
 // ----------------------------------------------------------------------------
+/** Adds a billboard node to scene.
+ */
+scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent)
+{
+    scene::IBillboardSceneNode* node = m_scene_manager->addBillboardSceneNode(parent, size);
+    assert(node->getMaterialCount() > 0);
+    node->setMaterialTexture(0, texture);
+    return node;
+}   // addMesh
+
+// ----------------------------------------------------------------------------
 /** Creates a quad mesh buffer and adds it to the scene graph. (FIXME: wrong docs? I don't think it does)
  */
 scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,

@@ -89,6 +89,8 @@ public:
                                        float wave_speed, float wave_length);
     scene::ISceneNode    *addOctTree(scene::IMesh *mesh);
     scene::ISceneNode    *addMesh(scene::IMesh *mesh);
+    scene::ISceneNode    *addBillboard(const core::dimension2d< f32 > size, video::ITexture *texture, scene::ISceneNode* parent=NULL);
+
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
     scene::ISceneNode    *addSkyDome(const std::string &texture, int hori_res,

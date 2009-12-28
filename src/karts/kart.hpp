@@ -42,6 +42,7 @@ class btUprightConstraint;
 class btKart;
 class btVehicleTuning;
 class Quad;
+class Stars;
 
 class Kart : public TerrainInfo, public Moveable
 {
@@ -84,14 +85,20 @@ private:
     // -----------------
     /** The shadow of a kart. */
     Shadow       *m_shadow;
+    
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
     bool          m_shadow_enabled;
+    
     /** Smoke from skidding. */
     Smoke        *m_smoke_system;
+    
     /** Water splash when driving in water. */
     WaterSplash  *m_water_splash_system;
 
+    /** For stars rotating around head effect */
+    Stars        *m_stars_effect;
+    
     /** Graphical effect when using a nitro. */
     Nitro        *m_nitro;
     float         m_wheel_rotation;

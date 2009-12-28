@@ -269,6 +269,7 @@
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
 		95C77D66106958A50080838E /* check_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D65106958A50080838E /* check_line.cpp */; };
 		95C77D6F106958E10080838E /* check_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D6D106958E10080838E /* check_sphere.cpp */; };
+		95C9C97210E93456005A418D /* stars.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C9C97010E93456005A418D /* stars.cpp */; };
 		95CB476C0FF30EF400413BAE /* bezier_curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95CB476B0FF30EF400413BAE /* bezier_curve.cpp */; };
 		95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D1F5F60FC8C3E300FF6968 /* input.cpp */; };
 		95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2343E1078227A00625256 /* feature_unlocked.cpp */; };
@@ -868,6 +869,8 @@
 		95C77D65106958A50080838E /* check_line.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_line.cpp; path = ../../tracks/check_line.cpp; sourceTree = SOURCE_ROOT; };
 		95C77D6D106958E10080838E /* check_sphere.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_sphere.cpp; path = ../../tracks/check_sphere.cpp; sourceTree = SOURCE_ROOT; };
 		95C77D6E106958E10080838E /* check_sphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = check_sphere.hpp; path = ../../tracks/check_sphere.hpp; sourceTree = SOURCE_ROOT; };
+		95C9C97010E93456005A418D /* stars.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stars.cpp; path = ../../graphics/stars.cpp; sourceTree = SOURCE_ROOT; };
+		95C9C97110E93456005A418D /* stars.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stars.hpp; path = ../../graphics/stars.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F60F82FCB7003323DB /* physical_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = physical_object.hpp; path = ../../physics/physical_object.hpp; sourceTree = SOURCE_ROOT; };
 		95CA59F70F82FCB7003323DB /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = physical_object.cpp; path = ../../physics/physical_object.cpp; sourceTree = SOURCE_ROOT; };
 		95CB476A0FF30EF400413BAE /* bezier_curve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bezier_curve.hpp; path = ../../tracks/bezier_curve.hpp; sourceTree = SOURCE_ROOT; };
@@ -1211,6 +1214,8 @@
 				952A1540103F66D600B1895D /* skid_marks.hpp */,
 				952A1541103F66D600B1895D /* smoke.cpp */,
 				952A1542103F66D600B1895D /* smoke.hpp */,
+				95C9C97010E93456005A418D /* stars.cpp */,
+				95C9C97110E93456005A418D /* stars.hpp */,
 				952A1543103F66D600B1895D /* water_splash.cpp */,
 				952A1544103F66D600B1895D /* water_splash.hpp */,
 			);
@@ -2576,6 +2581,7 @@
 				953C3CCA10CAF3EE0025F78A /* CGUIFont.cpp in Sources */,
 				956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */,
 				956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */,
+				95C9C97210E93456005A418D /* stars.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
