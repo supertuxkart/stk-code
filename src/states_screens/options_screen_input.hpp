@@ -31,9 +31,10 @@ struct Input;
 
 class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput>
 {
-    void updateInputButtons(DeviceConfig* config);
-
     OptionsScreenInput();
+
+    void updateInputButtons(DeviceConfig* config);
+    void buildDeviceList();
     
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
@@ -41,7 +42,8 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     void gotSensedInput(Input* sensedInput);
-    
+    void rebuildDeviceList();
+
     void init();
     void tearDown();
 };

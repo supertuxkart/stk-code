@@ -89,6 +89,46 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
 }
 
 // -----------------------------------------------------------------------------
+
+void OptionsScreenInput::buildDeviceList()
+{
+    DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
+    assert( devices != NULL );
+    
+    const int keyboard_config_count = input_manager->getDeviceList()->getKeyboardConfigAmount();
+    
+    for (int i=0; i<keyboard_config_count; i++)
+    {
+        //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
+        
+        std::ostringstream kbname;
+        kbname << "keyboard" << i;
+        const std::string internal_name = kbname.str();
+        
+        
+        devices->addItem(StringUtils::insertValues(_("Keyboard %i"), i), internal_name, "/gui/keyboard.png");
+    }
+    
+    const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
+    
+    for (int i = 0; i < gpad_config_count; i++)
+    {
+        GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
+        // Don't display the configuration if a matching device is not available
+        if (config->isInUse())
+        {
+            const irr::core::stringw name = config->getName().c_str();
+            
+            std::ostringstream gpname;
+            gpname << "gamepad" << i;
+            const std::string internal_name = gpname.str();
+            
+            devices->addItem(name, internal_name, "/gui/gamepad.png");
+        }
+    }    
+}
+
+// -----------------------------------------------------------------------------
 void OptionsScreenInput::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
@@ -100,46 +140,26 @@ void OptionsScreenInput::init()
     
     if (!this->m_inited)
     {        
-        const int keyboard_config_count = input_manager->getDeviceList()->getKeyboardConfigAmount();
-
-        for (int i=0; i<keyboard_config_count; i++)
-        {
-            //KeyboardConfig *config = input_manager->getDeviceList()->getKeyboardConfig(i);
-            
-            std::ostringstream kbname;
-            kbname << "keyboard" << i;
-            const std::string internal_name = kbname.str();
-            
-            
-            devices->addItem(StringUtils::insertValues(_("Keyboard %i"), i), internal_name, "/gui/keyboard.png");
-        }
-        
-        const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
-        
-        for (int i = 0; i < gpad_config_count; i++)
-        {
-            GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
-            // Don't display the configuration if a matching device is not available
-            if (config->isInUse())
-            {
-                const irr::core::stringw name = config->getName().c_str();
-                
-                std::ostringstream gpname;
-                gpname << "gamepad" << i;
-                const std::string internal_name = gpname.str();
-                
-                devices->addItem(name, internal_name, "/gui/gamepad.png");
-            }
-        }
-        
+        buildDeviceList();        
         this->m_inited = true;
-        
     }
     devices->updateItemDisplay();
     
     // trigger displaying bindings for default selected device
     const std::string name2("devices");
     eventCallback(devices, name2, GUI_PLAYER_ID);
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput::rebuildDeviceList()
+{
+    DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
+    assert( devices != NULL );
+    
+    devices->clearItems();
+    buildDeviceList();        
+    devices->updateItemDisplay();
 }
 
 // -----------------------------------------------------------------------------

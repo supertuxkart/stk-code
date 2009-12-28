@@ -19,8 +19,11 @@
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
+#include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -92,17 +95,18 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent(std::string& eventSour
 
     if (eventSource == "cancel")
     {   
-        // irrLicht is too stupid to remove focus from deleted widgets
-        // so do it by hand
-        //GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
-        //GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
-        
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "addkeyboard")
     {
-        // TODO
+        input_manager->getDeviceList()->addEmptyKeyboard();
+        input_manager->getDeviceList()->serialize();
+        ModalDialog::dismiss();
+        
+        ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
+        
+        return GUIEngine::EVENT_BLOCK;
     }
     
     return GUIEngine::EVENT_LET;

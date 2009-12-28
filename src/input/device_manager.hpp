@@ -86,6 +86,7 @@ public:
     bool                getConfigForGamepad(const int sdl_id, GamepadConfig **config);    
     
     // ---- Keyboard(s) ----
+    void addEmptyKeyboard();
     void addKeyboard(KeyboardDevice* d);
     int getKeyboardConfigAmount() const                     { return m_keyboard_configs.size(); }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }

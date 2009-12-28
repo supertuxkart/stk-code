@@ -166,6 +166,14 @@ void DeviceManager::addKeyboard(KeyboardDevice* d)
     m_keyboards.push_back(d);
 }
 // -----------------------------------------------------------------------------
+void DeviceManager::addEmptyKeyboard()
+{
+    KeyboardConfig* newConf = new KeyboardConfig();
+    m_keyboard_configs.push_back(newConf);
+    m_keyboards.push_back( new KeyboardDevice(newConf) );
+}
+
+// -----------------------------------------------------------------------------
 void DeviceManager::addGamepad(GamePadDevice* d)
 {
     m_gamepads.push_back(d);
