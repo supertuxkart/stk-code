@@ -41,6 +41,7 @@ private:
     /** Whether stars are currently enabled */
     bool m_enabled;
     
+    float m_fade_in_time;
     float m_remaining_time;
     
  public:

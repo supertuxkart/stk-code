@@ -43,6 +43,7 @@ Stars::Stars(scene::IAnimatedMeshSceneNode* parentKart)
                                                                 texture,
                                                                 parentKart);
         star_material->setMaterialProperties(&(billboard->getMaterial(0)));
+        //billboard->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         billboard->setMaterialTexture(0, star_material->getTexture());
         
         billboard->setVisible(false);
@@ -73,11 +74,13 @@ void Stars::showFor(float time)
 {
     m_enabled = true;
     m_remaining_time = time;
+    m_fade_in_time = 1.0f;
     
     const int nodeAmount = m_nodes.size();
     for (int n=0; n<nodeAmount; n++)
     {
         m_nodes[n]->setVisible(true);
+        ((scene::IBillboardSceneNode*)m_nodes[n])->setSize( core::dimension2d< f32 >(0.01f, 0.01f) );
     }
     
     // set stars initial position
@@ -115,10 +118,40 @@ void Stars::update(float delta_t)
         // keep angle in range [0, 1[
         angle -= (int)angle;
         
+        float radius = RADIUS;
+        
+
+        // manage "fade-in"
+        if (m_fade_in_time > 0.0f)
+        {
+            //m_nodes[n]->getMaterial(0).AmbientColor.setAlpha((1.0f - m_fade_in_time)*255.0f);
+            //m_nodes[n]->getMaterial(0).DiffuseColor.setAlpha((1.0f - m_fade_in_time)*255.0f);
+
+            float fade = (1.0f - m_fade_in_time);
+            
+            ((scene::IBillboardSceneNode*)m_nodes[n])->setSize(
+                    core::dimension2d< f32 >(fade*STAR_SIZE, fade*STAR_SIZE) );
+            
+            radius *= fade;
+        }
+        // manage "fade-out"
+        else if (m_remaining_time < 1.0f)
+        {
+            //m_nodes[n]->getMaterial(0).AmbientColor.setAlpha(m_remaining_time*255.0f);
+            //m_nodes[n]->getMaterial(0).DiffuseColor.setAlpha(m_remaining_time*255.0f);
+
+            radius *= m_remaining_time;
+            
+            ((scene::IBillboardSceneNode*)m_nodes[n])->setSize( core::dimension2d< f32 >(m_remaining_time*STAR_SIZE,
+                                                                                         m_remaining_time*STAR_SIZE) );
+        }
+        
         // set position
-        m_nodes[n]->setPosition(m_center + core::vector3df( std::cos(angle*M_PI*2.0f)*RADIUS,
-                                                            0.0f,
-                                                            std::sin(angle*M_PI*2.0f)*RADIUS));
-    }
+        m_nodes[n]->setPosition(m_center + core::vector3df( std::cos(angle*M_PI*2.0f)*radius,
+                                                           0.0f,
+                                                           std::sin(angle*M_PI*2.0f)*radius));
+    } // end for
+    
+    if (m_fade_in_time > 0.0f) m_fade_in_time -= delta_t;
 }
 
