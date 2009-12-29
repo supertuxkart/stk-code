@@ -23,7 +23,7 @@
 #include "irrlicht.h"
 #include <cmath>
 
-const int STAR_AMOUNT = 8;
+const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;
 const float STAR_SIZE = 0.4f;
 
@@ -147,9 +147,9 @@ void Stars::update(float delta_t)
         }
         
         // set position
-        m_nodes[n]->setPosition(m_center + core::vector3df( std::cos(angle*M_PI*2.0f)*radius,
-                                                           0.0f,
-                                                           std::sin(angle*M_PI*2.0f)*radius));
+        m_nodes[n]->setPosition(m_center + core::vector3df( std::cos(angle*M_PI*2.0f)*radius, // Position in circle
+                                                           std::cos(angle*M_PI*2.0f + m_remaining_time*4.0f)*radius*0.25f, // Shake up and down like falling coin
+                                                           std::sin(angle*M_PI*2.0f)*radius)); // Position in circle
     } // end for
     
     if (m_fade_in_time > 0.0f) m_fade_in_time -= delta_t;
