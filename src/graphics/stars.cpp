@@ -16,12 +16,14 @@
 
 #include "graphics/stars.hpp"
 
+#include <cmath>
+
+#include "irrlicht.h"
+
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-
-#include "irrlicht.h"
-#include <cmath>
+#include "utils/constants.hpp"
 
 const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;
