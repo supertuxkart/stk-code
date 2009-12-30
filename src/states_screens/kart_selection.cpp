@@ -281,7 +281,7 @@ FocusDispatcher* g_dispatcher = NULL;
             const KartProperties* props = kart_properties_manager->getKart(default_kart);
             KartModel* kartModel = props->getKartModel();
             
-            this->modelView->addModel( kartModel->getModel() );
+            this->modelView->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
             this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
             this->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
             this->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
@@ -659,7 +659,7 @@ public:
             KartModel* kartModel = kart->getKartModel();
             
             w3->clearModels();
-            w3->addModel( kartModel->getModel() );
+            w3->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
             w3->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
             w3->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
             w3->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );

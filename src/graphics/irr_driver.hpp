@@ -154,8 +154,23 @@ public:
         
         ~RTTProvider();
         
+        /**
+          * \brief Quick utility method to setup a scene from a plain list of models
+          *
+          * Sets up a given vector of meshes for render-to-texture. Ideal to embed a 3D
+          * object inside the GUI. If there are multiple meshes, the first mesh is considered
+          * to be the root, and all following meshes will have their locations relative to
+          * the location of the first mesh.
+          *
+          * \param mesh             The list of meshes to add to the scene
+          * \param mesh_location    Location of each fo these meshes
+          * \param model_frames     For animated meshes, which frame to use (value can be -1 to set none)
+          *                         When frame is not -1, the corresponding IMesh must be an IAnimatedMesh.
+          * \precondition           The 3 vectors have the same size.
+          */
         void setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
-                           std::vector<Vec3>& mesh_location);
+                           std::vector<Vec3>& mesh_location,
+                           const std::vector<int>& model_frames);
         
         /** Optional 'angle' parameter will rotate the object added *through setupRTTScene* */
         video::ITexture* renderToTexture(float angle=-1,

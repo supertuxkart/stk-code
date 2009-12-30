@@ -820,24 +820,50 @@ IrrDriver::RTTProvider::~RTTProvider()
  *  object inside the GUI. If there are multiple meshes, the first mesh is considered
  *  to be the root, and all following meshes will have their locations relative to
  * the location of the first mesh.
- *
- * Parameters:
- *  \param mesh Vector of meshes to render.
- *  \param mesh_location For each mesh the location where it should be 
- *         positioned.
  */
 void IrrDriver::RTTProvider::setupRTTScene(ptr_vector<scene::IMesh, REF>& mesh, 
-                                           std::vector<Vec3>& mesh_location)
-{     
-    m_rtt_main_node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0));
-    assert(m_rtt_main_node != NULL);
+                                           std::vector<Vec3>& mesh_location,
+                                           const std::vector<int>& model_frames)
+{         
+    if (model_frames[0] == -1)
+    {
+        scene::ISceneNode* node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0), NULL);
+        node->setPosition( mesh_location[0].toIrrVector() );
+        m_rtt_main_node = node;
+    }
+    else
+    {
+        scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()->addAnimatedMeshSceneNode((IAnimatedMesh*)mesh.get(0), NULL);
+        node->setPosition( mesh_location[0].toIrrVector() );
+        node->setFrameLoop(model_frames[0], model_frames[0]);
+        node->setAnimationSpeed(0);
+        
+        m_rtt_main_node = node;
+        //std::cout << "(((( set frame " << model_frames[0] << " ))))\n";
+    }
     
+    assert(m_rtt_main_node != NULL);
+    assert(mesh.size() == (int)mesh_location.size());
+    assert(mesh.size() == (int)model_frames.size());
+
     const int mesh_amount = mesh.size();
     for (int n=1; n<mesh_amount; n++)
     {
-        scene::ISceneNode* node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n), m_rtt_main_node);
-        node->setPosition( mesh_location[n].toIrrVector() );
-        node->updateAbsolutePosition();
+        if (model_frames[n] == -1)
+        {
+            scene::ISceneNode* node = irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n), m_rtt_main_node);
+            node->setPosition( mesh_location[n].toIrrVector() );
+            node->updateAbsolutePosition();
+        }
+        else
+        {
+            scene::IAnimatedMeshSceneNode* node = irr_driver->getSceneManager()->addAnimatedMeshSceneNode((IAnimatedMesh*)mesh.get(n), m_rtt_main_node);
+            node->setPosition( mesh_location[n].toIrrVector() );
+            node->setFrameLoop(model_frames[n], model_frames[n]);
+            node->setAnimationSpeed(0);
+            node->updateAbsolutePosition();
+            //std::cout << "(((( set frame " << model_frames[n] << " ))))\n";
+        }
     }
     
     m_rtt_main_node->setScale( core::vector3df(35.0f, 35.0f, 35.0f) );

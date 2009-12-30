@@ -63,15 +63,17 @@ void ModelViewWidget::clearModels()
 {
     m_models.clearWithoutDeleting();
     m_model_location.clear();
+    m_model_frames.clear();
     
     delete m_rtt_provider;
     m_rtt_provider = NULL;
 }
 // -----------------------------------------------------------------------------
-void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location)
+void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location, const int frame)
 {
     m_models.push_back(mesh);
     m_model_location.push_back(location);
+    m_model_frames.push_back(frame);
     
     /*
      ((IGUIMeshViewer*)m_element)->setMesh( mesh );
@@ -138,7 +140,7 @@ void ModelViewWidget::update(float delta)
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
         m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name );
-        m_rtt_provider->setupRTTScene(m_models, m_model_location);
+        m_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_frames);
     }
     
     m_texture = m_rtt_provider->renderToTexture(angle);
