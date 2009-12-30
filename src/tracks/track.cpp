@@ -140,8 +140,6 @@ void Track::cleanup()
     }
 
     delete m_track_object_manager;
-
-    delete m_track_object_manager;
     m_track_object_manager = NULL;
 
     irr_driver->removeNode(m_sun);
