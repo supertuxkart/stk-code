@@ -406,10 +406,16 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
             if (w != NULL) return w;
         }
         
-        if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||
-            within_vector->get(i)->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */) continue;
+        Widget* item = within_vector->get(i);
+        if (item->m_element == NULL ||
+            item->m_element->getTabOrder() == -1 ||
+            item->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+            !item->m_focusable)
+        {
+            continue;
+        }
         
-        return within_vector->get(i);
+        return item;
     }
     return NULL;
 }
@@ -431,10 +437,16 @@ Widget* Screen::getLastWidget(ptr_vector<Widget>* within_vector)
             if (w != NULL) return w;
         }
         
-        if (within_vector->get(i)->m_element == NULL || within_vector->get(i)->m_element->getTabOrder() == -1 ||
-            within_vector->get(i)->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */) continue;
+        Widget* item = within_vector->get(i);
+        if (item->m_element == NULL ||
+            item->m_element->getTabOrder() == -1 ||
+            item->m_element->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+            !item->m_focusable)
+        {
+            continue;
+        }
         
-        return within_vector->get(i);
+        return item;
     }
     return NULL;
 }

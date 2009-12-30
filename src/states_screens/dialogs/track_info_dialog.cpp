@@ -50,42 +50,6 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
     m_track_ident = trackIdent;
 
-    // ---- Lap count m_spinner
-    m_spinner = new SpinnerWidget();
-    m_spinner->x = m_area.getWidth()/2 - 200;
-    m_spinner->y = y2;
-    m_spinner->w = 400;
-    m_spinner->h = y3 - y2 - 15;
-    m_spinner->setParent(m_irrlicht_window);
-    
-    m_spinner->m_properties[PROP_MIN_VALUE] = "1";
-    m_spinner->m_properties[PROP_MAX_VALUE] = "99";
-    
-    //I18N: In the track setup screen (number of laps choice, where %i is the number)
-    m_spinner->m_text = _("%i laps");
-    
-    m_children.push_back(m_spinner);
-    m_spinner->add();
-    m_spinner->setValue(3);
-    m_spinner->getIrrlichtElement()->setTabStop(true);
-    m_spinner->getIrrlichtElement()->setTabGroup(false);
-
-    // ---- Start button
-    ButtonWidget* okBtn = new ButtonWidget();
-    okBtn->m_properties[PROP_ID] = "start";
-    okBtn->m_text = _("Start Race");
-    okBtn->x = m_area.getWidth()/2 - 200;
-    okBtn->y = y3;
-    okBtn->w = 400;
-    okBtn->h = m_area.getHeight() - y3 - 15;
-    okBtn->setParent(m_irrlicht_window);
-    m_children.push_back(okBtn);
-    okBtn->add();
-    okBtn->getIrrlichtElement()->setTabStop(true);
-    okBtn->getIrrlichtElement()->setTabGroup(false);
-    
-    okBtn->setFocusForPlayer( GUI_PLAYER_ID );
-    
     // ---- Track title
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( trackName.c_str(),
@@ -205,6 +169,42 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    
+    // ---- Lap count m_spinner
+    m_spinner = new SpinnerWidget();
+    m_spinner->x = m_area.getWidth()/2 - 200;
+    m_spinner->y = y2;
+    m_spinner->w = 400;
+    m_spinner->h = y3 - y2 - 15;
+    m_spinner->setParent(m_irrlicht_window);
+    
+    m_spinner->m_properties[PROP_MIN_VALUE] = "1";
+    m_spinner->m_properties[PROP_MAX_VALUE] = "99";
+    
+    //I18N: In the track setup screen (number of laps choice, where %i is the number)
+    m_spinner->m_text = _("%i laps");
+    
+    m_children.push_back(m_spinner);
+    m_spinner->add();
+    m_spinner->setValue(3);
+    m_spinner->getIrrlichtElement()->setTabStop(true);
+    m_spinner->getIrrlichtElement()->setTabGroup(false);
+    
+    // ---- Start button
+    ButtonWidget* okBtn = new ButtonWidget();
+    okBtn->m_properties[PROP_ID] = "start";
+    okBtn->m_text = _("Start Race");
+    okBtn->x = m_area.getWidth()/2 - 200;
+    okBtn->y = y3;
+    okBtn->w = 400;
+    okBtn->h = m_area.getHeight() - y3 - 15;
+    okBtn->setParent(m_irrlicht_window);
+    m_children.push_back(okBtn);
+    okBtn->add();
+    okBtn->getIrrlichtElement()->setTabStop(true);
+    okBtn->getIrrlichtElement()->setTabGroup(false);
+    
+    okBtn->setFocusForPlayer( GUI_PLAYER_ID );
     
 }
 

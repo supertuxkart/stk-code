@@ -117,12 +117,15 @@ void ModalDialog::onEnterPressedInternal()
     
 Widget* ModalDialog::getLastWidget()
 {
+    // FIXME: don't duplicate this code from 'Screen.cpp'
     const int childrenCount = m_children.size();
     
     for (int i=childrenCount-1; i>=0; i--)
     {
-        if (m_children[i].getIrrlichtElement() == NULL || m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
-            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */)
+        if (m_children[i].getIrrlichtElement() == NULL ||
+            m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
+            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+            !m_children[i].m_focusable)
         {
             continue;
         }
@@ -133,12 +136,15 @@ Widget* ModalDialog::getLastWidget()
 }
 Widget* ModalDialog::getFirstWidget()
 {
+    // FIXME: don't duplicate this code from 'Screen.cpp'
     const int childrenCount = m_children.size();
     
     for (int i=0; i<childrenCount; i++)
     {
-        if (m_children[i].getIrrlichtElement() == NULL || m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
-            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */)
+        if (m_children[i].getIrrlichtElement() == NULL ||
+            m_children[i].getIrrlichtElement()->getTabOrder() == -1 ||
+            m_children[i].getIrrlichtElement()->getTabOrder() >= 1000 /* non-tabbing items are given such IDs */ ||
+            !m_children[i].m_focusable)
         {
             continue;
         }
