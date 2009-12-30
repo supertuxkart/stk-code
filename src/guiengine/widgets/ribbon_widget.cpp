@@ -22,6 +22,8 @@
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <cmath>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -159,7 +161,15 @@ void RibbonWidget::add()
         {
             // how much space to keep for the label under the button
             const bool has_label = m_children[i].m_text.size() > 0;
-            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight() : 10;
+            
+            int line_number = 1;
+            core::dimension2d< u32 > dim = GUIEngine::getFont()->getDimension( m_children[i].m_text.c_str() );
+            if ((int)dim.Width > one_button_space)
+            {
+                line_number = std::ceil((float)dim.Width/(float)one_button_space);
+            }
+            
+            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_number : 10;
             
             float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
             
@@ -204,28 +214,8 @@ void RibbonWidget::add()
             m_children[i].w = old_w;
             m_children[i].h = old_h;
             
-            // ---- label part
-            /*
-            if (has_label)
-            {
-                subsize = rect<s32>(widget_x - one_button_space/2,
-                                    (int)((button_y + m_children[i].h)*zoom) + 5, // leave 5 pixels between button and label
-                                    widget_x + (int)(one_button_space/2.0f), h);
-                
-                stringw& message = m_children[i].m_text;
-                IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), subsize, false, true, btn);
-                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-                label->setTabStop(false);
-                label->setNotClipped(true);
-                
-                m_labels.push_back(label);
-                
-                const int final_y = subsize.getHeight() + label->getTextHeight();
-                if(final_y > biggest_y) biggest_y = final_y;
-            }
-            */
-            //subbtn->setTabStop(false);
-            //subbtn->setTabGroup(false);
+            // the label itself will be added by the icon widget. since it adds the label outside of the
+            // widget area it is assigned to, the label will appear in the area we want at the bottom
         }
         else
         {
