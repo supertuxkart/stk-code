@@ -55,6 +55,11 @@ A plain text buttons.
 WTYPE_ICON_BUTTON       "icon-button", "icon"
 A component with an image, and optional text to go under it. The "icon" variant will have no border and will not
 be clickable. PROP_ICON is mandatory for this component.
+There are three ways to place the texture within the allocated space; the default (and only way currently accessible
+through xml files) is to scale the texture to fit, while preserving its aspect ratio; other methods, currently only
+accessible through C++ code, are to stretch the texture to fill the area without caring for aspect ratio, and another
+to respect an aspect ratio other than the texture's (useful for track screenshots, which are 4:3 compressed to fit
+in a power-of-two 256x256 texture)
 
 WTYPE_CHECKBOX          "checkbox"
 A checkbox. Not used at the moment.

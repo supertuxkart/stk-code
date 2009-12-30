@@ -153,31 +153,16 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
 
     
     // ---- Track screenshot
-    // stretch the *texture* within the widget (and the widget has the right aspect ratio)
-    // (Yeah, that's complicated, but screenshots are saved compressed horizontally so it's hard to be clean)
-    IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_STRETCH, false, false);
+    IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+                                                              false, false);
+    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); // images are saved squared, but must be stretched to 4:3 
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     
-    const int x_from = area_right.UpperLeftCorner.X;
-    const int y_from = area_right.UpperLeftCorner.Y;
-    const int available_w = area_right.getWidth();
-    const int available_h = area_right.getHeight();
+    screenshotWidget->x = area_right.UpperLeftCorner.X;
+    screenshotWidget->y = area_right.UpperLeftCorner.Y;
+    screenshotWidget->w = area_right.getWidth();
+    screenshotWidget->h = area_right.getHeight();
     
-    // TODO: move that "custom aspect ratio" code into the Image widget
-    // find a size that has the right aspect ratio (4:3) and fits within available space
-    int suggested_h = available_h;
-    int suggested_w = (4.0f / 3.0f) * suggested_h;
-    if (suggested_w > available_w)
-    {
-        const float needed_scale_factor = (float)available_w / (float)suggested_w;
-        suggested_w *= needed_scale_factor;
-        suggested_h *= needed_scale_factor;
-    }
-    
-    screenshotWidget->x = x_from + (available_w - suggested_w)/2; // center horizontally
-    screenshotWidget->y = y_from + (available_h - suggested_h)/2; // center vertically
-    screenshotWidget->w = suggested_w;
-    screenshotWidget->h = suggested_h;
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; // temporary icon, will replace it just after
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();

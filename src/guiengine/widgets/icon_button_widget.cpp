@@ -26,10 +26,12 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop, const bool focusable)
 {
-    m_tab_stop = tab_stop;
     m_label = NULL;
-    m_type = WTYPE_ICON_BUTTON;
     m_texture = NULL;
+    m_type = WTYPE_ICON_BUTTON;
+    m_custom_aspect_ratio = 1.0f;
+
+    m_tab_stop = tab_stop;
     m_focusable = focusable;
     m_scale_mode = scale_mode;
 }
@@ -44,14 +46,34 @@ void IconButtonWidget::add()
 
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
-    int x_gap = 0;
+    float useAspectRatio = -1.0f;
     
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
-        x_gap = (int)((float)w - (float)m_texture_w * (float)h / m_texture_h);
+        useAspectRatio = (float)m_texture_w / (float)m_texture_h;
+        //std::cout << "m_texture_h=" << m_texture_h << "; m_texture_w="<< m_texture_w << "; useAspectRatio=" << useAspectRatio << std::endl;
+    }
+    else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
+    {
+        useAspectRatio = m_custom_aspect_ratio;
     }
     
-    rect<s32> widget_size = rect<s32>(x + x_gap/2, y, x + w - x_gap/2, y + h);
+    int suggested_h = h;
+    int suggested_w = (useAspectRatio < 0 ? w : useAspectRatio*suggested_h);
+    
+    if (suggested_w > w)
+    {
+        const float needed_scale_factor = (float)w / (float)suggested_w;
+        suggested_w *= needed_scale_factor;
+        suggested_h *= needed_scale_factor;
+    }
+    const int x_from = x + (w - suggested_w)/2; // center horizontally
+    const int y_from = y + (h - suggested_h)/2; // center vertically
+    
+    rect<s32> widget_size = rect<s32>(x_from,
+                                      y_from,
+                                      x_from + suggested_w,
+                                      y_from + suggested_h);
     //std::cout << "Creating a IGUIButton " << widget_size.UpperLeftCorner.X << ", " << widget_size.UpperLeftCorner.Y <<
     //" : " << widget_size.getWidth() << "x" << widget_size.getHeight() << std::endl;
     

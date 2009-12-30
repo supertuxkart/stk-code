@@ -35,7 +35,8 @@ namespace GUIEngine
         enum ScaleMode
         {
             SCALE_MODE_STRETCH,
-            SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO
+            SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO,
+            SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO
         };
         
     protected:
@@ -46,10 +47,10 @@ namespace GUIEngine
         int m_texture_w, m_texture_h;
         
         ScaleMode m_scale_mode;
+        float m_custom_aspect_ratio;
+        
     public:
-        
 
-        
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
@@ -58,6 +59,10 @@ namespace GUIEngine
         
         /** Callback called when this widget needs to be added (see base class Widget) */
         virtual void add();
+        
+        /** Call this if scale mode is SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO.
+          * \param custom_aspect_ratio  The width/height aspect ratio */
+        void setCustomAspectRatio(float custom_aspect_ratio) { m_custom_aspect_ratio = custom_aspect_ratio; }
         
         /** Change the text label if there is a label (label won't be added if there initially wasn't one) */
         void setLabel(irr::core::stringw new_label);
