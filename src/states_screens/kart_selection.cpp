@@ -684,13 +684,25 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
     g_dispatcher = new FocusDispatcher(this);
 }
-
+// -----------------------------------------------------------------------------
+void KartSelectionScreen::forgetWhatWasLoaded()
+{    
+    Screen::forgetWhatWasLoaded();
+    
+    // this pointer is no more valid
+    g_dispatcher = NULL;
+}
 // -----------------------------------------------------------------------------
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
     std::cout << "playerJoin() ==========\n";
 
+    if (g_dispatcher == NULL)
+    {
+        g_dispatcher = new FocusDispatcher(this);
+    }
+    
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
@@ -717,7 +729,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     {
         g_dispatcher->setRootID(kartsArea.m_reserved_id);
         g_dispatcher->add();
-        m_widgets.push_back(g_dispatcher);
+        if (!m_widgets.contains(g_dispatcher)) m_widgets.push_back(g_dispatcher);
 
         // We keep the ID of the "root" widget, see comment at top
         g_root_id = kartsArea.m_reserved_id;

@@ -93,6 +93,7 @@ namespace GUIEngine
     class Widget : public SkinWidgetContainer
     {
     protected:
+        int m_magic_number;
 
         friend class EventHandler;
         friend class RibbonWidget;

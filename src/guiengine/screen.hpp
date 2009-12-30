@@ -92,6 +92,8 @@ namespace GUIEngine
         /** Will be called to determine if the 3D scene must be rendered when at this screen. */
         bool m_render_3d;
         
+        
+        int m_magic_number;
     public:
         bool throttleFPS;
         
@@ -107,11 +109,12 @@ namespace GUIEngine
         
         /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
             (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
-        void forgetWhatWasLoaded();
+        virtual void forgetWhatWasLoaded();
         
         Screen(); /**< creates a dummy incomplete object; only use to override behaviour in sub-class */
         Screen(const char* filename);
-        virtual ~Screen(){}
+        virtual ~Screen();
+        
         bool operator ==(const char* filename) const { return m_filename == filename; }
         
         /** returns an object by name, or NULL if not found */

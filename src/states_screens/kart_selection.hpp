@@ -70,4 +70,7 @@ public:
     
     /** Standard 'Screen' callback every frame */
     void onUpdate(float dt, irr::video::IVideoDriver*);
+    
+    /** overload */
+    virtual void forgetWhatWasLoaded();
 };

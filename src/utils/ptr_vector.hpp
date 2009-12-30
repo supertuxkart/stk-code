@@ -129,10 +129,15 @@ bool contains( TYPE* instance ) const
 
 void clearAndDeleteAll()
 {
-    for(unsigned int n=0; n<contentsVector.size(); n++)
+    for (unsigned int n=0; n<contentsVector.size(); n++)
     {
         TYPE * pointer = contentsVector[n];
         delete pointer;
+        contentsVector[n] = (TYPE*)0xDEADBEEF;
+        
+        // When deleting, it's important that the same pointer cannot be
+        // twice in the vector, resulting in a double delete
+        assert( !contains(pointer) );
     }
     contentsVector.clear();
 }

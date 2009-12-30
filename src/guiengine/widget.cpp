@@ -56,6 +56,8 @@ namespace GUIEngine
 // -----------------------------------------------------------------------------
 Widget::Widget(bool reserve_id)
 {
+    m_magic_number = 0xCAFEC001;
+    
     x = -1;
     y = -1;
     w = -1;
@@ -88,6 +90,8 @@ Widget::Widget(bool reserve_id)
 
 Widget::~Widget()
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     // If any player focused this widget, unset that focus
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -97,10 +101,13 @@ Widget::~Widget()
         }
     }
     
+    m_magic_number = 0xDEADBEEF;
 }
     
 void Widget::elementRemoved()
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     m_element = NULL;
     
     // If any player focused this widget, unset that focus
@@ -137,6 +144,7 @@ void Widget::resetIDCounters()
 // -----------------------------------------------------------------------------
 void Widget::add()
 {
+    assert(m_magic_number == 0xCAFEC001);
     if (m_reserve_id)
     {
         m_reserved_id = getNewID();
@@ -151,6 +159,8 @@ void Widget::add()
   */
 void Widget::setFocusForPlayer(const int playerID)
 {    
+    assert(m_magic_number == 0xCAFEC001);
+    
     // Unset focus flag on previous widget that had focus
     if (GUIEngine::getFocusForPlayer(playerID) != NULL)
     {
@@ -167,6 +177,8 @@ void Widget::setFocusForPlayer(const int playerID)
     
 void Widget::unsetFocusForPlayer(const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     if (m_player_focus[playerID]) this->unfocused(playerID);
     m_player_focus[playerID] = false;
 }
@@ -176,6 +188,8 @@ void Widget::unsetFocusForPlayer(const int playerID)
  */
 bool Widget::isFocusedForPlayer(const int playerID)
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     return m_player_focus[playerID];
 }
     
@@ -189,7 +203,7 @@ bool Widget::isFocusedForPlayer(const int playerID)
  *     Returns false if couldn't convert to either
  */
 bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
-{
+{    
     bool is_number;
     int i;
     std::istringstream myStream(x);
@@ -211,6 +225,8 @@ bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percen
     
 void Widget::move(const int x, const int y, const int w, const int h)
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     this->x = x;
     this->y = y;
     this->w = w;
@@ -226,6 +242,8 @@ void Widget::move(const int x, const int y, const int w, const int h)
  */
 void Widget::readCoords(Widget* parent)
 {
+    assert(m_magic_number == 0xCAFEC001);
+    
     /* determine widget position and size if not already done by sizers */
     std::string x       = m_properties[PROP_X];
     std::string y       = m_properties[PROP_Y];
@@ -360,6 +378,7 @@ void Widget::readCoords(Widget* parent)
 
 void Widget::setParent(IGUIElement* parent)
 {
+    assert(m_magic_number == 0xCAFEC001);
     m_parent = parent;
 }
 

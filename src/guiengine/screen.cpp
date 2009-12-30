@@ -42,6 +42,8 @@ using namespace GUIEngine;
 
 Screen::Screen(const char* file)
 {
+    m_magic_number = 0xCAFEC001;
+
     throttleFPS = true;
     
     m_mouse_x = 0;
@@ -55,6 +57,8 @@ Screen::Screen(const char* file)
 
 Screen::Screen()
 {
+    m_magic_number = 0xCAFEC001;
+
     m_mouse_x = 0;
     m_mouse_y = 0;
     m_loaded = false;
@@ -62,8 +66,20 @@ Screen::Screen()
     m_render_3d = false;
 }
 
+Screen::~Screen()
+{
+    assert(m_magic_number == 0xCAFEC001);
+    m_magic_number = 0xDEADBEEF;
+}
+
 void Screen::forgetWhatWasLoaded()
 {
+    assert(m_magic_number == 0xCAFEC001);
+    for (int n=0; n<m_widgets.size(); n++)
+    {
+        assert(m_widgets[n].m_magic_number == 0xCAFEC001);
+    }
+    
     m_loaded = false;
     m_inited = false;
     m_widgets.clearAndDeleteAll();
@@ -77,6 +93,7 @@ void Screen::forgetWhatWasLoaded()
 // -----------------------------------------------------------------------------
 void Screen::loadFromFile()
 {
+    assert(m_magic_number == 0xCAFEC001);
     IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
@@ -86,6 +103,7 @@ void Screen::loadFromFile()
 /* small shortcut so this method can be called without arguments */
 void Screen::calculateLayout()
 {
+    assert(m_magic_number == 0xCAFEC001);
     // build layout
     calculateLayout( m_widgets );
 }
@@ -97,6 +115,7 @@ void Screen::calculateLayout()
  */
 void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
 {
+    assert(m_magic_number == 0xCAFEC001);
     const unsigned short widgets_amount = widgets.size();
     
     // ----- read x/y/size parameters
@@ -264,6 +283,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
 
 void Screen::addWidgets()
 {
+    assert(m_magic_number == 0xCAFEC001);
     if (!m_loaded) loadFromFile();
     
     addWidgetsRecursively( m_widgets );
@@ -312,6 +332,7 @@ void Screen::addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent)
  */
 void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
 {
+    assert(m_magic_number == 0xCAFEC001);
     if (within_vector == NULL) within_vector = &m_widgets;
     const unsigned short widgets_amount = within_vector->size();
     
@@ -330,11 +351,13 @@ void Screen::elementsWereDeleted(ptr_vector<Widget>* within_vector)
 // -----------------------------------------------------------------------------
 void Screen::manualAddWidget(Widget* w)
 {
+    assert(m_magic_number == 0xCAFEC001);
     m_widgets.push_back(w);
 }
 // -----------------------------------------------------------------------------
 void Screen::manualRemoveWidget(Widget* w)
 {
+    assert(m_magic_number == 0xCAFEC001);
     m_widgets.remove(w);
 }
 
