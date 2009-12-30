@@ -232,7 +232,7 @@ void IrrDriver::showPointer()
 //-----------------------------------------------------------------------------
 void IrrDriver::hidePointer()
 {
-    this->getDevice()->getCursorControl()->setVisible(true);
+    this->getDevice()->getCursorControl()->setVisible(false);
 }   // hidePointer
 
 //-----------------------------------------------------------------------------
