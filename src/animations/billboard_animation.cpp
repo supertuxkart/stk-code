@@ -23,8 +23,8 @@ class XMLNode;
 
 /** A 2d billboard animation. */
 BillboardAnimation::BillboardAnimation(const Track &track_name, 
-                                       const XMLNode &node, float fps) 
-                  : AnimationBase(node, fps)
+                                       const XMLNode &node)
+                  : AnimationBase(node)
 {
 }   // BillboardAnimation
 

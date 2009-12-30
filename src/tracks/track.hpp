@@ -41,13 +41,14 @@ using namespace irr;
 #include "tracks/quad_graph.hpp"
 #include "utils/vec3.hpp"
 
-class TriangleMesh;
-class MovingTexture;
-class XMLNode;
-class PhysicalObject;
-class BezierCurve;
 class AnimationManager;
+class BezierCurve;
 class CheckManager;
+class MovingTexture;
+class PhysicalObject;
+class TrackObjectManager;
+class TriangleMesh;
+class XMLNode;
 
 class Track
 {
@@ -103,8 +104,8 @@ private:
     /** The list of all animated textures. */
     std::vector<MovingTexture*> m_animated_textures;
 
-    /** List of all physical objects. */
-    std::vector<PhysicalObject*> m_physical_objects;
+    /** Manager for all track objects. */
+    TrackObjectManager *m_track_object_manager;
 
     /** If a sky dome is used, the number of horizontal segments 
      *  the sphere should be divided in. */

@@ -22,18 +22,15 @@
 
 #include <string>
 
-#include "irrlicht.h"
-using namespace irr;
-
 #include "btBulletDynamicsCommon.h"
 
 #include "physics/user_pointer.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/vec3.hpp"
 
-class scene::IAnimatedMesh;
 class XMLNode;
 
-class PhysicalObject
+class PhysicalObject : public TrackObject
 {
 public:
     enum bodyTypes {MP_NONE, MP_CONE, MP_BOX, MP_SPHERE};
@@ -54,14 +51,16 @@ protected:
     UserPointer           m_user_pointer;
     /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
-    /** The irrlicht mesh for this object. */
-    scene::IMesh         *m_mesh;
-    /** The irrlicht scene node this object is attached to. */
-    scene::ISceneNode    *m_node;
-    /** Radius of the object - this obviously depends on the actual shape. */
+
+    /** Radius of the object - this obviously depends on the actual shape.
+     *  As a default the radius is being determined from the shape of the
+     *  mesh, but in somce cases that could lead to incorrect results
+     *  (if the mesh does not closely resemble a sphere, see init() for 
+     *  details, but is supposed to be a sphere). In this case the radius
+     *  can be set in the scene file. */
     float                 m_radius;
 public:
-                 PhysicalObject (const XMLNode *node);
+                 PhysicalObject (const XMLNode &node);
     virtual     ~PhysicalObject (); 
     void         update         (float dt);
     void         init           ();

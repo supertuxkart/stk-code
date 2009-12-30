@@ -25,48 +25,50 @@
 #include "irrlicht.h"
 using namespace irr;
 
+#include "tracks/track_object.hpp"
+
 class XMLNode;
 class Ipo;
 
 /** A base class for all animations. */
-class AnimationBase
+class AnimationBase : public TrackObject
 {
 private:
-        /** Two types of animations: cyclic ones that play all the time, and
-         *  one time only (which might get triggered more than once). */
-        enum AnimTimeType { ATT_CYCLIC, ATT_CYCLIC_ONCE } m_anim_type;
+    /** Two types of animations: cyclic ones that play all the time, and
+    *  one time only (which might get triggered more than once). */
+    enum AnimTimeType { ATT_CYCLIC, ATT_CYCLIC_ONCE } m_anim_type;
 
-        /** True if the animation is currently playing. */
-        bool  m_playing;
+    /** True if the animation is currently playing. */
+    bool  m_playing;
 
-        /** For one time animations: start time. */
-        float m_start;
+    /** For one time animations: start time. */
+    float m_start;
 
-        /** For cyclic animations: duration of the cycle. */
-        float m_cycle_length;
+    /** For cyclic animations: duration of the cycle. */
+    float m_cycle_length;
 
-        /** The current time in the cycle of a cyclic animation. */
-        float m_current_time;
+    /** The current time in the cycle of a cyclic animation. */
+    float m_current_time;
 
-        /** The inital position of this object. */
-        core::vector3df m_initial_xyz;
-        
-        /** The initial rotation of this object. */
-        core::vector3df m_initial_hpr;
+    /** The inital position of this object. */
+    core::vector3df m_initial_xyz;
+
+    /** The initial rotation of this object. */
+    core::vector3df m_initial_hpr;
 protected:
-        /** All IPOs for this animation. */
-        std::vector<Ipo*> m_all_ipos;
+    /** All IPOs for this animation. */
+    std::vector<Ipo*> m_all_ipos;
 
 public:
-                 AnimationBase(const XMLNode &node, float fps);
+                 AnimationBase(const XMLNode &node);
     virtual     ~AnimationBase();
-        virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr);
-        /** This needs to be implemented by the inheriting classes. It is called
-         *  once per frame from the track. */
-        virtual void update(float dt) = 0;
-        void         setInitialTransform(const core::vector3df &xyz, 
-                                             const core::vector3df &hpr);
-        void         reset();
+    virtual void update(float dt, core::vector3df *xyz, core::vector3df *hpr);
+    /** This needs to be implemented by the inheriting classes. It is called
+    *  once per frame from the track. */
+    virtual void update(float dt) = 0;
+    void         setInitialTransform(const core::vector3df &xyz, 
+                                     const core::vector3df &hpr);
+    void         reset();
 
 };   // AnimationBase
 

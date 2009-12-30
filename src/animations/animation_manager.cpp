@@ -31,12 +31,10 @@ AnimationManager::AnimationManager(const Track &track, const XMLNode &node)
     {
         const XMLNode *anim_node = node.getNode(i);
         std::string type = anim_node->getName();
-        float fps=25;
-        anim_node->get("fps", &fps);
         if(type=="anim_billboard")
-            m_all_animations.push_back(new BillboardAnimation(track, *anim_node, fps));
+            m_all_animations.push_back(new BillboardAnimation(track, *anim_node));
         else if(type=="animations-IPO")
-            m_all_animations.push_back(new ThreeDAnimation(track, *anim_node, fps));
+            m_all_animations.push_back(new ThreeDAnimation(track, *anim_node));
         else
             fprintf(stderr, "Unknown animation type '%s' - ignored.\n", 
                     type.c_str());

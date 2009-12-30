@@ -34,27 +34,9 @@
 #include "utils/constants.hpp"
 
 ThreeDAnimation::ThreeDAnimation(const Track &track,
-                                 const XMLNode &node, float fps) 
-               : AnimationBase(node, fps)
+                                 const XMLNode &node)
+               : AnimationBase(node)
 {
-    std::string model_name;
-    node.get("obj", &model_name);
-
-    std::string full_path = track.getTrackFile(model_name);
-    m_mesh = irr_driver->getAnimatedMesh(full_path);
-    if(!m_mesh)
-    {
-        fprintf(stderr, "Warning: node '%s' animated model '%s' not found, aborting.\n",
-                node.getName().c_str(), model_name.c_str());
-        exit(-1);
-    }
-    m_animated_node = irr_driver->addAnimatedMesh(m_mesh);
-    core::vector3df xyz;
-    node.get("xyz", &xyz);
-    m_animated_node->setPosition(xyz);
-    core::vector3df hpr(0,0,0);
-    node.get("hpr", &hpr);
-    m_animated_node->setRotation(hpr);
     /** Save the initial position and rotation in the base animation object. */
     setInitialTransform(m_animated_node->getPosition(), m_animated_node->getRotation());
 
@@ -76,7 +58,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    MeshTools::minMax3D(m_mesh, &min, &max);
+    MeshTools::minMax3D(m_animated_mesh, &min, &max);
     Vec3 extend = max-min;
     if(shape=="box")
     {
@@ -130,8 +112,6 @@ ThreeDAnimation::~ThreeDAnimation()
     delete m_body;
     delete m_motion_state;
     delete m_collision_shape;
-    irr_driver->removeNode(m_animated_node);
-    irr_driver->removeMesh(m_mesh);
 }   // ~ThreeDAnimation
 
 // ----------------------------------------------------------------------------

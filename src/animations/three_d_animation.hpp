@@ -38,12 +38,6 @@ class XMLNode;
 class ThreeDAnimation : public AnimationBase
 {
 private:
-    /** Mesh of this animation. */
-    scene::IAnimatedMesh *m_mesh;
-
-    /** The scene node for the model. */
-    scene::IAnimatedMeshSceneNode *m_animated_node;
-
     /** The bullet collision shape for the physics. */
     btCollisionShape     *m_collision_shape;
 
@@ -59,8 +53,7 @@ private:
     void createPhysicsBody(const std::string &shape);
 
 public:
-                 ThreeDAnimation(const Track &track,
-                                const XMLNode &node, float fps);
+                 ThreeDAnimation(const Track &track, const XMLNode &node);
     virtual     ~ThreeDAnimation();
     virtual void update(float dt);
 

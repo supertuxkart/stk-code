@@ -1,4 +1,4 @@
-//  $Id: billboard_animation.hpp 1681 2008-04-09 13:52:48Z hikerstk $
+//  $Id: track_object_manager.hpp 4308 2009-12-17 00:22:29Z hikerstk $
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009  Joerg Henrichs
@@ -17,27 +17,32 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BILLBOARD_ANIMATION_HPP
-#define HEADER_BILLBOARD_ANIMATION_HPP
+#ifndef HEADER_TRACK_OBJECT_MANAGER_HPP
+#define HEADER_TRACK_OBJECT_MANAGER_HPP
 
-#include <string>
+#include <vector>
 
-#include "animations/animation_base.hpp"
-
+class PhysicalObject;
 class Track;
+class TrackObject;
+class Vec3;
 class XMLNode;
 
-/** A 2d billboard animation. */
-class BillboardAnimation : public AnimationBase
+class TrackObjectManager
 {
-private:
-
 public:
-             BillboardAnimation(const Track &track, const XMLNode &node);
-    virtual ~BillboardAnimation(){}
-    virtual void update(float dt);
-
-};   // BillboardAnimation
+    // The different type of track objects: physical objects, graphical 
+    // objects (without a physical representation) - the latter might be
+    // eye candy (to reduce work for physics), ...
+    enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
+    std::vector<TrackObject*> m_all_objects;
+public:
+         TrackObjectManager();
+    void add(const XMLNode &xml_node, const Track &track);
+    void update(float dt);
+    void handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
+    void reset();
+    void init();
+};   // class TrackObjectManager
 
 #endif
-

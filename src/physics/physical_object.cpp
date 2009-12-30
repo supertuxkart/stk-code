@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+
 #include "irrlicht.h"
 using namespace irr;
 
@@ -35,43 +36,9 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
-PhysicalObject::PhysicalObject(const XMLNode *xml_node)
+PhysicalObject::PhysicalObject(const XMLNode &xml_node)
+              : TrackObject(xml_node)
 {
-    std::string model_name;
-    const Track *track=RaceManager::getTrack();
-    xml_node->get("model", &model_name);
-    std::string full_path = track->getTrackFile(model_name);
-    scene::IAnimatedMesh *obj = irr_driver->getAnimatedMesh(full_path);
-    if(!obj)
-    {
-        // If the model isn't found in the track directory, look 
-        // in STK's model directory.
-        full_path = file_manager->getModelFile(model_name);
-        obj = irr_driver->getAnimatedMesh(full_path);
-        if(!obj)
-        {
-            fprintf(stderr, "Warning: '%s' in '%s' not found and is ignored.\n",
-                    xml_node->getName().c_str(), model_name.c_str());
-            return;
-        }   // if(!obj)
-    }
-    m_mesh = obj->getMesh(0);
-    m_node = irr_driver->addMesh(m_mesh);
-    //m_node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
-    Vec3 xyz(0,0,0);
-    int result = xml_node->get("xyz", &xyz);
-    xyz.setZ(RaceManager::getTrack()->getTerrainHeight(xyz));
-    Vec3 hpr(0,0,0);
-    result = xml_node->getHPR(&hpr);
-    if(!XMLNode::hasP(result) ||
-       !XMLNode::hasR(result))   // Needs perhaps pitch and roll
-    {
-    }
-    m_node->setPosition(xyz.toIrrVector());
-    m_node->setRotation(hpr.toIrrHPR());
-    m_init_pos.setIdentity();
-    m_init_pos.setOrigin(xyz);
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 
     m_shape        = NULL;
     m_body         = NULL;
@@ -80,21 +47,24 @@ PhysicalObject::PhysicalObject(const XMLNode *xml_node)
     m_radius       = -1;
 
     std::string shape;
-    xml_node->get("mass",   &m_mass  );
-    xml_node->get("radius", &m_radius);
-    xml_node->get("shape",  &shape   );
+    xml_node.get("mass",   &m_mass  );
+    xml_node.get("radius", &m_radius);
+    xml_node.get("shape",  &shape   );
 
     m_body_type = MP_NONE;
     if     (shape=="cone"   ) m_body_type = MP_CONE;
     else if(shape=="box"    ) m_body_type = MP_BOX;
     else if(shape=="sphere" ) m_body_type = MP_SPHERE;
+
+    m_init_pos.setIdentity();
+    m_init_pos.setOrigin(m_init_xyz);
+
 }   // PhysicalObject
 
 // -----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
     RaceManager::getWorld()->getPhysics()->removeBody(m_body);
-    irr_driver->removeNode(m_node);
     delete m_body;
     delete m_motion_state;
     delete m_shape;
@@ -105,12 +75,12 @@ PhysicalObject::~PhysicalObject()
  */
 void PhysicalObject::init()
 {
-    assert(m_mesh);
+    assert(m_animated_mesh);
 
     // 1. Determine size of the object
     // -------------------------------
     Vec3 min, max;
-    MeshTools::minMax3D(m_mesh, &min, &max);
+    MeshTools::minMax3D(m_animated_mesh, &min, &max);
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -128,13 +98,8 @@ void PhysicalObject::init()
     case MP_SPHERE: {
                     if(m_radius<0)
                     {
-                        float max_axis = std::max(extend.getX(), extend.getY());
-                        max_axis       = std::max(max_axis, extend.getZ());
-                        // Worst case radius: if the actual shape is more like
-                        // a box, the actual radius can be up to sqrt(3) larger
-                        // than the maxium axis size:
-                        // sqrt(x*x+y*y+z*z) <= sqrt(3*max_axis*max_axis)
-                        m_radius   = sqrt(3.0f)*max_axis;
+                        m_radius =      std::max(extend.getX(), extend.getY());
+                        m_radius = 0.5f*std::max(m_radius,      extend.getZ());
                     }
                     m_shape = new btSphereShape(m_radius);
                     break;
@@ -151,7 +116,7 @@ void PhysicalObject::init()
         irr_driver->getSceneManager()->getMeshManipulator();
     core::matrix4 transform(core::matrix4::EM4CONST_IDENTITY);  // 
     transform.setTranslation(offset_from_center.toIrrVector());
-    mesh_manipulator->transformMesh(m_mesh, transform);
+    mesh_manipulator->transformMesh(m_animated_mesh, transform);
 
     // 2. Create the rigid object
     // --------------------------
@@ -183,12 +148,12 @@ void PhysicalObject::update(float dt)
         m_body->setCenterOfMassTransform(m_init_pos);
         c.setXYZ(m_init_pos.getOrigin());
     }
-    m_node->setPosition(c.getXYZ().toIrrVector());
+    m_animated_node->setPosition(c.getXYZ().toIrrVector());
     btQuaternion q=t.getRotation();
     core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
     core::vector3df r;
     qirr.toEuler(r);
-    m_node->setRotation(r*RAD_TO_DEGREE);
+    m_animated_node->setRotation(r*RAD_TO_DEGREE);
     return;
 
 }   // update

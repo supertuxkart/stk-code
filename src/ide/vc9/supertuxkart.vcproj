@@ -653,6 +653,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\stars.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\water_splash.cpp"
 					>
 				</File>
@@ -750,6 +754,14 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\track_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_object.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_object_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -881,6 +893,10 @@
 				Name="states_screen"
 				>
 				<File
+					RelativePath="..\..\states_screens\arenas_screen.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\challenges.cpp"
 					>
 				</File>
@@ -943,6 +959,10 @@
 				<Filter
 					Name="dialogs"
 					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\add_device_dialog.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.cpp"
 						>
@@ -1463,6 +1483,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\graphics\stars.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\graphics\water_splash.hpp"
 					>
 				</File>
@@ -1520,6 +1544,14 @@
 				</File>
 				<File
 					RelativePath="..\..\tracks\track_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_object.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\tracks\track_object_manager.hpp"
 					>
 				</File>
 			</Filter>
@@ -1655,6 +1687,10 @@
 				Name="states_screens"
 				>
 				<File
+					RelativePath="..\..\states_screens\arenas_screen.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\states_screens\challenges.hpp"
 					>
 				</File>
@@ -1717,6 +1753,10 @@
 				<Filter
 					Name="dialogs"
 					>
+					<File
+						RelativePath="..\..\states_screens\dialogs\add_device_dialog.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.hpp"
 						>

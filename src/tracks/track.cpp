@@ -50,6 +50,7 @@ using namespace irr;
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -96,12 +97,12 @@ Track::~Track()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-        if(m_animation_manager)
-                m_animation_manager->reset();
+    if(m_animation_manager)
+        m_animation_manager->reset();
     if(m_check_manager)
         m_check_manager->reset(*this);
     item_manager->reset();
-
+    m_track_object_manager->reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -138,11 +139,10 @@ void Track::cleanup()
         m_animation_manager = NULL;
     }
 
-    for(unsigned int i=0; i<m_physical_objects.size(); i++)
-    {
-        delete m_physical_objects[i];
-    }
-    m_physical_objects.clear();
+    delete m_track_object_manager;
+
+    delete m_track_object_manager;
+    m_track_object_manager = NULL;
 
     irr_driver->removeNode(m_sun);
 
@@ -435,9 +435,15 @@ bool Track::loadMainTrack(const XMLNode &root)
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
-        // The have already been handled
+        // Animated textures have already been handled
         if(n->getName()=="animated-texture") continue;
-        assert(n->getName()=="object");
+        // Only "object" entries are allowed now inside of the model tag
+        if(n->getName()!="static-object")
+        {
+            fprintf(stderr, "Incorrect tag '%s' inside <model> of scene file - ignored\n",
+                    n->getName().c_str());
+            continue;
+        }
         model_name="";
         n->get("model", &model_name);
         full_path = m_root+"/"+model_name;
@@ -450,11 +456,12 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         m_all_meshes.push_back(a_mesh);
         scene::ISceneNode *scene_node = irr_driver->addAnimatedMesh(a_mesh);
-        core::vector3df xyz(0,0,0);
+        //core::vector3df xyz(0,0,0);
+        Vec3 xyz(0,0,0);
         n->get("xyz", &xyz);
         core::vector3df hpr(0,0,0);
         n->get("hpr", &hpr);
-        scene_node->setPosition(xyz);
+        scene_node->setPosition(xyz.toIrrVector());
         scene_node->setRotation(hpr);
         handleAnimatedTextures(scene_node, *n);
         m_all_nodes.push_back(scene_node);
@@ -525,18 +532,16 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
  */
 void Track::update(float dt)
 {
+    m_track_object_manager->update(dt);
+
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
         m_animated_textures[i]->update(dt);
     }
-    for(unsigned int i=0; i<m_physical_objects.size(); i++)
-    {
-        m_physical_objects[i]->update(dt);
-    }
-        if(m_animation_manager)
-                m_animation_manager->update(dt);
-        if(m_check_manager)
-                m_check_manager->update(dt);
+    if(m_animation_manager)
+        m_animation_manager->update(dt);
+    if(m_check_manager)
+        m_check_manager->update(dt);
     item_manager->update(dt);
 
 }   // update
@@ -550,11 +555,7 @@ void Track::update(float dt)
  */
 void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj) const
 {
-    for(std::vector<PhysicalObject*>::const_iterator i=m_physical_objects.begin();
-        i!=m_physical_objects.end(); i++)
-    {
-        (*i)->handleExplosion(pos, obj==(*i));
-    }
+    m_track_object_manager->handleExplosion(pos, obj);
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
@@ -567,17 +568,7 @@ void Track::createWater(const XMLNode &node)
     node.get("model", &model_name);
     std::string full_path = m_root+"/"+model_name;
 
-    //scene::IMesh *mesh = irr_driver->getMesh(full_path);
     scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->getMesh(full_path.c_str());
-    //irr_driver->getSceneManager()->addWaterSurfaceSceneNode(mesh->getMesh(0));
-    //scene::IAnimatedMesh *mesh = irr_driver->getSceneManager()->addHillPlaneMesh("myHill",
-    //            core::dimension2d<f32>(20,20),
-    //            core::dimension2d<u32>(40,40), 0, 0,
-    //            core::dimension2d<f32>(0,0),
-    //            core::dimension2d<f32>(10,10));
-
-    //scene::SMeshBuffer b(*(scene::SMeshBuffer*)(mesh->getMesh(0)->getMeshBuffer(0)));
-    //scene::SMeshBuffer* buffer = new scene::SMeshBuffer(*(scene::SMeshBuffer*)(mesh->getMeshBuffer(0)));
     
     float wave_height  = 2.0f;
     float wave_speed   = 300.0f;
@@ -616,8 +607,9 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(unsigned int mode_id)
 {
-    m_has_final_camera = false;
-    m_is_arena         = false;
+    m_has_final_camera     = false;
+    m_is_arena             = false;
+    m_track_object_manager = new TrackObjectManager();
     item_manager->setStyle();
 
     // Load the graph only now: this function is called from world, after
@@ -662,9 +654,9 @@ void Track::loadTrackModel(unsigned int mode_id)
         const std::string name = node->getName();
         // The track object was already converted before the loop
         if(name=="track") continue;
-        if(name=="physical-object")
+        if(name=="object")
         {
-            m_physical_objects.push_back(new PhysicalObject(node));
+            m_track_object_manager->add(*node, *this);
         }
         else if(name=="water")
         {
@@ -754,12 +746,8 @@ void Track::loadTrackModel(unsigned int mode_id)
     }
     delete root;
 
-    // Init all physical objects
-    for(std::vector<PhysicalObject*>::const_iterator i=m_physical_objects.begin();
-        i!=m_physical_objects.end(); i++)
-    {
-        (*i)->init();
-    }
+    // Init all track objects
+    m_track_object_manager->init();
 
     // Sky dome and boxes support
     // --------------------------

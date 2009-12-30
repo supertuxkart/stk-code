@@ -177,14 +177,10 @@ int XMLNode::get(const std::string &attribute, core::vector2df *value) const
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::vector3df *value) const
 {
-    std::string s = "";
-    if(!get(attribute, &s)) return 0;
+    Vec3 xyz;
+    if(!get(attribute, &xyz)) return 0;
 
-    std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=3) return 0;
-    value->X = (float)atof(v[0].c_str());
-    value->Y = (float)atof(v[1].c_str());
-    value->Z = (float)atof(v[2].c_str());
+    *value = xyz.toIrrVector();
     return 1;
 }   // get(vector3df)
 

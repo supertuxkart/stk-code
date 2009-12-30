@@ -24,8 +24,11 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 
-AnimationBase::AnimationBase(const XMLNode &node, float fps)
+AnimationBase::AnimationBase(const XMLNode &node)
+             : TrackObject(node)
 {
+    float fps=25;
+    node.get("fps", &fps);
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
