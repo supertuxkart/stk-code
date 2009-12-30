@@ -65,6 +65,7 @@ Screen::Screen()
 void Screen::forgetWhatWasLoaded()
 {
     m_loaded = false;
+    m_inited = false;
     m_widgets.clearAndDeleteAll();
 }
 
