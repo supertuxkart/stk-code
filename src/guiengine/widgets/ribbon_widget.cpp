@@ -159,24 +159,24 @@ void RibbonWidget::add()
         // ---- non-tabs ribbons
         else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
-            // how much space to keep for the label under the button
+            // find how much space to keep for the label under the button.
+            // consider font size, whether the label is multiline, etc...
             const bool has_label = m_children[i].m_text.size() > 0;
             
-            int line_number = 1;
+            int line_count = 1;
             core::dimension2d< u32 > dim = GUIEngine::getFont()->getDimension( m_children[i].m_text.c_str() );
             if ((int)dim.Width > one_button_space)
             {
-                line_number = std::ceil((float)dim.Width/(float)one_button_space);
+                line_count = std::ceil((float)dim.Width/(float)one_button_space);
             }
             
-            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_number : 10;
+            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_count : 10;
             
             float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
             
-            // size of the image
+            // calculate the size of the image
             video::ITexture* image = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
             float image_h = (float)image->getSize().Height;
-            //float image_w = (float)image->getSize().Width;
             float image_w = image_h*imageRatio;
 
             // if button too high to fit, scale down
@@ -184,9 +184,6 @@ void RibbonWidget::add()
             while (button_y + image_h*zoom + needed_space_under_button > h) zoom -= 0.01f;
             
             // ---- add bitmap button part
-            //rect<s32> subsize = rect<s32>(widget_x - (int)(image_w/2.0f), button_y,
-            //                              widget_x + (int)(image_w/2.0f), button_y + (int)(m_children[i].h*zoom));
-            
             // backup and restore position in case the same object is added multiple times (FIXME: unclean)
             int old_x = m_children[i].x;
             int old_y = m_children[i].y;
@@ -198,17 +195,13 @@ void RibbonWidget::add()
             m_children[i].w = (int)(image_w*zoom);
             m_children[i].h = (int)(image_h*zoom);
             
-            //std::wcout << L"Widget has text '" << m_children[i].m_text.c_str() << "'\n";
-
             IconButtonWidget* icon = ((IconButtonWidget*)m_children.get(i));
-            //std::cout << "Setting PROP_EXTEND_LABEL to " << (one_button_space - icon->w) << std::endl;
             icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_space - icon->w);
 
             m_children.get(i)->m_parent = btn;
             m_children.get(i)->add();
-            //subbtn->setUseAlphaChannel(true);
-            //subbtn->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
-            
+
+            // restore backuped size and location (see above for more info)
             m_children[i].x = old_x;
             m_children[i].y = old_y;
             m_children[i].w = old_w;
