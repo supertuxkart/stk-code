@@ -60,7 +60,10 @@ public:
     const KartProperties*    getKart                (const std::string &ident) const;
     const int                getKartId              (const std::string &ident) const;
     int                      getKartByGroup         (const std::string& group, int i) const;
+    
     void                     loadAllKarts           ();
+    void                     unloadAllKarts         ();
+
     const unsigned int       getNumberOfKarts       () const {return (unsigned int)m_karts_properties.size();}
     const std::vector<std::string>& 
                              getAllGroups           () const {return m_all_groups;     }
@@ -77,7 +80,6 @@ public:
     void                     selectKartName(const std::string &kart_name);
     bool                     testAndSetKart(int kartid);
     std::vector<std::string> getRandomKartList(int count, RemoteKartInfoList& existing_karts);
-    void                     removeTextures      ();
     /** Returns all directories from which karts were loaded. */
     const std::vector<std::string>* getAllKartDirs() const 
                                     { return &m_all_kart_dirs; }

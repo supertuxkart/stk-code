@@ -617,14 +617,25 @@ class KartHoverListener : public DynamicRibbonHoverListener
 {
     KartSelectionScreen* m_parent;
 public:
+    int m_magic_number;
+
     KartHoverListener(KartSelectionScreen* parent)
     {
+        m_magic_number = 0xCAFEC001;
         m_parent = parent;
+    }
+    
+    virtual ~KartHoverListener()
+    {
+        assert(m_magic_number == 0xCAFEC001);
+        m_magic_number = 0xDEADBEEF;
     }
     
     void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID,
                             const irr::core::stringw& selectionText, const int playerID)
     {
+        assert(m_magic_number == 0xCAFEC001);
+
         // Don't allow changing the selection after confirming it
         if (m_parent->m_kart_widgets[playerID].isReady())
         {
@@ -689,8 +700,9 @@ void KartSelectionScreen::forgetWhatWasLoaded()
 {    
     Screen::forgetWhatWasLoaded();
     
-    // this pointer is no more valid
+    // these pointers is no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
+    karthoverListener = NULL;
 }
 // -----------------------------------------------------------------------------
 // Return true if event was handled successfully

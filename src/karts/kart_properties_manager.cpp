@@ -68,7 +68,7 @@ void KartPropertiesManager::addKartSearchDir(const std::string &s)
 }   // addKartSearchDir
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::removeTextures()
+void KartPropertiesManager::unloadAllKarts()
 {
     for(KartPropertiesVector::iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
@@ -76,6 +76,11 @@ void KartPropertiesManager::removeTextures()
         delete *i;
     }
     m_karts_properties.clear();
+    m_selected_karts.clear();
+    m_kart_available.clear();
+    m_groups.clear();
+    m_all_groups.clear();
+    m_kart_search_path.clear();
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
@@ -145,8 +150,8 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 //-----------------------------------------------------------------------------
 const int KartPropertiesManager::getKartId(const std::string &ident) const
 {
-    std::cout << "======\n";
-    std::cout << "Searching for kart " << ident.c_str() << std::endl;
+    //std::cout << "======\n";
+    //std::cout << "Searching for kart " << ident.c_str() << std::endl;
     
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)

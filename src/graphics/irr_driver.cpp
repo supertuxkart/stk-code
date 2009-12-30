@@ -250,7 +250,7 @@ void IrrDriver::changeResolution()
     attachment_manager      -> removeTextures();
     projectile_manager      -> removeTextures();
     item_manager            -> removeTextures();
-    kart_properties_manager -> removeTextures();
+    kart_properties_manager -> unloadAllKarts();
     powerup_manager         -> removeTextures();
     GUIEngine::clear();
     GUIEngine::cleanUp();
