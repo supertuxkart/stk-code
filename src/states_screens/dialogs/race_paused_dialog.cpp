@@ -41,7 +41,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     RaceManager::getWorld()->pause();
     
     IGUIFont* font = GUIEngine::getTitleFont();
-    const int text_height = font->getDimension(L"X").Height;
+    const int text_height = GUIEngine::getFontHeight();
     
     IGUIFont* titlefont = GUIEngine::getTitleFont();
     const int title_height = font->getDimension(L"X").Height;

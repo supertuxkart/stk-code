@@ -88,7 +88,13 @@ namespace GUIEngine
         // otherwise check if the focus is the given widget
         return g_focus_for_player[playerID]->isSameIrrlichtWidgetAs(w);
     }
-        
+       
+    int getFontHeight()
+    {
+        // FIXME: this needs to be reset when changing resolution
+        static int fh = g_font->getDimension( L"X" ).Height;
+        return fh;
+    }
 // -----------------------------------------------------------------------------  
 void clear()
 {

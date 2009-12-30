@@ -47,7 +47,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     // ----
     
     IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    const int textHeight = GUIEngine::getFontHeight();
     
     const int textAreaYFrom = m_area.getHeight()/2 - textHeight/2;
     

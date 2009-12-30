@@ -70,7 +70,7 @@ void IconButtonWidget::add()
                                        0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
         widget_size = rect<s32>(x - label_extra_size/2, y + h, x + w + label_extra_size/2, y + h*2);
 
-        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, false /* word wrap */, m_parent);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, true /* word wrap */, m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
     }

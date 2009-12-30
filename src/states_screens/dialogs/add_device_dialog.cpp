@@ -35,7 +35,7 @@ using namespace irr::core;
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
 {    
     IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
     const int y_bottom = m_area.getHeight() - 2*(buttonHeight + 10) - 20;

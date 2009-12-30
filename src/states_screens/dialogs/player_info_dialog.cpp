@@ -46,7 +46,7 @@ void PlayerInfoDialog::showRegularDialog()
     const int y4 = m_area.getHeight()*5/6;
     
     IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
     {
@@ -122,7 +122,7 @@ void PlayerInfoDialog::showConfirmDialog()
         
     
     IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
     

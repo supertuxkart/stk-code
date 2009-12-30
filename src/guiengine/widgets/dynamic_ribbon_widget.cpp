@@ -60,7 +60,7 @@ void DynamicRibbonWidget::add()
     if (m_has_label)
     {
         // FIXME - won't work with multiline labels.
-        m_label_height = GUIEngine::getFont()->getDimension( L"X" ).Height;
+        m_label_height = GUIEngine::getFontHeight();
     }
     else
     {

@@ -159,9 +159,8 @@ void RibbonWidget::add()
         {
             // how much space to keep for the label under the button
             const bool has_label = m_children[i].m_text.size() > 0;
-            const int needed_space_under_button = has_label ? 30 : 10; // quite arbitrary for now
+            const int needed_space_under_button = has_label ? GUIEngine::getFontHeight() : 10;
             
-            // For now, the image stretches to keep the aspect ratio of the widget (FIXME, doesn't work)
             float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
             
             // size of the image

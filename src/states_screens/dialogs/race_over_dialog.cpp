@@ -45,7 +45,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeig
     //const int h = m_area.getHeight();
     
     IGUIFont* font = GUIEngine::getFont();
-    const int text_height = font->getDimension(L"X").Height;
+    const int text_height = GUIEngine::getFontHeight();
     
     const int button_h = text_height + 6;
     const int margin_between_buttons = 12;

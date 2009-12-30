@@ -258,6 +258,9 @@ namespace GUIEngine
     inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
     inline Skin*                      getSkin()          { return Private::g_skin;           }
 
+    /** Returns the height of the font in pixels */
+    int   getFontHeight();
+    
     float getLatestDt();
     
     /** Add a cutscene to the list of screens known by the gui engine */

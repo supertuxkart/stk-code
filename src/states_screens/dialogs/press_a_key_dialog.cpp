@@ -41,8 +41,8 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     widget->add();
     
     
-    IGUIFont* font = GUIEngine::getFont();
-    const int textHeight = font->getDimension(L"X").Height;
+    //IGUIFont* font = GUIEngine::getFont();
+    const int textHeight = GUIEngine::getFontHeight();
         
     ButtonWidget* widget2 = new ButtonWidget();
     widget2->m_properties[PROP_ID] = "cancel";
