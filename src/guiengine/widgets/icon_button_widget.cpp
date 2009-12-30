@@ -46,7 +46,7 @@ void IconButtonWidget::add()
     // so, happily, let's implement it ourselves
     int x_gap = 0;
     
-    if (m_scale_mode == SCALE_MODE_KEEP_ASPECT_RATIO)
+    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
         x_gap = (int)((float)w - (float)m_texture_w * (float)h / m_texture_h);
     }

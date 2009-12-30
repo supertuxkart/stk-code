@@ -22,7 +22,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ModelViewWidget::ModelViewWidget() : IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_ASPECT_RATIO, false, false)
+ModelViewWidget::ModelViewWidget() : IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;

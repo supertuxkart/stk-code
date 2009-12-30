@@ -35,7 +35,7 @@ namespace GUIEngine
         enum ScaleMode
         {
             SCALE_MODE_STRETCH,
-            SCALE_MODE_KEEP_ASPECT_RATIO
+            SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO
         };
         
     protected:
@@ -53,7 +53,7 @@ namespace GUIEngine
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
-        IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_ASPECT_RATIO, const bool tab_stop=true, const bool focusable=true);
+        IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true, const bool focusable=true);
         virtual ~IconButtonWidget() {}
         
         /** Callback called when this widget needs to be added (see base class Widget) */
