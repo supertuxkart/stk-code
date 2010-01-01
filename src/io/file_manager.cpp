@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <sys/stat.h>
+#include <iostream>
 #include <string>
 #ifdef WIN32
 #  include <io.h>
@@ -31,14 +32,11 @@
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
      //   Some portabilty defines
 #  endif
-#  define CONFIGDIR       "."
-#elif defined(__APPLE__)
-#  include <unistd.h>
-#  define CONFIGDIR       "Library/Application Support/SuperTuxKart"
 #else
 #  include <unistd.h>
-#  define CONFIGDIR       ".supertuxkart"
 #endif
+
+#define CONFIGDIR "supertuxkart"
 
 #include "irrlicht.h"
 #include "btBulletDynamicsCommon.h"
@@ -348,26 +346,35 @@ std::string FileManager::getHomeDir() const
     std::ostringstream s;
     if(getenv("APPDATA")!=NULL)
     {
-        s<<getenv("APPDATA")<<"/supertuxkart/";
+        s<<getenv("APPDATA")<<"/"<<CONFIGDIR<<"/";
         DIRNAME=s.str();
     }
     else DIRNAME=".";
-#else
-    if(getenv("HOME")!=NULL)
-    {
+#endif
+#ifdef linux
+	// Use new standards for config directory
+	if (getenv("XDG_CONFIG_HOME")!=NULL){
+		DIRNAME = getenv("XDG_CONFIG_HOME");
+	}else if (getenv("HOME")!=NULL){
+		DIRNAME = getenv("HOME");
+		DIRNAME += "/.config";
+	}else{
+		std::cerr << "No home directory, this should NOT happen!\n";
+		// This is what was here before, it looks rather questionable.
+		DIRNAME=".";
+	}
+    DIRNAME += "/";
+    DIRNAME += CONFIGDIR;
+#endif
+#ifdef __APPLE__
+    if (getenv("HOME")!=NULL){
         DIRNAME = getenv("HOME");
-    }
-    else
-    {
-    #ifdef __APPLE__
-        fprintf(stderr, "Home directory is undefined, this should NOT happen!\n");
+    }else{
+        std::cerr << "No home directory, this should NOT happen!\n";
         // Fall back to system-wide app data (rather than user-specific data), but should not happen anyway.
         DIRNAME = "";
-    #else
-        DIRNAME = ".";
-    #endif
-    }
-    DIRNAME += "/";
+	}
+    DIRNAME += "/Library/Application Support/";
     DIRNAME += CONFIGDIR;
 #endif
     return DIRNAME;
