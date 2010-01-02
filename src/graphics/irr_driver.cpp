@@ -33,14 +33,15 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
-#include "states_screens/state_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "main_loop.hpp"
 #include "modes/world.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
 
 using namespace irr::core;
@@ -687,7 +688,10 @@ void IrrDriver::displayFPS()
  */
 void IrrDriver::update(float dt)
 {
-    if(!m_device->run()) return;
+    if (!m_device->run())
+    {
+        main_loop->abort();
+    }
     
     m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
 
