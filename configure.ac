@@ -285,7 +285,17 @@ else
   CXXFLAGS=$save_CSSFLAGS
   LDFLAGS=$save_LDFLAGS
 fi
-glut_LIBS="$LIBS"
+
+
+case "${host}" in
+*darwin*|*macosx*)
+  glut_LIBS="$LIBS"
+  ;;
+*)
+  glut_LIBS="$LIBS -lGLU"
+  ;;
+esac
+
 LIBS=$save_LIBS
 
 dnl ==============
