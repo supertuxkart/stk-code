@@ -86,6 +86,7 @@ Widget::Widget(bool reserve_id)
     
     m_lock_badge = false;
     m_okay_badge = false;
+    m_bad_badge = false;
 }
 
 Widget::~Widget()

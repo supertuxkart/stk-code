@@ -93,7 +93,7 @@ namespace GUIEngine
     class Widget : public SkinWidgetContainer
     {
     protected:
-        int m_magic_number;
+        unsigned int m_magic_number;
 
         friend class EventHandler;
         friend class RibbonWidget;
@@ -203,6 +203,9 @@ namespace GUIEngine
         
         /** Show a 'good' badge on this widget */
         bool m_okay_badge;
+        
+        /** Show a 'good' badge on this widget */
+        bool m_bad_badge;
         
         /** Set to false if widget is something that should not receieve focus */
         bool m_focusable;

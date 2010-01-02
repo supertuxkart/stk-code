@@ -617,7 +617,7 @@ class KartHoverListener : public DynamicRibbonHoverListener
 {
     KartSelectionScreen* m_parent;
 public:
-    int m_magic_number;
+    unsigned int m_magic_number;
 
     KartHoverListener(KartSelectionScreen* parent)
     {

@@ -32,6 +32,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <set>
 
 using namespace GUIEngine;
 
@@ -49,41 +50,165 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         abort();
     }
     
+    // to detect duplicate entries
+    std::set<core::stringw> existing_bindings;
+    
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_up");
-        btn->setLabel( config->getBindingAsString(PA_ACCEL) );
+        core::stringw binding_name = config->getBindingAsString(PA_ACCEL);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_down");
-        btn->setLabel( config->getBindingAsString(PA_BRAKE) );
+        core::stringw binding_name = config->getBindingAsString(PA_BRAKE);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_left");
-        btn->setLabel( config->getBindingAsString(PA_LEFT) );
+        core::stringw binding_name = config->getBindingAsString(PA_LEFT);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_right");
-        btn->setLabel( config->getBindingAsString(PA_RIGHT) );
+        core::stringw binding_name = config->getBindingAsString(PA_RIGHT);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
+    
+    std::set<core::stringw>::iterator it;
+    
+    /*
+    std::cout << "existing_bindings contains:";
+    for ( it=existing_bindings.begin() ; it != existing_bindings.end(); it++ )
+    {
+        std::wcout << (*it).c_str() << ", ";
+    }
+    std::cout << "\n";
+    */
+    
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_fire");
-        btn->setLabel( config->getBindingAsString(PA_FIRE) );
+        core::stringw binding_name = config->getBindingAsString(PA_FIRE);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+            //std::cout << "Setting bad badge!!!!\n";
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_nitro");
-        btn->setLabel( config->getBindingAsString(PA_NITRO) );
+        core::stringw binding_name = config->getBindingAsString(PA_NITRO);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_drift");
-        btn->setLabel( config->getBindingAsString(PA_DRIFT) );
+        core::stringw binding_name = config->getBindingAsString(PA_DRIFT);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_rescue");
-        btn->setLabel( config->getBindingAsString(PA_RESCUE) );
+        core::stringw binding_name = config->getBindingAsString(PA_RESCUE);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_look_back");
-        btn->setLabel( config->getBindingAsString(PA_LOOK_BACK) );
+        core::stringw binding_name = config->getBindingAsString(PA_LOOK_BACK);
+        btn->setLabel( binding_name );
+        
+        // check if another binding already uses this key
+        if (existing_bindings.find(binding_name) != existing_bindings.end())
+        {
+            btn->m_bad_badge = true;
+        }
+        else
+        {
+            existing_bindings.insert(binding_name);
+            btn->m_bad_badge = false;
+        }
     }
     
 }

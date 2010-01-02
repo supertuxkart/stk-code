@@ -1152,8 +1152,8 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         SColor color(255, 255, 0, 0);
         GUIEngine::getFont()->draw(idstring.c_str(), rect, color, true, true);
     }
-    
-    if (widget->m_lock_badge || widget->m_okay_badge)
+        
+    if (widget->m_lock_badge || widget->m_okay_badge || widget->m_bad_badge)
     {
         drawBadgeOn(widget, rect);
     }
@@ -1163,6 +1163,7 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
 {
     video::ITexture* texture = NULL;
     float max_icon_size = 0.35f;
+    bool badge_at_left = true;
     
     if (widget->m_lock_badge)
     {
@@ -1173,6 +1174,11 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
     {
         texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
     }
+    else if (widget->m_bad_badge)
+    {
+        texture = irr_driver->getTexture(file_manager->getTextureFile("red_mark.png"));
+        badge_at_left = false;
+    }
     else
     {
         assert(false);
@@ -1180,14 +1186,20 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
     }
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
-    const int h = std::min( (int)(rect.getHeight()*max_icon_size), (int)(texture_size.Height) );
+    const int h = rect.getHeight() <= 50 ?
+                rect.getHeight() :
+                std::min( (int)(rect.getHeight()*max_icon_size), (int)(texture_size.Height) );
     int w = (int)(aspectRatio*h);
     
     const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
     
-    const core::rect< s32 > rect2 =  core::rect< s32 >(rect.UpperLeftCorner.X,
+    const core::rect< s32 > rect2 =  core::rect< s32 >(badge_at_left ?
+                                                            rect.UpperLeftCorner.X :
+                                                            rect.LowerRightCorner.X - w,
                                                        rect.LowerRightCorner.Y - h,
-                                                       rect.UpperLeftCorner.X + w,
+                                                       badge_at_left ?
+                                                            rect.UpperLeftCorner.X + w :
+                                                            rect.LowerRightCorner.X,
                                                        rect.LowerRightCorner.Y);
     
     GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,

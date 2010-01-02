@@ -93,7 +93,7 @@ namespace GUIEngine
         bool m_render_3d;
         
         
-        int m_magic_number;
+        unsigned int m_magic_number;
     public:
         bool throttleFPS;
         
