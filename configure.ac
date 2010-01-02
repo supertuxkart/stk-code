@@ -241,13 +241,12 @@ case "${host}" in
      return 0;
      }
     ],
-    irrlicht_sample_built_fine="true"
-    works_with_Xxf86vm="true"
-        ,
-      )
+    works_with_Xxf86vm="true",
+    )
     
     if test x$works_with_Xxf86vm = xtrue; then
       irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+      irrlicht_sample_built_fine="true"
     fi
   fi
   
