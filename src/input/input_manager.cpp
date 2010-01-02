@@ -230,15 +230,18 @@ int InputManager::getPlayerKeyboardID() const
     // In no-assign mode, just return the GUI player ID (devices not assigned yet)
     if (m_device_manager->getAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
     
-    // Otherwise, after devices are assigned, we can check the ID
-    // FIXME: don't hardcode keyboard 0, there may be multiple keyboard configs
-    if (m_device_manager->getKeyboard(0) != NULL)
+    // Otherwise, after devices are assigned, we can check in more depth
+    // Return the first keyboard that is actually being used
+    const int amount = m_device_manager->getKeyboardAmount();
+    for (int k=0; k<amount; k++)
     {
-        if (m_device_manager->getKeyboard(0)->getPlayer() != NULL)
+        if (m_device_manager->getKeyboard(k) != NULL &&
+            m_device_manager->getKeyboard(k)->getPlayer() != NULL)
         {
-            return m_device_manager->getKeyboard(0)->getPlayer()->m_id;
+            return m_device_manager->getKeyboard(k)->getPlayer()->m_id;
         }
     }
+    
     return -1;
 }
 //-----------------------------------------------------------------------------

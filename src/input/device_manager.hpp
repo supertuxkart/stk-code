@@ -88,10 +88,11 @@ public:
     // ---- Keyboard(s) ----
     void addEmptyKeyboard();
     void addKeyboard(KeyboardDevice* d);
-    int getKeyboardConfigAmount() const                     { return m_keyboard_configs.size(); }
+    void                clearKeyboard()                     { m_keyboards.clearAndDeleteAll(); }
+    int                 getKeyboardAmount()                 { return m_keyboards.size(); }
+    int                 getKeyboardConfigAmount() const     { return m_keyboard_configs.size(); }
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
     KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
-    void                clearKeyboard()                     { m_keyboards.clearAndDeleteAll(); }
     KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
 
 
