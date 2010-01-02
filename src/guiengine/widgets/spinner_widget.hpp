@@ -38,6 +38,15 @@ namespace GUIEngine
         EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
         EventPropagation rightPressed(const int playerID);
         EventPropagation leftPressed(const int playerID);
+        
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getWidthNeededAroundLabel()  const { return 25; }
+        
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getHeightNeededAroundLabel() const { return 16; }
+        
     public:
         
         SpinnerWidget(const bool gauge=false);

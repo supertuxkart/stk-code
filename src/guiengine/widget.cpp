@@ -314,10 +314,10 @@ void Widget::readCoords(Widget* parent)
     {
         IGUIFont* font = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont());
         core::dimension2d< u32 > dim = font->getDimension( m_text.c_str() );
-        label_w = dim.Width;
+        label_w = dim.Width + getWidthNeededAroundLabel();
         // FIXME - won't work with multiline labels. thus, for now, when multiple
         // lines are required, we need to specify a height explicitely
-        label_h = dim.Height;
+        label_h = dim.Height + getHeightNeededAroundLabel();
     }
 
     // ---- read dimension

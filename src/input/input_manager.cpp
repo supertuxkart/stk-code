@@ -264,17 +264,18 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value, &player, &action);
 
     // in menus, some keyboard keys are standard (before each player selected his device)
-    // FIXME: should enter always work to accept for a player using keyboard?
+    // So if a key could not be mapped to any known binding, fall back to check the defaults.
     if (!action_found && StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD &&
         m_mode == MENU && m_device_manager->getAssignMode() == NO_ASSIGN)
     {
         action = PA_FIRST;
 
-        if      (btnID == KEY_UP)    action = PA_ACCEL;
-        else if (btnID == KEY_DOWN)  action = PA_BRAKE;
-        else if (btnID == KEY_LEFT)  action = PA_LEFT;
-        else if (btnID == KEY_RIGHT) action = PA_RIGHT;
-        else if (btnID == KEY_SPACE) action = PA_FIRE;
+        if      (btnID == KEY_UP)     action = PA_ACCEL;
+        else if (btnID == KEY_DOWN)   action = PA_BRAKE;
+        else if (btnID == KEY_LEFT)   action = PA_LEFT;
+        else if (btnID == KEY_RIGHT)  action = PA_RIGHT;
+        else if (btnID == KEY_SPACE)  action = PA_FIRE;
+        else if (btnID == KEY_RETURN) action = PA_FIRE;
 
         if (btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {

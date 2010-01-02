@@ -62,7 +62,7 @@
         
         <spacer height="10" width="10"/>
 
-        <button id="apply_resolution" width="40%" height="30"
+        <button id="apply_resolution" height="35"
                 I18N="In the video settings menu" text="Apply video changes" />
         
     </box>

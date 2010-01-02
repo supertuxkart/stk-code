@@ -30,6 +30,14 @@ namespace GUIEngine
     /** A text field widget. See guiengine/engine.hpp for a detailed overview */
     class TextBoxWidget : public Widget
     {
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getWidthNeededAroundLabel()  const { return 10; }
+        
+        /** When inferring widget size from its label length, this method will be called to
+         * if/how much space must be added to the raw label's size for the widget to be large enough */
+        virtual int getHeightNeededAroundLabel() const { return 10; }
+        
     public:
         TextBoxWidget();
         ~TextBoxWidget()
