@@ -1,29 +1,29 @@
-dnl Process this file with autogen.sh to produce a configure script.
+# Process this file with autogen.sh to produce a configure script.
 
 AC_INIT(supertuxkart, SVN)
 AC_CONFIG_SRCDIR([src/main.cpp])
 
 AC_PREREQ(2.61)
 
-dnl ================================================
-dnl Initialize the automake stuff
-dnl set the $host variable based on local machine/os
-dnl ================================================
+# ================================================
+# Initialize the automake stuff
+# set the $host variable based on local machine/os
+# ================================================
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE([foreign tar-ustar])
 
 
-dnl =====================================================
-dnl Set the default CFLAGS/CXXFLAGS
-dnl If these were not set, the AC_PROG_CC and AC_PROG_CXX
-dnl scripts set them to "-g -O2".
-dnl =====================================================
+# =====================================================
+# Set the default CFLAGS/CXXFLAGS
+# If these were not set, the AC_PROG_CC and AC_PROG_CXX
+# scripts set them to "-g -O2".
+# =====================================================
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes"
 CXXFLAGS="$CXXFLAGS -Wall"
 
-dnl ===================
-dnl Check for compilers
-dnl ===================
+# ===================
+# Check for compilers
+# ===================
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
@@ -35,9 +35,9 @@ AC_C_BIGENDIAN
 AC_LANG(C++)
 
 
-dnl ===========================
-dnl Check for `configure' flags
-dnl ===========================
+# ===========================
+# Check for `configure' flags
+# ===========================
 SUMMARY="\nSummary of optional components:\n==============================="
 
 AC_ARG_ENABLE(debug, [AS_HELP_STRING(--enable-debug,
@@ -63,28 +63,28 @@ else
     SUMMARY="$SUMMARY\nDisabled compiler optimizations."
 fi
 
-dnl ===================
-dnl Checks for programs.
-dnl ===================
+# ===================
+# Checks for programs.
+# ===================
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 
-dnl ===============================
-dnl Check for MS Windows environment
-dnl ================================
+# ===============================
+# Check for MS Windows environment
+# ================================
 AC_CHECK_HEADER(windows.h)
 
-dnl ==================================
-dnl check for OpenGL related libraries
-dnl ==================================
+# ==================================
+# check for OpenGL related libraries
+# ==================================
 case "${host}" in
 *darwin*|*macosx*)
     opengl_LIBS="$LIBS -framework Carbon -framework OpenGL -framework IOKit -framework AGL"
     ;;
 
 *-*-cygwin* | *-*-mingw32*)
-    dnl CygWin under Windoze.
+    # CygWin under Windoze.
 
     echo Win32 specific hacks...
     AC_DEFINE([WIN32], 1, [Define for Win32 platforms])
@@ -98,22 +98,22 @@ case "${host}" in
     ;;
 
 *)
-   dnl X-Windows based machines
+   # X-Windows based machines
 
    save_LIBS=$LIBS
    AC_SEARCH_LIBS(glNewList, [ GL GLcore MesaGL ])
    opengl_LIBS="$LIBS"
    LIBS=$save_LIBS
    if test "x$ac_cv_search_glNewList" = "x-lGLcore"; then
-       dnl if GLcore found, then also check for GL
+       # if GLcore found, then also check for GL
        AC_SEARCH_LIBS(glXCreateContext, GL)
    fi
    ;;
 esac
 
-dnl ========================================
-dnl check for OpenAL libraries
-dnl ========================================
+# ========================================
+# check for OpenAL libraries
+# ========================================
 save_LIBS=$LIBS
 
 case "${host}" in
@@ -152,11 +152,11 @@ LIBS="$save_LIBS"
 
 save_LIBS=$LIBS
 
-dnl search for the libraries needed to use ogg vorbis
+# search for the libraries needed to use ogg vorbis
 AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
 
 if test x$have_vorbisfile_lib = xyes; then       
-    dnl check for the headers needed by ogg vorbis
+    # check for the headers needed by ogg vorbis
     AC_CHECK_HEADER(vorbis/vorbisfile.h, have_vorbisfile_hdr=yes)
     AC_CHECK_HEADER(ogg/ogg.h, have_ogg_hdr=yes)
 fi
@@ -179,9 +179,9 @@ LIBS=$save_LIBS
 AC_LANG_PUSH(C++)
 
 
-dnl ===============================
-dnl Check for irrlicht (if enabled)
-dnl ===============================
+# ===============================
+# Check for irrlicht (if enabled)
+# ===============================
 AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
                                   [specify the prefix path to irrlicht])])
 if test "x$with_irrlicht" != "x" ; then
@@ -209,16 +209,15 @@ case "${host}" in
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
 esac
 
-dnl Test if we need Xxf86vm. For now assume that if any problems
-dnl occur with this simple program, it must be caused by this
-dnl missing library. FIXME: better tests should be done here!!
-dnl FIXME: this program when run prints out two lines (version numbers) to stdout
+# Check these flags do work by building a small irrLicht sample
 echo "checking for irrlicht libraries."
 save_LIBS=$LIBS
 LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
 
 case "${host}" in
 *-*-linux* )
+  irrlicht_sample_built_fine="false"
+
   AC_TRY_RUN([
    #  include "irrlicht.h"
    int main() {
@@ -226,9 +225,35 @@ case "${host}" in
    return 0;
    }
   ],
-      ,
-  irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
-    )
+  irrlicht_sample_built_fine="true",
+  irrlicht_sample_built_fine="false"
+  )
+  
+  # If base irrLicht flags failed, try again with Xxf86vm
+  # FIXME: this program when run prints out two lines (version numbers) to stdout
+  if test x$irrlicht_sample_built_fine = xfalse; then
+    LIBS="$LIBS -lXxf86vm"
+    works_with_Xxf86vm="false"
+      AC_TRY_RUN([
+     #  include "irrlicht.h"
+     int main() {
+     irr::createDevice(irr::video::EDT_NULL);
+     return 0;
+     }
+    ],
+    irrlicht_sample_built_fine="true"
+    works_with_Xxf86vm="true"
+        ,
+      )
+    
+    if test x$works_with_Xxf86vm = xtrue; then
+      irrlicht_LIBS="$irrlicht_LIBS -lXxf86vm"
+    fi
+  fi
+  
+  if test x$irrlicht_sample_built_fine = xfalse; then
+    AC_MSG_ERROR([Can't build test irrLicht program, chech config.log to see the errors])
+  fi
   ;;
 *darwin*|*macosx*)
   AC_TRY_RUN([
@@ -248,24 +273,24 @@ esac
 
 LIBS=$save_LIBS
 
-dnl ======================================================
-dnl Try to supply the SVN revision number for the compiler
-dnl ======================================================
+# ======================================================
+# Try to supply the SVN revision number for the compiler
+# ======================================================
 AC_CHECK_PROGS(have_svnversion,[svnversion],"no")
 if test x$have_svnversion != xno; then
   SVNVERSION="`svnversion $srcdir`"
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
-dnl ==============================================
-dnl Glut (optional), used by bullet debugging only
-dnl ==============================================
+# ==============================================
+# Glut (optional), used by bullet debugging only
+# ==============================================
 save_LIBS=$LIBS
 save_LDFLAGS=$LDFLAGS
 save_CXXFLAGS=$CXXFLAGS
 case "${host}" in
 *darwin*|*macosx*)
-    dnl Apparently -framework is needed for include files and libraries
+    # Apparently -framework is needed for include files and libraries
     CXXFLAGS="$CXXFLAGS -framework GLUT"
     LDFLAGS="$LDFLAGS -framework GLUT"
 esac
@@ -280,8 +305,8 @@ if test x$have_glut_hdr = xyes; then
   SUMMARY="$SUMMARY\nGlut found, enabling optional bullet debug"
 else
   SUMMARY="$SUMMARY\nNo glut found, disabling bullet debug"
-  dnl Remove the unnecessary -framework GLUT on Macs (no impact
-  dnl of this on any other platforms)
+  # Remove the unnecessary -framework GLUT on Macs (no impact
+  # of this on any other platforms)
   CXXFLAGS=$save_CSSFLAGS
   LDFLAGS=$save_LDFLAGS
 fi
@@ -298,9 +323,9 @@ esac
 
 LIBS=$save_LIBS
 
-dnl ==============
-dnl Bullet physics
-dnl ==============
+# ==============
+# Bullet physics
+# ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
@@ -311,9 +336,9 @@ fi
 bullet_LIBS="$bullet_LIBS -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
 
-dnl ====
-dnl enet
-dnl ====
+# ====
+# enet
+# ====
 AC_CHECK_FUNC(gethostbyaddr_r, [AC_DEFINE(HAS_GETHOSTBYADDR_R)])
 AC_CHECK_FUNC(gethostbyname_r, [AC_DEFINE(HAS_GETHOSTBYNAME_R)])
 AC_CHECK_FUNC(poll, [AC_DEFINE(HAS_POLL)])
@@ -358,9 +383,9 @@ AC_SUBST(glut_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)
 
-dnl ================
-dnl Create makefiles
-dnl ================
+# ================
+# Create makefiles
+# ================
 AC_CONFIG_FILES([                   \
  Makefile                           \
  data/Makefile                      \
