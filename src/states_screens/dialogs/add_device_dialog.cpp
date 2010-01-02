@@ -42,7 +42,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
 
     core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
     
-    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( _("To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n\nTo add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay."),
+    IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( _("To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n\nTo add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"),
                                                               text_area, false , true , // border, word warp
                                                               m_irrlicht_window);
     b->setTabStop(false);

@@ -103,7 +103,11 @@
 
         <spacer width="50" height="10" /> 
  
-       <button id="add_device" proportion="1" width="25%" I18N="In the input configuration screen"  text="Add a device"/>
+        <button id="add_device" proportion="1" width="25%" I18N="In the input configuration screen"  text="Add a device"/>
+       
+        <label text="* Which config to use will be inferred from which 'fire' key is pressed to join the game."
+               proportion="2" word_wrap="true"/>
+        <spacer width="50" height="10" />
     </box>
     
  <spacer width="50" height="40" /> 
