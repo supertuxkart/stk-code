@@ -59,13 +59,13 @@ void IconButtonWidget::add()
     }
     
     int suggested_h = h;
-    int suggested_w = (useAspectRatio < 0 ? w : useAspectRatio*suggested_h);
+    int suggested_w = (int)((useAspectRatio < 0 ? w : useAspectRatio*suggested_h));
     
     if (suggested_w > w)
     {
         const float needed_scale_factor = (float)w / (float)suggested_w;
-        suggested_w *= needed_scale_factor;
-        suggested_h *= needed_scale_factor;
+        suggested_w = (int)(suggested_w*needed_scale_factor);
+        suggested_h = (int)(suggested_h*needed_scale_factor);
     }
     const int x_from = x + (w - suggested_w)/2; // center horizontally
     const int y_from = y + (h - suggested_h)/2; // center vertically

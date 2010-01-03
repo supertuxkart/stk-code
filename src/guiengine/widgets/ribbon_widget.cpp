@@ -167,7 +167,7 @@ void RibbonWidget::add()
             core::dimension2d< u32 > dim = GUIEngine::getFont()->getDimension( m_children[i].m_text.c_str() );
             if ((int)dim.Width > one_button_space)
             {
-                line_count = std::ceil((float)dim.Width/(float)one_button_space);
+                line_count = (int)(std::ceil((float)dim.Width/(float)one_button_space));
             }
             
             const int needed_space_under_button = has_label ? GUIEngine::getFontHeight()*line_count : 10;
