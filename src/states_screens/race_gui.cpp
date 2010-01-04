@@ -680,9 +680,12 @@ void RaceGUI::drawGlobalMusicDescription()
 {
     if (!UserConfigParams::m_music) return; // show no music description when it's off
     
+    gui::IGUIFont*       font = irr_driver->getRaceFont();
+
+    // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(RaceManager::getWorld()->m_auxiliary_timer - 2.0f) /
-    (float)(stk_config->m_music_credit_time - 2.0f);
+                            (float)(stk_config->m_music_credit_time - 2.0f);
     
     const int x_pulse = (int)(sin(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
     const int y_pulse = (int)(cos(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
@@ -697,52 +700,68 @@ void RaceGUI::drawGlobalMusicDescription()
         resize = 1.0f - (timeProgression - 0.9f)/0.1f;
     }
     
-    
-    const MusicInformation* mi=sound_manager->getCurrentMusic();
-    if(!mi) return;
-    
     const float resize3 = resize*resize*resize;
     
-    const int y = UserConfigParams::m_height - 80;
+    // ---- Get song name, and calculate its size, allowing us to position stuff
+    const MusicInformation* mi=sound_manager->getCurrentMusic();
+    if (!mi) return;
+    
+    std::string s="\""+mi->getTitle()+"\"";
+    core::stringw thetext(s.c_str());
+    
+    core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
+    int textWidth = textSize.Width;
+    
+    int textWidth2 = 0;
+    core::stringw thetext_composer;
+    if (mi->getComposer()!="")
+    {
+        std::string s = "by "+mi->getComposer();
+        thetext_composer = s.c_str();
+        textWidth2 = font->getDimension(thetext_composer.c_str()).Width;
+    }
+    const int max_text_size = (int)(UserConfigParams::m_width*2.0f/3.0f);
+    if (textWidth  > max_text_size) textWidth  = max_text_size;
+    if (textWidth2 > max_text_size) textWidth2 = max_text_size;
+
+    const int ICON_SIZE = 64;
+    const int y         = UserConfigParams::m_height - 80;
+    // the 20 is an arbitrary space left between the note icon and the text
+    const int noteX     = (UserConfigParams::m_width / 2) - std::max(textWidth, textWidth2)/2 - ICON_SIZE/2 - 20;
+    const int noteY     = y;
+    // the 20 is an arbitrary space left between the note icon and the text
+    const int textXFrom = (UserConfigParams::m_width / 2) - std::max(textWidth, textWidth2)/2 + 20;
+    const int textXTo   = (UserConfigParams::m_width / 2) + std::max(textWidth, textWidth2)/2 + 20;
+
+    // ---- Draw "by" text
     const int text_y = (int)(UserConfigParams::m_height - 80*(resize3) + 40*(1-resize));
     
     static const video::SColor white = video::SColor(255, 255, 255, 255);
-    gui::IGUIFont*       font = irr_driver->getRaceFont();
     if(mi->getComposer()!="")
     {
-        core::rect<s32> pos_by((UserConfigParams::m_width>>1) + 32, text_y+40,
-                              (UserConfigParams::m_width>>1) + 32, text_y+40);
+        core::rect<s32> pos_by(textXFrom, text_y+40,
+                               textXTo,   text_y+40);
         std::string s="by "+mi->getComposer();
         font->draw(core::stringw(s.c_str()).c_str(), pos_by, white, true, true);
     }
-
-    std::string s="\""+mi->getTitle()+"\"";
-
-    // Draw text
-    core::stringw thetext(s.c_str());
-
-    core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
-    const int textWidth = textSize.Width;
     
-    core::rect<s32> pos((UserConfigParams::m_width >> 1) + 32, text_y,
-                        (UserConfigParams::m_width >> 1) + 32, text_y);
+    // ---- Draw "song name" text
+    core::rect<s32> pos(textXFrom, text_y,
+                        textXTo,   text_y);
     
-    font->draw(thetext.c_str(), pos, white, true, true);
-    
-    
-
-    int iconSizeX = (int)(64*resize + x_pulse*resize*resize);
-    int iconSizeY = (int)(64*resize + y_pulse*resize*resize);
-
+    font->draw(thetext.c_str(), pos, white, true /* hcenter */, true /* vcenter */);
+ 
     // Draw music icon
+    int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
+    int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
+    
     video::ITexture *t = m_music_icon->getTexture();
-    const int noteX = (UserConfigParams::m_width >> 1) - textWidth/2 - 32;
-    const int noteY = y;
-    core::rect<s32> dest(noteX-iconSizeX/2+20,    noteY-iconSizeY/2+32, 
-                         noteX+iconSizeX/2+20,    noteY+iconSizeY/2+32);
+    core::rect<s32> dest(noteX-iconSizeX/2+20,    noteY-iconSizeY/2+ICON_SIZE/2, 
+                         noteX+iconSizeX/2+20,    noteY+iconSizeY/2+ICON_SIZE/2);
     const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
     
     irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL, NULL, true);
+    
 
 }   // drawGlobalMusicDescription
 
