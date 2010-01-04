@@ -44,8 +44,8 @@ Explosion::Explosion(const Vec3& coord, const int explosion_sound)
                                                               core::vector3df(0.0f,0.005f,0.0f), // velocity in m/ms
                                                               600, 900, // min max particles per sec
                                                               video::SColor(0, 0, 0, 0), video::SColor(0, 0, 0, 0), // min max colour
-                                                              (burst_time + explosion_time)*1000.0f,
-                                                              (burst_time + explosion_time)*1000.0f, // min max life ms
+                                                              (int)((burst_time + explosion_time)*1000.0f),
+                                                              (int)((burst_time + explosion_time)*1000.0f), // min max life ms
                                                               90, // max angle
                                                               core::dimension2df(0.3f, 0.3f), core::dimension2df(0.75f, 0.75f) // min max start size
                                                               );
@@ -97,7 +97,7 @@ void Explosion::update(float dt)
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
         
-        const float intensity = 255-(m_remaining_time/-explosion_time)*255;
+        const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
         m_node->getMaterial(0).AmbientColor.setGreen(intensity);
         m_node->getMaterial(0).DiffuseColor.setGreen(intensity);
         m_node->getMaterial(0).EmissiveColor.setGreen(intensity);
