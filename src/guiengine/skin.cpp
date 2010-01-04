@@ -834,28 +834,48 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     // FIXME: temporary only
     if (widget->isFocusedForPlayer(1))
     {
-        widget->r = 0;
-        widget->g = 200;
-        widget->b = 255;
+        //widget->r = 0;
+        //widget->g = 200;
+        //widget->b = 255;
+        
+        core::rect< s32 > rect2 = rect;
+        rect2.UpperLeftCorner.X += 2;
+        rect2.UpperLeftCorner.Y -= 3;
+        rect2.LowerRightCorner.X -= 2;
+        rect2.LowerRightCorner.Y += 5;
+        drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
     }
     else if (widget->isFocusedForPlayer(2))
     {
-        widget->r = 120;
-        widget->g = 0;
-        widget->b = 120;
+        //widget->r = 120;
+        //widget->g = 0;
+        ///widget->b = 120;
+        core::rect< s32 > rect2 = rect;
+        rect2.UpperLeftCorner.X += 2;
+        rect2.UpperLeftCorner.Y -= 3;
+        rect2.LowerRightCorner.X -= 2;
+        rect2.LowerRightCorner.Y += 5;
+        drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
     }
     else if (widget->isFocusedForPlayer(3))
     {
-        widget->r = 255;
-        widget->g = 0;
-        widget->b = 0;
+        //widget->r = 255;
+        //widget->g = 0;
+        //widget->b = 0;
+        core::rect< s32 > rect2 = rect;
+        rect2.UpperLeftCorner.X += 2;
+        rect2.UpperLeftCorner.Y -= 3;
+        rect2.LowerRightCorner.X -= 2;
+        rect2.LowerRightCorner.Y += 5;
+        drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
     }
+    /*
     else
     {
         widget->r = -1;
         widget->g = -1;
         widget->b = -1;
-    }
+    }*/
         
     core::rect< s32 > sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
