@@ -1032,8 +1032,7 @@ void KartSelectionScreen::allPlayersDone()
         
         if (selection == RANDOM_KART_ID)
         {
-            // FIXME: in multiplayer game, if two players select' random' make sure they don't select
-            // the same kart or an already selected kart
+            // don't select an already selected kart
             int randomID;
             bool done = false;
             do
