@@ -950,7 +950,7 @@ void KartSelectionScreen::init()
     }
     
     // add random
-    w->addItem(_("Random Kart"), "randomkart", "/gui/random_kart.png");
+    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
     
     /*
      
@@ -1014,7 +1014,7 @@ void KartSelectionScreen::allPlayersDone()
     {
         std::string selection = m_kart_widgets[n].m_kartInternalName;
         
-        if (selection == "randomkart")
+        if (selection == RANDOM_KART_ID)
         {
             // FIXME: in multiplayer game, if two players select' random' make sure they don't select
             // the same kart or an already selected kart
@@ -1097,7 +1097,7 @@ bool KartSelectionScreen::validateIdentChoices()
 bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
 {
     return player1.getKartInternalName() == player2.getKartInternalName() &&
-           player1.getKartInternalName() != "randomkart";
+           player1.getKartInternalName() != RANDOM_KART_ID;
 }
 
 bool KartSelectionScreen::validateKartChoices()
