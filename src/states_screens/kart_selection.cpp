@@ -45,6 +45,8 @@ InputDevice* player_1_device = NULL;
 using namespace GUIEngine;
 using irr::core::stringw;
 
+const char* RANDOM_KART_ID = "randomkart";
+
 class PlayerKartWidget;
     
 /** Currently, navigation for multiple players at the same time is implemented in
@@ -653,7 +655,7 @@ public:
         ModelViewWidget* w3 = m_parent->m_kart_widgets[playerID].modelView;
         assert( w3 != NULL );
         
-        if (selectionID == "randomkart")
+        if (selectionID == RANDOM_KART_ID)
         {
             // Random kart
             scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
@@ -1090,6 +1092,14 @@ bool KartSelectionScreen::validateIdentChoices()
 
 // -----------------------------------------------------------------------------
 
+/** Small utility that returns whether the two given players chose the same kart.
+  * The advantage of this function is that it can handle "random kart" selection. */
+bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
+{
+    return player1.getKartInternalName() == player2.getKartInternalName() &&
+           player1.getKartInternalName() != "randomkart";
+}
+
 bool KartSelectionScreen::validateKartChoices()
 {
     bool ok = true;
@@ -1107,7 +1117,7 @@ bool KartSelectionScreen::validateKartChoices()
         for (int m=n+1; m<amount; m++)
         {
             // check if 2 players took the same name
-            if (m_kart_widgets[n].getKartInternalName() == m_kart_widgets[m].getKartInternalName())
+            if (sameKart(m_kart_widgets[n], m_kart_widgets[m]))
             {
                 printf("\n***\n*** Kart conflict!! ***\n***\n\n");
                 std::cout << " Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
@@ -1187,7 +1197,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             }
         }
         // add random
-        w->addItem(_("Random Kart"), "randomkart", "/gui/random_kart.png");
+        w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
         
         w->updateItemDisplay();
         
@@ -1230,7 +1240,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             if (m_kart_widgets[n].isReady() &&
                 (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                  m_kart_widgets[playerID].getAssociatedPlayer()->getProfile() ||
-                 m_kart_widgets[n].getKartInternalName() == m_kart_widgets[playerID].getKartInternalName()))
+                 sameKart(m_kart_widgets[n], m_kart_widgets[playerID])))
             {
                 printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
                 
