@@ -681,6 +681,7 @@ public:
         }
 
         m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
+        m_parent->validateKartChoices();
     }
 };
 KartHoverListener* karthoverListener = NULL;
@@ -1058,7 +1059,7 @@ bool KartSelectionScreen::validateIdentChoices()
             // check if 2 players took the same name
             if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[m].getAssociatedPlayer()->getProfile())
             {
-                printf("\n***\n*** Someone else can't select this identity, you just took it!! ***\n***\n\n");
+                printf("\n***\n*** Identity conflict!! ***\n***\n\n");
                 std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
                 std::cout << " Player " << m << " chose " << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
 
@@ -1085,6 +1086,60 @@ bool KartSelectionScreen::validateIdentChoices()
     }
     
     return ok;
+}
+
+// -----------------------------------------------------------------------------
+
+bool KartSelectionScreen::validateKartChoices()
+{
+    bool ok = true;
+    
+    const int amount = m_kart_widgets.size();
+    
+    // reset all marks, we'll re-add them n ext if errors are still there
+    for (int n=0; n<amount; n++)
+    {
+        m_kart_widgets[n].modelView->m_bad_badge = false;
+    }
+    
+    for (int n=0; n<amount; n++)
+    {        
+        for (int m=n+1; m<amount; m++)
+        {
+            // check if 2 players took the same name
+            if (m_kart_widgets[n].getKartInternalName() == m_kart_widgets[m].getKartInternalName())
+            {
+                printf("\n***\n*** Kart conflict!! ***\n***\n\n");
+                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
+                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getKartInternalName() << std::endl;
+                
+                // two players took the same kart. check if one is ready
+                if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    std::cout << "--> Setting red badge on player " << n << std::endl;
+                    // player m is ready, so player n should not choose this name
+                    m_kart_widgets[n].modelView->m_bad_badge = true;
+                }
+                else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
+                {
+                    std::cout << "--> Setting red badge on player " << m << std::endl;
+                    // player n is ready, so player m should not choose this name
+                    m_kart_widgets[m].modelView->m_bad_badge = true;
+                }
+                else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    // it should be impossible for two players to confirm they're ready with the same kart
+                    assert(false);
+                }
+                
+                // we know it's not ok (but don't stop right now, all bad ones need red badges)
+                ok = false;
+            }
+        } // end for
+    }
+    
+    return ok;
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -1164,7 +1219,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "karts")
     {
-        // make sure no other player selected the same identity
+        // make sure no other player selected the same identity or kart
         //std::cout << "\n\n\\\\\\\\ Kart Selected ////\n";
         //std::cout << "Making sure no other player has ident " << g_player_karts[playerID].getAssociatedPlayer()->getProfile()->getName() << std::endl;
         const int amount = m_kart_widgets.size();
@@ -1173,9 +1228,11 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             if (n == playerID) continue; // don't check a kart against itself
             
             if (m_kart_widgets[n].isReady() &&
-                m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[playerID].getAssociatedPlayer()->getProfile())
+                (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                 m_kart_widgets[playerID].getAssociatedPlayer()->getProfile() ||
+                 m_kart_widgets[n].getKartInternalName() == m_kart_widgets[playerID].getKartInternalName()))
             {
-                printf("\n***\n*** You can't select this identity, someone already took it!! ***\n***\n\n");
+                printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
                 
                 //SFXType sound;
                 //SOUND_UGH SOUND_CRASH SOUND_USE_ANVIL SOUND_EXPLOSION SOUND_MOVE_MENU SOUND_SELECT_MENU
@@ -1192,8 +1249,10 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         m_kart_widgets[playerID].markAsReady();
         
         // validate choices to notify player of duplicates
-        const bool ok = validateIdentChoices();
-        if (!ok) return;
+        const bool names_ok = validateIdentChoices();
+        const bool karts_ok = validateKartChoices();
+        
+        if (!names_ok || !karts_ok) return;
         
         // check if all players are ready
         bool allPlayersReady = true;
@@ -1219,6 +1278,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         // those events may mean that a player selection changed, so validate again
         validateIdentChoices();
+        validateKartChoices();
     }
 }
 

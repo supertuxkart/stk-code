@@ -51,6 +51,10 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
         \return Whether all choices are ok */
     bool validateIdentChoices();
     
+    /** Checks karts chosen by players, making sure no duplicates are used.
+     \return Whether all choices are ok */
+    bool validateKartChoices();
+    
 public:
     
     /** Called when a player hits 'fire' on his device to join the game */
