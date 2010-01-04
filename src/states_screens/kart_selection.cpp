@@ -1010,7 +1010,23 @@ void KartSelectionScreen::allPlayersDone()
     
     //g_player_karts.clearAndDeleteAll();      
     //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
-    for (int n = 0; n < m_kart_widgets.size(); n++)
+    
+    std::vector<ItemDescription> items = w->getItems();
+    
+    // remove the 'random' item itself
+    const int item_count = items.size();
+    for (int n=0; n<item_count; n++)
+    {
+        if (items[n].m_code_name == RANDOM_KART_ID)
+        {
+            items[n].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+            break;
+        }
+    }
+    
+    // pick random karts
+    const int kart_count = m_kart_widgets.size();
+    for (int n = 0; n < kart_count; n++)
     {
         std::string selection = m_kart_widgets[n].m_kartInternalName;
         
@@ -1018,9 +1034,30 @@ void KartSelectionScreen::allPlayersDone()
         {
             // FIXME: in multiplayer game, if two players select' random' make sure they don't select
             // the same kart or an already selected kart
-            const std::vector<ItemDescription>& items = w->getItems();
-            const int randomID = random.get(items.size());
-            selection = items[randomID].m_code_name;
+            int randomID;
+            bool done = false;
+            do
+            {
+                randomID = random.get(item_count);
+                if (items[randomID].m_code_name != "x")
+                {
+                    selection = items[randomID].m_code_name;
+                    done = true;
+                }
+                items[randomID].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+            } while (!done);
+        }
+        else
+        {
+            // mark the item as taken
+            for (int i=0; i<item_count; i++)
+            {
+                if (items[i].m_code_name == items[n].m_code_name)
+                {
+                    items[i].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+                    break;
+                }
+            }
         }
         // std::cout << "selection=" << selection.c_str() << std::endl;
         
