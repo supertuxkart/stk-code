@@ -250,6 +250,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_log_errors
             PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors", "Enable logging of stdout and stderr to logfile") );
     
+    PARAM_PREFIX IntUserConfigParam         m_reverse_look_threshold
+            PARAM_DEFAULT(  IntUserConfigParam(9, "reverse_look_threshold") );
+    
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );
     
