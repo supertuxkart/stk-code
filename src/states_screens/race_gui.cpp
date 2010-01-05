@@ -560,12 +560,10 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
     }
     video::SMaterial m;
     m.setTexture(0, m_speed_bar_icon->getTexture());
+    m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     irr_driver->getVideoDriver()->setMaterial(m);
-#define DOES_NOT_WORK_ATM
-#ifdef DOES_NOT_WORK_ATM
     irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-#endif
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
