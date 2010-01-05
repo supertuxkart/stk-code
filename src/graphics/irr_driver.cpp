@@ -344,7 +344,11 @@ scene::ISceneNode* IrrDriver::addWaterNode(scene::IMesh *mesh,
  */
 scene::ISceneNode *IrrDriver::addOctTree(scene::IMesh *mesh)
 {
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
+    return m_scene_manager->addOctreeSceneNode(mesh);
+#else
     return m_scene_manager->addOctTreeSceneNode(mesh);
+#endif
 }   // addOctTree
 
 // ----------------------------------------------------------------------------

@@ -254,7 +254,12 @@ namespace GUIEngine
         virtual void    draw3DTabBody (irr::gui::IGUIElement *element, bool border, bool background, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::s32 tabHeight=-1, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
         virtual void    draw3DTabButton (irr::gui::IGUIElement *element, bool active, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip, irr::gui::EGUI_ALIGNMENT alignment=irr::gui::EGUIA_UPPERLEFT);
         virtual void    draw3DToolBar (irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR==7)
+        virtual irr::core::rect< irr::s32 >     draw3DWindowBackground (irr::gui::IGUIElement *element, bool drawTitleBar, irr::video::SColor titleBarColor, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip,
+                                                                        irr::core::rect<irr::s32>* checkClientArea=0);
+#else
         virtual irr::core::rect< irr::s32 >     draw3DWindowBackground (irr::gui::IGUIElement *element, bool drawTitleBar, irr::video::SColor titleBarColor, const irr::core::rect< irr::s32 > &rect, const irr::core::rect< irr::s32 > *clip);
+#endif
         virtual void    drawIcon (irr::gui::IGUIElement *element, irr::gui::EGUI_DEFAULT_ICON icon, const irr::core::position2di position, irr::u32 starttime, irr::u32 currenttime, bool loop=false, const irr::core::rect< irr::s32 > *clip=NULL);
         virtual irr::video::SColor  getColor (irr::gui::EGUI_DEFAULT_COLOR color) const;
         virtual const wchar_t*  getDefaultText (irr::gui::EGUI_DEFAULT_TEXT text) const;
