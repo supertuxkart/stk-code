@@ -174,6 +174,13 @@ void IrrDriver::initDevice()
     m_video_driver  = m_device->getVideoDriver();
     const std::string &font = file_manager->getFontFile("DomesticManners.xml");
     m_race_font     = m_gui_env->getFont(font.c_str());
+        
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
+    video::SMaterial& material2D = m_video_driver->getMaterial2D();
+    material2D.TextureLayer[0].BilinearFilter=true;
+    material2D.AntiAliasing=video::EAAM_FULL_BASIC;
+    //m_video_driver->enableMaterial2D();
+#endif
 }
 
 

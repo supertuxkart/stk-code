@@ -250,6 +250,8 @@ void render(float elapsed_time)
         g_skin->drawBGFadeColor();
     }
     
+    g_driver->enableMaterial2D();
+    
     if (gamestate == MENU || gamestate == INGAME_MENU)
     {
         g_skin->renderSections();
@@ -267,6 +269,8 @@ void render(float elapsed_time)
     {
         RaceManager::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
+    
+    g_driver->enableMaterial2D(false);
 }   // render
 
 // -----------------------------------------------------------------------------    
