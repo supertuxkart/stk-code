@@ -38,6 +38,7 @@ public:
     std::vector<TrackObject*> m_all_objects;
 public:
          TrackObjectManager();
+        ~TrackObjectManager();
     void add(const XMLNode &xml_node, const Track &track);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;

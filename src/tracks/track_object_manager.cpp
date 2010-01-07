@@ -29,6 +29,15 @@ TrackObjectManager::TrackObjectManager()
 }   // TrackObjectManager
 
 // ----------------------------------------------------------------------------
+TrackObjectManager::~TrackObjectManager()
+{
+    for(unsigned int i=0; i<m_all_objects.size(); i++)
+    {
+        delete m_all_objects[i];
+    }
+}   // ~TrackObjectManager
+
+// ----------------------------------------------------------------------------
 /** Adds an object to the track object manager. The type to add is specified
  *  in the xml_node.
  */
