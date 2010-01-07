@@ -177,7 +177,7 @@ void IrrDriver::initDevice()
         
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
-    for (int n=0; n<MATERIAL_MAX_TEXTURES; n++)
+    for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
     {
         material2D.TextureLayer[n].BilinearFilter = true;
         //material2D.TextureLayer[n].TextureWrap = ETC_CLAMP_TO_EDGE;
