@@ -250,7 +250,9 @@ void render(float elapsed_time)
         g_skin->drawBGFadeColor();
     }
     
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
     g_driver->enableMaterial2D();
+#endif
     
     if (gamestate == MENU || gamestate == INGAME_MENU)
     {
@@ -270,7 +272,9 @@ void render(float elapsed_time)
         RaceManager::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
     
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
     g_driver->enableMaterial2D(false);
+#endif
 }   // render
 
 // -----------------------------------------------------------------------------    
