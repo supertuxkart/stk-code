@@ -3,7 +3,7 @@ import sys
 
 f = open('./data/po/gui_strings.h', 'w')
 
-def traverse(node, isChallenge, level=0):
+def traverse(file, node, isChallenge, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -20,9 +20,9 @@ def traverse(node, isChallenge, level=0):
                # print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
                if comment == None:
-                   line += "_(\"" + e.getAttribute("name") + "\")\n\n"
+                   line += "//I18N: " + file + "\n_(\"" + e.getAttribute("name") + "\")\n\n"
                else:
-                   line += "//I18N: " + comment + "\n_(\"" + e.getAttribute("name") + "\");\n\n"
+                   line += "//I18N: File : " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("name") + "\");\n\n"
                
                f.write( line )
                
@@ -30,9 +30,9 @@ def traverse(node, isChallenge, level=0):
                # print "Label=", e.getAttribute("description"), " Comment=", comment
                line = ""
                if comment == None:
-                   line += "_(\"" + e.getAttribute("description") + "\")\n\n"
+                   line += "//I18N: " + file + "\n_(\"" + e.getAttribute("description") + "\")\n\n"
                else:
-                   line += "//I18N: " + comment + "\n_(\"" + e.getAttribute("description") + "\");\n\n"
+                   line += "//I18N: File : " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("description") + "\");\n\n"
                
                f.write( line )
         else:
@@ -40,14 +40,14 @@ def traverse(node, isChallenge, level=0):
                # print "Label=", e.getAttribute("text"), " Comment=", comment
                line = ""
                if comment == None:
-                   line += "_(\"" + e.getAttribute("text") + "\")\n\n"
+                   line += "//I18N: " + file + "\n_(\"" + e.getAttribute("text") + "\")\n\n"
                else:
-                   line += "//I18N: " + comment + "\n_(\"" + e.getAttribute("text") + "\");\n\n"
+                   line += "//I18N: " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("text") + "\");\n\n"
                
                f.write( line )
 
         
-        traverse(e, isChallenge, level+1)
+        traverse(file, e, isChallenge, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
@@ -58,5 +58,5 @@ for file in filenames:
         isChallenge = True
         
     doc = xml.dom.minidom.parse(file)
-    traverse(doc, isChallenge)
+    traverse(file, doc, isChallenge)
     

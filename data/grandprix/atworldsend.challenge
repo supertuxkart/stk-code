@@ -2,8 +2,8 @@
 
 <challenge
     id="islandfollow"
-    name="Follow the Leader on a\nDesert Island"
-    description="Win a Follow the Leader race\nwith 3 AI karts\non a Desert Island."
+    name="Follow the Leader on a Desert Island"
+    description="Win a Follow the Leader race with 3 AI karts on a Desert Island."
     unlock-gp="atworldsend"
     depend-on="tothemoonandbackgp tollwayhead2head tollwaytime citytime"
     major="single"
