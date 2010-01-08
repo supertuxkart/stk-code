@@ -65,7 +65,7 @@ fptr = NULL; \
 ileft = 0; \
 tptr = to; \
 oleft = BUFSIZ; \
-(void) iconv(cd, (&fptr), &ileft, &tptr, &oleft); \
+(void) iconv(cd, const_cast<char**>(&fptr), &ileft, &tptr, &oleft); \
 }
 
 bool convertToEncoding(const char* from, char* to, const int BUF_SIZE, const char* from_code, CONVERT_TO to_code)
@@ -92,7 +92,7 @@ bool convertToEncoding(const char* from, char* to, const int BUF_SIZE, const cha
         tptr = to;
         oleft = BUFSIZ;
         
-        ret = iconv(cd, (&fptr), &ileft, &tptr, &oleft);
+        ret = iconv(cd, const_cast<char **>(&fptr), &ileft, &tptr, &oleft);
         if (ret != (size_t)-1)
         {
             // iconv succeeded
