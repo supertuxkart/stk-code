@@ -593,7 +593,16 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
  */
 video::ITexture *IrrDriver::getTexture(const std::string &filename)
 {
-    return m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
+    video::ITexture* out = m_scene_manager->getVideoDriver()->getTexture(filename.c_str());
+    
+#ifndef NDEBUG
+    if (out == NULL)
+    {
+        printf("Put a breakpoint at line %s:%i to debug!\n", __FILE__, __LINE__ );
+    }
+#endif
+    
+    return out;
 }   // getTexture
 
 // ----------------------------------------------------------------------------
