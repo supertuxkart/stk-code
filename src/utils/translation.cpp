@@ -59,14 +59,25 @@ const char* CODE_NAMES[] =
  * This code is assuming the iconv call for initializing the state
  * won't fail due to lack of space in the output buffer.
  */
-#define INIT_SHIFT_STATE(cd, fptr, ileft, tptr, oleft) \
-{ \
-fptr = NULL; \
-ileft = 0; \
-tptr = to; \
-oleft = BUFSIZ; \
-(void) iconv(cd, const_cast<char**>(&fptr), &ileft, &tptr, &oleft); \
-}
+#if _LIBICONV_VERSION < 0x010B 
+    #define INIT_SHIFT_STATE(cd, fptr, ileft, tptr, oleft)  \
+    {                                                       \
+        fptr = NULL;                                        \
+        ileft = 0;                                          \
+        tptr = to;                                          \
+        oleft = BUFSIZ;                                     \
+        iconv(cd, &fptr, &ileft, &tptr, &oleft);            \
+    }
+#else
+    #define INIT_SHIFT_STATE(cd, fptr, ileft, tptr, oleft)  \
+    {                                                       \
+        fptr = NULL;                                        \
+        ileft = 0;                                          \
+        tptr = to;                                          \
+        oleft = BUFSIZ;                                     \
+        iconv(cd, const_cast<char**>(&fptr), &ileft, &tptr, &oleft); \
+    }
+#endif
 
 bool convertToEncoding(const char* from, char* to, const int BUF_SIZE, const char* from_code, CONVERT_TO to_code)
 {
@@ -92,7 +103,12 @@ bool convertToEncoding(const char* from, char* to, const int BUF_SIZE, const cha
         tptr = to;
         oleft = BUFSIZ;
         
-        ret = iconv(cd, const_cast<char **>(&fptr), &ileft, &tptr, &oleft);
+#if _LIBICONV_VERSION < 0x010B 
+        ret = iconv(cd, &fptr, &ileft, &tptr, &oleft);
+#else
+        ret = iconv(cd, const_cast<char**>(&fptr), &ileft, &tptr, &oleft);
+#endif
+        
         if (ret != (size_t)-1)
         {
             // iconv succeeded
