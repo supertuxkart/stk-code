@@ -26,6 +26,9 @@
 
 float SkidMarks::m_avoid_z_fighting  = 0.0f;
 const int SkidMarks::m_start_alpha = 128;
+const int SkidMarks::m_start_grey = 32;
+//const int start_premul = SkidMarks::m_start_grey * SkidMarks::m_start_alpha / 256; compiler whines about private later
+const int start_premul = 32 * 128 / 256;
 
 /** Initialises empty skid marks. */
 SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
@@ -33,7 +36,8 @@ SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
     m_width                   = width;
     m_material                = new video::SMaterial();
     m_material->MaterialType  = video::EMT_TRANSPARENT_VERTEX_ALPHA;
-    m_material->AmbientColor  = video::SColor(128, 16, 16, 16);
+    m_material->AmbientColor  = video::SColor(128, 0, 0, 0); // or should be start_premul?
+//    m_material->DiffuseColor  = video::SColor(SkidMarks::m_start_alpha, start_premul, start_premul, start_premul); compiler whines about private
     m_material->DiffuseColor  = video::SColor(128, 16, 16, 16);
     m_material->Shininess     = 0;
     m_skid_marking            = false;
@@ -270,16 +274,17 @@ void SkidMarks::SkidMarkQuads::fade(float f)
 {
     m_fade_out += f;
     // Changing the alpha value is quite expensive, so it's only done
-    // about 10 times till 0 is reached. 
+    // about 10 times till 0 is reached.
     if(m_fade_out*10>SkidMarks::m_start_alpha)
     {
         video::SColor &c=Material.DiffuseColor;
         int a=c.getAlpha();
         a -= a<m_fade_out ? a : (int)m_fade_out;
-        c.setAlpha(a);
+        int premul_grey = a * SkidMarks::m_start_grey / 255;
+        c.set(a, premul_grey, premul_grey, premul_grey);
         for(unsigned int i=0; i<Vertices.size(); i++)
         {
-            Vertices[i].Color.setAlpha(a);
+            Vertices[i].Color.set(a, premul_grey, premul_grey, premul_grey);
         }
         m_fade_out = 0.0f;
     }

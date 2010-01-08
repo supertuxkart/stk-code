@@ -44,6 +44,8 @@ private:
     int                m_current;
     /** Initial alpha value. */
     static const int   m_start_alpha;
+    /** Initial grey value, same for the 3 channels. */
+    static const int   m_start_grey;
 
     /** Material to use for the skid marks. */
     video::SMaterial  *m_material;
