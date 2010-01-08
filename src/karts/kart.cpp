@@ -506,15 +506,16 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         float sign_c = (sign_bits & (0x1 << 10)) ? 1.0f : -1.0f;
         float sign_d = (sign_bits & (0x1 << 11)) ? 1.0f : -1.0f;
         float sign_e = (sign_bits & (0x1 << 12)) ? 1.0f : -1.0f;
-        btVector3 diff(sign_a * (float)(rand()%16/16), sign_b * (float)(rand()%16/16), 2.0f);
+
+        btVector3 diff(sign_a * float(rand()%16) / 16.0f, sign_b * float(rand()%16) / 16.0f, 2.0f);
         diff.normalize();
-        diff*=stk_config->m_explosion_impulse/5.0f;
+        diff *= stk_config->m_explosion_impulse / 5.0f;
         m_uprightConstraint->setDisableTime(10.0f);
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(sign_c * float(rand()%32*5),
-                                                                   sign_d * float(rand()%32*5),
-                                                                   sign_e * float(rand()%32*5)));
-        
+
+        btVector3 torque(sign_c * float(rand()%32) * 5.0f, sign_d * float(rand()%32) * 5.0f, sign_e * float(rand()%32) * 5.0f);
+        getVehicle()->getRigidBody()->applyTorqueImpulse(torque);
+
         m_stars_effect->showFor(6.0f);
     }
     else  // only affected by a distant explosion
@@ -522,8 +523,11 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         btVector3 diff=getXYZ()-pos;
         //if the z component is negative, the resulting impulse could push the
         // kart through the floor. So in this case ignore z.
-        if(diff.getZ()<0) diff.setZ(0.0f);
+        if(diff.getZ()<0.0f) diff.setZ(0.0f);
         float len2=diff.length2();
+
+        // Protect against "near zero" distances
+        len2 = (len2 > 0.5f) ? len2 : 0.5f;
 
         // The correct formulae would be to first normalise diff,
         // then apply the impulse (which decreases 1/r^2 depending
