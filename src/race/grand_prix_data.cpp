@@ -48,7 +48,12 @@ GrandPrixData::GrandPrixData(const std::string filename)
 
         std::string temp_name;
         lisp->get      ("name",        temp_name     );
-        m_name = _(temp_name.c_str());
+        // FIXME: for now all GP names are automatically translated by
+        // the lisp code, so no need to translate them here (which actually
+        // results in a crash, since the translated name is wchar_t and not
+        // utf-8.
+        //m_name = _(temp_name.c_str());
+        m_name = temp_name.c_str();
         
         lisp->get      ("description", m_description );
         lisp->get      ("item",        m_item_style);
