@@ -191,8 +191,11 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
-    static int turn=1;
-    turn=1-turn;
+    // static int turn=1;
+    // turn=1-turn;
+
+    // For now disable the new AI.
+    int turn=0;
     switch(turn)
     {
         case 0:
