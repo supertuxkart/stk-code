@@ -321,7 +321,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib Irrlicht.lib ws2_32.lib"
+				AdditionalDependencies="opengl32.lib user32.lib gdi32.lib winmm.lib advapi32.lib OpenAL32.lib libogg.lib libvorbis.lib libvorbisfile.lib intl.lib iconv.lib Irrlicht.lib ws2_32.lib"
 				OutputFile="./../../../$(ProjectName)_d16.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(STK_LIB)&quot;;&quot;C:\cygwin\home\jh235117\local\irrlicht-1.7\lib\Win32-visualstudio&quot;"
