@@ -239,7 +239,7 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
         Vec3 side((orientation>=0) ? -1.0f : 1.0f, 0, 0);
         float speed_frac = faster_kart->getSpeed()/faster_kart->getMaxSpeed();
         Vec3 impulse = 
-            faster_kart->getTrans().getRotation()*side*side_impulse*speed_frac;
+	  faster_kart->getTrans().getBasis()*side*side_impulse*speed_frac;
         printf("orientation is %f impulse is %f %f %f\n", 
                 orientation, impulse.getX(),impulse.getY(),impulse.getZ());
         slower_kart->getBody()->applyCentralImpulse(impulse);
