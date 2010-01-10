@@ -23,6 +23,7 @@
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/player_kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"

@@ -37,6 +37,7 @@
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
+#include "karts/player_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"

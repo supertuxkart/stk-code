@@ -37,6 +37,7 @@
 #include "input/input.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"

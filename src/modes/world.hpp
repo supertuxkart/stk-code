@@ -22,8 +22,6 @@
 
 #include <vector>
 
-#include "karts/kart.hpp"
-#include "karts/player_kart.hpp"
 #include "modes/clock.hpp"
 #include "network/network_kart.hpp"
 #include "physics/physics.hpp"
@@ -31,10 +29,12 @@
 #include "states_screens/race_gui.hpp"
 #include "utils/random_generator.hpp"
 
-class SFXBase;
 class btRigidBody;
-class Track;
+class Kart;
+class PlayerKart;
 class RaceGUI;
+class SFXBase;
+class Track;
 
 /** This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created

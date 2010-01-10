@@ -1,5 +1,6 @@
 
 #include "config/player.hpp"
+#include "karts/player_kart.hpp"
 #include "race/race_manager.hpp"
 #include "modes/world.hpp"
 

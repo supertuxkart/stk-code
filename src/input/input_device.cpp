@@ -3,6 +3,7 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
+#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"

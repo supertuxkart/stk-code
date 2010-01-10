@@ -335,7 +335,7 @@ wchar_t* w_gettext(const char* original)
 #else
     const char* original_t = original;
 #endif
-    
+
     wchar_t* out_ptr = utf8_to_wchar_t(original_t);
     
     if (out_ptr == NULL)
@@ -343,7 +343,8 @@ wchar_t* w_gettext(const char* original)
         std::cerr << "  ERROR in w_gettext! could not be converted to wchar_t.\n";
     }
     
-    std::wcout << L"  translation : " << out_ptr << std::endl;
+    std::wcout << L"  translation : " << irr::core::stringc(out_ptr).c_str() << std::endl;
+    fprintf(stdout, "translation is '%s'.\n",  irr::core::stringc(out_ptr).c_str());
     
     return out_ptr;
 

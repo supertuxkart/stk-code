@@ -24,6 +24,7 @@
 
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
+#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"

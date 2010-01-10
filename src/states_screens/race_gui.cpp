@@ -33,6 +33,7 @@ using namespace irr;
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -227,10 +228,7 @@ void RaceGUI::renderPlayerView(unsigned int player_id)
 
     if(player_kart->hasViewBlockedByPlunger())
     {
-        int offset_x = viewport.UpperLeftCorner.X;
         int offset_y = viewport.UpperLeftCorner.Y;
-        float split_screen_ratio_x = scaling.X;
-        float split_screen_ratio_y = scaling.Y;
 
         const int screen_width = viewport.LowerRightCorner.X-viewport.UpperLeftCorner.X;
         const int plunger_size = viewport.UpperLeftCorner.Y-viewport.LowerRightCorner.Y;
@@ -577,7 +575,7 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart,
     const int lap = info[kart->getWorldKartId()].lap;
     
     if(lap<0) return;  // don't display 'lap 0/...'
-    float minRatio = std::min(scaling.X, scaling.Y);
+
     core::recti pos;
     pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
                            + (int)(0.15f*UserConfigParams::m_width*scaling.X);

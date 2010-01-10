@@ -39,6 +39,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/player_kart.hpp"
 #include "main_loop.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
