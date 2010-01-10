@@ -166,8 +166,8 @@ bool Physics::projectKartDownwards(const Kart *k)
 //-----------------------------------------------------------------------------
 /** Handles the special case of two karts colliding with each other, which means
  *  that bombs must be passed on. If both karts have a bomb, they'll explode
- *  immediately. This function is called from physics::update on the server
- *  (and if no networking is used), and from race_state on the client to replay
+ *  immediately. This function is called from physics::update() on the server
+ *  and if no networking is used, and from race_state on the client to replay
  *  what happened on the server.
  *  \param kartA First kart involved in the collision.
  *  \param kartB Second kart involved in the collision.
@@ -205,9 +205,44 @@ void Physics::KartKartCollision(Kart *kartA, Kart *kartB)
     }
     else
     {
-        // No bombs exchanged, no explosions, tell the other driver to move it!
         kartA->playCustomSFX(SFXManager::CUSTOM_CRASH);
         kartB->playCustomSFX(SFXManager::CUSTOM_CRASH);
+    }
+
+    // If bouncing crashes is enabled, add an additional force to the
+    // slower kart
+    Kart *faster_kart, *slower_kart;
+    if(kartA->getSpeed()>=kartB->getSpeed())
+    {
+        faster_kart = kartA;
+        slower_kart = kartB;
+    }
+    else
+    {
+        faster_kart = kartB;
+        slower_kart = kartA;
+    }
+    float side_impulse = faster_kart->getKartProperties()->getCollisionSideImpulse();
+    if(side_impulse>0)
+    {
+        Vec3 forwards_ws(0, 1, 0);
+        Vec3 forwards = faster_kart->getTrans()*forwards_ws;
+        core::line2df f(faster_kart->getXYZ().getX(),
+                        faster_kart->getXYZ().getY(),
+                       forwards.getX(), forwards.getY());
+        core::vector2df p(slower_kart->getXYZ().getX(), 
+                          slower_kart->getXYZ().getY());
+
+        float orientation=f.getPointOrientation(p);
+        // Now compute the vector to the side (right or left depending
+        // on where the kart was hit).
+        Vec3 side((orientation>=0) ? -1.0f : 1.0f, 0, 0);
+        float speed_frac = faster_kart->getSpeed()/faster_kart->getMaxSpeed();
+        Vec3 impulse = 
+            faster_kart->getTrans().getRotation()*side*side_impulse*speed_frac;
+        printf("orientation is %f impulse is %f %f %f\n", 
+                orientation, impulse.getX(),impulse.getY(),impulse.getZ());
+        slower_kart->getBody()->applyCentralImpulse(impulse);
     }
 }   // KartKartCollision
 

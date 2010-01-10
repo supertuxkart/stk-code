@@ -127,6 +127,9 @@ private:
                                       *   loses contact with the track. */
     float m_suspension_rest;
     float m_suspension_travel_cm;
+    /** An additional artifical side-impulse that pushes the slower kart
+     *  out of the way of the faster kart in case of a collision. */
+    float m_collision_side_impulse;
     float m_jump_velocity;            // z velocity set when jumping
     float m_z_rescue_offset;          // z offset after rescue
     float m_upright_tolerance;
@@ -224,6 +227,9 @@ public:
     float getSuspensionRest         () const {return m_suspension_rest;          }
     float getSuspensionTravelCM     () const {return m_suspension_travel_cm;     }
     float getJumpVelocity           () const {return m_jump_velocity;            }
+    /** Returns the (artificial) collision side impulse this kart will apply
+     *  to a slower kart in case of a collision. */
+    float getCollisionSideImpulse   () const {return m_collision_side_impulse;   }
     float getZRescueOffset          () const {return m_z_rescue_offset;          }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }

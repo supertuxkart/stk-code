@@ -40,7 +40,7 @@ private:
     btDefaultMotionState        *m_motion_state;
     btCollisionShape            *m_collision_shape;
 public:
-    TriangleMesh() : m_mesh() {};
+         TriangleMesh() : m_mesh() {};
         ~TriangleMesh();
     void addTriangle(const btVector3 &t1, const btVector3 &t2, 
                      const btVector3 &t3, const Material* m);

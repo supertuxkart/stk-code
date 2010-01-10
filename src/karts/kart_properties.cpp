@@ -62,7 +62,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_wheel_radius = m_chassis_linear_damping =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_jump_velocity =
-        m_z_rescue_offset = m_upright_tolerance =
+        m_z_rescue_offset = m_upright_tolerance = m_collision_side_impulse =
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max =
@@ -314,6 +314,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("suspension-rest", &m_suspension_rest);
     root->get("suspension-travel-cm", &m_suspension_travel_cm);
     root->get("jump-velocity", &m_jump_velocity);
+    root->get("collision-side-impulse", &m_collision_side_impulse);
     root->get("z-rescue-offset", &m_z_rescue_offset);
 
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
@@ -432,6 +433,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("gravity-center-shift",      m_gravity_center_shift     );
     lisp->get("suspension-rest",           m_suspension_rest          );
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
+    lisp->get("collision-side-impulse",    m_collision_side_impulse   );
     lisp->get("jump-velocity",             m_jump_velocity            );
     lisp->get("z-rescue-offset",           m_z_rescue_offset          );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
@@ -527,6 +529,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
     CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
     CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
+    CHECK_NEG(m_collision_side_impulse,    "collision-side-impulse"     );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
     CHECK_NEG(m_z_rescue_offset,           "z-rescue-offset"            );
     CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
