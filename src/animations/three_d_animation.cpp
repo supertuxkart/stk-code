@@ -95,7 +95,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     m_motion_state = new KartMotionState(trans);
     btRigidBody::btRigidBodyConstructionInfo info(0, m_motion_state, 
                                                   m_collision_shape);
-    
+
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
@@ -108,10 +108,13 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
 /** Destructor. */
 ThreeDAnimation::~ThreeDAnimation()
 {
-    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
-    delete m_body;
-    delete m_motion_state;
-    delete m_collision_shape;
+    if(m_body)
+    {
+        RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+        delete m_body;
+        delete m_motion_state;
+        delete m_collision_shape;
+    }
 }   // ~ThreeDAnimation
 
 // ----------------------------------------------------------------------------
