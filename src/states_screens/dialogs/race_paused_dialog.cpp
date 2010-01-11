@@ -64,7 +64,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     back_btn->m_properties[PROP_ID] = "backbtn";
     back_btn->m_properties[PROP_ICON] = "gui/back.png";
     //I18N: In the 'paused' screen
-    back_btn->m_text = L"Back to Race";
+    back_btn->m_text = _("Back to Race");
     back_btn->x = m_area.getWidth() / 2 - icon_size;
     back_btn->y = text_height*2;
     back_btn->w = icon_size*2; // width larger to leave room for text
@@ -93,7 +93,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_WIDTH] = "128";
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = L"Setup New Race";
+        ribbon_item->m_text = _("Setup New Race");
         m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
@@ -103,7 +103,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_WIDTH] = "128";
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = L"Restart Race";
+        ribbon_item->m_text = _("Restart Race");
         m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
@@ -113,7 +113,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_WIDTH] = "128";
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = L"Options";
+        ribbon_item->m_text = _("Options");
         m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
@@ -123,7 +123,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_WIDTH] = "128";
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = L"Help";
+        ribbon_item->m_text = _("Help");
         m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     {
@@ -133,7 +133,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
         ribbon_item->m_properties[PROP_WIDTH] = "128";
         ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = L"Exit Race";
+        ribbon_item->m_text = _("Exit Race");
         m_choice_ribbon->m_children.push_back(ribbon_item);
     }
     
