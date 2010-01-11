@@ -95,6 +95,15 @@ private:
 
     /** Musical notes icon (for music description and credits) */
     Material        *m_music_icon;
+
+    /** Translated string of 'finished' message. */
+    core::stringw    m_string_finished;
+
+    /** Translated string 'lap' displayed every frame. */
+    core::stringw    m_string_lap;
+
+    /** Translated strings 'ready', 'set', 'go'. */
+    core::stringw    m_string_ready, m_string_set, m_string_go;
     
     // Minimap related variables
     // -------------------------

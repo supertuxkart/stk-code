@@ -68,6 +68,16 @@ RaceGUI::RaceGUI()
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
     m_music_icon       = material_manager->getMaterial("notes.png");
     createMarkerTexture();
+
+    // Translate strings only one in constructor to avoid calling
+    // gettext in each frame.
+    //I18N: Shown at the end of a race
+    m_string_finished = _("Finished");
+    m_string_lap      = _("Lap");
+    //I18N: as in "ready, set, go", shown at the beginning of the race
+    m_string_ready    = _("Ready!");
+    m_string_set      = _("Set!");
+    m_string_go       = _("Go!");
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
@@ -585,19 +595,16 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart,
     if(kart->hasFinishedRace())
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
-        //I18N: Shown at the end of a race
-        core::stringw s=_("Finished");
         pos.UpperLeftCorner.Y -= 2*font_height;
         pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(s.c_str(), pos, color);
+        font->draw(m_string_finished.c_str(), pos, color);
     }
     else
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
-        core::stringw s = _("Lap");
         pos.UpperLeftCorner.Y -= 3*font_height;
         pos.LowerRightCorner   = pos.UpperLeftCorner;
-        font->draw(core::stringw(_("Lap")).c_str(), pos, color);
+        font->draw(m_string_lap.c_str(), pos, color);
     
         char str[256];
         sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
@@ -775,9 +782,7 @@ void RaceGUI::drawGlobalReadySetGo()
             core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
             gui::IGUIFont* font = irr_driver->getRaceFont();
-            //I18N: as in "ready, set, go", shown at the beginning of the race
-            core::stringw s=_("Ready!");
-            font->draw(s.c_str(), pos, color, true, true);
+            font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
     case SET_PHASE:
@@ -787,8 +792,7 @@ void RaceGUI::drawGlobalReadySetGo()
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
             gui::IGUIFont* font = irr_driver->getRaceFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
-            core::stringw s=_("Set!");
-            font->draw(s.c_str(), pos, color, true, true);
+            font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
     case GO_PHASE:
@@ -798,8 +802,7 @@ void RaceGUI::drawGlobalReadySetGo()
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
             gui::IGUIFont* font = irr_driver->getRaceFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
-            core::stringw s=_("Go!");
-            font->draw(s.c_str(), pos, color, true, true);
+            font->draw(m_string_go.c_str(), pos, color, true, true);
         }
         break;
     default: 
