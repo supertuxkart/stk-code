@@ -20,34 +20,37 @@
 #ifndef TRANSLATION_HPP
 #define TRANSLATION_HPP
 
+#include "irrlicht.h"
+
 #if ENABLE_NLS
+#  ifdef __APPLE__
+#    include <libintl/libintl.h>
+#  else
+#    include <libintl.h>
+#  endif
 
-#ifdef __APPLE__
-#  include <libintl/libintl.h>
-#else
-#  include <libintl.h>
-#endif
-
-#  define _(String) w_gettext(String)
-#  define gettext_noop(String) String
-#  define N_(String) gettext_noop (String)
-// libintl defines its own fprintf, which doesn't work for me :(
+#  define _(String)            (translations->w_gettext(String))
+#  define gettext_noop(String) (String)
+#  define N_(String)           (gettext_noop (String))
+// libintl defines its own fprintf, which doesn't work properly
 #  if defined(WIN32) && !defined(__CYGWIN__)
 #    undef fprintf
 #  endif
-#else
-#  define _(String) w_gettext(String)
-#  define gettext_noop(String) String
-#  define N_(String) String
+#else   // No NLS
+#  define _(String)            (translations->w_gettext(String))
+#  define gettext_noop(String) (String)
+#  define N_(String)           (String)
 #endif
 
 class Translations
 {
+private:
+    irr::core::stringw m_converted_string;
 public:
-    Translations();
-};
+                       Translations();
+    const wchar_t     *w_gettext(const char* original);
+};   // Translations
 
-wchar_t* w_gettext(const char* original);
 
 extern Translations* translations;
 #endif
