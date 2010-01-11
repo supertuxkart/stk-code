@@ -28,7 +28,14 @@
 class Track;
 class LinearWorld;
 class QuadGraph;
-class irr::scene::ISceneNode;
+
+namespace irr
+{
+    namespace scene
+    {
+        class ISceneNode;
+    }
+}
 
 class DefaultRobot : public AutoKart
 {
