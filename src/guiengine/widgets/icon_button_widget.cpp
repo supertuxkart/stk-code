@@ -116,7 +116,12 @@ void IconButtonWidget::setImage(const char* path_to_texture)
         // texture not found, try with absolute path
         m_texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
     }
-    assert(m_texture != NULL);
+    if(!m_texture)
+    {
+        fprintf(stderr, "Texture '%s' not found - aborting.\n", 
+	        m_properties[PROP_ICON].c_str());
+	exit(-1);
+    }
 
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
