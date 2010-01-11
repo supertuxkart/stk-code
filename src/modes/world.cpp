@@ -187,8 +187,8 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
 {
     Kart* currentRobot;
 
-    const int NUM_ROBOTS = 1;
 
+    // const int NUM_ROBOTS = 1;
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
     // static int turn=1;
