@@ -26,8 +26,8 @@
 #include "irrlicht.h"
 
 #include "utils/translation.hpp"
-#include "io/file_manager.hpp"
 
+#include <assert.h>
 #include <locale.h>
 #include <stdio.h>
 #include <errno.h>
@@ -35,6 +35,8 @@
 //#include <iconv.h>
 #include <stdlib.h>
 #include <iostream>
+
+#include "io/file_manager.hpp"
 
 enum CONVERT_TO
 {
