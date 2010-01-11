@@ -314,7 +314,10 @@ Translations::Translations()
     setlocale(LC_MESSAGES, "");
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
-    bind_textdomain_codeset(PACKAGE, "UTF-8");
+    if (sizeof(wchar_t) == 32) bind_textdomain_codeset(PACKAGE, "UTF-32");
+    else if (sizeof(wchar_t) == 16) bind_textdomain_codeset(PACKAGE, "UTF-16");
+    else assert(false);
+    
     //bind_textdomain_codeset(PACKAGE, "iso-8859-1");
     textdomain (PACKAGE);
 #endif
@@ -336,15 +339,31 @@ wchar_t* w_gettext(const char* original)
     const char* original_t = original;
 #endif
 
-    wchar_t* out_ptr = utf8_to_wchar_t(original_t);
+    /*
+    // print
+    for (int n=0;; n+=4)
+    {
+        std::cout << original_t[n] << " (" << (unsigned int)(original_t[n]) << "), "
+                  << original_t[n+1] << " (" << (unsigned int)(original_t[n+1]) << "), "
+                  << original_t[n+2] << " (" << (unsigned int)(original_t[n+2]) << "), "
+                  << original_t[n+3] << " (" << (unsigned int)(original_t[n+3]) << ")\n";
+        
+        if (original_t[n] | original_t[n+1] | original_t[n+2] | original_t[n+3] == 0) break;
+    }
+    */
     
+    //wchar_t* out_ptr = utf8_to_wchar_t(original_t);
+    wchar_t* out_ptr = (wchar_t*)original_t;
+    
+    /*
     if (out_ptr == NULL)
     {
         std::cerr << "  ERROR in w_gettext! could not be converted to wchar_t.\n";
     }
-    
-    std::wcout << L"  translation : " << irr::core::stringc(out_ptr).c_str() << std::endl;
-    fprintf(stdout, "translation is '%s'.\n",  irr::core::stringc(out_ptr).c_str());
+    */
+    std::wcout << L"  translation : " << out_ptr << std::endl;
+    //std::wcout << L"  translation : " << irr::core::stringc(out_ptr).c_str() << std::endl;
+    //fprintf(stdout, "translation is '%s'.\n",  irr::core::stringc(out_ptr).c_str());
     
     return out_ptr;
 
