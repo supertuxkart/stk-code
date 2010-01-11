@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <iconv.h>
+//#include <iconv.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -59,6 +59,7 @@ const char* CODE_NAMES[] =
  * This code is assuming the iconv call for initializing the state
  * won't fail due to lack of space in the output buffer.
  */
+/*
 #if defined(__APPLE__) && _LIBICONV_VERSION < 0x010B
     #define INIT_SHIFT_STATE(cd, fptr, ileft, tptr, oleft)  \
     {                                                       \
@@ -199,15 +200,14 @@ bool convertToEncoding(const char* from, char* to, const int BUF_SIZE, const cha
         }
     }
     
-    /*
-     * Initializes the conversion descriptor and outputs
-     * the sequence to change the state to initial state.
-     */
+ // Initializes the conversion descriptor and outputs
+ // the sequence to change the state to initial state.
     INIT_SHIFT_STATE(cd, fptr, ileft, tptr, oleft);
     
     iconv_close(cd);
     return true;
 }
+ */
 
 // TODO: use a type that works on all platforms
 typedef unsigned int uint32;
@@ -217,6 +217,7 @@ typedef unsigned int uint32;
  * \return             The appropriate representation of this text in the platform's native wchar_t type, or
  *                     NULL if conversion failed (in this case a message will be printed to the console)
  */
+/*
 wchar_t* utf8_to_wchar_t(const char* input_text)
 {
     const int buffer_size = 2048;                       // let's arbitrarly support 2048 chars
@@ -275,7 +276,7 @@ wchar_t* utf8_to_wchar_t(const char* input_text)
         return NULL;
     }
 }
-
+*/
 /*
 int main()
 {
@@ -314,8 +315,8 @@ Translations::Translations()
     setlocale(LC_MESSAGES, "");
 #endif
     bindtextdomain (PACKAGE, file_manager->getTranslationDir().c_str());
-    if (sizeof(wchar_t) == 32) bind_textdomain_codeset(PACKAGE, "UTF-32");
-    else if (sizeof(wchar_t) == 16) bind_textdomain_codeset(PACKAGE, "UTF-16");
+    if (sizeof(wchar_t) == 4) bind_textdomain_codeset(PACKAGE, "UTF-32");
+    else if (sizeof(wchar_t) == 2) bind_textdomain_codeset(PACKAGE, "UTF-16");
     else assert(false);
     
     //bind_textdomain_codeset(PACKAGE, "iso-8859-1");
