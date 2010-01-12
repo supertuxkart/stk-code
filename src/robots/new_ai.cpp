@@ -1034,6 +1034,7 @@ void NewAI::reset()
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
+    AutoKart::reset();
     m_quad_graph->findRoadSector(getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
@@ -1042,7 +1043,6 @@ void NewAI::reset()
         m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
     }
 
-    AutoKart::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------

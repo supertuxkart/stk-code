@@ -973,6 +973,8 @@ void DefaultRobot::reset()
     m_distance_ahead             = 0.0f;
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
+
+    AutoKart::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
     m_quad_graph->findRoadSector(getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
@@ -982,7 +984,6 @@ void DefaultRobot::reset()
         m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
     }
 
-    AutoKart::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
