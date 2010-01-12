@@ -94,8 +94,10 @@ void Stars::showFor(float time)
  */
 void Stars::reset()
 {
-    m_enabled = false;
-}   // unShow
+    // This will make the stars invisible and disable them
+    m_remaining_time = -1;
+}   // reset
+
 // ----------------------------------------------------------------------------
 
 void Stars::update(float delta_t)
