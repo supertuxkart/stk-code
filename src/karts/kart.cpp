@@ -380,7 +380,8 @@ void Kart::reset()
     m_controls.m_drift     = false;
     m_controls.m_fire      = false;
     m_controls.m_look_back = false;
-
+    // Reset star effect in case that it is currently being shown.
+    m_stars_effect->reset();
     m_vehicle->deactivateZipper();
 
     // Set the brakes so that karts don't slide downhill

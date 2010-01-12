@@ -90,6 +90,13 @@ void Stars::showFor(float time)
 }
 
 // ----------------------------------------------------------------------------
+/** Resets the stars, esp. disabling them at a restart.
+ */
+void Stars::reset()
+{
+    m_enabled = false;
+}   // unShow
+// ----------------------------------------------------------------------------
 
 void Stars::update(float delta_t)
 {
