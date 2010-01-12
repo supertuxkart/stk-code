@@ -90,7 +90,7 @@ FileManager* file_manager = 0;
  *  exists) changed in reInit().
  *
  */
-FileManager::FileManager()
+FileManager::FileManager(char *argv[])
 {
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
@@ -108,18 +108,30 @@ FileManager::FileManager()
     m_file_system  = m_device->getFileSystem();
     m_is_full_path = false;
 
+	irr::io::path exe_path;
+
+    // Also check for data dirs relative to the path of the executable.
+    // This is esp. useful for Visual Studio, since it's not necessary
+    // to define the working directory when debugging, it works automatically.
+	if(m_file_system->existFile(argv[0]))
+		exe_path = m_file_system->getFileDir(argv[0]);
+
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         m_root_dir= getenv ( "SUPERTUXKART_DATADIR" ) ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( m_root_dir ) ) { /* nothing to do */ }
 #endif
-   // else if(m_file_system->existFile("/Developer/games/supertuxkart/data/stk_config.xml"))
-    //    m_root_dir = "/Developer/games/supertuxkart" ;
-    // FIXME - existFile() fails to detect the file, even though it exists, on my computer
     else if(m_file_system->existFile("data/stk_config.xml"))
         m_root_dir = "." ;
     else if(m_file_system->existFile("../data/stk_config.xml"))
         m_root_dir = ".." ;
+    else if(m_file_system->existFile(exe_path+"/data/stk_config.xml"))
+        m_root_dir = exe_path.c_str();
+    else if(m_file_system->existFile(exe_path+"/../data/stk_config.xml"))
+    {
+        m_root_dir = exe_path.c_str();
+        m_root_dir += "/..";
+    }
     else
 #ifdef SUPERTUXKART_DATADIR
         m_root_dir = SUPERTUXKART_DATADIR ;

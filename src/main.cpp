@@ -492,9 +492,9 @@ int handleCmdLine(int argc, char **argv)
 //=============================================================================
 /** Initialises the minimum number of managers to get access to user_config.
  */
-void initUserConfig()
+void initUserConfig(char *argv[])
 {
-    file_manager            = new FileManager();
+    file_manager            = new FileManager(argv);
     translations            = new Translations();   // needs file_manager
     user_config             = new UserConfig();     // needs file_manager
 }   // initUserConfig
@@ -579,7 +579,8 @@ int main(int argc, char *argv[] )
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
-        initUserConfig();
+        initUserConfig(argv); // argv passed so config file can be
+                              // found more reliably
         handleCmdLinePreliminary(argc, argv);
         
         initRest();

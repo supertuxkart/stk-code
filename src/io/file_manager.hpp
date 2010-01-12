@@ -53,7 +53,7 @@ private:
     io::path createAbsoluteFilename(const std::string &f);
 
 public:
-                    FileManager();
+                    FileManager(char *argv[]);
                    ~FileManager();
     void            setDevice(IrrlichtDevice *device);
     void            dropFileSystem();
