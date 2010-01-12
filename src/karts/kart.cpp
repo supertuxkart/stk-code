@@ -972,7 +972,11 @@ void Kart::updatePhysics (float dt)
             engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
 
         // Lose some traction when skidding, so it is not abused by player
-        if(m_controls.m_drift)
+	// The AI will be allowed to cheat on medium and hard difficulty in
+	// order to make them more competitive (this might be removed once
+	// the AI is better).
+        if(m_controls.m_drift && 
+           (race_manager->getDifficulty()==RaceManager::RD_EASY || isPlayerKart()) )
             engine_power *= 0.5f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
