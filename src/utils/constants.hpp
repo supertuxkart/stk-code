@@ -49,5 +49,7 @@
 
 const int MAX_PLAYER_COUNT = 4;
 
+extern int IS_LITTLE_ENDIAN;
+
 
 #endif

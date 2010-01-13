@@ -42,6 +42,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
+#include "utils/constants.hpp"
 
 SFXManager* sfx_manager= NULL;
 

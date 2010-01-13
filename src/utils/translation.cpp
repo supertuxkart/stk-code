@@ -37,10 +37,10 @@
 #include "irrlicht.h"
 
 #include "io/file_manager.hpp"
+#include "utils/constants.hpp"
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
-
 
 Translations* translations=NULL;
 bool remove_bom = false;
@@ -62,7 +62,8 @@ Translations::Translations()
     if (sizeof(wchar_t) == 4)
     {
         // FIXME: will probably not work on PPC maccs
-        bind_textdomain_codeset(PACKAGE, "UTF-32LE");
+        if (IS_LITTLE_ENDIAN) bind_textdomain_codeset(PACKAGE, "UTF-32LE");
+        else                  bind_textdomain_codeset(PACKAGE, "UTF-32BE");
     }
     else if (sizeof(wchar_t) == 2)
     {

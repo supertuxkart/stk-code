@@ -31,8 +31,6 @@
 
 class Vec3;
 
-extern bool IS_LITTLE_ENDIAN;
-
 class SoundManager
 {
 private:        
