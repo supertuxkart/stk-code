@@ -513,6 +513,10 @@
 				Name="utils"
 				>
 				<File
+					RelativePath="..\..\utils\constants.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\utils\random_generator.cpp"
 					>
 				</File>
