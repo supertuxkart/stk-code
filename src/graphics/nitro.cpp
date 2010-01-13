@@ -25,8 +25,6 @@
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
-#include <cstdio>
-
 Nitro::Nitro(Kart* kart) : m_kart(kart)
 {
     const float particle_size = 0.25f;
