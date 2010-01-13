@@ -25,6 +25,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
@@ -46,7 +47,8 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
     m_name          = "Tux";
     m_ident         = "tux";
     m_icon_file     = "tuxicon.png";
-    m_shadow_file   = "tuxkartshadow.png";
+    m_shadow_file   = "generickartshadow.png";
+
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
@@ -195,6 +197,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_kart_model.getWidth(), m_kart_model.getLength(),
         m_kart_model.getHeight());
 
+    m_shadow_texture = irr_driver->getTexture(m_shadow_file);
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 

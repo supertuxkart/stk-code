@@ -39,11 +39,11 @@ private:
     /** The scene node of the kart to which this shadow belongs. */
     scene::ISceneNode  *m_parent_kart_node;
 public:
-                       Shadow(const std::string &name,
-                           scene::IAnimatedMeshSceneNode *node);
-                      ~Shadow();
-    void               enableShadow();
-    void               disableShadow();
+         Shadow(video::ITexture *texture,
+                scene::IAnimatedMeshSceneNode *node);
+        ~Shadow();
+    void enableShadow();
+    void disableShadow();
 };   // Shadow
 #endif
 

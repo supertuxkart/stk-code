@@ -1210,10 +1210,10 @@ void Kart::loadData()
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
+       
+    m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
+                          m_animated_node);
 
-    m_shadow = new Shadow(file_manager->getKartFile(m_kart_properties->getShadowFile(),
-                                                    getIdent()                         ),
-                                                    m_animated_node);
     m_stars_effect = new Stars(m_animated_node);
 }   // loadData
 

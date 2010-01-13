@@ -71,6 +71,7 @@ private:
                                        *   character select screen. */
     std::string m_shadow_file;        /**< Filename of the image file that
                                        *   contains the shadow for this kart.*/
+    video::ITexture *m_shadow_texture;/**< The texture with the shadow. */
     video::SColor m_color;            /**< Color the represents the kart in the
                                        *   status bar and on the track-view. */
     int  m_shape;                     /**< Number of vertices in polygon when
@@ -185,7 +186,7 @@ public:
     KartModel*    getKartModel       () const {return &m_kart_model;              }
     const irr::core::stringw& getName() const {return m_name;                     }
     const std::string& getIdent      () const {return m_ident;                    }
-    const std::string& getShadowFile () const {return m_shadow_file;              }
+    video::ITexture *getShadowTexture() const {return m_shadow_texture;     }
     const std::string& getIconFile   () const {return m_icon_file;                }
     const int          getCustomSfxId (SFXManager::CustomSFX type) 
                                        const  {return m_custom_sfx_id[type];      }

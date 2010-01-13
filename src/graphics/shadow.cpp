@@ -23,9 +23,8 @@
 
 #include "graphics/irr_driver.hpp"
 
-Shadow::Shadow(const std::string &name, scene::IAnimatedMeshSceneNode *node)
+Shadow::Shadow(video::ITexture *texture, scene::IAnimatedMeshSceneNode *node)
 {
-    video::ITexture *texture = irr_driver->getTexture(name);
     video::SMaterial m;
     m.setTexture(0, texture);
     m.BackfaceCulling = false;
