@@ -103,7 +103,7 @@ void RibbonWidget::add()
         
         if (getRibbonType() == RIBBON_TABS)
         {
-            IGUIButton * subbtn;
+            IGUIButton * subbtn = NULL;
             rect<s32> subsize = rect<s32>(widget_x - one_button_space/2+2,  0,
                                           widget_x + one_button_space/2-2,  h);
             
@@ -152,6 +152,10 @@ void RibbonWidget::add()
                 subbtn->setTabStop(false);
                 subbtn->setTabGroup(false);
                 
+            }
+            else
+            {
+                std::cerr << "Invalid tab bar contents\n";
             }
             
             m_children[i].m_element = subbtn;
