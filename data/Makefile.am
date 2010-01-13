@@ -11,7 +11,7 @@ dist_pkgdata_DATA = \
  $(shell find $(srcdir) -maxdepth 1 -name "*.challenge") \
  $(shell find $(srcdir) -name "*.collectable") \
  $(shell find $(srcdir) -name "*.projectile") \
- $(shell find $(srcdir) -name "*.xml") \
+ stk_config.xml  bubblegum.xml                \
  CREDITS
 
 desktopdir = $(prefix)/share/applications
