@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-07 18:18-0500\n"
+"POT-Creation-Date: 2010-01-14 17:50-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "%s is ready"
 msgstr ""
 
-#: src/modes/world.cpp:458
+#: src/modes/world.cpp:461
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -198,6 +198,11 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:67
+msgid "Back to Race"
+msgstr ""
+
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: ./data/gui/credits.stkgui
 #: data/po/gui_strings.h:30 data/po/gui_strings.h:37
@@ -344,6 +349,11 @@ msgstr ""
 msgid "Enter the new player's name"
 msgstr ""
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+msgid "Exit Race"
+msgstr ""
+
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:417
@@ -392,7 +402,7 @@ msgstr ""
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:513
 msgid ""
-"Finish with at least 6 points of intro on three laps of Oliver's Math Class "
+"Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
 msgstr ""
 
@@ -404,7 +414,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:591
+#: src/states_screens/race_gui.cpp:75
 msgid "Finished"
 msgstr ""
 
@@ -471,8 +481,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:803
+#: src/states_screens/race_gui.cpp:80
 msgid "Go!"
 msgstr ""
 
@@ -482,8 +491,10 @@ msgstr ""
 msgid "Grand Prix"
 msgstr ""
 
+#. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:126
 #: data/po/gui_strings.h:210
 msgid "Help"
 msgstr ""
@@ -517,7 +528,7 @@ msgstr ""
 msgid "Keyboard %i"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:599 src/states_screens/race_gui.cpp:602
+#: src/states_screens/race_gui.cpp:76
 msgid "Lap"
 msgstr ""
 
@@ -634,8 +645,10 @@ msgstr ""
 msgid "Number of AI karts"
 msgstr ""
 
+#. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:116
 #: data/po/gui_strings.h:206
 msgid "Options"
 msgstr ""
@@ -737,7 +750,7 @@ msgid "Random Track"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:781
+#: src/states_screens/race_gui.cpp:78
 msgid "Ready!"
 msgstr ""
 
@@ -765,6 +778,11 @@ msgstr ""
 msgid "Rescue"
 msgstr ""
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:106
+msgid "Restart Race"
+msgstr ""
+
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Key binding
 #: data/po/gui_strings.h:316
@@ -783,12 +801,13 @@ msgstr ""
 msgid "Select a game mode"
 msgstr ""
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:792
+#: src/states_screens/race_gui.cpp:79
 msgid "Set!"
 msgstr ""
 
+#. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_over_dialog.cpp:201
+#: src/states_screens/dialogs/race_paused_dialog.cpp:96
 msgid "Setup New Race"
 msgstr ""
 
@@ -979,7 +998,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/modes/world.cpp:454
+#: src/modes/world.cpp:457
 msgid ""
 "You have been\n"
 "eliminated!"

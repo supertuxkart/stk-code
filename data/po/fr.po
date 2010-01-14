@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-07 18:18-0500\n"
-"PO-Revision-Date: 2010-01-07 18:21-0500\n"
+"POT-Creation-Date: 2010-01-14 17:50-0500\n"
+"PO-Revision-Date: 2010-01-14 17:51-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgstr "%i tours"
 msgid "%s is ready"
 msgstr "%s est prêt"
 
-#: src/modes/world.cpp:458
+#: src/modes/world.cpp:461
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -193,6 +193,11 @@ msgstr "Axe %d %s"
 msgid "Back"
 msgstr "Retour"
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:67
+msgid "Back to Race"
+msgstr "Retour à la course"
+
 #. I18N: ./data/gui/challenges.stkgui
 #. I18N: ./data/gui/credits.stkgui
 #: data/po/gui_strings.h:30
@@ -337,6 +342,11 @@ msgstr "Activé"
 msgid "Enter the new player's name"
 msgstr "Entre le nom du nouveau joueur"
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+msgid "Exit Race"
+msgstr "Quitter la course"
+
 #. I18N: ./data/gui/racesetup.stkgui
 #. I18N: Difficulty
 #: data/po/gui_strings.h:417
@@ -383,7 +393,7 @@ msgstr "Course dans la ville en 4:20"
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
 #: data/po/gui_strings.h:513
-msgid "Finish with at least 6 points of intro on three laps of Oliver's Math Class in under 52 seconds."
+msgid "Finish with at least 6 points of nitro on three laps of Oliver's Math Class in under 52 seconds."
 msgstr "Ramasse au moins 6 points de nitro en 3 tours de 'La classe de Maths d'Oliver' en 52 secondes."
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
@@ -392,7 +402,7 @@ msgid "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under 
 msgstr "Ramasse au moins 9 points de nitro en 3 tours sur la piste 'Sables mouvants' en 2:20."
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:591
+#: src/states_screens/race_gui.cpp:75
 msgid "Finished"
 msgstr "Fini"
 
@@ -460,8 +470,7 @@ msgstr ""
 msgid "General"
 msgstr "Général"
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:803
+#: src/states_screens/race_gui.cpp:80
 msgid "Go!"
 msgstr "Partez!"
 
@@ -471,8 +480,10 @@ msgstr "Partez!"
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
+#. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:126
 #: data/po/gui_strings.h:210
 msgid "Help"
 msgstr "Aide"
@@ -504,8 +515,7 @@ msgstr "Intermédiaire"
 msgid "Keyboard %i"
 msgstr "Clavier %i"
 
-#: src/states_screens/race_gui.cpp:599
-#: src/states_screens/race_gui.cpp:602
+#: src/states_screens/race_gui.cpp:76
 msgid "Lap"
 msgstr "Tour"
 
@@ -637,8 +647,10 @@ msgstr "Débutant"
 msgid "Number of AI karts"
 msgstr "Nombre de karts IA"
 
+#. I18N: In the 'paused' screen
 #. I18N: ./data/gui/main.stkgui
 #. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:116
 #: data/po/gui_strings.h:206
 msgid "Options"
 msgstr "Options"
@@ -740,7 +752,7 @@ msgid "Random Track"
 msgstr "Piste aléatoire"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:781
+#: src/states_screens/race_gui.cpp:78
 msgid "Ready!"
 msgstr "À vos marques..."
 
@@ -766,6 +778,12 @@ msgstr "Renommer"
 msgid "Rescue"
 msgstr "Sauvetage"
 
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:106
+#, fuzzy
+msgid "Restart Race"
+msgstr "Commencer la course"
+
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Key binding
 #: data/po/gui_strings.h:316
@@ -781,12 +799,13 @@ msgstr "vise la seconde place, car lorsque le compte à rebours atteint zéro, l
 msgid "Select a game mode"
 msgstr "Choisis un mode de jeu"
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:792
+#: src/states_screens/race_gui.cpp:79
 msgid "Set!"
 msgstr "Prêts"
 
+#. I18N: In the 'paused' screen
 #: src/states_screens/dialogs/race_over_dialog.cpp:201
+#: src/states_screens/dialogs/race_paused_dialog.cpp:96
 msgid "Setup New Race"
 msgstr "Nouvelle course"
 
@@ -981,7 +1000,7 @@ msgstr "Remporte le grand prix 'Jusqu'à la lune' contre 3 opposants virtuels ex
 msgid "You finished the race!"
 msgstr "Tu as fini la course !"
 
-#: src/modes/world.cpp:454
+#: src/modes/world.cpp:457
 msgid ""
 "You have been\n"
 "eliminated!"
