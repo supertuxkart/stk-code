@@ -144,7 +144,7 @@ void DynamicRibbonWidget::add()
     for (int i=0; i<m_row_amount; i++)
     {
         m_ids[i] = getNewID();
-        std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
+        //std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
     }
     
     setSubElements();
