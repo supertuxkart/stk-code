@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <stdexcept>
 
 #include "challenges/challenge.hpp"
 #include "race/race_manager.hpp"
@@ -49,7 +50,7 @@ private:
     void error(const char *id) const;
 
 public:
-                 ChallengeData(const std::string& filename);
+                 ChallengeData(const std::string& filename) throw(std::runtime_error);
     void         setRace() const;
     virtual void check() const;
     virtual bool raceFinished();

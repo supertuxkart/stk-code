@@ -74,12 +74,24 @@ UnlockManager::UnlockManager()
             if(f)
             {
                 fclose(f);
-                addChallenge(new ChallengeData(filename));
+                ChallengeData* newChallenge = NULL;
+                try
+                {
+                    newChallenge = new ChallengeData(filename);
+                }
+                catch (std::runtime_error& ex)
+                {
+                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
+                              << ex.what() << " : challenge will be ignored.\n\n"; 
+                    continue;
+                }
+                addChallenge(newChallenge);
+
             }   // if file
         }   // for file in files
     }   // for dir in all_track_dirs
 
-    // Load challenges from .../data/karts
+    // Load challenges from .../data/karts (FIXME: the code below is just copied and pasted from above xD)
     // -----------------------------------
     const std::vector<std::string> *all_kart_dirs = 
         kart_properties_manager->getAllKartDirs();
@@ -99,7 +111,19 @@ UnlockManager::UnlockManager()
             if(f)
             {
                 fclose(f);
-                addChallenge(new ChallengeData(filename));
+                
+                ChallengeData* newChallenge = NULL;
+                try
+                {
+                    newChallenge = new ChallengeData(filename);
+                }
+                catch (std::runtime_error& ex)
+                {
+                    std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
+                    << ex.what() << " : challenge will be ignored.\n\n"; 
+                    continue;
+                }
+                addChallenge(newChallenge);
             }   // if file
         }   // for file in files
     }   // for dir in all_karts_dirs
@@ -140,9 +164,22 @@ void UnlockManager::addChallenge(Challenge *c)
 }   // addChallenge
 
 //-----------------------------------------------------------------------------
+
 void UnlockManager::addChallenge(const std::string& filename)
 {
-    addChallenge(new ChallengeData(filename));
+    ChallengeData* newChallenge = NULL;
+    try
+    {
+        newChallenge = new ChallengeData(filename);
+    }
+    catch (std::runtime_error& ex)
+    {
+        std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
+        << ex.what() << " : challenge will be ignored.\n\n"; 
+        return;
+    }
+    addChallenge(newChallenge);
+    
 }   // addChallenge
 
 //-----------------------------------------------------------------------------

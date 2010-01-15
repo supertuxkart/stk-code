@@ -34,7 +34,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-ChallengeData::ChallengeData(const std::string& filename)
+ChallengeData::ChallengeData(const std::string& filename) throw(std::runtime_error)
 {
     m_filename    = filename;
     m_major       = RaceManager::MAJOR_MODE_SINGLE;
@@ -80,7 +80,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     std::string s;
     if(!root->get("name", &s) ) error("name");
-    std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
+    //std::cout << "    // Challenge name = <" << s.c_str() << ">\n";
     setName( _(s.c_str()) );
 
     if(!root->get("id", &s) ) error("id");
@@ -88,7 +88,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     if(!root->get("description", &s) ) error("description");
     setChallengeDescription( _(s.c_str()) );
-    std::cout << "    // Challenge description = <" << s.c_str() << ">\n";
+    //std::cout << "    // Challenge description = <" << s.c_str() << ">\n";
 
     if(!root->get("karts", &m_num_karts)  ) error("karts");
 
