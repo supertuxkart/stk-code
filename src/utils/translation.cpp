@@ -85,7 +85,11 @@ const wchar_t* Translations::w_gettext(const char* original)
     if (original[0] == '\0') return L"";
     
 #if TRANSLATE_VERBOSE
+    #if ENABLE_NLS
     std::cout << "Translating " << original << "\n";
+    #else
+    std::cout << "NOT Translating " << original << "\n";
+    #endif
 #endif
     
 #if ENABLE_NLS
