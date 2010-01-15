@@ -285,30 +285,22 @@ class UserConfig
 private:
    
     /** Filename of the user config file. */
-    std::string m_filename;
-
-    void        addDefaultPlayer ();
-
-public:
-
+    std::string        m_filename;
     irr::core::stringw m_warning;
-    int         CheckAndCreateDir();
-    
-         UserConfig();
-         UserConfig(const std::string& filename);
-        ~UserConfig();
-    void setDefaults();
+
+    void  addDefaultPlayer();
+public:
+          UserConfig();
+         ~UserConfig();
 
     bool  loadConfig();
-    bool  loadConfig(const std::string& filename);
-    void  saveConfig()                    { saveConfig(m_filename);     }
-    void  saveConfig(const std::string& filename);
+    void  saveConfig();
 
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
     
-};
+};   // UserConfig
 
 
 extern UserConfig *user_config;

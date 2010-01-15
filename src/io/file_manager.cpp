@@ -20,11 +20,22 @@
 
 #include "io/file_manager.hpp"
 
+#include <stdio.h>
 #include <stdexcept>
 #include <sstream>
 #include <sys/stat.h>
 #include <iostream>
 #include <string>
+
+// For mkdir
+#if !defined(WIN32) || defined(__CYGWIN__)
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#else
+#  include <direct.h>
+#endif
+
+
 #ifdef WIN32
 #  include <io.h>
 #  include <stdio.h>
@@ -36,7 +47,6 @@
 #  include <unistd.h>
 #endif
 
-#define CONFIGDIR "supertuxkart"
 
 #include "irrlicht.h"
 #include "btBulletDynamicsCommon.h"
@@ -142,7 +152,7 @@ FileManager::FileManager(char *argv[])
     // after the filemanager (to get the path to the tranlsations from it)
     fprintf(stderr, "Data files will be fetched from: '%s'\n",
             m_root_dir.c_str() );
-
+    checkAndCreateConfigDir();
 }  // FileManager
 
 //-----------------------------------------------------------------------------
@@ -349,53 +359,107 @@ std::string FileManager::getItemFile(const std::string& fname) const
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getHomeDir() const
+/** If the directory specified in path does not exist, it is created.
+ * /params path Directory to test.
+ * /return True if the directory exists or could be created, false otherwise.
+ */
+bool FileManager::checkAndCreateDirectory(const std::string &path)
 {
-    std::string DIRNAME;
+    io::path p=m_file_system->getWorkingDirectory();
+    // irrlicht apparently returns true for files and directory
+    // (using access/_access internally):
+    if(m_file_system->existFile(io::path(path.c_str())))
+        return true;
+
+    // Otherwise try to create the directory:
+#if defined(WIN32) && !defined(__CYGWIN__)
+    bool error = _mkdir(path.c_str()) != 0;
+#else
+    bool error = mkdir(path.c_str(), 0755) != 0;
+#endif
+    return !error;
+}   // checkAndCreateDirectory
+
+//-----------------------------------------------------------------------------
+/** Checks if the config directory exists, and it not, tries to create it. */
+void FileManager::checkAndCreateConfigDir()
+{
 #ifdef WIN32
     // Try to use the APPDATA directory to store config files and highscore
     // lists. If not defined, used the current directory.
-    std::ostringstream s;
     if(getenv("APPDATA")!=NULL)
     {
-        s<<getenv("APPDATA")<<"/"<<CONFIGDIR<<"/";
-        DIRNAME=s.str();
+        m_config_dir  = getenv("APPDATA");
+        if(!checkAndCreateDirectory(m_config_dir))
+        {
+            fprintf(stderr, "Can't create config dir '%s', falling back to '.'.\n",
+                    m_config_dir.c_str());
+            m_config_dir = ".";
+        }
     }
-    else DIRNAME=".";
-#endif
-#ifdef linux
-	// Use new standards for config directory
-	if (getenv("XDG_CONFIG_HOME")!=NULL){
-		DIRNAME = getenv("XDG_CONFIG_HOME");
-	}else if (getenv("HOME")!=NULL){
-		DIRNAME = getenv("HOME");
-		DIRNAME += "/.config";
-	}else{
-		std::cerr << "No home directory, this should NOT happen!\n";
-		// This is what was here before, it looks rather questionable.
-		DIRNAME=".";
-	}
-    DIRNAME += "/";
-    DIRNAME += CONFIGDIR;
-#endif
-#ifdef __APPLE__
-    if (getenv("HOME")!=NULL){
-        DIRNAME = getenv("HOME");
-    }else{
+    else 
+        m_config_dir = ".";
+#else
+#  ifdef __APPLE__
+    if (getenv("HOME")!=NULL)
+    {
+        m_config_dir = getenv("HOME");
+    }
+    else
+    {
         std::cerr << "No home directory, this should NOT happen!\n";
         // Fall back to system-wide app data (rather than user-specific data), but should not happen anyway.
-        DIRNAME = "";
+        m_config_dir = "";
 	}
-    DIRNAME += "/Library/Application Support/";
-    DIRNAME += CONFIGDIR;
+    m_config_dir += "/Library/Application Support/";
+#  else
+    // Remaining unix variants. Use the new standards for config directory
+    // i.e. either XDG_CONFIG_HOME or $HOME/.config
+	if (getenv("XDG_CONFIG_HOME")!=NULL){
+		m_config_dir = getenv("XDG_CONFIG_HOME");
+	}
+    else if (!getenv("HOME"))
+    {
+	    std::cerr << "No home directory, this should NOT happen - trying '.' for config files!\n";
+        m_config_dir = ".";
+    }
+    else
+    {
+		m_config_dir  = getenv("HOME");
+		m_config_dir += "/.config";
+        if(!checkAndCreateDirectory(m_config_dir))
+        {
+            // If $HOME/.config can not be created:
+            fprintf(stderr, "Can't create dir '%s', falling back to use '%s'.\n",
+                    m_config_dir.c_str(), getenv("HOME"));
+            m_config_dir = getenv("HOME");
+        }
+    }
+#  endif
 #endif
-    return DIRNAME;
-}   // getHomeDir
+    const std::string CONFIGDIR("supertuxkart");
+
+    m_config_dir += "/";
+    m_config_dir += CONFIGDIR;
+    if(!checkAndCreateDirectory(m_config_dir))
+    {
+        fprintf(stderr, "Can not  create config dir '%s', falling back to '.'.\n",
+            m_config_dir.c_str());
+        m_config_dir = ".";
+    }
+    return;
+}   // checkAndCreateConfigDir
+
+//-----------------------------------------------------------------------------
+std::string FileManager::getConfigDir() const
+{
+    return m_config_dir;
+}   // getConfigDir
 
 //-----------------------------------------------------------------------------
 std::string FileManager::getLogFile(const std::string& fname) const
 {
-    return getHomeDir()+"/"+fname;
+    return getConfigDir()+"/"+fname;
 }   // getLogFile
 
 //-----------------------------------------------------------------------------
@@ -419,14 +483,14 @@ std::string FileManager::getFontFile(const std::string& fname) const
 //-----------------------------------------------------------------------------
 std::string FileManager::getHighscoreFile(const std::string& fname) const
 {
-    return getHomeDir()+"/"+fname;
+    return getConfigDir()+"/"+fname;
 }   // getHighscoreFile
 
 //-----------------------------------------------------------------------------
 /** Returns the full path of the challenge file. */
 std::string FileManager::getChallengeFile(const std::string &fname) const
 {
-    return getHomeDir()+"/"+fname;
+    return getConfigDir()+"/"+fname;
 }   // getChallengeFile
 
 //-----------------------------------------------------------------------------

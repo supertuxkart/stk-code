@@ -20,22 +20,14 @@
 
 
 
-#include <stdio.h>
-#include <stdexcept>
-#include <sstream>
+//#include <stdio.h>
+//#include <stdexcept>
+//#include <sstream>
 #include <string>
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
 #include "utils/ptr_vector.hpp"
-
-// for mkdir:
-#if !defined(WIN32) || defined(__CYGWIN__)
-#  include <sys/stat.h>
-#  include <sys/types.h>
-#else
-#  include <direct.h>
-#endif
 
 class UserConfigParam;
 static ptr_vector<UserConfigParam, REF> all_params;
@@ -331,23 +323,14 @@ UserConfig *user_config;
 
 UserConfig::UserConfig()
 {
-    setDefaults();
+    m_filename = "supertuxkart.cfg";
+    m_warning  = "";
+    //m_blacklist_res.clear();
     if(!loadConfig() || UserConfigParams::m_all_players.size() == 0)
     {
         addDefaultPlayer();
     }
 }   // UserConfig
-
-// -----------------------------------------------------------------------------
-UserConfig::UserConfig(const std::string& filename)
-{
-    setDefaults();
-    if(!loadConfig(filename) || UserConfigParams::m_all_players.size() == 0)
-    {
-        addDefaultPlayer();
-    }
-}   // UserConfig
-
 
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
@@ -373,86 +356,10 @@ void UserConfig::addDefaultPlayer()
 }
 
 // -----------------------------------------------------------------------------
-/**
- * Load default values for options
- */
-void UserConfig::setDefaults()
-{
-#ifdef WIN32
-    m_filename = file_manager->getLogFile("supertuxkart.cfg");
-#else
-    m_filename = file_manager->getLogFile("config");
-#endif
-
-    m_warning           = "";
-    //m_blacklist_res.clear();
-
-}   // setDefaults
-
-// -----------------------------------------------------------------------------
-/**
- * load default configuration file for this platform
- */
+/** Load configuration values from file. */
 bool UserConfig::loadConfig()
 {
-    return loadConfig(m_filename);
-}   // loadConfig
-
-// -----------------------------------------------------------------------------
-/**
- * Checks for existance of the STK configuration directory. If the
- * directory does not exist, it will be created. Return values:
- * 1: config dir exists
- * 2: does not exist, but was created
- * 0: does not exist, and could not be created.
- */
-int UserConfig::CheckAndCreateDir()
-{
-    // the standard C/C++ libraries don't include anything allowing to check
-    // for directory existance. I work around this by checking if trying to
-    // check for the config file (first reading, then writing)
-
-    const std::string filename = file_manager->getHomeDir() + "/config";
-
-    std::ofstream test(filename.c_str(), std::ios::in);
-
-    if(test.fail() || !test.is_open())
-    {
-        std::ofstream test2(filename.c_str(), std::ios::out);
-
-        if(test2.fail() || !test2.is_open())
-        {
-            int bError;
-#if defined(WIN32) && !defined(__CYGWIN__)
-            bError = _mkdir(file_manager->getHomeDir().c_str()      ) != 0;
-#else
-            bError = mkdir(file_manager->getHomeDir().c_str(), 0755) != 0;
-#endif
-            if(bError)
-            {
-                fprintf(stderr, "Couldn't create '%s', config files will not be saved.\n",
-                        file_manager->getHomeDir().c_str());
-                return 0;
-            }
-            else
-            {
-                printf("Config directory '%s' successfully created.\n", file_manager->getHomeDir().c_str());
-                return 2;
-            }
-        }
-        if(test2.is_open()) test2.close();
-
-    }
-    if(test.is_open()) test.close();
-    return 1;
-
-}   // CheckAndCreateDir
-
-// -----------------------------------------------------------------------------
-/** Load configuration values from file. */
-bool UserConfig::loadConfig(const std::string& filename)
-{
-
+    const std::string filename = file_manager->getConfigDir()+"/"+m_filename;
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
@@ -530,26 +437,23 @@ bool UserConfig::loadConfig(const std::string& filename)
 
 // -----------------------------------------------------------------------------
 /** Write settings to config file. */
-void UserConfig::saveConfig(const std::string& filepath)
+void UserConfig::saveConfig()
 {
-    const int DIR_EXIST = CheckAndCreateDir();
-    // Check if the config directory exists (again, since it was already checked
-    // when reading the config file - this is done in case that the problem was
-    // fixed while tuxkart is running). If the directory does not exist and
-    // can not be created, an error message was already printed to stderr,
-    // and we can exit here without any further messages.
-    if (DIR_EXIST == 0)
+    const std::string dir = file_manager->getConfigDir();
+    if(dir=="")
     {
         std::cerr << "User config firectory does not exist, cannot save config file!\n";
         return;
     }
 
+    const std::string filename = dir + "/" + m_filename;
+
     std::ofstream configfile;
-    configfile.open (filepath.c_str());
+    configfile.open (filename.c_str());
 
     if(!configfile.is_open())
     {
-        std::cerr << "Failed to open " << filepath.c_str() << " for writing, user config won't be saved\n";
+        std::cerr << "Failed to open " << filename.c_str() << " for writing, user config won't be saved\n";
         return;
     }
 

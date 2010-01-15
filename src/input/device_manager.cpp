@@ -297,7 +297,7 @@ InputDevice* DeviceManager::getLatestUsedDevice()
 // -----------------------------------------------------------------------------
 bool DeviceManager::deserialize()
 {
-    static std::string filepath = file_manager->getHomeDir() + "/input.config";
+    static std::string filepath = file_manager->getConfigDir() + "/input.config";
     
     printf("Deserializing input.config...\n");
 
@@ -394,8 +394,7 @@ bool DeviceManager::deserialize()
 // -----------------------------------------------------------------------------
 void DeviceManager::serialize()
 {
-    static std::string filepath = file_manager->getHomeDir() + "/input.config";
-    user_config->CheckAndCreateDir();
+    static std::string filepath = file_manager->getConfigDir() + "/input.config";
     printf("Serializing input.config...\n");
 
     

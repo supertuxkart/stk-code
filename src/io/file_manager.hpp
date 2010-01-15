@@ -40,6 +40,9 @@ private:
     IrrlichtDevice             *m_device;
 
     bool                        m_is_full_path;
+    /** Directory where user config files are stored. */
+    std::string                 m_config_dir;
+    /** Root data directory. */
     std::string                 m_root_dir;
     std::vector<std::string>    m_texture_search_path,
                                 m_model_search_path,
@@ -50,8 +53,9 @@ private:
                                  const;
     void makePath               (std::string& path, const std::string& dir,
                                  const std::string& fname) const;
-    io::path createAbsoluteFilename(const std::string &f);
-
+    bool            checkAndCreateDirectory(const std::string &path);
+    io::path        createAbsoluteFilename(const std::string &f);
+    void            checkAndCreateConfigDir();
 public:
                     FileManager(char *argv[]);
                    ~FileManager();
@@ -60,7 +64,7 @@ public:
     io::IXMLReader *createXMLReader(const std::string &filename);
     XMLNode        *createXMLTree(const std::string &filename);
 
-    std::string getHomeDir       () const;
+    std::string getConfigDir     () const;
     std::string getKartDir       () const;
     std::string getDataDir       () const;
     std::string getItemsDir      () const;
