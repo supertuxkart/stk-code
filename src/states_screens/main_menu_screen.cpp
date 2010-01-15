@@ -78,7 +78,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         }
         else
         {
-            scene->setUnlockedPicture( GUIEngine::getDriver()->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
+            scene->setUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
             StateManager::get()->pushScreen(scene);
         }
     }

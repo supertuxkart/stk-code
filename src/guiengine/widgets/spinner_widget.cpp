@@ -231,7 +231,6 @@ void SpinnerWidget::setValue(const int new_value)
         std::ostringstream icon;
         icon << file_manager->getDataDir() << "/"  << m_properties[PROP_ICON];
         std::string imagefile = StringUtils::insertValues(icon.str(), m_value);
-        //((IGUIButton*)(m_children[1].m_element))->setImage(GUIEngine::getDriver()->getTexture(imagefile));
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
     else if (m_labels.size() > 0)

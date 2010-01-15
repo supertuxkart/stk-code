@@ -298,9 +298,9 @@ void Widget::readCoords(Widget* parent)
 
     if(m_properties[PROP_ICON].size() > 0)
     {
-        ITexture* texture = GUIEngine::getDriver()->getTexture(
-                                                               (file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str()
-                                                                );
+        ITexture* texture = irr_driver->getTexture(
+                  (file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
+        
         if(texture != NULL)
         {
             texture_w = texture->getSize().Width;

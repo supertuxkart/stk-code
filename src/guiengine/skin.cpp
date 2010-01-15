@@ -91,7 +91,7 @@ namespace SkinConfig
         newParam.preserve_h_aspect_ratios = preserve_h_aspect_ratios;
         
         // call last since it calculates coords considering all other parameters
-        newParam.setTexture( GUIEngine::getDriver()->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() ) );
+        newParam.setTexture( irr_driver->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() ) );
         
         if(areas.size() > 0)
         {

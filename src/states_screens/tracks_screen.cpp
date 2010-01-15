@@ -58,7 +58,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = GUIEngine::getDriver()->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                    ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
                     new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
                 }

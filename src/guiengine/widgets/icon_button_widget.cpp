@@ -39,7 +39,7 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop, co
 void IconButtonWidget::add()
 {
     // ---- Icon
-    m_texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+    m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
     assert(m_texture != NULL);
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
@@ -109,12 +109,12 @@ void IconButtonWidget::add()
 void IconButtonWidget::setImage(const char* path_to_texture)
 {
     m_properties[PROP_ICON] = path_to_texture;
-    m_texture = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
+    m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
 
     if (m_texture == NULL)
     {
         // texture not found, try with absolute path
-        m_texture = GUIEngine::getDriver()->getTexture(m_properties[PROP_ICON].c_str());
+        m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
     }
     if(!m_texture)
     {

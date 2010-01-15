@@ -135,7 +135,7 @@ void RibbonWidget::add()
                 //MyGUIButton* icon = new MyGUIButton(GUIEngine::getGUIEnv(), subbtn, same_id, icon_part, true);
                 IGUIButton* icon = GUIEngine::getGUIEnv()->addButton(icon_part, subbtn, same_id, L"");
                 icon->setScaleImage(true);
-                icon->setImage( GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
+                icon->setImage( irr_driver->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str()) );
                 icon->setUseAlphaChannel(true);
                 icon->setDrawBorder(false);
                 icon->setTabStop(false);
@@ -179,7 +179,7 @@ void RibbonWidget::add()
             float imageRatio = (float)m_children[i].w/(float)m_children[i].h;
             
             // calculate the size of the image
-            video::ITexture* image = GUIEngine::getDriver()->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
+            video::ITexture* image = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_children[i].m_properties[PROP_ICON]).c_str());
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
 
