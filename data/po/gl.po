@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart 0.6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-07 18:18-0500\n"
-"PO-Revision-Date: 2010-01-15 11:45-0500\n"
+"PO-Revision-Date: 2010-01-15 15:34-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: Galician <proxecto@trasno.net>\n"
 "MIME-Version: 1.0\n"
@@ -1014,7 +1014,7 @@ msgstr "[ningún]"
 #: data/po/gui_strings.h:261
 #: data/po/gui_strings.h:288
 msgid "all"
-msgstr "todos"
+msgstr ""
 
 #. I18N: ./data/gui/arenas.stkgui
 #. I18N: Ignore
@@ -1028,7 +1028,7 @@ msgstr "todos"
 #: data/po/gui_strings.h:423
 #: data/po/gui_strings.h:447
 msgid "bottom"
-msgstr "abaixo"
+msgstr ""
 
 #~ msgid "%dx%d Blacklisted"
 #~ msgstr "%dx%d está na lista negra"
