@@ -10,7 +10,6 @@ dist_pkgdata_DATA = \
  $(shell find $(srcdir) -name "*.cup") \
  $(shell find $(srcdir) -maxdepth 1 -name "*.challenge") \
  $(shell find $(srcdir) -name "*.collectable") \
- $(shell find $(srcdir) -name "*.projectile") \
  stk_config.xml  bubblegum.xml                \
  CREDITS
 
