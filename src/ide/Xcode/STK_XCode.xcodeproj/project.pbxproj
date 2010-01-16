@@ -1408,6 +1408,7 @@
 				9507E9260FC1C8C100BD2B92 /* OpenGL */,
 				95C2AC6E0F296541000D3E5D /* src */,
 			);
+			includeInIndex = 0;
 			name = bullet;
 			path = ../../bullet;
 			sourceTree = SOURCE_ROOT;

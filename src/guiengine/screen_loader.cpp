@@ -184,6 +184,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_width,      PROP_MAX_WIDTH);
                 READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
                 READ_PROPERTY(extend_label,   PROP_EXTEND_LABEL);
+                READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
 #undef READ_PROPERTY
                                 
                 const char* text = xml->getAttributeValue( "text" );

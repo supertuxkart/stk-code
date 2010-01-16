@@ -55,7 +55,12 @@ void DynamicRibbonWidget::add()
 {
     //printf("****DynamicRibbonWidget::add()****\n");
 
-    m_has_label = (m_text == "bottom");
+    m_has_label = (m_properties[PROP_LABELS_LOCATION] == "bottom");
+    
+    assert( m_properties[PROP_LABELS_LOCATION] == "bottom" ||
+            m_properties[PROP_LABELS_LOCATION] == "each" ||
+            m_properties[PROP_LABELS_LOCATION] == "none" ||
+            m_properties[PROP_LABELS_LOCATION] == "");
     
     if (m_has_label)
     {
@@ -235,7 +240,9 @@ void DynamicRibbonWidget::setSubElements()
             icon->w = atoi(icon->m_properties[PROP_WIDTH].c_str());
             icon->h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
 
-            if (m_text == "all") icon->m_text = " "; // FIXME: what's that??
+            // If we want each icon to have its own label, we must make it non-empty, otherwise
+            // it will assume there is no label and none will be created (FIXME: that's ugly)
+            if (m_properties[PROP_LABELS_LOCATION] == "each") icon->m_text = " ";
             
             // std::cout << "ribbon text = " << m_properties[PROP_TEXT].c_str() << std::endl;
             

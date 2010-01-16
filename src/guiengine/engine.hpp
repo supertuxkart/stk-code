@@ -24,6 +24,7 @@
 _______________________________________________________
 Internal constant       Name in XML files
 _______________________________________________________
+ 
 WTYPE_RIBBON            "ribbon", "buttonbar", "tabs"
 appears an horizontal bar containing elements laid in a row, each being and icon and/or a label
 the "ribbon" subcategory will behave a bit like a radio button group, i.e. one element must selected.
@@ -81,14 +82,15 @@ Builds uponc the basic Ribbon to be more dynamic (dynamics contents, possibly wi
 NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or icons (this will
 affect the type of highlighting used).
-PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added is nown)
-An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to show textures to any aspect ratio
-you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it in 4:3 ratio).
-Supports an optional label at the bottom if PROP_TEXT is set. Gives a special meaning to the text parameter. A value of "bottom"
-means to display the name of the selected icon at the bottom. A value of "all" means that each icon shall have its name under it.
-The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line scrollable ribbons. The difference between both is that
-'scrollable_ribbon' always has a value selected (like in a combo box, or radio buttons), while 'scrollable_toolbar' is a
-scrollable list of buttons that can be pressed to trigger actions.
+PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added
+is nown) An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to show textures
+to any aspect ratio you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it
+in 4:3 ratio).
+Supports an optional label at the bottom if PROP_LABELS_LOCATION is set (see more on PROP_LABELS_LOCATION below).
+The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line
+scrollable ribbons. The difference between both is that 'scrollable_ribbon' always has a value selected (like in
+a combo box, or radio buttons), while 'scrollable_toolbar' is a scrollable list of buttons that can be pressed to
+trigger actions.
  
 WTYPE_MODEL_VIEW        "model"
 Displays a model. Currently incomplete. Contents must be set programmatically.
@@ -119,6 +121,7 @@ relative to the /data directory of STK.
 
 PROP_TEXT_ALIGN         "text_align"
 used exclusively by label components. Value can be "right" or "center" (left used if not specified).
+ 
 PROP_WORD_WRAP          "word_wrap"
 used exclusively by label components. Value can be "true" to indicate that long text should spawn on
 multiple lines.
@@ -182,11 +185,16 @@ remaining space according to their proportions.
 
 PROP_SQUARE             "square_items"
 Valid on Ribbons or RibbonGrids. Can be "true" (omitting it means "false"). Indicates whether the contents
-use rectangular icons (this will affect the type of focus/highlighting used)
+use rectangular icons as opposed to "round" icons (this will affect the type of focus/highlighting used)
 
 PROP_EXTEND_LABEL       "extend_label"
 How many pixels the label is allowed to expand beyond the boundaries of the widget itself. Currently only
-allowed on icon widgets,
+allowed on icon widgets.
+ 
+PROP_LABELS_LOCATION    "label_location"
+Currently only used by dynamic ribbons. Decides where the label is. Value can be "each", "bottom", or "none"
+(if ommitted, "none" is the default). "each" means that every item has its own label. "bottom" means there
+is a single label for all at the bottom, that displays the name of the current item.
  
 +--------------------------+
 + Using the Engine in Code +

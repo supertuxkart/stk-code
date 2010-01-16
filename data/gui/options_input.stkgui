@@ -16,7 +16,7 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
     
-        <scrollable_ribbon id="devices" proportion="3" I18N="Ignore" text="all" width="100%"
+        <scrollable_ribbon id="devices" proportion="3" label_location="each" width="100%"
                     square_items="false" align="center" child_width="256" child_height="128" />
         
         

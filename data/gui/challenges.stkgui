@@ -7,7 +7,7 @@
         <box id="animated_area" width="100%" proportion="1" layout="vertical-row">
         
         <ribbon_grid id="challenges" proportion="3" width="100%"
-            I18N="Ignore" text="bottom" align="center" child_width="128" child_height="128" />
+            label_location="bottom" align="center" child_width="128" child_height="128" />
         
         <spacer proportion="1" width="100%"/>
                 
