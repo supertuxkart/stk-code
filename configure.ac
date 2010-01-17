@@ -191,13 +191,24 @@ if test "x$with_irrlicht" != "x" ; then
       AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
    fi
 else
+    # check in /usr/local
    CPPFLAGS_save=CPPFLAGS
    CPPFLAGS="${CPPFLAGS} -I /usr/local/include/irrlicht"
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+   with_irrlicht="/usr/local"
+   
+   # if it's not found there, try /usr instead
    if test x$have_irrlicht_hdr != xyes; then
-      AC_MSG_ERROR([Can't find irrlicht installation, use --with-irrlicht...])
+       CPPFLAGS="${CPPFLAGS_save} -I /usr/include/irrlicht"
+       AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+       with_irrlicht="/usr"
+       
+       if test x$have_irrlicht_hdr != xyes; then
+          AC_MSG_ERROR([Can't find irrlicht installation in standard prefixes, use --with-irrlicht...])
+       fi
    fi
 fi
+
 case "${host}" in
 *-*-linux* )
   irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
