@@ -211,7 +211,7 @@ fi
 
 case "${host}" in
 *-*-linux* )
-  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -lIrrlicht"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht"
   ;;
 *darwin*|*macosx*)
   irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
