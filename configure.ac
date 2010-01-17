@@ -185,7 +185,7 @@ AC_LANG_PUSH(C++)
 AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
                                   [specify the prefix path to irrlicht])])
 if test "x$with_irrlicht" != "x" ; then
-   CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include"
+   CPPFLAGS="${CPPFLAGS} -I $with_irrlicht/include -I $with_irrlicht/irrlicht/include"
    AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
    if test x$have_irrlicht_hdr != xyes; then
       AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
