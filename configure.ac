@@ -195,22 +195,34 @@ if test "x$with_irrlicht" != "x" ; then
       AC_MSG_ERROR([Can't find irrlicht in $with_irrlicht.])
    fi
 else
-    # check in /usr/local
-   CPPFLAGS_save=CPPFLAGS
-   CPPFLAGS="${CPPFLAGS} -I /usr/local/include/irrlicht"
-   AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
-   with_irrlicht="/usr/local"
+   # check in /usr
+   #echo " in /usr/ : "
+   AC_CHECK_HEADER(irrlicht.h, irrlicht_found_in_usr=yes, irrlicht_found_in_usr=no, /usr/include)
    
-   # if it's not found there, try /usr instead
-   if test x$have_irrlicht_hdr != xyes; then
-       CPPFLAGS="${CPPFLAGS_save} -I /usr/include/irrlicht"
-       AC_CHECK_HEADER(irrlicht.h, have_irrlicht_hdr=yes)
+   # if it's not found there, try /usr/local instead
+   if test x$irrlicht_found_in_usr == xyes; then
        with_irrlicht="/usr"
+   else
+   
+       # I'd like to fall back to check /usr/local second, but stupid autotools does not support
+       # checking for a header in 2 directories because it caches results
+       AC_MSG_ERROR([Can't find irrlicht installation in /usr, use --with-irrlicht...])
        
-       if test x$have_irrlicht_hdr != xyes; then
-          AC_MSG_ERROR([Can't find irrlicht installation in standard prefixes, use --with-irrlicht...])
-       fi
+       ## erase cached result
+       #ac_cv_header_irrlicht_h=""
+       #
+       #echo " in /usr/local/ : "
+       #AC_CHECK_HEADER(irrlicht.h, irrlicht_found_in_usr_local=yes, irrlicht_found_in_usr_local=no, /usr/local/include)
+       #
+       #if test x$have_irrlicht_hdr == xyes; then
+       #   with_irrlicht="/usr/local"
+       #else
+       #   AC_MSG_ERROR([Can't find irrlicht installation in standard prefixes, use --with-irrlicht...])
+       #fi
    fi
+   
+   CPPFLAGS="${CPPFLAGS} -I ${with_irrlicht}/include/irrlicht"
+
 fi
 
 case "${host}" in
