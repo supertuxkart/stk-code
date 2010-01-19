@@ -323,7 +323,7 @@ UserConfig *user_config;
 
 UserConfig::UserConfig()
 {
-    m_filename = "supertuxkart.cfg";
+    m_filename = "config.xml";
     m_warning  = "";
     //m_blacklist_res.clear();
     if(!loadConfig() || UserConfigParams::m_all_players.size() == 0)
