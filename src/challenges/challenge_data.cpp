@@ -34,7 +34,10 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-ChallengeData::ChallengeData(const std::string& filename) throw(std::runtime_error)
+ChallengeData::ChallengeData(const std::string& filename)
+#ifndef WIN32
+                                                      throw(std::runtime_error)
+#endif
 {
     m_filename    = filename;
     m_major       = RaceManager::MAJOR_MODE_SINGLE;

@@ -50,7 +50,11 @@ private:
     void error(const char *id) const;
 
 public:
+#ifdef WIN32
+                 ChallengeData(const std::string& filename);
+#else
                  ChallengeData(const std::string& filename) throw(std::runtime_error);
+#endif
     void         setRace() const;
     virtual void check() const;
     virtual bool raceFinished();
