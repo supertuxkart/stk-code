@@ -53,7 +53,17 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
     core::vector3df v = m_matrix->getTranslation();
     m_x = v.X;
     m_y = v.Y;
-}   // Moving Texture
+}   // MovingTexture
+
+//-----------------------------------------------------------------------------
+MovingTexture::MovingTexture(float dx, float dy)
+{
+    m_dx     = dx;
+    m_dy     = dy;
+    m_x      = 0;
+    m_y      = 0;
+    m_matrix = NULL;
+}   // MovingTexture
 
 //-----------------------------------------------------------------------------
 /** Destructor for an animated texture.
@@ -61,6 +71,15 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
 MovingTexture::~MovingTexture()
 {
 }   // ~MovingTexture
+
+//-----------------------------------------------------------------------------
+/** Resets at (re)start of a race.
+ */
+void MovingTexture::reset()
+{
+    m_x = m_y = 0;
+    m_matrix->setTextureTranslate(m_x, m_y);
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Updates the transform of an animated texture.

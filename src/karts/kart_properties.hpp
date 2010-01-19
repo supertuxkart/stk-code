@@ -140,8 +140,9 @@ private:
                                        *   when skidding. */
     float m_slipstream_length;        /**< How far behind a kart slipstreaming
                                        *   is effective. */
-    float m_slipstream_time;          /**< Time after which sstream has maxium
-                                       *   benefit. */
+    float m_slipstream_collect_time;  /**< Time after which sstream gives a 
+                                       *   bonus. */
+    float m_slipstream_use_time;      /**< Time sstream bonus is effective. */
     float m_slipstream_add_power;     /**< Additional power due to sstreaming. */
     float m_slipstream_min_speed;     /**< Minimum speed for slipstream to take
                                        *   effect. */
@@ -246,7 +247,9 @@ public:
     /** Returns how far behind a kart slipstreaming works. */
     float getSlipstreamLength       () const {return m_slipstream_length;        }
     /** Returns time after which slipstream has maximum effect. */
-    float getSlipstreamTime         () const {return m_slipstream_time;          }
+    float getSlipstreamCollectTime  () const {return m_slipstream_collect_time;  }
+    /** Returns time after which slipstream has maximum effect. */
+    float getSlipstreamUseTime      () const {return m_slipstream_use_time;      }
     /** Returns additional power due to slipstreaming. */
     float getSlipstreamAddPower     () const {return m_slipstream_add_power;     }
     /** Returns the minimum slipstream speed. */

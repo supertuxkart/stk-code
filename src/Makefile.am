@@ -68,6 +68,8 @@ supertuxkart_SOURCES = \
  graphics/shadow.hpp \
  graphics/skid_marks.cpp \
  graphics/skid_marks.hpp \
+ graphics/slip_stream.cpp \
+ graphics/slip_stream.hpp \
  graphics/smoke.cpp \
  graphics/smoke.hpp \
  graphics/stars.cpp \

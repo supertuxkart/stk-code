@@ -120,8 +120,9 @@ skid-decrease: multiplicative decrease of skidding factor in each frame.
 skid-max: maximum skidding factor = maximum increase of steering angle.
 time-till-max-skid: Time till maximum skidding is reached.
 skid-visual: Additional graphical rotation of kart.
-slipstrea slipstream-length: How far behind a kart slipstream works
-slipstream-time: How many seconds of sstream give  maximum benefit
+slipstream slipstream-length: How far behind a kart slipstream works
+slipstream-collect-time: How many seconds of sstream give  maximum benefit
+slipstream-use-time: How long the benefit will last.
 slipstream-add-power: Additional power due to sstreaming. 1 = +100%
 slipstream-min-speed: Minimum speed necessary for slipstream to take effect.
 
@@ -195,10 +196,11 @@ rubber-band-duration is the duration a rubber band acts.
     skid-max="2.5"
     time-till-max-skid="0.4"
     skid-visual="0.16"
-    slipstream-length="5"
-    slipstream-time="5"
+    slipstream-length="10"
+    slipstream-collect-time="2"
+    slipstream-use-time="5"
     slipstream-add-power="3"
-    slipstream-min-speed="15"
+    slipstream-min-speed="10"
 
     brake-factor="11.0"
     min-speed-radius="0 3"

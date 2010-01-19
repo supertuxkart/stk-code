@@ -72,7 +72,8 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_camera_max_accel = m_camera_max_brake =
-        m_slipstream_length = m_slipstream_time = m_slipstream_add_power =
+        m_slipstream_length = m_slipstream_collect_time = 
+        m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_camera_distance = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
@@ -242,7 +243,8 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("time-till-max-skid", &m_time_till_max_skid);
     root->get("skid-visual", &m_skid_visual);
     root->get("slipstream-length", &m_slipstream_length);
-    root->get("slipstream-time", &m_slipstream_time);
+    root->get("slipstream-collect-time", &m_slipstream_collect_time);
+    root->get("slipstream-use-time", &m_slipstream_use_time);
     root->get("slipstream-add-power", &m_slipstream_add_power);
     root->get("slipstream-min-speed", &m_slipstream_min_speed);
     root->get("brake-factor", &m_brake_factor);
@@ -453,7 +455,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("skid-max",                  m_skid_max                 );
     lisp->get("skid-visual",               m_skid_visual              );
     lisp->get("slipstream-length",         m_slipstream_length        );
-    lisp->get("slipstream-time",           m_slipstream_time          );
+    lisp->get("slipstream-collect-time",   m_slipstream_collect_time  );
+    lisp->get("slipstream-use-time",       m_slipstream_use_time      );
     lisp->get("slipstream-add-power",      m_slipstream_add_power     );
     lisp->get("slipstream-min-speed",      m_slipstream_min_speed     );
 
@@ -547,7 +550,8 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_max,                  "skid-max"                   );
     CHECK_NEG(m_skid_visual,               "skid-visual"                );
     CHECK_NEG(m_slipstream_length,         "slipstream-length"          );
-    CHECK_NEG(m_slipstream_time,           "slipstream-time"            );
+    CHECK_NEG(m_slipstream_collect_time,   "slipstream-collect-time"    );
+    CHECK_NEG(m_slipstream_use_time,       "slipstream-use-time"         );
     CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"       );
     CHECK_NEG(m_slipstream_min_speed,      "slipstream-min-speed"       );
 

@@ -33,6 +33,7 @@
 #include "graphics/nitro.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
+#include "graphics/slip_stream.hpp"
 #include "graphics/smoke.hpp"
 #include "graphics/stars.hpp"
 #include "graphics/water_splash.hpp"
@@ -79,6 +80,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_stars_effect         = NULL;
     m_water_splash_system  = NULL;
     m_nitro                = NULL;
+    m_slip_stream          = NULL;
     m_skidmarks            = NULL;
     m_animated_node        = NULL;
 
@@ -133,8 +135,8 @@ Kart::Kart (const std::string& kart_name, int position,
     Vec3 p1(-getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
     Vec3 p2( getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
     Vec3 p3( getKartWidth()*0.5f, -getKartLength()*0.5f, 0);
-    m_slipstream_original_area = new Quad(p0, p1, p2, p3);
-    m_slipstream_area          = new Quad(p0, p1, p2, p3);
+    m_slipstream_original_quad = new Quad(p0, p1, p2, p3);
+    m_slipstream_quad          = new Quad(p0, p1, p2, p3);
 
     reset();
 }   // Kart
@@ -278,6 +280,7 @@ Kart::~Kart()
     if(m_smoke_system)        delete m_smoke_system;
     if(m_water_splash_system) delete m_water_splash_system;
     if(m_nitro)               delete m_nitro;
+    if(m_slip_stream)         delete m_slip_stream;
 
     delete m_shadow;
     delete m_stars_effect;
@@ -293,8 +296,8 @@ Kart::~Kart()
     {
         delete m_kart_chassis.getChildShape(i);
     }
-    delete m_slipstream_original_area;
-    delete m_slipstream_area;
+    delete m_slipstream_original_quad;
+    delete m_slipstream_quad;
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
@@ -372,6 +375,7 @@ void Kart::reset()
     m_time_last_crash      = 0.0f;
     m_max_speed_reduction  = 0.0f;
     m_power_reduction      = 50.0f;
+    m_slipstream_mode      = SS_NONE;
 
     m_controls.m_steer     = 0.0f;
     m_controls.m_accel     = 0.0f;
@@ -382,6 +386,7 @@ void Kart::reset()
     m_controls.m_look_back = false;
     // Reset star effect in case that it is currently being shown.
     m_stars_effect->reset();
+    m_slip_stream->reset();
     m_vehicle->deactivateZipper();
 
     // Set the brakes so that karts don't slide downhill
@@ -613,6 +618,7 @@ void Kart::update(float dt)
         m_smoke_system->update(dt);
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
+        m_slip_stream->update(dt);
     }  // UserConfigParams::m_graphical_effects
 
     updatePhysics(dt);
@@ -782,24 +788,29 @@ float Kart::handleNitro(float dt)
 
 //-----------------------------------------------------------------------------
 /** This function manages slipstreaming. It adds up the time a kart was
- *  slipstreaming, and returns the potential power boost due to coming
- *  out of slipstream.
+ *  slipstreaming, and if a kart was slipstreaming long enough, it will
+ *  add power to the kart for a certain amount of time.
  */
 float Kart::handleSlipstream(float dt)
 {
+    // First see if we are currently using accumulated slipstream credits:
+    // -------------------------------------------------------------------
+    if(m_slipstream_mode==SS_USE)
+    {
+        printf("Using slipstream\n");
+        m_slipstream_time -= dt;
+        if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
+        return m_kart_properties->getSlipstreamAddPower();
+    }
+
     // If this kart is too slow for slipstreaming taking effect, do nothing
+    // --------------------------------------------------------------------
     if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) return 0;
 
-    m_slipstream_original_area->transform(getTrans(), m_slipstream_area);
+    // Then test if this kart is in the slipstream range of another kart:
+    // ------------------------------------------------------------------
+    m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
 
-    // Note: there is a slight inconsistency here: Karts are updated one
-    // after another. So if the position of this kart is compared with the
-    // slipstream area of a kart already updated, it will use the new
-    // slipstream area of that kart, but for karts not yet updated the
-    // old position will be used. The differences should not be noticable,
-    // and simplifies the update process (which would otherwise have to be
-    // done in two stages). Besides, the same problem exists everywhere
-    // in the kart update process.
     unsigned int n     = race_manager->getNumKarts();
     bool is_sstreaming = false;
     for(unsigned int i=0; i<n; i++)
@@ -810,41 +821,43 @@ float Kart::handleSlipstream(float dt)
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
-        // against the minimum slipstream kart of this kart - not entirely
-        // sure if this makes sense, but it makes it easier to give karts
-        // different slipstream properties.
+        // against the minimum slipstream speed kart of this kart - not 
+        // entirely sure if this makes sense, but it makes it easier to 
+        // give karts different slipstream properties.
         if(kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
             continue;
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
         Vec3 delta = getXYZ() - kart->getXYZ();
-        float l    = kart->m_kart_properties->getSlipstreamLength() + kart->getKartLength()*0.5f;
+        float l    = kart->m_kart_properties->getSlipstreamLength() 
+                   + kart->getKartLength()*0.5f;
         if(delta.length2_2d() > l*l) continue;
 
-        if(kart->m_slipstream_area->pointInQuad(getXYZ()))
+        if(kart->m_slipstream_quad->pointInQuad(getXYZ()))
         {
-            is_sstreaming = true;
+            is_sstreaming     = true;
             break;
         }
     }
 
-    float add_power = 0;
-
-    if(m_slipstream_time >0 && !is_sstreaming)
+    if(!is_sstreaming)
     {
-        // Kart is using slipstream advantage
-        add_power         = getMaxPower() * m_kart_properties->getSlipstreamAddPower();
-        m_slipstream_time = std::max(m_slipstream_time - dt, 0.0f);
-    }
-    else if(is_sstreaming)
-    {
-        // Kart is collecting sliptstream advantage
-        m_slipstream_time = std::min(m_slipstream_time + dt,
-                                     m_kart_properties->getSlipstreamTime());
-
+        m_slipstream_time -=dt;
+        if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
+        return 0;
     }
 
-    return add_power;
+    // Accumulate slipstream credits now
+    m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
+                                                   : m_slipstream_time+dt;
+    printf("Collecting slipstream %f\n", m_slipstream_time);
+    m_slipstream_mode = SS_COLLECT;
+    if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
+    {
+        m_slipstream_mode = SS_USE;
+        return m_kart_properties->getSlipstreamAddPower();
+    }
+    return 0;
 }   // handleSlipstream
 
 
@@ -1207,6 +1220,7 @@ void Kart::loadData()
     m_smoke_system        = new Smoke(this);
     m_water_splash_system = new WaterSplash(this);
     m_nitro               = new Nitro(this);
+    m_slip_stream         = new SlipStream(this);
 
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks = new SkidMarks(*this);
@@ -1282,6 +1296,12 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         // become a huge unsigned number in the particle scene node!
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
                                  ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
+    float f=0;
+    if(m_slipstream_mode==SS_COLLECT)
+        f=1.0f;
+    else if(m_slipstream_mode==SS_USE)
+        f=2.0f;
+    m_slip_stream->setIntensity(f);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
