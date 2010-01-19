@@ -166,7 +166,7 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
         
         // ---- lay widgets in row
         int x = parent->x, y = parent->y;
-        for(int n=0; n<widgets_amount; n++)
+        for (int n=0; n<widgets_amount; n++)
         {
             std::string prop = widgets[n].m_properties[ PROP_PROPORTION ];
             if(prop.size() != 0)
@@ -174,26 +174,37 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                 // proportional size
                 int proportion = 1;
                 std::istringstream myStream(prop);
-                if(!(myStream >> proportion))
+                if (!(myStream >> proportion))
                     std::cerr << "/!\\ Warning /!\\ : proportion  '" << prop.c_str() << "' is not a number in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
                 
                 const float fraction = (float)proportion/(float)total_proportion;
                 
-                if(horizontal)
+                if (horizontal)
                 {
    
                     widgets[n].x = x;
                     
-                    if(widgets[n].m_properties[ PROP_Y ].size() > 0)
-                        widgets[n].y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
-                    else
-                        widgets[n].y = y;
+                    
+                    std::string align = widgets[n].m_properties[ PROP_ALIGN ];
+                    if (align.size() < 1)
+                    {        
+                        if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                            widgets[n].y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                        else
+                            widgets[n].y = y;
+                    }
+                    else if (align == "top")     widgets[n].y = y;
+                    else if (align == "center")  widgets[n].y = y + h/2 - widgets[n].h/2;
+                    else if (align == "bottom")  widgets[n].y = y + h - widgets[n].h;
+                    else std::cerr  << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                    <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
+                                    << "', in a horiozntal-row layout)\n";
                     
                     widgets[n].w = (int)(left_space*fraction);
-                    if(widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
+                    if (widgets[n].m_properties[PROP_MAX_WIDTH].size() > 0)
                     {
                         const int max_width = atoi( widgets[n].m_properties[PROP_MAX_WIDTH].c_str() );
-                        if(widgets[n].w > max_width) widgets[n].w = max_width;
+                        if (widgets[n].w > max_width) widgets[n].w = max_width;
                     }
                     
                     x += widgets[n].w;
@@ -202,24 +213,26 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                 {    
                     widgets[n].h = (int)(left_space*fraction);
                     
-                    if(widgets[n].m_properties[PROP_MAX_HEIGHT].size() > 0)
+                    if (widgets[n].m_properties[PROP_MAX_HEIGHT].size() > 0)
                     {
                         const int max_height = atoi( widgets[n].m_properties[PROP_MAX_HEIGHT].c_str() );
                         if(widgets[n].h > max_height) widgets[n].h = max_height;
                     }
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
-                    if(align.size() < 1)
+                    if (align.size() < 1)
                     {                        
-                        if(widgets[n].m_properties[ PROP_X ].size() > 0)
+                        if (widgets[n].m_properties[ PROP_X ].size() > 0)
                             widgets[n].x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
                         else
                             widgets[n].x = x;
                     }
-                    else if(align == "left") widgets[n].x = x;
-                    else if(align == "center") widgets[n].x = x + w/2 - widgets[n].w/2;
-                    else if(align == "right") widgets[n].x = x + w - widgets[n].w;
-                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str() << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                    else if (align == "left")   widgets[n].x = x;
+                    else if (align == "center") widgets[n].x = x + w/2 - widgets[n].w/2;
+                    else if (align == "right")  widgets[n].x = x + w - widgets[n].w;
+                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
+                                   <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
+                                   << "', in a vertical-row layout)\n";
                     widgets[n].y = y;
                     
                     y += widgets[n].h;
@@ -229,14 +242,23 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
             {
                 // absolute size
                 
-                if(horizontal)
+                if (horizontal)
                 {
                     widgets[n].x = x;
                     
-                    if(widgets[n].m_properties[ PROP_Y ].size() > 0)
-                        widgets[n].y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
-                    else
-                        widgets[n].y = y;
+                    std::string align = widgets[n].m_properties[ PROP_ALIGN ];
+
+                    if (align.size() < 1)
+                    {
+                        if (widgets[n].m_properties[ PROP_Y ].size() > 0)
+                            widgets[n].y = atoi(widgets[n].m_properties[ PROP_Y ].c_str());
+                        else
+                            widgets[n].y = y;
+                    }
+                    else if (align == "top")    widgets[n].y = y;
+                    else if (align == "center") widgets[n].y = y + h/2 - widgets[n].h/2;
+                    else if (align == "bottom") widgets[n].y = y + h - widgets[n].h;
+                    else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str() << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
                     
                     x += widgets[n].w;
                 }
@@ -246,16 +268,16 @@ void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
                     
                     std::string align = widgets[n].m_properties[ PROP_ALIGN ];
                     
-                    if(align.size() < 1)
+                    if (align.size() < 1)
                     {
-                        if(widgets[n].m_properties[ PROP_X ].size() > 0)
+                        if (widgets[n].m_properties[ PROP_X ].size() > 0)
                             widgets[n].x = atoi(widgets[n].m_properties[ PROP_X ].c_str());
                         else
                             widgets[n].x = x;
                     }
-                    else if(align == "left") widgets[n].x = x;
-                    else if(align == "center") widgets[n].x = x + w/2 - widgets[n].w/2;
-                    else if(align == "right") widgets[n].x = x + w - widgets[n].w;
+                    else if (align == "left")   widgets[n].x = x;
+                    else if (align == "center") widgets[n].x = x + w/2 - widgets[n].w/2;
+                    else if (align == "right")  widgets[n].x = x + w - widgets[n].w;
                     else std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str() << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
                     widgets[n].y = y;
                     

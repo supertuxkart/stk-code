@@ -170,8 +170,10 @@ see PROP_ALIGN and PROP_PROPORTION to known more about controlling layouts. Note
 layed-out div will ignore all x/y coordinates you may give them as parameter.
 
 PROP_ALIGN              "align"
-For widgets located inside a vertical-row layout div. Value can be "left", "center" or "right". Determines how
-the x coord of the widget will be determined.
+For widgets located inside a vertical-row layout div : Changes how the x coord of the widget is determined.
+ value can be "left", "center" or "right".
+For widgets located inside a horizontal-row layout div : Changes how the y coord of the widget is determined.
+ value can be "top", "center" or "bottom".
 
 PROP_PROPORTION         "proportion"
 Helps  determining widget size dynamically (according to available screen space) in layed-out divs. In a

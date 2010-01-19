@@ -34,8 +34,8 @@ void LabelWidget::add()
     stringw& message = m_text;
     
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
-    if(m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
-    else if(m_properties[PROP_TEXT_ALIGN] == "right") align = EGUIA_LOWERRIGHT;
+    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
+    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; // TODO - make confiurable through XML file?
     
     IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, m_parent, -1);

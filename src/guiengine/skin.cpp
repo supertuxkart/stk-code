@@ -702,7 +702,7 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             const int y_shift_up = (int)(rect.getHeight() * (outgrow/2.0f));
             
             core::rect< s32 > rect2( position2d< s32 >(rect.UpperLeftCorner.X + x_gap,
-                                                      rect.UpperLeftCorner.Y - y_shift_up),
+                                                       rect.UpperLeftCorner.Y - y_shift_up),
                                     dimension2d< s32 >(rectWidth, rectHeight) );
             
             GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
