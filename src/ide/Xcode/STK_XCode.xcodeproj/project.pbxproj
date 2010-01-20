@@ -276,6 +276,7 @@
 		95D2343F1078227A00625256 /* feature_unlocked.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D2343E1078227A00625256 /* feature_unlocked.cpp */; };
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
+		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
 		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
 		95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */; };
 		95ECA10210124C5000D47C5F /* icon_button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */; };
@@ -1053,6 +1054,8 @@
 		95D950CF0FE473CA002E10AD /* stk_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stk_config.hpp; path = ../../config/stk_config.hpp; sourceTree = SOURCE_ROOT; };
 		95D950D00FE473CA002E10AD /* user_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = user_config.cpp; path = ../../config/user_config.cpp; sourceTree = SOURCE_ROOT; };
 		95D950D10FE473CA002E10AD /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../config/user_config.hpp; sourceTree = SOURCE_ROOT; };
+		95DFC5001106933B00A043A9 /* slip_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = slip_stream.cpp; path = ../../graphics/slip_stream.cpp; sourceTree = SOURCE_ROOT; };
+		95DFC5011106933B00A043A9 /* slip_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = slip_stream.hpp; path = ../../graphics/slip_stream.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EC10124C5000D47C5F /* button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = button_widget.cpp; path = ../../guiengine/widgets/button_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0ED10124C5000D47C5F /* button_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = button_widget.hpp; path = ../../guiengine/widgets/button_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_box_widget.cpp; path = ../../guiengine/widgets/check_box_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -1214,6 +1217,8 @@
 				952A153E103F66D600B1895D /* shadow.hpp */,
 				952A153F103F66D600B1895D /* skid_marks.cpp */,
 				952A1540103F66D600B1895D /* skid_marks.hpp */,
+				95DFC5001106933B00A043A9 /* slip_stream.cpp */,
+				95DFC5011106933B00A043A9 /* slip_stream.hpp */,
 				952A1541103F66D600B1895D /* smoke.cpp */,
 				952A1542103F66D600B1895D /* smoke.hpp */,
 				95C9C97010E93456005A418D /* stars.cpp */,
@@ -2593,6 +2598,7 @@
 				959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */,
 				959482D410EBC0790031BADF /* track_object.cpp in Sources */,
 				9553823A10FD4FEC00737979 /* constants.cpp in Sources */,
+				95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
