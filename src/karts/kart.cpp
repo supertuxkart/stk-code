@@ -374,7 +374,7 @@ void Kart::reset()
     m_skidding             = 1.0f;
     m_time_last_crash      = 0.0f;
     m_max_speed_reduction  = 0.0f;
-    m_power_reduction      = 50.0f;
+    m_power_reduction      = 1.0f;
     m_slipstream_mode      = SS_NONE;
 
     m_controls.m_steer     = 0.0f;
@@ -672,7 +672,7 @@ void Kart::update(float dt)
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
     }
     const Material* material=getMaterial();
-    m_power_reduction = 50.0f;
+    m_power_reduction = 1.0f;
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
@@ -983,7 +983,7 @@ void Kart::updatePhysics (float dt)
         // update() depending on terrain type. Don't apply this if kart is already
         // going slowly, this would make it hard accelerating to get out of there
         if(m_speed > 4.0)
-            engine_power *= m_power_reduction/stk_config->m_slowdown_factor;
+            engine_power *= m_power_reduction;
 
         // Lose some traction when skidding, so it is not abused by player
 	// The AI will be allowed to cheat on medium and hard difficulty in
@@ -1031,7 +1031,7 @@ void Kart::updatePhysics (float dt)
                     // normal terrain (power_reduction/slowdown_factor should
                     // be 2.5 (which was experimentally determined to feel
                     // right).
-                    float f = 2.5f - 3.8f*(1-m_power_reduction/stk_config->m_slowdown_factor);
+                    float f = 2.5f - 3.8f*(1-m_power_reduction);
                     // Avoid that a kart gets really stuck:
                     if(f<0.1f) f=0.1f;
                     m_vehicle->applyEngineForce(-engine_power*f, 2);

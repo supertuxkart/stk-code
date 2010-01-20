@@ -24,9 +24,6 @@ max-history is the maximum number of history frames.
 max-skidmarks is the max. number o skidmarks per kart.
 skid-fadeout-time is the time till the skid marks fade out
 
-slowdown-factor is the engine reduction depending on terrain; see kart for
-details
-
 near-ground is the distance above ground when the upright constraint will be
 disabled to allow more violent explosions.
 
@@ -50,7 +47,6 @@ final-camera-time is the time for the final camera to reach it's destination
     max-history="10000"
     max-skidmarks="100"
     skid-fadeout-time="60"
-    slowdown-factor="10"
     near-ground="2"
     delay-finish-time="10"
     music-credit-time="10"

@@ -58,7 +58,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("reset",            &m_resetter          );
     node->get("collide",          &m_collideable       );
     node->get("maxSpeed",         &m_max_speed_fraction);
-    node->get("slowdownTime",     &m_slowdown          );
+    node->get("slowdown",         &m_slowdown          );
     std::string s("");
     node->get("graphical-effect", &s                   );
     if(s=="water")
@@ -107,7 +107,7 @@ void Material::init(unsigned int index)
     m_resetter           = false;
     m_collideable        = true;
     m_max_speed_fraction = 1.0f;
-    m_slowdown           = stk_config->m_slowdown_factor;
+    m_slowdown           = 1.0f;
     m_graphical_effect   = GE_NONE;
 }
 
