@@ -508,7 +508,7 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     
     SColor* colorptr = NULL;
     
-    if (w->r != -1 && w->g != -1 && w->b != -1 || ID_DEBUG)
+    if ( (w->r != -1 && w->g != -1 && w->b != -1) || ID_DEBUG)
     {
         SColor thecolor(255, w->r, w->g, w->b);
         colorptr = new SColor[4]();
