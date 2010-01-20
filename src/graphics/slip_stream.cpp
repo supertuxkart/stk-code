@@ -35,7 +35,14 @@ SlipStream::SlipStream(Kart* kart) : m_kart(kart), MovingTexture(0, 0)
     Material *material = material_manager->getMaterial("slipstream.png");
     m.setTexture(0, material->getTexture());
     m.setFlag(video::EMF_BACK_FACE_CULLING, false);
-    m.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+    m.setFlag(video::EMF_COLOR_MATERIAL, true);
+
+    m.ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
+    
+    //m.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+    //m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+    
     createMesh(m);
     m_node = irr_driver->addMesh(m_mesh);
     m_node->setParent(m_kart->getNode());
@@ -97,7 +104,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
             v.Pos.X =  sin(i*f)*radius[j];
             v.Pos.Y = -cos(i*f)*radius[j];
             v.Pos.Z = distance[j];
-            v.Color = video::SColor(alphas[j], 255, 0, 0);
+            v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
             v.TCoords.X = curr_distance/length;
             v.TCoords.Y = (float)i/(num_segments-1);
             buffer->Vertices.push_back(v);
