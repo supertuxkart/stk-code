@@ -56,8 +56,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("ignore",           &m_ignore            );
     node->get("zipper",           &m_zipper            );
     node->get("reset",            &m_resetter          );
-    node->get("collide",          &m_collideable       );
-    node->get("maxSpeed",         &m_max_speed_fraction);
+    node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown",         &m_slowdown          );
     std::string s("");
     node->get("graphical-effect", &s                   );
@@ -105,7 +104,6 @@ void Material::init(unsigned int index)
     m_ignore             = false;
     m_zipper             = false;
     m_resetter           = false;
-    m_collideable        = true;
     m_max_speed_fraction = 1.0f;
     m_slowdown           = 1.0f;
     m_graphical_effect   = GE_NONE;

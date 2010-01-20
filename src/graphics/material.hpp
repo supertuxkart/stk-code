@@ -37,7 +37,6 @@ private:
     unsigned int     m_index;
     std::string      m_texname;
     GraphicalEffect  m_graphical_effect;
-    bool             m_collideable;
     bool             m_zipper;
     bool             m_resetter;
     bool             m_ignore;
@@ -66,7 +65,6 @@ public:
     bool  isIgnore           () const { return m_ignore;             }
     bool  isZipper           () const { return m_zipper;             }
     bool  isSphereMap        () const { return m_sphere_map;         }
-    bool  isCrashable        () const { return m_collideable;        }
     bool  isReset            () const { return m_resetter;           }
     float getFriction        () const { return m_friction;           }
     const std::string& 
