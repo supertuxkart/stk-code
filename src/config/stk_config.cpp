@@ -114,7 +114,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_min_track_version,         "min-track-version"          );
     CHECK_NEG(m_max_track_version,         "max-track-version"          );
     CHECK_NEG(m_skid_fadeout_time,         "skid-fadeout-time"          );
-    CHECK_NEG(m_slowdown_factor,           "slowdown-factor"            );
     CHECK_NEG(m_near_ground,               "near-ground"                );
     CHECK_NEG(m_delay_finish_time,         "delay-finish-time"          );
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
@@ -135,9 +134,8 @@ void STKConfig::init_defaults()
         m_bomb_time            = m_bomb_time_increase        =
         m_anvil_time           = m_zipper_time               =
         m_zipper_force         = m_zipper_speed_gain         =
-        m_zipper_max_speed_fraction =
+        m_zipper_max_speed_fraction = m_music_credit_time    = 
         m_explosion_impulse    = m_explosion_impulse_objects =
-        m_music_credit_time    = m_slowdown_factor           =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_final_camera_time    = m_near_ground               = UNDEFINED;
     m_max_karts                = -100;
@@ -206,7 +204,6 @@ void STKConfig::getAllData(const XMLNode * root)
     node->get("max-history", &m_max_history);
     node->get("max-skidmarks", &m_max_skidmarks);
     node->get("skid-fadeout-time", &m_skid_fadeout_time);
-    node->get("slowdown-factor", &m_slowdown_factor);
     node->get("near-ground", &m_near_ground);
     node->get("delay-finish-time", &m_delay_finish_time);
     node->get("music-credit-time", &m_music_credit_time);
