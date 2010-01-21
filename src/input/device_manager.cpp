@@ -12,6 +12,8 @@
 
 #define INPUT_MODE_DEBUG 0
 
+const char* INPUT_FILE_NAME = "input.xml";
+
 DeviceManager::DeviceManager()
 {
     m_latest_used_device = NULL;
@@ -297,9 +299,9 @@ InputDevice* DeviceManager::getLatestUsedDevice()
 // -----------------------------------------------------------------------------
 bool DeviceManager::deserialize()
 {
-    static std::string filepath = file_manager->getConfigDir() + "/input.config";
+    static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
     
-    printf("Deserializing input.config...\n");
+    printf("Deserializing input.xml...\n");
 
     if(!file_manager->fileExists(filepath))
     {
@@ -394,8 +396,8 @@ bool DeviceManager::deserialize()
 // -----------------------------------------------------------------------------
 void DeviceManager::serialize()
 {
-    static std::string filepath = file_manager->getConfigDir() + "/input.config";
-    printf("Serializing input.config...\n");
+    static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
+    printf("Serializing input.xml...\n");
 
     
     std::ofstream configfile;
