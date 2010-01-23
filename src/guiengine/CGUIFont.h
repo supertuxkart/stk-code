@@ -13,6 +13,7 @@
 #include "IXMLReader.h"
 #include "IReadFile.h"
 #include "irrArray.h"
+#include <map>
 
 namespace irr
 {
@@ -33,6 +34,16 @@ class ScalableFont : public IGUIFontBitmap
     float m_scale;
     bool m_shadow;
     irr::video::SColor m_shadow_color;
+    
+    struct TextureInfo
+    {
+        irr::core::stringc m_file_name;
+        bool m_has_alpha;
+    };
+    
+    std::map<int /* texture file ID */, TextureInfo> m_texture_files;
+    
+    void lazyLoadTexture(int texID);
 public:
 
 	//! constructor

@@ -84,13 +84,23 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
 
                 
+                // make sure the sprite bank has enough textures in it
 				while (i+1 > SpriteBank->getTextureCount())
-					SpriteBank->addTexture(0);
+                {
+					SpriteBank->addTexture(NULL);
+                }
 
+                TextureInfo info;
+                info.m_file_name = fn;
+                info.m_has_alpha = (alpha == core::stringw("false"));
+                
 				// disable mipmaps+filtering
 				//bool mipmap = Driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
 				//Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
 
+                m_texture_files[i] = info;
+                
+                /*
 				// load texture
 				SpriteBank->setTexture(i, Driver->getTexture(fn));
 
@@ -110,6 +120,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
 					if (alpha == core::stringw("false"))
 						Driver->makeColorKeyTexture(SpriteBank->getTexture(i), core::position2di(0,0));
 				}
+                 */
 			}
 			else if (core::stringw(L"c") == xml->getNodeName())
 			{
@@ -226,30 +237,25 @@ void ScalableFont::setMaxHeight()
 //! loads a font file, native file needed, for texture parsing
 bool ScalableFont::load(io::IReadFile* file)
 {
-	if (!Driver)
-		return false;
+	if (!Driver) return false;
 
-	return loadTexture(Driver->createImageFromFile(file),
-				file->getFileName());
+	return loadTexture(Driver->createImageFromFile(file), file->getFileName());
 }
 
 
 //! loads a font file, native file needed, for texture parsing
 bool ScalableFont::load(const io::path& filename)
 {
-	if (!Driver)
-		return false;
+	if (!Driver) return false;
 
-	return loadTexture(Driver->createImageFromFile( filename ),
-				filename);
+	return loadTexture(Driver->createImageFromFile( filename ), filename);
 }
 
 
 //! load & prepare font from ITexture
 bool ScalableFont::loadTexture(video::IImage* image, const io::path& name)
 {
-	if (!image)
-		return false;
+	if (!image) return false;
 
 	s32 lowerRightPositions = 0;
 
@@ -489,8 +495,7 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& position,
 					video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip)
 {
-	if (!Driver)
-		return;
+	if (!Driver) return;
     
     if (m_shadow)
     {
@@ -510,38 +515,37 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 	core::dimension2d<s32> textDimension;
 	core::position2d<s32> offset = position.UpperLeftCorner;
 
-	if (hcenter || vcenter || clip)
-		textDimension = getDimension(text.c_str());
+	if (hcenter || vcenter || clip) textDimension = getDimension(text.c_str());
 
 	if (hcenter)
     {
-		offset.X += (position.getWidth() - textDimension.Width) >> 1;
+		offset.X += (position.getWidth() - textDimension.Width) / 2;
     }
 
 	if (vcenter)
-		offset.Y += (position.getHeight() - textDimension.Height) >> 1;
+    {
+		offset.Y += (position.getHeight() - textDimension.Height) / 2;
+    }
 
 	if (clip)
 	{
 		core::rect<s32> clippedRect(offset, textDimension);
 		clippedRect.clipAgainst(*clip);
-		if (!clippedRect.isValid())
-			return;
+		if (!clippedRect.isValid()) return;
 	}
 
 	core::array<u32> indices(text.size());
 	core::array<core::position2di> offsets(text.size());
 
-	for(u32 i = 0;i < text.size();i++)
+	for (u32 i = 0;i < text.size();i++)
 	{
 		wchar_t c = text[i];
 
 		bool lineBreak=false;
-		if ( c == L'\r') // Windows breaks
+		if (c == L'\r') // Windows breaks
 		{
 			lineBreak = true;
-			if ( text[i + 1] == L'\n') // Windows breaks
-				c = text[++i];
+			if (text[i + 1] == L'\n') c = text[++i];
 		}
 		else if ( c == L'\n') // Unix breaks
 		{
@@ -595,7 +599,7 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
         //	offsets[n].X << ", " << offsets[n].Y << "; size = " << source.getWidth() << ", " << source.getHeight() << std::endl;
         
         core::dimension2d<s32> size = source.getSize();
-        size.Width = (int)(size.Width * m_scale);
+        size.Width  = (int)(size.Width  * m_scale);
         size.Height = (int)(size.Height * m_scale);
         core::rect<s32> dest(offsets[n], size);
         //std::cout << "source size = " << source.getWidth() << ", " << source.getHeight() << ", dest size = " << dest.getWidth() << ", " << dest.getHeight() << "; m_scale=" << m_scale << std::endl;
@@ -603,6 +607,14 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
         video::SColor colors[] = {color, color, color, color};
         
         video::ITexture* texture = SpriteBank->getTexture(texID);
+        if (texture == NULL)
+        {
+            // perform lazy loading
+            lazyLoadTexture(texID);
+            texture = SpriteBank->getTexture(texID);
+            assert(texture != NULL);
+        }
+        
         driver->draw2DImage(texture,
         					dest,
                             source,
@@ -612,6 +624,31 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 }
 
 
+void ScalableFont::lazyLoadTexture(int texID)
+{
+    // load texture
+    SpriteBank->setTexture(texID, Driver->getTexture( m_texture_files[texID].m_file_name ));
+    
+    // set previous mip-map+filter state
+    //Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, mipmap);
+    
+    // couldn't load texture, abort.
+    if (!SpriteBank->getTexture(texID))
+    {
+        std::cerr << "!!!!! Unable to load all textures in the font" << std::endl;
+        _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+        return;
+    }
+    else
+    {
+        // colorkey texture rather than alpha channel?
+        if (! m_texture_files[texID].m_has_alpha)
+        {
+            Driver->makeColorKeyTexture(SpriteBank->getTexture(texID), core::position2di(0,0));
+        }
+    }
+}
+    
 //! Calculates the index of the character in the text which is on a specific position.
 s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
 {
