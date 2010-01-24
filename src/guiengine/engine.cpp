@@ -205,12 +205,12 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     const float title_text_scale = 0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
 
     //ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/okolaks.xml").c_str());
-    ScalableFont* sfont = new ScalableFont(g_env, (file_manager->getGUIDir() + "/LayneHansom.xml").c_str());
+    ScalableFont* sfont = new ScalableFont(g_env, file_manager->getFontFile("LayneHansom.xml").c_str() );
     sfont->setScale(normal_text_scale);
     sfont->setKerningHeight(-5);
     g_font = sfont;
     
-    ScalableFont* sfont2 = new ScalableFont(g_env, (file_manager->getGUIDir() + "/title_font.xml").c_str());
+    ScalableFont* sfont2 = new ScalableFont(g_env, file_manager->getFontFile("title_font.xml").c_str() );
     sfont2->setScale(title_text_scale);
     sfont2->setKerningWidth(-18);
     g_title_font = sfont2;

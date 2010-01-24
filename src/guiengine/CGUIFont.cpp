@@ -77,7 +77,8 @@ bool ScalableFont::load(io::IXMLReader* xml)
 			if (core::stringw(L"Texture") == xml->getNodeName())
 			{
 				// add a texture
-				core::stringc fn = core::stringc((file_manager->getGUIDir() + "/").c_str()) + xml->getAttributeValue(L"filename");
+                core::stringc filename = xml->getAttributeValue(L"filename");
+				core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
 				u32 i = (u32)xml->getAttributeValueAsInt(L"index");
 				core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
 
