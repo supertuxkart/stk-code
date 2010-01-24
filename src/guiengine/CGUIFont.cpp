@@ -613,7 +613,11 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
             // perform lazy loading
             lazyLoadTexture(texID);
             texture = SpriteBank->getTexture(texID);
-            assert(texture != NULL);
+            if (texture == NULL)
+            {
+                std::cerr << "WARNING: character not found in current font\n";
+                continue; // no such character
+            }
         }
         
         driver->draw2DImage(texture,
