@@ -46,6 +46,10 @@ class ScalableFont : public IGUIFontBitmap
     void lazyLoadTexture(int texID);
 public:
 
+    ScalableFont* m_fallback_font;
+    float         m_fallback_font_scale;
+    int           m_fallback_kerning_width;
+    
 	//! constructor
 	ScalableFont(IGUIEnvironment* env, const io::path& filename);
 
@@ -112,7 +116,7 @@ private:
 
 	void readPositions(video::IImage* texture, s32& lowerRightPositions);
 
-	s32 getAreaFromCharacter (const wchar_t c) const;
+	s32 getAreaFromCharacter (const wchar_t c, bool* fallback_font) const;
 	void setMaxHeight();
 
 	core::array<SFontArea>		Areas;

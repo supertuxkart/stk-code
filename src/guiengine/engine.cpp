@@ -211,6 +211,9 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     g_font = sfont;
     
     ScalableFont* sfont2 = new ScalableFont(g_env, file_manager->getFontFile("title_font.xml").c_str() );
+    sfont2->m_fallback_font = sfont;
+    sfont2->m_fallback_font_scale = 4.0f; // because the fallback font is much smaller than the title font
+    sfont2->m_fallback_kerning_width = 15;
     sfont2->setScale(title_text_scale);
     sfont2->setKerningWidth(-18);
     g_title_font = sfont2;
