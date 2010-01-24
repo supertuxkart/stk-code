@@ -173,8 +173,8 @@ void IrrDriver::initDevice()
     //                                                   true);
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    const std::string &font = file_manager->getFontFile("DomesticManners.xml");
-    m_race_font     = m_gui_env->getFont(font.c_str());
+    //const std::string &font = file_manager->getFontFile("DomesticManners.xml");
+    //m_race_font     = m_gui_env->getFont(font.c_str());
         
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
@@ -683,7 +683,7 @@ void IrrDriver::renderBulletDebugView()
  */
 void IrrDriver::displayFPS()
 {
-    gui::IGUIFont* font = getRaceFont();
+    gui::IGUIFont* font = GUIEngine::getFont();
     const int fps       = m_device->getVideoDriver()->getFPS();
 
     // Min and max info tracking, per mode, so user can check game vs menus

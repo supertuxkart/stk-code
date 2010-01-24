@@ -28,6 +28,7 @@ using namespace irr;
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
@@ -277,7 +278,7 @@ void RaceGUI::drawGlobalTimer()
         pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
     }
     
-    gui::IGUIFont* font = irr_driver->getRaceFont();
+    gui::IGUIFont* font = GUIEngine::getFont();
     font->draw(sw.c_str(), pos, time_color);
 }   // DRAWGLOBALTimer
 
@@ -345,7 +346,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         ICON_PLAYER_WIDTH = 35;
     }
     
-    gui::IGUIFont* font = irr_driver->getRaceFont();
+    gui::IGUIFont* font = GUIEngine::getFont();
     const unsigned int kart_amount = race_manager->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -517,7 +518,7 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
                             offset.Y-(int)(10*minRatio),
                             offset.X-(int)(30*minRatio), 
                             offset.Y-(int)(10*minRatio) );
-        irr_driver->getRaceFont()->draw(core::stringw("!").c_str(), pos, color);
+        GUIEngine::getFont()->draw(core::stringw("!").c_str(), pos, color);
     }
 
     const float speed =  kart->getSpeed();
@@ -590,9 +591,9 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart,
     pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
                            + (int)(0.15f*UserConfigParams::m_width*scaling.X);
     pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
-    gui::IGUIFont* font    = irr_driver->getRaceFont();
-    int font_height        = (int)(60*scaling.Y);
-    if(kart->hasFinishedRace())
+    gui::IGUIFont* font    = GUIEngine::getFont();
+    int font_height        = (int)(font->getDimension(L"X").Height*scaling.Y);
+    if (kart->hasFinishedRace())
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
         pos.UpperLeftCorner.Y -= 2*font_height;
@@ -659,7 +660,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart,
         if( msg.m_kart && msg.m_kart!=player_kart) continue;
 
         core::rect<s32> pos(x, y, x, y);
-        irr_driver->getRaceFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
+        GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
                                         pos, msg.m_color, true, true);
         y+=40;        
     }   // for i in all messages
@@ -683,7 +684,7 @@ void RaceGUI::drawGlobalMusicDescription()
 {
     if (!UserConfigParams::m_music) return; // show no music description when it's off
     
-    gui::IGUIFont*       font = irr_driver->getRaceFont();
+    gui::IGUIFont*       font = GUIEngine::getFont();
 
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
@@ -778,29 +779,33 @@ void RaceGUI::drawGlobalReadySetGo()
     {
     case READY_PHASE:
         {
-            static video::SColor color = video::SColor(255, 230, 168, 158);
+            //static video::SColor color = video::SColor(255, 230, 168, 158);
+            static video::SColor color = video::SColor(255, 255, 255, 255);
             core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = irr_driver->getRaceFont();
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
     case SET_PHASE:
         {
-            static video::SColor color = video::SColor(255, 230, 230, 158);
+            //static video::SColor color = video::SColor(255, 230, 230, 158);
+            static video::SColor color = video::SColor(255, 255, 255, 255);
             core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = irr_driver->getRaceFont();
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
     case GO_PHASE:
         {
-            static video::SColor color = video::SColor(255, 100, 209, 100);
+            //static video::SColor color = video::SColor(255, 100, 209, 100);
+            static video::SColor color = video::SColor(255, 255, 255, 255);
             core::rect<s32> pos(UserConfigParams::m_width>>1, UserConfigParams::m_height>>1,
                                 UserConfigParams::m_width>>1, UserConfigParams::m_height>>1);
-            gui::IGUIFont* font = irr_driver->getRaceFont();
+            //gui::IGUIFont* font = irr_driver->getRaceFont();
+            gui::IGUIFont* font = GUIEngine::getTitleFont();
             //I18N: as in "ready, set, go", shown at the beginning of the race
             font->draw(m_string_go.c_str(), pos, color, true, true);
         }

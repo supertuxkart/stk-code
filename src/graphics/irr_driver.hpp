@@ -78,7 +78,7 @@ public:
     scene::IMesh         *getMesh(const std::string &name);
     /** Returns the gui environment, used to add widgets to a screen. */
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
-    irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
+    //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
