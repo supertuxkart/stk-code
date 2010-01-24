@@ -216,6 +216,7 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     sfont2->m_fallback_kerning_width = 15;
     sfont2->setScale(title_text_scale);
     sfont2->setKerningWidth(-18);
+    sfont2->m_black_border = true;
     g_title_font = sfont2;
     
 

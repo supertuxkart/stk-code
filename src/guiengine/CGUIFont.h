@@ -46,6 +46,8 @@ class ScalableFont : public IGUIFontBitmap
     void lazyLoadTexture(int texID);
 public:
 
+    bool m_black_border;
+    
     ScalableFont* m_fallback_font;
     float         m_fallback_font_scale;
     int           m_fallback_kerning_width;

@@ -27,6 +27,8 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     m_fallback_font_scale = 1.0f;
     m_fallback_kerning_width = 0;
     
+    m_black_border = false;
+    
 	#ifdef _DEBUG
 	setDebugName("ScalableFont");
 	#endif
@@ -517,7 +519,7 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 					video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip)
 {
 	if (!Driver) return;
-    
+        
     if (m_shadow)
     {
         m_shadow = false; // avoid infinite recursion
@@ -677,10 +679,10 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
             }
         }
         
-        if (fallback[n])
+        if (m_black_border)
         {
             // draw black border
-            static video::SColor black(255,0,0,0);
+            video::SColor black(color.getAlpha(),0,0,0);
             video::SColor black_colors[] = {black, black, black, black};
             
             for (int x_delta=-2; x_delta<=2; x_delta++)
@@ -695,10 +697,13 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
                                         black_colors, true);
                 }            
             }
-            
+        }
+        
+        if (fallback[n])
+        {
             // draw text over
-            static video::SColor orange(255, 255, 100, 0);
-            static video::SColor yellow(255, 255, 220, 15);
+            static video::SColor orange(color.getAlpha(), 255, 100, 0);
+            static video::SColor yellow(color.getAlpha(), 255, 220, 15);
             video::SColor title_colors[] = {yellow, orange, orange, yellow};
             driver->draw2DImage(texture,
                                 dest,
@@ -720,6 +725,8 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 
 void ScalableFont::lazyLoadTexture(int texID)
 {
+    Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
+    
     // load texture
     SpriteBank->setTexture(texID, Driver->getTexture( m_texture_files[texID].m_file_name ));
     

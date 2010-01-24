@@ -178,12 +178,15 @@ void IrrDriver::initDevice()
         
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
+    material2D.setFlag(video::EMF_ANTI_ALIASING, true);
     for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
     {
         material2D.TextureLayer[n].BilinearFilter = true;
         //material2D.TextureLayer[n].TextureWrap = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapU = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapV = ETC_CLAMP_TO_EDGE;
+        
+        material2D.TextureLayer[n].LODBias = 8.0f;
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
