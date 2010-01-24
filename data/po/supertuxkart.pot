@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-15 19:02-0500\n"
+"POT-Creation-Date: 2010-01-24 10:33-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,12 @@ msgstr ""
 #: src/states_screens/dialogs/track_info_dialog.cpp:187
 #, c-format
 msgid "%i laps"
+msgstr ""
+
+#. I18N: as in "fastest lap: 60 seconds by Wilber"
+#: src/modes/linear_world.cpp:263
+#, c-format
+msgid "%s by %s"
 msgstr ""
 
 #: src/states_screens/kart_selection.cpp:417
