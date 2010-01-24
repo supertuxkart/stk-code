@@ -32,41 +32,42 @@ using irr::core::stringc;
 
 namespace GUIEngine
 {
-    const float TIME_SECTION_FADE = 0.4f;
+    const float TIME_SECTION_FADE = 0.8f;
+    const float ENTRIES_FADE_TIME = 0.3f;
 
     class CreditsEntry
+    {
+    public:
+        stringw m_name;
+        std::vector<stringw> m_subentries;
+        
+        CreditsEntry(stringw& name)
         {
-        public:
-            stringw m_name;
-            std::vector<stringw> m_subentries;
-            
-            CreditsEntry(stringw& name)
-            {
-                m_name = name;
-            }
-        };
+            m_name = name;
+        }
+    };
     
     
     class CreditsSection
+    {
+    public:
+        // read-only
+        std::vector<CreditsEntry> m_entries;
+        stringw m_name;
+        
+        CreditsSection(stringw name)
         {
-        public:
-            // read-only
-            std::vector<CreditsEntry> m_entries;
-            stringw m_name;
-            
-            CreditsSection(stringw name)
-            {
-                this->m_name = name;
-            }
-            void addEntry(CreditsEntry& entry)
-            {
-                m_entries.push_back(entry);
-            }
-            void addSubEntry(stringw& subEntryString)
-            {
-                m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
-            }
-        };
+            this->m_name = name;
+        }
+        void addEntry(CreditsEntry& entry)
+        {
+            m_entries.push_back(entry);
+        }
+        void addSubEntry(stringw& subEntryString)
+        {
+            m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
+        }
+    };
     
     CreditsSection* CreditsScreen::getCurrentSection()
     {
@@ -145,7 +146,7 @@ namespace GUIEngine
         time_before_next_step -= elapsed_time*0.8f; // multiply by 0.8 to slow it down a bit as a whole
 
         const bool before_first_elem = (m_curr_element == -1);
-        const bool after_last_elem = (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
+        const bool after_last_elem   = (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
 
         
         // ---- section name
@@ -155,17 +156,19 @@ namespace GUIEngine
         // manage fade-in
         if (before_first_elem)
         {
-            int alpha = 255 - (int)(time_before_next_step/TIME_SECTION_FADE * 255);
-            if(alpha < 0) alpha = 0;
-            else if(alpha > 255) alpha = 255;
+            // I use 425 instead of 255 so that there is a little pause after
+            int alpha = 425 - (int)(time_before_next_step/TIME_SECTION_FADE * 425);
+            if      (alpha < 0) alpha = 0;
+            else if (alpha > 255) alpha = 255;
             white_color.setAlpha( alpha );
         }
         // manage fade-out
         else if (after_last_elem)
         {
-            int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 255);
-            if(alpha < 0) alpha = 0;
-            else if(alpha > 255) alpha = 255;
+            // I use 425 instead of 255 so that there is a little pause after
+            int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 425) - (425-255);
+            if      (alpha < 0)   alpha = 0;
+            else if (alpha > 255) alpha = 255;
             white_color.setAlpha( alpha );
         }
         
@@ -178,21 +181,23 @@ namespace GUIEngine
             int text_offset  = 0;
             
             // fade in
-            if (time_before_next_step < 0.3f)
+            if (time_before_next_step < ENTRIES_FADE_TIME)
             {
-                const float fade_in = time_before_next_step / 0.3f;
+                const float fade_in = time_before_next_step / ENTRIES_FADE_TIME;
                 
                 int alpha =  (int)(fade_in * 255);
-                if(alpha < 0) alpha = 0;
-                else if(alpha > 255) alpha = 255;
+                
+                if      (alpha < 0) alpha = 0;
+                else if (alpha > 255) alpha = 255;
+                
                 color.setAlpha( alpha );
                 
                 text_offset = (int)((1.0f - fade_in) * 100);
             }
             // fade out
-            else if (time_before_next_step >= m_time_element - 0.3f)
+            else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
             {
-                const float fade_out = (time_before_next_step - (m_time_element - 0.3f)) / 0.3f;
+                const float fade_out = (time_before_next_step - (m_time_element - ENTRIES_FADE_TIME)) / ENTRIES_FADE_TIME;
                 
                 int alpha = 255 - (int)(fade_out * 255);
                 if(alpha < 0) alpha = 0;
