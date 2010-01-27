@@ -800,12 +800,17 @@ float Kart::handleSlipstream(float dt)
         printf("Using slipstream\n");
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
+        m_slip_stream->setIntensity(2.0f, NULL);
         return m_kart_properties->getSlipstreamAddPower();
     }
 
     // If this kart is too slow for slipstreaming taking effect, do nothing
     // --------------------------------------------------------------------
-    if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) return 0;
+    if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed())
+    {
+        m_slip_stream->setIntensity(0, NULL);
+        return 0;
+    }
 
     // Then test if this kart is in the slipstream range of another kart:
     // ------------------------------------------------------------------
@@ -813,44 +818,48 @@ float Kart::handleSlipstream(float dt)
 
     unsigned int n     = race_manager->getNumKarts();
     bool is_sstreaming = false;
+    Kart *target_kart;
     for(unsigned int i=0; i<n; i++)
     {
-        Kart *kart = race_manager->getKart(i);
+        target_kart = race_manager->getKart(i);
         // Don't test for slipstream with itself.
-        if(kart==this) continue;
+        if(target_kart==this) continue;
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
         // against the minimum slipstream speed kart of this kart - not 
         // entirely sure if this makes sense, but it makes it easier to 
         // give karts different slipstream properties.
-        if(kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
+        if(target_kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
             continue;
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
-        Vec3 delta = getXYZ() - kart->getXYZ();
-        float l    = kart->m_kart_properties->getSlipstreamLength() 
-                   + kart->getKartLength()*0.5f;
+        Vec3 delta = getXYZ() - target_kart->getXYZ();
+        float l    = target_kart->m_kart_properties->getSlipstreamLength() 
+                   + target_kart->getKartLength()*0.5f;
         if(delta.length2_2d() > l*l) continue;
 
-        if(kart->m_slipstream_quad->pointInQuad(getXYZ()))
+        if(target_kart->m_slipstream_quad->pointInQuad(getXYZ()))
         {
             is_sstreaming     = true;
             break;
         }
-    }
+    }   //
 
     if(!is_sstreaming)
     {
         m_slipstream_time -=dt;
         if(m_slipstream_time<0) m_slipstream_mode = SS_NONE;
+        m_slip_stream->setIntensity(0, NULL);
         return 0;
-    }
+    }   // for i<number of karts
 
     // Accumulate slipstream credits now
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
                                                    : m_slipstream_time+dt;
     printf("Collecting slipstream %f\n", m_slipstream_time);
+    m_slip_stream->setIntensity(m_slipstream_time, target_kart);
+
     m_slipstream_mode = SS_COLLECT;
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
@@ -1296,12 +1305,6 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
         // become a huge unsigned number in the particle scene node!
         m_nitro->setCreationRate(m_controls.m_nitro && m_collected_energy>0
                                  ? (10.0f + fabsf(getSpeed())*20.0f) : 0);
-    float f=0;
-    if(m_slipstream_mode==SS_COLLECT)
-        f=1.0f;
-    else if(m_slipstream_mode==SS_USE)
-        f=2.0f;
-    m_slip_stream->setIntensity(f);
 
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()

@@ -45,9 +45,10 @@ SlipStream::SlipStream(Kart* kart) : m_kart(kart), MovingTexture(0, 0)
     
     createMesh(m);
     m_node = irr_driver->addMesh(m_mesh);
-    m_node->setParent(m_kart->getNode());
+    //m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, 
-                                        0*0.25f,
+//                                        0*0.25f,
+                                        0*0.25f+2.5,
                                         m_kart->getKartLength()) );
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
 }   // SlipStream
@@ -76,7 +77,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // The distance of each of the circle from the kart. The number of
     // entries in this array must be the same as the number of non-zero 
     // entries in the radius[] array above. No 'end of list' entry required.
-    float distance[] = {0.0f, 2.0f, 4.0f };
+    float distance[] = {2.0f, 6.0f, 14.0f };
 
     // The alpha values for the rings, no 'end of list' entry required.
     int alphas[]     = {0, 255, 0};
@@ -89,8 +90,12 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // Length is distance of last circle to distance of first circle:
     float length = distance[num_circles-1] - distance[0];
 
-    // The number of points for each circle.
-    const int   num_segments   = 15;
+    // The number of points for each circle. Since part of the slip stream
+    // might be under the ground (esp. first and last segment), specify
+    // which one is the first and last to be actually drawn.
+    const int   num_segments   = 7;
+    const int   first_segment  = 0;
+    const int   last_segment   = 6;
     const float f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
     buffer->Material           = material;
@@ -98,30 +103,34 @@ void SlipStream::createMesh(const video::SMaterial &material)
     {
         float curr_distance = distance[j]-distance[0];
         // Create the vertices for each of the circle
-        for(unsigned int i=0; i<num_segments; i++)
+        for(unsigned int i=first_segment; i<=last_segment; i++)
         {
-            video::S3DVertex v;                  
-            v.Pos.X =  sin(i*f)*radius[j];
-            v.Pos.Y = -cos(i*f)*radius[j];
+            video::S3DVertex v;
+            // Offset every 2nd circle by one half segment to increase
+            // the number of planes so it looks better.
+            v.Pos.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
+            v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
             v.Pos.Z = distance[j];
             v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
             v.TCoords.X = curr_distance/length;
-            v.TCoords.Y = (float)i/(num_segments-1);
+            v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment);
             buffer->Vertices.push_back(v);
         }   // for i<num_segments
     }   // while radius[num_circles]!=0
 
-    // Now create the triangles. 
+    // Now create the triangles from circle j to j+1 (so the loop
+    // only goes to num_circles-1).
+    const int diff_segments = last_segment-first_segment+1;
     for(unsigned int j=0; j<num_circles-1; j++)
     {
-        for(unsigned int i=0; i<num_segments-1; i++)
+        for(unsigned int i=first_segment; i<last_segment; i++)
         {
-            buffer->Indices.push_back( j   *num_segments+i  );
-            buffer->Indices.push_back((j+1)*num_segments+i  );
-            buffer->Indices.push_back( j   *num_segments+i+1);
-            buffer->Indices.push_back( j   *num_segments+i+1);
-            buffer->Indices.push_back((j+1)*num_segments+i  );
-            buffer->Indices.push_back((j+1)*num_segments+i+1);
+            buffer->Indices.push_back( j   *diff_segments+i  );
+            buffer->Indices.push_back((j+1)*diff_segments+i  );
+            buffer->Indices.push_back( j   *diff_segments+i+1);
+            buffer->Indices.push_back( j   *diff_segments+i+1);
+            buffer->Indices.push_back((j+1)*diff_segments+i  );
+            buffer->Indices.push_back((j+1)*diff_segments+i+1);
         }
     }   // for j<num_circles-1
 
@@ -139,18 +148,65 @@ void SlipStream::createMesh(const video::SMaterial &material)
  *                      1 = collecting
  *                      2 = using slip stream bonus
  */
-void SlipStream::setIntensity(float f)
+void SlipStream::setIntensity(float f, const Kart *kart)
 {
     // For now: disable them permanently
     m_node->setVisible(false);
     return;
 
+
+    if(!kart)
+    {
+        m_node->setVisible(false);
+        return;
+    }
+
+    const float above_terrain = 0.2f;
+    core::vector3df my_pos = m_kart->getNode()->getPosition();
+    my_pos.Y = m_kart->getHoT()+above_terrain;
+    m_node->setPosition(my_pos);
+    
+    core::vector3df other_pos = kart->getNode()->getPosition();
+    other_pos.Y = kart->getHoT()+above_terrain;
+    core::vector3df diff =   other_pos - my_pos;
+    core::vector3df rotation = diff.getHorizontalAngle();
+    m_node->setRotation(rotation);
+
     // For real testing in game: this needs some tuning!
     //m_node->setVisible(f!=0);
-    //MovingTexture::setSpeed(f*0.1f, 0);
-
+    //MovingTexture::setSpeed(f, 0);
+    //return;
     // For debugging: make the slip stream effect visible all the time
     m_node->setVisible(true);
     MovingTexture::setSpeed(1.0f, 0.0f);
 }   // setIntensity
 
+//-----------------------------------------------------------------------------
+/** Update, called once per timestep.
+ *  \param dt Time step size.
+ */
+void SlipStream::update(float dt)
+{
+    core::vector3df pos = m_kart->getNode()->getPosition();
+    pos.Y = m_kart->getHoT()+0.2f;
+    m_node->setPosition(pos);
+
+    core::vector3df f = core::vector3df(0, 0, 10) - f;
+    core::vector3df r = f.getHorizontalAngle();
+    m_node->setRotation(r);
+    return;
+
+    // Smooth the rotation: take 80% of old rotation, 20% of new:
+    float weight_old = 0.5f;
+    const core::vector3df &new_rotation = m_kart->getNode()->getRotation();
+    
+    const core::quaternion new_rot(m_kart->getNode()->getRotation());
+    const core::quaternion old_rot(m_node->getRotation()            );
+
+    core::quaternion interpo;
+    //interpo.slerp(new_rot, old_rot, weight_old);
+    core::vector3df interp;
+    new_rot.toEuler(interp);
+    m_node->setRotation(interp);
+    MovingTexture::update(dt);
+}   // update

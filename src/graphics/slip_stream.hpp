@@ -45,7 +45,8 @@ private:
 public:
                  SlipStream  (Kart* kart);
     virtual     ~SlipStream  ();
-    void         setIntensity(float f);
+    virtual void update(float dt);
+    void         setIntensity(float f, const Kart* kart);
 };   // SlipStream
 #endif
 
