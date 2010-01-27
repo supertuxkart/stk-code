@@ -492,9 +492,12 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                                             bb_max.getY()-bb_min.getY(),
                                             -1, bb_max.getZ()-bb_min.getZ()+1);
     camera->setProjectionMatrix(projection, true);
-    camera->setPosition(core::vector3df(center.getX(), bb_max.getZ(), center.getY()));
+    // Adjust z position by +1 for max, -1 for min - this helps in case that
+    // the maximum z coordinate is negative (otherwise the minimap is mirrored)
+    // and avoids problems for tracks which have a flat (max z = min z) minimap.
+    camera->setPosition(core::vector3df(center.getX(), bb_max.getZ()+1, center.getY()));
     camera->setUpVector(core::vector3df(0,0,1));
-    camera->setTarget(core::vector3df(center.getX(),0,center.getY()));
+    camera->setTarget(core::vector3df(center.getX(),bb_min.getZ()-1,center.getY()));
     
     video::ITexture *texture = rttProvider.renderToTexture();
     
