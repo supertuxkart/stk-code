@@ -497,7 +497,7 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 		thisLine.Width += area.underhang;
         
         
-        if (fallback) thisLine.Width += (area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width;
+        if (fallback) thisLine.Width += (int)((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width);
 		else          thisLine.Width += area.width + area.overhang + GlobalKerningWidth;
 	}
 
@@ -638,10 +638,11 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
                                   positions[sprites[spriteID].Frames[0].rectNumber]);
         
         core::dimension2d<s32> size = source.getSize();
-        size.Width  = (int)(size.Width  * m_scale);
-        size.Height = (int)(size.Height * m_scale);
-        core::rect<s32> dest(offsets[n], (fallback[n] ? size*m_fallback_font_scale : size));
-        
+        float scale = fallback[n] ? m_scale*m_fallback_font_scale : m_scale;
+        size.Width  = (int)(size.Width  * scale);
+        size.Height = (int)(size.Height * scale);
+        core::rect<s32> dest(offsets[n], size);
+
         video::SColor colors[] = {color, color, color, color};
                 
         video::ITexture* texture = (fallback[n] ?
