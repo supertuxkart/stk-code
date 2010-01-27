@@ -37,15 +37,15 @@ private:
     core::matrix4       *m_matrix;
 
 public:
-         MovingTexture(core::matrix4 *matrix, const XMLNode &node);
-         MovingTexture(core::matrix4 *matrix, float dx, float dy);
-         MovingTexture(float dx, float dy);
-        ~MovingTexture();
+                 MovingTexture(core::matrix4 *matrix, const XMLNode &node);
+                 MovingTexture(core::matrix4 *matrix, float dx, float dy);
+                 MovingTexture(float dx, float dy);
+    virtual     ~MovingTexture();
 
     /** Sets the speed of the animation. */
-    void setSpeed(float dx, float dy) {m_dx = dx; m_dy = dy;}
+    void         setSpeed(float dx, float dy) {m_dx = dx; m_dy = dy;}
     /** Sets the texture matrix. */
-    void setTextureMatrix(core::matrix4 *matrix) {m_matrix=matrix;}
+    void         setTextureMatrix(core::matrix4 *matrix) {m_matrix=matrix;}
     virtual void update  (float dt);
     virtual void reset   ();
 }
