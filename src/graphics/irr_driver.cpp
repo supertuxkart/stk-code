@@ -293,6 +293,27 @@ void IrrDriver::changeResolution()
 }   // changeResolution
 
 // ----------------------------------------------------------------------------
+/** Prints statistics about rendering, e.g. number of drawn and culled 
+ *  triangles etc. Note that printing this information will also slow
+ *  down STK.
+ */
+void IrrDriver::printRenderStats()
+{
+    io::IAttributes * attr = m_scene_manager->getParameters();
+    printf("[%ls], FPS:%03d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n,
+	   m_video_driver->getName(),
+	   m_video_driver->getFPS (),
+	   (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
+	   attr->getAttributeAsInt ( "culled" ),
+	   attr->getAttributeAsInt ( "calls" ),
+	   attr->getAttributeAsInt ( "drawn_solid" ),
+	   attr->getAttributeAsInt ( "drawn_transparent" ),
+	   attr->getAttributeAsInt ( "drawn_transparent_effect" )
+	   );
+
+}   // printRenderStats
+
+// ----------------------------------------------------------------------------
 /** Loads an animated mesh and returns a pointer to it.
  *  \param filename File to load.
  */
@@ -780,7 +801,9 @@ void IrrDriver::update(float dt)
 
     }   // just to makr the begin/end scene block
     m_device->getVideoDriver()->endScene();
-    
+    // Enable this next print statement to get render information printed
+    // E.g. number of triangles rendered, culled etc.
+    //printRenderStats();
 }   // update
 
 // ----------------------------------------------------------------------------
