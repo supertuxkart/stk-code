@@ -300,7 +300,7 @@ void IrrDriver::changeResolution()
 void IrrDriver::printRenderStats()
 {
     io::IAttributes * attr = m_scene_manager->getParameters();
-    printf("[%ls], FPS:%03d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n,
+    printf("[%ls], FPS:%03d Tri:%.03fm Cull %d/%d nodes (%d,%d,%d)\n",
 	   m_video_driver->getName(),
 	   m_video_driver->getFPS (),
 	   (f32) m_video_driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000000.f ),
