@@ -110,8 +110,9 @@ public:
     void                  update(float dt);
     
     void                  changeResolution();
-    void showPointer();
-    void hidePointer();
+    void                  showPointer();
+    void                  hidePointer();
+    void                  printRenderStats();
     /** Returns the current real time, which might not be 0 at start of the
      *  application. Value in msec.
      */
