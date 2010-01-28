@@ -45,6 +45,8 @@ private:
     bool             m_sphere_map;
     bool             m_transparency;
     bool             m_alpha_blending;
+    /** True if lightmapping is enabled for this material. */
+    bool             m_lightmap;
     float            m_friction;
     /** How much the top speed is reduced per second. */
     float            m_slowdown;

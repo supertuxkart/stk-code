@@ -49,6 +49,7 @@ Material::Material(const XMLNode *node, int index)
     b=false;
     node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
     node->get("transparency",     &m_transparency      );
+    node->get("lightmap",         &m_lightmap          );
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
     node->get("sphere",           &m_sphere_map        );
@@ -97,6 +98,7 @@ void Material::init(unsigned int index)
     m_index              = index;
     m_clamp_tex          = 0;
     m_transparency       = false;
+    m_lightmap           = false;
     m_alpha_blending     = false;
     m_lighting           = true;
     m_sphere_map         = false;
@@ -135,9 +137,11 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     else if (m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     
-    if (m_sphere_map)
+    else if (m_sphere_map)
         m->MaterialType = video::EMT_SPHERE_MAP;
-    
+    else if (m_lightmap)
+        m->MaterialType = video::EMT_LIGHTMAP;
+
     if (!m_lighting)
     {
         //m->setFlag( video::EMF_LIGHTING, false );
