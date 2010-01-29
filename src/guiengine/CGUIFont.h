@@ -14,6 +14,7 @@
 #include "IReadFile.h"
 #include "irrArray.h"
 #include <map>
+#include <iostream>
 
 namespace irr
 {
@@ -39,6 +40,13 @@ class ScalableFont : public IGUIFontBitmap
     {
         irr::core::stringc m_file_name;
         bool m_has_alpha;
+        float m_scale;
+        
+        TextureInfo()
+        {
+            m_has_alpha = false;
+            m_scale = 1.0f;
+        }
     };
     
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
@@ -112,6 +120,8 @@ private:
 		s32				width;
 		u32				spriteno;
 	};
+    
+    int getCharWidth(const SFontArea& area, const bool fallback) const;
 
 	//! load & prepare font from ITexture
 	bool loadTexture(video::IImage * image, const io::path& name);

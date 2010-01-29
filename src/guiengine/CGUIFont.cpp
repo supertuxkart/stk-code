@@ -86,6 +86,11 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 core::stringc filename = xml->getAttributeValue(L"filename");
 				core::stringc fn = file_manager->getFontFile(filename.c_str()).c_str();
 				u32 i = (u32)xml->getAttributeValueAsInt(L"index");
+                
+                float scale = xml->getAttributeValueAsFloat(L"scale");
+                if (scale < 0.01f) scale = 1.0f; // FIXME: how do you check if some property exists in a cleaner way?
+                //std::cout  << "scale = " << scale << std::endl;
+                
 				core::stringw alpha = xml->getAttributeValue(L"hasAlpha");
 
                 //std::cout << "---- Adding font texture " << fn.c_str() << "; alpha=" << alpha.c_str() << std::endl;
@@ -100,6 +105,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
                 TextureInfo info;
                 info.m_file_name = fn;
                 info.m_has_alpha = (alpha == core::stringw("false"));
+                info.m_scale = scale;
                 
 				// disable mipmaps+filtering
 				//bool mipmap = Driver->getTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS);
@@ -225,6 +231,7 @@ void ScalableFont::setScale(const float scale)
 
 void ScalableFont::setMaxHeight()
 {
+    // FIXME: should consider per-texture scaling
 	MaxHeight = 0;
 	s32 t;
 
@@ -466,7 +473,7 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
 	core::dimension2d<u32> dim(0, 0);
-	core::dimension2d<u32> thisLine(0, MaxHeight);
+	core::dimension2d<u32> thisLine(0, MaxHeight*m_scale);
 
 	for (const wchar_t* p = text; *p; ++p)
 	{
@@ -494,11 +501,16 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
         const int areaID = getAreaFromCharacter(*p, &fallback);
 		const SFontArea &area = (fallback ? m_fallback_font->Areas[areaID] : Areas[areaID]);
 
+        
+        //const TextureInfo& info = (*(m_texture_files.find(area.spriteno))).second;
+        //const float char_scale = info.m_scale;
+        
 		thisLine.Width += area.underhang;
         
+        thisLine.Width += getCharWidth(area, fallback);
         
-        if (fallback) thisLine.Width += (int)((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width);
-		else          thisLine.Width += area.width + area.overhang + GlobalKerningWidth;
+        //if (fallback) thisLine.Width += (area.width + area.overhang)*m_fallback_font_scale*char_scale*m_scale + m_fallback_kerning_width;
+		//else          thisLine.Width += (area.width + area.overhang)*m_scale*char_scale + GlobalKerningWidth;
 	}
 
 	dim.Height += thisLine.Height;
@@ -506,8 +518,8 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
    // std::cout << "ScalableFont::getDimension returns : " << dim.Width << ", " << dim.Height << " --> ";
 
-    dim.Width  = (int)(dim.Width  * m_scale);
-    dim.Height = (int)(dim.Height * m_scale);
+    dim.Width  = (int)(dim.Width + 0.9f); // round up
+    dim.Height = (int)(dim.Height + 0.9f);
 
     //std::cout << dim.Width << ", " << dim.Height << std::endl;
     
@@ -590,11 +602,14 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 			continue;
 		}
 
+
         bool fallback_font = false;
         const int areaID = getAreaFromCharacter(c, &fallback_font);
         //std::cout << "Char " << c << " has area " << areaID << std::endl;
 		SFontArea& area = (fallback_font ? m_fallback_font->Areas[areaID] : Areas[areaID]);
-
+        
+        //float char_scale = m_texture_files[area.spriteno].m_scale;
+        
 		offset.X += area.underhang;
 		if ( Invisible.findFirst ( c ) < 0 )
 		{
@@ -603,9 +618,10 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
             fallback[i] = fallback_font;
 		}
         
-        if (fallback[i]) offset.X += (int)(((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width) * m_scale);
-		else             offset.X += (int)((area.width + area.overhang + GlobalKerningWidth) * m_scale);
-	}
+        //std::cout << "Char " << (char)((c >> 24) & 0xFF) << ", " << (char)((c >> 16) & 0xFF) << ", " <<
+        //                        (char)((c >> 8) & 0xFF) << ", " << (char)(c & 0xFF)  << std::endl;
+        offset.X += getCharWidth(area, fallback[i]);
+    }
 
 	//SpriteBank->draw2DSpriteBatch(indices, offsets, clip, color);
     
@@ -637,12 +653,23 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
                                   (*fallback_positions)[(*fallback_sprites)[spriteID].Frames[0].rectNumber] :
                                   positions[sprites[spriteID].Frames[0].rectNumber]);
         
-        core::dimension2d<s32> size = source.getSize();
-        float scale = fallback[n] ? m_scale*m_fallback_font_scale : m_scale;
-        size.Width  = (int)(size.Width  * scale);
-        size.Height = (int)(size.Height * scale);
-        core::rect<s32> dest(offsets[n], size);
+        const TextureInfo& info = (fallback[n] ?
+                                   (*(m_fallback_font->m_texture_files.find(texID))).second :
+                                   (*(m_texture_files.find(texID))).second
+                                   );
+        float char_scale = info.m_scale;
 
+        core::dimension2d<s32> size = source.getSize();
+        
+        float scale = (fallback[n] ? m_scale*m_fallback_font_scale : m_scale);
+        size.Width  = (int)(size.Width  * scale * char_scale);
+        size.Height = (int)(size.Height * scale * char_scale);
+        
+        // align vertically if character is smaller
+        int y_shift = (size.Height < MaxHeight*m_scale ? (MaxHeight*m_scale - size.Height)/2: 0);
+        
+        core::rect<s32> dest(offsets[n] + core::position2di(0, y_shift), size);
+        
         video::SColor colors[] = {color, color, color, color};
                 
         video::ITexture* texture = (fallback[n] ?
@@ -729,6 +756,7 @@ void ScalableFont::lazyLoadTexture(int texID)
     Driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
     
     // load texture
+    assert(m_texture_files[texID].m_file_name.size() > 0);
     SpriteBank->setTexture(texID, Driver->getTexture( m_texture_files[texID].m_file_name ));
     
     // set previous mip-map+filter state
@@ -743,6 +771,8 @@ void ScalableFont::lazyLoadTexture(int texID)
     }
     else
     {
+        assert(m_texture_files[texID].m_file_name.size() > 0);
+        
         // colorkey texture rather than alpha channel?
         if (! m_texture_files[texID].m_has_alpha)
         {
@@ -750,6 +780,31 @@ void ScalableFont::lazyLoadTexture(int texID)
         }
     }
 }
+    
+int ScalableFont::getCharWidth(const SFontArea& area, const bool fallback) const
+{
+    core::array< SGUISprite >& sprites = SpriteBank->getSprites();        
+    core::array< SGUISprite >* fallback_sprites = (m_fallback_font != NULL ?
+                                                   &m_fallback_font->SpriteBank->getSprites() :
+                                                   NULL);
+    
+    const int texID = (fallback ?
+                       (*fallback_sprites)[area.spriteno].Frames[0].textureNumber :
+                       sprites[area.spriteno].Frames[0].textureNumber);
+    
+    const TextureInfo& info = (fallback ?
+                               (*(m_fallback_font->m_texture_files.find(texID))).second :
+                                (*(m_texture_files.find(texID))).second
+                               );
+    assert(info.m_file_name.size() > 0);
+    const float char_scale = info.m_scale;
+    
+    //std::cout << "area.spriteno=" << area.spriteno << ", char_scale=" << char_scale << std::endl;
+    
+    if (fallback) return (int)(((area.width + area.overhang)*m_fallback_font_scale + m_fallback_kerning_width) * m_scale * char_scale);
+    else          return (int)((area.width + area.overhang + GlobalKerningWidth) * m_scale * char_scale);
+}
+    
     
 //! Calculates the index of the character in the text which is on a specific position.
 s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
