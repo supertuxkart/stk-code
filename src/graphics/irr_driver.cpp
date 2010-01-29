@@ -704,18 +704,18 @@ void IrrDriver::renderBulletDebugView()
  */
 void IrrDriver::displayFPS()
 {
-    gui::IGUIFont* font = GUIEngine::getFont();
-    const int fps       = m_device->getVideoDriver()->getFPS();
-
     // We will let pass some time to let things settle before trusting FPS counter
-    // even if we also ignore fps = 1 which tends to happen in first checks
-#define NOTRUST 20
-    static int notrust     = NOTRUST;
+    // even if we also ignore fps = 1, which tends to happen in first checks
+#define NO_TRUST_COUNT 25
+    static int no_trust = NO_TRUST_COUNT;
 
-    if(notrust) {
-        notrust--;
+    if(no_trust) {
+        no_trust--;
         return;
     }
+
+    gui::IGUIFont* font = GUIEngine::getFont();
+    const int fps       = m_device->getVideoDriver()->getFPS();
 
     // Min and max info tracking, per mode, so user can check game vs menus
     bool current_state     = StateManager::get()->getGameState() == GUIEngine::GAME;
@@ -728,7 +728,7 @@ void IrrDriver::displayFPS()
     {
         min = 999;
         max = 0;
-        notrust = NOTRUST;
+        no_trust = NO_TRUST_COUNT;
         prev_state = current_state;
     }
 
