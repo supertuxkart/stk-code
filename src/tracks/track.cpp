@@ -421,7 +421,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
 
     m_all_meshes.push_back(mesh);
-    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
+    mesh->setHardwareMappingHint(scene::EHM_STATIC);
     core::vector3df xyz(0,0,0);
     track_node->getXYZ(&xyz);
     core::vector3df hpr(0,0,0);
@@ -676,12 +677,13 @@ void Track::loadTrackModel(unsigned int mode_id)
             scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
             if(!mesh)
             {
-                fprintf(stderr, "Warning: Main track model '%s' in '%s' not found, aborting.\n",
+                fprintf(stderr, "Warning: model '%s' in '%s' not found, aborting.\n",
                     node->getName().c_str(), model_name.c_str());
                 exit(-1);
             }
+            mesh->setHardwareMappingHint(scene::EHM_STATIC);
             m_all_meshes.push_back(mesh);
-            scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+            scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
             core::vector3df xyz(0,0,0);
             node->getXYZ(&xyz);
             core::vector3df hpr(0,0,0);
