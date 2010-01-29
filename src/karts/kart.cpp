@@ -797,7 +797,7 @@ float Kart::handleSlipstream(float dt)
     // -------------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
     {
-        printf("Using slipstream\n");
+        //printf("Using slipstream\n");
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
         m_slip_stream->setIntensity(2.0f, NULL);
@@ -857,7 +857,7 @@ float Kart::handleSlipstream(float dt)
     // Accumulate slipstream credits now
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt 
                                                    : m_slipstream_time+dt;
-    printf("Collecting slipstream %f\n", m_slipstream_time);
+    //printf("Collecting slipstream %f\n", m_slipstream_time);
     m_slip_stream->setIntensity(m_slipstream_time, target_kart);
 
     m_slipstream_mode = SS_COLLECT;
