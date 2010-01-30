@@ -568,13 +568,14 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 		clippedRect.clipAgainst(*clip);
 		if (!clippedRect.isValid()) return;
 	}
-
+    
+    // ---- collect character locations
     const unsigned int text_size = text.size();
-	core::array<u32> indices(text_size);
+	core::array<s32> indices(text_size);
 	core::array<core::position2di> offsets(text_size);
     std::vector<bool> fallback(text_size);
     
-	for (u32 i = 0;i < text_size;i++)
+	for (u32 i = 0; i<text_size; i++)
 	{
 		wchar_t c = text[i];
 
@@ -617,14 +618,34 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 			offsets.push_back(offset);
             fallback[i] = fallback_font;
 		}
+        else
+        {
+            // invisible character. add something to the array anyway so that indices from
+            // the various arrays remain in sync
+            indices.push_back(-1);
+            offsets.push_back(offset);
+            fallback[i] = fallback_font;
+        }
         
-        //std::cout << "Char " << (char)((c >> 24) & 0xFF) << ", " << (char)((c >> 16) & 0xFF) << ", " <<
-        //                        (char)((c >> 8) & 0xFF) << ", " << (char)(c & 0xFF)  << std::endl;
+        /*
+        if (fallback_font)
+        {
+            std::cout << "Fallback : ";
+            std::cout << "Char " << (unsigned)((c >> 24) & 0xFF) << ", " << (unsigned)((c >> 16) & 0xFF) << ", " <<
+                                    (unsigned)((c >> 8) & 0xFF) << ", " << (unsigned)(c & 0xFF)  << std::endl;
+            std::cout << "    w = " << getCharWidth(area, fallback[i]) << ", fallback[" << i << "]=" << fallback[i] << std::endl;
+        }
+         */
+        
+        // std::cout << "Char " << (char)((c >> 24) & 0xFF) << ", " << (char)((c >> 16) & 0xFF) << ", " <<
+        //              (char)((c >> 8) & 0xFF) << ", " << (char)(c & 0xFF)  << std::endl;
+        
         offset.X += getCharWidth(area, fallback[i]);
     }
 
 	//SpriteBank->draw2DSpriteBatch(indices, offsets, clip, color);
     
+    // ---- do the actual rendering
     const int indiceAmount = indices.size();
     core::array< SGUISprite >& sprites = SpriteBank->getSprites();
     core::array< core::rect<s32> >& positions = SpriteBank->getPositions();
@@ -635,13 +656,14 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
     core::array< core::rect<s32> >* fallback_positions = (m_fallback_font != NULL ?
                                                           &m_fallback_font->SpriteBank->getPositions() :
                                                           NULL);
-    
+
     video::IVideoDriver* driver = GUIEngine::getDriver();
     const int spriteAmount = sprites.size();
     for (int n=0; n<indiceAmount; n++)
     {
         const int spriteID = indices[n];
         if (!fallback[n] && (spriteID < 0 || spriteID >= spriteAmount)) continue;
+        if (indices[n] == -1) continue;
         
         //assert(sprites[spriteID].Frames.size() > 0);
         
@@ -679,11 +701,12 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
         /*
         if (fallback[n])
         {
-            std::cout << "USING fallback font " << core::stringc(texture->getName()).c_str() <<
-            "; source area is " << source.UpperLeftCorner.X << ", " << source.UpperLeftCorner.Y <<
-            ", size " << source.getWidth() << ", " << source.getHeight() << "; dest = " <<
-            offsets[n].X << ", " << offsets[n].Y << std::endl;
-        }*/
+            std::cout << "USING fallback font " << core::stringc(texture->getName()).c_str()
+                      << "; source area is " << source.UpperLeftCorner.X << ", " << source.UpperLeftCorner.Y
+                      << ", size " << source.getWidth() << ", " << source.getHeight() << "; dest = "
+                      << offsets[n].X << ", " << offsets[n].Y << std::endl;
+        }
+        */
         
         if (texture == NULL)
         {
