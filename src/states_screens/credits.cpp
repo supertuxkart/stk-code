@@ -74,6 +74,53 @@ namespace GUIEngine
         return m_sections.get(m_sections.size()-1);
     }
     
+    bool getWideLine(std::ifstream& file, stringw* out)
+    {
+        if (!file.good())
+        {
+            //std::cout << "File is not good!\n";
+            return false;
+        }
+        wchar_t wide_char;
+
+        bool found_eol = false;
+        stringw line;
+        
+        char buff[2];
+        
+        while (true)
+        {
+            file.read( buff, 2 );
+            if (file.good())
+            {
+                //std::cout << buff[0] << ", " << buff[1]
+                //          << "(" << std::hex << (unsigned)buff[0] << ", " << std::hex << (unsigned)buff[1] << ")\n";
+                
+                // FIXME: endianness issues possible here?
+                wide_char = unsigned(buff[0] & 0xFF) | (unsigned(buff[1] & 0xFF) << 8);
+                line += wide_char;
+                //std::cout << "Read char " << (char)(wide_char) << " (" << std::hex << wide_char << ")" << std::endl;
+                if (wide_char == L'\n')
+                {
+                    //std::cout << "EOL\n";
+                    found_eol = true;
+                    break;
+                }
+            }
+            else
+            {
+                //std::cout << "- file not good -\n";
+                //file.get(); // if we stopped on EOL, try to skip it
+                break;
+            }
+        }
+        
+        if (!found_eol) return false;
+        *out = line;
+        //std::cout << "Read line <" << stringc(line.c_str()).c_str() << ">\n";
+        return true;
+    }
+    
     CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
     {
         reset();
@@ -84,15 +131,19 @@ namespace GUIEngine
 
         std::ifstream file( creditsfile.c_str() ) ;
         stringw line;
-        std::string getline;
-        while (std::getline( file, getline ))
+        
+        // skip Unicode header
+        file.get();
+        file.get();
+        
+        // let's assume the file is encoded as UTF-16
+        while (getWideLine( file, &line ))
         {
-            line = getline.c_str();
             line = line.trim();
             
-            if(line.size() < 1) continue; // empty line
+            if (line.size() < 1) continue; // empty line
             
-            if (line[0] == '=' && line[line.size()-1] == '=')
+            if ((line[0] & 0xFF) == '=' && (line[line.size()-1] & 0xFF) == '=')
             {
                 line = stringw( line.subString(1, line.size()-2).c_str() );
                 line = line.trim();
@@ -101,7 +152,7 @@ namespace GUIEngine
                 //std::cout << "Section : " << (char*)(cversion.c_str()) << std::endl;
                 m_sections.push_back( new CreditsSection(line)  );
             }
-            else if (line[0] == '-')
+            else if ((line[0] & 0xFF) == '-')
             {
                 line = stringw( line.subString(1, line.size()-1).c_str() );
                 line = line.trim();
@@ -120,6 +171,7 @@ namespace GUIEngine
                 getCurrentSection()->addEntry( entry );
             }
         } // end while
+        assert(m_sections.size() > 0);
         
     }
     
