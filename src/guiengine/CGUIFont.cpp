@@ -473,7 +473,7 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
 	core::dimension2d<u32> dim(0, 0);
-	core::dimension2d<u32> thisLine(0, MaxHeight*m_scale);
+	core::dimension2d<u32> thisLine(0, (int)(MaxHeight*m_scale));
 
 	for (const wchar_t* p = text; *p; ++p)
 	{
@@ -666,7 +666,7 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
         size.Height = (int)(size.Height * scale * char_scale);
         
         // align vertically if character is smaller
-        int y_shift = (size.Height < MaxHeight*m_scale ? (MaxHeight*m_scale - size.Height)/2: 0);
+        int y_shift = (size.Height < MaxHeight*m_scale ? (int)((MaxHeight*m_scale - size.Height)/2.0f) : 0);
         
         core::rect<s32> dest(offsets[n] + core::position2di(0, y_shift), size);
         
