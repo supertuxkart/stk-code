@@ -34,6 +34,8 @@ protected:
     
     void pushMenu(std::string name);
     
+    void setGameState(GameState state);
+    
 public:
     AbstractStateManager();
     virtual ~AbstractStateManager() { }

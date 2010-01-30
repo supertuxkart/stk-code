@@ -56,7 +56,7 @@ void AbstractStateManager::enterGameState()
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.push_back("race");
-    m_game_mode = GAME;
+    setGameState(GAME);
     cleanForGame();
     input_manager->setMode(InputManager::INGAME);
 }
@@ -84,12 +84,12 @@ void AbstractStateManager::pushMenu(std::string name)
     m_menu_stack.push_back(name);
     if (m_game_mode == GAME)
     {
-        m_game_mode = INGAME_MENU;
+        setGameState(INGAME_MENU);
         RaceManager::getWorld()->pause();
     }
     else
     {
-        m_game_mode = MENU;
+        setGameState(MENU);
     }
     switchToScreen(name.c_str());
 }
@@ -157,16 +157,24 @@ void AbstractStateManager::popMenu()
         {
             RaceManager::getWorld()->unpause();
         }
-        m_game_mode = GAME;
+        setGameState(GAME);
         cleanForGame();
         input_manager->setMode(InputManager::INGAME);
     }
     else
     {
-        m_game_mode = MENU;
+        setGameState(MENU);
         switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
         getCurrentScreen()->init();
     }
+}
+
+void AbstractStateManager::setGameState(GameState state)
+{
+    m_game_mode = state;
+    
+    if (m_game_mode == GAME) irr_driver->hidePointer();
+    else                     irr_driver->showPointer();
 }
 
 void AbstractStateManager::resetAndGoToScreen(Screen* screen)
@@ -178,7 +186,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.clear();
     m_menu_stack.push_back(name);
-    m_game_mode = MENU;
+    setGameState(MENU);
     sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
     switchToScreen(name.c_str());
     getCurrentScreen()->init();

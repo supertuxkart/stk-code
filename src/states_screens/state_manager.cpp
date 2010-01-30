@@ -102,6 +102,11 @@ void StateManager::resetActivePlayers()
     m_active_players.clearWithoutDeleting();
 }
 
+#if 0
+#pragma mark -
+#pragma mark misc stuff
+#endif
+
 bool StateManager::throttleFPS()
 {
     return m_game_mode != GUIEngine::GAME  &&  GUIEngine::getCurrentScreen()->throttleFPS;

@@ -22,11 +22,20 @@ using namespace irr;
 
 namespace GUIEngine
 {
-// global instance of the current dialog if any
-static ModalDialog* modalWindow = NULL;
+    /** global instance of the current dialog if any */
+    static ModalDialog* modalWindow = NULL;
+
+    /** To remember and restore the previous state */
+    bool pointer_was_shown;
+}
+
+using namespace GUIEngine;
 
 ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
 {
+    pointer_was_shown = irr_driver->isPointerShown();
+    irr_driver->showPointer();
+    
     const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
     const int w = (int)(frame_size.Width*percentWidth);
@@ -67,6 +76,10 @@ ModalDialog::~ModalDialog()
     m_irrlicht_window->remove();
     
     if (modalWindow == this) modalWindow = NULL;
+    
+    // restore previous pointer state
+    if (pointer_was_shown)  irr_driver->showPointer();
+    else                    irr_driver->hidePointer();
 }
 
 void ModalDialog::clearWindow()
@@ -153,4 +166,3 @@ Widget* ModalDialog::getFirstWidget()
     return NULL;
 }
     
-}

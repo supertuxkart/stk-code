@@ -54,7 +54,6 @@ IrrDriver *irr_driver = NULL;
 IrrDriver::IrrDriver()
 {
     file_manager->dropFileSystem();
-
     initDevice();
 }   // IrrDriver
 
@@ -70,7 +69,7 @@ void IrrDriver::initDevice()
     static bool firstTime = true;
 
     // ---- the first time, get a list of available video modes
-    if(firstTime)
+    if (firstTime)
     {
         m_device = createDevice(video::EDT_NULL);
         
@@ -191,6 +190,11 @@ void IrrDriver::initDevice()
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
 #endif
+    
+    // set cursor viasible by default (what's the default is not tooclearly documented,
+    // so let's decide ourselves...)
+    m_device->getCursorControl()->setVisible(true);
+    m_pointer_shown = true;
 }
 
 
@@ -244,13 +248,21 @@ video::E_DRIVER_TYPE IrrDriver::getEngineDriverType( int index )
 //-----------------------------------------------------------------------------
 void IrrDriver::showPointer()
 {
-    this->getDevice()->getCursorControl()->setVisible(true);
+    if (!m_pointer_shown)
+    {
+        m_pointer_shown = true;
+        this->getDevice()->getCursorControl()->setVisible(true);
+    }
 }   // showPointer
 
 //-----------------------------------------------------------------------------
 void IrrDriver::hidePointer()
 {
-    this->getDevice()->getCursorControl()->setVisible(false);
+    if (m_pointer_shown)
+    {
+        m_pointer_shown = false;
+        this->getDevice()->getCursorControl()->setVisible(false);
+    }
 }   // hidePointer
 
 //-----------------------------------------------------------------------------
