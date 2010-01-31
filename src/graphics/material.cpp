@@ -48,7 +48,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("clampU", &b);  if(b) m_clamp_tex +=UCLAMP;
     b=false;
     node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
-    node->get("transparency",     &m_transparency      );
+    node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
     node->get("alpha",            &m_alpha_blending    );
     node->get("light",            &m_lighting          );
@@ -97,7 +97,7 @@ void Material::init(unsigned int index)
 {
     m_index              = index;
     m_clamp_tex          = 0;
-    m_transparency       = false;
+    m_alpha_testing       = false;
     m_lightmap           = false;
     m_alpha_blending     = false;
     m_lighting           = true;
@@ -127,7 +127,7 @@ void Material::install(bool is_full_path)
  */
 void  Material::setMaterialProperties(video::SMaterial *m) const
 {
-    if (m_transparency)
+    if (m_alpha_testing)
         // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
         // scene_manager->getParameters()->setAttribute(
         //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
@@ -137,18 +137,42 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     else if (m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     
-    else if (m_sphere_map)
-        m->MaterialType = video::EMT_SPHERE_MAP;
-    else if (m_lightmap)
-        m->MaterialType = video::EMT_LIGHTMAP;
+    if (m_sphere_map) m->MaterialType = video::EMT_SPHERE_MAP;
+    
+    if (m_lightmap)   m->MaterialType = video::EMT_LIGHTMAP;
 
     if (!m_lighting)
     {
         //m->setFlag( video::EMF_LIGHTING, false );
-        m->AmbientColor = video::SColor(255, 255, 255, 255);
-        m->DiffuseColor = video::SColor(255, 255, 255, 255);
+        m->AmbientColor  = video::SColor(255, 255, 255, 255);
+        m->DiffuseColor  = video::SColor(255, 255, 255, 255);
         m->EmissiveColor = video::SColor(255, 255, 255, 255);
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
+    if (m_clamp_tex & UCLAMP)
+    {
+        //  m->setFlag();
+        //  n1->getMaterial(0).TextureLayer[0].TextureWrap = video::ETC_CLAMP;
+        /**
+        //! Texture is clamped to the last pixel
+		ETC_CLAMP,
+		//! Texture is clamped to the edge pixel
+		ETC_CLAMP_TO_EDGE,
+		//! Texture is clamped to the border pixel (if exists)
+		ETC_CLAMP_TO_BORDER,
+        */
+        for (unsigned int n=0; n<video::MATERIAL_MAX_TEXTURES; n++)
+        {
+            m->TextureLayer[n].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
+        }
+    }
+    if (m_clamp_tex & VCLAMP)
+    {
+        for (unsigned int n=0; n<video::MATERIAL_MAX_TEXTURES; n++)
+        {
+            m->TextureLayer[n].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+        }
+    }
+    
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties

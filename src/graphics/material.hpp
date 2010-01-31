@@ -43,7 +43,7 @@ private:
     int              m_clamp_tex;
     bool             m_lighting;
     bool             m_sphere_map;
-    bool             m_transparency;
+    bool             m_alpha_testing;
     bool             m_alpha_blending;
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
