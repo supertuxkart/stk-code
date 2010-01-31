@@ -155,7 +155,7 @@ namespace GUIEngine
             else if ((line[0] & 0xFF) == '-')
             {
                 line = stringw( line.subString(1, line.size()-1).c_str() );
-                line = line.trim();
+                //line = line.trim();
                 
                 //stringc cversion = line.c_str();
                 //std::cout << "---- Sub-Entry : " << (char*)(cversion.c_str()) << std::endl;
