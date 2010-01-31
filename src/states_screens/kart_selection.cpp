@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "kart_selection.hpp"
@@ -956,7 +957,8 @@ void KartSelectionScreen::init()
         if (prop->getIdent() == default_kart)
         {
             std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+            const bool locked = unlock_manager->isLocked(prop->getIdent());
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
             //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
             break;
         }
@@ -969,7 +971,8 @@ void KartSelectionScreen::init()
         if (prop->getIdent() != default_kart)
         {
             std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str());
+            const bool locked = unlock_manager->isLocked(prop->getIdent());
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
             //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
         }
     }
@@ -1243,6 +1246,10 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
                 w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
             }
+        }
+        else if (selection == "locked")
+        {
+            unlock_manager->playLockSound();
         }
         else
         {        
