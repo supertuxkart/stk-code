@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-31 11:54-0500\n"
+"POT-Creation-Date: 2010-01-31 13:20-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,6 +74,11 @@ msgid ""
 "join the game."
 msgstr ""
 
+#. I18N: Game mode
+#: src/race/race_manager.hpp:121
+msgid "3 Strikes Battle"
+msgstr ""
+
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 #: data/po/gui_strings.h:150
@@ -119,10 +124,7 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: Kart group
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: track group
 #: data/po/gui_strings.h:11 data/po/gui_strings.h:174
-#: data/po/gui_strings.h:432
 msgid "Add-Ons"
 msgstr ""
 
@@ -130,10 +132,7 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: Kart group
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: track group
 #: data/po/gui_strings.h:15 data/po/gui_strings.h:182
-#: data/po/gui_strings.h:436
 msgid "All"
 msgstr ""
 
@@ -273,7 +272,7 @@ msgid "Choose a Kart"
 msgstr ""
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
-#: data/po/gui_strings.h:487
+#: data/po/gui_strings.h:475
 msgid "Collect Nitro in Math Class"
 msgstr ""
 
@@ -284,7 +283,7 @@ msgid "Collect blue boxes : they will give you weapons or other powerups"
 msgstr ""
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
-#: data/po/gui_strings.h:463
+#: data/po/gui_strings.h:451
 msgid "Collect the Pharaohs Treasure"
 msgstr ""
 
@@ -298,7 +297,7 @@ msgid ""
 msgstr ""
 
 #. I18N: ./data/grandprix/alltracks.challenge
-#: data/po/gui_strings.h:448
+#: data/po/gui_strings.h:436
 msgid ""
 "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
 msgstr ""
@@ -375,45 +374,45 @@ msgid "Final lap!"
 msgstr ""
 
 #. I18N: ./data/tracks/jungle/jungle.challenge
-#: data/po/gui_strings.h:502
+#: data/po/gui_strings.h:490
 msgid "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
 msgstr ""
 
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
-#: data/po/gui_strings.h:508
+#: data/po/gui_strings.h:496
 msgid "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
 msgstr ""
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
-#: data/po/gui_strings.h:478
+#: data/po/gui_strings.h:466
 msgid ""
 "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
 msgstr ""
 
 #. I18N: ./data/tracks/jungle/jungle.challenge
-#: data/po/gui_strings.h:499
+#: data/po/gui_strings.h:487
 msgid "Finish Race track in 2:40"
 msgstr ""
 
 #. I18N: ./data/tracks/canyon/canyon.challenge
-#: data/po/gui_strings.h:475
+#: data/po/gui_strings.h:463
 msgid "Finish Tux Tollway track in 3:35"
 msgstr ""
 
 #. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
-#: data/po/gui_strings.h:505
+#: data/po/gui_strings.h:493
 msgid "Finish the City track in 4:20"
 msgstr ""
 
 #. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
-#: data/po/gui_strings.h:490
+#: data/po/gui_strings.h:478
 msgid ""
 "Finish with at least 6 points of nitro on three laps of Oliver's Math Class "
 "in under 52 seconds."
 msgstr ""
 
 #. I18N: ./data/grandprix/tothemoonandback.challenge
-#: data/po/gui_strings.h:466
+#: data/po/gui_strings.h:454
 msgid ""
 "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under "
 "2:20 minutes."
@@ -430,13 +429,18 @@ msgstr ""
 msgid "Fire"
 msgstr ""
 
+#. I18N: Game mode
+#: src/race/race_manager.hpp:119
+msgid "Follow the Leader"
+msgstr ""
+
 #. I18N: ./data/tracks/city/city.challenge
-#: data/po/gui_strings.h:481
+#: data/po/gui_strings.h:469
 msgid "Follow the Leader in the Jungle"
 msgstr ""
 
 #. I18N: ./data/grandprix/atworldsend.challenge
-#: data/po/gui_strings.h:451
+#: data/po/gui_strings.h:439
 msgid "Follow the Leader on a Desert Island"
 msgstr ""
 
@@ -551,7 +555,7 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:83
 #: src/states_screens/challenges.cpp:83
 #: src/states_screens/race_setup_screen.cpp:175
-#: src/states_screens/tracks_screen.cpp:101
+#: src/states_screens/tracks_screen.cpp:110
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr ""
 
@@ -637,6 +641,11 @@ msgstr ""
 #. I18N: Key binding
 #: data/po/gui_strings.h:316
 msgid "Nitro"
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:115
+msgid "Normal Race"
 msgstr ""
 
 #. I18N: ./data/gui/racesetup.stkgui
@@ -751,7 +760,7 @@ msgstr ""
 msgid "Random Kart"
 msgstr ""
 
-#: src/states_screens/tracks_screen.cpp:108
+#: src/states_screens/tracks_screen.cpp:117
 msgid "Random Track"
 msgstr ""
 
@@ -844,9 +853,7 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/karts.stkgui
 #. I18N: Kart group
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: track group
-#: data/po/gui_strings.h:7 data/po/gui_strings.h:170 data/po/gui_strings.h:428
+#: data/po/gui_strings.h:7 data/po/gui_strings.h:170
 msgid "Standard"
 msgstr ""
 
@@ -886,6 +893,11 @@ msgstr ""
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
+msgstr ""
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:117
+msgid "Time Trial"
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
@@ -944,58 +956,58 @@ msgid "Weapons"
 msgstr ""
 
 #. I18N: ./data/followtheleader.challenge
-#: data/po/gui_strings.h:439
+#: data/po/gui_strings.h:427
 msgid "Win Penguin Playground Grand Prix"
 msgstr ""
 
 #. I18N: ./data/followtheleader.challenge
-#: data/po/gui_strings.h:442
+#: data/po/gui_strings.h:430
 msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
 msgstr ""
 
 #. I18N: ./data/grandprix/snagdrive.challenge
-#: data/po/gui_strings.h:457
+#: data/po/gui_strings.h:445
 msgid "Win To the Moon and Back Grand Prix"
 msgstr ""
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
-#: data/po/gui_strings.h:496
+#: data/po/gui_strings.h:484
 msgid ""
 "Win a 1 lap Head to Head on Tux Tollway against 1 'Racer' level AI kart."
 msgstr ""
 
 #. I18N: ./data/karts/gnu/gnu.challenge
-#: data/po/gui_strings.h:472
+#: data/po/gui_strings.h:460
 msgid "Win a 4 lap race on Snow Mountain against 4 'Racer' level AI kart."
 msgstr ""
 
 #. I18N: ./data/tracks/city/city.challenge
-#: data/po/gui_strings.h:484
+#: data/po/gui_strings.h:472
 msgid "Win a Follow the Leader race with 3 AI karts in the Amazonian Jungle."
 msgstr ""
 
 #. I18N: ./data/grandprix/atworldsend.challenge
-#: data/po/gui_strings.h:454
+#: data/po/gui_strings.h:442
 msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
 msgstr ""
 
 #. I18N: ./data/tracks/fortmagma/fortmagma.challenge
-#: data/po/gui_strings.h:493
+#: data/po/gui_strings.h:481
 msgid "Win a Head to Head on Tux Tollway"
 msgstr ""
 
 #. I18N: ./data/karts/gnu/gnu.challenge
-#: data/po/gui_strings.h:469
+#: data/po/gui_strings.h:457
 msgid "Win a race on Snow Mountain"
 msgstr ""
 
 #. I18N: ./data/grandprix/alltracks.challenge
-#: data/po/gui_strings.h:445
+#: data/po/gui_strings.h:433
 msgid "Win the At World's End Grand Prix"
 msgstr ""
 
 #. I18N: ./data/grandprix/snagdrive.challenge
-#: data/po/gui_strings.h:460
+#: data/po/gui_strings.h:448
 msgid "Win the To the Moon and Back Grand Prix with 3 'Racer' Level AI karts."
 msgstr ""
 

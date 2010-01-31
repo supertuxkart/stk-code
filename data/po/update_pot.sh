@@ -2,7 +2,7 @@
 #
 # ./data/po/update_pot.sh
 
-CPP_FILE_LIST=`find ./src -name '*.cpp' -print`
+CPP_FILE_LIST="`find ./src -name '*.cpp' -print` `find ./src -name '*.hpp' -print`"
 LISP_FILE_LIST="`find ./data -name '*.track' -print` `find ./data -name '*.challenge' -print` `find ./data -name '*.grandprix' -print`"
 XML_FILE_LIST=`find ./data -name '*.xml' -print`
 STKGUI_FILE_LIST=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print`
