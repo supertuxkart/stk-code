@@ -101,6 +101,7 @@ void RibbonWidget::add()
         
         const int widget_x = one_button_space*(i+1) - one_button_space/2;
         
+        // ---- tab ribbons
         if (getRibbonType() == RIBBON_TABS)
         {
             IGUIButton * subbtn = NULL;
@@ -160,7 +161,7 @@ void RibbonWidget::add()
             
             m_children[i].m_element = subbtn;
         }
-        // ---- non-tabs ribbons
+        // ---- icon ribbons
         else if (m_children[i].m_type == WTYPE_ICON_BUTTON)
         {
             // find how much space to keep for the label under the button.

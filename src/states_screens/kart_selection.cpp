@@ -697,6 +697,24 @@ KartHoverListener* karthoverListener = NULL;
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
     g_dispatcher = new FocusDispatcher(this);
+    
+    // Dynamically add tabs
+    // FIXME: it's not very well documented that RibbonWidgets can have dynamically generated contents
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    assert( tabs != NULL );
+    
+    tabs->m_children.clearAndDeleteAll();
+    
+    const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
+    
+    const int amount = groups.size();
+    for (int n=0; n<amount; n++)
+    {
+        ButtonWidget* item = new ButtonWidget();
+        item->m_text = groups[n].c_str(); // FIXME: i18n ?
+        item->m_properties[PROP_ID] = groups[n];
+        tabs->m_children.push_back(item);
+    }
 }
 // -----------------------------------------------------------------------------
 void KartSelectionScreen::forgetWhatWasLoaded()

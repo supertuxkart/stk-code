@@ -22,11 +22,15 @@
         <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
                      child_width="80" child_height="80"/>
     </box>
+    
+    <!-- Groups will be added dynamically at runtime -->
     <tabs width="100%" height="25" id="kartgroups">
+    <!--
         <button id="standard" I18N="Kart group" text="Standard"/>
         <button id="addons" I18N="Kart group" text="Add-Ons"/>
         <button id="special" I18N="Kart group" text="Special"/>
         <button id="all" I18N="Kart group" text="All"/>
+        -->
     </tabs>
         
     <spacer height="15" width="25"/>

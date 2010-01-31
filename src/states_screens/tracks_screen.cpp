@@ -31,6 +31,23 @@ using namespace irr::video;
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
+    // Dynamically add tabs
+    // FIXME: it's not very well documented that RibbonWidgets can have dynamically generated contents
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+    assert( tabs != NULL );
+    
+    tabs->m_children.clearAndDeleteAll();
+    
+    const std::vector<std::string>& groups = track_manager->getAllGroups();
+    
+    const int amount = groups.size();
+    for (int n=0; n<amount; n++)
+    {
+        ButtonWidget* item = new ButtonWidget();
+        item->m_text = groups[n].c_str(); // FIXME: i18n ?
+        item->m_properties[PROP_ID] = groups[n];
+        tabs->m_children.push_back(item);
+    }
 }
 
 
@@ -78,6 +95,28 @@ void TracksScreen::init()
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
+    
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+    assert( tabs != NULL );
+    
+    /*
+    tracks->m_children.clearAndDeleteAll();
+    
+    ButtonWidget* item1 = new ButtonWidget();
+    item1->m_text = _("Standard");
+    item1->m_proeprties[PROP_ID] = "stdtracks";
+    tracks->m_children.push_back(item1);
+    
+    ButtonWidget* item2 = new ButtonWidget();
+    item2->m_text = _("Add-Ons");
+    item2->m_proeprties[PROP_ID] = "addontracks";
+    tracks->m_children.push_back(item2);
+*/
+    //tabs->clearItems();
+    //tabs->addItem( _("Standard"), "stdtracks", "" /* image */);
+    //tabs->addItem( _("Add-Ons"), "stdtracks", "" /* image */);
+    //tabs->addItem( _("Special"), "stdtracks", "" /* image */);
+    //tabs->updateItemDisplay();
     
     // Re-build track list everytime (accounts for locking changes, etc.)
     w->clearItems();

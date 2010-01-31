@@ -21,11 +21,8 @@
         <spacer width="20" height="13" />
     </box>
 
-    <tabs width="100%" height="25" id="trackgroups">
-        <button id="standard" I18N="track group" text="Standard"/>
-        <button id="addons" I18N="track group" text="Add-Ons"/>
-        <button id="all" I18N="track group" text="All"/>
-    </tabs>
+    <!-- Populated dynamically at runtime -->
+    <tabs width="100%" height="25" id="trackgroups"> </tabs>
 
     <spacer width="20" height="13" />
     
