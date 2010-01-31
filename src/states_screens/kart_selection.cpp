@@ -46,6 +46,7 @@ using namespace GUIEngine;
 using irr::core::stringw;
 
 const char* RANDOM_KART_ID = "randomkart";
+const char* ALL_KART_GROUPS_ID  = "all";
 
 class PlayerKartWidget;
     
@@ -715,6 +716,12 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
         item->m_properties[PROP_ID] = groups[n];
         tabs->m_children.push_back(item);
     }
+    
+    ButtonWidget* item = new ButtonWidget();
+    //I18N: name of the tab that will show tracks from all groups
+    item->m_text = _("All");
+    item->m_properties[PROP_ID] = ALL_KART_GROUPS_ID;
+    tabs->m_children.push_back(item);
 }
 // -----------------------------------------------------------------------------
 void KartSelectionScreen::forgetWhatWasLoaded()
@@ -1225,7 +1232,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         // TODO : preserve selection of karts for all players
         // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
         
-        if (selection == "all")
+        if (selection == ALL_KART_GROUPS_ID)
         {
             const int kart_amount = kart_properties_manager->getNumberOfKarts();
             

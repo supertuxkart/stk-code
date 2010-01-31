@@ -29,6 +29,8 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;
 
+const char* ALL_TRACK_GROUPS_ID = "all";
+
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
     // Dynamically add tabs
@@ -48,6 +50,12 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
         item->m_properties[PROP_ID] = groups[n];
         tabs->m_children.push_back(item);
     }
+    
+    ButtonWidget* item = new ButtonWidget();
+    //I18N: name of the tab that will show tracks from all groups
+    item->m_text = _("All");
+    item->m_properties[PROP_ID] = ALL_TRACK_GROUPS_ID;
+    tabs->m_children.push_back(item);
 }
 
 
