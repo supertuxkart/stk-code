@@ -149,6 +149,9 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->EmissiveColor = video::SColor(255, 255, 255, 255);
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
+    
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
+
     if (m_clamp_tex & UCLAMP)
     {
         //  m->setFlag();
@@ -173,6 +176,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
             m->TextureLayer[n].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
         }
     }
-    
+#endif
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties
