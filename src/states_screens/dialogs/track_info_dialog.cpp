@@ -40,6 +40,7 @@ using namespace irr::video;
 using namespace irr::core;
 using namespace GUIEngine;
 
+// ------------------------------------------------------------------------------------------------------
 
 TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
                                  ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
@@ -58,93 +59,18 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     a->setTabStop(false);
 
     // ---- High Scores & track info
-    // TODO: update highscores display when number of laps changes
-
     const int hscores_y_from = y1;
     const int hscores_y_to = y1 + (y2 - y1)*2/3;
-
-    core::rect< s32 > hiscores_title_area(5, hscores_y_from, m_area.getWidth()/2, hscores_y_from + 30);
-    stringw text = _("= Highscores =");
-    IGUIStaticText* hscores_header = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), hiscores_title_area,
-                                                                           false , true , // border, word warp
-                                                                            m_irrlicht_window);
-    hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-
+    addHighScoreWidgets(hscores_y_from, hscores_y_to);
+    updateHighScores();
     
-    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
-
-    std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
-    const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
-    
-    HighscoreEntry* highscores = highscore_manager->getHighscoreEntry(type,
-                                                                      race_manager->getNumKarts(),
-                                                                      race_manager->getDifficulty(),
-                                                                      trackIdent,
-                                                                      race_manager->getNumLaps()); 
-    const int amount = highscores->getNumberEntries();
-    
-    std::string kart_name;
-    std::string name;
-    float time;
-    
-    // fill highscore entries
-    for (int n=0; n<HIGHSCORE_COUNT; n++)
-    {
-        const int from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+1)/(HIGHSCORE_COUNT+1);
-        const int next_from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+2)/(HIGHSCORE_COUNT+1);
-
-        const int gap = 3;
-        const int icon_size = next_from_y - from_y - gap*2;
-        
-        core::rect< s32 > icon_area(5, from_y + gap, 5 + icon_size, from_y + icon_size);
-        
-        m_kart_icons[n] = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
-        m_kart_icons[n]->setImage(texture);
-        m_kart_icons[n]->setScaleImage(true);
-        m_kart_icons[n]->setTabStop(false);
-        m_kart_icons[n]->setUseAlphaChannel(true);
-        
-        core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
-
-        irr::core::stringw line;
-        
-        // Check if this entry is filled or still empty
-        if (n < amount)
-        {
-            char buffer[256];
-            
-            highscores->getEntry(n, kart_name, name, &time);
-            sprintf(buffer, "%s : %.2f s\n", name.c_str(), time);
-                        
-            const KartProperties* prop = kart_properties_manager->getKart(kart_name);
-            if (prop != NULL)
-            {
-                std::string icon_path = file_manager->getDataDir() ;
-                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
-                m_kart_icons[n]->setImage(kart_icon_texture);
-            }
-            line = buffer;
-        }
-        else
-        {
-            //I18N: for empty highscores entries
-            line = _("(Empty)");
-            line += "\n";
-        }
-        
-        m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( line.c_str(), entry_area,
-                                                                       false , true , // border, word warp
-                                                                        m_irrlicht_window);
-        
-    }
-    
+    // ---- Track credits
     Track* track = track_manager->getTrack(trackIdent);
     
     core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
-    text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
+    stringw text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
 
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
                                                                   creator_info_area, false , true , // border, word warp
@@ -180,6 +106,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     m_spinner->h = y3 - y2 - 15;
     m_spinner->setParent(m_irrlicht_window);
     
+    m_spinner->m_properties[PROP_ID] = "lapcountspinner";
     m_spinner->m_properties[PROP_MIN_VALUE] = "1";
     m_spinner->m_properties[PROP_MAX_VALUE] = "99";
     
@@ -210,6 +137,8 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 TrackInfoDialog::~TrackInfoDialog()
 {
     // Place focus back on selected track, in case the dialog was cancelled and we're back to
@@ -224,6 +153,102 @@ TrackInfoDialog::~TrackInfoDialog()
 
 // ------------------------------------------------------------------------------------------------------
 
+void TrackInfoDialog::addHighScoreWidgets(const int hscores_y_from, const int hscores_y_to)
+{
+    ITexture* texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
+
+    core::rect< s32 > hiscores_title_area(5, hscores_y_from, m_area.getWidth()/2, hscores_y_from + 30);
+    stringw text = _("= Highscores =");
+    IGUIStaticText* hscores_header = GUIEngine::getGUIEnv()->addStaticText( text.c_str(), hiscores_title_area,
+                                                                           false , true , // border, word warp
+                                                                           m_irrlicht_window);
+    hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    
+
+    
+    // fill highscore entries
+    for (int n=0; n<HIGHSCORE_COUNT; n++)
+    {
+        const int from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+1)/(HIGHSCORE_COUNT+1);
+        const int next_from_y = hscores_y_from + (hscores_y_to - hscores_y_from)*(n+2)/(HIGHSCORE_COUNT+1);
+        
+        const int gap = 3;
+        const int icon_size = next_from_y - from_y - gap*2;
+        
+        core::rect< s32 > icon_area(5, from_y + gap, 5 + icon_size, from_y + icon_size);
+        
+        m_kart_icons[n] = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
+        m_kart_icons[n]->setImage(texture);
+        m_kart_icons[n]->setScaleImage(true);
+        m_kart_icons[n]->setTabStop(false);
+        m_kart_icons[n]->setUseAlphaChannel(true);
+
+        core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
+        m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( L"", entry_area,
+                                                                       false , true , // border, word warp
+                                                                       m_irrlicht_window);
+    }
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void TrackInfoDialog::updateHighScores()
+{
+    std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
+    const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
+    
+    HighscoreEntry* highscores = highscore_manager->getHighscoreEntry(type,
+                                                                      race_manager->getNumKarts(),
+                                                                      race_manager->getDifficulty(),
+                                                                      m_track_ident,
+                                                                      race_manager->getNumLaps()); 
+    const int amount = highscores->getNumberEntries();
+    
+    std::string kart_name;
+    std::string name;
+    float time;
+    
+    // fill highscore entries
+    for (int n=0; n<HIGHSCORE_COUNT; n++)
+    {        
+        irr::core::stringw line;
+        
+        // Check if this entry is filled or still empty
+        if (n < amount)
+        {
+            char buffer[256];
+            
+            highscores->getEntry(n, kart_name, name, &time);
+            sprintf(buffer, "%s : %.2f s\n", name.c_str(), time);
+            
+            const KartProperties* prop = kart_properties_manager->getKart(kart_name);
+            if (prop != NULL)
+            {
+                std::string icon_path = file_manager->getDataDir() ;
+                icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                m_kart_icons[n]->setImage(kart_icon_texture);
+            }
+            line = buffer;
+        }
+        else
+        {
+            //I18N: for empty highscores entries
+            line = _("(Empty)");
+            line += "\n";
+            
+            ITexture* no_kart_texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
+            m_kart_icons[n]->setImage(no_kart_texture);
+
+        }
+        
+        m_highscore_entries[n]->setText( line.c_str() );
+        
+    }    
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 // FIXME : this probably doesn't belong here
 void startGame(const std::string trackIdent, const int num_laps)
 {
@@ -231,7 +256,7 @@ void startGame(const std::string trackIdent, const int num_laps)
     
     IVideoDriver* driver = GUIEngine::getDriver();
     
-    // TODO : draw a loading screen
+    //TODO?: draw a loading screen
     driver->endScene();
     driver->beginScene(true, false);
     driver->endScene();
@@ -248,13 +273,17 @@ void startGame(const std::string trackIdent, const int num_laps)
     
     race_manager->startNew();
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 void TrackInfoDialog::onEnterPressedInternal()
 {
     const int num_laps = m_spinner->getValue();
     startGame(m_track_ident, num_laps);
 }
+
 // ------------------------------------------------------------------------------------------------------   
+
 GUIEngine::EventPropagation TrackInfoDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "start" )
@@ -263,5 +292,12 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(std::string& eventSour
         startGame(m_track_ident, num_laps);
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "lapcountspinner")
+    {
+        const int num_laps = m_spinner->getValue();
+        race_manager->setNumLaps(num_laps);
+        updateHighScores();
+    }
+    
     return GUIEngine::EVENT_LET;
 }

@@ -35,6 +35,9 @@ class TrackInfoDialog : public GUIEngine::ModalDialog
     irr::gui::IGUIImage* m_kart_icons[HIGHSCORE_COUNT];
     irr::gui::IGUIStaticText* m_highscore_entries[HIGHSCORE_COUNT];
     
+    void addHighScoreWidgets(const int hscores_y_from, const int hscores_y_to);
+    void updateHighScores();
+    
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
