@@ -38,7 +38,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
     
-    const int y_bottom = m_area.getHeight() - 2*(buttonHeight + 10) - 20;
+    const int y_bottom = m_area.getHeight() - 2*(buttonHeight + 10) - 10;
 
     core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
     
@@ -73,7 +73,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         const int textWidth = font->getDimension( widget->m_text.c_str() ).Width + 40;
         
         widget->x = m_area.getWidth()/2 - textWidth/2;
-        widget->y = y_bottom + buttonHeight + 20;
+        widget->y = y_bottom + buttonHeight + 10;
         widget->w = textWidth;
         widget->h = buttonHeight;
         widget->setParent(m_irrlicht_window);
