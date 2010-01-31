@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-24 10:33-0500\n"
-"PO-Revision-Date: 2010-01-24 10:35-0500\n"
+"POT-Creation-Date: 2010-01-31 11:54-0500\n"
+"PO-Revision-Date: 2010-01-31 11:57-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -408,7 +408,7 @@ msgid "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under 
 msgstr "Ramasse au moins 9 points de nitro en 3 tours sur la piste 'Sables mouvants' en 2:20."
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:75
+#: src/states_screens/race_gui.cpp:76
 msgid "Finished"
 msgstr "Fini"
 
@@ -476,7 +476,7 @@ msgstr ""
 msgid "General"
 msgstr "Général"
 
-#: src/states_screens/race_gui.cpp:80
+#: src/states_screens/race_gui.cpp:81
 msgid "Go!"
 msgstr "Partez!"
 
@@ -521,7 +521,7 @@ msgstr "Intermédiaire"
 msgid "Keyboard %i"
 msgstr "Clavier %i"
 
-#: src/states_screens/race_gui.cpp:76
+#: src/states_screens/race_gui.cpp:77
 msgid "Lap"
 msgstr "Tour"
 
@@ -758,7 +758,7 @@ msgid "Random Track"
 msgstr "Piste aléatoire"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:78
+#: src/states_screens/race_gui.cpp:79
 msgid "Ready!"
 msgstr "À vos marques..."
 
@@ -804,7 +804,7 @@ msgstr "vise la seconde place, car lorsque le compte à rebours atteint zéro, l
 msgid "Select a game mode"
 msgstr "Choisis un mode de jeu"
 
-#: src/states_screens/race_gui.cpp:79
+#: src/states_screens/race_gui.cpp:80
 msgid "Set!"
 msgstr "Prêts"
 
@@ -897,7 +897,6 @@ msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr "Contre la montre : aucun bonus dans les pistes - seule ton habileté compte !"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:45
-#, fuzzy
 msgid ""
 "To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
 "\n"
@@ -905,7 +904,7 @@ msgid ""
 msgstr ""
 "Pour ajouter un nouveau Gamepad ou Joystick, assure-toi simplement qu'il est connecté avant d'ouvrir SuperTuxKart, il apparaitra automatiquement dans la liste.\n"
 "\n"
-"Pour ajouter une configuration clavier supplémentaire, tu peux utiliser le bouton ci-dessous. TOUTEFOIS, il est important de noter que la majorité des claviers ne peuvent pas gérer plus de quelques touches enfoncées à la fois, ce serait donc inapproprié pour le jeu multijoueur."
+"Pour ajouter une configuration clavier supplémentaire, tu peux utiliser le bouton ci-dessous. TOUTEFOIS, il est important de noter que la majorité des claviers ne peuvent pas gérer plus de quelques touches enfoncées à la fois, ce serait donc inapproprié pour le jeu multijoueur. (Il demeure possible de connected plusieurs claviers, mais chaque joueur doit tout de même avoir des touches distinctes)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu

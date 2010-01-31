@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-24 10:33-0500\n"
+"POT-Creation-Date: 2010-01-31 11:54-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,7 +420,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Shown at the end of a race
-#: src/states_screens/race_gui.cpp:75
+#: src/states_screens/race_gui.cpp:76
 msgid "Finished"
 msgstr ""
 
@@ -487,7 +487,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:80
+#: src/states_screens/race_gui.cpp:81
 msgid "Go!"
 msgstr ""
 
@@ -534,7 +534,7 @@ msgstr ""
 msgid "Keyboard %i"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:76
+#: src/states_screens/race_gui.cpp:77
 msgid "Lap"
 msgstr ""
 
@@ -756,7 +756,7 @@ msgid "Random Track"
 msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui.cpp:78
+#: src/states_screens/race_gui.cpp:79
 msgid "Ready!"
 msgstr ""
 
@@ -807,7 +807,7 @@ msgstr ""
 msgid "Select a game mode"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:79
+#: src/states_screens/race_gui.cpp:80
 msgid "Set!"
 msgstr ""
 
