@@ -767,9 +767,14 @@ void IrrDriver::update(float dt)
         main_loop->abort();
     }
     
-    m_device->getVideoDriver()->beginScene(false, true, video::SColor(255,100,101,140));
+    const bool inRace = race_manager->raceIsActive();
+    // With bullet debug view we have to clear the back buffer, but
+    // that's not necessary for non-debug
+    bool back_buffer_clear = inRace && UserConfigParams::m_bullet_debug;
+    m_device->getVideoDriver()->beginScene(back_buffer_clear,
+                                           true, video::SColor(255,100,101,140));
 
-    {   // Just to mark the beding/end scene block
+    {   // Just to mark the begin/end scene block
         GUIEngine::GameState state = StateManager::get()->getGameState();
         if (state != GUIEngine::GAME)
         {
@@ -782,10 +787,9 @@ void IrrDriver::update(float dt)
             }
         }
 
-        const bool inRace = race_manager->raceIsActive();
         if (inRace)
         {
-            if (UserConfigParams::m_bullet_debug) 
+            if (UserConfigParams::m_bullet_debug)
             {
                 renderBulletDebugView();
             }
@@ -816,13 +820,18 @@ void IrrDriver::update(float dt)
             m_scene_manager->drawAll();
         }
         
-       // Either render the gui, or the global elements of the race gui.
-        GUIEngine::render(dt);
+        // The render and displayFPS calls interfere with bullet debug
+        // rendering, so they can not be called.
+        if(!inRace || !UserConfigParams::m_bullet_debug)
+        {
+            // Either render the gui, or the global elements of the race gui.
+            GUIEngine::render(dt);
 
-        // draw FPS if enabled
-        if ( UserConfigParams::m_display_fps ) displayFPS();
+            // draw FPS if enabled
+            if ( UserConfigParams::m_display_fps ) displayFPS();
+        }
 
-    }   // just to makr the begin/end scene block
+    }   // just to mark the begin/end scene block
     m_device->getVideoDriver()->endScene();
     // Enable this next print statement to get render information printed
     // E.g. number of triangles rendered, culled etc.
