@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-01-31 13:20-0500\n"
-"PO-Revision-Date: 2010-01-31 13:36-0500\n"
+"PO-Revision-Date: 2010-02-01 16:23-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -913,7 +913,7 @@ msgid ""
 msgstr ""
 "Pour ajouter un nouveau Gamepad ou Joystick, assure-toi simplement qu'il est connecté avant d'ouvrir SuperTuxKart, il apparaitra automatiquement dans la liste.\n"
 "\n"
-"Pour ajouter une configuration clavier supplémentaire, tu peux utiliser le bouton ci-dessous. TOUTEFOIS, il est important de noter que la majorité des claviers ne peuvent pas gérer plus de quelques touches enfoncées à la fois, ce serait donc inapproprié pour le jeu multijoueur. (Il demeure possible de connected plusieurs claviers, mais chaque joueur doit tout de même avoir des touches distinctes)"
+"Pour ajouter une configuration clavier supplémentaire, tu peux utiliser le bouton ci-dessous. TOUTEFOIS, il est important de noter que la majorité des claviers ne peuvent pas gérer plus de quelques touches enfoncées à la fois et sont donc inappropriés pour le jeu multijoueur. (Il demeure possible de connecter plusieurs claviers, mais chaque joueur doit tout de même avoir des touches distinctes)"
 
 #. I18N: ./data/gui/help2.stkgui
 #. I18N: In the help menu
