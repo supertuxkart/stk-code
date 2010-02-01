@@ -28,8 +28,8 @@
 #include "utils/string_utils.hpp"
 
 
-#define UCLAMP   1
-#define VCLAMP   2
+const unsigned int UCLAMP = 1;
+const unsigned int VCLAMP = 2;
 
 //-----------------------------------------------------------------------------
 /** Create a new material using the parameters specified in the xml file.
@@ -38,16 +38,17 @@
  */
 Material::Material(const XMLNode *node, int index)
 {
+    
     node->get("name", &m_texname);
-    if(m_texname=="")
+    if (m_texname=="")
     {
         throw std::runtime_error("No texture name specified in %s file\n");
     }
     init(index);
-    bool b=false;
-    node->get("clampU", &b);  if(b) m_clamp_tex +=UCLAMP;
-    b=false;
-    node->get("clampV", &b);  if(b) m_clamp_tex +=VCLAMP;
+    bool b = false;
+    node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP;
+    b = false;
+    node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP;
     node->get("transparency",     &m_alpha_testing     );
     node->get("lightmap",         &m_lightmap          );
     node->get("alpha",            &m_alpha_blending    );
@@ -97,7 +98,7 @@ void Material::init(unsigned int index)
 {
     m_index              = index;
     m_clamp_tex          = 0;
-    m_alpha_testing       = false;
+    m_alpha_testing      = false;
     m_lightmap           = false;
     m_alpha_blending     = false;
     m_lighting           = true;
@@ -152,7 +153,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
 
-    if (m_clamp_tex & UCLAMP)
+    if (m_clamp_tex & UCLAMP != 0)
     {
         //  m->setFlag();
         //  n1->getMaterial(0).TextureLayer[0].TextureWrap = video::ETC_CLAMP;
@@ -169,13 +170,14 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
             m->TextureLayer[n].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
         }
     }
-    if (m_clamp_tex & VCLAMP)
+    if (m_clamp_tex & VCLAMP != 0)
     {
         for (unsigned int n=0; n<video::MATERIAL_MAX_TEXTURES; n++)
         {
             m->TextureLayer[n].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
         }
     }
+
 #endif
     // FIXME: more parameters need to be set!
 }   // setMaterialProperties

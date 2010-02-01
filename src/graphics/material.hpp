@@ -40,7 +40,8 @@ private:
     bool             m_zipper;
     bool             m_resetter;
     bool             m_ignore;
-    int              m_clamp_tex;
+    /** Texture clamp bitmask */
+    unsigned int     m_clamp_tex;
     bool             m_lighting;
     bool             m_sphere_map;
     bool             m_alpha_testing;
