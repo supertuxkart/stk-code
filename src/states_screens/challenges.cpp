@@ -74,7 +74,7 @@ namespace GUIEngine
         {
             // TODO : add bronze/silver/gold difficulties to challenges
             sprintf(buffer, "solved%i", n);
-            w->addItem(solvedChallenges[n]->getName(), buffer, file_manager->getTextureFile("cup_gold.png"));
+            w->addItem(solvedChallenges[n]->getName(), buffer, "/textures/cup_gold.png");
             std::cout << "// Adding challenge " << buffer << " : <" << solvedChallenges[n]->getId().c_str() << ">\n";
 
         }
