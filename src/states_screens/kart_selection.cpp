@@ -1251,6 +1251,9 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         {
             unlock_manager->playLockSound();
         }
+        else if (selection == NO_ITEM_ID)
+        {
+        }
         else
         {        
             std::vector<int> group = kart_properties_manager->getKartsInGroup(selection);

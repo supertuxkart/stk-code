@@ -28,6 +28,9 @@
 
 namespace GUIEngine
 {
+    /** The identifier returned for empty "cells" in the ribbon */
+    extern const char* NO_ITEM_ID;
+    
     /**
      * Even if you have a ribbon that only acts on click/enter, you may wish to know which
      * item is currently highlighted. In this case, create a listener and pass it to the ribbon.

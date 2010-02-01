@@ -29,6 +29,11 @@ using namespace irr::gui;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
+namespace GUIEngine
+{
+    const char* NO_ITEM_ID = "?";
+}
+
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const int max_rows)
 {
     m_scroll_offset = 0;
@@ -569,7 +574,8 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
         }
     }
     
-    m_label->setText( L"Unknown Item" );
+    if (selection_id == NO_ITEM_ID) m_label->setText( L"" );
+    else                            m_label->setText( L"Unknown Item" );
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::updateItemDisplay()
@@ -622,8 +628,8 @@ void DynamicRibbonWidget::updateItemDisplay()
             }
             else
             {
-                icon->setImage( "/gui/main_help.png" );
-                icon->m_properties[PROP_ID] = "?";
+                icon->setImage( "/textures/transparence.png" );
+                icon->m_properties[PROP_ID] = NO_ITEM_ID;
             }
         } // next column
     } // next row

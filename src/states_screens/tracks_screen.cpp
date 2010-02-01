@@ -78,6 +78,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 unlock_manager->playLockSound();
             }
+            else if (selection == NO_ITEM_ID)
+            {
+            }
             else
             {
                 Track* clickedTrack = track_manager->getTrack(selection);

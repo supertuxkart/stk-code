@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 #include "audio/sound_manager.hpp"
 #include "config/stk_config.hpp"
@@ -60,6 +61,7 @@ void TrackManager::addTrackSearchDir(const std::string &dir)
 //-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
  *  \param ident Identifier = basename of the directory the track is in.
+ *  \return      The corresponding track object, or NULL if not found
  */
 Track* TrackManager::getTrack(const std::string& ident) const
 {
@@ -71,7 +73,10 @@ Track* TrackManager::getTrack(const std::string& ident) const
 
     std::ostringstream msg;
     msg<<"TrackManager: Couldn't find track: '"<<ident<<"'";
-    throw std::runtime_error(msg.str());
+    std::cerr << msg.str() << std::endl;
+    return NULL;
+    
+    //throw std::runtime_error(msg.str());
 }   // getTrack
 
 //-----------------------------------------------------------------------------
