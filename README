@@ -25,18 +25,30 @@ HARDWARE REQUIREMENTS
 * A sound card would be nice - but it's not essential.
 * Ideally, you want a joystick with at least 6 buttons.
 
+COMPILING SuperTuxkart
+======================
 
-
-COMPILING ON WINDOWS
-====================
+WINDOWS
+-------
 A project file for Visual Studio 9 (e.g. the free 2008 express 
-edition) is included in the sources. A separate dependency 
-package is available on SuperTuxKart's sourceforge page, which
-includes all necessary libraries, header files, and dlls to
-compile and run the source code.
+edition) is included in the sources in src/ide/vc9. A separate
+dependency package is available on SuperTuxKart's sourceforge 
+page, which includes all necessary libraries, header files, 
+and dlls to compile and run the source code.
 
 While compilation with cygwin is not officially supported,
 this has been done (check with the forum for details).
+
+MAC OSX
+-------
+The latest information about compilation on Mac are on our wiki:
+http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX
+The Xcode project file is in /src/ide/Xcode/, but it still 
+requires that all dependencies are installed as explained on the wiki.
+
+UNIX
+----
+See INSTALL for details.
 
 
 LICENSE
