@@ -162,7 +162,7 @@ private:
 
     void loadTrackInfo();
     void itemCommand(const Vec3 &xyz, Item::ItemType item_type, 
-                     int bNeedHeight);
+                     bool drop);
     void loadQuadGraph(unsigned int mode_id);
     void convertTrackToBullet(const scene::IMesh *mesh,
                               const scene::ISceneNode*node);

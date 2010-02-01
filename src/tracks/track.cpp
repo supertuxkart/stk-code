@@ -703,9 +703,15 @@ void Track::loadTrackModel(unsigned int mode_id)
             else if(name=="small-nitro") type = Item::ITEM_SILVER_COIN;
             else                         type = Item::ITEM_GOLD_COIN;
             Vec3 xyz;
-            int bits = node->getXYZ(&xyz);
+            // Set some kind of default in case Z is not defined in the file
+            // (with the new track exporter it always is defined anyway).
+            // Z is the height from which the item is dropped on the track.
+            xyz.setZ(1000);
+            node->getXYZ(&xyz);
+            bool drop=true;
+            node->get("drop", &drop);
             // Height is needed if bit 2 (for z) is not set
-            itemCommand(xyz, type, /* need_height */ !XMLNode::hasZ(bits) );
+            itemCommand(xyz, type, drop);
         }
         else if (name=="start")
         {
@@ -878,11 +884,11 @@ void Track::handleCamera(const XMLNode &root)
 /** Handle creation and placement of an item.
  *  \param xyz The position of the item.
  *  \param type The item type.
- *  \param need_height True if the item Z position should be determined based on
+ *  \param drop True if the item Z position should be determined based on
  *         the track topology.
  */
 void Track::itemCommand(const Vec3 &xyz, Item::ItemType type, 
-                        int need_height)
+                        bool drop)
 {
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX && 
@@ -891,9 +897,8 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 
     Vec3 loc(xyz);
     // if only 2d coordinates are given, let the item fall from very high
-    if(need_height)
+    if(drop)
     {
-        loc.setZ(1000);
         loc.setZ(getTerrainHeight(loc));
     }
 
