@@ -34,9 +34,9 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     
     irr::scene::ISceneNode* m_sky;
     irr::scene::ICameraSceneNode* m_camera;
-    irr::scene::ISceneNode* m_chest;
-    irr::scene::ISceneNode* m_chest_top;
-    irr::scene::ISceneNode* m_key;
+    irr::scene::IAnimatedMeshSceneNode* m_chest;
+    //irr::scene::ISceneNode* m_chest_top;
+    //irr::scene::ISceneNode* m_key;
     irr::scene::ILightSceneNode* m_light;
 public:
 

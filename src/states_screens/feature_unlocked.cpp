@@ -53,6 +53,14 @@ void FeatureUnlockedCutScene::init()
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
     
+    scene::IAnimatedMesh* model_chest = irr_driver->getAnimatedMesh( file_manager->getModelFile("chest.b3d") );
+    assert(model_chest != NULL);
+    m_chest = irr_driver->addAnimatedMesh(model_chest);
+    m_chest->setPosition( core::vector3df(2, -3, 0) );
+    m_chest->setScale( core::vector3df(10.0f, 10.0f, 10.0f) );
+    m_chest->setRotation( core::vector3df(0.0f, 160, 0.0f) );
+
+    /*
     scene::IMesh* model_chest = item_manager->getOtherModel("chest_bottom");
     scene::IMesh* model_chest_top = item_manager->getOtherModel("chest_top");
     scene::IMesh* model_key = item_manager->getOtherModel("key");
@@ -66,7 +74,7 @@ void FeatureUnlockedCutScene::init()
     m_key_pos = 45.0f;
     m_key_angle = 0.0f;
     m_key->setPosition( core::vector3df(0, 0, m_key_pos) );
-    
+
     const int materials = m_key->getMaterialCount();
     for (int n=0; n<materials; n++)
     {
@@ -82,6 +90,7 @@ void FeatureUnlockedCutScene::init()
     }
     
     m_key->setScale( core::vector3df(0.8f, 0.8f, 0.8f) );
+    */
     
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
     
@@ -146,11 +155,11 @@ void FeatureUnlockedCutScene::tearDown()
     m_camera = NULL;
     
     irr_driver->removeNode(m_chest);
-    irr_driver->removeNode(m_chest_top);
-    irr_driver->removeNode(m_key);
+    //irr_driver->removeNode(m_chest_top);
+    //irr_driver->removeNode(m_key);
     m_chest = NULL;
-    m_chest_top = NULL;
-    m_key = NULL;
+    //m_chest_top = NULL;
+    //m_key = NULL;
     
     irr_driver->removeNode(m_light);
     m_light = NULL;
@@ -170,6 +179,12 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
+    const float ANIM_TO = 4.5f;
+    const int last_image = m_chest->getEndFrame() - 1;
+    const float current_frame = std::min((double)last_image, m_global_time/(float)ANIM_TO * last_image);
+    //std::cout << "current_frame: " << current_frame << std::endl;
+    m_chest->setCurrentFrame( current_frame );
+    /*
     const float KEY_Y = 6.8f;
     const float KEY_FINAL_DIST = 15;
     
@@ -192,11 +207,14 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     //printf("m_key_angle = %f\n", m_key_angle);
     m_key->setRotation( core::vector3df(0, m_key_angle*90.0f, -m_key_angle*90.0f) );
 
-    const int GIFT_EXIT_FROM = 7;
-    const int GIFT_EXIT_TO = 20;
-        
+     */
+    
+    const int GIFT_EXIT_FROM = ANIM_TO;
+    const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 12;
+
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
     {
+        /*
         const double chest_top_angle = ((double)(m_global_time - GIFT_EXIT_FROM)*3/(double)GIFT_EXIT_TO)*110.0;
         m_chest_top->setRotation( core::vector3df( 360.0f-(float)std::min(110.0, chest_top_angle), 0, 0 ));
         if (chest_top_angle < 110.0) 
@@ -205,10 +223,11 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
             chestpos.Y += dt*6;
             m_chest_top->setPosition(chestpos);
         }
+         */
         
         core::vector3df pos = m_root_gift_node->getPosition();
-        pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.5/GIFT_EXIT_TO)  )*50.0f;
-        pos.X += 5*dt;
+        pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.2/GIFT_EXIT_TO)  )*30.0f;
+        pos.X += 2*dt;
         pos.Z += 5*dt;
 
         m_root_gift_node->setPosition(pos);
@@ -232,7 +251,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                                30.0f,
                                                sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
     }
-    
+
     if (m_root_gift_node != NULL)
     {
         m_camera->setTarget( m_root_gift_node->getPosition() + core::vector3df(0.0f, 10.0f, 0.0f) );
