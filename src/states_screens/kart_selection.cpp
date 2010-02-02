@@ -795,20 +795,13 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         m_kart_widgets[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
     }
     
-    if (firstPlayer)
+    
+    if (!firstPlayer)
     {
-        // Focus a kart for this player
-        const int playerID = amount-1;
-        if (!firstPlayer)
-        {
-            w->setSelection(playerID, playerID, true);
-        }
-    }
-    else
-    {
-        //const int playerID = amount-1;
+        // select something (anything) in the ribbon so that the selection array does not contain
+        // garbage (FIXME: the ribbon should handle this internally!)
         w->setSelection(new_player_id, new_player_id, true);
-        
+            
         newPlayerWidget->playerName->setFocusForPlayer(new_player_id);
     }
     
