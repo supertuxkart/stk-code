@@ -21,11 +21,27 @@
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/gift.png"/>
             <spacer width="25" height="25"/>
-            <label proportion="2" height="100%" word_wrap="true"
+            <label proportion="6" height="100%" word_wrap="true"
                    I18N="In the help menu"
                    text="Collect blue boxes : they will give you weapons or other powerups"/>
+            <spacer width="25" height="25"/>
+            <icon align="center" width="64" height="64" icon="gui/banana.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="4" height="100%" word_wrap="true"
+                   I18N="In the help menu"
+                   text="Avoid bananas!"/>
         </div>
 
+<!--
+        <div width="100%" proportion="2" layout="horizontal-row">
+            <icon align="center" width="64" height="64" icon="gui/banana.png"/>
+            <spacer width="25" height="25"/>
+            <label proportion="2" height="100%" word_wrap="true"
+                   I18N="In the help menu"
+                   text="Avoid bananas!"/>
+        </div>
+        -->
+        
         <div width="100%" proportion="2" layout="horizontal-row">
             <icon align="center" width="64" height="64" icon="gui/nitro.png"/>
             <spacer width="25" height="25"/>
