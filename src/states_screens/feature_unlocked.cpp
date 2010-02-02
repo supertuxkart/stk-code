@@ -14,6 +14,8 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+// -------------------------------------------------------------------------------------
+
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.stkgui")
 {
     setNeeds3D(true);
@@ -23,12 +25,16 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
     m_unlocked_thing_picture = NULL;
 }
 
+// -------------------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::setUnlockedKart(KartProperties* unlocked_kart)
 {
     assert(unlocked_kart != NULL);
     m_unlocked_kart = unlocked_kart;
     m_unlocked_thing_picture = NULL;
 }
+
+// -------------------------------------------------------------------------------------
 
 void FeatureUnlockedCutScene::setUnlockedPicture(irr::video::ITexture* picture)
 {
@@ -38,13 +44,24 @@ void FeatureUnlockedCutScene::setUnlockedPicture(irr::video::ITexture* picture)
     m_unlocked_thing_picture = picture;
 }
 
+// -------------------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::init()
 {
     m_sky_angle = 0.0f;
     m_global_time = 0.0f;
     
-    m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("lscales.png"), 16 /* hori_res */, 16 /* vert_res */,
-                           1.0f /* texture_percent */,  2.0f /* sphere_percent */);
+    //m_sky = irr_driver->addSkyDome(file_manager->getTextureFile("lscales.png"), 16 /* hori_res */, 16 /* vert_res */,
+    //                       1.0f /* texture_percent */,  2.0f /* sphere_percent */);
+    
+    std::vector<std::string> texture_names(6);
+    texture_names[0] = file_manager->getTextureFile("purplenebula.png");
+    texture_names[1] = file_manager->getTextureFile("purplenebula2.png");
+    texture_names[2] = file_manager->getTextureFile("purplenebula.png");
+    texture_names[3] = file_manager->getTextureFile("purplenebula2.png");
+    texture_names[4] = file_manager->getTextureFile("purplenebula.png");
+    texture_names[5] = file_manager->getTextureFile("purplenebula2.png");
+    m_sky = irr_driver->addSkyBox(texture_names);
     
     m_camera = irr_driver->addCameraSceneNode();
     m_camera->setPosition( core::vector3df(0.0, 30.0f, 70.0f) );
@@ -58,40 +75,7 @@ void FeatureUnlockedCutScene::init()
     m_chest = irr_driver->addAnimatedMesh(model_chest);
     m_chest->setPosition( core::vector3df(2, -3, 0) );
     m_chest->setScale( core::vector3df(10.0f, 10.0f, 10.0f) );
-    m_chest->setRotation( core::vector3df(0.0f, 160, 0.0f) );
 
-    /*
-    scene::IMesh* model_chest = item_manager->getOtherModel("chest_bottom");
-    scene::IMesh* model_chest_top = item_manager->getOtherModel("chest_top");
-    scene::IMesh* model_key = item_manager->getOtherModel("key");
-    
-    m_chest = irr_driver->addMesh(model_chest);
-    m_chest_top = irr_driver->addMesh(model_chest_top);
-    m_key = irr_driver->addMesh(model_key);
-
-    m_chest->setPosition( core::vector3df(-3, -3, 0) );
-    m_chest_top->setPosition( core::vector3df(-3, -3, 0) );
-    m_key_pos = 45.0f;
-    m_key_angle = 0.0f;
-    m_key->setPosition( core::vector3df(0, 0, m_key_pos) );
-
-    const int materials = m_key->getMaterialCount();
-    for (int n=0; n<materials; n++)
-    {
-        m_key->getMaterial(n).setFlag(EMF_LIGHTING, true);
-        
-        m_key->getMaterial(n).Shininess = 100.0f; // set size of specular highlights
-        m_key->getMaterial(n).SpecularColor.set(255,50,50,50); 
-        m_key->getMaterial(n).DiffuseColor.set(255,150,150,150);
-        
-        m_key->getMaterial(n).setFlag(EMF_GOURAUD_SHADING , true);
-        
-        m_key->getMaterial(n).MaterialType = video::EMT_SPHERE_MAP;
-    }
-    
-    m_key->setScale( core::vector3df(0.8f, 0.8f, 0.8f) );
-    */
-    
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
@@ -129,21 +113,10 @@ void FeatureUnlockedCutScene::init()
     {
         std::cerr << "There is nothing in the chest!!!\n";
     }
-    
-    /*
-    for (unsigned int i=0; i<sky->getMaterialCount(); i++)
-    {
-        video::SMaterial &irrMaterial = sky->getMaterial(i);
-        for (unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t = irrMaterial.getTexture(j);
-            if(!t) continue;
-            core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-            m_animated_textures.push_back(new MovingTexture(m, 0.05f, 0.0f));
-        }   // for j<MATERIAL_MAX_TEXTURES
-    }   // for i<getMaterialCount
-     */
 }
+
+// -------------------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::tearDown()
 {
     printf("+++++++ FeatureUnlockedCutScene:tearDown +++++++++\n");
@@ -171,6 +144,19 @@ void FeatureUnlockedCutScene::tearDown()
     }
 }
 
+// -------------------------------------------------------------------------------------
+
+//FIXME: doesn't go here...
+template<typename T>
+T keepInRange(T from, T to, T value)
+{
+    if (value < from) return from;
+    if (value > to  ) return to;
+    return value;
+}
+
+// -------------------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* driver)
 {
     m_global_time += dt;
@@ -179,52 +165,28 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     if (m_sky_angle > 360) m_sky_angle -= 360;
     m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
 
-    const float ANIM_TO = 4.5f;
+    const float ANIM_FROM = 2.0f;
+    const float ANIM_TO = 5.5f;
     const int last_image = m_chest->getEndFrame() - 1;
-    const float current_frame = std::min((double)last_image, m_global_time/(float)ANIM_TO * last_image);
+    
+    if (m_global_time < ANIM_FROM)
+    {
+        // progression of the chest rotation between 0 and 1
+        const float rotationProgression = keepInRange( 0.0f, 1.0f, (float)sin(M_PI/2.0f*m_global_time/double(ANIM_FROM)) );
+        const float chest_rotation = keepInRange(80.0f, 160.0f, (float)(80 + rotationProgression * 80) );
+        m_chest->setRotation( core::vector3df(0.0f, chest_rotation, 0.0f) );
+    }
+    
+    const float current_frame = keepInRange(0.0, (double)last_image,
+                                          (m_global_time - ANIM_FROM)/(double)(ANIM_TO - ANIM_FROM) * last_image);
     //std::cout << "current_frame: " << current_frame << std::endl;
     m_chest->setCurrentFrame( current_frame );
-    /*
-    const float KEY_Y = 6.8f;
-    const float KEY_FINAL_DIST = 15;
-    
-    if (m_key_pos > KEY_FINAL_DIST) m_key_pos -= dt*5;
-    m_key->setPosition( core::vector3df(0, KEY_Y, m_key_pos) );
-    
-    // distance at which the key starts rotating
-    const float KEY_ROTATION_FROM = 30.0f;
-    // distance at which the key finishes rotating
-    const float KEY_ROTATION_TO = KEY_FINAL_DIST + 10.0f;
-    
-    //const float CHEST_OPEN_FROM = KEY_ROTATION_TO + 1.0f;
-    //const float CHEST_OPEN_TO = KEY_ROTATION_TO + 8.0f;
-
-    m_key_angle = 1.0f - (m_key_pos - KEY_ROTATION_TO) / (KEY_ROTATION_FROM - KEY_ROTATION_TO);
-    if (m_key_angle < 0.0f) m_key_angle = 0.0f;
-    else if (m_key_angle > 1.0f) m_key_angle = 1.0f;
-
-    
-    //printf("m_key_angle = %f\n", m_key_angle);
-    m_key->setRotation( core::vector3df(0, m_key_angle*90.0f, -m_key_angle*90.0f) );
-
-     */
-    
+       
     const int GIFT_EXIT_FROM = ANIM_TO;
     const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 12;
 
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
     {
-        /*
-        const double chest_top_angle = ((double)(m_global_time - GIFT_EXIT_FROM)*3/(double)GIFT_EXIT_TO)*110.0;
-        m_chest_top->setRotation( core::vector3df( 360.0f-(float)std::min(110.0, chest_top_angle), 0, 0 ));
-        if (chest_top_angle < 110.0) 
-        {
-            core::vector3df chestpos = m_chest_top->getPosition();
-            chestpos.Y += dt*6;
-            m_chest_top->setPosition(chestpos);
-        }
-         */
-        
         core::vector3df pos = m_root_gift_node->getPosition();
         pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.2/GIFT_EXIT_TO)  )*30.0f;
         pos.X += 2*dt;
@@ -275,10 +237,16 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                     true/* center h */, true /* center v */ );
 }
 
-void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
+// -------------------------------------------------------------------------------------
+
+void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget,
+                                            const std::string& name,
+                                            const int playerID)
 {
     if (name == "back")
     {
         StateManager::get()->escapePressed();
     }
 }
+
+// -------------------------------------------------------------------------------------
