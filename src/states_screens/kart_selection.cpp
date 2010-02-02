@@ -762,8 +762,8 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     kartsArea.x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
     // ---- Create new active player
-    const int id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
-    ActivePlayer *aplayer = StateManager::get()->getActivePlayer(id);
+    const int new_player_id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+    ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
     
     // ---- Create focus dispatcher
     if (firstPlayer)
@@ -778,22 +778,12 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
     
     // ---- Create player/kart widget
-    PlayerKartWidget* newPlayer;
-    /*
-    if (firstPlayer)
-    {
-        newPlayer = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size(), kartsArea.m_reserved_id);
-    }
-    else
-    {*/
-        newPlayer = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
-    /*
-    }*/
+    PlayerKartWidget* newPlayerWidget = new PlayerKartWidget(this, aplayer, &kartsArea, m_kart_widgets.size());
+
+    this->manualAddWidget(newPlayerWidget);
+    newPlayerWidget->add();
     
-    this->manualAddWidget(newPlayer);
-    newPlayer->add();
-    
-    m_kart_widgets.push_back(newPlayer);
+    m_kart_widgets.push_back(newPlayerWidget);
     
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
@@ -805,12 +795,23 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         m_kart_widgets[n].move( fullarea->x + splitWidth*n, fullarea->y, splitWidth, fullarea->h );
     }
     
-    // ---- Focus a kart for this player
-    const int playerID = amount-1;
-    if (!firstPlayer)
+    if (firstPlayer)
     {
-        w->setSelection(playerID, playerID, true);
+        // Focus a kart for this player
+        const int playerID = amount-1;
+        if (!firstPlayer)
+        {
+            w->setSelection(playerID, playerID, true);
+        }
     }
+    else
+    {
+        //const int playerID = amount-1;
+        w->setSelection(new_player_id, new_player_id, true);
+        
+        newPlayerWidget->playerName->setFocusForPlayer(new_player_id);
+    }
+    
     return true;
 }
 
