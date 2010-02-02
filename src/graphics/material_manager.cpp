@@ -61,6 +61,7 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
         if (m_materials[i]->getTexFname()==image)
         {
             m_materials[i]->setMaterialProperties(&(mb->getMaterial()));
+            return;
         }
     }   // for i
 }   // setAllMaterialFlags
