@@ -267,6 +267,8 @@ bool DeviceManager::translateInput( Input::InputType type,
             break;
     };
 
+    //if (*player != NULL) std::cout << "btn " << btnID << " belongs to player " << (*player)->m_id << std::endl;
+    
     /*
     if (device != NULL)
     {

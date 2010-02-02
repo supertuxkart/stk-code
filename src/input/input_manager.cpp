@@ -286,7 +286,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         if (action != PA_FIRST)
         {
             action_found = true;
-            player = 0;
+            player = NULL;
         }
     }
     
@@ -383,6 +383,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 m_timer = 0;
             }
 
+            // When in master-only mode, we can safely assume that players are set up, contrarly to
+            // early menus where we accept every input because players are not set-up yet
+            if (m_master_player_only && player == NULL) return;
+            
             // menu input
             if (!m_timer_in_use)
             {
@@ -391,6 +395,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     m_timer_in_use = true;
                     m_timer = 0.25;
                 }
+                
                 int playerID = (player == NULL ? 0 : player->m_id);
                 
                 // If only the master player can act, and this player is not the master, ignore his input
@@ -405,7 +410,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         handleStaticAction( btnID, value );
     }
 }   // input
+
 //-----------------------------------------------------------------------------
+
 void InputManager::setMasterPlayerOnly(bool enabled)
 {
 #if INPUT_MODE_DEBUG
@@ -413,12 +420,17 @@ void InputManager::setMasterPlayerOnly(bool enabled)
 #endif
     m_master_player_only = enabled;
 }
+
+//-----------------------------------------------------------------------------
+
 /** Returns whether only the master player should be allowed to perform changes in menus */
 bool InputManager::masterPlayerOnly() const
 {
     return m_device_manager->getAssignMode() == ASSIGN && m_master_player_only;
 }
+
 //-----------------------------------------------------------------------------
+
 /**
  * Called on keyboard events [indirectly] by irrLicht
  *
