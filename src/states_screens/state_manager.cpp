@@ -99,7 +99,7 @@ void StateManager::resetActivePlayers()
     {
         m_active_players[i].setDevice(NULL);
     }
-    m_active_players.clearWithoutDeleting();
+    m_active_players.clearAndDeleteAll();
 }
 
 #if 0
