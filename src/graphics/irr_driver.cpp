@@ -53,6 +53,7 @@ IrrDriver *irr_driver = NULL;
 
 IrrDriver::IrrDriver()
 {
+    m_res_switching = false;
     file_manager->dropFileSystem();
     initDevice();
 }   // IrrDriver
@@ -191,7 +192,7 @@ void IrrDriver::initDevice()
     //m_video_driver->enableMaterial2D();
 #endif
     
-    // set cursor viasible by default (what's the default is not tooclearly documented,
+    // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
     m_device->getCursorControl()->setVisible(true);
     m_pointer_shown = true;
@@ -268,6 +269,8 @@ void IrrDriver::hidePointer()
 //-----------------------------------------------------------------------------
 void IrrDriver::changeResolution()
 {
+    m_res_switching = true;
+    
     // show black before resolution switch so we don't see OpenGL's buffer garbage during switch
     m_device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
     m_device->getVideoDriver()->draw2DRectangle( SColor(255, 0, 0, 0),
@@ -298,10 +301,9 @@ void IrrDriver::changeResolution()
     attachment_manager      -> loadModels();
 
     // Re-init GUI engine
-    IrrlichtDevice* device = irr_driver->getDevice();
-    video::IVideoDriver* driver = device->getVideoDriver();
-    GUIEngine::init(device, driver, StateManager::get());
+    GUIEngine::init(m_device, m_video_driver, StateManager::get());
     GUIEngine::reshowCurrentScreen();
+    
 }   // changeResolution
 
 // ----------------------------------------------------------------------------
@@ -764,7 +766,9 @@ void IrrDriver::update(float dt)
 {
     if (!m_device->run())
     {
-        main_loop->abort();
+        // FIXME: I have NO idea why, after performing resolution switch, the irrlicht device asks once to be deleted
+        if (m_res_switching)    m_res_switching = false;
+        else                    main_loop->abort();
     }
     
     const bool inRace = race_manager->raceIsActive();

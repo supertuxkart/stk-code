@@ -51,6 +51,10 @@ private:
     /** Irrlicht race font. */
     irr::gui::IGUIFont         *m_race_font;
     
+    /** Flag set during resolution switching, so that the game doesn't think it needs
+      * to exit because no frame is open */
+    bool m_res_switching;
+    
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
