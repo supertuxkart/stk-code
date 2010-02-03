@@ -100,11 +100,22 @@ void FeatureUnlockedCutScene::init()
     }
     else if (m_unlocked_thing_picture != NULL)
     {
-        // TODO
         video::SMaterial m;
         m.BackfaceCulling = false;
         m.setTexture(0, m_unlocked_thing_picture);
+        m.AmbientColor = SColor(255,255,255,255);
+        m.DiffuseColor = SColor(255,255,255,255);
+        m.GouraudShading = false;
+        m.Shininess = 0;
+        //m.setFlag(video::EMF_TEXTURE_WRAP, false);
         
+#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
+        m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
+        m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+#else
+        m.TextureLayer[0].TextureWrap = video::ETC_CLAMP_TO_EDGE;
+#endif
+
         scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m, 1.0, 0.75);
         m_root_gift_node   = irr_driver->addMesh(mesh);
 
