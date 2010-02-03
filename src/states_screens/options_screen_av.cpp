@@ -33,6 +33,7 @@
 
 using namespace GUIEngine;
 
+
 OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 {
 }
@@ -71,6 +72,7 @@ void OptionsScreenAV::init()
         CheckBoxWidget* full = this->getWidget<CheckBoxWidget>("fullscreen");
         assert( full != NULL );
         full->setState( UserConfigParams::m_fullscreen );
+        
         
         // --- get resolution list from irrlicht the first time
         if(!this->m_inited)

@@ -49,8 +49,13 @@ using namespace irr::core;
 using namespace irr::scene;
 using namespace irr::video;
 
+/** singleton */
 IrrDriver *irr_driver = NULL;
 
+const int MIN_SUPPORTED_HEIGHT = 480; //TODO: do some tests, 480 might be too small without a special menu
+const int MIN_SUPPORTED_WIDTH  = 800;
+
+// ----------------------------------------------------------------------------
 IrrDriver::IrrDriver()
 {
     m_res_switching = false;
@@ -84,11 +89,15 @@ void IrrDriver::initDevice()
         for(int i=0; i<count; i++)
         {
             // only consider 32-bit resolutions for now
-            if(modes->getVideoModeDepth(i) >= 24)
+            if (modes->getVideoModeDepth(i) >= 24)
             {
+                const int w = modes->getVideoModeResolution(i).Width;
+                const int h = modes->getVideoModeResolution(i).Height;
+                if (h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) continue;
+
                 VideoMode mode;
-                mode.width = modes->getVideoModeResolution(i).Width;
-                mode.height = modes->getVideoModeResolution(i).Height;
+                mode.width = w;
+                mode.height = h;
                 m_modes.push_back( mode );
             }
             
