@@ -105,6 +105,7 @@ void FeatureUnlockedCutScene::init()
         m.setTexture(0, m_unlocked_thing_picture);
         m.AmbientColor = SColor(255,255,255,255);
         m.DiffuseColor = SColor(255,255,255,255);
+        m.SpecularColor = SColor(0,0,0,0);
         m.GouraudShading = false;
         m.Shininess = 0;
         //m.setFlag(video::EMF_TEXTURE_WRAP, false);
