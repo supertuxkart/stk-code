@@ -1393,16 +1393,18 @@ EventPropagation FocusDispatcher::focused(const int playerID)
     {
         if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
         {
-            std::cout << "--> Redirecting focus for player " << playerID << " from FocusDispatcher "  <<
-            " (ID " << m_element->getID() <<
-            ") to spinner " << n << " (ID " << m_parent->m_kart_widgets[n].playerName->getIrrlichtElement()->getID() << ")" << std::endl;
-            //int IDbefore = GUIEngine::getGUIEnv()->getFocus()->getID();
+            // If player is done, don't do anything with focus
+            if (m_parent->m_kart_widgets[n].isReady()) return GUIEngine::EVENT_BLOCK;
+            
+            //std::cout << "--> Redirecting focus for player " << playerID << " from FocusDispatcher "  <<
+            //             " (ID " << m_element->getID() <<
+            //             ") to spinner " << n << " (ID " <<
+            //             m_parent->m_kart_widgets[n].playerName->getIrrlichtElement()->getID() << 
+            //             ")" << std::endl;
             
             m_parent->m_kart_widgets[n].playerName->setFocusForPlayer(playerID);
             
-            //int IDafter = GUIEngine::getGUIEnv()->getFocus()->getID();
-            //std::cout << "--> ID before : " << IDbefore << "; ID after : " << IDafter << std::endl;
-            
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
