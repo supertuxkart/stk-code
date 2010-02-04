@@ -137,10 +137,10 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
     else if (m_alpha_blending)
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    
-    if (m_sphere_map) m->MaterialType = video::EMT_SPHERE_MAP;
-    
-    if (m_lightmap)   m->MaterialType = video::EMT_LIGHTMAP;
+    else if (m_sphere_map) 
+        m->MaterialType = video::EMT_SPHERE_MAP;
+    else if (m_lightmap)
+        m->MaterialType = video::EMT_LIGHTMAP;
 
     if (!m_lighting)
     {
@@ -153,7 +153,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
 
-    if (m_clamp_tex & UCLAMP != 0)
+    if ( (m_clamp_tex & UCLAMP) != 0)
     {
         //  m->setFlag();
         //  n1->getMaterial(0).TextureLayer[0].TextureWrap = video::ETC_CLAMP;
@@ -170,7 +170,7 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
             m->TextureLayer[n].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
         }
     }
-    if (m_clamp_tex & VCLAMP != 0)
+    if ( (m_clamp_tex & VCLAMP) != 0)
     {
         for (unsigned int n=0; n<video::MATERIAL_MAX_TEXTURES; n++)
         {
