@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -43,7 +44,25 @@ ItemManager::ItemManager()
 {
     m_all_meshes.clear();
     // The actual loading is done in loadDefaultItems
+
+    // Prepare the switch to array, which stores which item should be
+    // switched to what other item. Initialise it with a mapping that
+    // each item is switched to itself, so basically a no-op.
+    m_switch_to.reserve(Item::ITEM_COUNT);
+    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
+        m_switch_to.push_back((Item::ItemType)i);
 }   // ItemManager
+
+//-----------------------------------------------------------------------------
+/** Sets which objects is getting switched to what.
+ *  \param switch A mapping of items types to item types for the mapping.
+ *         must contain one entry for each item.
+ */
+void ItemManager::setSwitchItems(const std::vector<int> &switch_items)
+{
+    for(unsigned int i=Item::ITEM_FIRST; i<Item::ITEM_COUNT; i++)
+        m_switch_to[i]=(Item::ItemType)stk_config->m_switch_items[i];
+}   // setSwitchItems
 
 //-----------------------------------------------------------------------------
 void ItemManager::removeTextures()
@@ -107,8 +126,8 @@ void ItemManager::setDefaultItemStyle()
     std::string DEFAULT_NAMES[Item::ITEM_LAST - Item::ITEM_FIRST +1];
     DEFAULT_NAMES[Item::ITEM_BONUS_BOX]   = "gift-box";
     DEFAULT_NAMES[Item::ITEM_BANANA]      = "banana";
-    DEFAULT_NAMES[Item::ITEM_GOLD_COIN]   = "nitrotank-big";
-    DEFAULT_NAMES[Item::ITEM_SILVER_COIN] = "nitrotank-small";
+    DEFAULT_NAMES[Item::ITEM_NITRO_BIG]   = "nitrotank-big";
+    DEFAULT_NAMES[Item::ITEM_NITRO_SMALL] = "nitrotank-small";
     DEFAULT_NAMES[Item::ITEM_BUBBLEGUM]   = "bubblegum";
 
     bool bError=0;
@@ -143,6 +162,13 @@ void ItemManager::setDefaultItemStyle()
 }   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
+/** Creates a new item.
+ *  \param type Type of the item.
+ *  \param xyz  Position of the item.
+ *  \param normal The normal of the terrain to set roll and pitch.
+ *  \param parent In case of a dropped item used to avoid that a kart
+ *         is affected by its own items.
+ */
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
                            const Vec3 &normal, Kart *parent)
 {
@@ -258,6 +284,8 @@ void ItemManager::reset()
             i++;
         }
     }  // for i
+
+    m_switch_time = -1;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -299,14 +327,51 @@ void ItemManager::setStyle()
 }   // setStyle
 
 //-----------------------------------------------------------------------------
-void ItemManager::update(float delta)
+void ItemManager::update(float dt)
+{
+    // If switch time is over, switch all items back
+    if(m_switch_time>=0)
+    {
+        m_switch_time -= dt;
+        if(m_switch_time<0)
+        {
+            for(AllItemTypes::iterator i =m_all_items.begin();
+                i!=m_all_items.end();  i++)
+            {   
+                (*i)->switchBack();
+            }   // for m_all_items
+        }   // m_switch_time < 0
+    }   // m_switch_time>=0
+
+    for(AllItemTypes::iterator i =m_all_items.begin();
+        i!=m_all_items.end();  i++)
+    {
+        (*i)->update(dt);
+    }   // for m_all_items
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Switches all items: boxes become bananas and vice versa for a certain
+ *  amount of time (as defined in stk_config.xml.
+ */
+void ItemManager::switchItems()
 {
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        (*i)->update(delta);
+        Item::ItemType new_type = m_switch_to[(*i)->getType()];
+
+        if(m_switch_time<0)
+            (*i)->switchTo(new_type, m_item_mesh[(int)new_type]);
+        // FIXME: if switch is used while items are switched: 
+        // switch back - but that doesn't work properly yet
+        //else
+        //    (*i)->switchBack();
     }   // for m_all_items
-}   // delta
+
+    m_switch_time = stk_config->m_item_switch_time;
+
+}   // switchItems
 
 //-----------------------------------------------------------------------------
 void ItemManager::loadItemStyle(const std::string filename)
@@ -326,10 +391,10 @@ void ItemManager::loadItemStyle(const std::string filename)
         throw std::runtime_error(msg.str());
         delete root;
     }
-    setItem(item_node, "red",   Item::ITEM_BONUS_BOX   );
-    setItem(item_node, "green", Item::ITEM_BANANA );
-    setItem(item_node, "gold"  ,Item::ITEM_GOLD_COIN  );
-    setItem(item_node, "silver",Item::ITEM_SILVER_COIN);
+    setItem(item_node, "red",   Item::ITEM_BONUS_BOX  );
+    setItem(item_node, "green", Item::ITEM_BANANA     );
+    setItem(item_node, "gold"  ,Item::ITEM_NITRO_BIG  );
+    setItem(item_node, "silver",Item::ITEM_NITRO_SMALL);
     delete root;
 }   // loadItemStyle
 

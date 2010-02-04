@@ -46,6 +46,7 @@ initPowerupType ict[]=
     {POWERUP_BUBBLEGUM, "bubblegum.xml"            },
     {POWERUP_CAKE,      "cake.projectile"          },
     {POWERUP_ANVIL,     "anvil.collectable"        },
+    {POWERUP_SWITCH,    "switch.collectable"       },
     {POWERUP_PARACHUTE, "parachute.collectable"    },
     {POWERUP_PLUNGER,   "plunger.projectile"       },
     {POWERUP_MAX,       ""                         },
@@ -69,6 +70,8 @@ void PowerupManager::removeTextures()
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
+/** Loads all projectiles from the powerup.xml file.
+ */
 void PowerupManager::loadPowerups()
 {
     for(int i=0; ict[i].powerup != POWERUP_MAX; i++)

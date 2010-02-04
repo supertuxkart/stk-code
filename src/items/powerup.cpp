@@ -129,6 +129,9 @@ void Powerup::use()
     {
     case POWERUP_ZIPPER:   m_owner->handleZipper();
         break ;
+    case POWERUP_SWITCH:
+        item_manager->switchItems();
+        break;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
     case POWERUP_PLUNGER:

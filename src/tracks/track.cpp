@@ -700,8 +700,8 @@ void Track::loadTrackModel(unsigned int mode_id)
             Item::ItemType type;
             if     (name=="banana"     ) type = Item::ITEM_BANANA;
             else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
-            else if(name=="small-nitro") type = Item::ITEM_SILVER_COIN;
-            else                         type = Item::ITEM_GOLD_COIN;
+            else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
+            else                         type = Item::ITEM_NITRO_BIG;
             Vec3 xyz;
             // Set some kind of default in case Z is not defined in the file
             // (with the new track exporter it always is defined anyway).
@@ -905,7 +905,8 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // Don't tilt the items, since otherwise the rotation will look odd,
     // i.e. the items will not rotate around the normal, but 'wobble'
     // around.
-    Vec3 normal(0, 0, 0.0f);
+    //Vec3 normal(0.7, 0, 0.7);
+    Vec3 normal(0, 0, 1);
     item_manager->newItem(type, loc, normal);
 }   // itemCommand
 

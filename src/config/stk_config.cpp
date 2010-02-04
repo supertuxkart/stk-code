@@ -24,8 +24,9 @@
 #include <sstream>
 
 #include "io/file_manager.hpp"
-//#include "lisp/parser.hpp"
 #include "io/xml_node.hpp"
+#include "items/item.hpp"
+#include "items/item_manager.hpp"
 #include "audio/music_information.hpp"
 
 STKConfig* stk_config=0;
@@ -80,6 +81,11 @@ void STKConfig::load(const std::string &filename)
         fprintf(stderr,"No follow leader interval(s) defined in stk_config");
         exit(-1);
     }
+    if(m_switch_items.size()!=Item::ITEM_LAST-Item::ITEM_FIRST+1)
+    {
+        fprintf(stderr,"No item switches defined in stk_config");
+        exit(-1);
+    }
     if(m_menu_background.size()==0)
     {
         fprintf(stderr,"No menu background defined in stk_config");
@@ -104,6 +110,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_zipper_force,              "zipper-force"               );
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_zipper_max_speed_fraction, "zipper-max-speed-fraction"  );
+    CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_final_camera_time,         "final-camera-time"          );
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
@@ -119,6 +126,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_music_credit_time,         "music-credit-time"          );
 
     m_kart_properties.checkAllSet(filename);
+    item_manager->setSwitchItems(m_switch_items);
 }   // load
 
 // -----------------------------------------------------------------------------
@@ -134,10 +142,11 @@ void STKConfig::init_defaults()
         m_bomb_time            = m_bomb_time_increase        =
         m_anvil_time           = m_zipper_time               =
         m_zipper_force         = m_zipper_speed_gain         =
-        m_zipper_max_speed_fraction = m_music_credit_time    = 
+        m_zipper_max_speed_fraction = m_music_credit_time    =
         m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
-        m_final_camera_time    = m_near_ground               = UNDEFINED;
+        m_final_camera_time    = m_near_ground               = 
+        m_item_switch_time     = UNDEFINED;
     m_max_karts                = -100;
     m_grid_order               = -100;
     m_max_history              = -100;
@@ -150,6 +159,7 @@ void STKConfig::init_defaults()
     m_enable_networking        = true;
     m_scores.clear();
     m_leader_intervals.clear();
+    m_switch_items.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -227,11 +237,13 @@ void STKConfig::getAllData(const XMLNode * root)
     node->get("bomb-time", &m_bomb_time);
     node->get("bomb-time-increase", &m_bomb_time_increase);
     node->get("leader-intervals", &m_leader_intervals);
+    node->get("switch-items", &m_switch_items);
     node->get("anvil-time", &m_anvil_time);
     node->get("zipper-time", &m_zipper_time);
     node->get("zipper-force", &m_zipper_force);
     node->get("zipper-speed-gain", &m_zipper_speed_gain);
     node->get("zipper-max-speed-fraction", &m_zipper_max_speed_fraction);
+    node->get("item-switch-time", &m_item_switch_time);
 
 
     node = root -> getNode("misc-defaults");

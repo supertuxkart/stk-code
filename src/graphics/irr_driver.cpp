@@ -460,7 +460,7 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  *  since the node is not optimised.
  *  \param mesh The mesh to add.
  */
-scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
+scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh)
 {
     return m_scene_manager->addMeshSceneNode(mesh);
 }   // addMesh

@@ -35,6 +35,7 @@
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
+#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/player_kart.hpp"
@@ -118,6 +119,13 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 Kart* kart = RaceManager::getPlayerKart(0);
                 kart->setPowerup(POWERUP_CAKE, 10000);
+            }
+            break;
+        case KEY_F4:
+            if (race_manager->getNumPlayers() ==1 )
+            {
+                Kart* kart = RaceManager::getPlayerKart(0);
+                kart->setPowerup(POWERUP_SWITCH, 10000);
             }
             break;
         case KEY_F11:

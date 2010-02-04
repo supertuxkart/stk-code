@@ -426,8 +426,8 @@ void Kart::collectedItem(const Item &item, int add_info)
         m_attachment.hitBanana(item, add_info); 
         break;
 
-    case Item::ITEM_SILVER_COIN: m_collected_energy++ ;                  break;
-    case Item::ITEM_GOLD_COIN  : m_collected_energy += 3 ;               break;
+    case Item::ITEM_NITRO_SMALL: m_collected_energy++;    break;
+    case Item::ITEM_NITRO_BIG:   m_collected_energy += 3; break;
     case Item::ITEM_BONUS_BOX  :
         {
             // In wheelie style, karts get more items depending on energy,
@@ -451,7 +451,7 @@ void Kart::collectedItem(const Item &item, int add_info)
     // functions (hit{Red,Green}Item), so only coins need to be
     // stored here.
     if(network_manager->getMode()==NetworkManager::NW_SERVER &&
-        (type==Item::ITEM_SILVER_COIN || type==Item::ITEM_GOLD_COIN)                       )
+        (type==Item::ITEM_NITRO_BIG || type==Item::ITEM_NITRO_SMALL) )
     {
         race_state->itemCollected(getWorldKartId(), item.getItemId());
     }

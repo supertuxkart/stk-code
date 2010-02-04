@@ -31,13 +31,16 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_rotate           = rotate;
     m_event_handler    = NULL;
     m_deactive_time    = 0;
+    m_normal           = normal;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
     m_coord            = Coord(xyz, hpr);
     m_item_id          = item_id;
     m_type             = type;
+    m_original_type    = ITEM_NONE;
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
+    m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
     // If lighting would be enabled certain items (esp. bananas)
     // don't look smooth, so for now generally disable lighting
@@ -48,6 +51,31 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 }   // Item
 
 //-----------------------------------------------------------------------------
+/** Changes this item to be a new type for a certain amount of time.
+ *  \param type New type of this item.
+ *  \param mesh Mesh to use to display this item.
+ */
+void Item::switchTo(ItemType type, scene::IMesh *mesh)
+{
+    m_original_type    = m_type;
+    m_type             = type;
+    m_node->setMesh(mesh);
+}   // switchTo
+
+//-----------------------------------------------------------------------------
+/** Switch  backs to the original item.
+ */
+void Item::switchBack()
+{
+    assert(m_original_type!=ITEM_NONE);
+    m_type          = m_original_type;
+    m_original_type = ITEM_NONE;
+    m_node->setMesh(m_original_mesh);
+}   // switchBack
+
+//-----------------------------------------------------------------------------
+/** Removes an item.
+ */
 Item::~Item()
 {
     irr_driver->removeNode(m_node);
@@ -55,27 +83,43 @@ Item::~Item()
 }   // ~Item
 
 //-----------------------------------------------------------------------------
+/** Resets before a race (esp. if a race is restarted).
+ */
 void Item::reset()
 {
     m_collected        = false;
     m_time_till_return = 0.0f;
     m_deactive_time    = 0.0f;
+    if(m_original_type!=ITEM_NONE)
+    {
+        m_type          = m_original_type;
+        m_original_type = ITEM_NONE;
+    }
 }   // reset
+
 //-----------------------------------------------------------------------------
+/** Sets which karts dropped an item. This is used to avoid that a kart is
+ *  affected by its own items.
+ *  \param parent Kart that dropped the item.
+ */
 void Item::setParent(Kart* parent)
 {
-    m_event_handler        = parent;
+    m_event_handler = parent;
     m_deactive_time = 1.5f;
 }
 
 //-----------------------------------------------------------------------------
-void Item::update(float delta)
+/** Updated the item - rotates it, takes care of items coming back into
+ *  the game after it has been collected.
+ *  \param dt Time step size.
+ */
+void Item::update(float dt)
 {
-    if(m_event_handler != NULL && m_deactive_time > 0) m_deactive_time -= delta;
+    if(m_event_handler != NULL && m_deactive_time > 0) m_deactive_time -= dt;
     
     if(m_collected)
     {
-        m_time_till_return -= delta;
+        m_time_till_return -= dt;
         if ( m_time_till_return > 0 )
         {
             Vec3 hell(m_coord.getXYZ());
@@ -95,10 +139,22 @@ void Item::update(float delta)
         
         if(!m_rotate) return;
         // have it rotate
-        Vec3 rotation(delta*M_PI, 0, 0);
+        Vec3 rotation(dt*M_PI, 0, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_node->setRotation(m_coord.getHPR().toIrrHPR());
         m_node->setPosition(m_coord.getXYZ().toIrrVector());
+        return;
+
+        static float t=0;
+        t += dt;
+
+        btQuaternion q(Vec3(0,0,1), t*0.1f);
+        btQuaternion q_orig(m_normal, 0);
+        btQuaternion result=q+q_orig;
+        btMatrix3x3 m(result);
+        float y, p, r;
+        m.getEuler(y, p, r);
+        m_node->setRotation(Vec3(y, p, r).toIrrHPR());
     }
 }   // update
 

@@ -43,6 +43,13 @@ private:
     std::map<std::string,scene::IMesh*> m_all_meshes;
 
     std::string m_user_filename;
+
+    /** Remaining time that items should remain switched. */
+    float m_switch_time;
+
+    /** What item is item is switched to. */
+    std::vector<Item::ItemType> m_switch_to;
+
     void setDefaultItemStyle();
     void setItem(const lisp::Lisp *item_node, const char *colour,
                  Item::ItemType type);
@@ -62,6 +69,8 @@ public:
     void           setUserFilename (char *s) {m_user_filename=s;}
     void           collectedItem   (int item_id, Kart *kart,
                                     int add_info=-1);
+    void           switchItems     ();
+    void           setSwitchItems(const std::vector<int> &switch_items);
     void           setStyle        ();
     scene::IMesh*  getItemModel    (Item::ItemType type)
                                       {return m_item_mesh[type];}

@@ -56,6 +56,7 @@ public:
     float m_zipper_speed_gain;       /**<Initial one time speed gain.        */
     float m_zipper_max_speed_fraction;/**<Fraction of max speed allowed past
                                           regular max speed                  */
+    float m_item_switch_time;        /**< Time items will be switched.       */
     float m_final_camera_time;       /**<Time for the movement of the final
                                       *  camera.                             */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
@@ -85,6 +86,7 @@ public:
     std::vector<float>
           m_leader_intervals;        /**<Interval in follow the leader till
                                          last kart is reomved.               */
+    std::vector<int> m_switch_items; /**< How to switch items.               */
     std::vector<int>
           m_scores;                  /**<Scores depending on position.       */
 

@@ -30,28 +30,52 @@ using namespace irr;
 class Item
 {
 public:
+    // The list of all items. Important for the switch item function:
+    // bubblegum must be the last item (since bubble gum can't be
+    // switched with any other item, since it's a different objecct).
     enum ItemType
     {
         ITEM_FIRST,
         ITEM_BONUS_BOX = ITEM_FIRST,
         ITEM_BANANA,
-        ITEM_GOLD_COIN,
-        ITEM_SILVER_COIN,
+        ITEM_NITRO_BIG,
+        ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
-        ITEM_LAST = ITEM_BUBBLEGUM
+        ITEM_LAST = ITEM_BUBBLEGUM,
+        ITEM_COUNT,
+        ITEM_NONE
     };
 
 private:
-    ItemType      m_type;         // Item type
-    bool          m_collected;        // true if item was collected & is not displayed
-    float         m_time_till_return;  // time till a collected item reappears
-    Coord         m_coord;        // Original coordinates, used mainly when
-                                  // collected items reappear.
-    /** Scene node of this item. */
-    scene::ISceneNode *m_node;
-    unsigned int  m_item_id;      // index in item_manager field
+    /** Item type. */
+    ItemType      m_type;
 
-    bool          m_rotate;       // set to false if item should not rotate
+    /** If the item is switched, this contains the original type.
+     *  It is ITEM_NONE if the item is not switched. */
+    ItemType      m_original_type;
+
+    /** True if item was collected & is not displayed. */
+    bool          m_collected;
+
+    /** Time till a collected item reappears. */
+    float         m_time_till_return;
+
+    /** Original coordinates, used mainly when collected items reappear. */
+    Coord         m_coord;    
+
+    /** Scene node of this item. */
+    scene::IMeshSceneNode *m_node;
+
+    /** Stores the original mesh in order to reset it. */
+    scene::IMesh *m_original_mesh;
+
+    Vec3          m_normal;
+
+    /** Index in item_manager field. */
+    unsigned int  m_item_id;
+
+    /** Set to false if item should not rotate. */
+    bool          m_rotate;       
     
     /** optionally, set this if this item was laid by a particular kart. in this case,
         the 'm_deactive_time' will also be set - see below. */ 
@@ -92,6 +116,8 @@ public:
     bool          wasCollected() const { return m_collected;}    
     void          setParent(Kart* parent);
     void          reset();
+    void          switchTo(ItemType type, scene::IMesh *mesh);
+    void          switchBack();
 };   // class Item
 
 #endif
