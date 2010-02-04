@@ -277,6 +277,7 @@
 		95D950D20FE473CA002E10AD /* stk_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950CE0FE473CA002E10AD /* stk_config.cpp */; };
 		95D950D30FE473CA002E10AD /* user_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95D950D00FE473CA002E10AD /* user_config.cpp */; };
 		95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95DFC5001106933B00A043A9 /* slip_stream.cpp */; };
+		95E246BE111A2959000C965D /* confirm_resolution_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */; };
 		95ECA10010124C5000D47C5F /* button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EC10124C5000D47C5F /* button_widget.cpp */; };
 		95ECA10110124C5000D47C5F /* check_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */; };
 		95ECA10210124C5000D47C5F /* icon_button_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0F010124C5000D47C5F /* icon_button_widget.cpp */; };
@@ -1056,6 +1057,8 @@
 		95D950D10FE473CA002E10AD /* user_config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = user_config.hpp; path = ../../config/user_config.hpp; sourceTree = SOURCE_ROOT; };
 		95DFC5001106933B00A043A9 /* slip_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = slip_stream.cpp; path = ../../graphics/slip_stream.cpp; sourceTree = SOURCE_ROOT; };
 		95DFC5011106933B00A043A9 /* slip_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = slip_stream.hpp; path = ../../graphics/slip_stream.hpp; sourceTree = SOURCE_ROOT; };
+		95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = confirm_resolution_dialog.cpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.cpp; sourceTree = SOURCE_ROOT; };
+		95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = confirm_resolution_dialog.hpp; path = ../../states_screens/dialogs/confirm_resolution_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EC10124C5000D47C5F /* button_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = button_widget.cpp; path = ../../guiengine/widgets/button_widget.cpp; sourceTree = SOURCE_ROOT; };
 		95ECA0ED10124C5000D47C5F /* button_widget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = button_widget.hpp; path = ../../guiengine/widgets/button_widget.hpp; sourceTree = SOURCE_ROOT; };
 		95ECA0EE10124C5000D47C5F /* check_box_widget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = check_box_widget.cpp; path = ../../guiengine/widgets/check_box_widget.cpp; sourceTree = SOURCE_ROOT; };
@@ -1321,6 +1324,8 @@
 			children = (
 				956541DF10DD628C00C83E99 /* add_device_dialog.cpp */,
 				956541E010DD628C00C83E99 /* add_device_dialog.hpp */,
+				95E246BC111A2959000C965D /* confirm_resolution_dialog.cpp */,
+				95E246BD111A2959000C965D /* confirm_resolution_dialog.hpp */,
 				95833237101243ED00C5137E /* enter_player_name_dialog.cpp */,
 				95833238101243ED00C5137E /* enter_player_name_dialog.hpp */,
 				95833239101243ED00C5137E /* player_info_dialog.cpp */,
@@ -2599,6 +2604,7 @@
 				959482D410EBC0790031BADF /* track_object.cpp in Sources */,
 				9553823A10FD4FEC00737979 /* constants.cpp in Sources */,
 				95DFC5021106933B00A043A9 /* slip_stream.cpp in Sources */,
+				95E246BE111A2959000C965D /* confirm_resolution_dialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

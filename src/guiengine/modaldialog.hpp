@@ -74,6 +74,9 @@ public:
     static void onEnterPressed();
     static ModalDialog* getCurrent();
     static bool isADialogActive();
+    
+    /** Override to be notified of updates */
+    virtual void onUpdate(float dt) { }
 };  
     
 }

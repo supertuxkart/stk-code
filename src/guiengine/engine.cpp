@@ -169,6 +169,14 @@ void cleanUp()
     
     g_current_screen = NULL;
     needsUpdate.clearWithoutDeleting();
+    
+    if (ModalDialog::isADialogActive()) ModalDialog::dismiss();
+
+    delete g_font;
+    g_font = NULL;
+    delete g_title_font;
+    g_title_font = NULL;
+        
     // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
 }
     
@@ -270,7 +278,8 @@ void render(float elapsed_time)
     // ---- some menus may need updating
     if (gamestate != GAME)
     {
-        getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+        if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
+        else                                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
     }
     else
     {

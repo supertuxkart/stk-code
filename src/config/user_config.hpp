@@ -215,8 +215,8 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(800, "prev_width", &m_video_group, "Previous screen/window width") );
     PARAM_PREFIX IntUserConfigParam         m_prev_height
             PARAM_DEFAULT(  IntUserConfigParam(600, "prev_height", &m_video_group,"Previous screen/window height") );
-    PARAM_PREFIX BoolUserConfigParam        m_prev_windowed
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "prev_windowed", &m_video_group) );
+    PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen", &m_video_group) );
     
     // TODO : adapt to be more powerful with irrlicht
     PARAM_PREFIX BoolUserConfigParam        m_graphical_effects

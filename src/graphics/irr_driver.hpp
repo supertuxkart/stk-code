@@ -66,6 +66,9 @@ private:
     /** Whether the mouse cursor is currently shown */
     bool m_pointer_shown;
     
+    /** Internal method that applies the resolution in user settings. */
+    void                 doApplyResSettings();
+    
 public:
                           IrrDriver();
                          ~IrrDriver();
@@ -117,7 +120,11 @@ public:
     void                  removeCamera(Camera *camera);
     void                  update(float dt);
     
-    void                  changeResolution();
+    /** Call to change resolution */
+    void                  changeResolution(const int w, const int h, const bool fullscreen);
+    /** Call this to roll back to the previous resolution if a resolution switch attempt goes bad */
+    void                  cancelResChange();
+    
     void                  showPointer();
     void                  hidePointer();
     bool                  isPointerShown() const { return m_pointer_shown; }

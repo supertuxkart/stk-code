@@ -198,16 +198,13 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
     {
         using namespace GUIEngine;
         
-        UserConfigParams::m_prev_width = UserConfigParams::m_width;
-        UserConfigParams::m_prev_height = UserConfigParams::m_height;
-        
         DynamicRibbonWidget* w1 = this->getWidget<DynamicRibbonWidget>("resolutions");
         assert(w1 != NULL);
         
         const std::string& res = w1->getSelectionIDString(GUI_PLAYER_ID);
         
         int w = -1, h = -1;
-        if( sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1 )
+        if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)
         {
             std::cerr << "Failed to decode resolution : " << res.c_str() << std::endl;
             return;
@@ -216,10 +213,8 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* w2 = this->getWidget<CheckBoxWidget>("fullscreen");
         assert(w2 != NULL);
         
-        UserConfigParams::m_width = w;
-        UserConfigParams::m_height = h;
-        UserConfigParams::m_fullscreen = w2->getState();
-        irr_driver->changeResolution();
+
+        irr_driver->changeResolution(w, h, w2->getState());
     }
     
 }

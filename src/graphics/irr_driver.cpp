@@ -42,6 +42,7 @@
 #include "karts/player_kart.hpp"
 #include "main_loop.hpp"
 #include "modes/world.hpp"
+#include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
 
@@ -276,7 +277,26 @@ void IrrDriver::hidePointer()
 }   // hidePointer
 
 //-----------------------------------------------------------------------------
-void IrrDriver::changeResolution()
+
+void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen)
+{
+    // update user config values
+    UserConfigParams::m_prev_width = UserConfigParams::m_width;
+    UserConfigParams::m_prev_height = UserConfigParams::m_height;
+    UserConfigParams::m_prev_fullscreen = UserConfigParams::m_fullscreen;
+    
+    UserConfigParams::m_width = w;
+    UserConfigParams::m_height = h;
+    UserConfigParams::m_fullscreen = fullscreen;
+
+    doApplyResSettings();
+    
+    new ConfirmResolutionDialog();
+}
+
+//-----------------------------------------------------------------------------
+
+void IrrDriver::doApplyResSettings()
 {
     m_res_switching = true;
     
@@ -299,6 +319,10 @@ void IrrDriver::changeResolution()
 
     m_device->closeDevice();
     m_device->drop();
+    m_device        = NULL;
+    m_video_driver  = NULL;
+    m_gui_env       = NULL;
+    m_scene_manager = NULL;
     initDevice();
 
     material_manager->reInit();
@@ -314,6 +338,17 @@ void IrrDriver::changeResolution()
     GUIEngine::reshowCurrentScreen();
     
 }   // changeResolution
+
+// ----------------------------------------------------------------------------
+
+void IrrDriver::cancelResChange()
+{
+    UserConfigParams::m_width = UserConfigParams::m_prev_width;
+    UserConfigParams::m_height = UserConfigParams::m_prev_height;
+    UserConfigParams::m_fullscreen = UserConfigParams::m_prev_fullscreen;
+    
+    doApplyResSettings();
+}   // cancelResChange
 
 // ----------------------------------------------------------------------------
 /** Prints statistics about rendering, e.g. number of drawn and culled 
