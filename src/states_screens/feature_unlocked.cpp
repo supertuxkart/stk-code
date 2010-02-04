@@ -189,12 +189,12 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
         m_chest->setRotation( core::vector3df(0.0f, chest_rotation, 0.0f) );
     }
     
-    const float current_frame = keepInRange(0.0, (double)last_image,
-                                          (m_global_time - ANIM_FROM)/(double)(ANIM_TO - ANIM_FROM) * last_image);
+    const float current_frame = (float)keepInRange(0.0, (double)last_image,
+                                                  (m_global_time - ANIM_FROM)/(double)(ANIM_TO - ANIM_FROM) * last_image);
     //std::cout << "current_frame: " << current_frame << std::endl;
     m_chest->setCurrentFrame( current_frame );
        
-    const int GIFT_EXIT_FROM = ANIM_TO;
+    const int GIFT_EXIT_FROM = (int)ANIM_TO;
     const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 12;
 
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
