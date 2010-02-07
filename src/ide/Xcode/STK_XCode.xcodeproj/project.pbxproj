@@ -168,7 +168,6 @@
 		9551C8A20FC1B72500DB481B /* attachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0F60F296545000D3E5D /* attachment.cpp */; };
 		9551C8A30FC1B72500DB481B /* attachment_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0F80F296545000D3E5D /* attachment_manager.cpp */; };
 		9551C8A40FC1B72500DB481B /* bowling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0FA0F296545000D3E5D /* bowling.cpp */; };
-		9551C8A50FC1B72500DB481B /* bubblegumitem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0FC0F296545000D3E5D /* bubblegumitem.cpp */; };
 		9551C8A60FC1B72500DB481B /* cake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B0FE0F296545000D3E5D /* cake.cpp */; };
 		9551C8A70FC1B72500DB481B /* flyable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1000F296545000D3E5D /* flyable.cpp */; };
 		9551C8A80FC1B72500DB481B /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1020F296545000D3E5D /* item.cpp */; };
@@ -752,8 +751,6 @@
 		95C2B0F90F296545000D3E5D /* attachment_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = attachment_manager.hpp; path = ../../items/attachment_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0FA0F296545000D3E5D /* bowling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bowling.cpp; path = ../../items/bowling.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B0FB0F296545000D3E5D /* bowling.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bowling.hpp; path = ../../items/bowling.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B0FC0F296545000D3E5D /* bubblegumitem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bubblegumitem.cpp; path = ../../items/bubblegumitem.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B0FD0F296545000D3E5D /* bubblegumitem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bubblegumitem.hpp; path = ../../items/bubblegumitem.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B0FE0F296545000D3E5D /* cake.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cake.cpp; path = ../../items/cake.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B0FF0F296545000D3E5D /* cake.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = cake.hpp; path = ../../items/cake.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1000F296545000D3E5D /* flyable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = flyable.cpp; path = ../../items/flyable.cpp; sourceTree = SOURCE_ROOT; };
@@ -1810,8 +1807,6 @@
 				95C2B0F90F296545000D3E5D /* attachment_manager.hpp */,
 				95C2B0FA0F296545000D3E5D /* bowling.cpp */,
 				95C2B0FB0F296545000D3E5D /* bowling.hpp */,
-				95C2B0FC0F296545000D3E5D /* bubblegumitem.cpp */,
-				95C2B0FD0F296545000D3E5D /* bubblegumitem.hpp */,
 				95C2B0FE0F296545000D3E5D /* cake.cpp */,
 				95C2B0FF0F296545000D3E5D /* cake.hpp */,
 				95C2B1000F296545000D3E5D /* flyable.cpp */,
@@ -2449,7 +2444,6 @@
 				9551C8A20FC1B72500DB481B /* attachment.cpp in Sources */,
 				9551C8A30FC1B72500DB481B /* attachment_manager.cpp in Sources */,
 				9551C8A40FC1B72500DB481B /* bowling.cpp in Sources */,
-				9551C8A50FC1B72500DB481B /* bubblegumitem.cpp in Sources */,
 				9551C8A60FC1B72500DB481B /* cake.cpp in Sources */,
 				9551C8A70FC1B72500DB481B /* flyable.cpp in Sources */,
 				9551C8A80FC1B72500DB481B /* item.cpp in Sources */,
