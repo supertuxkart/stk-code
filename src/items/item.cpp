@@ -60,6 +60,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
     m_original_type    = m_type;
     m_type             = type;
     m_node->setMesh(mesh);
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
