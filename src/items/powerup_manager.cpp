@@ -49,7 +49,8 @@ PowerupManager::~PowerupManager()
 {
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
     {
-        m_all_meshes[(PowerupType)i]->drop();
+        if(m_all_meshes[(PowerupType)i])
+            m_all_meshes[(PowerupType)i]->drop();
     }
  
 }   // ~PowerupManager
@@ -120,6 +121,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
             o<<"Can't load model '"<<model<<"' for powerup type '"<<type<<"', aborting.";
             throw std::runtime_error(o.str());
         }
+        m_all_meshes[type]->grab();
     }
     else
     {
