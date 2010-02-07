@@ -72,7 +72,7 @@ zipper-force is the additional zipper force
 zipper-speed-gain is the one time additional speed  
 item-switch-time How long a switch is being effective.
 switch-items for each item list the index of the item it is switched with.
-             Order: item, banana, big-nitro, small-nitro
+             Order: item, banana, big-nitro, small-nitro, bubble-bum
 -->
 
 <attachment-parameters
@@ -91,7 +91,7 @@ switch-items for each item list the index of the item it is switched with.
     zipper-speed-gain="4.5"
     zipper-max-speed-fraction="2.0"
     item-switch-time="5"
-    switch-items="1 0 1 1 4"
+    switch-items="1 0 4 4 0"
 />
 
 <!-- GENERAL KART DEFAULTS

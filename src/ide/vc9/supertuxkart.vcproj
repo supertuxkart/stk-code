@@ -605,10 +605,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\items\bubblegumitem.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\items\cake.cpp"
 					>
 				</File>
@@ -1424,10 +1420,6 @@
 				</File>
 				<File
 					RelativePath="..\..\items\bowling.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\items\bubblegumitem.hpp"
 					>
 				</File>
 				<File

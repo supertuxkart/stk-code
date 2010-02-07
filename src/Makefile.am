@@ -132,8 +132,6 @@ supertuxkart_SOURCES = \
  items/attachment_manager.hpp \
  items/bowling.cpp \
  items/bowling.hpp \
- items/bubblegumitem.cpp \
- items/bubblegumitem.hpp \
  items/cake.cpp \
  items/cake.hpp \
  items/flyable.cpp \

@@ -29,7 +29,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
-#include "items/bubblegumitem.hpp"
 #include "karts/kart.hpp"
 #include "network/network_manager.hpp"
 #include "tracks/track.hpp"
@@ -143,12 +142,7 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
                            const Vec3 &normal, Kart *parent)
 {
     Item* h;
-    if(type == Item::ITEM_BUBBLEGUM)
-        h = new BubbleGumItem(type, xyz, normal, m_item_mesh[type], 
-                              m_all_items.size());
-    else
-        h = new Item(type, xyz, normal, m_item_mesh[type],
-                     m_all_items.size());
+    h = new Item(type, xyz, normal, m_item_mesh[type], m_all_items.size());
     if(parent != NULL) h->setParent(parent);
     
     m_all_items.push_back(h);
@@ -209,7 +203,7 @@ void ItemManager::reset()
     {
         if((*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
-            BubbleGumItem *b=static_cast<BubbleGumItem*>(*i);
+            Item *b=*i;
             AllItemTypes::iterator i_next = m_all_items.erase(i); 
             delete b;
             i = i_next;

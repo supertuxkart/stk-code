@@ -26,9 +26,9 @@
 #include "utils/vec3.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
-           scene::IMesh* mesh, unsigned int item_id, bool rotate)
+           scene::IMesh* mesh, unsigned int item_id)
 {
-    m_rotate           = rotate;
+    setType(type);
     m_event_handler    = NULL;
     m_deactive_time    = 0;
     m_normal           = normal;
@@ -36,7 +36,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     Vec3  hpr          = Vec3(0, normal);
     m_coord            = Coord(xyz, hpr);
     m_item_id          = item_id;
-    m_type             = type;
     m_original_type    = ITEM_NONE;
     m_collected        = false;
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
@@ -47,6 +46,17 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 }   // Item
 
 //-----------------------------------------------------------------------------
+/** Sets the type of this item, but also derived values, e.g. m_rotate.
+ *  (bubblegums do not return).
+ *  \param type New type of the item.
+ */
+void Item::setType(ItemType type)
+{
+    m_type   = type;
+    m_rotate = type!=ITEM_BUBBLEGUM;
+}   // setType
+
+//-----------------------------------------------------------------------------
 /** Changes this item to be a new type for a certain amount of time.
  *  \param type New type of this item.
  *  \param mesh Mesh to use to display this item.
@@ -54,7 +64,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 void Item::switchTo(ItemType type, scene::IMesh *mesh)
 {
     m_original_type    = m_type;
-    m_type             = type;
+    setType(type);
     m_node->setMesh(mesh);
 }   // switchTo
 
@@ -64,7 +74,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
 void Item::switchBack()
 {
     assert(m_original_type!=ITEM_NONE);
-    m_type          = m_original_type;
+    setType(m_original_type);
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);
 }   // switchBack
@@ -88,7 +98,7 @@ void Item::reset()
     m_deactive_time    = 0.0f;
     if(m_original_type!=ITEM_NONE)
     {
-        m_type          = m_original_type;
+        setType(m_original_type);
         m_original_type = ITEM_NONE;
     }
 }   // reset
@@ -102,7 +112,7 @@ void Item::setParent(Kart* parent)
 {
     m_event_handler = parent;
     m_deactive_time = 1.5f;
-}
+}   // setParent
 
 //-----------------------------------------------------------------------------
 /** Updated the item - rotates it, takes care of items coming back into
@@ -111,7 +121,7 @@ void Item::setParent(Kart* parent)
  */
 void Item::update(float dt)
 {
-    if(m_event_handler != NULL && m_deactive_time > 0) m_deactive_time -= dt;
+    if(m_deactive_time > 0) m_deactive_time -= dt;
     
     if(m_collected)
     {
@@ -161,9 +171,20 @@ void Item::update(float dt)
  */
 void Item::collected(float t)
 {
-    m_collected        = true;
-    // Note if the time is negative, in update the m_collected flag will
-    // be automatically set to false again.
-    m_time_till_return = t;
+    m_collected  = true;
+    if(m_type==ITEM_BUBBLEGUM)
+    {
+        deactivate(0.5);
+        // Set the time till reappear to -1 seconds --> the item will 
+        // reappear immediately.
+        m_time_till_return = -1;
+
+    }
+    else
+    {
+        // Note if the time is negative, in update the m_collected flag will
+        // be automatically set to false again.
+        m_time_till_return = t;
+    }
 }   // isCollected
 

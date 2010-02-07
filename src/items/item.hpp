@@ -84,10 +84,10 @@ private:
        deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
     
+    void          setType(ItemType type);
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
-                        scene::IMesh* mesh, unsigned int item_id,
-                        bool rotate=true);
+                        scene::IMesh* mesh, unsigned int item_id);
     virtual       ~Item ();
     void          update  (float delta);
     virtual void  collected(float t=2.0f);
