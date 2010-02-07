@@ -36,7 +36,9 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-RaceOverDialog::RaceOverDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
+RaceOverDialog::RaceOverDialog(const float percentWidth, 
+                               const float percentHeight) 
+              : ModalDialog(percentWidth, percentHeight)
 {
     // Switch to barrier mode: server waits for ack from each client
     network_manager->beginRaceResultBarrier();

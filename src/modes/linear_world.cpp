@@ -432,15 +432,16 @@ void LinearWorld::raceResultOrder( int* order )
 }   // raceResultOrder
 
 //-----------------------------------------------------------------------------
+/** Estimate the arrival time of any karts that haven't arrived yet by using 
+ *  their average speed up to now and the distance still to race. This 
+ *  approach guarantees that the order of the karts won't change anymore 
+ *  (karts ahead will have a higher average speed and therefore finish the 
+ *  race earlier than karts further behind), so the position doesn't have to
+ *  be updated to get the correct scoring.
+ *  \param kart The kart for which to estimate the finishing times.
+ */
 float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 {
-    // Estimate the arrival time of any karts that haven't arrived
-    // yet by using their average speed up to now and the distance
-    // still to race. This approach guarantees that the order of
-    // the karts won't change anymore (karts ahead will have a
-    // higher average speed and therefore finish the race earlier
-    // than karts further behind), so the position doesn't have to
-    // be updated to get the correct scoring.
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
     float distance_covered  = kart_info.m_race_lap * m_track->getTrackLength()
         + getDistanceDownTrackForKart(kart->getWorldKartId());

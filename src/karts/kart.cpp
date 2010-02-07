@@ -408,6 +408,14 @@ void Kart::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Sets that this kart has finished the race and finishing time. It also
+ *  notifies the race_manager about the race completion for this kart.
+ *  \param time The finishing time for this kart. It can either be the
+ *         actual time when the kart finished (in which case time() = 
+ *         world->getTime()), or the estimated time in case that all
+ *         player kart have finished the race and all AI karts get
+ *         an estimated finish time set.
+ */
 void Kart::raceFinished(float time)
 {
     m_finished_race = true;
