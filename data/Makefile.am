@@ -4,13 +4,13 @@ SUBDIRS    = fonts gui karts models music po sfx textures tracks grandprix
 pkgdatadir = $(datadir)/games/$(PACKAGE)/data
 
 dist_pkgdata_DATA = \
- $(shell find $(srcdir) -name "*.data") \
- $(shell find $(srcdir) -name "*.items") \
- $(shell find $(srcdir) -name "*.projectile") \
- $(shell find $(srcdir) -name "*.cup") \
+ $(shell find $(srcdir) -name "*.data")                  \
+ $(shell find $(srcdir) -name "*.items")                 \
+ $(shell find $(srcdir) -name "*.projectile")            \
+ $(shell find $(srcdir) -name "*.cup")                   \
  $(shell find $(srcdir) -maxdepth 1 -name "*.challenge") \
- $(shell find $(srcdir) -name "*.collectable") \
- stk_config.xml  bubblegum.xml                \
+ $(shell find $(srcdir) -name "*.collectable")           \
+ stk_config.xml  powerup.xml  items.xml                  \
  CREDITS
 
 desktopdir = $(prefix)/share/applications
