@@ -79,7 +79,7 @@ private:
     
     /** optionally, set this if this item was laid by a particular kart. in this case,
         the 'm_deactive_time' will also be set - see below. */ 
-    Kart*         m_event_handler;
+    const Kart   *m_event_handler;
     /** optionally, if item was placed by a kart, a timer can be used to temporarly
        deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
@@ -90,7 +90,7 @@ public:
                         scene::IMesh* mesh, unsigned int item_id);
     virtual       ~Item ();
     void          update  (float delta);
-    virtual void  collected(float t=2.0f);
+    virtual void  collected(const Kart *kart, float t=2.0f);
     
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, and
@@ -99,17 +99,10 @@ public:
      */
     bool hitKart (Kart* kart ) const
     {
-        return m_deactive_time <=0 &&
+        return (m_event_handler!=kart || m_deactive_time <=0) &&
                (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
     }   // hitKart
 
-    // ------------------------------------------------------------------------
-    /** Deactivates the item for a certain amount of time. It is used to
-     *  prevent bubble gum from hitting a kart over and over again (in each
-     *  frame) by giving it time to drive away.
-     *  \param t Time the item is deactivated.
-     */
-    void          deactivate(float t)  { m_deactive_time=t; }
     // ------------------------------------------------------------------------
     unsigned int  getItemId()    const { return m_item_id;  }
     ItemType      getType()      const { return m_type;     }

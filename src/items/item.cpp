@@ -42,6 +42,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
     m_node->setPosition(xyz.toIrrVector());
+    m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item
 
@@ -170,16 +171,19 @@ void Item::update(float dt)
  *  has been collected, and the time to return to the parameter. 
  *  \param t Time till the object reappears (defaults to 2 seconds).
  */
-void Item::collected(float t)
+void Item::collected(const Kart *kart, float t)
 {
-    m_collected  = true;
+    m_collected     = true;
+    m_event_handler = kart;
     if(m_type==ITEM_BUBBLEGUM)
     {
-        deactivate(0.5);
+        // Deactivates the item for a certain amount of time. It is used to
+        // prevent bubble gum from hitting a kart over and over again (in each
+        // frame) by giving it time to drive away.
+        m_deactive_time = 0.5f;
         // Set the time till reappear to -1 seconds --> the item will 
         // reappear immediately.
         m_time_till_return = -1;
-
     }
     else
     {
