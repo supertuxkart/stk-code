@@ -119,6 +119,10 @@ void ItemManager::loadDefaultItems()
                     item_names[i].c_str());
             exit(-1);
         }
+        // If lighting would be enabled certain items (esp. bananas)
+        // don't look smooth, so for now generally disable lighting
+        // FIXME : re-export models with normals instead
+        mesh->setMaterialFlag(video::EMF_LIGHTING, false);
         std::string shortName = 
             StringUtils::getBasename(StringUtils::removeExtension(model_filename));
         m_all_meshes[shortName] = mesh;

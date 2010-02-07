@@ -42,10 +42,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
     m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
-    // If lighting would be enabled certain items (esp. bananas)
-    // don't look smooth, so for now generally disable lighting
-    // FIXME : re-export models with normals instead
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
     m_node->setPosition(xyz.toIrrVector());
     m_node->grab();
 }   // Item
@@ -60,7 +56,6 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
     m_original_type    = m_type;
     m_type             = type;
     m_node->setMesh(mesh);
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // switchTo
 
 //-----------------------------------------------------------------------------
@@ -72,7 +67,6 @@ void Item::switchBack()
     m_type          = m_original_type;
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // switchBack
 
 //-----------------------------------------------------------------------------
