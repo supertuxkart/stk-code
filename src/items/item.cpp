@@ -126,20 +126,21 @@ void Item::update(float dt)
     if(m_collected)
     {
         m_time_till_return -= dt;
-        if ( m_time_till_return > 0 )
+        if(m_time_till_return<0)
         {
-            Vec3 hell(m_coord.getXYZ());
+            m_collected=false;
+            m_node->setScale(core::vector3df(1,1,1));
 
-            hell.setZ( (m_time_till_return>1.0f) ? -1000000.0f 
-               : m_coord.getXYZ().getZ() - m_time_till_return / 2.0f);
-            m_node->setPosition(hell.toIrrVector());
-        }
-        else
+        }   // time till return <0 --> is fully visible again
+        else if ( m_time_till_return <=1.0f )
         {
-            m_collected    = false;
-        }   // T>0
-
-    }
+            // Make it visible by scaling it from 0 to 1:
+            m_node->setVisible(true);
+            m_node->setScale(core::vector3df(1,1,1)*(1-m_time_till_return));
+            core::vector3df pos = m_coord.getXYZ().toIrrVector();
+            pos.Y = pos.Y+2.0f*m_time_till_return;
+        }   // time till return < 1
+    }   // if collected
     else
     {   // not m_collected
         
@@ -185,6 +186,7 @@ void Item::collected(float t)
         // Note if the time is negative, in update the m_collected flag will
         // be automatically set to false again.
         m_time_till_return = t;
+        m_node->setVisible(false);
     }
 }   // isCollected
 
