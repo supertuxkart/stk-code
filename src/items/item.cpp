@@ -72,6 +72,7 @@ void Item::switchBack()
     m_type          = m_original_type;
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);
+    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 }   // switchBack
 
 //-----------------------------------------------------------------------------
