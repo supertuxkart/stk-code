@@ -66,9 +66,12 @@ void StandardRace::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
-void StandardRace::update(float delta)
+/** Called once per frame to update race specific data structures.
+ *  \param dt TIme step size.
+ */
+void StandardRace::update(float dt)
 {    
-    LinearWorld::update(delta);
+    LinearWorld::update(dt);
     if(!TimedRace::isRacePhase()) return;
     
     // All karts are finished
@@ -82,6 +85,15 @@ void StandardRace::update(float delta)
     // ===========================================================
     else if(isRaceOver())
     {
+        // Update the estimated finishing time for all karts that haven't
+        // finished yet.
+        const unsigned int kart_amount = race_manager->getNumKarts();
+        for(unsigned int i = 0; i < kart_amount ; i++)
+        {
+            if(!m_kart[i]->hasFinishedRace())
+                m_kart[i]->raceFinished(estimateFinishTimeForKart(m_kart[i]));
+        }   // i<kart_amount
+
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
         enterRaceOverState(true /* delay */);
@@ -89,7 +101,7 @@ void StandardRace::update(float delta)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Returns tru if the race is finished, i.e. all player karts are finished.
+/** Returns true if the race is finished, i.e. all player karts are finished.
  */
 bool StandardRace::isRaceOver()
 {
