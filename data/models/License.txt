@@ -10,8 +10,8 @@
     created by horace aka thomas oppl (toppl@fh-sbg.ac.at) (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
 
-* chest_*, key
-    by Marianne gagnon
+* chest*
+    by MiniBjorn (c) 2010
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
 
 Others are GPL.
