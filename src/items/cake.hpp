@@ -27,6 +27,8 @@
 
 #include "items/flyable.hpp"
 
+class XMLNode;
+
 class Cake : public Flyable
 {
 private:
@@ -39,7 +41,7 @@ private:
                                       // projectile (NULL if none)
 public:
     Cake (Kart *kart);
-    static  void init     (const lisp::Lisp* lisp, scene::IMesh *cake_model);
+    static  void init     (const XMLNode &node, scene::IMesh *cake_model);
     virtual void update   (float dt);
     virtual void hitTrack ()                      { hit(NULL);               }
     // Kinematic objects are not allowed to have a velocity (assertion in 

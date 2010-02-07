@@ -26,6 +26,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
@@ -114,17 +115,17 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
 
 }   // createPhysics
 // -----------------------------------------------------------------------------
-void Flyable::init(const lisp::Lisp* lisp, scene::IMesh *model,
+void Flyable::init(const XMLNode &node, scene::IMesh *model,
                    PowerupType type)
 {
     m_st_speed[type]        = 25.0f;
     m_st_max_height[type]   = 1.0f;
     m_st_min_height[type]   = 3.0f;
     m_st_force_updown[type] = 15.0f;
-    lisp->get("speed",           m_st_speed[type]       );
-    lisp->get("min-height",      m_st_min_height[type]  );
-    lisp->get("max-height",      m_st_max_height[type]  );
-    lisp->get("force-updown",    m_st_force_updown[type]);
+    node.get("speed",           &(m_st_speed[type])       );
+    node.get("min-height",      &(m_st_min_height[type])  );
+    node.get("max-height",      &(m_st_max_height[type])  );
+    node.get("force-updown",    &(m_st_force_updown[type]));
 
     // Store the size of the model
     Vec3 min, max;

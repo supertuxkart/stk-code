@@ -24,6 +24,7 @@
 
 #include <iostream>
 
+#include "io/xml_node.hpp"
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 
@@ -114,9 +115,13 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 }   // Cake
 
 // -----------------------------------------------------------------------------
-void Cake::init(const lisp::Lisp* lisp, scene::IMesh *cake_model)
+/** Initialises the object from an entry in the powerup.xml file.
+ *  \param node The xml node for this object.
+ *  \param cakde_model The mesh model of the cake.
+ */
+void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 {
-    Flyable::init(lisp, cake_model, POWERUP_CAKE);
+    Flyable::init(node, cake_model, POWERUP_CAKE);
     m_st_max_distance   = 80.0f;
     m_st_max_distance_squared = 80.0f * 80.0f;
     m_gravity = 9.8f;
@@ -124,8 +129,7 @@ void Cake::init(const lisp::Lisp* lisp, scene::IMesh *cake_model)
     if (m_gravity < 0)
     m_gravity *= -1;
 
-
-    lisp->get("max-distance",    m_st_max_distance  );
+    node.get("max-distance",    &m_st_max_distance  );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
 }   // init
 

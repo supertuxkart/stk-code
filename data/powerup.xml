@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<powerup>
+  <item name="zipper"         icon="zipper_collect.png" />
+  <item name="bowling"        icon="bowling-icon.png"
+        model="bowling.b3d"   speed="4.0"
+        min-height="0.2"      max-height="1.0"
+        force-updown="1"      force-to-target="40"
+        max-distance="25"                               />
+  <item name="bubblegum"      icon="bubblegum-icon.png" />
+  <item name="cake"           icon="cake-icon.png"
+        model="cake.b3d"      speed="50"
+        min-height="0.2"      max-height="1.0"
+        force-updown="25"     max-distance="90"         />
+  <item name="anchor"         icon="anchor-icon.png"
+        model="anchor.b3d"                              />
+  <item name="switch"         icon="swap-icon.png"      />
+  <item name="parachute"      icon="parachute.png"
+        model="parachute.b3d"                           />
+  <item name="plunger"        icon="plunger-icon.png"
+        model="plunger.b3d"   speed="35"
+        min-height="0.2"      max-height="1.0"
+        force-updown="35"     force-to-target="15"
+        max-distance="25"                               />
+</powerup>
+

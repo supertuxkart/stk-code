@@ -34,6 +34,7 @@ using namespace irr;
 class FlyableInfo;
 class Kart;
 class PhysicalObject;
+class XMLNode;
 
 class Flyable : public Moveable, public TerrainInfo
 {
@@ -114,7 +115,7 @@ public:
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
      *  but gravity will basically be disabled.                          */
     void         setAdjustZVelocity(bool f) { m_adjust_z_velocity = f; }
-    static void  init        (const lisp::Lisp* lisp, scene::IMesh *model,
+    static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupType type);
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);

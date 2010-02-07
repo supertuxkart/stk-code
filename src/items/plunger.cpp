@@ -23,6 +23,7 @@
 #include "items/plunger.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/player_kart.hpp"
@@ -107,9 +108,9 @@ Plunger::~Plunger()
 }   // ~Plunger
 
 // -----------------------------------------------------------------------------
-void Plunger::init(const lisp::Lisp* lisp, scene::IMesh *plunger_model)
+void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 {
-    Flyable::init(lisp, plunger_model, POWERUP_PLUNGER);
+    Flyable::init(node, plunger_model, POWERUP_PLUNGER);
 }   // init
 
 // -----------------------------------------------------------------------------

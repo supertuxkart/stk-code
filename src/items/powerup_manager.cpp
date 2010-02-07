@@ -27,30 +27,10 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
-
-
-typedef struct
-{
-    PowerupType powerup;
-    const char*const dataFile;
-}
-initPowerupType;
-
-initPowerupType ict[]=
-{
-    {POWERUP_ZIPPER,    "zipper.collectable"       },
-    {POWERUP_BOWLING,   "bowling.projectile"       },
-    {POWERUP_BUBBLEGUM, "bubblegum.xml"            },
-    {POWERUP_CAKE,      "cake.projectile"          },
-    {POWERUP_ANVIL,     "anvil.collectable"        },
-    {POWERUP_SWITCH,    "switch.collectable"       },
-    {POWERUP_PARACHUTE, "parachute.collectable"    },
-    {POWERUP_PLUNGER,   "plunger.projectile"       },
-    {POWERUP_MAX,       ""                         },
-};
 
 PowerupManager* powerup_manager=0;
 
@@ -65,82 +45,95 @@ PowerupManager::PowerupManager()
 }   // PowerupManager
 
 //-----------------------------------------------------------------------------
+PowerupManager::~PowerupManager()
+{
+    for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
+    {
+        m_all_meshes[(PowerupType)i]->drop();
+    }
+ 
+}   // ~PowerupManager
+
+//-----------------------------------------------------------------------------
 void PowerupManager::removeTextures()
 {
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
+/** Determines the powerup type for a given name.
+ *  \param name Name of the powerup to look up.
+ *  \return The type, or POWERUP_NOTHING if the name is not found
+ */
+PowerupType PowerupManager::getPowerupType(const std::string &name)
+{
+    // Must match the order of PowerupType in powerup_manager.hpp!!
+    static std::string powerup_names[] = {
+        "",            /* Nothing */ 
+        "bubblegum", "cake", "bowling", "zipper", "plunger", "switch", 
+        "parachute", "anchor"
+    };
+
+    for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
+    {
+        if(powerup_names[i]==name) return(PowerupType)i;
+    }
+    return POWERUP_NOTHING;
+}   // getPowerupType
+
+//-----------------------------------------------------------------------------
 /** Loads all projectiles from the powerup.xml file.
  */
-void PowerupManager::loadPowerups()
+void PowerupManager::loadAllPowerups()
 {
-    for(int i=0; ict[i].powerup != POWERUP_MAX; i++)
+    XMLNode *root = file_manager->createXMLTree("data/powerup.xml");
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
-        Load(ict[i].powerup, ict[i].dataFile);
+        const XMLNode *node=root->getNode(i);
+        std::string name;
+        node->get("name", &name);
+        PowerupType type = getPowerupType(name);
+        LoadPowerup(type, *node);
     }
-}  // loadPowerups
+}  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
-void PowerupManager::Load(int collectType, const char* filename)
+void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 {
-    const lisp::Lisp* ROOT = 0;
+    std::string icon_file(""); 
+    node.get("icon", &icon_file);
+    m_all_icons[type] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     false,
+                                  /*make_permanent */ true); 
 
-    lisp::Parser parser;
-    std::string tmp= "data/" + (std::string)filename;
-    ROOT = parser.parse(file_manager->getConfigFile(filename));
-        
-    const lisp::Lisp* lisp = ROOT->getLisp("tuxkart-collectable");
-    if(!lisp)
-    {
-        std::ostringstream msg;
-        msg << "No 'tuxkart-collectable' node found while parsing '" 
-            << filename << "'.";
-        throw std::runtime_error(msg.str());
-    }
-    LoadNode(lisp, collectType);
 
-    delete ROOT;
-
-}   // Load
-
-//-----------------------------------------------------------------------------
-void PowerupManager::LoadNode(const lisp::Lisp* lisp, int collectType )
-{
-    std::string sName, sModel, sIconFile; 
-    lisp->get("name",            sName                              );
-    lisp->get("mesh",            sModel                             );
-    lisp->get("icon",            sIconFile                          );
-    // load material
-    m_all_icons[collectType] = material_manager->getMaterial(sIconFile,
-                                                     /* full_path */    false,
-                                                     /*make_permanent */ true); 
-    if(sModel!="")
+    std::string model(""); 
+    node.get("model", &model);
+    if(model.size()>0)
     {
         // FIXME LEAK: not freed (unimportant, since the models have to exist
         // for the whole game anyway).
-        std::string full_path = file_manager->getModelFile(sModel);
-        m_all_meshes[collectType] = irr_driver->getMesh(full_path);
+        std::string full_path = file_manager->getModelFile(model);
+        m_all_meshes[type] = irr_driver->getMesh(full_path);
+        if(!m_all_meshes[type])
+        {
+            std::ostringstream o;
+            o<<"Can't load model '"<<model<<"' for powerup type '"<<type<<"', aborting.";
+            throw std::runtime_error(o.str());
+        }
     }
     else
     {
-        m_all_meshes[collectType] = 0;
-        m_all_extends[collectType] = btVector3(0.0f,0.0f,0.0f);
-    }
-    if(!m_all_meshes[collectType])
-    {
-        std::ostringstream o;
-        o<<"Can't load model '"<<sModel<<"' for '"<<sName<<"', aborting.";
-        throw std::runtime_error(o.str());
+        m_all_meshes[type] = 0;
+        m_all_extends[type] = btVector3(0.0f,0.0f,0.0f);
     }
     // Load special attributes for certain powerups
-    switch (collectType) {
+    switch (type) {
         case POWERUP_BOWLING:          
-             Bowling::init(lisp, m_all_meshes[collectType]); break;
+             Bowling::init(node, m_all_meshes[type]); break;
         case POWERUP_PLUNGER:          
-             Plunger::init(lisp, m_all_meshes[collectType]); break;
+             Plunger::init(node, m_all_meshes[type]); break;
         case POWERUP_CAKE: 
-             Cake::init(lisp, m_all_meshes[collectType]); break;
+             Cake::init(node, m_all_meshes[type]);    break;
         default:;
     }   // switch
 }   // LoadNode
-

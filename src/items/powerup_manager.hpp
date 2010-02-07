@@ -27,19 +27,24 @@
 #include "btBulletDynamicsCommon.h"
 
 class Material;
+class XMLNode;
 
 // The anvil and parachute must be at the end of the enum, and the
 // zipper just before them (see Powerup::hitBonusBox).
 enum PowerupType {POWERUP_NOTHING,
-                  POWERUP_BUBBLEGUM, POWERUP_CAKE,
+                  POWERUP_FIRST, 
+                  POWERUP_BUBBLEGUM = POWERUP_FIRST, 
+                  POWERUP_CAKE,
                   POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
                   POWERUP_SWITCH,
-                  POWERUP_PARACHUTE, POWERUP_ANVIL, //powerup.cpp assumes these two come last
+                  POWERUP_PARACHUTE, 
+                  POWERUP_ANVIL,      //powerup.cpp assumes these two come last
+                  POWERUP_LAST=POWERUP_ANVIL,
                   POWERUP_MAX};
 
 class PowerupManager
 {
-protected:
+private:
     Material*     m_all_icons [POWERUP_MAX];
     float         m_all_max_distance[POWERUP_MAX];    // if a target is closer than this
     float         m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
@@ -48,11 +53,13 @@ protected:
     scene::IMesh *m_all_meshes[POWERUP_MAX];
     btVector3     m_all_extends[POWERUP_MAX];
     void          LoadNode       (const lisp::Lisp* lisp, int collectType);
+    PowerupType   getPowerupType(const std::string &name);
 public:
-    PowerupManager           ();
-    void          loadPowerups();
+                  PowerupManager  ();
+                 ~PowerupManager  ();
+    void          loadAllPowerups ();
     void          removeTextures  ();
-    void          Load            (int collectType, const char* filename);
+    void          LoadPowerup     (PowerupType type, const XMLNode &node);
     Material*     getIcon         (int type) const {return m_all_icons [type];      }
     /** Returns the mesh for a certain powerup. 
      *  \param type Mesh type for which the model is returned. */

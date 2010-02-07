@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/camera.hpp"
+#include "io/xml_node.hpp"
 #include "items/bowling.hpp"
 #include "karts/player_kart.hpp"
 
@@ -69,17 +70,21 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
 }   // Bowling
 
 // -----------------------------------------------------------------------------
-void Bowling::init(const lisp::Lisp* lisp, scene::IMesh *bowling)
+/** Initialises this object with data from the power.xml file.
+ *  \param node XML Node
+ *  \param bowling The bowling ball mesh
+ */
+void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
 {
-    Flyable::init(lisp, bowling, POWERUP_BOWLING);
-    m_st_max_distance    = 20.0f;
+    Flyable::init(node, bowling, POWERUP_BOWLING);
+    m_st_max_distance         = 20.0f;
     m_st_max_distance_squared = 20.0f * 20.0f;
-    m_st_force_to_target = 10.0f;
+    m_st_force_to_target      = 10.0f;
  
-    lisp->get("max-distance",    m_st_max_distance   );
+    node.get("max-distance",    &m_st_max_distance   );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
     
-    lisp->get("force-to-target", m_st_force_to_target);
+    node.get("force-to-target", &m_st_force_to_target);
 }   // init
 
 // -----------------------------------------------------------------------------

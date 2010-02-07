@@ -327,7 +327,7 @@ void IrrDriver::doApplyResSettings()
 
     material_manager->reInit();
 
-    powerup_manager         -> loadPowerups();
+    powerup_manager         -> loadAllPowerups();
     kart_properties_manager -> loadAllKarts();
     item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();

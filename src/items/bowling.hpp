@@ -25,6 +25,8 @@ using namespace irr;
 
 #include "items/flyable.hpp"
 
+class XMLNode;
+
 class Bowling : public Flyable
 {
 private:
@@ -34,7 +36,7 @@ private:
     
 public:
     Bowling(Kart* kart);
-    static  void init(const lisp::Lisp* lisp, scene::IMesh *bowling);
+    static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual void update(float dt);
     
     int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }

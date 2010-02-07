@@ -423,7 +423,6 @@ AC_CONFIG_FILES([                   \
  data/fonts/Makefile                \
  data/grandprix/Makefile            \
  data/gui/Makefile                  \
- data/items/Makefile                \
  data/karts/Makefile                \
  data/models/Makefile               \
  data/music/Makefile                \

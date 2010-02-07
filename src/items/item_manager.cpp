@@ -98,68 +98,34 @@ ItemManager::~ItemManager()
 //-----------------------------------------------------------------------------
 void ItemManager::loadDefaultItems()
 {
-    // Load all models. This can't be done in the constructor, 
-    // since the file_manager isn't ready at that stage.
-    // -------------------------------------------------------
-    std::set<std::string> files;
-    file_manager->listFiles(files, file_manager->getItemsDir(),
-                            /*is_full_path*/true, 
-                            /*make_full_path*/true);
-    for(std::set<std::string>::iterator i  = files.begin();
-            i != files.end();  ++i)
+    // The names must be given in the order of the definition of ItemType
+    // in item.hpp. Note that bubblegum strictly isn't an item,
+    // it is implemented as one, and so loaded here, too.
+    static const std::string item_names[] = {"bonus-box", "banana",
+                                             "nitro-big", "nitro-small", 
+                                             "bubblegum" };
+
+    const XMLNode *root = file_manager->createXMLTree("data/items.xml");
+    for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
-        if(StringUtils::getExtension(*i)!="b3d") continue;
-        scene::IMesh *mesh = irr_driver->getAnimatedMesh(*i);
-        if(!mesh) continue;
-        std::string shortName = StringUtils::getBasename(StringUtils::removeExtension(*i));
+        const XMLNode *node = root->getNode(item_names[i]);
+        std::string model_filename;
+        if (node)
+            node->get("model", &model_filename);
+        scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
+        if(!node || model_filename.size()==0 || !mesh)
+        {
+            fprintf(stderr, "Item model '%s' in items.xml could not be loaded - aborting",
+                    item_names[i].c_str());
+            exit(-1);
+        }
+        std::string shortName = 
+            StringUtils::getBasename(StringUtils::removeExtension(model_filename));
         m_all_meshes[shortName] = mesh;
+        m_item_mesh[i]          = mesh;
         mesh->grab();
     }   // for i
-
-    setDefaultItemStyle();
 }   // loadDefaultItems
-
-//-----------------------------------------------------------------------------
-void ItemManager::setDefaultItemStyle()
-{
-    // FIXME - This should go in an internal, system wide configuration file
-    std::string DEFAULT_NAMES[Item::ITEM_LAST - Item::ITEM_FIRST +1];
-    DEFAULT_NAMES[Item::ITEM_BONUS_BOX]   = "gift-box";
-    DEFAULT_NAMES[Item::ITEM_BANANA]      = "banana";
-    DEFAULT_NAMES[Item::ITEM_NITRO_BIG]   = "nitrotank-big";
-    DEFAULT_NAMES[Item::ITEM_NITRO_SMALL] = "nitrotank-small";
-    DEFAULT_NAMES[Item::ITEM_BUBBLEGUM]   = "bubblegum";
-
-    bool bError=0;
-    std::ostringstream msg;
-    for(int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
-    {
-        m_item_mesh[i] = m_all_meshes[DEFAULT_NAMES[i]];
-        if(!m_item_mesh[i])
-        {
-            msg << "Item model '" << DEFAULT_NAMES[i] 
-                << "' is missing (see item_manager)!\n";
-            bError=1;
-            break;
-        }   // if !m_item_model
-    }   // for i
-    if(bError)
-    {
-        fprintf(stderr, "The following models are available:\n");
-        for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
-        {
-            if(i->second)
-            {
-                fprintf(stderr, "   %s in %s.ac.\n",
-                    i->first.c_str(),
-                    i->first.c_str());
-            }  // if i->second
-        }
-        throw std::runtime_error(msg.str());
-        exit(-1);
-    }   // if bError
-
-}   // setDefaultItemStyle
 
 //-----------------------------------------------------------------------------
 /** Creates a new item.
@@ -225,40 +191,6 @@ void ItemManager::cleanup()
         delete *i;
     }
     m_all_items.clear();
-
-    setDefaultItemStyle();
-
-    // FIXME - this seems outdated
-    
-    // Then load the default style from the user_config file
-    // -----------------------------------------------------
-    // This way if an item is not defined in the item-style-file, the
-    // default (i.e. old herring) is used.
-    try
-    {
-        // FIXME: This should go in a system-wide configuration file,
-        //        and only one of this and the hard-coded settings in
-        //        setDefaultItemStyle are necessary!!!
-        loadItemStyle(UserConfigParams::m_item_style);
-    }
-    catch(std::runtime_error)
-    {
-        fprintf(stderr,"The item style '%s' in your configuration file does not exist.\nIt is ignored.\n",
-                UserConfigParams::m_item_style.c_str());
-        UserConfigParams::m_item_style="";
-    }
-
-    try
-    {
-        loadItemStyle(m_user_filename);
-    }
-    catch(std::runtime_error)
-    {
-        fprintf(stderr,"The item style '%s' specified on the command line does not exist.\nIt is ignored.\n",
-                m_user_filename.c_str());
-        m_user_filename="";  // reset to avoid further warnings.
-    }
-
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -287,44 +219,6 @@ void ItemManager::reset()
 
     m_switch_time = -1;
 }   // reset
-
-//-----------------------------------------------------------------------------
-/** Sets the selected item style to be used in the track. The style depends on
- *  either the GP or the track selected.
- */
-void ItemManager::setStyle()
-{
-    if(race_manager->getMajorMode()== RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
-        try
-        {
-            item_manager->loadItemStyle(race_manager->getItemStyle());
-        }
-        catch(std::runtime_error)
-        {
-            fprintf(stderr, "The grand prix '%ls' contains an invalid item style '%s'.\n",
-                    race_manager->getGrandPrix()->getName().c_str(),
-                    race_manager->getItemStyle().c_str());
-            fprintf(stderr, "Please fix the file 'l%s'.\n",
-                    race_manager->getGrandPrix()->getFilename().c_str());
-        }
-    }
-    else
-    {
-        try
-        {
-            item_manager->loadItemStyle(RaceManager::getTrack()->getItemStyle());
-        }
-        catch(std::runtime_error)
-        {
-            fprintf(stderr, "The track '%ls' contains an invalid item style '%s'.\n",
-                    RaceManager::getTrack()->getName().c_str(), 
-                    RaceManager::getTrack()->getItemStyle().c_str());
-            fprintf(stderr, "Please fix the file '%s'.\n",
-                    RaceManager::getTrack()->getFilename().c_str());
-        }
-    }
-}   // setStyle
 
 //-----------------------------------------------------------------------------
 void ItemManager::update(float dt)
@@ -365,38 +259,16 @@ void ItemManager::switchItems()
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type]);
         // FIXME: if switch is used while items are switched: 
         // switch back - but that doesn't work properly yet
-        //else
-        //    (*i)->switchBack();
+        else
+            (*i)->switchBack();
     }   // for m_all_items
 
-    m_switch_time = stk_config->m_item_switch_time;
+    // if the items are already switched (m_switch_time >=0)
+    // then switch back, and set m_switch_time to -1 to indicate
+    // that the items are now back to normal.
+    m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
 
 }   // switchItems
-
-//-----------------------------------------------------------------------------
-void ItemManager::loadItemStyle(const std::string filename)
-{
-    if(filename.length()==0) return;
-    const lisp::Lisp* root = 0;
-    lisp::Parser parser;
-    
-    root = parser.parse(file_manager->getConfigFile(filename + ".items"));
-
-    const lisp::Lisp* item_node = root->getLisp("item");
-    if(!item_node)
-    {
-        std::ostringstream msg;
-        msg << "Couldn't load map '" << filename << "': no item node.";
-        delete root;
-        throw std::runtime_error(msg.str());
-        delete root;
-    }
-    setItem(item_node, "red",   Item::ITEM_BONUS_BOX  );
-    setItem(item_node, "green", Item::ITEM_BANANA     );
-    setItem(item_node, "gold"  ,Item::ITEM_NITRO_BIG  );
-    setItem(item_node, "silver",Item::ITEM_NITRO_SMALL);
-    delete root;
-}   // loadItemStyle
 
 //-----------------------------------------------------------------------------
 void ItemManager::setItem(const lisp::Lisp *item_node,

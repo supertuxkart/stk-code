@@ -613,7 +613,7 @@ int main(int argc, char *argv[] )
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
         projectile_manager      -> loadData        ();
-        powerup_manager         -> loadPowerups    ();
+        powerup_manager         -> loadAllPowerups ();
         item_manager            -> loadDefaultItems();
         attachment_manager      -> loadModels      ();
 

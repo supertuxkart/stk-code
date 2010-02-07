@@ -27,9 +27,10 @@
 using namespace irr;
 #include "items/flyable.hpp"
 
-class RubberBand;
 class Kart;
 class PhysicalObject;
+class RubberBand;
+class XMLNode;
 
 class Plunger : public Flyable
 {
@@ -44,7 +45,7 @@ private:
 public:
                  Plunger(Kart *kart);
                 ~Plunger();
-    static  void init(const lisp::Lisp* lisp, scene::IMesh* missile);
+    static  void init(const XMLNode &node, scene::IMesh* missile);
     /** Sets the keep-alive value. Setting it to 0 will remove the plunger
      *  at the next update - which is used if the rubber band snaps. 
      */

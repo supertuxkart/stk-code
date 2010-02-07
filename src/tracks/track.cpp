@@ -617,7 +617,6 @@ void Track::loadTrackModel(unsigned int mode_id)
     m_has_final_camera     = false;
     m_is_arena             = false;
     m_track_object_manager = new TrackObjectManager();
-    item_manager->setStyle();
 
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores

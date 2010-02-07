@@ -2,4 +2,16 @@
     created by MiniBjorn (c) 2008
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
 
+* bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac, giftbox.ac
+    created by MiniBjorn (c) 2008
+    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+
+* banana.ac
+    created by horace aka thomas oppl (toppl@fh-sbg.ac.at) (c) 2008
+    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+
+* chest_*, key
+    by Marianne gagnon
+    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+
 Others are GPL.
