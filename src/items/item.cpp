@@ -153,6 +153,7 @@ void Item::update(float dt)
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_node->setRotation(m_coord.getHPR().toIrrHPR());
         m_node->setPosition(m_coord.getXYZ().toIrrVector());
+        return;
 
         core::quaternion q;
         q.rotationFromTo(core::vector3df(0,1,0), m_normal.toIrrVector());
