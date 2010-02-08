@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "modes/clock.hpp"
+#include "modes/world_status.hpp"
 #include "network/network_kart.hpp"
 #include "physics/physics.hpp"
 #include "race/highscores.hpp"
@@ -76,7 +76,7 @@ class Track;
  *        RaceManager).
  */
 
-class World : public TimedRace
+class World : public WorldStatus
 {
 public:
     typedef std::vector<Kart*> Karts;
@@ -118,6 +118,8 @@ protected:
     
     /** Pointer to the race GUI. The race GUI is handedl by world. */
     RaceGUI *m_race_gui;
+
+    virtual void onGo();
     
 public:
     World();
@@ -152,8 +154,6 @@ public:
     float getFastestLapTime() const           { return m_fastest_lap;               }
     void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time; }
     HighscoreEntry* getHighscores() const;
-    float getTime() const                     { return TimedRace::getTime();           }
-    Phase getPhase() const                    { return TimedRace::getPhase();          }
 
     virtual void terminateRace();
     
@@ -180,8 +180,8 @@ public:
       * The code that draws the timer should call this first to know
       * whether the game mode wants a timer drawn
       */
-    bool shouldDrawTimer() const    { return TimedRace::isRacePhase() &&
-                                             TimedRace::getClockMode() != CLOCK_NONE; }
+    bool shouldDrawTimer() const    { return isRacePhase() &&
+                                             getClockMode() != CLOCK_NONE; }
     
     /** called when a bonus box is hit, to determine which types of powerups are allowed
         in each game mode. By default all are accepted, override in child classes to get

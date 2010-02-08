@@ -26,16 +26,13 @@ class FollowTheLeaderRace : public LinearWorld
     std::vector<float>  m_leader_intervals;    // time till elimination in follow leader
 public:
     
-    FollowTheLeaderRace();
+             FollowTheLeaderRace();
     virtual ~FollowTheLeaderRace();
     
     // clock events
     virtual void countdownReachedZero();
-    virtual void onGo();
-    virtual void terminateRace();
     
     // overriding World methods
-    virtual void update(float delta);
     virtual void restartRace();
     virtual std::string getIdent() const;
     virtual bool useFastMusicNearEnd() const { return false; }

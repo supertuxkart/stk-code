@@ -172,8 +172,6 @@ supertuxkart_SOURCES = \
  lisp/parser.hpp \
  lisp/writer.cpp \
  lisp/writer.hpp \
- modes/clock.cpp \
- modes/clock.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/linear_world.cpp \
@@ -186,6 +184,8 @@ supertuxkart_SOURCES = \
  modes/three_strikes_battle.hpp \
  modes/world.cpp \
  modes/world.hpp \
+ modes/world_status.cpp \
+ modes/world_status.hpp \
  network/character_confirm_message.hpp \
  network/character_info_message.hpp \
  network/character_selected_message.hpp \

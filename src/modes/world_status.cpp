@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "modes/clock.hpp"
+#include "modes/world_status.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -24,7 +24,7 @@
 #include "states_screens/dialogs/race_over_dialog.hpp"
 
 //-----------------------------------------------------------------------------
-TimedRace::TimedRace()
+WorldStatus::WorldStatus()
 {
     m_mode            = CHRONO;
     m_time            = 0.0f;
@@ -36,10 +36,10 @@ TimedRace::TimedRace()
     // FIXME - is it a really good idea to reload and delete the sound every race??
     m_prestart_sound  = sfx_manager->newSFX(SFXManager::SOUND_PRESTART);
     m_start_sound     = sfx_manager->newSFX(SFXManager::SOUND_START);
-}   // TimedRace
+}   // WorldStatus
 
 //-----------------------------------------------------------------------------
-void TimedRace::reset()
+void WorldStatus::reset()
 {
     m_time = 0.0f;
     m_auxiliary_timer = 0.0f;
@@ -48,21 +48,21 @@ void TimedRace::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-TimedRace::~TimedRace()
+WorldStatus::~WorldStatus()
 {
     sfx_manager->deleteSFX(m_prestart_sound);
     sfx_manager->deleteSFX(m_start_sound);
-}   // ~TimedRace
+}   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
-void TimedRace::setClockMode(const ClockType mode, const float initial_time)
+void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
     m_mode = mode;
     m_time = initial_time;
 }   // setClockMode
 
 //-----------------------------------------------------------------------------
-void TimedRace::enterRaceOverState(const bool delay)
+void WorldStatus::enterRaceOverState(const bool delay)
 {
     if(m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE) return; // we already know
     
@@ -79,7 +79,7 @@ void TimedRace::enterRaceOverState(const bool delay)
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
-void TimedRace::update(const float dt)
+void WorldStatus::update(const float dt)
 {
     switch(m_phase)
     {
@@ -133,13 +133,10 @@ void TimedRace::update(const float dt)
             if(m_auxiliary_timer < stk_config->m_delay_finish_time) break;
             
             m_phase = FINISH_PHASE;
-            
-            new RaceOverDialog(0.6f, 0.9f);
-            
-            break;            
+            // NOTE: no break, fall through to FINISH_PHASE handling!!
         }
         case FINISH_PHASE:
-            // event
+            new RaceOverDialog(0.6f, 0.9f);
             terminateRace();
             return;
         default: break;  // default for RACE_PHASE, LIMBO_PHASE
@@ -164,18 +161,18 @@ void TimedRace::update(const float dt)
     }
 }
 //-----------------------------------------------------------------------------
-void TimedRace::setTime(const float time)
+void WorldStatus::setTime(const float time)
 {
     m_time = time;
 }
 //-----------------------------------------------------------------------------
-void TimedRace::pause()
+void WorldStatus::pause()
 {
     m_previous_phase = m_phase;
     m_phase = LIMBO_PHASE;
 }
 //-----------------------------------------------------------------------------
-void TimedRace::unpause()
+void WorldStatus::unpause()
 {
     m_phase = m_previous_phase;
 }

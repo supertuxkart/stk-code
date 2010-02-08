@@ -54,7 +54,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 void Item::setType(ItemType type)
 {
     m_type   = type;
-    m_rotate = type!=ITEM_BUBBLEGUM;
+    m_rotate = true;//type!=ITEM_BUBBLEGUM;
 }   // setType
 
 //-----------------------------------------------------------------------------
@@ -74,6 +74,8 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
  */
 void Item::switchBack()
 {
+    if(m_original_type==ITEM_NONE)
+        printf("XX");
     assert(m_original_type!=ITEM_NONE);
     setType(m_original_type);
     m_original_type = ITEM_NONE;
@@ -151,10 +153,20 @@ void Item::update(float dt)
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_node->setRotation(m_coord.getHPR().toIrrHPR());
         m_node->setPosition(m_coord.getXYZ().toIrrVector());
-        return;
 
+        core::quaternion q;
+        q.rotationFromTo(core::vector3df(0,1,0), m_normal.toIrrVector());
+        core::quaternion q2;
         static float t=0;
         t += dt;
+        q2.fromAngleAxis(t, m_normal.toIrrVector());
+        core::quaternion all=q*q2;
+        core::vector3df euler;
+        all.toEuler(euler);
+        m_node->setRotation(euler);
+
+        return;
+#ifdef xx
 
         btQuaternion q(Vec3(0,0,1), t*0.1f);
         btQuaternion q_orig(m_normal, 0);
@@ -163,6 +175,7 @@ void Item::update(float dt)
         float y, p, r;
         m.getEuler(y, p, r);
         m_node->setRotation(Vec3(y, p, r).toIrrHPR());
+#endif
     }
 }   // update
 

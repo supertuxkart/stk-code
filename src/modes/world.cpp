@@ -58,11 +58,11 @@
  *  after the constructor. Those functions can be called in the init() 
  *  function, which is called immediately after the constructor.
  */
-World::World() : TimedRace()
+World::World() : WorldStatus()
 {
     m_physics  = NULL;
     m_race_gui = NULL;
-    TimedRace::setClockMode( CHRONO );
+    WorldStatus::setClockMode( CHRONO );
 }   // World
 
 // ----------------------------------------------------------------------------
@@ -235,14 +235,28 @@ World::~World()
 }   // ~World
 
 //-----------------------------------------------------------------------------
+/** Called when 'go' is being displayed for the first time. Here the brakes
+ *  of the karts are released.
+ */
+void World::onGo()
+{
+    // Reset the brakes now that the prestart 
+    // phase is over (braking prevents the karts 
+    // from sliding downhill)
+    for(unsigned int i=0; i<m_kart.size(); i++) 
+    {
+        m_kart[i]->resetBrakes();
+    }
+}   // onGo
+
+//-----------------------------------------------------------------------------
 void World::terminateRace()
 {
     updateHighscores();
-    TimedRace::pause();
-    // TODO - race results GUI
-    //menu_manager->pushMenu(MENUID_RACERESULT);
+    WorldStatus::pause();
     unlock_manager->raceFinished();
-}
+}   // terminateRace
+
 //-----------------------------------------------------------------------------
 /** Waits till each kart is resting on the ground
  *
@@ -323,7 +337,7 @@ void World::resetAllKarts()
 void World::update(float dt)
 {
     if(history->replayHistory()) dt=history->getNextDelta();
-    TimedRace::update(dt);
+    WorldStatus::update(dt);
     // Clear race state so that new information can be stored
     race_state->clear();
 
@@ -342,7 +356,7 @@ void World::update(float dt)
     // The order of updates is rather important: if track update would
     // be called before kart update, then the check manager (called from
     // track update) will be using the old kart position to determine
-    // e.g. if a kart has started a new line. But linear world (from
+    // e.g. if a kart has crossed a new line. But linear world (from
     // which this is called in case of a race) will be using the new
     // position of the karts to determine the driveline quad a kart
     // is on. So if a kart just arrived at quad 0 (meaning the distance
@@ -477,7 +491,7 @@ void World::removeKart(int kart_number)
     // ignored in all loops). Important:world->getCurrentNumKarts() returns
     // the number of karts still racing. This value can not be used for loops
     // over all karts, use race_manager->getNumKarts() instead!
-    race_manager->RaceFinished(kart, TimedRace::getTime());
+    race_manager->RaceFinished(kart, WorldStatus::getTime());
     kart->eliminate();
     m_eliminated_karts++;
 
@@ -492,7 +506,7 @@ void World::getDefaultCollectibles(int& collectible_type, int& amount )
 //-----------------------------------------------------------------------------
 void World::restartRace()
 {
-    TimedRace::reset();
+    WorldStatus::reset();
     m_faster_music_active = false;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -521,17 +535,17 @@ void  World::pause()
 {
     sound_manager->pauseMusic();
     sfx_manager->pauseAll();
-    TimedRace::pause();
-}
+    WorldStatus::pause();
+}   // pause
 
 //-----------------------------------------------------------------------------
 void  World::unpause()
 {
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
-    TimedRace::unpause();
+    WorldStatus::unpause();
     for(unsigned int i=0; i<m_player_karts.size(); i++)
         m_player_karts[i]->resetInputState();
-}
+}   // pause
 
 /* EOF */

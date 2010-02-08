@@ -561,10 +561,6 @@
 				Name="modes"
 				>
 				<File
-					RelativePath="..\..\modes\clock.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\modes\follow_the_leader.cpp"
 					>
 				</File>
@@ -586,6 +582,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\world.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\world_status.cpp"
 					>
 				</File>
 			</Filter>
@@ -1379,10 +1379,6 @@
 				Name="modes"
 				>
 				<File
-					RelativePath="..\..\modes\clock.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\modes\follow_the_leader.hpp"
 					>
 				</File>
@@ -1404,6 +1400,10 @@
 				</File>
 				<File
 					RelativePath="..\..\modes\world.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modes\world_status.hpp"
 					>
 				</File>
 			</Filter>

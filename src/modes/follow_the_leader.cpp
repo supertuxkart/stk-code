@@ -30,7 +30,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals = stk_config->m_leader_intervals;
     m_use_highscores   = false;  // disable high scores
-    TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -43,16 +43,18 @@ FollowTheLeaderRace::~FollowTheLeaderRace()
 #pragma mark clock events
 #endif
 //-----------------------------------------------------------------------------
+/** Called when a kart must be eliminated.
+ */
 void FollowTheLeaderRace::countdownReachedZero()
 {
     if(m_leader_intervals.size()>1)
         m_leader_intervals.erase(m_leader_intervals.begin());
-    TimedRace::setTime(m_leader_intervals[0]);
+    WorldStatus::setTime(m_leader_intervals[0]);
     int kart_number;
     // If the leader kart is not the first kart, remove the first
     // kart, otherwise remove the last kart.
     int position_to_remove = m_kart[0]->getPosition()==1 
-        ? getCurrentNumKarts() : 1;
+                           ? getCurrentNumKarts() : 1;
     const int kart_amount = m_kart.size();
     for (kart_number=0; kart_number<kart_amount; kart_number++)
     {
@@ -102,40 +104,12 @@ bool FollowTheLeaderRace::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-void FollowTheLeaderRace::onGo()
-{
-    // Reset the brakes now that the prestart 
-    // phase is over (braking prevents the karts 
-    // from sliding downhill)
-    for(unsigned int i=0; i<m_kart.size(); i++) 
-    {
-        m_kart[i]->resetBrakes();
-    }
-}
-//-----------------------------------------------------------------------------
-void FollowTheLeaderRace::terminateRace()
-{
-    LinearWorld::terminateRace();
-}
-
-
-#if 0
-#pragma mark -
-#pragma mark overridden from World
-#endif
-
-//-----------------------------------------------------------------------------
-void FollowTheLeaderRace::update(float delta)
-{   
-    LinearWorld::update(delta);
-}
-//-----------------------------------------------------------------------------
 void FollowTheLeaderRace::restartRace()
 {
     LinearWorld::restartRace();
     m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
-    TimedRace::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    WorldStatus::setClockMode(COUNTDOWN, m_leader_intervals[0]);
 }   // restartRace
 
 //-----------------------------------------------------------------------------

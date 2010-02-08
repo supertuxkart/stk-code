@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
 {
-    TimedRace::setClockMode(CHRONO);
+    WorldStatus::setClockMode(CHRONO);
 }   // StandardRace
 
 //-----------------------------------------------------------------------------
@@ -36,34 +36,10 @@ StandardRace::~StandardRace()
 #pragma mark clock events
 #endif
 
-//-----------------------------------------------------------------------------
-void StandardRace::onGo()
-{
-    // Reset the brakes now that the prestart 
-    // phase is over (braking prevents the karts 
-    // from sliding downhill)
-    for(unsigned int i=0; i<m_kart.size(); i++) 
-    {
-        m_kart[i]->resetBrakes();
-    }
-}   // onGo
-
-//-----------------------------------------------------------------------------
-void StandardRace::terminateRace()
-{
-    LinearWorld::terminateRace();
-}   // terminateRace
-
 #if 0
 #pragma mark -
 #pragma mark overridden from World
 #endif
-
-//-----------------------------------------------------------------------------
-void StandardRace::restartRace()
-{
-    LinearWorld::restartRace();
-}   // restartRace
 
 //-----------------------------------------------------------------------------
 /** Called once per frame to update race specific data structures.
@@ -72,7 +48,7 @@ void StandardRace::restartRace()
 void StandardRace::update(float dt)
 {    
     LinearWorld::update(dt);
-    if(!TimedRace::isRacePhase()) return;
+    if(!WorldStatus::isRacePhase()) return;
     
     // All karts are finished
     if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )

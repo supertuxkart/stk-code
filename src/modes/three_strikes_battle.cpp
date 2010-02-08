@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
-    TimedRace::setClockMode(CHRONO);
+    WorldStatus::setClockMode(CHRONO);
     m_use_highscores = false;
     
     World::init();
@@ -60,17 +60,6 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 }   // ~ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
-void ThreeStrikesBattle::onGo()
-{
-    // Reset the brakes now that the prestart 
-    // phase is over (braking prevents the karts 
-    // from sliding downhill)
-    for(unsigned int i=0; i<m_kart.size(); i++) 
-    {
-        m_kart[i]->resetBrakes();
-    }
-}   // onGo
-//-----------------------------------------------------------------------------
 
 void ThreeStrikesBattle::terminateRace()
 {
@@ -82,7 +71,7 @@ void ThreeStrikesBattle::terminateRace()
     {
         if(!m_kart[i]->hasFinishedRace())
         {
-            m_kart[i]->raceFinished(TimedRace::getTime());
+            m_kart[i]->raceFinished(WorldStatus::getTime());
         }  // if !hasFinishedRace
     }   // for i
     
@@ -103,7 +92,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
     {
-        m_kart[kart_id]->raceFinished(TimedRace::getTime());
+        m_kart[kart_id]->raceFinished(WorldStatus::getTime());
         removeKart(kart_id);
     }
     
@@ -150,9 +139,9 @@ void ThreeStrikesBattle::updateKartRanks()
         for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
         {
             const int this_karts_time = m_kart[karts_list[n]]->hasFinishedRace() ?
-                (int)m_kart[karts_list[n]]->getFinishTime() : (int)TimedRace::getTime();
+                (int)m_kart[karts_list[n]]->getFinishTime() : (int)WorldStatus::getTime();
             const int next_karts_time = m_kart[karts_list[n+1]]->hasFinishedRace() ?
-                (int)m_kart[karts_list[n+1]]->getFinishTime() : (int)TimedRace::getTime();
+                (int)m_kart[karts_list[n+1]]->getFinishTime() : (int)WorldStatus::getTime();
 
             bool swap = false;
             
@@ -186,7 +175,7 @@ void ThreeStrikesBattle::enterRaceOverState(const bool delay)
     // Add the results for the remaining kart
     for(int i=0; i<(int)race_manager->getNumKarts(); i++)
         if(!m_kart[i]->isEliminated()) 
-            race_manager->RaceFinished(m_kart[i], TimedRace::getTime());
+            race_manager->RaceFinished(m_kart[i], WorldStatus::getTime());
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
