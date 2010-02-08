@@ -54,7 +54,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 void Item::setType(ItemType type)
 {
     m_type   = type;
-    m_rotate = true;//type!=ITEM_BUBBLEGUM;
+    m_rotate = type!=ITEM_BUBBLEGUM;
 }   // setType
 
 //-----------------------------------------------------------------------------
