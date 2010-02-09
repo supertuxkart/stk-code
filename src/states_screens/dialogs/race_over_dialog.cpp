@@ -72,7 +72,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     int*  order = new int [num_karts];
     RaceManager::getWorld()->raceResultOrder( order );
     
-    const bool display_time = (RaceManager::getWorld()->getClockMode() == CHRONO);
+    const bool display_time = 
+        (RaceManager::getWorld()->getClockMode() == WorldStatus::CLOCK_CHRONO);
 
     int line_h = text_height + 15;
     const int lines_from_y = text_height + 15;

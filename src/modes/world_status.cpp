@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
-    m_mode            = CHRONO;
+    m_mode            = CLOCK_CHRONO;
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_phase           = SETUP_PHASE;
@@ -39,15 +39,19 @@ WorldStatus::WorldStatus()
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
+/** Resets all status information, used when starting a new race.
+ */
 void WorldStatus::reset()
 {
-    m_time = 0.0f;
+    m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
-    m_phase = READY_PHASE; // FIXME - unsure
-    m_previous_phase      = SETUP_PHASE;
+    m_phase           = READY_PHASE; // FIXME - unsure
+    m_previous_phase  = SETUP_PHASE;
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Destructor of WorldStatus.
+ */
 WorldStatus::~WorldStatus()
 {
     sfx_manager->deleteSFX(m_prestart_sound);
@@ -55,6 +59,10 @@ WorldStatus::~WorldStatus()
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
+/** Sets the clock mode and the initial time of the world clock.
+ *  \param mode The new clock mode.
+ *  \param initial_time The new initial time for the world clock.
+ */
 void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
     m_mode = mode;
@@ -62,6 +70,9 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 }   // setClockMode
 
 //-----------------------------------------------------------------------------
+/** Adjusts the phase to be finish or delay_finish.
+ *  \param delay True if there should be a delay before the game finishes.
+ */
 void WorldStatus::enterRaceOverState(const bool delay)
 {
     if(m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE) return; // we already know
@@ -79,6 +90,9 @@ void WorldStatus::enterRaceOverState(const bool delay)
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
+/** Updates all status information, called once per frame.
+ *  \param dt Duration of time step.
+ */
 void WorldStatus::update(const float dt)
 {
     switch(m_phase)
@@ -144,10 +158,10 @@ void WorldStatus::update(const float dt)
     
     switch(m_mode)
     {
-        case CHRONO:
+        case CLOCK_CHRONO:
             m_time += dt;
             break;
-        case COUNTDOWN:
+        case CLOCK_COUNTDOWN:
             m_time -= dt;
             
             if(m_time <= 0.0)
@@ -159,18 +173,24 @@ void WorldStatus::update(const float dt)
                 break;
         default: break;
     }
-}
+}   // update
+
 //-----------------------------------------------------------------------------
+/** Sets the time for the clock.
+ *  \param time New time to set.
+ */
 void WorldStatus::setTime(const float time)
 {
     m_time = time;
-}
+}   // setTime
+
 //-----------------------------------------------------------------------------
 void WorldStatus::pause()
 {
     m_previous_phase = m_phase;
-    m_phase = LIMBO_PHASE;
-}
+    m_phase          = LIMBO_PHASE;
+}   // pause
+
 //-----------------------------------------------------------------------------
 void WorldStatus::unpause()
 {

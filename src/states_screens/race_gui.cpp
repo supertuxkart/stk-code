@@ -194,8 +194,8 @@ void RaceGUI::renderGlobal(float dt)
     }
     
     assert(RaceManager::getWorld() != NULL);
-    if(RaceManager::getWorld()->getPhase() >= READY_PHASE &&
-       RaceManager::getWorld()->getPhase() <= GO_PHASE      )
+    if(RaceManager::getWorld()->getPhase() >= WorldStatus::READY_PHASE &&
+       RaceManager::getWorld()->getPhase() <= WorldStatus::GO_PHASE      )
     {
         drawGlobalReadySetGo();
     }
@@ -204,8 +204,8 @@ void RaceGUI::renderGlobal(float dt)
     if(!RaceManager::getWorld()->isRacePhase()) return;
 
     drawGlobalTimer();
-    if(RaceManager::getWorld()->getPhase() == GO_PHASE ||
-        RaceManager::getWorld()->getPhase() == MUSIC_PHASE)
+    if(RaceManager::getWorld()->getPhase() == WorldStatus::GO_PHASE ||
+       RaceManager::getWorld()->getPhase() == WorldStatus::MUSIC_PHASE)
     {
         drawGlobalMusicDescription();
     }
@@ -777,7 +777,7 @@ void RaceGUI::drawGlobalReadySetGo()
     assert(RaceManager::getWorld() != NULL);
     switch (RaceManager::getWorld()->getPhase())
     {
-    case READY_PHASE:
+    case WorldStatus::READY_PHASE:
         {
             //static video::SColor color = video::SColor(255, 230, 168, 158);
             static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -787,7 +787,7 @@ void RaceGUI::drawGlobalReadySetGo()
             font->draw(m_string_ready.c_str(), pos, color, true, true);
         }
         break;
-    case SET_PHASE:
+    case WorldStatus::SET_PHASE:
         {
             //static video::SColor color = video::SColor(255, 230, 230, 158);
             static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -798,7 +798,7 @@ void RaceGUI::drawGlobalReadySetGo()
             font->draw(m_string_set.c_str(), pos, color, true, true);
         }
         break;
-    case GO_PHASE:
+    case WorldStatus::GO_PHASE:
         {
             //static video::SColor color = video::SColor(255, 100, 209, 100);
             static video::SColor color = video::SColor(255, 255, 255, 255);

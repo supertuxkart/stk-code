@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
-    WorldStatus::setClockMode(CHRONO);
+    WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
     
     World::init();

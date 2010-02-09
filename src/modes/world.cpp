@@ -62,7 +62,7 @@ World::World() : WorldStatus()
 {
     m_physics  = NULL;
     m_race_gui = NULL;
-    WorldStatus::setClockMode( CHRONO );
+    WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
 
 // ----------------------------------------------------------------------------
@@ -250,6 +250,9 @@ void World::onGo()
 }   // onGo
 
 //-----------------------------------------------------------------------------
+/** Called at the end of a race. Updates highscores, pauses the game, and
+ *  informs the unlock manager about the finished race.
+ */
 void World::terminateRace()
 {
     updateHighscores();
@@ -390,7 +393,7 @@ HighscoreEntry* World::getHighscores() const
 }
 // ----------------------------------------------------------------------------
 /*
- * usually called at the end of a race. Checks if the current times are worth a new
+ * Usually called at the end of a race. Checks if the current times are worth a new
  * score, if so it notifies the HighscoreManager so the new score is added and saved.
  */
 void World::updateHighscores()
@@ -485,7 +488,7 @@ void World::removeKart(int kart_number)
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
-    projectile_manager->newExplosion(kart->getXYZ());
+    //projectile_manager->newExplosion(kart->getXYZ());
     // The kart can't be really removed from the m_kart array, since otherwise
     // a race can't be restarted. So it's only marked to be eliminated (and
     // ignored in all loops). Important:world->getCurrentNumKarts() returns

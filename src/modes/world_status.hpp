@@ -20,42 +20,45 @@
 
 class SFXBase;
 
-enum ClockType
-{
-    CLOCK_NONE,
-    CHRONO, // counts up
-    COUNTDOWN
-};
-
-enum Phase {
-    // Game setup, e.g. track loading
-    SETUP_PHASE,
-    // 'Ready' is displayed
-    READY_PHASE,
-    // 'Set' is displayed
-    SET_PHASE,
-    // 'Go' is displayed, but this is already race phase
-    GO_PHASE,
-    // Race is started, 'go' is gone, but music name is still there
-    MUSIC_PHASE,
-    // the actual race has started, no ready/set/go is displayed anymore
-    RACE_PHASE,
-    // All players have finished, now wait a certain amount of time for AI
-    // karts to finish. If they do not finish in that time, finish the race
-    DELAY_FINISH_PHASE,
-    // The player crossed the finishing line and his and the time of
-    // the other players is displayed, controll is automatic
-    FINISH_PHASE,
-    // The state after finish where no calculations are done.
-    LIMBO_PHASE,
-};
-
 /**
  * A class that manages the clock (countdown, chrono, etc.) Also manages stuff
  * like the 'ready/set/go' text at the beginning or the delay at the end of a race.
  */
 class WorldStatus
 {
+public:
+    /** Different clock types for a race. */
+    enum ClockType
+    {
+        CLOCK_NONE,
+        CLOCK_CHRONO, // counts up
+        CLOCK_COUNTDOWN
+    };
+
+    enum Phase {
+        // Game setup, e.g. track loading
+        SETUP_PHASE,
+        // 'Ready' is displayed
+        READY_PHASE,
+        // 'Set' is displayed
+        SET_PHASE,
+        // 'Go' is displayed, but this is already race phase
+        GO_PHASE,
+        // Race is started, 'go' is gone, but music name is still there
+        MUSIC_PHASE,
+        // the actual race has started, no ready/set/go is displayed anymore
+        RACE_PHASE,
+        // All players have finished, now wait a certain amount of time for AI
+        // karts to finish. If they do not finish in that time, finish the race
+        DELAY_FINISH_PHASE,
+        // The player crossed the finishing line and his and the time of
+        // the other players is displayed, controll is automatic
+        FINISH_PHASE,
+        // Phase while playing the end (win/lose) animation.
+        END_ANIMATION_PHASE, 
+        // The state after finish where no calculations are done.
+        LIMBO_PHASE,
+    };
 protected:
     SFXBase    *m_prestart_sound;
     SFXBase    *m_start_sound;
@@ -113,8 +116,6 @@ public:
     void    pause();
     void    unpause();
     
-    /** Gets called when the race is about to finish (but with the option of adding
-        * some delay to watch the end of the race. */
     virtual void enterRaceOverState(const bool delay=false);
 
     /** Called when it's really over (delay over if any)

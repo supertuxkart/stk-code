@@ -30,7 +30,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
 {
     m_leader_intervals = stk_config->m_leader_intervals;
     m_use_highscores   = false;  // disable high scores
-    setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -90,10 +90,11 @@ void FollowTheLeaderRace::countdownReachedZero()
     {
         // Note: LinearWorld::terminateRace adds the scores for all remaining
         // karts in the race.
-        enterRaceOverState();
+        enterRaceOverState(false);
         return;
     }
-}
+}   // countdownReachedZero
+
 //-----------------------------------------------------------------------------
 /** The follow the leader race is over if there is only one kart left,
  *  or if all players have gone.
@@ -109,7 +110,8 @@ void FollowTheLeaderRace::restartRace()
     LinearWorld::restartRace();
     m_leader_intervals.clear();
     m_leader_intervals    = stk_config->m_leader_intervals;
-    WorldStatus::setClockMode(COUNTDOWN, m_leader_intervals[0]);
+    WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, 
+                              m_leader_intervals[0]);
 }   // restartRace
 
 //-----------------------------------------------------------------------------

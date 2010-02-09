@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
 {
-    WorldStatus::setClockMode(CHRONO);
+    WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // StandardRace
 
 //-----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void StandardRace::update(float dt)
 
         // Set delay mode to have time for camera animation, and
         // to give the AI some time to get non-estimated timings
-        enterRaceOverState(true /* delay */);
+        enterRaceOverState();
     }
 }   // update
 

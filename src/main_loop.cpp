@@ -114,7 +114,7 @@ void MainLoop::updateRace(float dt)
     if(!race_manager->getWorld()->isFinishPhase())
         network_manager->receiveUpdates();
 
-    if ( RaceManager::getWorld()->getPhase() != LIMBO_PHASE)
+    if ( RaceManager::getWorld()->getPhase() != WorldStatus::LIMBO_PHASE)
     {
         history->update(dt);
         RaceManager::getWorld()->update(dt);
