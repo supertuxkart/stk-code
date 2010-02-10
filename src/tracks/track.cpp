@@ -904,8 +904,8 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // Don't tilt the items, since otherwise the rotation will look odd,
     // i.e. the items will not rotate around the normal, but 'wobble'
     // around.
-    Vec3 normal(0.7071f, 0, 0.7071f);
-    //Vec3 normal(0, 0, 1);
+    //Vec3 normal(0.7071f, 0, 0.7071f);
+    Vec3 normal(0, 0, 1);
     item_manager->newItem(type, loc, normal);
 }   // itemCommand
 
