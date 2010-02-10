@@ -61,14 +61,12 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
-
-    const unsigned int num_karts = race_manager->getNumKarts();
-    
-    int*  order = new int [num_karts];
-    RaceManager::getWorld()->raceResultOrder( order );
-    
-    const bool display_time = 
-        (RaceManager::getWorld()->getClockMode() == WorldStatus::CLOCK_CHRONO);
+    World *world = RaceManager::getWorld();
+    const unsigned int num_karts = world->getNumKarts();
+    int*  order  = new int [num_karts];
+    world->raceResultOrder(order);
+        
+    const bool display_time = (world->getClockMode() == WorldStatus::CLOCK_CHRONO);
 
     int line_h = text_height + 15;
     const int lines_from_y = text_height + 15;
@@ -86,7 +84,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         
         stringw kart_results_line;
         
-        const Kart *current_kart = RaceManager::getKart(order[i]);
+        const Kart *current_kart = world->getKart(order[i]);
         const stringw& kart_name = current_kart->getName();
                 
         char sTime[20];

@@ -62,9 +62,10 @@ void RaceState::serialise()
     // 1. Kart positions
     // -----------------
     addChar(num_karts);
+    World *world = RaceManager::getWorld();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart = RaceManager::getKart(i);
+        const Kart* kart = world->getKart(i);
         m_kart_controls[i].serialise(this);
         addVec3(kart->getXYZ());
         addQuaternion(kart->getRotation());
@@ -116,13 +117,14 @@ void RaceState::receive(ENetPacket *pkt)
     // 1. Kart information
     // -------------------
     unsigned int num_karts = getChar();
+    World *world = RaceManager::getWorld();
     for(unsigned int i=0; i<num_karts; i++)
     {
         KartControl kc(this);
         // Currently not used!
         Vec3 xyz       = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart     = RaceManager::getKart(i);
+        Kart *kart     = world->getKart(i);
         // Firing needs to be done from here to guarantee that any potential
         // new rockets are created before the update for the rockets is handled
         if(kc.m_fire)
@@ -139,10 +141,10 @@ void RaceState::receive(ENetPacket *pkt)
     {
         ItemInfo hi(this);
         if(hi.m_item_id==-1)     // Rescue triggered
-            RaceManager::getKart(hi.m_kart_id)->forceRescue();
+            world->getKart(hi.m_kart_id)->forceRescue();
         else
             item_manager->collectedItem(hi.m_item_id,
-                                          RaceManager::getKart(hi.m_kart_id),
+                                          world->getKart(hi.m_kart_id),
                                           hi.m_add_info);
     }
 
@@ -167,12 +169,12 @@ void RaceState::receive(ENetPacket *pkt)
         signed char kart_id2 = getChar();
         if(kart_id2==-1)
         {   // kart - track collision
-            RaceManager::getKart(kart_id1)->crashed(NULL);
-        }
+            world->getKart(kart_id1)->crashed(NULL);
+            }
         else
         {
-            RaceManager::getWorld()->getPhysics()->KartKartCollision(RaceManager::getKart(kart_id1),
-                                                        RaceManager::getKart(kart_id2));
+            world->getPhysics()->KartKartCollision(world->getKart(kart_id1),
+                                                    world->getKart(kart_id2));
         }
     }   // for(i=0; i<num_collisions; i+=2)
     clear();  // free message buffer

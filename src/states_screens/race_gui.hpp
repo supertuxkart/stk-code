@@ -145,18 +145,18 @@ private:
                               video::S3DVertex *v, unsigned short int *index);
 
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (Kart *player_kart,
+    void drawEnergyMeter       (const Kart *kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawPowerupIcons      (Kart* player_kart,
+    void drawPowerupIcons      (const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawAllMessages       (Kart* player_kart,
+    void drawAllMessages       (const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawSpeed             (Kart* kart, const core::recti &viewport, 
+    void drawSpeed             (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
-    void drawLap               (const KartIconDisplayInfo* info, Kart* kart,
+    void drawLap               (const KartIconDisplayInfo* info, const Kart* kart,
                                 const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
@@ -171,7 +171,7 @@ public:
          RaceGUI();
         ~RaceGUI();
     void renderGlobal(float dt);
-    void renderPlayerView(unsigned int player_id);
+    void renderPlayerView(const Kart *kart);
     
     void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
                     int fonst_size, 

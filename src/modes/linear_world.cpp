@@ -126,7 +126,7 @@ void LinearWorld::update(float delta)
     // especially updates the kart positions.
     World::update(delta);
 
-    const unsigned int kart_amount = race_manager->getNumKarts();
+    const unsigned int kart_amount = getNumKarts();
 
     // Do stuff specific to this subtype of race.
     // ------------------------------------------
@@ -323,7 +323,7 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     // Find the best time for the lap. We can't simply use
     // the time of the kart at position 1, since the kart
     // might have been overtaken by now
-    const unsigned int kart_amount = race_manager->getNumKarts();
+    const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUI::KartIconDisplayInfo& rank_info = m_kart_display_info[i];
@@ -422,12 +422,14 @@ void LinearWorld::terminateRace()
 }   // terminateRace
 
 // ----------------------------------------------------------------------------
+/** Sets up the mapping from kart position to kart index.
+ */
 void LinearWorld::raceResultOrder( int* order )
 {
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    const unsigned int NUM_KARTS = getNumKarts();
     for(unsigned int i=0; i < NUM_KARTS; i++)
     {
-        order[RaceManager::getKart(i)->getPosition()-1] = i; // even for eliminated karts
+        order[getKart(i)->getPosition()-1] = i; // even for eliminated karts
     }
 }   // raceResultOrder
 

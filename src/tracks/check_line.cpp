@@ -22,6 +22,7 @@
 #include <string>
 
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 
 /** Constructor for a checkline. 
@@ -32,7 +33,9 @@
 CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node) 
          : CheckStructure(check_manager, node)
 {
-    m_previous_sign.resize(race_manager->getNumKarts());
+    // Note that when this is called the karts have not been allocated
+    // in world, so we can't call world->getNumKarts()
+    m_previous_sign.resize(race_manager->getNumberOfKarts());
     core::vector2df p1, p2;
     node.get("p1", &p1);
     node.get("p2", &p2);

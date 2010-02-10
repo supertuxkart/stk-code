@@ -94,10 +94,11 @@ RaceGUI::~RaceGUI()
  */
 void RaceGUI::createMarkerTexture()
 {
-    unsigned int n=race_manager->getNumKarts();
-    unsigned int npower2 = 1;
+    World *world           = RaceManager::getWorld();
+    unsigned int num_karts = race_manager->getNumberOfKarts();
+    unsigned int npower2   = 1;
     // Textures must be power of 2, so 
-    while(npower2<n) npower2*=2;
+    while(npower2<num_karts) npower2*=2;
 
     int radius     = (m_marker_rendered_size>>1)-1;
     IrrDriver::RTTProvider rttProvider(core::dimension2du(m_marker_rendered_size * npower2, 
@@ -126,7 +127,7 @@ void RaceGUI::createMarkerTexture()
     video::SMaterial m;
     m.setTexture(0, NULL);
     irr_driver->getVideoDriver()->setMaterial(m);
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    for(unsigned int i=0; i<num_karts; i++)
     {
         const std::string& kart_ident = race_manager->getKartIdent(i);
         const KartProperties *kp = kart_properties_manager->getKart(kart_ident);
@@ -218,26 +219,23 @@ void RaceGUI::renderGlobal(float dt)
 //-----------------------------------------------------------------------------
 /** Render the details for a single player, i.e. speed, energy, 
  *  collectibles, ...
- *  \param player_id  Player id.
- *  \param viewport Viewport to use (already set in the camera).
- *  \param scaling Scaling to use.
+ *  \param kart Pointer to the kart for which to render the view.
  */
-void RaceGUI::renderPlayerView(unsigned int player_id)
+void RaceGUI::renderPlayerView(const Kart *kart)
 {
-    PlayerKart* player_kart = RaceManager::getWorld()->getLocalPlayerKart(player_id);
-    const core::recti &viewport    = player_kart->getViewport();
-    const core::vector2df &scaling = player_kart->getScaling();
-    drawAllMessages     (player_kart, viewport, scaling);
+    const core::recti &viewport    = kart->getViewport();
+    const core::vector2df &scaling = kart->getScaling();
+    drawAllMessages     (kart, viewport, scaling);
     if(!RaceManager::getWorld()->isRacePhase()) return;
 
     RaceGUI::KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
 
-    drawPowerupIcons    (player_kart, viewport, scaling);
-    drawEnergyMeter     (player_kart, viewport, scaling);
-    drawSpeed           (player_kart, viewport, scaling);
-    drawLap             (info, player_kart, viewport, scaling);
+    drawPowerupIcons    (kart, viewport, scaling);
+    drawEnergyMeter     (kart, viewport, scaling);
+    drawSpeed           (kart, viewport, scaling);
+    drawLap             (info, kart, viewport, scaling);
 
-    if(player_kart->hasViewBlockedByPlunger())
+    if(kart->hasViewBlockedByPlunger())
     {
         int offset_y = viewport.UpperLeftCorner.Y;
 
@@ -300,9 +298,10 @@ void RaceGUI::drawGlobalMiniMap()
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
     irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    World *world = RaceManager::getWorld();
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const Kart *kart = RaceManager::getKart(i);
+        const Kart *kart = world->getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
@@ -347,10 +346,11 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     }
     
     gui::IGUIFont* font = GUIEngine::getFont();
-    const unsigned int kart_amount = race_manager->getNumKarts();
+    World *world = RaceManager::getWorld();
+    const unsigned int kart_amount = world->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
-        Kart* kart   = RaceManager::getKart(i);
+        Kart* kart   = world->getKart(i);
         if(kart->isEliminated()) continue;
         const int position = kart->getPosition();
 
@@ -391,14 +391,14 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 }   // drawGlobalPlayerIcons
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawPowerupIcons(Kart* player_kart, 
+void RaceGUI::drawPowerupIcons(const Kart* kart, 
                                const core::recti &viewport, 
                                const core::vector2df &scaling)
 {
     // If player doesn't have anything, do nothing.
-    Powerup* powerup=player_kart->getPowerup();
+    const Powerup* powerup = kart->getPowerup();
     if(powerup->getType() == POWERUP_NOTHING) return;
-    int n  = player_kart->getNumPowerup() ;
+    int n  = kart->getNumPowerup() ;
     if(n<1) return;    // shouldn't happen, but just in case
     if(n>5) n=5;       // Display at most 5 items
 
@@ -424,11 +424,11 @@ void RaceGUI::drawPowerupIcons(Kart* player_kart,
 
 //-----------------------------------------------------------------------------
 /* Energy meter that gets filled with coins */
-void RaceGUI::drawEnergyMeter (Kart *player_kart,              
+void RaceGUI::drawEnergyMeter (const Kart *kart,              
                                const core::recti &viewport, 
                                const core::vector2df &scaling)
 {
-    float state = (float)(player_kart->getEnergy()) / MAX_ITEMS_COLLECTED;
+    float state = (float)(kart->getEnergy()) / MAX_ITEMS_COLLECTED;
     int x = (int)((UserConfigParams::m_width-24) * scaling.X) + viewport.UpperLeftCorner.X;
     //int y = (int)(250 * scaling.Y) + viewport.UpperLeftCorner.Y;
     int y = viewport.LowerRightCorner.Y -  (int)(250 * scaling.Y);
@@ -485,7 +485,7 @@ void RaceGUI::drawEnergyMeter (Kart *player_kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport, 
+void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport, 
                         const core::vector2df &scaling)
 {
 
@@ -576,7 +576,7 @@ void RaceGUI::drawSpeed(Kart* kart, const core::recti &viewport,
 } // drawSpeed
 
 //-----------------------------------------------------------------------------
-void RaceGUI::drawLap(const KartIconDisplayInfo* info, Kart* kart, 
+void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart, 
                       const core::recti &viewport, 
                       const core::vector2df &scaling)
 {
@@ -640,7 +640,7 @@ void RaceGUI::cleanupMessages(const float dt)
 //-----------------------------------------------------------------------------
 /** Displays all messages in the message queue
  **/
-void RaceGUI::drawAllMessages(Kart* player_kart,
+void RaceGUI::drawAllMessages(const Kart* kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
@@ -657,7 +657,7 @@ void RaceGUI::drawAllMessages(Kart* player_kart,
         TimedMessage const &msg = *i;
 
         // Display only messages for all karts, or messages for this kart
-        if( msg.m_kart && msg.m_kart!=player_kart) continue;
+        if( msg.m_kart && msg.m_kart!=kart) continue;
 
         core::rect<s32> pos(x, y, x, y);
         GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),

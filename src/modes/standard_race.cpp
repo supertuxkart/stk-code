@@ -41,7 +41,7 @@ void StandardRace::update(float dt)
     if(!WorldStatus::isRacePhase()) return;
     
     // All karts are finished
-    if(race_manager->getFinishedKarts() >= race_manager->getNumKarts() )
+    if(race_manager->getFinishedKarts() >= getNumKarts() )
     {
         enterRaceOverState();
         unlock_manager->raceFinished();
@@ -53,7 +53,7 @@ void StandardRace::update(float dt)
     {
         // Update the estimated finishing time for all karts that haven't
         // finished yet.
-        const unsigned int kart_amount = race_manager->getNumKarts();
+        const unsigned int kart_amount = getNumKarts();
         for(unsigned int i = 0; i < kart_amount ; i++)
         {
             if(!m_kart[i]->hasFinishedRace())

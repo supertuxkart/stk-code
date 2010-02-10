@@ -25,7 +25,8 @@
 KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)
 {
-    unsigned int num_karts = RaceManager::getWorld()->getCurrentNumKarts();
+    World *world = RaceManager::getWorld();
+    unsigned int num_karts = world->getNumKarts();
 
     // Send the number of karts and for each kart the compressed 
     // control structure (3 ints) and xyz,hpr (4 floats: quaternion:
@@ -35,7 +36,7 @@ KartUpdateMessage::KartUpdateMessage()
     addChar(num_karts);
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const Kart* kart = RaceManager::getKart(i);
+        const Kart* kart = world->getKart(i);
         const KartControl& kc=kart->getControls();
         kc.serialise(this);
         addVec3(kart->getXYZ());
@@ -46,6 +47,7 @@ KartUpdateMessage::KartUpdateMessage()
 KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
                   : Message(pkt, MT_KART_INFO)
 {
+    World *world = RaceManager::getWorld();
     unsigned int num_karts = getInt();
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -53,7 +55,7 @@ KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
         KartControl kc(this);
         Vec3 xyz = getVec3();
         btQuaternion q = getQuaternion();
-        Kart *kart = RaceManager::getKart(i);
+        Kart *kart = world->getKart(i);
         kart->setXYZ(xyz);
         kart->setRotation(q);
     }   // for i

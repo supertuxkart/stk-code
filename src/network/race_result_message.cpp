@@ -28,9 +28,9 @@
  */
 RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
 {
-    const unsigned int num_karts = race_manager->getNumKarts();
-    allocate(num_karts * (getFloatLength()+getCharLength()));
     World *world = race_manager->getWorld();
+    const unsigned int num_karts = world->getNumKarts();
+    allocate(num_karts * (getFloatLength()+getCharLength()));
     for(unsigned int i=0; i<num_karts; i++)
     {
         const Kart *kart = world->getKart(i);
@@ -47,8 +47,8 @@ RaceResultMessage::RaceResultMessage() : Message(MT_RACE_RESULT)
 RaceResultMessage::RaceResultMessage(ENetPacket* pkt) 
                  : Message(pkt, MT_RACE_RESULT)
 {
-    const unsigned int num_karts = race_manager->getNumKarts();
     World *world = race_manager->getWorld();
+    const unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)
     {
         Kart *kart = world->getKart(i);

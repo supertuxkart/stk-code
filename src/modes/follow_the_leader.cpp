@@ -131,7 +131,7 @@ RaceGUI::KartIconDisplayInfo* FollowTheLeaderRace::getKartsDisplayInfo()
 //-----------------------------------------------------------------------------
 void FollowTheLeaderRace::raceResultOrder( int* order )
 {
-    const unsigned int NUM_KARTS = race_manager->getNumKarts();
+    const unsigned int NUM_KARTS = getNumKarts();
     
     int *scores       = new int[NUM_KARTS];
     double *race_time = new double[NUM_KARTS];
@@ -170,7 +170,7 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     } while(!sorted);
     
     for(unsigned int i=1; i<NUM_KARTS; i++)
-        RaceManager::getKart(order[i])->setPosition(i);
+        RaceManager::getWorld()->getKart(order[i])->setPosition(i);
     
     delete []scores;
     delete []race_time;

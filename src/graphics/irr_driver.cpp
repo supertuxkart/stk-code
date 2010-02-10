@@ -746,7 +746,8 @@ void IrrDriver::renderBulletDebugView()
     float f=2.0f;
     glFrustum(-f, f, -f, f, 1.0, 1000.0);
 
-    const Kart *kart = RaceManager::getKart(race_manager->getNumKarts()-1);
+    World *world = RaceManager::getWorld();
+    const Kart *kart = world->getKart(world->getNumKarts()-1);
     Vec3 xyz = kart->getXYZ();
     // Compute the camera position 5 units behind and 4 units higher than the kart
     Vec3 cam_pos= kart->getTrans()(Vec3(0, -5, 4));
@@ -757,12 +758,12 @@ void IrrDriver::renderBulletDebugView()
               xyz.getX(),     xyz.getY(),     xyz.getZ(),
               0.0f,           0.0f,           1.0f            );
 
-    for (unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+    for (unsigned int i = 0 ; i < world->getNumKarts(); ++i)
     {
-        Kart *kart=RaceManager::getKart((int)i);
+        Kart *kart=world->getKart((int)i);
         if(!kart->isEliminated()) kart->draw();
     }
-    RaceManager::getWorld()->getPhysics()->draw();
+    world->getPhysics()->draw();
 #endif
 }   // renderBulletDebugView
 
@@ -865,10 +866,13 @@ void IrrDriver::update(float dt)
                 m_video_driver->setViewPort(core::recti(0, 0,
                                                         UserConfigParams::m_width,
                                                         UserConfigParams::m_height));
-                for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+                World *world = RaceManager::getWorld();
+                for(unsigned int i=0; i<world->getNumKarts(); i++)
                 {
-                    rg->renderPlayerView(i);
-                }  // for i<getNumLocalPlayers
+                    Kart *kart = world->getKart(i);
+                    if(kart->getCamera())
+                        rg->renderPlayerView(kart);
+                }  // for i<getNumKarts
             }   // !bullet_debug
         }
         else

@@ -85,7 +85,7 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     // karts can be seen.
     Kart *newkart = loadRobot(kart_ident, index+1, init_pos);
 
-    if (index == (int)race_manager->getNumKarts()-1)
+    if (index == (int)getNumKarts()-1)
     {
         // The pointer to the camera does not have to be stored, since it
         // the camera for robots is not modified.
@@ -110,7 +110,7 @@ bool ProfileWorld::isRaceOver()
         return getTime()>m_time;
 
     // Now it must be laps based profiling:
-    return race_manager->getFinishedKarts()==race_manager->getNumKarts();
+    return race_manager->getFinishedKarts()==getNumKarts();
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------

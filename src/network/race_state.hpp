@@ -26,6 +26,7 @@
 #include "items/item.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_control.hpp"
+#include "modes/world.hpp"
 #include "network/flyable_info.hpp"
 #include "network/item_info.hpp"
 #include "network/message.hpp"
@@ -54,7 +55,7 @@ private:
         /** Initialise the global race state. */
         RaceState() : Message(MT_RACE_STATE) 
         {
-            m_kart_controls.resize(race_manager->getNumKarts());
+            m_kart_controls.resize(race_manager->getWorld()->getNumKarts());
         }   // RaceState()
         // --------------------------------------------------------------------
         void itemCollected(int kartid, int item_id, char add_info=-1)

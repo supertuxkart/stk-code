@@ -61,7 +61,9 @@ private:
     float         m_time_till_return;
 
     /** Original coordinates, used mainly when collected items reappear. */
-    Coord         m_coord;    
+    Coord         m_coord;
+    core::quaternion m_rotate_to_normal;
+    float            m_rotate_amount;
 
     /** Scene node of this item. */
     scene::IMeshSceneNode *m_node;

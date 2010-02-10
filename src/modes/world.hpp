@@ -32,7 +32,6 @@
 class btRigidBody;
 class Kart;
 class PlayerKart;
-class RaceGUI;
 class SFXBase;
 class Track;
 
@@ -136,10 +135,11 @@ public:
     void            disableRace(); // Put race into limbo phase
     /** Returns a pointer to the race gui. */
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
-    PlayerKart     *getPlayerKart(int player)   const { return m_player_karts[player];      }
+    PlayerKart     *getPlayerKart(int player)   const;
     unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
     PlayerKart     *getLocalPlayerKart(int n)   const { return m_local_player_karts[n];     }
     NetworkKart    *getNetworkKart(int n)       const { return m_network_karts[n];          }
+    unsigned int    getNumKarts()               const { return m_kart.size();               }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
                                                             kartId < int(m_kart.size()));
                                                         return m_kart[kartId];               }
@@ -214,6 +214,7 @@ public:
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
     virtual void raceResultOrder( int* order ) = 0;
+
 };
 
 #endif

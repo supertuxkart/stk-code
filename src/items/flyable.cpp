@@ -150,9 +150,10 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     *minDistSquared = -1.0f;
     *minKart = NULL;
 
-    for(unsigned int i=0 ; i<race_manager->getNumKarts(); i++ )
+    World *world = RaceManager::getWorld();
+    for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
-        Kart *kart = RaceManager::getKart(i);
+        Kart *kart = world->getKart(i);
         if(kart->isEliminated() || kart == m_owner || kart->isRescue() ) continue;
         btTransform t=kart->getTrans();
 
@@ -324,9 +325,10 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 
     // Apply explosion effect
     // ----------------------
-    for ( unsigned int i = 0 ; i < race_manager->getNumKarts() ; i++ )
+    World *world = RaceManager::getWorld();
+    for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
-        Kart *kart = RaceManager::getKart(i);
+        Kart *kart = world->getKart(i);
         // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
         // rockets on short distance.

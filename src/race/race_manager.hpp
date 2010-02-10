@@ -188,10 +188,10 @@ private:
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
+    static World                    *m_world;
     
     /** The race manager manages the world, i.e. maintains 
      *  this world pointer. */
-    static World                    *m_world;
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -199,14 +199,15 @@ private:
         return (left.m_score < right.m_score);
     }
 
+
 public:
     bool   m_active_race; //True if there is a race
 
-    static World* getWorld() {return m_world;}
-    static void setWorld(World* world);
+    /** Returns the world object. */
+    static World *getWorld() { return m_world; }
+
     static Track* getTrack();
     static PlayerKart* getPlayerKart(const unsigned int n);
-    static Kart* getKart(const unsigned int n);
     
 public:
                  RaceManager();
@@ -217,6 +218,9 @@ public:
                  getLocalKartInfo(unsigned int n) const {return m_local_kart_info[n];}
     void         setNumLocalPlayers(unsigned int n);
     unsigned int getNumLocalPlayers() const  {return m_local_kart_info.size(); };
+    /** Returns the selected number of karts (selected=number of players and 
+     *  AI karts. */
+    unsigned int getNumberOfKarts()   const  {return m_num_karts; }
 
     void         setNumPlayers(int num);
     void         setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki);
@@ -236,7 +240,6 @@ public:
                  getMajorMode()           const { return m_major_mode;              }
     MinorRaceModeType
                  getMinorMode()           const { return m_minor_mode;              }
-    unsigned int getNumKarts()            const { return m_num_karts;               }
     unsigned int getNumPlayers()          const { return m_player_karts.size();     }
     int          getNumLaps()             const { return m_num_laps[m_track_number];}
     Difficulty   getDifficulty()          const { return m_difficulty;              }

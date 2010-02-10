@@ -52,10 +52,10 @@ RaceInfoMessage::RaceInfoMessage(const std::vector<RemoteKartInfo>& kart_info)
     len += getStringVectorLength(rkl);
 
     allocate(len);
-    addChar(race_manager->getMajorMode() );
-    addInt (race_manager->getMinorMode() );
-    addChar(race_manager->getDifficulty());
-    addChar(race_manager->getNumKarts()  );
+    addChar(race_manager->getMajorMode()    );
+    addInt (race_manager->getMinorMode()    );
+    addChar(race_manager->getDifficulty()   );
+    addChar(race_manager->getNumberOfKarts());
     if(race_manager->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX)
         addString(cup->getId());
     else

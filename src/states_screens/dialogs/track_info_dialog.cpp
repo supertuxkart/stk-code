@@ -197,11 +197,12 @@ void TrackInfoDialog::updateHighScores()
     std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
     const HighscoreEntry::HighscoreType type = "HST_" + game_mode_ident;
     
-    HighscoreEntry* highscores = highscore_manager->getHighscoreEntry(type,
-                                                                      race_manager->getNumKarts(),
-                                                                      race_manager->getDifficulty(),
-                                                                      m_track_ident,
-                                                                      race_manager->getNumLaps()); 
+    HighscoreEntry* highscores = 
+        highscore_manager->getHighscoreEntry(type,
+                                             race_manager->getNumberOfKarts(),
+                                             race_manager->getDifficulty(),
+                                             m_track_ident,
+                                             race_manager->getNumLaps()        );
     const int amount = highscores->getNumberEntries();
     
     std::string kart_name;

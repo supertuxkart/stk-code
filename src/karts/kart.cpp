@@ -83,6 +83,7 @@ Kart::Kart (const std::string& kart_name, int position,
     m_slip_stream          = NULL;
     m_skidmarks            = NULL;
     m_animated_node        = NULL;
+    m_camera               = NULL;
 
     m_view_blocked_by_plunger = 0;
 
@@ -824,12 +825,13 @@ float Kart::handleSlipstream(float dt)
     // ------------------------------------------------------------------
     m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
 
-    unsigned int n     = race_manager->getNumKarts();
+    World *world       = RaceManager::getWorld();
+    unsigned int n     = world->getNumKarts();
     bool is_sstreaming = false;
     Kart *target_kart;
     for(unsigned int i=0; i<n; i++)
     {
-        target_kart = race_manager->getKart(i);
+        target_kart = world->getKart(i);
         // Don't test for slipstream with itself.
         if(target_kart==this) continue;
 

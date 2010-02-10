@@ -108,7 +108,7 @@ void Powerup::set(PowerupType type, int n)
 }  // set
 
 //-----------------------------------------------------------------------------
-Material *Powerup::getIcon()
+Material *Powerup::getIcon() const
 {
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
@@ -125,6 +125,7 @@ void Powerup::use()
     if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
     
     m_number--;
+    World *world = RaceManager::getWorld();
     switch (m_type)
     {
     case POWERUP_ZIPPER:   m_owner->handleZipper();
@@ -163,9 +164,9 @@ void Powerup::use()
         
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
-        for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+        for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
-            Kart *kart=RaceManager::getKart(i);
+            Kart *kart=world->getKart(i);
             if(kart->isEliminated()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
@@ -196,9 +197,9 @@ void Powerup::use()
             //Attach a parachutte(that last as twice as the
             //one from the bananas) to all the karts that
             //are in front of this one.
-            for(unsigned int i = 0 ; i < race_manager->getNumKarts(); ++i)
+            for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
-                Kart *kart=RaceManager::getKart(i);
+                Kart *kart=world->getKart(i);
                 if(kart->isEliminated() || kart== m_owner) continue;
                 if(m_owner->getPosition() > kart->getPosition())
                 {
@@ -256,9 +257,10 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
         {
             //If the driver in the first position has finished, give the driver
             //the parachute.
-            for(unsigned int i=0; i < race_manager->getNumKarts(); ++i)
+            World *world = RaceManager::getWorld();
+            for(unsigned int i=0; i < world->getNumKarts(); ++i)
             {
-                Kart *kart = RaceManager::getKart(i);
+                Kart *kart = world->getKart(i);
                 if(kart->isEliminated() || kart == m_owner) continue;
                 if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {

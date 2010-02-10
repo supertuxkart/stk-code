@@ -289,7 +289,7 @@ void NewAI::handleBraking()
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        getPosition() < RaceManager::getKart(0)->getPosition()             &&
+        getPosition() < m_world->getKart(0)->getPosition()             &&
         getInitialPosition()>1                                       )
     {
         m_controls.m_brake = true;
@@ -572,7 +572,7 @@ void NewAI::computeNearestKarts()
     m_kart_behind    = m_kart_ahead      = NULL;
     m_distance_ahead = m_distance_behind = 9999999.9f;
     float my_dist = m_world->getDistanceDownTrackForKart(getWorldKartId());
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    for(unsigned int i=0; i<m_world->getNumKarts(); i++)
     {
         Kart *k = m_world->getKart(i);
         if(k->isEliminated() || k==this) continue;
@@ -843,7 +843,7 @@ void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
     //tell when a kart is going to get out of the track so it steers.
     m_crashes.clear();
 
-    const size_t NUM_KARTS = race_manager->getNumKarts();
+    const size_t NUM_KARTS = m_world->getNumKarts();
 
     //Protection against having vel_normal with nan values
     const Vec3 &VEL = getVelocity();
@@ -868,9 +868,9 @@ void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const Kart* kart = RaceManager::getKart(j);
+                const Kart* kart = m_world->getKart(j);
                 if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
-                const Kart *other_kart = RaceManager::getKart(j);
+                const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(getVelocityLC().getY() < other_kart->getVelocityLC().getY())
                     continue;

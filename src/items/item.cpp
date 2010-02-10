@@ -35,6 +35,8 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
     m_coord            = Coord(xyz, hpr);
+    m_rotate_to_normal = core::quaternion(hpr.toIrrVector());
+    m_rotate_amount    = 0;
     m_item_id          = item_id;
     m_original_type    = ITEM_NONE;
     m_collected        = false;
@@ -74,6 +76,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh)
  */
 void Item::switchBack()
 {
+    // FIXME: debug only - printf to be able to set a breakpoint.
     if(m_original_type==ITEM_NONE)
         printf("XX");
     assert(m_original_type!=ITEM_NONE);
@@ -155,15 +158,39 @@ void Item::update(float dt)
         m_node->setPosition(m_coord.getXYZ().toIrrVector());
         return;
 
-        core::quaternion q;
-        q.rotationFromTo(core::vector3df(0,1,0), m_normal.toIrrVector());
+        m_rotate_amount += dt*M_PI;
+        if(m_rotate_amount>2*M_PI) m_rotate_amount -= 2*M_PI;
+
+        core::quaternion qx;
+        qx.fromAngleAxis(m_rotate_amount, m_normal.toIrrVector());
+        core::quaternion qall = m_rotate_to_normal*qx;
+        core::vector3df qeuler;
+        qx.toEuler(qeuler);
+        qeuler *= 180/3.1415926f;
+        m_node->setRotation(qeuler);
+        return;
+
+
+        const core::matrix4 &m=m_node->getAbsoluteTransformation();
+        core::quaternion current_rotation(m);
+        float anglec;
+        core::vector3df axisc;
+        current_rotation.toAngleAxis(anglec, axisc);
+        printf("curre %f axis %f %f %f\n", anglec,axisc.X, axisc.Y, axisc.Z);
         core::quaternion q2;
-        static float t=0;
-        t += dt;
-        q2.fromAngleAxis(t, m_normal.toIrrVector());
-        core::quaternion all=q*q2;
+        q2.fromAngleAxis(dt*M_PI, m_normal.toIrrVector());
+        float angle2;
+        core::vector3df axis2;
+        q2.toAngleAxis(angle2, axis2);
+        printf("new   %f axis %f %f %f\n", angle2,axis2.X, axis2.Y, axis2.Z);
+        core::quaternion all=current_rotation*q2;
+        float angle;
+        core::vector3df axis;
+        all.toAngleAxis(angle, axis);
+        printf("angle %f axis %f %f %f\n", angle,axis.X, axis.Y, axis.Z);
         core::vector3df euler;
         all.toEuler(euler);
+        euler *=180/3.1415926f;
         m_node->setRotation(euler);
 
         return;

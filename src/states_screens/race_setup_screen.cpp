@@ -152,7 +152,7 @@ void RaceSetupScreen::init()
     w->setSelection( race_manager->getDifficulty(), GUI_PLAYER_ID );
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
-    kartamount->setValue( race_manager->getNumKarts() - race_manager->getNumPlayers() );
+    kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );
     
     DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
     assert( w2 != NULL );

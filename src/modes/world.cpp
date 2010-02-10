@@ -102,7 +102,9 @@ void World::init()
     // Create the physics
     m_physics = new Physics();
 
-    assert(race_manager->getNumKarts() > 0);
+    unsigned int num_karts = race_manager->getNumberOfKarts();
+
+    assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
@@ -112,7 +114,7 @@ void World::init()
     m_network_karts.resize(race_manager->getNumPlayers());
     m_local_player_karts.resize(race_manager->getNumLocalPlayers());
 
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    for(unsigned int i=0; i<num_karts; i++)
     {
         btTransform init_pos=m_track->getStartTransform(i);
         const std::string& kart_ident = race_manager->getKartIdent(i);
@@ -384,13 +386,14 @@ HighscoreEntry* World::getHighscores() const
 
     HighscoreEntry* highscores =
         highscore_manager->getHighscoreEntry(type,
-                                             race_manager->getNumKarts(),
+                                             getNumKarts(),
                                              race_manager->getDifficulty(),
                                              race_manager->getTrackName(),
                                              race_manager->getNumLaps());
 
     return highscores;
-}
+}   // getHighscores
+
 // ----------------------------------------------------------------------------
 /*
  * Usually called at the end of a race. Checks if the current times are worth a new
@@ -457,6 +460,17 @@ void World::updateHighscores()
     delete []index;
 
 }   // updateHighscores
+
+//-----------------------------------------------------------------------------
+/** Returns the n-th player kart. Note that this function is O(N), not O(1),
+ *  so it shouldn't be called inside of loops.
+ */
+PlayerKart *World::getPlayerKart(int player) const
+{
+    for(unsigned int i=0; i<m_kart.size(); i++)
+        if(m_kart[i]->isPlayerKart()) return (PlayerKart*)m_kart[i];
+    return NULL;
+}   // getPlayerKart
 
 //-----------------------------------------------------------------------------
 /** Called in follow-leader-mode to remove the last kart

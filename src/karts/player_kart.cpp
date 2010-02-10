@@ -47,7 +47,7 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
 {
     m_player       = player;
     m_penalty_time = 0.0f;
-    m_camera       = new Camera(player_index, this);
+    setCamera(new Camera(player_index, this));
     m_camera->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
@@ -320,11 +320,12 @@ void PlayerKart::setPosition(int p)
 {
     if(getPosition()<p)
     {
+        World *world = RaceManager::getWorld();
         //have the kart that did the passing beep.
         //I'm not sure if this method of finding the passing kart is fail-safe.
-        for(unsigned int i = 0 ; i < race_manager->getNumKarts(); i++ )
+        for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
         {
-            Kart *kart = RaceManager::getWorld()->getKart(i);
+            Kart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
                 kart->beep();

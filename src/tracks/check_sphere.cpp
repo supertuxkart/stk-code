@@ -39,9 +39,10 @@ CheckSphere::CheckSphere(CheckManager *check_manager, const XMLNode &node)
     node.get("radius", &m_radius2);
     m_radius2 *= m_radius2;
     node.get("xyz", &m_center_point);
-    m_is_inside.resize(race_manager->getNumKarts());
-    m_distance2.resize(race_manager->getNumKarts());
-    for(unsigned int i=0; i< race_manager->getNumKarts(); i++)
+    unsigned int num_karts = RaceManager::getWorld()->getNumKarts();
+    m_is_inside.resize(num_karts);
+    m_distance2.resize(num_karts);
+    for(unsigned int i=0; i< num_karts; i++)
     {
         m_is_inside[i] = false;
     }

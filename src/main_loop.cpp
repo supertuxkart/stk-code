@@ -103,7 +103,7 @@ void MainLoop::updateRace(float dt)
     // Client: send current controls to server
     // But don't do this if the race is in finish phase (otherwise 
     // messages can be mixed up in the race manager)
-    if(!race_manager->getWorld()->isFinishPhase())
+    if(!RaceManager::getWorld()->isFinishPhase())
         network_manager->sendUpdates();
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 

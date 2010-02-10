@@ -40,27 +40,20 @@
 RaceManager* race_manager= NULL;
 
 World *RaceManager::m_world=NULL;
+
 //-----------------------------------------------------------------------------
-/** Call to set the world, or call setWorld(NULL) to delete the current world.
- */
-void RaceManager::setWorld(World* world)
-{
-    assert(!m_world);
-    m_world = world;
-}
 Track* RaceManager::getTrack()
 {
     return m_world->getTrack();
-}
+}   // getTrack
+
+//-----------------------------------------------------------------------------
 PlayerKart* RaceManager::getPlayerKart(const unsigned int n)
 {
     return m_world->getPlayerKart(n);
-}
-Kart* RaceManager::getKart(const unsigned int n)
-{
-    //if (n<0||n>2) printf("X");
-    return m_world->getKart(n);
-}
+}   // getPlayerKart
+
+
 //-----------------------------------------------------------------------------
 
 /** Constructs the race manager.
@@ -322,7 +315,7 @@ void RaceManager::exitRace()
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
         // calculate the rank of each kart
-        const unsigned int NUM_KARTS = race_manager->getNumKarts();
+        const unsigned int NUM_KARTS = getNumberOfKarts();
         
         int *scores   = new int[NUM_KARTS];
         int *position = new int[NUM_KARTS];

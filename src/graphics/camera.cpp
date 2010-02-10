@@ -308,11 +308,13 @@ void Camera::update(float dt)
         }
     case CM_LEADER_MODE:
         {
-            wanted_target = RaceManager::getKart(0)->getXYZ().toIrrVector();
+            World *world  = RaceManager::getWorld();
+            Kart *kart    = world->getKart(0);
+            wanted_target = kart->getXYZ().toIrrVector();
             // Follows the leader kart, higher off of the ground, further from the kart,
             // and turns in the opposite direction from the kart for a nice effect. :)
-            float angle_around = RaceManager::getKart(0)->getHPR().getX();
-            float angle_up     = RaceManager::getKart(0)->getHPR().getY() + 40.0f*DEGREE_TO_RAD;
+            float angle_around = kart->getHPR().getX();
+            float angle_up     = kart->getHPR().getY() + 40.0f*DEGREE_TO_RAD;
             wanted_position.setX(sin(angle_around));
             wanted_position.setY(cos(angle_around));
             wanted_position.setZ(sin(angle_up)    );

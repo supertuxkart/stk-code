@@ -23,6 +23,7 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/moveable.hpp"
@@ -48,17 +49,28 @@ class Stars;
 class Kart : public TerrainInfo, public Moveable
 {
 private:
-    btTransform  m_reset_transform;    // reset position
-    unsigned int m_world_kart_id;      // index of kart in world
-    float        m_skidding;           ///< Accumulated skidding factor.
+    /** Reset position. */
+    btTransform  m_reset_transform;
+    /** Index of kart in world. */
+    unsigned int m_world_kart_id;
+    /** Accumulated skidding factor. */
+    float        m_skidding;
 
     int          m_initial_position;   // initial position of kart
     int          m_race_position;      // current race position (1-numKarts)
+
+    /** The camera for each kart. Not all karts have cameras (e.g. AI karts
+     *  usually don't), but there are exceptions: e.g. after the end of a
+     *  race an AI kart is replacing the kart for a player.
+     */
+
 protected:       // Used by the AI atm
     KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
     Powerup      m_powerup;
     float        m_zipper_time_left;   /**<Zipper time left. */
     Attachment   m_attachment;
+    /** Easier access for player_kart. */
+    Camera       *m_camera;
 private:
     float        m_max_speed;          // maximum speed of the kart, computed from
     /** Depending on terrain a certain reduction to the maximum speed applies.
@@ -205,7 +217,19 @@ public:
         m_attachment.set(t, time_left, k);   
     }
     // ------------------------------------------------------------------------
+    /** Returns the camera of this kart (or NULL if no camera is attached
+     *  to this kart. */
+    Camera*        getCamera         () {return m_camera;}
+    /** Sets the camera for this kart. */
+    void           setCamera(Camera *camera) {m_camera=camera; }
+    /** Sets viewport etc. for the camera of this kart. */
+    void           activateCamera    () {m_camera->activate(); }
+    /** Returns the viewport of the camera of this kart. */
+    const core::recti& getViewport() const {return m_camera->getViewport(); }
+    /** Returns the scaling in x/y direction for the camera of this kart. */
+    const core::vector2df& getScaling() const {return m_camera->getScaling(); }
 
+    const Powerup *getPowerup          () const { return &m_powerup;         }
     Powerup       *getPowerup          ()       { return &m_powerup;         }
     int            getNumPowerup       () const { return  m_powerup.getNum();}
     float          getEnergy           () const { return  m_collected_energy;}

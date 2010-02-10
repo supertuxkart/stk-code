@@ -62,9 +62,10 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    World *world = RaceManager::getWorld();
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
+        const Vec3 &xyz = world->getKart(i)->getXYZ();
         m_previous_position.push_back(xyz);
         
         // Activate all checkline
@@ -78,9 +79,10 @@ void CheckStructure::reset(const Track &track)
  */
 void CheckStructure::update(float dt)
 {
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+    World *world = RaceManager::getWorld();
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const Vec3 &xyz = race_manager->getKart(i)->getXYZ();
+        const Vec3 &xyz = world->getKart(i)->getXYZ();
         // Only check active checklines.
         if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {

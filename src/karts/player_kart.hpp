@@ -23,12 +23,10 @@
 #define HEADER_PLAYERKART_HPP
 
 #include "config/player.hpp"
-#include "graphics/camera.hpp"
 #include "karts/kart.hpp"
 
 class SFXBase;
 class Player;
-class Camera;
 
 /** PlayerKart manages control events from the player and moves
     them to the Kart */
@@ -41,7 +39,6 @@ private:
 
     ActivePlayer *m_player;
     float         m_penalty_time;
-    Camera       *m_camera;
 
     SFXBase      *m_bzzt_sound;
     SFXBase      *m_wee_sound;
@@ -66,15 +63,8 @@ public:
     virtual void   setPosition       (int p);
     virtual void   raceFinished      (float time);
     bool           isPlayerKart      () const {return true;}
-    Camera*        getCamera         () {return m_camera;}
     void           reset             ();
     void           resetInputState   ();
-    /** Sets viewport etc. for the camera of this kart. */
-    void           activateCamera    () {m_camera->activate(); }
-    /** Returns the viewport of the camera of this kart. */
-    const core::recti& getViewport() const {return m_camera->getViewport(); }
-    /** Returns the scaling in x/y direction for the camera of this kart. */
-    const core::vector2df& getScaling() const {return m_camera->getScaling(); }
 };
 
 #endif

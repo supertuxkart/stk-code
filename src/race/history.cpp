@@ -64,9 +64,10 @@ void History::initRecording()
 void History::allocateMemory(int number_of_frames)
 {
     m_all_deltas.resize   (number_of_frames);
-    m_all_controls.resize (number_of_frames*race_manager->getNumKarts());
-    m_all_xyz.resize      (number_of_frames*race_manager->getNumKarts());
-    m_all_rotations.resize(number_of_frames*race_manager->getNumKarts());
+    unsigned int num_karts = RaceManager::getWorld()->getNumKarts();
+    m_all_controls.resize (number_of_frames*num_karts);
+    m_all_xyz.resize      (number_of_frames*num_karts);
+    m_all_rotations.resize(number_of_frames*num_karts);
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
@@ -100,14 +101,12 @@ void History::updateSaving(float dt)
     }
     m_all_deltas[m_current] = dt;
 
-    unsigned int max_num_karts = race_manager->getNumKarts();
-    // n<=max_num_karts, e.g. if karts are eliminated
-    unsigned int n     = race_manager->getNumKarts();
-
-    for(unsigned int i=0; i<n; i++)
+    World *world = RaceManager::getWorld();
+    unsigned int num_karts = world->getNumKarts();
+    for(unsigned int i=0; i<num_karts; i++)
     {
-        unsigned int index=m_current*max_num_karts+i;
-        const Kart *kart = RaceManager::getKart(i);
+        unsigned int index     = m_current*num_karts+i;
+        const Kart *kart       = world->getKart(i);
         m_all_controls[index]  = kart->getControls();
         m_all_xyz[index]       = kart->getXYZ();
         m_all_rotations[index] = kart->getRotation();
@@ -126,10 +125,11 @@ void History::updateReplay(float dt)
         printf("Replay finished.\n");
         exit(2);
     }
-    unsigned int num_karts = race_manager->getNumKarts();
+    World *world = RaceManager::getWorld();
+    unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
-        Kart *kart = RaceManager::getKart(k);
+        Kart *kart = world->getKart(k);
         unsigned int index=m_current*num_karts+k;
         if(m_replay_mode==HISTORY_POSITION)
         {
@@ -149,20 +149,21 @@ void History::updateReplay(float dt)
  */
 void History::Save()
 {
-    FILE *fd = fopen("history.dat","w");
-    int  nKarts = race_manager->getNumKarts();
+    FILE *fd       = fopen("history.dat","w");
+    World *world   = RaceManager::getWorld();
+    int  num_karts = world->getNumKarts();
 #ifdef VERSION
     fprintf(fd, "Version:  %s\n",   VERSION);
 #endif
-    fprintf(fd, "numkarts: %d\n",   nKarts);
+    fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      RaceManager::getTrack()->getIdent().c_str());
 
     int k;
-    for(k=0; k<nKarts; k++)
+    for(k=0; k<num_karts; k++)
     {
-        fprintf(fd, "model %d: %s\n",k, RaceManager::getKart(k)->getIdent().c_str());
+        fprintf(fd, "model %d: %s\n",k, world->getKart(k)->getIdent().c_str());
     }
     fprintf(fd, "size:     %d\n", m_size);
 
@@ -173,7 +174,7 @@ void History::Save()
         j=(j+1)%m_size;
     }
 
-    for(int k=0; k<nKarts; k++)
+    for(int k=0; k<num_karts; k++)
     {
         //Kart* kart= RaceManager::getKart(k);
         j = m_wrapped ? m_current : 0;

@@ -265,10 +265,11 @@ bool ChallengeData::raceFinished()
     // Single races
     // ------------
     std::string track_name = RaceManager::getTrack()->getIdent();
-    if(track_name!=m_track_name                    ) return false;    // wrong track
-    if((int)race_manager->getNumKarts()<m_num_karts) return false;    // not enough AI karts
+    if(track_name!=m_track_name                      ) return false;    // wrong track
+    World *world = RaceManager::getWorld();
+    if((int)world->getNumKarts()<m_num_karts         ) return false;    // not enough AI karts
 
-    Kart* kart = RaceManager::getPlayerKart(0);
+    PlayerKart* kart = RaceManager::getPlayerKart(0);
     if(m_energy>0   && kart->getEnergy()  <m_energy  ) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 
@@ -295,12 +296,13 @@ bool ChallengeData::raceFinished()
 // ----------------------------------------------------------------------------
 bool ChallengeData::grandPrixFinished()
 {
-   // printf("----- checking if GP challenge is solved\n");
+    // Note that we have to call race_manager->getNumKarts, since there
+    // is no world objects to query at this stage.
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
         race_manager->getGrandPrix()->getId() != m_gp_id                     ||
         race_manager->getDifficulty()!= m_difficulty                         ||
-        race_manager->getNumKarts()   < (unsigned int)m_num_karts            ||
+        race_manager->getNumberOfKarts() < (unsigned int)m_num_karts         ||
         race_manager->getNumPlayers() > 1) return false;
 
     // check if the player came first.

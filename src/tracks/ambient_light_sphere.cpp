@@ -49,17 +49,17 @@ AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager,
 void AmbientLightSphere::update(float dt)
 {
     CheckStructure::update(dt);
-    race_manager->getNumLocalPlayers();
-    
-    for(unsigned int i=0; i<race_manager->getNumKarts(); i++)
+
+    World *world = RaceManager::getWorld();
+    for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        Kart *kart=race_manager->getKart(i);
-        if(!kart->isPlayerKart()) continue;
+        Kart *kart=world->getKart(i);
+        if(!kart->getCamera()) continue;
         if(isInside(i))
         {
             float d2=getDistance2ForKart(i);
             video::SColor color;
-            Track *track=RaceManager::getWorld()->getTrack();
+            Track *track=world->getTrack();
             if(d2<m_inner_radius2)
             {   // Inside inner radius --> use new ambient color
                 color = m_ambient_color;
