@@ -95,7 +95,6 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
     }
     //m_local_player_karts[index] = static_cast<PlayerKart*>(newkart);
     //m_player_karts[index]       = static_cast<PlayerKart*>(newkart);
-    m_local_player_karts.clear();
     m_player_karts.clear();
     return newkart;
 }   // createKart

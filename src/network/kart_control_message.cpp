@@ -26,12 +26,13 @@
 KartControlMessage::KartControlMessage()
                   : Message(Message::MT_KART_CONTROL)
 {
-    unsigned int num_local_players = RaceManager::getWorld()->getCurrentNumLocalPlayers();
+    World *world=RaceManager::getWorld();
+    unsigned int num_local_players = race_manager->getNumLocalPlayers();
     unsigned int control_size      = KartControl::getLength();
     allocate(control_size*num_local_players);
     for(unsigned int i=0; i<num_local_players; i++)
     {
-        const Kart *kart            = RaceManager::getWorld()->getLocalPlayerKart(i);
+        const Kart *kart            = world->getLocalPlayerKart(i);
         const KartControl& controls = kart->getControls();
         controls.serialise(this);
     }

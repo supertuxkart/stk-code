@@ -853,20 +853,22 @@ void IrrDriver::update(float dt)
             }
             else
             {
-                RaceGUI *rg = RaceManager::getWorld()->getRaceGUI();
-                for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+                World *world = RaceManager::getWorld();
+                RaceGUI *rg = world->getRaceGUI();
+                for(unsigned int i=0; i<world->getNumKarts(); i++)
                 {
-                    PlayerKart *pk=RaceManager::getWorld()->getLocalPlayerKart(i);
-                    pk->activateCamera();
-                    m_scene_manager->drawAll();
-
-                }
+                    Kart *kart=world->getKart(i);
+                    if(kart->getCamera()) 
+                    {
+                        kart->activateCamera();
+                        m_scene_manager->drawAll();
+                    }   // if kart->Camera
+                }   // for i<world->getNumKarts()
                 // To draw the race gui we set the viewport back to the full
                 // screen. 
                 m_video_driver->setViewPort(core::recti(0, 0,
                                                         UserConfigParams::m_width,
                                                         UserConfigParams::m_height));
-                World *world = RaceManager::getWorld();
                 for(unsigned int i=0; i<world->getNumKarts(); i++)
                 {
                     Kart *kart = world->getKart(i);

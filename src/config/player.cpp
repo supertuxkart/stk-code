@@ -51,12 +51,14 @@ void ActivePlayer::setDevice(InputDevice* device)
 // ----------------------------------------------------------------------------
 PlayerKart* ActivePlayer::getKart()
 {    
-    const int amount = RaceManager::getWorld()->getCurrentNumLocalPlayers();
-    for (int p=0; p<amount; p++)
+    World *world = RaceManager::getWorld();
+    const int num_karts = world->getNumKarts();
+    for (int p=0; p<num_karts; p++)
     {
-        if (RaceManager::getWorld()->getLocalPlayerKart(p)->getPlayer() == this)
+        Kart *kart = world->getKart(p);
+        if(kart->isPlayerKart() && ((PlayerKart*)kart)->getPlayer() == this)
         {
-            return RaceManager::getWorld()->getLocalPlayerKart(p);
+            return (PlayerKart*)kart;
         }
     }
     

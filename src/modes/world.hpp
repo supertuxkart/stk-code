@@ -82,7 +82,6 @@ public:
 protected:
     
     std::vector<PlayerKart*>  m_player_karts;
-    std::vector<PlayerKart*>  m_local_player_karts;
     std::vector<NetworkKart*> m_network_karts; 
     RandomGenerator           m_random;
 
@@ -136,8 +135,7 @@ public:
     /** Returns a pointer to the race gui. */
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     PlayerKart     *getPlayerKart(int player)   const;
-    unsigned int    getCurrentNumLocalPlayers() const { return m_local_player_karts.size(); }
-    PlayerKart     *getLocalPlayerKart(int n)   const { return m_local_player_karts[n];     }
+    PlayerKart     *getLocalPlayerKart(int n)   const;
     NetworkKart    *getNetworkKart(int n)       const { return m_network_karts[n];          }
     unsigned int    getNumKarts()               const { return m_kart.size();               }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&

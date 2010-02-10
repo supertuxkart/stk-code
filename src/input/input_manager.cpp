@@ -90,7 +90,7 @@ void InputManager::handleStaticAction(int key, int value)
 #ifdef DEBUG
     static bool control_is_pressed=false;
 #endif
-    
+    World *world=RaceManager::getWorld();
     switch (key)
     {
 #ifdef DEBUG
@@ -102,7 +102,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F1:
             if (race_manager->getNumPlayers() ==1 )
             {
-                Kart* kart = RaceManager::getWorld()->getLocalPlayerKart(0);
+                Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
                 projectile_manager->newExplosion(Vec3(0, 8, 0.5));
             }
@@ -110,21 +110,21 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F2:
             if (race_manager->getNumPlayers() ==1 )
             {
-                Kart* kart = RaceManager::getPlayerKart(0);
+                Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_PLUNGER, 10000);
             }
             break;
         case KEY_F3:
             if (race_manager->getNumPlayers() ==1 )
             {
-                Kart* kart = RaceManager::getPlayerKart(0);
+                Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_CAKE, 10000);
             }
             break;
         case KEY_F4:
             if (race_manager->getNumPlayers() ==1 )
             {
-                Kart* kart = RaceManager::getPlayerKart(0);
+                Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_SWITCH, 10000);
             }
             break;
@@ -138,7 +138,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F5:
             if (race_manager->getNumPlayers() ==1 )
             {   
-                Kart* kart = RaceManager::getPlayerKart(0);
+                Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
             }   
             break;

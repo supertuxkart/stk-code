@@ -112,7 +112,6 @@ void World::init()
 
     m_player_karts.resize(race_manager->getNumPlayers());
     m_network_karts.resize(race_manager->getNumPlayers());
-    m_local_player_karts.resize(race_manager->getNumLocalPlayers());
 
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -162,7 +161,6 @@ Kart *World::createKart(const std::string &kart_ident, int index,
                                  StateManager::get()->getActivePlayer(local_player_id),
                                  init_pos, local_player_id);
         m_player_karts[global_player_id] = (PlayerKart*)newkart;
-        m_local_player_karts[local_player_id] = static_cast<PlayerKart*>(newkart);
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         newkart = new NetworkKart(kart_ident, position, init_pos,
@@ -464,13 +462,38 @@ void World::updateHighscores()
 //-----------------------------------------------------------------------------
 /** Returns the n-th player kart. Note that this function is O(N), not O(1),
  *  so it shouldn't be called inside of loops.
+ *  \param n Index of player kart to return.
  */
-PlayerKart *World::getPlayerKart(int player) const
+PlayerKart *World::getPlayerKart(int n) const
 {
+    unsigned int count=-1;
+
     for(unsigned int i=0; i<m_kart.size(); i++)
-        if(m_kart[i]->isPlayerKart()) return (PlayerKart*)m_kart[i];
+        if(m_kart[i]->isPlayerKart())
+        {
+            count++;
+            if(count==n) return (PlayerKart*)m_kart[i];
+        }
     return NULL;
 }   // getPlayerKart
+
+//-----------------------------------------------------------------------------
+/** Returns the nth local player kart, i.e. a player kart that has a camera.
+ *  \param n Index of player kart to return.
+ */
+PlayerKart *World::getLocalPlayerKart(int n) const
+{
+    unsigned int count=-1;
+    for(unsigned int i=0; i<m_kart.size(); i++)
+    {
+        if(m_kart[i]->getCamera() && m_kart[i]->isPlayerKart())
+        {
+            count++;
+            if(count==n) return (PlayerKart*)m_kart[i];
+        }
+    }
+    return NULL;
+}   // getLocalPlayerKart
 
 //-----------------------------------------------------------------------------
 /** Called in follow-leader-mode to remove the last kart
