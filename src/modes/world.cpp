@@ -459,7 +459,7 @@ void World::updateHighscores()
  *  so it shouldn't be called inside of loops.
  *  \param n Index of player kart to return.
  */
-PlayerKart *World::getPlayerKart(int n) const
+PlayerKart *World::getPlayerKart(unsigned int n) const
 {
     unsigned int count=-1;
 
@@ -476,7 +476,7 @@ PlayerKart *World::getPlayerKart(int n) const
 /** Returns the nth local player kart, i.e. a player kart that has a camera.
  *  \param n Index of player kart to return.
  */
-PlayerKart *World::getLocalPlayerKart(int n) const
+PlayerKart *World::getLocalPlayerKart(unsigned int n) const
 {
     unsigned int count=-1;
     for(unsigned int i=0; i<m_karts.size(); i++)

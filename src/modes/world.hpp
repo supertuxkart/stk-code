@@ -137,8 +137,8 @@ public:
     void            disableRace(); // Put race into limbo phase
     /** Returns a pointer to the race gui. */
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
-    PlayerKart     *getPlayerKart(int player)   const;
-    PlayerKart     *getLocalPlayerKart(int n)   const;
+    PlayerKart     *getPlayerKart(unsigned int player) const;
+    PlayerKart     *getLocalPlayerKart(unsigned int n) const;
     unsigned int    getNumKarts()               const { return m_karts.size();              }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
                                                             kartId < int(m_karts.size()));

@@ -94,7 +94,6 @@ RaceGUI::~RaceGUI()
  */
 void RaceGUI::createMarkerTexture()
 {
-    World *world           = RaceManager::getWorld();
     unsigned int num_karts = race_manager->getNumberOfKarts();
     unsigned int npower2   = 1;
     // Textures must be power of 2, so 
