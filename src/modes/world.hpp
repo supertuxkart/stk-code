@@ -78,20 +78,23 @@ class Track;
 class World : public WorldStatus
 {
 public:
-    typedef std::vector<Kart*> Karts;
+    typedef std::vector<Kart*> KartList;
 protected:
-    
-    std::vector<PlayerKart*>  m_player_karts;
-    std::vector<NetworkKart*> m_network_karts; 
+    /** The list of all karts. */
+    KartList                  m_karts;
     RandomGenerator           m_random;
 
-    Karts       m_kart;
     Physics*    m_physics;
     float       m_fastest_lap;
     Kart*       m_fastest_kart;
-    Phase       m_previous_phase;      // used during the race popup menu
-    int         m_eliminated_karts;    // number of eliminated karts
-    int         m_eliminated_players;  // number of eliminated players
+    /** Used during the race popup menu. */
+    Phase       m_previous_phase;
+    /** Number of eliminated karts. */
+    int         m_eliminated_karts;
+    /** Number of eliminated players. */
+    int         m_eliminated_players;
+    /** OVerall number of players. */
+    int         m_num_players;
 
     bool        m_faster_music_active; // true if faster music was activated
 
@@ -136,14 +139,15 @@ public:
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     PlayerKart     *getPlayerKart(int player)   const;
     PlayerKart     *getLocalPlayerKart(int n)   const;
-    NetworkKart    *getNetworkKart(int n)       const { return m_network_karts[n];          }
-    unsigned int    getNumKarts()               const { return m_kart.size();               }
+    unsigned int    getNumKarts()               const { return m_karts.size();              }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
-                                                            kartId < int(m_kart.size()));
-                                                        return m_kart[kartId];               }
-    unsigned int    getCurrentNumKarts()        const { return (int)m_kart.size() -
+                                                            kartId < int(m_karts.size()));
+                                                        return m_karts[kartId];             }
+    /** Returns the number of currently active (i.e.non-elikminated) karts. */
+    unsigned int    getCurrentNumKarts()        const { return (int)m_karts.size() -
                                                             m_eliminated_karts;              }
-    unsigned int    getCurrentNumPlayers()      const { return (int)m_player_karts.size()-
+    /** Returns the number of currently active (i.e. non-eliminated) players. */
+    unsigned int    getCurrentNumPlayers()      const { return m_num_players -
                                                             m_eliminated_players;            }
     
     Physics *getPhysics() const               { return m_physics;                   }

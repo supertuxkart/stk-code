@@ -38,17 +38,25 @@ KartControlMessage::KartControlMessage()
     }
 }   // KartControlMessage
 // ----------------------------------------------------------------------------
-// kart_id_offset is the global id of the first kart on the host from which
-// this packet was received.
+/** Receives a kart control message. 
+ *  \param kart_id_offset is the global id of the first kart on the host from 
+ *         which this packet was received.
+ */
 KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
                                        int num_local_players)
                   : Message(pkt, MT_KART_CONTROL)
 {
+    // FIXME: This probably does not work anymore - it assume that
+    // num_local_Players is the number of all local karts, while it might
+    // only be the number of all network karts.
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         KartControl kc(this);
-        NetworkKart *kart = RaceManager::getWorld()->getNetworkKart(i);
-        kart->setControl(kc);
+        Kart *kart = RaceManager::getWorld()->getKart(i);
+        if(kart->isNetworkKart())
+        {
+            ((NetworkKart*)kart)->setControl(kc);
+        }
     }
 };   // KartControlMessage
 

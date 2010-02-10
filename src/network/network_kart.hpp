@@ -31,5 +31,6 @@ public:
                      const btTransform& init_transform,
                      int global_player_id);
     void setControl(const KartControl& kc);
+    virtual bool isNetworkKart() const { return true; }
 };   // NetworkKart
 #endif

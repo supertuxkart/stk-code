@@ -56,8 +56,8 @@ void StandardRace::update(float dt)
         const unsigned int kart_amount = getNumKarts();
         for(unsigned int i = 0; i < kart_amount ; i++)
         {
-            if(!m_kart[i]->hasFinishedRace())
-                m_kart[i]->raceFinished(estimateFinishTimeForKart(m_kart[i]));
+            if(!m_karts[i]->hasFinishedRace())
+                m_karts[i]->raceFinished(estimateFinishTimeForKart(m_karts[i]));
         }   // i<kart_amount
 
         // Set delay mode to have time for camera animation, and

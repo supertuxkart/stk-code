@@ -93,9 +93,6 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
         // of profile mode???
         new Camera(index, newkart);
     }
-    //m_local_player_karts[index] = static_cast<PlayerKart*>(newkart);
-    //m_player_karts[index]       = static_cast<PlayerKart*>(newkart);
-    m_player_karts.clear();
     return newkart;
 }   // createKart
 
@@ -129,17 +126,17 @@ void ProfileWorld::enterRaceOverState(const bool delay)
            m_frame_count, runtime, (float)m_frame_count/runtime);
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    for ( Karts::size_type i = 0; i < m_kart.size(); ++i)
+    for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
     {
-        max_t = std::max(max_t, m_kart[i]->getFinishTime());
-        min_t = std::min(min_t, m_kart[i]->getFinishTime());
-        av_t += m_kart[i]->getFinishTime();
+        max_t = std::max(max_t, m_karts[i]->getFinishTime());
+        min_t = std::min(min_t, m_karts[i]->getFinishTime());
+        av_t += m_karts[i]->getFinishTime();
         printf("%ls  start %d  end %d time %f\n",
-            m_kart[i]->getName().c_str(),(int)i,
-            m_kart[i]->getPosition(),
-            m_kart[i]->getFinishTime());
+            m_karts[i]->getName().c_str(),(int)i,
+            m_karts[i]->getPosition(),
+            m_karts[i]->getFinishTime());
     }
-    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_kart.size());
+    printf("min %f  max %f  av %f\n",min_t, max_t, av_t/m_karts.size());
 
     std::exit(-2);
 }   // enterRaceOverState

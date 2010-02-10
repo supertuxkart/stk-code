@@ -173,7 +173,6 @@ private:
     Difficulty                       m_difficulty;
     MajorRaceModeType                m_major_mode;
     MinorRaceModeType                m_minor_mode;
-    typedef std::vector<std::string> PlayerKarts;
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
     std::vector<RemoteKartInfo>      m_local_kart_info;

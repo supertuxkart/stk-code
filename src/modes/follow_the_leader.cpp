@@ -53,13 +53,13 @@ void FollowTheLeaderRace::countdownReachedZero()
     int kart_number;
     // If the leader kart is not the first kart, remove the first
     // kart, otherwise remove the last kart.
-    int position_to_remove = m_kart[0]->getPosition()==1 
+    int position_to_remove = m_karts[0]->getPosition()==1 
                            ? getCurrentNumKarts() : 1;
-    const int kart_amount = m_kart.size();
+    const int kart_amount = m_karts.size();
     for (kart_number=0; kart_number<kart_amount; kart_number++)
     {
-        if(m_kart[kart_number]->isEliminated()) continue;
-        if(m_kart[kart_number]->getPosition()==position_to_remove)
+        if(m_karts[kart_number]->isEliminated()) continue;
+        if(m_karts[kart_number]->getPosition()==position_to_remove)
             break;
     }
     if(kart_number==kart_amount)
@@ -69,14 +69,14 @@ void FollowTheLeaderRace::countdownReachedZero()
         for(int i=0; i<kart_amount; i++)
         {
             fprintf(stderr,"kart %d: eliminated %d position %d\n",
-                    i,m_kart[i]->isEliminated(), m_kart[i]->getPosition());
+                    i,m_karts[i]->isEliminated(), m_karts[i]->getPosition());
         }   // for i
     }  // kart_number==m_kart.size()
     else
     {
         // In case that the kart on position 1 was removed, we have to set
         // the correct position (which equals the remaining number of karts).
-        m_kart[kart_number]->setPosition(getCurrentNumKarts());
+        m_karts[kart_number]->setPosition(getCurrentNumKarts());
         removeKart(kart_number);
     }
     

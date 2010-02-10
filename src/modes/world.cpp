@@ -110,9 +110,6 @@ void World::init()
     // karts can be positioned properly on (and not in) the tracks.
     m_track->loadTrackModel();
 
-    m_player_karts.resize(race_manager->getNumPlayers());
-    m_network_karts.resize(race_manager->getNumPlayers());
-
     for(unsigned int i=0; i<num_karts; i++)
     {
         btTransform init_pos=m_track->getStartTransform(i);
@@ -121,8 +118,8 @@ void World::init()
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
         Kart* newkart = createKart(kart_ident, i, local_player_id,  
                                    global_player_id, init_pos);
-        m_kart.push_back(newkart);
-        newkart->setWorldKartId(m_kart.size()-1);
+        m_karts.push_back(newkart);
+        newkart->setWorldKartId(m_karts.size()-1);
     }  // for i
 
     resetAllKarts();
@@ -160,13 +157,10 @@ Kart *World::createKart(const std::string &kart_ident, int index,
         newkart = new PlayerKart(kart_ident, position,
                                  StateManager::get()->getActivePlayer(local_player_id),
                                  init_pos, local_player_id);
-        m_player_karts[global_player_id] = (PlayerKart*)newkart;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         newkart = new NetworkKart(kart_ident, position, init_pos,
                                   global_player_id);
-        m_network_karts[global_player_id] = static_cast<NetworkKart*>(newkart);
-        m_player_karts[global_player_id] = (PlayerKart*)newkart;
         break;
     case RaceManager::KT_AI:
         std::cout << "===== World : creating AI kart for #" << index << "===========\n";
@@ -222,10 +216,10 @@ World::~World()
     if(m_track)
         m_track->cleanup();
 
-    for ( unsigned int i = 0 ; i < m_kart.size() ; i++ )
-        delete m_kart[i];
+    for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
+        delete m_karts[i];
 
-    m_kart.clear();
+    m_karts.clear();
     projectile_manager->cleanup();
     // In case that the track is not found, m_physics is still undefined.
     if(m_physics)
@@ -243,9 +237,9 @@ void World::onGo()
     // Reset the brakes now that the prestart 
     // phase is over (braking prevents the karts 
     // from sliding downhill)
-    for(unsigned int i=0; i<m_kart.size(); i++) 
+    for(unsigned int i=0; i<m_karts.size(); i++) 
     {
-        m_kart[i]->resetBrakes();
+        m_karts[i]->resetBrakes();
     }
 }   // onGo
 
@@ -270,7 +264,7 @@ void World::resetAllKarts()
 {
     //Project karts onto track from above. This will lower each kart so
     //that at least one of its wheel will be on the surface of the track
-    for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
         ///start projection from top of kart
         btVector3 up_offset(0, 0, 0.5f * ((*i)->getKartHeight()));
@@ -281,7 +275,7 @@ void World::resetAllKarts()
         if (!kart_over_ground)
         {
             fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-                    (int)(i-m_kart.begin()), m_track->getIdent().c_str());
+                    (int)(i-m_karts.begin()), m_track->getIdent().c_str());
             exit(-1);
         }
     }
@@ -301,7 +295,7 @@ void World::resetAllKarts()
     {
         m_physics->update(1.f/60.f);
         all_finished=true;
-        for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
         {
             if(!(*i)->isInRest())
             {
@@ -319,7 +313,7 @@ void World::resetAllKarts()
                 if(!material)
                 {
                     fprintf(stderr, "ERROR: no valid starting position for kart %d on track %s.\n",
-                (int)(i-m_kart.begin()), m_track->getIdent().c_str());
+                (int)(i-m_karts.begin()), m_track->getIdent().c_str());
                     exit(-1);
                 }
                 all_finished=false;
@@ -330,10 +324,11 @@ void World::resetAllKarts()
 
     // Now store the current (i.e. in rest) suspension length for each kart,
     // so that the karts can visualise the suspension.
-    for ( Karts::iterator i=m_kart.begin(); i!=m_kart.end(); i++)
+    for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
         (*i)->setSuspensionLength();
-    for(unsigned int i=0; i<m_player_karts.size(); i++)
-        m_player_karts[i]->getCamera()->setInitialTransform();
+    for(unsigned int i=0; i<m_karts.size(); i++)
+        if(m_karts[i]->getCamera())
+            m_karts[i]->getCamera()->setInitialTransform();
 }   // resetAllKarts
 
 //-----------------------------------------------------------------------------
@@ -350,11 +345,11 @@ void World::update(float dt)
         m_physics->update(dt);
     }
 
-    const int kart_amount = m_kart.size();
+    const int kart_amount = m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
         // Update all karts that are not eliminated
-        if(!m_kart[i]->isEliminated()) m_kart[i]->update(dt) ;
+        if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
     }
     // The order of updates is rather important: if track update would
     // be called before kart update, then the check manager (called from
@@ -406,16 +401,16 @@ void World::updateHighscores()
     // someone might get into the highscore list, only to be kicked out
     // again by a faster kart in the same race), which might be confusing
     // if we ever decide to display a message (e.g. during a race)
-    unsigned int *index = new unsigned int[m_kart.size()];
+    unsigned int *index = new unsigned int[m_karts.size()];
 
-    const unsigned int kart_amount = m_kart.size();
+    const unsigned int kart_amount = m_karts.size();
     for (unsigned int i=0; i<kart_amount; i++ )
     {
         index[i] = 999; // first reset the contents of the array
     }
     for (unsigned int i=0; i<kart_amount; i++ )
     {
-        const int pos = m_kart[i]->getPosition()-1;
+        const int pos = m_karts[i]->getPosition()-1;
         if(pos < 0 || pos >= (int)kart_amount) continue; // wrong position
         index[pos] = i;
     }
@@ -430,21 +425,21 @@ void World::updateHighscores()
 
 #ifdef DEBUG
             fprintf(stderr, "Error, incorrect kart positions:");
-            for (unsigned int i=0; i<m_kart.size(); i++ )
+            for (unsigned int i=0; i<m_karts.size(); i++ )
             {
-                fprintf(stderr, "i=%d position %d\n",i, m_kart[i]->getPosition());
+                fprintf(stderr, "i=%d position %d\n",i, m_karts[i]->getPosition());
             }
 #endif
             continue;
         }
 
         // Only record times for player karts and only if they finished the race
-        if(!m_kart[index[pos]]->isPlayerKart()) continue;
-        if (!m_kart[index[pos]]->hasFinishedRace()) continue;
+        if(!m_karts[index[pos]]->isPlayerKart()) continue;
+        if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
         assert(index[pos] >= 0);
-        assert(index[pos] < m_kart.size());
-        PlayerKart *k = (PlayerKart*)m_kart[index[pos]];
+        assert(index[pos] < m_karts.size());
+        PlayerKart *k = (PlayerKart*)m_karts[index[pos]];
 
         HighscoreEntry* highscores = getHighscores();
 
@@ -468,11 +463,11 @@ PlayerKart *World::getPlayerKart(int n) const
 {
     unsigned int count=-1;
 
-    for(unsigned int i=0; i<m_kart.size(); i++)
-        if(m_kart[i]->isPlayerKart())
+    for(unsigned int i=0; i<m_karts.size(); i++)
+        if(m_karts[i]->isPlayerKart())
         {
             count++;
-            if(count==n) return (PlayerKart*)m_kart[i];
+            if(count==n) return (PlayerKart*)m_karts[i];
         }
     return NULL;
 }   // getPlayerKart
@@ -484,12 +479,12 @@ PlayerKart *World::getPlayerKart(int n) const
 PlayerKart *World::getLocalPlayerKart(int n) const
 {
     unsigned int count=-1;
-    for(unsigned int i=0; i<m_kart.size(); i++)
+    for(unsigned int i=0; i<m_karts.size(); i++)
     {
-        if(m_kart[i]->getCamera() && m_kart[i]->isPlayerKart())
+        if(m_karts[i]->getCamera() && m_karts[i]->isPlayerKart())
         {
             count++;
-            if(count==n) return (PlayerKart*)m_kart[i];
+            if(count==n) return (PlayerKart*)m_karts[i];
         }
     }
     return NULL;
@@ -500,12 +495,12 @@ PlayerKart *World::getLocalPlayerKart(int n) const
 */
 void World::removeKart(int kart_number)
 {
-    Kart *kart = m_kart[kart_number];
+    Kart *kart = m_karts[kart_number];
 
     // Display a message about the eliminated kart in the race gui
-    for (std::vector<PlayerKart*>::iterator i  = m_player_karts.begin();
-        i != m_player_karts.end();  i++ )
+    for (KartList::iterator i  = m_karts.begin(); i != m_karts.end();  i++ )
     {
+        if(!(*i)->getCamera()) continue;
         if(*i==kart)
         {
             m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
@@ -551,7 +546,7 @@ void World::restartRace()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
 
-    for ( Karts::iterator i = m_kart.begin(); i != m_kart.end() ; ++i )
+    for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {
         (*i)->reset();
     }
@@ -584,8 +579,8 @@ void  World::unpause()
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
     WorldStatus::unpause();
-    for(unsigned int i=0; i<m_player_karts.size(); i++)
-        m_player_karts[i]->resetInputState();
+    for(unsigned int i=0; i<m_karts.size(); i++)
+        if(m_karts[i]->isPlayerKart()) ((PlayerKart*)m_karts[i])->resetInputState();
 }   // pause
 
 /* EOF */

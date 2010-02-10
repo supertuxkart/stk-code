@@ -315,7 +315,8 @@ public:
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
     virtual const irr::core::stringw& getName() const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
-    virtual bool    isPlayerKart    () const {return false;                        }
+    virtual bool   isPlayerKart     () const {return false;                        }
+    virtual bool   isNetworkKart    () const { return true; }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
     virtual void   collectedItem    (const Item &item, int random_attachment);

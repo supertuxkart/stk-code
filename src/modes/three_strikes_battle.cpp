@@ -38,7 +38,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         exit(1);
     }
  
-    const unsigned int kart_amount = m_kart.size();
+    const unsigned int kart_amount = m_karts.size();
     m_kart_display_info = new RaceGUI::KartIconDisplayInfo[kart_amount];
     
     for(unsigned int n=0; n<kart_amount; n++)
@@ -49,7 +49,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
         m_kart_info.push_back(info);
         
         // no positions in this mode
-        m_kart[n]->setPosition(-1);
+        m_karts[n]->setPosition(-1);
     }// next kart
 }   // ThreeStrikesBattle
 
@@ -66,12 +66,12 @@ void ThreeStrikesBattle::terminateRace()
     updateKartRanks();
     
     // if some karts have not yet finished yet
-    const unsigned int kart_amount = m_kart.size();
-    for ( Karts::size_type i = 0; i < kart_amount; ++i)
+    const unsigned int kart_amount = m_karts.size();
+    for ( KartList::size_type i = 0; i < kart_amount; ++i)
     {
-        if(!m_kart[i]->hasFinishedRace())
+        if(!m_karts[i]->hasFinishedRace())
         {
-            m_kart[i]->raceFinished(WorldStatus::getTime());
+            m_karts[i]->raceFinished(WorldStatus::getTime());
         }  // if !hasFinishedRace
     }   // for i
     
@@ -82,7 +82,7 @@ void ThreeStrikesBattle::terminateRace()
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
     assert(kart_id >= 0);
-    assert(kart_id < (int)m_kart.size());
+    assert(kart_id < (int)m_karts.size());
     
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
@@ -92,7 +92,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
     {
-        m_kart[kart_id]->raceFinished(WorldStatus::getTime());
+        m_karts[kart_id]->raceFinished(WorldStatus::getTime());
         removeKart(kart_id);
     }
     
@@ -138,10 +138,10 @@ void ThreeStrikesBattle::updateKartRanks()
         sorted = true;
         for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
         {
-            const int this_karts_time = m_kart[karts_list[n]]->hasFinishedRace() ?
-                (int)m_kart[karts_list[n]]->getFinishTime() : (int)WorldStatus::getTime();
-            const int next_karts_time = m_kart[karts_list[n+1]]->hasFinishedRace() ?
-                (int)m_kart[karts_list[n+1]]->getFinishTime() : (int)WorldStatus::getTime();
+            const int this_karts_time = m_karts[karts_list[n]]->hasFinishedRace() ?
+                (int)m_karts[karts_list[n]]->getFinishTime() : (int)WorldStatus::getTime();
+            const int next_karts_time = m_karts[karts_list[n+1]]->hasFinishedRace() ?
+                (int)m_karts[karts_list[n+1]]->getFinishTime() : (int)WorldStatus::getTime();
 
             bool swap = false;
             
@@ -163,7 +163,7 @@ void ThreeStrikesBattle::updateKartRanks()
     
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
-        m_kart[ karts_list[n] ]->setPosition( n+1 );
+        m_karts[ karts_list[n] ]->setPosition( n+1 );
     }
     delete [] karts_list;
 }   // updateKartRank
@@ -174,8 +174,8 @@ void ThreeStrikesBattle::enterRaceOverState(const bool delay)
     World::enterRaceOverState(delay);
     // Add the results for the remaining kart
     for(unsigned int i=0; i<getNumKarts(); i++)
-        if(!m_kart[i]->isEliminated()) 
-            race_manager->RaceFinished(m_kart[i], WorldStatus::getTime());
+        if(!m_karts[i]->isEliminated()) 
+            race_manager->RaceFinished(m_karts[i], WorldStatus::getTime());
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
@@ -191,14 +191,14 @@ void ThreeStrikesBattle::restartRace()
 {
     World::restartRace();
     
-    const unsigned int kart_amount = m_kart.size();
+    const unsigned int kart_amount = m_karts.size();
     
     for(unsigned int n=0; n<kart_amount; n++)
     {
         m_kart_info[n].m_lives         = 3;
         
         // no positions in this mode
-        m_kart[n]->setPosition(-1);
+        m_karts[n]->setPosition(-1);
     }// next kart
 }   // restartRace
 
@@ -316,7 +316,7 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
     const unsigned int num_karts = getNumKarts();
     for( unsigned int kart_id    = 0; kart_id < num_karts; ++kart_id )
     {
-        const int pos = m_kart[kart_id]->getPosition() - 1;
+        const int pos = m_karts[kart_id]->getPosition() - 1;
         assert(pos >= 0);
         assert(pos < (int)num_karts);
         order[pos] = kart_id;
