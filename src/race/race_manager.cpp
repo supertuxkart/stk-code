@@ -58,8 +58,7 @@ PlayerKart* RaceManager::getPlayerKart(const unsigned int n)
 }
 Kart* RaceManager::getKart(const unsigned int n)
 {
-    if(n<0||n>2)
-        printf("X");
+    //if (n<0||n>2) printf("X");
     return m_world->getKart(n);
 }
 //-----------------------------------------------------------------------------

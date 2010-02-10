@@ -109,6 +109,7 @@ FileManager::FileManager(char *argv[])
     getcwd(buffer, 256);
 #endif
 
+    //std::cout << "^^^^^^^^ CREATING m_device (NULL) in FileManager ^^^^^^^^\n";
     m_device = createDevice(video::EDT_NULL);
 
 #ifdef __APPLE__
@@ -161,6 +162,8 @@ FileManager::FileManager(char *argv[])
  */
 void FileManager::dropFileSystem()
 {
+    //std::cout << "^^^^^^^^ Dropping m_device (in FileManager) ^^^^^^^^\n";
+
     m_device->drop();
 }   // dropFileSystem
 
@@ -171,6 +174,8 @@ void FileManager::dropFileSystem()
 void FileManager::setDevice(IrrlichtDevice *device)
 {
     m_device = device;
+    
+    //std::cout << "^^^^^^^^ GRABBING m_device (FileManager) ^^^^^^^^\n";
     m_device->grab();  // To make sure that the device still exists while
                        // file_manager has a pointer to the file system.
     m_file_system  = m_device->getFileSystem();
@@ -200,6 +205,7 @@ FileManager::~FileManager()
     popTextureSearchPath();
     // m_file_system is ref-counted, so no delete/drop necessary.
     m_file_system = NULL;
+    //std::cout << "^^^^^^^^ Dropping m_device (FileManager) ^^^^^^^^\n";
     m_device->drop();
 }   // ~FileManager
 

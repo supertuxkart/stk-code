@@ -60,6 +60,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
 IrrDriver::IrrDriver()
 {
     m_res_switching = false;
+    m_device = NULL;
     file_manager->dropFileSystem();
     initDevice();
 }   // IrrDriver
@@ -67,7 +68,10 @@ IrrDriver::IrrDriver()
 // ----------------------------------------------------------------------------
 IrrDriver::~IrrDriver()
 {
+    //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
+    assert(m_device != NULL);
     m_device->drop();
+    m_device = NULL;
 }   // ~IrrDriver
 // ----------------------------------------------------------------------------
 
@@ -78,6 +82,7 @@ void IrrDriver::initDevice()
     // ---- the first time, get a list of available video modes
     if (firstTime)
     {
+        //std::cout << "^^^^^^^^ Creating m_device (as NULL) ^^^^^^^^\n";
         m_device = createDevice(video::EDT_NULL);
         
         video::IVideoModeList* modes = m_device->getVideoModeList();
@@ -107,6 +112,7 @@ void IrrDriver::initDevice()
             //" resolution=" << modes->getVideoModeResolution(i).Width <<
             //"x" << modes->getVideoModeResolution(i).Height << std::endl;
         }
+        //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
         m_device->closeDevice();
         
         firstTime = false;
@@ -145,6 +151,7 @@ void IrrDriver::initDevice()
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for(int bits=32; bits>15; bits -=8)
         {
+            //std::cout << "^^^^^^^^ CREATING m_device ^^^^^^^^\n";
             m_device = createDevice(type,
                                     core::dimension2d<u32>(UserConfigParams::m_width,
                                                            UserConfigParams::m_height ),
@@ -317,7 +324,9 @@ void IrrDriver::doApplyResSettings()
     GUIEngine::clear();
     GUIEngine::cleanUp();
 
+    //std::cout << "^^^^^^^^ Closing m_device ^^^^^^^^\n";
     m_device->closeDevice();
+    //std::cout << "^^^^^^^^ Dropping m_device ^^^^^^^^\n";
     m_device->drop();
     m_device        = NULL;
     m_video_driver  = NULL;

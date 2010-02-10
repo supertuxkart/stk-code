@@ -53,11 +53,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     const int margin_between_buttons = 12;
     const int buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
     
-    if (unlock_manager->getRecentlyUnlockedFeatures().size()>0)
-    {
-        // TODO: unlocked features
-    }
-    
     // ---- Ranking
     core::rect< s32 > area(0, 0, m_area.getWidth()*2/3, text_height);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Race Results"),
@@ -192,7 +187,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
 
     
     // ---- Buttons at the bottom
-    // TODO: make these buttons work
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
         ButtonWidget* new_race_btn = new ButtonWidget();

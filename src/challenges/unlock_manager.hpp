@@ -39,6 +39,9 @@ private:
     Challenge *getChallenge      (const std::string& id);
     void       computeActive     ();
     void       load              ();
+    
+    void       unlockFeature     (Challenge* c, bool do_save=true);
+
 public:
                UnlockManager     ();
               ~UnlockManager     ();
@@ -64,7 +67,6 @@ public:
     
     void       raceFinished      ();
     void       grandPrixFinished ();
-    void       unlockFeature     (Challenge* c, bool do_save=true);
     void       lockFeature       (Challenge* challenge);
     bool       isLocked          (const std::string& feature);
     void       check             () const;

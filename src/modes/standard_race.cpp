@@ -31,16 +31,6 @@ StandardRace::~StandardRace()
 {
 }   // ~StandardRace
     
-#if 0
-#pragma mark -
-#pragma mark clock events
-#endif
-
-#if 0
-#pragma mark -
-#pragma mark overridden from World
-#endif
-
 //-----------------------------------------------------------------------------
 /** Called once per frame to update race specific data structures.
  *  \param dt TIme step size.
