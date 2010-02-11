@@ -36,11 +36,6 @@
 
 MainLoop* main_loop = 0;
 
-// FIXME hacky hacky FPS info
-int minFPS  = 999;
-int lastFPS =  -1;
-int maxFPS  =   0;
-
 MainLoop::MainLoop() :
 m_abort(false),
 m_frame_count(0)
