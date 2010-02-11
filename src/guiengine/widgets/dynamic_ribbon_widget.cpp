@@ -80,7 +80,7 @@ void DynamicRibbonWidget::add()
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
-        // leave room for many lines, just in case
+        // leave room for many lines, just in case (FIXME: remove this hack)
         rect<s32> label_size = rect<s32>(x, y + h - m_label_height, x+w, y+h+m_label_height*5);
         m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
@@ -148,7 +148,7 @@ void DynamicRibbonWidget::add()
     m_row_amount = (int)round((h-m_label_height) / (float)m_child_height);
     if (m_row_amount > m_max_rows) m_row_amount = m_max_rows;
     
-    // get and build a list of IDs (by now we may not yet know how many rows we will needs,
+    // get and build a list of IDs (by now we may not yet know everything about items,
     // but we need to get IDs *now* in order for tabbing to work.
     m_ids.resize(m_row_amount);
     for (int i=0; i<m_row_amount; i++)
