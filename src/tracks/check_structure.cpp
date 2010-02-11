@@ -62,7 +62,7 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Vec3 &xyz = world->getKart(i)->getXYZ();
@@ -79,7 +79,7 @@ void CheckStructure::reset(const Track &track)
  */
 void CheckStructure::update(float dt)
 {
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Vec3 &xyz = world->getKart(i)->getXYZ();
@@ -100,7 +100,7 @@ void CheckStructure::trigger(unsigned int kart_index)
 {
     switch(m_check_type)
     {
-    case CT_NEW_LAP : RaceManager::getWorld()->newLap(kart_index); 
+    case CT_NEW_LAP : World::getWorld()->newLap(kart_index); 
                       m_is_active[kart_index] = false;
                       break;
     case CT_ACTIVATE: {

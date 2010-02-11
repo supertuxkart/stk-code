@@ -205,9 +205,9 @@ void Kart::createPhysics()
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster =
-        new btDefaultVehicleRaycaster(RaceManager::getWorld()->getPhysics()->getPhysicsWorld());
+        new btDefaultVehicleRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld());
     m_tuning  = new btKart::btVehicleTuning();
-        m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
+    m_tuning->m_maxSuspensionTravelCm = m_kart_properties->getSuspensionTravelCM();
     m_vehicle = new btKart(*m_tuning, m_body, m_vehicle_raycaster,
                            m_kart_properties->getTrackConnectionAccel());
 
@@ -246,7 +246,7 @@ void Kart::createPhysics()
     m_uprightConstraint->setErp(1.0f);
     m_uprightConstraint->setLimitSoftness(1.0f);
     m_uprightConstraint->setDamping(0.0f);
-    RaceManager::getWorld()->getPhysics()->addKart(this);
+    World::getWorld()->getPhysics()->addKart(this);
 
     //create the engine sound
     if(m_engine_sound)
@@ -288,7 +288,7 @@ Kart::~Kart()
 
     if(m_skidmarks) delete m_skidmarks ;
 
-    RaceManager::getWorld()->getPhysics()->removeKart(this);
+    World::getWorld()->getPhysics()->removeKart(this);
     delete m_vehicle;
     delete m_tuning;
     delete m_vehicle_raycaster;
@@ -307,7 +307,7 @@ void Kart::eliminate()
     m_eliminated = true;
     if (!m_rescue)
     {
-        RaceManager::getWorld()->getPhysics()->removeKart(this);
+        World::getWorld()->getPhysics()->removeKart(this);
     }
 
     // make the kart invisible by placing it way under the track
@@ -356,7 +356,7 @@ void Kart::reset()
     // physics world. Add it again.
     if(m_eliminated || m_rescue)
     {
-        RaceManager::getWorld()->getPhysics()->addKart(this);
+        World::getWorld()->getPhysics()->addKart(this);
     }
 
     m_view_blocked_by_plunger = 0.0;
@@ -610,7 +610,7 @@ void Kart::update(float dt)
             m_rescue_roll  = getHPR().getRoll();
             race_state->itemCollected(getWorldKartId(), -1, -1);
         }
-        RaceManager::getWorld()->getPhysics()->removeKart(this);
+        World::getWorld()->getPhysics()->removeKart(this);
 
         btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
@@ -686,7 +686,7 @@ void Kart::update(float dt)
     {
         // let kart fall a bit before rescuing
         if(fabs( getXYZ().getZ()
-                -RaceManager::getTrack()->getQuadGraph().getQuad(0).getCenter().getZ() ) > 17)
+	        -World::getWorld()->getTrack()->getQuadGraph().getQuad(0).getCenter().getZ() ) > 17)
             forceRescue();
     }
     else if(material)
@@ -774,7 +774,7 @@ void Kart::draw()
         m_vehicle->updateWheelTransform(i, true);
         float m[16];
         m_vehicle->getWheelInfo(i).m_worldTransform.getOpenGLMatrix(m);
-        RaceManager::getWorld()->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
+        World::getWorld()->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
     }
 }   // draw
 
@@ -825,7 +825,7 @@ float Kart::handleSlipstream(float dt)
     // ------------------------------------------------------------------
     m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
 
-    World *world       = RaceManager::getWorld();
+    World *world       = World::getWorld();
     unsigned int n     = world->getNumKarts();
     bool is_sstreaming = false;
     Kart *target_kart;
@@ -898,9 +898,9 @@ void Kart::crashed(Kart *k)
      *  long disabling of the engine. Therefore, this reaction is disabled
      *  for 0.5 seconds after a crash.
      */
-    if(RaceManager::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
+    if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
 
-    m_time_last_crash = RaceManager::getWorld()->getTime();
+    m_time_last_crash = World::getWorld()->getTime();
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
@@ -1016,7 +1016,7 @@ void Kart::updatePhysics (float dt)
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
         if(m_vehicle->getWheelInfo(0).m_brake &&
-            !RaceManager::getWorld()->isStartPhase())
+            !World::getWorld()->isStartPhase())
             resetBrakes();
 
     }
@@ -1080,8 +1080,8 @@ void Kart::updatePhysics (float dt)
             if(!RaceManager::getWorld()->isStartPhase())
                 resetBrakes();
 #endif
-        }
-    }
+        }  
+  }
 #ifdef ENABLE_JUMP
     if(m_controls.jump && isOnGround())
     {
@@ -1216,7 +1216,7 @@ void Kart::endRescue()
 {
     m_rescue = false ;
 
-    RaceManager::getWorld()->getPhysics()->addKart(this);
+    World::getWorld()->getPhysics()->addKart(this);
     
     m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
     m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
@@ -1224,7 +1224,7 @@ void Kart::endRescue()
     m_vehicle->deactivateZipper();
 
     // let the mode decide where to put the kart
-    RaceManager::getWorld()->moveKartAfterRescue(this, m_body);
+    World::getWorld()->moveKartAfterRescue(this, m_body);
     
 }   // endRescue
 

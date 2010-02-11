@@ -64,7 +64,7 @@ void History::initRecording()
 void History::allocateMemory(int number_of_frames)
 {
     m_all_deltas.resize   (number_of_frames);
-    unsigned int num_karts = RaceManager::getWorld()->getNumKarts();
+    unsigned int num_karts = World::getWorld()->getNumKarts();
     m_all_controls.resize (number_of_frames*num_karts);
     m_all_xyz.resize      (number_of_frames*num_karts);
     m_all_rotations.resize(number_of_frames*num_karts);
@@ -101,7 +101,7 @@ void History::updateSaving(float dt)
     }
     m_all_deltas[m_current] = dt;
 
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -125,7 +125,7 @@ void History::updateReplay(float dt)
         printf("Replay finished.\n");
         exit(2);
     }
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
     {
@@ -150,7 +150,7 @@ void History::updateReplay(float dt)
 void History::Save()
 {
     FILE *fd       = fopen("history.dat","w");
-    World *world   = RaceManager::getWorld();
+    World *world   = World::getWorld();
     int  num_karts = world->getNumKarts();
 #ifdef VERSION
     fprintf(fd, "Version:  %s\n",   VERSION);
@@ -158,7 +158,7 @@ void History::Save()
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
-    fprintf(fd, "track: %s\n",      RaceManager::getTrack()->getIdent().c_str());
+    fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
 
     int k;
     for(k=0; k<num_karts; k++)

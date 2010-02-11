@@ -240,7 +240,7 @@ void PlayerKart::update(float dt)
     if(!history->replayHistory())
         steer(dt, m_steer_val);
 
-    if(RaceManager::getWorld()->isStartPhase())
+    if(World::getWorld()->isStartPhase())
     {
         if(m_controls.m_accel || m_controls.m_brake ||
            m_controls.m_fire || m_controls.m_nitro  || m_controls.m_drift)
@@ -248,7 +248,7 @@ void PlayerKart::update(float dt)
             if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
                 m_penalty_time=1.0;
-                RaceGUI* m=RaceManager::getWorld()->getRaceGUI();
+                RaceGUI* m=World::getWorld()->getRaceGUI();
                 if(m)
                 {
                     m->addMessage(_("Penalty time!!"),
@@ -320,7 +320,7 @@ void PlayerKart::setPosition(int p)
 {
     if(getPosition()<p)
     {
-        World *world = RaceManager::getWorld();
+        World *world = World::getWorld();
         //have the kart that did the passing beep.
         //I'm not sure if this method of finding the passing kart is fail-safe.
         for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
@@ -348,7 +348,7 @@ void PlayerKart::raceFinished(float time)
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
         m_camera->setMode(Camera::CM_FINAL);
     
-    RaceGUI* m=RaceManager::getWorld()->getRaceGUI();
+    RaceGUI* m=World::getWorld()->getRaceGUI();
     if(m)
     {
         m->addMessage(getPosition()==1 ? _("You won the race!") 

@@ -29,7 +29,7 @@
  *  \param kart Pointer to the kart to which the slip stream
  *              belongs to.
  */
-SlipStream::SlipStream(Kart* kart) : m_kart(kart), MovingTexture(0, 0)
+SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
 {
     video::SMaterial m;
     Material *material = material_manager->getMaterial("slipstream.png");
@@ -93,12 +93,12 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // The number of points for each circle. Since part of the slip stream
     // might be under the ground (esp. first and last segment), specify
     // which one is the first and last to be actually drawn.
-    const int   num_segments   = 7;
-    const int   first_segment  = 0;
-    const int   last_segment   = 6;
-    const float f              = 2*M_PI/float(num_segments);
-    scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
-    buffer->Material           = material;
+    const unsigned int  num_segments   = 7;
+    const unsigned int  first_segment  = 0;
+    const unsigned int  last_segment   = 6;
+    const float         f              = 2*M_PI/float(num_segments);
+    scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
+    buffer->Material                   = material;
     for(unsigned int j=0; j<num_circles; j++)
     {
         float curr_distance = distance[j]-distance[0];

@@ -31,7 +31,6 @@
 class Kart;
 class PlayerKart;
 class Track;
-class World;
 
 /** The race manager has two functions:
  *  1) it stores information about the race the user selected (e.g. number
@@ -187,10 +186,7 @@ private:
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
-    static World                    *m_world;
-    
-    /** The race manager manages the world, i.e. maintains 
-     *  this world pointer. */
+
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -199,15 +195,6 @@ private:
     }
 
 
-public:
-    bool   m_active_race; //True if there is a race
-
-    /** Returns the world object. */
-    static World *getWorld() { return m_world; }
-
-    static Track* getTrack();
-    static PlayerKart* getPlayerKart(const unsigned int n);
-    
 public:
                  RaceManager();
                 ~RaceManager();
@@ -265,7 +252,6 @@ public:
     int          getPositionScore(int p)  const { return m_score_for_position[p-1];      }
     bool         allPlayerFinished()      const {return 
                                            m_num_finished_players==m_player_karts.size();}
-    bool         raceIsActive()           const { return m_active_race;                  }
     const std::vector<std::string>&
                  getRandomKartList()      const { return m_random_kart_list;             }
     void         setRandomKartList(const std::vector<std::string>& rkl)

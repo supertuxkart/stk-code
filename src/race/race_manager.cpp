@@ -39,23 +39,6 @@
 
 RaceManager* race_manager= NULL;
 
-World *RaceManager::m_world=NULL;
-
-//-----------------------------------------------------------------------------
-Track* RaceManager::getTrack()
-{
-    return m_world->getTrack();
-}   // getTrack
-
-//-----------------------------------------------------------------------------
-PlayerKart* RaceManager::getPlayerKart(const unsigned int n)
-{
-    return m_world->getPlayerKart(n);
-}   // getPlayerKart
-
-
-//-----------------------------------------------------------------------------
-
 /** Constructs the race manager.
  */
 RaceManager::RaceManager()
@@ -65,10 +48,8 @@ RaceManager::RaceManager()
     m_major_mode         = MAJOR_MODE_SINGLE;
     m_minor_mode         = MINOR_MODE_NORMAL_RACE;
     m_track_number       = 0;
-    m_active_race        = false;
     m_score_for_position = stk_config->m_scores;
     m_coin_target        = 0;
-    m_world              = NULL;
     setTrack("jungle");
     setNumLocalPlayers(0);
     //setLocalKartInfo(0, "tux");
@@ -248,20 +229,20 @@ void RaceManager::startNextRace()
     // handling of objects which get created in the constructor
     // and need world to be defined.
     if     (ProfileWorld::isProfileMode())            
-        m_world = new ProfileWorld();
+        World::setWorld(new ProfileWorld());
     else if(m_minor_mode==MINOR_MODE_FOLLOW_LEADER) 
-        m_world = new FollowTheLeaderRace();
+        World::setWorld(new FollowTheLeaderRace());
     else if(m_minor_mode==MINOR_MODE_NORMAL_RACE || 
             m_minor_mode==MINOR_MODE_TIME_TRIAL)    
-        m_world = new StandardRace();
+        World::setWorld(new StandardRace());
     else if(m_minor_mode==MINOR_MODE_3_STRIKES)     
-        m_world = new ThreeStrikesBattle();
+        World::setWorld(new ThreeStrikesBattle());
     else
     { 
         fprintf(stderr,"Could not create given race mode\n"); 
         assert(0); 
     }
-    m_world->init();
+    World::getWorld()->init();
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
     // The race is rerun, and the points and scores get reset ... but if
@@ -273,9 +254,8 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
 
-
-    m_active_race = true;
 }   // startNextRace
+
 //-----------------------------------------------------------------------------
 /** If there are more races to do, it starts the next race, otherwise it
  *  calls exitRace to finish the race.
@@ -383,10 +363,8 @@ void RaceManager::exitRace()
         // menu_manager->switchToGrandPrixEnding();
     }
 
-    delete m_world;
-    m_world        = NULL;
+    delete World::getWorld();
     m_track_number = 0;
-    m_active_race  = false;    
     
     StateManager::get()->resetActivePlayers();
     input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
@@ -428,7 +406,7 @@ void RaceManager::rerunRace()
         m_kart_status[i].m_score         = m_kart_status[i].m_last_score;
         m_kart_status[i].m_overall_time -= m_kart_status[i].m_last_time;
     }
-    m_world->restartRace();
+    World::getWorld()->restartRace();
 }   // rerunRace
 
 /* EOF */

@@ -48,7 +48,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                                    this,
                                                    m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f,
-                                           -RaceManager::getTrack()->getGravity()));
+                                           -World::getWorld()->getTrack()->getGravity()));
 #ifdef HAVE_GLUT
     if(UserConfigParams::m_bullet_debug)
       {

@@ -746,7 +746,7 @@ void IrrDriver::renderBulletDebugView()
     float f=2.0f;
     glFrustum(-f, f, -f, f, 1.0, 1000.0);
 
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     const Kart *kart = world->getKart(world->getNumKarts()-1);
     Vec3 xyz = kart->getXYZ();
     // Compute the camera position 5 units behind and 4 units higher than the kart
@@ -824,8 +824,9 @@ void IrrDriver::update(float dt)
         if (m_res_switching)    m_res_switching = false;
         else                    main_loop->abort();
     }
+    World *world = World::getWorld();
     
-    const bool inRace = race_manager->raceIsActive();
+    const bool inRace = world!=NULL;
     // With bullet debug view we have to clear the back buffer, but
     // that's not necessary for non-debug
     bool back_buffer_clear = inRace && UserConfigParams::m_bullet_debug;
@@ -853,7 +854,6 @@ void IrrDriver::update(float dt)
             }
             else
             {
-                World *world = RaceManager::getWorld();
                 RaceGUI *rg = world->getRaceGUI();
                 for(unsigned int i=0; i<world->getNumKarts(); i++)
                 {

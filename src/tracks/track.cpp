@@ -297,7 +297,7 @@ void Track::loadQuadGraph(unsigned int mode_id)
 {
     m_quad_graph = new QuadGraph(m_root+"/"+m_all_modes[mode_id].m_quad_name,
                                  m_root+"/"+m_all_modes[mode_id].m_graph_name);
-    m_mini_map   = m_quad_graph->makeMiniMap(RaceManager::getWorld()->getRaceGUI()->getMiniMapSize(), 
+    m_mini_map   = m_quad_graph->makeMiniMap(World::getWorld()->getRaceGUI()->getMiniMapSize(), 
                                              "minimap::"+m_ident);
     if(m_quad_graph->getNumNodes()==0)
     {
@@ -433,7 +433,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_all_nodes.push_back(scene_node);
 
     MeshTools::minMax3D(mesh, &m_aabb_min, &m_aabb_max);
-    RaceManager::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
+    World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
     for(unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
@@ -891,7 +891,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
 {
     // Some modes (e.g. time trial) don't have any bonus boxes
     if(type==Item::ITEM_BONUS_BOX && 
-       !RaceManager::getWorld()->haveBonusBoxes()) 
+       !World::getWorld()->haveBonusBoxes()) 
         return;
 
     Vec3 loc(xyz);
@@ -943,7 +943,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
         }   // AddSingleResult
     };   // myCollision
     MaterialCollision rayCallback(pos, to_pos);
-    RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
+    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(pos, to_pos, rayCallback);
 
     if(!rayCallback.HasHit()) 
     {

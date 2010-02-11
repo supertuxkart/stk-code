@@ -26,7 +26,7 @@ TriangleMesh::~TriangleMesh()
 {
     if(m_body)
     {
-        RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+        World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
         delete m_collision_shape;
@@ -68,7 +68,7 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state, m_collision_shape);
     m_body=new btRigidBody(info);
 
-    RaceManager::getWorld()->getPhysics()->addBody(m_body);
+    World::getWorld()->getPhysics()->addBody(m_body);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
     m_body->setCollisionFlags(m_body->getCollisionFlags()  | 
@@ -84,7 +84,7 @@ void TriangleMesh::createBody(btCollisionObject::CollisionFlags flags)
  */
 void TriangleMesh::removeBody()
 {
-    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+    World::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     m_body = 0;
 }   // removeBody

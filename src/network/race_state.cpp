@@ -34,7 +34,7 @@ void RaceState::serialise()
 
     // 1. Add all kart information
     // ---------------------------
-    unsigned int num_karts = RaceManager::getWorld()->getCurrentNumKarts();
+    unsigned int num_karts = World::getWorld()->getCurrentNumKarts();
     KartControl c;
     // Send the number of karts and for each kart the compressed 
     // control structure, xyz,hpr, and speed (which is necessary to
@@ -62,7 +62,7 @@ void RaceState::serialise()
     // 1. Kart positions
     // -----------------
     addChar(num_karts);
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0; i<num_karts; i++)
     {
         const Kart* kart = world->getKart(i);
@@ -117,7 +117,7 @@ void RaceState::receive(ENetPacket *pkt)
     // 1. Kart information
     // -------------------
     unsigned int num_karts = getChar();
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0; i<num_karts; i++)
     {
         KartControl kc(this);

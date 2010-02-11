@@ -61,7 +61,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     caption->setTabStop(false);
     caption->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     const unsigned int num_karts = world->getNumKarts();
     int*  order  = new int [num_karts];
     world->raceResultOrder(order);
@@ -142,7 +142,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     delete[] order;
     
     // ---- Highscores
-    const HighscoreEntry *hs = RaceManager::getWorld()->getHighscores();
+    const HighscoreEntry *hs = World::getWorld()->getHighscores();
     if (hs != NULL)
     {
         core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);
@@ -243,14 +243,14 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSourc
     {
         ModalDialog::dismiss();
         network_manager->setState(NetworkManager::NS_MAIN_MENU);
-        RaceManager::getWorld()->unpause();
+        World::getWorld()->unpause();
         race_manager->rerunRace();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "newracebtn")
     {
         ModalDialog::dismiss();
-        RaceManager::getWorld()->unpause();
+        World::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
@@ -259,7 +259,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSourc
     else if (eventSource == "backtomenu")
     {
         ModalDialog::dismiss();
-        RaceManager::getWorld()->unpause();
+        World::getWorld()->unpause();
         race_manager->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         return GUIEngine::EVENT_BLOCK;
@@ -267,7 +267,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSourc
     else if (eventSource == "continuegp")
     {
         ModalDialog::dismiss();
-        RaceManager::getWorld()->unpause();
+        World::getWorld()->unpause();
         race_manager->next();
         return GUIEngine::EVENT_BLOCK;
     }

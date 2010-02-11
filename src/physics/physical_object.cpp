@@ -64,7 +64,7 @@ PhysicalObject::PhysicalObject(const XMLNode &xml_node)
 // -----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
-    RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+    World::getWorld()->getPhysics()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
     delete m_shape;
@@ -133,7 +133,7 @@ void PhysicalObject::init()
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
 
-    RaceManager::getWorld()->getPhysics()->addBody(m_body);
+    World::getWorld()->getPhysics()->addBody(m_body);
 }   // init
 
 // -----------------------------------------------------------------------------

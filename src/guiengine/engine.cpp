@@ -283,7 +283,7 @@ void render(float elapsed_time)
     }
     else
     {
-        RaceManager::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
+        World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)

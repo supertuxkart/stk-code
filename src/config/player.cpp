@@ -3,7 +3,6 @@
 
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
-#include "race/race_manager.hpp"
 
 ActivePlayer::ActivePlayer(PlayerProfile* player, InputDevice *device)
 {
@@ -51,7 +50,7 @@ void ActivePlayer::setDevice(InputDevice* device)
 // ----------------------------------------------------------------------------
 PlayerKart* ActivePlayer::getKart()
 {    
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     const int num_karts = world->getNumKarts();
     for (int p=0; p<num_karts; p++)
     {

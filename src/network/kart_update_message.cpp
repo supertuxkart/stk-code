@@ -25,7 +25,7 @@
 KartUpdateMessage::KartUpdateMessage()
                  : Message(Message::MT_KART_INFO)
 {
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
 
     // Send the number of karts and for each kart the compressed 
@@ -47,7 +47,7 @@ KartUpdateMessage::KartUpdateMessage()
 KartUpdateMessage::KartUpdateMessage(ENetPacket* pkt)
                   : Message(pkt, MT_KART_INFO)
 {
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     unsigned int num_karts = getInt();
     for(unsigned int i=0; i<num_karts; i++)
     {

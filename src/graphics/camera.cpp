@@ -38,7 +38,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     setupCamera();
     m_distance = kart->getKartProperties()->getCameraDistance() * 0.5f;
     m_kart     = kart;
-    m_ambient_light = RaceManager::getTrack()->getDefaultAmbientColor();
+    m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
@@ -139,6 +139,7 @@ void Camera::setupCamera()
  */
 void Camera::setMode(Mode mode)
 {
+    World *world = World::getWorld();
     // If we switch from reverse view, move the camera immediately to the 
     // correct position. 
     if(m_mode==CM_REVERSE && mode==CM_NORMAL)
@@ -150,7 +151,7 @@ void Camera::setMode(Mode mode)
     }
     if(mode==CM_FINAL)
     {
-        const Track* track       = RaceManager::getTrack();
+        const Track* track       = world->getTrack();
         core::vector3df wanted_position(track->getCameraPosition().toIrrVector());
         core::vector3df curr_position(m_camera->getPosition());
         m_lin_velocity           = (wanted_position-curr_position)
@@ -168,7 +169,7 @@ void Camera::setMode(Mode mode)
     // If the camera is set to final mode but there is no camera
     // end position defined, ignore this request and leave the camera
     // in normal mode.
-    if(mode!=CM_FINAL || RaceManager::getTrack()->hasFinalCamera())
+    if(mode!=CM_FINAL || world->getTrack()->hasFinalCamera())
     {
         m_mode = mode;
     }
@@ -308,7 +309,7 @@ void Camera::update(float dt)
         }
     case CM_LEADER_MODE:
         {
-            World *world  = RaceManager::getWorld();
+            World *world  = World::getWorld();
             Kart *kart    = world->getKart(0);
             wanted_target = kart->getXYZ().toIrrVector();
             // Follows the leader kart, higher off of the ground, further from the kart,

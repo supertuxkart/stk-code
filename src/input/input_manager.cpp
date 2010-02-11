@@ -85,12 +85,13 @@ InputManager::~InputManager()
     delete m_device_manager;
 }   // ~InputManager
 
+//-----------------------------------------------------------------------------
 void InputManager::handleStaticAction(int key, int value)
 {
 #ifdef DEBUG
     static bool control_is_pressed=false;
 #endif
-    World *world=RaceManager::getWorld();
+    World *world=World::getWorld();
     switch (key)
     {
 #ifdef DEBUG
@@ -164,6 +165,7 @@ void InputManager::handleStaticAction(int key, int value)
 
 }
 
+//-----------------------------------------------------------------------------
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */

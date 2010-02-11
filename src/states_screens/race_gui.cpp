@@ -193,25 +193,26 @@ void RaceGUI::renderGlobal(float dt)
                                                                       UserConfigParams::m_width, UserConfigParams::m_height));
     }
     
-    assert(RaceManager::getWorld() != NULL);
-    if(RaceManager::getWorld()->getPhase() >= WorldStatus::READY_PHASE &&
-       RaceManager::getWorld()->getPhase() <= WorldStatus::GO_PHASE      )
+    World *world = World::getWorld();
+    assert(world != NULL);
+    if(world->getPhase() >= WorldStatus::READY_PHASE &&
+       world->getPhase() <= WorldStatus::GO_PHASE      )
     {
         drawGlobalReadySetGo();
     }
 
     // Timer etc. are not displayed unless the game is actually started.
-    if(!RaceManager::getWorld()->isRacePhase()) return;
+    if(!world->isRacePhase()) return;
 
     drawGlobalTimer();
-    if(RaceManager::getWorld()->getPhase() == WorldStatus::GO_PHASE ||
-       RaceManager::getWorld()->getPhase() == WorldStatus::MUSIC_PHASE)
+    if(world->getPhase() == WorldStatus::GO_PHASE ||
+       world->getPhase() == WorldStatus::MUSIC_PHASE)
     {
         drawGlobalMusicDescription();
     }
 
     drawGlobalMiniMap();
-    RaceGUI::KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
+    RaceGUI::KartIconDisplayInfo* info = world->getKartsDisplayInfo();
     drawGlobalPlayerIcons(info);
 }   // renderGlobal
 
@@ -225,9 +226,9 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     const core::recti &viewport    = kart->getViewport();
     const core::vector2df &scaling = kart->getScaling();
     drawAllMessages     (kart, viewport, scaling);
-    if(!RaceManager::getWorld()->isRacePhase()) return;
+    if(!World::getWorld()->isRacePhase()) return;
 
-    RaceGUI::KartIconDisplayInfo* info = RaceManager::getWorld()->getKartsDisplayInfo();
+    RaceGUI::KartIconDisplayInfo* info = World::getWorld()->getKartsDisplayInfo();
 
     drawPowerupIcons    (kart, viewport, scaling);
     drawEnergyMeter     (kart, viewport, scaling);
@@ -259,10 +260,10 @@ void RaceGUI::renderPlayerView(const Kart *kart)
  */
 void RaceGUI::drawGlobalTimer()
 {
-    assert(RaceManager::getWorld() != NULL);
+    assert(World::getWorld() != NULL);
     
-    if(!RaceManager::getWorld()->shouldDrawTimer()) return;
-    std::string s = StringUtils::timeToString(RaceManager::getWorld()->getTime());
+    if(!World::getWorld()->shouldDrawTimer()) return;
+    std::string s = StringUtils::timeToString(World::getWorld()->getTime());
     core::stringw sw(s.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
@@ -284,10 +285,11 @@ void RaceGUI::drawGlobalTimer()
  */
 void RaceGUI::drawGlobalMiniMap()
 {
+    World *world = World::getWorld();
     // arenas currently don't have a map.
-    if(RaceManager::getTrack()->isArena()) return;
+    if(world->getTrack()->isArena()) return;
 
-    const video::ITexture *mini_map=RaceManager::getTrack()->getMiniMap();
+    const video::ITexture *mini_map=world->getTrack()->getMiniMap();
     
     int upper_y = UserConfigParams::m_height-m_map_bottom-m_map_height;
     int lower_y = UserConfigParams::m_height-m_map_bottom;
@@ -297,14 +299,13 @@ void RaceGUI::drawGlobalMiniMap()
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
     irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
     
-    World *world = RaceManager::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Kart *kart = world->getKart(i);
         if(kart->isEliminated()) continue;   // don't draw eliminated kart
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
-        RaceManager::getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         // int marker_height = m_marker->getOriginalSize().Height;
         core::rect<s32> source(i    *m_marker_rendered_size, 0, 
                                (i+1)*m_marker_rendered_size, m_marker_rendered_size);
@@ -322,8 +323,6 @@ void RaceGUI::drawGlobalMiniMap()
 // Draw players icons and their times (if defined in the current mode).
 void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 {
-    assert(RaceManager::getWorld() != NULL);
-
     int x = 5;
     int y_base = 20;
     
@@ -345,7 +344,7 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
     }
     
     gui::IGUIFont* font = GUIEngine::getFont();
-    World *world = RaceManager::getWorld();
+    World *world        = World::getWorld();
     const unsigned int kart_amount = world->getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
@@ -580,7 +579,7 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
                       const core::vector2df &scaling)
 {
     // Don't display laps in follow the leader mode
-    if(!RaceManager::getWorld()->raceHasLaps()) return;
+    if(!World::getWorld()->raceHasLaps()) return;
     
     const int lap = info[kart->getWorldKartId()].lap;
     
@@ -685,13 +684,14 @@ void RaceGUI::drawGlobalMusicDescription()
     
     gui::IGUIFont*       font = GUIEngine::getFont();
 
+    World *world = World::getWorld();
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
-    float timeProgression = (float)(RaceManager::getWorld()->m_auxiliary_timer - 2.0f) /
+    float timeProgression = (float)(world->m_auxiliary_timer - 2.0f) /
                             (float)(stk_config->m_music_credit_time - 2.0f);
     
-    const int x_pulse = (int)(sin(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
-    const int y_pulse = (int)(cos(RaceManager::getWorld()->m_auxiliary_timer*9.0f)*10.0f);
+    const int x_pulse = (int)(sin(world->m_auxiliary_timer*9.0f)*10.0f);
+    const int y_pulse = (int)(cos(world->m_auxiliary_timer*9.0f)*10.0f);
     
     float resize = 1.0f;
     if (timeProgression < 0.1)
@@ -773,8 +773,7 @@ void RaceGUI::drawGlobalMusicDescription()
  */
 void RaceGUI::drawGlobalReadySetGo()
 {
-    assert(RaceManager::getWorld() != NULL);
-    switch (RaceManager::getWorld()->getPhase())
+    switch (World::getWorld()->getPhase())
     {
     case WorldStatus::READY_PHASE:
         {

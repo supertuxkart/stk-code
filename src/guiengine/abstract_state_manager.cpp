@@ -27,7 +27,6 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
-#include "race/race_manager.hpp"
 
 using namespace GUIEngine;
 
@@ -51,6 +50,7 @@ void initGUI()
 }
  */
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::enterGameState()
 {
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
@@ -61,6 +61,7 @@ void AbstractStateManager::enterGameState()
     input_manager->setMode(InputManager::INGAME);
 }
 
+// -----------------------------------------------------------------------------
 GameState AbstractStateManager::getGameState()
 {
     return m_game_mode;
@@ -72,6 +73,7 @@ GameState AbstractStateManager::getGameState()
 #pragma mark Push/pop menus
 #endif
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::pushMenu(std::string name)
 {
     // currently, only a single in-game menu is supported
@@ -85,7 +87,7 @@ void AbstractStateManager::pushMenu(std::string name)
     if (m_game_mode == GAME)
     {
         setGameState(INGAME_MENU);
-        RaceManager::getWorld()->pause();
+        World::getWorld()->pause();
     }
     else
     {
@@ -94,12 +96,14 @@ void AbstractStateManager::pushMenu(std::string name)
     switchToScreen(name.c_str());
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::pushScreen(Screen* screen)
 {
     pushMenu(screen->getName());
     screen->init();
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 {
     assert(m_game_mode != GAME);
@@ -117,6 +121,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     getCurrentScreen()->init();
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::reshowTopMostMenu()
 {
     assert(m_game_mode != GAME);
@@ -134,6 +139,7 @@ void AbstractStateManager::reshowTopMostMenu()
     getCurrentScreen()->init();
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::popMenu()
 {
     assert(m_game_mode != GAME);
@@ -155,7 +161,7 @@ void AbstractStateManager::popMenu()
         m_menu_stack.push_back("race");
         if (m_game_mode == INGAME_MENU)
         {
-            RaceManager::getWorld()->unpause();
+            World::getWorld()->unpause();
         }
         setGameState(GAME);
         cleanForGame();
@@ -169,6 +175,7 @@ void AbstractStateManager::popMenu()
     }
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::setGameState(GameState state)
 {
     m_game_mode = state;
@@ -177,11 +184,12 @@ void AbstractStateManager::setGameState(GameState state)
     else                     irr_driver->showPointer();
 }
 
+// -----------------------------------------------------------------------------
 void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
     std::string name = screen->getName();
 
-    assert(!race_manager->raceIsActive());
+    assert(World::getWorld()==NULL);
     
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.clear();

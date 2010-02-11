@@ -29,7 +29,6 @@
 #include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
-#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -160,7 +159,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         // because the ref count reaches zero.
         Vec3 hell(0, 0, -10000);
         getNode()->setPosition(hell.toIrrVector());
-        RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+        World::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
     {
@@ -175,7 +174,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
             Vec3 hell(0, 0, -10000);
             getNode()->setPosition(hell.toIrrVector());
         }
-        RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+        World::getWorld()->getPhysics()->removeBody(getBody());
 
         if(kart)
         {

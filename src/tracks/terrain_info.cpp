@@ -21,6 +21,7 @@
 
 #include <math.h>
 
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -45,8 +46,8 @@ void TerrainInfo::update(const Vec3& pos)
     m_HoT_counter++;
     if(m_HoT_counter>=m_HoT_frequency)
     {
-        RaceManager::getTrack()->getTerrainInfo(pos, &m_HoT,
-                                               &m_normal, &m_material);
+        World::getWorld()->getTrack()->getTerrainInfo(pos, &m_HoT,
+                                                      &m_normal, &m_material);
         m_normal.normalize();
         m_HoT_counter = 0;
     }

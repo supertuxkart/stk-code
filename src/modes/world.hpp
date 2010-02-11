@@ -79,6 +79,9 @@ class World : public WorldStatus
 {
 public:
     typedef std::vector<Kart*> KartList;
+private:
+    /** A pointer to the global world object for a race. */
+    static World *m_world;
 protected:
     /** The list of all karts. */
     KartList                  m_karts;
@@ -116,20 +119,27 @@ protected:
 protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
-    
+
     /** Pointer to the race GUI. The race GUI is handedl by world. */
     RaceGUI *m_race_gui;
 
     virtual void onGo();
     
 public:
-    World();
+                    World();
+    virtual        ~World();
+    /** Returns a pointer to the world object. This is only used by
+     *  the race_manager. */
+    static World*   getWorld() { return m_world; }
+
+    /** Sets the pointer to the world object. This is only used by
+     *  the race_manager.*/
+    static void     setWorld(World *world) {m_world = world; }
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
-    virtual void init();
+    virtual void    init();
     
-    virtual         ~World();
     virtual void    update(float delta);
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool    isRaceOver() = 0;

@@ -50,7 +50,7 @@ void AmbientLightSphere::update(float dt)
 {
     CheckStructure::update(dt);
 
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         Kart *kart=world->getKart(i);
@@ -86,6 +86,6 @@ void AmbientLightSphere::update(float dt)
 bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
                                      int indx)
 {
-    if(!RaceManager::getWorld()->getKart(indx)->isPlayerKart()) return false;
+    if(!World::getWorld()->getKart(indx)->isPlayerKart()) return false;
     return CheckSphere::isTriggered(old_pos, new_pos, indx);
 }   // isTriggered

@@ -175,8 +175,8 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
         m_owner.getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
-    RaceManager::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
-                                                                      ray_callback);
+    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p, 
+                                                                ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
     if(m_owner.getBody()->getBroadphaseHandle())

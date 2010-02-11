@@ -38,7 +38,7 @@ using namespace irr::gui;
 
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) : ModalDialog(percentWidth, percentHeight)
 {
-    RaceManager::getWorld()->pause();
+    World::getWorld()->pause();
     
     IGUIFont* font = GUIEngine::getTitleFont();
     const int text_height = GUIEngine::getFontHeight();
@@ -262,14 +262,14 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
         {
             ModalDialog::dismiss();
             network_manager->setState(NetworkManager::NS_MAIN_MENU);
-            RaceManager::getWorld()->unpause();
+            World::getWorld()->unpause();
             race_manager->rerunRace();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "newrace")
         {
             ModalDialog::dismiss();
-            RaceManager::getWorld()->unpause();
+            World::getWorld()->unpause();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
@@ -281,6 +281,6 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSou
 
 RacePausedDialog::~RacePausedDialog()
 {
-    RaceManager::getWorld()->unpause();
+    World::getWorld()->unpause();
 }
 

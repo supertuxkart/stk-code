@@ -29,7 +29,6 @@
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
-#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
@@ -55,7 +54,7 @@ void Powerup::reset()
     m_number = 0;
     
     int type, number;
-    RaceManager::getWorld()->getDefaultCollectibles( type, number );
+    World::getWorld()->getDefaultCollectibles( type, number );
     set( (PowerupType)type, number );
 }   // reset
 
@@ -125,7 +124,7 @@ void Powerup::use()
     if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
     
     m_number--;
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     switch (m_type)
     {
     case POWERUP_ZIPPER:   m_owner->handleZipper();
@@ -150,7 +149,7 @@ void Powerup::use()
         float z_coord = Track::NOHIT;
         Vec3 normal;
         const Material* unused2;        
-        RaceManager::getTrack()->getTerrainInfo(pos, &z_coord, &normal, &unused2);
+        world->getTrack()->getTerrainInfo(pos, &z_coord, &normal, &unused2);
         normal.normalize();
         assert(z_coord != Track::NOHIT);
         
@@ -236,12 +235,13 @@ void Powerup::use()
 //-----------------------------------------------------------------------------
 void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
+    World *world = World::getWorld();
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
     if(m_owner->getPosition() != 1 && m_type == POWERUP_NOTHING &&
-       race_manager->getWorld()->acceptPowerup(POWERUP_PARACHUTE) &&
-       race_manager->getWorld()->acceptPowerup(POWERUP_ANVIL))
+       world->acceptPowerup(POWERUP_PARACHUTE) &&
+       world->acceptPowerup(POWERUP_ANVIL))
     {
         // On client: just set the value
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
@@ -250,14 +250,13 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
             set( (PowerupType)add_info, 1);
             return;
         }
-        const int SPECIAL_PROB = (int)(15.0 / ((float)RaceManager::getWorld()->getCurrentNumKarts() /
+        const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
                                          (float)m_owner->getPosition()));
         const int RAND_NUM = m_random.get(100);
         if(RAND_NUM <= SPECIAL_PROB)
         {
             //If the driver in the first position has finished, give the driver
             //the parachute.
-            World *world = RaceManager::getWorld();
             for(unsigned int i=0; i < world->getNumKarts(); ++i)
             {
                 Kart *kart = world->getKart(i);
@@ -317,7 +316,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     {
         newC = (PowerupType)(m_random.get(POWERUP_MAX - 1 - 2) + 1);
         // allow the game mode to allow or disallow this type of powerup
-        if(race_manager->getWorld()->acceptPowerup(newC)) break;
+        if(world->acceptPowerup(newC)) break;
     }
     
     // Save the information about the powerup in the race state

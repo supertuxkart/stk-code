@@ -103,7 +103,7 @@ void MainLoop::updateRace(float dt)
     // Client: send current controls to server
     // But don't do this if the race is in finish phase (otherwise 
     // messages can be mixed up in the race manager)
-    if(!RaceManager::getWorld()->isFinishPhase())
+    if(!World::getWorld()->isFinishPhase())
         network_manager->sendUpdates();
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
@@ -111,13 +111,13 @@ void MainLoop::updateRace(float dt)
     // race results are displayed (i.e. game is in finish phase) 
     // messages must be handled by the normal update of the network 
     // manager
-    if(!race_manager->getWorld()->isFinishPhase())
+    if(!World::getWorld()->isFinishPhase())
         network_manager->receiveUpdates();
 
-    if ( RaceManager::getWorld()->getPhase() != WorldStatus::LIMBO_PHASE)
+    if ( World::getWorld()->getPhase() != WorldStatus::LIMBO_PHASE)
     {
         history->update(dt);
-        RaceManager::getWorld()->update(dt);
+        World::getWorld()->update(dt);
     }   // phase != limbo phase
 }   // updateRace
 
@@ -135,7 +135,7 @@ void MainLoop::run()
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
-        if (!music_on && !race_manager->raceIsActive())
+        if (!music_on && !World::getWorld())
         {
             sound_manager->stopMusic();   // stop potential 'left over' music from race
             sound_manager->startMusic(stk_config->m_title_music);
@@ -143,7 +143,7 @@ void MainLoop::run()
         }
         network_manager->update(dt);
 
-        if (race_manager->raceIsActive())
+        if (World::getWorld())  // race is active if world exists
         {
             // Busy wait if race_manager is active (i.e. creating of world is done)
             // till all clients have reached this state.

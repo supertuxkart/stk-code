@@ -30,7 +30,6 @@
 #include "network/flyable_info.hpp"
 #include "network/item_info.hpp"
 #include "network/message.hpp"
-#include "race/race_manager.hpp"
 
 /** This class stores the state information of a (single) race, e.g. the 
     position and orientation of karts, collisions that have happened etc.
@@ -55,7 +54,7 @@ private:
         /** Initialise the global race state. */
         RaceState() : Message(MT_RACE_STATE) 
         {
-            m_kart_controls.resize(race_manager->getWorld()->getNumKarts());
+            m_kart_controls.resize(World::getWorld()->getNumKarts());
         }   // RaceState()
         // --------------------------------------------------------------------
         void itemCollected(int kartid, int item_id, char add_info=-1)

@@ -28,7 +28,6 @@
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "physics/kart_motion_state.hpp"
-#include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -99,7 +98,7 @@ void ThreeDAnimation::createPhysicsBody(const std::string &shape)
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
-    RaceManager::getWorld()->getPhysics()->addBody(m_body);
+    World::getWorld()->getPhysics()->addBody(m_body);
     m_body->setCollisionFlags( m_body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
     m_body->setActivationState(DISABLE_DEACTIVATION);
 }   // createPhysicsBody
@@ -110,7 +109,7 @@ ThreeDAnimation::~ThreeDAnimation()
 {
     if(m_body)
     {
-        RaceManager::getWorld()->getPhysics()->removeBody(m_body);
+        World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
         delete m_motion_state;
         delete m_collision_shape;

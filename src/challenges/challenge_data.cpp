@@ -264,12 +264,12 @@ bool ChallengeData::raceFinished()
 
     // Single races
     // ------------
-    std::string track_name = RaceManager::getTrack()->getIdent();
+    World *world = World::getWorld();
+    std::string track_name = world->getTrack()->getIdent();
     if(track_name!=m_track_name                      ) return false;    // wrong track
-    World *world = RaceManager::getWorld();
     if((int)world->getNumKarts()<m_num_karts         ) return false;    // not enough AI karts
 
-    PlayerKart* kart = RaceManager::getPlayerKart(0);
+    PlayerKart* kart = world->getPlayerKart(0);
     if(m_energy>0   && kart->getEnergy()  <m_energy  ) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 
@@ -284,7 +284,7 @@ bool ChallengeData::raceFinished()
     // ---------------------
     // FIXME - encapsulate this better, each race mode needs to be able to specify
     // its own challenges and deal with them
-    LinearWorld* lworld = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
+    LinearWorld* lworld = dynamic_cast<LinearWorld*>(world);
     if(lworld != NULL)
     {
         if(lworld->getLapForKart( kart->getWorldKartId() ) != m_num_laps) return false;         // wrong number of laps
@@ -306,7 +306,7 @@ bool ChallengeData::grandPrixFinished()
         race_manager->getNumPlayers() > 1) return false;
 
     // check if the player came first.
-    Kart* kart = RaceManager::getPlayerKart(0);
+    Kart* kart = World::getWorld()->getPlayerKart(0);
     const int rank = race_manager->getKartFinalGPRank(kart->getWorldKartId());
     //printf("getting rank for %s : %i \n", kart->getName().c_str(), rank );
     if( rank != 0 ) return false;

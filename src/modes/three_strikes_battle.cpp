@@ -250,7 +250,8 @@ RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 {
     // find closest point to drop kart on
-    const int start_spots_amount = RaceManager::getTrack()->getNumberOfStartPositions();
+    World *world = World::getWorld();
+    const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
     int smallest_distance_found = -1, closest_id_found = -1;
@@ -262,7 +263,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
-        const Vec3 &v=RaceManager::getTrack()->getStartPosition(n);
+        const Vec3 &v=world->getTrack()->getStartPosition(n);
         const int dist_n = abs((int)(kart_x - v.getX())) +
                            abs((int)(kart_y - v.getY()));
         if(dist_n < smallest_distance_found || closest_id_found == -1)
@@ -273,12 +274,12 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     }
     
     assert(closest_id_found != -1);
-    const Vec3 &v=RaceManager::getTrack()->getStartPosition(closest_id_found);
+    const Vec3 &v=world->getTrack()->getStartPosition(closest_id_found);
     kart->setXYZ( Vec3(v) );
     
     // FIXME - implement correct heading
     btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
-                         RaceManager::getTrack()->getStartHeading(closest_id_found));
+                         world->getTrack()->getStartHeading(closest_id_found));
     kart->setRotation(heading);
 
     //position kart from same height as in World::resetAllKarts

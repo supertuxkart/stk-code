@@ -135,7 +135,8 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     
     int *scores       = new int[NUM_KARTS];
     double *race_time = new double[NUM_KARTS];
-    
+    World *world      = World::getWorld();
+
     // Ignore kart 0, since it was the leader
     order[0] = -1;
     for( unsigned int kart_id = 1; kart_id < NUM_KARTS; ++kart_id )
@@ -145,8 +146,8 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
         race_time[kart_id] = race_manager->getOverallTime(kart_id);
         
         // check this kart is not in front of leader. If it is, give a score of 0
-        if(m_kart_info[kart_id].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(kart_id) >
-           m_kart_info[0].m_race_lap * RaceManager::getTrack()->getTrackLength() + getDistanceDownTrackForKart(0))
+        if(m_kart_info[kart_id].m_race_lap * world->getTrack()->getTrackLength() + getDistanceDownTrackForKart(kart_id) >
+           m_kart_info[0].m_race_lap * world->getTrack()->getTrackLength() + getDistanceDownTrackForKart(0))
             scores[kart_id] = 0;
     }
     
@@ -170,7 +171,7 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
     } while(!sorted);
     
     for(unsigned int i=1; i<NUM_KARTS; i++)
-        RaceManager::getWorld()->getKart(order[i])->setPosition(i);
+        world->getKart(order[i])->setPosition(i);
     
     delete []scores;
     delete []race_time;

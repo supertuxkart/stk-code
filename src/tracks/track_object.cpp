@@ -22,6 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 /** A track object: any additional object on the track. This object implements
@@ -37,7 +38,7 @@ TrackObject::TrackObject(const XMLNode &xml_node)
 
     std::string model_name;
     xml_node.get("model", &model_name);
-    std::string full_path = RaceManager::getTrack()->getTrackFile(model_name);
+    std::string full_path = World::getWorld()->getTrack()->getTrackFile(model_name);
     m_animated_mesh = irr_driver->getAnimatedMesh(full_path);
     if(!m_animated_mesh)
     {

@@ -31,7 +31,6 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
-#include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -99,7 +98,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape);
     m_user_pointer.set(this);
-    RaceManager::getWorld()->getPhysics()->addBody(getBody());
+    World::getWorld()->getPhysics()->addBody(getBody());
 
     m_body->setGravity(btVector3(0.0f, 0.0f, gravity));
 
@@ -138,7 +137,7 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
 Flyable::~Flyable()
 {
     if(m_shape) delete m_shape;
-    RaceManager::getWorld()->getPhysics()->removeBody(getBody());
+    World::getWorld()->getPhysics()->removeBody(getBody());
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
@@ -150,7 +149,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     *minDistSquared = -1.0f;
     *minKart = NULL;
 
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
         Kart *kart = world->getKart(i);
@@ -252,7 +251,7 @@ void Flyable::update(float dt)
 
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
-    race_manager->getTrack()->getAABB(&min, &max);
+    World::getWorld()->getTrack()->getAABB(&min, &max);
     Vec3 xyz = getXYZ();
     if(xyz[0]<(*min)[0] || xyz[1]<(*min)[1] || xyz[2]<(*min)[2] ||
        xyz[0]>(*max)[0] || xyz[1]>(*max)[1]                         )
@@ -325,7 +324,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 
     // Apply explosion effect
     // ----------------------
-    World *world = RaceManager::getWorld();
+    World *world = World::getWorld();
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         Kart *kart = world->getKart(i);
@@ -336,13 +335,13 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
         {
             // Set a flag it if was a direct hit.
             kart->handleExplosion(getXYZ(), kart==kart_hit);
-            if(kart==kart_hit && RaceManager::getTrack()->isArena())
+            if(kart==kart_hit && world->getTrack()->isArena())
             {
-                RaceManager::getWorld()->kartHit(kart->getWorldKartId());
+                world->kartHit(kart->getWorldKartId());
             }
         }
     }
-    RaceManager::getTrack()->handleExplosion(getXYZ(), object);
+    world->getTrack()->handleExplosion(getXYZ(), object);
 }   // hit
 
 /* EOF */

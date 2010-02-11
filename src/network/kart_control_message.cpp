@@ -26,7 +26,7 @@
 KartControlMessage::KartControlMessage()
                   : Message(Message::MT_KART_CONTROL)
 {
-    World *world=RaceManager::getWorld();
+    World *world=World::getWorld();
     unsigned int num_local_players = race_manager->getNumLocalPlayers();
     unsigned int control_size      = KartControl::getLength();
     allocate(control_size*num_local_players);
@@ -52,7 +52,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     for(int i=kart_id_offset; i<kart_id_offset+num_local_players; i++)
     {
         KartControl kc(this);
-        Kart *kart = RaceManager::getWorld()->getKart(i);
+        Kart *kart = World::getWorld()->getKart(i);
         if(kart->isNetworkKart())
         {
             ((NetworkKart*)kart)->setControl(kc);

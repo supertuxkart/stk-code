@@ -52,7 +52,8 @@ NewAI::NewAI(const std::string& kart_name,
 {
     m_kart_length = m_kart_properties->getKartModel()->getLength();
     m_kart_width  = m_kart_properties->getKartModel()->getWidth();
-    m_track = RaceManager::getTrack();
+    m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
+    m_track       = m_world->getTrack();
     m_quad_graph  = &m_track->getQuadGraph();
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
@@ -108,9 +109,6 @@ NewAI::NewAI(const std::string& kart_name,
     }
     // Reset must be called after m_quad_graph etc. is set up        
     reset();
-
-    m_world = dynamic_cast<LinearWorld*>(RaceManager::getWorld());
-    assert(m_world != NULL);
     
     switch( race_manager->getDifficulty())
     {

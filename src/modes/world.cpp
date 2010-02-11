@@ -52,6 +52,8 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
+World* World::m_world = NULL;
+
 //-----------------------------------------------------------------------------
 /** Constructor. Note that in the constructor it is not possible to call any
  *  functions that use RaceManager::getWorld(), since this is only defined
@@ -79,6 +81,7 @@ void World::init()
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
+    m_num_players         = 0;
 
     m_use_highscores = true;
 
@@ -157,10 +160,12 @@ Kart *World::createKart(const std::string &kart_ident, int index,
         newkart = new PlayerKart(kart_ident, position,
                                  StateManager::get()->getActivePlayer(local_player_id),
                                  init_pos, local_player_id);
+        m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
         newkart = new NetworkKart(kart_ident, position, init_pos,
                                   global_player_id);
+        m_num_players++;
         break;
     case RaceManager::KT_AI:
         std::cout << "===== World : creating AI kart for #" << index << "===========\n";
@@ -226,6 +231,7 @@ World::~World()
         delete m_physics;
 
     sound_manager -> stopMusic();
+    m_world = NULL;
 }   // ~World
 
 //-----------------------------------------------------------------------------
