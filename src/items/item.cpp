@@ -78,7 +78,7 @@ void Item::switchBack()
 {
     // FIXME: debug only - printf to be able to set a breakpoint.
     if(m_original_type==ITEM_NONE)
-        printf("XX");
+        printf("XX item none inside switchBack\n");
     assert(m_original_type!=ITEM_NONE);
     setType(m_original_type);
     m_original_type = ITEM_NONE;
