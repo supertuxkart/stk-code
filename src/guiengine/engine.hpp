@@ -78,14 +78,14 @@ Supports property PROP_LAYOUT. Of spawn type (<div>...</div>, place children wit
  "box" is a variant that acts exactly the same but is visible on-screen
 
 WTYPE_DYNAMIC_RIBBON       "ribbon_grid", "scrollable_ribbon", "scrollable_toolbar"
-Builds uponc the basic Ribbon to be more dynamic (dynamics contents, possibly with scrolling, possibly multi-line)
+Builds upon the basic Ribbon to be more dynamic (dynamics contents, possibly with scrolling, possibly multi-line)
 NOT of spawn type (<ribbon_grid .../>), contents must be programmatically set at runtime.
 Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or icons (this will
 affect the type of highlighting used).
-PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be added
-is nown) An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to show textures
-to any aspect ratio you want (so you can e.g. save textures to a power-of-two size like 256x256, but then show it
-in 4:3 ratio).
+PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be
+added is known) An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to
+show textures to any aspect ratio you want (so you can e.g. save textures to a power-of-two size like 256x256,
+but then show it in 4:3 ratio).
 Supports an optional label at the bottom if PROP_LABELS_LOCATION is set (see more on PROP_LABELS_LOCATION below).
 The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line
 scrollable ribbons. The difference between both is that 'scrollable_ribbon' always has a value selected (like in
