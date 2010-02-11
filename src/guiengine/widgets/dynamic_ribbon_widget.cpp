@@ -218,6 +218,7 @@ void DynamicRibbonWidget::setSubElements()
         {
             ribbon = new RibbonWidget(RIBBON_TOOLBAR);
         }
+        ribbon->setListener(this);
         ribbon->m_reserved_id = m_ids[n];
                 
         ribbon->x = x + m_arrows_w;
@@ -467,22 +468,31 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
     
     return EVENT_LET;
 }
+
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::onRowChange(RibbonWidget* row, const int playerID)
+
+void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 {
-    if (row->m_selection[playerID] >= row->m_children.size())
+    scroll(delta_x);
+}
+
+// -----------------------------------------------------------------------------
+
+void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID)
+{
+    if (emitter->m_selection[playerID] >= emitter->m_children.size())
     {
-        row->m_selection[playerID] = row->m_children.size()-1;
+        emitter->m_selection[playerID] = emitter->m_children.size()-1;
     }
     
-    updateLabel(row);
+    updateLabel(emitter);
     
     const int listenerAmount = m_hover_listeners.size();
     for (int n=0; n<listenerAmount; n++)
     {
-        m_hover_listeners[n].onSelectionChanged(this, row->getSelectionIDString(playerID),
-                                                row->getSelectionText(playerID), playerID);
-    }
+        m_hover_listeners[n].onSelectionChanged(this, emitter->getSelectionIDString(playerID),
+                                                emitter->getSelectionText(playerID), playerID);
+    }    
 }
 
 #if 0
@@ -503,7 +513,7 @@ void DynamicRibbonWidget::scroll(const int x_delta)
     else if (m_scroll_offset > max_scroll) m_scroll_offset = 0;
     
     updateItemDisplay();
-
+    
     // update selection markers in child ribbon
     if (m_combo)
     {
@@ -514,7 +524,7 @@ void DynamicRibbonWidget::scroll(const int x_delta)
             if (id < 0) id += m_items.size();
             ribbon->setSelection(id, n);
         }
-    }
+    }    
 }
 // -----------------------------------------------------------------------------
 /** DynamicRibbonWidget is made of several ribbons; each of them thus has
@@ -684,3 +694,7 @@ bool DynamicRibbonWidget::setSelection(const std::string item_codename, const in
     }
     return false;
 }
+
+// -----------------------------------------------------------------------------
+
+

@@ -99,10 +99,7 @@ void SpinnerWidget::add()
     // label
     if (m_graphical)
     {
-        std::ostringstream icon_stream;
-        icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
-        std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
-        ITexture* texture = irr_driver->getTexture(imagefile);
+        ITexture* texture = getTexture();
         assert(texture != NULL);
         
         const int texture_width = texture->getSize().Width;
@@ -146,6 +143,18 @@ void SpinnerWidget::add()
     m_children[2].m_properties[PROP_ID] = "right";
     m_children[2].id = m_children[2].m_element->getID();
 }
+
+// -----------------------------------------------------------------------------
+
+ITexture* SpinnerWidget::getTexture()
+{
+    assert(m_graphical);
+    std::ostringstream icon_stream;
+    icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
+    std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
+    ITexture* texture = irr_driver->getTexture(imagefile);
+    return texture;
+}
 // -----------------------------------------------------------------------------
 void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 {
@@ -154,13 +163,9 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
     
-    if(m_graphical)
+    if (m_graphical)
     {
-        // FIXME : code duplicated from add()
-        std::ostringstream icon_stream;
-        icon_stream << file_manager->getDataDir() << "/" << m_properties[PROP_ICON];
-        std::string imagefile = StringUtils::insertValues(icon_stream.str(), m_value);
-        ITexture* texture = irr_driver->getTexture(imagefile);
+        ITexture* texture = getTexture();
         assert(texture != NULL);
         
         const int texture_width = texture->getSize().Width;

@@ -19,6 +19,7 @@
 #include "guiengine/widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -60,7 +61,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->setParent(m_irrlicht_window);
     m_children.push_back(textCtrl);
     textCtrl->add();
-    textCtrl->setFocusForPlayer(0); // FIXME : don't hardcode player 0 ?
+    textCtrl->setFocusForPlayer(GUI_PLAYER_ID);
     
     // TODO : add Ok button
 

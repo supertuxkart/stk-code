@@ -47,6 +47,9 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 16; }
         
+        /** Call only if this spinner is graphical. Returns the current texture to display */
+        irr::video::ITexture* getTexture();
+
     public:
         
         SpinnerWidget(const bool gauge=false);

@@ -39,6 +39,16 @@ namespace GUIEngine
         See guiengine/engine.hpp for a detailed overview */
     class RibbonWidget : public Widget
     {
+    public:
+        class IRibbonListener
+        {
+        public:
+            virtual ~IRibbonListener(){}
+            virtual void onRibbonWidgetScroll(const int delta_x) = 0;
+            virtual void onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID) = 0;
+        };
+        
+    private:
         friend class DynamicRibbonWidget;
         friend class EventHandler;
         
@@ -61,6 +71,8 @@ namespace GUIEngine
         
         ptr_vector<irr::gui::IGUIStaticText, REF> m_labels;
         
+        IRibbonListener* m_listener;
+        
     public:
         
         /** Contains which element within the ribbon is currently focused by player 0 (used by the skin to
@@ -72,6 +84,10 @@ namespace GUIEngine
         
         void add();
 
+        /** Sets a listener that will be notified of changes on this ribbon.
+          * Does _not_ take ownership of the listener, i.e. will not delete it. */
+        void setListener(IRibbonListener* listener) { m_listener = listener; }
+        
         /** Returns the type of this ribbon (see guiengine/engine.hpp for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         

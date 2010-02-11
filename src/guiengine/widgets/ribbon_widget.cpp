@@ -45,6 +45,7 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     m_mouse_focus = NULL;
     updateSelection();
     m_type = WTYPE_RIBBON;
+    m_listener = NULL;
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::add()
@@ -253,12 +254,10 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     m_selection[playerID]++;
     if (m_selection[playerID] >= m_children.size())
     {
-        if (m_event_handler != NULL)
-        {
-            ((DynamicRibbonWidget*)m_event_handler)->scroll(1); // FIXME? - find cleaner way to propagate event to parent
-            m_selection[playerID] = m_children.size()-1;
-        }
-        else m_selection[playerID] = 0;
+        if (m_listener != NULL)         m_listener->onRibbonWidgetScroll(1);
+
+        if (m_event_handler != NULL)    m_selection[playerID] = m_children.size()-1;
+        else                            m_selection[playerID] = 0;
     }
     updateSelection();
     
@@ -288,12 +287,10 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
     {
-        if (m_event_handler != NULL)
-        {
-            ((DynamicRibbonWidget*)m_event_handler)->scroll(-1); // FIXME? - find cleaner way to propagate event to parent
-            m_selection[playerID] = 0;
-        }
-        else m_selection[playerID] = m_children.size()-1;
+        if (m_listener != NULL)         m_listener->onRibbonWidgetScroll(-1);
+
+        if (m_event_handler != NULL)    m_selection[playerID] = 0;
+        else                            m_selection[playerID] = m_children.size()-1;
     }
     updateSelection();
     
@@ -334,13 +331,8 @@ EventPropagation RibbonWidget::focused(const int playerID)
         }
     }
     
-    if (m_event_handler != NULL)
-    {
-        //m_focus->setFocusForPlayer( playerID );
-                
-        // FIXME : unclean, children ribbons shouldn't need to know about their parent
-        ((DynamicRibbonWidget*)m_event_handler)->onRowChange( this, playerID );
-    }
+    if (m_listener != NULL) m_listener->onRibbonWidgetFocus( this, playerID );
+
     
     return EVENT_LET;
 }

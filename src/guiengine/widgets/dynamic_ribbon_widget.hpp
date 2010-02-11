@@ -54,7 +54,7 @@ namespace GUIEngine
     
     /** A dynamic ribbon (builds upon RibbonWidget, adding dynamic contents creation and sizing, scrolling, multiple-row
         layouts). See guiengine/engine.hpp for a detailed overview */
-    class DynamicRibbonWidget : public Widget
+    class DynamicRibbonWidget : public Widget, public RibbonWidget::IRibbonListener
     {
         friend class RibbonWidget;
         
@@ -137,7 +137,6 @@ namespace GUIEngine
         int m_selected_item[MAX_PLAYER_COUNT];
         
         /** Callbacks */
-        virtual void onRowChange(RibbonWidget* row, const int playerID);
         virtual void add();
         virtual EventPropagation mouseHovered(Widget* child, const int playerID);
         virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
@@ -200,6 +199,12 @@ namespace GUIEngine
          * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
          */
         virtual void elementRemoved();
+        
+        /** callback from IRibbonListener */
+        virtual void onRibbonWidgetScroll(const int delta_x);
+        
+        /** callback from IRibbonListener */
+        virtual void onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID);
     };
     
 }
