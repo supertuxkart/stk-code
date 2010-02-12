@@ -1107,6 +1107,9 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
         drawListSelection(rect, widget, focused);
     }  
 }
+
+// -----------------------------------------------------------------------------
+
 void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, const bool pressed)
 {    
     const int id = element->getID();
@@ -1173,11 +1176,13 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         GUIEngine::getFont()->draw(idstring.c_str(), rect, color, true, true);
     }
         
-    if (widget->m_lock_badge || widget->m_okay_badge || widget->m_bad_badge)
+    if (widget->m_badges != 0)
     {
         drawBadgeOn(widget, rect);
     }
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
 {
@@ -1185,25 +1190,26 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
     float max_icon_size = 0.35f;
     bool badge_at_left = true;
     
-    if (widget->m_lock_badge)
+    if (widget->m_badges & LOCKED_BADGE)
     {
         texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
         max_icon_size = 0.5f; // Lock badge can be quite big
     }
-    else if (widget->m_okay_badge)
+    if (widget->m_badges & OK_BADGE)
     {
         texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
     }
-    else if (widget->m_bad_badge)
+    if (widget->m_badges & BAD_BADGE)
     {
         texture = irr_driver->getTexture(file_manager->getTextureFile("red_mark.png"));
         badge_at_left = false;
     }
-    else
+    if (widget->m_badges & TROPHY_BADGE)
     {
-        assert(false);
-        return;
+        texture = irr_driver->getTexture(file_manager->getTextureFile("cup_bronze.png"));
+        badge_at_left = false;
     }
+
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
     const int h = rect.getHeight() <= 50 ?
@@ -1226,15 +1232,21 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
                                         0 /* no clipping */, 0, true /* alpha */);
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     process3DPane(element, rect, true /* pressed */ );
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     process3DPane(element, rect, false /* pressed */ );
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {    
@@ -1316,6 +1328,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     //    GUIEngine::getDriver()->draw2DRectangle( SColor(255, 0, 150, 0), rect );
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::drawBGFadeColor()
 {
     // fade out background
@@ -1325,6 +1339,8 @@ void Skin::drawBGFadeColor()
                                             core::rect< s32 >(position2d< s32 >(0,0) ,
                                             GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }
+
+// -----------------------------------------------------------------------------
 
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR==7)
 core::rect< s32 > Skin::draw3DWindowBackground(IGUIElement *element, bool drawTitleBar, 
@@ -1365,29 +1381,42 @@ core::rect< s32 > Skin::draw3DWindowBackground(IGUIElement *element, bool drawTi
     return rect;
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::draw3DMenuPane (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     //printf("draw menu pane\n");
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::draw3DTabBody (IGUIElement *element, bool border, bool background, const core::rect< s32 > &rect, const core::rect< s32 > *clip, s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
 {
     //printf("draw tab body\n");
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::draw3DTabButton (IGUIElement *element, bool active, const core::rect< s32 > &rect, const core::rect< s32 > *clip, gui::EGUI_ALIGNMENT alignment)
 {
     //printf("draw tab button\n");
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::draw3DToolBar (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon, const core::position2di position, u32 starttime, u32 currenttime, bool loop, const core::rect< s32 > *clip)
 {
+    // we won't let irrLicht decide when to call this, we draw them ourselves.
     /* m_fallback_skin->drawIcon(element, icon, position, starttime, currenttime, loop, clip); */
 }
+
+// -----------------------------------------------------------------------------
 
 video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const 
 {
@@ -1433,15 +1462,22 @@ video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
     
 }
 
+// -----------------------------------------------------------------------------
+
 const wchar_t*  Skin::getDefaultText (EGUI_DEFAULT_TEXT text) const 
 {
+    // No idea what this is for
     return L"SuperTuxKart";
 }
+
+// -----------------------------------------------------------------------------
 
 IGUIFont* Skin::getFont (EGUI_DEFAULT_FONT which) const 
 {
     return GUIEngine::getFont();
 }
+
+// -----------------------------------------------------------------------------
 
 u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const 
 {
@@ -1450,43 +1486,57 @@ u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const
     return 0;
 }
 
+// -----------------------------------------------------------------------------
+
 s32 Skin::getSize (EGUI_DEFAULT_SIZE texture_size) const 
 {
     return m_fallback_skin->getSize(texture_size);
 }
+
+// -----------------------------------------------------------------------------
 
 IGUISpriteBank* Skin::getSpriteBank () const 
 {
     return m_fallback_skin->getSpriteBank();
 }
 
-//EGUI_SKIN_TYPE    getType () const
+// -----------------------------------------------------------------------------
 
 void Skin::setColor (EGUI_DEFAULT_COLOR which, video::SColor newColor)
 {
     m_fallback_skin->setColor(which, newColor);
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::setDefaultText (EGUI_DEFAULT_TEXT which, const wchar_t *newText)
 {
     m_fallback_skin->setDefaultText(which, newText);
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::setFont (IGUIFont *font, EGUI_DEFAULT_FONT which)
 {
     m_fallback_skin->setFont(font, which);
 }
 
+// -----------------------------------------------------------------------------
+
 void Skin::setIcon (EGUI_DEFAULT_ICON icon, u32 index)
 {
     m_fallback_skin->setIcon(icon, index);
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::setSize (EGUI_DEFAULT_SIZE which, s32 texture_size)
 {
     m_fallback_skin->setSize(which, texture_size);
     //printf("setting size\n");
 }
+
+// -----------------------------------------------------------------------------
 
 void Skin::setSpriteBank (IGUISpriteBank *bank)
 {

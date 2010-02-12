@@ -127,17 +127,33 @@ void TracksScreen::init()
         
         std::vector<std::string> tracks = gp->getTracks();
         
-        // TODO: use actual screenshots
+        std::string sshot_file = "gui/main_help.png";
+        for (unsigned int t=0; t<tracks.size(); t++)
+        {
+            // TODO: add cycling screenshots instead of the still of a random track
+            Track* curr = track_manager->getTrack(tracks[t]);
+            if (curr == NULL)
+            {
+                std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' refers to track '"
+                          << tracks[t] << "', which does not exist.\n";
+            }
+            else
+            {
+                sshot_file = curr->getScreenshotFile();
+                break;
+            }
+        }
+        
         if (unlock_manager->isLocked(gp->getId()))
         {
-            gps_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", "gui/main_help.png", true );
+            gps_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", sshot_file, TROPHY_BADGE );
         }
         else
         {
-            gps_widget->addItem( gp->getName(), gp->getId(), "gui/main_help.png", false );
+            gps_widget->addItem( gp->getName(), gp->getId(), sshot_file, TROPHY_BADGE );
         }
     }
-    gps_widget->updateItemDisplay();   
+    gps_widget->updateItemDisplay();
     
     // Reset track list everytime (accounts for locking changes, etc.)
     tracks_widget->clearItems();

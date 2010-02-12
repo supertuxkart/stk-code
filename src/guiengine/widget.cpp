@@ -52,8 +52,11 @@ namespace GUIEngine
     {
         g_is_within_a_text_box = in;
     }
-    
+}
+using namespace GUIEngine;
+
 // -----------------------------------------------------------------------------
+
 Widget::Widget(bool reserve_id)
 {
     m_magic_number = 0xCAFEC001;
@@ -84,10 +87,10 @@ Widget::Widget(bool reserve_id)
     
     m_reserved_id = -1;
     
-    m_lock_badge = false;
-    m_okay_badge = false;
-    m_bad_badge = false;
+    m_badges = 0;
 }
+
+// -----------------------------------------------------------------------------
 
 Widget::~Widget()
 {
@@ -105,6 +108,8 @@ Widget::~Widget()
     m_magic_number = 0xDEADBEEF;
 }
     
+// -----------------------------------------------------------------------------
+
 void Widget::elementRemoved()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -123,8 +128,13 @@ void Widget::elementRemoved()
 }
 
 // -----------------------------------------------------------------------------
-static unsigned int id_counter = 0;
-static unsigned int id_counter_2 = 1000; // for items that can't be reached with keyboard navigation but can be clicked
+namespace GUIEngine
+{
+    static unsigned int id_counter = 0;
+    
+    /** // for items that can't be reached with keyboard navigation but can be clicked */
+    static unsigned int id_counter_2 = 1000;
+}
 
 int Widget::getNewID()
 {
@@ -134,6 +144,9 @@ int Widget::getNewNoFocusID()
 {
     return id_counter_2++;
 }
+
+// -----------------------------------------------------------------------------
+
 /** When switching to a new screen, this function will be called to reset ID counters
  * (so we start again from ID 0, and don't grow to big numbers) */
 void Widget::resetIDCounters()
@@ -143,6 +156,7 @@ void Widget::resetIDCounters()
 }
 
 // -----------------------------------------------------------------------------
+
 void Widget::add()
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -176,6 +190,8 @@ void Widget::setFocusForPlayer(const int playerID)
     this->focused(playerID);
 }
     
+// -----------------------------------------------------------------------------
+
 void Widget::unsetFocusForPlayer(const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -183,6 +199,8 @@ void Widget::unsetFocusForPlayer(const int playerID)
     if (m_player_focus[playerID]) this->unfocused(playerID);
     m_player_focus[playerID] = false;
 }
+
+// -----------------------------------------------------------------------------
 
 /**
  * \param playerID ID of the player you want to set/unset focus for, starting from 0
@@ -194,6 +212,7 @@ bool Widget::isFocusedForPlayer(const int playerID)
     return m_player_focus[playerID];
 }
     
+// -----------------------------------------------------------------------------
 
 /**
  * Receives as string the raw property value retrieved from XML file.
@@ -223,7 +242,9 @@ bool Widget::convertToCoord(std::string& x, int* absolute /* out */, int* percen
         return true;
     }
 }
-    
+
+// -----------------------------------------------------------------------------
+
 void Widget::move(const int x, const int y, const int w, const int h)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -377,11 +398,11 @@ void Widget::readCoords(Widget* parent)
     }    
 }
 
+// -----------------------------------------------------------------------------
+
 void Widget::setParent(IGUIElement* parent)
 {
     assert(m_magic_number == 0xCAFEC001);
     m_parent = parent;
-}
-
 }
 

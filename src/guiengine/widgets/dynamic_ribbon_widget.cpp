@@ -266,13 +266,13 @@ void DynamicRibbonWidget::setSubElements()
  }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
-                                   const std::string& image_file, const bool locked )
+                                   const std::string& image_file, const unsigned int badges )
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
     desc.m_code_name = code_name;
     desc.m_sshot_file = image_file;
-    desc.m_locked = locked;
+    desc.m_badges = badges;
     
     m_items.push_back(desc);
 }
@@ -629,7 +629,7 @@ void DynamicRibbonWidget::updateItemDisplay()
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
                 icon->setLabel(m_items[icon_id].m_user_name);
                 icon->m_text                  = m_items[icon_id].m_user_name;
-                icon->m_lock_badge            = m_items[icon_id].m_locked;
+                icon->m_badges                = m_items[icon_id].m_badges;
                 
                 //std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
                 

@@ -50,6 +50,12 @@ namespace GUIEngine
         WTYPE_TEXTBOX
     };
     
+    const int LOCKED_BADGE = 0x1;
+    const int OK_BADGE     = 0x2;
+    const int BAD_BADGE    = 0x4;
+    const int TROPHY_BADGE = 0x8;
+    
+    
     enum Property
     {
         PROP_ID = 100,
@@ -207,14 +213,8 @@ namespace GUIEngine
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
         
-        /** Show a 'locked' badge on this widget */
-        bool m_lock_badge;
-        
-        /** Show a 'good' badge on this widget */
-        bool m_okay_badge;
-        
-        /** Show a 'good' badge on this widget */
-        bool m_bad_badge;
+        /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
+        int m_badges;
         
         /** Set to false if widget is something that should not receieve focus */
         bool m_focusable;
