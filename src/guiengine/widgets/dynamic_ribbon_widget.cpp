@@ -705,7 +705,6 @@ void DynamicRibbonWidget::updateItemDisplay()
 void DynamicRibbonWidget::update(float dt)
 {
     const int row_amount = m_rows.size();
-    const int item_amount = m_items.size();
     for (int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
@@ -726,7 +725,7 @@ void DynamicRibbonWidget::update(float dt)
                 int frameAfter = (int)(m_items[icon_id].m_curr_time / m_items[icon_id].m_time_per_frame);
                 if (frameAfter == frameBefore) continue; // no frame change yet
                 
-                if (frameAfter >= m_items[icon_id].m_all_images.size())
+                if (frameAfter >= (int)m_items[icon_id].m_all_images.size())
                 {
                     m_items[icon_id].m_curr_time = 0;
                     frameAfter = 0;
