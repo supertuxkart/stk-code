@@ -127,30 +127,36 @@ void TracksScreen::init()
         
         std::vector<std::string> tracks = gp->getTracks();
         
-        std::string sshot_file = "gui/main_help.png";
+        std::vector<std::string> sshot_files;
         for (unsigned int t=0; t<tracks.size(); t++)
         {
-            // TODO: add cycling screenshots instead of the still of a random track
             Track* curr = track_manager->getTrack(tracks[t]);
             if (curr == NULL)
             {
+                //TODO: show warning to user? don't add GP to GUI?
                 std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' refers to track '"
                           << tracks[t] << "', which does not exist.\n";
             }
             else
             {
-                sshot_file = curr->getScreenshotFile();
-                break;
+                sshot_files.push_back(curr->getScreenshotFile());
             }
+        }
+        if (sshot_files.size() == 0)
+        {
+            //TODO: show warning to user? don't add GP to GUI?
+            std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' does not contain any valid track.\n";
+            sshot_files.push_back("gui/main_help.png");
         }
         
         if (unlock_manager->isLocked(gp->getId()))
         {
-            gps_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", sshot_file, TROPHY_BADGE );
+            gps_widget->addAnimatedItem( _("Locked : solve active challenges to gain access to more!"),
+                                        "locked", sshot_files, 1.5f, TROPHY_BADGE );
         }
         else
         {
-            gps_widget->addItem( gp->getName(), gp->getId(), sshot_file, TROPHY_BADGE );
+            gps_widget->addAnimatedItem( gp->getName(), gp->getId(), sshot_files, 1.5f, TROPHY_BADGE );
         }
     }
     gps_widget->updateItemDisplay();

@@ -49,6 +49,13 @@ namespace GUIEngine
         irr::core::stringw m_user_name;
         std::string m_code_name;
         std::string m_sshot_file;
+        
+        bool m_animated;
+        /** used instead of 'm_sshot_file' if m_animated is true */
+        std::vector<std::string> m_all_images;
+        float m_curr_time;
+        float m_time_per_frame;
+        
         unsigned int m_badges;
     };
     
@@ -61,12 +68,15 @@ namespace GUIEngine
         /** A list of all listeners that registered to be notified on hover/selection */
         ptr_vector<DynamicRibbonHoverListener> m_hover_listeners;
         
-        virtual ~DynamicRibbonWidget() {}
+        virtual ~DynamicRibbonWidget();
         
         /** Used for ribbon grids that have a label at the bottom */
         bool m_has_label;
         irr::gui::IGUIStaticText* m_label;
         int m_label_height;
+        
+        /** Whether this ribbon contains at least one animated item */
+        bool m_animated_contents;
         
         /** Used to keep track of item count changes */
         int m_previous_item_count;
@@ -159,11 +169,26 @@ namespace GUIEngine
           *
           * \param user_name   The name that will shown to the user (may be translated)
           * \param code_name   The non-translated internal name used to uniquely identify this item.
-          * \param image_name  A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
-          * \param badge       Whether to add badges to this item
+          * \param image_file  A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
+          * \param badge       Whether to add badges to this item (bitmask, see possible values in widget.hpp)
           */
-        void addItem( const irr::core::stringw& user_name, const std::string& code_name, const std::string& image_file, const unsigned int badge=0 );
+        void addItem( const irr::core::stringw& user_name, const std::string& code_name,
+                      const std::string& image_file, const unsigned int badge=0 );
         
+        /** Dynamically add an animated item to the ribbon's list of items (will not be visible until you
+         * call 'updateItemDisplay' or 'add'). Animated means it has many images that will be shown in
+         * a slideshown fashion.
+         *
+         * \param user_name   The name that will shown to the user (may be translated)
+         * \param code_name   The non-translated internal name used to uniquely identify this item.
+         * \param image_files A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
+         * \param time_per_frame  Time (in seconds) to spend at each image.
+         * \param badge       Whether to add badges to this item (bitmask, see possible values in widget.hpp)
+         */
+        void addAnimatedItem( const irr::core::stringw& user_name, const std::string& code_name,
+                             const std::vector<std::string>& image_files, const float time_per_frame,
+                             const unsigned int badge=0 );
+
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
         void clearItems();
@@ -210,6 +235,8 @@ namespace GUIEngine
         
         /** callback from IRibbonListener */
         virtual void onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID);
+        
+        virtual void update(float delta);
     };
     
 }

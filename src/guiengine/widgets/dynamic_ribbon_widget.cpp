@@ -55,6 +55,15 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_selected_item[0] = 0; // only player 0 has a selection by default
 }
 // -----------------------------------------------------------------------------
+DynamicRibbonWidget::~DynamicRibbonWidget()
+{
+    if (m_animated_contents)
+    {
+        GUIEngine::needsUpdate.remove(this);
+    }
+}
+
+// -----------------------------------------------------------------------------
 void DynamicRibbonWidget::add()
 {
     //printf("****DynamicRibbonWidget::add()****\n");
@@ -284,9 +293,42 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     desc.m_code_name = code_name;
     desc.m_sshot_file = image_file;
     desc.m_badges = badges;
+    desc.m_animated = false;
     
     m_items.push_back(desc);
 }
+
+// -----------------------------------------------------------------------------
+
+void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, const std::string& code_name,
+                                           const std::vector<std::string>& image_files, const float time_per_frame,
+                                           const unsigned int badges )
+{
+    ItemDescription desc;
+    desc.m_user_name = user_name;
+    desc.m_code_name = code_name;
+    desc.m_all_images = image_files;
+    desc.m_badges = badges;
+    desc.m_animated = true;
+    desc.m_curr_time = 0.0f;
+    desc.m_time_per_frame = time_per_frame;
+    
+    m_items.push_back(desc);
+    
+    if (!m_animated_contents)
+    {
+        m_animated_contents = true;
+        
+        /*
+         FIXME: remove this unclean thing, I think irrlicht provides this feature:
+         virtual void IGUIElement::OnPostRender (u32 timeMs)
+         \brief animate the element and its children. 
+         FIXME 2: I think it will remain in the needsUpdate even when leaving the screen?
+         */
+        GUIEngine::needsUpdate.push_back(this);
+    }
+}
+
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::clearItems()
 {
@@ -634,7 +676,9 @@ void DynamicRibbonWidget::updateItemDisplay()
             
             if (icon_id < item_amount)
             {
-                std::string item_icon = m_items[icon_id].m_sshot_file;
+                std::string item_icon = (m_items[icon_id].m_animated ?
+                                         m_items[icon_id].m_all_images[0] :
+                                         m_items[icon_id].m_sshot_file);
                 icon->setImage( item_icon.c_str() );
                 
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
@@ -655,6 +699,47 @@ void DynamicRibbonWidget::updateItemDisplay()
         } // next column
     } // next row
 }
+
+// -----------------------------------------------------------------------------
+
+void DynamicRibbonWidget::update(float dt)
+{
+    const int row_amount = m_rows.size();
+    const int item_amount = m_items.size();
+    for (int n=0; n<row_amount; n++)
+    {
+        RibbonWidget& row = m_rows[n];
+        
+        const int items_in_row = row.m_children.size();
+        for (int i=0; i<items_in_row; i++)
+        {
+            int col_scroll = i + m_scroll_offset;
+            int icon_id = (col_scroll)*row_amount + n;
+
+            //m_items[icon_id].
+            
+            if (m_items[icon_id].m_animated)
+            {
+                const int frameBefore = (int)(m_items[icon_id].m_curr_time / m_items[icon_id].m_time_per_frame);
+
+                m_items[icon_id].m_curr_time += dt;
+                int frameAfter = (int)(m_items[icon_id].m_curr_time / m_items[icon_id].m_time_per_frame);
+                if (frameAfter == frameBefore) continue; // no frame change yet
+                
+                if (frameAfter >= m_items[icon_id].m_all_images.size())
+                {
+                    m_items[icon_id].m_curr_time = 0;
+                    frameAfter = 0;
+                }
+                
+                IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
+                icon->setImage( m_items[icon_id].m_all_images[frameAfter].c_str() );
+            }
+
+        }
+    }
+}
+
 // -----------------------------------------------------------------------------
 bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bool focusIt)
 {

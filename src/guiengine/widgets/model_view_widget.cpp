@@ -48,9 +48,10 @@ void ModelViewWidget::add()
     IconButtonWidget::add();
 
     /*
-     TODO: remove this unclean thing, I think irrlicht provides this feature:
+     FIXME: remove this unclean thing, I think irrlicht provides this feature:
         virtual void IGUIElement::OnPostRender (u32 timeMs)
         \brief animate the element and its children. 
+     FIXME 2: I think it will remain in the needsUpdate even when leaving the screen?
      */
     GUIEngine::needsUpdate.push_back(this);
     
