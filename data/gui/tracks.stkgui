@@ -5,12 +5,9 @@
     <header width="100%" I18N="Section in track selection screen" text="Grand Prix"
             align="center" text_align="center" />
 
-    <buttonbar id="gps" height="175" width="100%" align="center" square_items="true">
-        <icon-button id="gp1" width="171" height="128" icon="gui/track_random.png" text="Penguin Playground"/>
-        <icon-button id="gp2" width="171" height="128" icon="gui/track_random.png" text="Snag Drive"/>
-        <icon-button id="gp3" width="171" height="128" icon="gui/track_random.png" text="To the Moon and Back"/>
-        <icon-button id="gp4" width="171" height="128" icon="gui/track_random.png" text="At World's End"/>
-    </buttonbar>
+    <scrollable_toolbar id="gps" height="175" width="100%" align="center" label_location="each"
+                        square_items="true" align="center"
+                        child_width="128" child_height="128" />
     
     <header width="100%" I18N="Section in track selection screen" text="All Tracks"
             align="center" text_align="center" />

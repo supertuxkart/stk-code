@@ -18,6 +18,8 @@
 #include "challenges/unlock_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
@@ -95,74 +97,70 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (name == "gps")
     {
-        RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
-        if(w != NULL)
-            std::cout << "Clicked on GrandPrix " << w->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
+        RibbonWidget* tracks_widget = dynamic_cast<RibbonWidget*>(widget);
+        if(tracks_widget != NULL)
+            std::cout << "Clicked on GrandPrix " << tracks_widget->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
     }
     
 }
 
 void TracksScreen::init()
 {
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( w != NULL );
+    DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
+    assert( gps_widget != NULL );
+    
+    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( tracks_widget != NULL );
     
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
+       
+    // Reset GP list everytime (accounts for locking changes, etc.)
+    gps_widget->clearItems();
     
-    /*
-    tracks->m_children.clearAndDeleteAll();
+    // Build GP list
+    const int gpAmount = grand_prix_manager->getNumberOfGrandPrix();
+    for (int n=0; n<gpAmount; n++)
+    {
+        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
+        std::cout << "Got GP : " << gp->getId() << std::endl;
+        
+        std::vector<std::string> tracks = gp->getTracks();
+        
+        // TODO: use actual screenshots
+        if (unlock_manager->isLocked(gp->getId()))
+        {
+            gps_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", "gui/main_help.png", true );
+        }
+        else
+        {
+            gps_widget->addItem( gp->getName(), gp->getId(), "gui/main_help.png", false );
+        }
+    }
+    gps_widget->updateItemDisplay();   
     
-    ButtonWidget* item1 = new ButtonWidget();
-    item1->m_text = _("Standard");
-    item1->m_proeprties[PROP_ID] = "stdtracks";
-    tracks->m_children.push_back(item1);
+    // Reset track list everytime (accounts for locking changes, etc.)
+    tracks_widget->clearItems();
     
-    ButtonWidget* item2 = new ButtonWidget();
-    item2->m_text = _("Add-Ons");
-    item2->m_proeprties[PROP_ID] = "addontracks";
-    tracks->m_children.push_back(item2);
-*/
-    //tabs->clearItems();
-    //tabs->addItem( _("Standard"), "stdtracks", "" /* image */);
-    //tabs->addItem( _("Add-Ons"), "stdtracks", "" /* image */);
-    //tabs->addItem( _("Special"), "stdtracks", "" /* image */);
-    //tabs->updateItemDisplay();
-    
-    // Re-build track list everytime (accounts for locking changes, etc.)
-    w->clearItems();
-    
+    // Build track list
     const int trackAmount = track_manager->getNumberOfTracks();
-    //bool hasLockedTracks = false;
     for (int n=0; n<trackAmount; n++)
     {
         Track* curr = track_manager->getTrack(n);
         if (curr->isArena()) continue;
         
-        /*
         if (unlock_manager->isLocked(curr->getIdent()))
         {
-            hasLockedTracks = true;
-            continue;
-        }
-         */
-        if (unlock_manager->isLocked(curr->getIdent()))
-        {
-            w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
+            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
         }
         else
         {
-            w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
+            tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
         }
     }
-    w->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
-/*
-    if (hasLockedTracks)
-    {
-        w->addItem(_("Locked Tracks"), "Lock", "textures/gui_lock.png");
-    }
-    */
-    w->updateItemDisplay();    
+    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
+
+    tracks_widget->updateItemDisplay();    
 }
 
 void TracksScreen::tearDown()
@@ -171,9 +169,9 @@ void TracksScreen::tearDown()
 
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( w != NULL );
+    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( tracks_widget != NULL );
     
     // FIXME: don't hardcode player 0?
-    w->setSelection(trackName, 0, true); 
+    tracks_widget->setSelection(trackName, 0, true); 
 }
