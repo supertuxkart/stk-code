@@ -20,6 +20,7 @@
 #include "items/item.hpp"
 
 #include "graphics/irr_driver.hpp"
+#include "items/item_manager.hpp"   // FIXME: DEBUG ONLY
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"
@@ -78,8 +79,9 @@ void Item::switchBack()
 {
     // FIXME: debug only - printf to be able to set a breakpoint.
     if(m_original_type==ITEM_NONE)
-        printf("XX item none inside switchBack\n");
-    assert(m_original_type!=ITEM_NONE);
+        printf("XX item none inside switchBack item=%d switch_time=%f\n",
+               m_type, item_manager->m_switch_time);
+    //assert(m_original_type!=ITEM_NONE);
     setType(m_original_type);
     m_original_type = ITEM_NONE;
     m_node->setMesh(m_original_mesh);

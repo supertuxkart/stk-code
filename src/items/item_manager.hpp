@@ -44,10 +44,6 @@ private:
 
     std::string m_user_filename;
 
-    /** Remaining time that items should remain switched. If the
-     *  value is <0, it indicates that the items are not switched atm. */
-    float m_switch_time;
-
     /** What item is item is switched to. */
     std::vector<Item::ItemType> m_switch_to;
 
@@ -55,6 +51,11 @@ private:
                  Item::ItemType type);
 
 public:
+    // DEBUG only, this variable should become private again.
+    /** Remaining time that items should remain switched. If the
+     *  value is <0, it indicates that the items are not switched atm. */
+    float m_switch_time;
+
                    ItemManager();
                   ~ItemManager();
     void           loadDefaultItems();
