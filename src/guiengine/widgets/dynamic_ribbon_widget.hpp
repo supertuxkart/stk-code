@@ -91,8 +91,8 @@ namespace GUIEngine
         /** The total number of columns given item count and row count (even counting not visible with current scrolling) */
         int m_needed_cols;
         
-        /** The maximum number of rows, as passed to the constructor */
-        int m_max_rows;
+        /** Whether this ribbon can have multiple rows (i.e. ribbon grid) or is a single line */
+        bool m_multi_row;
         
         /** irrlicht relies on consecutive IDs to perform keyboard navigation between widgets. However, since this
             widget is dynamic, irrlicht widgets are not created as early as all others, so by the time we're ready
@@ -143,7 +143,12 @@ namespace GUIEngine
         
 
     public:
-        DynamicRibbonWidget(const bool combo=false, const int max_rows=4);
+        /**
+          * \param combo     Whether this is a "combo" ribbon, i.e. whether there is always one selected item.
+          *                  If set to false, will behave more like a toolbar.
+          * \param multi_row Whether this ribbon can have more than one row
+          */
+        DynamicRibbonWidget(const bool combo, const bool multi_row);
         
         /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
          ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */

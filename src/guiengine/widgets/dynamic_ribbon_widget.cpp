@@ -34,21 +34,20 @@ namespace GUIEngine
     const char* NO_ITEM_ID = "?";
 }
 
-DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const int max_rows)
+DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 {
-    m_scroll_offset = 0;
-    m_needed_cols = 0;
-    m_col_amount = 0;
-    m_has_label = false;
+    m_scroll_offset       = 0;
+    m_needed_cols         = 0;
+    m_col_amount          = 0;
     m_previous_item_count = 0;
+    m_multi_row           = multi_row;
+    m_combo               = combo;
+    m_has_label           = false;
+    m_left_widget         = NULL;
+    m_right_widget        = NULL;
+    m_type                = WTYPE_DYNAMIC_RIBBON;
     
-    m_max_rows = max_rows;
-    m_combo = combo;
-    
-    m_left_widget = NULL;
-    m_right_widget = NULL;
-    m_type = WTYPE_DYNAMIC_RIBBON;
-    
+    // by default, set all players to have no selection in this ribbon
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_selected_item[n] = -1;
@@ -144,10 +143,22 @@ void DynamicRibbonWidget::add()
         m_child_height = 256;
     }
     
-    // determine row amonunt
+    // determine row amount
     m_row_amount = (int)round((h-m_label_height) / (float)m_child_height);
-    if (m_row_amount > m_max_rows) m_row_amount = m_max_rows;
     
+    if (m_properties[PROP_MAX_ROWS].size() > 0)
+    {
+        const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
+        if (max_rows < 1)
+        {
+            std::cout << "/!\\ WARNING : the 'max_rows' property must be an integer greater than zero."
+                      << " Ingoring current value '" << m_properties[PROP_MAX_ROWS] << "'\n"; 
+        }
+        else
+        {
+            if (m_row_amount > max_rows) m_row_amount = max_rows;
+        }
+    }
     // get and build a list of IDs (by now we may not yet know everything about items,
     // but we need to get IDs *now* in order for tabbing to work.
     m_ids.resize(m_row_amount);

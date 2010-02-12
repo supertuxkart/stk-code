@@ -198,6 +198,9 @@ Currently only used by dynamic ribbons. Decides where the label is. Value can be
 (if ommitted, "none" is the default). "each" means that every item has its own label. "bottom" means there
 is a single label for all at the bottom, that displays the name of the current item.
  
+PROP_MAX_ROWS           "max_rows"
+Currently used for ribbon grids only. Indicates the maximum amount of rows this ribbon can have.
+ 
 +--------------------------+
 + Using the Engine in Code +
 +--------------------------+

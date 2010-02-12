@@ -79,7 +79,8 @@ namespace GUIEngine
         PROP_MAX_HEIGHT,
         PROP_SQUARE,
         PROP_EXTEND_LABEL,
-        PROP_LABELS_LOCATION
+        PROP_LABELS_LOCATION,
+        PROP_MAX_ROWS
     };
     
     bool isWithinATextBox();

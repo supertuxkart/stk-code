@@ -130,15 +130,15 @@ void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_t
                 }
                 else if (!strcmp("ribbon_grid", xml->getNodeName()))
                 {
-                    append_to.push_back(new DynamicRibbonWidget());
+                    append_to.push_back(new DynamicRibbonWidget(false /* combo */, true /* multi-row */));
                 }
                 else if (!strcmp("scrollable_ribbon", xml->getNodeName()))
                 {
-                    append_to.push_back(new DynamicRibbonWidget(true, 1));
+                    append_to.push_back(new DynamicRibbonWidget(true /* combo */, false /* multi-row */));
                 }
                 else if (!strcmp("scrollable_toolbar", xml->getNodeName()))
                 {
-                    append_to.push_back(new DynamicRibbonWidget(false, 1));
+                    append_to.push_back(new DynamicRibbonWidget(false /* combo */, false /* multi-row */));
                 }
                 else if (!strcmp("model", xml->getNodeName()))
                 {
@@ -185,6 +185,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
                 READ_PROPERTY(extend_label,   PROP_EXTEND_LABEL);
                 READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
+                READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
 #undef READ_PROPERTY
                                 
                 const char* text = xml->getAttributeValue( "text" );
