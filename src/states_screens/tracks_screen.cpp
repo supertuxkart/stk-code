@@ -172,7 +172,7 @@ void TracksScreen::init()
         
         if (unlock_manager->isLocked(gp->getId()))
         {
-            gps_widget->addAnimatedItem( _("Locked : solve active challenges to gain access to more!"),
+            gps_widget->addAnimatedItem( _("Locked!"),
                                          "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
                                          IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
