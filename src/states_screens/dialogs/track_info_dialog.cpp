@@ -82,7 +82,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false, false);
     // images are saved squared, but must be stretched to 4:
-    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); 3 
+    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f);
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     
     screenshotWidget->x = area_right.UpperLeftCorner.X;

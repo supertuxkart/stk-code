@@ -15,28 +15,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRACKS_SCREEN_HPP
-#define HEADER_TRACKS_SCREEN_HPP
 
-#include "guiengine/screen.hpp"
+#ifndef HEADER_GP_INFO_DIALOG_HPP
+#define HEADER_GP_INFO_DIALOG_HPP
 
+#include "guiengine/modaldialog.hpp"
 
-namespace GUIEngine { class Widget; }
-
-class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TracksScreen>
+class GPInfoDialog : public GUIEngine::ModalDialog
 {
-    friend class GUIEngine::ScreenSingleton<TracksScreen>;
+    std::string m_gp_ident;
     
-    TracksScreen();
     
 public:
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    void init();
-    void tearDown();
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    GPInfoDialog(const std::string& gpIdent, const float percentWidth, const float percentHeight);
+    virtual ~GPInfoDialog();
     
-    void setFocusOnTrack(const std::string& trackName);
-    void setFocusOnGP(const std::string& gpName);
-
+    void onEnterPressedInternal();
+    GUIEngine::EventPropagation processEvent(std::string& eventSource);
 };
 
 #endif

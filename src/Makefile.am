@@ -262,16 +262,18 @@ supertuxkart_SOURCES = \
  states_screens/dialogs/confirm_resolution_dialog.hpp \
  states_screens/dialogs/enter_player_name_dialog.cpp \
  states_screens/dialogs/enter_player_name_dialog.hpp \
+ states_screens/dialogs/gp_info_dialog.cpp \
+ states_screens/dialogs/gp_info_dialog.hpp \
  states_screens/dialogs/player_info_dialog.hpp \
- states_screens/dialogs/press_a_key_dialog.hpp \
- states_screens/dialogs/track_info_dialog.cpp \
- states_screens/dialogs/track_info_dialog.hpp \
  states_screens/dialogs/player_info_dialog.cpp \
+ states_screens/dialogs/press_a_key_dialog.hpp \
  states_screens/dialogs/press_a_key_dialog.cpp \
  states_screens/dialogs/race_over_dialog.cpp \
  states_screens/dialogs/race_over_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.hpp \
  states_screens/dialogs/race_paused_dialog.cpp \
+ states_screens/dialogs/track_info_dialog.cpp \
+ states_screens/dialogs/track_info_dialog.hpp \
  states_screens/arenas_screen.cpp \
  states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \

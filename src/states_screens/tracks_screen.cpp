@@ -22,6 +22,7 @@
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
+#include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -33,7 +34,7 @@ using namespace irr::video;
 
 const char* ALL_TRACK_GROUPS_ID = "all";
 
-// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
@@ -62,7 +63,7 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
     tabs->m_children.push_back(item);
 }
 
-// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -101,20 +102,24 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (name == "gps")
     {
-        RibbonWidget* tracks_widget = dynamic_cast<RibbonWidget*>(widget);
-        if (tracks_widget != NULL)
+        DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
+        if (gps_widget != NULL)
         {
-            //TODO
             std::cout << "Clicked on GrandPrix "
-                      << tracks_widget->getSelectionIDString(GUI_PLAYER_ID).c_str()
-                      << std::endl;
+            << gps_widget->getSelectionIDString(GUI_PLAYER_ID).c_str()
+            << std::endl;
+            
+            new GPInfoDialog( gps_widget->getSelectionIDString(GUI_PLAYER_ID), 0.8f, 0.7f );
+        }
+        else
+        {
+            assert(false);
         }
     }
     
 }
 
-// -----------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------------------------
 
 void TracksScreen::init()
 {
@@ -197,13 +202,13 @@ void TracksScreen::init()
     tracks_widget->updateItemDisplay();    
 }
 
-// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 void TracksScreen::tearDown()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
@@ -214,5 +219,16 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     tracks_widget->setSelection(trackName, 0, true); 
 }
 
-// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+
+void TracksScreen::setFocusOnGP(const std::string& gpName)
+{
+    DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
+    assert( gps_widget != NULL );
+    
+    // FIXME: don't hardcode player 0?
+    gps_widget->setSelection(gpName, 0, true); 
+}
+
+// -----------------------------------------------------------------------------------------------
 
