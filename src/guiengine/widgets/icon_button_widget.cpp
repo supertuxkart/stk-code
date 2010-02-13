@@ -24,7 +24,8 @@ using namespace irr::core;
 using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
-IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop, const bool focusable)
+IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
+                                   const bool focusable, IconPathType pathType)
 {
     m_label = NULL;
     m_texture = NULL;
@@ -34,12 +35,22 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop, co
     m_tab_stop = tab_stop;
     m_focusable = focusable;
     m_scale_mode = scale_mode;
+    
+    m_icon_path_type = pathType;
 }
 // -----------------------------------------------------------------------------
 void IconButtonWidget::add()
 {
     // ---- Icon
-    m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+    if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+    {
+        m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
+    }
+    else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
+    {
+        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
+    }
+    
     assert(m_texture != NULL);
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
@@ -106,21 +117,28 @@ void IconButtonWidget::add()
 /** \precondition At the moment, the new texture must have the same aspct ratio as the previous one since the object will not
   *               be modified to fit a different aspect ratio
   */
-void IconButtonWidget::setImage(const char* path_to_texture)
+void IconButtonWidget::setImage(const char* path_to_texture, IconPathType pathType)
 {
-    m_properties[PROP_ICON] = path_to_texture;
-    m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
-
-    if (m_texture == NULL)
+    if (pathType != ICON_PATH_TYPE_NO_CHANGE)
     {
-        // texture not found, try with absolute path
+        m_icon_path_type = pathType;
+    }
+    
+    m_properties[PROP_ICON] = path_to_texture;
+    
+    if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+    {
         m_texture = irr_driver->getTexture(m_properties[PROP_ICON].c_str());
     }
-    if(!m_texture)
+    else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
     {
-        fprintf(stderr, "Texture '%s' not found - aborting.\n", 
-	        m_properties[PROP_ICON].c_str());
-	exit(-1);
+        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" + m_properties[PROP_ICON]).c_str());
+    }
+    
+    if (!m_texture)
+    {
+        fprintf(stderr, "Texture '%s' not found!\n",  m_properties[PROP_ICON].c_str());
+        m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
     }
 
     m_texture_w = m_texture->getSize().Width;

@@ -286,7 +286,8 @@ void DynamicRibbonWidget::setSubElements()
  }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
-                                   const std::string& image_file, const unsigned int badges )
+                                   const std::string& image_file, const unsigned int badges,
+                                   IconButtonWidget::IconPathType image_path_type)
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
@@ -294,6 +295,7 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
     desc.m_sshot_file = image_file;
     desc.m_badges = badges;
     desc.m_animated = false;
+    desc.m_image_path_type = image_path_type;
     
     m_items.push_back(desc);
 }
@@ -302,7 +304,7 @@ void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const st
 
 void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, const std::string& code_name,
                                            const std::vector<std::string>& image_files, const float time_per_frame,
-                                           const unsigned int badges )
+                                           const unsigned int badges, IconButtonWidget::IconPathType image_path_type )
 {
     ItemDescription desc;
     desc.m_user_name = user_name;
@@ -312,6 +314,7 @@ void DynamicRibbonWidget::addAnimatedItem( const irr::core::stringw& user_name, 
     desc.m_animated = true;
     desc.m_curr_time = 0.0f;
     desc.m_time_per_frame = time_per_frame;
+    desc.m_image_path_type = image_path_type;
     
     m_items.push_back(desc);
     
@@ -679,7 +682,7 @@ void DynamicRibbonWidget::updateItemDisplay()
                 std::string item_icon = (m_items[icon_id].m_animated ?
                                          m_items[icon_id].m_all_images[0] :
                                          m_items[icon_id].m_sshot_file);
-                icon->setImage( item_icon.c_str() );
+                icon->setImage( item_icon.c_str(), m_items[icon_id].m_image_path_type );
                 
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
                 icon->setLabel(m_items[icon_id].m_user_name);

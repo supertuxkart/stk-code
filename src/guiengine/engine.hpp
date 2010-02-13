@@ -116,8 +116,9 @@ gives text (a label) to the widget where supported. Ribbon-grids give a special 
 to this parameter, see ribbon-grid docs above.
 
 PROP_ICON               "icon"
-give an icon to the widget. Property contents is the path to the file, relative
-relative to the /data directory of STK.
+give an icon to the widget. Property contents is the path to the file, by default relative
+relative to the /data directory of STK (several methods of IconButtonWidget and DynamicRibbon
+can enable you to use absolute paths if you wish).
 
 PROP_TEXT_ALIGN         "text_align"
 used exclusively by label components. Value can be "right" or "center" (left used if not specified).

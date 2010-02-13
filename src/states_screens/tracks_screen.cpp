@@ -169,11 +169,13 @@ void TracksScreen::init()
         if (unlock_manager->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem( _("Locked : solve active challenges to gain access to more!"),
-                                        "locked", sshot_files, 1.5f, TROPHY_BADGE );
+                                         "locked", sshot_files, 1.5f, TROPHY_BADGE,
+                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
         else
         {
-            gps_widget->addAnimatedItem( gp->getName(), gp->getId(), sshot_files, 1.5f, TROPHY_BADGE );
+            gps_widget->addAnimatedItem( gp->getName(), gp->getId(), sshot_files, 1.5f, TROPHY_BADGE,
+                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
     gps_widget->updateItemDisplay();
@@ -190,14 +192,18 @@ void TracksScreen::init()
         
         if (unlock_manager->isLocked(curr->getIdent()))
         {
-            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
+            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
+                                   "locked", curr->getScreenshotFile(), true,
+                                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
         else
         {
-            tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
+            tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
+                                    false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
-    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png");
+    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
+                           IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();    
 }

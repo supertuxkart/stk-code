@@ -215,7 +215,10 @@ public:
 
     const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
+    
+    /** Returns an absolute path to the screenshot file of this track */
     const std::string& getScreenshotFile () const {return m_screenshot;         }
+    
     const std::string& getItemStyle      () const {return m_item_style;         }
     bool               hasFinalCamera    () const {return m_has_final_camera;   }
     const Vec3&        getCameraPosition () const {return m_camera_final_position;}

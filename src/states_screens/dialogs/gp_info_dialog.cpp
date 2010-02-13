@@ -19,6 +19,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "io/file_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
@@ -107,8 +108,10 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     }
   
     // ---- Track screenshot
+    
     m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                                                              false, false);
+                                               false /* tab stop */, false /* focusable */,
+                                               IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE /* Track gives us absolute paths */);
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
     
@@ -119,12 +122,11 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     
     Track* track = track_manager->getTrack(tracks[0]);
     
-    // temporary icon, will replace it just after adding (hack to support absolute paths [FIXME])
-    m_screenshot_widget->m_properties[PROP_ICON] =  "gui/main_help.png";
-    
+    m_screenshot_widget->m_properties[PROP_ICON] = (track  != NULL ?
+                                                    track->getScreenshotFile().c_str() :
+                                                    file_manager->getDataDir() + "gui/main_help.png");
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
-    m_screenshot_widget->setImage(track  != NULL ? track->getScreenshotFile().c_str() : "gui/main_help.png");
     m_children.push_back(m_screenshot_widget);
     
     
@@ -228,7 +230,9 @@ void GPInfoDialog::onUpdate(float dt)
     }
     
     Track* track = track_manager->getTrack(tracks[frameAfter]);
-    m_screenshot_widget->setImage(track  != NULL ? track->getScreenshotFile().c_str() : "gui/main_help.png");
+    m_screenshot_widget->setImage((track  != NULL ? track->getScreenshotFile().c_str() :
+                                                    (file_manager->getDataDir()+"gui/main_help.png").c_str()),
+                                  IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 }
 
 // ------------------------------------------------------------------------------------------------------

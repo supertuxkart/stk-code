@@ -49,6 +49,7 @@ namespace GUIEngine
         irr::core::stringw m_user_name;
         std::string m_code_name;
         std::string m_sshot_file;
+        IconButtonWidget::IconPathType m_image_path_type;
         
         bool m_animated;
         /** used instead of 'm_sshot_file' if m_animated is true */
@@ -167,27 +168,31 @@ namespace GUIEngine
         /** Dynamically add an item to the ribbon's list of items (will not be visible until you
           * call 'updateItemDisplay' or 'add').
           *
-          * \param user_name   The name that will shown to the user (may be translated)
-          * \param code_name   The non-translated internal name used to uniquely identify this item.
-          * \param image_file  A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
-          * \param badge       Whether to add badges to this item (bitmask, see possible values in widget.hpp)
+          * \param user_name       The name that will shown to the user (may be translated)
+          * \param code_name       The non-translated internal name used to uniquely identify this item.
+          * \param image_file      A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
+          * \param badge           Whether to add badges to this item (bitmask, see possible values in widget.hpp)
+          * \param image_path_type How to interpret the path to the image (absolute or relative)
           */
         void addItem( const irr::core::stringw& user_name, const std::string& code_name,
-                      const std::string& image_file, const unsigned int badge=0 );
+                      const std::string& image_file, const unsigned int badge=0,
+                      IconButtonWidget::IconPathType image_path_type=IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
         
         /** Dynamically add an animated item to the ribbon's list of items (will not be visible until you
          * call 'updateItemDisplay' or 'add'). Animated means it has many images that will be shown in
          * a slideshown fashion.
          *
-         * \param user_name   The name that will shown to the user (may be translated)
-         * \param code_name   The non-translated internal name used to uniquely identify this item.
-         * \param image_files A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
+         * \param user_name       The name that will shown to the user (may be translated)
+         * \param code_name       The non-translated internal name used to uniquely identify this item.
+         * \param image_files     A path to a texture that will the icon of this item (path relative to data dir, just like PROP_ICON)
          * \param time_per_frame  Time (in seconds) to spend at each image.
-         * \param badge       Whether to add badges to this item (bitmask, see possible values in widget.hpp)
+         * \param badge           Whether to add badges to this item (bitmask, see possible values in widget.hpp)
+         * \param image_path_type How to interpret the path to the image (absolute or relative)
          */
         void addAnimatedItem( const irr::core::stringw& user_name, const std::string& code_name,
                              const std::vector<std::string>& image_files, const float time_per_frame,
-                             const unsigned int badge=0 );
+                             const unsigned int badge=0,
+                             IconButtonWidget::IconPathType image_path_type=IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */

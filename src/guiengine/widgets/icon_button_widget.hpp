@@ -38,8 +38,20 @@ namespace GUIEngine
             SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO,
             SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO
         };
+        enum IconPathType
+        {
+            ICON_PATH_TYPE_ABSOLUTE,
+            /** relative to the data dir */
+            ICON_PATH_TYPE_RELATIVE,
+            /** not a valid value per se, but can be passed as argument to leave
+              * the path type as it currently is */
+            ICON_PATH_TYPE_NO_CHANGE
+        };
         
     protected:
+        
+        IconPathType m_icon_path_type;
+        
         friend class Skin;
         
         irr::gui::IGUIStaticText* m_label;
@@ -54,7 +66,8 @@ namespace GUIEngine
         /** Whether to make the widget included in keyboard navigation order when adding */
         bool m_tab_stop;
 
-        IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true, const bool focusable=true);
+        IconButtonWidget(ScaleMode scale_mode=SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, const bool tab_stop=true,
+                         const bool focusable=true, IconPathType pathType=ICON_PATH_TYPE_RELATIVE);
         virtual ~IconButtonWidget() {}
         
         /** Callback called when this widget needs to be added (see base class Widget) */
@@ -68,7 +81,7 @@ namespace GUIEngine
         void setLabel(irr::core::stringw new_label);
         
         /** Change the texture used for this icon. The path is relative to the data directory, just like PROP_ICON. */
-        void setImage(const char* path_to_texture);
+        void setImage(const char* path_to_texture, IconPathType pathType=ICON_PATH_TYPE_NO_CHANGE);
         
         /** Change the texture used for this icon. */
         void setImage(irr::video::ITexture* texture);
