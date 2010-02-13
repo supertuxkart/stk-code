@@ -31,10 +31,13 @@
 
 using namespace GUIEngine;
 
+// -----------------------------------------------------------------------------
+
 RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
 {
 }
 
+// -----------------------------------------------------------------------------
 
 void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -97,53 +100,9 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         
         race_manager->setNumKarts( race_manager->getNumPlayers() + w->getValue() );
     }
-    /*
-     289         race_manager->setDifficulty((RaceManager::Difficulty)m_difficulty);
-     290         UserConfigParams::setDefaultNumDifficulty(m_difficulty);
-     
-     // if there is no AI, there's no point asking the player for the amount of karts.
-     299     // It will always be the same as the number of human players
-     300     if(RaceManager::isBattleMode( race_manager->getMinorMode() ))
-     301     {
-     302         race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-     303         // Don't change the default number of karts in user_config
-     304     }
-     305     else
-     306     {
-     307         race_manager->setNumKarts(m_num_karts);
-     308         UserConfigParams::setDefaultNumKarts(race_manager->getNumKarts());
-     309     }
-     
-     311     if( race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX    &&
-     312         RaceManager::modeHasLaps( race_manager->getMinorMode() )    )
-     313     {
-     314         race_manager->setNumLaps( m_num_laps );
-     315         UserConfigParams::setDefaultNumLaps(m_num_laps);
-     316     }
-     317     // Might still be set from a previous challenge
-     318     race_manager->setCoinTarget(0);
-     
-     input_manager->setMode(InputManager::INGAME);
-     
-     race_manager->setLocalKartInfo(0, argv[i+1]);
-     
-     race_manager->setDifficulty(RaceManager::RD_EASY);
-     race_manager->setDifficulty(RaceManager::RD_HARD);
-     race_manager->setDifficulty(RaceManager::RD_HARD);
-     
-     race_manager->setTrack(argv[i+1]);
-     
-     UserConfigParams::setDefaultNumKarts(stk_config->m_max_karts);
-     race_manager->setNumKarts(UserConfigParams::getDefaultNumKarts() );
-     
-     UserConfigParams::getDefaultNumKarts()
-     
-     StateManager::enterGameState();
-     race_manager->startNew();
-     */
-    
-    
 }
+
+// -----------------------------------------------------------------------------
 
 void RaceSetupScreen::init()
 {
@@ -159,14 +118,16 @@ void RaceSetupScreen::init()
     w2->clearItems();
 
     // ---- Add game modes
-    irr::core::stringw name1 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_NORMAL_RACE)) +
-                                L"\n";
+    irr::core::stringw name1 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_NORMAL_RACE)) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
     name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
     
     w2->addItem( name1, "normal", "/gui/mode_normal.png");
     
-    irr::core::stringw name2 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) +
-                                L"\n";
+    irr::core::stringw name2 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
     name2 += _("Contains no powerups, so only your driving skills matter!");
     w2->addItem( name2, "timetrial", "/gui/mode_tt.png");
     
@@ -177,16 +138,18 @@ void RaceSetupScreen::init()
     }
     else
     {
-        irr::core::stringw name3 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) +
-                        L"\n";
+        irr::core::stringw name3 = irr::core::stringw(
+            RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
+        //FIXME: avoid duplicating descriptions from the help menu!
         name3 += _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
         w2->addItem(name3, "ftl", "/gui/mode_ftl.png", false);
     }
     
     if (race_manager->getNumPlayers() > 1)
     {
-        irr::core::stringw name4 = irr::core::stringw(RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) +
-                        L"\n";
+        irr::core::stringw name4 = irr::core::stringw(
+            RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
+        //FIXME: avoid duplicating descriptions from the help menu!
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
         w2->addItem( name4, "3strikes", "/gui/mode_3strikes.png");
     }
@@ -195,6 +158,10 @@ void RaceSetupScreen::init()
     w2->updateItemDisplay();    
 }
 
+// -----------------------------------------------------------------------------
+
 void RaceSetupScreen::tearDown()
 {
 }
+
+// -----------------------------------------------------------------------------
