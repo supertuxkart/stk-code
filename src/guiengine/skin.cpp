@@ -1184,54 +1184,57 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
 
 // -----------------------------------------------------------------------------
 
-void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
+void doDrawBadge(ITexture* texture, const core::rect<s32>& rect, float max_icon_size, bool badge_at_left)
 {
-    video::ITexture* texture = NULL;
-    float max_icon_size = 0.35f;
-    bool badge_at_left = true;
-    
-    if (widget->m_badges & LOCKED_BADGE)
-    {
-        texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
-        max_icon_size = 0.5f; // Lock badge can be quite big
-    }
-    if (widget->m_badges & OK_BADGE)
-    {
-        texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
-    }
-    if (widget->m_badges & BAD_BADGE)
-    {
-        texture = irr_driver->getTexture(file_manager->getTextureFile("red_mark.png"));
-        badge_at_left = false;
-    }
-    if (widget->m_badges & TROPHY_BADGE)
-    {
-        texture = irr_driver->getTexture(file_manager->getTextureFile("cup_bronze.png"));
-        badge_at_left = false;
-    }
-
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width / (float)texture_size.Height;
     const int h = rect.getHeight() <= 50 ?
-                rect.getHeight() :
-                std::min( (int)(rect.getHeight()*max_icon_size), (int)(texture_size.Height) );
+    rect.getHeight() :
+    std::min( (int)(rect.getHeight()*max_icon_size), (int)(texture_size.Height) );
     int w = (int)(aspectRatio*h);
     
     const core::rect<s32> source_area = core::rect<s32>(0, 0, texture_size.Width, texture_size.Height);
     
     const core::rect< s32 > rect2 =  core::rect< s32 >(badge_at_left ?
-                                                            rect.UpperLeftCorner.X :
-                                                            rect.LowerRightCorner.X - w,
+                                                       rect.UpperLeftCorner.X :
+                                                       rect.LowerRightCorner.X - w,
                                                        rect.LowerRightCorner.Y - h,
                                                        badge_at_left ?
-                                                            rect.UpperLeftCorner.X + w :
-                                                            rect.LowerRightCorner.X,
+                                                       rect.UpperLeftCorner.X + w :
+                                                       rect.LowerRightCorner.X,
                                                        rect.LowerRightCorner.Y);
     
     GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,
                                         0 /* no clipping */, 0, true /* alpha */);
 }
 
+void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
+{    
+    if (widget->m_badges & LOCKED_BADGE)
+    {
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getTextureFile("gui_lock.png"));
+        float max_icon_size = 0.5f; // Lock badge can be quite big
+        doDrawBadge(texture, rect, max_icon_size, true);
+    }
+    if (widget->m_badges & OK_BADGE)
+    {
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getTextureFile("green_check.png"));
+        float max_icon_size = 0.35f;
+        doDrawBadge(texture, rect, max_icon_size, true);
+    }
+    if (widget->m_badges & BAD_BADGE)
+    {
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getTextureFile("red_mark.png"));
+        float max_icon_size = 0.35f;
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & TROPHY_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(file_manager->getTextureFile("cup_bronze.png"));
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+}
 // -----------------------------------------------------------------------------
 
 void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)

@@ -105,11 +105,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (gps_widget != NULL)
         {
-            std::cout << "Clicked on GrandPrix "
-            << gps_widget->getSelectionIDString(GUI_PLAYER_ID).c_str()
-            << std::endl;
+            std::string selection = gps_widget->getSelectionIDString(GUI_PLAYER_ID);
             
-            new GPInfoDialog( gps_widget->getSelectionIDString(GUI_PLAYER_ID), 0.8f, 0.7f );
+            if (selection == "locked")
+            {
+                unlock_manager->playLockSound();
+            }
+            else
+            {
+                new GPInfoDialog( selection, 0.8f, 0.7f );
+            }
         }
         else
         {
@@ -140,7 +145,6 @@ void TracksScreen::init()
     for (int n=0; n<gpAmount; n++)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
-        std::cout << "Got GP : " << gp->getId() << std::endl;
         
         std::vector<std::string> tracks = gp->getTracks();
         
@@ -169,7 +173,7 @@ void TracksScreen::init()
         if (unlock_manager->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem( _("Locked : solve active challenges to gain access to more!"),
-                                         "locked", sshot_files, 1.5f, TROPHY_BADGE,
+                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
                                          IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
         else
