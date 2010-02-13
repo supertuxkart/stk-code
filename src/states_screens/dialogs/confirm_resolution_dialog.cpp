@@ -30,6 +30,8 @@ using namespace GUIEngine;
 using namespace irr::gui;
 using namespace irr::core;
 
+// ------------------------------------------------------------------------------------------------------
+
 ConfirmResolutionDialog::ConfirmResolutionDialog() : ModalDialog(0.7f, 0.7f)
 {    
     m_countdown_message = NULL;

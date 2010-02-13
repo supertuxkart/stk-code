@@ -32,6 +32,8 @@ using namespace GUIEngine;
 using namespace irr::gui;
 using namespace irr::core;
 
+// ------------------------------------------------------------------------------------------------------
+
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
 {    
     IGUIFont* font = GUIEngine::getFont();
@@ -85,11 +87,15 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
     }
     
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 void AddDeviceDialog::onEnterPressedInternal()
 {
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 GUIEngine::EventPropagation AddDeviceDialog::processEvent(std::string& eventSource)
 {
 
@@ -111,3 +117,5 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent(std::string& eventSour
     
     return GUIEngine::EVENT_LET;
 }
+
+// ------------------------------------------------------------------------------------------------------

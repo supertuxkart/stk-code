@@ -73,15 +73,16 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     stringw text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
 
     IGUIStaticText* b = GUIEngine::getGUIEnv()->addStaticText( text.c_str(),
-                                                                  creator_info_area, false , true , // border, word warp
-                                                                  m_irrlicht_window);
+                                               creator_info_area, false , true , // border, word warp
+                                               m_irrlicht_window);
     b->setTabStop(false);
 
     
     // ---- Track screenshot
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false, false);
-    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); // images are saved squared, but must be stretched to 4:3 
+    // images are saved squared, but must be stretched to 4:
+    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); 3 
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
     
     screenshotWidget->x = area_right.UpperLeftCorner.X;
@@ -89,7 +90,8 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->w = area_right.getWidth();
     screenshotWidget->h = area_right.getHeight();
     
-    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; // temporary icon, will replace it just after
+    // temporary icon, will replace it just after
+    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();
     screenshotWidget->setImage(screenshot);
@@ -164,8 +166,6 @@ void TrackInfoDialog::addHighScoreWidgets(const int hscores_y_from, const int hs
                                                                            m_irrlicht_window);
     hscores_header->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
-
-    
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
     {
@@ -185,8 +185,8 @@ void TrackInfoDialog::addHighScoreWidgets(const int hscores_y_from, const int hs
 
         core::rect< s32 > entry_area(icon_size + 10, from_y, m_area.getWidth()/2, next_from_y);
         m_highscore_entries[n] = GUIEngine::getGUIEnv()->addStaticText( L"", entry_area,
-                                                                       false , true , // border, word warp
-                                                                       m_irrlicht_window);
+                                                               false , true , // border, word warp
+                                                               m_irrlicht_window);
     }
 }
 
@@ -238,7 +238,8 @@ void TrackInfoDialog::updateHighScores()
             line = _("(Empty)");
             line += "\n";
             
-            ITexture* no_kart_texture = irr_driver->getTexture( (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
+            ITexture* no_kart_texture = irr_driver->getTexture(
+                    (file_manager->getGUIDir() + "/random_kart.png").c_str() ) ;
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }
@@ -302,3 +303,5 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(std::string& eventSour
     
     return GUIEngine::EVENT_LET;
 }
+
+// ------------------------------------------------------------------------------------------------------

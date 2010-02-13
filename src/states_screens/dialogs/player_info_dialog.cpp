@@ -29,6 +29,8 @@ using namespace GUIEngine;
 using namespace irr::gui;
 using namespace irr::core;
 
+// ------------------------------------------------------------------------------------------------------
+
 PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {
     m_player = player;
@@ -115,7 +117,9 @@ void PlayerInfoDialog::showRegularDialog()
     
     textCtrl->setFocusForPlayer( GUI_PLAYER_ID );
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 void PlayerInfoDialog::showConfirmDialog()
 {
     clearWindow();
@@ -135,8 +139,8 @@ void PlayerInfoDialog::showConfirmDialog()
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
-                                                              area_left, false /* border */, true /* word wrap */,
-                                                              m_irrlicht_window);
+                                              area_left, false /* border */, true /* word wrap */,
+                                              m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
     {
@@ -178,11 +182,15 @@ void PlayerInfoDialog::showConfirmDialog()
     }
     
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 void PlayerInfoDialog::onEnterPressedInternal()
 {
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 GUIEngine::EventPropagation PlayerInfoDialog::processEvent(std::string& eventSource)
 {
     if (eventSource == "renameplayer")
@@ -238,3 +246,6 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(std::string& eventSou
     }
     return GUIEngine::EVENT_LET;
 }
+
+// ------------------------------------------------------------------------------------------------------
+

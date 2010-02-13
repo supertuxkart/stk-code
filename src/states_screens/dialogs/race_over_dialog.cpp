@@ -36,6 +36,8 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+// ------------------------------------------------------------------------------------------------------
+
 RaceOverDialog::RaceOverDialog(const float percentWidth, 
                                const float percentHeight) 
               : ModalDialog(percentWidth, percentHeight)
@@ -43,10 +45,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     // Switch to barrier mode: server waits for ack from each client
     network_manager->beginRaceResultBarrier();
 
-    //const int w = m_area.getWidth();
-    //const int h = m_area.getHeight();
-    
-    //IGUIFont* font = GUIEngine::getFont();
     const int text_height = GUIEngine::getFontHeight();
     
     const int button_h = text_height + 6;
@@ -72,8 +70,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     const int lines_from_y = text_height + 15;
     
     // make things more compact if we're missing space
-    while (lines_from_y + (int)num_karts*line_h > buttons_y_from) // cheap way to avoid calculating the required size with proper maths
-    {
+    while (lines_from_y + (int)num_karts*line_h > buttons_y_from) // cheap way to avoid calculating the               
+    {                                                             // required size with proper maths
         line_h = (int)(line_h*0.9f);
     }
     
@@ -113,7 +111,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         else
         {
             kart_results_line = StringUtils::insertValues( L"%i. %s %s",
-                                                          current_kart->getPosition(), kart_name.c_str(), sTime);
+                                                          current_kart->getPosition(),
+                                                          kart_name.c_str(), sTime);
         }
         
         const KartProperties* prop = current_kart->getKartProperties();
@@ -122,10 +121,10 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
         
         const int icon_size = text_height;
-        core::rect< s32 > entry_area(10 + icon_size, lines_from_y+line_h*i, m_area.getWidth()*2/3, lines_from_y+line_h*(i+1));
-        core::rect< s32 > icon_area(5, lines_from_y + line_h*i, 5+icon_size, lines_from_y+ line_h*i + icon_size);
-
-        // std::wcout << kart_results_line.c_str() << std::endl;
+        core::rect< s32 > entry_area(10 + icon_size,         lines_from_y+line_h*i,
+                                     m_area.getWidth()*2/3,  lines_from_y+line_h*(i+1));
+        core::rect< s32 > icon_area(5,            lines_from_y + line_h*i,
+                                    5+icon_size,  lines_from_y+ line_h*i + icon_size);
         
         GUIEngine::getGUIEnv()->addStaticText( kart_results_line.c_str(), entry_area,
                                                                        false , true , // border, word warp
@@ -147,8 +146,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     {
         core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);
         IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( _("Highscores"),
-                                                                        hsarea, false, false, // border, word warp
-                                                                        m_irrlicht_window);
+                                                        hsarea, false, false, // border, word warp
+                                                        m_irrlicht_window);
         highscores->setTabStop(false);
         highscores->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         
@@ -182,8 +181,6 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         } // next score
     } // end if hs != NULL
 
-
-    
     // ---- Buttons at the bottom
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
@@ -233,9 +230,13 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 void RaceOverDialog::onEnterPressedInternal()
 {
 }
+
+// ------------------------------------------------------------------------------------------------------
 
 GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSource)
 {
@@ -273,7 +274,6 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(std::string& eventSourc
     }
     return GUIEngine::EVENT_LET;
 }
-
 
  //-----------------------------------------------------------------------------
  /** This is used on the client and server to display a message while waiting

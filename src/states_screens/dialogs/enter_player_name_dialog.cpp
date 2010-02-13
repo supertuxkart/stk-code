@@ -27,6 +27,8 @@ using namespace irr;
 using namespace irr::core;
 using namespace irr::gui;
 
+// -----------------------------------------------------------------------------
+
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
@@ -78,10 +80,16 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     cancelButton->add();
 
 }
+
+// -----------------------------------------------------------------------------
+
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
     textCtrl->getIrrlichtElement()->remove();
 }
+
+// -----------------------------------------------------------------------------
+
 GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
@@ -91,6 +99,9 @@ GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(std::string& eve
     }
     return GUIEngine::EVENT_LET;
 }
+
+// -----------------------------------------------------------------------------
+
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
@@ -116,3 +127,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
     ModalDialog::dismiss();
 }
+
+// -----------------------------------------------------------------------------
+
+

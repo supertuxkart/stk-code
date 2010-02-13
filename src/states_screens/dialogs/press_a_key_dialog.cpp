@@ -25,6 +25,8 @@
 using namespace GUIEngine;
 using namespace irr::gui;
 
+// ------------------------------------------------------------------------------------------------------
+
 PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
@@ -56,7 +58,9 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
     m_children.push_back(widget2);
     widget2->add();
 }
+
 // ------------------------------------------------------------------------------------------------------
+
 GUIEngine::EventPropagation PressAKeyDialog::processEvent(std::string& eventSource)
 {
     if(eventSource == "cancel")
@@ -67,3 +71,5 @@ GUIEngine::EventPropagation PressAKeyDialog::processEvent(std::string& eventSour
     }
     return GUIEngine::EVENT_LET;
 }
+
+// ------------------------------------------------------------------------------------------------------
