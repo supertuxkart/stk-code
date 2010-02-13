@@ -33,6 +33,8 @@ using namespace irr::video;
 
 const char* ALL_TRACK_GROUPS_ID = "all";
 
+// -----------------------------------------------------------------------------
+
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
     // Dynamically add tabs
@@ -60,6 +62,7 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
     tabs->m_children.push_back(item);
 }
 
+// -----------------------------------------------------------------------------
 
 void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -90,7 +93,8 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
+                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                                         screenshot, 0.8f, 0.7f);
                 }
             }
         }
@@ -98,11 +102,19 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (name == "gps")
     {
         RibbonWidget* tracks_widget = dynamic_cast<RibbonWidget*>(widget);
-        if(tracks_widget != NULL)
-            std::cout << "Clicked on GrandPrix " << tracks_widget->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
+        if (tracks_widget != NULL)
+        {
+            //TODO
+            std::cout << "Clicked on GrandPrix "
+                      << tracks_widget->getSelectionIDString(GUI_PLAYER_ID).c_str()
+                      << std::endl;
+        }
     }
     
 }
+
+// -----------------------------------------------------------------------------
+
 
 void TracksScreen::init()
 {
@@ -185,9 +197,13 @@ void TracksScreen::init()
     tracks_widget->updateItemDisplay();    
 }
 
+// -----------------------------------------------------------------------------
+
 void TracksScreen::tearDown()
 {
 }
+
+// -----------------------------------------------------------------------------
 
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
@@ -197,3 +213,6 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     // FIXME: don't hardcode player 0?
     tracks_widget->setSelection(trackName, 0, true); 
 }
+
+// -----------------------------------------------------------------------------
+
