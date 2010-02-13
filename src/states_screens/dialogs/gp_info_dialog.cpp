@@ -20,6 +20,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
@@ -184,7 +185,7 @@ void startGPGame(const GrandPrixData* gp)
     race_manager->setGrandPrix(*gp);
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );
-    //network_manager->setupPlayerKartInfo();
+    network_manager->setupPlayerKartInfo();
     //race_manager->getKartType(1) = KT_PLAYER;
     
     race_manager->startNew();
