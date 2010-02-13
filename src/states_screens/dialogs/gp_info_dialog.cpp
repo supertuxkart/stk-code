@@ -40,6 +40,8 @@ using namespace GUIEngine;
 
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
+    m_curr_time = 0.0f;
+    
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*6/7;
     
@@ -74,7 +76,6 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     for (int t=0; t<trackAmount; t++)
     {
         const int from_y      = y1 + height_of_one_line*(t+1);
-        const int next_from_y = y1 + height_of_one_line*(t+2);
         
         Track* track = track_manager->getTrack(tracks[t]);
         stringw lineText;
@@ -88,36 +89,44 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         {
             lineText = track->getName();
         }
+                
+        LabelWidget* widget = new LabelWidget();
+        widget->m_text = lineText;
+        widget->x = 20;
+        widget->y = from_y;
+        widget->w = m_area.getWidth()/2 - 20;
+        widget->h = height_of_one_line;
+        widget->setParent(m_irrlicht_window);
         
-        core::rect< s32 > entry_area(20, from_y, m_area.getWidth()/2, next_from_y);
-        IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
-                                               entry_area, false , true , // border, word warp
-                                               m_irrlicht_window);
+        m_children.push_back(widget);
+        widget->add();
+        
+        // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
+        //                                       entry_area, false , true , // border, word warp
+        //                                       m_irrlicht_window);
     }
-
-   /*    
+  
     // ---- Track screenshot
-    IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+    m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false, false);
-    // images are saved squared, but must be stretched to 4:
-    screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); 3 
-    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y1-10);
+    // images are saved squared, but must be stretched to 4:3
+    m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
     
-    screenshotWidget->x = area_right.UpperLeftCorner.X;
-    screenshotWidget->y = area_right.UpperLeftCorner.Y;
-    screenshotWidget->w = area_right.getWidth();
-    screenshotWidget->h = area_right.getHeight();
+    m_screenshot_widget->x = m_area.getWidth()/2;
+    m_screenshot_widget->y = y1;
+    m_screenshot_widget->w = m_area.getWidth()/2;
+    m_screenshot_widget->h = y2 - y1 - 10;
     
-    // temporary icon, will replace it just after
-    screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
-    screenshotWidget->setParent(m_irrlicht_window);
-    screenshotWidget->add();
-    screenshotWidget->setImage(screenshot);
-    m_children.push_back(screenshotWidget);
+    Track* track = track_manager->getTrack(tracks[0]);
     
-    a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-    */
+    // temporary icon, will replace it just after adding (hack to support absolute paths [FIXME])
+    m_screenshot_widget->m_properties[PROP_ICON] =  "gui/main_help.png";
+    
+    m_screenshot_widget->setParent(m_irrlicht_window);
+    m_screenshot_widget->add();
+    m_screenshot_widget->setImage(track  != NULL ? track->getScreenshotFile().c_str() : "gui/main_help.png");
+    m_children.push_back(m_screenshot_widget);
+    
     
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
@@ -197,6 +206,29 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(std::string& eventSource)
     }
     
     return GUIEngine::EVENT_LET;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void GPInfoDialog::onUpdate(float dt)
+{
+    const int frameBefore = (int)(m_curr_time / 1.5f);
+    m_curr_time += dt;
+    int frameAfter = (int)(m_curr_time / 1.5f);
+    
+    if (frameAfter == frameBefore) return; // if nothing changed, return right now
+    
+    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
+    assert(gp != NULL);
+    const std::vector<std::string>& tracks = gp->getTracks();
+    if (frameAfter >= (int)tracks.size())
+    {
+        frameAfter = 0;
+        m_curr_time = 0;
+    }
+    
+    Track* track = track_manager->getTrack(tracks[frameAfter]);
+    m_screenshot_widget->setImage(track  != NULL ? track->getScreenshotFile().c_str() : "gui/main_help.png");
 }
 
 // ------------------------------------------------------------------------------------------------------

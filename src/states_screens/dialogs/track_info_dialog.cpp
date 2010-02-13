@@ -90,7 +90,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->w = area_right.getWidth();
     screenshotWidget->h = area_right.getHeight();
     
-    // temporary icon, will replace it just after
+    // temporary icon, will replace it just after (hack to support absolute paths [FIXME])
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();

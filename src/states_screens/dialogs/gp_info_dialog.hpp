@@ -21,10 +21,17 @@
 
 #include "guiengine/modaldialog.hpp"
 
+namespace GUIEngine
+{
+    class IconButtonWidget;
+}
+
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_gp_ident;
+    GUIEngine::IconButtonWidget* m_screenshot_widget;
     
+    float m_curr_time;
     
 public:
     /**
@@ -35,6 +42,9 @@ public:
     
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(std::string& eventSource);
+    
+    virtual void onUpdate(float dt);
+
 };
 
 #endif
