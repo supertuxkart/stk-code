@@ -24,6 +24,8 @@
 #include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
 
@@ -39,8 +41,7 @@ using namespace GUIEngine;
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
     const int y1 = m_area.getHeight()/7;
-    const int y2 = m_area.getHeight()*5/7;
-    const int y3 = m_area.getHeight()*6/7;
+    const int y2 = m_area.getHeight()*6/7;
     
     m_gp_ident = gpIdent;
 
@@ -62,13 +63,45 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
 
+    // ---- Track listings
+    const std::vector<std::string>& tracks = gp->getTracks();
+    const int trackAmount = tracks.size();
+
+    int height_of_one_line = (y2 - y1)/(trackAmount+1);
+    const int textHeight = GUIEngine::getFontHeight();
+    if (height_of_one_line > (int)(textHeight*1.5f)) height_of_one_line = (int)(textHeight*1.5f);
+    
+    for (int t=0; t<trackAmount; t++)
+    {
+        const int from_y      = y1 + height_of_one_line*(t+1);
+        const int next_from_y = y1 + height_of_one_line*(t+2);
+        
+        Track* track = track_manager->getTrack(tracks[t]);
+        stringw lineText;
+        if (track == NULL)
+        {
+            //FIXME: what to do if this happens?
+            lineText = L"MISSING : ";
+            lineText.append( stringw(tracks[t].c_str()) );
+        }
+        else
+        {
+            lineText = track->getName();
+        }
+        
+        core::rect< s32 > entry_area(20, from_y, m_area.getWidth()/2, next_from_y);
+        IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
+                                               entry_area, false , true , // border, word warp
+                                               m_irrlicht_window);
+    }
+
    /*    
     // ---- Track screenshot
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                               false, false);
     // images are saved squared, but must be stretched to 4:
     screenshotWidget->setCustomAspectRatio(4.0f / 3.0f); 3 
-    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
+    core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y1-10);
     
     screenshotWidget->x = area_right.UpperLeftCorner.X;
     screenshotWidget->y = area_right.UpperLeftCorner.Y;
@@ -91,9 +124,9 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->m_properties[PROP_ID] = "start";
     okBtn->m_text = _("Start Grand Prix");
     okBtn->x = m_area.getWidth()/2 - 200;
-    okBtn->y = y3;
+    okBtn->y = y2;
     okBtn->w = 400;
-    okBtn->h = m_area.getHeight() - y3 - 15;
+    okBtn->h = m_area.getHeight() - y2 - 15;
     okBtn->setParent(m_irrlicht_window);
     m_children.push_back(okBtn);
     okBtn->add();
