@@ -171,10 +171,15 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
             btVector3 direction(trans.getBasis()[0][1],
                                 trans.getBasis()[1][1],
                                 trans.getBasis()[2][1]);
-
-            const float angle = to_target.angle( backwards ? -direction : direction );
-
-            if(fabsf(angle) > 1) continue;
+            // Originally it used angle = to_target.angle( backwards ? -direction : direction );
+            // but since sometimes due to rounding errors we get an acos(x) with x>1, causing
+            // an assertion failure. So we remove the whole acos() test here:
+            Vec3  v = backwards ? -direction : direction;
+            float s = sqrt(v.length2() * to_target.length2());
+            float c = to_target.dot(v)/s;
+            // Original test was: fabsf(acos(c))>1,  which is the same as
+            // fabsf(c)<cos(1)
+            if(fabsf(c)<0.54) continue;
         }
 
         if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
