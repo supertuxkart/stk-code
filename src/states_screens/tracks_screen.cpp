@@ -203,11 +203,11 @@ void TracksScreen::init()
         else
         {
             tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
-                                    false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                                    0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
     tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
-                           IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+                           0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();    
 }
