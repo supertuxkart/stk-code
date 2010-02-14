@@ -188,6 +188,7 @@ void startGPGame(const GrandPrixData* gp)
     network_manager->setupPlayerKartInfo();
     //race_manager->getKartType(1) = KT_PLAYER;
     
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     race_manager->startNew();
 }
 

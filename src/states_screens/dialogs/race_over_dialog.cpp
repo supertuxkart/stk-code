@@ -45,6 +45,12 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     // Switch to barrier mode: server waits for ack from each client
     network_manager->beginRaceResultBarrier();
 
+    std::cout << "race_manager->getMajorMode()=" << race_manager->getMajorMode()
+              << ", RaceManager::MAJOR_MODE_GRAND_PRIX=" << RaceManager::MAJOR_MODE_GRAND_PRIX 
+              << ", RaceManager::MAJOR_MODE_SINGLE=" << RaceManager::MAJOR_MODE_SINGLE << "\n";
+    
+    const bool show_highscores = (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX);
+    
     const int text_height = GUIEngine::getFontHeight();
     
     const int button_h = text_height + 6;
@@ -52,7 +58,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     const int buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
     
     // ---- Ranking
-    core::rect< s32 > area(0, 0, m_area.getWidth()*2/3, text_height);
+    core::rect< s32 > area(0, 0, (show_highscores ? m_area.getWidth()*2/3 : m_area.getWidth()), text_height);
     IGUIStaticText* caption = GUIEngine::getGUIEnv()->addStaticText( _("Race Results"),
                                                               area, false, false, // border, word warp
                                                               m_irrlicht_window);
@@ -120,9 +126,11 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
         ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
         
+        const int entry_width = (show_highscores?  m_area.getWidth()*2/3 :  m_area.getWidth());
+        
         const int icon_size = text_height;
         core::rect< s32 > entry_area(10 + icon_size,         lines_from_y+line_h*i,
-                                     m_area.getWidth()*2/3,  lines_from_y+line_h*(i+1));
+                                     entry_width,  lines_from_y+line_h*(i+1));
         core::rect< s32 > icon_area(5,            lines_from_y + line_h*i,
                                     5+icon_size,  lines_from_y+ line_h*i + icon_size);
         
@@ -141,45 +149,48 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     delete[] order;
     
     // ---- Highscores
-    const HighscoreEntry *hs = World::getWorld()->getHighscores();
-    if (hs != NULL)
+    if (show_highscores)
     {
-        core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);
-        IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( _("Highscores"),
-                                                        hsarea, false, false, // border, word warp
-                                                        m_irrlicht_window);
-        highscores->setTabStop(false);
-        highscores->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-        
-        unsigned int num_scores = hs->getNumberEntries();
+        const HighscoreEntry *hs = World::getWorld()->getHighscores();
+        if (hs != NULL)
+        {
+            core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);
+            IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( _("Highscores"),
+                                                            hsarea, false, false, // border, word warp
+                                                            m_irrlicht_window);
+            highscores->setTabStop(false);
+            highscores->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+            
+            unsigned int num_scores = hs->getNumberEntries();
+                    
+            char timebuffer[64];
+            for (unsigned int i=0; i<num_scores; i++)
+            {            
+                std::string kart_name, name;
+                float T;
+                hs->getEntry(i, kart_name, name, &T);
+                const int   MINS   = (int) floor ( T / 60.0 ) ;
+                const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
+                const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
+                sprintf(timebuffer, "%2d:%02d.%01d", MINS, SECS, TENTHS);
+                            
+                const int line_from = lines_from_y + text_height*(i*3);
                 
-        char timebuffer[64];
-        for (unsigned int i=0; i<num_scores; i++)
-        {            
-            std::string kart_name, name;
-            float T;
-            hs->getEntry(i, kart_name, name, &T);
-            const int   MINS   = (int) floor ( T / 60.0 ) ;
-            const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
-            const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-            sprintf(timebuffer, "%2d:%02d.%01d", MINS, SECS, TENTHS);
-                        
-            const int line_from = lines_from_y + text_height*(i*3);
-            
-            stringw playerName = name.c_str();
-            
-            core::rect< s32 > linearea(m_area.getWidth()*2/3, line_from,
-                                       m_area.getWidth(), line_from + text_height);
-            GUIEngine::getGUIEnv()->addStaticText( playerName.c_str(),
-                                                   linearea, false, false, // border, word warp
-                                                   m_irrlicht_window);
-            core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + text_height,
-                                       m_area.getWidth(), line_from + text_height*2);
-            GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer).c_str(),
-                                                  linearea2, false, false, // border, word warp
-                                                  m_irrlicht_window);
-        } // next score
-    } // end if hs != NULL
+                stringw playerName = name.c_str();
+                
+                core::rect< s32 > linearea(m_area.getWidth()*2/3, line_from,
+                                           m_area.getWidth(), line_from + text_height);
+                GUIEngine::getGUIEnv()->addStaticText( playerName.c_str(),
+                                                       linearea, false, false, // border, word warp
+                                                       m_irrlicht_window);
+                core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + text_height,
+                                           m_area.getWidth(), line_from + text_height*2);
+                GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer).c_str(),
+                                                      linearea2, false, false, // border, word warp
+                                                      m_irrlicht_window);
+            } // next score
+        } // end if hs != NULL
+    } // end if not GP
 
     // ---- Buttons at the bottom
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
@@ -194,18 +205,32 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         new_race_btn->setParent(m_irrlicht_window);
         m_children.push_back(new_race_btn);
         new_race_btn->add();
-    }
     
-    ButtonWidget* race_again_btn = new ButtonWidget();
-    race_again_btn->m_properties[PROP_ID] = "raceagainbtn";
-    race_again_btn->x = 15;
-    race_again_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
-    race_again_btn->w = m_area.getWidth() - 30;
-    race_again_btn->h = button_h;
-    race_again_btn->m_text = _("Race in this track again");
-    race_again_btn->setParent(m_irrlicht_window);
-    m_children.push_back(race_again_btn);
-    race_again_btn->add();
+        ButtonWidget* race_again_btn = new ButtonWidget();
+        race_again_btn->m_properties[PROP_ID] = "raceagainbtn";
+        race_again_btn->x = 15;
+        race_again_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        race_again_btn->w = m_area.getWidth() - 30;
+        race_again_btn->h = button_h;
+        race_again_btn->m_text = _("Race in this track again");
+        race_again_btn->setParent(m_irrlicht_window);
+        m_children.push_back(race_again_btn);
+        race_again_btn->add();
+    }
+    else
+    {
+        // grand prix
+        ButtonWidget* abort_gp = new ButtonWidget();
+        abort_gp->m_properties[PROP_ID] = "backtomenu";
+        abort_gp->x = 15;
+        abort_gp->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        abort_gp->w = m_area.getWidth() - 30;
+        abort_gp->h = button_h;
+        abort_gp->m_text = _("Abort Grand Prix");
+        abort_gp->setParent(m_irrlicht_window);
+        m_children.push_back(abort_gp);
+        abort_gp->add();
+    }
     
     ButtonWidget* whats_next_btn = new ButtonWidget();
     whats_next_btn->x = 15;
