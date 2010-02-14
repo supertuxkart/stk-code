@@ -129,14 +129,14 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         const int entry_width = (show_highscores?  m_area.getWidth()*2/3 :  m_area.getWidth());
         
         const int icon_size = text_height;
-        core::rect< s32 > entry_area(10 + icon_size,         lines_from_y+line_h*i,
-                                     entry_width,  lines_from_y+line_h*(i+1));
-        core::rect< s32 > icon_area(5,            lines_from_y + line_h*i,
-                                    5+icon_size,  lines_from_y+ line_h*i + icon_size);
+        core::rect< s32 > entry_area(10 + icon_size, lines_from_y + line_h*i,
+                                     entry_width   , lines_from_y + line_h*(i+1));
+        core::rect< s32 > icon_area (5             , lines_from_y + line_h*i,
+                                     5+icon_size   , lines_from_y + line_h*i + icon_size);
         
         GUIEngine::getGUIEnv()->addStaticText( kart_results_line.c_str(), entry_area,
-                                                                       false , true , // border, word warp
-                                                                       m_irrlicht_window);
+                                               false , true , // border, word warp
+                                               m_irrlicht_window);
         IGUIImage* img = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
         img->setImage(kart_icon_texture);
         img->setScaleImage(true);
