@@ -91,7 +91,7 @@ switch-items for each item list the index of the item it is switched with.
     zipper-speed-gain="4.5"
     zipper-max-speed-fraction="2.0"
     item-switch-time="5"
-    switch-items="1 0 4 4 3"
+    switch-items="1 0 4 4 2"
 />
 
 <!-- GENERAL KART DEFAULTS
