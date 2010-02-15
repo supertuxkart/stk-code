@@ -186,7 +186,7 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, PowerupType type)
 // -----------------------------------------------------------------------------
 /** See if there is an old, unused explosion object available. If so,
  *  reuse this object, otherwise create a new one. */
-Explosion* ProjectileManager::newExplosion(const Vec3& coord, const int explosion_sound)
+Explosion* ProjectileManager::newExplosion(const Vec3& coord, const char* explosion_sound)
 {
     Explosion *e = new Explosion(coord, explosion_sound);
     m_active_explosions.push_back(e);

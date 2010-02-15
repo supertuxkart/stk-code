@@ -66,7 +66,7 @@ public:
     void             cleanup          ();
     void             update           (float dt);
     Flyable*         newProjectile    (Kart *kart, PowerupType type);
-    Explosion*       newExplosion     (const Vec3& coord, const int explosion_sound=(SFXManager::SFXType)SFXManager::SOUND_EXPLOSION);
+    Explosion*       newExplosion     (const Vec3& coord, const char* explosion_sound="explosion");
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
 };

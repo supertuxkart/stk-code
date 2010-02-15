@@ -128,7 +128,7 @@ public:
     void         setHasHit   () { m_has_hit_something = true; }
     void         reset       () { Moveable::reset();          }
     bool         isOwnerImmunity(const Kart *kart_hit) const;
-    virtual int  getExplosionSound() const { return SFXManager::SOUND_EXPLOSION; }
+    virtual const char*  getExplosionSound() const { return "explosion"; }
     /** Indicates if an explosion needs to be added if this flyable
       * is removed. */
     virtual bool needsExplosion() const {return true;}

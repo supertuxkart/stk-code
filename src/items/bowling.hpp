@@ -39,7 +39,7 @@ public:
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual void update(float dt);
     
-    int getExplosionSound() const { return SFXManager::SOUND_BOWLING_STRIKE; }
+    const char* getExplosionSound() const { return "bowling_strike"; }
     
 };   // Bowling
 

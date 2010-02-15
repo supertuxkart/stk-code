@@ -160,8 +160,7 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
         
-        if(sample_sound == NULL)
-            sample_sound = sfx_manager->newSFX( SFXManager::SOUND_SKID );
+        if (sample_sound == NULL) sample_sound = sfx_manager->createSoundSource( "skid" );
         sample_sound->volume(1);
         
         sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );

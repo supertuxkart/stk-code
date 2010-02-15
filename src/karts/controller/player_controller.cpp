@@ -50,11 +50,11 @@ PlayerController::PlayerController(Kart *kart, ActivePlayer *player,
     kart->setCamera(new Camera(player_index, kart));
     kart->getCamera()->setMode(Camera::CM_NORMAL);
 
-    m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
-    m_wee_sound   = sfx_manager->newSFX(SFXManager::SOUND_WEE  );
-    m_ugh_sound   = sfx_manager->newSFX(SFXManager::SOUND_UGH  );
-    m_grab_sound  = sfx_manager->newSFX(SFXManager::SOUND_GRAB );
-    m_full_sound  = sfx_manager->newSFX(SFXManager::SOUND_FULL );
+    m_bzzt_sound  = sfx_manager->createSoundSource( "bzzt" );
+    m_wee_sound   = sfx_manager->createSoundSource( "wee"  );
+    m_ugh_sound   = sfx_manager->createSoundSource( "ugh"  );
+    m_grab_sound  = sfx_manager->createSoundSource( "grab" );
+    m_full_sound  = sfx_manager->createSoundSource( "full" );
 
     reset();
 }   // PlayerController

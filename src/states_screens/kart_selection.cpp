@@ -423,7 +423,7 @@ FocusDispatcher* g_dispatcher = NULL;
             playerName->elementRemoved();
             playerName = NULL;
             
-            SFXManager::quickSound( SFXManager::SOUND_WEE );
+            SFXManager::quickSound( "wee" );
             
             modelView->setRotateTo(30.0f, 150.0f);
             
@@ -834,7 +834,7 @@ bool KartSelectionScreen::playerQuit(ActivePlayer* player)
             // Check that this player has not already confirmed, then they can't back out
             if (m_kart_widgets[n].isReady())
             {
-                sfx_manager->quickSound( SFXManager::SOUND_USE_ANVIL );
+                sfx_manager->quickSound( "use_anvil" );
                 return true;
             }
             
@@ -1311,7 +1311,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
                 
                 //SFXType sound;
                 //SOUND_UGH SOUND_CRASH SOUND_USE_ANVIL SOUND_EXPLOSION SOUND_MOVE_MENU SOUND_SELECT_MENU
-                sfx_manager->quickSound( SFXManager::SOUND_USE_ANVIL );
+                sfx_manager->quickSound( "use_anvil" );
                 
                 return;
             }

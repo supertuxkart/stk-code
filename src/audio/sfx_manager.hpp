@@ -21,6 +21,7 @@
 #define HEADER_SFX_MANAGER_HPP
 
 #include <vector>
+#include <map>
 #ifdef __APPLE__
 #  include <OpenAL/al.h>
 #else
@@ -31,7 +32,7 @@
 #include "utils/vec3.hpp"
 
 class SFXBase;
-
+class XMLNode;
 
 /** Manager of all sound effects. The manager reads all sound effects and
  *  maintains the corresponding buffers. Each sound effect objects uses
@@ -40,21 +41,11 @@ class SFXBase;
 class SFXManager
 {
 public:
-    /** The different type of sound effects. */
-    enum SFXType
-    {
-        SOUND_UGH,  SOUND_SKID, SOUND_BOWLING_ROLL, SOUND_BOWLING_STRIKE, SOUND_WINNER, SOUND_CRASH, SOUND_GRAB,
-        SOUND_SHOT, SOUND_GOO, SOUND_WEE, SOUND_EXPLOSION, SOUND_BZZT, SOUND_BEEP, SOUND_BACK_MENU, SOUND_USE_ANVIL,
-        SOUND_USE_PARACHUTE, SOUND_SELECT_MENU, SOUND_MOVE_MENU, SOUND_FULL, SOUND_LOCKED,
-        SOUND_PRESTART, SOUND_START, SOUND_ENGINE_SMALL, SOUND_ENGINE_LARGE, SOUND_SWAP,
-        NUM_SOUNDS
-    };
 
-
-    /*
-        Entries for custom SFX sounds.  These are unique for each kart.
-        eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
-    */
+    /**
+      *  Entries for custom SFX sounds.  These are unique for each kart.
+      * eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
+      */
     enum CustomSFX
     {
         CUSTOM_HORN,    // Replaces default horn
@@ -70,10 +61,6 @@ public:
         NUM_CUSTOMS
     };
 
-    // LISP (or in the future xml) tag for each custom sound
-    const char *getCustomTagName(int id);
-
-
     /** Status of a sound effect. */
     enum SFXStatus
     {
@@ -82,32 +69,67 @@ public:
     };
 
 private:        
-    /** The buffers for all sound effects. These are shared among all
+    
+    class SFXBufferInfo
+    {
+    private:
+    public:
+        ALuint   m_sfx_buffer;
+        bool     m_sfx_positional;
+        float    m_sfx_rolloff;
+        float    m_sfx_gain;
+        
+        SFXBufferInfo()
+        {
+            m_sfx_buffer = 0;
+            m_sfx_gain = 1.0f;
+            m_sfx_rolloff = 0.1f;
+            m_sfx_positional = false;
+        }
+
+        
+        /** Cannot appear in destructor because copy-constructors may be used,
+          * and the OpenAL source must not be deleted on a copy */
+        void freeBuffer()
+        {
+            alDeleteBuffers(1, &m_sfx_buffer);
+            m_sfx_buffer = 0;
+        }
+        ~SFXBufferInfo()
+        {
+        }
+    };
+    
+    /** The buffers and info for all sound effects. These are shared among all
      *  instances of SFXOpenal. */
-    std::vector<ALuint>       m_sfx_buffers;
-    std::vector<int>          m_sfx_positional;
-    std::vector<float>        m_sfx_rolloff;
-    std::vector<float>        m_sfx_gain;
-    std::vector<SFXBase*>     m_all_sfx;
+    std::map<std::string, SFXBufferInfo> m_all_sfx_types;
+    
+    /** The actual instances (sound sources) */
+    std::vector<SFXBase*> m_all_sfx;
+    
+    /** To play non-positional sounds without having to create a new object for each */
+    static std::map<std::string, SFXBase*> m_quick_sounds;
+
     bool                      m_initialized;
     float                     m_masterGain;
 
     void                      loadSfx();
 
-    void                      loadSingleSfx(const lisp::Lisp *lisp, 
-                                            const  char *name, 
-                                            int type);
+    void                      loadSingleSfx(const XMLNode* node);
 
 public:
                              SFXManager();
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
-    int                       addSingleSfx( std::string    filename,
-                                            int            positional,
+    bool                     addSingleSfx(  const char* sfx_name,
+                                            std::string    filename,
+                                            bool           positional,
                                             float          rolloff,
                                             float          gain);
 
-    SFXBase                 *newSFX(int id);
+    SFXBase*                 createSoundSource(const SFXBufferInfo& info, const bool addToSFXList=true);
+    SFXBase*                 createSoundSource(const char* name, const bool addToSFXList=true);
+    
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();
@@ -120,7 +142,7 @@ public:
     
     /** Positional sound is cool, but creating a new object just to play a simple
         menu sound is not. This function allows for 'quick sounds' in a single call.*/
-    static void              quickSound(SFXType soundType);
+    static void              quickSound(const char* soundName);
 
 };
 

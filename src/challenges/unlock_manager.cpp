@@ -44,7 +44,7 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager=this;
 
-    m_locked_sound = sfx_manager->newSFX(SFXManager::SOUND_LOCKED);
+    m_locked_sound = sfx_manager->createSoundSource("locked");
     
     // Read challenges from .../data
     // -----------------------------

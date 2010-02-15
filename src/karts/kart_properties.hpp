@@ -107,8 +107,7 @@ private:
     float       m_rubber_band_duration;/**< Duration a rubber band works.    */
     float       m_wheel_base;          /**< Wheel base of the kart.          */
     float       m_nitro_power_boost;   /**< Nitro power boost.               */
-    SFXManager::SFXType
-                m_engine_sfx_type;     /**< Engine sound effect.         */
+    std::string m_engine_sfx_type;     /**< Engine sound effect.             */
 
     // bullet physics data
     // -------------------
@@ -207,8 +206,7 @@ public:
     float getTimeFullSteerAI        () const {return m_time_full_steer_ai;       }
     float getBrakeFactor            () const {return m_brake_factor;             }
     float getMaxSpeedReverseRatio   () const {return m_max_speed_reverse_ratio;  }
-    SFXManager::SFXType getEngineSfxType()
-                                       const {return m_engine_sfx_type;          }
+    const char* getEngineSfxType    () const {return m_engine_sfx_type.c_str();  }
 
     //bullet physics get functions
     float getSuspensionStiffness    () const {return m_suspension_stiffness;     }

@@ -43,18 +43,27 @@ SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) 
     m_defaultGain = gain;
 
     alGenSources(1, &m_soundSource );
-    if(!SFXManager::checkError("generating a source")) return;
+    if (!SFXManager::checkError("generating a source")) return;
 
+    assert( alIsBuffer(m_soundBuffer) );
+    assert( alIsSource(m_soundSource) );
+
+    //std::cout << "Setting a source with buffer " << m_soundBuffer << ", rolloff " << rolloff
+    //          << ", gain=" << m_defaultGain << ", positional=" << (positional ? "true" : "false") << std::endl;
+    
     alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
+    
+    if (!SFXManager::checkError("attaching the buffer to the source")) return;
+    
     alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff      );
     alSourcef (m_soundSource, AL_GAIN,            m_defaultGain);
-    if(positional)
-       alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
-    else
-       alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
+    
+
+    if (positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
+    else            alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
 
     m_positional = positional;
     m_ok = SFXManager::checkError("setting up the source");

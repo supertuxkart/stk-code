@@ -80,10 +80,10 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
     m_version                = 0;
     m_color                  = video::SColor(255, 0, 0, 0);
     m_shape                  = 32;  // close enough to a circle.
-    m_engine_sfx_type        = SFXManager::SOUND_ENGINE_SMALL;
+    m_engine_sfx_type        = "engine_small";
+    
     // The default constructor for stk_config uses filename=""
-    if(filename!="")
-        load(filename);
+    if (filename != "") load(filename);
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -222,13 +222,13 @@ void KartProperties::getAllData(const XMLNode * root)
     std::string sfx_type_string;
     root->get("engine-sound", &sfx_type_string);
 
-    if(sfx_type_string == "large")
+    if      (sfx_type_string == "large")
     {
-        m_engine_sfx_type = SFXManager::SOUND_ENGINE_LARGE;
+        m_engine_sfx_type = "engine_large";
     }
-    else if(sfx_type_string == "small")
+    else if (sfx_type_string == "small")
     {
-        m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
+        m_engine_sfx_type = "engine_small";
     }
 
     root->get("has-skidmarks", &m_has_skidmarks);
@@ -362,7 +362,8 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("brake-factor",               m_brake_factor);
     lisp->get("mass",                       m_mass);
 
-    // Load custom kart SFX files
+    /*
+    // Load custom kart SFX files (TODO: enable back when it's implemented properly)
     for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
     {
         std::string tempFile;
@@ -385,24 +386,26 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
             m_custom_sfx_id[i] = -1;
         }
     }
-
+*/
     std::string sfx_type_string;
     lisp->get("engine-sound",                 sfx_type_string);
     if(sfx_type_string == "large")
     {
-        m_engine_sfx_type = SFXManager::SOUND_ENGINE_LARGE;
+        m_engine_sfx_type = "engine_large";
     }
     else if(sfx_type_string == "small")
     {
-        m_engine_sfx_type = SFXManager::SOUND_ENGINE_SMALL;
+        m_engine_sfx_type = "engine_small";
     }
 
     std::vector<float> v;
     if(lisp->getVector("max-speed-radius",      v))
     {
-        if(v.size()!=2)
+        if (v.size()!=2)
+        {
             printf("Incorrect max-speed-angle specifications for kart '%s'\n",
                    getIdent().c_str());
+        }
         else
         {
             m_max_speed_turn = v[0];
