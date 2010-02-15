@@ -47,15 +47,14 @@ private:
     /** What item is item is switched to. */
     std::vector<Item::ItemType> m_switch_to;
 
-    void setItem(const lisp::Lisp *item_node, const char *colour,
-                 Item::ItemType type);
-
-public:
-    // DEBUG only, this variable should become private again.
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
     float m_switch_time;
 
+    void setItem(const lisp::Lisp *item_node, const char *colour,
+                 Item::ItemType type);
+
+public:
                    ItemManager();
                   ~ItemManager();
     void           loadDefaultItems();

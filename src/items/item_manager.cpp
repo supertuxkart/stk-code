@@ -141,12 +141,16 @@ void ItemManager::loadDefaultItems()
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
                            const Vec3 &normal, Kart *parent)
 {
-    Item* h;
-    h = new Item(type, xyz, normal, m_item_mesh[type], m_all_items.size());
-    if(parent != NULL) h->setParent(parent);
-    
-    m_all_items.push_back(h);
-    return h;
+    Item* item;
+    item = new Item(type, xyz, normal, m_item_mesh[type], m_all_items.size());
+    if(parent != NULL) item->setParent(parent);
+    if(m_switch_time>=0)
+    {
+        Item::ItemType new_type = m_switch_to[item->getType()];
+        item->switchTo(new_type, m_item_mesh[(int)new_type]);
+    }
+    m_all_items.push_back(item);
+    return item;
 }   // newItem
 
 //-----------------------------------------------------------------------------
