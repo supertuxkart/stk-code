@@ -329,7 +329,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
 
 void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
 {
-    std::cout << "Naviagte up!\n";
+    //std::cout << "Naviagte up!\n";
     IGUIElement *el = NULL, *first=NULL, *closest=NULL;
     
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
@@ -344,18 +344,6 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         assert(list != NULL);
         
         const bool stay_within_list = list->getSelected() > 0;
-        /*
-        if (type == Input::IT_STICKMOTION)
-        {
-            // simulate a key press
-            irr::SEvent::SKeyInput evt;
-            evt.PressedDown = pressedDown;
-            evt.Key = KEY_UP;
-            irr::SEvent wrapper;
-            wrapper.KeyInput = evt;
-            wrapper.EventType = EET_KEY_INPUT_EVENT;
-            GUIEngine::getDevice()->postEventFromUser(wrapper);
-        }*/
         
         if (stay_within_list)
         {
@@ -391,7 +379,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     if (el != NULL && el->getTabGroup() != NULL &&
         el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
     {
-        std::cout << "Navigating up to " << closest->getID() << std::endl;
+        //std::cout << "Navigating up to " << closest->getID() << std::endl;
         Widget* w = GUIEngine::getWidget( closest->getID() );
         w->setFocusForPlayer(playerID);
         
@@ -408,7 +396,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     }
     else
     {        
-        std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
+        //std::cout << "EventHandler::navigateUp : warp around, selecting the last widget\n";
         //if (el == NULL) std::cout << "    because el is null\n";
         //else if (el->getTabGroup() == NULL) std::cout << "    because el's tab group is null\n";
         //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known previous\n"; 
@@ -435,7 +423,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
 
 void EventHandler::navigateDown(const int playerID, Input::InputType type, const bool pressedDown)
 {
-    std::cout << "Naviagte down!\n";
+    //std::cout << "Naviagte down!\n";
 
     IGUIElement *el = NULL, *first = NULL, *closest = NULL;
     
@@ -452,19 +440,6 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         assert(list != NULL);
         
         const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
-        
-        /*
-        if (type == Input::IT_STICKMOTION)
-        {
-            // simulate a key press
-            irr::SEvent::SKeyInput evt;
-            evt.PressedDown = pressedDown;
-            evt.Key = KEY_DOWN;
-            irr::SEvent wrapper;
-            wrapper.KeyInput = evt;
-            wrapper.EventType = EET_KEY_INPUT_EVENT;
-            GUIEngine::getDevice()->postEventFromUser(wrapper);
-        }*/
             
         if (stay_within_list)
         {
@@ -479,9 +454,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     
     if (w != NULL && w->m_tab_down_root != -1)
     {
-        //std::cout << " w->m_tab_down_root=" <<  w->m_tab_down_root << std::endl;
         Widget* down = GUIEngine::getWidget( w->m_tab_down_root );
-        //std::cout << "navigateDown : setting root to " << w->m_tab_down_root << std::endl;
         assert(down != NULL);
         el = down->getIrrlichtElement();
         
@@ -501,8 +474,6 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
-        //std::cout << "Navigating down to " << closest->getID() << std::endl;
-
         Widget* w = GUIEngine::getWidget( closest->getID() );
         assert( w != NULL );
         w->setFocusForPlayer(playerID);
@@ -518,13 +489,6 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     }
     else
     {
-        std::cout << "EventHandler::navigateDown : warp around, selecting the first widget\n";
-        //if (el == NULL) std::cout << "    because el is null\n";
-        //else if (el->getTabGroup() == NULL) std::cout << "    because el's tab group is null\n";
-        //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known next\n"; 
-
-        
-        //std::cout << "!!! Player " << playerID << " cannot navigating down, no next widget found;\n";
 
         // select the first widget
         Widget* w = NULL;
