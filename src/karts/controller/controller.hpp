@@ -41,7 +41,7 @@ protected:
 
 public:
                   Controller         (Kart *kart);
-                 ~Controller         () {};
+    virtual      ~Controller         () {};
     virtual void  reset              () {};
     virtual void  update             (float dt) {};
     virtual void  handleZipper       () {};
