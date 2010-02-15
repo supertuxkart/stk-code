@@ -57,8 +57,6 @@ void Challenge::addUnlockGPReward(const std::string &gp_name)
 {
     UnlockableFeature feature;
     
-    // FIXME : why are we translation an internal name here??
-    //feature.name = _(gp_name.c_str());
     feature.name = gp_name.c_str();
     
     feature.type = UNLOCK_GP;
