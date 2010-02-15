@@ -55,14 +55,14 @@ namespace SkinConfig
         bool preserve_h_aspect_ratios = false;
         std::string areas;
         
-        if(node->get("type", &type) == 0)
+        if (node->get("type", &type) == 0)
         {
             std::cerr << "Error in skin : All elements must have a type\n";
             return;
         }
         node->get("state", &state);
         
-        if(node->get("image", &image) == 0)
+        if (node->get("image", &image) == 0)
         {
             std::cerr << "Error in skin : All elements must have an image\n";
             return;
@@ -93,14 +93,14 @@ namespace SkinConfig
         // call last since it calculates coords considering all other parameters
         newParam.setTexture( irr_driver->getTexture( (file_manager->getGUIDir() + "/skins/" + image).c_str() ) );
         
-        if(areas.size() > 0)
+        if (areas.size() > 0)
         {
             newParam.areas = 0;
-            if(areas.find("body") != std::string::npos) newParam.areas |= BoxRenderParams::BODY;
-            if(areas.find("top") != std::string::npos) newParam.areas |= BoxRenderParams::TOP;
+            if(areas.find("body")   != std::string::npos) newParam.areas |= BoxRenderParams::BODY;
+            if(areas.find("top")    != std::string::npos) newParam.areas |= BoxRenderParams::TOP;
             if(areas.find("bottom") != std::string::npos) newParam.areas |= BoxRenderParams::BOTTOM;
-            if(areas.find("left") != std::string::npos) newParam.areas |= BoxRenderParams::LEFT;
-            if(areas.find("right") != std::string::npos) newParam.areas |= BoxRenderParams::RIGHT;
+            if(areas.find("left")   != std::string::npos) newParam.areas |= BoxRenderParams::LEFT;
+            if(areas.find("right")  != std::string::npos) newParam.areas |= BoxRenderParams::RIGHT;
         }
         
         m_render_params[type+"::"+state] = newParam;
@@ -140,15 +140,15 @@ namespace SkinConfig
         }
         
         const int amount = root->getNumNodes();
-        for(int i=0; i<amount; i++)
+        for (int i=0; i<amount; i++)
         {
             const XMLNode* node = root->getNode(i);
             
-            if(node->getName() == "element")
+            if (node->getName() == "element")
             {
                 parseElement(node);
             }
-            else if(node->getName() == "color")
+            else if (node->getName() == "color")
             {
                 parseColor(node);
             }
