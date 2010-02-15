@@ -96,6 +96,10 @@ void Powerup::set(PowerupType type, int n)
             m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_GOO);
             break ;
             
+        case POWERUP_SWITCH:
+            m_sound_use          = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
+            break;
+            
         case POWERUP_NOTHING:
         case POWERUP_CAKE:
         case POWERUP_PLUNGER:
@@ -121,7 +125,12 @@ void Powerup::use()
     if (m_type != POWERUP_NOTHING && m_type != POWERUP_ZIPPER) m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
     // FIXME - for some collectibles, set() is never called
-    if(m_sound_use == NULL) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
+    if(m_sound_use == NULL)
+    {
+        //if (m_type == POWERUP_SWITCH) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
+        //else                          
+        m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SHOT);
+    }
     
     m_number--;
     World *world = World::getWorld();
@@ -131,6 +140,8 @@ void Powerup::use()
         break ;
     case POWERUP_SWITCH:
         item_manager->switchItems();
+        m_sound_use->position(m_owner->getXYZ());
+        m_sound_use->play();
         break;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
