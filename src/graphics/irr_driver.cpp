@@ -39,7 +39,6 @@
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "karts/player_kart.hpp"
 #include "main_loop.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
@@ -860,7 +859,7 @@ void IrrDriver::update(float dt)
                     Kart *kart=world->getKart(i);
                     if(kart->getCamera()) 
                     {
-                        kart->activateCamera();
+                        kart->getCamera()->activate();
                         m_scene_manager->drawAll();
                     }   // if kart->Camera
                 }   // for i<world->getNumKarts()

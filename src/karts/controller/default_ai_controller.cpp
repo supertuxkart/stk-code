@@ -22,7 +22,7 @@
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
 #undef AI_DEBUG
 
-#include "robots/new_ai.hpp"
+#include "karts/controller/default_ai_controller.hpp"
 
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
@@ -37,7 +37,6 @@
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
-#include "karts/player_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -45,14 +44,12 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-NewAI::NewAI(const std::string& kart_name,
-                           int position, const btTransform& init_pos, 
-                           const Track *track) :
-    AutoKart( kart_name, position, init_pos )
+DefaultAIController::DefaultAIController(Kart *kart) : Controller(kart)
 {
-    m_kart_length = m_kart_properties->getKartModel()->getLength();
-    m_kart_width  = m_kart_properties->getKartModel()->getWidth();
-    m_world       = dynamic_cast<LinearWorld*>(World::getWorld());
+    m_kart        = kart;
+    m_kart_length = m_kart->getKartProperties()->getKartModel()->getLength();
+    m_kart_width  = m_kart->getKartProperties()->getKartModel()->getWidth();
+    m_world       = dynamic_cast<LinearWorld*>(World::getWorld());    
     m_track       = m_world->getTrack();
     m_quad_graph  = &m_track->getQuadGraph();
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
@@ -109,7 +106,7 @@ NewAI::NewAI(const std::string& kart_name,
     }
     // Reset must be called after m_quad_graph etc. is set up        
     reset();
-    
+
     switch( race_manager->getDifficulty())
     {
     case RaceManager::RD_EASY:
@@ -152,38 +149,42 @@ NewAI::NewAI(const std::string& kart_name,
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
-    m_debug_left   = irr_driver->getSceneManager()->addSphereSceneNode(1);
-    m_debug_right  = irr_driver->getSceneManager()->addSphereSceneNode(1);
 #endif
-}   // NewAI
+}   // DefaultAIController
 
 //-----------------------------------------------------------------------------
-/** The destructor deletes the shared TrackInfo objects if no more NewAI
+/** The destructor deletes the shared TrackInfo objects if no more DefaultAIController
  *  instances are around.
  */
-NewAI::~NewAI()
+DefaultAIController::~DefaultAIController()
 {
 #ifdef AI_DEBUG
     irr_driver->removeNode(m_debug_sphere);
-    irr_driver->removeNode(m_debug_left  );
-    irr_driver->removeNode(m_debug_right );
 #endif
-}   // ~NewAI
+}   // ~DefaultAIController
+
+//-----------------------------------------------------------------------------
+const irr::core::stringw& DefaultAIController::getNamePostfix() const 
+{
+    // Static to avoid returning the address of a temporary stringq
+    static irr::core::stringw name="(default)";
+    return name;
+}   // getNamePostfix
 
 //-----------------------------------------------------------------------------
 //TODO: if the AI is crashing constantly, make it move backwards in a straight
 //line, then move forward while turning.
-void NewAI::update(float dt)
+void DefaultAIController::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls.m_look_back = false;
-    m_controls.m_nitro     = false;
+    m_controls->m_look_back = false;
+    m_controls->m_nitro     = false;
 
     // Update the current node:
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
     {
         int old_node = m_track_node;
-        m_quad_graph->findRoadSector(getXYZ(), &m_track_node, 
+        m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node, 
                                      &m_all_look_aheads[m_track_node]);
         // IF the AI is off track (or on a branch of the track it did not
         // select to be on), keep the old position.
@@ -193,19 +194,19 @@ void NewAI::update(float dt)
     }
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
-        m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
+        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
     }
     // The client does not do any AI computations.
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
     {
-        AutoKart::update(dt);
+        Controller::update(dt);
         return;
     }
 
     if( m_world->isStartPhase() )
     {
         handleRaceStart();
-        AutoKart::update(dt);
+        Controller::update(dt);
         return;
     }
 
@@ -216,18 +217,18 @@ void NewAI::update(float dt)
     steps = calcSteps();
 
     computeNearestKarts();
-    checkCrashes( steps, getXYZ() );
+    checkCrashes( steps, m_kart->getXYZ() );
     findCurve();
 
     // Special behaviour if we have a bomb attach: try to hit the kart ahead 
     // of us.
     bool commands_set = false;
-    if(m_handle_bomb && getAttachment()->getType()==ATTACH_BOMB && 
+    if(m_handle_bomb && m_kart->getAttachment()->getType()==ATTACH_BOMB && 
         m_kart_ahead )
     {
         // Use nitro if the kart is far ahead, or faster than this kart
-        m_controls.m_nitro = m_distance_ahead>10.0f || 
-                             m_kart_ahead->getSpeed() > getSpeed();
+        m_controls->m_nitro = m_distance_ahead>10.0f || 
+                             m_kart_ahead->getSpeed() > m_kart->getSpeed();
         // If we are close enough, try to hit this kart
         if(m_distance_ahead<=10)
         {
@@ -235,10 +236,10 @@ void NewAI::update(float dt)
 
             // If we are faster, try to predict the point where we will hit
             // the other kart
-            if(m_kart_ahead->getSpeed() < getSpeed())
+            if(m_kart_ahead->getSpeed() < m_kart->getSpeed())
             {
                 float time_till_hit = m_distance_ahead
-                                    / (getSpeed()-m_kart_ahead->getSpeed());
+                                    / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
             float steer_angle = steerToPoint(m_kart_ahead->getXYZ(), 
@@ -257,13 +258,13 @@ void NewAI::update(float dt)
         handleRescue(dt);
         handleBraking();
         // If a bomb is attached, nitro might already be set.
-        if(!m_controls.m_nitro)
+        if(!m_controls->m_nitro)
             handleNitroAndZipper();
     }
     // If we are supposed to use nitro, but have a zipper, 
     // use the zipper instead
-    if(m_controls.m_nitro && m_powerup.getType()==POWERUP_ZIPPER && 
-        getSpeed()>1.0f && m_zipper_time_left<=0)
+    if(m_controls->m_nitro && m_kart->getPowerup()->getType()==POWERUP_ZIPPER && 
+        m_kart->getSpeed()>1.0f && m_kart->getZipperTimeLeft()<=0)
     {
         // Make sure that not all AI karts use the zipper at the same
         // time in time trial at start up, so during the first 5 seconds
@@ -271,26 +272,26 @@ void NewAI::update(float dt)
         if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_TIME_TRIAL ||
             (m_world->getTime()<3.0f && rand()%50==1) )
         {
-            m_controls.m_nitro = false;
-            m_controls.m_fire  = true;
+            m_controls->m_nitro = false;
+            m_controls->m_fire  = true;
         }
     }
 
     /*And obviously general kart stuff*/
-    AutoKart::update(dt);
+    Controller::update(dt);
     m_collided = false;
 }   // update
 
 //-----------------------------------------------------------------------------
-void NewAI::handleBraking()
+void DefaultAIController::handleBraking()
 {
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        getPosition() < m_world->getKart(0)->getPosition()             &&
-        getInitialPosition()>1                                       )
+        m_kart->getPosition() < m_world->getKart(0)->getPosition()           &&
+        m_kart->getInitialPosition()>1                                         )
     {
-        m_controls.m_brake = true;
+        m_controls->m_brake = true;
         return;
     }
         
@@ -298,13 +299,13 @@ void NewAI::handleBraking()
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if (m_crashes.m_road && getVelocityLC().getY() > MIN_SPEED && 
-        m_world->isOnRoad(getWorldKartId()) )
+    if (m_crashes.m_road && m_kart->getVelocityLC().getY() > MIN_SPEED && 
+        m_world->isOnRoad(m_kart->getWorldKartId()) )
     {
         float kart_ang_diff = 
             m_quad_graph->getAngleToNext(m_track_node,
                                          m_successor_index[m_track_node])
-          - getHPR().getHeading();
+          - m_kart->getHPR().getHeading();
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
@@ -318,21 +319,21 @@ void NewAI::handleBraking()
             //if the curve angle is bigger than what the kart can steer, brake
             //even if we are in the inside, because the kart would be 'thrown'
             //out of the curve.
-            if(!(m_world->getDistanceToCenterForKart(getWorldKartId()) 
+            if(!(m_world->getDistanceToCenterForKart(m_kart->getWorldKartId()) 
                  > m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE*getMaxSteerAngle()))
+                 -CURVE_INSIDE_PERC || m_curve_angle > RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
             {
-                m_controls.m_brake = false;
+                m_controls->m_brake = false;
                 return;
             }
         }
         else if( m_curve_angle < -MIN_TRACK_ANGLE ) //Next curve is right
         {
-            if(!(m_world->getDistanceToCenterForKart( getWorldKartId() ) 
+            if(!(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) 
                 < m_quad_graph->getNode(m_track_node).getPathWidth() *
-                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE*getMaxSteerAngle()))
+                 CURVE_INSIDE_PERC || m_curve_angle < -RAD_TO_DEGREE*m_kart->getMaxSteerAngle()))
             {
-                m_controls.m_brake = false;
+                m_controls->m_brake = false;
                 return;
             }
         }
@@ -340,23 +341,23 @@ void NewAI::handleBraking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        if(getVelocityLC().getY() > m_curve_target_speed ||
+        if(m_kart->getVelocityLC().getY() > m_curve_target_speed ||
            kart_ang_diff          > MIN_TRACK_ANGLE         )
         {
 #ifdef AI_DEBUG
         std::cout << "BRAKING" << std::endl;
 #endif
-            m_controls.m_brake = true;
+            m_controls->m_brake = true;
             return;
         }
 
     }
 
-    m_controls.m_brake = false;
+    m_controls->m_brake = false;
 }   // handleBraking
 
 //-----------------------------------------------------------------------------
-void NewAI::handleSteering(float dt)
+void DefaultAIController::handleSteering(float dt)
 {
     const int next = m_next_node_index[m_track_node];
     
@@ -366,8 +367,8 @@ void NewAI::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-    if( fabsf(m_world->getDistanceToCenterForKart( getWorldKartId() ))  >
-       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+1.0f )
+    if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
+       0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
     {
         steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter(), 
                                    dt );
@@ -395,7 +396,7 @@ void NewAI::handleSteering(float dt)
         }
         else
         {
-            if(m_world->getDistanceToCenterForKart( getWorldKartId() ) >
+            if(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) >
                m_world->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
                 steer_angle = steerToAngle(next, -M_PI*0.5f );
@@ -423,7 +424,11 @@ void NewAI::handleSteering(float dt)
         case FT_FAREST_POINT:
             {
                 Vec3 straight_point;
-                steer_angle = findNonCrashingAngle();
+                findNonCrashingPoint(&straight_point);
+#ifdef AI_DEBUG
+                m_debug_sphere->setPosition(straight_point.toIrrVector());
+#endif
+                steer_angle = steerToPoint(straight_point, dt);
             }
             break;
 
@@ -441,6 +446,10 @@ void NewAI::handleSteering(float dt)
             break;
         }
 
+#ifdef AI_DEBUG
+        std::cout << "- Fallback."  << std::endl;
+#endif
+
     }
     // avoid steer vibrations
     //if (fabsf(steer_angle) < 1.0f*3.1415/180.0f)
@@ -450,10 +459,10 @@ void NewAI::handleSteering(float dt)
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
-void NewAI::handleItems( const float DELTA, const int STEPS )
+void DefaultAIController::handleItems( const float DELTA, const int STEPS )
 {
-    m_controls.m_fire = false;
-    if(isRescue() || m_powerup.getType() == POWERUP_NOTHING ) return;
+    m_controls->m_fire = false;
+    if(m_kart->isRescue() || m_kart->getPowerup()->getType() == POWERUP_NOTHING ) return;
 
     m_time_since_last_shot += DELTA;
 
@@ -463,7 +472,7 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
     {
         if( m_time_since_last_shot > 10.0f )
         {
-            m_controls.m_fire = true;
+            m_controls->m_fire = true;
             m_time_since_last_shot = 0.0f;
         }
         return;
@@ -471,7 +480,7 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
 
     // Tactic 2: calculate
     // -------------------
-    switch( m_powerup.getType() )
+    switch( m_kart->getPowerup()->getType() )
     {
     case POWERUP_ZIPPER:
         // Do nothing. Further up a zipper is used if nitro should be selected,
@@ -486,7 +495,7 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
         // kart as well? I.e. only drop if the kart behind is faster? Otoh 
         // this approach helps preventing an overtaken kart to overtake us 
         // again.
-        m_controls.m_fire = (m_distance_behind < 15.0f &&
+        m_controls->m_fire = (m_distance_behind < 15.0f &&
                                m_distance_behind > 3.0f   ) || 
                             m_time_since_last_shot>10.0f;
         if(m_distance_behind < 10.0f && m_distance_behind > 2.0f   )
@@ -496,7 +505,7 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
     // towards m_kart_ahead. And some of them can fire backwards, too - which
     // isn't yet supported for AI karts.
     case POWERUP_CAKE:
-        m_controls.m_fire = (m_kart_ahead && m_distance_ahead < 20.0f) ||
+        m_controls->m_fire = (m_kart_ahead && m_distance_ahead < 20.0f) ||
                              m_time_since_last_shot > 10.0f;
         break;
     case POWERUP_BOWLING:
@@ -509,11 +518,11 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
                                   !m_kart_ahead;
             float distance = fire_backwards ? m_distance_behind 
                                             : m_distance_ahead;
-            m_controls.m_fire = (fire_backwards && distance < 30.0f)  || 
+            m_controls->m_fire = (fire_backwards && distance < 30.0f)  || 
                                 (!fire_backwards && distance <10.0f)  ||
                                 m_time_since_last_shot > 10.0f;
-            if(m_controls.m_fire)
-                m_controls.m_look_back = fire_backwards;
+            if(m_controls->m_fire)
+                m_controls->m_look_back = fire_backwards;
             break;
         }
     case POWERUP_PLUNGER:
@@ -525,26 +534,27 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
                                   !m_kart_ahead;
             float distance = fire_backwards ? m_distance_behind 
                                             : m_distance_ahead;
-            m_controls.m_fire = distance < 30.0f                 || 
+            m_controls->m_fire = distance < 30.0f                 || 
                                 m_time_since_last_shot > 10.0f;
-            if(m_controls.m_fire)
-                m_controls.m_look_back = fire_backwards;
+            if(m_controls->m_fire)
+                m_controls->m_look_back = fire_backwards;
             break;
         }
     case POWERUP_ANVIL:
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_controls.m_fire = m_world->getTime()<1.0f && getPosition()>2;
+            m_controls->m_fire = m_world->getTime()<1.0f && 
+                                 m_kart->getPosition()>2;
         }
         else
         {
-            m_controls.m_fire = m_time_since_last_shot > 3.0f && 
-                                getPosition()>1;
+            m_controls->m_fire = m_time_since_last_shot > 3.0f && 
+                                 m_kart->getPosition()>1;
         }
     default:
-        m_controls.m_fire = true;
+        m_controls->m_fire = true;
     }
-    if(m_controls.m_fire)  m_time_since_last_shot = 0.0f;
+    if(m_controls->m_fire)  m_time_since_last_shot = 0.0f;
     return;
 }   // handleItems
 
@@ -553,10 +563,10 @@ void NewAI::handleItems( const float DELTA, const int STEPS )
  *  'closeness' is for now simply based on the position, i.e. if a kart is
  *  more than one lap behind or ahead, it is not considered to be closest.
  */
-void NewAI::computeNearestKarts()
+void DefaultAIController::computeNearestKarts()
 {
     bool need_to_check = false;
-    int my_position    = getPosition();
+    int my_position    = m_kart->getPosition();
     // See if the kart ahead has changed:
     if( ( m_kart_ahead && m_kart_ahead->getPosition()+1!=my_position ) ||
         (!m_kart_ahead && my_position>1                              )    )
@@ -569,11 +579,11 @@ void NewAI::computeNearestKarts()
 
     m_kart_behind    = m_kart_ahead      = NULL;
     m_distance_ahead = m_distance_behind = 9999999.9f;
-    float my_dist = m_world->getDistanceDownTrackForKart(getWorldKartId());
+    float my_dist = m_world->getDistanceDownTrackForKart(m_kart->getWorldKartId());
     for(unsigned int i=0; i<m_world->getNumKarts(); i++)
     {
         Kart *k = m_world->getKart(i);
-        if(k->isEliminated() || k==this) continue;
+        if(k->isEliminated() || k==m_kart) continue;
         if(k->getPosition()==my_position+1) 
         {
             m_kart_behind = k;
@@ -593,28 +603,28 @@ void NewAI::computeNearestKarts()
 }   // computeNearestKarts
 
 //-----------------------------------------------------------------------------
-void NewAI::handleAcceleration( const float DELTA )
+void DefaultAIController::handleAcceleration( const float DELTA )
 {
     //Do not accelerate until we have delayed the start enough
     if( m_time_till_start > 0.0f )
     {
         m_time_till_start -= DELTA;
-        m_controls.m_accel = 0.0f;
+        m_controls->m_accel = 0.0f;
         return;
     }
 
-    if( m_controls.m_brake == true )
+    if( m_controls->m_brake == true )
     {
-        m_controls.m_accel = 0.0f;
+        m_controls->m_accel = 0.0f;
         return;
     }
 
-    if(hasViewBlockedByPlunger())
+    if(m_kart->hasViewBlockedByPlunger())
     {
-        if(!(getSpeed() > getMaxSpeedOnTerrain() / 2))
-            m_controls.m_accel = 0.05f;
+        if(!(m_kart->getSpeed() > m_kart->getMaxSpeedOnTerrain() / 2))
+            m_controls->m_accel = 0.05f;
         else 
-            m_controls.m_accel = 0.0f;
+            m_controls->m_accel = 0.0f;
         return;
     }
     
@@ -623,7 +633,7 @@ void NewAI::handleAcceleration( const float DELTA )
         //Find if any player is ahead of this kart
         bool player_winning = false;
         for(unsigned int i = 0; i < race_manager->getNumPlayers(); ++i )
-            if( getPosition() > m_world->getPlayerKart(i)->getPosition() )
+            if( m_kart->getPosition() > m_world->getPlayerKart(i)->getPosition() )
             {
                 player_winning = true;
                 break;
@@ -631,16 +641,16 @@ void NewAI::handleAcceleration( const float DELTA )
 
         if( player_winning )
         {
-            m_controls.m_accel = m_max_handicap_accel;
+            m_controls->m_accel = m_max_handicap_accel;
             return;
         }
     }
 
-    m_controls.m_accel = 1.0f;
+    m_controls->m_accel = 1.0f;
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------
-void NewAI::handleRaceStart()
+void DefaultAIController::handleRaceStart()
 {
     //FIXME: make karts able to get a penalty for accelerating too soon
     //like players, should happen to about 20% of the karts in easy,
@@ -656,15 +666,15 @@ void NewAI::handleRaceStart()
 }   // handleRaceStart
 
 //-----------------------------------------------------------------------------
-void NewAI::handleRescue(const float DELTA)
+void DefaultAIController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(getSpeed()<2.0f && !isRescue() && !m_world->isStartPhase())
+    if(m_kart->getSpeed()<2.0f && !m_kart->isRescue() && !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            forceRescue();
+            m_kart->forceRescue();
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }
@@ -677,36 +687,36 @@ void NewAI::handleRescue(const float DELTA)
 //-----------------------------------------------------------------------------
 /** Decides wether to use nitro or not.
  */
-void NewAI::handleNitroAndZipper()
+void DefaultAIController::handleNitroAndZipper()
 {
-    m_controls.m_nitro = false;
+    m_controls->m_nitro = false;
     // If we are already very fast, save nitro.
-    if(getSpeed() > 0.95f*getMaxSpeedOnTerrain())
+    if(m_kart->getSpeed() > 0.95f*m_kart->getMaxSpeedOnTerrain())
         return;
     // Don't use nitro when the AI has a plunger in the face!
-    if(hasViewBlockedByPlunger()) return;
+    if(m_kart->hasViewBlockedByPlunger()) return;
     
     // Don't use nitro if the kart doesn't have any or is not on ground.
-    if(!isOnGround() || hasFinishedRace()) return;
+    if(!m_kart->isOnGround() || m_kart->hasFinishedRace()) return;
     
     // Don't compute nitro usage if we don't have nitro or are not supposed
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
-    if( (getEnergy()==0                       || m_nitro_level==NITRO_NONE)  &&
-        (m_powerup.getType()!=POWERUP_ZIPPER  || m_item_tactic==IT_TEN_SECONDS) )
+    if( (m_kart->getEnergy()==0                          || m_nitro_level==NITRO_NONE)  &&
+        (m_kart->getPowerup()->getType()!=POWERUP_ZIPPER || m_item_tactic==IT_TEN_SECONDS) )
         return;
 
     // If a parachute or anvil is attached, the nitro doesn't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment = 
-                                   m_attachment.getType()==ATTACH_PARACHUTE ||
-                                   m_attachment.getType()==ATTACH_ANVIL;
+                    m_kart->getAttachment()->getType()==ATTACH_PARACHUTE ||
+                    m_kart->getAttachment()->getType()==ATTACH_ANVIL;
     if(has_slowdown_attachment) return;
 
     // If the kart is very slow (e.g. after rescue), use nitro
-    if(getSpeed()<5)
+    if(m_kart->getSpeed()<5)
     {
-        m_controls.m_nitro = true;
+        m_controls->m_nitro = true;
         return;
     }
 
@@ -714,9 +724,9 @@ void NewAI::handleNitroAndZipper()
     // (i.e. more than 2) nitro, use it.
     // -------------------------------------------------
     const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(getPosition()== (int)num_karts && getEnergy()>2.0f)
+    if(m_kart->getPosition()== (int)num_karts && m_kart->getEnergy()>2.0f)
     {
-        m_controls.m_nitro = true;
+        m_controls->m_nitro = true;
         return;
     }
 
@@ -724,13 +734,13 @@ void NewAI::handleNitroAndZipper()
     // anyway. Since the kart is faster with nitro, estimate a 50% time
     // decrease (additionally some nitro will be saved when top speed
     // is reached).
-    if(m_world->getLapForKart(getWorldKartId())==race_manager->getNumLaps()-1 &&
+    if(m_world->getLapForKart(m_kart->getWorldKartId())==race_manager->getNumLaps()-1 &&
         m_nitro_level == NITRO_ALL)
     {
-        float finish = m_world->getEstimatedFinishTime(getWorldKartId());
-        if( 1.5f*getEnergy() >= finish - m_world->getTime() )
+        float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId());
+        if( 1.5f*m_kart->getEnergy() >= finish - m_world->getTime() )
         {
-            m_controls.m_nitro = true;
+            m_controls->m_nitro = true;
             return;
         }
     }
@@ -742,35 +752,35 @@ void NewAI::handleNitroAndZipper()
     // Try to overtake a kart that is close ahead, except 
     // when we are already much faster than that kart
     // --------------------------------------------------
-    if(m_kart_ahead                               && 
-        m_distance_ahead < overtake_distance      &&
-        m_kart_ahead->getSpeed()+5.0f > getSpeed()   )
+    if(m_kart_ahead                                       && 
+        m_distance_ahead < overtake_distance              &&
+        m_kart_ahead->getSpeed()+5.0f > m_kart->getSpeed()   )
     {
-            m_controls.m_nitro = true;
+            m_controls->m_nitro = true;
             return;
     }
 
-    if(m_kart_behind                          &&
-        m_distance_behind < overtake_distance &&
-        m_kart_behind->getSpeed() > getSpeed()    )
+    if(m_kart_behind                                   &&
+        m_distance_behind < overtake_distance          &&
+        m_kart_behind->getSpeed() > m_kart->getSpeed()    )
     {
         // Only prevent overtaking on highest level
-        m_controls.m_nitro = m_nitro_level==NITRO_ALL;
+        m_controls->m_nitro = m_nitro_level==NITRO_ALL;
         return;
     }
     
 }   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------
-float NewAI::steerToAngle(const size_t SECTOR, const float ANGLE)
+float DefaultAIController::steerToAngle(const size_t SECTOR, const float ANGLE)
 {
     float angle = m_quad_graph->getAngleToNext(SECTOR,
                                                m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - getHPR().getHeading();
+    float steer_angle = angle - m_kart->getHPR().getHeading();
 
-    if(hasViewBlockedByPlunger())
+    if(m_kart->hasViewBlockedByPlunger())
         steer_angle += ANGLE/5;
     else
         steer_angle += ANGLE;
@@ -787,20 +797,20 @@ float NewAI::steerToAngle(const size_t SECTOR, const float ANGLE)
  *  \param point Point to steer towards.
  *  \param dt    Time step.
  */
-float NewAI::steerToPoint(const Vec3 &point, float dt)
+float DefaultAIController::steerToPoint(const Vec3 &point, float dt)
 {
     // No sense steering if we are not driving.
-    if(getSpeed()==0) return 0.0f;
-    const float dx        = point.getX() - getXYZ().getX();
-    const float dy        = point.getY() - getXYZ().getY();
+    if(m_kart->getSpeed()==0) return 0.0f;
+    const float dx        = point.getX() - m_kart->getXYZ().getX();
+    const float dy        = point.getY() - m_kart->getXYZ().getY();
     /** Angle from the kart position to the point in world coordinates. */
     float theta           = -atan2(dx, dy);
 
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
-    float angle_2_point   = theta - getHPR().getHeading() 
-                                  - dt*m_body->getAngularVelocity().getZ()*2.0f;
+    float angle_2_point   = theta - m_kart->getHPR().getHeading() 
+                          - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;
 
@@ -816,8 +826,8 @@ float NewAI::steerToPoint(const Vec3 &point, float dt)
      *  computed, and from that the turn radius, and then the steer angle.
      *  (note: the 2*M_PI can be removed from the computations)
      */
-    float radius          = dt*getSpeed()/angle_2_point;
-    float sin_steer_angle = m_kart_properties->getWheelBase()/radius;
+    float radius          = dt*m_kart->getSpeed()/angle_2_point;
+    float sin_steer_angle = m_kart->getKartProperties()->getWheelBase()/radius;
 #ifdef DEBUG_OUTPUT
     printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
         theta, angle_2_point, m_body->getAngularVelocity().getZ(),
@@ -825,14 +835,16 @@ float NewAI::steerToPoint(const Vec3 &point, float dt)
 #endif
     // Add 0.1 since rouding errors will otherwise result in the kart
     // not using drifting.
-    if(sin_steer_angle <= -1.0f) return -getMaxSteerAngle()*m_skidding_threshold-0.1f;
-    if(sin_steer_angle >=  1.0f) return  getMaxSteerAngle()*m_skidding_threshold+0.1f;
-    float steer_angle     = asin(sin_steer_angle);
+    if(sin_steer_angle <= -1.0f)
+        return -m_kart->getMaxSteerAngle()*m_skidding_threshold-0.1f;
+    if(sin_steer_angle >=  1.0f) 
+        return  m_kart->getMaxSteerAngle()*m_skidding_threshold+0.1f;
+    float steer_angle     = asin(sin_steer_angle);    
     return steer_angle;
 }   // steerToPoint
 
 //-----------------------------------------------------------------------------
-void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
+void DefaultAIController::checkCrashes( const int STEPS, const Vec3& pos )
 {
     //Right now there are 2 kind of 'crashes': with other karts and another
     //with the track. The sight line is used to find if the karts crash with
@@ -844,7 +856,7 @@ void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
     const size_t NUM_KARTS = m_world->getNumKarts();
 
     //Protection against having vel_normal with nan values
-    const Vec3 &VEL = getVelocity();
+    const Vec3 &VEL = m_kart->getVelocity();
     Vec3 vel_normal(VEL.getX(), VEL.getY(), 0.0);
     float speed=vel_normal.length();
     // If the velocity is zero, no sense in checking for crashes in time
@@ -867,10 +879,10 @@ void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
                 const Kart* kart = m_world->getKart(j);
-                if(kart==this||kart->isEliminated()) continue;   // ignore eliminated karts
+                if(kart==m_kart||kart->isEliminated()) continue;   // ignore eliminated karts
                 const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
-                if(getVelocityLC().getY() < other_kart->getVelocityLC().getY())
+                if(m_kart->getVelocityLC().getY() < other_kart->getVelocityLC().getY())
                     continue;
                 Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
                 float kart_distance = (step_coord - other_kart_xyz).length_2d();
@@ -895,76 +907,12 @@ void NewAI::checkCrashes( const int STEPS, const Vec3& pos )
 }   // checkCrashes
 
 //-----------------------------------------------------------------------------
-float NewAI::findNonCrashingAngle()
-{    
-    unsigned int current_sector = m_track_node;
-    const Vec3 &xyz   = getXYZ();
-    const Quad &q     = m_quad_graph->getQuad(current_sector);
-    const Vec3 &right = q[2];
-    const Vec3 &left  = q[3];
-    Vec3 final_right = q[2];
-    Vec3 final_left  = q[3];
-
-    float very_right  = -atan2(right.getX()-xyz.getX(),
-                              right.getY()-xyz.getY())
-                      - getHPR().getHeading();
-    float very_left   = -atan2(left.getX()-xyz.getX(),
-                              left.getY()-xyz.getY())
-                      - getHPR().getHeading();
-    very_left         = normalizeAngle(very_left);
-    very_right        = normalizeAngle(very_right);
-    float dist        = 0;
-
-    while(dist<40.0f)
-    {
-        const Quad &q = m_quad_graph->getQuad(current_sector);
-        const Vec3 &right = q[2];
-        const Vec3 &left  = q[3];
-
-        float angle_right = -atan2(right.getX()-xyz.getX(),
-                                  right.getY()-xyz.getY())
-                                  - getHPR().getHeading();
-        float angle_left  = -atan2(left.getX()-xyz.getX(),
-                                  left.getY()-xyz.getY())
-                                  - getHPR().getHeading();
-        angle_left  = normalizeAngle(angle_left);
-        angle_right = normalizeAngle(angle_right);
-
-        // Break if the left and the right beam overlap.
-        if(angle_left<very_right ||
-            angle_right>very_left) break;
-
-        if(angle_left <very_left )
-        {
-            very_left  = angle_left;
-            final_left = left;
-        }
-        if(angle_right>very_right)
-        {
-            very_right  = angle_right;
-            final_right = right;
-        }
-        dist += m_quad_graph->getDistanceToNext(current_sector, 
-                                                m_successor_index[current_sector]);
-        current_sector = m_next_node_index[current_sector];
-    }
-    Vec3 middle=(final_left+final_right)*0.5f;
-    float steer_angle=steerToPoint(middle, 1/60.0f);
-#ifdef AI_DEBUG
-    m_debug_left->setPosition(final_left.toIrrVector());
-    m_debug_right->setPosition(final_right.toIrrVector());
-    m_debug_sphere->setPosition(middle.toIrrVector());
-#endif
-    return steer_angle;
-}   // findNonCrashingAngle
-
-//-----------------------------------------------------------------------------
 /** Find the sector that at the longest distance from the kart, that can be
  *  driven to without crashing with the track, then find towards which of
  *  the two edges of the track is closest to the next curve after wards,
  *  and return the position of that edge.
  */
-void NewAI::findNonCrashingPoint(Vec3 *result)
+void DefaultAIController::findNonCrashingPoint(Vec3 *result)
 {    
     unsigned int sector = m_next_node_index[m_track_node];
     int target_sector;
@@ -982,7 +930,8 @@ void NewAI::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getQuad(target_sector).getCenter() - getXYZ();
+        direction = m_quad_graph->getQuad(target_sector).getCenter() 
+                  - m_kart->getXYZ();
 
         float len=direction.length_2d();
         steps = int( len / m_kart_length );
@@ -997,7 +946,7 @@ void NewAI::findNonCrashingPoint(Vec3 *result)
         //Test if we crash if we drive towards the target sector
         for( int i = 2; i < steps; ++i )
         {
-            step_coord = getXYZ()+direction*m_kart_length * float(i);
+            step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
 
             m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
                                                    sector );
@@ -1017,11 +966,11 @@ void NewAI::findNonCrashingPoint(Vec3 *result)
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
-void NewAI::reset()
+void DefaultAIController::reset()
 {
     m_time_since_last_shot       = 0.0f;
     m_start_kart_crash_direction = 0;
-    m_curve_target_speed         = getMaxSpeedOnTerrain();
+    m_curve_target_speed         = m_kart->getMaxSpeedOnTerrain();
     m_curve_angle                = 0.0;
     m_time_till_start            = -1.0f;
     m_crash_time                 = 0.0f;
@@ -1031,20 +980,21 @@ void NewAI::reset()
     m_distance_ahead             = 0.0f;
     m_kart_behind                = NULL;
     m_distance_behind            = 0.0f;
+
+    Controller::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
-    AutoKart::reset();
-    m_quad_graph->findRoadSector(getXYZ(), &m_track_node);
+    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
         fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
-                getIdent().c_str());
-        m_track_node = m_quad_graph->findOutOfRoadSector(getXYZ());
+                m_kart->getIdent().c_str());
+        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
     }
 
 }   // reset
 
 //-----------------------------------------------------------------------------
-inline float NewAI::normalizeAngle(float angle)
+inline float DefaultAIController::normalizeAngle(float angle)
 {
     while( angle >  2*M_PI ) angle -= 2*M_PI;
     while( angle < -2*M_PI ) angle += 2*M_PI;
@@ -1060,9 +1010,9 @@ inline float NewAI::normalizeAngle(float angle)
  *  and gets the number of steps to use for the sight line of the kart.
  *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
  */
-int NewAI::calcSteps()
+int DefaultAIController::calcSteps()
 {
-    int steps = int( getVelocityLC().getY() / m_kart_length );
+    int steps = int( m_kart->getVelocityLC().getY() / m_kart_length );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -1072,7 +1022,7 @@ int NewAI::calcSteps()
     //        for more steps if we hit another kart?? If we steer hard,
     //        the approximation used (pos + velocity*dt) will be even
     //        worse, since it doesn't take steering into account.
-    if( fabsf(m_controls.m_steer) > 0.95 )
+    if( fabsf(m_controls->m_steer) > 0.95 )
     {
         const int WIDTH_STEPS = 
             (int)( m_quad_graph->getNode(m_future_sector).getPathWidth()
@@ -1095,32 +1045,32 @@ int NewAI::calcSteps()
  *  \param angle Steering angle.
  *  \param dt Time step.
  */
-void NewAI::setSteering(float angle, float dt)
+void DefaultAIController::setSteering(float angle, float dt)
 {
-    float steer_fraction = angle / getMaxSteerAngle();
-    m_controls.m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
-    if(hasViewBlockedByPlunger()) m_controls.m_drift = false;
-    float old_steer      = m_controls.m_steer;
+    float steer_fraction = angle / m_kart->getMaxSteerAngle();
+    m_controls->m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
+    if(m_kart->hasViewBlockedByPlunger()) m_controls->m_drift = false;
+    float old_steer      = m_controls->m_steer;
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
-    if(hasViewBlockedByPlunger())
+    if(m_kart->hasViewBlockedByPlunger())
     {
         if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
     }
     
     // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_kart_properties->getTimeFullSteerAI();
+    float max_steer_change = dt/m_kart->getKartProperties()->getTimeFullSteerAI();
     if(old_steer < steer_fraction)
     {
-        m_controls.m_steer = (old_steer+max_steer_change > steer_fraction) 
+        m_controls->m_steer = (old_steer+max_steer_change > steer_fraction) 
                            ? steer_fraction : old_steer+max_steer_change;
     }
     else
     {
-        m_controls.m_steer = (old_steer-max_steer_change < steer_fraction) 
+        m_controls->m_steer = (old_steer-max_steer_change < steer_fraction) 
                            ? steer_fraction : old_steer-max_steer_change;
     }
 }   // setSteering
@@ -1132,11 +1082,11 @@ void NewAI::setSteering(float angle, float dt)
  *
  * The number of sectors that form the curve is dependant on the kart's speed.
  */
-void NewAI::findCurve()
+void DefaultAIController::findCurve()
 {
     float total_dist = 0.0f;
     int i;
-    for(i = m_track_node; total_dist < getVelocityLC().getY(); 
+    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getY(); 
         i = m_next_node_index[i])
     {
         total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);
@@ -1148,5 +1098,5 @@ void NewAI::findCurve()
                       -m_quad_graph->getAngleToNext(m_track_node, 
                                                     m_successor_index[m_track_node]) );
     
-    m_curve_target_speed = getMaxSpeedOnTerrain();
+    m_curve_target_speed = m_kart->getMaxSpeedOnTerrain();
 }   // findCurve

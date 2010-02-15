@@ -3,7 +3,7 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_device.hpp"
-#include "karts/player_kart.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -80,6 +80,7 @@ GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const i
     for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
         m_buttonPressed[n] = false;
 }   // GamePadDevice
+
 // -----------------------------------------------------------------------------
 
 bool GamePadDevice::isButtonPressed(const int i)
@@ -92,12 +93,14 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 }
 // -----------------------------------------------------------------------------
 
-void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player)
+void GamePadDevice::resetAxisDirection(const int axis, 
+                                       Input::AxisDirection direction, 
+                                       ActivePlayer* player)
 {
     KeyBinding bind;
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
 
-    PlayerKart* pk = player->getKart();
+    Kart* pk = player->getKart();
     if (pk == NULL)
     {
         std::cerr << "Error, trying to reset axis for an unknown player\n";
@@ -109,7 +112,7 @@ void GamePadDevice::resetAxisDirection(const int axis, Input::AxisDirection dire
         bind = m_configuration->getBinding(n);
         if(bind.id == axis && bind.dir == direction)
         {
-            pk->action((PlayerAction)n, 0);
+            ((PlayerController*)(pk->getController()))->action((PlayerAction)n, 0);
             return;
         }
     }

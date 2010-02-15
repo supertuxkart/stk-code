@@ -24,7 +24,7 @@
 
 #include "LinearMath/btQuaternion.h"
 
-#include "karts/kart_control.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "utils/vec3.hpp"
 
 class Kart;

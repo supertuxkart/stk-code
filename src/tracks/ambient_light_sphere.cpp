@@ -24,7 +24,6 @@
 
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
-#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -70,7 +69,7 @@ void AmbientLightSphere::update(float dt)
                 const video::SColor &def = track->getDefaultAmbientColor();
                 color = m_ambient_color.getInterpolated(def, f);
             }
-            ((PlayerKart*)kart)->getCamera()->setAmbientLight(color);
+            kart->getCamera()->setAmbientLight(color);
         }   // if active
     }   // for i<num_karts
 }   // update
@@ -86,6 +85,6 @@ void AmbientLightSphere::update(float dt)
 bool AmbientLightSphere::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 
                                      int indx)
 {
-    if(!World::getWorld()->getKart(indx)->isPlayerKart()) return false;
+    if(!World::getWorld()->getKart(indx)->getCamera()) return false;
     return CheckSphere::isTriggered(old_pos, new_pos, indx);
 }   // isTriggered

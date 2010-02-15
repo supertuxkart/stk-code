@@ -29,9 +29,9 @@
 class AutoKart : public Kart
 {
 public:
-    AutoKart(const std::string& kart_name, int position,
+    AutoKart(const std::string& ident, int position,
         const btTransform& init_pos) :
-    Kart(kart_name, position, init_pos) {}
+    Kart(ident, position, init_pos) {}
 
     bool  isPlayerKart() const {return false;}
 };   // AutoKart

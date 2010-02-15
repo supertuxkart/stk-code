@@ -16,17 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NEWAI_HPP
-#define HEADER_NEWAI_HPP
+#ifndef HEADER_END_KART_HPP
+#define HEADER_END_KART_HPP
 
-#include "karts/auto_kart.hpp"
+#include "karts/controller/controller.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/vec3.hpp"
-
-/* third coord won't be used */
 
 class Track;
 class LinearWorld;
 class QuadGraph;
+
 namespace irr
 {
     namespace scene
@@ -35,82 +35,21 @@ namespace irr
     }
 }
 
-class NewAI : public AutoKart
+class EndController : public Controller
 {
 private:
-    enum FallbackTactic
-    {
-        FT_AVOID_TRACK_CRASH, //Only steer to avoid getting out of the road,
-                              //otherwise, don't steer at all
-        FT_PARALLEL,    //Stay parallel to the road
-        FT_FAREST_POINT //Drive towards the farest non-crashing point that
-                        //the kart can drive to in a straight line without
-                        //crashing with the track.
-    };
-
-    /** How the AI uses nitro. */
-    enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_level;
-    enum ItemTactic
-    {
-        IT_TEN_SECONDS, //Fire after 10 seconds have passed, since the item
-                        //was grabbed.
-        IT_CALCULATE //Aim carefully, check for enough space for boosters,
-                     //and that other conditions are meet before firing.
-    };
-
-    class CrashTypes
-    {
-        public:
-
-        bool m_road; //true if we are going to 'crash' with the bounds of the road
-        int m_kart; //-1 if no crash, pos numbers are the kart it crashes with
-        CrashTypes() : m_road(false), m_kart(-1) {};
-        void clear() {m_road = false; m_kart = -1;}
-    } m_crashes;
-
-    /*Difficulty handling variables*/
-    float m_max_start_delay; //Delay before accelerating at the start of each
-                             //race
     int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
                      //even has check around the kart, if 1, it checks around
                      //the kart always, and more than that will check the
                      //remaining number of steps in front of the kart, always
-    bool  m_wait_for_players; //If true, the acceleration is decreased when
-                              //the AI is in a better position than all the
-                              //human players.
     float m_max_handicap_accel; //The allowed maximum speed, in percentage,
                                 //from 0.0 to 1.0. Used only when
                                 //m_wait_for_players == true.
-    FallbackTactic m_fallback_tactic; //General steering procedure. Used
-                                      //mostly on straight lines and on curves
-                                      //that re too small to need special
-                                      //handling.
     
-    ItemTactic m_item_tactic; //How are items going to be used?
-
-    /** True if the kart should try to pass on a bomb to another kart. */
-
-    bool m_handle_bomb;
     /*General purpose variables*/
     //The crash percentage is how much of the time the AI has been crashing,
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
-    int   m_collided;           // true if the kart collided with the track
-
-    /** Pointer to the closest kart ahead of this kart. NULL if this
-     *  kart is first. */
-    Kart *m_kart_ahead;
-    /** Distance to the kart ahead. */
-    float m_distance_ahead;
-
-    /** Pointer to the closest kart behind this kart. NULL if this kart
-     *  is last. */
-    Kart *m_kart_behind;
-    /** Distance to the kard behind. */
-    float m_distance_behind;
-
-    /** Time an item has been collected and not used. */
-    float m_time_since_last_shot;
 
     float m_time_till_start; //Used to simulate a delay at the start of the
                              //race, since human players don't accelerate
@@ -158,7 +97,6 @@ private:
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
-    irr::scene::ISceneNode *m_debug_left, *m_debug_right;
 
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
@@ -171,14 +109,10 @@ private:
      *variable, except handle_race_start() that isn't associated with any
      *specific action (more like, associated with inaction).
      */
-    void  handleRaceStart();
     void  handleAcceleration(const float DELTA);
     void  handleSteering(float dt);
-    void  handleItems(const float DELTA, const int STEPS);
     void  handleRescue(const float DELTA);
     void  handleBraking();
-    void  handleNitroAndZipper();
-    void  computeNearestKarts();
 
     /*Lower level functions not called directly from update()*/
     float steerToAngle(const size_t SECTOR, const float ANGLE);
@@ -186,7 +120,6 @@ private:
 
     void  checkCrashes(const int STEPS, const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
-    float findNonCrashingAngle();
 
     float normalizeAngle(float angle);
     int   calcSteps();
@@ -194,18 +127,11 @@ private:
     void  findCurve();
 
 public:
-                 NewAI(const std::string& kart_name, int position,
-                              const btTransform& init_pos, const Track *track);
-                ~NewAI();
-    void         update      (float delta) ;
-    void         reset       ();
-    virtual void crashed     (Kart *k) {if(k) m_collided = true;};
-    virtual const irr::core::stringw& getName() const 
-    {
-        static irr::core::stringw name = Kart::getName()+irr::core::stringw("(NewAI)");
-        return name;
-    }   // getName
-};
+                 EndController(Kart *kart);
+                ~EndController();
+    virtual void update      (float delta) ;
+    virtual void reset       ();
+};   // EndKart
 
 #endif
 

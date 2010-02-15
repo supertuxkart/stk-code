@@ -23,7 +23,7 @@
 #include "audio/sound_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "karts/player_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"

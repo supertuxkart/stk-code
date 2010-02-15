@@ -55,7 +55,8 @@ RaceResultMessage::RaceResultMessage(ENetPacket* pkt)
         float time  = getFloat();
         char position = getChar();
         kart->setPosition(position);
-        kart->raceFinished(time);
+        kart->finishedRace(time);
+        world->createEndKart(i);
     }
 }   // RaceResultMessage
 

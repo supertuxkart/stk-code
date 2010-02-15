@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/player_kart.hpp"
+#include "karts/controller/player_controller.hpp"
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -38,17 +38,17 @@
  *  \param position The starting position (1 to n).
  *  \param player The player to which this kart belongs.
  *  \param init_pos The start coordinates and heading of the kart.
- *  \param player_index  Index of the player akrt.
+ *  \param player_index  Index of the player kart.
  */
-PlayerKart::PlayerKart(const std::string& kart_name, int position, 
-                       ActivePlayer *player, const btTransform& init_pos, 
-                       unsigned int player_index) :
-            Kart(kart_name, position, init_pos)
+PlayerController::PlayerController(Kart *kart, ActivePlayer *player, 
+                                   unsigned int player_index)      
+                : Controller(kart)
 {
     m_player       = player;
+    m_player->setKart(kart);
     m_penalty_time = 0.0f;
-    setCamera(new Camera(player_index, this));
-    m_camera->setMode(Camera::CM_NORMAL);
+    kart->setCamera(new Camera(player_index, kart));
+    kart->getCamera()->setMode(Camera::CM_NORMAL);
 
     m_bzzt_sound  = sfx_manager->newSFX(SFXManager::SOUND_BZZT );
     m_wee_sound   = sfx_manager->newSFX(SFXManager::SOUND_WEE  );
@@ -57,25 +57,24 @@ PlayerKart::PlayerKart(const std::string& kart_name, int position,
     m_full_sound  = sfx_manager->newSFX(SFXManager::SOUND_FULL );
 
     reset();
-}   // PlayerKart
+}   // PlayerController
 
 //-----------------------------------------------------------------------------
 /** Destructor for a player kart.
  */
-PlayerKart::~PlayerKart()
+PlayerController::~PlayerController()
 {
-    delete m_camera;
     sfx_manager->deleteSFX(m_bzzt_sound);
     sfx_manager->deleteSFX(m_wee_sound );
     sfx_manager->deleteSFX(m_ugh_sound );
     sfx_manager->deleteSFX(m_grab_sound);
     sfx_manager->deleteSFX(m_full_sound);
-}   // ~PlayerKart
+}   // ~PlayerController
 
 //-----------------------------------------------------------------------------
 /** Resets the player kart for a new or restarted race.
  */
-void PlayerKart::reset()
+void PlayerController::reset()
 {
     m_steer_val_l  = 0;
     m_steer_val_r  = 0;
@@ -83,8 +82,7 @@ void PlayerKart::reset()
     m_prev_brake   = 0;
     m_prev_accel   = 0;
     m_penalty_time = 0;
-    Kart::reset();
-    m_camera->reset();
+    Controller::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -92,7 +90,7 @@ void PlayerKart::reset()
  *  avoid that any keys pressed at the time the menu is opened are still 
  *  considered to be pressed.
  */
-void PlayerKart::resetInputState()
+void PlayerController::resetInputState()
 {
     m_steer_val_l  = 0;
     m_steer_val_r  = 0;
@@ -114,7 +112,7 @@ void PlayerKart::resetInputState()
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
  */
-void PlayerKart::action(PlayerAction action, int value)
+void PlayerController::action(PlayerAction action, int value)
 {
     switch (action)
     {
@@ -138,42 +136,42 @@ void PlayerKart::action(PlayerAction action, int value)
         m_prev_accel = value;
         if(value)
         {
-            m_controls.m_accel = value/32768.0f;
-            m_controls.m_brake = false;
+            m_controls->m_accel = value/32768.0f;
+            m_controls->m_brake = false;
         }
         else
         {
-            m_controls.m_accel = 0.0f;
-            m_controls.m_brake = m_prev_brake;
+            m_controls->m_accel = 0.0f;
+            m_controls->m_brake = m_prev_brake;
         }
         break;
     case PA_BRAKE:
         m_prev_brake = value!=0;
         if(value)
         {
-            m_controls.m_brake = true;
-            m_controls.m_accel = 0.0f;
+            m_controls->m_brake = true;
+            m_controls->m_accel = 0.0f;
         }
         else
         {
-            m_controls.m_brake = false;
-            m_controls.m_accel = m_prev_accel/32768.0f;
+            m_controls->m_brake = false;
+            m_controls->m_accel = m_prev_accel/32768.0f;
         }
         break;
     case PA_NITRO:
-        m_controls.m_nitro = (value!=0);
+        m_controls->m_nitro = (value!=0);
         break;
     case PA_RESCUE:
-        m_controls.m_rescue = (value!=0);
+        m_controls->m_rescue = (value!=0);
         break;
     case PA_FIRE:
-        m_controls.m_fire = (value!=0);
+        m_controls->m_fire = (value!=0);
         break;
     case PA_LOOK_BACK:
-        m_controls.m_look_back = (value!=0);
+        m_controls->m_look_back = (value!=0);
         break;
     case PA_DRIFT:
-        m_controls.m_drift = (value!=0);
+        m_controls->m_drift = (value!=0);
         break;
     default: assert(false);
     }
@@ -183,57 +181,56 @@ void PlayerKart::action(PlayerAction action, int value)
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void PlayerKart::steer(float dt, int steer_val)
+void PlayerController::steer(float dt, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
         printf("steering: steer_val %d ", steer_val);
     }
-    const float STEER_CHANGE = dt/getTimeFullSteer();  // amount the steering is changed
+    const float STEER_CHANGE = dt/m_kart->getTimeFullSteer();  // amount the steering is changed
     if (steer_val < 0)
     {
       // If we got analog values do not cumulate.
       if (steer_val > -32767)
-        m_controls.m_steer = -steer_val/32767.0f;
+        m_controls->m_steer = -steer_val/32767.0f;
       else
-        m_controls.m_steer += STEER_CHANGE;
+        m_controls->m_steer += STEER_CHANGE;
     }
     else if(steer_val > 0)
     {
       // If we got analog values do not cumulate.
       if (steer_val < 32767)
-        m_controls.m_steer = -steer_val/32767.0f;
+        m_controls->m_steer = -steer_val/32767.0f;
       else
-        m_controls.m_steer -= STEER_CHANGE;
+        m_controls->m_steer -= STEER_CHANGE;
     }
     else
     {   // no key is pressed
-        if(m_controls.m_steer>0.0f)
+        if(m_controls->m_steer>0.0f)
         {
-            m_controls.m_steer -= STEER_CHANGE;
-            if(m_controls.m_steer<0.0f) m_controls.m_steer=0.0f;
+            m_controls->m_steer -= STEER_CHANGE;
+            if(m_controls->m_steer<0.0f) m_controls->m_steer=0.0f;
         }
         else
-        {   // m_controls.m_steer<=0.0f;
-            m_controls.m_steer += STEER_CHANGE;
-            if(m_controls.m_steer>0.0f) m_controls.m_steer=0.0f;
-        }   // if m_controls.m_steer<=0.0f
+        {   // m_controls->m_steer<=0.0f;
+            m_controls->m_steer += STEER_CHANGE;
+            if(m_controls->m_steer>0.0f) m_controls->m_steer=0.0f;
+        }   // if m_controls->m_steer<=0.0f
     }   // no key is pressed
     if(UserConfigParams::m_gamepad_debug)
     {
-        printf("  set to: %f\n", m_controls.m_steer);
+        printf("  set to: %f\n", m_controls->m_steer);
     }
 
-    m_controls.m_steer = std::min(1.0f, std::max(-1.0f, m_controls.m_steer));
+    m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
 
 }   // steer
 
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void PlayerKart::update(float dt)
+void PlayerController::update(float dt)
 {
-    m_camera->update(dt);
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.
@@ -242,8 +239,8 @@ void PlayerKart::update(float dt)
 
     if(World::getWorld()->isStartPhase())
     {
-        if(m_controls.m_accel || m_controls.m_brake ||
-           m_controls.m_fire || m_controls.m_nitro  || m_controls.m_drift)
+        if(m_controls->m_accel || m_controls->m_brake ||
+           m_controls->m_fire || m_controls->m_nitro  || m_controls->m_drift)
         {
             if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
@@ -251,8 +248,7 @@ void PlayerKart::update(float dt)
                 RaceGUI* m=World::getWorld()->getRaceGUI();
                 if(m)
                 {
-                    m->addMessage(_("Penalty time!!"),
-                                  this, 2.0f, 60);
+                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f, 60);
                 }
                 m_bzzt_sound->play();
             }   // if penalty_time = 0
@@ -262,7 +258,7 @@ void PlayerKart::update(float dt)
             // The call to update is necessary here (even though the kart
             // shouldn't actually change) to update m_transform. Otherwise
             // the camera gets the wrong position. 
-            Kart::update(dt);
+            Controller::update(dt);
         }
         return;
     }   // if isStartPhase
@@ -273,52 +269,45 @@ void PlayerKart::update(float dt)
         return;
     }
 
-    if ( m_controls.m_fire && !isRescue())
+    if ( m_controls->m_fire && !m_kart->isRescue())
     {
-        if (m_powerup.getType()==POWERUP_NOTHING) 
-            Kart::beep();
+        if (m_kart->getPowerup()->getType()==POWERUP_NOTHING) 
+            m_kart->beep();
     }
     
     // Camera looks back when reversing
-    if(m_camera->getMode()!=Camera::CM_FINAL)
+    if(m_kart->getCamera()->getMode()!=Camera::CM_FINAL)
     {
 		// look backward when the player requests or
 		// if automatic reverse camera is active
-    	if (m_controls.m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && Kart::getSpeed()<-UserConfigParams::m_reverse_look_threshold))
-    		m_camera->setMode(Camera::CM_REVERSE);
+    	if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
+            m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
+    		m_kart->getCamera()->setMode(Camera::CM_REVERSE);
     	else
-    		m_camera->setMode(Camera::CM_NORMAL);
+            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
     }
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
     // up sitting on a brick wall, with all wheels in the air :((
-    if ( m_controls.m_rescue )
+    if ( m_controls->m_rescue )
     {
-        forceRescue();
-        m_controls.m_rescue=false;
+        m_kart->forceRescue();
+        m_controls->m_rescue=false;
     }
-    if (isRescue() && m_attachment.getType() != ATTACH_TINYTUX)
+    if (m_kart->isRescue() && m_kart->getAttachment()->getType() != ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();
     }
-    Kart::update(dt);
+    Controller::update(dt);
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Marks the kart as having had a crash.
- */
-void PlayerKart::crashed(Kart *kart)
-{
-    Kart::crashed(kart);
-}   // crashed
 
 //-----------------------------------------------------------------------------
 /** Checks if the kart was overtaken, and if so plays a sound
 */
-void PlayerKart::setPosition(int p)
+void PlayerController::setPosition(int p)
 {
-    if(getPosition()<p)
+    if(m_kart->getPosition()<p)
     {
         World *world = World::getWorld();
         //have the kart that did the passing beep.
@@ -333,36 +322,33 @@ void PlayerKart::setPosition(int p)
             }
         }
     }
-    Kart::setPosition(p);
 }   // setPosition
 
 //-----------------------------------------------------------------------------
 /** Called when a kart finishes race.
  *  /param time Finishing time for this kart.
  */
-void PlayerKart::raceFinished(float time)
+void PlayerController::finishedRace(float time)
 {
-    Kart::raceFinished(time);
     // Set race over camera (but not in follow the leader mode, since the kart
     // will most likely not be at the starting line at the end of the race
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        m_camera->setMode(Camera::CM_FINAL);
+        m_kart->getCamera()->setMode(Camera::CM_FINAL);
     
     RaceGUI* m=World::getWorld()->getRaceGUI();
     if(m)
     {
-        m->addMessage(getPosition()==1 ? _("You won the race!") 
-                                       : _("You finished the race!") ,
-                      this, 2.0f, 60);
+        m->addMessage(m_kart->getPosition()==1 ? _("You won the race!") 
+                                               : _("You finished the race!") ,
+                      m_kart, 2.0f, 60);
     }
-}   // raceFinished
+}   // finishedRace
 
 //-----------------------------------------------------------------------------
 /** Called when a kart hits or uses a zipper.
  */
-void PlayerKart::handleZipper()
+void PlayerController::handleZipper()
 {
-    Kart::handleZipper();
     m_wee_sound->play();
 }   // handleZipper
 
@@ -376,14 +362,10 @@ void PlayerKart::handleZipper()
  *                  let the server determine the powerup/attachment for
  *                  the clients.
  */
-void PlayerKart::collectedItem(const Item &item, int add_info)
+void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
 {
-    // FIXME - how does the old item relate to the total amount of items?
-    const float old_energy= getEnergy();
-    Kart::collectedItem(item, add_info);
-
     if(old_energy < MAX_ITEMS_COLLECTED &&
-       getEnergy() == MAX_ITEMS_COLLECTED)
+       m_kart->getEnergy() == MAX_ITEMS_COLLECTED)
     {
         m_full_sound->play();
     }

@@ -21,8 +21,6 @@
 
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "robots/default_robot.hpp"
-
 
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps = 0;
@@ -83,17 +81,15 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
 {
     // Create a camera for the last kart (since this way more of the
     // karts can be seen.
-    Kart *newkart = loadRobot(kart_ident, index+1, init_pos);
+    Kart *new_kart         = new Kart(kart_ident, index+1, init_pos);
+    Controller *controller = loadAIController(new_kart);
+    new_kart->setController(controller);
 
     if (index == (int)getNumKarts()-1)
     {
-        // The pointer to the camera does not have to be stored, since it
-        // the camera for robots is not modified.
-        // FIXME: this is broken now, where do we store the camera in case
-        // of profile mode???
-        new Camera(index, newkart);
+        new_kart->setCamera(new Camera(index, new_kart));
     }
-    return newkart;
+    return new_kart;
 }   // createKart
 
 //-----------------------------------------------------------------------------

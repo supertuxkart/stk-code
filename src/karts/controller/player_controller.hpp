@@ -23,14 +23,14 @@
 #define HEADER_PLAYERKART_HPP
 
 #include "config/player.hpp"
-#include "karts/kart.hpp"
+#include "karts/controller/controller.hpp"
 
 class SFXBase;
 class Player;
 
 /** PlayerKart manages control events from the player and moves
     them to the Kart */
-class PlayerKart : public Kart
+class PlayerController : public Controller
 {
 private:
     int           m_steer_val, m_steer_val_l, m_steer_val_r;
@@ -48,22 +48,20 @@ private:
 
     void steer(float, int);
 public:
-                   PlayerKart(const std::string& kart_name,
-                              int position, ActivePlayer *_player,
-                              const btTransform& init_pos, 
-                              unsigned int player_index);
-                  ~PlayerKart        ();
+                   PlayerController  (Kart *kart, ActivePlayer *_player,
+                                      unsigned int player_index);
+                  ~PlayerController  ();
     ActivePlayer  *getPlayer         () { return m_player;                }
     PlayerProfile *getPlayerProfile  () { return m_player->getProfile();  }
     void           update            (float);
     void           action            (PlayerAction action, int value);
     void           handleZipper      ();
-    void           collectedItem     (const Item &item, int add_info=-1);
-    virtual void   crashed           (Kart *k);
+    void           collectedItem     (const Item &item, int add_info=-1,
+                                      float previous_energy=0);
     virtual void   setPosition       (int p);
-    virtual void   raceFinished      (float time);
-    bool           isPlayerKart      () const {return true;}
-    void           reset             ();
+    virtual void   finishedRace      (float time);
+    bool           isPlayerController() const {return true;}
+    virtual void   reset             ();
     void           resetInputState   ();
 };
 

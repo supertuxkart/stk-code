@@ -57,7 +57,7 @@
 #  pragma warning(disable:4355)
 #endif
 
-Kart::Kart (const std::string& kart_name, int position,
+Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
        Moveable(), m_powerup(this), m_attachment(this)
@@ -66,11 +66,10 @@ Kart::Kart (const std::string& kart_name, int position,
 #  pragma warning(1:4355)
 #endif
 {
-    m_kart_properties      = kart_properties_manager->getKart(kart_name);
+    m_kart_properties      = kart_properties_manager->getKart(ident);
     assert(m_kart_properties != NULL);
     m_initial_position     = position;
     m_collected_energy     = 0;
-    m_eliminated           = false;
     m_finished_race        = false;
     m_finish_time          = 0.0f;
     m_slipstream_time      = 0.0f;
@@ -84,6 +83,8 @@ Kart::Kart (const std::string& kart_name, int position,
     m_skidmarks            = NULL;
     m_animated_node        = NULL;
     m_camera               = NULL;
+    m_controller           = NULL;
+    m_saved_controller     = NULL;
 
     m_view_blocked_by_plunger = 0;
 
@@ -100,12 +101,12 @@ Kart::Kart (const std::string& kart_name, int position,
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
 
-    // Setting rescue to false is important! If rescue is set when reset() is
-    // called, it is assumed that this was triggered by a restart, and that
-    // the vehicle must be added back to the physics world. Since reset() is
-    // also called at the very start, it must be guaranteed that rescue is
-    // not set.
-    m_rescue                  = false;
+    // Re-setting kart mode is important! If the mode should be rescue when 
+    // reset() is called, it is assumed that this was triggered by a restart, 
+    // and that the vehicle must be added back to the physics world. Since 
+    // reset() is also called at the very start, it must be guaranteed that 
+    // rescue is not set.
+    m_kart_mode               = KM_RACE;
     m_wheel_rotation          = 0;
 
     // Create SFXBase for each custom sound
@@ -141,6 +142,19 @@ Kart::Kart (const std::string& kart_name, int position,
 
     reset();
 }   // Kart
+
+// -----------------------------------------------------------------------------
+/** Saves the old controller in m_saved_controller and stores a new 
+ *  controller. The save controller is needed in case of a reset.
+ *  \param controller The new controller to use (atm it's always an
+ *         end controller).
+ */
+void Kart::setController(Controller *controller)
+{
+    assert(m_saved_controller==NULL);
+    m_saved_controller = m_controller;
+    m_controller       = controller;
+}   // setController
 
 // -----------------------------------------------------------------------------
 
@@ -302,17 +316,19 @@ Kart::~Kart()
 }   // ~Kart
 
 //-----------------------------------------------------------------------------
+/** Eliminates a kart from the race. It removes the kart from the physics
+ *  world, and makes the scene node invisible.
+ */
 void Kart::eliminate()
 {
-    m_eliminated = true;
-    if (!m_rescue)
+    if (m_kart_mode!=KM_RESCUE)
     {
         World::getWorld()->getPhysics()->removeKart(this);
     }
+    m_kart_mode = KM_ELIMINATED;
 
     // make the kart invisible by placing it way under the track
-    Vec3 hell(0, 0, -10000.0f);
-    getNode()->setPosition(hell.toIrrVector());
+    getNode()->setVisible(false);
 }   // eliminate
 
 //-----------------------------------------------------------------------------
@@ -350,23 +366,35 @@ void Kart::updatedWeight()
 }   // updatedWeight
 
 //-----------------------------------------------------------------------------
+/** Reset before a new race.
+ */
 void Kart::reset()
 {
     // If the kart was eliminated or rescued, the body was removed from the
     // physics world. Add it again.
-    if(m_eliminated || m_rescue)
+    if(m_kart_mode==KM_ELIMINATED || m_kart_mode==KM_RESCUE)
     {
         World::getWorld()->getPhysics()->addKart(this);
     }
 
+    if(m_node)
+        m_node->setVisible(true);  // In case that the kart was eliminated
+    if(m_camera)
+        m_camera->reset();
+    // If the controller was replaced (e.g. replaced by end controller), 
+    //  restore the original controller. 
+    if(m_saved_controller)
+    {
+        m_controller       = m_saved_controller;
+        m_saved_controller = NULL;
+    }
     m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
     m_powerup.reset();
 
     m_race_position        = 9;
     m_finished_race        = false;
-    m_eliminated           = false;
-    m_rescue               = false;
+    m_kart_mode            = KM_RACE;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
@@ -417,16 +445,19 @@ void Kart::reset()
  *         player kart have finished the race and all AI karts get
  *         an estimated finish time set.
  */
-void Kart::raceFinished(float time)
+void Kart::finishedRace(float time)
 {
     m_finished_race = true;
     m_finish_time   = time;
+    m_kart_mode     = KM_END_ANIM;
+    m_controller->finishedRace(time);
     race_manager->RaceFinished(this, time);
-}   // raceFinished
+}   // finishedRace
 
 //-----------------------------------------------------------------------------
 void Kart::collectedItem(const Item &item, int add_info)
 {
+    float old_energy          = m_collected_energy;
     const Item::ItemType type = item.getType();
 
     switch (type)
@@ -467,6 +498,7 @@ void Kart::collectedItem(const Item &item, int add_info)
 
     if ( m_collected_energy > MAX_ITEMS_COLLECTED )
         m_collected_energy = MAX_ITEMS_COLLECTED;
+    m_controller->collectedItem(item, add_info, old_energy);
 
 }   // collectedItem
 
@@ -563,6 +595,9 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
+    m_controller->update(dt);
+    if(m_camera)
+        m_camera->update(dt);
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
 
@@ -598,7 +633,7 @@ void Kart::update(float dt)
     m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
     m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
 
-    if ( m_rescue )
+    if ( m_kart_mode==KM_RESCUE )
     {
         // Let the kart raise 2m in the 2 seconds of the rescue
         const float rescue_time   = 2.0f;
@@ -618,7 +653,7 @@ void Kart::update(float dt)
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
         setXYZRotation(getXYZ()+Vec3(0, 0, rescue_height*dt/rescue_time),
                        getRotation()*q_roll*q_pitch);
-    }   // if m_rescue
+    }   // if rescue mode
     m_attachment.update(dt);
 
     //smoke drawing control point
@@ -723,12 +758,12 @@ void Kart::update(float dt)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
-    if( (!isOnGround() || m_rescue) && m_shadow_enabled)
+    if( (!isOnGround() || m_kart_mode==KM_RESCUE) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && !m_rescue)
+    if(!m_shadow_enabled && isOnGround() && m_kart_mode!=KM_RESCUE)
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;
@@ -753,6 +788,7 @@ void Kart::handleZipper()
     m_vehicle->activateZipper(speed);
     // Play custom character sound (weee!)
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
+    m_controller->handleZipper();
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
@@ -890,9 +926,14 @@ void Kart::resetBrakes()
 {
     for(int i=0; i<4; i++) m_vehicle->setBrake(0.0f, i);
 }   // resetBrakes
+
 // -----------------------------------------------------------------------------
+/** Called when the kart crashes against the track (k=NULL) or another kart.
+ *  \params k Either a kart if a kart was hit, or NULL if the track was hit.
+ */
 void Kart::crashed(Kart *k)
 {
+    m_controller->crashed();
     /** If a kart is crashing against the track, the collision is often
      *  reported more than once, resulting in a machine gun effect, and too
      *  long disabling of the engine. Therefore, this reaction is disabled
@@ -1009,7 +1050,7 @@ void Kart::updatePhysics (float dt)
 	// order to make them more competitive (this might be removed once
 	// the AI is better).
         if(m_controls.m_drift && 
-           (race_manager->getDifficulty()==RaceManager::RD_EASY || isPlayerKart()) )
+            (race_manager->getDifficulty()==RaceManager::RD_EASY || m_controller->isPlayerController()) )
             engine_power *= 0.5f;
         m_vehicle->applyEngineForce(engine_power, 2);
         m_vehicle->applyEngineForce(engine_power, 3);
@@ -1205,16 +1246,19 @@ void Kart::updatePhysics (float dt)
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
+/** Sets the mode of the kart to being rescued.
+ */
 void Kart::forceRescue()
 {
-    m_rescue=true;
+    m_kart_mode=KM_RESCUE;
 }   // forceRescue
+
 //-----------------------------------------------------------------------------
 /** Drops a kart which was rescued back on the track.
  */
 void Kart::endRescue()
 {
-    m_rescue = false ;
+    m_kart_mode = KM_RACE;
 
     World::getWorld()->getPhysics()->addKart(this);
     

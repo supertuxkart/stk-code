@@ -37,8 +37,8 @@
 #include "input/input.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/kart.hpp"
-#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
@@ -368,7 +368,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         if (StateManager::get()->getGameState() == GUIEngine::GAME && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Find the corresponding PlayerKart from our ActivePlayer instance
-            PlayerKart* pk;
+            Kart* pk;
 
             if (player == NULL)
             {
@@ -384,7 +384,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 return;
             }
             
-            pk->action(action, abs(value));
+            ((PlayerController*)pk->getController())->action(action, abs(value));
         }
         // ... when in menus
         else

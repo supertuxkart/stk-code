@@ -20,7 +20,7 @@
 #include "graphics/camera.hpp"
 #include "io/xml_node.hpp"
 #include "items/bowling.hpp"
-#include "karts/player_kart.hpp"
+#include "karts/kart.hpp"
 
 float Bowling::m_st_max_distance;   // maximum distance for a bowling ball to be attracted
 float Bowling::m_st_max_distance_squared;

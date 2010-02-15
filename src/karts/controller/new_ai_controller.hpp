@@ -16,11 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DEFAULT_HPP
-#define HEADER_DEFAULT_HPP
+#ifndef HEADER_NEWAI_CONTROLLER_HPP
+#define HEADER_NEWAI_CONTROLLER_HPP
 
-#include "karts/auto_kart.hpp"
-#include "modes/profile_world.hpp"
+#include "karts/controller/controller.hpp"
 #include "utils/vec3.hpp"
 
 /* third coord won't be used */
@@ -28,7 +27,6 @@
 class Track;
 class LinearWorld;
 class QuadGraph;
-
 namespace irr
 {
     namespace scene
@@ -37,7 +35,7 @@ namespace irr
     }
 }
 
-class DefaultRobot : public AutoKart
+class NewAIController : public Controller
 {
 private:
     enum FallbackTactic
@@ -160,6 +158,7 @@ private:
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+    irr::scene::ISceneNode *m_debug_left, *m_debug_right;
 
     /** The minimum steering angle at which the AI adds skidding. Lower values
      *  tend to improve the line the AI is driving. This is used to adjust for
@@ -187,6 +186,7 @@ private:
 
     void  checkCrashes(const int STEPS, const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
+    float findNonCrashingAngle();
 
     float normalizeAngle(float angle);
     int   calcSteps();
@@ -194,22 +194,16 @@ private:
     void  findCurve();
 
 public:
-                 DefaultRobot(const std::string& kart_name, int position,
-                              const btTransform& init_pos, const Track *track);
-                ~DefaultRobot();
-    void         update      (float delta) ;
-    void         reset       ();
+                 NewAIController(Kart *kart);
+    virtual     ~NewAIController();
+    virtual void update      (float delta) ;
+    virtual void reset       ();
     virtual void crashed     (Kart *k) {if(k) m_collided = true;};
-    virtual const irr::core::stringw& getName() const 
+    virtual const irr::core::stringw& getN() const 
     {
-        // Static to avoid returning the address of a temporary stringq
-        static irr::core::stringw name=m_kart_properties->getName();
-        // Add the name of the AI in case of profile mode, to make it
-        // easier to compare AIs
-        if(ProfileWorld::isProfileMode())
-            name+="(default)";
+        static irr::core::stringw name("(NewAI)");
         return name;
-    }
+    }   // getName
 };
 
 #endif

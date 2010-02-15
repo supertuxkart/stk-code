@@ -57,7 +57,10 @@ void StandardRace::update(float dt)
         for(unsigned int i = 0; i < kart_amount ; i++)
         {
             if(!m_karts[i]->hasFinishedRace())
-                m_karts[i]->raceFinished(estimateFinishTimeForKart(m_karts[i]));
+            {
+                m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
+                createEndKart(i);
+            }
         }   // i<kart_amount
 
         // Set delay mode to have time for camera animation, and

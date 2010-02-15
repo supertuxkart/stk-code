@@ -25,7 +25,7 @@
 #include "input/input_device.hpp"
 
 class InputDevice;
-class PlayerKart;
+class Kart;
 
 /**
   * class for managing player profiles (name, control configuration, etc.)
@@ -36,13 +36,11 @@ class PlayerProfile
 {
 private:
     
-    // for saving to config file
+    /** For saving to config file. */
     GroupUserConfigParam  m_player_group;
     
     StringUserConfigParam m_name;
     
-    // int m_last_kart_id;
-
 public:
     
     PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
@@ -66,8 +64,11 @@ public:
   */
 class ActivePlayer
 {
-    PlayerProfile* m_player;
-    InputDevice* m_device;
+    PlayerProfile *m_player;
+    InputDevice   *m_device;
+
+    /** Pointer to the kart of this player, only valid during the game. */
+    Kart          *m_kart;
 public:
     /** ID of this player within the list of active players */
     int m_id;
@@ -80,8 +81,10 @@ public:
     
     InputDevice* getDevice() const;
     void setDevice(InputDevice* device);
-    
-    PlayerKart* getKart();
+    /** Sets the kart for this player. */
+    void setKart(Kart *kart) { m_kart = kart; }
+    /** Returns the kart of this player. Only valid while world exists. */
+    Kart* getKart()          { return m_kart; }
 };
 
 #endif

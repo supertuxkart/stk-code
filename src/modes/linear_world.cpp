@@ -89,13 +89,13 @@ void LinearWorld::restartRace()
     World::restartRace();
 
     const unsigned int kart_amount = m_karts.size();
-    for(unsigned int n=0; n<kart_amount; n++)
+    for(unsigned int i=0; i<kart_amount; i++)
     {
-        KartInfo& info = m_kart_info[n];
+        KartInfo& info = m_kart_info[i];
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
         info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
         info.m_lap_start_time       = 0;
-        m_track->getQuadGraph().findRoadSector(m_karts[n]->getXYZ(),
+        m_track->getQuadGraph().findRoadSector(m_karts[i]->getXYZ(),
                                                &info.m_track_sector);
 
         //If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
@@ -104,19 +104,23 @@ void LinearWorld::restartRace()
         if (!info.m_on_road)
         {
             info.m_track_sector =
-                m_track->getQuadGraph().findOutOfRoadSector(m_karts[n]->getXYZ(),
+                m_track->getQuadGraph().findOutOfRoadSector(m_karts[i]->getXYZ(),
                                                             QuadGraph::UNKNOWN_SECTOR );
         }
 
         m_track->getQuadGraph().spatialToTrack(&info.m_curr_track_coords,
-                                               m_karts[n]->getXYZ(),
+                                               m_karts[i]->getXYZ(),
                                                info.m_track_sector );
         info.m_race_lap             = -1;
         info.m_lap_start_time       = -0;
         info.m_time_at_last_lap     = 99999.9f;
-
-        updateRacePosition(m_karts[n], info);
     }   // next kart
+
+    // First all kart infos must be updated before  the kart position can be 
+    // recomputed, since otherwise 'new' (initialised) valued will be compared
+    // with old values.
+    for(unsigned int i=0; i<kart_amount; i++)
+        updateRacePosition(m_karts[i], m_kart_info[i]);
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -236,7 +240,10 @@ void LinearWorld::newLap(unsigned int kart_index)
         // receive a message from the server. So a client does not do
         // anything here.
         if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
-            kart->raceFinished(getTime());
+        {
+            kart->finishedRace(getTime());
+            createEndKart(kart_index);
+        }
     }
     {
         float time_per_lap;
@@ -416,7 +423,8 @@ void LinearWorld::terminateRace()
         if(!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
         {
             const float est_finish_time = m_kart_info[i].m_estimated_finish;
-            m_karts[i]->raceFinished(est_finish_time);
+            m_karts[i]->finishedRace(est_finish_time);
+            createEndKart(i);
         }  // if !hasFinishedRace
     }   // for i
 }   // terminateRace
@@ -563,7 +571,6 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
                         p++;
         }
     } //next kart
-
     kart->setPosition(p);
     // Switch on faster music if not already done so, if the
     // first kart is doing its last lap, and if the estimated
@@ -587,7 +594,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
  */
 void LinearWorld::checkForWrongDirection(unsigned int i)
 {
-    if(!m_karts[i]->isPlayerKart()) return;
+    if(!m_karts[i]->getController()->isPlayerController()) return;
     if(!m_kart_info[i].m_on_road) return;
 
     // FIXME: Don't do this if the in-game option menu is on the screen!

@@ -1,7 +1,7 @@
 
 #include "config/player.hpp"
 
-#include "karts/player_kart.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
 
 ActivePlayer::ActivePlayer(PlayerProfile* player, InputDevice *device)
@@ -47,20 +47,3 @@ void ActivePlayer::setDevice(InputDevice* device)
     if (device != NULL) device->setPlayer(this);
 }   // setDevice
 
-// ----------------------------------------------------------------------------
-PlayerKart* ActivePlayer::getKart()
-{    
-    World *world = World::getWorld();
-    const int num_karts = world->getNumKarts();
-    for (int p=0; p<num_karts; p++)
-    {
-        Kart *kart = world->getKart(p);
-        if(kart->isPlayerKart() && ((PlayerKart*)kart)->getPlayer() == this)
-        {
-            return (PlayerKart*)kart;
-        }
-    }
-    
-    std::cout << "ActivePlayer::getKart() failed to find player named " << m_player->getName() << std::endl;
-    return NULL;
-}   // getKart

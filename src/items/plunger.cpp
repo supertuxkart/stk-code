@@ -26,7 +26,7 @@
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/player_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track.hpp"

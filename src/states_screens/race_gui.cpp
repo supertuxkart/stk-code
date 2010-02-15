@@ -34,7 +34,6 @@ using namespace irr;
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -223,8 +222,8 @@ void RaceGUI::renderGlobal(float dt)
  */
 void RaceGUI::renderPlayerView(const Kart *kart)
 {
-    const core::recti &viewport    = kart->getViewport();
-    const core::vector2df &scaling = kart->getScaling();
+    const core::recti &viewport    = kart->getCamera()->getViewport();
+    const core::vector2df &scaling = kart->getCamera()->getScaling();
     drawAllMessages     (kart, viewport, scaling);
     if(!World::getWorld()->isRacePhase()) return;
 
@@ -309,8 +308,9 @@ void RaceGUI::drawGlobalMiniMap()
         // int marker_height = m_marker->getOriginalSize().Height;
         core::rect<s32> source(i    *m_marker_rendered_size, 0, 
                                (i+1)*m_marker_rendered_size, m_marker_rendered_size);
-        int marker_half_size =  (kart->isPlayerKart() ? m_marker_player_size 
-                                                      : m_marker_ai_size      )>>1;
+        int marker_half_size = (kart->getController()->isPlayerController() 
+                                ? m_marker_player_size 
+                                : m_marker_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size), 
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size), 
@@ -373,8 +373,10 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
         }
 
         // draw icon
-        video::ITexture *icon = kart->getKartProperties()->getIconMaterial()->getTexture();
-        int w = kart->isPlayerKart() ? ICON_PLAYER_WIDTH : ICON_WIDTH;
+        video::ITexture *icon = 
+            kart->getKartProperties()->getIconMaterial()->getTexture();
+        int w = kart->getController()->isPlayerController() ? ICON_PLAYER_WIDTH
+                                                            : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
 
         // Fixes crash bug, why are certain icons not showing up?

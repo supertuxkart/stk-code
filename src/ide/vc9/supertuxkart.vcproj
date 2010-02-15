@@ -482,18 +482,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="robots"
-				>
-				<File
-					RelativePath="../../../src\robots\default_robot.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\robots\new_ai.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="challenges"
 				>
 				<File
@@ -688,10 +676,30 @@
 					RelativePath="..\..\karts\moveable.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\karts\player_kart.cpp"
+				<Filter
+					Name="controller"
 					>
-				</File>
+					<File
+						RelativePath="..\..\karts\controller\controller.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\default_ai_controller.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\end_controller.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\new_ai_controller.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\player_controller.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="graphics"
@@ -1064,6 +1072,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\states_screens\dialogs\gp_info_dialog.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\states_screens\dialogs\player_info_dialog.cpp"
 						>
 					</File>
@@ -1196,18 +1208,6 @@
 				</File>
 				<File
 					RelativePath="../../../src\lisp\writer.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="robots"
-				>
-				<File
-					RelativePath="../../../src\robots\default_robot.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\robots\new_ai.hpp"
 					>
 				</File>
 			</Filter>
@@ -1522,10 +1522,30 @@
 					RelativePath="..\..\karts\moveable.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\karts\player_kart.hpp"
+				<Filter
+					Name="controller"
 					>
-				</File>
+					<File
+						RelativePath="..\..\karts\controller\controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\default_ai_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\end_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\new_ai_controller.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\karts\controller\player_controller.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="graphics"
@@ -1859,6 +1879,10 @@
 					</File>
 					<File
 						RelativePath="..\..\states_screens\dialogs\enter_player_name_dialog.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\states_screens\dialogs\gp_info_dialog.hpp"
 						>
 					</File>
 					<File

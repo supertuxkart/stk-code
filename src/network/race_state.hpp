@@ -24,8 +24,8 @@
 
 #include "items/flyable.hpp"
 #include "items/item.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "karts/kart.hpp"
-#include "karts/kart_control.hpp"
 #include "modes/world.hpp"
 #include "network/flyable_info.hpp"
 #include "network/item_info.hpp"

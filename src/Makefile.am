@@ -151,6 +151,17 @@ supertuxkart_SOURCES = \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
  karts/auto_kart.hpp \
+ karts/controller/controller.cpp \
+ karts/controller/controller.hpp \
+ karts/controller/default_ai_controller.cpp \
+ karts/controller/default_ai_controller.hpp \
+ karts/controller/end_controller.cpp \
+ karts/controller/end_controller.hpp \
+ karts/controller/kart_control.hpp \
+ karts/controller/new_ai_controller.cpp \
+ karts/controller/new_ai_controller.hpp \
+ karts/controller/player_controller.cpp \
+ karts/controller/player_controller.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
  karts/kart_control.hpp \
@@ -248,10 +259,6 @@ supertuxkart_SOURCES = \
  replay/replay_player.hpp \
  replay/replay_recorder.cpp \
  replay/replay_recorder.hpp \
- robots/default_robot.cpp \
- robots/default_robot.hpp \
- robots/new_ai.cpp \
- robots/new_ai.hpp \
  states_screens/challenges.cpp \
  states_screens/challenges.hpp \
  states_screens/credits.cpp \

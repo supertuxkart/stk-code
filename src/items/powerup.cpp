@@ -178,7 +178,7 @@ void Powerup::use()
                 // or the kart "throwing" the anvil? Ideally it should be both.
                 // Meanwhile, don't play it near AI karts since they obviously
                 // don't hear anything
-                if(kart->isPlayerKart())
+                if(kart->getController()->isPlayerController())
                     m_sound_use->position(kart->getXYZ());
                 else
                     m_sound_use->position(m_owner->getXYZ());
@@ -204,7 +204,7 @@ void Powerup::use()
                 {
                     kart->attach(ATTACH_PARACHUTE, stk_config->m_parachute_time_other);
 
-                    if(kart->isPlayerKart())
+                    if(kart->getController()->isPlayerController())
                         player_kart = kart;
                 }
             }
@@ -213,7 +213,7 @@ void Powerup::use()
             // or the kart "throwing" the anvil? Ideally it should be both.
             // Meanwhile, don't play it near AI karts since they obviously
             // don't hear anything
-            if(m_owner->isPlayerKart())
+            if(m_owner->getController()->isPlayerController())
                 m_sound_use->position(m_owner->getXYZ());
             else if(player_kart)
                 m_sound_use->position(player_kart->getXYZ());

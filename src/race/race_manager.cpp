@@ -391,7 +391,7 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
-    if(kart->isPlayerKart()) m_num_finished_players++;
+    if(kart->getController()->isPlayerController()) m_num_finished_players++;
 }   // raceFinished
 
 //-----------------------------------------------------------------------------

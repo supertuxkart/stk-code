@@ -71,7 +71,8 @@ void ThreeStrikesBattle::terminateRace()
     {
         if(!m_karts[i]->hasFinishedRace())
         {
-            m_karts[i]->raceFinished(WorldStatus::getTime());
+            m_karts[i]->finishedRace(WorldStatus::getTime());
+            createEndKart(i);
         }  // if !hasFinishedRace
     }   // for i
     
@@ -92,8 +93,10 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // check if kart is 'dead'
     if(m_kart_info[kart_id].m_lives < 1)
     {
-        m_karts[kart_id]->raceFinished(WorldStatus::getTime());
+        m_karts[kart_id]->finishedRace(WorldStatus::getTime());
         removeKart(kart_id);
+        // FIXME - what about end camera here??
+        // createEndCamera(kart_id)
     }
     
     const unsigned int NUM_KARTS = getNumKarts();

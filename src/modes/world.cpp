@@ -36,7 +36,10 @@
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/auto_kart.hpp"
-#include "karts/player_kart.hpp"
+#include "karts/controller/default_ai_controller.hpp"
+#include "karts/controller/new_ai_controller.hpp"
+#include "karts/controller/player_controller.hpp"
+#include "karts/controller/end_controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
@@ -44,8 +47,6 @@
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
-#include "robots/default_robot.hpp"
-#include "robots/new_ai.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -151,42 +152,44 @@ Kart *World::createKart(const std::string &kart_ident, int index,
                         int local_player_id, int global_player_id,
                         const btTransform &init_pos)
 {
-    Kart *newkart = NULL;
-    int position  = index+1;
+    int position           = index+1;
+    Kart *new_kart         = new Kart(kart_ident, position, init_pos);
+    Controller *controller = NULL;
     switch(race_manager->getKartType(index))
     {
     case RaceManager::KT_PLAYER:
         std::cout << "===== World : creating player kart for kart #" << index << " which has local_player_id " << local_player_id << " ===========\n";
-        newkart = new PlayerKart(kart_ident, position,
-                                 StateManager::get()->getActivePlayer(local_player_id),
-                                 init_pos, local_player_id);
+        controller = new PlayerController(new_kart, 
+                                          StateManager::get()->getActivePlayer(local_player_id),
+                                          local_player_id);
         m_num_players ++;
         break;
-    case RaceManager::KT_NETWORK_PLAYER:
-        newkart = new NetworkKart(kart_ident, position, init_pos,
-                                  global_player_id);
-        m_num_players++;
-        break;
+    //case RaceManager::KT_NETWORK_PLAYER:
+        //controller = new NetworkController(kart_ident, position, init_pos,
+        //                          global_player_id);
+        //m_num_players++;
+        //break;
     case RaceManager::KT_AI:
         std::cout << "===== World : creating AI kart for #" << index << "===========\n";
 
-        newkart = loadRobot(kart_ident, position, init_pos);
+        controller = loadAIController(new_kart);
         break;
     case RaceManager::KT_GHOST:
         break;
     case RaceManager::KT_LEADER:
         break;
     }
-    return newkart;
+    new_kart->setController(controller);
+    return new_kart;
 }   // createKart
 
 //-----------------------------------------------------------------------------
-Kart* World::loadRobot(const std::string& kart_name, int position,
-                       const btTransform& init_pos)
+/** Creates an AI controller for the kart.
+ *  \param kart The kart to be controlled by an AI.
+ */
+Controller* World::loadAIController(Kart *kart)
 {
-    Kart* currentRobot;
-
-
+    Controller *controller;
     // const int NUM_ROBOTS = 1;
     // For now: instead of random switching, use each
     // robot in turns: switch(m_random.get(NUM_ROBOTS))
@@ -198,19 +201,19 @@ Kart* World::loadRobot(const std::string& kart_name, int position,
     switch(turn)
     {
         case 0:
-            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
+            controller = new DefaultAIController(kart);
             break;
         case 1:
-            currentRobot = new NewAI(kart_name, position, init_pos, m_track);
+            controller = new NewAIController(kart);
             break;
         default:
             std::cerr << "Warning: Unknown robot, using default." << std::endl;
-            currentRobot = new DefaultRobot(kart_name, position, init_pos, m_track);
+            controller = new DefaultAIController(kart);
             break;
     }
 
-    return currentRobot;
-}   // loadRobot
+    return controller;
+}   // loadAIController
 
 //-----------------------------------------------------------------------------
 World::~World()
@@ -440,17 +443,18 @@ void World::updateHighscores()
         }
 
         // Only record times for player karts and only if they finished the race
-        if(!m_karts[index[pos]]->isPlayerKart()) continue;
+        if(!m_karts[index[pos]]->getController()->isPlayerController()) continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
         assert(index[pos] >= 0);
         assert(index[pos] < m_karts.size());
-        PlayerKart *k = (PlayerKart*)m_karts[index[pos]];
+        Kart *k = (Kart*)m_karts[index[pos]];
 
         HighscoreEntry* highscores = getHighscores();
 
+        PlayerController *controller = (PlayerController*)(k->getController());
         if(highscores->addData(k->getIdent(),
-                               k->getPlayer()->getProfile()->getName(),
+                               controller->getPlayer()->getProfile()->getName(),
                                k->getFinishTime())>0 )
         {
             highscore_manager->Save();
@@ -465,15 +469,15 @@ void World::updateHighscores()
  *  so it shouldn't be called inside of loops.
  *  \param n Index of player kart to return.
  */
-PlayerKart *World::getPlayerKart(unsigned int n) const
+Kart *World::getPlayerKart(unsigned int n) const
 {
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->isPlayerKart())
+        if(m_karts[i]->getController()->isPlayerController())
         {
             count++;
-            if(count==n) return (PlayerKart*)m_karts[i];
+            if(count==n) return m_karts[i];
         }
     return NULL;
 }   // getPlayerKart
@@ -482,15 +486,15 @@ PlayerKart *World::getPlayerKart(unsigned int n) const
 /** Returns the nth local player kart, i.e. a player kart that has a camera.
  *  \param n Index of player kart to return.
  */
-PlayerKart *World::getLocalPlayerKart(unsigned int n) const
+Kart *World::getLocalPlayerKart(unsigned int n) const
 {
     unsigned int count=-1;
     for(unsigned int i=0; i<m_karts.size(); i++)
     {
-        if(m_karts[i]->getCamera() && m_karts[i]->isPlayerKart())
+        if(m_karts[i]->getCamera() && m_karts[i]->getController()->isPlayerController())
         {
             count++;
-            if(count==n) return (PlayerKart*)m_karts[i];
+            if(count==n) return m_karts[i];
         }
     }
     return NULL;
@@ -518,11 +522,11 @@ void World::removeKart(int kart_number)
                                                              *i, 2.0f, 60);
         }
     }   // for i in kart
-    if(kart->isPlayerKart())
+    if(kart->getController()->isPlayerController())
     {
         // Change the camera so that it will be attached to the leader
         // and facing backwards.
-        Camera* camera=((PlayerKart*)kart)->getCamera();
+        Camera* camera=kart->getCamera();
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
@@ -580,13 +584,23 @@ void  World::pause()
 }   // pause
 
 //-----------------------------------------------------------------------------
-void  World::unpause()
+void World::unpause()
 {
     sound_manager->resumeMusic() ;
     sfx_manager->resumeAll();
     WorldStatus::unpause();
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->isPlayerKart()) ((PlayerKart*)m_karts[i])->resetInputState();
+        if(m_karts[i]->getController()->isPlayerController())
+            ((PlayerController*)(m_karts[i]->getController()))->resetInputState();
 }   // pause
 
+//-----------------------------------------------------------------------------
+/** Replaces the kart with index i with an EndKart, i.e. a kart that shows the
+ *  end animation, and does not use any items anymore.
+ *  \param i Index of the kart to be replaced.
+ */
+void World::createEndKart(unsigned int i)
+{
+    m_karts[i]->setController(new EndController(m_karts[i]));
+}   // createEndKart
 /* EOF */

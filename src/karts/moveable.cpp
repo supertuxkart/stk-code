@@ -24,7 +24,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "karts/player_kart.hpp"
 #include "utils/coord.hpp"
 
 Moveable::Moveable()

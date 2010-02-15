@@ -29,7 +29,7 @@
 #include "utils/translation.hpp"
 
 class Kart;
-class PlayerKart;
+class Kart;
 class Track;
 
 /** The race manager has two functions:

@@ -31,7 +31,6 @@
 
 class btRigidBody;
 class Kart;
-class PlayerKart;
 class SFXBase;
 class Track;
 
@@ -109,8 +108,8 @@ protected:
     void  updateHighscores  ();
     void  resetAllKarts     ();
     void  removeKart        (int kart_number);
-    Kart* loadRobot         (const std::string& kart_name, int position,
-                             const btTransform& init_pos);
+    Controller* 
+          loadAIController  (Kart *kart);
     void  estimateFinishTimes();
 
     virtual Kart *createKart(const std::string &kart_ident, int index, 
@@ -147,8 +146,8 @@ public:
     void            disableRace(); // Put race into limbo phase
     /** Returns a pointer to the race gui. */
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
-    PlayerKart     *getPlayerKart(unsigned int player) const;
-    PlayerKart     *getLocalPlayerKart(unsigned int n) const;
+    Kart           *getPlayerKart(unsigned int player) const;
+    Kart           *getLocalPlayerKart(unsigned int n) const;
     unsigned int    getNumKarts()               const { return m_karts.size();              }
     Kart           *getKart(int kartId)         const { assert(kartId >= 0 &&
                                                             kartId < int(m_karts.size()));
@@ -226,7 +225,7 @@ public:
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
     virtual void raceResultOrder( int* order ) = 0;
-
+    void createEndKart(unsigned int i);
 };
 
 #endif

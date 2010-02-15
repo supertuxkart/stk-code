@@ -23,7 +23,6 @@
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "karts/player_kart.hpp"
 #include "lisp/lisp.hpp"
 #include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
@@ -269,7 +268,7 @@ bool ChallengeData::raceFinished()
     if(track_name!=m_track_name                      ) return false;    // wrong track
     if((int)world->getNumKarts()<m_num_karts         ) return false;    // not enough AI karts
 
-    PlayerKart* kart = world->getPlayerKart(0);
+    Kart* kart = world->getPlayerKart(0);
     if(m_energy>0   && kart->getEnergy()  <m_energy  ) return false;  // not enough energy
     if(m_position>0 && kart->getPosition()>m_position) return false;  // too far behind
 

@@ -28,7 +28,8 @@
 #include "items/powerup.hpp"
 #include "karts/moveable.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/kart_control.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "karts/kart_model.hpp"
 #include "tracks/terrain_info.hpp"
 
@@ -46,6 +47,14 @@ class btVehicleTuning;
 class Quad;
 class Stars;
 
+/** The main kart class. All type of karts are of this object, but with 
+ *  different controllers. The controllers are what turn a kart into a 
+ *  player kart (i.e. the controller handle input), or an AI kart (the
+ *  controller runs the AI code to set steering etc).
+ *  Kart has two base classes: the most important one is moveable (which
+ *  is an object that is moved on the track, and has position and rotations)
+ *  and TerrainInfo, which manages the terrain the kart is on.
+ */
 class Kart : public TerrainInfo, public Moveable
 {
 private:
@@ -56,8 +65,20 @@ private:
     /** Accumulated skidding factor. */
     float        m_skidding;
 
-    int          m_initial_position;   // initial position of kart
-    int          m_race_position;      // current race position (1-numKarts)
+    /** The main controller of this object, used for driving. This 
+     *  controller is used to run the kart. It will be replaced
+     *  with an end kart controller when the kart finishes the race. */
+    Controller  *m_controller;
+    /** This saves the original controller when the end controller is
+     *  used. This is an easy solution for restarting the race, since
+     *  the controller do not need to be reinitialised. */
+    Controller  *m_saved_controller;
+
+    /** Initial rank of the kart. */
+    int          m_initial_position;
+
+    /** Current race position (1-num_karts). */
+    int          m_race_position;
 
     /** The camera for each kart. Not all karts have cameras (e.g. AI karts
      *  usually don't), but there are exceptions: e.g. after the end of a
@@ -91,7 +112,8 @@ private:
     btKart                  *m_vehicle;
     btUprightConstraint     *m_uprightConstraint;
 
-     /** The amount of energy collected by hitting coins. */
+     /** The amount of energy collected by hitting coins. Note that it
+      *  must be float, since dt is subtraced in each timestep. */
     float         m_collected_energy;
 
     // Graphical effects
@@ -153,8 +175,11 @@ private:
     float         m_view_blocked_by_plunger;
     float         m_speed;
     float         m_current_gear_ratio;
-    bool          m_rescue;
-    bool          m_eliminated;
+    /** Different kart modes: normal racing, being rescued, showing end
+     *  animation, explosions, kart eliminated. */
+    enum          {KM_RACE, KM_RESCUE, KM_END_ANIM, KM_EXPLOSION, 
+                   KM_ELIMINATED}
+                  m_kart_mode;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
@@ -173,7 +198,7 @@ protected:
 
     
 public:
-                   Kart(const std::string& kart_name, int position, 
+                   Kart(const std::string& ident, int position, 
                         const btTransform& init_transform);
     virtual       ~Kart();
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
@@ -199,18 +224,22 @@ public:
     void setPowerup (PowerupType t, int n)
     { 
         m_powerup.set(t, n);
-    }
+    }   // setPowerup
+
     // ------------------------------------------------------------------------
     /** Sets the position in race this kart has (1<=p<=n). */
     virtual void setPosition(int p)    
     {
         m_race_position = p;
-    }
+        m_controller->setPosition(p);
+    }   // setPosition
+
     // ------------------------------------------------------------------------
     Attachment *getAttachment() 
     {
         return &m_attachment;          
-    }
+    }   // getAttachment
+
     // ------------------------------------------------------------------------
     void setAttachmentType(attachmentType t, float time_left=0.0f, Kart*k=NULL)
     {
@@ -218,25 +247,30 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
-     *  to this kart. */
-    Camera*        getCamera         () {return m_camera;}
+     *  to this kart). */
+    Camera*        getCamera         ()       {return m_camera;}
+    /** Returns the camera of this kart (or NULL if no camera is attached
+     *  to this kart) - const version. */
+    const Camera*  getCamera         () const {return m_camera;}
     /** Sets the camera for this kart. */
     void           setCamera(Camera *camera) {m_camera=camera; }
-    /** Sets viewport etc. for the camera of this kart. */
-    void           activateCamera    () {m_camera->activate(); }
-    /** Returns the viewport of the camera of this kart. */
-    const core::recti& getViewport() const {return m_camera->getViewport(); }
-    /** Returns the scaling in x/y direction for the camera of this kart. */
-    const core::vector2df& getScaling() const {return m_camera->getScaling(); }
 
     const Powerup *getPowerup          () const { return &m_powerup;         }
     Powerup       *getPowerup          ()       { return &m_powerup;         }
-    int            getNumPowerup       () const { return  m_powerup.getNum();}
-    float          getEnergy           () const { return  m_collected_energy;}
-    int            getPosition         () const { return  m_race_position;       }
-    int            getInitialPosition  () const { return  m_initial_position;    }
-    float          getFinishTime       () const { return  m_finish_time;         }
-    bool           hasFinishedRace     () const { return  m_finished_race;       }
+    /** Returns the number of powerups. */
+    int            getNumPowerup       () const { return m_powerup.getNum(); }
+    /** Returns the time left for a zipper. */
+    float          getZipperTimeLeft   () const { return m_zipper_time_left; }
+    /** Returns the remaining collected energy. */
+    float          getEnergy           () const { return m_collected_energy; }
+    /** Returns the current position of this kart in the race. */
+    int            getPosition         () const { return m_race_position;    }
+    /** Returns the initial position of this kart. */
+    int            getInitialPosition  () const { return m_initial_position; }
+    /** Returns the finished time for a kart. */
+    float          getFinishTime       () const { return m_finish_time;      }
+    /** Returns true if this kart has finished the race. */
+    bool           hasFinishedRace     () const { return m_finished_race;    }
     void           endRescue           ();
     void           getClosestKart      (float *cdist, int *closest);
 
@@ -270,6 +304,8 @@ public:
     const Vec3&    getGravityCenterShift   () const
         {return m_kart_properties->getGravityCenterShift();                    }
     float          getSteerPercent  () const {return m_controls.m_steer;       }
+    KartControl&
+                   getControls      ()       {return m_controls;               }
     const KartControl&
                    getControls      () const {return m_controls;               }
     /** Sets the kart controls. Used e.g. by replaying history. */
@@ -303,20 +339,24 @@ public:
     void           setSuspensionLength();
     float          handleNitro      (float dt);
     float          getActualWheelForce();
+    /** True if the wheels are touching the ground. */
     bool           isOnGround       () const;
+    /** Returns true if the kart is close to the ground, used to dis/enable
+     *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
-    bool           isEliminated     () const {return m_eliminated;}
+    /** Returns true if the kart is eliminated. */
+    bool           isEliminated     () const {return m_kart_mode==KM_ELIMINATED;}
+    /** Returns true if the kart is being rescued. */
+    bool           isRescue         () const {return m_kart_mode==KM_RESCUE;}
     void           eliminate        ();
-    bool           isRescue         () const {return m_rescue;}
     void           resetBrakes      ();
     void           adjustSpeed      (float f);
     void           updatedWeight    ();
     void           forceRescue      ();
     void           handleExplosion  (const Vec3& pos, bool direct_hit);
+    /** Returns a name to be displayed for this kart. */
     virtual const irr::core::stringw& getName() const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}
-    virtual bool   isPlayerKart     () const {return false;                        }
-    virtual bool   isNetworkKart    () const { return true; }
     // addMessages gets called by world to add messages to the gui
     virtual void   addMessages      () {};
     virtual void   collectedItem    (const Item &item, int random_attachment);
@@ -325,9 +365,16 @@ public:
     virtual void   crashed          (Kart *k);
     
     virtual void   update           (float dt);
-    virtual void   raceFinished     (float time);
+    virtual void   finishedRace     (float time);
     void           beep             ();
     bool           playCustomSFX    (unsigned int type);
+    /** Returns the start transform, i.e. position and rotation. */
+    const btTransform getResetTransform() const {return m_reset_transform;}
+    /** Returns the controller of this kart. */
+    Controller*    getController() { return m_controller; }
+    /** Returns the controller of this kart (const version). */
+    const Controller* getController() const { return m_controller; }
+    void           setController(Controller *controller);
 };
 
 

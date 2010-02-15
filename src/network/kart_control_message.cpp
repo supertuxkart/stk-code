@@ -19,7 +19,6 @@
 
 #include "network/kart_control_message.hpp"
 
-#include "karts/player_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_kart.hpp"
 
@@ -53,7 +52,7 @@ KartControlMessage::KartControlMessage(ENetPacket* pkt, int kart_id_offset,
     {
         KartControl kc(this);
         Kart *kart = World::getWorld()->getKart(i);
-        if(kart->isNetworkKart())
+        if(kart->getController()->isNetworkController())
         {
             ((NetworkKart*)kart)->setControl(kc);
         }
