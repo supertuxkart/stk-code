@@ -774,7 +774,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 
         // We keep the ID of the "root" widget, see comment at top
         g_root_id = kartsArea.m_reserved_id;
-        std::cout << "++++ root ID : " << g_root_id << std::endl;
+        //std::cout << "++++ root ID : " << g_root_id << std::endl;
     }
     
     // ---- Create player/kart widget
