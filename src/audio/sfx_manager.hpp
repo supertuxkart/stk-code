@@ -20,6 +20,7 @@
 #ifndef HEADER_SFX_MANAGER_HPP
 #define HEADER_SFX_MANAGER_HPP
 
+#include <string>
 #include <vector>
 #include <map>
 #ifdef __APPLE__
