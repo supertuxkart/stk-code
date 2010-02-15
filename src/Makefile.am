@@ -173,8 +173,6 @@ supertuxkart_SOURCES = \
  karts/kart_properties_manager.hpp    \
  karts/moveable.cpp \
  karts/moveable.hpp \
- karts/player_kart.cpp \
- karts/player_kart.hpp \
  lisp/lexer.cpp \
  lisp/lexer.hpp \
  lisp/lisp.cpp \
