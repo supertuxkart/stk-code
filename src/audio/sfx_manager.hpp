@@ -28,7 +28,6 @@
 #  include <AL/al.h>
 #endif
 
-#include "lisp/lisp.hpp"
 #include "utils/vec3.hpp"
 
 class SFXBase;
