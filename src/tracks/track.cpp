@@ -39,8 +39,6 @@ using namespace irr;
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "items/item_manager.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
 #include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/triangle_mesh.hpp"
