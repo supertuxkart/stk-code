@@ -24,17 +24,16 @@
 
 #include "audio/music_ogg.hpp"
 #include "config/user_config.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
+#include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
-MusicInformation::MusicInformation(const std::string& filename)
+MusicInformation::MusicInformation(const std::string& filename) throw (std::runtime_error)
 {
     m_title           = "";
     m_composer        = "";
-    m_numLoops        = LOOP_FOREVER;
+    //m_numLoops        = LOOP_FOREVER;
     m_normal_filename = "";
     m_fast_filename   = "";
     m_normal_music    = NULL;
@@ -45,7 +44,7 @@ MusicInformation::MusicInformation(const std::string& filename)
     m_gain            = 1.0f;
     m_adjustedGain    = 1.0f;
 
-    if(StringUtils::getExtension(filename)!="music")
+    if (StringUtils::getExtension(filename) != "music")
     {
         // Create information just from ogg file
         // -------------------------------------
@@ -57,6 +56,70 @@ MusicInformation::MusicInformation(const std::string& filename)
 
     // Otherwise read config file
     // --------------------------
+    
+    XMLNode* root = file_manager->createXMLTree(filename);
+    if (!root)
+    {
+        std::cerr << "Could not read music XML file " << filename.c_str() << std::endl;
+        throw std::runtime_error("Can open music XML file");
+    }
+    
+    const int amount = root->getNumNodes();
+    for (int i=0; i<amount; i++)
+    {
+        const XMLNode* node = root->getNode(i);
+        
+        if (node->getName() == "music")
+        {
+            // outer node, ignore
+        }
+        else if (node->getName() == "title")
+        {
+            if (node->get("value", &m_title) == 0)
+            {
+                fprintf(stderr, "/!\\ The '<title value=' attribute is mandatory in the music XML file!\n");
+                throw std::runtime_error("Incomplete or corrupt music XML file");
+                return;
+            }
+        }
+        else if (node->getName() == "composer")
+        {
+            if (node->get("value", &m_composer) == 0)
+            {
+                fprintf(stderr, "/!\\ The '<composer value=' attribute is mandatory in the music XML file!\n");
+                throw std::runtime_error("Incomplete or corrupt music XML file");
+                return;
+            }
+        }
+        else if (node->getName() == "file")
+        {
+            if (node->get("value", &m_normal_filename) == 0)
+            {
+                fprintf(stderr, "/!\\ The '<file value=' attribute is mandatory in the music XML file!\n");
+                throw std::runtime_error("Incomplete or corrupt music XML file");
+                return;
+            }
+        }
+        else if (node->getName() == "gain")
+        {
+            node->get("gain", &m_gain);
+        }
+        else
+        {
+            std::cerr << "Unknown node in music XML file : " << node->getName().c_str() << std::endl;
+            throw std::runtime_error("Unknown node in music XML file");
+        }
+    }// nend for
+    
+    delete root;
+    
+    //TODO: not implemented back (is this useful in any way?)
+    // LISP->getVector("tracks",      m_all_tracks     );
+    
+    //TODO: not implemented back (is this used in any way?)
+    m_enable_fast = false;
+    
+    /*
     lisp::Parser parser;
     const lisp::Lisp* const ROOT = parser.parse(filename);
 
@@ -85,18 +148,18 @@ MusicInformation::MusicInformation(const std::string& filename)
     LISP->getVector("tracks",      m_all_tracks     );
     LISP->get      ("gain",        m_gain           );
     m_adjustedGain = m_gain;
+     */
+    
+    // Get the path from the filename and add it to the ogg filename
+    std::string path  = StringUtils::getPath(filename);
+    m_normal_filename = path + "/" + m_normal_filename;
 
     // Get the path from the filename and add it to the ogg filename
-    std::string path=StringUtils::getPath(filename);
-    m_normal_filename=path+"/"+m_normal_filename;
-
-    // Get the path from the filename and add it to the ogg filename
-    if(m_fast_filename!="")
+    if (m_fast_filename != "")
     {
-        m_fast_filename=path+"/"+m_fast_filename;
+        m_fast_filename = path + "/" + m_fast_filename;
     }
 
-    delete ROOT;
 
 }   // MusicInformation
 

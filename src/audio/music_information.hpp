@@ -21,6 +21,7 @@
 #define HEADER_MUSIC_INFORMATION_HPP
 
 #include <string>
+#include <stdexcept>
 #include <vector>
 
 class Music;
@@ -33,7 +34,8 @@ private:
     std::string              m_normal_filename;
     std::string              m_fast_filename;
     std::vector<std::string> m_all_tracks;      
-    int                      m_numLoops;
+    //int                      m_numLoops;
+    
     /** If faster music is enabled at all (either separate file or using
      *  the pitch shift approach). */
     bool                     m_enable_fast;    
@@ -54,12 +56,12 @@ private:
     float                    m_time_since_faster;
 
 public:
-                       MusicInformation (const std::string& filename);
+                       MusicInformation (const std::string& filename) throw (std::runtime_error);
     const std::string& getComposer      () const {return m_composer;        }
     const std::string& getTitle         () const {return m_title;           }
     const std::string& getNormalFilename() const {return m_normal_filename; }
     const std::string& getFastFilename  () const {return m_fast_filename;   }
-    int                getNumLoops      () const {return m_numLoops;        }
+    //int                getNumLoops      () const {return m_numLoops;        }
     float              getFasterTime    () const {return m_faster_time;     }
     float              getMaxPitch      () const {return m_max_pitch;       }
     void               addMusicToTracks ();
