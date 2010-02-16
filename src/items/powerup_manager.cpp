@@ -86,7 +86,8 @@ PowerupType PowerupManager::getPowerupType(const std::string &name)
  */
 void PowerupManager::loadAllPowerups()
 {
-    XMLNode *root = file_manager->createXMLTree("data/powerup.xml");
+    const std::string file_name = file_manager->getConfigFile("powerup.xml");
+    XMLNode *root               = file_manager->createXMLTree(file_name);
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node=root->getNode(i);

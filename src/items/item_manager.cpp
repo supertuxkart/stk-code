@@ -103,8 +103,8 @@ void ItemManager::loadDefaultItems()
     static const std::string item_names[] = {"bonus-box", "banana",
                                              "nitro-big", "nitro-small", 
                                              "bubblegum" };
-
-    const XMLNode *root = file_manager->createXMLTree("data/items.xml");
+    const std::string file_name = file_manager->getConfigFile("items.xml");
+    const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
         const XMLNode *node = root->getNode(item_names[i]);
