@@ -67,7 +67,6 @@ public:
     std::string getConfigDir     () const;
     std::string getKartDir       () const;
     std::string getDataDir       () const;
-    std::string getItemsDir      () const;
     std::string getTranslationDir() const;
     std::string getGUIDir        () const;
     std::vector<std::string>getMusicDirs() const;

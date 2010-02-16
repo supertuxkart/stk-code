@@ -324,11 +324,6 @@ std::string FileManager::getKartDir() const
 }   // getKartDir
 
 //-----------------------------------------------------------------------------
-std::string FileManager::getItemsDir() const
-{
-    return m_root_dir+"/data/items";
-}   // getItemsDir
-//-----------------------------------------------------------------------------
 std::string FileManager::getTranslationDir() const
 {
     return m_root_dir+"/data/po";
@@ -356,12 +351,6 @@ std::string FileManager::getKartFile(const std::string& fname,
 std::string FileManager::getConfigFile(const std::string& fname) const
 {
     return m_root_dir+"/data/"+fname;
-}   // getConfigFile
-
-//-----------------------------------------------------------------------------
-std::string FileManager::getItemFile(const std::string& fname) const
-{
-    return getItemsDir()+"/"+fname;
 }   // getConfigFile
 
 //-----------------------------------------------------------------------------
