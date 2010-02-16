@@ -23,8 +23,6 @@
 
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
 #include "modes/linear_world.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"

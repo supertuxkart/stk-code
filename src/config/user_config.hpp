@@ -46,9 +46,6 @@ const int CURRENT_CONFIG_VERSION = 7;
 #include <fstream>
 
 #include "input/input.hpp"
-#include "lisp/lisp.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/writer.hpp"
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;

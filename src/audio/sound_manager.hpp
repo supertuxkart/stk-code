@@ -25,7 +25,6 @@
 #include <vector>
 #include <string>
 
-#include "lisp/lisp.hpp"
 #include "audio/music.hpp"
 #include "audio/music_information.hpp"
 

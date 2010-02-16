@@ -24,7 +24,6 @@
 #include <vector>
 #include <map>
 #include "items/item.hpp"
-#include "lisp/lisp.hpp"
 
 class Kart;
 
