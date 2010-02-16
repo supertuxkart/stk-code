@@ -55,7 +55,8 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
                 {
                     ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
                     
-                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(), screenshot, 0.8f, 0.7f);
+                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                                         screenshot, 0.8f, 0.7f);
                 }
             }
         }
@@ -80,11 +81,13 @@ void ArenasScreen::init()
 
         if (unlock_manager->isLocked(curr->getIdent()))
         {
-            w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked", curr->getScreenshotFile(), true );
+            w->addItem( _("Locked : solve active challenges to gain access to more!"),
+                        "locked", curr->getScreenshotFile(), LOCKED_BADGE );
         }
         else
         {
-             w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), false );
+             w->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
+                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
     }
     w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
