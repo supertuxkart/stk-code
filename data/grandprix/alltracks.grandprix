@@ -1,10 +1,23 @@
-;; -*- mode: lisp -*-
 
-(supertuxkart-grand-prix
- (name _("All tracks"))
- (description _("All tracks included in SuperTuxKart"))
- (tracks "beach" "startrack" "lighthouse" "jungle" "mines" "islandtrack" "sandtrack" "fortmagma" "snowtuxpeak" "crescentcrossing" "olivermath" "racetrack" "city" "xr591" "canyon" "snowmountain" "tuxtollway" "skyline")
- (laps      2         3            4          3       3         2             3           3            3              2               4            3         2        3      2           3            2          3)
-)
+<supertuxkart_grand_prix name="All tracks" description="All tracks included in SuperTuxKart">
 
-;; EOF ;;
+    <track id="beach"            laps="2" />
+    <track id="startrack"        laps="3" />
+    <track id="lighthouse"       laps="4" />
+    <track id="jungle"           laps="3" />
+    <track id="mines"            laps="3" />
+    <track id="islandtrack"      laps="2" />
+    <track id="sandtrack"        laps="3" />
+    <track id="fortmagma"        laps="3" />
+    <track id="snowtuxpeak"      laps="3" />
+    <track id="crescentcrossing" laps="2" />
+    <track id="olivermath"       laps="4" />
+    <track id="racetrack"        laps="3" />
+    <track id="city"             laps="2" />
+    <track id="xr591"            laps="3" />
+    <track id="canyon"           laps="2" />
+    <track id="snowmountain"     laps="3" />
+    <track id="tuxtollway"       laps="2" />
+    <track id="skyline"          laps="3" />
+
+</supertuxkart_grand_prix>

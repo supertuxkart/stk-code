@@ -3,7 +3,7 @@ import sys
 
 f = open('./data/po/gui_strings.h', 'w')
 
-def traverse(file, node, isChallenge, level=0):
+def traverse(file, node, isChallenge, isGP, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -15,7 +15,7 @@ def traverse(file, node, isChallenge, level=0):
         if e.hasAttribute("I18N"):
            comment = e.getAttribute("I18N")
          
-        if isChallenge:
+        if isChallenge or isGP:
            if e.hasAttribute("name"):
                # print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
@@ -47,16 +47,26 @@ def traverse(file, node, isChallenge, level=0):
                f.write( line )
 
         
-        traverse(file, e, isChallenge, level+1)
+        traverse(file, e, isChallenge, isGP, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
-    print "Parsing", file
+    #print "Parsing", file
     
     isChallenge = False
+    isGP = False
+    
     if file.endswith(".challenge"):
         isChallenge = True
+    if file.endswith(".grandprix"):
+        isGP = True 
         
-    doc = xml.dom.minidom.parse(file)
-    traverse(file, doc, isChallenge)
+    try:
+        doc = xml.dom.minidom.parse(file)
+    except:
+        print "============================================"
+        print "/!\\ Expat doesn't like ", file, "!"
+        print "============================================"
+
+    traverse(file, doc, isChallenge, isGP)
     

@@ -4,8 +4,8 @@
 
 CPP_FILE_LIST="`find ./src -name '*.cpp' -print` `find ./src -name '*.hpp' -print`"
 LISP_FILE_LIST="`find ./data -name '*.track' -print` `find ./data -name '*.challenge' -print` `find ./data -name '*.grandprix' -print`"
-XML_FILE_LIST=`find ./data -name '*.xml' -print`
-STKGUI_FILE_LIST=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print`
+#XML_FILE_LIST=`find ./data -name '*.xml' -print`
+OTHER_XML_FILES=`find ./data -name '*.stkgui' -print && find ./data -name '*.challenge' -print && find ./data -name '*.grandprix' -print`
 
 echo "--------------------"
 echo "    Source Files :"
@@ -20,13 +20,10 @@ echo $LISP_FILE_LIST
 echo "--------------------"
 echo "    XMl Files :"
 echo "--------------------"
-echo $STKGUI_FILE_LIST # $XML_FILE_LIST
+echo $OTHER_XML_FILES # $XML_FILE_LIST
 
 # XML Files
-# (Since xgettext cannot read XML directly, strings are extracted using 'grep' and 'sed' first
-#grep -ho 'text=\"[^\"]*' $XML_FILE_LIST $STKGUI_FILE_LIST | sed 's/text=\"\(.*\)/_(\"\1\")/' > ./data/po/gui_strings.txt
-# nothing in .xml files atm. If there ever is, add $XML_FILE_LIST below
-python ./data/po/extract_strings_from_XML.py $STKGUI_FILE_LIST
+python ./data/po/extract_strings_from_XML.py $OTHER_XML_FILES
 
 
 

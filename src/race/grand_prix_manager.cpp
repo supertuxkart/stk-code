@@ -57,7 +57,14 @@ const GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 // ----------------------------------------------------------------------------
 void GrandPrixManager::load(const std::string& filename)
 {
-    m_gp_data.push_back(new GrandPrixData(filename));
+    try
+    {
+        m_gp_data.push_back(new GrandPrixData(filename));
+    }
+    catch (std::logic_error& er)
+    {
+        fprintf(stderr, "GrandPrixManager : ignoring GP %s ( %s ) \n", filename.c_str(), er.what());
+    }
 }   // load
 
 // ----------------------------------------------------------------------------

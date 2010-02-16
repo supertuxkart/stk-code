@@ -1,10 +1,10 @@
-;; -*- mode: lisp -*-
 
-(supertuxkart-grand-prix
- (name _("To the Moon and Back"))
- (description _("Second grand prix"))
- (tracks "lighthouse" "skyline" "startrack" "xr591" "beach")
- (laps      4             3        3           3        2 )
-)
+<supertuxkart_grand_prix name="To the Moon and Back" description="Second grand prix">
 
-;; EOF ;;
+    <track id="lighthouse" laps="4" />
+    <track id="skyline"    laps="3" />
+    <track id="startrack"  laps="3" />
+    <track id="xr591"      laps="3" />
+    <track id="beach"      laps="2" />
+ 
+</supertuxkart_grand_prix>

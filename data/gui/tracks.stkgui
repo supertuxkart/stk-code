@@ -6,8 +6,7 @@
             align="center" text_align="center" />
 
     <scrollable_toolbar id="gps" height="175" width="100%" align="center" label_location="each"
-                        square_items="true" align="center"
-                        child_width="160" child_height="120" />
+                        square_items="true" child_width="160" child_height="120" />
     
     <header width="100%" I18N="Section in track selection screen" text="All Tracks"
             align="center" text_align="center" />

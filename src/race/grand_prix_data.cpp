@@ -24,50 +24,102 @@
 #include <stdexcept>
 
 #include "io/file_manager.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/lisp.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-GrandPrixData::GrandPrixData(const std::string filename)
+GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
 {
     m_filename = filename;
     m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
-    const lisp::Lisp* lisp = 0;
-    try
+    
+    XMLNode* root = file_manager->createXMLTree(file_manager->getDataDir()+filename);
+    if (!root)
     {
-        lisp::Parser parser;
-        lisp = parser.parse(file_manager->getConfigFile(m_filename));
-
-        lisp = lisp->getLisp("supertuxkart-grand-prix");
-        if(!lisp)
-        {
-            throw std::runtime_error("No supertuxkart-grand-prix node");
-        }
-
+        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s'\n", filename.c_str());
+        throw std::logic_error("File not found");
+    }
+    
+    bool foundName = false;
+    
+    if (root->getName() == "supertuxkart_grand_prix")
+    {
         std::string temp_name;
-        lisp->get      ("name",        temp_name     );
-        // FIXME: for now all GP names are automatically translated by
-        // the lisp code, so no need to translate them here (which actually
-        // results in a crash, since the translated name is wchar_t and not
-        // utf-8.
-        //m_name = _(temp_name.c_str());
-        m_name = temp_name.c_str();
+        if (root->get("name", &temp_name) == 0)
+        {
+            fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+                    "missing 'name' attribute\n", filename.c_str());
+            delete root;
+            throw std::logic_error("File contents are incomplete or corrupt");
+        }
+        m_name = _(temp_name.c_str());
+        foundName = true;
         
-        lisp->get      ("description", m_description );
-        lisp->get      ("item",        m_item_style);
-        lisp->getVector("tracks",      m_tracks      );
-        lisp->getVector("laps",        m_laps        );
+        std::string temp_desc;
+        const int readDesc = root->get( "description", &temp_desc );
+        if (readDesc == 1 && temp_desc.size() > 0)
+        {
+            m_description = _(temp_desc.c_str());
+        }
+        
+        // This used to be there, but I'm leaving it out since it seems it was unused
+        // lisp->get("item", m_item_style);
+        
     }
-    catch(std::exception& err)
+    else
     {
-        fprintf(stderr, "Error while reading grandprix file '%s'\n", filename.c_str());
-        fprintf(stderr, "%s", err.what());
-        fprintf(stderr, "\n");
+        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+                "Root node has an unexpected name\n", filename.c_str());
+        delete root;
+        throw std::logic_error("File contents are incomplete or corrupt");
     }
 
-    delete lisp;
+    
+    const int amount = root->getNumNodes();
+    for (int i=0; i<amount; i++)
+    {
+        const XMLNode* node = root->getNode(i);
+        
+        // read a track entry
+        if (node->getName() == "track")
+        {
+            std::string trackID;
+            int numLaps;
+            
+            const int idFound  = node->get("id",   &trackID );
+            const int lapFound = node->get("laps", &numLaps );
+
+            if (!idFound || !lapFound)
+            {
+                fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+                                "<track> tag does not have id and laps attributes. \n", filename.c_str());
+                delete root;
+                throw std::logic_error("File contents are incomplete or corrupt");
+            }
+            
+            m_tracks.push_back(trackID);
+            m_laps.push_back(numLaps);
+            
+            assert(m_tracks.size() == m_laps.size());
+        }
+        else
+        {
+            std::cerr << "Unknown node in Grand Prix XML file : " << node->getName().c_str() << std::endl;
+            delete root;
+            throw std::runtime_error("Unknown node in sfx XML file");
+        }
+    }// nend for
+    
+    delete root;
+
+    // sanity checks
+    if  (!foundName)
+    {
+        fprintf(stderr, "/!\\ Error while trying to read grandprix file '%s' : "
+                "missing 'name' attribute\n", filename.c_str());
+        throw std::logic_error("File contents are incomplete or corrupt");
+    }
+
 }
 // ----------------------------------------------------------------------------
 bool GrandPrixData::checkConsistency()

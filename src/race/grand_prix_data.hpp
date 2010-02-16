@@ -25,33 +25,43 @@
 #include <vector>
 #include <cassert>
 #include <irrString.h>
+#include <stdexcept>
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
     of races that has to be completed one after the other */
 class GrandPrixData
 {
-    irr::core::stringw m_name;  // The name of the grand prix - might be translated!
-    std::string m_id;           // Internal name of the grand prix, not translated
-    std::string m_filename;     // Original filename, only for error handling needed
-    std::string m_description;  // Description for this track
-    std::string m_item_style;   // item style which overwrites the track default
-    /** The ident of the tracks in this grand prix in their right order, ident
-        means the filename of the .track file without .track extension
-        (ie. 'volcano') */
+    irr::core::stringw m_name;         //!< The name of the grand prix - might be translated!
+    irr::core::stringw m_description;  //!< Description for this GP
+    std::string m_id;                  //!< Internal name of the grand prix, not translated
+    std::string m_filename;            //!< Original filename, only for error handling needed
+    std::string m_item_style;          //!< item style which overwrites the track default
+    
+    /**
+      * The ident of the tracks in this grand prix in their right order, ident
+      * means the filename of the .track file without .track extension (ie. 'volcano')
+      */
     std::vector<std::string> m_tracks;
-    /** The number of laps that each track should be raced, in the right
-     * order*/
+    
+    /** The number of laps that each track should be raced, in the right order */
     std::vector<int> m_laps;
 
 public:
 
     /** Load the GrandPrixData from the given filename */
-                       GrandPrixData  (const std::string filename);
+                       GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
+    
+    /** @return the (potentially translated) user-visible name of the Grand Prix */
     const irr::core::stringw& getName ()        const { return m_name;          }
+    
+    /** @return the (potentially translated) user-visible description of the Grand Prix */
+    const irr::core::stringw& getDescription () const { return m_description;   }
+
+    /** @return the internale name identifier of the Grand Prix (not translated) */
     const std::string& getId          ()        const { return m_id;            }
-    const std::string& getDescription ()        const { return m_description;   }
-    const std::string& getItemStyle   ()        const { return m_item_style; }
+    
+    const std::string& getItemStyle   ()        const { return m_item_style;    }
     const std::string& getFilename    ()        const { return m_filename;      }
     const std::string& getTrack(size_t track_index) const { assert(track_index >= 0); assert(track_index < m_tracks.size()); 
                                                        return m_tracks[track_index]; }
