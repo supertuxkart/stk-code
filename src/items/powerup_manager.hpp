@@ -22,9 +22,8 @@
 
 #include "irrlicht.h"
 
-#include "lisp/parser.hpp"
-#include "lisp/lisp.hpp"
 #include "btBulletDynamicsCommon.h"
+#include <string>
 
 class Material;
 class XMLNode;
@@ -50,9 +49,8 @@ private:
     float         m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
                                                      // the target
     float         m_all_max_turn_angle[POWERUP_MAX];  // maximum turn angle for homing
-    scene::IMesh *m_all_meshes[POWERUP_MAX];
+    irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
     btVector3     m_all_extends[POWERUP_MAX];
-    void          LoadNode       (const lisp::Lisp* lisp, int collectType);
     PowerupType   getPowerupType(const std::string &name);
 public:
                   PowerupManager  ();
@@ -63,11 +61,11 @@ public:
     Material*     getIcon         (int type) const {return m_all_icons [type];      }
     /** Returns the mesh for a certain powerup. 
      *  \param type Mesh type for which the model is returned. */
-    scene::IMesh *getMesh         (int type) const {return m_all_meshes[type];      }
+    irr::scene::IMesh *getMesh         (int type) const {return m_all_meshes[type];      }
     float         getForceToTarget(int type) const {return m_all_force_to_target[type]; }
     float         getMaxDistance  (int type) const {return m_all_max_distance[type];}
     float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
-    const btVector3& getExtend   (int type) const {return m_all_extends[type];     }
+    const btVector3& getExtend    (int type) const {return m_all_extends[type];     }
 };
 
 extern PowerupManager* powerup_manager;
