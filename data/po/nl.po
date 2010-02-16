@@ -1,26 +1,38 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-01 21:05-0500\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-msgid ""
-msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-13 15:03+1100\n"
-"PO-Revision-Date: 2009-01-20 00:01+0100\n"
-"Last-Translator: Asciimonster <asciimonster@myrealbox.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-
-#: src/gui/config_display.cpp:395
+#. I18N: In the track setup screen (number of laps choice, where %i is the number)
+#: src/states_screens/dialogs/track_info_dialog.cpp:114
 #, c-format
-msgid "%dx%d Blacklisted"
-msgstr "%dx%d op Verbanningslijst"
+msgid "%i laps"
+msgstr "%i ronden"
 
-#: src/modes/world.cpp:413
+#. I18N: as in "fastest lap: 60 seconds by Wilber"
+#: src/modes/linear_world.cpp:263
+#, c-format
+msgid "%s by %s"
+msgstr "%s bij %s"
+
+#: src/states_screens/kart_selection.cpp:419
+#, c-format
+msgid "%s is ready"
+msgstr "%s is klaar"
+
+#: src/modes/world.cpp:461
 #, c-format
 msgid ""
 "'%s' has\n"
@@ -29,483 +41,555 @@ msgstr ""
 "'%s' is\n"
 "geëlimineerd."
 
-#: src/gui/game_mode.cpp:87
-msgid "3 Strikes Battle"
-msgstr "Veldslag"
+#. I18N: for empty highscores entries
+#: src/states_screens/dialogs/track_info_dialog.cpp:237
+msgid "(Empty)"
+msgstr "(Leeg)"
 
-#: src/gui/help_page_three.cpp:75
-msgid ""
-"3 Strikes Battle : only in multiplayer games.\n"
-"Hit others with weapons until they lose all their lives."
+#. I18N: ./data/gui/karts.stkgui
+#. I18N: In the kart selection (player setup) screen
+#: data/po/gui_strings.h:170
+msgid "(more players can join by pressing 'fire' now)"
+msgstr "(andere spelers kunnen meedoen door de knop 'vuren' in te drukken)"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help screen
+#: data/po/gui_strings.h:75
+msgid "* Current key bindings can be seen/changed in menu Options"
+msgstr ""
+"Bekijk en/of wijzig de huidige toetsinstellingen in het\n"
+"Opties->Speler instellingen menu"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:158
+msgid "* Most of these game modes can also be played in a Grand Prix fashion : instead of playing a single race, you play many in a row. The better you rank, the more points you get. In the end, the player with the most points wins the cup."
+msgstr "* De meeste speltypen kunnen ook als Grand Prix gespeeld worden: In plaats van een enkele race, speel je er een aantal achter elkaar. Hoe hoger je finisht hoe meer punten je verzameld. Degene met de meeste punten wint de cup."
+
+#. I18N: ./data/gui/options_input.stkgui
+#: data/po/gui_strings.h:339
+msgid "* Which config to use will be inferred from which 'fire' key is pressed to join the game."
+msgstr "* De vuurknop die gebruikt wordt om het spel te starten bepaald de gebruikte configuratie."
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:121
+msgid "3 Strikes Battle"
+msgstr "3 slag strijd"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:154
+msgid "3 Strikes Battle : only in multiplayer games. Hit others with weapons until they lose all their lives."
 msgstr ""
 "Veldslag: alleen voor meerdere spelers.\n"
 "Raak de tegenstanders drie maal met je wapens om te winnen."
 
-#: src/gui/help_page_three.cpp:83
-#: src/gui/help_page_two.cpp:128
-msgid "< Back"
-msgstr "< Terug"
+#: src/states_screens/dialogs/track_info_dialog.cpp:161
+msgid "= Highscores ="
+msgstr "Hoogste scores"
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:72
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:194
+msgid "About"
+msgstr "Over"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:264
 msgid "Accelerate"
 msgstr "Versnellen"
 
-#: src/gui/challenges_menu.cpp:37
-msgid "Active Challenges"
-msgstr "Actieve Uitdagingen"
+#. I18N: In the 'add new input device' dialog
+#: src/states_screens/dialogs/add_device_dialog.cpp:56
+msgid "Add Keyboard Configuration"
+msgstr "Toetsenbord configuratie toevoegen"
 
-#: data/grandprix/alltracks.grandprix:4
-msgid "All tracks"
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:366
+msgid "Add Player"
+msgstr "Speler toevoegen"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the input configuration screen
+#: data/po/gui_strings.h:336
+msgid "Add a device"
+msgstr "Apparaat toevoegen"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: data/po/gui_strings.h:11
+msgid "Add-Ons"
+msgstr "Extra"
+
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: src/states_screens/kart_selection.cpp:723
+#: src/states_screens/tracks_screen.cpp:56
+#: data/po/gui_strings.h:15
+msgid "All"
+msgstr "Alle"
+
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:412
+msgid "All Tracks"
 msgstr "Alle levels"
 
-#: data/grandprix/alltracks.grandprix:5
-msgid "All tracks included in SuperTuxKart"
-msgstr "Alle levels in SuperTuxKart"
+#: src/states_screens/race_setup_screen.cpp:164
+msgid "All blows allowed, so catch weapons and make clever use of them!"
+msgstr "Bruut geweld is toegestaan, dus grijp die wapens en zet ze slim in!"
 
-#: data/tracks/jungle/jungle.track:4
-msgid "Amazonian Journey"
-msgstr "Tocht door de Amazone"
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:116
+msgid "Anchor - slows down greatly the kart in the first position"
+msgstr "Aambeeld â Remt de kart in leidende positie af"
 
-#: src/gui/help_page_two.cpp:111
-msgid "Anvil - slows down greatly the kart in the first position"
-msgstr "Aambeeld – Remt de kart in leidende positie af"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: In the video settings menu
+#: data/po/gui_strings.h:241
+msgid "Apply video changes"
+msgstr "Beeldscherminstellingen toepassen"
 
-#: src/gui/config_display.cpp:99
-msgid "Apply "
-msgstr "Toepassen"
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: Section in arena tracks selection screen
+#: data/po/gui_strings.h:3
+msgid "Arenas"
+msgstr "Arena's"
 
-#: src/gui/config_display.cpp:361
-#, c-format
-msgid "Apply %dx%d"
-msgstr "Toepassen %dx%d"
-
-#: data/tracks/lighthouse/lighthouse.track:4
-msgid "Around the Lighthouse"
-msgstr "Rond de vuurtoren"
-
-#: data/grandprix/atworldsend.grandprix:4
-msgid "At world's end"
+#. I18N: ./data/gui/tracks.stkgui
+#: data/po/gui_strings.h:408
+msgid "At World's End"
 msgstr "Het einde van de wereld"
 
-#: src/gui/help_page_one.cpp:74
-msgid "Avoid bananas"
-msgstr "Vermijd bananen"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:205
+#: data/po/gui_strings.h:252
+#: data/po/gui_strings.h:350
+msgid "Audio/Video"
+msgstr "Audio/Video"
 
-#: src/gui/grand_prix_ending.cpp:138
-#: src/gui/race_results_gui.cpp:70
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:59
+msgid "Avoid bananas!"
+msgstr "Vermijd bananen!"
+
+#. I18N: to appear in input configuration screen, for gamepad axes
+#: src/input/input.cpp:478
+#, c-format
+msgid "Axis %d %s"
+msgstr "muis as %d %s"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu, to return to the previous screen
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In the options menu, to go back to the main menu or game
+#: data/po/gui_strings.h:79
+#: data/po/gui_strings.h:120
+#: data/po/gui_strings.h:162
+#: data/po/gui_strings.h:245
+#: data/po/gui_strings.h:343
+#: data/po/gui_strings.h:370
+msgid "Back"
+msgstr "Terug"
+
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:67
+msgid "Back to Race"
+msgstr "Terug naar de wedstrijd"
+
+#. I18N: ./data/gui/challenges.stkgui
+#. I18N: ./data/gui/credits.stkgui
+#: data/po/gui_strings.h:22
+#: data/po/gui_strings.h:29
+msgid "Back to main menu"
+msgstr "Terug naar het hoofdmenu"
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:232
 msgid "Back to the main menu"
 msgstr "Terug naar het hoofdmenu"
 
-#: src/gui/help_page_one.cpp:153
-#: src/gui/help_page_three.cpp:87
-#: src/gui/help_page_two.cpp:131
-msgid "Back to the menu"
-msgstr "Terug naar het menu"
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:110
+msgid "Bowling Ball - bounces off walls. If you are looking back, it will be thrown backwards."
+msgstr "Bowling Bal - Stuitert van de wanden. Als je naar achteren kijkt, dan wordt hij naar achtereen gegooid."
 
-#: src/gui/network_gui.cpp:60
-msgid "Become server"
-msgstr "Server worden"
-
-#: src/gui/help_page_two.cpp:84
-msgid ""
-"Bowling Ball - bounces off walls. If you are looking back,\n"
-"it will be thrown backwards."
-msgstr ""
-"Bowling Bal - Stuitert van de wanden. Als je naar\n"
-" achteren kijkt, dan wordt hij naar achtereen gegooid."
-
-#: src/gui/player_controls.cpp:72
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:272
 msgid "Brake"
 msgstr "Remmen"
 
-#: src/gui/help_page_two.cpp:66
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:101
 msgid "BubbleGum - leave a sticky pink puddle behind you"
 msgstr "Bubblegum - Laat een plakkerige smurrie achter."
 
-#: src/gui/help_page_two.cpp:75
-msgid ""
-"Cake - thrown at the closest rival,\n"
-"best on short ranges and long straights"
-msgstr ""
-"Taart - Gooi hem naar je dichtsbijzijnde tegenstander,\n"
-" goed op de korte afstanden en rechte stukken."
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:104
+msgid "Cake - thrown at the closest rival, best on short ranges and long straights"
+msgstr "Taart - Gooi hem naar je dichtsbijzijnde tegenstander, goed op de korte afstanden en rechte stukken."
 
-#: src/gui/network_gui.cpp:179
-msgid "Can't connect to server"
-msgstr "Kan niet verbinden met server"
+#: src/states_screens/dialogs/add_device_dialog.cpp:71
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:69
+#: src/states_screens/dialogs/player_info_dialog.cpp:85
+msgid "Cancel"
+msgstr "Annuleren"
 
-#: data/tracks/canyon/canyon.track:4
-msgid "Canyon"
-msgstr "Het ravijn"
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:165
+msgid "Cancel Remove"
+msgstr "Verwijderen ongedaan maken"
 
-#: src/gui/main_menu.cpp:61
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:182
 msgid "Challenges"
 msgstr "Uitdagingen"
 
-#: src/gui/player_controls.cpp:85
-#, c-format
-msgid "Choose your controls, %s"
-msgstr "Stel de toetsen in, %s"
+#. I18N: ./data/gui/challenges.stkgui
+#. I18N: Title for challenges screen
+#: data/po/gui_strings.h:19
+msgid "Challenges : Trophy Room"
+msgstr "Uitdagingen: Trofeekast"
 
-#: data/tracks/city/city.track:4
-msgid "City"
-msgstr "In de stad"
+#. I18N: ./data/gui/karts.stkgui
+#. I18N: In the kart selection (player setup) screen
+#: data/po/gui_strings.h:166
+msgid "Choose a Kart"
+msgstr "Kies een kart"
 
-#: src/gui/config_display.cpp:104
-msgid "Clear from Blacklist"
-msgstr "Verwijderen uit verbanningslijst"
-
-#: data/tracks/crescentcrossing/crescentcrossing.challenge:5
+#. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
+#: data/po/gui_strings.h:463
 msgid "Collect Nitro in Math Class"
 msgstr "Verzamel lachgas in het wiskundelokaal"
 
-#: data/grandprix/tothemoonandback.challenge:5
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:55
+msgid "Collect blue boxes : they will give you weapons or other powerups"
+msgstr "Verzamel blauwe dozen: Deze bevatten wapens en powerups"
+
+#. I18N: ./data/grandprix/tothemoonandback.challenge
+#: data/po/gui_strings.h:439
 msgid "Collect the Pharaohs Treasure"
 msgstr "Vergaar de schat van de Farao"
 
-#: src/gui/help_page_one.cpp:123
-msgid ""
-"Collecting nitro allows you to get speed boosts whenever you\n"
-"wish by pressing the appropriate key. You can see your\n"
-"current level of nitro in the bar at the right of the game screen."
-msgstr ""
-"Lachgas is niet om te lachen. Verzamel lachgas en je kan extra\n"
-" snelheid krijgen wanneer jij dat wilt. Je lachgasmeter, tijdens het\n"
-" spel rechts in beeld, geeft aan hoeveel je nog over hebt."
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:63
+msgid "Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key. You can see your current level of nitro in the bar at the right of the game screen."
+msgstr "Lachgas is niet om te lachen. Verzamel lachgas en je kan extra snelheid krijgen wanneer jij dat wilt. Je lachgasmeter, tijdens het spel rechts in beeld, geeft aan hoeveel je nog over hebt."
 
-#: data/grandprix/alltracks.challenge:6
-msgid ""
-"Come first in the At World's End\n"
-"Grand Prix with 3 'Racer'\n"
-"Level AI karts."
-msgstr ""
-"Wordt eerste in 'het einde \n"
-"van de wereld' op niveau \n"
-"'Coureur' met 3 tegenstanders"
+#. I18N: ./data/grandprix/alltracks.challenge
+#: data/po/gui_strings.h:424
+msgid "Come first in the At World's End Grand Prix with 3 'Racer' Level AI karts."
+msgstr "Wordt eerste in 'het einde van de wereld' op niveau 'Coureur' met 3 tegenstanders"
 
-#: src/gui/display_res_confirm.cpp:56
-msgid "Confirm Resolution"
-msgstr "Resolutie bevestigen"
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:147
+msgid "Confirm Remove"
+msgstr "Verwijderen bevestigen"
 
-#: src/gui/display_res_confirm.cpp:110
-#, c-format
-msgid "Confirm Resolution Within %d Seconds"
-msgstr "Bevestig de nieuwe resolutie binnen %d seconden"
+#: src/states_screens/race_setup_screen.cpp:170
+msgid "Contains no powerups, so only your driving skills matter!"
+msgstr "Er zijn geen bonus items, dus alles hangt van je stuurmankunst af!"
 
-#: src/gui/display_res_confirm.cpp:51
-msgid "Confirm Resolution Within 5 Seconds"
-msgstr "Bevestig de nieuwe resolutie binnen 5 seconden"
-
-#: src/gui/network_gui.cpp:56
-msgid "Connect to server"
-msgstr "Verbonden met server"
-
-#: src/gui/network_gui.cpp:155
-msgid "Connected:"
-msgstr "Verbonden:"
-
-#: src/gui/feature_unlocked.cpp:48
-#: src/gui/grand_prix_ending.cpp:134
-#: src/gui/race_results_gui.cpp:59
+#. I18N: ./data/gui/feature_unlocked.stkgui
+#: data/po/gui_strings.h:32
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: src/gui/race_results_gui.cpp:66
+#: src/states_screens/dialogs/race_over_dialog.cpp:227
 msgid "Continue Grand Prix"
 msgstr "Doorgaan met Grand Prix"
 
-#: data/tracks/beach/beach.track:5
-#: data/tracks/lighthouse/lighthouse.track:5
-msgid ""
-"Created by Ingo Ruhnke,\n"
-"modified by M. Gagnon"
-msgstr ""
-"Ontworpen Ingo Ruhnke,\n"
-"aangepast door Marianne Gagnon"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:213
+#: data/po/gui_strings.h:260
+#: data/po/gui_strings.h:358
+msgid "Controls"
+msgstr "Besturing"
 
-#: data/tracks/fortmagma/fortmagma.track:5
-#: data/tracks/sandtrack/sandtrack.track:5
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:5
-msgid ""
-"Created by Oliver & Steve Baker\n"
-"modified by Marianne Gagnon"
-msgstr ""
-"Ontworpen door Oliver & Steve Baker,\n"
-"aangepast door Marianne Gagnon"
-
-#: src/gui/main_menu.cpp:78
+#. I18N: ./data/gui/credits.stkgui
+#. I18N: Title in credits screen
+#: data/po/gui_strings.h:26
 msgid "Credits"
 msgstr "Auteurs"
 
-#: data/tracks/crescentcrossing/crescentcrossing.track:4
-msgid "Crescent Crossing"
-msgstr "Krakend Kerkhof"
-
-#. I18N: displays current resolution
-#: src/gui/config_display.cpp:89
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/dialogs/player_info_dialog.cpp:131
 #, c-format
-msgid "Current: %dx%d"
-msgstr "Huidig: %dx%d"
+msgid "Do you really want to delete player '%s' ?"
+msgstr "Weet u zeker dat speler '%s' verwijderd moet worden?"
 
-#: src/gui/config_display.cpp:96
-msgid "Decrease Resolution"
-msgstr "Verlaag resolutie"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Next to checkbox in settings menu
+#: data/po/gui_strings.h:221
+#: data/po/gui_strings.h:229
+msgid "Enabled"
+msgstr "Actief"
 
-#: src/gui/race_options.cpp:84
-msgid "Difficulty"
-msgstr "Niveau"
+#. I18N: In the 'add new player' dialog
+#: src/states_screens/dialogs/enter_player_name_dialog.cpp:35
+msgid "Enter the new player's name"
+msgstr "Voer de naam van de speler in"
 
-#: src/gui/options.cpp:50
-msgid "Display"
-msgstr "Grafisch"
-
-#: src/gui/config_display.cpp:58
-msgid "Display Settings"
-msgstr "Grafische instellingen"
-
-#: src/gui/race_options.cpp:326
-msgid "Driver"
-msgstr "Chauffeur"
-
-#: src/gui/config_controls.cpp:43
-msgid "Edit controls for who?"
-msgstr "Voor welke speler de toetsen wijzigen?"
-
-#: src/gui/race_menu.cpp:58
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
 msgid "Exit Race"
 msgstr "Verlaat wedstrijd"
 
-#: data/tracks/jungle/jungle.challenge:6
-msgid ""
-"Finish 3 laps in Racetrack\n"
-"with 3 easy AI karts\n"
-"in under 2:40 minutes."
-msgstr ""
-"Voltooi 3 ronden op \n"
-"'Het racecircuit' binnen \n"
-"2:40 met 3 tegenstanders"
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:389
+msgid "Expert"
+msgstr "Expert"
 
-#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:6
-msgid ""
-"Finish 3 laps on the City track\n"
-"with 3 AI karts\n"
-"in under 4:20 minutes."
-msgstr ""
-"Voltooi 3 ronden van \n"
-"'In de stad' binnen 4:20 \n"
-"met 3 tegenstanders"
+#: src/states_screens/feature_unlocked.cpp:234
+msgid "Feature Unlocked"
+msgstr "Nieuwe optie geactiveerd"
 
-#: data/tracks/canyon/canyon.challenge:6
-msgid ""
-"Finish 3 laps on the Tux Tollway\n"
-"track with 3 AI karts\n"
-"in under 3:35 minutes."
-msgstr ""
-"Rij 3 ronden over de \n"
-"Tolweg binnen 3:35 \n"
-"met 3 tegenstanders"
+#: src/modes/linear_world.cpp:229
+msgid "Final lap!"
+msgstr "Laaste ronde!"
 
-#: data/tracks/jungle/jungle.challenge:5
+#. I18N: ./data/tracks/jungle/jungle.challenge
+#: data/po/gui_strings.h:478
+msgid "Finish 3 laps in Racetrack with 3 easy AI karts in under 2:40 minutes."
+msgstr "Voltooi 3 ronden op 'Het racecircuit' binnen 2:40 met 3 tegenstanders"
+
+#. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
+#: data/po/gui_strings.h:484
+msgid "Finish 3 laps on the City track with 3 AI karts in under 4:20 minutes."
+msgstr "Voltooi 3 ronden van 'In de stad' binnen 4:20 met 3 tegenstanders"
+
+#. I18N: ./data/tracks/canyon/canyon.challenge
+#: data/po/gui_strings.h:454
+msgid "Finish 3 laps on the Tux Tollway track with 3 AI karts in under 3:35 minutes."
+msgstr "Rij 3 ronden over de Tolweg binnen 3:35 met 3 tegenstanders"
+
+#. I18N: ./data/tracks/jungle/jungle.challenge
+#: data/po/gui_strings.h:475
 msgid "Finish Race track in 2:40"
 msgstr "Voltooi het racecircuit binnen 2:40"
 
-#: data/tracks/canyon/canyon.challenge:5
+#. I18N: ./data/tracks/canyon/canyon.challenge
+#: data/po/gui_strings.h:451
 msgid "Finish Tux Tollway track in 3:35"
 msgstr "Doe de tolweg binnen 3 minuten en 35 seconden"
 
-#: data/tracks/snowtuxpeak/snowtuxpeak.challenge:5
+#. I18N: ./data/tracks/snowtuxpeak/snowtuxpeak.challenge
+#: data/po/gui_strings.h:481
 msgid "Finish the City track in 4:20"
 msgstr "Doe het stadsparcours binnen 4:20"
 
-#: data/grandprix/tothemoonandback.challenge:6
-msgid ""
-"Finish with at least 9 nitro \n"
-"points on 3 laps of Shifting Sands\n"
-"in under 2:20 minutes."
-msgstr ""
-"Verzamel binnen 2 minuut 20 \n"
-"ten minste 9 vaten lachgas op 3 \n"
-"ronden van 'de Zandduinen'"
+#. I18N: ./data/tracks/crescentcrossing/crescentcrossing.challenge
+#: data/po/gui_strings.h:466
+msgid "Finish with at least 6 points of nitro on three laps of Oliver's Math Class in under 52 seconds."
+msgstr "Verzamel ten minste 6 vaten lachgas in drie ronden door het wiskundelokaal van Olivier en blijf binnen 52 seconden "
 
-#: src/gui/race_gui.cpp:685
-#, c-format
+#. I18N: ./data/grandprix/tothemoonandback.challenge
+#: data/po/gui_strings.h:442
+msgid "Finish with at least 9 nitro points on 3 laps of Shifting Sands in under 2:20 minutes."
+msgstr "Verzamel binnen 2 minuut 20 ten minste 9 vaten lachgas op 3 ronden van 'de Zandduinen'"
+
+#. I18N: Shown at the end of a race
+#: src/states_screens/race_gui.cpp:76
 msgid "Finished"
 msgstr "Klaar"
 
-#: data/tracks/crescentcrossing/crescentcrossing.challenge:6
-msgid ""
-"Finsih with at least 6 points\n"
-" of intro on three laps of\n"
-"Oliver's Math Class\n"
-"in under 52 seconds."
-msgstr ""
-"Verzamel ten minste 6 vaten \n"
-"lachgas in drie ronden door het \n"
-"wiskundelokaal van Olivier \n"
-"en blijf binnen 52 seconden "
-
-#. I18N: name of controls, like in "fire missile"
-#: src/gui/player_controls.cpp:74
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:296
 msgid "Fire"
 msgstr "Vuren"
 
-#: data/grandprix/penguinplayground.grandprix:5
-msgid "First grand prix, easy to get started"
-msgstr "De eerste Grand Prix. Om er even in te komen"
-
-#: src/gui/game_mode.cpp:77
-#: src/gui/game_mode.cpp:115
-#: data/followtheleader.challenge:7
+#. I18N: Game mode
+#: src/race/race_manager.hpp:119
 msgid "Follow the Leader"
-msgstr "Zwaan kleef aan"
+msgstr "Zwaan-kleef-aan"
 
-#: data/tracks/city/city.challenge:5
+#. I18N: ./data/tracks/city/city.challenge
+#: data/po/gui_strings.h:457
 msgid "Follow the Leader in the Jungle"
 msgstr "Zwaan-kleef-aan in de jungle"
 
-#: data/grandprix/atworldsend.challenge:5
-msgid ""
-"Follow the Leader on a\n"
-"Desert Island"
-msgstr ""
-"Zwaan-kleef-aan op \n"
-"een tropisch eiland"
+#. I18N: ./data/grandprix/atworldsend.challenge
+#: data/po/gui_strings.h:427
+msgid "Follow the Leader on a Desert Island"
+msgstr "Zwaan-kleef-aan op een tropisch eiland"
 
-#: src/gui/help_page_three.cpp:70
-msgid ""
-"Follow the leader: run for second place, as the last kart\n"
-"will be disqualified every time the counter hits zero.\n"
-" Beware : going in front of the leader will get you eliminated too!"
-msgstr ""
-"Volg de leider: Als de klok op nul staat wordt de laatste kart\n"
-" geëlimineerd. Dus wordt tweede om te winnen!\n"
-"Pas op: de karts VOOR de  leider worden ook geëlimineerd!"
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:150
+msgid "Follow the leader: run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"
+msgstr "Volg de leider: Als de klok op nul staat wordt de laatste kart geïlimineerd. Dus wordt tweede om te winnen! Pas op: de karts VOOR de  leider worden ook geëlimineerd!"
 
-#: src/gui/help_page_one.cpp:69
-msgid "Force your rivals bite *your* dust!"
-msgstr "Laat je rivalen stof happen!"
-
-#: data/tracks/fortmagma/fortmagma.track:4
-msgid "Fort Magma"
-msgstr "Fort magma"
-
-#: src/gui/num_players.cpp:41
-msgid "Four Players"
-msgstr "Vier spelers"
-
-#: src/gui/config_display.cpp:80
-#: src/gui/config_display.cpp:135
-#: src/gui/config_display.cpp:193
-msgid "Fullscreen mode"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: In the video settings
+#: data/po/gui_strings.h:237
+msgid "Fullscreen"
 msgstr "Volledig scherm"
 
-#: src/gui/game_mode.cpp:152
-msgid "Game mode help"
-msgstr "Spelvorm informatie"
-
-#: src/gui/help_page_three.cpp:43
-msgid "Game modes"
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:47
+#: data/po/gui_strings.h:94
+#: data/po/gui_strings.h:135
+msgid "Game Modes"
 msgstr "Spelvormen"
 
-#: src/gui/challenges_menu.cpp:55
-#: src/gui/credits_menu.cpp:79
-msgid "Go back to the main menu"
-msgstr "Terug naar het hoofdmenu"
+#. I18N: to appear in input configuration screen, for gamepad buttons
+#: src/input/input.cpp:482
+#, c-format
+msgid "Gamepad button %d"
+msgstr "Gamepad knop %d"
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:836
+#. I18N: to appear in input configuration screen, for gamepad hats
+#: src/input/input.cpp:486
+#, c-format
+msgid "Gamepad hat %d"
+msgstr "Gamepad hoed %d"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:39
+#: data/po/gui_strings.h:86
+#: data/po/gui_strings.h:127
+msgid "General"
+msgstr "Algemeen"
+
+#: src/states_screens/race_gui.cpp:81
 msgid "Go!"
 msgstr "Af!"
 
-#: src/gui/help_page_one.cpp:73
-msgid "Grab blue boxes and nitro"
-msgstr "Pak blauwe dozen en lachgas"
-
-#: src/gui/game_mode.cpp:99
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: Section in track selection screen
+#: data/po/gui_strings.h:396
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
-#: src/gui/help_page_three.cpp:50
-msgid ""
-"Grand Prix: Win victory points \n"
-"by racing through a group of tracks,  \n"
-"most points wins (shortest time in case of a tie!)          "
-msgstr ""
-"Grand Prix: Per parcours win je punten door vooraan te \n"
-"eindigen in de groep. De beste over alle parcoursen wit! \n"
-"(Bij gelijkspel geldt de laaste totaaltijd)"
-
-#: src/gui/main_menu.cpp:75
-#: src/gui/race_menu.cpp:49
+#. I18N: In the 'paused' screen
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:126
+#: data/po/gui_strings.h:190
 msgid "Help"
 msgstr "Hulp"
 
-#: src/gui/race_results_gui.cpp:120
+#: src/states_screens/dialogs/race_over_dialog.cpp:153
 msgid "Highscores"
 msgstr "Hoogste scores"
 
-#: src/gui/help_page_one.cpp:130
-msgid ""
-"If you see a button with a lock like the one to the right,\n"
-"you need to complete a challenge to unlock it."
-msgstr ""
-"Het icoontje van een slot geeft aan dat je een uitdaging\n"
-" moet winnen voordat deze optie actief wordt."
+#: src/states_screens/race_setup_screen.cpp:190
+msgid "Hit others with weapons until they lose all their lives. (Only in multiplayer games)"
+msgstr "Alleen voor meerdere spelers. Raak de tegenstanders met je wapens om te winnen."
 
-#: src/gui/config_display.cpp:94
-msgid "Increase Resolution"
-msgstr "Verhoog resolutie"
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:67
+msgid "If you see a button with a lock like this one, you need to complete a challenge to unlock it."
+msgstr "Een item met hangslot is pas beschikbaar als er een uitdaging gewonnen wordt"
 
-#: src/user_config.cpp:1004
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:385
+msgid "Intermediate"
+msgstr "Gemiddeld"
+
+#: src/states_screens/options_screen_input.cpp:234
 #, c-format
-msgid "Invalid"
-msgstr "Ongeldig"
+msgid "Keyboard %i"
+msgstr "Toetsenbord %i"
 
-#: src/karts/player_kart.cpp:365
-msgid "Invalid short-cut!!"
-msgstr "Niet afsteken!!"
-
-#: data/tracks/castle/castle.track:4
-msgid "King Weird's Castle"
-msgstr "Het Krankioreme Kasteel van de Koning"
-
-#: src/gui/race_gui.cpp:690
+#: src/states_screens/race_gui.cpp:77
 msgid "Lap"
 msgstr "Ronde"
 
-#: data/grandprix/atworldsend.grandprix:5
-msgid "Last grand prix, longer and harder"
-msgstr "De laatse Grand Prix. Langer en zwaarder"
-
-#: src/modes/follow_the_leader.cpp:139
+#: src/modes/follow_the_leader.cpp:152
 msgid "Leader"
 msgstr "Leider"
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:68
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:280
 msgid "Left"
 msgstr "Links"
 
-#: src/gui/race_results_gui.cpp:303
-#: src/gui/start_race_feedback.cpp:86
-msgid "Loading race..."
-msgstr "Bezig met het laden..."
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/challenges.cpp:83
+#: src/states_screens/race_setup_screen.cpp:175
+#: src/states_screens/tracks_screen.cpp:151
+msgid "Locked : solve active challenges to gain access to more!"
+msgstr "Op slot: Te openen door uitdagingen te winnen"
 
-#. I18N: name of controls
-#: src/gui/player_controls.cpp:76
-msgid "Look back"
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:328
+msgid "Look Back"
 msgstr "Achteruit kijken"
 
-#: src/gui/main_menu.cpp:58
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:51
+msgid "Make your rivals bite dust!"
+msgstr "Laat je rivalen stof happen!"
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#: src/input/input.cpp:494
+#, c-format
+msgid "Mouse axis %d %s"
+msgstr "muis as %d %s"
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used at all)
+#: src/input/input.cpp:490
+#, c-format
+msgid "Mouse button %d"
+msgstr "muisknop %d"
+
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in the audio/video settings submenu
+#: data/po/gui_strings.h:217
+msgid "Music"
+msgstr "Muziek"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:178
 msgid "Networking"
 msgstr "Netwerk"
 
-#: src/gui/feature_unlocked.cpp:37
-msgid "New Feature Unlocked"
-msgstr "Nieuwe optie geactiveerd"
-
-#: src/challenges/challenge.cpp:136
+#: src/challenges/challenge.cpp:123
 #, c-format
 msgid ""
 "New Grand Prix '%s'\n"
@@ -514,7 +598,7 @@ msgstr ""
 "Grand Prix '%s'\n"
 "is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:140
+#: src/challenges/challenge.cpp:129
 #, c-format
 msgid ""
 "New difficulty\n"
@@ -525,11 +609,11 @@ msgstr ""
 "'%s'\n"
 "is nu beschikbaar!"
 
-#: src/modes/linear_world.cpp:286
+#: src/modes/linear_world.cpp:257
 msgid "New fastest lap"
 msgstr "Nieuwe snelste ronde"
 
-#: src/challenges/challenge.cpp:131
+#: src/challenges/challenge.cpp:116
 #, c-format
 msgid ""
 "New game mode\n"
@@ -539,7 +623,7 @@ msgstr ""
 "Nieuwe spelvorm\n"
 "'%s'is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:144
+#: src/challenges/challenge.cpp:135
 #, c-format
 msgid ""
 "New kart\n"
@@ -549,7 +633,7 @@ msgstr ""
 "Nieuwe kart '%s'\n"
 "is nu beschikbaar!"
 
-#: src/challenges/challenge.cpp:127
+#: src/challenges/challenge.cpp:110
 #, c-format
 msgid ""
 "New track '%s'\n"
@@ -558,298 +642,246 @@ msgstr ""
 "Nieuw parcours '%s'\n"
 "is nu beschikbaar!"
 
-#: src/gui/help_page_one.cpp:156
-#: src/gui/help_page_two.cpp:134
-msgid "Next >"
-msgstr "Volgende >"
-
-#: src/gui/config_display.cpp:84
-msgid "Next background"
-msgstr "Volgende achtergrond"
-
-#: src/gui/player_controls.cpp:72
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:304
 msgid "Nitro"
 msgstr "Lachgas"
 
-#: src/gui/grand_prix_select.cpp:63
-#: src/gui/grand_prix_select.cpp:69
-msgid "No Grand Prix selected"
-msgstr "Geen Grand Prix geselecteerd"
+#. I18N: Game mode
+#: src/race/race_manager.hpp:115
+msgid "Normal Race"
+msgstr "Normale Race"
 
-#: src/gui/race_options.cpp:325
-#: src/gui/race_options.cpp:328
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#: data/po/gui_strings.h:381
 msgid "Novice"
 msgstr "Beginneling"
 
-#: src/gui/race_options.cpp:100
-msgid "Number of karts"
-msgstr "Kies het aantal karts"
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: In race setup menu
+#: data/po/gui_strings.h:377
+msgid "Number of AI karts"
+msgstr "Aantal karts"
 
-#: src/gui/race_options.cpp:122
-msgid "Number of laps"
-msgstr "Kies het aantal ronden"
-
-#: src/gui/network_gui.cpp:158
-#: src/gui/race_results_gui.cpp:49
-msgid "OK"
-msgstr "OK"
-
-#: src/user_config.cpp:528
-msgid "Old config file found, check your key bindings!"
-msgstr "Oud configuratiebestand gevonden, controleer toetsinstellingen!"
-
-#: data/tracks/olivermath/olivermath.track:4
-msgid "Oliver's Math Class"
-msgstr "De wiskundeklas van Olivier"
-
-#: data/tracks/beach/beach.track:4
-msgid "On the Beach"
-msgstr "Strandvakantie"
-
-#: src/gui/main_menu.cpp:63
-#: src/gui/options.cpp:40
-#: src/gui/race_menu.cpp:48
+#. I18N: In the 'paused' screen
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:116
+#: data/po/gui_strings.h:186
 msgid "Options"
 msgstr "Opties"
 
-#: src/gui/help_page_two.cpp:102
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:113
 msgid "Parachute - slows down all karts in a better position!"
-msgstr "Parachute – remt alle karts voor je af!"
+msgstr "Parachute - remt alle karts voor je af!"
 
-#: src/gui/race_menu.cpp:45
+#: src/states_screens/dialogs/race_paused_dialog.cpp:54
 msgid "Paused"
 msgstr "Gepauzeerd"
 
-#: src/gui/race_gui.cpp:865
+#: src/karts/player_kart.cpp:254
 msgid "Penalty time!!"
 msgstr "Straftijd!!"
 
-#: data/grandprix/penguinplayground.grandprix:4
+#. I18N: ./data/gui/tracks.stkgui
+#: data/po/gui_strings.h:399
 msgid "Penguin Playground"
 msgstr "Speeltuin voor pinguïns"
 
-#. I18N: as in 'Player 2'
-#: src/gui/player_controls.cpp:290
-msgid "Player "
-msgstr "Speler"
-
-#: src/gui/char_sel.cpp:86
+#. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+#: src/states_screens/kart_selection.cpp:238
+#: src/states_screens/kart_selection.cpp:351
 #, c-format
-msgid "Player %d, choose a driver"
-msgstr "Speler %d, kies een karakter"
+msgid "Player %i (%s)"
+msgstr "Speler %i (%s)"
 
-#: src/gui/config_controls.cpp:46
-msgid "Player 1"
-msgstr "Speler 1"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#: data/po/gui_strings.h:209
+#: data/po/gui_strings.h:256
+#: data/po/gui_strings.h:354
+msgid "Players"
+msgstr "Spelers"
 
-#: src/gui/config_controls.cpp:47
-msgid "Player 2"
-msgstr "Speler 2"
+#. I18N: ./data/gui/help2.stkgui
+#: data/po/gui_strings.h:107
+msgid "Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight!"
+msgstr "Zuignap - Gooi hen naar een tegenstander voor je en houd hem tegen, of gooi hem naar achteren om iemands zicht te ontemen!"
 
-#: src/gui/config_controls.cpp:48
-msgid "Player 3"
-msgstr "Speler 3"
-
-#: src/gui/config_controls.cpp:49
-msgid "Player 4"
-msgstr "Speler 4"
-
-#: src/gui/options.cpp:42
-msgid "Player Config"
-msgstr "Speler instellingen"
-
-#: src/gui/player_controls.cpp:92
-msgid "Player name"
-msgstr "Naam speler"
-
-#: src/gui/help_page_two.cpp:120
-msgid ""
-"Plunger - throw straight to pull an opponent back,\n"
-"or throw while looking back to make one lose sight!"
-msgstr ""
-"Zuignap - Gooi hen naar een tegenstander voor je en\n"
-" houd hem tegen, of gooi hem naar achteren om\n"
-" iemands zicht te ontemen!"
-
-#: data/tracks/prehistoric/prehistoric.track:4
-msgid "Prehistoric Island"
-msgstr "Prehistorisch Eiland"
-
-#: src/gui/display_res_confirm.cpp:60
-msgid "Press <ESC> to Cancel"
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:49
+msgid "Press ESC to cancel"
 msgstr "Druk op <ESC> om te annuleren"
 
-#: src/gui/config_controls.cpp:53
-#: src/gui/config_display.cpp:108
-#: src/gui/config_sound.cpp:64
-#: src/gui/game_mode.cpp:158
-#: src/gui/grand_prix_select.cpp:80
-#: src/gui/network_gui.cpp:79
-#: src/gui/num_players.cpp:46
-#: src/gui/options.cpp:58
-#: src/gui/player_controls.cpp:124
-#: src/gui/race_options.cpp:152
-msgid "Press <ESC> to go back"
-msgstr "Druk op <ESC> om terug te keren"
-
-#: src/gui/player_controls.cpp:168
-msgid "Press key"
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:32
+msgid "Press a key"
 msgstr "Druk op een toets"
 
-#: src/gui/game_mode.cpp:67
-#: src/gui/game_mode.cpp:105
-msgid "Quick Race"
-msgstr "Instant wedstrijd"
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In players configuration menu
+#: data/po/gui_strings.h:362
+msgid "Press enter or double-click on a player to edit him/her"
+msgstr "Druk op Enter of dubbelklik op een speler om him/haar te wijzigen"
 
-#: src/gui/help_page_three.cpp:58
-msgid "Quick race: Pick a single track, shortest time wins.         "
-msgstr "Snelle race: Één enkel parcours, snelste tijd wint"
-
-#: src/gui/main_menu.cpp:64
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:198
 msgid "Quit"
 msgstr "Einde"
 
-#: src/gui/race_gui.cpp:637
-msgid "REV"
-msgstr "R"
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#: data/po/gui_strings.h:174
+msgid "Race"
+msgstr "Coureur"
 
-#: src/gui/race_results_gui.cpp:74
+#: src/states_screens/dialogs/race_over_dialog.cpp:61
+msgid "Race Results"
+msgstr "Wedstrijdresultaat"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#: data/po/gui_strings.h:373
+msgid "Race Setup"
+msgstr "Wedstrijdregels"
+
+#: src/states_screens/dialogs/race_over_dialog.cpp:213
 msgid "Race in this track again"
 msgstr "Doe dit parcours opnieuw"
 
-#: src/gui/race_results_gui.cpp:92
-msgid "Race results"
-msgstr "Wedstrijdresultaat"
+#: src/states_screens/arenas_screen.cpp:90
+msgid "Random Arena"
+msgstr "Willekeurige Arena"
 
-#: src/gui/race_options.cpp:327
-msgid "Racer"
-msgstr "Coureur"
+#: src/states_screens/kart_selection.cpp:667
+#: src/states_screens/kart_selection.cpp:975
+#: src/states_screens/kart_selection.cpp:1265
+msgid "Random Kart"
+msgstr "Willekeurige Kart"
 
-#: data/tracks/racetrack/racetrack.track:4
-msgid "Racetrack"
-msgstr "Racecircuit"
+#: src/states_screens/tracks_screen.cpp:158
+msgid "Random Track"
+msgstr "Willekeurig circuit"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:816
+#: src/states_screens/race_gui.cpp:79
 msgid "Ready!"
 msgstr "Op uw plaatsen?"
 
-#: src/gui/player_controls.cpp:72
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:142
+msgid "Regular Race - all blows allowed, so catch weapons and make clever use of them!"
+msgstr "Normale race - alles is toegestaan, dus grijp die wapens en gebruik ze slim!"
+
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:103
+msgid "Remove"
+msgstr "Verwijder"
+
+#. I18N: In the player info dialog
+#: src/states_screens/dialogs/player_info_dialog.cpp:70
+msgid "Rename"
+msgstr "Hernoem"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:320
 msgid "Rescue"
 msgstr "Herstellen"
 
-#: src/gui/race_menu.cpp:50
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_paused_dialog.cpp:106
 msgid "Restart Race"
 msgstr "Herstart wedstrijd"
 
-#: src/gui/race_menu.cpp:47
-msgid "Return To Race"
-msgstr "Terug naar de wedstrijd"
-
-#. I18N: name of controls (here, 'right' is the opposite of 'left' not the opposite of 'wrong')
-#: src/gui/player_controls.cpp:70
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:288
 msgid "Right"
 msgstr "Rechts"
 
-#: data/grandprix/tothemoonandback.grandprix:5
-msgid "Second grand prix"
-msgstr "Tweede Grand Prix"
+#: src/states_screens/race_setup_screen.cpp:182
+msgid "Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!"
+msgstr "Als de klok op nul staat wordt de laatste kart geëlimineerd. Dus wordt tweede om te winnen! Pas op: de karts VOOR de  leider worden ook geëlimineerd!"
 
-#: src/gui/network_gui.cpp:52
-msgid "Select network mode"
-msgstr "Kies netwerk type"
+#. I18N: ./data/gui/racesetup.stkgui
+#: data/po/gui_strings.h:392
+msgid "Select a game mode"
+msgstr "Kies speltype"
 
-#. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/gui/race_gui.cpp:826
+#: src/states_screens/race_gui.cpp:80
 msgid "Set!"
 msgstr "Klaar?"
 
-#: src/gui/race_menu.cpp:55
-#: src/gui/race_results_gui.cpp:79
+#. I18N: In the 'paused' screen
+#: src/states_screens/dialogs/race_over_dialog.cpp:201
+#: src/states_screens/dialogs/race_paused_dialog.cpp:96
 msgid "Setup New Race"
 msgstr "Nieuwe wedstrijd maken"
 
-#: src/gui/player_controls.cpp:72
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Key binding
+#: data/po/gui_strings.h:312
 msgid "Sharp Turn"
 msgstr "Korte bocht"
 
-#: data/tracks/sandtrack/sandtrack.track:4
-msgid "Shifting Sands"
-msgstr "De zandduinen"
-
-#: src/gui/main_menu.cpp:53
-msgid "Single Player"
-msgstr "Enkele speler"
-
-#: src/gui/game_mode.cpp:61
-msgid "Single Race"
-msgstr "Enkele wedstrijd"
-
-#: data/tracks/skyline/skyline.track:4
-msgid "Skyline"
-msgstr "Futurodam"
-
-#: data/grandprix/snagdrive.grandprix:4
+#. I18N: ./data/gui/tracks.stkgui
+#: data/po/gui_strings.h:402
 msgid "Snag Drive"
 msgstr "Beren op de weg"
 
-#: data/tracks/snowmountain/snowmountain.track:4
-msgid "Snow Mountain"
-msgstr "Sneeuwberg"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in audio/video settings submenu
+#: data/po/gui_strings.h:225
+msgid "Sound Effects"
+msgstr "Geluidseffecten"
 
-#: data/tracks/snowtuxpeak/snowtuxpeak.track:4
-msgid "SnowTux Peak"
-msgstr "SneeuwTux berg"
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#: data/po/gui_strings.h:7
+msgid "Standard"
+msgstr "Standaard"
 
-#: src/gui/options.cpp:53
-msgid "Sound"
-msgstr "Geluid"
-
-#: src/gui/config_sound.cpp:40
-msgid "Sound Settings"
-msgstr "Geluid instellingen"
-
-#: src/gui/main_menu.cpp:54
-msgid "Splitscreen"
-msgstr "Gesplitst scherm"
-
-#: data/tracks/startrack/startrack.track:4
-msgid "Star Track"
-msgstr "Tussen de sterren"
-
-#: src/gui/race_options.cpp:142
-msgid "Start race"
+#: src/states_screens/dialogs/track_info_dialog.cpp:125
+msgid "Start Race"
 msgstr "Start wedstrijd"
 
-#: src/gui/start_race_feedback.cpp:39
-msgid "Synchronising network..."
-msgstr "Netwerk synchoniseren..."
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: ./data/gui/help3.stkgui
+#: data/po/gui_strings.h:35
+#: data/po/gui_strings.h:82
+#: data/po/gui_strings.h:123
+msgid "SuperTuxKart Help"
+msgstr "SuperTuxKart Hulp"
 
-#: src/gui/race_results_gui.cpp:273
-msgid "Synchronising."
-msgstr "Synchroniseren."
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_players.stkgui
+#: data/po/gui_strings.h:201
+#: data/po/gui_strings.h:248
+#: data/po/gui_strings.h:346
+msgid "SuperTuxKart Options"
+msgstr "SuperTuxKart Opties"
 
-#: src/gui/help_page_one.cpp:145
-msgid ""
-"The 'sharp turn' key allows you to do sharp turns\n"
-"and have better control in tight curves"
-msgstr ""
-"Gebruik de 'krappe bocht toets' als je een krappe\n"
-" bocht nadert. Voorkomt dat je moet steken."
+#. I18N: ./data/gui/help3.stkgui
+#: data/po/gui_strings.h:138
+msgid "SuperTuxKart features several game modes"
+msgstr "SuperTuxKart heeft meerdere speltypen"
 
-#: data/tracks/islandtrack/islandtrack.track:4
-msgid "The Island"
-msgstr "Het Eiland"
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help menu
+#: data/po/gui_strings.h:71
+msgid "The 'sharp turn' key allows you to do sharp turns and have better control in tight curves"
+msgstr "Gebruik de 'krappe bocht toets' als je een krappe bocht nadert. Voorkomt dat je moet steken."
 
-#: src/gui/help_page_one.cpp:117
-msgid ""
-"The current key bindings can be seen/changed in the\n"
-"Options->Player Config menu."
-msgstr ""
-"Bekijk en/of wijzig de huidige toetsinstellingen in het\n"
-"Opties->Speler instellingen menu"
-
-#: src/highscore_manager.cpp:108
+#: src/race/highscore_manager.cpp:107
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -857,176 +889,127 @@ msgstr ""
 "Het recordbestand was te oud,\n"
 "de records zijn verwijderd."
 
-#: data/tracks/mines/mines.track:4
-msgid "The old mine"
-msgstr "De oude mijn"
-
-#: src/gui/grand_prix_ending.cpp:84
-#, c-format
-msgid "The winner is %s!"
-msgstr "De winnar is %s!"
-
-#: data/grandprix/snagdrive.grandprix:5
-msgid "Third grand prix"
-msgstr "Derde Grand Prix"
-
-#: src/gui/num_players.cpp:40
-msgid "Three Players"
-msgstr "Drie spelers"
-
-#: src/gui/game_mode.cpp:72
-#: src/gui/game_mode.cpp:110
+#. I18N: Game mode
+#: src/race/race_manager.hpp:117
 msgid "Time Trial"
 msgstr "Tegen de klok"
 
-#: src/gui/help_page_three.cpp:63
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:146
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
 msgstr "Tegen de klok: Er zijn geen bonus items, dus alles hangt van je stuurmankunst af!"
 
-#: src/gui/help_page_two.cpp:58
-msgid "To help you win, there are certain powerups you can grab:"
+#: src/states_screens/dialogs/add_device_dialog.cpp:45
+msgid ""
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
+"\n"
+"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+msgstr ""
+"Plug je Gamepad/Joystick in de computer, zet hem aan (indien nodig), en start SuperTuxKart. De Gamepad/Joystick staat dan in deze lijst.\n"
+"\n"
+"Onderstaande knop voegt een toetsenbordconfiguratie toe, maar LET OP: \n"
+"De meeste toetsenborden kunnen maar een beperkt aantal toetsaanslagen per keer verwerken, wat spelen onmogelijk maakt. Je kan meerdere toetsenborden aan 1 computer verbinden, maar de twee spelers moeten nog steeds verschillende toetscombinaties gebruiken."
+
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu
+#: data/po/gui_strings.h:98
+msgid "To help you win, there are some powerups you can collect :"
 msgstr "Om je te helpen, kun je deze dingen verzamelen en gebruiken:"
 
-#: data/grandprix/tothemoonandback.grandprix:4
+#. I18N: ./data/gui/tracks.stkgui
+#: data/po/gui_strings.h:405
 msgid "To the Moon and Back"
 msgstr "Naar de maan (en terug)"
 
-#: src/gui/config_sound.cpp:46
-#: src/gui/config_sound.cpp:91
-msgid "Turn off music"
-msgstr "Muziek uit"
+#. I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
+#: src/states_screens/dialogs/track_info_dialog.cpp:73
+#, c-format
+msgid "Track by %s"
+msgstr "Parcours door %s"
 
-#: src/gui/config_sound.cpp:55
-#: src/gui/config_sound.cpp:104
-msgid "Turn off sound effects"
-msgstr "Geluidseffecten uit"
+#. I18N: ./data/gui/options_av.stkgui
+#. I18N: Section in the audio/video settings submenu
+#: data/po/gui_strings.h:233
+msgid "Video"
+msgstr "Video"
 
-#: src/gui/config_sound.cpp:50
-#: src/gui/config_sound.cpp:85
-msgid "Turn on music"
-msgstr "Muziek aan"
-
-#: src/gui/config_sound.cpp:59
-#: src/gui/config_sound.cpp:99
-msgid "Turn on sound effects"
-msgstr "Geluidseffecten aan"
-
-#: data/tracks/tuxtollway/tuxtollway.track:4
-msgid "Tux Tollway"
-msgstr "Tolweg van Tux"
-
-#: src/gui/num_players.cpp:39
-msgid "Two Players"
-msgstr "Twee spelers"
-
-#: src/modes/linear_world.cpp:654
+#: src/modes/linear_world.cpp:612
 msgid "WRONG WAY!"
 msgstr "VERKEERDE RICHTING!"
 
-#: src/gui/char_sel.cpp:126
-#: src/gui/network_gui.cpp:162
-msgid "Waiting for clients"
-msgstr "Wachten op clients"
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#: data/po/gui_strings.h:43
+#: data/po/gui_strings.h:90
+#: data/po/gui_strings.h:131
+msgid "Weapons"
+msgstr "Wapens"
 
-#: src/gui/char_sel.cpp:124
-#: src/gui/network_gui.cpp:118
-msgid "Waiting for server"
-msgstr "Wachten op server"
+#. I18N: ./data/followtheleader.challenge
+#: data/po/gui_strings.h:415
+msgid "Win Penguin Playground Grand Prix"
+msgstr "Win de Grand Prix 'Speeltuin voor pinguïns'"
 
-#: data/followtheleader.challenge:5
-msgid ""
-"Win Penguin Playground Grand\n"
-"Prix"
-msgstr ""
-"Win de Grand Prix \n"
-"'Speeltuin voor pinguïns'"
+#. I18N: ./data/followtheleader.challenge
+#: data/po/gui_strings.h:418
+msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
+msgstr "Win de Grand Prix 'Speeltuin voor pinguïns' op niveau 'Coureur' en 3 tegenstanders"
 
-#: data/followtheleader.challenge:6
-msgid ""
-"Win Penguin Playground Grand\n"
-"Prix with 3 'Racer' Level AI karts."
-msgstr ""
-"Win de Grand Prix \n"
-"'Speeltuin voor pinguïns' \n"
-"op niveau 'Coureur' en 3 tegenstanders"
+#. I18N: ./data/grandprix/snagdrive.challenge
+#: data/po/gui_strings.h:433
+msgid "Win To the Moon and Back Grand Prix"
+msgstr "Win de Grand Prix 'Naar de maan (en terug)'"
 
-#: data/grandprix/snagdrive.challenge:5
-msgid ""
-"Win To the Moon and Back\n"
-"Grand Prix"
-msgstr ""
-"Win de Grand Prix \n"
-"'Naar de maan (en terug)'"
+#. I18N: ./data/tracks/fortmagma/fortmagma.challenge
+#: data/po/gui_strings.h:472
+msgid "Win a 1 lap Head to Head on Tux Tollway against 1 'Racer' level AI kart."
+msgstr "Race en win 1 ronde over de tolweg tegen 1 tegenstander op 'Coureur' niveau"
 
-#: data/tracks/fortmagma/fortmagma.challenge:6
-msgid ""
-"Win a 1 lap Head to Head\n"
-"on Tux Tollway against 1 'Racer'\n"
-"level AI kart."
-msgstr ""
-"Race en win 1 ronde over de \n"
-"tolweg tegen 1 tegenstander \n"
-"op 'Coureur' niveau"
+#. I18N: ./data/karts/gnu/gnu.challenge
+#: data/po/gui_strings.h:448
+msgid "Win a 4 lap race on Snow Mountain against 4 'Racer' level AI kart."
+msgstr "Race en win 1 ronde over de sneeuwberg tegen 4 tegenstanders op 'Coureur' niveau"
 
-#: data/tracks/city/city.challenge:6
-msgid ""
-"Win a Follow the Leader race\n"
-"with 3 AI karts\n"
-"in the Amazonian Jungle."
-msgstr ""
-"Win een zwaan-kleef-aan \n"
-"met 3 tegenstanders \n"
-"in de Amazone"
+#. I18N: ./data/tracks/city/city.challenge
+#: data/po/gui_strings.h:460
+msgid "Win a Follow the Leader race with 3 AI karts in the Amazonian Jungle."
+msgstr "Win een zwaan-kleef-aan met 3 tegenstanders in de Amazone"
 
-#: data/grandprix/atworldsend.challenge:6
-msgid ""
-"Win a Follow the Leader race\n"
-"with 3 AI karts\n"
-"on a Desert Island."
-msgstr ""
-"Win een zwaan-kleef-aan \n"
-"met 3 tegenstanders \n"
-"op het tropisch eiland"
+#. I18N: ./data/grandprix/atworldsend.challenge
+#: data/po/gui_strings.h:430
+msgid "Win a Follow the Leader race with 3 AI karts on a Desert Island."
+msgstr "Win een zwaan-kleef-aan met 3 tegenstanders op het tropisch eiland"
 
-#: data/tracks/fortmagma/fortmagma.challenge:5
-msgid ""
-"Win a Head to Head on\n"
-"Tux Tollway"
-msgstr ""
-"Win een 1 op 1 duel \n"
-"over de tolweg"
+#. I18N: ./data/tracks/fortmagma/fortmagma.challenge
+#: data/po/gui_strings.h:469
+msgid "Win a Head to Head on Tux Tollway"
+msgstr "Win een 1 op 1 duel over de tolweg"
 
-#: data/grandprix/alltracks.challenge:5
-msgid ""
-"Win the At World's End\n"
-"Grand Prix"
-msgstr ""
-"Win de Grand Prix\n"
-"'Het einde van de wereld'"
+#. I18N: ./data/karts/gnu/gnu.challenge
+#: data/po/gui_strings.h:445
+msgid "Win a race on Snow Mountain"
+msgstr "Win een race over de Sneeuwberg"
 
-#: data/grandprix/snagdrive.challenge:6
-msgid ""
-"Win the To the Moon and Back\n"
-"Grand Prix with 3 'Racer'\n"
-"Level AI karts."
-msgstr ""
-"Win de Grand Prix 'Naar de \n"
-"maan' met drie tegenstandes \n"
-"op 'Coureur' niveau"
+#. I18N: ./data/grandprix/alltracks.challenge
+#: data/po/gui_strings.h:421
+msgid "Win the At World's End Grand Prix"
+msgstr "Win de Grand Prix 'Het einde van de wereld'"
 
-#: src/gui/config_display.cpp:75
-msgid "Window mode"
-msgstr "In venster"
+#. I18N: ./data/grandprix/snagdrive.challenge
+#: data/po/gui_strings.h:436
+msgid "Win the To the Moon and Back Grand Prix with 3 'Racer' Level AI karts."
+msgstr "Win de Grand Prix 'Naar de maan' met drie tegenstandes op 'Coureur' niveau"
 
-#: data/tracks/xr591/xr591.track:4
-msgid "XR591"
-msgstr "XR591"
-
-#: src/karts/player_kart.cpp:303
+#: src/karts/player_kart.cpp:354
 msgid "You finished the race!"
 msgstr "Race afgelopen!"
 
-#: src/modes/world.cpp:408
+#: src/modes/world.cpp:457
 msgid ""
 "You have been\n"
 "eliminated!"
@@ -1034,45 +1017,30 @@ msgstr ""
 "Je bent\n"
 "geëlimineerd!"
 
-#: src/karts/player_kart.cpp:303
+#: src/karts/player_kart.cpp:353
 msgid "You won the race!"
 msgstr "Je hebt de race gewonnen!"
 
-#: src/gui/help_page_two.cpp:93
-msgid "Zipper - speed boost"
-msgstr "Pijltje – extra snelheid"
+#. I18N: Unbound key binding
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Unbound key binding
+#: src/input/input.cpp:39
+#: data/po/gui_strings.h:268
+#: data/po/gui_strings.h:276
+#: data/po/gui_strings.h:284
+#: data/po/gui_strings.h:292
+#: data/po/gui_strings.h:300
+#: data/po/gui_strings.h:308
+#: data/po/gui_strings.h:316
+#: data/po/gui_strings.h:324
+#: data/po/gui_strings.h:332
+msgid "[none]"
+msgstr "[geen]"
 
-#: src/user_config.cpp:986
-#, c-format
-msgid "joy %d axis %d  %c"
-msgstr "joystick %d as %d  %c"
-
-#: src/user_config.cpp:991
-#, c-format
-msgid "joy %d btn %d"
-msgstr "joystick %d knop %d"
-
-#: src/user_config.cpp:994
-#, c-format
-msgid "joy %d hat %d"
-msgstr "joystick %d hat %d"
-
-#: src/user_config.cpp:1000
-#, c-format
-msgid "mouse axis %d %c"
-msgstr "muis as %d %c"
-
-#: src/user_config.cpp:997
-#, c-format
-msgid "mouse btn %d"
-msgstr "muisknop %d"
-
-#: src/user_config.cpp:980
-#: src/user_config.cpp:1025
-#, c-format
-msgid "not set"
-msgstr "geen waarde"
-
-#~ msgid "Race Track"
-#~ msgstr "Racecircuit"
+#~ msgid "Special"
+#~ msgstr "Speciaal"
+#~ msgid "all"
+#~ msgstr "alle"
+#~ msgid "bottom"
+#~ msgstr "onder"
 
