@@ -41,6 +41,7 @@ typedef std::map<std::string,scene::IMesh*>::const_iterator CI_type;
 
 ItemManager::ItemManager()
 {
+    m_switch_time = -1.0f;
     m_all_meshes.clear();
     // The actual loading is done in loadDefaultItems
 
