@@ -112,7 +112,7 @@ void MainLoop::updateRace(float dt)
     if ( World::getWorld()->getPhase() != WorldStatus::LIMBO_PHASE)
     {
         history->update(dt);
-        World::getWorld()->update(dt);
+        World::getWorld()->updateWorld(dt);
     }   // phase != limbo phase
 }   // updateRace
 

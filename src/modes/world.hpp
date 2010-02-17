@@ -110,7 +110,6 @@ protected:
     void  removeKart        (int kart_number);
     Controller* 
           loadAIController  (Kart *kart);
-    void  estimateFinishTimes();
 
     virtual Kart *createKart(const std::string &kart_ident, int index, 
                              int local_player_id, int global_player_id,
@@ -122,8 +121,19 @@ protected:
     /** Pointer to the race GUI. The race GUI is handedl by world. */
     RaceGUI *m_race_gui;
 
-    virtual void onGo();
-    
+    virtual void    onGo();
+    /** Returns true if the race is over. Must be defined by all modes. */
+    virtual bool    isRaceOver() = 0;
+    virtual void    update(float dt);
+    /** Used for AI karts that are still racing when all player kart finished.
+     *  Generally it should estimate the arrival time for those karts, but as
+     *  a default (useful for battle mode and ftl races) we just use the 
+     *  current time for this (since this is a good value for karts still 
+     *  around at the end of a race, and other criteria (number of lives,
+     *  race position) will be used to determine the final order.
+     */
+    virtual float   estimateFinishTimeForKart(Kart* kart) {return getTime(); }
+
 public:
                     World();
     virtual        ~World();
@@ -139,9 +149,7 @@ public:
         results will be incorrect */
     virtual void    init();
     
-    virtual void    update(float delta);
-    /** Returns true if the race is over. Must be defined by all modes. */
-    virtual bool    isRaceOver() = 0;
+    void            updateWorld(float dt);
     virtual void    restartRace();
     void            disableRace(); // Put race into limbo phase
     /** Returns a pointer to the race gui. */
@@ -225,7 +233,6 @@ public:
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
     virtual void raceResultOrder( int* order ) = 0;
-    void createEndKart(unsigned int i);
 };
 
 #endif

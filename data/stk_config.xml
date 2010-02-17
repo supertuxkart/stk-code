@@ -48,7 +48,7 @@ final-camera-time is the time for the final camera to reach it's destination
     max-skidmarks="100"
     skid-fadeout-time="60"
     near-ground="2"
-    delay-finish-time="10"
+    delay-finish-time="4"
     music-credit-time="10"
     final-camera-time="1.5"
 />

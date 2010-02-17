@@ -44,7 +44,8 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-EndController::EndController(Kart *kart) : Controller(kart)
+EndController::EndController(Kart *kart, ActivePlayer *player) 
+             : Controller(kart, player)
 {
     m_kart_length = m_kart->getKartProperties()->getKartModel()->getLength();
     m_kart_width  = m_kart->getKartProperties()->getKartModel()->getWidth();
@@ -55,11 +56,13 @@ EndController::EndController(Kart *kart) : Controller(kart)
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
 
-    // Initialise the fields with -1
+    // Initialise the fields
     for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
     {
         m_next_node_index.push_back(-1);
-        m_successor_index.push_back(-1);
+        // 0 is always a valid successor - so even if the kart should end
+        // up by accident on a non-selected path, it will keep on working.
+        m_successor_index.push_back(0);
     }
     // For now pick one part on random, which is not adjusted during the run
     std::vector<unsigned int> next;

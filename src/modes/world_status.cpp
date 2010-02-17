@@ -70,24 +70,31 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 }   // setClockMode
 
 //-----------------------------------------------------------------------------
-/** Adjusts the phase to be finish or delay_finish.
- *  \param delay True if there should be a delay before the game finishes.
+/** Called when the race is finished, but it still leaves some time
+ *  for an end of race animation, and potentially let some more AI karts
+ *  finish the race.
  */
-void WorldStatus::enterRaceOverState(const bool delay)
+void WorldStatus::enterRaceOverState()
 {
-    if(m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE) return; // we already know
+    // Don't
+    if(    m_phase == DELAY_FINISH_PHASE
+        || m_phase == FINISH_PHASE 
+        || m_phase == LIMBO_PHASE        ) return;
     
-    if(delay)
-    {
-        m_phase = DELAY_FINISH_PHASE;
-        m_auxiliary_timer = 0.0f;
-    }
-    else
-        m_phase = FINISH_PHASE;
+    m_phase = DELAY_FINISH_PHASE;
+    m_auxiliary_timer = 0.0f;
     
+}   // enterRaceOverState
+
+//-----------------------------------------------------------------------------
+/** Called when it's really over (delay over if any). This function must be
+ *  called after all stats were updated from the different modes!
+ */
+void WorldStatus::terminateRace()
+{
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
         network_manager->sendRaceResults();
-}   // enterRaceOverState
+}   // terminateRace
 
 //-----------------------------------------------------------------------------
 /** Updates all status information, called once per frame.
@@ -150,8 +157,8 @@ void WorldStatus::update(const float dt)
             // NOTE: no break, fall through to FINISH_PHASE handling!!
         }
         case FINISH_PHASE:
-            new RaceOverDialog(0.6f, 0.9f);
             terminateRace();
+            new RaceOverDialog(0.6f, 0.9f);
             return;
         default: break;  // default for RACE_PHASE, LIMBO_PHASE
     }

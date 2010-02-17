@@ -38,10 +38,15 @@ namespace irr
 class EndController : public Controller
 {
 private:
-    int m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
-                     //even has check around the kart, if 1, it checks around
-                     //the kart always, and more than that will check the
-                     //remaining number of steps in front of the kart, always
+    /** Stores the type of the previous controller. This is necessary so that
+     *  after the end of race ths kart (and its results) can still be 
+     *  identified to be from a player kart. */
+    bool  m_was_player_controller;
+
+    int   m_min_steps; //Minimum number of steps to check. If 0, the AI doesn't
+                       //even has check around the kart, if 1, it checks around
+                       //the kart always, and more than that will check the
+                       //remaining number of steps in front of the kart, always
     float m_max_handicap_accel; //The allowed maximum speed, in percentage,
                                 //from 0.0 to 1.0. Used only when
                                 //m_wait_for_players == true.
@@ -109,28 +114,30 @@ private:
      *variable, except handle_race_start() that isn't associated with any
      *specific action (more like, associated with inaction).
      */
-    void  handleAcceleration(const float DELTA);
-    void  handleSteering(float dt);
-    void  handleRescue(const float DELTA);
-    void  handleBraking();
-
+    void         handleAcceleration(const float DELTA);
+    void         handleSteering(float dt);
+    void         handleRescue(const float DELTA);
+    void         handleBraking();
     /*Lower level functions not called directly from update()*/
-    float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const Vec3 &point, float dt);
+    float        steerToAngle(const size_t SECTOR, const float ANGLE);
+    float        steerToPoint(const Vec3 &point, float dt);
 
-    void  checkCrashes(const int STEPS, const Vec3& pos);
-    void  findNonCrashingPoint(Vec3 *result);
-
-    float normalizeAngle(float angle);
-    int   calcSteps();
-    void  setSteering(float angle, float dt);
-    void  findCurve();
-
+    void         checkCrashes(const int STEPS, const Vec3& pos);
+    void         findNonCrashingPoint(Vec3 *result);
+    float        normalizeAngle(float angle);
+    int          calcSteps();
+    void         setSteering(float angle, float dt);
+    void         findCurve();
 public:
-                 EndController(Kart *kart);
+                 EndController(Kart *kart, ActivePlayer* player);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();
+    /** Returns if the original controller of the kart was a player 
+     *  controller. This way e.g. highscores can still be assigned
+     *  to the right player. */
+    virtual bool isPlayerController () const {return m_player!=NULL;}
+
 };   // EndKart
 
 #endif

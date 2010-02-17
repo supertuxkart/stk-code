@@ -55,10 +55,23 @@
 
 World* World::m_world = NULL;
 
+/** The main world class is used to handle the track and the karts.
+ *  The end of the race is detected in two phases: first the (abstract)
+ *  function isRaceOver, which must be implemented by all game modes,
+ *  must return true. In which case enterRaceOverState is called. At 
+ *  this time a winning (or losing) animation can be played. The WorldStatus
+ *  class will in its enterRaceOverState switch to DELAY_FINISH_PHASE,
+ *  but the remaining AI kart will keep on racing during that time.
+ *  After a time period specified in stk_config.xml WorldStatus will
+ *  switch to FINISH_PHASE and call terminateRace. Now the finishing status
+ *  of all karts is set (i.e. in a normal race the arrival time for karts
+ *  will be estimated), highscore is updated, and the race result gui
+ *  is being displayed.
+ */
 //-----------------------------------------------------------------------------
 /** Constructor. Note that in the constructor it is not possible to call any
- *  functions that use RaceManager::getWorld(), since this is only defined
- *  after the constructor. Those functions can be called in the init() 
+ *  functions that use World::getWorld(), since this is only defined
+ *  after the constructor. Those functions must be called in the init() 
  *  function, which is called immediately after the constructor.
  */
 World::World() : WorldStatus()
@@ -70,7 +83,7 @@ World::World() : WorldStatus()
 
 // ----------------------------------------------------------------------------
 /** This function is called after the World constructor. In init() functions
- *  can be called that use RaceManager::getWorld(). The init function is 
+ *  can be called that use World::getWorld(). The init function is 
  *  called immediately after the constructor.
  */
 void World::init()
@@ -146,7 +159,7 @@ void World::init()
  *         this player on the local machine.
  *  \param global_player_id If the kart is a player kart this is the index of
  *         this player globally (i.e. including network players).
- *  \param init_pos The start XYZ coordinates.
+ *  \param init_pos The start transform (xyz and hpr).
  */
 Kart *World::createKart(const std::string &kart_ident, int index,
                         int local_player_id, int global_player_id,
@@ -158,7 +171,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
     switch(race_manager->getKartType(index))
     {
     case RaceManager::KT_PLAYER:
-        std::cout << "===== World : creating player kart for kart #" << index << " which has local_player_id " << local_player_id << " ===========\n";
+        std::cout << "===== World : creating player controller for kart #" << index << " which has local_player_id " << local_player_id << " ===========\n";
         controller = new PlayerController(new_kart, 
                                           StateManager::get()->getActivePlayer(local_player_id),
                                           local_player_id);
@@ -170,7 +183,7 @@ Kart *World::createKart(const std::string &kart_ident, int index,
         //m_num_players++;
         //break;
     case RaceManager::KT_AI:
-        std::cout << "===== World : creating AI kart for #" << index << "===========\n";
+        std::cout << "===== World : creating AI controller for #" << index << "===========\n";
 
         controller = loadAIController(new_kart);
         break;
@@ -254,13 +267,27 @@ void World::onGo()
 
 //-----------------------------------------------------------------------------
 /** Called at the end of a race. Updates highscores, pauses the game, and
- *  informs the unlock manager about the finished race.
+ *  informs the unlock manager about the finished race. This function must
+ *  be called after all other stats were updated from the different game
+ *  modes.
  */
 void World::terminateRace()
 {
+    // Update the estimated finishing time for all karts that haven't
+    // finished yet.
+    const unsigned int kart_amount = getNumKarts();
+    for(unsigned int i = 0; i < kart_amount ; i++)
+    {
+        if(!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
+        {
+            m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
+
+        }
+    }   // i<kart_amount
     updateHighscores();
     WorldStatus::pause();
     unlock_manager->raceFinished();
+    WorldStatus::terminateRace();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
@@ -339,6 +366,26 @@ void World::resetAllKarts()
         if(m_karts[i]->getCamera())
             m_karts[i]->getCamera()->setInitialTransform();
 }   // resetAllKarts
+
+//-----------------------------------------------------------------------------
+/** This is the main interface to update the world. This function calls
+ *  update(), and checks for the end of the race. Note that race over 
+ *  handling can not necessarily be done in update(), since not all
+ *  data structures might have been updated (e.g.LinearWorld must
+ *  call World::update() first, to get updated kart positions. If race
+ *  over would be handled in World::update, LinearWorld had no opportunity
+ *  to update its data structures before the race is finished).
+ *  \param dt Time step size.
+ */
+void World::updateWorld(float dt)
+{
+    update(dt);
+    if( (!isFinishPhase()) && isRaceOver())
+    {
+        enterRaceOverState();
+    }
+
+}   // updateWorld
 
 //-----------------------------------------------------------------------------
 void World::update(float dt)
@@ -530,13 +577,12 @@ void World::removeKart(int kart_number)
         camera->setMode(Camera::CM_LEADER_MODE);
         m_eliminated_players++;
     }
-    //projectile_manager->newExplosion(kart->getXYZ());
+
     // The kart can't be really removed from the m_kart array, since otherwise
     // a race can't be restarted. So it's only marked to be eliminated (and
     // ignored in all loops). Important:world->getCurrentNumKarts() returns
     // the number of karts still racing. This value can not be used for loops
     // over all karts, use race_manager->getNumKarts() instead!
-    race_manager->RaceFinished(kart, WorldStatus::getTime());
     kart->eliminate();
     m_eliminated_karts++;
 
@@ -594,13 +640,4 @@ void World::unpause()
             ((PlayerController*)(m_karts[i]->getController()))->resetInputState();
 }   // pause
 
-//-----------------------------------------------------------------------------
-/** Replaces the kart with index i with an EndKart, i.e. a kart that shows the
- *  end animation, and does not use any items anymore.
- *  \param i Index of the kart to be replaced.
- */
-void World::createEndKart(unsigned int i)
-{
-    m_karts[i]->setController(new EndController(m_karts[i]));
-}   // createEndKart
 /* EOF */

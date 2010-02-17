@@ -33,26 +33,23 @@ class Player;
 class PlayerController : public Controller
 {
 private:
-    int           m_steer_val, m_steer_val_l, m_steer_val_r;
-    int           m_prev_accel;
-    bool          m_prev_brake;
+    int            m_steer_val, m_steer_val_l, m_steer_val_r;
+    int            m_prev_accel;
+    bool           m_prev_brake;
 
-    ActivePlayer *m_player;
-    float         m_penalty_time;
+    float          m_penalty_time;
 
-    SFXBase      *m_bzzt_sound;
-    SFXBase      *m_wee_sound;
-    SFXBase      *m_ugh_sound;
-    SFXBase      *m_grab_sound;
-    SFXBase      *m_full_sound;
+    SFXBase       *m_bzzt_sound;
+    SFXBase       *m_wee_sound;
+    SFXBase       *m_ugh_sound;
+    SFXBase       *m_grab_sound;
+    SFXBase       *m_full_sound;
 
-    void steer(float, int);
+    void           steer(float, int);
 public:
                    PlayerController  (Kart *kart, ActivePlayer *_player,
                                       unsigned int player_index);
                   ~PlayerController  ();
-    ActivePlayer  *getPlayer         () { return m_player;                }
-    PlayerProfile *getPlayerProfile  () { return m_player->getProfile();  }
     void           update            (float);
     void           action            (PlayerAction action, int value);
     void           handleZipper      ();

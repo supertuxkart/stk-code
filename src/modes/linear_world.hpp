@@ -54,58 +54,57 @@ private:
 
 protected:
     RaceGUI::KartIconDisplayInfo* m_kart_display_info;
-    
-    /** Linear races can trigger rescues for one additional reason : shortcuts.
-    * It may need to do some specific world before calling the generic Kart::forceRescue
-    */
-    void            rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
-    
-    void            checkForWrongDirection(unsigned int i);
-    float           estimateFinishTimeForKart(Kart* kart);
-    void            updateRacePosition ( Kart* kart, KartInfo& kart_info );
-public:
-    LinearWorld();
-    /** call just after instanciating. can't be moved to the contructor as child
-        classes must be instanciated, otherwise polymorphism will fail and the
-        results will be incorrect */
-    void init();
-    virtual ~LinearWorld();
-    
+
     /** This vector contains an 'KartInfo' struct for every kart in the race.
       * This member is not strictly private but try not to use it directly outside
       * tightly related classes (e.g. AI)
       */
     std::vector<KartInfo> m_kart_info;
 
-    virtual void    update(float delta);
     
-    int             getSectorForKart(const int kart_id) const;
-    float           getDistanceDownTrackForKart(const int kart_id) const;
-    float           getDistanceToCenterForKart(const int kart_id) const;
-    float           getEstimatedFinishTime(const int kart_id) const;
-    int             getLapForKart(const int kart_id) const;
-    void            setTimeAtLapForKart(float t, const int kart_id);
-    float           getTimeAtLapForKart(const int kart_id) const;
+    /** Linear races can trigger rescues for one additional reason : shortcuts.
+    * It may need to do some specific world before calling the generic Kart::forceRescue
+    */
+    void          rescueKartAfterShortcut(Kart* kart, KartInfo& kart_info);
+    void          checkForWrongDirection(unsigned int i);
+    void          updateRacePosition(Kart* kart, KartInfo& kart_info );
+    virtual float estimateFinishTimeForKart(Kart* kart);
 
-    virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
-    virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
-    
-    virtual void    terminateRace();
-    virtual void    restartRace();
-    
-    virtual bool raceHasLaps(){ return true; }
-    virtual void newLap(unsigned int kart_index);
+public:
+                  LinearWorld();
+    /** call just after instanciating. can't be moved to the contructor as child
+        classes must be instanciated, otherwise polymorphism will fail and the
+        results will be incorrect */
+    void          init();
+    virtual      ~LinearWorld();
+    virtual void  update(float delta);
+    int           getSectorForKart(const int kart_id) const;
+    float         getDistanceDownTrackForKart(const int kart_id) const;
+    float         getDistanceToCenterForKart(const int kart_id) const;
+    float         getEstimatedFinishTime(const int kart_id) const;
+    int           getLapForKart(const int kart_id) const;
+    void          setTimeAtLapForKart(float t, const int kart_id);
+    float         getTimeAtLapForKart(const int kart_id) const;
 
-    virtual bool haveBonusBoxes(){ return true; }
+    virtual  RaceGUI::KartIconDisplayInfo* 
+                  getKartsDisplayInfo();
+    virtual void  moveKartAfterRescue(Kart* kart, btRigidBody* body);
+    
+    virtual void  restartRace();
+    
+    virtual bool  raceHasLaps(){ return true; }
+    virtual void  newLap(unsigned int kart_index);
+
+    virtual bool  haveBonusBoxes(){ return true; }
     
     /** Called by the race result GUI at the end of the race to know the final order
         (fill in the 'order' array) */
-    virtual void raceResultOrder( int* order );
+    virtual void  raceResultOrder( int* order );
     /** Returns true if the kart is on a valid driveline quad.
      *  \param kart_index  Index of the kart.
      */
-    bool isOnRoad(unsigned int kart_index) const 
-        { return m_kart_info[kart_index].m_on_road; }
-};
+    bool          isOnRoad(unsigned int kart_index) const 
+                 { return m_kart_info[kart_index].m_on_road; }
+};   // LinearWorld
 
 #endif

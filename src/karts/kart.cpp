@@ -40,6 +40,7 @@
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/controller/end_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "network/race_state.hpp"
@@ -381,8 +382,6 @@ void Kart::reset()
         World::getWorld()->getPhysics()->addKart(this);
     }
 
-    if(m_node)
-        m_node->setVisible(true);  // In case that the kart was eliminated
     if(m_camera)
         m_camera->reset();
     // If the controller was replaced (e.g. replaced by end controller), 
@@ -392,6 +391,10 @@ void Kart::reset()
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
+    // Reset is also called when the kart is created, at which time
+    // m_controller is not yet defined.
+    if(m_controller)
+        m_controller->reset();
     m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
     m_powerup.reset();
@@ -451,11 +454,17 @@ void Kart::reset()
  */
 void Kart::finishedRace(float time)
 {
+    // m_finished_race can be true if e.g. an AI kart was set to finish
+    // because the race was over (i.e. estimating the finish time). If
+    // this kart then crosses the finish line (with the end controller)
+    // it would trigger a race end again.
+    if(m_finished_race) return;
     m_finished_race = true;
     m_finish_time   = time;
     m_kart_mode     = KM_END_ANIM;
     m_controller->finishedRace(time);
-    race_manager->RaceFinished(this, time);
+    race_manager->kartFinishedRace(this, time);
+    setController(new EndController(this, m_controller->getPlayer()));
 }   // finishedRace
 
 //-----------------------------------------------------------------------------

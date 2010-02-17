@@ -373,12 +373,13 @@ void RaceManager::exitRace()
 
 //-----------------------------------------------------------------------------
 /** A kart has finished the race at the specified time (which can be 
- *  different from RaceManager::getWorld()->getClock() in case of setting extrapolated arrival 
- *  times).
+ *  different from World::getWorld()->getClock() in case of setting 
+ *  extrapolated arrival times). This function is only called from
+ *  kart::finishedRace()
  *  \param kart The kart that finished the race.
  *  \param time Time at which the kart finished the race.
  */
-void RaceManager::RaceFinished(const Kart *kart, float time)
+void RaceManager::kartFinishedRace(const Kart *kart, float time)
 {
     unsigned int id = kart->getWorldKartId();
     int pos = kart->getPosition();
@@ -392,7 +393,7 @@ void RaceManager::RaceFinished(const Kart *kart, float time)
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
     if(kart->getController()->isPlayerController()) m_num_finished_players++;
-}   // raceFinished
+}   // kartFinishedRace
 
 //-----------------------------------------------------------------------------
 /** Reruns the last race. This is called after a race is finished, and it will

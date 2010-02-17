@@ -115,12 +115,9 @@ public:
     
     void    pause();
     void    unpause();
-    
-    virtual void enterRaceOverState(const bool delay=false);
+    virtual void enterRaceOverState();
 
-    /** Called when it's really over (delay over if any)
-        */
-    virtual void terminateRace() = 0;
+    virtual void terminateRace();
     
     /*
      * Will be called to notify your derived class that the clock,

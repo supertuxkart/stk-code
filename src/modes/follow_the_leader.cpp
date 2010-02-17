@@ -83,21 +83,12 @@ void FollowTheLeaderRace::countdownReachedZero()
     // almost over, use fast music
     if(getCurrentNumKarts()==3)  
         sound_manager->switchToFastMusic();
-    
-    // The follow the leader race is over if there is only one kart left,
-    // or if all players have gone
-    if(isRaceOver())
-    {
-        // Note: LinearWorld::terminateRace adds the scores for all remaining
-        // karts in the race.
-        enterRaceOverState(false);
-        return;
-    }
+    // End of race is detected from the World::update()    
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
-/** The follow the leader race is over if there is only one kart left,
- *  or if all players have gone.
+/** The follow the leader race is over if there is only one kart left (plus
+ *  the leader), or if all players have gone.
  */
 bool FollowTheLeaderRace::isRaceOver()
 {
@@ -146,9 +137,13 @@ void FollowTheLeaderRace::raceResultOrder( int* order )
         race_time[kart_id] = race_manager->getOverallTime(kart_id);
         
         // check this kart is not in front of leader. If it is, give a score of 0
-        if(m_kart_info[kart_id].m_race_lap * world->getTrack()->getTrackLength() + getDistanceDownTrackForKart(kart_id) >
-           m_kart_info[0].m_race_lap * world->getTrack()->getTrackLength() + getDistanceDownTrackForKart(0))
+        if(   getLapForKart(kart_id) * world->getTrack()->getTrackLength() 
+              + getDistanceDownTrackForKart(kart_id)
+            > getLapForKart(0)       * world->getTrack()->getTrackLength() 
+              + getDistanceDownTrackForKart(0))
+        {
             scores[kart_id] = 0;
+        }
     }
     
     //Bubblesort

@@ -49,6 +49,7 @@ class GrandPrixData
 public:
 
     /** Load the GrandPrixData from the given filename */
+#pragma warning(disable:4290)
                        GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
     

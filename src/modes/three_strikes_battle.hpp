@@ -51,7 +51,6 @@ public:
     
     // overriding World methods
     virtual void restartRace();
-    virtual void enterRaceOverState(const bool delay=false);
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
     virtual bool useFastMusicNearEnd() const { return false; }

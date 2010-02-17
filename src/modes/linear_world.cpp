@@ -139,8 +139,8 @@ void LinearWorld::update(float delta)
         KartInfo& kart_info = m_kart_info[n];
         Kart* kart = m_karts[n];
 
-        // Nothing to do for karts that are currently being rescued.
-        if(kart->isRescue()) continue;
+        // Nothing to do for karts that are currently being rescued or eliminated
+        if(kart->isRescue() || kart->isEliminated()) continue;
 
         // ---------- deal with sector data ---------
 
@@ -176,15 +176,14 @@ void LinearWorld::update(float delta)
     for(unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
-        if(!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
-        {
-            updateRacePosition(m_karts[i], m_kart_info[i]);
-            // During the last lap update the estimated finish time.
-            // This is used to play the faster music, and by the AI
-            if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
-                m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_karts[i]);
-            checkForWrongDirection(i);
-        }
+        if(m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) 
+            continue;
+        updateRacePosition(m_karts[i], m_kart_info[i]);
+        // During the last lap update the estimated finish time.
+        // This is used to play the faster music, and by the AI
+        if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
+            m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_karts[i]);
+        checkForWrongDirection(i);
     }
 #ifdef DEBUG
     // FIXME: Debug output in case that the double position error
@@ -207,7 +206,6 @@ void LinearWorld::update(float delta)
         pos_used[m_karts[i]->getPosition()]=i;
     }
 #endif
-
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -242,7 +240,6 @@ void LinearWorld::newLap(unsigned int kart_index)
         if(network_manager->getMode()!=NetworkManager::NW_CLIENT)
         {
             kart->finishedRace(getTime());
-            createEndKart(kart_index);
         }
     }
     {
@@ -409,26 +406,6 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
     return m_kart_display_info;
 }   // getKartsDisplayInfo
 
-//-----------------------------------------------------------------------------
-void LinearWorld::terminateRace()
-{
-    World::terminateRace();
-
-    // if some karts have not yet finished the race yet, estimate
-    // their times and use these values to proceed without waiting
-    const unsigned int kart_amount = m_karts.size();
-    for ( KartList::size_type i = 0; i < kart_amount; ++i)
-    {
-        // Eliminated karts have already called raceFinished.
-        if(!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated())
-        {
-            const float est_finish_time = m_kart_info[i].m_estimated_finish;
-            m_karts[i]->finishedRace(est_finish_time);
-            createEndKart(i);
-        }  // if !hasFinishedRace
-    }   // for i
-}   // terminateRace
-
 // ----------------------------------------------------------------------------
 /** Sets up the mapping from kart position to kart index.
  */
@@ -465,7 +442,7 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
     // the average speed computed above.
     return getTime() + (full_distance - distance_covered)  / average_speed;
 
-}   // estimateFinishTime
+}   // estimateFinishTimeForKart
 
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart

@@ -97,6 +97,11 @@ void Moveable::reset()
         m_body->setAngularVelocity(btVector3(0, 0, 0));
         m_body->setCenterOfMassTransform(m_transform);
     }
+    if(m_node)
+        m_node->setVisible(true);  // In case that the objects was eliminated
+    if(m_animated_node)
+        m_animated_node->setVisible(true);
+
     Coord c(m_transform);
     m_hpr = c.getHPR();
 }   // reset

@@ -53,7 +53,7 @@ public:
     virtual  std::string getInternalCode() const {return "PROFILE"; }
     virtual  void        update(float dt);
     virtual  bool        isRaceOver();
-    virtual  void        enterRaceOverState(const bool delay=false);
+    virtual  void        enterRaceOverState();
 
     static   void setProfileModeTime(float time);
     static   void setProfileModeLaps(int laps);

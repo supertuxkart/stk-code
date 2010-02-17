@@ -115,7 +115,11 @@ void ProfileWorld::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void ProfileWorld::enterRaceOverState(const bool delay)
+/** This function is called when the race is finished, but end-of-race
+ *  animations have still to be played. In the case of profiling,
+ *  we can just abort here without waiting for the animations.
+ */
+void ProfileWorld::enterRaceOverState()
 {
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",

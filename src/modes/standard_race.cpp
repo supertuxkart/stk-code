@@ -27,53 +27,12 @@ StandardRace::StandardRace() : LinearWorld()
 }   // StandardRace
 
 //-----------------------------------------------------------------------------
-StandardRace::~StandardRace()
-{
-}   // ~StandardRace
-    
-//-----------------------------------------------------------------------------
-/** Called once per frame to update race specific data structures.
- *  \param dt TIme step size.
- */
-void StandardRace::update(float dt)
-{    
-    LinearWorld::update(dt);
-    if(!WorldStatus::isRacePhase()) return;
-    
-    // All karts are finished
-    if(race_manager->getFinishedKarts() >= getNumKarts() )
-    {
-        enterRaceOverState();
-        unlock_manager->raceFinished();
-    }   // if all karts are finished
-    
-    // All player karts are finished, but computer still racing
-    // ===========================================================
-    else if(isRaceOver())
-    {
-        // Update the estimated finishing time for all karts that haven't
-        // finished yet.
-        const unsigned int kart_amount = getNumKarts();
-        for(unsigned int i = 0; i < kart_amount ; i++)
-        {
-            if(!m_karts[i]->hasFinishedRace())
-            {
-                m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
-                createEndKart(i);
-            }
-        }   // i<kart_amount
-
-        // Set delay mode to have time for camera animation, and
-        // to give the AI some time to get non-estimated timings
-        enterRaceOverState();
-    }
-}   // update
-
-//-----------------------------------------------------------------------------
 /** Returns true if the race is finished, i.e. all player karts are finished.
  */
 bool StandardRace::isRaceOver()
 {
+    // The race is over if all players have finished the race. Remaining 
+    // times for AI opponents will be estimated in enterRaceOverState
     return race_manager->allPlayerFinished();
 }   // isRaceOver
 
@@ -106,6 +65,6 @@ std::string StandardRace::getIdent() const
     if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return IDENT_TTRIAL;
     else
-        return IDENT_STD;
-    
+        return IDENT_STD;    
 }   // getIdent
+

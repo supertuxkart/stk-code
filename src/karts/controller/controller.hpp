@@ -25,6 +25,7 @@ using namespace irr;
 
 class Kart;
 class Item;
+class ActivePlayer;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
@@ -39,14 +40,21 @@ protected:
      *  it commands. */
     KartControl  *m_controls;
 
+    /** If this belongs to a player, it stores the active player data
+     *  structure. Otherwise it is 0. */
+    ActivePlayer *m_player;
 public:
-                  Controller         (Kart *kart);
+                  Controller         (Kart *kart, ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
+    /** Returns the active player for this controller (NULL 
+     *  if this controller does not belong to a player.    */
+    ActivePlayer *getPlayer          () {return m_player;}
     virtual void  reset              () {};
     virtual void  update             (float dt) {};
     virtual void  handleZipper       () {};
     virtual void  collectedItem      (const Item &item, int add_info=-1,
                                      float previous_energy=0) {};
+
     virtual void  crashed            () {};
     virtual void  setPosition        (int p) {};
     virtual void  finishedRace       (float time) {};

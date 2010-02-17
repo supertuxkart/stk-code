@@ -56,6 +56,7 @@ private:
     float                    m_time_since_faster;
 
 public:
+#pragma warning(disable:4290)
                        MusicInformation (const std::string& filename) throw (std::runtime_error);
     const std::string& getComposer      () const {return m_composer;        }
     const std::string& getTitle         () const {return m_title;           }

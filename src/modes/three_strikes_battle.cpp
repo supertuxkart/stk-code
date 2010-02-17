@@ -60,26 +60,6 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 }   // ~ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
-
-void ThreeStrikesBattle::terminateRace()
-{
-    updateKartRanks();
-    
-    // if some karts have not yet finished yet
-    const unsigned int kart_amount = m_karts.size();
-    for ( KartList::size_type i = 0; i < kart_amount; ++i)
-    {
-        if(!m_karts[i]->hasFinishedRace())
-        {
-            m_karts[i]->finishedRace(WorldStatus::getTime());
-            createEndKart(i);
-        }  // if !hasFinishedRace
-    }   // for i
-    
-    World::terminateRace();
-}   // terminateRace
-
-//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::kartHit(const int kart_id)
 {
     assert(kart_id >= 0);
@@ -172,22 +152,23 @@ void ThreeStrikesBattle::updateKartRanks()
 }   // updateKartRank
 
 //-----------------------------------------------------------------------------
-void ThreeStrikesBattle::enterRaceOverState(const bool delay)
-{
-    World::enterRaceOverState(delay);
-    // Add the results for the remaining kart
-    for(unsigned int i=0; i<getNumKarts(); i++)
-        if(!m_karts[i]->isEliminated()) 
-            race_manager->RaceFinished(m_karts[i], WorldStatus::getTime());
-}   // enterRaceOverState
-
-//-----------------------------------------------------------------------------
 /** The battle is over if only one kart is left, or no player kart.
  */
 bool ThreeStrikesBattle::isRaceOver()
 {
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Called when the race finishes, i.e. after playing (if necessary) an
+ *  end of race animation. It updates the time for all karts still racing,
+ *  and then updates the ranks.
+ */
+void ThreeStrikesBattle::terminateRace()
+{
+    updateKartRanks();   
+    World::terminateRace();
+}   // terminateRace
 
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::restartRace()
