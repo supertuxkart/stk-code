@@ -86,11 +86,12 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         else if (selectedMode == "3strikes")
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            //FIXME: it's a little weird that the value from the 'AI karts' spinner is ignored
+            race_manager->setNumKarts( race_manager->getNumPlayers() ); // no AI karts;
             StateManager::get()->pushScreen( ArenasScreen::getInstance() );
         }
         else if (selectedMode == "locked")
         {
-            std::cout << "Requesting sound to be played\n";
             unlock_manager->playLockSound();
         }
     }

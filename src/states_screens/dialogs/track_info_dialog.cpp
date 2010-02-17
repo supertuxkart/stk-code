@@ -45,6 +45,8 @@ using namespace GUIEngine;
 TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
                                  ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
 {
+    const bool has_laps = RaceManager::modeHasLaps(race_manager->getMinorMode());
+    
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*5/7;
     const int y3 = m_area.getHeight()*6/7;
@@ -101,25 +103,32 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     b->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
     
     // ---- Lap count m_spinner
-    m_spinner = new SpinnerWidget();
-    m_spinner->x = m_area.getWidth()/2 - 200;
-    m_spinner->y = y2;
-    m_spinner->w = 400;
-    m_spinner->h = y3 - y2 - 15;
-    m_spinner->setParent(m_irrlicht_window);
-    
-    m_spinner->m_properties[PROP_ID] = "lapcountspinner";
-    m_spinner->m_properties[PROP_MIN_VALUE] = "1";
-    m_spinner->m_properties[PROP_MAX_VALUE] = "99";
-    
-    //I18N: In the track setup screen (number of laps choice, where %i is the number)
-    m_spinner->m_text = _("%i laps");
-    
-    m_children.push_back(m_spinner);
-    m_spinner->add();
-    m_spinner->setValue(3);
-    m_spinner->getIrrlichtElement()->setTabStop(true);
-    m_spinner->getIrrlichtElement()->setTabGroup(false);
+    if (has_laps)
+    {
+        m_spinner = new SpinnerWidget();
+        m_spinner->x = m_area.getWidth()/2 - 200;
+        m_spinner->y = y2;
+        m_spinner->w = 400;
+        m_spinner->h = y3 - y2 - 15;
+        m_spinner->setParent(m_irrlicht_window);
+        
+        m_spinner->m_properties[PROP_ID] = "lapcountspinner";
+        m_spinner->m_properties[PROP_MIN_VALUE] = "1";
+        m_spinner->m_properties[PROP_MAX_VALUE] = "99";
+        
+        //I18N: In the track setup screen (number of laps choice, where %i is the number)
+        m_spinner->m_text = _("%i laps");
+        
+        m_children.push_back(m_spinner);
+        m_spinner->add();
+        m_spinner->setValue(3);
+        m_spinner->getIrrlichtElement()->setTabStop(true);
+        m_spinner->getIrrlichtElement()->setTabGroup(false);
+    }
+    else
+    {
+        m_spinner = NULL;
+    }
     
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
@@ -252,6 +261,13 @@ void TrackInfoDialog::updateHighScores()
 // ------------------------------------------------------------------------------------------------------
 
 // FIXME : this probably doesn't belong here
+/**
+  * Start a race, using the settings set through previous menus, plus which track
+  * plus number of laps if relevant
+  *
+  * \param trackIdent  Internal name of the track to race on
+  * \param num_laps    Number of laps to do, or -1 if not relevant
+  */
 void startGame(const std::string trackIdent, const int num_laps)
 {
     ModalDialog::dismiss();
@@ -267,7 +283,9 @@ void startGame(const std::string trackIdent, const int num_laps)
     StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);
     race_manager->setTrack(trackIdent.c_str());
-    race_manager->setNumLaps( num_laps );
+    
+    if (num_laps != -1) race_manager->setNumLaps( num_laps );
+    
     race_manager->setCoinTarget( 0 ); // Might still be set from a previous challenge
     //race_manager->setNumKarts( 1 );
     network_manager->setupPlayerKartInfo();
@@ -280,7 +298,7 @@ void startGame(const std::string trackIdent, const int num_laps)
 
 void TrackInfoDialog::onEnterPressedInternal()
 {
-    const int num_laps = m_spinner->getValue();
+    const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
     startGame(m_track_ident, num_laps);
 }
 
@@ -290,12 +308,13 @@ GUIEngine::EventPropagation TrackInfoDialog::processEvent(std::string& eventSour
 {
     if (eventSource == "start" )
     {
-        const int num_laps = m_spinner->getValue();
+        const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
         startGame(m_track_ident, num_laps);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "lapcountspinner")
     {
+        assert(m_spinner != NULL);
         const int num_laps = m_spinner->getValue();
         race_manager->setNumLaps(num_laps);
         updateHighScores();

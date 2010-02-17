@@ -45,6 +45,8 @@ public:
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
     
+    virtual void init();
+    
     // clock events
     virtual bool isRaceOver();
     virtual void terminateRace();

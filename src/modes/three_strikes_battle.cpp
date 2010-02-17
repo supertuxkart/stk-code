@@ -28,7 +28,9 @@ ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
-    
+}
+void ThreeStrikesBattle::init()
+{
     World::init();
     
     // check for possible problems if AI karts were incorrectly added
