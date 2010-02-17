@@ -151,7 +151,10 @@ public:
     
     void            updateWorld(float dt);
     virtual void    restartRace();
-    void            disableRace(); // Put race into limbo phase
+    
+    /** Put race into limbo phase */
+    void            disableRace();
+    
     /** Returns a pointer to the race gui. */
     RaceGUI        *getRaceGUI()                const { return m_race_gui;                  }
     Kart           *getPlayerKart(unsigned int player) const;
@@ -167,12 +170,13 @@ public:
     unsigned int    getCurrentNumPlayers()      const { return m_num_players -
                                                             m_eliminated_players;            }
     
-    Physics *getPhysics() const               { return m_physics;                   }
-    Track *getTrack() const                   { return m_track;                     }
-    Kart* getFastestKart() const              { return m_fastest_kart;              }
-    float getFastestLapTime() const           { return m_fastest_lap;               }
-    void  setFastestLap(Kart *k, float time)  {m_fastest_kart=k;m_fastest_lap=time; }
-    HighscoreEntry* getHighscores() const;
+    Physics        *getPhysics()                const { return m_physics;                   }
+    Track          *getTrack()                  const { return m_track;                     }
+    Kart           *getFastestKart()            const { return m_fastest_kart;              }
+    float           getFastestLapTime()         const { return m_fastest_lap;               }
+    void            setFastestLap(Kart *k, float time){ m_fastest_kart = k;
+                                                        m_fastest_lap  = time;              }
+    HighscoreEntry *getHighscores() const;
 
     virtual void terminateRace();
     
@@ -201,6 +205,9 @@ public:
       */
     bool shouldDrawTimer() const    { return isRacePhase() &&
                                              getClockMode() != CLOCK_NONE; }
+    
+    /** \return whether this world can generate/have highscores */
+    bool useHighScores() const      { return m_use_highscores; }
     
     /** called when a bonus box is hit, to determine which types of powerups are allowed
         in each game mode. By default all are accepted, override in child classes to get

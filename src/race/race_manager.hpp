@@ -274,24 +274,35 @@ public:
         if(id > 999 && id < 2000) return true;
         else return false;
     }
+    
     /** get information about given mode (returns true if 'mode' is of battle type)
         info is stored in its ID for conveniance, see the macros above for exact meaning
         */
     static bool isBattleMode(const MinorRaceModeType type)
     {
         const int id = (int)type;
-        if(id >= 2000) return true;
-        else return false;
+        if (id >= 2000) return true;
+        else            return false;
     }
+    
     /** get information about given mode (returns true if 'mode' requires lap counting)
         info is stored in its ID for conveniance, see the macros above for exact meaning
         */
     static bool modeHasLaps(const MinorRaceModeType type)
     {
-        if(isBattleMode(type)) return false;
+        if (isBattleMode(type)) return false;
         const int id = (int)type;
         const int answer = (id-1000)/100;
         return answer!=0;
+    }
+    
+    static bool modeHasHighscores(const MinorRaceModeType type)
+    {
+        //FIXME: this information is duplicated. RaceManager knows about it, and
+        //       each World may set m_use_highscores to true or false. The reason
+        //       for this duplication is that we might want to know whether to
+        //       display highscores without creating a World.
+        return type != MINOR_MODE_3_STRIKES && type != MINOR_MODE_FOLLOW_LEADER;
     }
 };
 

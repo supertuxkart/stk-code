@@ -45,7 +45,8 @@ using namespace GUIEngine;
 TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core::stringw& trackName,
                                  ITexture* screenshot, const float w, const float h) : ModalDialog(w, h)
 {
-    const bool has_laps = RaceManager::modeHasLaps(race_manager->getMinorMode());
+    const bool has_laps       = RaceManager::modeHasLaps      (race_manager->getMinorMode());
+    const bool has_highscores = RaceManager::modeHasHighscores(race_manager->getMinorMode());
     
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*5/7;
@@ -60,11 +61,14 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
                                                                m_irrlicht_window);
     a->setTabStop(false);
 
-    // ---- High Scores & track info
+    // ---- High Scores
     const int hscores_y_from = y1;
     const int hscores_y_to = y1 + (y2 - y1)*2/3;
-    addHighScoreWidgets(hscores_y_from, hscores_y_to);
-    updateHighScores();
+    if (has_highscores)
+    {
+        addHighScoreWidgets(hscores_y_from, hscores_y_to);
+        updateHighScores();
+    }
     
     // ---- Track credits
     Track* track = track_manager->getTrack(trackIdent);
