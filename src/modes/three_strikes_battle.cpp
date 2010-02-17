@@ -311,7 +311,7 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
 }   // raceResultOrder
 
 //-----------------------------------------------------------------------------
-bool ThreeStrikesBattle::acceptPowerup(const int type) const
+bool ThreeStrikesBattle::acceptPowerup(const PowerupType type) const
 {
     // these powerups don't make much sense in battle mode
     if(type == POWERUP_PARACHUTE || type == POWERUP_ANVIL ||
