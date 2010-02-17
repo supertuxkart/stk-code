@@ -63,8 +63,8 @@ bool DeviceConfig::getAction  ( Input::InputType    type,
 
             if (type == Input::IT_STICKMOTION)
             {
-                if ((m_bindings[n].dir == Input::AD_POSITIVE) && (value > 0) ||
-                    (m_bindings[n].dir == Input::AD_NEGATIVE) && (value < 0))
+                if ( ((m_bindings[n].dir == Input::AD_POSITIVE) && (value > 0)) ||
+                     ((m_bindings[n].dir == Input::AD_NEGATIVE) && (value < 0))    )
                 {
                     success = true;
                    *action = (PlayerAction)n;
