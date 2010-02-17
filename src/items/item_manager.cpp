@@ -202,7 +202,15 @@ void ItemManager::cleanup()
  */
 void ItemManager::reset()
 {
-    std::vector<AllItemTypes::iterator> to_delete;
+    // If items are switched, switch them back first.
+    if(m_switch_time>=0)
+    {
+        for(AllItemTypes::iterator i =m_all_items.begin(); 
+                                   i!=m_all_items.end(); i++)
+            (*i)->switchBack();
+        m_switch_time = -1.0f;
+
+    }
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
