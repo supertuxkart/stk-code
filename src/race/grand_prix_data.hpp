@@ -49,7 +49,9 @@ class GrandPrixData
 public:
 
     /** Load the GrandPrixData from the given filename */
+#if defined(WIN32) || defined(_WIN32)
 #pragma warning(disable:4290)
+#endif
                        GrandPrixData  (const std::string filename) throw(std::logic_error);
                        GrandPrixData  ()       {}; // empty for initialising
     
