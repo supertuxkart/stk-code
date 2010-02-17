@@ -91,7 +91,12 @@ void ArenasScreen::init()
         }
     }
     w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
-    w->updateItemDisplay();    
+    w->updateItemDisplay();  
+    
+    assert(w->getItems().size() > 0);
+    
+    // FIXME: don't hardcode player 0?
+    w->setSelection(w->getItems()[0].m_code_name, 0, true); 
 }
 
 void ArenasScreen::tearDown()
