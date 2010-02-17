@@ -71,6 +71,9 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     
     core::rect< s32 > creator_info_area(0, hscores_y_to, m_area.getWidth()/2, y2);
     
+    std::cout << "(( Track author : " << stringc(track->getDesigner().c_str()).c_str()
+              << " - " << track->getDesigner().size() << " chars )))\n";
+    
     //I18N: when showing who is the author of track '%s' (place %s where the name of the author should appear)
     stringw text = StringUtils::insertValues(_("Track by %s"), track->getDesigner().c_str());
 

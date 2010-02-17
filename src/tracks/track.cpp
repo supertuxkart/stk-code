@@ -62,7 +62,7 @@ Track::Track(std::string filename)
     m_root                 = StringUtils::getPath(StringUtils::removeExtension(m_filename));
     m_ident                = StringUtils::getBasename(m_root);
     m_item_style           = "";
-    m_description          = "";
+    //m_description          = "";
     m_designer             = "";
     m_screenshot           = "";
     m_version              = 0;
@@ -202,7 +202,7 @@ void Track::loadTrackInfo()
     root->get("name",                  &temp_name);
     m_name = _(temp_name.c_str());
     
-    root->get("description",           &m_description);
+    //root->get("description",           &m_description);
     root->get("designer",              &m_designer);
     root->get("version",               &m_version);
     std::vector<std::string> filenames;

@@ -213,7 +213,7 @@ public:
     /** Returns the filename of this track. */
     const std::string& getFilename       () const {return m_filename;           }
 
-    const std::string& getDescription    () const {return m_description;        }
+    //const std::string& getDescription    () const {return m_description;        }
     const std::string& getDesigner       () const {return m_designer;           }
     
     /** Returns an absolute path to the screenshot file of this track */
