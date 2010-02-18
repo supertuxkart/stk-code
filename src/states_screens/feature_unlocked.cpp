@@ -131,8 +131,6 @@ void FeatureUnlockedCutScene::init()
 
 void FeatureUnlockedCutScene::tearDown()
 {
-    printf("+++++++ FeatureUnlockedCutScene:tearDown +++++++++\n");
-    
     irr_driver->removeNode(m_sky);
     m_sky = NULL;
     
