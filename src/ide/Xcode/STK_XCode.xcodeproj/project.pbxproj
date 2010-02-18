@@ -248,7 +248,6 @@
 		956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECC1128D3FB004336C8 /* end_controller.cpp */; };
 		956C6ED61128D3FB004336C8 /* new_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECF1128D3FB004336C8 /* new_ai_controller.cpp */; };
 		956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ED11128D3FB004336C8 /* player_controller.cpp */; };
-		956D36A710095035007FCB95 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956D36A610095035007FCB95 /* player.cpp */; };
 		9574F17C11206881008D202E /* world_status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9574F17A11206881008D202E /* world_status.cpp */; };
 		958330CC10122B4A00C5137E /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B210122B4A00C5137E /* engine.cpp */; };
 		958330CD10122B4A00C5137E /* event_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958330B410122B4A00C5137E /* event_handler.cpp */; };
@@ -456,7 +455,6 @@
 		956C6ED01128D3FB004336C8 /* new_ai_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = new_ai_controller.hpp; path = ../../karts/controller/new_ai_controller.hpp; sourceTree = SOURCE_ROOT; };
 		956C6ED11128D3FB004336C8 /* player_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player_controller.cpp; path = ../../karts/controller/player_controller.cpp; sourceTree = SOURCE_ROOT; };
 		956C6ED21128D3FB004336C8 /* player_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = player_controller.hpp; path = ../../karts/controller/player_controller.hpp; sourceTree = SOURCE_ROOT; };
-		956D36A610095035007FCB95 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = ../../config/player.cpp; sourceTree = SOURCE_ROOT; };
 		9574F17A11206881008D202E /* world_status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = world_status.cpp; path = ../../modes/world_status.cpp; sourceTree = SOURCE_ROOT; };
 		9574F17B11206881008D202E /* world_status.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = world_status.hpp; path = ../../modes/world_status.hpp; sourceTree = SOURCE_ROOT; };
 		958330B210122B4A00C5137E /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = engine.cpp; path = ../../guiengine/engine.cpp; sourceTree = SOURCE_ROOT; };
@@ -2238,7 +2236,6 @@
 			children = (
 				95B5CD13102DE08F00EF2001 /* device_config.cpp */,
 				95B5CD12102DE08F00EF2001 /* device_config.hpp */,
-				956D36A610095035007FCB95 /* player.cpp */,
 				95D950CD0FE473CA002E10AD /* player.hpp */,
 				95D950CE0FE473CA002E10AD /* stk_config.cpp */,
 				95D950CF0FE473CA002E10AD /* stk_config.hpp */,
@@ -2544,7 +2541,6 @@
 				951BC65E0FFAF290006B5FF1 /* ipo.cpp in Sources */,
 				955DE88310042701006A4F3C /* check_manager.cpp in Sources */,
 				955DE88C1004273B006A4F3C /* check_structure.cpp in Sources */,
-				956D36A710095035007FCB95 /* player.cpp in Sources */,
 				958330CC10122B4A00C5137E /* engine.cpp in Sources */,
 				958330CD10122B4A00C5137E /* event_handler.cpp in Sources */,
 				958330CE10122B4A00C5137E /* modaldialog.cpp in Sources */,

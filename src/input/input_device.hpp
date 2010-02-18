@@ -2,13 +2,13 @@
 #define INPUT_DEVICE_HPP
 
 #include <string>
-#include "input/input.hpp"
-#include "config/device_config.hpp"
 #include <iostream>
 #include <fstream>
-#include "io/xml_node.hpp"
 
-class ActivePlayer;
+#include "config/device_config.hpp"
+#include "input/input.hpp"
+#include "io/xml_node.hpp"
+#include "states_screens/state_manager.hpp"
 
 enum DeviceType
 {
@@ -21,7 +21,7 @@ class InputDevice
     friend class DeviceManager;
 protected:
     DeviceType m_type;
-    ActivePlayer* m_player;
+    StateManager::ActivePlayer* m_player;
     DeviceConfig* m_configuration;
 
 public:
@@ -33,8 +33,8 @@ public:
 
     DeviceType getType() const { return m_type; };
     
-    void setPlayer(ActivePlayer* owner);
-    ActivePlayer *getPlayer() {return m_player;}
+    void setPlayer(StateManager::ActivePlayer* owner);
+    StateManager::ActivePlayer *getPlayer() { return m_player; }
     
     /**
       * returns a human-readable string for the key binded with the given action
@@ -61,7 +61,7 @@ public:
 
 class GamePadDevice : public InputDevice
 {
-    void resetAxisDirection(const int axis, Input::AxisDirection direction, ActivePlayer* player);
+    void resetAxisDirection(const int axis, Input::AxisDirection direction, StateManager::ActivePlayer* player);
     bool m_buttonPressed[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
 
 public:
@@ -85,7 +85,8 @@ public:
      *                     the value of the 'type' parameter)
      * \param[out] action  The action associated to this input (only check this value if method returned true)
      */
-    bool hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action);
+    bool hasBinding(Input::InputType type, const int id, const int value,
+                    StateManager::ActivePlayer* player, PlayerAction* action);
 
 };
 

@@ -256,7 +256,7 @@ int InputManager::getPlayerKeyboardID() const
         if (m_device_manager->getKeyboard(k) != NULL &&
             m_device_manager->getKeyboard(k)->getPlayer() != NULL)
         {
-            return m_device_manager->getKeyboard(k)->getPlayer()->m_id;
+            return m_device_manager->getKeyboard(k)->getPlayer()->getID();
         }
     }
     
@@ -277,7 +277,7 @@ int InputManager::getPlayerKeyboardID() const
  */
 void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID, int axisDirection, int value)
 {
-    ActivePlayer*   player = NULL;
+    StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value, &player, &action);
 
@@ -413,7 +413,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     m_timer = 0.25;
                 }
                 
-                int playerID = (player == NULL ? 0 : player->m_id);
+                int playerID = (player == NULL ? 0 : player->getID());
                 
                 // If only the master player can act, and this player is not the master, ignore his input
                 if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0) return;

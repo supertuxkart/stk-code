@@ -91,7 +91,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
     assert(0<=player_id && player_id <m_local_kart_info.size());
 
     m_local_kart_info[player_id] = RemoteKartInfo(player_id, kart,
-                                                  StateManager::get()->getActivePlayer(player_id)->getProfile()->getName(),
+                                                  StateManager::get()->getActivePlayerProfile(player_id)->getName(),
                                                   network_manager->getMyHostId());
 }   // setLocalKartInfo
 

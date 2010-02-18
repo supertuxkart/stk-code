@@ -44,7 +44,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-EndController::EndController(Kart *kart, ActivePlayer *player) 
+EndController::EndController(Kart *kart, StateManager::ActivePlayer *player) 
              : Controller(kart, player)
 {
     m_kart_length = m_kart->getKartProperties()->getKartModel()->getLength();

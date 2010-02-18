@@ -129,7 +129,7 @@ private:
     void         setSteering(float angle, float dt);
     void         findCurve();
 public:
-                 EndController(Kart *kart, ActivePlayer* player);
+                 EndController(Kart *kart, StateManager::ActivePlayer* player);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();

@@ -72,7 +72,7 @@ void ConnectMessage::setId()
 {
     char hostname[256];
     gethostname(hostname, 255);
-    const std::string& id = StateManager::get()->getActivePlayer(0)->getProfile()->getName();
+    const std::string& id = StateManager::get()->getActivePlayerProfile(0)->getName();
     std::ostringstream o;
     o << id << '@' << hostname;
     m_id = o.str();

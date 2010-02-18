@@ -22,11 +22,11 @@
 #include <string>
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
-#include "input/input_device.hpp"
 #include "config/player.hpp"
 
 struct Input;
-class ActivePlayer;
+class InputDevice;
+class Kart;
 
 namespace GUIEngine
 {
@@ -37,18 +37,72 @@ const static int GUI_PLAYER_ID = 0;
 
 class StateManager : public GUIEngine::AbstractStateManager
 {
-    /**
-     * A list of all currently playing players.
-     */
-    ptr_vector<ActivePlayer, HOLD> m_active_players;
     
     void updateActivePlayerIDs();
 
     
 public:
-    ptr_vector<ActivePlayer, HOLD>& getActivePlayers();
+
+    /**
+      * Represents a player that is currently playing.
+      * Ties toghether :
+      *   - a player's identity (and thus his/her highscores)
+      *   - which input device is used by which player
+      *  (we're very flexible on this; ActivePlayer #1
+      *   can choose to e.g. use profile #5 and device #2)
+      */
+    class ActivePlayer
+    {
+        friend class StateManager;
+        
+        PlayerProfile *m_player;
+        InputDevice   *m_device;
+    
+        /** Pointer to the kart of this player, only valid during the game. */
+        Kart          *m_kart;
+        
+        /** ID of this player within the list of active players */
+        int m_id;
+        
+        ActivePlayer(PlayerProfile* player, InputDevice* device);
+        
+    public:
+    
+        ~ActivePlayer();
+        
+        /** \return the identity of this active player */
+        PlayerProfile* getProfile() { return m_player; }
+        
+        /** \return the identity of this active player */
+        const PlayerProfile* getConstProfile() const { return m_player; }
+
+        /** Call to change the identity of this player (useful when player is selecting his identity) */
+        void setPlayerProfile(PlayerProfile* player);
+        
+        /** ID of this player within the list of active players */
+        int getID() const { return m_id; }
+        
+        /** \return Which input device this player is using, or NULL if none is set yet */
+        InputDevice* getDevice() const { return m_device; }
+         
+        void setDevice(InputDevice* device);
+        
+        /** Sets the kart for this player. */
+        void setKart(Kart *kart) { m_kart = kart; }
+        
+        /** \return the kart of this player. Only valid while world exists. */
+        Kart* getKart()          { assert(m_kart != NULL); return m_kart; }
+    };
+
+
+    const ptr_vector<ActivePlayer, HOLD>& getActivePlayers() { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);
     
+    /** \return    the PlayerProfile of a given ActivePlayer.
+      * \param id  the ID of the active player for whichyou want the profile
+      */
+    const PlayerProfile* getActivePlayerProfile(const int id);
+
     /**
       * Adds a new player to the list of active players. StateManager takes ownership of the object
       * so no need to delete it yourself.
@@ -68,6 +122,12 @@ public:
     
     // singleton
     static StateManager* get();
+    
+private:
+    /**
+     * A list of all currently playing players.
+     */
+    ptr_vector<ActivePlayer, HOLD> m_active_players;
 };
 
 #endif

@@ -183,7 +183,7 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 // -----------------------------------------------------------------------------
 
 InputDevice* DeviceManager::mapKeyboardInput( int btnID,
-                                              ActivePlayer **player /* out */,
+                                              StateManager::ActivePlayer **player /* out */,
                                               PlayerAction *action /* out */ )
 {
     const int keyboard_amount = m_keyboards.size();
@@ -218,7 +218,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int btnID,
                                              int axisDir,
                                              int value,
-                                             ActivePlayer **player /* out */,
+                                             StateManager::ActivePlayer **player /* out */,
                                              PlayerAction *action /* out */)
 {
     GamePadDevice  *gPad = getGamePadFromIrrID(deviceID);
@@ -248,7 +248,7 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     int btnID,
                                     int axisDir,
                                     int value,
-                                    ActivePlayer** player /* out */,
+                                    StateManager::ActivePlayer** player /* out */,
                                     PlayerAction* action /* out */ )
 {
     InputDevice *device = NULL;

@@ -21,6 +21,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
@@ -35,16 +36,17 @@ StateManager* StateManager::get()
     return state_manager_singleton;
 }
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 #if 0
 #pragma mark -
 #pragma mark Player Management
 #endif
 
-ptr_vector<ActivePlayer, HOLD>& StateManager::getActivePlayers()
-{
-    return m_active_players;
-}
-ActivePlayer* StateManager::getActivePlayer(const int id)
+// ----------------------------------------------------------------------------
+
+StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
 {
     ActivePlayer *returnPlayer = NULL;
     if (id < m_active_players.size() && id >= 0)
@@ -54,12 +56,25 @@ ActivePlayer* StateManager::getActivePlayer(const int id)
     else
     {
         fprintf(stderr, "getActivePlayer(): id out of bounds\n");
+        return false;
     }
     
     assert( returnPlayer->m_id == id );
     
     return returnPlayer;
 }
+
+// ----------------------------------------------------------------------------
+
+const PlayerProfile* StateManager::getActivePlayerProfile(const int id)
+{
+    ActivePlayer* a = getActivePlayer(id);
+    if (a == NULL) return NULL;
+    return a->getProfile();
+}
+
+// ----------------------------------------------------------------------------
+
 void StateManager::updateActivePlayerIDs()
 {
     const int amount = m_active_players.size();
@@ -68,6 +83,8 @@ void StateManager::updateActivePlayerIDs()
         m_active_players[n].m_id = n;
     }
 }
+
+// ----------------------------------------------------------------------------
 
 int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
 {
@@ -82,15 +99,22 @@ int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device
     return i;
 }
 
+// ----------------------------------------------------------------------------
+
 void StateManager::removeActivePlayer(int id)
 {
     m_active_players.erase(id);
     updateActivePlayerIDs();
 }
+
+// ----------------------------------------------------------------------------
+
 int StateManager::activePlayerCount()
 {
     return m_active_players.size();
 }
+
+// ----------------------------------------------------------------------------
 
 void StateManager::resetActivePlayers()
 {
@@ -102,6 +126,9 @@ void StateManager::resetActivePlayers()
     m_active_players.clearAndDeleteAll();
 }
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 #if 0
 #pragma mark -
 #pragma mark misc stuff
@@ -111,6 +138,8 @@ bool StateManager::throttleFPS()
 {
     return m_game_mode != GUIEngine::GAME  &&  GUIEngine::getCurrentScreen()->throttleFPS;
 }
+
+// ----------------------------------------------------------------------------
 
 void StateManager::escapePressed()
 {
@@ -139,5 +168,43 @@ void StateManager::escapePressed()
         popMenu();
     }
 }
+
+
+#if 0
+#pragma mark -
+#pragma mark ActivePlayer
+#endif
+
+StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player, InputDevice *device)
+{
+    m_player = player;
+    m_device = NULL;
+    m_kart = NULL;
+    setDevice(device);
+}  // ActivePlayer
+
+// ----------------------------------------------------------------------------
+StateManager::ActivePlayer::~ActivePlayer()
+{
+    setDevice(NULL);
+}   // ~ActivePlayer
+
+// ----------------------------------------------------------------------------
+void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
+{
+    m_player = player;
+}   // setPlayerProfile
+
+// ----------------------------------------------------------------------------
+void StateManager::ActivePlayer::setDevice(InputDevice* device)
+{
+    // unset player from previous device he was assigned to, if any
+    if (m_device != NULL) m_device->setPlayer(NULL);
+    
+    m_device = device;
+    
+    // inform the devce of its new owner
+    if (device != NULL) device->setPlayer(this);
+}   // setDevice
 
 

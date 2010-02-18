@@ -22,10 +22,10 @@
 using namespace irr;
 
 #include "karts/controller/kart_control.hpp"
+#include "states_screens/state_manager.hpp"
 
 class Kart;
 class Item;
-class ActivePlayer;
 
 /** This is the base class for kart controller - that can be a player 
  *  or a a robot.
@@ -42,13 +42,13 @@ protected:
 
     /** If this belongs to a player, it stores the active player data
      *  structure. Otherwise it is 0. */
-    ActivePlayer *m_player;
+    StateManager::ActivePlayer *m_player;
 public:
-                  Controller         (Kart *kart, ActivePlayer *player=NULL);
+                  Controller         (Kart *kart, StateManager::ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
     /** Returns the active player for this controller (NULL 
      *  if this controller does not belong to a player.    */
-    ActivePlayer *getPlayer          () {return m_player;}
+    StateManager::ActivePlayer *getPlayer () {return m_player;}
     virtual void  reset              () {};
     virtual void  update             (float dt) {};
     virtual void  handleZipper       () {};

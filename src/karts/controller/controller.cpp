@@ -26,7 +26,7 @@
 /** Constructor, saves the kart pointer and a pointer to the KartControl
  *  of the kart.
  */
-Controller::Controller(Kart *kart, ActivePlayer *player)
+Controller::Controller(Kart *kart, StateManager::ActivePlayer *player)
 {
     m_controls = &(kart->getControls());
     m_kart     = kart;

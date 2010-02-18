@@ -182,7 +182,7 @@ FocusDispatcher* g_dispatcher = NULL;
         float x_speed, y_speed, w_speed, h_speed;
 
         /** Object representing this player */
-        ActivePlayer* m_associatedPlayer;
+        StateManager::ActivePlayer* m_associatedPlayer;
         int m_playerID;
 
         /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
@@ -201,7 +201,8 @@ FocusDispatcher* g_dispatcher = NULL;
         std::string deviceName;
         std::string m_kartInternalName;
         
-        PlayerKartWidget(KartSelectionScreen* parent, ActivePlayer* associatedPlayer, Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
+        PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
+                         Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
         {
             m_associatedPlayer = associatedPlayer;
             x_speed = 1.0f;
@@ -330,9 +331,10 @@ FocusDispatcher* g_dispatcher = NULL;
         /** Called when players are renumbered (changes the player ID) */
         void setPlayerID(const int newPlayerID)
         {
-            if (StateManager::get()->getActivePlayers().get(newPlayerID) != m_associatedPlayer)
+            if (StateManager::get()->getActivePlayer(newPlayerID) != m_associatedPlayer)
             {
-                printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n", StateManager::get()->getActivePlayers().get(newPlayerID), newPlayerID, m_associatedPlayer);
+                printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n",
+                       StateManager::get()->getActivePlayer(newPlayerID), newPlayerID, m_associatedPlayer);
                 std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
                 assert(false);
             }
@@ -388,7 +390,7 @@ FocusDispatcher* g_dispatcher = NULL;
         }
         
         /** Get the associated ActivePlayer object*/
-        ActivePlayer* getAssociatedPlayer()
+        StateManager::ActivePlayer* getAssociatedPlayer()
         {
             return m_associatedPlayer;
         }
@@ -763,7 +765,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     
     // ---- Create new active player
     const int new_player_id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
-    ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
+    StateManager::ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
     
     // ---- Create focus dispatcher
     if (firstPlayer)
@@ -812,7 +814,7 @@ PlayerKartWidget* removedWidget = NULL;
 
 // -----------------------------------------------------------------------------
 // Returns true if event was handled succesfully
-bool KartSelectionScreen::playerQuit(ActivePlayer* player)
+bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 {    
     int playerID = -1;
     
@@ -1013,13 +1015,14 @@ void KartSelectionScreen::allPlayersDone()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     
-    ptr_vector< ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
+    const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
     
     // ---- Print selection (for debugging purposes)
     std::cout << "==========\n" << players.size() << " players :\n";
-    for(int n=0; n<players.size(); n++)
+    for (int n=0; n<players.size(); n++)
     {
-        std::cout << "     Player " << n << " is " << players[n].getProfile()->getName() << " on " << players[n].getDevice()->m_name << std::endl;
+        std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
+                  << " on " << players[n].getDevice()->m_name << std::endl;
     }
     std::cout << "==========\n";
     

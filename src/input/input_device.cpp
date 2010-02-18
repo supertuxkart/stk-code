@@ -18,7 +18,7 @@ InputDevice::InputDevice()
 /**
   * Sets which players uses this device; or pass NULL to say no player uses it. 
   */
-void InputDevice::setPlayer(ActivePlayer* owner)
+void InputDevice::setPlayer(StateManager::ActivePlayer* owner)
 {
     m_player = owner;
 }
@@ -95,7 +95,7 @@ void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 
 void GamePadDevice::resetAxisDirection(const int axis, 
                                        Input::AxisDirection direction, 
-                                       ActivePlayer* player)
+                                       StateManager::ActivePlayer* player)
 {
     KeyBinding bind;
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return; // ignore this while in menus
@@ -126,7 +126,8 @@ void GamePadDevice::resetAxisDirection(const int axis,
   */
 
 
-bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value, ActivePlayer* player, PlayerAction* action /* out */)
+bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value,
+                               StateManager::ActivePlayer* player, PlayerAction* action /* out */)
 {
     bool success = false;
     if(m_prevAxisDirections == NULL) return false; // device not open

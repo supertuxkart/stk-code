@@ -40,7 +40,7 @@
  *  \param init_pos The start coordinates and heading of the kart.
  *  \param player_index  Index of the player kart.
  */
-PlayerController::PlayerController(Kart *kart, ActivePlayer *player, 
+PlayerController::PlayerController(Kart *kart, StateManager::ActivePlayer *player, 
                                    unsigned int player_index)      
                 : Controller(kart)
 {

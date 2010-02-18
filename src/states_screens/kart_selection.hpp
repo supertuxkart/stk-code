@@ -19,13 +19,13 @@
 
 #include <string>
 #include "guiengine/screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 namespace GUIEngine
 {
     class Widget;
 }
 class InputDevice;
-class ActivePlayer;
 class PlayerKartWidget;
 class KartHoverListener;
 
@@ -61,7 +61,7 @@ public:
     bool playerJoin(InputDevice* device, bool firstPlayer);
     
     /** Called when a player hits 'rescue' on his device to leave the game */
-    bool playerQuit(ActivePlayer* player);
+    bool playerQuit(StateManager::ActivePlayer* player);
     
     /** Standard 'Screen' callback before screen is entered */
     void init();

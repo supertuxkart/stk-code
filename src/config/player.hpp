@@ -22,10 +22,6 @@
 
 #include <string>
 #include "config/user_config.hpp"
-#include "input/input_device.hpp"
-
-class InputDevice;
-class Kart;
 
 /**
   * class for managing player profiles (name, control configuration, etc.)
@@ -51,40 +47,10 @@ public:
     
     void setName(const std::string &name_){ m_name = name_;}
 
-    const char* getName() { return m_name.c_str(); }
+    const char* getName() const { return m_name.c_str(); }
 
     //int getLastKartId(){ return m_last_kart_id; }
     //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
-};
-
-/**
-  * Represents a player that is currently playing. It helps manage associating with a
-  * player profile and an input device (we're very flexible on this; ActivePlayer #1
-  * can choose to e.g. use profile #5 and device #2)
-  */
-class ActivePlayer
-{
-    PlayerProfile *m_player;
-    InputDevice   *m_device;
-
-    /** Pointer to the kart of this player, only valid during the game. */
-    Kart          *m_kart;
-public:
-    /** ID of this player within the list of active players */
-    int m_id;
-    
-    ActivePlayer(PlayerProfile* player, InputDevice* device);
-    ~ActivePlayer();
-    
-    PlayerProfile* getProfile();
-    void setPlayerProfile(PlayerProfile* player);
-    
-    InputDevice* getDevice() const;
-    void setDevice(InputDevice* device);
-    /** Sets the kart for this player. */
-    void setKart(Kart *kart) { m_kart = kart; }
-    /** Returns the kart of this player. Only valid while world exists. */
-    Kart* getKart()          { return m_kart; }
 };
 
 #endif

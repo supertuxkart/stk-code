@@ -48,7 +48,7 @@ private:
                                         int btnID,
                                         int axisDir,
                                         int value,
-                                        ActivePlayer **player /* out */,
+                                        StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
 
     /**
@@ -59,7 +59,7 @@ private:
      * \return                 The device to which this input belongs
      */
     InputDevice *mapKeyboardInput     ( int btnID,
-                                        ActivePlayer **player /* out */,
+                                        StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
 
     bool deserialize();
@@ -108,7 +108,7 @@ public:
                          int btnID,
                          int axisDir,
                          int value,
-                         ActivePlayer** player /* out */,
+                         StateManager::ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );
 
     InputDevice*        getLatestUsedDevice();
