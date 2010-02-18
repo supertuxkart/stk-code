@@ -318,7 +318,8 @@ void Skin::drawBgImage()
     GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area, 0 /* no clipping */, 0, false /* alpha */);
 }
 
-void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest, BoxRenderParams& params)
+void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest,
+                                         BoxRenderParams& params, bool deactivated)
 {
     // check if widget moved. if so, recalculate coords
     if(w->x != dest.UpperLeftCorner.X || w->y != dest.UpperLeftCorner.Y ||
@@ -362,7 +363,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
      +----l--------------------m----n
      */
     
-    if(!w->dest_areas_inited)
+    if (!w->dest_areas_inited)
     {
         w->dest_x = dest.UpperLeftCorner.X;
         w->dest_y = dest.UpperLeftCorner.Y;
@@ -449,9 +450,9 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
         w->dest_areas_inited = true;
     }
     
-    if(vertical_flip)
+    if (vertical_flip)
     {
-        if(!w->dest_areas_yflip_inited)
+        if (!w->dest_areas_yflip_inited)
         {
 #define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y - w->dest_y; \
 const int y2 = X.LowerRightCorner.Y - w->dest_y; \
@@ -508,7 +509,8 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     
     SColor* colorptr = NULL;
     
-    if ( (w->r != -1 && w->g != -1 && w->b != -1) || ID_DEBUG)
+    // create a color object
+    if ( (w->r != -1 && w->g != -1 && w->b != -1) || ID_DEBUG || deactivated)
     {
         SColor thecolor(255, w->r, w->g, w->b);
         colorptr = new SColor[4]();
@@ -517,7 +519,9 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
         colorptr[2] = thecolor;
         colorptr[3] = thecolor;
     }
-    if (ID_DEBUG)
+    
+    // set it to transluscent
+    if (ID_DEBUG || deactivated)
     {
         colorptr[0].setAlpha(100);
         colorptr[1].setAlpha(100);
@@ -597,16 +601,28 @@ void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool press
         sized_rect.LowerRightCorner.Y = center.Y + (int)(((int)rect.LowerRightCorner.Y - (int)center.Y)*texture_size);
         
         if (focused)
-            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::focused"]);
+        {
+            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::focused"],
+                                          w->m_deactivated);
+        }
         else
-            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::neutral"]);
+        {
+            drawBoxFromStretchableTexture(w, sized_rect, SkinConfig::m_render_params["button::neutral"],
+                                          w->m_deactivated);
+        }
     }
     else
     {
         if (focused)
-            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::focused"]);
+        {
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::focused"],
+                                          w->m_deactivated);
+        }
         else
-            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::neutral"]);
+        {
+            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["button::neutral"],
+                                          w->m_deactivated);
+        }
     }
 }
 
@@ -616,6 +632,9 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool 
 
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
+    //TODO: do something better than hide it when a widget is deactivated?
+    if (widget->m_deactivated) return;
+    
     const int playerID = 0; // FIXME : don't hardcode player 0 ?
 
     bool mark_selected = widget->isSelected(playerID);
@@ -831,13 +850,8 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     BoxRenderParams& params = (focused || pressed) ? SkinConfig::m_render_params["spinner::focused"] : 
                                                      SkinConfig::m_render_params["spinner::neutral"];
     
-    // FIXME: temporary only
     if (widget->isFocusedForPlayer(1))
     {
-        //widget->r = 0;
-        //widget->g = 200;
-        //widget->b = 255;
-        
         core::rect< s32 > rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
         rect2.UpperLeftCorner.Y -= 3;
@@ -847,9 +861,6 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     }
     else if (widget->isFocusedForPlayer(2))
     {
-        //widget->r = 120;
-        //widget->g = 0;
-        ///widget->b = 120;
         core::rect< s32 > rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
         rect2.UpperLeftCorner.Y -= 3;
@@ -859,9 +870,6 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     }
     else if (widget->isFocusedForPlayer(3))
     {
-        //widget->r = 255;
-        //widget->g = 0;
-        //widget->b = 0;
         core::rect< s32 > rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
         rect2.UpperLeftCorner.Y -= 3;
@@ -869,16 +877,10 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
     }
-    /*
-    else
-    {
-        widget->r = -1;
-        widget->g = -1;
-        widget->b = -1;
-    }*/
         
     core::rect< s32 > sized_rect = rect;
-    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+    if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
+        widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
         const float texture_size = sin(m_dialog_size*M_PI*0.5f);
@@ -892,12 +894,12 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
         sized_rect.LowerRightCorner.Y = center.Y + (int)(((int)rect.LowerRightCorner.Y - (int)center.Y)*texture_size);
     }
 
-    drawBoxFromStretchableTexture(widget, sized_rect, params);
+    drawBoxFromStretchableTexture(widget, sized_rect, params, widget->m_deactivated);
 
     
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
-    if (w->isGauge())
+    if (w->isGauge() && !w->m_deactivated)
     {
         const int handle_size = (int)( widget->h*params.left_border/(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin()) / (w->getMax() - w->getMin());
@@ -923,8 +925,8 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
 }
 
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
-{
-    if(pressed)
+{    
+    if (pressed)
     {
         Widget* spinner = widget->m_event_handler;
         int areas = 0;
@@ -941,13 +943,17 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         
         BoxRenderParams& params = SkinConfig::m_render_params["spinner::down"];
         params.areas = areas;
-        drawBoxFromStretchableTexture(widget, rect, params);
+        drawBoxFromStretchableTexture(widget, rect, params, widget->m_deactivated);
     }
     
 }
 
 void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
+    //TODO: do something better than hide it when a widget is deactivated?
+    if (widget->m_deactivated) return;
+    
+    
     if (focused)
     {
         int grow = 45;
@@ -1011,23 +1017,22 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
 
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
 { 
+    //TODO: do something better than hide it when a widget is deactivated?
+    if (widget->m_deactivated) return;
+    
     CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
     
     ITexture* texture;
     
-    if(w->getState() == true)
+    if (w->getState() == true)
     {
-        if(focused)
-            texture = SkinConfig::m_render_params["checkbox::focused+checked"].getImage();
-        else
-            texture = SkinConfig::m_render_params["checkbox::neutral+checked"].getImage();
+        if (focused) texture = SkinConfig::m_render_params["checkbox::focused+checked"].getImage();
+        else         texture = SkinConfig::m_render_params["checkbox::neutral+checked"].getImage();
     }
     else
     {
-        if(focused)
-            texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].getImage();
-        else
-            texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"].getImage();
+        if (focused) texture = SkinConfig::m_render_params["checkbox::focused+unchecked"].getImage();
+        else         texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"].getImage();
     }
     
     const int texture_w = texture->getSize().Width;
@@ -1144,7 +1149,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     }
     else if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_SPINNER)
     {
-        drawSpinnerChild(rect, widget, pressed, focused);
+        if (!widget->m_event_handler->m_deactivated) drawSpinnerChild(rect, widget, pressed, focused);
     }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
     {

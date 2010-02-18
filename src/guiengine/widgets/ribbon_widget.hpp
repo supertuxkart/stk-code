@@ -46,6 +46,7 @@ namespace GUIEngine
             virtual ~IRibbonListener(){}
             virtual void onRibbonWidgetScroll(const int delta_x) = 0;
             virtual void onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID) = 0;
+            virtual void onSelectionChange() = 0;
         };
         
     private:
@@ -85,7 +86,8 @@ namespace GUIEngine
         void add();
 
         /** Sets a listener that will be notified of changes on this ribbon.
-          * Does _not_ take ownership of the listener, i.e. will not delete it. */
+          * Does _not_ take ownership of the listener, i.e. will not delete it.
+          * You may call this with the listener parameter set to NULL to remove the listener. */
         void setListener(IRibbonListener* listener) { m_listener = listener; }
         
         /** Returns the type of this ribbon (see guiengine/engine.hpp for detailed descriptions) */

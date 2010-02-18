@@ -31,6 +31,24 @@
 
 using namespace GUIEngine;
 
+class GameModeRibbonListener : public DynamicRibbonHoverListener
+{
+    RaceSetupScreen* m_parent;
+public:
+
+    GameModeRibbonListener(RaceSetupScreen* parent)
+    {
+        m_parent = parent;
+    }
+
+    virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, const std::string& selectionID, 
+                                    const irr::core::stringw& selectionText, const int playerID)
+    {
+        // game mode changed!!
+        m_parent->onGameModeChanged();
+    }
+};
+
 // -----------------------------------------------------------------------------
 
 RaceSetupScreen::RaceSetupScreen() : Screen("racesetup.stkgui")
@@ -105,6 +123,34 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
 
 // -----------------------------------------------------------------------------
 
+void RaceSetupScreen::onGameModeChanged()
+{
+    DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
+    assert( w2 != NULL );
+    
+    //FIXME: don't hardcode player 0?
+    std::string gamemode = w2->getSelectionIDString(0);
+    
+    // deactivate the AI karts count widget for modes for which we have no AI
+    //FIXME? Don't hardcode here which modes have an AI and which don't
+    SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
+    kartamount->m_deactivated = (gamemode == "3strikes");
+    
+    // use this dirty trick to hide the number inside the spinner (FIXME)
+    if (kartamount->m_deactivated)
+    {
+        kartamount->m_text = L"-";
+        kartamount->setValue( kartamount->getValue() );
+    }
+    else if (kartamount->m_text.size() > 0)
+    {
+        kartamount->m_text = L"";
+        kartamount->setValue( kartamount->getValue() );
+    }
+}
+
+// -----------------------------------------------------------------------------
+
 void RaceSetupScreen::init()
 {
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
@@ -157,12 +203,22 @@ void RaceSetupScreen::init()
     
 
     w2->updateItemDisplay();    
+    
+    //FIXME: it's unclear to me whether I must add a listener everytime init is called or not
+    m_mode_listener = new GameModeRibbonListener(this);
+    w2->registerHoverListener(m_mode_listener);
 }
 
 // -----------------------------------------------------------------------------
 
 void RaceSetupScreen::tearDown()
 {
+    //delete m_mode_listener;
+    //m_mode_listener = NULL;
+    
+    //DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
+    //assert( w2 != NULL );
+    // w2->setListener(NULL);
 }
 
 // -----------------------------------------------------------------------------

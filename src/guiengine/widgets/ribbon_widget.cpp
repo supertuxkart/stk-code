@@ -41,11 +41,12 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     }
     m_selection[0] = 0; // only player 0 has a selection by default
     
+    m_type = WTYPE_RIBBON;
     m_ribbon_type = type;
     m_mouse_focus = NULL;
-    updateSelection();
-    m_type = WTYPE_RIBBON;
     m_listener = NULL;
+
+    updateSelection();
 }
 // -----------------------------------------------------------------------------
 void RibbonWidget::add()
@@ -410,6 +411,8 @@ void RibbonWidget::updateSelection()
         }
     }
      */
+    
+    if (m_listener) m_listener->onSelectionChange();
 }
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)

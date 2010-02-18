@@ -22,11 +22,18 @@
 
 namespace GUIEngine { class Widget; }
 
+class GameModeRibbonListener;
+
 class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<RaceSetupScreen>
 {
     friend class GUIEngine::ScreenSingleton<RaceSetupScreen>;
-    
+    friend class GameModeRibbonListener;
+
     RaceSetupScreen();
+    
+    GameModeRibbonListener* m_mode_listener;
+    
+    void onGameModeChanged();
     
 public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);

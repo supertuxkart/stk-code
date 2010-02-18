@@ -241,6 +241,9 @@ namespace GUIEngine
         /** callback from IRibbonListener */
         virtual void onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID);
         
+        /** callback from IRibbonListener */
+        virtual void onSelectionChange(){}
+
         virtual void update(float delta);
     };
     

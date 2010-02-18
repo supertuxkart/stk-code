@@ -29,12 +29,15 @@ using namespace irr::gui;
 using namespace irr::video;
 
 // -----------------------------------------------------------------------------
+
 SpinnerWidget::SpinnerWidget(const bool gauge)
 {
     m_gauge = gauge;
     m_type = WTYPE_SPINNER;
 }
+
 // -----------------------------------------------------------------------------
+
 void SpinnerWidget::add()
 {
     // retrieve min and max values
@@ -155,7 +158,9 @@ ITexture* SpinnerWidget::getTexture()
     ITexture* texture = irr_driver->getTexture(imagefile);
     return texture;
 }
+
 // -----------------------------------------------------------------------------
+
 void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 {
     Widget::move(x, y, w, h);
@@ -185,8 +190,12 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
 }
 
 // -----------------------------------------------------------------------------
+
 EventPropagation SpinnerWidget::rightPressed(const int playerID)
 {
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return EVENT_BLOCK;
+    
     //std::cout  << "Right pressed\n";
     if (m_value+1 <= m_max) setValue(m_value+1);
     
@@ -194,9 +203,14 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     
     return EVENT_LET;
 }
+
 // -----------------------------------------------------------------------------
+
 EventPropagation SpinnerWidget::leftPressed(const int playerID)
 {
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return EVENT_BLOCK;
+    
     //std::cout  << "Left pressed\n";
     if (m_value-1 >= m_min) setValue(m_value-1);
     
@@ -204,21 +218,30 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     
     return EVENT_LET;
 }
+
 // -----------------------------------------------------------------------------
+
 EventPropagation SpinnerWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
-    if (originator == "left") leftPressed(playerID);
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return EVENT_BLOCK;
+    
+    if      (originator == "left")  leftPressed(playerID);
     else if (originator == "right") rightPressed(playerID);
     
     this->setFocusForPlayer( playerID );
     return EVENT_LET;
 }
+
 // -----------------------------------------------------------------------------
+
 void SpinnerWidget::clearLabels()
 {
     m_labels.clear();
 }
+
 // -----------------------------------------------------------------------------
+
 void SpinnerWidget::addLabel(stringw label)
 {
     m_labels.push_back(label);
@@ -226,7 +249,9 @@ void SpinnerWidget::addLabel(stringw label)
     m_max = m_labels.size()-1;
     setValue(0);
 }
+
 // -----------------------------------------------------------------------------
+
 void SpinnerWidget::setValue(const int new_value)
 {
     m_value = new_value;
@@ -253,6 +278,8 @@ void SpinnerWidget::setValue(const int new_value)
     }
 }
 
+// -----------------------------------------------------------------------------
+
 stringw SpinnerWidget::getStringValue() const
 {
     if (m_labels.size() > 0)
@@ -271,3 +298,6 @@ stringw SpinnerWidget::getStringValue() const
     /** To avoid compiler warnings about missing return statements. */
     return "";
 }
+
+// -----------------------------------------------------------------------------
+

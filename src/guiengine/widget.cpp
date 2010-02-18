@@ -86,8 +86,8 @@ Widget::Widget(bool reserve_id)
     }
     
     m_reserved_id = -1;
-    
-    m_badges = 0;
+    m_deactivated = false;
+    m_badges      = 0;
 }
 
 // -----------------------------------------------------------------------------

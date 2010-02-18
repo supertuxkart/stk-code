@@ -96,7 +96,7 @@ namespace GUIEngine
       * Each widget may have an irrlicht parent (most often used to put widgets in dialogs)
       * and also optionally one or many children.
       *
-      * Each widget also has a set of properties stored in a ma (see enum above)
+      * Each widget also has a set of properties stored in a map (see enum above)
       */
     class Widget : public SkinWidgetContainer
     {
@@ -127,14 +127,15 @@ namespace GUIEngine
           * the event propagate to the user's event handler.
           */
         virtual EventPropagation rightPressed(const int playerID) { return EVENT_BLOCK; }
-        virtual EventPropagation leftPressed(const int playerID) { return EVENT_BLOCK; }
+        virtual EventPropagation leftPressed (const int playerID) { return EVENT_BLOCK; }
         
         /** used when you set eventSupervisors - see m_event_handler explainations below
             called when one of a widget's children is hovered.
-            Returns 'true' if main event handler should be notified of a change. */
+            \return 'EVENT_LET' if main event handler should be notified of a change, 'EVENT_BLOCK' otherwise */
         virtual EventPropagation mouseHovered(Widget* child, const int playerID) { return EVENT_BLOCK; }
         
-        /** override in children if you need to know when the widget is focused. return whether to block event */
+        /** override in children if you need to know when the widget is focused.
+          * \return whether to block event */
         virtual EventPropagation focused(const int playerID) { setWithinATextBox(false); return EVENT_LET; }
         
         /** override in children if you need to know when the widget is unfocused. */
@@ -227,6 +228,9 @@ namespace GUIEngine
             2) Theorically, in 'add()', derived widgets should checked if this value is set, and use
                it instead of creating a new ID if it is. In practice, it's not widely implemented (FIXME) */
         int m_reserved_id;
+        
+        /** A simple flag that can be raised to hide this widget */
+        bool m_deactivated;
         
         Widget(bool reserve_id = false);
         virtual ~Widget();
