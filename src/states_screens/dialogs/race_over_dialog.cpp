@@ -45,11 +45,12 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     // Switch to barrier mode: server waits for ack from each client
     network_manager->beginRaceResultBarrier();
 
-    std::cout << "race_manager->getMajorMode()=" << race_manager->getMajorMode()
-              << ", RaceManager::MAJOR_MODE_GRAND_PRIX=" << RaceManager::MAJOR_MODE_GRAND_PRIX 
-              << ", RaceManager::MAJOR_MODE_SINGLE=" << RaceManager::MAJOR_MODE_SINGLE << "\n";
-    
-    const bool show_highscores = (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX);
+    //std::cout << "race_manager->getMajorMode()=" << race_manager->getMajorMode()
+    //          << ", RaceManager::MAJOR_MODE_GRAND_PRIX=" << RaceManager::MAJOR_MODE_GRAND_PRIX 
+    //          << ", RaceManager::MAJOR_MODE_SINGLE=" << RaceManager::MAJOR_MODE_SINGLE << "\n";
+        
+    const bool show_highscores = (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX) &&
+                                 World::getWorld()->useHighScores();
     
     const int text_height = GUIEngine::getFontHeight();
     

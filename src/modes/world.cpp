@@ -76,8 +76,11 @@ World* World::m_world = NULL;
  */
 World::World() : WorldStatus()
 {
-    m_physics  = NULL;
-    m_race_gui = NULL;
+    m_physics        = NULL;
+    m_race_gui       = NULL;
+    m_use_highscores = true;
+    m_track          = NULL;
+
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
 
@@ -89,15 +92,12 @@ World::World() : WorldStatus()
 void World::init()
 {
     race_state            = new RaceState();
-    m_track               = NULL;
     m_faster_music_active = false;
     m_fastest_lap         = 9999999.9f;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
     m_num_players         = 0;
-
-    m_use_highscores = true;
 
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
