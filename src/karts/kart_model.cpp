@@ -48,9 +48,8 @@ KartModel::KartModel()
     m_wheel_filename[2] = "wheel-rear-right.3ds";
     m_wheel_filename[3] = "wheel-rear-left.3ds";
     m_mesh              = NULL;
-    m_af_left           = -1;
-    m_af_straight       = -1;
-    m_af_right          = -1;
+    for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
+        m_animation_frame[i]=-1;
     m_animation_speed   = 15;
 }   // KartModel
 
@@ -61,11 +60,13 @@ KartModel::KartModel()
  */
 void KartModel::loadInfo(const lisp::Lisp* lisp)
 {
-    lisp->get("model-file",         m_model_filename );
-    lisp->get("animation-left",     m_af_left        );
-    lisp->get("animation-straight", m_af_straight    );
-    lisp->get("animation-right",    m_af_right       );
-    lisp->get("animation-speed",    m_animation_speed);
+    lisp->get("model-file",              m_model_filename               );
+    lisp->get("animation-left",          m_animation_frame[AF_LEFT]     );
+    lisp->get("animation-straight",      m_animation_frame[AF_STRAIGHT] );
+    lisp->get("animation-right",         m_animation_frame[AF_RIGHT]    );
+    lisp->get("animation-start-winning", m_animation_frame[AF_WIN_START]);
+    lisp->get("animation-end-winning",   m_animation_frame[AF_WIN_END]  );
+    lisp->get("animation-speed",         m_animation_speed              );
 
     loadWheelInfo(lisp, "wheel-front-right", 0);
     loadWheelInfo(lisp, "wheel-front-left",  1);
@@ -210,6 +211,30 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 }   // setDefaultPhysicsPosition
 
 // ----------------------------------------------------------------------------
+/** Enables- or disables the end animation. 
+ *  \param status True if end animation should be played, false otherwise.
+ */
+void KartModel::setEndAnimation(bool status)
+{
+    m_end_animation = status;
+    if(!m_end_animation)
+    {
+        m_node->setLoopMode(false);
+        m_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
+                             m_animation_frame[AF_STRAIGHT] );
+    }
+
+    if(m_end_animation && m_animation_frame[AF_WIN_START]>-1 &&
+        m_animation_frame[AF_WIN_END]>-1)
+    {
+        m_node->setFrameLoop(m_animation_frame[AF_WIN_START], 
+                             m_animation_frame[AF_WIN_END]    );
+        m_node->setLoopMode(true);
+        m_node->setAnimationSpeed(m_animation_speed);
+    }
+}   // setEndAnimation
+
+// ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension.
  *  \param rotation How far the wheels should rotate.
  *  \param visual_steer How much the front wheels are turned for steering.
@@ -254,7 +279,11 @@ void KartModel::update(float rotation, float visual_steer,
     m_wheel_node[2]->setRotation(wheel_rear );
     m_wheel_node[3]->setRotation(wheel_rear );
 
-    if(m_af_left<0) return;   // no animations defined
+    // Check if the end animation is being played, if so, don't
+    // play steering animation.
+    if(m_end_animation) return;
+
+    if(m_animation_frame[AF_LEFT]<0) return;   // no animations defined
 
     // Update animation if necessary
     // -----------------------------
@@ -263,9 +292,13 @@ void KartModel::update(float rotation, float visual_steer,
     // (say) 50% of left or right.
     int end;
     static int last_end=-1;
-    if(steer>0.0f)       end = m_af_straight-(int)((m_af_straight-m_af_left)*steer);
-    else if(steer<0.0f)  end = m_af_straight+(int)((m_af_straight-m_af_right)*steer);
-    else                 end = m_af_straight;
+    if(steer>0.0f)       end = m_animation_frame[AF_STRAIGHT]
+                             - (int)( ( m_animation_frame[AF_STRAIGHT]
+                                       -m_animation_frame[AF_LEFT]    )*steer);
+    else if(steer<0.0f)  end = m_animation_frame[AF_STRAIGHT]
+                             + (int) ( (m_animation_frame[AF_STRAIGHT] 
+                                       -m_animation_frame[AF_RIGHT]   )*steer);
+    else                 end = m_animation_frame[AF_STRAIGHT];
 
     // No changes to current frame loop
     if(end==last_end) return;

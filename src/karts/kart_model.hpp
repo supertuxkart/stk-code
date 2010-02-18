@@ -39,9 +39,18 @@ class KartProperties;
 class KartModel
 {
 private:
-    /** The frames in which the animation points to the left, straight
-     *  ahead, and to the right. */
-    int m_af_left, m_af_straight, m_af_right;
+    enum   AnimationFrameType
+           {AF_BEGIN,            // First animation frame
+            AF_LEFT = AF_BEGIN,  // Steering to the left
+            AF_STRAIGHT,         // Going straight
+            AF_RIGHT,            // Steering to the right
+            AF_WIN_START,        // Begin of win animation
+            AF_WIN_END,          // End of win animation
+            AF_END=AF_WIN_END,   // Last animation frame 
+            AF_COUNT};           // Number of entries here
+
+    /** Which frame number starts/end which animation. */
+    int m_animation_frame[AF_COUNT];
 
     /** Animation speed. */
     float m_animation_speed;
@@ -90,6 +99,8 @@ private:
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
 
+    /** True if the end animation is being shown. */
+    bool  m_end_animation;
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
     float m_kart_height;              /**< Height of kart. */
@@ -110,7 +121,7 @@ public:
     scene::IMesh* getWheelModel(const int wheelID) const { return m_wheel_model[wheelID]; }
     
     /** Since karts might be animated, we might need to know which base frame to use */
-    int  getBaseFrame() const   { return m_af_straight;  }
+    int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
     
     /** Returns the position of a wheel relative to the kart. 
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear 
@@ -141,5 +152,8 @@ public:
                  float steer, const float suspension[4]);
     void  resetWheels();
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
+
+    /** Enables- or disables the end animation. */
+    void  setEndAnimation(bool status);
 };   // KartModel
 #endif

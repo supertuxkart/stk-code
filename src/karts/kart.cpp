@@ -395,6 +395,7 @@ void Kart::reset()
     // m_controller is not yet defined.
     if(m_controller)
         m_controller->reset();
+    m_kart_properties->getKartModel()->setEndAnimation(false);
     m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
     m_powerup.reset();
@@ -465,6 +466,8 @@ void Kart::finishedRace(float time)
     m_controller->finishedRace(time);
     race_manager->kartFinishedRace(this, time);
     setController(new EndController(this, m_controller->getPlayer()));
+    m_kart_properties->getKartModel()->setEndAnimation(true);
+    m_camera->setMode(Camera::CM_REVERSE);
 }   // finishedRace
 
 //-----------------------------------------------------------------------------
