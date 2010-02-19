@@ -644,25 +644,30 @@ void RaceGUI::drawAllMessages(const Kart* kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {
+    //TODO: don't hardcode, detect dynamically from font size
+    const int MESSAGE_MAX_HEIGHT = 70;
+    
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
     int y = (int)(scaling.Y*164 + UserConfigParams::m_height 
                                 - viewport.LowerRightCorner.Y );
-    int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)>>1;
+    const int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)/2;
+    const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
+
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
     // in the right order: "1" on top of "2"
-    for(AllMessageType::const_iterator i=m_messages.begin();i!=m_messages.end(); ++i)
+    for (AllMessageType::const_iterator i = m_messages.begin(); i != m_messages.end(); ++i)
     {
         TimedMessage const &msg = *i;
 
         // Display only messages for all karts, or messages for this kart
-        if( msg.m_kart && msg.m_kart!=kart) continue;
+        if (msg.m_kart && msg.m_kart!=kart) continue;
 
-        core::rect<s32> pos(x, y, x, y);
+        core::rect<s32> pos(x - w/2, y, x + w/2, y + MESSAGE_MAX_HEIGHT);
         GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                                        pos, msg.m_color, true, true);
-        y+=40;        
+                                   pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+        y += MESSAGE_MAX_HEIGHT;        
     }   // for i in all messages
 }   // drawAllMessages
 
