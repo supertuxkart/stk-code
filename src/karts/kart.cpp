@@ -467,7 +467,9 @@ void Kart::finishedRace(float time)
     race_manager->kartFinishedRace(this, time);
     setController(new EndController(this, m_controller->getPlayer()));
     m_kart_properties->getKartModel()->setEndAnimation(true);
-    m_camera->setMode(Camera::CM_REVERSE);
+    // Not all karts have a camera
+    if(m_camera)
+        m_camera->setMode(Camera::CM_REVERSE);
 }   // finishedRace
 
 //-----------------------------------------------------------------------------
