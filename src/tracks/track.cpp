@@ -72,6 +72,7 @@ Track::Track(std::string filename)
     m_all_meshes.clear();
     m_has_final_camera     = false;
     m_is_arena             = false;
+    m_camera_far           = 1000.0f;
     m_quad_graph           = NULL;
     m_animation_manager    = NULL;
     m_check_manager        = NULL;
@@ -718,6 +719,10 @@ void Track::loadTrackModel(unsigned int mode_id)
             float h=0;
             node->get("h", &h);
             m_start_heading.push_back(h);
+        }
+        else if(name=="camera")
+        {
+            node->get("far", &m_camera_far);
         }
         else if(name=="animations")
         {

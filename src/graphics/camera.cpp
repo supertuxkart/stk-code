@@ -131,6 +131,7 @@ void Camera::setupCamera()
     }   // switch
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
+    m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
 }   // setupCamera
 
 // ----------------------------------------------------------------------------

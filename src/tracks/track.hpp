@@ -89,6 +89,8 @@ private:
     /** The version of this track. A certain STK version will only support
      *  certain track versions. */
     int                      m_version;
+    /** Far value for cameras for this track. */
+    float                    m_camera_far;
 
     /** The graph used to connect the quads. */
     QuadGraph               *m_quad_graph;
@@ -267,6 +269,9 @@ public:
     /** Sets the current ambient color for a kart with index k. */
     void   setAmbientColor(const video::SColor &color,
                            unsigned int k);
+    /** Returns the far value for cameras. */
+    float  getCameraFar() const { return m_camera_far; }
+
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const 
                                            { return m_start_positions.size(); }
