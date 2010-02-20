@@ -194,7 +194,6 @@ void EndController::handleBraking()
         return;
     }
         
-    const float MIN_SPEED = 5.0f;
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.

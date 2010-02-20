@@ -177,7 +177,8 @@ Kart *World::createKart(const std::string &kart_ident, int index,
                                           local_player_id);
         m_num_players ++;
         break;
-    //case RaceManager::KT_NETWORK_PLAYER:
+    case RaceManager::KT_NETWORK_PLAYER:
+		break;  // Avoid compiler warning about enum not handled.
         //controller = new NetworkController(kart_ident, position, init_pos,
         //                          global_player_id);
         //m_num_players++;
