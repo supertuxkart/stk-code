@@ -578,7 +578,11 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         m_uprightConstraint->setDisableTime(10.0f);
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
 
-        btVector3 torque(sign_c * float(rand()%32) * 5.0f, sign_d * float(rand()%32) * 5.0f, sign_e * float(rand()%32) * 5.0f);
+        float torqueX = sign_c * (20.0f + float(rand()%32) * 5.0f);
+        float torqueY = sign_d * (20.0f + float(rand()%32) * 5.0f);
+        float torqueZ = sign_e * (20.0f + float(rand()%32) * 5.0f);
+
+        btVector3 torque(torqueX, torqueY, torqueZ);
         getVehicle()->getRigidBody()->applyTorqueImpulse(torque);
 
         m_stars_effect->showFor(6.0f);
