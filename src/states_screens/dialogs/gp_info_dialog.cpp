@@ -75,6 +75,8 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     const int textHeight = GUIEngine::getFontHeight();
     if (height_of_one_line > (int)(textHeight*1.5f)) height_of_one_line = (int)(textHeight*1.5f);
     
+    bool gp_ok = true;
+    
     for (int t=0; t<trackAmount; t++)
     {
         const int from_y      = y1 + height_of_one_line*(t+1);
@@ -83,9 +85,9 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         stringw lineText;
         if (track == NULL)
         {
-            //FIXME: what to do if this happens?
             lineText = L"MISSING : ";
             lineText.append( stringw(tracks[t].c_str()) );
+            gp_ok = false;
         }
         else
         {
@@ -133,8 +135,19 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     
     // ---- Start button
     ButtonWidget* okBtn = new ButtonWidget();
-    okBtn->m_properties[PROP_ID] = "start";
-    okBtn->m_text = _("Start Grand Prix");
+    
+    if (gp_ok)
+    {
+        okBtn->m_properties[PROP_ID] = "start";
+        okBtn->m_text = _("Start Grand Prix");
+    }
+    else
+    {
+        okBtn->m_properties[PROP_ID] = "cannot_start";
+        okBtn->m_text = _("This Grand Prix is broken!");
+        okBtn->m_badges |= BAD_BADGE;
+    }
+    
     okBtn->x = m_area.getWidth()/2 - 200;
     okBtn->y = y2;
     okBtn->w = 400;
@@ -203,10 +216,14 @@ void GPInfoDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation GPInfoDialog::processEvent(std::string& eventSource)
 {
-    if (eventSource == "start" )
+    if (eventSource == "start")
     {
         startGPGame(grand_prix_manager->getGrandPrix(m_gp_ident));
         return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "cannot_start")
+    {
+        sfx_manager->quickSound( "use_anvil" );
     }
     
     return GUIEngine::EVENT_LET;
