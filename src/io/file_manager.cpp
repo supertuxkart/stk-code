@@ -428,6 +428,7 @@ void FileManager::checkAndCreateConfigDir()
             fprintf(stderr, "Can't create dir '%s', falling back to use '%s'.\n",
                     m_config_dir.c_str(), getenv("HOME"));
             m_config_dir = getenv("HOME");
+            m_config_dir += ".";
         }
     }
 #  endif
