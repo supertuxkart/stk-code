@@ -110,7 +110,7 @@ void GrandPrixOver::tearDown()
     {
         irr_driver->removeNode(m_podium_step[n]);
         m_podium_step[n] = NULL;
-        irr_driver->removeNode(m_kart_node[n]);
+        if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
         m_kart_node[n] = NULL;
     }
 }

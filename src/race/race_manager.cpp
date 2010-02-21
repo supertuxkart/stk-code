@@ -367,8 +367,9 @@ void RaceManager::exitRace()
         StateManager::get()->pushScreen        ( GrandPrixOver::getInstance()  );
         
         std::string winners[3];
-        for (unsigned int i=start; i < m_kart_status.size(); ++i)
+        for (unsigned int i=0; i < m_kart_status.size(); ++i)
         {
+            std::cout << m_kart_status[i].m_ident << " has GP final rank " << m_kart_status[i].m_gp_final_rank << std::endl;
             const int rank = m_kart_status[i].m_gp_final_rank;
             if (rank >= 0 && rank < 3)
             {
