@@ -129,7 +129,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
     // ---- karts move
     if (m_phase == 1)
     {
-        int karts_on_target = 0;
+        int karts_not_yet_done = 0;
         for (int k=0; k<3; k++)
         {
             if (m_kart_node[k] != NULL)
@@ -171,7 +171,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
                 }
                 
                 
-                if (x_target_reached && z_target_reached) karts_on_target++;
+                if (!x_target_reached || !z_target_reached) karts_not_yet_done++;
                 
                 //std::cout << "kart position [" << k << "] = " << m_kart_x[k] << ", " << m_kart_z[k] << std::endl;
                 
@@ -179,7 +179,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
             }
         } // end for
         
-        if (karts_on_target == 3)
+        if (karts_not_yet_done == 0)
         {
             m_phase = 2;
         }
@@ -188,7 +188,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
     // ---- Karts Rotate
     else if (m_phase == 2)
     {
-        int karts_on_target = 0;
+        int karts_not_yet_done = 0;
         for (int k=0; k<3; k++)
         {
             if (m_kart_node[k] != NULL)
@@ -198,15 +198,12 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
                     m_kart_rotation[k] += 25.0f*dt;
                     m_kart_node[k]->setRotation( core::vector3df(0, m_kart_rotation[k], 0) );
                     m_podium_step[k]->setRotation( core::vector3df(0, m_kart_rotation[k], 0) );
-                }
-                else
-                {
-                    karts_on_target++;
+                    karts_not_yet_done++;
                 }
             }
         } // end for
         
-        if (karts_on_target == 3) m_phase = 3;
+        if (karts_not_yet_done == 0) m_phase = 3;
     }
     
     // ---- Podium Rises
