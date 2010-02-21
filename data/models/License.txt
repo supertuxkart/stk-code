@@ -14,4 +14,10 @@
     by MiniBjorn (c) 2010
     released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
 
+* village
+    released un CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    tree by Julius Krischan Makowka, released un CC-BY-SA 3.0
+    mushrooms by pfunked, with modifications by Marianne Gagnon, released under CC-BY-SA 3.0
+    scene and finishing touches by Marianne Gagnon
+
 Others are GPL.
