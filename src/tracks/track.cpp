@@ -84,7 +84,7 @@ Track::Track(std::string filename)
 Track::~Track()
 {
     if(m_quad_graph)    delete m_quad_graph;
-        if(m_check_manager) delete m_check_manager;
+    if(m_check_manager) delete m_check_manager;
     if(m_mini_map)      irr_driver->removeTexture(m_mini_map);
 }   // ~Track
 
