@@ -268,6 +268,7 @@
 		958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D8C53104F523000A81934 /* race_paused_dialog.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
+		959D42FD1130C4F2005077E2 /* grand_prix_over.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959D42FB1130C4F2005077E2 /* grand_prix_over.cpp */; };
 		95B5CD14102DE08F00EF2001 /* device_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95B5CD13102DE08F00EF2001 /* device_config.cpp */; };
 		95C77D631069589B0080838E /* ambient_light_sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D621069589B0080838E /* ambient_light_sphere.cpp */; };
 		95C77D66106958A50080838E /* check_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C77D65106958A50080838E /* check_line.cpp */; };
@@ -494,6 +495,8 @@
 		959482D010EBC0790031BADF /* track_object_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object_manager.hpp; path = ../../tracks/track_object_manager.hpp; sourceTree = SOURCE_ROOT; };
 		959482D110EBC0790031BADF /* track_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_object.cpp; path = ../../tracks/track_object.cpp; sourceTree = SOURCE_ROOT; };
 		959482D210EBC0790031BADF /* track_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_object.hpp; path = ../../tracks/track_object.hpp; sourceTree = SOURCE_ROOT; };
+		959D42FB1130C4F2005077E2 /* grand_prix_over.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grand_prix_over.cpp; path = ../../states_screens/grand_prix_over.cpp; sourceTree = SOURCE_ROOT; };
+		959D42FC1130C4F2005077E2 /* grand_prix_over.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = grand_prix_over.hpp; path = ../../states_screens/grand_prix_over.hpp; sourceTree = SOURCE_ROOT; };
 		95A118290F77EA3100B18B3D /* input.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input.hpp; path = ../../input/input.hpp; sourceTree = SOURCE_ROOT; };
 		95A1182A0F77EA3100B18B3D /* input_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input_manager.cpp; path = ../../input/input_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95A1182B0F77EA3100B18B3D /* input_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = input_manager.hpp; path = ../../input/input_manager.hpp; sourceTree = SOURCE_ROOT; };
@@ -1313,6 +1316,8 @@
 				958330C310122B4A00C5137E /* credits.hpp */,
 				95D2343E1078227A00625256 /* feature_unlocked.cpp */,
 				95D2343D1078227A00625256 /* feature_unlocked.hpp */,
+				959D42FB1130C4F2005077E2 /* grand_prix_over.cpp */,
+				959D42FC1130C4F2005077E2 /* grand_prix_over.hpp */,
 				9522F1DE10795E8A0067ECF5 /* help_screen_1.cpp */,
 				9522F1DF10795E8A0067ECF5 /* help_screen_1.hpp */,
 				9522F1E210795EFF0067ECF5 /* help_screen_2.cpp */,
@@ -2613,6 +2618,7 @@
 				956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */,
 				956C6ED61128D3FB004336C8 /* new_ai_controller.cpp in Sources */,
 				956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */,
+				959D42FD1130C4F2005077E2 /* grand_prix_over.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

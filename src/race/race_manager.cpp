@@ -24,8 +24,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/stk_config.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "states_screens/state_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -35,6 +33,10 @@
 #include "modes/world.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "network/network_manager.hpp"
+#include "states_screens/grand_prix_over.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 
 RaceManager* race_manager= NULL;
@@ -360,8 +362,9 @@ void RaceManager::exitRace()
         delete []race_time;
         
         unlock_manager->grandPrixFinished();
-        // TODO - Grand Prix ending
-        // menu_manager->switchToGrandPrixEnding();
+        
+        StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
+        StateManager::get()->pushScreen        ( GrandPrixOver::getInstance()  );
     }
 
     delete World::getWorld();

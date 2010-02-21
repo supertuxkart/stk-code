@@ -1,0 +1,5 @@
+<stkgui>
+
+    <button id="continue" x="20" y="-40" width="250" height="35" align="left" text="Continue"/>
+
+</stkgui>

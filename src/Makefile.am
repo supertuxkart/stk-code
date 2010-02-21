@@ -282,6 +282,8 @@ supertuxkart_SOURCES = \
  states_screens/arenas_screen.hpp \
  states_screens/feature_unlocked.cpp \
  states_screens/feature_unlocked.hpp \
+ states_screens/grand_prix_over.cpp  \
+ states_screens/grand_prix_over.hpp  \
  states_screens/help_screen_1.cpp \
  states_screens/help_screen_1.hpp \
  states_screens/help_screen_2.cpp \
