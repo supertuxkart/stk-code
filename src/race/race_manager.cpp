@@ -351,7 +351,7 @@ void RaceManager::exitRace()
             }
         } while(!sorted);
         
-        for(unsigned int i=start; i < NUM_KARTS; ++i)
+        for (unsigned int i=start; i < NUM_KARTS; ++i)
         {
             //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i-start);
             m_kart_status[position[i]].m_gp_final_rank = i - start;
@@ -365,6 +365,18 @@ void RaceManager::exitRace()
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
         StateManager::get()->pushScreen        ( GrandPrixOver::getInstance()  );
+        
+        std::string winners[3];
+        for (unsigned int i=start; i < m_kart_status.size(); ++i)
+        {
+            const int rank = m_kart_status[i].m_gp_final_rank;
+            if (rank >= 0 && rank < 3)
+            {
+                winners[rank] = m_kart_status[i].m_ident;
+            }
+        }
+        
+        GrandPrixOver::getInstance()->setKarts(winners);
     }
 
     delete World::getWorld();

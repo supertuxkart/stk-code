@@ -31,6 +31,8 @@
 
 // FIXME : remove, temporary test
 #include "states_screens/feature_unlocked.hpp"
+#include "states_screens/grand_prix_over.hpp"
+
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -65,6 +67,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     if (selection == "network")
     {
         // FIXME : remove, temporary test
+        GrandPrixOver* scene = GrandPrixOver::getInstance();
+        const std::string winners[] = { "tux", "nolok", "pidgin" };
+        scene->setKarts( winners );
+        StateManager::get()->pushScreen(scene);
+
+        /*
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
         static int i = 0;
@@ -81,6 +89,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
             scene->setUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
             StateManager::get()->pushScreen(scene);
         }
+         */
     }
     
     if (selection == "new")
