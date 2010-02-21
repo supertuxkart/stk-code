@@ -217,43 +217,58 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         race_again_btn->setParent(m_irrlicht_window);
         m_children.push_back(race_again_btn);
         race_again_btn->add();
+        
+        ButtonWidget* whats_next_btn = new ButtonWidget();
+        whats_next_btn->x = 15;
+        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
+        whats_next_btn->w = m_area.getWidth() - 30;
+        whats_next_btn->h = button_h;
+        whats_next_btn->setParent(m_irrlicht_window);
+        
+        whats_next_btn->m_text = _("Back to the main menu");
+        whats_next_btn->m_properties[PROP_ID] = "backtomenu";
+        
+        m_children.push_back(whats_next_btn);
+        whats_next_btn->add();
+        
+        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
     }
-    else
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        // grand prix
+        ButtonWidget* whats_next_btn = new ButtonWidget();
+        whats_next_btn->x = 15;
+        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        whats_next_btn->w = m_area.getWidth() - 30;
+        whats_next_btn->h = button_h;
+        whats_next_btn->setParent(m_irrlicht_window);
+        
+        whats_next_btn->m_text = _("Continue Grand Prix");
+        whats_next_btn->m_properties[PROP_ID] = "continuegp";
+        
+        m_children.push_back(whats_next_btn);
+        whats_next_btn->add();
+        
+        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+        
+        
         ButtonWidget* abort_gp = new ButtonWidget();
         abort_gp->m_properties[PROP_ID] = "backtomenu";
         abort_gp->x = 15;
-        abort_gp->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        abort_gp->y = m_area.getHeight() - (button_h + margin_between_buttons);
         abort_gp->w = m_area.getWidth() - 30;
         abort_gp->h = button_h;
         abort_gp->m_text = _("Abort Grand Prix");
         abort_gp->setParent(m_irrlicht_window);
         m_children.push_back(abort_gp);
         abort_gp->add();
-    }
-    
-    ButtonWidget* whats_next_btn = new ButtonWidget();
-    whats_next_btn->x = 15;
-    whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
-    whats_next_btn->w = m_area.getWidth() - 30;
-    whats_next_btn->h = button_h;
-    whats_next_btn->setParent(m_irrlicht_window);
-    
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-    {
-        whats_next_btn->m_text = _("Continue Grand Prix");
-        whats_next_btn->m_properties[PROP_ID] = "continuegp";
+        
+
     }
     else
     {
-        whats_next_btn->m_text = _("Back to the main menu");
-        whats_next_btn->m_properties[PROP_ID] = "backtomenu";
+        assert(false);
     }
-    m_children.push_back(whats_next_btn);
-    whats_next_btn->add();
-    
-    whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+
 }
 
 // ------------------------------------------------------------------------------------------------------
