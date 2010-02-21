@@ -262,6 +262,7 @@ void RaceManager::startNextRace()
  */
 void RaceManager::next()
 {
+    delete World::getWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
     m_track_number++;
