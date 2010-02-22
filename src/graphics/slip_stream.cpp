@@ -196,15 +196,10 @@ void SlipStream::update(float dt)
     m_node->setRotation(r);
     return;
 
-    // Smooth the rotation: take 80% of old rotation, 20% of new:
-    float weight_old = 0.5f;
-    const core::vector3df &new_rotation = m_kart->getNode()->getRotation();
-    
     const core::quaternion new_rot(m_kart->getNode()->getRotation());
     const core::quaternion old_rot(m_node->getRotation()            );
 
     core::quaternion interpo;
-    //interpo.slerp(new_rot, old_rot, weight_old);
     core::vector3df interp;
     new_rot.toEuler(interp);
     m_node->setRotation(interp);
