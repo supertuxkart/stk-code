@@ -1,6 +1,7 @@
 
 #include "states_screens/grand_prix_over.hpp"
 
+#include "audio/sound_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -31,12 +32,23 @@ GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
     m_kart_node[2] = NULL;
+    
+    m_podium_x[0] = 1.4f;
+    m_podium_z[0] = 0.0f;
+    
+    m_podium_x[1] = 2.2f;
+    m_podium_z[1] = 0.5f;
+    
+    m_podium_x[2] = 3.0f;
+    m_podium_z[2] = 0.0f;
 }
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixOver::init()
 {
+    sound_manager->startMusic(sound_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
+
     m_phase = 1;
     m_sky_angle = 0.0f;
     m_global_time = 0.0f;
@@ -68,15 +80,6 @@ void GrandPrixOver::init()
     scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getModelFile("wood_podium.b3d") );
     assert(podium_model != NULL);
     
-    
-    m_podium_x[0] = 1.4f;
-    m_podium_z[0] = 0.0f;
-    
-    m_podium_x[1] = 2.2f;
-    m_podium_z[1] = 0.5f;
-    
-    m_podium_x[2] = 3.0f;
-    m_podium_z[2] = 0.0f;
     
     m_podium_step[0] = irr_driver->addMesh(podium_model);
     m_podium_step[0]->setPosition( core::vector3df(m_podium_x[0], INITIAL_PODIUM_Y, m_podium_z[0]) );
@@ -119,6 +122,11 @@ void GrandPrixOver::tearDown()
         if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
         m_kart_node[n] = NULL;
     }
+
+    // restore menu music when leaving (FIXME: this assume we always go to menu after)
+    sound_manager->stopMusic();
+    sound_manager->startMusic(stk_config->m_title_music);
+
 }
 
 // -------------------------------------------------------------------------------------
@@ -140,25 +148,7 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
         {
             if (m_kart_node[k] != NULL)
             {
-                bool x_target_reached = false, z_target_reached = false;
-                
-                if (fabsf(m_kart_x[k] - m_podium_x[k]) > dt)
-                {
-                    if (m_kart_x[k] < m_podium_x[k])
-                    {
-                        m_kart_x[k] += dt;
-                    }
-                    else if (m_kart_x[k] > m_podium_x[k])
-                    {
-                        m_kart_x[k] -= dt;
-                    }
-                }
-                else
-                {
-                    m_kart_x[k] = m_podium_x[k];
-                    x_target_reached = true;
-                }
-                
+
                 if (fabsf(m_kart_z[k] - m_podium_z[k]) > dt)
                 {
                     if (m_kart_z[k] < m_podium_z[k])
@@ -169,18 +159,9 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
                     {
                         m_kart_z[k] -= dt;
                     }
+                    karts_not_yet_done++;
                 }
-                else
-                {
-                    m_kart_z[k] = m_podium_z[k];
-                    z_target_reached=true;
-                }
-                
-                
-                if (!x_target_reached || !z_target_reached) karts_not_yet_done++;
-                
-                //std::cout << "kart position [" << k << "] = " << m_kart_x[k] << ", " << m_kart_z[k] << std::endl;
-                
+
                 m_kart_node[k]->setPosition( core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
             }
         } // end for
@@ -302,7 +283,7 @@ void GrandPrixOver::setKarts(const std::string idents_arg[3])
         {
             KartModel* kartModel = kart->getKartModel();
             
-            m_kart_x[n] = n*2;
+            m_kart_x[n] = m_podium_x[n];
             m_kart_y[n] = INITIAL_Y;
             m_kart_z[n] = -4;
             m_kart_rotation[n] = 0.0f;
