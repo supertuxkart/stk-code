@@ -90,7 +90,7 @@ case "${host}" in
     AC_DEFINE([WIN32], 1, [Define for Win32 platforms])
     AC_DEFINE([NOMINMAX], 1, [Define for Win32 platforms])
 
-    opengl_LIBS="-lglut32 -lglu32 -lopengl32 -luser32 -lgdi32 -lm -lwinmm"
+    opengl_LIBS="-lopengl32 -luser32 -lgdi32 -lm -lwinmm"
     joystick_LIBS="$joystick_LIBS -lwinmm"
     LDFLAGS="$LDFLAGS -mwindows"
 
@@ -313,58 +313,13 @@ if test x$have_svnversion != xno; then
   AC_DEFINE_UNQUOTED([SVNVERSION],"$SVNVERSION",["SVN revision number"])
 fi
 
-# ==============================================
-# Glut (optional), used by bullet debugging only
-# ==============================================
-save_LIBS=$LIBS
-save_LDFLAGS=$LDFLAGS
-save_CXXFLAGS=$CXXFLAGS
-case "${host}" in
-*darwin*|*macosx*)
-    # Apparently -framework is needed for include files and libraries
-    CXXFLAGS="$CXXFLAGS -framework GLUT"
-    LDFLAGS="$LDFLAGS -framework GLUT"
-esac
-AC_SEARCH_LIBS(glutInit, [glut], have_glut_lib=yes)
-
-if test x$have_glut_lib = xyes; then
-    # Apple has the headers in GLUT/glut.h instead of GL/glut.h 
-    AC_CHECK_HEADERS([GL/glut.h GLUT/glut.h], have_glut_hdr=yes)
-fi
-if test x$have_glut_hdr = xyes; then
-  AC_DEFINE(HAVE_GLUT)
-  SUMMARY="$SUMMARY\nGlut found, enabling optional bullet debug"
-else
-  SUMMARY="$SUMMARY\nNo glut found, disabling bullet debug"
-  # Remove the unnecessary -framework GLUT on Macs (no impact
-  # of this on any other platforms)
-  CXXFLAGS=$save_CSSFLAGS
-  LDFLAGS=$save_LDFLAGS
-fi
-
-
-case "${host}" in
-*darwin*|*macosx*)
-  glut_LIBS="$LIBS"
-  ;;
-*)
-  glut_LIBS="$LIBS -lGLU"
-  ;;
-esac
-
-LIBS=$save_LIBS
-
 # ==============
 # Bullet physics
 # ==============
 AC_DEFINE([BT_NO_PROFILE], [], [Disable bullet internal profiling])
 SUMMARY="$SUMMARY\nUsing bullet physics."
 BULLETTREE="src/bullet"
-bullet_LIBS=""
-if test x$have_glut_hdr = xyes; then
-  bullet_LIBS="-Lbullet/Demos/OpenGL -lbulletopenglsupport"
-fi
-bullet_LIBS="$bullet_LIBS -Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
+bullet_LIBS="-Lbullet/src -lbulletdynamics -lbulletcollision -lbulletmath"
 
 
 # ====
@@ -410,7 +365,6 @@ AC_SUBST(enet_LIBS)
 AC_SUBST(opengl_LIBS)
 AC_SUBST(openal_LIBS)
 AC_SUBST(oggvorbis_LIBS)
-AC_SUBST(glut_LIBS)
 AC_SUBST(BULLETTREE)
 AC_SUBST(ENETTREE)
 

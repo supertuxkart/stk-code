@@ -641,6 +641,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\physics\irr_debug_drawer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\physical_object.cpp"
 					>
 				</File>
@@ -1002,6 +1006,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\feature_unlocked.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\grand_prix_over.cpp"
 					>
 				</File>
 				<File
@@ -1467,6 +1475,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\physics\irr_debug_drawer.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\physics\kart_motion_state.hpp"
 					>
 				</File>
@@ -1812,6 +1824,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\feature_unlocked.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\grand_prix_over.hpp"
 					>
 				</File>
 				<File

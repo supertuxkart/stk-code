@@ -227,6 +227,8 @@ supertuxkart_SOURCES = \
  physics/btKart.hpp \
  physics/btUprightConstraint.cpp \
  physics/btUprightConstraint.hpp \
+ physics/irr_debug_drawer.cpp \
+ physics/irr_debug_drawer.hpp \
  physics/kart_motion_state.hpp \
  physics/physical_object.cpp \
  physics/physical_object.hpp \
@@ -354,7 +356,7 @@ supertuxkart_SOURCES = \
 
 # Link in the specific gcc 4.1 bug work around
 supertuxkart_LDADD = \
-        $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) $(glut_LIBS) \
+        $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) \
         $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
         $(INTLLIBS)
 

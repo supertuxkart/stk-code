@@ -19,14 +19,6 @@
 
 #include "graphics/irr_driver.hpp"
 
-#ifdef HAVE_GLUT
-#  ifdef __APPLE__
-#    include <GLUT/glut.h>
-#  else
-#    include <GL/glut.h>
-#  endif
-#endif
-
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/material_manager.hpp"
@@ -202,7 +194,7 @@ void IrrDriver::initDevice()
         material2D.TextureLayer[n].TextureWrapU = ETC_CLAMP_TO_EDGE;
         material2D.TextureLayer[n].TextureWrapV = ETC_CLAMP_TO_EDGE;
         
-        material2D.TextureLayer[n].LODBias = 8.0f;
+        material2D.TextureLayer[n].LODBias = 8;
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
@@ -525,7 +517,8 @@ scene::IMesh *IrrDriver::createQuadMesh(const video::SMaterial *material,
 
 /** Creates a quad mesh buffer
  */
-scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material, const double w, const double h)
+scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material, 
+                                                const double w, const double h)
 {
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
     
@@ -535,17 +528,17 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
     v1.TCoords = core::vector2d<f32>(0,1);
     
     video::S3DVertex v2;
-    v2.Pos    = core::vector3df(w,0,0);
+    v2.Pos    = core::vector3df((float)w,0,0);
     v2.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v2.TCoords = core::vector2d<f32>(1,1);
     
     video::S3DVertex v3;
-    v3.Pos    = core::vector3df(w,h,0);
+    v3.Pos    = core::vector3df((float)w,(float)h,0);
     v3.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v3.TCoords = core::vector2d<f32>(1,0);
     
     video::S3DVertex v4;
-    v4.Pos    = core::vector3df(0,h,0);
+    v4.Pos    = core::vector3df(0,(float)h,0);
     v4.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v4.TCoords = core::vector2d<f32>(0,0);
     
@@ -706,67 +699,6 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
 }   // setAmbientLight
 
 // ----------------------------------------------------------------------------
-/** Renders the bullet debug view using glut.
- */
-void IrrDriver::renderBulletDebugView()
-{
-#ifdef HAVE_GLUT
-    // Use bullets debug drawer
-    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    /*  light_position is NOT default value */
-    GLfloat light_position0[] = { 1.0, 1.0, 1.0, 0.0 };
-    GLfloat light_position1[] = { -1.0, -1.0, -1.0, 0.0 };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-
-    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glClearColor(0.8f,0.8f,0.8f,0);
-
-    glCullFace(GL_BACK);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    float f=2.0f;
-    glFrustum(-f, f, -f, f, 1.0, 1000.0);
-
-    World *world = World::getWorld();
-    const Kart *kart = world->getKart(world->getNumKarts()-1);
-    Vec3 xyz = kart->getXYZ();
-    // Compute the camera position 5 units behind and 4 units higher than the kart
-    Vec3 cam_pos= kart->getTrans()(Vec3(0, -5, 4));
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    gluLookAt(cam_pos.getX(), cam_pos.getY(), cam_pos.getZ(),
-              xyz.getX(),     xyz.getY(),     xyz.getZ(),
-              0.0f,           0.0f,           1.0f            );
-
-    for (unsigned int i = 0 ; i < world->getNumKarts(); ++i)
-    {
-        Kart *kart=world->getKart((int)i);
-        if(!kart->isEliminated()) kart->draw();
-    }
-    world->getPhysics()->draw();
-#endif
-}   // renderBulletDebugView
-
-// ----------------------------------------------------------------------------
 /** Displays the FPS on the screen.
  */
 void IrrDriver::displayFPS()
@@ -847,34 +779,32 @@ void IrrDriver::update(float dt)
 
         if (inRace)
         {
-            if (UserConfigParams::m_bullet_debug)
+            RaceGUI *rg = world->getRaceGUI();
+            for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
-                renderBulletDebugView();
-            }
-            else
+                Kart *kart=world->getKart(i);
+                if(kart->getCamera()) 
+                {
+                    kart->getCamera()->activate();
+                    m_scene_manager->drawAll();
+                    // Note that drawAll must be called before rendering
+                    // the bullet debug view, since otherwise the camera
+                    // is not set up properly.
+                    if (UserConfigParams::m_bullet_debug)
+                        World::getWorld()->getPhysics()->draw();
+                }   // if kart->Camera
+            }   // for i<world->getNumKarts()
+            // To draw the race gui we set the viewport back to the full
+            // screen. 
+            m_video_driver->setViewPort(core::recti(0, 0,
+                UserConfigParams::m_width,
+                UserConfigParams::m_height));
+            for(unsigned int i=0; i<world->getNumKarts(); i++)
             {
-                RaceGUI *rg = world->getRaceGUI();
-                for(unsigned int i=0; i<world->getNumKarts(); i++)
-                {
-                    Kart *kart=world->getKart(i);
-                    if(kart->getCamera()) 
-                    {
-                        kart->getCamera()->activate();
-                        m_scene_manager->drawAll();
-                    }   // if kart->Camera
-                }   // for i<world->getNumKarts()
-                // To draw the race gui we set the viewport back to the full
-                // screen. 
-                m_video_driver->setViewPort(core::recti(0, 0,
-                                                        UserConfigParams::m_width,
-                                                        UserConfigParams::m_height));
-                for(unsigned int i=0; i<world->getNumKarts(); i++)
-                {
-                    Kart *kart = world->getKart(i);
-                    if(kart->getCamera())
-                        rg->renderPlayerView(kart);
-                }  // for i<getNumKarts
-            }   // !bullet_debug
+                Kart *kart = world->getKart(i);
+                if(kart->getCamera())
+                    rg->renderPlayerView(kart);
+            }  // for i<getNumKarts
         }
         else
         {
@@ -884,7 +814,7 @@ void IrrDriver::update(float dt)
         
         // The render and displayFPS calls interfere with bullet debug
         // rendering, so they can not be called.
-        if(!inRace || !UserConfigParams::m_bullet_debug)
+        //FIXME   if(!inRace || !UserConfigParams::m_bullet_debug)
         {
             // Either render the gui, or the global elements of the race gui.
             GUIEngine::render(dt);

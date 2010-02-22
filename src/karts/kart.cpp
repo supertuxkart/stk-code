@@ -23,8 +23,6 @@
 #include <math.h>
 #include <iostream>
 
-#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
-
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -814,29 +812,6 @@ void Kart::handleZipper()
     playCustomSFX(SFXManager::CUSTOM_ZIPPER);
     m_controller->handleZipper();
 }   // handleZipper
-
-//-----------------------------------------------------------------------------
-void Kart::draw()
-{
-    float m[16];
-    btTransform t=getTrans();
-    t.getOpenGLMatrix(m);
-
-    btVector3 wire_color(0.5f, 0.5f, 0.5f);
-    //RaceManager::getWorld()->getPhysics()->debugDraw(m, m_body->getCollisionShape(),
-    //                               wire_color);
-    btCylinderShapeX wheelShape( btVector3(0.1f,
-                                        m_kart_properties->getWheelRadius(),
-                                        m_kart_properties->getWheelRadius()));
-    btVector3 wheelColor(0,0,1);
-    for(int i=0; i<m_vehicle->getNumWheels(); i++)
-    {
-        m_vehicle->updateWheelTransform(i, true);
-        float m[16];
-        m_vehicle->getWheelInfo(i).m_worldTransform.getOpenGLMatrix(m);
-        World::getWorld()->getPhysics()->debugDraw(m, &wheelShape, wheelColor);
-    }
-}   // draw
 
 // -----------------------------------------------------------------------------
 /** Returned an additional engine power boost when using nitro.

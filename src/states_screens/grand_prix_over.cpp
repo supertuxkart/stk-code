@@ -290,7 +290,7 @@ void GrandPrixOver::setKarts(const std::string idents_arg[3])
             
             kart_main_node = irr_driver->addMesh(kartModel->getModel());
             kart_main_node->setPosition( core::vector3df(m_kart_x[n], m_kart_y[n], m_kart_z[n]) );
-            kart_main_node->setScale( core::vector3df(0.4f, 0.4, 0.4f)  );
+            kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
             kart_main_node->updateAbsolutePosition();
             
             for (int wheel=0; wheel<4; wheel++)

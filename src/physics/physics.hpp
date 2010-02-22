@@ -24,9 +24,8 @@
 #include <vector>
 
 #include "btBulletDynamicsCommon.h"
-#include "bullet/Demos/OpenGL/GLDebugDrawer.h"
-#include "bullet/Demos/OpenGL/GL_ShapeDrawer.h"
 
+#include "Physics/irr_debug_drawer.hpp"
 #include "physics/user_pointer.hpp"
 
 class Vec3;
@@ -83,10 +82,7 @@ private:
     };  // CollisionList
 
     btDynamicsWorld                 *m_dynamics_world;
-#ifdef HAVE_GLUT
-    GLDebugDrawer                   *m_debug_drawer;
-    GL_ShapeDrawer                   m_shape_drawer;
-#endif
+    IrrDebugDrawer                  *m_debug_drawer;
     btCollisionDispatcher           *m_dispatcher;
     btBroadphaseInterface           *m_axis_sweep;
     btDefaultCollisionConfiguration *m_collision_conf;
@@ -106,6 +102,10 @@ public:
     btDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}
     void  debugDraw        (float m[16], btCollisionShape *s, const btVector3 color);
+    /** Activates the debug drawer. */
+    void  activateDebug    () {m_debug_drawer->activate();   }
+    /** Deactivates the debug drawer. */
+    void deactivateDebug   () {m_debug_drawer->deactivate(); }
     bool  projectKartDownwards(const Kart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,

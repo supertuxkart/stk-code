@@ -130,11 +130,14 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         case KEY_F11:
-            // FIXME: at this stage you can only switch back from debug view to normal
-            // view, if switching again you noly get a grey screen - some opengl settings
-            // are missing.
             if(value && control_is_pressed)
+            {
                 UserConfigParams::m_bullet_debug = !UserConfigParams::m_bullet_debug;
+                if(UserConfigParams::m_bullet_debug)
+                    world->getPhysics()->activateDebug();
+                else
+                    world->getPhysics()->deactivateDebug();
+            }
             break;
         case KEY_F5:
             if (race_manager->getNumPlayers() ==1 )

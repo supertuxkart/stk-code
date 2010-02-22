@@ -58,7 +58,6 @@ private:
     void setAllMaterialFlags(scene::IAnimatedMesh *mesh) const;
     std::vector<VideoMode> m_modes;
 
-    void                  renderBulletDebugView();
     void                  displayFPS();
     void                  setupViewports();
     video::E_DRIVER_TYPE  getEngineDriverType(int index);

@@ -673,50 +673,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="Demos"
-				>
-				<Filter
-					Name="OpenGL"
-					>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_Api.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_BitmapFont.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_font_helv10.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\DemoApplication.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GL_ShapeDrawer.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GL_Simplex1to4.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GLDebugDrawer.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GlutStuff.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\RenderTexture.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1247,62 +1203,6 @@
 					</File>
 					<File
 						RelativePath="..\..\bullet\src\BulletDynamics\Vehicle\btWheelInfo.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Demos"
-				>
-				<Filter
-					Name="OpenGL"
-					>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_Api.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_BitmapFont.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_FontData.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_Fonts.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\BMF_Settings.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\DebugCastResult.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\DemoApplication.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GL_ShapeDrawer.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GL_Simplex1to4.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GLDebugDrawer.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\GlutStuff.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\bullet\Demos\OpenGL\RenderTexture.h"
 						>
 					</File>
 				</Filter>

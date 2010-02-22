@@ -329,7 +329,6 @@ public:
     btKart        *getVehicle       () const {return m_vehicle;                }
     btUprightConstraint *getUprightConstraint() const {return m_uprightConstraint;}
     void           createPhysics    ();
-    void           draw             ();
     bool           isInRest         () const;
     //have to use this instead of moveable getVelocity to get velocity for bullet rigid body
     float          getSpeed         () const {return m_speed;                 }

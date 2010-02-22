@@ -23,6 +23,7 @@
 #include "network/race_state.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
+#include "physics/irr_debug_drawer.hpp"
 #include "tracks/track.hpp"
 
 // ----------------------------------------------------------------------------
@@ -49,22 +50,15 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                                    m_collision_conf);
     m_dynamics_world->setGravity(btVector3(0.0f, 0.0f,
                                            -World::getWorld()->getTrack()->getGravity()));
-#ifdef HAVE_GLUT
-    if(UserConfigParams::m_bullet_debug)
-      {
-        m_debug_drawer = new GLDebugDrawer();
-        m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
-        m_dynamics_world->setDebugDrawer(m_debug_drawer);
-    }
-#endif
+    m_debug_drawer = new IrrDebugDrawer();
+    m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+    m_dynamics_world->setDebugDrawer(m_debug_drawer);
 }   // init
 
 //-----------------------------------------------------------------------------
 Physics::~Physics()
 {
-#ifdef HAVE_GLUT
     if(UserConfigParams::m_bullet_debug) delete m_debug_drawer;
-#endif
     delete m_dynamics_world;
     delete m_axis_sweep;
     delete m_dispatcher;
@@ -349,43 +343,20 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
-    int num_objects = m_dynamics_world->getNumCollisionObjects();
-    for(int i=0; i<num_objects; i++)
-    {
-        btCollisionObject *obj = m_dynamics_world->getCollisionObjectArray()[i];
-        btRigidBody* body = btRigidBody::upcast(obj);
-        if(!body) continue;
-        float m[16];
-        btVector3 wireColor(1,0,0);
-        btDefaultMotionState *myMotion = (btDefaultMotionState*)body->getMotionState();
-        if(myMotion)
-        {
-            myMotion->m_graphicsWorldTrans.getOpenGLMatrix(m);
-            // Karts need culling GL_FRONT (not sure why), otherwise they appear to
-            // rotate incorrectly due to incorrect culling
-            UserPointer *up = (UserPointer*)body->getUserPointer();
-            if(up->is(UserPointer::UP_KART))
-                glCullFace(GL_FRONT);
-            debugDraw(m, obj->getCollisionShape(), wireColor);
-        }
-    }  // for i
+    video::SColor color(77,179,0,0);
+    video::SMaterial material;
+    material.Thickness = 2;
+    material.AmbientColor = color;
+    material.DiffuseColor = color;
+    material.EmissiveColor= color;
+    material.BackfaceCulling = false;
+    material.setFlag(video::EMF_LIGHTING, false);
+    irr_driver->getVideoDriver()->setMaterial(material);
+    irr_driver->getVideoDriver()->setTransform(video::ETS_WORLD, 
+                                               core::IdentityMatrix);
+    m_dynamics_world->debugDrawWorld();
+    return;
 }   // draw
-
-// -----------------------------------------------------------------------------
-/** Helper function for Physics::draw(). It calls the shape drawer from
- *  bullet to render the actual object.
- *  \param m OpenGL matrix to apply.
- *  \param s Collision shape to drwa.
- *  \param color Colour to use.
- */
-void Physics::debugDraw(float m[16], btCollisionShape *s, const btVector3 color)
-{
-#ifdef HAVE_GLUT
-    m_shape_drawer.drawOpenGL(m, s, color, 0);
-    //                               btIDebugDraw::DBG_DrawWireframe);
-    //                               btIDebugDraw::DBG_DrawAabb);
-#endif
-}   // debugDraw
 
 // -----------------------------------------------------------------------------
 

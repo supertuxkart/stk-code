@@ -69,15 +69,6 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-// Only needed for bullet debug!
-#ifdef HAVE_GLUT
-#  ifdef __APPLE__
-#    include <GLUT/glut.h>
-#  else
-#    include <GL/glut.h>
-#  endif
-#endif
-
 void cmdLineHelp (char* invocation)
 {
     fprintf ( stdout,
@@ -254,12 +245,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_track_debug=1;
         }
-#ifdef HAVE_GLUT
         else if(!strcmp(argv[i], "--bullet-debug"))
         {
             UserConfigParams::m_bullet_debug=1;
         }
-#endif
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             UserConfigParams::m_print_kart_sizes=true;
@@ -441,7 +430,7 @@ int handleCmdLine(int argc, char **argv)
             else
             {
                 printf("Profiling: %d seconds.\n", n);
-                ProfileWorld::setProfileModeTime(n);
+                ProfileWorld::setProfileModeTime((float)n);
                 race_manager->setNumLaps(999999); // profile end depends on time
             }
         }
@@ -572,10 +561,6 @@ void cleanTuxKart()
 int main(int argc, char *argv[] ) 
 {
     try {
-#ifdef HAVE_GLUT
-        // only needed for bullet debugging.
-        glutInit(&argc, argv);
-#endif
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
