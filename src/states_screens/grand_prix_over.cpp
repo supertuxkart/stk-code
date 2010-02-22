@@ -113,9 +113,11 @@ void GrandPrixOver::init()
     sceneManager->setAmbientLight(video::SColor(255, 120, 120, 120));
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
+    m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos,
+                                                               video::SColorf(1.0f,1.0f,1.0f),
+                                                               300.0f /* radius */);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
+    m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 // -------------------------------------------------------------------------------------

@@ -1,23 +1,28 @@
 * bowling.ac, plunger.ac, cake.ac, bomb.ac, anchor.ac
     created by MiniBjorn (c) 2008
-    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    released under Creative Commons Attribution-Share Alike 3.0
+    [http://creativecommons.org/licenses/by-sa/3.0/]
 
 * bubblegum.ac, nitrotank-big.ac, nitrotank-small.ac, giftbox.ac
     created by MiniBjorn (c) 2008
-    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    released under Creative Commons Attribution-Share Alike 3.0
+    [http://creativecommons.org/licenses/by-sa/3.0/]
 
 * banana.ac
     created by horace aka thomas oppl (toppl@fh-sbg.ac.at) (c) 2008
-    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    released under Creative Commons Attribution-Share Alike 3.0
+    [http://creativecommons.org/licenses/by-sa/3.0/]
 
 * chest*
     by MiniBjorn (c) 2010
-    released under Creative Commons Attribution-Share Alike 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    released under Creative Commons Attribution-Share Alike 3.0
+    [http://creativecommons.org/licenses/by-sa/3.0/]
 
 * village
-    released un CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
-    tree by Julius Krischan Makowka, released un CC-BY-SA 3.0
+    released under CC-BY-SA 3.0 [http://creativecommons.org/licenses/by-sa/3.0/]
+    oak by Julius Krischan Makowka, released un CC-BY-SA 3.0
     mushrooms by pfunked, with modifications by Marianne Gagnon, released under CC-BY-SA 3.0
+    pinos by Moser Juan José, with minor modifications by Marianne Gagnon, released under CC-BY-SA 3.0
     scene and finishing touches by Marianne Gagnon
 
 * shroom_color* textures by Julius Krischan Makowka, released un CC-BY-SA 3.0
