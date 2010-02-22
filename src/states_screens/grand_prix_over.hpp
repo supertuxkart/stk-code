@@ -35,6 +35,9 @@ class GrandPrixOver : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
     float m_podium_x[3], m_podium_z[3];
     float m_kart_rotation[3];
     
+    float m_camera_x, m_camera_y, m_camera_z;
+    float m_camera_target_x, m_camera_target_z;
+    
 public:
 
     void onUpdate(float dt, irr::video::IVideoDriver*);

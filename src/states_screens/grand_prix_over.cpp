@@ -46,9 +46,15 @@ void GrandPrixOver::init()
                            1.0f /* texture_percent */,  2.0f /* sphere_percent */);
     
     m_camera = irr_driver->addCameraSceneNode();
-    m_camera->setPosition( core::vector3df(3.0, 0.0f, -5.0f) );
+    m_camera_x = 3.0f;
+    m_camera_y = 0.0f;
+    m_camera_z = -5.0f;
+    m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
     m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    m_camera->setTarget( core::vector3df(1.5f, -2.0f, 0.0f) );
+    
+    m_camera_target_x = 1.5f;
+    m_camera_target_z = 0.0f;
+    m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
     
@@ -227,6 +233,27 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
         } // end for
         
     }
+    
+    if (m_phase > 1)
+    {
+        //m_camera_x = 3.0f;
+        if (m_camera_z < -2.0f)                m_camera_z        += dt*0.2f;
+        if (m_camera_x < m_podium_x[1])        m_camera_x        += dt*0.1f;
+        else if (m_camera_x > m_podium_x[1])   m_camera_x        -= dt*0.1f;
+
+        if (m_camera_target_x < m_podium_x[1]) m_camera_target_x += dt*0.1f;
+        
+        if (m_camera_y > -1.8f)                m_camera_y        -= dt*0.1f;
+        //else  if (m_camera_y < -3.0f)          m_camera_y        += dt*0.1f;
+
+        
+        m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
+        
+        m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
+        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+        m_camera->updateAbsolutePosition();
+    }
+    
     
     // ---- title
     static const int w = irr_driver->getFrameSize().Width;
