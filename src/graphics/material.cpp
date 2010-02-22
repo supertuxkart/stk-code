@@ -139,7 +139,6 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
     else if (m_alpha_blending)
     {
-        m->ZWriteEnable = false; // for transluscent stuff, don't write to the Z buffer
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     }
     else if (m_sphere_map) 
