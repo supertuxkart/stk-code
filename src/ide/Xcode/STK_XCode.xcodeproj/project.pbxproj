@@ -7,15 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9507E95C0FC1C8C200BD2B92 /* BMF_Api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9310FC1C8C100BD2B92 /* BMF_Api.cpp */; };
-		9507E95E0FC1C8C200BD2B92 /* BMF_BitmapFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9340FC1C8C100BD2B92 /* BMF_BitmapFont.cpp */; };
-		9507E9600FC1C8C200BD2B92 /* BMF_font_helv10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9370FC1C8C100BD2B92 /* BMF_font_helv10.cpp */; };
-		9507E9620FC1C8C200BD2B92 /* DemoApplication.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E93D0FC1C8C100BD2B92 /* DemoApplication.cpp */; };
-		9507E9640FC1C8C200BD2B92 /* GL_ShapeDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9400FC1C8C100BD2B92 /* GL_ShapeDrawer.cpp */; };
-		9507E9660FC1C8C200BD2B92 /* GL_Simplex1to4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9430FC1C8C100BD2B92 /* GL_Simplex1to4.cpp */; };
-		9507E9680FC1C8C200BD2B92 /* GLDebugDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9460FC1C8C100BD2B92 /* GLDebugDrawer.cpp */; };
-		9507E96A0FC1C8C200BD2B92 /* GlutStuff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9490FC1C8C100BD2B92 /* GlutStuff.cpp */; };
-		9507E9700FC1C8C200BD2B92 /* RenderTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */; };
 		9507E9B70FC1CCE900BD2B92 /* stk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9507E9B60FC1CCE900BD2B92 /* stk.icns */; };
 		9507E9D10FC1CDCE00BD2B92 /* Ogg.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7F90FC1B63C00DB481B /* Ogg.framework */; };
 		9507E9D20FC1CDCE00BD2B92 /* OpenAL.framework in Copy frameworks */ = {isa = PBXBuildFile; fileRef = 9551C7FA0FC1B63C00DB481B /* OpenAL.framework */; };
@@ -243,6 +234,7 @@
 		95634EF21126272C009C145D /* gp_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95634EF01126272C009C145D /* gp_info_dialog.cpp */; };
 		956541BB10DD5F0A00C83E99 /* arenas_screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541B910DD5F0A00C83E99 /* arenas_screen.cpp */; };
 		956541E110DD628C00C83E99 /* add_device_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956541DF10DD628C00C83E99 /* add_device_dialog.cpp */; };
+		956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */; };
 		956C6ED31128D3FB004336C8 /* controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6EC81128D3FB004336C8 /* controller.cpp */; };
 		956C6ED41128D3FB004336C8 /* default_ai_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */; };
 		956C6ED51128D3FB004336C8 /* end_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 956C6ECC1128D3FB004336C8 /* end_controller.cpp */; };
@@ -315,27 +307,6 @@
 		950557570F6968860056E88C /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9505575F0F6968A50056E88C /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		950557640F6968BE0056E88C /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
-		9507E9310FC1C8C100BD2B92 /* BMF_Api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMF_Api.cpp; path = ../../bullet/Demos/OpenGL/BMF_Api.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9320FC1C8C100BD2B92 /* BMF_Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_Api.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/BMF_Api.h; sourceTree = SOURCE_ROOT; };
-		9507E9340FC1C8C100BD2B92 /* BMF_BitmapFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMF_BitmapFont.cpp; path = ../../bullet/Demos/OpenGL/BMF_BitmapFont.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9350FC1C8C100BD2B92 /* BMF_BitmapFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_BitmapFont.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/BMF_BitmapFont.h; sourceTree = SOURCE_ROOT; };
-		9507E9370FC1C8C100BD2B92 /* BMF_font_helv10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMF_font_helv10.cpp; path = ../../bullet/Demos/OpenGL/BMF_font_helv10.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9390FC1C8C100BD2B92 /* BMF_FontData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_FontData.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/BMF_FontData.h; sourceTree = SOURCE_ROOT; };
-		9507E93A0FC1C8C100BD2B92 /* BMF_Fonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_Fonts.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/BMF_Fonts.h; sourceTree = SOURCE_ROOT; };
-		9507E93B0FC1C8C100BD2B92 /* BMF_Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMF_Settings.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/BMF_Settings.h; sourceTree = SOURCE_ROOT; };
-		9507E93C0FC1C8C100BD2B92 /* DebugCastResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugCastResult.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/DebugCastResult.h; sourceTree = SOURCE_ROOT; };
-		9507E93D0FC1C8C100BD2B92 /* DemoApplication.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoApplication.cpp; path = ../../bullet/Demos/OpenGL/DemoApplication.cpp; sourceTree = SOURCE_ROOT; };
-		9507E93E0FC1C8C100BD2B92 /* DemoApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoApplication.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/DemoApplication.h; sourceTree = SOURCE_ROOT; };
-		9507E9400FC1C8C100BD2B92 /* GL_ShapeDrawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GL_ShapeDrawer.cpp; path = ../../bullet/Demos/OpenGL/GL_ShapeDrawer.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9410FC1C8C100BD2B92 /* GL_ShapeDrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GL_ShapeDrawer.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/GL_ShapeDrawer.h; sourceTree = SOURCE_ROOT; };
-		9507E9430FC1C8C100BD2B92 /* GL_Simplex1to4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GL_Simplex1to4.cpp; path = ../../bullet/Demos/OpenGL/GL_Simplex1to4.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9440FC1C8C100BD2B92 /* GL_Simplex1to4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GL_Simplex1to4.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/GL_Simplex1to4.h; sourceTree = SOURCE_ROOT; };
-		9507E9460FC1C8C100BD2B92 /* GLDebugDrawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GLDebugDrawer.cpp; path = ../../bullet/Demos/OpenGL/GLDebugDrawer.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9470FC1C8C100BD2B92 /* GLDebugDrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLDebugDrawer.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/GLDebugDrawer.h; sourceTree = SOURCE_ROOT; };
-		9507E9490FC1C8C100BD2B92 /* GlutStuff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GlutStuff.cpp; path = ../../bullet/Demos/OpenGL/GlutStuff.cpp; sourceTree = SOURCE_ROOT; };
-		9507E94A0FC1C8C100BD2B92 /* GlutStuff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GlutStuff.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/GlutStuff.h; sourceTree = SOURCE_ROOT; };
-		9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTexture.cpp; path = ../../bullet/Demos/OpenGL/RenderTexture.cpp; sourceTree = SOURCE_ROOT; };
-		9507E9510FC1C8C200BD2B92 /* RenderTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderTexture.h; path = ../../../../supertuxkart/src/bullet/Demos/OpenGL/RenderTexture.h; sourceTree = SOURCE_ROOT; };
 		9507E9B60FC1CCE900BD2B92 /* stk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = stk.icns; sourceTree = SOURCE_ROOT; };
 		951B7D17108E52C900BC03AE /* challenges.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = challenges.hpp; path = ../../states_screens/challenges.hpp; sourceTree = SOURCE_ROOT; };
 		951B7D18108E52C900BC03AE /* challenges.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = challenges.cpp; path = ../../states_screens/challenges.cpp; sourceTree = SOURCE_ROOT; };
@@ -445,6 +416,8 @@
 		956541BA10DD5F0A00C83E99 /* arenas_screen.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = arenas_screen.hpp; path = ../../states_screens/arenas_screen.hpp; sourceTree = SOURCE_ROOT; };
 		956541DF10DD628C00C83E99 /* add_device_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = add_device_dialog.cpp; path = ../../states_screens/dialogs/add_device_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		956541E010DD628C00C83E99 /* add_device_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = add_device_dialog.hpp; path = ../../states_screens/dialogs/add_device_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = irr_debug_drawer.cpp; path = ../../physics/irr_debug_drawer.cpp; sourceTree = SOURCE_ROOT; };
+		956830DF1132EC9E00088D14 /* irr_debug_drawer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = irr_debug_drawer.hpp; path = ../../physics/irr_debug_drawer.hpp; sourceTree = SOURCE_ROOT; };
 		956C6EC81128D3FB004336C8 /* controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controller.cpp; path = ../../karts/controller/controller.cpp; sourceTree = SOURCE_ROOT; };
 		956C6EC91128D3FB004336C8 /* controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = controller.hpp; path = ../../karts/controller/controller.hpp; sourceTree = SOURCE_ROOT; };
 		956C6ECA1128D3FB004336C8 /* default_ai_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = default_ai_controller.cpp; path = ../../karts/controller/default_ai_controller.cpp; sourceTree = SOURCE_ROOT; };
@@ -1137,35 +1110,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9507E9260FC1C8C100BD2B92 /* OpenGL */ = {
-			isa = PBXGroup;
-			children = (
-				9507E9310FC1C8C100BD2B92 /* BMF_Api.cpp */,
-				9507E9320FC1C8C100BD2B92 /* BMF_Api.h */,
-				9507E9340FC1C8C100BD2B92 /* BMF_BitmapFont.cpp */,
-				9507E9350FC1C8C100BD2B92 /* BMF_BitmapFont.h */,
-				9507E9370FC1C8C100BD2B92 /* BMF_font_helv10.cpp */,
-				9507E9390FC1C8C100BD2B92 /* BMF_FontData.h */,
-				9507E93A0FC1C8C100BD2B92 /* BMF_Fonts.h */,
-				9507E93B0FC1C8C100BD2B92 /* BMF_Settings.h */,
-				9507E93C0FC1C8C100BD2B92 /* DebugCastResult.h */,
-				9507E93D0FC1C8C100BD2B92 /* DemoApplication.cpp */,
-				9507E93E0FC1C8C100BD2B92 /* DemoApplication.h */,
-				9507E9400FC1C8C100BD2B92 /* GL_ShapeDrawer.cpp */,
-				9507E9410FC1C8C100BD2B92 /* GL_ShapeDrawer.h */,
-				9507E9430FC1C8C100BD2B92 /* GL_Simplex1to4.cpp */,
-				9507E9440FC1C8C100BD2B92 /* GL_Simplex1to4.h */,
-				9507E9460FC1C8C100BD2B92 /* GLDebugDrawer.cpp */,
-				9507E9470FC1C8C100BD2B92 /* GLDebugDrawer.h */,
-				9507E9490FC1C8C100BD2B92 /* GlutStuff.cpp */,
-				9507E94A0FC1C8C100BD2B92 /* GlutStuff.h */,
-				9507E9500FC1C8C200BD2B92 /* RenderTexture.cpp */,
-				9507E9510FC1C8C200BD2B92 /* RenderTexture.h */,
-			);
-			name = OpenGL;
-			path = games/supertuxkart/src/bullet/Demos/OpenGL;
-			sourceTree = SYSTEM_DEVELOPER_DIR;
-		};
 		9513B40E0F0EDE80005D29F6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1444,7 +1388,6 @@
 		95C2AC360F296540000D3E5D /* bullet */ = {
 			isa = PBXGroup;
 			children = (
-				9507E9260FC1C8C100BD2B92 /* OpenGL */,
 				95C2AC6E0F296541000D3E5D /* src */,
 			);
 			includeInIndex = 0;
@@ -1963,6 +1906,8 @@
 				95C2B1810F296545000D3E5D /* btKart.hpp */,
 				95C2B1820F296545000D3E5D /* btUprightConstraint.cpp */,
 				95C2B1830F296545000D3E5D /* btUprightConstraint.hpp */,
+				956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */,
+				956830DF1132EC9E00088D14 /* irr_debug_drawer.hpp */,
 				95C2B1840F296545000D3E5D /* kart_motion_state.hpp */,
 				95CA59F60F82FCB7003323DB /* physical_object.hpp */,
 				95CA59F70F82FCB7003323DB /* physical_object.cpp */,
@@ -2518,15 +2463,6 @@
 				9551C8F90FC1B72500DB481B /* physical_object.cpp in Sources */,
 				9551C8FA0FC1B72500DB481B /* quad_set.cpp in Sources */,
 				9551C8FB0FC1B72500DB481B /* quad_graph.cpp in Sources */,
-				9507E95C0FC1C8C200BD2B92 /* BMF_Api.cpp in Sources */,
-				9507E95E0FC1C8C200BD2B92 /* BMF_BitmapFont.cpp in Sources */,
-				9507E9600FC1C8C200BD2B92 /* BMF_font_helv10.cpp in Sources */,
-				9507E9620FC1C8C200BD2B92 /* DemoApplication.cpp in Sources */,
-				9507E9640FC1C8C200BD2B92 /* GL_ShapeDrawer.cpp in Sources */,
-				9507E9660FC1C8C200BD2B92 /* GL_Simplex1to4.cpp in Sources */,
-				9507E9680FC1C8C200BD2B92 /* GLDebugDrawer.cpp in Sources */,
-				9507E96A0FC1C8C200BD2B92 /* GlutStuff.cpp in Sources */,
-				9507E9700FC1C8C200BD2B92 /* RenderTexture.cpp in Sources */,
 				953789730FC7829100DD1F8E /* graph_node.cpp in Sources */,
 				953789820FC7831400DD1F8E /* quad.cpp in Sources */,
 				95D1F5F70FC8C3E300FF6968 /* input.cpp in Sources */,
@@ -2619,6 +2555,7 @@
 				956C6ED61128D3FB004336C8 /* new_ai_controller.cpp in Sources */,
 				956C6ED71128D3FB004336C8 /* player_controller.cpp in Sources */,
 				959D42FD1130C4F2005077E2 /* grand_prix_over.cpp in Sources */,
+				956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

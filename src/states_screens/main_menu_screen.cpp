@@ -68,7 +68,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     {
         // FIXME : remove, temporary test
         GrandPrixOver* scene = GrandPrixOver::getInstance();
-        const std::string winners[] = { "tux", "nolok", "pidgin" };
+        const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
         scene->setKarts( winners );
         StateManager::get()->pushScreen(scene);
 

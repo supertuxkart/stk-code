@@ -45,6 +45,25 @@ GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")
 
 // -------------------------------------------------------------------------------------
 
+void traverse(scene::ISceneNode* curr, int level=0)
+{
+    for (int n=0; n<level; n++) std::cout << "|    ";
+    
+    unsigned int type = curr->getType();
+    const char* ptr = (const char*)&type;
+    
+    std::cout << "+ " << curr->getName() << " ("
+              << char(ptr[0]) << char(ptr[1])
+              << char(ptr[2]) << char(ptr[3]) << std::endl;
+    
+    const core::list<  scene::ISceneNode  * >& children = curr->getChildren();
+    for (core::list<scene::ISceneNode*>::ConstIterator it=children.begin(); it != children.end(); it++)
+    {
+        traverse(*it, level+1);
+    }
+    
+}
+
 void GrandPrixOver::init()
 {
     sound_manager->startMusic(sound_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
@@ -90,13 +109,13 @@ void GrandPrixOver::init()
     m_podium_step[2] = irr_driver->addMesh(podium_model);
     m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
     
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120, 120, 120));
+    scene::ISceneManager* sceneManager = irr_driver->getSceneManager();
+    sceneManager->setAmbientLight(video::SColor(255, 120, 120, 120));
     
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
     m_light = irr_driver->getSceneManager()->addLightSceneNode(NULL, sun_pos, video::SColorf(1.0f,1.0f,1.0f), 10000.0f /* radius */);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-
 }
 
 // -------------------------------------------------------------------------------------
