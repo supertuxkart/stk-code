@@ -25,7 +25,7 @@
 
 #include "btBulletDynamicsCommon.h"
 
-#include "Physics/irr_debug_drawer.hpp"
+#include "physics/irr_debug_drawer.hpp"
 #include "physics/user_pointer.hpp"
 
 class Vec3;
