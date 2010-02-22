@@ -129,18 +129,27 @@ void Material::install(bool is_full_path)
 void  Material::setMaterialProperties(video::SMaterial *m) const
 {
     if (m_alpha_testing)
+    {
         // Note: if EMT_TRANSPARENT_ALPHA_CHANNEL is used, you have to use
         // scene_manager->getParameters()->setAttribute(
         //    scene::ALLOW_ZWRITE_ON_TRANSPARENT, true);  and enable 
         // updates of the Z buffer of the material. Since the _REF 
         // approach is faster (and looks better imho), this is used for now.
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+    }
     else if (m_alpha_blending)
+    {
+        m->ZWriteEnable = false; // for transluscent stuff, don't write to the Z buffer
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
     else if (m_sphere_map) 
+    {
         m->MaterialType = video::EMT_SPHERE_MAP;
+    }
     else if (m_lightmap)
+    {
         m->MaterialType = video::EMT_LIGHTMAP;
+    }
 
     if (!m_lighting)
     {
