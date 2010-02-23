@@ -191,8 +191,8 @@ void Kart::createPhysics()
     float kart_height = km->getHeight();
 
     btBoxShape *shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                                 0.5f*kart_length,
-                                                 0.5f*kart_height));
+                                                 0.5f*kart_height,
+                                                 0.5f*kart_length));
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
     // Shift center of gravity downwards, so that the kart
@@ -229,15 +229,15 @@ void Kart::createPhysics()
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
-    m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 2,  /*forward: */ 1);
+    m_vehicle->setCoordinateSystem(/*right: */ 0,  /*up: */ 1,  /*forward: */ 2);
 
     // Add wheels
     // ----------
     float wheel_radius    = m_kart_properties->getWheelRadius();
     float suspension_rest = m_kart_properties->getSuspensionRest();
 
-    btVector3 wheel_direction(0.0f, 0.0f, -1.0f);
-    btVector3 wheel_axle(1.0f,0.0f,0.0f);
+    btVector3 wheel_direction(0.0f, -1.0f, 0.0f);
+    btVector3 wheel_axle(-1.0f,0.0f,0.0f);
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -1027,7 +1027,7 @@ bool Kart::playCustomSFX(unsigned int type)
      */
 }
 // -----------------------------------------------------------------------------
-void Kart::updatePhysics (float dt)
+void Kart::updatePhysics(float dt)
 {
 
     m_bounce_back_time-=dt;
@@ -1171,8 +1171,8 @@ void Kart::updatePhysics (float dt)
     }
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
-    m_vehicle->setSteeringValue(steering, 0);
-    m_vehicle->setSteeringValue(steering, 1);
+    m_vehicle->setSteeringValue(-steering, 0);
+    m_vehicle->setSteeringValue(-steering, 1);
 
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
@@ -1320,12 +1320,12 @@ void Kart::setSuspensionLength()
 //-----------------------------------------------------------------------------
 void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 {
-    float wheel_z_axis[4];
+    float wheel_y_axis[4];
     KartModel *kart_model = m_kart_properties->getKartModel();
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        wheel_z_axis[i] = m_default_suspension_length[i]
+        wheel_y_axis[i] = m_default_suspension_length[i]
                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
 #define AUTO_SKID_VISUAL 1.7f
@@ -1335,15 +1335,15 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     else
         auto_skid = m_controls.m_steer*30.0f;
     kart_model->update(m_wheel_rotation, auto_skid,
-                       getSteerPercent(), wheel_z_axis);
+                       getSteerPercent(), wheel_y_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
-    float X = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getZ()
+    float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
             - m_default_suspension_length[0]
             - m_vehicle->getWheelInfo(0).m_wheelsRadius
             - (kart_model->getWheelGraphicsRadius(0)
-               -kart_model->getWheelGraphicsPosition(0).getZ() );
-    center_shift.setZ(X);
+               -kart_model->getWheelGraphicsPosition(0).getY() );
+    center_shift.setY(y);
 
     if(m_smoke_system)
     {

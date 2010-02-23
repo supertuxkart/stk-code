@@ -164,7 +164,7 @@ void Camera::setMode(Mode mode)
         core::vector3df curr_hpr = m_camera->getRotation();
         m_target_velocity        = (target - m_camera->getTarget())
                                  / stk_config->m_final_camera_time;
-        m_final_time         = 0.0f;
+        m_final_time             = 0.0f;
      }
 
     // If the camera is set to final mode but there is no camera
@@ -199,7 +199,8 @@ void Camera::reset()
  */
 void Camera::setInitialTransform()
 {
-    m_camera->setPosition( m_kart->getXYZ().toIrrVector() - core::vector3df(0, -25, 50) );
+    m_camera->setPosition(  m_kart->getXYZ().toIrrVector() 
+                          - core::vector3df(0, 50, -25)   );
 }   // setInitialTransform
 
 //-----------------------------------------------------------------------------
@@ -246,16 +247,16 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
                                          Vec3 *wanted_target)
 {
     *wanted_target = m_kart->getXYZ();
-    wanted_target->setZ(wanted_target->getZ()+ 0.75f);
+    wanted_target->setY(wanted_target->getY()+ 0.75f);
     // This first line moves the camera around behind the kart, pointing it 
     // towards where the kart is turning (and turning even more while skidding).
     float steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
     float dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
-    float angle_around = m_kart->getHPR().getX() + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = m_kart->getHPR().getY() - 30.0f*DEGREE_TO_RAD;      
+    float angle_around = m_kart->getHPR().getHeading() + m_rotation_range * dampened_steer * 0.5f;
+    float angle_up     = m_kart->getHPR().getPitch()   - 30.0f*DEGREE_TO_RAD;      
     wanted_position->setX( sin(angle_around));
-    wanted_position->setY(-cos(angle_around));
-    wanted_position->setZ(-sin(angle_up)    );
+    wanted_position->setY(-sin(angle_up)    );
+    wanted_position->setZ(-cos(angle_around));
     *wanted_position *= m_distance;
     *wanted_position += *wanted_target;
 }   // computeNormalCameraPosition
@@ -283,11 +284,14 @@ void Camera::update(float dt)
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             wanted_target.setZ(wanted_target.getZ()+ 0.75f);
-            float angle_around = m_kart->getHPR().getX() - m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
-            float angle_up     = m_kart->getHPR().getY() + 30.0f*DEGREE_TO_RAD;
+            float angle_around = m_kart->getHPR().getHeading()
+                               - m_rotation_range * m_kart->getSteerPercent() 
+                               * m_kart->getSkidding();
+            float angle_up     = m_kart->getHPR().getPitch() 
+                               + 30.0f*DEGREE_TO_RAD;
             wanted_position.setX(-sin(angle_around));
-            wanted_position.setY( cos(angle_around));
-            wanted_position.setZ( sin(angle_up)    );
+            wanted_position.setY( sin(angle_up)    );
+            wanted_position.setZ( cos(angle_around));
             wanted_position *= m_distance * 2.0f;
             wanted_position += wanted_target;
             smoothMoveCamera(dt, wanted_position, wanted_target);
@@ -297,12 +301,15 @@ void Camera::update(float dt)
         }
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
         {
-            wanted_target.setZ(wanted_target.getZ()+0.75f);
-            float angle_around = m_kart->getHPR().getX() + m_rotation_range * m_kart->getSteerPercent() * m_kart->getSkidding();
-            float angle_up     = m_kart->getHPR().getY() - 20.0f*DEGREE_TO_RAD;
+            wanted_target.setY(wanted_target.getY()+0.75f);
+            float angle_around = m_kart->getHPR().getHeading() 
+                               + m_rotation_range * m_kart->getSteerPercent() 
+                               * m_kart->getSkidding();
+            float angle_up     = m_kart->getHPR().getPitch() 
+                               - 20.0f*DEGREE_TO_RAD;
             wanted_position.setX( sin(angle_around));
-            wanted_position.setY(-cos(angle_around));
-            wanted_position.setZ(-sin(angle_up)    );
+            wanted_position.setY(-sin(angle_up)    );
+            wanted_position.setZ(-cos(angle_around));
             wanted_position *= m_distance * 0.5f;
             wanted_position += wanted_target;
             smoothMoveCamera(dt, wanted_position, wanted_target);
@@ -315,11 +322,11 @@ void Camera::update(float dt)
             wanted_target = kart->getXYZ().toIrrVector();
             // Follows the leader kart, higher off of the ground, further from the kart,
             // and turns in the opposite direction from the kart for a nice effect. :)
-            float angle_around = kart->getHPR().getX();
-            float angle_up     = kart->getHPR().getY() + 40.0f*DEGREE_TO_RAD;
+            float angle_around = kart->getHPR().getHeading();
+            float angle_up     = kart->getHPR().getPitch() + 40.0f*DEGREE_TO_RAD;
             wanted_position.setX(sin(angle_around));
-            wanted_position.setY(cos(angle_around));
-            wanted_position.setZ(sin(angle_up)    );
+            wanted_position.setY(sin(angle_up)    );
+            wanted_position.setZ(cos(angle_around));
             wanted_position *= m_distance * 2.0f;
             wanted_position += wanted_target;
             smoothMoveCamera(dt, wanted_position, wanted_target);

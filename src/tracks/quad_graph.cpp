@@ -79,7 +79,7 @@ void QuadGraph::setStartCoordinate(const CheckLine &cl)
     }
     Vec3 xyz;
     spatialToTrack(&xyz, start_point, sector);
-    m_offset_for_startline = xyz.getY();
+    m_offset_for_startline = xyz.getZ();
 }   // setStartCoordinate
 
 // -----------------------------------------------------------------------------
@@ -311,7 +311,7 @@ void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) 
  *  of the returned vector is how much of the track the point has gone
  *  through, the x-axis is on which side of the road it is. The Z axis
  *  is not changed.
- *  \param dst Returns the results in the X and Y coordinates.
+ *  \param dst Returns the results in the X and Z coordinates.
  *  \param xyz The position of the kart.
  *  \param sector The graph node the position is on.
  */
@@ -325,10 +325,10 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
     }
 
     getNode(sector).getDistances(xyz, dst);
-    float y=dst->getY();
-    y=y-m_offset_for_startline;
-    if(y<0) y+=m_lap_length;
-    dst->setY(y);
+    float z=dst->getZ();
+    z=z-m_offset_for_startline;
+    if(z<0) z+=m_lap_length;
+    dst->setZ(z);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------

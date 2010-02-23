@@ -155,7 +155,7 @@ void Item::update(float dt)
         
         if(!m_rotate) return;
         // have it rotate
-        Vec3 rotation(dt*M_PI, 0, 0);
+        Vec3 rotation(0, dt*M_PI, 0);
         m_coord.setHPR(m_coord.getHPR()+rotation);
         m_node->setRotation(m_coord.getHPR().toIrrHPR());
         m_node->setPosition(m_coord.getXYZ().toIrrVector());

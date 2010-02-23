@@ -109,8 +109,8 @@ void KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 size = max-min;
     m_z_offset    = min.getZ();
     m_kart_width  = size.getX();
-    m_kart_height = size.getZ();
-    m_kart_length = size.getY();
+    m_kart_height = size.getY();
+    m_kart_length = size.getZ();
     // FIXME: How do we handle this? it's a mesh only, so we can't
     // simply move it in a transform (unless we turn it into a scene 
     // node). m_z_offset should probably be made available to kart.
@@ -127,9 +127,9 @@ void KartModel::loadModels(const KartProperties &kart_properties)
             m_wheel_graphics_position[i].setX( ( i==1||i==3) 
                                                ? -0.5f*m_kart_width
                                                :  0.5f*m_kart_width  );
-            m_wheel_graphics_position[i].setY( (i<2) ?  0.5f*m_kart_length
+            m_wheel_graphics_position[i].setY(0);
+            m_wheel_graphics_position[i].setZ( (i<2) ?  0.5f*m_kart_length
                                                      : -0.5f*m_kart_length);
-            m_wheel_graphics_position[i].setZ(0);
         }
     }
 
@@ -198,13 +198,13 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
                                                ? -0.5f*m_kart_width
                                                :  0.5f*m_kart_width
                                                +center_shift.getX(  ));
-            m_wheel_physics_position[i].setY( (0.5f*m_kart_length-wheel_radius)
-                                              * ( (i<2) ? 1 : -1)
-                                               +center_shift.getY());
             // Set the connection point so that a maximum compressed wheel
             // (susp. length=0) will still poke a little bit out under the 
             // kart
-            m_wheel_physics_position[i].setZ(wheel_radius-0.05f);
+            m_wheel_physics_position[i].setY(wheel_radius-0.05f);
+            m_wheel_physics_position[i].setZ( (0.5f*m_kart_length-wheel_radius)
+                                              * ( (i<2) ? 1 : -1)
+                                               +center_shift.getZ());
         }   // if physics position is not defined
     }
 
@@ -263,7 +263,6 @@ void KartModel::update(float rotation, float visual_steer,
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
-//    core::vector3df wheel_rear (RAD_TO_DEGREE(-rotation), 0, 0);
     core::vector3df wheel_rear (-rotation, 0, 0);
     core::vector3df wheel_steer(0, -visual_steer, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;

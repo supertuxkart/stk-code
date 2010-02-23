@@ -280,12 +280,20 @@ int LinearWorld::getSectorForKart(const int kart_id) const
 }   // getSectorForKart
 
 //-----------------------------------------------------------------------------
+/** Returns the distance the kart has travelled along the track since 
+ *  crossing the start line..
+ *  \param kart_id Index of the kart.
+ */
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
-    return m_kart_info[kart_id].m_curr_track_coords.getY();
+    return m_kart_info[kart_id].m_curr_track_coords.getZ();
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
+/** Gets the distance of the kart from the center of the driveline. Positive
+ *  is to the right of the center, negative values to the left.
+ *  \param kart_id Index of kart.
+ */
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_curr_track_coords.getX();

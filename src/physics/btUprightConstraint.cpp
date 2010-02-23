@@ -103,7 +103,7 @@ btUprightConstraint::btUprightConstraint(btRigidBody& rbA, const btTransform& fr
       m_limit[0].m_accumulatedImpulse = 0.0f;
       m_limit[1].m_accumulatedImpulse = 0.0f;
       m_limit[ 0 ].m_axis             = btVector3( 1, 0, 0 );
-      m_limit[ 1 ].m_axis             = btVector3( 0, 1, 0 );
+      m_limit[ 1 ].m_axis             = btVector3( 0, 0, 1 );
       setLimit( SIMD_PI * 0.4f );
 }
  
@@ -114,9 +114,9 @@ btUprightConstraint::btUprightConstraint(btRigidBody& rbA, const btTransform& fr
 void btUprightConstraint::buildJacobian()
 {
       btTransform worldTransform = m_rbA.getCenterOfMassTransform() * m_frameInA;
-      btVector3   upAxis         = worldTransform.getBasis().getColumn(2);
-      m_limit[ 0 ].m_angle       =  btAtan2( upAxis.getZ(), upAxis.getY() )-SIMD_PI/2.0f;
-      m_limit[ 1 ].m_angle       = -btAtan2( upAxis.getZ(), upAxis.getX() )+SIMD_PI/2.0f;
+      btVector3   upAxis         = worldTransform.getBasis().getColumn(1);
+      m_limit[ 0 ].m_angle       =  btAtan2( upAxis.getY(), upAxis.getZ() )-SIMD_PI/2.0f;
+      m_limit[ 1 ].m_angle       = -btAtan2( upAxis.getY(), upAxis.getX() )+SIMD_PI/2.0f;
 
       for ( int i = 0; i < 2; i++ )
       {

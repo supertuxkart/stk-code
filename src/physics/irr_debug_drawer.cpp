@@ -59,12 +59,10 @@ void IrrDebugDrawer::deactivate()
 void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
                               const btVector3& color)
 {
-    Vec3 f(from); 
-    Vec3 t(to);
     video::SColor c(255, (int)(color.getX()*255), (int)(color.getY()*255),
                          (int)(color.getZ()*255)                          );
-    irr_driver->getVideoDriver()->draw3DLine(f.toIrrVector(),
-                                             t.toIrrVector(), c);
+    irr_driver->getVideoDriver()->draw3DLine((const core::vector3df&)from,
+                                             (const core::vector3df&)to, c);
 }
 
 /* EOF */

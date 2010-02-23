@@ -175,14 +175,14 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     if(m_gravity_center_shift.getX()==UNDEFINED)
     {
         m_gravity_center_shift.setX(0);
-        m_gravity_center_shift.setY(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setZ(m_kart_model.getHeight()*0.5f);
+        m_gravity_center_shift.setY(m_kart_model.getHeight()*0.5f);
+        m_gravity_center_shift.setZ(0);
     }
     m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
-        m_wheel_radius);
-    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
-        -m_kart_model.getWheelPhysicsPosition(2).getY());
+                                           m_wheel_radius           );
+    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getZ()
+                         -m_kart_model.getWheelPhysicsPosition(2).getZ());
     m_angle_at_min = asinf(m_wheel_base/m_min_radius);
     m_angle_at_max = asinf(m_wheel_base/m_max_radius);
     if(m_max_speed_turn == m_min_speed_turn)

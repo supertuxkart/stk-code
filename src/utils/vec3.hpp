@@ -40,8 +40,7 @@ public:
      *  axis as well (so a vector3df can be stored in and restored from
      *  a vec3).
      */
-    inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Z, v.Y) {}
-    //inline Vec3(sgVec3 a)                  : btVector3(a[0], a[1], a[2]) {}
+    inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Y, v.Z) {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     inline Vec3()                          : btVector3()                 {}
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
@@ -54,22 +53,21 @@ public:
         {m_x=heading;
          setPitchRoll(normal);}
 
-    void                  setHPR(const btMatrix3x3& m);
-    inline const float    operator[](int n) const         {return *(&m_x+n); }
-    inline const float    getHeading() const       {return m_x; }
-    inline const float    getPitch() const         {return m_y; }
-    inline const float    getRoll() const          {return m_z; }
-    inline const void     setHeading(float f)      {m_x = f;}
-    inline const void     setPitch(float f)        {m_y = f;}
-    inline const void     setRoll(float f)         {m_z = f;}
-    float*                toFloat() const          {return (float*)this;     }
+    void                   setHPR(const btQuaternion& q);
+    inline const float     operator[](int n) const  { return *(&m_x+n); }
+    inline const float     getHeading() const       { return m_x;       }
+    inline const float     getPitch() const         { return m_y;       }
+    inline const float     getRoll() const          { return m_z;       }
+    inline const void      setHeading(float f)      { m_x = f;          }
+    inline const void      setPitch(float f)        { m_y = f;          }
+    inline const void      setRoll(float f)         { m_z = f;          }
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
-    const core::vector3df toIrrVector()   const;
-    const core::vector3df toIrrHPR()      const;
-    const core::vector2df toIrrVector2d() const;
-    void                  degreeToRad();
+    const core::vector3df& toIrrVector()   const;
+    const core::vector3df  toIrrHPR()      const;
+    const core::vector2df  toIrrVector2d() const;
+    void                   degreeToRad();
     Vec3&          operator=(const btVector3& a)   {*(btVector3*)this=a; return *this;}
-    Vec3&          operator=(const btMatrix3x3& m) {setHPR(m);           return *this;}
+    Vec3&          operator=(const btQuaternion& q){setHPR(q);           return *this;}
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */

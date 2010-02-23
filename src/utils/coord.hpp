@@ -56,7 +56,7 @@ public:
     Coord(const btTransform& t)
     {
         m_xyz = t.getOrigin();
-        m_hpr.setHPR(t.getBasis());
+        m_hpr.setHPR(t.getRotation());
         //setSgCoord();
     }   // Coord
     // ------------------------------------------------------------------------

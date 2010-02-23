@@ -128,14 +128,14 @@ void Moveable::update(float dt)
     //m_hpr.setZ(-r.Z);
 
 
-    m_hpr.setHPR(m_transform.getBasis());
+    m_hpr.setHPR(m_transform.getRotation());
     // roll is not set correctly, I assume due to a different HPR order.
     // So we compute the proper roll (by taking the angle between the up
     // vector and the rotated up vector).
-    Vec3 up(0,0,1);
-    Vec3 roll_vec = m_transform.getBasis()*up;
-    float roll = atan2(roll_vec.getX(), roll_vec.getZ());
-    m_hpr.setRoll(roll);
+    //Vec3 up(0, 1, 0);
+    //Vec3 roll_vec = m_transform.getBasis()*up;
+    //float roll = atan2(roll_vec.getX(), roll_vec.getY());
+    //m_hpr.setRoll(roll);
 
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;
@@ -161,8 +161,7 @@ void Moveable::createBody(float mass, btTransform& trans,
     // functions are not called correctly. So only init the pointer to zero.
     m_user_pointer.zero();
     m_body->setUserPointer(&m_user_pointer);
-    const btMatrix3x3& basis=m_body->getWorldTransform().getBasis();
-    m_hpr.setHPR(basis);
+    m_hpr.setHPR(m_body->getWorldTransform().getRotation());
 }   // createBody
 
 //-----------------------------------------------------------------------------

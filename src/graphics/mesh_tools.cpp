@@ -36,8 +36,8 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
         for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
             int indx=mbIndices[j];
             Vec3 c(mbVertices[indx].Pos.X,
-                   mbVertices[indx].Pos.Z,
-                   mbVertices[indx].Pos.Y  );
+                   mbVertices[indx].Pos.Y,
+                   mbVertices[indx].Pos.Z  );
             min->min(c);
             max->max(c);
         }   // for j
