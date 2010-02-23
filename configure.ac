@@ -389,7 +389,6 @@ AC_CONFIG_FILES([                   \
  src/ide/Makefile                   \
  src/bullet/Makefile                \
  src/bullet/src/Makefile            \
- src/bullet/Demos/OpenGL/Makefile   \
  src/enet/Makefile                  \
 ])
 AC_OUTPUT
