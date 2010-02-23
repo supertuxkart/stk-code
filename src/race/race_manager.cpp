@@ -207,6 +207,12 @@ void RaceManager::startNew()
  */
 void RaceManager::startNextRace()
 {
+    IrrlichtDevice* device = irr_driver->getDevice();
+    GUIEngine::renderLoading();
+    device->getVideoDriver()->endScene();
+    device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
+
+    
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
 

@@ -299,6 +299,7 @@ namespace GUIEngine
     void reshowCurrentScreen();
     
     void render(float dt);
+    void renderLoading();
     
     void transmitEvent(Widget* widget, std::string& name, const int playerID);
     

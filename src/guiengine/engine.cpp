@@ -292,6 +292,38 @@ void render(float elapsed_time)
 }   // render
 
 // -----------------------------------------------------------------------------    
+
+void renderLoading()
+{
+    g_skin->drawBgImage();
+    ITexture* loading = irr_driver->getTexture( file_manager->getGUIDir() + "/loading.png" );
+    
+    const int texture_w = loading->getSize().Width;
+    const int texture_h = loading->getSize().Height;
+    
+    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    const int screen_w = frame_size.Width;
+    const int screen_h = frame_size.Height;
+    
+    const core::rect< s32 > dest_area = core::rect< s32 >(screen_w/2 - texture_w/2,
+                                                          screen_h/2 - texture_h/2,
+                                                          screen_w/2 + texture_w/2,
+                                                          screen_h/2 + texture_h/2);
+    
+    const core::rect< s32 > source_area = core::rect< s32 >(0, 0, texture_w, texture_h);
+    
+    GUIEngine::getDriver()->draw2DImage( loading, dest_area, source_area,
+                                        0 /* no clipping */, 0, true /* alpha */);
+    
+    
+    g_title_font->draw(_("Loading"),
+                       core::rect< s32 >( 0, screen_h/2 + texture_h/2, screen_w, screen_h ),
+                       SColor(255,255,255,255),
+                       true/* center h */, false /* center v */ );
+    
+} // renderLoading
+    
+// -----------------------------------------------------------------------------    
 Widget* getWidget(const char* name)
 {
     // if a modal dialog is shown, search within it too
