@@ -2,6 +2,7 @@
 #include "states_screens/grand_prix_over.hpp"
 
 #include "audio/sound_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -118,6 +119,8 @@ void GrandPrixOver::init()
                                                                300.0f /* radius */);
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 0.0f, 0.0f, 0.0f);
+    
+    sfx_manager->quickSound("winner");
 }
 
 // -------------------------------------------------------------------------------------
