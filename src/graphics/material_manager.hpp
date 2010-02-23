@@ -43,7 +43,10 @@ public:
     void      reInit           ();
     void      setAllMaterialFlags(video::ITexture* t, 
                                   scene::IMeshBuffer *mb) const;
+    
     void      setAllUntexturedMaterialFlags(scene::IMeshBuffer *mb) const;
+    void      setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const;
+
     int       addEntity        (Material *m);
     Material *getMaterial      (const std::string& t, bool is_full_path=false,
                                 bool make_permanent=false);

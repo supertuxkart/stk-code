@@ -392,6 +392,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
     scene::IAnimatedMesh *m = m_scene_manager->getMesh(filename.c_str());
     if(!m) return NULL;
     setAllMaterialFlags(m);
+    
     return m->getMesh(0);
 }   // getMesh
 
@@ -410,8 +411,9 @@ void IrrDriver::setAllMaterialFlags(scene::IAnimatedMesh *mesh) const
         for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
         {
             video::ITexture* t=irr_material.getTexture(j);
-            if(!t) continue;
-            material_manager->setAllMaterialFlags(t, mb);
+            if (!t) material_manager->setAllFlatMaterialFlags(mb);
+            else    material_manager->setAllMaterialFlags(t, mb);
+            
         }   // for j<MATERIAL_MAX_TEXTURES
         material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
