@@ -96,7 +96,7 @@ void AddDeviceDialog::onEnterPressedInternal()
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation AddDeviceDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation AddDeviceDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == "cancel")

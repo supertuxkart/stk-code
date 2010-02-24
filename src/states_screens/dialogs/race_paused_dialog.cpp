@@ -155,7 +155,7 @@ void RacePausedDialog::onEnterPressedInternal()
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation RacePausedDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& eventSource)
 {
     std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << ")\n";
     

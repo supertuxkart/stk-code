@@ -61,7 +61,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation PressAKeyDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eventSource)
 {
     if(eventSource == "cancel")
     {

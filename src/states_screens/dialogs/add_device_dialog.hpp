@@ -31,7 +31,7 @@ public:
      */
     AddDeviceDialog();
     void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
   
 

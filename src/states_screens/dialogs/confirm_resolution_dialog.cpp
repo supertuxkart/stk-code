@@ -131,7 +131,7 @@ void ConfirmResolutionDialog::updateMessage()
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation ConfirmResolutionDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation ConfirmResolutionDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == "cancel")

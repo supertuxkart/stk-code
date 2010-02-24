@@ -310,7 +310,7 @@ void TrackInfoDialog::onEnterPressedInternal()
 
 // ------------------------------------------------------------------------------------------------------   
 
-GUIEngine::EventPropagation TrackInfoDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation TrackInfoDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "start" )
     {

@@ -57,7 +57,7 @@ public:
     virtual ~ModalDialog();
     
     /** Returns whether to block event propagation (usually, you will want to block events you processed) */
-    virtual EventPropagation processEvent(std::string& eventSource){ return EVENT_LET; }
+    virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
     
     bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
     bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
@@ -74,6 +74,9 @@ public:
     static void onEnterPressed();
     static ModalDialog* getCurrent();
     static bool isADialogActive();
+    
+    /** Override to change what happens on escape pressed */
+    virtual void escapePressed() { dismiss(); }
     
     /** Override to be notified of updates */
     virtual void onUpdate(float dt) { }

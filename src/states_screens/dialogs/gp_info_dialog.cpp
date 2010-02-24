@@ -214,7 +214,7 @@ void GPInfoDialog::onEnterPressedInternal()
 
 // ------------------------------------------------------------------------------------------------------   
 
-GUIEngine::EventPropagation GPInfoDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "start")
     {

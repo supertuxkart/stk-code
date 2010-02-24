@@ -90,7 +90,7 @@ EnterPlayerNameDialog::~EnterPlayerNameDialog()
 
 // -----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::string& eventSource)
 {
     if(eventSource == "cancel")
     {

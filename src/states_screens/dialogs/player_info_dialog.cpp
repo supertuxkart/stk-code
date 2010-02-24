@@ -191,7 +191,7 @@ void PlayerInfoDialog::onEnterPressedInternal()
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation PlayerInfoDialog::processEvent(std::string& eventSource)
+GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "renameplayer")
     {

@@ -30,7 +30,9 @@ public:
     RaceOverDialog(const float percentWidth, const float percentHeight);  
     
     void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    
+    virtual void escapePressed();
 };
 
 
