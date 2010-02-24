@@ -644,7 +644,6 @@ void Kart::update(float dt)
         m_uprightConstraint->setLimit(M_PI);
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
@@ -666,11 +665,11 @@ void Kart::update(float dt)
         }
         World::getWorld()->getPhysics()->removeKart(this);
 
-        btQuaternion q_roll (btVector3(0.f, 1.f, 0.f),
+        btQuaternion q_roll (btVector3(0.0f, 0.0f, 1.0f),
                              -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
                              -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
-        setXYZRotation(getXYZ()+Vec3(0, 0, rescue_height*dt/rescue_time),
+        setXYZRotation(getXYZ()+Vec3(0, rescue_height*dt/rescue_time, 0),
                        getRotation()*q_roll*q_pitch);
     }   // if rescue mode
     m_attachment.update(dt);
