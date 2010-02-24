@@ -161,6 +161,24 @@ namespace StringUtils
     
     // ------------------------------------------------------------------------
     /** Like the other ones above but for wide strings */
+    template <class T1, class T2, class T3, class T4, class T5, class T6>
+    irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
+                                    const T2 &v2, const T3 &v3, const T4 &v4,
+                                    const T5 &v5, const T6 &v6)
+    {
+        std::vector<irr::core::stringw> all_vals;
+        all_vals.push_back( irr::core::stringw(v1) ); 
+        all_vals.push_back( irr::core::stringw(v2) ); 
+        all_vals.push_back( irr::core::stringw(v3) ); 
+        all_vals.push_back( irr::core::stringw(v4) ); 
+        all_vals.push_back( irr::core::stringw(v5) ); 
+        all_vals.push_back( irr::core::stringw(v6) ); 
+        return insertValues(s, all_vals);
+    }
+    
+    
+    // ------------------------------------------------------------------------
+    /** Like the other ones above but for wide strings */
     template <class T1, class T2, class T3, class T4, class T5>
     irr::core::stringw insertValues(const irr::core::stringw &s, const T1 &v1,
                                     const T2 &v2, const T3 &v3, const T4 &v4,
