@@ -356,9 +356,9 @@ void RaceGUI::drawGlobalPlayerIcons(const KartIconDisplayInfo* info)
 
         if (info[i].time.size() > 0)
         {
-            static video::SColor color = video::SColor(255, (int)(255*info[i].r),
-                                                       (int)(255*info[i].g), 
-                                                       (int)(255*info[i].b)      );
+            video::SColor color = video::SColor(255, (int)(255*info[i].r),
+                                                     (int)(255*info[i].g), 
+                                                     (int)(255*info[i].b)      );
             core::rect<s32> pos(x+ICON_PLAYER_WIDTH, y+5, x+ICON_PLAYER_WIDTH, y+5);
             core::stringw s=info[i].time.c_str();
             font->draw(s.c_str(), pos, color);
