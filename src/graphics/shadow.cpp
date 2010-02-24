@@ -23,7 +23,7 @@
 
 #include "graphics/irr_driver.hpp"
 
-Shadow::Shadow(video::ITexture *texture, scene::IAnimatedMeshSceneNode *node)
+Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node)
 {
     video::SMaterial m;
     m.setTexture(0, texture);
