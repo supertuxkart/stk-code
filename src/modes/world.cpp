@@ -388,9 +388,21 @@ void World::updateWorld(float dt)
 
 }   // updateWorld
 
+#define MEASURE_FPS 0
+
 //-----------------------------------------------------------------------------
 void World::update(float dt)
 {
+#if MEASURE_FPS
+    static float time = 0.0f;
+    time += dt;
+    if (time > 5.0f)
+    {
+        time -= 5.0f;
+        printf("%i\n",irr_driver->getVideoDriver()->getFPS());
+    }
+#endif
+
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     // Clear race state so that new information can be stored
