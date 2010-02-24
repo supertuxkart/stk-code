@@ -489,15 +489,15 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     Vec3 center = (bb_max+bb_min)*0.5f;
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH(bb_max.getX()-bb_min.getX(), 
-                                            bb_max.getY()-bb_min.getY(),
-                                            -1, bb_max.getZ()-bb_min.getZ()+1);
+                                            bb_max.getZ()-bb_min.getZ(),
+                                            -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
     // Adjust z position by +1 for max, -1 for min - this helps in case that
     // the maximum z coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max z = min z) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_max.getZ()+1, center.getY()));
-    camera->setUpVector(core::vector3df(0,0,1));
-    camera->setTarget(core::vector3df(center.getX(),bb_min.getZ()-1,center.getY()));
+    camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
+    camera->setUpVector(core::vector3df(0, 0, 1));
+    camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
     
     video::ITexture *texture = rttProvider.renderToTexture();
     
@@ -505,7 +505,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
     m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
-    m_scaling.setY(dimension.Width/(bb_max.getY()-bb_min.getY()));
+    m_scaling.setZ(dimension.Width/(bb_max.getZ()-bb_min.getZ()));
     return texture;
 }   // drawMiniMap
 
@@ -519,6 +519,6 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 void QuadGraph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 {
     draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling.getX());
-    draw_at->setY((xyz.getY()-m_min_coord.getY())*m_scaling.getY());
+    draw_at->setY((xyz.getZ()-m_min_coord.getZ())*m_scaling.getZ());
 
 }   // mapPoint
