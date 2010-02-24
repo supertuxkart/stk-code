@@ -134,7 +134,7 @@ void PlayerController::action(PlayerAction action, int value)
         break;
     case PA_ACCEL:
         m_prev_accel = value;
-        if(value)
+        if (value && !(m_penalty_time > 0.0f))
         {
             m_controls->m_accel = value/32768.0f;
             m_controls->m_brake = false;
