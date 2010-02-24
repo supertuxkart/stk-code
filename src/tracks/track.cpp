@@ -214,7 +214,8 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
+        
+    for (unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *mode=root->getNode(i);
         if(mode->getName()!="mode") continue;
@@ -615,7 +616,7 @@ void Track::createWater(const XMLNode &node)
 void Track::loadTrackModel(unsigned int mode_id)
 {
     m_has_final_camera     = false;
-    m_is_arena             = false;
+    //m_is_arena             = false;
     m_track_object_manager = new TrackObjectManager();
 
     // Load the graph only now: this function is called from world, after
