@@ -154,7 +154,7 @@ void Physics::update(float dt)
 
 bool Physics::projectKartDownwards(const Kart *k)
 {
-    btVector3 hell(0, 0, -10000);
+    btVector3 hell(0, -10000, 0);
     return k->getVehicle()->projectVehicleToSurface(hell, true /*allow translation*/);
 } //projectKartsDownwards
 

@@ -269,7 +269,11 @@ void Camera::update(float dt)
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
-
+    Vec3 rotated_forw=m_kart->getTrans().getBasis()*Vec3(0,0,1);
+    float heading=atan2f(-rotated_forw.getX(), rotated_forw.getZ());
+    printf("kart hpr %f (%f) %f %f\n",
+           m_kart->getHPR().getX(),heading, m_kart->getHPR().getY(),
+           m_kart->getHPR().getZ());
     // Each case should set wanted_position and wanted_target according to 
     // what is needed for that mode. Yes, there is a lot of duplicate code 
     // but it is (IMHO) much easier to follow this way.

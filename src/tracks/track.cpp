@@ -918,7 +918,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
                             const Material **material) const
 {
     btVector3 to_pos(pos);
-    to_pos.setZ(-100000.f);
+    to_pos.setY(-100000.f);
 
     class MaterialCollision : public btCollisionWorld::ClosestRayResultCallback
     {

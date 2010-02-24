@@ -304,7 +304,7 @@ void World::resetAllKarts()
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
         ///start projection from top of kart
-        btVector3 up_offset(0, 0, 0.5f * ((*i)->getKartHeight()));
+        btVector3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
         (*i)->getVehicle()->getRigidBody()->translate (up_offset);
 
         bool kart_over_ground = m_physics->projectKartDownwards(*i);

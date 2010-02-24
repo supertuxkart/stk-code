@@ -645,7 +645,6 @@ void Kart::update(float dt)
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
 
-
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
