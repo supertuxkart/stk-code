@@ -209,7 +209,10 @@ void TracksScreen::init()
     tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
                            0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
-    tracks_widget->updateItemDisplay();    
+    tracks_widget->updateItemDisplay();   
+    
+    // FIXME: don't hardcode player 0?
+    tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, 0, true);
 }
 
 // -----------------------------------------------------------------------------------------------
