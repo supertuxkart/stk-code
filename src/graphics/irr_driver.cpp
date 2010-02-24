@@ -411,8 +411,9 @@ void IrrDriver::setAllMaterialFlags(scene::IAnimatedMesh *mesh) const
         for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
         {
             video::ITexture* t=irr_material.getTexture(j);
-            if (!t) material_manager->setAllFlatMaterialFlags(mb);
-            else    material_manager->setAllMaterialFlags(t, mb);
+            //if (!t) material_manager->setAllFlatMaterialFlags(mb);
+            //else    material_manager->setAllMaterialFlags(t, mb);
+            if(t) material_manager->setAllMaterialFlags(t, mb);
             
         }   // for j<MATERIAL_MAX_TEXTURES
         material_manager->setAllUntexturedMaterialFlags(mb);
