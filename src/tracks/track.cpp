@@ -705,7 +705,7 @@ void Track::loadTrackModel(unsigned int mode_id)
             // Set some kind of default in case Z is not defined in the file
             // (with the new track exporter it always is defined anyway).
             // Z is the height from which the item is dropped on the track.
-            xyz.setZ(1000);
+            xyz.setY(1000);
             node->getXYZ(&xyz);
             bool drop=true;
             node->get("drop", &drop);
@@ -902,7 +902,7 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // if only 2d coordinates are given, let the item fall from very high
     if(drop)
     {
-        loc.setZ(getTerrainHeight(loc));
+        loc.setY(getTerrainHeight(loc));
     }
 
     // Don't tilt the items, since otherwise the rotation will look odd,
@@ -956,7 +956,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
         return;
     }
 
-    *hot      = rayCallback.m_hitPointWorld.getZ();
+    *hot      = rayCallback.m_hitPointWorld.getY();
     *normal   = rayCallback.m_hitNormalWorld;
     *material = rayCallback.m_material;
     // Note: material might be NULL. This happens if the ray cast does not
