@@ -419,8 +419,8 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
 
     m_all_meshes.push_back(mesh);
-    //scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
-    scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
+    //scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
     mesh->setHardwareMappingHint(scene::EHM_STATIC);
     core::vector3df xyz(0,0,0);
     track_node->getXYZ(&xyz);
