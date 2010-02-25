@@ -70,7 +70,6 @@ Track::Track(std::string filename)
     m_non_collision_mesh   = new TriangleMesh();
     m_all_nodes.clear();
     m_all_meshes.clear();
-    m_has_final_camera     = false;
     m_is_arena             = false;
     m_camera_far           = 1000.0f;
     m_quad_graph           = NULL;
@@ -214,8 +213,7 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("arena",                 &m_is_arena);
     root->get("groups",                &m_groups);
-        
-    for (unsigned int i=0; i<root->getNumNodes(); i++)
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *mode=root->getNode(i);
         if(mode->getName()!="mode") continue;
@@ -226,20 +224,20 @@ void Track::loadTrackInfo()
         mode->get("scene", &tm.m_scene     );
         m_all_modes.push_back(tm);
     }
-    
     // If no mode is specified, add a default mode.
-    if (m_all_modes.size()==0)
+    if(m_all_modes.size()==0)
     {
         TrackMode tm;
         m_all_modes.push_back(tm);
     }
 
-    if (m_groups.size()==0) m_groups.push_back("standard");
-    
+    if(m_groups.size()==0)
+        m_groups.push_back("standard");
     const XMLNode *xml_node = root->getNode("curves");
-    if (xml_node) loadCurves(*xml_node);
+        if(xml_node)
+                loadCurves(*xml_node);
 
-    // Set the correct paths
+        // Set the correct paths
     m_screenshot = m_root+"/"+m_screenshot;
     delete root;
 
@@ -248,11 +246,11 @@ void Track::loadTrackInfo()
 //-----------------------------------------------------------------------------
 void Track::loadCurves(const XMLNode &node)
 {
-    for (unsigned int i=0; i<node.getNumNodes(); i++)
-    {
-        const XMLNode *curve = node.getNode(i);
-        m_all_curves.push_back(new BezierCurve(*curve));
-    }   // for i<node.getNumNodes
+        for(unsigned int i=0; i<node.getNumNodes(); i++)
+        {
+                const XMLNode *curve = node.getNode(i);
+                m_all_curves.push_back(new BezierCurve(*curve));
+        }   // for i<node.getNumNodes
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
@@ -357,12 +355,10 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
     core::matrix4 mat;
     mat.setRotationDegrees(hpr);
     mat.setTranslation(pos);
-    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
-    {
+    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
-        if(mb->getVertexType()!=video::EVT_STANDARD)
-        {
+        if(mb->getVertexType()!=video::EVT_STANDARD) {
             fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
                 mb->getVertexType());
             continue;
@@ -372,8 +368,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
 
         const Material* material=0;
         TriangleMesh *tmesh = m_track_mesh;
-        if(t)
-        {
+        if(t) {
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
             std::string image = std::string(core::stringc(t->getName()).c_str());
 #else
@@ -391,10 +386,8 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
         u16 *mbIndices = mb->getIndices();
         Vec3 vertices[3];
         irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-        for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
-        {
-            for(unsigned int k=0; k<3; k++)
-            {
+        for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
+            for(unsigned int k=0; k<3; k++) {
                 int indx=mbIndices[j+k];
                 core::vector3df v = mbVertices[indx].Pos;
                 mat.transformVect(v);
@@ -620,8 +613,7 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(unsigned int mode_id)
 {
-    m_has_final_camera     = false;
-    //m_is_arena             = false;
+    m_is_arena             = false;
     m_track_object_manager = new TrackObjectManager();
 
     // Load the graph only now: this function is called from world, after
@@ -756,10 +748,6 @@ void Track::loadTrackModel(unsigned int mode_id)
         {
             handleSky(*node, path);
         }
-        else if (name=="camera")
-        {
-            handleCamera(*node);
-        }
         else
         {
             fprintf(stderr, "Warning: element '%s' not found.\n",
@@ -876,18 +864,6 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         }
     }   // if sky-box
 }   // handleSky
-
-//-----------------------------------------------------------------------------
-/** Reads the final camera position.
- *  \param root The XML node with the camera node.
- */
-void Track::handleCamera(const XMLNode &root)
-{
-    m_has_final_camera  = true;
-    root.get("final-position", &m_camera_final_position);
-    root.get("final-hpr",      &m_camera_final_hpr     );
-    m_camera_final_hpr.degreeToRad();
-}   // handleCamera
 
 //-----------------------------------------------------------------------------
 /** Handle creation and placement of an item.

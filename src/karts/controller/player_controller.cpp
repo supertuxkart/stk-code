@@ -275,17 +275,13 @@ void PlayerController::update(float dt)
             m_kart->beep();
     }
     
-    // Camera looks back when reversing
-    if(m_kart->getCamera()->getMode()!=Camera::CM_FINAL)
-    {
-		// look backward when the player requests or
-		// if automatic reverse camera is active
-    	if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
-            m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
-    		m_kart->getCamera()->setMode(Camera::CM_REVERSE);
-    	else
-            m_kart->getCamera()->setMode(Camera::CM_NORMAL);
-    }
+    // look backward when the player requests or
+    // if automatic reverse camera is active
+    if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold>0 && 
+        m_kart->getSpeed()<-UserConfigParams::m_reverse_look_threshold))
+        m_kart->getCamera()->setMode(Camera::CM_REVERSE);
+    else
+        m_kart->getCamera()->setMode(Camera::CM_NORMAL);
 
     // We can't restrict rescue to fulfil isOnGround() (which would be more like
     // MK), since e.g. in the City track it is possible for the kart to end
@@ -330,10 +326,6 @@ void PlayerController::setPosition(int p)
  */
 void PlayerController::finishedRace(float time)
 {
-    // Set race over camera (but not in follow the leader mode, since the kart
-    // will most likely not be at the starting line at the end of the race
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        m_kart->getCamera()->setMode(Camera::CM_FINAL);
     
     RaceGUI* m=World::getWorld()->getRaceGUI();
     if(m)

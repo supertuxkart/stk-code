@@ -74,12 +74,6 @@ private:
     scene::ILightSceneNode  *m_sun;
     TriangleMesh*            m_track_mesh;
     TriangleMesh*            m_non_collision_mesh;
-    /** True if the track/scene has a final camera position. */
-    bool                     m_has_final_camera;
-    /** The final xyz coordinates of the camera. */
-    Vec3                     m_camera_final_position;
-    /** The final hpr rotation of the camera. */
-    Vec3                     m_camera_final_hpr;
     /** Minimum coordinates of this track. */
     Vec3                     m_aabb_min;
     /** Maximum coordinates of this track. */
@@ -175,7 +169,6 @@ private:
     void loadCurves(const XMLNode &node);
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
     void handleSky(const XMLNode &root, const std::string &filename);
-    void handleCamera(const XMLNode &root);
 
 public:
 
@@ -222,9 +215,6 @@ public:
     const std::string& getScreenshotFile () const {return m_screenshot;         }
     
     const std::string& getItemStyle      () const {return m_item_style;         }
-    bool               hasFinalCamera    () const {return m_has_final_camera;   }
-    const Vec3&        getCameraPosition () const {return m_camera_final_position;}
-    const Vec3&        getCameraHPR      () const {return m_camera_final_hpr;   }
     btTransform        getStartTransform (unsigned int pos) const;
     void               getTerrainInfo(const Vec3 &pos, float *hot, Vec3* normal,
                                       const Material **material) const;

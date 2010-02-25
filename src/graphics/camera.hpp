@@ -36,7 +36,6 @@ public:
         CM_CLOSEUP,       // Closer to kart
         CM_REVERSE,       // Looking backwards
         CM_LEADER_MODE,   // for deleted player karts in follow the leader
-        CM_FINAL,         // Final camera to show the end of the race
         CM_SIMPLE_REPLAY
     };
 
@@ -86,10 +85,6 @@ private:
 
     /** Velocity of the target of the camera, only used for end camera. */
     core::vector3df m_target_velocity;
-
-    /** Counts the time for the end camera only, to indicate when
-     *  the end camera should stop moving. */
-    float           m_final_time;
 
     void setupCamera();
     void smoothMoveCamera(float dt, const Vec3 &wanted_position,

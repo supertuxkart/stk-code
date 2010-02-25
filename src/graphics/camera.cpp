@@ -150,30 +150,8 @@ void Camera::setMode(Mode mode)
         m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
     }
-    if(mode==CM_FINAL)
-    {
-        const Track* track       = world->getTrack();
-        core::vector3df wanted_position(track->getCameraPosition().toIrrVector());
-        core::vector3df curr_position(m_camera->getPosition());
-        m_lin_velocity           = (wanted_position-curr_position)
-                                 / stk_config->m_final_camera_time;
-        float distance           = (m_kart->getXYZ() - curr_position).length();
-        core::vector3df hpr      = track->getCameraHPR().toIrrHPR();
-        core::vector3df target   = hpr.rotationToDirection(core::vector3df(0, 0, 1)*distance)
-                                 + wanted_position;
-        core::vector3df curr_hpr = m_camera->getRotation();
-        m_target_velocity        = (target - m_camera->getTarget())
-                                 / stk_config->m_final_camera_time;
-        m_final_time         = 0.0f;
-     }
 
-    // If the camera is set to final mode but there is no camera
-    // end position defined, ignore this request and leave the camera
-    // in normal mode.
-    if(mode!=CM_FINAL || world->getTrack()->hasFinalCamera())
-    {
-        m_mode = mode;
-    }
+    m_mode = mode;
 }   // setMode
 
 // ----------------------------------------------------------------------------
@@ -324,19 +302,6 @@ void Camera::update(float dt)
             wanted_position *= m_distance * 2.0f;
             wanted_position += wanted_target;
             smoothMoveCamera(dt, wanted_position, wanted_target);
-            break;
-        }
-    case CM_FINAL:
-        {
-            m_final_time +=dt;
-            if(m_final_time < stk_config->m_final_camera_time)
-            {
-                core::vector3df new_pos = m_camera->getPosition()+m_lin_velocity*dt;
-                m_camera->setPosition(new_pos);
-                core::vector3df new_target = m_camera->getTarget()+m_target_velocity*dt;
-                m_camera->setTarget(new_target);
-            }
-            return;
             break;
         }
     case CM_SIMPLE_REPLAY:
