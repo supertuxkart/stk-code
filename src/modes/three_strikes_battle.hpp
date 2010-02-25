@@ -41,7 +41,15 @@ private:
     std::vector<BattleInfo> m_kart_info;
     
 public:
-
+    
+    /** Used to show a nice graph when battle is over */
+    struct BattleEvent
+    {
+        float m_time;
+        std::vector<BattleInfo> m_kart_info;
+    };
+    std::vector<BattleEvent> m_battle_events;
+    
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
     

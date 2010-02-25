@@ -561,27 +561,36 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
 }   // getLocalPlayerKart
 
 //-----------------------------------------------------------------------------
-/** Called in follow-leader-mode to remove the last kart
-*/
-void World::removeKart(int kart_number)
+/** Remove (eliminate) a kart from the race */
+void World::removeKart(int kart_number, bool notifyOfElimination)
 {
     Kart *kart = m_karts[kart_number];
 
+    std::cout << "==== World::removeKart ====\n";
+    
     // Display a message about the eliminated kart in the race gui
-    for (KartList::iterator i  = m_karts.begin(); i != m_karts.end();  i++ )
+    if (notifyOfElimination)
     {
-        if(!(*i)->getCamera()) continue;
-        if(*i==kart)
+        for (KartList::iterator i  = m_karts.begin(); i != m_karts.end();  i++ )
         {
-            m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
-        }
-        else
-        {
-            m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has\nbeen eliminated."),
-                                                             kart->getName().c_str()),
-                                                             *i, 2.0f, 60);
-        }
-    }   // for i in kart
+            if(!(*i)->getCamera()) continue;
+            if(*i==kart)
+            {
+                std::cout << "You have been eliminated (i = " << (*i)->getIdent() << ")\n";
+                m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
+            }
+            else
+            {
+                std::cout << kart->getIdent().c_str() << " has been eliminated (i = " << (*i)->getIdent() << ")\n";
+                m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has\nbeen eliminated."),
+                                                                 kart->getName().c_str()),
+                                                                 *i, 2.0f, 60);
+            }
+        }   // for i in kart
+    }
+    
+    std::cout << "=========================\n";
+
     if(kart->getController()->isPlayerController())
     {
         // Change the camera so that it will be attached to the leader

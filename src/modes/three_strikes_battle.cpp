@@ -53,6 +53,13 @@ void ThreeStrikesBattle::init()
         // no positions in this mode
         m_karts[n]->setPosition(-1);
     }// next kart
+    
+    
+    BattleEvent evt;
+    evt.m_time = 0.0f;
+    evt.m_kart_info = m_kart_info;
+    m_battle_events.push_back(evt);    
+    
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -70,24 +77,27 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
     
+    // record event
+    BattleEvent evt;
+    evt.m_time = getTime();
+    evt.m_kart_info = m_kart_info;
+    m_battle_events.push_back(evt);   
+    
     updateKartRanks();
         
     // check if kart is 'dead'
-    if(m_kart_info[kart_id].m_lives < 1)
+    if (m_kart_info[kart_id].m_lives < 1)
     {
         m_karts[kart_id]->finishedRace(WorldStatus::getTime());
         removeKart(kart_id);
-        // FIXME - what about end camera here??
-        // createEndCamera(kart_id)
     }
     
     const unsigned int NUM_KARTS = getNumKarts();
     int num_karts_many_lives = 0;
  
-    for( unsigned int n = 0; n < NUM_KARTS; ++n )
+    for (unsigned int n = 0; n < NUM_KARTS; ++n)
     {
-        if (m_kart_info[n].m_lives > 1)
-            num_karts_many_lives++;
+        if (m_kart_info[n].m_lives > 1) num_karts_many_lives++;
     }
     
     // when almost over, use fast music
@@ -168,6 +178,17 @@ bool ThreeStrikesBattle::isRaceOver()
  */
 void ThreeStrikesBattle::terminateRace()
 {
+    for (unsigned int n=0; n<m_battle_events.size(); n++)
+    {
+        const float time = m_battle_events[n].m_time;
+        printf("At time %f :\n", time);
+        
+        for (unsigned int k=0; k<m_battle_events[n].m_kart_info.size(); k++)
+        {
+            printf("    kart %s had %i lives\n", m_karts[k]->getIdent().c_str(), m_battle_events[n].m_kart_info[k].m_lives);
+        }
+    }
+    
     updateKartRanks();   
     World::terminateRace();
 }   // terminateRace
@@ -186,6 +207,8 @@ void ThreeStrikesBattle::restartRace()
         // no positions in this mode
         m_karts[n]->setPosition(-1);
     }// next kart
+    
+    m_battle_events.clear();
 }   // restartRace
 
 //-----------------------------------------------------------------------------

@@ -467,11 +467,25 @@ void Kart::finishedRace(float time)
     m_kart_mode     = KM_END_ANIM;
     m_controller->finishedRace(time);
     race_manager->kartFinishedRace(this, time);
-    setController(new EndController(this, m_controller->getPlayer()));
-    m_kart_properties->getKartModel()->setEndAnimation(true);
-    // Not all karts have a camera
-    if(m_camera)
-        m_camera->setMode(Camera::CM_REVERSE);
+    
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    {
+        // in modes that support it, start end animation
+        setController(new EndController(this, m_controller->getPlayer()));
+        m_kart_properties->getKartModel()->setEndAnimation(true);
+        
+        // Not all karts have a camera
+        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+    {
+        //TODO: what to do on FTL end?
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    {
+    }             
+        
 }   // finishedRace
 
 //-----------------------------------------------------------------------------

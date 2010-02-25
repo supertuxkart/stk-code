@@ -107,7 +107,7 @@ protected:
     
     void  updateHighscores  ();
     void  resetAllKarts     ();
-    void  removeKart        (int kart_number);
+    void  removeKart        (int kart_number, bool notifyOfElimination=true);
     Controller* 
           loadAIController  (Kart *kart);
 

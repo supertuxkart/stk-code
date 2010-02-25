@@ -649,8 +649,7 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
-    int y = (int)(scaling.Y*164 + UserConfigParams::m_height 
-                                - viewport.LowerRightCorner.Y );
+    int y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
     const int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)/2;
     const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
 

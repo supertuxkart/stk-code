@@ -56,10 +56,10 @@ private:
     class TimedMessage
     {
      public:
-        irr::core::stringw m_message;            // message to display
-        float              m_remaining_time;     // time remaining before removing this message from screen
-        video::SColor      m_color;              // color of message
-        int                m_font_size;          // size
+        irr::core::stringw m_message;            //!< message to display
+        float              m_remaining_time;     //!< time remaining before removing this message from screen
+        video::SColor      m_color;              //!< color of message
+        int                m_font_size;          //!< size
         const Kart        *m_kart;
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
