@@ -200,6 +200,7 @@ void Camera::reset()
 void Camera::setInitialTransform()
 {
     m_camera->setPosition( m_kart->getXYZ().toIrrVector() - core::vector3df(0, -25, 50) );
+    m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
 }   // setInitialTransform
 
 //-----------------------------------------------------------------------------

@@ -380,8 +380,12 @@ void Kart::reset()
         World::getWorld()->getPhysics()->addKart(this);
     }
 
-    if(m_camera)
+    if (m_camera)
+    {
         m_camera->reset();
+        m_camera->setInitialTransform();
+    }
+    
     // If the controller was replaced (e.g. replaced by end controller), 
     //  restore the original controller. 
     if(m_saved_controller)
