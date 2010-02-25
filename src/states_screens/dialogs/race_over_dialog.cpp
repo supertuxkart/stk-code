@@ -21,6 +21,7 @@
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
@@ -56,7 +57,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     
     const int button_h = text_height + 6;
     const int margin_between_buttons = 12;
-    const int buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
+    m_buttons_y_from = m_area.getHeight() - 3*(button_h + margin_between_buttons);
     
     // ---- Ranking
     core::rect< s32 > area(0, 0, (show_highscores ? m_area.getWidth()*2/3 : m_area.getWidth()), text_height);
@@ -78,10 +79,12 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     const int lines_from_y = text_height + 15;
     
     // make things more compact if we're missing space
-    while (lines_from_y + (int)num_karts*line_h > buttons_y_from) // cheap way to avoid calculating the               
+    while (lines_from_y + (int)num_karts*line_h > m_buttons_y_from) // cheap way to avoid calculating the               
     {                                                             // required size with proper maths
         line_h = (int)(line_h*0.9f);
     }
+    
+    m_rankings_y_bottom = -1.0f;
     
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
     for (unsigned int i = 0; i < num_karts; ++i)
@@ -155,6 +158,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         core::rect< s32 > icon_area (5             , lines_from_y + line_h*i,
                                      5+icon_size   , lines_from_y + line_h*i + icon_size);
         
+        m_rankings_y_bottom = lines_from_y + line_h*(i+1);
+        
         GUIEngine::getGUIEnv()->addStaticText( kart_results_line.c_str(), entry_area,
                                                false , true , // border, word warp
                                                m_irrlicht_window);
@@ -212,7 +217,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             } // next score
         } // end if hs != NULL
     } // end if not GP
-
+    
     // ---- Buttons at the bottom
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
@@ -357,3 +362,99 @@ void RaceOverDialog::escapePressed()
 }
 
 //-----------------------------------------------------------------------------
+
+void RaceOverDialog::onUpdate(float dt)
+{
+    // Draw battle report (if relevant)
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    {
+        // only draw if we have enough space (FIXME: find better way?)
+        if (m_buttons_y_from - m_rankings_y_bottom >= 100)
+        {
+            renderThreeStrikesGraph(m_area.UpperLeftCorner.X + 15, m_rankings_y_bottom + 30,
+                                    m_area.getWidth() - 30,
+                                    m_buttons_y_from - m_rankings_y_bottom - 45);
+        }
+        
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int w, const int h)
+{
+    assert(h > 0);
+    assert(w > 0);
+    assert(x >= 0);
+    assert(y >= 0);
+    
+    ThreeStrikesBattle* world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
+    assert(world != NULL);
+    
+    const unsigned int evt_count = world->m_battle_events.size();
+    if (evt_count < 2) return;
+    
+    SColor black(255,0,0,0);
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y),
+                                              core::position2d<s32>(x, y + h), black);
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y + h),
+                                              core::position2d<s32>(x + w, y +  h), black);
+    
+    float lastEventTime = 0.0f;
+    int max_life_count = 0;
+    
+    const unsigned int kart_count = world->m_battle_events[0].m_kart_info.size();
+    
+    for (unsigned int n=0; n<evt_count; ++n)
+    {
+        const float time = world->m_battle_events[n].m_time;
+        if (time > lastEventTime) lastEventTime = time;
+        
+        assert(world->m_battle_events[n].m_kart_info.size() == kart_count);
+
+        for (unsigned int k=0; k<kart_count; k++)
+        {
+            if (world->m_battle_events[n].m_kart_info[k].m_lives > max_life_count)
+            {
+                max_life_count = world->m_battle_events[n].m_kart_info[k].m_lives;
+            }
+        }
+    }
+    
+    assert(lastEventTime > 0.0f);
+    assert(max_life_count > 0);
+    
+    for (unsigned int n=1; n<evt_count; ++n)
+    {
+        const float previous_time = world->m_battle_events[n-1].m_time;
+        const float time = world->m_battle_events[n].m_time;
+        
+        //printf("At time %f :\n", time);
+        
+        const int previous_event_x  = (int)(x + w*previous_time/lastEventTime);
+        const int event_x           = (int)(x + w*time/lastEventTime);
+                
+        assert(world->m_battle_events[n].m_kart_info.size() == kart_count);
+
+        for (unsigned int k=0; k<kart_count; k++)
+        {
+            const int kart_lives          = world->m_battle_events[n].m_kart_info[k].m_lives;
+            const int kart_previous_lives = world->m_battle_events[n-1].m_kart_info[k].m_lives;
+
+            //printf("    kart %s had %i lives\n", world->getKart(k)->getIdent().c_str(),
+            //       world->m_battle_events[n].m_kart_info[k].m_lives);
+            
+            const int event_y          = y + h - (int)(h * (float)kart_lives / (float)max_life_count);
+            const int previous_event_y = y + h - (int)(h * (float)kart_previous_lives / (float)max_life_count);
+
+            const video::SColor& color = world->getKart(k)->getKartProperties()->getColor();
+            
+            irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(previous_event_x, previous_event_y),
+                                                      core::position2d<s32>(event_x, previous_event_y), color);
+            irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(event_x, previous_event_y),
+                                                      core::position2d<s32>(event_x, event_y), color);
+
+        }
+    }
+    
+}

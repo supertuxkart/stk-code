@@ -21,8 +21,15 @@
 
 #include "guiengine/modaldialog.hpp"
 
+namespace irr { namespace video { class ITexture; } }
+
 class RaceOverDialog : public GUIEngine::ModalDialog
 {
+    void renderThreeStrikesGraph(const int x, const int y, const int w, const int h);
+
+    int m_buttons_y_from;
+    int m_rankings_y_bottom;
+    
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -33,6 +40,8 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     
     virtual void escapePressed();
+    
+    virtual void onUpdate(float dt);
 };
 
 

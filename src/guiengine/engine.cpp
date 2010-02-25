@@ -283,7 +283,8 @@ void render(float elapsed_time)
     }
     else
     {
-        World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
+        if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
+        else                                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)

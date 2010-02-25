@@ -178,17 +178,6 @@ bool ThreeStrikesBattle::isRaceOver()
  */
 void ThreeStrikesBattle::terminateRace()
 {
-    for (unsigned int n=0; n<m_battle_events.size(); n++)
-    {
-        const float time = m_battle_events[n].m_time;
-        printf("At time %f :\n", time);
-        
-        for (unsigned int k=0; k<m_battle_events[n].m_kart_info.size(); k++)
-        {
-            printf("    kart %s had %i lives\n", m_karts[k]->getIdent().c_str(), m_battle_events[n].m_kart_info[k].m_lives);
-        }
-    }
-    
     updateKartRanks();   
     World::terminateRace();
 }   // terminateRace
