@@ -61,7 +61,7 @@ void MaterialManager::setAllFlatMaterialFlags(scene::IMeshBuffer *mb) const
         //material.Wireframe=true;
     }
     
-    material.Shininess = 0.6f;
+//    material.Shininess = 0.6f;
 }
 
 //-----------------------------------------------------------------------------
