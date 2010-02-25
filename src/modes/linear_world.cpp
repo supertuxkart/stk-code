@@ -480,7 +480,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
 
-    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f),
+    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
                          m_track->getAngle(info.m_track_sector) );
     kart->setRotation(heading);
 
@@ -491,8 +491,8 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     float epsilon = 0.5f * kart->getKartHeight();
 
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, kart->getKartHeight() + epsilon));
-    pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
+    pos.setOrigin(kart->getXYZ()+btVector3(0, kart->getKartHeight() + epsilon, 0));
+    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                     m_track->getAngle(info.m_track_sector)));
 
     body->setCenterOfMassTransform(pos);
@@ -503,9 +503,9 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
                                 kart->getKartHeight();
-        body->translate(btVector3(0, 0, vertical_offset));
+        body->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {
@@ -593,7 +593,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
         return;
 
     // check if the player is going in the wrong direction
-    float angle_diff = kart->getHPR().getHeading() -
+    float angle_diff = kart->getHeading() -
                        m_track->getAngle(m_kart_info[i].m_track_sector);
     if(angle_diff > M_PI) angle_diff -= 2*M_PI;
     else if (angle_diff < -M_PI) angle_diff += 2*M_PI;

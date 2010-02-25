@@ -56,10 +56,10 @@ public:
     void                   setHPR(const btQuaternion& q);
     inline const float     operator[](int n) const  { return *(&m_x+n); }
     inline const float     getHeading() const       { return m_y;       }
-    inline const float     getPitch() const         { return m_z;       }
+    inline const float     getPitch() const         { return m_x;       }
     inline const float     getRoll() const          { return m_z;       }
-    inline const void      setHeading(float f)      { m_x = f;          }
-    inline const void      setPitch(float f)        { m_y = f;          }
+    inline const void      setHeading(float f)      { m_y = f;          }
+    inline const void      setPitch(float f)        { m_x = f;          }
     inline const void      setRoll(float f)         { m_z = f;          }
     /** Converts a Vec3 to an irrlicht 3d floating point vector. */
     const core::vector3df& toIrrVector()   const;

@@ -212,6 +212,10 @@ void Camera::setInitialTransform()
 void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
                               const Vec3 &wanted_target)
 {
+    //FIXME:  m_camera->setPosition(wanted_position.toIrrVector());
+    //m_camera->setTarget(wanted_target.toIrrVector());
+    //return;
+
     // Smoothly interpolate towards the position and target
     core::vector3df current_position = m_camera->getPosition();
     core::vector3df current_target   = m_camera->getTarget();
@@ -252,9 +256,9 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     // towards where the kart is turning (and turning even more while skidding).
     float steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
     float dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
-    float angle_around = m_kart->getHPR().getHeading() + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = m_kart->getHPR().getPitch()   - 30.0f*DEGREE_TO_RAD;      
-    wanted_position->setX( sin(angle_around));
+    float angle_around = m_kart->getHeading() + m_rotation_range * dampened_steer * 0.5f;
+    float angle_up     = m_kart->getHPR().getPitch() - DEGREE_TO_RAD * 30;
+    wanted_position->setX(-sin(angle_around));
     wanted_position->setY(-sin(angle_up)    );
     wanted_position->setZ(-cos(angle_around));
     *wanted_position *= m_distance;
@@ -269,11 +273,6 @@ void Camera::update(float dt)
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
-    Vec3 rotated_forw=m_kart->getTrans().getBasis()*Vec3(0,0,1);
-    float heading=atan2f(-rotated_forw.getX(), rotated_forw.getZ());
-    printf("kart hpr %f (%f) %f %f\n",
-           m_kart->getHPR().getX(),heading, m_kart->getHPR().getY(),
-           m_kart->getHPR().getZ());
     // Each case should set wanted_position and wanted_target according to 
     // what is needed for that mode. Yes, there is a lot of duplicate code 
     // but it is (IMHO) much easier to follow this way.
@@ -287,13 +286,13 @@ void Camera::update(float dt)
         }
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
-            wanted_target.setZ(wanted_target.getZ()+ 0.75f);
+            wanted_target.setY(wanted_target.getY()+ 0.75f);
             float angle_around = m_kart->getHPR().getHeading()
                                - m_rotation_range * m_kart->getSteerPercent() 
                                * m_kart->getSkidding();
             float angle_up     = m_kart->getHPR().getPitch() 
                                + 30.0f*DEGREE_TO_RAD;
-            wanted_position.setX(-sin(angle_around));
+            wanted_position.setX( sin(angle_around));
             wanted_position.setY( sin(angle_up)    );
             wanted_position.setZ( cos(angle_around));
             wanted_position *= m_distance * 2.0f;

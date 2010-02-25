@@ -129,24 +129,9 @@ void Moveable::update(float dt)
 
 
     m_hpr.setHPR(m_transform.getRotation());
-    // roll is not set correctly, I assume due to a different HPR order.
-    // So we compute the proper roll (by taking the angle between the up
-    // vector and the rotated up vector).
-    //Vec3 up(0, 1, 0);
-    //Vec3 roll_vec = m_transform.getBasis()*up;
-    //float roll = atan2(roll_vec.getX(), roll_vec.getY());
-    //m_hpr.setRoll(roll);
-    Vec3 up(0, 1, 0);
-    Vec3 pitch_vec = m_transform.getBasis()*up;
-    float p = atan2f(pitch_vec.getZ(), pitch_vec.getY());
-    float r = atan2f(pitch_vec.getX(), pitch_vec.getY());
-    Vec3 forw(0,0,1);
-    Vec3 forw_vec = m_transform.getBasis()*forw;
-    float h = atan2f(forw_vec.getX(), forw_vec.getZ());
-    printf("orig: %f %f %f now %f %f %f\n", 
-        m_hpr.getX(), m_hpr.getY(), m_hpr.getZ(), h, p, r);
-    //m_hpr = Vec3(h, p, r);
-    //m_hpr.setPitch(p);
+    Vec3 forw(1, 0, 0);
+    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
+    m_heading = -atan2f(forw_vec.getZ(), forw_vec.getX());
 
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;

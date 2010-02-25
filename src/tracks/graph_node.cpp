@@ -76,7 +76,7 @@ void GraphNode::addSuccessor(unsigned int to)
     Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
     m_distance_to_next.push_back(d2.getLength());
     
-    float theta = -atan2(diff.getX(), diff.getZ());
+    float theta = atan2(diff.getX(), diff.getZ());
     m_angle_to_next.push_back(theta);
 
     // The length of this quad is the average of the left and right side

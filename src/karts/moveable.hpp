@@ -40,9 +40,12 @@ class Material;
 class Moveable
 {
 private:
-    btVector3        m_velocityLC;      /**<Velocity in kart coordinates            */
-    btTransform      m_transform;
-    Vec3             m_hpr;
+    btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */
+    btTransform            m_transform;
+    Vec3                   m_hpr;
+    /** The heading in m_hpr is between -90 and 90 degrees only. The 'real'
+    *  heading between -180 to 180 degrees is stored in this variable. */
+    float                  m_heading;
 
 protected:
     UserPointer            m_user_pointer;
@@ -68,7 +71,10 @@ public:
                  &getVelocityLC() const        {return m_velocityLC;               }
     virtual void  setVelocity(const btVector3& v) {m_body->setLinearVelocity(v);   }
     const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
+    /** Return the rotation, but heading is restricted to -90 and 90 degrees. */
     const Vec3&   getHPR()        const        {return m_hpr;                      }
+    /** Returns the heading between -180 and 180 degrees. */
+    float         getHeading()    const        {return m_heading;                  }
     const btQuaternion 
                   getRotation()   const          {return m_transform.getRotation();  }
 
