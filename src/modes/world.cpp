@@ -565,8 +565,6 @@ Kart *World::getLocalPlayerKart(unsigned int n) const
 void World::removeKart(int kart_number, bool notifyOfElimination)
 {
     Kart *kart = m_karts[kart_number];
-
-    std::cout << "==== World::removeKart ====\n";
     
     // Display a message about the eliminated kart in the race gui
     if (notifyOfElimination)
@@ -576,12 +574,10 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
             if(!(*i)->getCamera()) continue;
             if(*i==kart)
             {
-                std::cout << "You have been eliminated (i = " << (*i)->getIdent() << ")\n";
                 m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
             }
             else
             {
-                std::cout << kart->getIdent().c_str() << " has been eliminated (i = " << (*i)->getIdent() << ")\n";
                 m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has\nbeen eliminated."),
                                                                  kart->getName().c_str()),
                                                                  *i, 2.0f, 60);
@@ -589,8 +585,6 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
         }   // for i in kart
     }
     
-    std::cout << "=========================\n";
-
     if(kart->getController()->isPlayerController())
     {
         // Change the camera so that it will be attached to the leader
