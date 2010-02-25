@@ -209,7 +209,7 @@ rubber-band-duration is the duration a rubber band acts.
     engine-power="400 400 300"
     max-speed="32.22 28 25"
     mass="225"
-    suspension-stiffness="48.0"
+    suspension-stiffness="248.0"
     wheel-damping-relaxation="20"
     wheel-damping-compression="4.4"
     friction-slip="10000000"
