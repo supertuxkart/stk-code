@@ -462,6 +462,10 @@ int handleCmdLine(int argc, char **argv)
         else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
         else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
         else if( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
+#ifdef __APPLE__
+        // on OS X, sometimes the Finder will pass a -psn* something parameter to the application
+        else if( strncmp(argv[i], "-psn", 3) == 0) {}
+#endif
         else
         {
             fprintf ( stderr, "Invalid parameter: %s.\n\n", argv[i] );
