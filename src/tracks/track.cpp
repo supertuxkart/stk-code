@@ -248,11 +248,11 @@ void Track::loadTrackInfo()
 //-----------------------------------------------------------------------------
 void Track::loadCurves(const XMLNode &node)
 {
-        for(unsigned int i=0; i<node.getNumNodes(); i++)
-        {
-                const XMLNode *curve = node.getNode(i);
-                m_all_curves.push_back(new BezierCurve(*curve));
-        }   // for i<node.getNumNodes
+    for (unsigned int i=0; i<node.getNumNodes(); i++)
+    {
+        const XMLNode *curve = node.getNode(i);
+        m_all_curves.push_back(new BezierCurve(*curve));
+    }   // for i<node.getNumNodes
 }   // loadCurves
 
 //-----------------------------------------------------------------------------
@@ -357,10 +357,12 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
     core::matrix4 mat;
     mat.setRotationDegrees(hpr);
     mat.setTranslation(pos);
-    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
+    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
+    {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
-        if(mb->getVertexType()!=video::EVT_STANDARD) {
+        if(mb->getVertexType()!=video::EVT_STANDARD)
+        {
             fprintf(stderr, "WARNING: Physics::convertTrack: Ignoring type '%d'!", 
                 mb->getVertexType());
             continue;
@@ -370,7 +372,8 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
 
         const Material* material=0;
         TriangleMesh *tmesh = m_track_mesh;
-        if(t) {
+        if(t)
+        {
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR == 7)
             std::string image = std::string(core::stringc(t->getName()).c_str());
 #else
@@ -388,8 +391,10 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
         u16 *mbIndices = mb->getIndices();
         Vec3 vertices[3];
         irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-        for(unsigned int j=0; j<mb->getIndexCount(); j+=3) {
-            for(unsigned int k=0; k<3; k++) {
+        for(unsigned int j=0; j<mb->getIndexCount(); j+=3)
+        {
+            for(unsigned int k=0; k<3; k++)
+            {
                 int indx=mbIndices[j+k];
                 core::vector3df v = mbVertices[indx].Pos;
                 mat.transformVect(v);
