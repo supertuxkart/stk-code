@@ -397,9 +397,17 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     SColor black(255,0,0,0);
     irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y),
                                               core::position2d<s32>(x, y + h), black);
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y),
+                                              core::position2d<s32>(x - 7, y + 13), black);
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y),
+                                              core::position2d<s32>(x + 7, y + 13), black);
+    
     irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x, y + h),
                                               core::position2d<s32>(x + w, y +  h), black);
-    
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x + w, y +  h),
+                                              core::position2d<s32>(x + w - 13, y + h + 7), black);
+    irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(x + w, y +  h),
+                                             core::position2d<s32>(x + w - 13, y + h - 7), black);
     float lastEventTime = 0.0f;
     int max_life_count = 0;
     

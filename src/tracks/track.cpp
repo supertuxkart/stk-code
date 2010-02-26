@@ -613,14 +613,14 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(unsigned int mode_id)
 {
-    m_is_arena             = false;
+    //m_is_arena             = false;
     m_track_object_manager = new TrackObjectManager();
 
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    loadQuadGraph(mode_id);
+    if (!m_is_arena) loadQuadGraph(mode_id);
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
