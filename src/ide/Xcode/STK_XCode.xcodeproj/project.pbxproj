@@ -2624,7 +2624,10 @@
 				INFOPLIST_FILE = "SuperTuxKart-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DDEBUG=1",
+				);
 				OTHER_CFLAGS_QUOTED_FOR_TARGET_1 = "-DPACKAGE=\"\\\"supertuxkart\\\"\"";
 				OTHER_LDFLAGS = "$(inherited)";
 				PREBINDING = NO;
