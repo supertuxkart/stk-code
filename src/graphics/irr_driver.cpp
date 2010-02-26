@@ -763,7 +763,7 @@ void IrrDriver::update(float dt)
     const bool inRace = world!=NULL;
     // With bullet debug view we have to clear the back buffer, but
     // that's not necessary for non-debug
-    bool back_buffer_clear = inRace && UserConfigParams::m_bullet_debug;
+    bool back_buffer_clear = inRace && world->getPhysics()->isDebug();
     m_device->getVideoDriver()->beginScene(back_buffer_clear,
                                            true, video::SColor(255,100,101,140));
 
@@ -792,9 +792,11 @@ void IrrDriver::update(float dt)
                     m_scene_manager->drawAll();
                     // Note that drawAll must be called before rendering
                     // the bullet debug view, since otherwise the camera
-                    // is not set up properly.
-                    if (UserConfigParams::m_bullet_debug)
-                        World::getWorld()->getPhysics()->draw();
+                    // is not set up properly. This is only used for 
+                    // the bullet debug view.
+#ifdef DEBUG
+                    World::getWorld()->getPhysics()->draw();
+#endif
                 }   // if kart->Camera
             }   // for i<world->getNumKarts()
             // To draw the race gui we set the viewport back to the full

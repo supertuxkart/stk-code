@@ -101,11 +101,11 @@ public:
     void  draw             ();
     btDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}
-    void  debugDraw        (float m[16], btCollisionShape *s, const btVector3 color);
-    /** Activates the debug drawer. */
-    void  activateDebug    () {m_debug_drawer->activate();   }
-    /** Deactivates the debug drawer. */
-    void deactivateDebug   () {m_debug_drawer->deactivate(); }
+    /** Activates the next debug mode (or switches it off again).
+     */
+    void  nextDebugMode    () {m_debug_drawer->nextDebugMode(); }
+    /** Returns true if the debug drawer is enabled. */
+    bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
     bool  projectKartDownwards(const Kart *k);
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,

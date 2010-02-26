@@ -132,11 +132,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F11:
             if(value && control_is_pressed)
             {
-                UserConfigParams::m_bullet_debug = !UserConfigParams::m_bullet_debug;
-                if(UserConfigParams::m_bullet_debug)
-                    world->getPhysics()->activateDebug();
-                else
-                    world->getPhysics()->deactivateDebug();
+                world->getPhysics()->nextDebugMode();
             }
             break;
         case KEY_F5:

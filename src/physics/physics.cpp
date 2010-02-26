@@ -52,14 +52,13 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
                                            -World::getWorld()->getTrack()->getGravity(),
                                            0.0f));
     m_debug_drawer = new IrrDebugDrawer();
-    m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
 }   // init
 
 //-----------------------------------------------------------------------------
 Physics::~Physics()
 {
-    if(UserConfigParams::m_bullet_debug) delete m_debug_drawer;
+    delete m_debug_drawer;
     delete m_dynamics_world;
     delete m_axis_sweep;
     delete m_dispatcher;
@@ -344,6 +343,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
+    if(!m_debug_drawer->debugEnabled()) return;
+
     video::SColor color(77,179,0,0);
     video::SMaterial material;
     material.Thickness = 2;

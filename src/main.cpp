@@ -245,10 +245,6 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_track_debug=1;
         }
-        else if(!strcmp(argv[i], "--bullet-debug"))
-        {
-            UserConfigParams::m_bullet_debug=1;
-        }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             UserConfigParams::m_print_kart_sizes=true;

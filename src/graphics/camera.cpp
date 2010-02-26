@@ -212,7 +212,7 @@ void Camera::setInitialTransform()
 void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
                               const Vec3 &wanted_target)
 {
-    //FIXME:  m_camera->setPosition(wanted_position.toIrrVector());
+    //m_camera->setPosition(wanted_position.toIrrVector());
     //m_camera->setTarget(wanted_target.toIrrVector());
     //return;
 
@@ -250,6 +250,11 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
 void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
                                          Vec3 *wanted_target)
 {
+    Vec3  x1 = m_kart->getTrans().getBasis()*Vec3(0,1,0);
+    float y1 = atan2f(x1.getX(), x1.getZ());
+    Vec3  x2 = m_kart->getTrans().getBasis()*Vec3(0,0,1);
+    float y2 = atan2f(x1.getY(), x1.getX());
+
     *wanted_target = m_kart->getXYZ();
     wanted_target->setY(wanted_target->getY()+ 0.75f);
     // This first line moves the camera around behind the kart, pointing it 
@@ -257,12 +262,19 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     float steering = m_kart->getSteerPercent() * (1.0f + (m_kart->getSkidding() - 1.0f)/2.3f ); // dampen skidding effect
     float dampened_steer =  fabsf(steering) * steering; // quadratically to dampen small variations (but keep sign)
     float angle_around = m_kart->getHeading() + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = m_kart->getHPR().getPitch() - DEGREE_TO_RAD * 30;
+    //float angle_up     = m_kart->getHPR().getPitch() + DEGREE_TO_RAD * 30;
+    float angle_up     = -y2 + 60.0f*DEGREE_TO_RAD;
+
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY(-sin(angle_up)    );
     wanted_position->setZ(-cos(angle_around));
     *wanted_position *= m_distance;
     *wanted_position += *wanted_target;
+    printf("hpr = %f %f %f y %f  pitch1 %f pitch2 %f\n",
+        m_kart->getHPR().getHeading(),m_kart->getHPR().getRoll(),
+        m_kart->getHPR().getPitch(), wanted_position->getY(),
+        y1, y2);
+
 }   // computeNormalCameraPosition
 
 //-----------------------------------------------------------------------------
