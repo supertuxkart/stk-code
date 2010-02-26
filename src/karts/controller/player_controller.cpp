@@ -44,6 +44,7 @@ PlayerController::PlayerController(Kart *kart, StateManager::ActivePlayer *playe
                                    unsigned int player_index)      
                 : Controller(kart)
 {
+    assert(player != NULL);
     m_player       = player;
     m_player->setKart(kart);
     m_penalty_time = 0.0f;

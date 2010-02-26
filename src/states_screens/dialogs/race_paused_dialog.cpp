@@ -25,8 +25,8 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/options_screen_av.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -201,11 +201,19 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& ev
         }
         else if (selection == "newrace")
         {
+            /*
             ModalDialog::dismiss();
             World::getWorld()->unpause();
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
+            return GUIEngine::EVENT_BLOCK;
+             */
+            ModalDialog::dismiss();
+            World::getWorld()->unpause();
+            race_manager->exitRace();
+            Screen* newStack[] = {MainMenuScreen::getInstance(), RaceSetupScreen::getInstance(), NULL};
+            StateManager::get()->resetAndSetStack( newStack );
             return GUIEngine::EVENT_BLOCK;
         }
     }

@@ -45,6 +45,15 @@ public:
     void replaceTopMostScreen(Screen* screen);
     void popMenu();
     void resetAndGoToScreen(Screen* screen);
+    
+    /**
+      * Sets the whole menu stack. Only the topmost screen will be inited/shown, but others remain
+      * under for cases where the user wants to go back.
+      * @param screens an array containing the menus that should go into stack. The first item will be
+      *                the bottom item in the stack, the last item will be the stack top. Array must be
+      *                NULL-terminated.
+      */
+    void resetAndSetStack(Screen* screens[]);
     void enterGameState();
     
     GameState getGameState();

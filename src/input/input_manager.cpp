@@ -90,8 +90,8 @@ void InputManager::handleStaticAction(int key, int value)
 {
 #ifdef DEBUG
     static bool control_is_pressed=false;
-#endif
     World *world=World::getWorld();
+#endif
     switch (key)
     {
 #ifdef DEBUG
@@ -659,6 +659,8 @@ bool InputManager::isInMode(InputDriverMode expMode)
  */
 void InputManager::setMode(InputDriverMode new_mode)
 {
+    if (new_mode == m_mode) return; // no change
+    
     switch (new_mode)
     {
         case MENU:
@@ -678,9 +680,9 @@ void InputManager::setMode(InputDriverMode new_mode)
                     m_mouse_val_x = m_mouse_val_y = 0;
 
                     irr_driver->showPointer();
-                    m_device_manager->setAssignMode(NO_ASSIGN);
-
-                    // Fall through expected.
+                    m_mode = MENU;
+                    break;
+                    
                 case BOOTSTRAP:
                     // Leaving boot strap mode.
 

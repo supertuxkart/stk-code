@@ -185,6 +185,7 @@ void AbstractStateManager::setGameState(GameState state)
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
     std::string name = screen->getName();
@@ -199,4 +200,28 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     switchToScreen(name.c_str());
     getCurrentScreen()->init();
 }
+
+// -----------------------------------------------------------------------------
+
+void AbstractStateManager::resetAndSetStack(Screen* screens[])
+{
+    assert(screens != NULL);
+    assert(screens[0] != NULL);
+    
+    input_manager->setMode(InputManager::MENU);
+    
+    m_menu_stack.clear();
+    
+    for (int n=0; screens[n] != NULL; n++)
+    {
+        m_menu_stack.push_back(screens[n]->getName());
+    }
+    
+    setGameState(MENU);
+    
+    sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+    switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
+    getCurrentScreen()->init();
+}
+
 

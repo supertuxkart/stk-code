@@ -56,7 +56,8 @@ StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
     else
     {
         fprintf(stderr, "getActivePlayer(): id out of bounds\n");
-        return false;
+        assert(false);
+        return NULL;
     }
     
     assert( returnPlayer->m_id == id );

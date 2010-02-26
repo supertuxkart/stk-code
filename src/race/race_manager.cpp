@@ -388,10 +388,6 @@ void RaceManager::exitRace()
 
     delete World::getWorld();
     m_track_number = 0;
-    
-    StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceList()->setAssignMode(NO_ASSIGN);
-    input_manager->setMasterPlayerOnly(false);
 }   // exitRace
 
 //-----------------------------------------------------------------------------

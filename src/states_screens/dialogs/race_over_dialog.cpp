@@ -26,8 +26,8 @@
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
-#include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -319,8 +319,8 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
         ModalDialog::dismiss();
         World::getWorld()->unpause();
         race_manager->exitRace();
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        StateManager::get()->pushScreen(KartSelectionScreen::getInstance());
+        Screen* newStack[] = {MainMenuScreen::getInstance(), RaceSetupScreen::getInstance(), NULL};
+        StateManager::get()->resetAndSetStack( newStack );
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "backtomenu")
