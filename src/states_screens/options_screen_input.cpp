@@ -61,7 +61,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -77,7 +77,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -93,7 +93,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -109,7 +109,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -137,7 +137,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
             //std::cout << "Setting bad badge!!!!\n";
         }
         else
@@ -154,7 +154,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -170,7 +170,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -186,7 +186,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {
@@ -202,7 +202,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         // check if another binding already uses this key
         if (existing_bindings.find(binding_name) != existing_bindings.end())
         {
-            btn->m_badges = BAD_BADGE;
+            btn->setBadge(BAD_BADGE);
         }
         else
         {

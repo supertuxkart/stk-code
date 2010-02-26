@@ -218,6 +218,15 @@ namespace GUIEngine
         /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
         int m_badges;
         
+        void setBadge(int badge_bit)
+        {
+            m_badges |= badge_bit;
+        }
+        void unsetBadge(int badge_bit)
+        {
+            m_badges &= (~badge_bit);
+        }
+        
         /** Set to false if widget is something that should not receieve focus */
         bool m_focusable;
         

@@ -432,7 +432,8 @@ FocusDispatcher* g_dispatcher = NULL;
             player_id_w *= 2;
             player_name_w = 0;
             
-            modelView->m_badges = OK_BADGE;
+            modelView->setBadge(OK_BADGE);
+            
             /*
             irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("green_check.png").c_str() ) ;
             const int check_size = 128; // TODO: reduce size on smaller resolutions?
@@ -1170,7 +1171,7 @@ bool KartSelectionScreen::validateKartChoices()
     // reset all marks, we'll re-add them next if errors are still there
     for (int n=0; n<amount; n++)
     {
-        m_kart_widgets[n].modelView->m_badges = 0;
+        m_kart_widgets[n].modelView->unsetBadge(BAD_BADGE);
     }
     
     for (int n=0; n<amount; n++)
@@ -1189,13 +1190,13 @@ bool KartSelectionScreen::validateKartChoices()
                 {
                     std::cout << "--> Setting red badge on player " << n << std::endl;
                     // player m is ready, so player n should not choose this name
-                    m_kart_widgets[n].modelView->m_badges = BAD_BADGE;
+                    m_kart_widgets[n].modelView->setBadge(BAD_BADGE);
                 }
                 else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
                 {
                     std::cout << "--> Setting red badge on player " << m << std::endl;
                     // player n is ready, so player m should not choose this name
-                    m_kart_widgets[m].modelView->m_badges = BAD_BADGE;
+                    m_kart_widgets[m].modelView->setBadge(BAD_BADGE);
                 }
                 else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
                 {

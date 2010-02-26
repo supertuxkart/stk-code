@@ -145,7 +145,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     {
         okBtn->m_properties[PROP_ID] = "cannot_start";
         okBtn->m_text = _("This Grand Prix is broken!");
-        okBtn->m_badges |= BAD_BADGE;
+        okBtn->setBadge(BAD_BADGE);
     }
     
     okBtn->x = m_area.getWidth()/2 - 200;
