@@ -177,6 +177,8 @@ public:
                     int fonst_size, 
                     const video::SColor &color=video::SColor(255, 255, 0, 255));
 
+    void clearAllMessages() { m_messages.clear(); }
+    
     /** Returns the size of the texture on which to render the minimap to. */
     const core::dimension2du getMiniMapSize() const 
                   { return core::dimension2du(m_map_width, m_map_height); }

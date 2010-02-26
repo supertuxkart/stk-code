@@ -327,13 +327,6 @@ void PlayerController::setPosition(int p)
 void PlayerController::finishedRace(float time)
 {
     
-    RaceGUI* m=World::getWorld()->getRaceGUI();
-    if(m)
-    {
-        m->addMessage(m_kart->getPosition()==1 ? _("You won the race!") 
-                                               : _("You finished the race!") ,
-                      m_kart, 2.0f, 60);
-    }
 }   // finishedRace
 
 //-----------------------------------------------------------------------------

@@ -477,10 +477,22 @@ void Kart::finishedRace(float time)
         
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
+        
+        RaceGUI* m = World::getWorld()->getRaceGUI();
+        if(m)
+        {
+            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+                          this, 2.0f, 60);
+        }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
-        //TODO: what to do on FTL end?
+    {        
+        RaceGUI* m = World::getWorld()->getRaceGUI();
+        if(m)
+        {
+            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+                          this, 2.0f, 60);
+        }
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {

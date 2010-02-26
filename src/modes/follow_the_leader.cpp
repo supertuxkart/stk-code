@@ -81,14 +81,17 @@ void FollowTheLeaderRace::countdownReachedZero()
     }
     
     // almost over, use fast music
-    if(getCurrentNumKarts()==3)  
+    if(getCurrentNumKarts()==3)
+    {
         sound_manager->switchToFastMusic();
-    // End of race is detected from the World::update()    
+    }
+    
+    // End of race is also detected from the World::update(), 
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
 /** The follow the leader race is over if there is only one kart left (plus
- *  the leader), or if all players have gone.
+ *  the leader), or if all (human) players have been eliminated.
  */
 bool FollowTheLeaderRace::isRaceOver()
 {

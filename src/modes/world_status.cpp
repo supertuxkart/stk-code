@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
-    m_mode            = CLOCK_CHRONO;
+    m_clock_mode            = CLOCK_CHRONO;
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_phase           = SETUP_PHASE;
@@ -65,7 +65,7 @@ WorldStatus::~WorldStatus()
  */
 void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 {
-    m_mode = mode;
+    m_clock_mode = mode;
     m_time = initial_time;
 }   // setClockMode
 
@@ -163,12 +163,19 @@ void WorldStatus::update(const float dt)
         default: break;  // default for RACE_PHASE, LIMBO_PHASE
     }
     
-    switch(m_mode)
+    switch(m_clock_mode)
     {
         case CLOCK_CHRONO:
             m_time += dt;
             break;
         case CLOCK_COUNTDOWN:
+            // stop countdown when race is over
+            if (m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE || m_phase == LIMBO_PHASE)
+            {
+                m_time = 0.0f;
+                break;
+            }
+            
             m_time -= dt;
             
             if(m_time <= 0.0)
@@ -177,7 +184,7 @@ void WorldStatus::update(const float dt)
                 countdownReachedZero();
             }
                 
-                break;
+            break;
         default: break;
     }
 }   // update

@@ -64,16 +64,16 @@ protected:
     SFXBase    *m_start_sound;
     
     /**
-        * Elasped/remaining time in seconds
-     */
+      * Elasped/remaining time in seconds
+      */
     float           m_time;
-    ClockType       m_mode;
+    ClockType       m_clock_mode;
     
     Phase           m_phase;
 
     /**
-        * Remember previous phase e.g. on pause
-     */
+      * Remember previous phase e.g. on pause
+      */
     Phase          m_previous_phase;
 public:
              WorldStatus();
@@ -104,7 +104,7 @@ public:
                                                       * for countdowns)
      */
     void    setClockMode(const ClockType mode, const float initial_time=0.0f);
-    int     getClockMode() const { return m_mode; }
+    int     getClockMode() const { return m_clock_mode; }
     /**
         * Call each frame, with the elapsed time as argument.
      */

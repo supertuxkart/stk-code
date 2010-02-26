@@ -148,6 +148,10 @@ void World::init()
 
     if(!history->replayHistory()) history->initRecording();
     network_manager->worldLoaded();
+    
+    // erase messages left over
+    RaceGUI* m = World::getWorld()->getRaceGUI();
+    if (m) m->clearAllMessages();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -288,6 +292,10 @@ void World::terminateRace()
     updateHighscores();
     WorldStatus::pause();
     unlock_manager->raceFinished();
+    
+    RaceGUI* m = World::getWorld()->getRaceGUI();
+    if (m) m->clearAllMessages();
+    
     WorldStatus::terminateRace();
 }   // terminateRace
 
