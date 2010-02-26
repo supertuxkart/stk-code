@@ -224,6 +224,27 @@ void RaceGUI::renderPlayerView(const Kart *kart)
 {
     const core::recti &viewport    = kart->getCamera()->getViewport();
     const core::vector2df &scaling = kart->getCamera()->getScaling();
+    
+    if (kart->hasViewBlockedByPlunger())
+    {
+        int offset_y = viewport.UpperLeftCorner.Y;
+        
+        const int screen_width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+        const int plunger_size = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 - plunger_size/2;
+        
+        video::ITexture *t=m_plunger_face->getTexture();
+        core::rect<s32> dest(plunger_x,              offset_y, 
+                             plunger_x+plunger_size, offset_y+plunger_size);
+        const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
+        
+        //static const video::SColor white = video::SColor(255, 255, 255, 255);
+        
+        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL /* clip */, 
+                                                  NULL /* color */, true /* alpha */);
+    }
+
+    
     drawAllMessages     (kart, viewport, scaling);
     if(!World::getWorld()->isRacePhase()) return;
 
@@ -234,24 +255,6 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     drawSpeed           (kart, viewport, scaling);
     drawLap             (info, kart, viewport, scaling);
 
-    if (kart->hasViewBlockedByPlunger())
-    {
-        int offset_y = viewport.UpperLeftCorner.Y;
-
-        const int screen_width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
-        const int plunger_size = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-        int plunger_x = viewport.UpperLeftCorner.X + screen_width/2 - plunger_size/2;
-
-        video::ITexture *t=m_plunger_face->getTexture();
-        core::rect<s32> dest(plunger_x,              offset_y, 
-                             plunger_x+plunger_size, offset_y+plunger_size);
-        const core::rect<s32> source(core::position2d<s32>(0,0), t->getOriginalSize());
-
-        //static const video::SColor white = video::SColor(255, 255, 255, 255);
-
-        irr_driver->getVideoDriver()->draw2DImage(t, dest, source, NULL /* clip */, 
-                                                  NULL /* color */, true /* alpha */);
-    }
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
