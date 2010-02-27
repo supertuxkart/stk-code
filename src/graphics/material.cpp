@@ -159,6 +159,9 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
     
+    //FIXME: only set on textures viewed at oblique angles, to avoid slowing down the game with this everywhere
+    m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
 
     if ( (m_clamp_tex & UCLAMP) != 0)
