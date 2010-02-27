@@ -241,11 +241,10 @@ void PlayerController::update(float dt)
     if(World::getWorld()->isStartPhase())
     {
         if(m_controls->m_accel || m_controls->m_brake ||
-           m_controls->m_fire || m_controls->m_nitro  || m_controls->m_drift)
+           m_controls->m_fire  || m_controls->m_nitro  || m_controls->m_drift)
         {
-            if(m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
+            if (m_penalty_time == 0.0)//eliminates machine-gun-effect for SOUND_BZZT
             {
-                m_penalty_time=1.0;
                 RaceGUI* m=World::getWorld()->getRaceGUI();
                 if(m)
                 {
@@ -253,6 +252,10 @@ void PlayerController::update(float dt)
                 }
                 m_bzzt_sound->play();
             }   // if penalty_time = 0
+            
+            m_penalty_time      = 1.0;
+            m_controls->m_accel = 0.0f;
+            
         }   // if key pressed
         else
         {
