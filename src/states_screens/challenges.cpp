@@ -73,7 +73,8 @@ namespace GUIEngine
         for (int n=0; n<solvedChallengeAmount; n++)
         {
             // TODO : add bronze/silver/gold difficulties to challenges
-            w->addItem(solvedChallenges[n]->getName(), solvedChallenges[n]->getId(), "/textures/cup_gold.png");
+            w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
+                       solvedChallenges[n]->getId(), "/textures/cup_gold.png");
         }
         for (int n=0; n<lockedChallengeAmount; n++)
         {
