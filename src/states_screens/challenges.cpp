@@ -129,6 +129,7 @@ namespace GUIEngine
                 // Go straight to the race
                 StateManager::get()->enterGameState();                
                 
+                //FIXME: why do we need to invoke the network manager for local games??
                 network_manager->initCharacterDataStructures();
                 network_manager->setupPlayerKartInfo();
                 
