@@ -219,7 +219,35 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     } // end if not GP
     
     // ---- Buttons at the bottom
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
+    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    {
+        LabelWidget* unlocked_label = new LabelWidget();
+        unlocked_label->m_properties[PROP_ID] = "label";
+        unlocked_label->x = 15;
+        unlocked_label->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        unlocked_label->w = m_area.getWidth() - 30;
+        unlocked_label->h = button_h;
+        unlocked_label->m_text = _("You unlocked a new feature!");
+        unlocked_label->setParent(m_irrlicht_window);
+        m_children.push_back(unlocked_label);
+        unlocked_label->add();
+        
+        ButtonWidget* whats_next_btn = new ButtonWidget();
+        whats_next_btn->x = 15;
+        whats_next_btn->y = m_area.getHeight() - (button_h + margin_between_buttons);
+        whats_next_btn->w = m_area.getWidth() - 30;
+        whats_next_btn->h = button_h;
+        whats_next_btn->setParent(m_irrlicht_window);
+        
+        whats_next_btn->m_text = _("See unlocked features");
+        whats_next_btn->m_properties[PROP_ID] = "seeunlocked";
+        
+        m_children.push_back(whats_next_btn);
+        whats_next_btn->add();
+        
+        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+    }
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
         ButtonWidget* new_race_btn = new ButtonWidget();
         new_race_btn->m_properties[PROP_ID] = "newracebtn";
