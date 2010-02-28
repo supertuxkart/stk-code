@@ -116,14 +116,24 @@ ChallengeData::ChallengeData(const std::string& filename)
     root->get("energy", &m_energy ); // This is optional
     if(m_major==RaceManager::MAJOR_MODE_SINGLE)
     {
-        if(!root->get("track",  &m_track_name )) error("track");
-        if(!root->get("laps",   &m_num_laps   ) && 
-           m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (!root->get("track",  &m_track_name ))
+        {
+            error("track");
+        }
+        if (track_manager->getTrack(m_track_name) == NULL)
+        {
+            error("track");
+        }
+        
+        if (!root->get("laps",   &m_num_laps   ) && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
            error("laps");
+        }
     }
     else   // GP
     {
-        if(!root->get("gp",   &m_gp_id )) error("gp");
+        if (!root->get("gp",   &m_gp_id ))                     error("gp");
+        if (grand_prix_manager->getGrandPrix(m_gp_id) == NULL) error("gp");
     }
 
     getUnlocks(root, "unlock-track",      UNLOCK_TRACK);
@@ -149,8 +159,7 @@ void ChallengeData::error(const char *id) const
     
     std::cerr << "ChallengeData : " << msg.str() << std::endl;
     
-    // FIXME: disable this till all tracks are converted
-    // FIXME throw std::runtime_error(msg.str());
+    throw std::runtime_error(msg.str());
 }   // error
 
 // ----------------------------------------------------------------------------
