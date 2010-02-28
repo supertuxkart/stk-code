@@ -141,10 +141,17 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         case KEY_F5:
             if (race_manager->getNumPlayers() ==1 )
-            {   
+            {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BOWLING, 10000);
-            }   
+            }
+            break;
+        case KEY_F6:
+            if (race_manager->getNumPlayers() == 1)
+            {
+                Kart* kart = world->getLocalPlayerKart(0);
+                kart->setPowerup(POWERUP_PARACHUTE, 10000);
+            }
             break;
 #endif
         case KEY_F12:
