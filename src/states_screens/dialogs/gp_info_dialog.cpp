@@ -185,13 +185,7 @@ void startGPGame(const GrandPrixData* gp)
     assert(gp != NULL);
     ModalDialog::dismiss();
     
-    IVideoDriver* driver = GUIEngine::getDriver();
-    
-    //TODO?: draw a loading screen
-    driver->endScene();
-    driver->beginScene(true, false);
-    driver->endScene();
-    
+    //FIXME: simplify and centralize race start sequence!!
     
     StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);

@@ -274,15 +274,9 @@ void TrackInfoDialog::updateHighScores()
   */
 void startGame(const std::string trackIdent, const int num_laps)
 {
+    //FIXME: simplify and centralize race start sequence!!
+
     ModalDialog::dismiss();
-    
-    IVideoDriver* driver = GUIEngine::getDriver();
-    
-    //TODO?: draw a loading screen
-    driver->endScene();
-    driver->beginScene(true, false);
-    driver->endScene();
-    
     
     StateManager::get()->enterGameState();
     //race_manager->setDifficulty(RaceManager::RD_HARD);

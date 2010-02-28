@@ -54,7 +54,10 @@ public:
 #else
                  ChallengeData(const std::string& filename) throw(std::runtime_error);
 #endif
+    
+    /** sets the right parameters in RaceManager to try this challenge */
     void         setRace() const;
+    
     virtual void check() const;
     virtual bool raceFinished();
     virtual bool grandPrixFinished();

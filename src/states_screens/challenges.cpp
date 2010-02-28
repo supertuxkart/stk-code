@@ -18,7 +18,15 @@
 
 #include "states_screens/challenges.hpp"
 
+
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
+#include "guiengine/engine.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
+#include "network/network_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -27,11 +35,6 @@
 #include "irrString.h"
 using irr::core::stringw;
 using irr::core::stringc;
-
-#include "config/user_config.hpp"
-#include "guiengine/engine.hpp"
-#include "io/file_manager.hpp"
-
 
 namespace GUIEngine
 {
@@ -62,28 +65,20 @@ namespace GUIEngine
         const int solvedChallengeAmount = solvedChallenges.size();
         const int lockedChallengeAmount = lockedChallenges.size();
         
-        char buffer[64];
         for (int n=0; n<activeChallengeAmount; n++)
         {
-            sprintf(buffer, "challenge%i", n);
-            std::cout << "// Adding challenge " << buffer << " : <" << activeChallenges[n]->getId().c_str() << ">\n";
             w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
-                       buffer, "/gui/challenge.png");
+                       activeChallenges[n]->getId(), "/gui/challenge.png");
         }
         for (int n=0; n<solvedChallengeAmount; n++)
         {
             // TODO : add bronze/silver/gold difficulties to challenges
-            sprintf(buffer, "solved%i", n);
-            w->addItem(solvedChallenges[n]->getName(), buffer, "/textures/cup_gold.png");
-            std::cout << "// Adding challenge " << buffer << " : <" << solvedChallenges[n]->getId().c_str() << ">\n";
-
+            w->addItem(solvedChallenges[n]->getName(), solvedChallenges[n]->getId(), "/textures/cup_gold.png");
         }
         for (int n=0; n<lockedChallengeAmount; n++)
         {
             w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
                        "/gui/challenge.png", true);
-            std::cout << "// Adding locked challenge <" << lockedChallenges[n]->getId().c_str() << ">\n";
-
         }
         
         
@@ -113,6 +108,33 @@ namespace GUIEngine
             if (selection == "locked")
             {
                 unlock_manager->playLockSound();
+            }
+            else
+            {
+                //FIXME: simplify and centralize race start sequence!!
+
+                // Use latest used device
+                InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+                
+                // Create player and associate player with device (FIXME: ask for player ident)
+                StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+                
+                // Set up race manager appropriately
+                race_manager->setNumLocalPlayers(1);
+                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+                
+                // ASSIGN should make sure that only input from assigned devices is read.
+                input_manager->getDeviceList()->setAssignMode(ASSIGN);
+                
+                // Go straight to the race
+                StateManager::get()->enterGameState();                
+                
+                network_manager->initCharacterDataStructures();
+                network_manager->setupPlayerKartInfo();
+                
+                // Launch challenge
+                unlock_manager->getChallenge(selection)->setRace();
+                race_manager->startNew();
             }
         }
     }

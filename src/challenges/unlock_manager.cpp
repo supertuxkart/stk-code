@@ -210,7 +210,7 @@ std::vector<const Challenge*> UnlockManager::getActiveChallenges()
 }   // getActiveChallenges
 
 //-----------------------------------------------------------------------------
-Challenge* UnlockManager::getChallenge(const std::string& id)
+const Challenge* UnlockManager::getChallenge(const std::string& id)
 {
     if(m_all_challenges.find(id)==m_all_challenges.end()) return NULL;
     return m_all_challenges[id];

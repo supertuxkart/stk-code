@@ -36,7 +36,6 @@ private:
     AllChallengesType             m_all_challenges;
     std::map<std::string, bool>   m_locked_features;
     std::vector<const Challenge*> m_unlocked_features;
-    Challenge *getChallenge      (const std::string& id);
     void       computeActive     ();
     void       load              ();
     
@@ -65,6 +64,8 @@ public:
     /** Returns the list of currently inaccessible (locked) challenges */
     const std::vector<const Challenge*>   getLockedChallenges();
     
+    const Challenge *getChallenge      (const std::string& id);
+
     void       raceFinished      ();
     void       grandPrixFinished ();
     void       lockFeature       (Challenge* challenge);
