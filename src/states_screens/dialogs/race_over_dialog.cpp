@@ -21,14 +21,18 @@
 #include "io/file_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
+#include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -366,6 +370,49 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
         race_manager->next();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "seeunlocked")
+    {
+        std::vector<const Challenge*> unlocked = unlock_manager->getRecentlyUnlockedFeatures();
+        unlock_manager->clearUnlocked();
+        
+        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        for (unsigned int n=0; n<unlocked.size(); n++)
+        {
+            //FIXME: this is only a placeholder
+            const bool unlocked_kart      = true;
+            const bool unlocked_track     = false;
+            const bool unlocked_game_mode = false;
+
+            //FIXME: update the feature unlocked scene to be able to handle when many features are unlocked
+            if (unlocked_kart)
+            {
+                // the passed kart will not be modified, that's why I allow myself to use const_cast
+                scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
+            }
+            else if (unlocked_track)
+            {
+                scene->setUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
+            }
+            else if (unlocked_game_mode)
+            {
+                //TODO!
+                assert(false);
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+        
+        ModalDialog::dismiss();
+        
+        // clear the race (FIXME: is this the right way to go?)
+        World::deleteWorld();
+        
+        StateManager::get()->pushScreen(scene);
+        return GUIEngine::EVENT_BLOCK;
+    }
+    
     return GUIEngine::EVENT_LET;
 }
 
@@ -373,7 +420,12 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
 
 void RaceOverDialog::escapePressed()
 {
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    {
+        std::string what = "seeunlocked";
+        processEvent(what);
+    }
+    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         std::string what = "continuegp";
         processEvent(what);

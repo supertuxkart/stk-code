@@ -137,10 +137,13 @@ protected:
 public:
                     World();
     virtual        ~World();
-    /** Returns a pointer to the world object. This is only used by
-     *  the race_manager. */
+    /** Returns a pointer to the (singleton) world object. */
     static World*   getWorld() { return m_world; }
 
+    /** Delete the )singleton) world object, if it exists, and sets the singleton pointer to NULL.
+      * It's harmless to call this if the world has been deleted already. */
+    static void     deleteWorld() { delete m_world; m_world = NULL; }
+    
     /** Sets the pointer to the world object. This is only used by
      *  the race_manager.*/
     static void     setWorld(World *world) {m_world = world; }

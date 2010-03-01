@@ -87,7 +87,7 @@ void AbstractStateManager::pushMenu(std::string name)
     if (m_game_mode == GAME)
     {
         setGameState(INGAME_MENU);
-        World::getWorld()->pause();
+        if (World::getWorld() != NULL) World::getWorld()->pause();
     }
     else
     {
@@ -161,7 +161,7 @@ void AbstractStateManager::popMenu()
         m_menu_stack.push_back("race");
         if (m_game_mode == INGAME_MENU)
         {
-            World::getWorld()->unpause();
+            if (World::getWorld() != NULL) World::getWorld()->unpause();
         }
         setGameState(GAME);
         cleanForGame();

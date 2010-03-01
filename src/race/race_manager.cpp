@@ -270,7 +270,7 @@ void RaceManager::startNextRace()
  */
 void RaceManager::next()
 {
-    delete World::getWorld();
+    World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
     m_track_number++;
@@ -386,7 +386,7 @@ void RaceManager::exitRace()
         GrandPrixOver::getInstance()->setKarts(winners);
     }
 
-    delete World::getWorld();
+    World::deleteWorld();
     m_track_number = 0;
 }   // exitRace
 
