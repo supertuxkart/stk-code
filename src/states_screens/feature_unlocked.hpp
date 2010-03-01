@@ -38,6 +38,9 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     //irr::scene::ISceneNode* m_chest_top;
     //irr::scene::ISceneNode* m_key;
     irr::scene::ILightSceneNode* m_light;
+    
+    void continueButtonPressed();
+    
 public:
 
     void onUpdate(float dt, irr::video::IVideoDriver*);
@@ -52,6 +55,9 @@ public:
     
     /** Call before showing up the screen to make a picture come out of the chest */
     void setUnlockedPicture(irr::video::ITexture* picture);
+    
+    /** override from base class to handle escape press */
+    virtual bool onEscapePressed();
 };
 
 #endif

@@ -149,6 +149,10 @@ namespace GUIEngine
         virtual void init() = 0;
         virtual void tearDown() = 0;
         
+        /** Called when escape is pressed.
+          * @return true if the screen should be closed, false if you handled the press another way */
+        virtual bool onEscapePressed() { return true; }
+        
         /**
          * will be called everytime sometimes happens.
          * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its

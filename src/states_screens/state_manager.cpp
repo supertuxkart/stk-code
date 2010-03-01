@@ -166,7 +166,7 @@ void StateManager::escapePressed()
     // In menus
     else
     {
-        popMenu();
+        if (getCurrentScreen()->onEscapePressed()) popMenu();
     }
 }
 
