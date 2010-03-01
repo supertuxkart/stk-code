@@ -46,6 +46,10 @@ private:
     bool             m_sphere_map;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
+     
+    /** Whether to use anisotropic filtering for this texture */
+    bool             m_anisotropic;
+    
     /** True if lightmapping is enabled for this material. */
     bool             m_lightmap;
     float            m_friction;

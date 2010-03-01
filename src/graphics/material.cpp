@@ -60,6 +60,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("reset",            &m_resetter          );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown",         &m_slowdown          );
+    node->get("anisotropic",      &m_anisotropic       );
     std::string s("");
     node->get("graphical-effect", &s                   );
     if(s=="water")
@@ -102,6 +103,7 @@ void Material::init(unsigned int index)
     m_lightmap           = false;
     m_alpha_blending     = false;
     m_lighting           = true;
+    m_anisotropic        = false;
     m_sphere_map         = false;
     m_friction           = 1.0f;
     m_ignore             = false;
@@ -159,8 +161,10 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
     
-    //FIXME: only set on textures viewed at oblique angles, to avoid slowing down the game with this everywhere
-    m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    if (m_anisotropic)
+    {
+        m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
 
