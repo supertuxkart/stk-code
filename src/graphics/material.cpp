@@ -21,6 +21,7 @@
 
 #include <stdexcept>
 
+#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -161,9 +162,13 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
     
-    if (m_anisotropic)
+    if (m_anisotropic && UserConfigParams::m_anisotropic)
     {
         m->setFlag(video::EMF_ANISOTROPIC_FILTER, true);
+    }
+    else if (UserConfigParams::m_trilinear)
+    {
+        m->setFlag(video::EMF_TRILINEAR_FILTER, true);
     }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)

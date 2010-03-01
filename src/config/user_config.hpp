@@ -241,6 +241,18 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_server_port
             PARAM_DEFAULT(  IntUserConfigParam(2305, "server_port", "Information about last server used") );
     
+    // ---- Graphic Quality
+    PARAM_PREFIX GroupUserConfigParam        m_graphics_quality
+            PARAM_DEFAULT( GroupUserConfigParam("GFX", "Graphics Quality Settings") );
+    
+    PARAM_PREFIX BoolUserConfigParam         m_anisotropic
+            PARAM_DEFAULT( BoolUserConfigParam(true, "anisotropic", &m_graphics_quality,
+                                               "Whether anisotropic filtering is allowed to be used (true or false)") );
+    PARAM_PREFIX BoolUserConfigParam         m_trilinear
+        PARAM_DEFAULT( BoolUserConfigParam(true, "trilinear", &m_graphics_quality,
+                                       "Whether trilinear filtering is allowed to be used (true or false)") );
+    
+
     // ---- Misc
     PARAM_PREFIX BoolUserConfigParam        m_crashed
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") ); // TODO : is this used with new code? does it still work?
@@ -271,7 +283,7 @@ namespace UserConfigParams
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
     
     PARAM_PREFIX ptr_vector<PlayerProfile>  m_all_players;
-    
+
 }
 #undef PARAM_PREFIX
 #undef PARAM_SUFFIX
