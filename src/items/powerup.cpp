@@ -202,7 +202,7 @@ void Powerup::use()
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(_("Arrr, the %s dropped anchor, Captain!"), kart->getName().c_str());
+                anchor_message += StringUtils::insertValues(_("Arrr, the %s dropped anchor, Captain!"), kart->getName().c_str()).c_str();
                 gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
                 break;
             }
