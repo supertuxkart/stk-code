@@ -110,6 +110,8 @@ void Item::reset()
         setType(m_original_type);
         m_original_type = ITEM_NONE;
     }
+    
+    m_node->setScale(core::vector3df(1,1,1));
 }   // reset
 
 //-----------------------------------------------------------------------------
