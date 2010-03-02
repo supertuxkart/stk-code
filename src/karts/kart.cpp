@@ -133,12 +133,12 @@ Kart::Kart (const std::string& ident, int position,
     }
 
     loadData();
-    float l = m_kart_properties->getSlipstreamLength();
+    float length = m_kart_properties->getSlipstreamLength();
 
-    Vec3 p0(-getKartWidth()*0.5f, -getKartLength()*0.5f, 0);
-    Vec3 p1(-getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
-    Vec3 p2( getKartWidth()*0.5f, -getKartLength()*0.5f-l, 0);
-    Vec3 p3( getKartWidth()*0.5f, -getKartLength()*0.5f, 0);
+    Vec3 p0(-getKartWidth()*0.5f, 0, -getKartLength()*0.5f       );
+    Vec3 p1(-getKartWidth()*0.5f, 0, -getKartLength()*0.5f-length);
+    Vec3 p2( getKartWidth()*0.5f, 0, -getKartLength()*0.5f-length);
+    Vec3 p3( getKartWidth()*0.5f, 0, -getKartLength()*0.5f       );
     m_slipstream_original_quad = new Quad(p0, p1, p2, p3);
     m_slipstream_quad          = new Quad(p0, p1, p2, p3);
 
@@ -237,7 +237,7 @@ void Kart::createPhysics()
     float suspension_rest = m_kart_properties->getSuspensionRest();
 
     btVector3 wheel_direction(0.0f, -1.0f, 0.0f);
-    btVector3 wheel_axle(-1.0f,0.0f,0.0f);
+    btVector3 wheel_axle(-1.0f, 0.0f, 0.0f);
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -255,7 +255,7 @@ void Kart::createPhysics()
     // Obviously these allocs have to be properly managed/freed
     btTransform t;
     t.setIdentity();
-    m_uprightConstraint=new btUprightConstraint(*m_body, t);
+    m_uprightConstraint=new btUprightConstraint(this, t);
     m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     m_uprightConstraint->setBounce(0.0f);
     m_uprightConstraint->setMaxLimitForce(m_kart_properties->getUprightMaxForce());
@@ -640,13 +640,11 @@ void Kart::update(float dt)
     }
 
     // When really on air, free fly, when near ground, try to glide / adjust for landing
-    if(!isNearGround())
-        m_uprightConstraint->setLimit(M_PI);
-    else
+    //if(!isNearGround())
+//FIXME        m_uprightConstraint->setLimit(M_PI);
+    //else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-// FIXXXXXXXXXXXXXXXXXMMMMMMMMMMEEEEEEEEEEEEEEE fixme
-    m_uprightConstraint->setLimit(M_PI);
-// FIXXXXXXXXXXXXXXXXXMMMMMMMMMMEEEEEEEEEEEEEEE fixme
+
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
@@ -1053,9 +1051,9 @@ void Kart::updatePhysics(float dt)
             engine_power *= m_power_reduction;
 
         // Lose some traction when skidding, so it is not abused by player
-	// The AI will be allowed to cheat on medium and hard difficulty in
-	// order to make them more competitive (this might be removed once
-	// the AI is better).
+        // The AI will be allowed to cheat on medium and hard difficulty in
+        // order to make them more competitive (this might be removed once
+        // the AI is better).
         if(m_controls.m_drift && 
             (race_manager->getDifficulty()==RaceManager::RD_EASY || m_controller->isPlayerController()) )
             engine_power *= 0.5f;
@@ -1104,32 +1102,27 @@ void Kart::updatePhysics(float dt)
                     m_vehicle->applyEngineForce(-engine_power*f, 2);
                     m_vehicle->applyEngineForce(-engine_power*f, 3);
                 }
-                else
+                else  // -m_speed >= max speed on this terrain
                 {
                     m_vehicle->applyEngineForce(0.f, 2);
                     m_vehicle->applyEngineForce(0.f, 3);
                 }
 
-            }
+            }   // m_speed <00
         }
-        else
+        else   // !m_brake
         {
             // lift the foot from throttle, brakes with 10% engine_power
             m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 2);
             m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 3);
 
-#if 1
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people, eg
             if(abs(m_speed) < 5.0f) {
                 for(int i=0; i<4; i++) m_vehicle->setBrake(20.0f, i);
             }
-#else
-            if(!RaceManager::getWorld()->isStartPhase())
-                resetBrakes();
-#endif
-        }  
-  }
+        }   // !m_brake
+    }   // not accelerating
 #ifdef ENABLE_JUMP
     if(m_controls.jump && isOnGround())
     {
@@ -1183,9 +1176,9 @@ void Kart::updatePhysics(float dt)
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
     btVector3 forwardW (
-               chassisTrans.getBasis()[0][1],
-               chassisTrans.getBasis()[1][1],
-               chassisTrans.getBasis()[2][1]);
+               chassisTrans.getBasis()[0][2],
+               chassisTrans.getBasis()[1][2],
+               chassisTrans.getBasis()[2][2]);
 
     if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
         m_speed *= -1.f;
@@ -1198,7 +1191,7 @@ void Kart::updatePhysics(float dt)
         m_speed                    = max_speed;
         btVector3 velocity         = m_body->getLinearVelocity();
 
-        velocity.setY( velocity.getY() * velocity_ratio );
+        velocity.setZ( velocity.getZ() * velocity_ratio );
         velocity.setX( velocity.getX() * velocity_ratio );
 
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
@@ -1213,11 +1206,11 @@ void Kart::updatePhysics(float dt)
     // to suspensionTravel / dt with dt = 1/60 (since this is the dt
     // bullet is using).
     const Vec3 &v = m_body->getLinearVelocity();
-    if(v.getZ() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
+    if(v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
     {
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setZ(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
+        v_clamped.setY(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
         m_body->setLinearVelocity(v_clamped);
     }
 
@@ -1319,24 +1312,33 @@ void Kart::setSuspensionLength()
 }   // setSuspensionLength
 
 //-----------------------------------------------------------------------------
+/** Updates the graphics model. Mainly set the graphical position to be the
+ *  same as the physics position, but uses offsets to position and rotation
+ *  for special gfx effects (e.g. skidding will turn the karts more). The
+ *  variables are actually not used here atm, but are defined here and then
+ *  used in Moveable.
+ *  \param off_xyz Offset to be added to the position.
+ *  \param off_hpr Offset to be added to rotation (euler values).
+ */
 void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
 {
-    float wheel_y_axis[4];
+    float wheel_up_axis[4];
     KartModel *kart_model = m_kart_properties->getKartModel();
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        wheel_y_axis[i] = m_default_suspension_length[i]
-                        - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
+        wheel_up_axis[i] = m_default_suspension_length[i]
+                         - m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }
-#define AUTO_SKID_VISUAL 1.7f
+    const float auto_skid_visual=1.7f;
     float auto_skid;
-    if (m_skidding>AUTO_SKID_VISUAL) // Above a limit, start counter rotating the wheels to get drifting look
-        auto_skid = m_controls.m_steer*30.0f*((AUTO_SKID_VISUAL - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
-    else
+    // FIXME
+//    if (m_skidding>auto_skid_visual) // Above a limit, start counter rotating the wheels to get drifting look
+//        auto_skid = m_controls.m_steer*30.0f*((auto_skid_visual - m_skidding) / 0.8f); // divisor comes from max_skid - AUTO_SKID_VISUAL
+//    else
         auto_skid = m_controls.m_steer*30.0f;
     kart_model->update(m_wheel_rotation, auto_skid,
-                       getSteerPercent(), wheel_y_axis);
+                       getSteerPercent(), wheel_up_axis);
 
     Vec3        center_shift  = getGravityCenterShift();
     float y = m_vehicle->getWheelInfo(0).m_chassisConnectionPointCS.getY()
@@ -1370,7 +1372,9 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
-    Moveable::updateGraphics(center_shift, Vec3(offset_heading, 0, 0));
+    printf("heading: %f hpr %f offset %f\n",
+        getHeading(), getHPR().getHeading(), -offset_heading);
+    Moveable::updateGraphics(center_shift, Vec3(0, -offset_heading, 0));
 }   // updateGraphics
 
 /* EOF */

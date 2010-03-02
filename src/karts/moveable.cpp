@@ -70,8 +70,18 @@ void Moveable::setAnimatedNode(scene::IAnimatedMeshSceneNode *n)
 }   // setAnimatedNode
 
 //-----------------------------------------------------------------------------
+/** Updates the graphics model. Mainly set the graphical position to be the
+ *  same as the physics position, but uses offsets to position and rotation
+ *  for special gfx effects (e.g. skidding will turn the karts more). 
+ *  \param off_xyz Offset to be added to the position.
+ *  \param off_hpr Offset to be added to rotation (euler values).
+ */
 void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
 {
+#ifdef DEBUG_PRINT
+    printf("moveable: %f %f (%f %f)\n", getXYZ().getX(), getXYZ().getZ(),
+        off_xyz.getX(), off_xyz.getZ());
+#endif
     Vec3 xyz=getXYZ()+off_xyz;
     Vec3 hpr=getHPR()+off_hpr;
     //sgCoord c=Coord(xyz, hpr).toSgCoord();
@@ -132,7 +142,6 @@ void Moveable::update(float dt)
     Vec3 forw(1, 0, 0);
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
     m_heading = -atan2f(forw_vec.getZ(), forw_vec.getX());
-
     updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
     m_first_time = false ;
 }   // update
