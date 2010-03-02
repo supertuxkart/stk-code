@@ -2,6 +2,7 @@
 #define HEADER_FEATURE_UNLOCKED_HPP
 
 #include "guiengine/screen.hpp"
+#include "utils/ptr_vector.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
@@ -13,12 +14,37 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     
     FeatureUnlockedCutScene();
     
-    /** Whichever of these is non-null decides whhat comes out of the chest */
-    KartProperties* m_unlocked_kart;
-    irr::video::ITexture* m_unlocked_thing_picture;
+    /** Whichever of these is non-null decides what comes out of the chest */
+    struct UnlockedThing
+    {
+        KartProperties* m_unlocked_kart;
+        irr::video::ITexture* m_picture;
+        
+        /** Contains whatever is in the chest */
+        scene::ISceneNode* m_root_gift_node;
+        
+        irr::core::stringw m_unlock_message;
+        
+        UnlockedThing(KartProperties* kart, irr::core::stringw msg)
+        {
+            m_unlocked_kart = kart;
+            m_picture = NULL;
+            m_unlock_message = msg;
+        }
+        UnlockedThing(irr::video::ITexture* pict, irr::core::stringw msg)
+        {
+            m_unlocked_kart = NULL;
+            m_picture = pict;
+            m_unlock_message = msg;
+        }
+        ~UnlockedThing()
+        {
+            if (m_root_gift_node != NULL) irr_driver->removeNode(m_root_gift_node);
+            m_root_gift_node = NULL;
+        }
+    };
+    ptr_vector<UnlockedThing, HOLD> m_unlocked_stuff;
     
-    /** Contains whatever is in the chest */
-    scene::ISceneNode* m_root_gift_node;
     
     /** sky angle, 0-360 */
     float m_sky_angle;
@@ -51,10 +77,10 @@ public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     /** Call before showing up the screen to make a kart come out of the chest */
-    void setUnlockedKart(KartProperties* unlocked_kart);
+    void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture come out of the chest */
-    void setUnlockedPicture(irr::video::ITexture* picture);
+    void addUnlockedPicture(irr::video::ITexture* picture, irr::core::stringw msg);
     
     /** override from base class to handle escape press */
     virtual bool onEscapePressed();

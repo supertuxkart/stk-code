@@ -39,6 +39,8 @@ struct UnlockableFeature
     std::string name; // internal name
     irr::core::stringw user_name; // not all types of feature have one
     REWARD_TYPE type;
+    
+    const irr::core::stringw getUnlockedMessage() const;
 };
 
 // A base class for all challenges
@@ -70,7 +72,6 @@ public:
     void  addUnlockKartReward(const std::string &internal_name,
                               const irr::core::stringw &user_name);
     
-    const irr::core::stringw getUnlockedMessage() const;
     const std::vector<UnlockableFeature>&
           getFeatures() const                    { return m_feature;             }
     void  setChallengeDescription(const irr::core::stringw& d) 

@@ -31,6 +31,44 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
+const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
+{
+    switch (type)
+    {
+        case UNLOCK_TRACK:
+        {    // {} avoids compiler warning
+            Track* track = track_manager->getTrack( name );
+            return StringUtils::insertValues(_("New track '%s' now available"), 
+                                             track->getName().c_str() );
+            break;
+        }
+        case UNLOCK_MODE:
+        {
+            return StringUtils::insertValues(_("New game mode '%s' now available"), 
+                                             user_name.c_str());
+        }
+        case UNLOCK_GP:
+        {
+            const irr::core::stringw& gp_user_name = grand_prix_manager->getGrandPrix(name)->getName();
+            return StringUtils::insertValues(_("New Grand Prix '%s' now available"),
+                                                gp_user_name.c_str());
+        }
+        case UNLOCK_DIFFICULTY:
+        {
+            return StringUtils::insertValues(_("New difficulty\n'%s' now available"), 
+                                             user_name.c_str());
+        }
+        case UNLOCK_KART:
+        {
+            const KartProperties *kp=kart_properties_manager->getKart( name );
+            return StringUtils::insertValues( _("New kart\n'%s' now available"),
+                                              kp->getName().c_str());
+        }
+        default:
+            assert(false);
+            return L"";
+    }   // switch
+}
 
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockTrackReward(const std::string &track_name)
@@ -83,61 +121,6 @@ void Challenge::addUnlockKartReward(const std::string &internal_name,
     feature.type = UNLOCK_KART;
     feature.user_name = user_name;
     m_feature.push_back(feature);
-}
-
-//-----------------------------------------------------------------------------
-const irr::core::stringw Challenge::getUnlockedMessage() const
-{
-    irr::core::stringw unlocked_message;
-
-    const unsigned int amount = (unsigned int)m_feature.size();
-    for(unsigned int n=0; n<amount; n++)
-    {
-        // add line break if we are showing multiple messages
-        if(n>0) unlocked_message+='\n';
-
-        irr::core::stringw message;
-
-        // write message depending on feature type
-        switch(m_feature[n].type)
-        {
-            case UNLOCK_TRACK:
-                {    // {} avoids compiler warning
-                    Track* track = track_manager->getTrack( m_feature[n].name );
-                    message = StringUtils::insertValues(
-                        _("New track '%s'\nnow available"), 
-                        track->getName().c_str() );
-                    break;
-                }
-            case UNLOCK_MODE:
-                message = StringUtils::insertValues( 
-                    _("New game mode\n'%s'\nnow available"), 
-                    m_feature[n].user_name.c_str());
-                break;
-            case UNLOCK_GP:
-            {
-                const irr::core::stringw& gp_user_name = grand_prix_manager->getGrandPrix(m_feature[n].name)->getName();
-                message = StringUtils::insertValues(
-                    _("New Grand Prix '%s'\nnow available"),
-                    gp_user_name.c_str());
-                break;
-            }
-            case UNLOCK_DIFFICULTY:
-                message = StringUtils::insertValues(
-                    _("New difficulty\n'%s'\nnow available"), 
-                    m_feature[n].user_name.c_str());
-                break;
-            case UNLOCK_KART:
-                const KartProperties *kp=kart_properties_manager->getKart(m_feature[n].name );
-                message = StringUtils::insertValues(
-                    _("New kart\n'%s'\nnow available"),
-                    kp->getName().c_str());
-                break;
-        }   // switch
-        unlocked_message += message;
-    }   // for n
-
-    return unlocked_message;
 }
 
 //-----------------------------------------------------------------------------

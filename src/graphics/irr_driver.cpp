@@ -524,23 +524,26 @@ scene::IMesh *IrrDriver::createTexturedQuadMesh(const video::SMaterial *material
 {
     scene::SMeshBuffer *buffer = new scene::SMeshBuffer();
     
+    const float w_2 = (float)w/2.0f;
+    const float h_2 = (float)h/2.0f;
+
     video::S3DVertex v1;
-    v1.Pos    = core::vector3df(0,0,0);
+    v1.Pos    = core::vector3df(-w_2,-h_2,0);
     v1.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0); // I hope normals are ok...
     v1.TCoords = core::vector2d<f32>(0,1);
     
     video::S3DVertex v2;
-    v2.Pos    = core::vector3df((float)w,0,0);
+    v2.Pos    = core::vector3df(w_2,-h_2,0);
     v2.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v2.TCoords = core::vector2d<f32>(1,1);
     
     video::S3DVertex v3;
-    v3.Pos    = core::vector3df((float)w,(float)h,0);
+    v3.Pos    = core::vector3df(w_2,h_2,0);
     v3.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v3.TCoords = core::vector2d<f32>(1,0);
     
     video::S3DVertex v4;
-    v4.Pos    = core::vector3df(0,(float)h,0);
+    v4.Pos    = core::vector3df(-w_2,h_2,0);
     v4.Normal = core::vector3df(1/sqrt(2.0f), 1/sqrt(2.0f), 0);
     v4.TCoords = core::vector2d<f32>(0,0);
     

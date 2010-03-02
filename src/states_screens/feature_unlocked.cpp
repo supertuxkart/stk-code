@@ -23,27 +23,23 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
     setNeeds3D(true);
     
     throttleFPS = false;
-    m_unlocked_kart = NULL;
-    m_unlocked_thing_picture = NULL;
 }
 
 // -------------------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::setUnlockedKart(KartProperties* unlocked_kart)
+void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg)
 {
     assert(unlocked_kart != NULL);
-    m_unlocked_kart = unlocked_kart;
-    m_unlocked_thing_picture = NULL;
+    m_unlocked_stuff.push_back( new UnlockedThing(unlocked_kart, msg) );
 }
 
 // -------------------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::setUnlockedPicture(irr::video::ITexture* picture)
+void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture, irr::core::stringw msg)
 {
     assert(picture != NULL);
 
-    m_unlocked_kart = NULL;
-    m_unlocked_thing_picture = picture;
+    m_unlocked_stuff.push_back( new UnlockedThing(picture, msg) );
 }
 
 // -------------------------------------------------------------------------------------
@@ -85,47 +81,54 @@ void FeatureUnlockedCutScene::init()
     m_light->getLightData().DiffuseColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     m_light->getLightData().SpecularColor = irr::video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
     
-    if (m_unlocked_kart != NULL)
+    const int unlockedStuffCount = m_unlocked_stuff.size();
+    
+    if (unlockedStuffCount == 0)  std::cerr << "There is nothing in the unlock chest!!!\n";
+    
+    for (int n=0; n<unlockedStuffCount; n++)
     {
-        KartModel* kartModel = m_unlocked_kart->getKartModel();
-        
-        scene::ISceneNode* kart_node = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getModel());
-
-        for (int n=0; n<4; n++)
+        if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
-            scene::ISceneNode* wheel = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getWheelModel(n), kart_node);
-            wheel->setPosition( kartModel->getWheelGraphicsPosition(n).toIrrVector() );
-            wheel->updateAbsolutePosition();
+            KartModel* kartModel = m_unlocked_stuff[n].m_unlocked_kart->getKartModel();
+            
+            scene::ISceneNode* kart_node = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getModel());
+
+            for (int w=0; w<4; w++)
+            {
+                scene::ISceneNode* wheel = irr_driver->getSceneManager()->addMeshSceneNode(kartModel->getWheelModel(w), kart_node);
+                wheel->setPosition( kartModel->getWheelGraphicsPosition(w).toIrrVector() );
+                wheel->updateAbsolutePosition();
+            }
+            
+            m_unlocked_stuff[n].m_root_gift_node = kart_node;
         }
-        
-        m_root_gift_node = kart_node;
-    }
-    else if (m_unlocked_thing_picture != NULL)
-    {
-        video::SMaterial m;
-        m.BackfaceCulling = false;
-        m.setTexture(0, m_unlocked_thing_picture);
-        m.AmbientColor = SColor(255,255,255,255);
-        m.DiffuseColor = SColor(255,255,255,255);
-        m.SpecularColor = SColor(0,0,0,0);
-        m.GouraudShading = false;
-        m.Shininess = 0;
-        //m.setFlag(video::EMF_TEXTURE_WRAP, false);
-        
-#if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
-        m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
-        m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-#else
-        m.TextureLayer[0].TextureWrap = video::ETC_CLAMP_TO_EDGE;
-#endif
+        else if (m_unlocked_stuff[n].m_picture != NULL)
+        {
+            video::SMaterial m;
+            m.BackfaceCulling = false;
+            m.setTexture(0, m_unlocked_stuff[n].m_picture);
+            m.AmbientColor = SColor(255,255,255,255);
+            m.DiffuseColor = SColor(255,255,255,255);
+            m.SpecularColor = SColor(0,0,0,0);
+            m.GouraudShading = false;
+            m.Shininess = 0;
+            //m.setFlag(video::EMF_TEXTURE_WRAP, false);
+            
+    #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
+            m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
+            m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+    #else
+            m.TextureLayer[0].TextureWrap = video::ETC_CLAMP_TO_EDGE;
+    #endif
 
-        scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m, 1.0, 0.75);
-        m_root_gift_node   = irr_driver->addMesh(mesh);
+            scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m, 1.0, 0.75);
+            m_unlocked_stuff[n].m_root_gift_node   = irr_driver->addMesh(mesh);
 
-    }
-    else
-    {
-        std::cerr << "There is nothing in the chest!!!\n";
+        }
+        else
+        {
+            std::cerr << "Malformed unlocked goody!!!\n";
+        }
     }
 }
 
@@ -149,11 +152,7 @@ void FeatureUnlockedCutScene::tearDown()
     irr_driver->removeNode(m_light);
     m_light = NULL;
     
-    if (m_root_gift_node != NULL)
-    {
-        irr_driver->removeNode(m_root_gift_node);
-        m_root_gift_node = NULL;
-    }
+    m_unlocked_stuff.clearAndDeleteAll();
 }
 
 // -------------------------------------------------------------------------------------
@@ -197,24 +196,43 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     const int GIFT_EXIT_FROM = (int)ANIM_TO;
     const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 12;
 
-    if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO && m_root_gift_node != NULL)
-    {
-        core::vector3df pos = m_root_gift_node->getPosition();
-        pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.2/GIFT_EXIT_TO)  )*30.0f;
-        pos.X += 2*dt;
-        pos.Z += 5*dt;
+    const int unlockedStuffCount = m_unlocked_stuff.size();
 
-        m_root_gift_node->setPosition(pos);
-        
-        core::vector3df scale = m_root_gift_node->getScale();
-        scale.X += 2*dt;
-        scale.Y += 2*dt;
-        scale.Z += 2*dt;
-        m_root_gift_node->setScale(scale);
-        
+    if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
+    {
+                
+        for (int n=0; n<unlockedStuffCount; n++)
+        {
+            if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
+            
+            core::vector3df pos = m_unlocked_stuff[n].m_root_gift_node->getPosition();
+            pos.Y = sin( (float)((m_global_time - GIFT_EXIT_FROM)*M_PI*1.2/GIFT_EXIT_TO)  )*30.0f;
+            
+            // when there are more than 1 unlocked items, make sure they each have their own path when they move
+            if (unlockedStuffCount > 1)
+            {
+                if (n % 2 == 0) pos.X -= 2.2f*dt*float( int((n + 1)/2) );
+                else            pos.X += 2.2f*dt*float( int((n + 1)/2) );
+                //std::cout << "Object " << n << " moving by " << (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ) << std::endl;
+            }
+            else
+            {
+                pos.X += 2*dt;
+            }
+            
+            pos.Z += 5*dt;
+
+            m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
+            
+            core::vector3df scale = m_unlocked_stuff[n].m_root_gift_node->getScale();
+            scale.X += 2*dt;
+            scale.Y += 2*dt;
+            scale.Z += 2*dt;
+            m_unlocked_stuff[n].m_root_gift_node->setScale(scale);
+        }
         
         core::vector3df campos = m_camera->getPosition();
-        campos.X += 5*dt;
+        campos.X += 2*dt;
         campos.Z += 5*dt;
         
         m_camera->setPosition(campos);
@@ -226,9 +244,11 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                                sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
     }
 
-    if (m_root_gift_node != NULL)
+    assert(m_unlocked_stuff.size() > 0);
+    if (m_unlocked_stuff[0].m_root_gift_node != NULL)
     {
-        m_camera->setTarget( m_root_gift_node->getPosition() + core::vector3df(0.0f, 10.0f, 0.0f) );
+        m_camera->setTarget( m_unlocked_stuff[0].m_root_gift_node->getPosition() +
+                            core::vector3df(0.0f, 10.0f, 0.0f) );
         m_camera->updateAbsolutePosition();
     }
     else
@@ -241,12 +261,28 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
     static const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
     
-    static int test_y = 0;
-    
     GUIEngine::getTitleFont()->draw(_("Feature Unlocked"),
-                                    core::rect< s32 >( 0, test_y, w, h/10 ),
+                                    core::rect< s32 >( 0, 0, w, h/10 ),
                                     color,
                                     true/* center h */, true /* center v */ );
+    
+    if (m_global_time > GIFT_EXIT_TO)
+    {
+        const irr::video::SColor color2(255, 255, 126, 21);
+        const int fontH = GUIEngine::getFontHeight();
+        const int MARGIN = 10;
+        
+        int message_y = h - fontH*3 - MARGIN;
+        
+        for (int n=0; n<unlockedStuffCount; n++)
+        {
+            GUIEngine::getFont()->draw(m_unlocked_stuff[n].m_unlock_message,
+                                       core::rect< s32 >( 0, message_y, w, message_y + fontH ),
+                                       color2,
+                                       true /* center h */, true /* center v */ );
+            message_y -= (fontH + MARGIN);
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------

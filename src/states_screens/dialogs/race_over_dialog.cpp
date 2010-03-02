@@ -376,34 +376,73 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
         unlock_manager->clearUnlocked();
         
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        
+        /*
+        scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),
+                               _("Unlocked gnu kart") );
+        scene->addUnlockedPicture(
+                                  irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()),
+                                  _("Unlocked beach track"));
+        scene->addUnlockedPicture(
+                                  irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
+                                  _("Unlocked lighthouse track"));
+        //scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("canyon")->getScreenshotFile().c_str()) );
+         */
+
+        assert(unlocked.size() > 0);
         for (unsigned int n=0; n<unlocked.size(); n++)
         {
-            //FIXME: this is only a placeholder
-            const bool unlocked_kart      = true;
-            const bool unlocked_track     = false;
-            const bool unlocked_game_mode = false;
+            const std::vector<UnlockableFeature>& unlockedFeatures = unlocked[n]->getFeatures();
+            assert(unlockedFeatures.size() > 0);
+            
+            for (unsigned int i=0; i<unlockedFeatures.size(); i++)
+            {
+         
+                switch (unlockedFeatures[i].type)
+                {
+                    case UNLOCK_TRACK:
+                    {
+                        Track* track = track_manager->getTrack(unlockedFeatures[i].name);
+                        assert(track != NULL);
+                        const std::string sshot = track->getScreenshotFile();
+                        scene->addUnlockedPicture( irr_driver->getTexture(sshot.c_str()),
+                                                   unlockedFeatures[i].getUnlockedMessage() );
+                        break;
+                    }
+                    case UNLOCK_GP:
+                    {
+                        //TODO
+                        break;
+                    }
+                    case UNLOCK_MODE:
+                    {
+                        //TODO
+                        break;
+                    }
+                    case UNLOCK_KART:
+                    {
+                        const KartProperties* kart = kart_properties_manager->getKart(unlockedFeatures[i].name);
+                        assert(kart != NULL);
+                        
+                        // the passed kart will not be modified, that's why I allow myself to use const_cast
+                        scene->addUnlockedKart( const_cast<KartProperties*>(kart),
+                                                unlockedFeatures[i].getUnlockedMessage() );
+                        break;
+                    }
+                    case UNLOCK_DIFFICULTY:
+                    {
+                        //TODO
+                        break;
+                    }
+                    default:
+                    {
+                        assert(false);
+                    }
+                }
+                
+            } // next feature
+        } // next challenge
 
-            //FIXME: update the feature unlocked scene to be able to handle when many features are unlocked
-            if (unlocked_kart)
-            {
-                // the passed kart will not be modified, that's why I allow myself to use const_cast
-                scene->setUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")) );
-            }
-            else if (unlocked_track)
-            {
-                scene->setUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()) );
-            }
-            else if (unlocked_game_mode)
-            {
-                //TODO!
-                assert(false);
-            }
-            else
-            {
-                assert(false);
-            }
-        }
-        
         ModalDialog::dismiss();
         
         // clear the race (FIXME: is this the right way to go?)

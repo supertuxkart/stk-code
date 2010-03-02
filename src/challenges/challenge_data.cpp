@@ -227,7 +227,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
                             if (prop == NULL)
                             {
                                 std::cerr << "Challenge refers to kart " << attrib <<
-                                             ", which is unknown. Ignoring challenge.\n";
+                                             ", which is unknown. Ignoring reward.\n";
                                 break;
                             }
                             irr::core::stringw user_name = prop->getName();
