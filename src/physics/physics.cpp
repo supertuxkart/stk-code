@@ -343,7 +343,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
-    if(!m_debug_drawer->debugEnabled()) return;
+    if(!m_debug_drawer->debugEnabled() ||
+        !World::getWorld()->isRacePhase()) return;
 
     video::SColor color(77,179,0,0);
     video::SMaterial material;
