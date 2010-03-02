@@ -30,6 +30,8 @@
 #include "network/network_manager.hpp"
 #include "network/race_state.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
+
 
 //-----------------------------------------------------------------------------
 Powerup::Powerup(Kart* kart_)
@@ -134,6 +136,7 @@ void Powerup::use()
     
     m_number--;
     World *world = World::getWorld();
+    RaceGUI* gui = World::getWorld()->getRaceGUI();
     switch (m_type)
     {
     case POWERUP_ZIPPER:   m_owner->handleZipper();
@@ -142,14 +145,8 @@ void Powerup::use()
         item_manager->switchItems();
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
-
-        // {} needed because "jump to case label \n  crosses initialization of RaceGUI* gui" errors
-        {
-        RaceGUI* gui = World::getWorld()->getRaceGUI();
         // Apocalypse Now style
         gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
-        }
-
         break;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
@@ -203,6 +200,10 @@ void Powerup::use()
                     m_sound_use->position(m_owner->getXYZ());
                 
                 m_sound_use->play();
+
+                irr::core::stringw anchor_message;
+                anchor_message += StringUtils::insertValues(_("Arrr, the %s dropped anchor, Captain!"), kart->getName().c_str());
+                gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
                 break;
             }
         }
@@ -237,6 +238,9 @@ void Powerup::use()
             else if(player_kart)
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
+
+            // Parachutist shout
+            gui->addMessage(_("Geronimo!!!"), NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
         }
         break;
 
