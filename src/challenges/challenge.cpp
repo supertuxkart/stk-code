@@ -55,13 +55,13 @@ const irr::core::stringw UnlockableFeature::getUnlockedMessage() const
         }
         case UNLOCK_DIFFICULTY:
         {
-            return StringUtils::insertValues(_("New difficulty\n'%s' now available"), 
+            return StringUtils::insertValues(_("New difficulty '%s' now available"), 
                                              user_name.c_str());
         }
         case UNLOCK_KART:
         {
             const KartProperties *kp=kart_properties_manager->getKart( name );
-            return StringUtils::insertValues( _("New kart\n'%s' now available"),
+            return StringUtils::insertValues( _("New kart '%s' now available"),
                                               kp->getName().c_str());
         }
         default:
