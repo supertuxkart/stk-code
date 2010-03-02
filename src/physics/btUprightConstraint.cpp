@@ -23,6 +23,7 @@ subject to the following restrictions:
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "LinearMath/btTransformUtil.h"
 
+#include "karts/kart.hpp"
 //!
 //!
 //!
@@ -89,11 +90,13 @@ void btUprightConstraint::solveAngularLimit(
 //!
 //!
 
-btUprightConstraint::btUprightConstraint(btRigidBody& rbA, const btTransform& frameInA )
-        : btTypedConstraint(D6_CONSTRAINT_TYPE, rbA)
-        , m_frameInA(frameInA)
+btUprightConstraint::btUprightConstraint(const Kart *kart, 
+                                         const btTransform& frameInA)
+                   : btTypedConstraint(D6_CONSTRAINT_TYPE, *(kart->getBody()))
+                   , m_frameInA(frameInA)
 
 {
+      m_kart                          = kart;
       m_ERP                           = 1.0f;
       m_bounce                        = 0.0f;
       m_damping                       = 1.0f;
@@ -115,9 +118,8 @@ void btUprightConstraint::buildJacobian()
 {
       btTransform worldTransform = m_rbA.getCenterOfMassTransform() * m_frameInA;
       btVector3   upAxis         = worldTransform.getBasis().getColumn(1);
-      m_limit[ 0 ].m_angle       =  btAtan2( upAxis.getY(), upAxis.getZ() )-SIMD_PI/2.0f;
-      m_limit[ 1 ].m_angle       = -btAtan2( upAxis.getY(), upAxis.getX() )+SIMD_PI/2.0f;
-
+      m_limit[ 0 ].m_angle       = m_kart->getHPR().getPitch();
+      m_limit[ 1 ].m_angle       = m_kart->getHPR().getRoll();
       for ( int i = 0; i < 2; i++ )
       {
           if ( m_limit[ i ].m_angle < -SIMD_PI )
@@ -148,7 +150,9 @@ void btUprightConstraint::solveConstraint(btScalar    timeStep)
         if(m_disable_time>0.0f) return;
     }
 
-    solveAngularLimit( &m_limit[ 0 ], m_timeStep, btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
-    solveAngularLimit( &m_limit[ 1 ], m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
+    solveAngularLimit( &m_limit[ 0 ], m_timeStep, 
+                       btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
+    solveAngularLimit( &m_limit[ 1 ], 
+                       m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
 }
 

@@ -22,18 +22,15 @@ subject to the following restrictions:
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
 
 class btRigidBody;
-
-//!
-//!
-//!
+class Kart;
 
 class btUprightConstraintLimit
 {
 public:
-  btVector3   m_axis;
-        btScalar    m_angle;
-        btScalar    m_accumulatedImpulse;
-        btScalar    m_currentLimitError;
+    btVector3   m_axis;
+    btScalar    m_angle;
+    btScalar    m_accumulatedImpulse;
+    btScalar    m_currentLimitError;
 };
 
 class btUprightConstraint : public btTypedConstraint
@@ -55,77 +52,78 @@ protected:
 
     //! temporal variables
     //!@{
-        btScalar    m_timeStep;
-        btScalar    m_ERP;
-        btScalar    m_bounce;
-        btScalar    m_damping;
-        btScalar    m_maxLimitForce;
-        btScalar    m_limitSoftness;
-        btScalar        m_hiLimit;
-        btScalar        m_loLimit;
+    btScalar    m_timeStep;
+    btScalar    m_ERP;
+    btScalar    m_bounce;
+    btScalar    m_damping;
+    btScalar    m_maxLimitForce;
+    btScalar    m_limitSoftness;
+    btScalar    m_hiLimit;
+    btScalar    m_loLimit;
     btScalar    m_disable_time;
+    const Kart* m_kart;
 
-        btUprightConstraintLimit        m_limit[ 2 ];
+    btUprightConstraintLimit m_limit[2];
 
     //!@}
 
-    btUprightConstraint&      operator=(btUprightConstraint&      other)
+    btUprightConstraint& operator=(btUprightConstraint& other)
     {
         btAssert(0);
         (void) other;
         return *this;
     }
 
-    void buildAngularJacobian(btJacobianEntry & jacAngular,const btVector3 & jointAxisW);
+    void buildAngularJacobian(btJacobianEntry & jacAngular,
+                              const btVector3 & jointAxisW);
 
-       void solveAngularLimit(
-                                  btUprightConstraintLimit *limit,
-                  btScalar timeStep, btScalar jacDiagABInv,
-                  btRigidBody * body0 );
+    void solveAngularLimit(btUprightConstraintLimit *limit,
+                           btScalar timeStep, btScalar jacDiagABInv,
+                           btRigidBody * body0 );
 
 public:
 
-    btUprightConstraint(btRigidBody& rbA, const btTransform& frameInA );
+    btUprightConstraint(const Kart *kart, const btTransform& frameInA );
 
-        // -PI,+PI                      is the full range
-        // 0,0                          is no rotation around x or z
-        // -PI*0.2,+PI*0.2      is a nice bit of tilt
-        void setLimit( btScalar range )
-        {
-                m_loLimit = -range;
-                m_hiLimit = +range;
-        }
+    // -PI,+PI                      is the full range
+    // 0,0                          is no rotation around x or z
+    // -PI*0.2,+PI*0.2      is a nice bit of tilt
+    void setLimit( btScalar range )
+    {
+        m_loLimit = -range;
+        m_hiLimit = +range;
+    }
 
-        // Error correction scaling
-        // 0 - 1
-        //
-        void setErp( btScalar erp )
-        {
-                m_ERP = erp;
-        }
-        void setBounce( btScalar bounce )
-        {
-                m_bounce = bounce;
-        }
-        void setMaxLimitForce( btScalar force )
-        {
-                m_maxLimitForce = force;
-        }
-        void setLimitSoftness( btScalar softness )
-        {
-                m_limitSoftness = softness;
-        }
-        void setDamping( btScalar damping )
-        {
-                m_damping = damping;
-        }
+    // Error correction scaling
+    // 0 - 1
+    //
+    void setErp( btScalar erp )
+    {
+        m_ERP = erp;
+    }
+    void setBounce( btScalar bounce )
+    {
+        m_bounce = bounce;
+    }
+    void setMaxLimitForce( btScalar force )
+    {
+        m_maxLimitForce = force;
+    }
+    void setLimitSoftness( btScalar softness )
+    {
+        m_limitSoftness = softness;
+    }
+    void setDamping( btScalar damping )
+    {
+        m_damping = damping;
+    }
     void setDisableTime( btScalar t )
     {
         m_disable_time = t;
     }
 
     virtual void  buildJacobian();
-    virtual void  solveConstraint(btScalar      timeStep);
+    virtual void  solveConstraint(btScalar timeStep);
 };
 
  
