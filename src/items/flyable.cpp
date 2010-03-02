@@ -33,6 +33,7 @@
 #include "network/flyable_info.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 // static variables:
 float         Flyable::m_st_speed[POWERUP_MAX];
@@ -54,6 +55,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     m_force_updown      = m_st_force_updown[type];
 
     m_owner             = kart;
+    m_type              = type;
     m_has_hit_something = false;
     m_exploded          = false;
     m_shape             = NULL;
@@ -317,6 +319,35 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
     // the owner of this flyable should not be hit by his own flyable
     if(m_exploded || isOwnerImmunity(kart_hit)) return;
+
+    if (kart_hit != NULL)
+    {
+        RaceGUI* gui = World::getWorld()->getRaceGUI();
+        irr::core::stringw hit_message;
+        switch(m_type) {
+            case POWERUP_CAKE:
+                hit_message += StringUtils::insertValues(_("%s eats too much %s's cake"),
+                                                         kart_hit->getName().c_str(),
+                                                         m_owner->getName().c_str()
+                                                        ).c_str();
+            break;
+            case POWERUP_PLUNGER: // FIXME, this one never appears, maybe wrong place to handle
+                hit_message += StringUtils::insertValues(_("%s gets a fancy mask from %s"),
+                                                         kart_hit->getName().c_str(),
+                                                         m_owner->getName().c_str()
+                                                        ).c_str();
+            break;
+            case POWERUP_BOWLING:
+                hit_message += StringUtils::insertValues(_("%s will not play bowling with %s again"),
+                                                         kart_hit->getName().c_str(),
+                                                         m_owner->getName().c_str()
+                                                        ).c_str();
+            break;
+            default:
+                hit_message = _("UFO hit someone, the bug is right here");
+        }
+        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+    }
 
     m_has_hit_something=true;
     // Notify the projectile manager that this rocket has hit something.

@@ -52,6 +52,7 @@ private:
 
 protected:
     Kart*             m_owner;              // the kart which released this flyable
+    PowerupType       m_type;               // cake, ball, etc
     btCollisionShape *m_shape;
     float             m_max_height;
     float             m_min_height;
