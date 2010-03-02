@@ -142,6 +142,14 @@ void Powerup::use()
         item_manager->switchItems();
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
+
+        // {} needed because "jump to case label \n  crosses initialization of RaceGUI* gui" errors
+        {
+        RaceGUI* gui = World::getWorld()->getRaceGUI();
+        // Apocalypse Now style
+        gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+        }
+
         break;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
