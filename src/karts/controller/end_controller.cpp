@@ -301,7 +301,7 @@ float EndController::steerToAngle(const size_t SECTOR, const float ANGLE)
                                                m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - m_kart->getHPR().getHeading();
+    float steer_angle = angle - m_kart->getHeading();
 
     if(m_kart->hasViewBlockedByPlunger())
         steer_angle += ANGLE/5;
@@ -332,7 +332,7 @@ float EndController::steerToPoint(const Vec3 &point, float dt)
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
-    float angle_2_point   = theta - m_kart->getHPR().getHeading() 
+    float angle_2_point   = theta - m_kart->getHeading() 
                           - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;

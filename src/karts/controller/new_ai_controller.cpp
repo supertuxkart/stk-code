@@ -301,7 +301,7 @@ void NewAIController::handleBraking()
         float kart_ang_diff = 
             m_quad_graph->getAngleToNext(m_track_node,
                                          m_successor_index[m_track_node])
-          - m_kart->getHPR().getHeading();
+          - m_kart->getHeading();
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
@@ -765,7 +765,7 @@ float NewAIController::steerToAngle(const size_t SECTOR, const float ANGLE)
                                                m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - m_kart->getHPR().getHeading();
+    float steer_angle = angle - m_kart->getHeading();
 
     if(m_kart->hasViewBlockedByPlunger())
         steer_angle += ANGLE/5;
@@ -796,7 +796,7 @@ float NewAIController::steerToPoint(const Vec3 &point, float dt)
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
-    float angle_2_point   = theta - m_kart->getHPR().getHeading() 
+    float angle_2_point   = theta - m_kart->getHeading() 
                           - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;
@@ -904,10 +904,10 @@ float NewAIController::findNonCrashingAngle()
 
     float very_right  = -atan2(right.getX()-xyz.getX(),
                               right.getY()-xyz.getY())
-                      - m_kart->getHPR().getHeading();
+                      - m_kart->getHeading();
     float very_left   = -atan2(left.getX()-xyz.getX(),
                               left.getY()-xyz.getY())
-                      - m_kart->getHPR().getHeading();
+                      - m_kart->getHeading();
     very_left         = normalizeAngle(very_left);
     very_right        = normalizeAngle(very_right);
     float dist        = 0;
@@ -920,10 +920,10 @@ float NewAIController::findNonCrashingAngle()
 
         float angle_right = -atan2(right.getX()-xyz.getX(),
                                   right.getY()-xyz.getY())
-                                  - m_kart->getHPR().getHeading();
+                                  - m_kart->getHeading();
         float angle_left  = -atan2(left.getX()-xyz.getX(),
                                   left.getY()-xyz.getY())
-                                  - m_kart->getHPR().getHeading();
+                                  - m_kart->getHeading();
         angle_left  = normalizeAngle(angle_left);
         angle_right = normalizeAngle(angle_right);
 
