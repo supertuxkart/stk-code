@@ -65,6 +65,8 @@ void traverse(scene::ISceneNode* curr, int level=0)
     
 }
 
+// -------------------------------------------------------------------------------------
+
 void GrandPrixOver::init()
 {
     sound_manager->startMusic(sound_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
