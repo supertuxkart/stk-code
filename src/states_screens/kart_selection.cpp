@@ -859,6 +859,13 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         return false;
     }
 
+    if (StateManager::get()->activePlayerCount() >= MAX_PLAYER_COUNT)
+    {
+        std::cerr << "Maximum number of players reached\n";
+        sfx_manager->quickSound( "use_anvil" );
+        return false;
+    }
+    
     // ---- Get available area for karts
     // make a copy of the area, ands move it to be outside the screen
     Widget kartsArea = *this->getWidget("playerskarts"); // copy
