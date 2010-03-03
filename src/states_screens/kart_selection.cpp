@@ -102,518 +102,505 @@ public:
     
 FocusDispatcher* g_dispatcher = NULL;
 
-    // -----------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-    /** A small extension to the spinner widget to add features like player ID management or badging */
-    class PlayerNameSpinner : public SpinnerWidget
-    {
-        int m_playerID;
-        bool m_incorrect;
-        irr::gui::IGUIImage* m_red_mark_widget;
-        KartSelectionScreen* m_parent;
-        
-        //virtual EventPropagation focused(const int m_playerID) ;
-        
-    public:
-        PlayerNameSpinner(KartSelectionScreen* parent, const int playerID)
-        {
-            m_playerID        = playerID;
-            m_incorrect       = false;
-            m_red_mark_widget = NULL;
-            m_parent          = parent;
-        }
-        void setID(const int m_playerID)
-        {
-            PlayerNameSpinner::m_playerID = m_playerID;
-        }
-        
-        /** Add a red mark on the spinner to mean "invalid choice" */
-        void markAsIncorrect()
-        {
-            if (m_incorrect) return; // already flagged as incorrect
-            
-            m_incorrect = true;
-            
-            irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("red_mark.png").c_str() ) ;
-            const int mark_size = h;
-            const int mark_x = w - mark_size*2;
-            const int mark_y = 0;
-            core::rect< s32 > red_mark_area(mark_x, mark_y, mark_x + mark_size, mark_y + mark_size);
-            m_red_mark_widget = GUIEngine::getGUIEnv()->addImage( red_mark_area, /* parent */ m_element );
-            m_red_mark_widget->setImage(texture);
-            m_red_mark_widget->setScaleImage(true);
-            m_red_mark_widget->setTabStop(false);
-            m_red_mark_widget->setUseAlphaChannel(true);
-        }
-        
-        /** Remove any red mark set with 'markAsIncorrect' */
-        void markAsCorrect()
-        {
-            if (m_incorrect)
-            {
-                m_red_mark_widget->remove();
-                m_red_mark_widget = NULL;
-                m_incorrect = false;
-            }
-        }
-    };
-
-    // -----------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------
-
-    /** A widget representing the kart selection for a player (i.e. the player's number, name, the kart view, the kart's name) */
-    class PlayerKartWidget : public Widget
-    {        
-        /** Whether this player confirmed their selection */
-        bool m_ready;
-        
-        /** widget coordinates */
-        int player_id_x, player_id_y, player_id_w, player_id_h;
-        int player_name_x, player_name_y, player_name_w, player_name_h;
-        int model_x, model_y, model_w, model_h;
-        int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-        
-        /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is reserved, widget will not be
-            in the regular tabbing order */
-        int m_irrlicht_widget_ID;
-        
-        /** For animation purposes (see method 'move') */
-        int target_x, target_y, target_w, target_h;
-        float x_speed, y_speed, w_speed, h_speed;
-
-        /** Object representing this player */
-        StateManager::ActivePlayer* m_associatedPlayer;
-        int m_playerID;
-
-        /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
-        std::string spinnerID;
-        
-    public:
-        /** Sub-widgets created by this widget */
-        LabelWidget* playerIDLabel;
-        PlayerNameSpinner* playerName;
-        ModelViewWidget* modelView;
-        LabelWidget* kartName;
-        
-        
-
-        LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
-        std::string deviceName;
-        std::string m_kartInternalName;
-        
-        PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
-                         Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
-        {
-            m_associatedPlayer = associatedPlayer;
-            x_speed = 1.0f;
-            y_speed = 1.0f;
-            w_speed = 1.0f;
-            h_speed = 1.0f;
-            m_ready = false;
-            
-            m_irrlicht_widget_ID = irrlichtWidgetID;
-
-            this->m_playerID = m_playerID;
-            this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
-            
-            setSize(area->x, area->y, area->w, area->h);
-            target_x = x;
-            target_y = y;
-            target_w = w;
-            target_h = h;
-            
-            // ---- Player ID label
-            if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
-            {
-                deviceName += "keyboard";
-            }
-            else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
-            {
-                deviceName += "gamepad";
-            }
-            
-            playerIDLabel = new LabelWidget();
-            
-            playerIDLabel->m_text = 
-                //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-                StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str()); 
-            
-            playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
-            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
-            playerIDLabel->x = player_id_x;
-            playerIDLabel->y = player_id_y;
-            playerIDLabel->w = player_id_w;
-            playerIDLabel->h = player_id_h;
-            
-            //playerID->setParent(this);
-            m_children.push_back(playerIDLabel);
-            
-            // ---- Player identity spinner
-            playerName = new PlayerNameSpinner(parent, m_playerID);
-            playerName->x = player_name_x;
-            playerName->y = player_name_y;
-            playerName->w = player_name_w;
-            playerName->h = player_name_h;
-            //playerName->m_event_handler = this;
-            
-            if (irrlichtWidgetID == -1)
-            {
-                playerName->m_tab_down_root = g_root_id;
-            }
-            
-            spinnerID = StringUtils::insertValues("@p%i_spinner", m_playerID);
-            
-            const int playerAmount = UserConfigParams::m_all_players.size();
-            playerName->m_properties[PROP_MIN_VALUE] = "0";
-            playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
-            playerName->m_properties[PROP_ID] = spinnerID;
-            //playerName->m_event_handler = this;
-            m_children.push_back(playerName);
-            
-            // ----- Kart model view
-            modelView = new ModelViewWidget();
-            
-            modelView->x = model_x;
-            modelView->y = model_y;
-            modelView->w = model_w;
-            modelView->h = model_h;
-            modelView->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", m_playerID);
-            //modelView->setParent(this);
-            m_children.push_back(modelView);
-            
-            // Init kart model
-            std::string& default_kart = UserConfigParams::m_default_kart;
-            const KartProperties* props = kart_properties_manager->getKart(default_kart);
-            KartModel* kartModel = props->getKartModel();
-            
-            this->modelView->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
-            this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
-            this->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
-            this->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
-            this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
-            this->modelView->setRotateContinuously( 35.0f );
-            
-            // ---- Kart name label
-            kartName = new LabelWidget();
-            kartName->m_text = props->getName();
-            kartName->m_properties[PROP_TEXT_ALIGN] = "center";
-            kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
-            kartName->x = kart_name_x;
-            kartName->y = kart_name_y;
-            kartName->w = kart_name_w;
-            kartName->h = kart_name_h;
-            //kartName->setParent(this);
-            m_children.push_back(kartName);
-        }
-        
-        ~PlayerKartWidget()
-        {
-            if (GUIEngine::getFocusForPlayer(m_playerID) == this)
-            {
-                GUIEngine::focusNothingForPlayer(m_playerID);
-            }
-
-            if (playerIDLabel->getIrrlichtElement() != NULL)
-                playerIDLabel->getIrrlichtElement()->remove();
-            
-            if (playerName != NULL && playerName->getIrrlichtElement() != NULL)
-                playerName->getIrrlichtElement()->remove();
-            
-            if (modelView->getIrrlichtElement() != NULL)
-                modelView->getIrrlichtElement()->remove();
-
-            if (kartName->getIrrlichtElement() != NULL)
-                kartName->getIrrlichtElement()->remove();
-            
-            getCurrentScreen()->manualRemoveWidget(this);
-        }
-        
-        /** Called when players are renumbered (changes the player ID) */
-        void setPlayerID(const int newPlayerID)
-        {
-            if (StateManager::get()->getActivePlayer(newPlayerID) != m_associatedPlayer)
-            {
-                printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n",
-                       StateManager::get()->getActivePlayer(newPlayerID), newPlayerID, m_associatedPlayer);
-                std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
-                assert(false);
-            }
-            
-            // Remove current focus, but rembmer it
-            Widget* focus = GUIEngine::getFocusForPlayer(m_playerID);
-            GUIEngine::focusNothingForPlayer(m_playerID);
-
-            // Change the player ID
-            m_playerID = newPlayerID;
-            
-            // restore previous focus, but with new player ID
-            if (focus != NULL) focus->setFocusForPlayer(m_playerID);
-
-            //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
-            irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
-            playerIDLabel->setText( newLabel ); 
-            playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
-            
-            if (playerName != NULL) playerName->setID(m_playerID);
-        }
-        
-        /** Returns the ID of this player */
-        int getPlayerID() const
-        {
-            return m_playerID;
-        }
-        
-        /** Add the widgets to the current screen */
-        virtual void add()
-        {
-            playerIDLabel->add();
-            
-            // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
-            if (m_irrlicht_widget_ID != -1) playerName->m_reserved_id = m_irrlicht_widget_ID;
-            else playerName->m_reserved_id = Widget::getNewNoFocusID();
-            
-            playerName->add();
-            playerName->getIrrlichtElement()->setTabStop(false);
-            
-            modelView->add();
-            kartName->add();
-            
-            modelView->update(0);
-            
-            playerName->clearLabels();
-            const int playerAmount = UserConfigParams::m_all_players.size();
-            for(int n=0; n<playerAmount; n++)
-            {
-                playerName->addLabel( UserConfigParams::m_all_players[n].getName() );
-            }
-            
-        }
-        
-        /** Get the associated ActivePlayer object*/
-        StateManager::ActivePlayer* getAssociatedPlayer()
-        {
-            return m_associatedPlayer;
-        }
-        
-        /** Starts a 'move/resize' animation, by simply passing destination coords. The animation
-            will then occur on each call to 'onUpdate'. */
-        void move(const int x, const int y, const int w, const int h)
-        {
-            target_x = x;
-            target_y = y;
-            target_w = w;
-            target_h = h;
-            
-            x_speed = abs( this->x - x ) / 300.0f;
-            y_speed = abs( this->y - y ) / 300.0f;
-            w_speed = abs( this->w - w ) / 300.0f;
-            h_speed = abs( this->h - h ) / 300.0f;
-        }
-        
-        /** Call when player confirmed his identity and kart */
-        void markAsReady()
-        {
-            if (m_ready) return; // already ready
-            
-            m_ready = true;
-            
-            stringw playerNameString = playerName->getStringValue();
-            playerIDLabel->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
-            
-            m_children.remove(playerName);
-            playerName->getIrrlichtElement()->remove();
-            playerName->elementRemoved();
-            playerName = NULL;
-            
-            SFXManager::quickSound( "wee" );
-            
-            modelView->setRotateTo(30.0f, 150.0f);
-            
-            player_id_w *= 2;
-            player_name_w = 0;
-            
-            modelView->setBadge(OK_BADGE);
-            
-            /*
-            irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("green_check.png").c_str() ) ;
-            const int check_size = 128; // TODO: reduce size on smaller resolutions?
-            const int check_x = model_x + model_w - check_size;
-            const int check_y = model_y + model_h - check_size;
-            core::rect< s32 > green_check_area(check_x, check_y, check_x + check_size, check_y + check_size);
-            irr::gui::IGUIImage* greenCheckWidget = GUIEngine::getGUIEnv()->addImage( green_check_area );
-            greenCheckWidget->setImage(texture);
-            greenCheckWidget->setScaleImage(true);
-            greenCheckWidget->setTabStop(false);
-            greenCheckWidget->setUseAlphaChannel(true);
-             */
-        }
-        
-        /** \return Whether this player confirmed his kart and indent selection */
-        bool isReady()
-        {
-            return m_ready;
-        }
-        
-        /** Updates the animation (moving/shrinking/etc.) */
-        void onUpdate(float delta)
-        {
-            if (target_x == x && target_y == y && target_w == w && target_h == h) return;
-            
-            int move_step = (int)(delta*1000.0f);
-            
-            // move x towards target
-            if (x < target_x)
-            {
-                x += (int)(move_step*x_speed);
-                if (x > target_x) x = target_x; // don't move to the other side of the target
-            }
-            else if (x > target_x)
-            {
-                x -= (int)(move_step*x_speed);
-                if (x < target_x) x = target_x; // don't move to the other side of the target
-            }
-            
-            // move y towards target
-            if (y < target_y)
-            {
-                y += (int)(move_step*y_speed);
-                if (y > target_y) y = target_y; // don't move to the other side of the target
-            }
-            else if (y > target_y)
-            {
-                y -= (int)(move_step*y_speed);
-                if (y < target_y) y = target_y; // don't move to the other side of the target
-            }
-            
-            // move w towards target
-            if (w < target_w)
-            {
-                w += (int)(move_step*w_speed);
-                if (w > target_w) w = target_w; // don't move to the other side of the target
-            }
-            else if (w > target_w)
-            {
-                w -= (int)(move_step*w_speed);
-                if (w < target_w) w = target_w; // don't move to the other side of the target
-            }
-            // move h towards target
-            if (h < target_h)
-            {
-                h += (int)(move_step*h_speed);
-                if (h > target_h) h = target_h; // don't move to the other side of the target
-            }
-            else if (h > target_h)
-            {
-                h -= (int)(move_step*h_speed);
-                if (h < target_h) h = target_h; // don't move to the other side of the target
-            }
-            
-            setSize(x, y, w, h);
-            
-            playerIDLabel->move(player_id_x,
-                                player_id_y,
-                                player_id_w,
-                                player_id_h);
-            
-            if (playerName != NULL)
-            {
-                playerName->move(player_name_x,
-                                 player_name_y,
-                                 player_name_w,
-                                 player_name_h );
-            }
-            modelView->move(model_x,
-                            model_y,
-                            model_w,
-                            model_h);
-            kartName->move(kart_name_x,
-                           kart_name_y,
-                           kart_name_w,
-                           kart_name_h);
-            
-        }
-
-        /** Event callback */
-        virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
-        {
-            if (m_ready) return EVENT_LET; // if it's declared ready, there is really nothing to process
-            
-            //std::cout << "= kart selection :: transmitEvent " << originator << " =\n";
-
-            std::string name = w->m_properties[PROP_ID];
-            
-            //std::cout << "    (checking if that's me: I am " << spinnerID << ")\n";
-            
-            // update player profile when spinner changed
-            if (originator == spinnerID)
-            {
-                std::cout << "Identity changed for player " << m_playerID
-                          << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
-                m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
-            }
-
-            return EVENT_LET; // continue propagating the event
-        }
-
-        /** Sets the size of the widget as a whole, and placed children widgets inside itself */
-        void setSize(const int x, const int y, const int w, const int h)
-        {
-            this->x = x;
-            this->y = y;
-            this->w = w;
-            this->h = h;
-            
-            // -- sizes
-            player_id_w = w;
-            player_id_h = 25; // FIXME : don't hardcode font size
-            
-            player_name_h = 40;
-            player_name_w = std::min(400, w);
-            
-            kart_name_w = w;
-            kart_name_h = 25;
-            
-            // for shrinking effect
-            if (h < 175)
-            {
-                const float factor = h / 175.0f;
-                kart_name_h   = (int)(kart_name_h*factor);
-                player_name_h = (int)(player_name_h*factor);
-                player_id_h   = (int)(player_id_h*factor);
-            }
-            
-            // --- layout
-            player_id_x = x;
-            player_id_y = y;
-            
-            player_name_x = x + w/2 - player_name_w/2;
-            player_name_y = y + player_id_h;
-
-            const int modelMaxHeight =  h - kart_name_h - player_name_h - player_id_h;
-            const int modelMaxWidth =  w;
-            const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-            const int modelY = y + player_name_h + player_id_h;
-            model_x = x + w/2 - (int)(bestSize/2);
-            model_y = modelY + modelMaxHeight/2 - bestSize/2;
-            model_w = (int)(bestSize);
-            model_h = bestSize;
-            
-            kart_name_x = x;
-            kart_name_y = y + h - kart_name_h;
-        }
-        
-        /** Sets which kart was selected for this player */
-        void setKartInternalName(const std::string& whichKart)
-        {
-            m_kartInternalName = whichKart;
-        }
-        const std::string& getKartInternalName() const
-        {
-            return m_kartInternalName;
-        }
-    };
+/** A small extension to the spinner widget to add features like player ID management or badging */
+class PlayerNameSpinner : public SpinnerWidget
+{
+    int m_playerID;
+    bool m_incorrect;
+    irr::gui::IGUIImage* m_red_mark_widget;
+    KartSelectionScreen* m_parent;
     
+    //virtual EventPropagation focused(const int m_playerID) ;
+    
+public:
+    PlayerNameSpinner(KartSelectionScreen* parent, const int playerID)
+    {
+        m_playerID        = playerID;
+        m_incorrect       = false;
+        m_red_mark_widget = NULL;
+        m_parent          = parent;
+    }
+    void setID(const int m_playerID)
+    {
+        PlayerNameSpinner::m_playerID = m_playerID;
+    }
+    
+    /** Add a red mark on the spinner to mean "invalid choice" */
+    void markAsIncorrect()
+    {
+        if (m_incorrect) return; // already flagged as incorrect
+        
+        m_incorrect = true;
+        
+        irr::video::ITexture* texture = irr_driver->getTexture( file_manager->getTextureFile("red_mark.png").c_str() ) ;
+        const int mark_size = h;
+        const int mark_x = w - mark_size*2;
+        const int mark_y = 0;
+        core::rect< s32 > red_mark_area(mark_x, mark_y, mark_x + mark_size, mark_y + mark_size);
+        m_red_mark_widget = GUIEngine::getGUIEnv()->addImage( red_mark_area, /* parent */ m_element );
+        m_red_mark_widget->setImage(texture);
+        m_red_mark_widget->setScaleImage(true);
+        m_red_mark_widget->setTabStop(false);
+        m_red_mark_widget->setUseAlphaChannel(true);
+    }
+    
+    /** Remove any red mark set with 'markAsIncorrect' */
+    void markAsCorrect()
+    {
+        if (m_incorrect)
+        {
+            m_red_mark_widget->remove();
+            m_red_mark_widget = NULL;
+            m_incorrect = false;
+        }
+    }
+};
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/** A widget representing the kart selection for a player (i.e. the player's number, name, the kart view, the kart's name) */
+class PlayerKartWidget : public Widget
+{        
+    /** Whether this player confirmed their selection */
+    bool m_ready;
+    
+    /** widget coordinates */
+    int player_id_x, player_id_y, player_id_w, player_id_h;
+    int player_name_x, player_name_y, player_name_w, player_name_h;
+    int model_x, model_y, model_w, model_h;
+    int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
+    
+    /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is reserved, widget will not be
+        in the regular tabbing order */
+    int m_irrlicht_widget_ID;
+    
+    /** For animation purposes (see method 'move') */
+    int target_x, target_y, target_w, target_h;
+    float x_speed, y_speed, w_speed, h_speed;
+
+    /** Object representing this player */
+    StateManager::ActivePlayer* m_associatedPlayer;
+    int m_playerID;
+
+    /** Internal name of the spinner; useful to interpret spinner events, which contain the name of the activated object */
+    std::string spinnerID;
+    
+public:
+    /** Sub-widgets created by this widget */
+    LabelWidget* playerIDLabel;
+    PlayerNameSpinner* playerName;
+    ModelViewWidget* modelView;
+    LabelWidget* kartName;
+    
+    
+
+    LabelWidget *getPlayerIDLabel() {return playerIDLabel;}
+    std::string deviceName;
+    std::string m_kartInternalName;
+    
+    PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
+                     Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
+    {
+        m_associatedPlayer = associatedPlayer;
+        x_speed = 1.0f;
+        y_speed = 1.0f;
+        w_speed = 1.0f;
+        h_speed = 1.0f;
+        m_ready = false;
+        
+        m_irrlicht_widget_ID = irrlichtWidgetID;
+
+        this->m_playerID = m_playerID;
+        this->m_properties[PROP_ID] = StringUtils::insertValues("@p%i", m_playerID);
+        
+        setSize(area->x, area->y, area->w, area->h);
+        target_x = x;
+        target_y = y;
+        target_w = w;
+        target_h = h;
+        
+        // ---- Player ID label
+        if (associatedPlayer->getDevice()->getType() == DT_KEYBOARD)
+        {
+            deviceName += "keyboard";
+        }
+        else if (associatedPlayer->getDevice()->getType() == DT_GAMEPAD)
+        {
+            deviceName += "gamepad";
+        }
+        
+        playerIDLabel = new LabelWidget();
+        
+        playerIDLabel->m_text = 
+            //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+            StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str()); 
+        
+        playerIDLabel->m_properties[PROP_TEXT_ALIGN] = "center";
+        playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
+        playerIDLabel->x = player_id_x;
+        playerIDLabel->y = player_id_y;
+        playerIDLabel->w = player_id_w;
+        playerIDLabel->h = player_id_h;
+        
+        //playerID->setParent(this);
+        m_children.push_back(playerIDLabel);
+        
+        // ---- Player identity spinner
+        playerName = new PlayerNameSpinner(parent, m_playerID);
+        playerName->x = player_name_x;
+        playerName->y = player_name_y;
+        playerName->w = player_name_w;
+        playerName->h = player_name_h;
+        //playerName->m_event_handler = this;
+        
+        if (irrlichtWidgetID == -1)
+        {
+            playerName->m_tab_down_root = g_root_id;
+        }
+        
+        spinnerID = StringUtils::insertValues("@p%i_spinner", m_playerID);
+        
+        const int playerAmount = UserConfigParams::m_all_players.size();
+        playerName->m_properties[PROP_MIN_VALUE] = "0";
+        playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
+        playerName->m_properties[PROP_ID] = spinnerID;
+        //playerName->m_event_handler = this;
+        m_children.push_back(playerName);
+        
+        // ----- Kart model view
+        modelView = new ModelViewWidget();
+        
+        modelView->x = model_x;
+        modelView->y = model_y;
+        modelView->w = model_w;
+        modelView->h = model_h;
+        modelView->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_model", m_playerID);
+        //modelView->setParent(this);
+        m_children.push_back(modelView);
+        
+        // Init kart model
+        std::string& default_kart = UserConfigParams::m_default_kart;
+        const KartProperties* props = kart_properties_manager->getKart(default_kart);
+        KartModel* kartModel = props->getKartModel();
+        
+        this->modelView->addModel( kartModel->getModel(), Vec3(0,0,0), kartModel->getBaseFrame() );
+        this->modelView->addModel( kartModel->getWheelModel(0), kartModel->getWheelGraphicsPosition(0) );
+        this->modelView->addModel( kartModel->getWheelModel(1), kartModel->getWheelGraphicsPosition(1) );
+        this->modelView->addModel( kartModel->getWheelModel(2), kartModel->getWheelGraphicsPosition(2) );
+        this->modelView->addModel( kartModel->getWheelModel(3), kartModel->getWheelGraphicsPosition(3) );
+        this->modelView->setRotateContinuously( 35.0f );
+        
+        // ---- Kart name label
+        kartName = new LabelWidget();
+        kartName->m_text = props->getName();
+        kartName->m_properties[PROP_TEXT_ALIGN] = "center";
+        kartName->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_kartname", m_playerID);
+        kartName->x = kart_name_x;
+        kartName->y = kart_name_y;
+        kartName->w = kart_name_w;
+        kartName->h = kart_name_h;
+        //kartName->setParent(this);
+        m_children.push_back(kartName);
+    }
+    
+    ~PlayerKartWidget()
+    {
+        if (GUIEngine::getFocusForPlayer(m_playerID) == this)
+        {
+            GUIEngine::focusNothingForPlayer(m_playerID);
+        }
+
+        if (playerIDLabel->getIrrlichtElement() != NULL)
+            playerIDLabel->getIrrlichtElement()->remove();
+        
+        if (playerName != NULL && playerName->getIrrlichtElement() != NULL)
+            playerName->getIrrlichtElement()->remove();
+        
+        if (modelView->getIrrlichtElement() != NULL)
+            modelView->getIrrlichtElement()->remove();
+
+        if (kartName->getIrrlichtElement() != NULL)
+            kartName->getIrrlichtElement()->remove();
+        
+        getCurrentScreen()->manualRemoveWidget(this);
+    }
+    
+    /** Called when players are renumbered (changes the player ID) */
+    void setPlayerID(const int newPlayerID)
+    {
+        if (StateManager::get()->getActivePlayer(newPlayerID) != m_associatedPlayer)
+        {
+            printf("Player: %p\nIndex: %d\nm_associatedPlayer: %p\n",
+                   StateManager::get()->getActivePlayer(newPlayerID), newPlayerID, m_associatedPlayer);
+            std::cerr << "Internal inconsistency, PlayerKartWidget has IDs and pointers that do not correspond to one player\n";
+            assert(false);
+        }
+        
+        // Remove current focus, but rembmer it
+        Widget* focus = GUIEngine::getFocusForPlayer(m_playerID);
+        GUIEngine::focusNothingForPlayer(m_playerID);
+
+        // Change the player ID
+        m_playerID = newPlayerID;
+        
+        // restore previous focus, but with new player ID
+        if (focus != NULL) focus->setFocusForPlayer(m_playerID);
+
+        //I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
+        irr::core::stringw  newLabel = StringUtils::insertValues(_("Player %i (%s)"), m_playerID + 1, deviceName.c_str());
+        playerIDLabel->setText( newLabel ); 
+        playerIDLabel->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_label", m_playerID);
+        
+        if (playerName != NULL) playerName->setID(m_playerID);
+    }
+    
+    /** Returns the ID of this player */
+    int getPlayerID() const
+    {
+        return m_playerID;
+    }
+    
+    /** Add the widgets to the current screen */
+    virtual void add()
+    {
+        playerIDLabel->add();
+        
+        // the first player will have an ID of its own to allow for keyboard navigation despite this widget being added last
+        if (m_irrlicht_widget_ID != -1) playerName->m_reserved_id = m_irrlicht_widget_ID;
+        else playerName->m_reserved_id = Widget::getNewNoFocusID();
+        
+        playerName->add();
+        playerName->getIrrlichtElement()->setTabStop(false);
+        
+        modelView->add();
+        kartName->add();
+        
+        modelView->update(0);
+        
+        playerName->clearLabels();
+        const int playerAmount = UserConfigParams::m_all_players.size();
+        for(int n=0; n<playerAmount; n++)
+        {
+            playerName->addLabel( UserConfigParams::m_all_players[n].getName() );
+        }
+        
+    }
+    
+    /** Get the associated ActivePlayer object*/
+    StateManager::ActivePlayer* getAssociatedPlayer()
+    {
+        return m_associatedPlayer;
+    }
+    
+    /** Starts a 'move/resize' animation, by simply passing destination coords. The animation
+        will then occur on each call to 'onUpdate'. */
+    void move(const int x, const int y, const int w, const int h)
+    {
+        target_x = x;
+        target_y = y;
+        target_w = w;
+        target_h = h;
+        
+        x_speed = abs( this->x - x ) / 300.0f;
+        y_speed = abs( this->y - y ) / 300.0f;
+        w_speed = abs( this->w - w ) / 300.0f;
+        h_speed = abs( this->h - h ) / 300.0f;
+    }
+    
+    /** Call when player confirmed his identity and kart */
+    void markAsReady()
+    {
+        if (m_ready) return; // already ready
+        
+        m_ready = true;
+        
+        stringw playerNameString = playerName->getStringValue();
+        playerIDLabel->setText( StringUtils::insertValues( _("%s is ready"), playerNameString ) );
+        
+        m_children.remove(playerName);
+        playerName->getIrrlichtElement()->remove();
+        playerName->elementRemoved();
+        playerName = NULL;
+        
+        SFXManager::quickSound( "wee" );
+        
+        modelView->setRotateTo(30.0f, 150.0f);
+        
+        player_id_w *= 2;
+        player_name_w = 0;
+        
+        modelView->setBadge(OK_BADGE);
+    }
+    
+    /** \return Whether this player confirmed his kart and indent selection */
+    bool isReady()
+    {
+        return m_ready;
+    }
+    
+    /** Updates the animation (moving/shrinking/etc.) */
+    void onUpdate(float delta)
+    {
+        if (target_x == x && target_y == y && target_w == w && target_h == h) return;
+        
+        int move_step = (int)(delta*1000.0f);
+        
+        // move x towards target
+        if (x < target_x)
+        {
+            x += (int)(move_step*x_speed);
+            if (x > target_x) x = target_x; // don't move to the other side of the target
+        }
+        else if (x > target_x)
+        {
+            x -= (int)(move_step*x_speed);
+            if (x < target_x) x = target_x; // don't move to the other side of the target
+        }
+        
+        // move y towards target
+        if (y < target_y)
+        {
+            y += (int)(move_step*y_speed);
+            if (y > target_y) y = target_y; // don't move to the other side of the target
+        }
+        else if (y > target_y)
+        {
+            y -= (int)(move_step*y_speed);
+            if (y < target_y) y = target_y; // don't move to the other side of the target
+        }
+        
+        // move w towards target
+        if (w < target_w)
+        {
+            w += (int)(move_step*w_speed);
+            if (w > target_w) w = target_w; // don't move to the other side of the target
+        }
+        else if (w > target_w)
+        {
+            w -= (int)(move_step*w_speed);
+            if (w < target_w) w = target_w; // don't move to the other side of the target
+        }
+        // move h towards target
+        if (h < target_h)
+        {
+            h += (int)(move_step*h_speed);
+            if (h > target_h) h = target_h; // don't move to the other side of the target
+        }
+        else if (h > target_h)
+        {
+            h -= (int)(move_step*h_speed);
+            if (h < target_h) h = target_h; // don't move to the other side of the target
+        }
+        
+        setSize(x, y, w, h);
+        
+        playerIDLabel->move(player_id_x,
+                            player_id_y,
+                            player_id_w,
+                            player_id_h);
+        
+        if (playerName != NULL)
+        {
+            playerName->move(player_name_x,
+                             player_name_y,
+                             player_name_w,
+                             player_name_h );
+        }
+        modelView->move(model_x,
+                        model_y,
+                        model_w,
+                        model_h);
+        kartName->move(kart_name_x,
+                       kart_name_y,
+                       kart_name_w,
+                       kart_name_h);
+        
+    }
+
+    /** Event callback */
+    virtual GUIEngine::EventPropagation transmitEvent(Widget* w, const std::string& originator, const int m_playerID)
+    {
+        if (m_ready) return EVENT_LET; // if it's declared ready, there is really nothing to process
+        
+        //std::cout << "= kart selection :: transmitEvent " << originator << " =\n";
+
+        std::string name = w->m_properties[PROP_ID];
+        
+        //std::cout << "    (checking if that's me: I am " << spinnerID << ")\n";
+        
+        // update player profile when spinner changed
+        if (originator == spinnerID)
+        {
+            std::cout << "Identity changed for player " << m_playerID
+                      << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
+            m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
+        }
+
+        return EVENT_LET; // continue propagating the event
+    }
+
+    /** Sets the size of the widget as a whole, and placed children widgets inside itself */
+    void setSize(const int x, const int y, const int w, const int h)
+    {
+        this->x = x;
+        this->y = y;
+        this->w = w;
+        this->h = h;
+        
+        // -- sizes
+        player_id_w = w;
+        player_id_h = 25; // FIXME : don't hardcode font size
+        
+        player_name_h = 40;
+        player_name_w = std::min(400, w);
+        
+        kart_name_w = w;
+        kart_name_h = 25;
+        
+        // for shrinking effect
+        if (h < 175)
+        {
+            const float factor = h / 175.0f;
+            kart_name_h   = (int)(kart_name_h*factor);
+            player_name_h = (int)(player_name_h*factor);
+            player_id_h   = (int)(player_id_h*factor);
+        }
+        
+        // --- layout
+        player_id_x = x;
+        player_id_y = y;
+        
+        player_name_x = x + w/2 - player_name_w/2;
+        player_name_y = y + player_id_h;
+
+        const int modelMaxHeight =  h - kart_name_h - player_name_h - player_id_h;
+        const int modelMaxWidth =  w;
+        const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
+        const int modelY = y + player_name_h + player_id_h;
+        model_x = x + w/2 - (int)(bestSize/2);
+        model_y = modelY + modelMaxHeight/2 - bestSize/2;
+        model_w = (int)(bestSize);
+        model_h = bestSize;
+        
+        kart_name_x = x;
+        kart_name_y = y + h - kart_name_h;
+    }
+    
+    /** Sets which kart was selected for this player */
+    void setKartInternalName(const std::string& whichKart)
+    {
+        m_kartInternalName = whichKart;
+    }
+    const std::string& getKartInternalName() const
+    {
+        return m_kartInternalName;
+    }
+};
+
 #if 0
 #pragma mark -
 #pragma mark KartHoverListener
