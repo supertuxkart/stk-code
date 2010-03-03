@@ -47,8 +47,8 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
     
     const std::vector<std::string>& groups = track_manager->getAllGroups();
     
-    const int amount = groups.size();
-    for (int n=0; n<amount; n++)
+    const int group_amount = groups.size();
+    for (int n=0; n<group_amount; n++)
     {
         ButtonWidget* item = new ButtonWidget();
         item->m_text = groups[n].c_str(); // FIXME: i18n ?
@@ -56,11 +56,14 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
         tabs->m_children.push_back(item);
     }
     
-    ButtonWidget* item = new ButtonWidget();
-    //I18N: name of the tab that will show tracks from all groups
-    item->m_text = _("All");
-    item->m_properties[PROP_ID] = ALL_TRACK_GROUPS_ID;
-    tabs->m_children.push_back(item);
+    if (group_amount > 1)
+    {
+        ButtonWidget* item = new ButtonWidget();
+        //I18N: name of the tab that will show tracks from all groups
+        item->m_text = _("All");
+        item->m_properties[PROP_ID] = ALL_TRACK_GROUPS_ID;
+        tabs->m_children.push_back(item);
+    }
 }
 
 // -----------------------------------------------------------------------------------------------
