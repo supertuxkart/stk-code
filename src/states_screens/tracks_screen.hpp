@@ -29,6 +29,9 @@ class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     
     TracksScreen();
     
+    /** adds the tracks from the current track group into the tracks ribbon */
+    void buildTrackList();
+    
 public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     void init();

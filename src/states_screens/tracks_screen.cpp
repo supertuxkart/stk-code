@@ -137,6 +137,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             assert(false);
         }
     }
+    else if (name == "trackgroups")
+    {
+        buildTrackList();
+    }
     
 }
 
@@ -200,37 +204,8 @@ void TracksScreen::init()
     }
     gps_widget->updateItemDisplay();
     
-    // Reset track list everytime (accounts for locking changes, etc.)
-    tracks_widget->clearItems();
-    
-    // Build track list
-    
-    //FIXME: don't hardcode player 0?
-    const std::vector<int>& curr_group = track_manager->getTracksInGroup( tabs->getSelectionIDString(0) );
-    const int trackAmount = curr_group.size();
-    
-    for (int n=0; n<trackAmount; n++)
-    {
-        Track* curr = track_manager->getTrack( curr_group[n] );
-        if (curr->isArena()) continue;
-        
-        if (unlock_manager->isLocked(curr->getIdent()))
-        {
-            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                   "locked", curr->getScreenshotFile(), true,
-                                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        }
-        else
-        {
-            tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
-                                    0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-        }
-    }
-    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
-                           0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-
-    tracks_widget->updateItemDisplay();   
-    
+    buildTrackList();
+       
     // FIXME: don't hardcode player 0?
     tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, 0, true);
 }
@@ -239,6 +214,76 @@ void TracksScreen::init()
 
 void TracksScreen::tearDown()
 {
+}
+
+// -----------------------------------------------------------------------------------------------
+
+void TracksScreen::buildTrackList()
+{
+    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( tracks_widget != NULL );
+    
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+    assert( tabs != NULL );
+    
+    // Reset track list everytime (accounts for locking changes, etc.)
+    tracks_widget->clearItems();
+    
+    const std::string curr_group_name = tabs->getSelectionIDString(0);
+    
+    // Build track list
+    if (curr_group_name == ALL_TRACK_GROUPS_ID)
+    {
+        const int trackAmount = track_manager->getNumberOfTracks();
+        
+        for (int n=0; n<trackAmount; n++)
+        {
+            Track* curr = track_manager->getTrack( n );
+            if (curr->isArena()) continue;
+            
+            if (unlock_manager->isLocked(curr->getIdent()))
+            {
+                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
+                                       "locked", curr->getScreenshotFile(), true,
+                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            }
+            else
+            {
+                tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
+                                       0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            }
+        }
+        
+    }
+    else
+    {
+        //FIXME: don't hardcode player 0?
+        const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
+        const int trackAmount = curr_group.size();
+        
+        for (int n=0; n<trackAmount; n++)
+        {
+            Track* curr = track_manager->getTrack( curr_group[n] );
+            if (curr->isArena()) continue;
+            
+            if (unlock_manager->isLocked(curr->getIdent()))
+            {
+                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
+                                       "locked", curr->getScreenshotFile(), true,
+                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            }
+            else
+            {
+                tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
+                                       0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            }
+        }
+    }
+    
+    tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
+                           0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+    
+    tracks_widget->updateItemDisplay();       
 }
 
 // -----------------------------------------------------------------------------------------------
