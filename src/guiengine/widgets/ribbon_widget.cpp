@@ -252,6 +252,8 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
+    if (m_deactivated) return EVENT_LET;
+    
     m_selection[playerID]++;
     if (m_selection[playerID] >= m_children.size())
     {
@@ -285,6 +287,8 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
+    if (m_deactivated) return EVENT_LET;
+    
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
     {
@@ -340,6 +344,8 @@ EventPropagation RibbonWidget::focused(const int playerID)
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::mouseHovered(Widget* child, const int mousePlayerID)
 {
+    if (m_deactivated) return EVENT_LET;
+    
     //std::cout << "RibbonWidget::mouseHovered " << mousePlayerID << std::endl;
     const int subbuttons_amount = m_children.size();
     
@@ -417,18 +423,21 @@ void RibbonWidget::updateSelection()
 // -----------------------------------------------------------------------------
 EventPropagation RibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
-    const int subbuttons_amount = m_children.size();
-    
-    for (int i=0; i<subbuttons_amount; i++)
+    if (!m_deactivated)
     {
-        if (m_children[i].m_properties[PROP_ID] == originator)
+        const int subbuttons_amount = m_children.size();
+        
+        for (int i=0; i<subbuttons_amount; i++)
         {
-            m_selection[playerID] = i;
-            break;
+            if (m_children[i].m_properties[PROP_ID] == originator)
+            {
+                m_selection[playerID] = i;
+                break;
+            }
         }
+        
+        updateSelection();
     }
-    
-    updateSelection();
     
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );

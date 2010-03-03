@@ -35,11 +35,18 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
     
-    // ref only since we're adding them to a Screen, and the Screen will take ownership of these widgets
+    /** Contains the custom widget shown for every player. (ref only since we're adding them to a
+      * Screen, and the Screen will take ownership of these widgets)
+      */
     ptr_vector<PlayerKartWidget, REF> m_kart_widgets;
     
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     KartSelectionScreen();
+    
+    /** Stores whether any player confirmed their choice; then, some things are "frozen", for instance
+      * the selected kart group tab
+      */
+    bool m_player_confirmed;
     
     /** Called when all players selected their kart */
     void allPlayersDone();
@@ -48,11 +55,13 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     void renumberKarts();
 
     /** Checks identities chosen by players, making sure no duplicates are used.
-        \return Whether all choices are ok */
+      * \return Whether all choices are ok
+      */
     bool validateIdentChoices();
     
     /** Checks karts chosen by players, making sure no duplicates are used.
-     \return Whether all choices are ok */
+      * \return Whether all choices are ok
+      */
     bool validateKartChoices();
     
 public:

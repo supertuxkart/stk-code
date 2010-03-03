@@ -417,6 +417,8 @@ void DynamicRibbonWidget::registerHoverListener(DynamicRibbonHoverListener* list
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
 {    
+    if (m_deactivated) return EVENT_LET;
+    
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
@@ -443,6 +445,8 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
 {    
+    if (m_deactivated) return EVENT_LET;
+    
     RibbonWidget* w = getSelectedRibbon(playerID);
     if (w != NULL)
     {
@@ -465,6 +469,8 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
+    if (m_deactivated) return EVENT_LET;
+
     if (originator=="left")
     {
         scroll(-1);
@@ -492,6 +498,7 @@ EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& orig
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int playerID)
 {
+    if (m_deactivated) return EVENT_LET;
     //std::cout << "DynamicRibbonWidget::mouseHovered " << playerID << std::endl;
 
     updateLabel();
@@ -536,6 +543,8 @@ void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 
 void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int playerID)
 {
+    if (m_deactivated) return;
+    
     if (emitter->m_selection[playerID] >= emitter->m_children.size())
     {
         emitter->m_selection[playerID] = emitter->m_children.size()-1;

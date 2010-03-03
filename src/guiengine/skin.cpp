@@ -672,13 +672,11 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         if (mark_selected)
         {
             // selected tab should be slighlty bigger than others
-            if(vertical_flip)
-                rect2.UpperLeftCorner.Y -= 10;
-            else
-                rect2.LowerRightCorner.Y += 10;
+            if (vertical_flip) rect2.UpperLeftCorner.Y -= 10;
+            else               rect2.LowerRightCorner.Y += 10;
         }
         
-        drawBoxFromStretchableTexture(widget, rect2, *params);
+        drawBoxFromStretchableTexture(widget, rect2, *params, parentRibbon->m_deactivated);
         
         
     }

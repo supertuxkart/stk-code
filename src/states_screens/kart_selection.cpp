@@ -601,6 +601,14 @@ public:
     }
 };
 
+/** Small utility function that returns whether the two given players chose the same kart.
+ * The advantage of this function is that it can handle "random kart" selection. */
+bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
+{
+    return player1.getKartInternalName() == player2.getKartInternalName() &&
+    player1.getKartInternalName() != RANDOM_KART_ID;
+}
+
 #if 0
 #pragma mark -
 #pragma mark KartHoverListener
@@ -690,6 +698,7 @@ KartHoverListener* karthoverListener = NULL;
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
 {
     g_dispatcher = new FocusDispatcher(this);
+    m_player_confirmed = false;
     
     // Dynamically add tabs
     // FIXME: it's not very well documented that RibbonWidgets can have dynamically generated contents
@@ -715,15 +724,118 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     item->m_properties[PROP_ID] = ALL_KART_GROUPS_ID;
     tabs->m_children.push_back(item);
 }
+
+// ----------------------------------------------------------------------------- 
+
+void KartSelectionScreen::init()
+{
+    m_player_confirmed = false;
+    
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    assert( tabs != NULL );
+    tabs->m_deactivated = false;
+    
+    // FIXME: Reload previous kart selection screen state
+    m_kart_widgets.clearAndDeleteAll();
+    StateManager::get()->resetActivePlayers();
+    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
+    
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    
+    if (karthoverListener == NULL)
+    {
+        karthoverListener = new KartHoverListener(this);
+        w->registerHoverListener(karthoverListener);
+    }
+    
+    // Build kart list
+    // (it is built everytikme, to account for .g. locking)
+    w->clearItems();
+    std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
+    const int kart_amount = group.size();
+    
+    // add Tux (or whatever default kart) first
+    std::string& default_kart = UserConfigParams::m_default_kart;
+    for(int n=0; n<kart_amount; n++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+        if (prop->getIdent() == default_kart)
+        {
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            const bool locked = unlock_manager->isLocked(prop->getIdent());
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
+            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
+            break;
+        }
+    }
+    
+    // add others
+    for(int n=0; n<kart_amount; n++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+        if (prop->getIdent() != default_kart)
+        {
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            const bool locked = unlock_manager->isLocked(prop->getIdent());
+            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
+            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
+        }
+    }
+    
+    // add random
+    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
+    
+    /*
+     
+     TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
+     when players return to the kart selection screen, it will appear as
+     it did when they left (at least when returning from the track menu).
+     Rebuilding the screen is a little tricky.
+     
+     */
+    
+    if (m_kart_widgets.size() > 0)
+    {
+        // FIXME: trying to rebuild the screen
+        for (int n = 0; n < m_kart_widgets.size(); n++)
+        {
+            PlayerKartWidget *pkw;
+            pkw = m_kart_widgets.get(n);
+            this->manualAddWidget(pkw);
+            pkw->add();
+        }
+        
+    }
+    else // For now this is what will happen
+    {
+        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
+        w->updateItemDisplay();
+    }
+    
+    // Player 0 select first kart (Tux)
+    w->setSelection(0, 0, true);
+}
+
 // -----------------------------------------------------------------------------
+
+void KartSelectionScreen::tearDown()
+{
+    //g_player_karts.clearWithoutDeleting();
+    m_kart_widgets.clearAndDeleteAll();
+}
+
+// -----------------------------------------------------------------------------
+
 void KartSelectionScreen::forgetWhatWasLoaded()
 {    
     Screen::forgetWhatWasLoaded();
     
-    // these pointers is no more valid (have been deleted along other widgets)
+    // these pointers are no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
     karthoverListener = NULL;
 }
+
 // -----------------------------------------------------------------------------
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
@@ -905,310 +1017,12 @@ void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
 }
 
 // -----------------------------------------------------------------------------
-void KartSelectionScreen::tearDown()
-{
-    //g_player_karts.clearWithoutDeleting();
-    m_kart_widgets.clearAndDeleteAll();
-}
-    
-// ----------------------------------------------------------------------------- 
-void KartSelectionScreen::init()
-{
-    // FIXME: Reload previous kart selection screen state
-    m_kart_widgets.clearAndDeleteAll();
-    StateManager::get()->resetActivePlayers();
-    input_manager->getDeviceList()->setAssignMode(DETECT_NEW);
-    
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-    assert( w != NULL );
-    
-    if (karthoverListener == NULL)
-    {
-        karthoverListener = new KartHoverListener(this);
-        w->registerHoverListener(karthoverListener);
-    }
-              
-    // Build kart list
-    // (it is built everytikme, to account for .g. locking)
-    w->clearItems();
-    std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
-    const int kart_amount = group.size();
-    
-    // add Tux (or whatever default kart) first
-    std::string& default_kart = UserConfigParams::m_default_kart;
-    for(int n=0; n<kart_amount; n++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-        if (prop->getIdent() == default_kart)
-        {
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            const bool locked = unlock_manager->isLocked(prop->getIdent());
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
-            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
-            break;
-        }
-    }
-    
-    // add others
-    for(int n=0; n<kart_amount; n++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-        if (prop->getIdent() != default_kart)
-        {
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            const bool locked = unlock_manager->isLocked(prop->getIdent());
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
-            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
-        }
-    }
-    
-    // add random
-    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
-    
-    /*
-     
-     TODO: Ultimately, it'd be nice to *not* delete g_player_karts so that
-     when players return to the kart selection screen, it will appear as
-     it did when they left (at least when returning from the track menu).
-     Rebuilding the screen is a little tricky.
-     
-     */
-    
-    if (m_kart_widgets.size() > 0)
-    {
-        // FIXME: trying to rebuild the screen
-        for (int n = 0; n < m_kart_widgets.size(); n++)
-        {
-            PlayerKartWidget *pkw;
-            pkw = m_kart_widgets.get(n);
-            this->manualAddWidget(pkw);
-            pkw->add();
-        }
-        
-    }
-    else // For now this is what will happen
-    {
-        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(), true );
-        w->updateItemDisplay();
-    }
-    
-    // Player 0 select first kart (Tux)
-    w->setSelection(0, 0, true);
-}
-
-// -----------------------------------------------------------------------------
-void KartSelectionScreen::allPlayersDone()
-{        
-    input_manager->setMasterPlayerOnly(true);
-    
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-    assert( w != NULL );
-    
-    const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
-    
-    // ---- Print selection (for debugging purposes)
-    std::cout << "==========\n" << players.size() << " players :\n";
-    for (int n=0; n<players.size(); n++)
-    {
-        std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
-                  << " on " << players[n].getDevice()->m_name << std::endl;
-    }
-    std::cout << "==========\n";
-    
-    // ---- Give player info to race manager
-    race_manager->setNumPlayers( players.size() );
-    race_manager->setNumLocalPlayers( players.size() );
-    
-    // ---- Manage 'random kart' selection(s)
-    RandomGenerator random;
-    
-    //g_player_karts.clearAndDeleteAll();      
-    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
-    
-    std::vector<ItemDescription> items = w->getItems();
-    
-    // remove the 'random' item itself
-    const int item_count = items.size();
-    for (int n=0; n<item_count; n++)
-    {
-        if (items[n].m_code_name == RANDOM_KART_ID)
-        {
-            items[n].m_code_name = ID_DONT_USE;
-            break;
-        }
-    }
-    
-    // pick random karts
-    const int kart_count = m_kart_widgets.size();
-    for (int n = 0; n < kart_count; n++)
-    {
-        std::string selection = m_kart_widgets[n].m_kartInternalName;
-        
-        if (selection == RANDOM_KART_ID)
-        {
-            // don't select an already selected kart
-            int randomID;
-            bool done = false;
-            do
-            {
-                randomID = random.get(item_count);
-                if (items[randomID].m_code_name != ID_DONT_USE)
-                {
-                    selection = items[randomID].m_code_name;
-                    done = true;
-                }
-                items[randomID].m_code_name = ID_DONT_USE;
-            } while (!done);
-        }
-        else
-        {
-            // mark the item as taken
-            for (int i=0; i<item_count; i++)
-            {
-                if (items[i].m_code_name == items[n].m_code_name)
-                {
-                    items[i].m_code_name = ID_DONT_USE;
-                    break;
-                }
-            }
-        }
-        // std::cout << "selection=" << selection.c_str() << std::endl;
-        
-        race_manager->setLocalKartInfo(n, selection);
-    }
-    
-    // ---- Switch to assign mode
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
-    
-    StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
-}
-
-// -----------------------------------------------------------------------------
-bool KartSelectionScreen::validateIdentChoices()
-{
-    bool ok = true;
-    
-    const int amount = m_kart_widgets.size();
-    
-    // reset all marks, we'll re-add them next if errors are still there
-    for (int n=0; n<amount; n++)
-    {
-        // first check if the player name widget is still there, it won't be for those that confirmed
-        if (m_kart_widgets[n].playerName != NULL)
-        {
-            m_kart_widgets[n].playerName->markAsCorrect();
-            
-            // verify internal consistency in debug mode
-            assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                   UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
-        }
-    }
-    
-    for (int n=0; n<amount; n++)
-    {        
-        for (int m=n+1; m<amount; m++)
-        {            
-            // check if 2 players took the same name
-            if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[m].getAssociatedPlayer()->getProfile())
-            {
-                printf("\n***\n*** Identity conflict!! ***\n***\n\n");
-                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
-                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
-
-                // two players took the same name. check if one is ready
-                if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
-                {
-                    // player m is ready, so player n should not choose this name
-                    m_kart_widgets[n].playerName->markAsIncorrect();
-                }
-                else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
-                {
-                    // player n is ready, so player m should not choose this name
-                    m_kart_widgets[m].playerName->markAsIncorrect();
-                }
-                else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
-                {
-                    // it should be impossible for two players to confirm they're ready with the same name
-                    assert(false);
-                }
-                
-                ok = false;
-            }
-        } // end for
-    }
-    
-    return ok;
-}
-
-// -----------------------------------------------------------------------------
-
-/** Small utility that returns whether the two given players chose the same kart.
-  * The advantage of this function is that it can handle "random kart" selection. */
-bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
-{
-    return player1.getKartInternalName() == player2.getKartInternalName() &&
-           player1.getKartInternalName() != RANDOM_KART_ID;
-}
-
-bool KartSelectionScreen::validateKartChoices()
-{
-    bool ok = true;
-    
-    const int amount = m_kart_widgets.size();
-    
-    // reset all marks, we'll re-add them next if errors are still there
-    for (int n=0; n<amount; n++)
-    {
-        m_kart_widgets[n].modelView->unsetBadge(BAD_BADGE);
-    }
-    
-    for (int n=0; n<amount; n++)
-    {        
-        for (int m=n+1; m<amount; m++)
-        {
-            // check if 2 players took the same name
-            if (sameKart(m_kart_widgets[n], m_kart_widgets[m]))
-            {
-                printf("\n***\n*** Kart conflict!! ***\n***\n\n");
-                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
-                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getKartInternalName() << std::endl;
-                
-                // two players took the same kart. check if one is ready
-                if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
-                {
-                    std::cout << "--> Setting red badge on player " << n << std::endl;
-                    // player m is ready, so player n should not choose this name
-                    m_kart_widgets[n].modelView->setBadge(BAD_BADGE);
-                }
-                else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
-                {
-                    std::cout << "--> Setting red badge on player " << m << std::endl;
-                    // player n is ready, so player m should not choose this name
-                    m_kart_widgets[m].modelView->setBadge(BAD_BADGE);
-                }
-                else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
-                {
-                    // it should be impossible for two players to confirm they're ready with the same kart
-                    assert(false);
-                }
-                
-                // we know it's not ok (but don't stop right now, all bad ones need red badges)
-                ok = false;
-            }
-        } // end for
-    }
-    
-    return ok;
-    
-}
-
-// -----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
 void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "kartgroups")
+    if (name == "kartgroups" && !m_player_confirmed) // don't allow changing group after someone confirmed
     {
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
         assert(tabs != NULL);
@@ -1314,6 +1128,11 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         // Mark this player as ready to start
         m_kart_widgets[playerID].markAsReady();
+        m_player_confirmed = true;
+        
+        RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+        assert( tabs != NULL );
+        tabs->m_deactivated = true;
         
         // validate choices to notify player of duplicates
         const bool names_ok = validateIdentChoices();
@@ -1347,6 +1166,211 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         validateIdentChoices();
         validateKartChoices();
     }
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark KartSelectionScreen (private)
+#endif
+
+void KartSelectionScreen::allPlayersDone()
+{        
+    input_manager->setMasterPlayerOnly(true);
+    
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    assert( w != NULL );
+    
+    const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
+    
+    // ---- Print selection (for debugging purposes)
+    std::cout << "==========\n" << players.size() << " players :\n";
+    for (int n=0; n<players.size(); n++)
+    {
+        std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
+        << " on " << players[n].getDevice()->m_name << std::endl;
+    }
+    std::cout << "==========\n";
+    
+    // ---- Give player info to race manager
+    race_manager->setNumPlayers( players.size() );
+    race_manager->setNumLocalPlayers( players.size() );
+    
+    // ---- Manage 'random kart' selection(s)
+    RandomGenerator random;
+    
+    //g_player_karts.clearAndDeleteAll();      
+    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
+    
+    std::vector<ItemDescription> items = w->getItems();
+    
+    // remove the 'random' item itself
+    const int item_count = items.size();
+    for (int n=0; n<item_count; n++)
+    {
+        if (items[n].m_code_name == RANDOM_KART_ID)
+        {
+            items[n].m_code_name = ID_DONT_USE;
+            break;
+        }
+    }
+    
+    // pick random karts
+    const int kart_count = m_kart_widgets.size();
+    for (int n = 0; n < kart_count; n++)
+    {
+        std::string selection = m_kart_widgets[n].m_kartInternalName;
+        
+        if (selection == RANDOM_KART_ID)
+        {
+            // don't select an already selected kart
+            int randomID;
+            bool done = false;
+            do
+            {
+                randomID = random.get(item_count);
+                if (items[randomID].m_code_name != ID_DONT_USE)
+                {
+                    selection = items[randomID].m_code_name;
+                    done = true;
+                }
+                items[randomID].m_code_name = ID_DONT_USE;
+            } while (!done);
+        }
+        else
+        {
+            // mark the item as taken
+            for (int i=0; i<item_count; i++)
+            {
+                if (items[i].m_code_name == items[n].m_code_name)
+                {
+                    items[i].m_code_name = ID_DONT_USE;
+                    break;
+                }
+            }
+        }
+        // std::cout << "selection=" << selection.c_str() << std::endl;
+        
+        race_manager->setLocalKartInfo(n, selection);
+    }
+    
+    // ---- Switch to assign mode
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    
+    StateManager::get()->pushScreen( RaceSetupScreen::getInstance() );
+}
+
+// -----------------------------------------------------------------------------
+bool KartSelectionScreen::validateIdentChoices()
+{
+    bool ok = true;
+    
+    const int amount = m_kart_widgets.size();
+    
+    // reset all marks, we'll re-add them next if errors are still there
+    for (int n=0; n<amount; n++)
+    {
+        // first check if the player name widget is still there, it won't be for those that confirmed
+        if (m_kart_widgets[n].playerName != NULL)
+        {
+            m_kart_widgets[n].playerName->markAsCorrect();
+            
+            // verify internal consistency in debug mode
+            assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                   UserConfigParams::m_all_players.get(m_kart_widgets[n].playerName->getValue()) );
+        }
+    }
+    
+    for (int n=0; n<amount; n++)
+    {        
+        for (int m=n+1; m<amount; m++)
+        {            
+            // check if 2 players took the same name
+            if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[m].getAssociatedPlayer()->getProfile())
+            {
+                printf("\n***\n*** Identity conflict!! ***\n***\n\n");
+                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getAssociatedPlayer()->getProfile()->getName() << std::endl;
+                
+                // two players took the same name. check if one is ready
+                if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    // player m is ready, so player n should not choose this name
+                    m_kart_widgets[n].playerName->markAsIncorrect();
+                }
+                else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
+                {
+                    // player n is ready, so player m should not choose this name
+                    m_kart_widgets[m].playerName->markAsIncorrect();
+                }
+                else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    // it should be impossible for two players to confirm they're ready with the same name
+                    assert(false);
+                }
+                
+                ok = false;
+            }
+        } // end for
+    }
+    
+    return ok;
+}
+
+// -----------------------------------------------------------------------------
+
+bool KartSelectionScreen::validateKartChoices()
+{
+    bool ok = true;
+    
+    const int amount = m_kart_widgets.size();
+    
+    // reset all marks, we'll re-add them next if errors are still there
+    for (int n=0; n<amount; n++)
+    {
+        m_kart_widgets[n].modelView->unsetBadge(BAD_BADGE);
+    }
+    
+    for (int n=0; n<amount; n++)
+    {        
+        for (int m=n+1; m<amount; m++)
+        {
+            // check if 2 players took the same name
+            if (sameKart(m_kart_widgets[n], m_kart_widgets[m]))
+            {
+                printf("\n***\n*** Kart conflict!! ***\n***\n\n");
+                std::cout << " Player " << n << " chose " << m_kart_widgets[n].getKartInternalName() << std::endl;
+                std::cout << " Player " << m << " chose " << m_kart_widgets[m].getKartInternalName() << std::endl;
+                
+                // two players took the same kart. check if one is ready
+                if (!m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    std::cout << "--> Setting red badge on player " << n << std::endl;
+                    // player m is ready, so player n should not choose this name
+                    m_kart_widgets[n].modelView->setBadge(BAD_BADGE);
+                }
+                else if (m_kart_widgets[n].isReady() && !m_kart_widgets[m].isReady())
+                {
+                    std::cout << "--> Setting red badge on player " << m << std::endl;
+                    // player n is ready, so player m should not choose this name
+                    m_kart_widgets[m].modelView->setBadge(BAD_BADGE);
+                }
+                else if (m_kart_widgets[n].isReady() && m_kart_widgets[m].isReady())
+                {
+                    // it should be impossible for two players to confirm they're ready with the same kart
+                    assert(false);
+                }
+                
+                // we know it's not ok (but don't stop right now, all bad ones need red badges)
+                ok = false;
+            }
+        } // end for
+    }
+    
+    return ok;
+    
 }
 
 // -----------------------------------------------------------------------------
