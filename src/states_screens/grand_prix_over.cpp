@@ -175,13 +175,17 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
 
                 if (fabsf(m_kart_z[k] - m_podium_z[k]) > dt)
                 {
-                    if (m_kart_z[k] < m_podium_z[k])
+                    if (m_kart_z[k] < m_podium_z[k] - dt)
                     {
                         m_kart_z[k] += dt;
                     }
-                    else if (m_kart_z[k] > m_podium_z[k])
+                    else if (m_kart_z[k] > m_podium_z[k] + dt)
                     {
                         m_kart_z[k] -= dt;
+                    }
+                    else
+                    {
+                        m_kart_z[k] = m_podium_z[k];
                     }
                     karts_not_yet_done++;
                 }
@@ -242,14 +246,15 @@ void GrandPrixOver::onUpdate(float dt, irr::video::IVideoDriver* driver)
     if (m_phase > 1)
     {
         //m_camera_x = 3.0f;
-        if (m_camera_z < -2.0f)                m_camera_z        += dt*0.2f;
-        if (m_camera_x < m_podium_x[1])        m_camera_x        += dt*0.1f;
-        else if (m_camera_x > m_podium_x[1])   m_camera_x        -= dt*0.1f;
-
-        if (m_camera_target_x < m_podium_x[1]) m_camera_target_x += dt*0.1f;
+        if (m_camera_z < -2.0f)                          m_camera_z        += dt*0.2f;
         
-        if (m_camera_y > -1.8f)                m_camera_y        -= dt*0.1f;
-        //else  if (m_camera_y < -3.0f)          m_camera_y        += dt*0.1f;
+        if      (m_camera_x < m_podium_x[1] - dt*0.1f)   m_camera_x        += dt*0.1f;
+        else if (m_camera_x > m_podium_x[1] + dt*0.1f)   m_camera_x        -= dt*0.1f;
+        else                                             m_camera_x         = m_podium_x[1];
+            
+        if (m_camera_target_x < m_podium_x[1])           m_camera_target_x += dt*0.1f;
+        
+        if (m_camera_y > -1.8f)                          m_camera_y        -= dt*0.1f;
 
         
         m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
