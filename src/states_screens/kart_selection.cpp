@@ -48,6 +48,7 @@ using irr::core::stringw;
 
 const char* RANDOM_KART_ID = "randomkart";
 const char* ALL_KART_GROUPS_ID  = "all";
+const char* ID_DONT_USE = "x";
 
 class PlayerKartWidget;
     
@@ -1045,7 +1046,7 @@ void KartSelectionScreen::allPlayersDone()
     {
         if (items[n].m_code_name == RANDOM_KART_ID)
         {
-            items[n].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+            items[n].m_code_name = ID_DONT_USE;
             break;
         }
     }
@@ -1064,12 +1065,12 @@ void KartSelectionScreen::allPlayersDone()
             do
             {
                 randomID = random.get(item_count);
-                if (items[randomID].m_code_name != "x")
+                if (items[randomID].m_code_name != ID_DONT_USE)
                 {
                     selection = items[randomID].m_code_name;
                     done = true;
                 }
-                items[randomID].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+                items[randomID].m_code_name = ID_DONT_USE;
             } while (!done);
         }
         else
@@ -1079,7 +1080,7 @@ void KartSelectionScreen::allPlayersDone()
             {
                 if (items[i].m_code_name == items[n].m_code_name)
                 {
-                    items[i].m_code_name = "x"; // 'x' is the sentinel I use to mark an item as "don't use it"
+                    items[i].m_code_name = ID_DONT_USE;
                     break;
                 }
             }
