@@ -78,7 +78,23 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             
             if (selection == "random_track")
             {
-                // TODO
+                RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+                assert( tabs != NULL );
+                
+                const std::vector<int>& curr_group = track_manager->getTracksInGroup( tabs->getSelectionIDString(0) );
+                
+                RandomGenerator random;
+                const int randomID = random.get(curr_group.size());
+                
+                Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
+                if (clickedTrack != NULL)
+                {
+                    ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                    
+                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                                        screenshot, 0.8f, 0.7f);
+                }
+                
             }
             else if (selection == "locked")
             {
@@ -188,10 +204,14 @@ void TracksScreen::init()
     tracks_widget->clearItems();
     
     // Build track list
-    const int trackAmount = track_manager->getNumberOfTracks();
+    
+    //FIXME: don't hardcode player 0?
+    const std::vector<int>& curr_group = track_manager->getTracksInGroup( tabs->getSelectionIDString(0) );
+    const int trackAmount = curr_group.size();
+    
     for (int n=0; n<trackAmount; n++)
     {
-        Track* curr = track_manager->getTrack(n);
+        Track* curr = track_manager->getTrack( curr_group[n] );
         if (curr->isArena()) continue;
         
         if (unlock_manager->isLocked(curr->getIdent()))
