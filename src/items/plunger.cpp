@@ -31,6 +31,7 @@
 #include "physics/physical_object.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
@@ -147,11 +148,19 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return;
 
+    RaceGUI* gui = World::getWorld()->getRaceGUI();
+    irr::core::stringw hit_message;
+
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
     {
         if(kart) kart->blockViewWithPlunger();
+
+        hit_message += StringUtils::insertValues(_("%s gets a fancy mask from %s"),
+                                                 kart->getName().c_str(),
+                                                 m_owner->getName().c_str()
+                                                ).c_str();
 
         m_keep_alive = 0;
         // Make this object invisible by placing it faaar down. Not that if this
@@ -160,6 +169,8 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         Vec3 hell(0, 0, -10000);
         getNode()->setPosition(hell.toIrrVector());
         World::getWorld()->getPhysics()->removeBody(getBody());
+
+        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
     }
     else
     {

@@ -331,11 +331,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                                                          m_owner->getName().c_str()
                                                         ).c_str();
             break;
-            case POWERUP_PLUNGER: // FIXME, this one never appears, maybe wrong place to handle
-                hit_message += StringUtils::insertValues(_("%s gets a fancy mask from %s"),
-                                                         kart_hit->getName().c_str(),
-                                                         m_owner->getName().c_str()
-                                                        ).c_str();
+            case POWERUP_PLUNGER: // Handled by plunger.cpp Plunger::hit
             break;
             case POWERUP_BOWLING:
                 hit_message += StringUtils::insertValues(_("%s will not play bowling with %s again"),
