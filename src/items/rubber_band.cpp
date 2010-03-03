@@ -27,6 +27,7 @@
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
+#include "utils/string_utils.hpp"
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
@@ -211,6 +212,14 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
     {
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
+
+        RaceGUI* gui = World::getWorld()->getRaceGUI();
+        irr::core::stringw hit_message;
+        hit_message += StringUtils::insertValues(_("%s bites %s's bait"),
+                                                 kart_hit->getName().c_str(),
+                                                 m_owner.getName().c_str()
+                                                ).c_str();
+        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
         return;
     }
 
