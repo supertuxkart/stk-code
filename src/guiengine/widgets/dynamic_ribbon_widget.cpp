@@ -791,8 +791,6 @@ bool DynamicRibbonWidget::setSelection(int item_id, const int playerID, const bo
 // -----------------------------------------------------------------------------
 bool DynamicRibbonWidget::setSelection(const std::string item_codename, const int playerID, const bool focusIt)
 {
-    std::cout << "Set selection for player " << playerID << " : focus it = " << focusIt << "\n"; 
-
     const int item_count = m_items.size();
     for (int n=0; n<item_count; n++)
     {
