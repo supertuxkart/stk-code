@@ -64,6 +64,9 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
       */
     bool validateKartChoices();
     
+    /** Fill the ribbon with the karts from the currently selected group */
+    void setKartsFromCurrentGroup();
+    
 public:
     
     /** Called when a player hits 'fire' on his device to join the game */

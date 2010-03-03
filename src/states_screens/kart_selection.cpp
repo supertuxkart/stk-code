@@ -752,42 +752,8 @@ void KartSelectionScreen::init()
         w->registerHoverListener(karthoverListener);
     }
     
-    // Build kart list
-    // (it is built everytikme, to account for .g. locking)
-    w->clearItems();
-    std::vector<int> group = kart_properties_manager->getKartsInGroup("standard");
-    const int kart_amount = group.size();
-    
-    // add Tux (or whatever default kart) first
-    std::string& default_kart = UserConfigParams::m_default_kart;
-    for(int n=0; n<kart_amount; n++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-        if (prop->getIdent() == default_kart)
-        {
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            const bool locked = unlock_manager->isLocked(prop->getIdent());
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
-            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
-            break;
-        }
-    }
-    
-    // add others
-    for(int n=0; n<kart_amount; n++)
-    {
-        const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-        if (prop->getIdent() != default_kart)
-        {
-            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            const bool locked = unlock_manager->isLocked(prop->getIdent());
-            w->addItem(prop->getName(), prop->getIdent().c_str(), icon_path.c_str(), locked);
-            //std::cout << "Add item : " << prop->getIdent().c_str() << std::endl;
-        }
-    }
-    
-    // add random
-    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
+    // Build kart list (it is built everytime, to account for .g. locking)
+    setKartsFromCurrentGroup();
     
     /*
      
@@ -816,8 +782,8 @@ void KartSelectionScreen::init()
         w->updateItemDisplay();
     }
     
-    // Player 0 select first kart (Tux)
-    w->setSelection(0, 0, true);
+    // Player 0 select default kart
+    w->setSelection(UserConfigParams::m_default_kart, 0, true);
 }
 
 // -----------------------------------------------------------------------------
@@ -1036,52 +1002,15 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     {
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
         assert(tabs != NULL);
-
-        std::string selection = tabs->getSelectionIDString(GUI_PLAYER_ID);
-
         DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
-        w->clearItems();
+        assert(w != NULL);
+        
+        setKartsFromCurrentGroup();
+
+        const std::string selected_kart_group = tabs->getSelectionIDString(GUI_PLAYER_ID);
         
         // TODO : preserve selection of karts for all players
-        // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
-        
-        if (selection == ALL_KART_GROUPS_ID)
-        {
-            const int kart_amount = kart_properties_manager->getNumberOfKarts();
-            
-            for(int n=0; n<kart_amount; n++)
-            {
-                const KartProperties* prop = kart_properties_manager->getKartById(n);
-                
-                std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
-            }
-        }
-        else if (selection == "locked")
-        {
-            unlock_manager->playLockSound();
-        }
-        else if (selection == NO_ITEM_ID)
-        {
-        }
-        else
-        {        
-            std::vector<int> group = kart_properties_manager->getKartsInGroup(selection);
-            const int kart_amount = group.size();
-            
-            for(int n=0; n<kart_amount; n++)
-            {
-                const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-                
-                std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
-            }
-        }
-        // add random
-        w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
-        
-        w->updateItemDisplay();
-        
+               
         // update players selections
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
@@ -1089,8 +1018,8 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             // player 0 is the one that can change the groups, leave his focus on the tabs
             if (n > 0) GUIEngine::focusNothingForPlayer(n);
             
-            const std::string& selection = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selection, n, true ))
+            const std::string& selected_kart_group = m_kart_widgets[n].getKartInternalName();
+            if (!w->setSelection( selected_kart_group, n, true ))
             {
                 std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
                 // For now, select a random kart in this case (TODO : maybe do something better? )
@@ -1231,9 +1160,9 @@ void KartSelectionScreen::allPlayersDone()
     const int kart_count = m_kart_widgets.size();
     for (int n = 0; n < kart_count; n++)
     {
-        std::string selection = m_kart_widgets[n].m_kartInternalName;
+        std::string selected_kart_group = m_kart_widgets[n].m_kartInternalName;
         
-        if (selection == RANDOM_KART_ID)
+        if (selected_kart_group == RANDOM_KART_ID)
         {
             // don't select an already selected kart
             int randomID;
@@ -1243,7 +1172,7 @@ void KartSelectionScreen::allPlayersDone()
                 randomID = random.get(item_count);
                 if (items[randomID].m_code_name != ID_DONT_USE)
                 {
-                    selection = items[randomID].m_code_name;
+                    selected_kart_group = items[randomID].m_code_name;
                     done = true;
                 }
                 items[randomID].m_code_name = ID_DONT_USE;
@@ -1263,7 +1192,7 @@ void KartSelectionScreen::allPlayersDone()
         }
         // std::cout << "selection=" << selection.c_str() << std::endl;
         
-        race_manager->setLocalKartInfo(n, selection);
+        race_manager->setLocalKartInfo(n, selected_kart_group);
     }
     
     // ---- Switch to assign mode
@@ -1403,6 +1332,63 @@ void KartSelectionScreen::renumberKarts()
     printf("OK\n");
 
 }
+
+// -----------------------------------------------------------------------------
+
+void KartSelectionScreen::setKartsFromCurrentGroup()
+{
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
+    assert(tabs != NULL);
+    
+    const std::string selected_kart_group = tabs->getSelectionIDString(GUI_PLAYER_ID);
+    
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+    w->clearItems();
+    
+    // FIXME: merge this code with the code that adds karts initially, copy-and-paste is ugly
+    
+    if (selected_kart_group == ALL_KART_GROUPS_ID)
+    {
+        const int kart_amount = kart_properties_manager->getNumberOfKarts();
+        
+        for(int n=0; n<kart_amount; n++)
+        {
+            const KartProperties* prop = kart_properties_manager->getKartById(n);
+            
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+        }
+    }
+    //FIXME: what does this do there???
+    else if (selected_kart_group == "locked")
+    {
+        unlock_manager->playLockSound();
+    }
+    //FIXME: what does this do there???
+    else if (selected_kart_group == NO_ITEM_ID)
+    {
+    }
+    else
+    {        
+        std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
+        const int kart_amount = group.size();
+        
+        for (int n=0; n<kart_amount; n++)
+        {
+            const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
+            
+            std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+        }
+    }
+    // add random
+    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
+    
+    w->updateItemDisplay();    
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
