@@ -1008,27 +1008,33 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         setKartsFromCurrentGroup();
 
         const std::string selected_kart_group = tabs->getSelectionIDString(GUI_PLAYER_ID);
-        
-        // TODO : preserve selection of karts for all players
-               
-        // update players selections
+                       
+        // update players selections (FIXME: don't hardcode player 0 below)
         const int num_players = m_kart_widgets.size();
         for (int n=0; n<num_players; n++)
         {
             // player 0 is the one that can change the groups, leave his focus on the tabs
+            // for others, remove focus from kart that might no more exist in this tab.
             if (n > 0) GUIEngine::focusNothingForPlayer(n);
             
+            // try to preserve the same kart for each player (except for player 0, since it's the one 
+            // that can change the groups, so focus for player 0 must remain on the tabs)
             const std::string& selected_kart_group = m_kart_widgets[n].getKartInternalName();
-            if (!w->setSelection( selected_kart_group, n, true ))
+            if (!w->setSelection( selected_kart_group, n, n>0 ))
             {
+                // if we get here, it means one player "lost" his kart in the tab switch
                 std::cout << "Player " << n << " lost their selection when switching tabs!!!\n";
-                // For now, select a random kart in this case (TODO : maybe do something better? )
+                
+                // Select a random kart in this case
                 RandomGenerator random;
                 const int count = w->getItems().size();
                 if (count > 0)
                 {
                     const int randomID = random.get( count );
-                    w->setSelection( randomID, n, n > 0 ); // preserve selection for players > 0 (player 0 is the one that can change the groups)
+                    
+                    // select kart for players > 0 (player 0 is the one that can change the groups,
+                    // so focus for player 0 must remain on the tabs)
+                    w->setSelection( randomID, n, n>0 );
                 }
                 else
                 {
@@ -1040,8 +1046,6 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name == "karts")
     {
         // make sure no other player selected the same identity or kart
-        //std::cout << "\n\n\\\\\\\\ Kart Selected ////\n";
-        //std::cout << "Making sure no other player has ident " << g_player_karts[playerID].getAssociatedPlayer()->getProfile()->getName() << std::endl;
         const int amount = m_kart_widgets.size();
         for (int n=0; n<amount; n++)
         {
@@ -1054,10 +1058,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
             {
                 printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
                 
-                //SFXType sound;
-                //SOUND_UGH SOUND_CRASH SOUND_USE_ANVIL SOUND_EXPLOSION SOUND_MOVE_MENU SOUND_SELECT_MENU
                 sfx_manager->quickSound( "use_anvil" );
-                
                 return;
             }
             
