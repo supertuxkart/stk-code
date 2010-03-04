@@ -238,7 +238,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         m_max_sensed_type    = type;
         
         // don't notify on first axis value (unless the axis is pushed to the maximum)
-        if(m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION && first_value && abs(value) != Input::MAX_VALUE)
+        if (m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION &&
+            first_value && abs(value) < Input::MAX_VALUE*3.0f/4.0f)
         {
             std::cout << "not notifying on first value\n";
             return;
@@ -246,8 +247,8 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
     }
     
     // Notify the completion of the input sensing when key is released
-    if( abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
-       m_sensed_input->btnID == btnID)
+    if (abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
+        m_sensed_input->btnID == btnID)
     {
         OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
     }
