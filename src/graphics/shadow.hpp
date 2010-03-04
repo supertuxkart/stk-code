@@ -40,7 +40,7 @@ private:
     scene::ISceneNode  *m_parent_kart_node;
 public:
          Shadow(video::ITexture *texture,
-                scene::IAnimatedMeshSceneNode *node);
+                scene::ISceneNode *node);
         ~Shadow();
     void enableShadow();
     void disableShadow();

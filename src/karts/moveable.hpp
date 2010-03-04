@@ -49,11 +49,8 @@ private:
 
 protected:
     UserPointer            m_user_pointer;
-    scene::IAnimatedMesh  *m_animated_mesh;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
-    scene::IAnimatedMeshSceneNode
-                          *m_animated_node;
     int                    m_first_time ;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
@@ -61,10 +58,10 @@ protected:
 public:
                   Moveable();
     virtual      ~Moveable();
+    /** Returns the scene node of this moveable. */
     scene::ISceneNode 
-                 *getNode() const { return m_node ? m_node : m_animated_node; }
+                 *getNode() const { return m_node; }
     void          setNode(scene::ISceneNode *n);
-    void          setAnimatedNode(scene::IAnimatedMeshSceneNode *n);
     virtual const btVector3 
                  &getVelocity()   const        {return m_body->getLinearVelocity();}
     const btVector3
@@ -101,7 +98,8 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual void  handleZipper ()  {};
-    virtual void  updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr);
+    virtual void  updateGraphics(const Vec3& off_xyz,  
+                                 const btQuaternion& off_rotation);
     virtual void  reset();
     virtual void  update(float dt) ;
     btRigidBody  *getBody() const {return m_body; }

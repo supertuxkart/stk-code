@@ -32,9 +32,7 @@ Moveable::Moveable()
     m_motion_state    = 0;
     m_first_time      = true;
     m_mesh            = NULL;
-    m_animated_mesh   = NULL;
     m_node            = NULL;
-    m_animated_node   = NULL;
 }   // Moveable
 
 //-----------------------------------------------------------------------------
@@ -44,57 +42,38 @@ Moveable::~Moveable()
     if(m_body)         delete m_body;
     if(m_motion_state) delete m_motion_state;
     if(m_node) irr_driver->removeNode(m_node);
-    if(m_animated_node) irr_driver->removeNode(m_animated_node);
     if(m_mesh) irr_driver->removeMesh(m_mesh);
-    if(m_animated_mesh) irr_driver->removeMesh(m_animated_mesh);
 }   // ~Moveable
 
 //-----------------------------------------------------------------------------
-/** Sets this model to be non-animated.
+/** Sets the mesh for this model.
  *  \param n The scene node.
  */
 void Moveable::setNode(scene::ISceneNode *n)
 {
     m_node          = n; 
-    m_animated_node = NULL;
 }   // setNode
-
-//-----------------------------------------------------------------------------
-/** Sets this model to be animated.
- *  \param n The animated scene node.
- */
-void Moveable::setAnimatedNode(scene::IAnimatedMeshSceneNode *n)
-{
-    m_node          = NULL; 
-    m_animated_node = n;
-}   // setAnimatedNode
 
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
  *  for special gfx effects (e.g. skidding will turn the karts more). 
- *  \param off_xyz Offset to be added to the position.
- *  \param off_hpr Offset to be added to rotation (euler values).
+ *  \param offset_xyz Offset to be added to the position.
+ *  \param rotation Additional rotation.
  */
-void Moveable::updateGraphics(const Vec3& off_xyz, const Vec3& off_hpr)
+void Moveable::updateGraphics(const Vec3& offset_xyz,  
+                              const btQuaternion& rotation)
 {
 #ifdef DEBUG_PRINT
     printf("moveable: %f %f (%f %f)\n", getXYZ().getX(), getXYZ().getZ(),
         off_xyz.getX(), off_xyz.getZ());
 #endif
-    Vec3 xyz=getXYZ()+off_xyz;
-    Vec3 hpr=getHPR()+off_hpr;
-    //sgCoord c=Coord(xyz, hpr).toSgCoord();
-    if(m_node)
-    {
-        m_node->setPosition(xyz.toIrrVector());
-        m_node->setRotation(hpr.toIrrHPR());
-    }
-    else if(m_animated_node)
-    {
-        m_animated_node->setPosition(xyz.toIrrVector());
-        m_animated_node->setRotation(hpr.toIrrHPR());
-    }
+    Vec3 xyz=getXYZ()+offset_xyz;
+    btQuaternion r_all = getRotation()*rotation;
+    Vec3 hpr;
+    hpr.setHPR(r_all);
+    m_node->setPosition(xyz.toIrrVector());
+    m_node->setRotation(hpr.toIrrHPR());
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------
@@ -107,13 +86,10 @@ void Moveable::reset()
         m_body->setAngularVelocity(btVector3(0, 0, 0));
         m_body->setCenterOfMassTransform(m_transform);
     }
-    if(m_node)
-        m_node->setVisible(true);  // In case that the objects was eliminated
-    if(m_animated_node)
-        m_animated_node->setVisible(true);
+    m_node->setVisible(true);  // In case that the objects was eliminated
 
     Coord c(m_transform);
-    m_hpr = c.getHPR();
+    m_hpr.setHPR(m_transform.getRotation());
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -121,28 +97,11 @@ void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
     m_velocityLC = getVelocity()*m_transform.getBasis();
-    // The following code would synchronise bullet to irrlicht rotations, but
-    // heading etc. might not be 'correct', e.g. a 180 degree heading rotation
-    // would be reported as 180 degree roll and pitch, and 0 degree heading.
-    // So to get heading, pitch etc. the way needed elsewhere (camera etc),
-    // we would still have to rotate unit vectors and compute heading etc.
-    // with atan.
-    //btQuaternion q = m_transform.getRotation();
-    //core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
-    //core::vector3df r;
-    //qirr.toEuler(r);
-    // Note: toIrrHPR mixes the axis back etc., so the assignments below
-    // mean that getIrrHPR returns exactly (r.x,r.y,r.z)*RAD_TO_DEGREE
-    //m_hpr.setX(-r.Y);
-    //m_hpr.setY(-r.X);
-    //m_hpr.setZ(-r.Z);
-
-
     m_hpr.setHPR(m_transform.getRotation());
     Vec3 forw(1, 0, 0);
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
     m_heading = -atan2f(forw_vec.getZ(), forw_vec.getX());
-    updateGraphics(Vec3(0,0,0), Vec3(0,0,0));
+    updateGraphics(Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
     m_first_time = false ;
 }   // update
 

@@ -45,7 +45,7 @@ private:
     float m_remaining_time;
     
  public:
-           Stars  (scene::IAnimatedMeshSceneNode* parentKart);
+           Stars  (scene::ISceneNode* parentKart);
           ~Stars  ();
     void   showFor(float time);
     void   reset();

@@ -54,9 +54,9 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
     m_speed = fabsf(m_speed);
-    // Do not adjust the z velociy depending on height above terrain, since
+    // Do not adjust the up velociy depending on height above terrain, since
     // this would disable gravity.
-    setAdjustZVelocity(false);
+    setAdjustUpVelocity(false);
 
     // unset no_contact_response flags, so that the ball 
     // will bounce off the track
@@ -92,7 +92,7 @@ void Bowling::update(float dt)
 {
     Flyable::update(dt);    
     const Kart *kart=0;
-    btVector3   direction;
+    Vec3        direction;
     float       minDistance;
     getClosestKart(&kart, &minDistance, &direction);
     if(kart && minDistance<m_st_max_distance_squared)   // move bowling towards kart
@@ -112,7 +112,7 @@ void Bowling::update(float dt)
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
     btTransform trans = getTrans();
-    float hat         = trans.getOrigin().getZ();
+    float hat         = trans.getOrigin().getY();
     btVector3 v       = m_body->getLinearVelocity();
     float vlen        = v.length2();
     if (hat<= m_max_height)
@@ -120,7 +120,7 @@ void Bowling::update(float dt)
         if(vlen<0.8*m_speed*m_speed)
         {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
             if(vlen==0.0f) {
-                v    = btVector3(.5f, .5f, 0.0f);  // avoid 0 div.
+                v    = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
             }
             m_body->setLinearVelocity(v*m_speed/sqrt(vlen));
         }   // vlen < 0.8*m_speed*m_speed

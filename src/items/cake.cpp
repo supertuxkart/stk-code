@@ -42,32 +42,31 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     // collide with the track. By setting the mass to 1, collisions happen.
     // (if bullet is compiled with _DEBUG, a warning will be printed the first
     // time a homing-track collision happens).
-    float y_offset=kart->getKartLength()/2.0f + m_extend.getY()/2.0f;
+    float forward_offset=kart->getKartLength()/2.0f + m_extend.getZ()/2.0f;
 
     float up_velocity = m_speed/7.0f;
 
-    // give a speed proportional to kart speed
-    m_speed = kart->getSpeed() * m_speed / 23.0f;
-    if (kart->getSpeed() < 0)
-    m_speed /= 3.6f; //when going backwards, decrease speed of cake by less
+    // give a speed proportional to kart speed. m_speed is defined in flyable
+    m_speed *= kart->getSpeed() / 23.0f;
+
+    //when going backwards, decrease speed of cake by less
+    if (kart->getSpeed() < 0) m_speed /= 3.6f; 
 
     m_speed += 16.0f;
 
-    if (m_speed < 1.0f)
-    m_speed = 1.0f;
+    if (m_speed < 1.0f) m_speed = 1.0f;
 
     btTransform trans = kart->getTrans();
 
-    btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
-    btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
-                                thisKartDirMatrix[1][1],
-                                thisKartDirMatrix[2][1]);
-    float heading=atan2f(-thisKartDirVector.getX(), thisKartDirVector.getY());
+    float heading=kart->getHeading();
     float pitch = kart->getTerrainPitch(heading);
 
-    // find closest kart in front of the current one
-    const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */);
+    // Find closest kart in front of the current one
+    const Kart *closest_kart=0;   
+    Vec3         direction;
+    float       kartDistSquared;
+    getClosestKart(&closest_kart, &kartDistSquared, &direction, 
+                   kart /* search in front of this kart */);
 
     // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
     // allows the projectile to catch up with it
@@ -75,21 +74,21 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     // this code finds the correct angle and upwards velocity to hit an opponents'
     // vehicle if they were to continue travelling in the same direction and same speed
     // (barring any obstacles in the way of course)
-    if(closest_kart != NULL && kartDistSquared < m_st_max_distance_squared && m_speed>closest_kart->getSpeed())
+    if(closest_kart != NULL && kartDistSquared < m_st_max_distance_squared &&
+        m_speed>closest_kart->getSpeed())
     {
         m_target = (Kart*)closest_kart;
 
         float fire_angle     = 0.0f;
-        float time_estimated = 0.0f;
-
-        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
-                                       m_speed, m_gravity, y_offset,
-                                       &fire_angle, &up_velocity, &time_estimated);
+        getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
+                                       m_speed, m_gravity, forward_offset,
+                                       &fire_angle, &up_velocity);
 
         // apply transformation to the bullet object (without pitch)
-        btMatrix3x3 m;
-        m.setEulerZYX(0.0f, 0.0f, fire_angle /*+thisKartAngle*/);
-        trans.setBasis(m);
+        //btMatrix3x3 m;
+        //m.setEulerZYX(0.0f, 0.0f, fire_angle /*+thisKartAngle*/);
+        //trans.setBasis(m);
+        trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
     }
     else
     {
@@ -99,14 +98,14 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
         trans = kart->getKartHeading(pitch);
     }
 
-    m_initial_velocity = btVector3(0.0f, m_speed, up_velocity);
+    m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
-    createPhysics(y_offset, m_initial_velocity,
+    createPhysics(forward_offset, m_initial_velocity,
                   new btCylinderShape(0.5f*m_extend), -m_gravity,
                   true /* rotation */, false /* backwards */, &trans);
 
     //do not adjust height according to terrain
-    setAdjustZVelocity(false);
+    setAdjustUpVelocity(false);
 
     m_body->setActivationState(DISABLE_DEACTIVATION);
 
@@ -122,12 +121,11 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
 void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 {
     Flyable::init(node, cake_model, POWERUP_CAKE);
-    m_st_max_distance   = 80.0f;
+    m_st_max_distance         = 80.0f;
     m_st_max_distance_squared = 80.0f * 80.0f;
-    m_gravity = 9.8f;
+    m_gravity                 = 9.8f;
 
-    if (m_gravity < 0)
-    m_gravity *= -1;
+    if (m_gravity < 0) m_gravity *= -1.0f;
 
     node.get("max-distance",    &m_st_max_distance  );
     m_st_max_distance_squared = m_st_max_distance*m_st_max_distance;
@@ -150,7 +148,7 @@ void Cake::update(float dt)
         float time_estimated = 0.0f;
         float up_velocity    = 0.0f;
 
-        btVector3 origin = my_trans.getOrigin() - m_target->getNormal() * 0.5 * m_target->getKartHeight();
+        Vec3 origin = my_trans.getOrigin() - m_target->getNormal() * 0.5 * m_target->getKartHeight();
 
         getLinearKartItemIntersection (origin, m_target,
                                        m_speed, m_gravity, 0,

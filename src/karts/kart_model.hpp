@@ -115,7 +115,7 @@ public:
         ~KartModel();
     void loadInfo(const lisp::Lisp* lisp);
     void loadModels(const KartProperties &kart_properties);
-    void attachModel(scene::IAnimatedMeshSceneNode **node);
+    void attachModel(scene::ISceneNode **node);
     scene::IAnimatedMesh* getModel() const { return m_mesh; }
 
     scene::IMesh* getWheelModel(const int wheelID) const { return m_wheel_model[wheelID]; }

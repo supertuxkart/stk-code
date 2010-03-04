@@ -84,9 +84,10 @@ KartModel::~KartModel()
 /** Attach the kart model and wheels to the scene node.
  *  \param node Node to attach the models to.
  */
-void KartModel::attachModel(scene::IAnimatedMeshSceneNode **node)
+void KartModel::attachModel(scene::ISceneNode **node)
 {
-    m_node = *node = irr_driver->addAnimatedMesh(m_mesh);
+    *node = irr_driver->addAnimatedMesh(m_mesh);
+    m_node = static_cast<scene::IAnimatedMeshSceneNode*>(*node);
     m_node->setAnimationSpeed(1500);
     m_node->setLoopMode(false);
     for(unsigned int i=0; i<4; i++)

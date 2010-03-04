@@ -40,27 +40,25 @@ scene::IMesh* Flyable::m_st_model[POWERUP_MAX];
 float         Flyable::m_st_min_height[POWERUP_MAX];
 float         Flyable::m_st_max_height[POWERUP_MAX];
 float         Flyable::m_st_force_updown[POWERUP_MAX];
-btVector3     Flyable::m_st_extend[POWERUP_MAX];
+Vec3          Flyable::m_st_extend[POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
 Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 {
     // get the appropriate data from the static fields
-    m_speed             = m_st_speed[type];
-    m_extend            = m_st_extend[type];
-    m_max_height        = m_st_max_height[type];
-    m_min_height        = m_st_min_height[type];
-    m_average_height    = (m_min_height+m_max_height)/2.0f;
-    m_force_updown      = m_st_force_updown[type];
-
-    m_owner             = kart;
-    m_has_hit_something = false;
-    m_exploded          = false;
-    m_shape             = NULL;
-    m_mass              = mass;
-    m_adjust_z_velocity = true;
-
-    m_time_since_thrown = 0;
+    m_speed                        = m_st_speed[type];
+    m_extend                       = m_st_extend[type];
+    m_max_height                   = m_st_max_height[type];
+    m_min_height                   = m_st_min_height[type];
+    m_average_height               = (m_min_height+m_max_height)/2.0f;
+    m_force_updown                 = m_st_force_updown[type];
+    m_owner                        = kart;
+    m_has_hit_something            = false;
+    m_exploded                     = false;
+    m_shape                        = NULL;
+    m_mass                         = mass;
+    m_adjust_up_velocity           = true;
+    m_time_since_thrown            = 0;
     m_owner_has_temporary_immunity = true;
     m_max_lifespan = -1;
 
@@ -69,19 +67,32 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
 }   // Flyable
 
 // ----------------------------------------------------------------------------
-void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
+/** Creates a bullet physics body for the flyable item.
+ *  \param forw_offset How far ahead of the kart the flyable should be 
+ *         positioned. Necessary to avoid exploding a rocket inside of the
+ *         firing kart.
+ *  \param velocity Initial velocity of the flyable.
+ *  \param shape Collision shape of the flyable.
+ *  \param gravity Gravity to use for this flyable.
+ *  \param rotates True if the item should rotate, otherwise the angular factor
+ *         is set to 0 preventing rotations from happening.
+ *  \param turn_around True if the item is fired backwards.
+ *  \param custom_direction If defined the initial heading for this item, 
+ *         otherwise the kart's heading will be used.
+ */
+void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             btCollisionShape *shape, const float gravity,
                             const bool rotates, const bool turn_around,
-                            const btTransform* customDirection)
+                            const btTransform* custom_direction)
 {
     // Get Kart heading direction
-    btTransform trans = ( customDirection == NULL ? m_owner->getKartHeading() : *customDirection );
+    btTransform trans = ( custom_direction == NULL ? m_owner->getKartHeading()
+                                                   : *custom_direction );
 
     // Apply offset
     btTransform offset_transform;
     offset_transform.setIdentity();
-    btVector3 offset=btVector3(0,y_offset,m_average_height);
-    offset_transform.setOrigin(offset);
+    offset_transform.setOrigin(Vec3(0,m_average_height,forw_offset));
 
     // turn around
     if(turn_around)
@@ -89,7 +100,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
         btTransform turn_around_trans;
         //turn_around_trans.setOrigin(trans.getOrigin());
         turn_around_trans.setIdentity();
-        turn_around_trans.setRotation(btQuaternion(btVector3(0, 0, 1), M_PI));
+        turn_around_trans.setRotation(btQuaternion(btVector3(0, 1, 0), M_PI));
         trans  *= turn_around_trans;
     }
 
@@ -100,7 +111,7 @@ void Flyable::createPhysics(float y_offset, const btVector3 &velocity,
     m_user_pointer.set(this);
     World::getWorld()->getPhysics()->addBody(getBody());
 
-    m_body->setGravity(btVector3(0.0f, 0.0f, gravity));
+    m_body->setGravity(btVector3(0.0f, gravity, 0));
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -141,10 +152,18 @@ Flyable::~Flyable()
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
+/** Returns information on what is the closest kart and at what distance it is.
+ *  All 3 parameters first are of type 'out'. 'inFrontOf' can be set if you 
+ *  wish to know the closest kart in front of some karts (will ignore those 
+ *  behind). Useful e.g. for throwing projectiles in front only.
+ */
+
 void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
-                             btVector3 *minDelta, const Kart* inFrontOf, const bool backwards) const
+                             Vec3 *minDelta, const Kart* inFrontOf, 
+                             const bool backwards) const
 {
-    btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() : getTrans());
+    btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() 
+                                                 : getTrans());
 
     *minDistSquared = -1.0f;
     *minKart = NULL;
@@ -156,24 +175,23 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
         if(kart->isEliminated() || kart == m_owner || kart->isRescue() ) continue;
         btTransform t=kart->getTrans();
 
-        btVector3 delta = t.getOrigin()-tProjectile.getOrigin();
+        Vec3 delta      = t.getOrigin()-tProjectile.getOrigin();
         float distance2 = delta.length2();
 
         if(inFrontOf != NULL)
         {
             // Ignore karts behind the current one
-            btVector3 to_target = kart->getXYZ() - inFrontOf->getXYZ();
+            Vec3 to_target       = kart->getXYZ() - inFrontOf->getXYZ();
             const float distance = to_target.length();
             if(distance > 50) continue; // kart too far, don't aim at it
 
             btTransform trans = inFrontOf->getTrans();
-            // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
-            btVector3 direction(trans.getBasis()[0][1],
-                                trans.getBasis()[1][1],
-                                trans.getBasis()[2][1]);
+            // get heading=trans.getBasis*(0,0,1) ... so save the multiplication:
+            Vec3 direction(trans.getBasis().getColumn(2));
             // Originally it used angle = to_target.angle( backwards ? -direction : direction );
-            // but since sometimes due to rounding errors we get an acos(x) with x>1, causing
-            // an assertion failure. So we remove the whole acos() test here:
+            // but sometimes due to rounding errors we get an acos(x) with x>1, causing
+            // an assertion failure. So we remove the whole acos() test here and copy the
+            // code from to_target.angle(...)
             Vec3  v = backwards ? -direction : direction;
             float s = sqrt(v.length2() * to_target.length2());
             float c = to_target.dot(v)/s;
@@ -193,42 +211,52 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
 }   // getClosestKart
 
 //-----------------------------------------------------------------------------
-void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart *target_kart,
-                                             float item_XY_speed, float gravity, float y_offset,
-                                             float *fire_angle, float *up_velocity, float *time_estimated)
+/** Returns information on the parameters needed to hit a target kart moving 
+ *  at constant velocity and direction for a given speed in the XZ-plane.
+ *  \param origin Location of the kart shooting the item.
+ *  \param target_kart Which kart to target.
+ *  \param item_xz_speed Speed of the item projected in XZ plane.
+ *  \param gravity The gravity used for this item.
+ *  \param forw_offset How far ahead of the kart the item is shot (so that
+ *         the item does not originate inside of the shooting kart.
+ *  \param fire_angle Returns the angle to fire the item at.
+ *  \param up_velocity Returns the upwards velocity to use for the item.
+ */
+void Flyable::getLinearKartItemIntersection (const Vec3 &origin, 
+                                             const Kart *target_kart,
+                                             float item_XZ_speed, 
+                                             float gravity, float forw_offset,
+                                             float *fire_angle, 
+                                             float *up_velocity)
 {
-    Vec3 relative_target_kart_loc = target_kart->getTrans().getOrigin() - origin;
+    Vec3 relative_target_kart_loc = target_kart->getXYZ() - origin;
 
     btTransform trans = target_kart->getTrans();
-    Vec3 target_direction(trans.getBasis()[0][1],
-                          trans.getBasis()[1][1],
-                          trans.getBasis()[2][1]);
+    Vec3 target_direction(trans.getBasis().getColumn(2));
 
     float dx = relative_target_kart_loc.getX();
     float dy = relative_target_kart_loc.getY();
     float dz = relative_target_kart_loc.getZ();
 
-    float gx = target_direction.getX();
     float gy = target_direction.getY();
-    float gz = target_direction.getZ();
 
-    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed(); //Projected onto X-Y plane
+    //Projected onto X-Z plane
+    float target_kart_speed = target_direction.length_2d() * target_kart->getSpeed();
 
-    float target_kart_heading = atan2f(-gx, gy); //anti-clockwise
+    float target_kart_heading = target_kart->getHeading();
 
-    float dist = -(target_kart_speed / item_XY_speed) * (dx * cosf(target_kart_heading) + dy * sinf(target_kart_heading));
+    float dist = -(target_kart_speed / item_XZ_speed) * (dx * cosf(target_kart_heading) +
+                                                         dz * sinf(target_kart_heading));
 
-    float fire_th = (dx*dist - dy * sqrtf(dx*dx + dy*dy - dist*dist)) / (dx*dx + dy*dy);
-    fire_th = (((dist - dx*fire_th) / dy < 0) ? -acosf(fire_th): acosf(fire_th));
+    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist)) / (dx*dx + dz*dz);
+    fire_th = (((dist - dx*fire_th) / dz < 0) ? -acosf(fire_th): acosf(fire_th));
 
     float time = 0.0f;
-    float a = item_XY_speed * sinf (fire_th) + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XY_speed * cosf (fire_th) + target_kart_speed * cosf (target_kart_heading);
+    float a = item_XZ_speed * sinf (fire_th) + target_kart_speed * sinf (target_kart_heading);
+    float b = item_XZ_speed * cosf (fire_th) + target_kart_speed * cosf (target_kart_heading);
 
-    if (fabsf(a) > fabsf(b))
-        time = fabsf (dx / a);
-    else if (b != 0.0f)
-        time = fabsf(dy / b);
+    if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
+    else if (b != 0.0f)      time = fabsf(dz / b);
 
     if (fire_th > M_PI)
         fire_th -= M_PI;
@@ -236,12 +264,11 @@ void Flyable::getLinearKartItemIntersection (const btVector3 origin, const Kart 
         fire_th += M_PI;
 
     //createPhysics offset
-    time -= y_offset / sqrt(a*a+b*b);
+    time -= forw_offset / sqrt(a*a+b*b);
 
     *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dz / time) + (gz * target_kart->getSpeed());
-    *time_estimated = time;
-}
+    *up_velocity = (0.5f * time * gravity) + (dy / time) + (gy * target_kart->getSpeed());
+}   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
 void Flyable::update(float dt)
@@ -258,15 +285,15 @@ void Flyable::update(float dt)
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
     Vec3 xyz = getXYZ();
-    if(xyz[0]<(*min)[0] || xyz[1]<(*min)[1] || xyz[2]<(*min)[2] ||
-       xyz[0]>(*max)[0] || xyz[1]>(*max)[1]                         )
+    if(xyz[0]<(*min)[0] || xyz[2]<(*min)[2] || xyz[1]<(*min)[1] ||
+       xyz[0]>(*max)[0] || xyz[2]>(*max)[2]                         )
     {
         hit(NULL);    // flyable out of track boundary
         return;
     }
-    if(m_adjust_z_velocity)
+    if(m_adjust_up_velocity)
     {
-        float hat = pos.getZ()-getHoT();
+        float hat = pos.getY()-getHoT();
 
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat
@@ -274,14 +301,14 @@ void Flyable::update(float dt)
 
         float delta = m_average_height - std::max(std::min(hat, m_max_height), m_min_height);
         Vec3 v = getVelocity();
-        float heading = atan2f(-v.getX(), v.getY());
-        float pitch   = getTerrainPitch (heading);
-        float vel_z = m_force_updown*(delta);
+        float heading = atan2f(v.getX(), v.getZ());
+        float pitch   = getTerrainPitch(heading);
+        float vel_up = m_force_updown*(delta);
         if (hat < m_max_height) // take into account pitch of surface
-            vel_z += v.length_2d()*tanf(pitch);
-        v.setZ(vel_z);
+            vel_up += v.length_2d()*tanf(pitch);
+        v.setY(vel_up);
         setVelocity(v);
-    }   // if m_adjust_z_velocity
+    }   // if m_adjust_up_velocity
 
     Moveable::update(dt);
 }   // update

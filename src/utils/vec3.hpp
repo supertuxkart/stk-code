@@ -40,7 +40,7 @@ public:
      *  axis as well (so a vector3df can be stored in and restored from
      *  a vec3).
      */
-    inline Vec3(const core::vector3df &v) :  btVector3(v.X, v.Y, v.Z) {}
+    inline Vec3(const core::vector3df &v)  :  btVector3(v.X, v.Y, v.Z)   {}
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     inline Vec3()                          : btVector3()                 {}
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
@@ -71,10 +71,10 @@ public:
     Vec3           operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this-(btVector3)v1);}
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
-    float          length2_2d() const              {return m_x*m_x + m_y*m_y;}
+    float          length2_2d() const              {return m_x*m_x + m_z*m_z;}
     /** Returns the length of this vector in the plane, i.e. the vector is 
      *  used as a 2d vector. */
-    float          length_2d()  const              {return sqrt(m_x*m_x + m_y*m_y);}
+    float          length_2d()  const              {return sqrt(m_x*m_x + m_z*m_z);}
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */
     void           max(const Vec3& a)              {if(a.getX()>m_x) m_x=a.getX();

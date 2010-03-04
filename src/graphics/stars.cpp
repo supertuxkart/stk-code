@@ -29,7 +29,7 @@ const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;
 const float STAR_SIZE = 0.4f;
 
-Stars::Stars(scene::IAnimatedMeshSceneNode* parentKart)
+Stars::Stars(scene::ISceneNode* parentKart)
 {
     m_parent_kart_node = parentKart;
     m_enabled = false;

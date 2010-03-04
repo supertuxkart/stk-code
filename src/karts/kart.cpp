@@ -80,7 +80,6 @@ Kart::Kart (const std::string& ident, int position,
     m_nitro                = NULL;
     m_slip_stream          = NULL;
     m_skidmarks            = NULL;
-    m_animated_node        = NULL;
     m_camera               = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
@@ -162,19 +161,12 @@ void Kart::setController(Controller *controller)
 
 btTransform Kart::getKartHeading(const float customPitch)
 {
-    btTransform trans = this->getTrans();
+    btTransform trans = getTrans();
 
-    // get heading=trans.getBasis*(0,1,0) ... so save the multiplication:
-    btVector3 direction(trans.getBasis()[0][1],
-                        trans.getBasis()[1][1],
-                        trans.getBasis()[2][1]);
-    float heading=atan2(-direction.getX(), direction.getY());
-
-    TerrainInfo::update(this->getXYZ());
-    float pitch = (customPitch == -1 ? getTerrainPitch(heading) : customPitch);
+    float pitch = (customPitch == -1 ? getTerrainPitch(getHeading()) : customPitch);
 
     btMatrix3x3 m;
-    m.setEulerZYX(pitch, 0.0f, heading);
+    m.setEulerYPR(-getHeading(), pitch, 0.0f);
     trans.setBasis(m);
 
     return trans;
@@ -1276,7 +1268,7 @@ void Kart::endRescue()
 
 void Kart::loadData()
 {
-    m_kart_properties->getKartModel()->attachModel(&m_animated_node);
+    m_kart_properties->getKartModel()->attachModel(&m_node);
     createPhysics();
 
     // Attach Particle System
@@ -1289,9 +1281,9 @@ void Kart::loadData()
         m_skidmarks = new SkidMarks(*this);
        
     m_shadow = new Shadow(m_kart_properties->getShadowTexture(),
-                          m_animated_node);
+                          m_node);
 
-    m_stars_effect = new Stars(m_animated_node);
+    m_stars_effect = new Stars(m_node);
 }   // loadData
 
 //-----------------------------------------------------------------------------
@@ -1314,13 +1306,14 @@ void Kart::setSuspensionLength()
 //-----------------------------------------------------------------------------
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
- *  for special gfx effects (e.g. skidding will turn the karts more). The
+ *  for special gfx effects (e.g. skidding will turn the karts more). These
  *  variables are actually not used here atm, but are defined here and then
  *  used in Moveable.
- *  \param off_xyz Offset to be added to the position.
- *  \param off_hpr Offset to be added to rotation (euler values).
+ *  \param offset_xyz Offset to be added to the position.
+ *  \param rotation Additional rotation.
  */
-void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
+void Kart::updateGraphics(const Vec3& offset_xyz, 
+                          const btQuaternion& rotation)
 {
     float wheel_up_axis[4];
     KartModel *kart_model = m_kart_properties->getKartModel();
@@ -1374,7 +1367,8 @@ void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
                          * speed_ratio * m_skidding*m_skidding;
     printf("heading: %f hpr %f offset %f\n",
         getHeading(), getHPR().getHeading(), -offset_heading);
-    Moveable::updateGraphics(center_shift, Vec3(0, -offset_heading, 0));
+    Moveable::updateGraphics(center_shift, 
+                             btQuaternion(-offset_heading, 0, 0));
 }   // updateGraphics
 
 /* EOF */

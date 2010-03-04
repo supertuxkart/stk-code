@@ -45,10 +45,10 @@ private:
      *  It can happen that more than one collision between a rocket and
      *  a track or kart is reported by the physics.                        */
     bool              m_exploded;
-    /** If this flag is set, the Z velocity of the kart will not be
+    /** If this flag is set, the up velocity of the kart will not be
      *  adjusted in case that the objects is too high or too low above the
      *  terrain. Otherwise gravity will not work correctly on this object. */
-    bool              m_adjust_z_velocity;
+    bool              m_adjust_up_velocity;
 
 protected:
     Kart*             m_owner;              // the kart which released this flyable
@@ -59,7 +59,7 @@ protected:
     float             m_force_updown;
     float             m_speed;
     float             m_mass;
-    btVector3         m_extend;
+    Vec3              m_extend;
     // The flyable class stores the values for each flyable type, e.g.
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
@@ -69,7 +69,7 @@ protected:
     static float      m_st_min_height[POWERUP_MAX];    // min height above track
     static float      m_st_max_height[POWERUP_MAX];    // max height above track
     static float      m_st_force_updown[POWERUP_MAX];  // force pushing up/down
-    static btVector3  m_st_extend[POWERUP_MAX];        // size of the model
+    static Vec3       m_st_extend[POWERUP_MAX];        // size of the model
 
     /** time since thrown. used so a kart can't hit himself when trying something,
         and also to put some time limit to some collectibles */
@@ -82,28 +82,20 @@ protected:
         for a short time */
     bool              m_owner_has_temporary_immunity;
 
-    /** Returns information on what is the closest kart and at what
-        distance it is. All 3 parameters first are of type 'out'.
-        'inFrontOf' can be set if you wish to know the closest
-        kart in front of some karts (will ignore those behind).
-        Useful e.g. for throwing projectiles in front only.
-     */
     void              getClosestKart(const Kart **minKart, float *minDistSquared,
-                                     btVector3 *minDelta, const Kart* inFrontOf=NULL,
+                                     Vec3 *minDelta, const Kart* inFrontOf=NULL,
                                      const bool backwards=false) const;
 
-    /** Returns information on the parameters needed to hit a target kart
-        moving at constant velocity and direction for a given speed in the
-        XY-plane.
-     */
-    void getLinearKartItemIntersection(const btVector3 origin, const Kart *target_kart,
-                                       float item_XY_velocity, float gravity, float y_offset,
-                                       float *fire_angle, float *up_velocity, float *time);
+    void getLinearKartItemIntersection(const Vec3 &origin, 
+                                       const Kart *target_kart,
+                                       float item_XY_velocity, float gravity,
+                                       float forw_offset,
+                                       float *fire_angle, float *up_velocity);
 
 
     /** init bullet for moving objects like projectiles */
     void              createPhysics(float y_offset,
-                                    const btVector3 &velocity,
+                                    const Vec3 &velocity,
                                     btCollisionShape *shape, const float gravity=0.0f,
                                     const bool rotates=false, const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
@@ -114,7 +106,7 @@ public:
     /** Enables/disables adjusting ov velocity depending on height above
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
      *  but gravity will basically be disabled.                          */
-    void         setAdjustZVelocity(bool f) { m_adjust_z_velocity = f; }
+    void         setAdjustUpVelocity(bool f) { m_adjust_up_velocity = f; }
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupType type);
     virtual void update      (float);
