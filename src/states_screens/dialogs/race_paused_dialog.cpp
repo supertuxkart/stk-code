@@ -88,8 +88,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_choice_ribbon->h = icon_size + text_height;
     m_choice_ribbon->setParent(m_irrlicht_window);
     
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE &&
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
         IconButtonWidget* ribbon_item = new IconButtonWidget();
         ribbon_item->m_properties[PROP_ID] = "newrace";
