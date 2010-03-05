@@ -205,8 +205,11 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
             std::cout << "%% storing new gamepad button binding value=" << value <<
             " deviceID=" << deviceID << " btnID=" << btnID << "\n";
 
-            OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
-            return;
+            if (abs(value) > Input::MAX_VALUE/2.0f)
+            {
+                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+                return;
+            }
         }
         
         if( type == Input::IT_STICKMOTION )
@@ -460,11 +463,6 @@ EventPropagation InputManager::input(const SEvent& event)
         for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ; axis_id++)
         {
             int value = event.JoystickEvent.Axis[axis_id];
-
-#ifdef __APPLE__
-            // work around irrLicht bug. FIXME - get it fixed and remove this
-            if(value == -32768) continue; // ignore bogus values given by irrlicht
-#endif
 
             if (UserConfigParams::m_gamepad_debug)
             {
