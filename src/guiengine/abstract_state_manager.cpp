@@ -192,8 +192,10 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 
     assert(World::getWorld()==NULL);
     
-    input_manager->setMode(InputManager::MENU);
+    if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
+
+    input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
     setGameState(MENU);
     sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
@@ -210,6 +212,7 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     
     input_manager->setMode(InputManager::MENU);
     
+    if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     
     for (int n=0; screens[n] != NULL; n++)
