@@ -82,7 +82,7 @@ void Challenge::addUnlockTrackReward(const std::string &track_name)
 //-----------------------------------------------------------------------------
 void Challenge::addUnlockModeReward(const std::string &internal_mode_name,
                                     const irr::core::stringw &user_mode_name)
-{
+{    
     UnlockableFeature feature;
     feature.name = internal_mode_name;
     feature.type = UNLOCK_MODE;

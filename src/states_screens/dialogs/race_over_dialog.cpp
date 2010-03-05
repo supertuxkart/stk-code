@@ -405,7 +405,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
                         Track* track = track_manager->getTrack(unlockedFeatures[i].name);
                         assert(track != NULL);
                         const std::string sshot = track->getScreenshotFile();
-                        scene->addUnlockedPicture( irr_driver->getTexture(sshot.c_str()),
+                        scene->addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 1.0f, 0.75f,
                                                    unlockedFeatures[i].getUnlockedMessage() );
                         break;
                     }
@@ -416,7 +416,11 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
                     }
                     case UNLOCK_MODE:
                     {
-                        //TODO
+                        const RaceManager::MinorRaceModeType mode =
+                                RaceManager::getModeIDFromInternalName(unlockedFeatures[i].name.c_str());
+                        const std::string icon = file_manager->getDataDir() + "/" + RaceManager::getIconOf(mode);
+                        scene->addUnlockedPicture( irr_driver->getTexture(icon.c_str()), 0.8f, 0.8f,
+                                                   unlockedFeatures[i].getUnlockedMessage() );
                         break;
                     }
                     case UNLOCK_KART:

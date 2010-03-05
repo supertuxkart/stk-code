@@ -378,6 +378,8 @@ const std::string& RibbonWidget::getSelectionIDString(const int playerID)
 {
     static std::string empty;
     if (m_selection[playerID] == -1) return empty;
+    if (m_children.size() == 0)      return empty;
+    
     return m_children[m_selection[playerID]].m_properties[PROP_ID];
 }
 

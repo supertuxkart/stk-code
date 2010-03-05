@@ -32,6 +32,12 @@ class Kart;
 class Kart;
 class Track;
 
+
+static const char* IDENT_STD     = "STANDARD";
+static const char* IDENT_TTRIAL  = "STD_TIMETRIAL";
+static const char* FTL_IDENT     = "FOLLOW_LEADER";
+static const char* STRIKES_IDENT = "BATTLE_3_STRIKES";
+
 /** The race manager has two functions:
  *  1) it stores information about the race the user selected (e.g. number
  *     of karts, track, race mode etc.). Most of the values are just stored
@@ -82,18 +88,14 @@ public:
       */
     enum MinorRaceModeType
     {
+        MINOR_MODE_NONE          = -1,
+        
         MINOR_MODE_NORMAL_RACE   = LINEAR_RACE(0, true),
         MINOR_MODE_TIME_TRIAL    = LINEAR_RACE(1, true),
         MINOR_MODE_FOLLOW_LEADER = LINEAR_RACE(2, false),
         
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0)
     };
-    
-    // Stupid C++ doesn't accept string constants
-    #define IDENT_STD     "STANDARD"
-    #define IDENT_TTRIAL  "STD_TIMETRIAL"
-    #define FTL_IDENT     "FOLLOW_LEADER"
-    #define STRIKES_IDENT "BATTLE_3_STRIKES"
 
     static const char* getIdentOf(const MinorRaceModeType mode)
     {
@@ -103,6 +105,18 @@ public:
             case MINOR_MODE_TIME_TRIAL:     return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:  return FTL_IDENT;
             case MINOR_MODE_3_STRIKES:      return STRIKES_IDENT;
+            default: assert(false); return NULL;
+        }
+    }
+    
+    static const char* getIconOf(const MinorRaceModeType mode)
+    {
+        switch (mode)
+        {
+            case MINOR_MODE_NORMAL_RACE:    return "/gui/mode_normal.png";
+            case MINOR_MODE_TIME_TRIAL:     return "/gui/mode_tt.png";
+            case MINOR_MODE_FOLLOW_LEADER:  return "/gui/mode_ftl.png";
+            case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
             default: assert(false); return NULL;
         }
     }
@@ -121,15 +135,16 @@ public:
             default: assert(false); return NULL;
         }
     }
-    static const wchar_t* getNameOf(const char* name)
+    
+    static const MinorRaceModeType getModeIDFromInternalName(const char* name)
     {
-        if (strcmp(name, IDENT_STD) == 0) return getNameOf(MINOR_MODE_NORMAL_RACE);
-        else if (strcmp(name, IDENT_TTRIAL) == 0) return getNameOf(MINOR_MODE_TIME_TRIAL);
-        else if (strcmp(name, FTL_IDENT) == 0) return getNameOf(MINOR_MODE_FOLLOW_LEADER);
-        else if (strcmp(name, STRIKES_IDENT) == 0) return getNameOf(MINOR_MODE_3_STRIKES);
+        if      (strcmp(name, IDENT_STD)     == 0) return MINOR_MODE_NORMAL_RACE;
+        else if (strcmp(name, IDENT_TTRIAL)  == 0) return MINOR_MODE_TIME_TRIAL;
+        else if (strcmp(name, FTL_IDENT)     == 0) return MINOR_MODE_FOLLOW_LEADER;
+        else if (strcmp(name, STRIKES_IDENT) == 0) return MINOR_MODE_3_STRIKES;
 
         assert(0);
-        return NULL;
+        return MINOR_MODE_NONE;
     }
     
 #undef LINEAR_RACE

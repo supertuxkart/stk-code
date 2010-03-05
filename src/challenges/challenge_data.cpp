@@ -142,6 +142,11 @@ ChallengeData::ChallengeData(const std::string& filename)
     getUnlocks(root, "unlock-difficulty", UNLOCK_DIFFICULTY);
     getUnlocks(root, "unlock-kart",       UNLOCK_KART);
 
+    if (getFeatures().size() == 0)
+    {
+        error("missing unlocked features");
+    }
+    
     std::vector< std::string > deps;
     root->get("depend-on", &deps);
     for(unsigned int i=0; i<deps.size(); i++) addDependency(deps[i]);
@@ -196,6 +201,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
 {
     std:: string attrib;
     root->get(type, &attrib);
+    
     if (attrib . empty()) return;
 
     //std:: vector< std:: string > data;
@@ -214,7 +220,9 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
     case UNLOCK_GP:         addUnlockGPReward        (attrib        );
                             break;
             
-    case UNLOCK_MODE:       addUnlockModeReward      (attrib, RaceManager::getNameOf(attrib.c_str()));
+    case UNLOCK_MODE:       const RaceManager::MinorRaceModeType mode =
+                                RaceManager::getModeIDFromInternalName(attrib.c_str());
+                            addUnlockModeReward      (attrib, RaceManager::getNameOf(mode));
                             break;
             
     case UNLOCK_DIFFICULTY:

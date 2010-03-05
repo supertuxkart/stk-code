@@ -110,7 +110,7 @@ namespace GUIEngine
             {
                 unlock_manager->playLockSound();
             }
-            else
+            else if (!selection.empty())
             {
                 //FIXME: simplify and centralize race start sequence!!
 

@@ -170,18 +170,18 @@ void RaceSetupScreen::init()
     //FIXME: avoid duplicating descriptions from the help menu!
     name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
     
-    w2->addItem( name1, "normal", "/gui/mode_normal.png");
+    w2->addItem( name1, "normal", RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
     
     irr::core::stringw name2 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name2 += _("Contains no powerups, so only your driving skills matter!");
-    w2->addItem( name2, "timetrial", "/gui/mode_tt.png");
+    w2->addItem( name2, "timetrial", RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
     
     if (unlock_manager->isLocked("followtheleader"))
     {
         w2->addItem( _("Locked : solve active challenges to gain access to more!"),
-                    "locked", "/gui/mode_ftl.png", true);
+                    "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);
     }
     else
     {
@@ -189,7 +189,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
         name3 += _("Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware : going in front of the leader will get you eliminated too!");
-        w2->addItem(name3, "ftl", "/gui/mode_ftl.png", false);
+        w2->addItem(name3, "ftl", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
     
     if (race_manager->getNumPlayers() > 1)
@@ -198,7 +198,7 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
         name4 += _("Hit others with weapons until they lose all their lives. (Only in multiplayer games)");
-        w2->addItem( name4, "3strikes", "/gui/mode_3strikes.png");
+        w2->addItem( name4, "3strikes", RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
     }
     
 

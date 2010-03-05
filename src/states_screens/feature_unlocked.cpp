@@ -35,11 +35,12 @@ void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, irr
 
 // -------------------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture, irr::core::stringw msg)
+void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
+                                                 float w, float h, irr::core::stringw msg)
 {
     assert(picture != NULL);
 
-    m_unlocked_stuff.push_back( new UnlockedThing(picture, msg) );
+    m_unlocked_stuff.push_back( new UnlockedThing(picture, w, h, msg) );
 }
 
 // -------------------------------------------------------------------------------------
@@ -105,13 +106,14 @@ void FeatureUnlockedCutScene::init()
         else if (m_unlocked_stuff[n].m_picture != NULL)
         {
             video::SMaterial m;
+            m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
             m.BackfaceCulling = false;
             m.setTexture(0, m_unlocked_stuff[n].m_picture);
-            m.AmbientColor = SColor(255,255,255,255);
-            m.DiffuseColor = SColor(255,255,255,255);
-            m.SpecularColor = SColor(0,0,0,0);
+            m.AmbientColor   = SColor(255,255,255,255);
+            m.DiffuseColor   = SColor(255,255,255,255);
+            m.SpecularColor  = SColor(0,0,0,0);
             m.GouraudShading = false;
-            m.Shininess = 0;
+            m.Shininess      = 0;
             //m.setFlag(video::EMF_TEXTURE_WRAP, false);
             
     #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)
@@ -121,7 +123,9 @@ void FeatureUnlockedCutScene::init()
             m.TextureLayer[0].TextureWrap = video::ETC_CLAMP_TO_EDGE;
     #endif
 
-            scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m, 1.0, 0.75);
+            scene::IMesh* mesh = irr_driver->createTexturedQuadMesh(&m,
+                                                                    m_unlocked_stuff[n].m_w,
+                                                                    m_unlocked_stuff[n].m_h);
             m_unlocked_stuff[n].m_root_gift_node   = irr_driver->addMesh(mesh);
 
         }

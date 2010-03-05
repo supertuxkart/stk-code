@@ -357,7 +357,7 @@ const std::string& DynamicRibbonWidget::getSelectionIDString(const int playerID)
 {
     RibbonWidget* row = (RibbonWidget*)(m_rows.size() == 1 ? m_rows.get(0) : getSelectedRibbon(playerID));
     
-    if(row != NULL) return row->getSelectionIDString(playerID);
+    if (row != NULL) return row->getSelectionIDString(playerID);
     
     static const std::string nothing = "";
     return nothing;

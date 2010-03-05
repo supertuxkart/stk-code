@@ -17,8 +17,13 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     /** Whichever of these is non-null decides what comes out of the chest */
     struct UnlockedThing
     {
+        /** Will be non-null if this unlocked thing is a kart */
         KartProperties* m_unlocked_kart;
+        
+        /** Will be non-null if this unlocked thing is a picture */
         irr::video::ITexture* m_picture;
+        /** Will be set if this unlocked thing is a picture */
+        float m_w, m_h;
         
         /** Contains whatever is in the chest */
         scene::ISceneNode* m_root_gift_node;
@@ -31,10 +36,12 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
             m_picture = NULL;
             m_unlock_message = msg;
         }
-        UnlockedThing(irr::video::ITexture* pict, irr::core::stringw msg)
+        UnlockedThing(irr::video::ITexture* pict, float w, float h, irr::core::stringw msg)
         {
             m_unlocked_kart = NULL;
             m_picture = pict;
+            m_w = w;
+            m_h = h;
             m_unlock_message = msg;
         }
         ~UnlockedThing()
@@ -80,7 +87,7 @@ public:
     void addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg);
     
     /** Call before showing up the screen to make a picture come out of the chest */
-    void addUnlockedPicture(irr::video::ITexture* picture, irr::core::stringw msg);
+    void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
     
     /** override from base class to handle escape press */
     virtual bool onEscapePressed();
