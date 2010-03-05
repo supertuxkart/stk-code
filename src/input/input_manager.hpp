@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 #include <irrlicht.h>
-#include <map>
+#include <set>
 
 #include "guiengine/event_handler.hpp"
 #include "input/input.hpp"
@@ -34,7 +34,6 @@ class DeviceManager;
  */
 class InputManager
 {
-    std::map<int, int> m_sensed_input_on_all_axes;
 public:
     enum InputDriverMode {
         MENU = 0,
@@ -55,12 +54,8 @@ private:
 
     Input          *m_sensed_input;
     DeviceManager  *m_device_manager;
+    std::set<int>   m_sensed_input_high;
     
-    /** Stores the maximum sensed input values. This allows to select the
-     *  axis which was pushed the furthest when sensing input. */
-    int              m_max_sensed_input;
-    Input::InputType m_max_sensed_type;
-
     InputDriverMode  m_mode;
     
     /** When at true, only the master player can play with menus */

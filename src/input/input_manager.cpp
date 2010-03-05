@@ -181,34 +181,19 @@ void InputManager::handleStaticAction(int key, int value)
   */
 void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
 {
-    // See if the new input should be stored. This happens if:
-    // 1) the value is larger
-    // 2) nothing has been saved yet
-    // 3) the new event has the preferred type : TODO - reimplement
-    // The latter is necessary since some gamepads have analog
-    // buttons that can return two different events when pressed
-    bool store_new = (abs(value) > m_max_sensed_input         ||
-                      m_max_sensed_type  == Input::IT_NONE) && abs(value) > Input::MAX_VALUE/2;
-    
+    bool store_new = true;
+        
     // don't store if we're trying to do something like bindings keyboard keys on a gamepad
     if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
     if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
     
-    // only store axes and button presses when they're pushed quite far
-    if(m_mode == INPUT_SENSE_GAMEPAD &&
-            (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON) &&
-            abs(value) < Input::MAX_VALUE *2/3)
-    {
-        store_new = false;
-    }
-    
-    // for axis bindings, we request at least 2 different values bhefore accepting (ignore non-moving axes
-    // as some devices have special axes that are at max value at rest)
-    bool first_value = true;
-    
     if(store_new)
     {
         m_sensed_input->type = type;
+        m_sensed_input->deviceID = deviceID;
+        m_sensed_input->btnID = btnID;
+        m_sensed_input->axisDirection = axisDirection;
+
         if(type == Input::IT_STICKMOTION)
         {
             std::cout << "%% storing new axis binding, value=" << value <<
@@ -219,39 +204,36 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         {
             std::cout << "%% storing new gamepad button binding value=" << value <<
             " deviceID=" << deviceID << " btnID=" << btnID << "\n";
+
+            OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+            return;
         }
-        
-        m_sensed_input->deviceID = deviceID;
-        m_sensed_input->btnID = btnID;
-        m_sensed_input->axisDirection = axisDirection;
         
         if( type == Input::IT_STICKMOTION )
         {
-            const int inputID = axisDirection*50 + btnID; // a unique ID for each
-            if(m_sensed_input_on_all_axes.find(inputID) != m_sensed_input_on_all_axes.end() &&
-                m_sensed_input_on_all_axes[inputID] != abs(value)) first_value = false;
-            
-            m_sensed_input_on_all_axes[inputID] = abs(value);
-        }
-        
-        m_max_sensed_input   = abs(value);
-        m_max_sensed_type    = type;
-        
-        // don't notify on first axis value (unless the axis is pushed to the maximum)
-        if (m_mode == INPUT_SENSE_GAMEPAD && type == Input::IT_STICKMOTION &&
-            first_value && abs(value) < Input::MAX_VALUE*3.0f/4.0f)
-        {
-            std::cout << "not notifying on first value\n";
-            return;
+            // It is necessary to test both ids because the center position is always positive (0)
+            const int input_id = axisDirection*50 + btnID;
+            const int input_id_inverse = (axisDirection?0:-1) *50 + btnID;
+            bool id_has_high_value = m_sensed_input_high.find(input_id) != m_sensed_input_high.end();
+            bool inverse_id_has_high_value = m_sensed_input_high.find(input_id_inverse) != m_sensed_input_high.end();
+
+            if (!id_has_high_value && abs(value) > Input::MAX_VALUE*6.0f/7.0f) 
+            {
+                m_sensed_input_high.insert(input_id);
+            }
+            else if ( abs(value) < Input::MAX_VALUE/8.0f && id_has_high_value )
+            {
+                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+            }
+            else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_has_high_value )
+            {
+                m_sensed_input->axisDirection = (axisDirection?0:-1);
+                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+            }
         }
     }
-    
-    // Notify the completion of the input sensing when key is released
-    if (abs(value) < Input::MAX_VALUE/2  && m_sensed_input->deviceID == deviceID &&
-        m_sensed_input->btnID == btnID)
-    {
-        OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
-    }
+
+    return;
 }
 //-----------------------------------------------------------------------------
 int InputManager::getPlayerKeyboardID() const
@@ -706,7 +688,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                     // Leaving input sense mode.
 
                     irr_driver->showPointer();
-                    m_sensed_input_on_all_axes.clear();
+                    m_sensed_input_high.clear();
 
                     // The order is deliberate just in case someone starts to make
                     // STK multithreaded: m_sensed_input must not be 0 when
@@ -760,8 +742,6 @@ void InputManager::setMode(InputDriverMode new_mode)
             // Reset the helper values for the relative mouse movement supresses to
             // the notification of them as an input.
             m_mouse_val_x      = m_mouse_val_y = 0;
-            m_max_sensed_input = 0;
-            m_max_sensed_type  = Input::IT_NONE;
             m_sensed_input     = new Input();
 
             irr_driver->hidePointer();
