@@ -1365,8 +1365,6 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     float speed_ratio    = getSpeed()/getMaxSpeed();
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
-    printf("heading: %f hpr %f offset %f\n",
-        getHeading(), getHPR().getHeading(), -offset_heading);
     Moveable::updateGraphics(center_shift, 
                              btQuaternion(-offset_heading, 0, 0));
 }   // updateGraphics
