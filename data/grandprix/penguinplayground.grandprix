@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="Penguin Playground" description="First grand prix, easy to get started">
+<supertuxkart_grand_prix name="Penguin Playground">
 
     <track id="sandtrack"    laps="3" />
     <track id="snowmountain" laps="3" />

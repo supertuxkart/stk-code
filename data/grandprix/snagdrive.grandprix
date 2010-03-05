@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="Snag Drive" description="Third grand prix">
+<supertuxkart_grand_prix name="Snag Drive">
 
     <track id="islandtrack"      laps="2" />
     <track id="tuxtollway"       laps="2" />

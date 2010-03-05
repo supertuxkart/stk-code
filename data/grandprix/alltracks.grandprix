@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="All tracks" description="All tracks included in SuperTuxKart">
+<supertuxkart_grand_prix name="All tracks">
 
     <track id="beach"            laps="2" />
     <track id="startrack"        laps="3" />

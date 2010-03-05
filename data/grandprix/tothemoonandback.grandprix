@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="To the Moon and Back" description="Second grand prix">
+<supertuxkart_grand_prix name="To the Moon and Back">
 
     <track id="lighthouse" laps="4" />
     <track id="skyline"    laps="3" />

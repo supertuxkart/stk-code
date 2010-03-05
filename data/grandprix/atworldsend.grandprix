@@ -1,5 +1,5 @@
 
-<supertuxkart_grand_prix name="At World's End" description="Last grand prix, longer and harder">
+<supertuxkart_grand_prix name="At World's End">
 
     <track id="fortmagma"   laps="3" />
     <track id="canyon"      laps="2" />

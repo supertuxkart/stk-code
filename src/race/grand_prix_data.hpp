@@ -32,7 +32,9 @@
 class GrandPrixData
 {
     irr::core::stringw m_name;         //!< The name of the grand prix - might be translated!
-    irr::core::stringw m_description;  //!< Description for this GP
+
+    //irr::core::stringw m_description;  //!< Description for this GP
+    
     std::string m_id;                  //!< Internal name of the grand prix, not translated
     std::string m_filename;            //!< Original filename, only for error handling needed
     std::string m_item_style;          //!< item style which overwrites the track default
@@ -59,7 +61,7 @@ public:
     const irr::core::stringw& getName ()        const { return m_name;          }
     
     /** @return the (potentially translated) user-visible description of the Grand Prix */
-    const irr::core::stringw& getDescription () const { return m_description;   }
+    //const irr::core::stringw& getDescription () const { return m_description;   }
 
     /** @return the internale name identifier of the Grand Prix (not translated) */
     const std::string& getId          ()        const { return m_id;            }
