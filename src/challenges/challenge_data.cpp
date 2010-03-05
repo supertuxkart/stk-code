@@ -220,18 +220,20 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
     case UNLOCK_GP:         addUnlockGPReward        (attrib        );
                             break;
             
-    case UNLOCK_MODE:       const RaceManager::MinorRaceModeType mode =
+    case UNLOCK_MODE:       {
+                            const RaceManager::MinorRaceModeType mode =
                                 RaceManager::getModeIDFromInternalName(attrib.c_str());
                             addUnlockModeReward      (attrib, RaceManager::getNameOf(mode));
                             break;
-            
+                            }
     case UNLOCK_DIFFICULTY:
                             {
                             irr::core::stringw user_name = "?"; // TODO
                             addUnlockDifficultyReward(attrib, user_name);
                             break;
                             }
-    case UNLOCK_KART:       const KartProperties* prop = kart_properties_manager->getKart(attrib);
+    case UNLOCK_KART:       {
+                            const KartProperties* prop = kart_properties_manager->getKart(attrib);
                             if (prop == NULL)
                             {
                                 std::cerr << "Challenge refers to kart " << attrib <<
@@ -241,6 +243,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
                             irr::core::stringw user_name = prop->getName();
                             addUnlockKartReward(attrib, user_name);
                             break;
+                            }
     }   // switch
 }   // getUnlocks
 // ----------------------------------------------------------------------------

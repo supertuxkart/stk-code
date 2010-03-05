@@ -291,8 +291,6 @@ void OptionsScreenInput::rebuildDeviceList()
 static PlayerAction binding_to_set;
 static std::string binding_to_set_button;
 
-#define MAX_VALUE 32768
-
 void OptionsScreenInput::gotSensedInput(Input* sensedInput)
 {
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
