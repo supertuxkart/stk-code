@@ -138,6 +138,9 @@ private:
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
 
+    /** Used to display messages without overlapping */
+    int              m_max_font_height;
+    
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
                               const core::vector2df &center,
@@ -166,6 +169,7 @@ private:
     void drawGlobalMusicDescription();
     void cleanupMessages       (const float dt);
     void drawGlobalReadySetGo  ();
+    
 public:
 
          RaceGUI();

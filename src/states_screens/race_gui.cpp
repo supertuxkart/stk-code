@@ -56,7 +56,8 @@ RaceGUI::RaceGUI()
     m_map_height           = 100;
     m_map_left             =  10;
     m_map_bottom           =  10;
-
+    m_max_font_height      = GUIEngine::getFontHeight() + 10;
+    
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)
     {
@@ -650,10 +651,7 @@ void RaceGUI::cleanupMessages(const float dt)
 void RaceGUI::drawAllMessages(const Kart* kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
-{
-    //TODO: don't hardcode, detect dynamically from font size
-    const int MESSAGE_MAX_HEIGHT = 70;
-    
+{    
     // First line of text somewhat under the top of the screen. For now
     // start just under the timer display
     int y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
@@ -670,10 +668,10 @@ void RaceGUI::drawAllMessages(const Kart* kart,
         // Display only messages for all karts, or messages for this kart
         if (msg.m_kart && msg.m_kart!=kart) continue;
 
-        core::rect<s32> pos(x - w/2, y, x + w/2, y + MESSAGE_MAX_HEIGHT);
+        core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
         GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
                                    pos, msg.m_color, true /* hcenter */, true /* vcenter */);
-        y += MESSAGE_MAX_HEIGHT;        
+        y += m_max_font_height;        
     }   // for i in all messages
 }   // drawAllMessages
 

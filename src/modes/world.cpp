@@ -582,11 +582,11 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
             if(!(*i)->getCamera()) continue;
             if(*i==kart)
             {
-                m_race_gui->addMessage(_("You have been\neliminated!"), *i, 2.0f, 60);
+                m_race_gui->addMessage(_("You have been eliminated!"), *i, 2.0f, 60);
             }
             else
             {
-                m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has\nbeen eliminated."),
+                m_race_gui->addMessage(StringUtils::insertValues(_("'%s' has been eliminated."),
                                                                  kart->getName().c_str()),
                                                                  *i, 2.0f, 60);
             }
