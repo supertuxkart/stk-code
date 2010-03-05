@@ -331,6 +331,9 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
 {
     //std::cout << "Naviagte up!\n";
     IGUIElement *el = NULL, *first=NULL, *closest=NULL;
+
+    if (type == Input::IT_STICKBUTTON && !pressedDown)
+        return;
     
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
     if (w != NULL) el = w->getIrrlichtElement();
@@ -426,6 +429,9 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     //std::cout << "Naviagte down!\n";
 
     IGUIElement *el = NULL, *first = NULL, *closest = NULL;
+
+    if (type == Input::IT_STICKBUTTON && !pressedDown)
+        return;
     
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
     if (w != NULL) el = w->getIrrlichtElement();
