@@ -475,7 +475,7 @@ irr::core::stringw Input::getInputAsString(const Input::InputType type, const in
             break;
         case Input::IT_STICKMOTION:
             //I18N: to appear in input configuration screen, for gamepad axes
-            s = StringUtils::insertValues( _("Axis %d %s"), id, (dir == Input::AD_NEGATIVE) ? '-' : '+');
+            s = StringUtils::insertValues( _("Axis %d %s"), id, (dir == Input::AD_NEGATIVE) ? L"-" : L"+");
             break;
         case Input::IT_STICKBUTTON:
             //I18N: to appear in input configuration screen, for gamepad buttons
