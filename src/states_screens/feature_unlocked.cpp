@@ -222,23 +222,23 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
             }
             else
             {
-                pos.X += 2*dt;
+                pos.X += 2.0f*dt;
             }
             
-            pos.Z += 5*dt;
+            if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z += 5.0f*dt;
 
             m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
             
             core::vector3df scale = m_unlocked_stuff[n].m_root_gift_node->getScale();
-            scale.X += 2*dt;
-            scale.Y += 2*dt;
-            scale.Z += 2*dt;
+            scale.X += 2.0f*dt;
+            scale.Y += 2.0f*dt;
+            scale.Z += 2.0f*dt;
             m_unlocked_stuff[n].m_root_gift_node->setScale(scale);
         }
         
         core::vector3df campos = m_camera->getPosition();
-        campos.X += 2*dt;
-        campos.Z += 5*dt;
+        campos.X += 2.0f*dt;
+        campos.Z += 5.0f*dt;
         
         m_camera->setPosition(campos);
     }
