@@ -254,12 +254,6 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
 void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
                                          Vec3 *wanted_target)
 {
-    // The pitch in hpr is in between -pi and pi. But for the camera it
-    // must be restricted to -pi/2 and pi/2 - so recompute it by restricting
-    // y to positive values, i.e. no pitch of more than pi/2.
-    Vec3  up = m_kart->getTrans().getBasis().getColumn(1);
-    float pitch = atan2(up.getZ(), fabsf(up.getY()));
-
     *wanted_target = m_kart->getXYZ();
     wanted_target->setY(wanted_target->getY()+ 0.75f);
     // This first line moves the camera around behind the kart, pointing it 
@@ -271,7 +265,7 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     float dampened_steer =  fabsf(steering) * steering; 
     float angle_around = m_kart->getHeading() 
                        + m_rotation_range * dampened_steer * 0.5f;
-    float angle_up     = pitch + 30.0f*DEGREE_TO_RAD;
+    float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
 
     wanted_position->setX(-sin(angle_around));
     wanted_position->setY( sin(angle_up)    );
@@ -305,8 +299,7 @@ void Camera::update(float dt)
             float angle_around = m_kart->getHeading()
                                - m_rotation_range * m_kart->getSteerPercent() 
                                * m_kart->getSkidding();
-            float angle_up     = m_kart->getHPR().getPitch() 
-                               + 30.0f*DEGREE_TO_RAD;
+            float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY( sin(angle_up)    );
             wanted_position.setZ( cos(angle_around));
@@ -323,7 +316,7 @@ void Camera::update(float dt)
             float angle_around = m_kart->getHeading() 
                                + m_rotation_range * m_kart->getSteerPercent() 
                                * m_kart->getSkidding();
-            float angle_up     = m_kart->getHPR().getPitch() 
+            float angle_up     = m_kart->getPitch() 
                                - 20.0f*DEGREE_TO_RAD;
             wanted_position.setX( sin(angle_around));
             wanted_position.setY(-sin(angle_up)    );
@@ -341,7 +334,7 @@ void Camera::update(float dt)
             // Follows the leader kart, higher off of the ground, further from the kart,
             // and turns in the opposite direction from the kart for a nice effect. :)
             float angle_around = kart->getHeading();
-            float angle_up     = kart->getHPR().getPitch() + 40.0f*DEGREE_TO_RAD;
+            float angle_up     = kart->getPitch() + 40.0f*DEGREE_TO_RAD;
             wanted_position.setX(sin(angle_around));
             wanted_position.setY(sin(angle_up)    );
             wanted_position.setZ(cos(angle_around));

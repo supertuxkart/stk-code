@@ -299,7 +299,7 @@ void DefaultAIController::handleBraking()
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if (m_crashes.m_road && m_kart->getVelocityLC().getY() > MIN_SPEED && 
+    if (m_crashes.m_road && m_kart->getVelocityLC().getZ() > MIN_SPEED && 
         m_world->isOnRoad(m_kart->getWorldKartId()) )
     {
         float kart_ang_diff = 
@@ -341,7 +341,7 @@ void DefaultAIController::handleBraking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        if(m_kart->getVelocityLC().getY() > m_curve_target_speed ||
+        if(m_kart->getVelocityLC().getZ() > m_curve_target_speed ||
            kart_ang_diff          > MIN_TRACK_ANGLE         )
         {
 #ifdef AI_DEBUG
@@ -802,9 +802,9 @@ float DefaultAIController::steerToPoint(const Vec3 &point, float dt)
     // No sense steering if we are not driving.
     if(m_kart->getSpeed()==0) return 0.0f;
     const float dx        = point.getX() - m_kart->getXYZ().getX();
-    const float dy        = point.getY() - m_kart->getXYZ().getY();
+    const float dz        = point.getZ() - m_kart->getXYZ().getZ();
     /** Angle from the kart position to the point in world coordinates. */
-    float theta           = -atan2(dx, dy);
+    float theta           = -atan2(dx, dz);
 
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
@@ -857,7 +857,7 @@ void DefaultAIController::checkCrashes( const int STEPS, const Vec3& pos )
 
     //Protection against having vel_normal with nan values
     const Vec3 &VEL = m_kart->getVelocity();
-    Vec3 vel_normal(VEL.getX(), VEL.getY(), 0.0);
+    Vec3 vel_normal(VEL.getX(), VEL.getZ(), 0.0);
     float speed=vel_normal.length();
     // If the velocity is zero, no sense in checking for crashes in time
     if(speed==0) return;
@@ -882,7 +882,7 @@ void DefaultAIController::checkCrashes( const int STEPS, const Vec3& pos )
                 if(kart==m_kart||kart->isEliminated()) continue;   // ignore eliminated karts
                 const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
-                if(m_kart->getVelocityLC().getY() < other_kart->getVelocityLC().getY())
+                if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
                 Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
                 float kart_distance = (step_coord - other_kart_xyz).length_2d();
@@ -1012,7 +1012,7 @@ inline float DefaultAIController::normalizeAngle(float angle)
  */
 int DefaultAIController::calcSteps()
 {
-    int steps = int( m_kart->getVelocityLC().getY() / m_kart_length );
+    int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -1086,7 +1086,7 @@ void DefaultAIController::findCurve()
 {
     float total_dist = 0.0f;
     int i;
-    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getY(); 
+    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getZ(); 
         i = m_next_node_index[i])
     {
         total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);

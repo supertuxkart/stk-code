@@ -96,15 +96,20 @@ void Moveable::reset()
 void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC = getVelocity()*m_transform.getBasis();
+    m_velocityLC  = getVelocity()*m_transform.getBasis();
     m_hpr.setHPR(m_transform.getRotation());
-    Vec3 forw(1, 0, 0);
     Vec3 forw_vec = m_transform.getBasis().getColumn(0);
-    m_heading = -atan2f(forw_vec.getZ(), forw_vec.getX());
+    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
+
+    // The pitch in hpr is in between -pi and pi. But for the camera it
+    // must be restricted to -pi/2 and pi/2 - so recompute it by restricting
+    // y to positive values, i.e. no pitch of more than pi/2.
+    Vec3 up       = getTrans().getBasis().getColumn(1);
+    m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
+
     updateGraphics(Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
     m_first_time = false ;
 }   // update
-
 
 //-----------------------------------------------------------------------------
 void Moveable::createBody(float mass, btTransform& trans,

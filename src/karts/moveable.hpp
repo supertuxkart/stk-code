@@ -46,6 +46,8 @@ private:
     /** The heading in m_hpr is between -90 and 90 degrees only. The 'real'
     *  heading between -180 to 180 degrees is stored in this variable. */
     float                  m_heading;
+    /** The pitch between -90 and 90 degrees. */
+    float                  m_pitch;
 
 protected:
     UserPointer            m_user_pointer;
@@ -70,10 +72,15 @@ public:
     const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
     /** Return the rotation, but heading is restricted to -90 and 90 degrees. */
     const Vec3&   getHPR()        const        {return m_hpr;                      }
-    /** Returns the heading between -180 and 180 degrees. */
+    /** Returns the heading between -180 and 180 degrees. Note that using 
+     *  getHPR().getHeading() can result a different heading  (e.g. a heading
+     *  of 180 degrees is the same as a roll and pitch around 180).*/
     float         getHeading()    const        {return m_heading;                  }
+    /** Returns the pitch of the kart, restricted to between -90 and 90 degrees.
+     *  Note that using getHPR().getPitch can result in a different value! */
+    float         getPitch()      const        {return m_pitch;                    }
     const btQuaternion 
-                  getRotation()   const          {return m_transform.getRotation();  }
+                  getRotation()   const        {return m_transform.getRotation();  }
 
     /** Sets the XYZ coordinates of the moveable. */
     void setXYZ(const Vec3& a) 
