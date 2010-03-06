@@ -85,9 +85,6 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
                                        &fire_angle, &up_velocity);
 
         // apply transformation to the bullet object (without pitch)
-        //btMatrix3x3 m;
-        //m.setEulerZYX(0.0f, 0.0f, fire_angle /*+thisKartAngle*/);
-        //trans.setBasis(m);
         trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
     }
     else

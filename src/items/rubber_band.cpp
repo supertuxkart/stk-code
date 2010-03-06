@@ -90,10 +90,10 @@ void RubberBand::updatePosition()
     const float hh=.1f;  // half height of the band
     const Vec3 &p=m_end_position;  // for shorter typing
     irr::video::S3DVertex* v=(video::S3DVertex*)m_buffer->getVertices();
-    v[0].Pos.X = p.getX()-hh; v[0].Pos.Z=p.getY(); v[0].Pos.Y = p.getZ()-hh;
-    v[1].Pos.X = p.getX()+hh; v[1].Pos.Z=p.getY(); v[1].Pos.Y = p.getZ()+hh;
-    v[2].Pos.X = k.getX()+hh; v[2].Pos.Z=k.getY(); v[2].Pos.Y = k.getZ()+hh;
-    v[3].Pos.X = k.getX()-hh; v[3].Pos.Z=k.getY(); v[3].Pos.Y = k.getZ()-hh;
+    v[0].Pos.X = p.getX()-hh; v[0].Pos.Y=p.getY(); v[0].Pos.Z = p.getZ()-hh;
+    v[1].Pos.X = p.getX()+hh; v[1].Pos.Y=p.getY(); v[1].Pos.Z = p.getZ()+hh;
+    v[2].Pos.X = k.getX()+hh; v[2].Pos.Y=k.getY(); v[2].Pos.Z = k.getZ()+hh;
+    v[3].Pos.X = k.getX()-hh; v[3].Pos.Y=k.getY(); v[3].Pos.Z = k.getZ()-hh;
     m_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_buffer->getBoundingBox());
 }   // updatePosition

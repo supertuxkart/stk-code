@@ -56,7 +56,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
     btVector3 thisKartDirVector(thisKartDirMatrix.getColumn(2));
 
-    float heading=atan2f(-thisKartDirVector.getX(), thisKartDirVector.getY());
+    float heading=kart->getHeading();
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
@@ -67,10 +67,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
                                        plunger_speed, gravity, y_offset,
                                        &fire_angle, &up_velocity);
 
-        // apply transformation to the bullet object (without pitch)
-        btMatrix3x3 m;
-        m.setEulerYPR(fire_angle, 0.0f, 0.0f);
-        trans.setBasis(m);
+        trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
@@ -82,7 +79,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     {
         trans = kart->getKartHeading();
 
-        createPhysics(y_offset, btVector3(pitch, plunger_speed, 0.0f),
+        createPhysics(y_offset, btVector3(pitch, 0.0f, plunger_speed),
                       new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
     }
 

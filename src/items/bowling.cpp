@@ -47,7 +47,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
         if(m_speed < min_speed) m_speed = min_speed;
     }
 
-    createPhysics(y_offset, btVector3(0.0f, m_speed*2, 0.0f),
+    createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), 
                   -70.0f /*gravity*/, 
                   true /*rotates*/);
