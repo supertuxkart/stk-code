@@ -88,7 +88,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         line_h = (int)(line_h*0.9f);
     }
     
-    m_rankings_y_bottom = -1.0f;
+    m_rankings_y_bottom = -1;
     
     int kart_id = 0; // 'i' below is not reliable because some karts (e.g. leader) will be skipped
     for (unsigned int i = 0; i < num_karts; ++i)
