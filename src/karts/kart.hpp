@@ -336,6 +336,7 @@ public:
      *  from the server information.                                       */
     void           setSpeed         (float s) {m_speed = s;                   }
     void           setSuspensionLength();
+    void           applyEngineForce (float force);
     float          handleNitro      (float dt);
     float          getActualWheelForce();
     /** True if the wheels are touching the ground. */

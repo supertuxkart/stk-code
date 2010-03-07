@@ -433,8 +433,7 @@ void Kart::reset()
 
     setTrans(m_reset_transform);
 
-    m_vehicle->applyEngineForce (0.0f, 2);
-    m_vehicle->applyEngineForce (0.0f, 3);
+    applyEngineForce (0.0f);
 
     Moveable::reset();
     if(m_skidmarks) m_skidmarks->reset();
@@ -1082,20 +1081,19 @@ void Kart::updatePhysics (float dt)
             engine_power *= m_power_reduction;
 
         // Lose some traction when skidding, so it is not abused by player
-	// The AI will be allowed to cheat on medium and hard difficulty in
-	// order to make them more competitive (this might be removed once
-	// the AI is better).
+        // The AI will be allowed to cheat on medium and hard difficulty in
+        // order to make them more competitive (this might be removed once
+        // the AI is better).
         if(m_controls.m_drift && 
             (race_manager->getDifficulty()==RaceManager::RD_EASY || m_controller->isPlayerController()) )
             engine_power *= 0.5f;
-        m_vehicle->applyEngineForce(engine_power, 2);
-        m_vehicle->applyEngineForce(engine_power, 3);
+        applyEngineForce(engine_power);
+
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
         if(m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
             resetBrakes();
-
     }
     else
     {   // not accelerating
@@ -1103,8 +1101,7 @@ void Kart::updatePhysics (float dt)
         {   // check if the player is currently only slowing down or moving backwards
             if(m_speed > 0.0f)
             {   // going forward
-                m_vehicle->applyEngineForce(0.f, 2);//engine off
-                m_vehicle->applyEngineForce(0.f, 3);
+                applyEngineForce(0.f);
 
                 //apply the brakes
                 for(int i=0; i<4; i++) m_vehicle->setBrake(getBrakeFactor(), i);
@@ -1130,13 +1127,11 @@ void Kart::updatePhysics (float dt)
                     float f = 2.5f - 3.8f*(1-m_power_reduction);
                     // Avoid that a kart gets really stuck:
                     if(f<0.1f) f=0.1f;
-                    m_vehicle->applyEngineForce(-engine_power*f, 2);
-                    m_vehicle->applyEngineForce(-engine_power*f, 3);
+                    applyEngineForce(-engine_power*f);
                 }
                 else
                 {
-                    m_vehicle->applyEngineForce(0.f, 2);
-                    m_vehicle->applyEngineForce(0.f, 3);
+                    applyEngineForce(0.0f);
                 }
 
             }
@@ -1144,8 +1139,7 @@ void Kart::updatePhysics (float dt)
         else
         {
             // lift the foot from throttle, brakes with 10% engine_power
-            m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 2);
-            m_vehicle->applyEngineForce(-m_controls.m_accel*engine_power*0.1f, 3);
+            applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
 
 #if 1
             // If not giving power (forward or reverse gear), and speed is low
@@ -1346,6 +1340,31 @@ void Kart::setSuspensionLength()
             m_vehicle->getWheelInfo(i).m_raycastInfo.m_suspensionLength;
     }   // for i
 }   // setSuspensionLength
+
+//-----------------------------------------------------------------------------
+/** Applies engine power to all the wheels that are traction capable,
+ *  so other parts of code do not have to be adjusted to simulate different
+ *  kinds of vehicles in the general case, only if they are trying to
+ *  simulate traction control, diferentials or multiple independent electric
+ *  engines, they will have to tweak the power in a per wheel basis.
+ */
+void Kart::applyEngineForce(float force)
+{
+    // Split power to simulate a 4WD 40-60, other values possible
+    // FWD or RWD is a matter of putting a 0 and 1 in the right place
+    float frontForce = force*0.4f;
+    float rearForce = force*0.6f;
+    // Front wheels
+    for(unsigned int i=0; i<2; i++)
+    {
+        m_vehicle->applyEngineForce (frontForce, i);
+    }
+    // Rear wheels
+    for(unsigned int i=2; i<4; i++)
+    {
+        m_vehicle->applyEngineForce (rearForce, i);
+    }
+}   // applyEngineForce
 
 //-----------------------------------------------------------------------------
 void Kart::updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr)
