@@ -170,7 +170,7 @@ private:
         KartType    m_kart_type;        // Kart type: AI, player, network player etc.
         int         m_local_player_id;  // player controling the kart, for AI: -1
         int         m_global_player_id; // global ID of player
-        int         m_gp_final_rank;    // In GPs, at the end, will hold the overall rank of this kart.
+        int         m_gp_rank;    // In GPs, at the end, will hold the overall rank of this kart.
         
         KartStatus(const std::string& ident, const int& prev_finish_pos, 
                    int local_player_id, int global_player_id, KartType kt) :
@@ -189,7 +189,7 @@ private:
     MinorRaceModeType                m_minor_mode;
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
-    std::vector<RemoteKartInfo>      m_local_kart_info;
+    std::vector<RemoteKartInfo>      m_local_player_karts;
     std::vector<std::string>         m_tracks;
     std::vector<int>                 m_host_ids;
     std::vector<int>                 m_num_laps;
@@ -216,9 +216,9 @@ public:
     void         reset();
     void         setLocalKartInfo(unsigned int player_id, const std::string& kart);
     const RemoteKartInfo& 
-                 getLocalKartInfo(unsigned int n) const {return m_local_kart_info[n];}
+                 getLocalKartInfo(unsigned int n) const {return m_local_player_karts[n];}
     void         setNumLocalPlayers(unsigned int n);
-    unsigned int getNumLocalPlayers() const  {return m_local_kart_info.size(); };
+    unsigned int getNumLocalPlayers() const  {return m_local_player_karts.size(); };
     /** Returns the selected number of karts (selected=number of players and 
      *  AI karts. */
     unsigned int getNumberOfKarts()   const  {return m_num_karts; }
@@ -232,9 +232,9 @@ public:
     void         setNumLaps(int num)            { m_num_laps.clear();
                                                   m_num_laps.push_back(num);        }
     void         setMajorMode(MajorRaceModeType mode)
-                                                { m_major_mode = mode;        }
+                                                { m_major_mode = mode;              }
     void         setMinorMode(MinorRaceModeType mode)
-                                                { m_minor_mode = mode;       }
+                                                { m_minor_mode = mode;              }
     void         setNumKarts(int num)           { m_num_karts = num;                }
     void         setCoinTarget(int num)         { m_coin_target = num;              }
     MajorRaceModeType
@@ -250,8 +250,12 @@ public:
     unsigned int getFinishedPlayers()     const { return m_num_finished_players;    }
     const std::string& getItemStyle()     const { return m_grand_prix.getItemStyle(); }
     
-    int          getKartFinalGPRank(const int kart_id)
-                                          const { return m_kart_status[kart_id].m_gp_final_rank; }
+    void         computeGPRanks();
+    int          getKartGPRank(const int kart_id)
+                                          const { return m_kart_status[kart_id].m_gp_rank; }
+    
+    /** \return the GP rank of a local player, or -1 if the given player ID doesn't exist */
+    int          getLocalPlayerGPRank(const int playerID) const;
     
     const std::string&  
                  getKartIdent(int kart)   const { return m_kart_status[kart].m_ident;}

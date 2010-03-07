@@ -340,8 +340,9 @@ void UnlockManager::grandPrixFinished()
     for(AllChallengesType::iterator i =m_all_challenges.begin(); 
                                     i!=m_all_challenges.end();  i++)
     {
-        if(i->second->isActive() &&i->second->grandPrixFinished())
+        if(i->second->isActive() && i->second->grandPrixFinished())
         {
+            std::cout << "===== A FEATURE WAS UNLOCKED BECAUSE YOU WON THE GP!! ==\n";
             unlockFeature(i->second);
         }
     }

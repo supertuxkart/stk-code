@@ -323,10 +323,13 @@ bool ChallengeData::grandPrixFinished()
         race_manager->getNumPlayers() > 1) return false;
 
     // check if the player came first.
-    Kart* kart = World::getWorld()->getPlayerKart(0);
-    const int rank = race_manager->getKartFinalGPRank(kart->getWorldKartId());
+    //assert(World::getWorld() != NULL);
+    // Kart* kart = World::getWorld()->getPlayerKart(0);
+    //const int rank = race_manager->getKartGPRank(kart->getWorldKartId());
+    const int rank = race_manager->getLocalPlayerGPRank(0);
+    
     //printf("getting rank for %s : %i \n", kart->getName().c_str(), rank );
-    if( rank != 0 ) return false;
+    if (rank != 0) return false;
 
     return true;
 }   // grandPrixFinished

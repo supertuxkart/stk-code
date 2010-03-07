@@ -90,12 +90,27 @@ void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki
  */
 void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& kart)
 {
-    assert(0<=player_id && player_id <m_local_kart_info.size());
+    assert(0<=player_id && player_id <m_local_player_karts.size());
 
-    m_local_kart_info[player_id] = RemoteKartInfo(player_id, kart,
+    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
                                                   StateManager::get()->getActivePlayerProfile(player_id)->getName(),
                                                   network_manager->getMyHostId());
 }   // setLocalKartInfo
+
+//-----------------------------------------------------------------------------
+
+int RaceManager::getLocalPlayerGPRank(const int playerID) const
+{
+    const int amount = m_kart_status.size();
+    for (int n=0; n<amount; n++)
+    {
+        if (m_kart_status[n].m_local_player_id == playerID)
+        {
+            return m_kart_status[n].m_gp_rank;
+        }
+    }
+    return -1;
+}
 
 //-----------------------------------------------------------------------------
 /** Sets the number of local players playing on this computer (including
@@ -104,7 +119,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id, const std::string& ka
  */
 void RaceManager::setNumLocalPlayers(unsigned int n)
 {
-    m_local_kart_info.resize(n);
+    m_local_player_karts.resize(n);
 }   // setNumLocalPlayers
 
 //-----------------------------------------------------------------------------
@@ -295,6 +310,77 @@ void RaceManager::next()
 }   // next
 
 //-----------------------------------------------------------------------------
+/**
+  * Sets/updates the m_gp_rank status of each KartStatus object
+  */
+void RaceManager::computeGPRanks()
+{
+    // calculate the rank of each kart
+    const unsigned int NUM_KARTS = getNumberOfKarts();
+    
+    int *scores   = new int[NUM_KARTS];
+    int *position = new int[NUM_KARTS];
+    double *race_time = new double[NUM_KARTS];
+    // Ignore the first kart if it's a follow-the-leader race.
+    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
+    for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
+    {
+        position[kart_id]  = kart_id;
+        scores[kart_id]    = race_manager->getKartScore(kart_id);
+        race_time[kart_id] = race_manager->getOverallTime(kart_id);
+    }
+    
+    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+    {
+        // fill values for leader
+        position[0]  = -1;
+        scores[0]    = -1;
+        race_time[0] = -1; 
+        m_kart_status[0].m_gp_rank = -1;
+    }
+    
+    //Bubblesort
+    bool sorted;
+    do
+    {
+        sorted = true;
+        for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
+        {
+            if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
+                                            && race_time[i] > race_time[i+1]))
+            {
+                int tmp_score[2];
+                double tmp_time;
+                
+                tmp_score[0] = position[i];
+                tmp_score[1] = scores[i];
+                tmp_time = race_time[i];
+                
+                position[i] = position[i+1];
+                scores[i] = scores[i+1];
+                race_time[i] = race_time[i+1];
+                
+                position[i+1] = tmp_score[0];
+                scores[i+1] = tmp_score[1];
+                race_time[i+1] = tmp_time;
+                
+                sorted = false;
+            }
+        }
+    } while(!sorted);
+    
+    for (unsigned int i=start; i < NUM_KARTS; ++i)
+    {
+        //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i-start);
+        m_kart_status[position[i]].m_gp_rank = i - start;
+    }
+    // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_rank);
+    delete []scores;
+    delete []position;
+    delete []race_time;    
+}
+
+//-----------------------------------------------------------------------------
 /** In GP displays the GP result screen, and then deletes the world.
  */
 void RaceManager::exitRace()
@@ -303,70 +389,7 @@ void RaceManager::exitRace()
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size()) 
     {
-        // calculate the rank of each kart
-        const unsigned int NUM_KARTS = getNumberOfKarts();
-        
-        int *scores   = new int[NUM_KARTS];
-        int *position = new int[NUM_KARTS];
-        double *race_time = new double[NUM_KARTS];
-        // Ignore the first kart if it's a follow-the-leader race.
-        int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER) ? 1 : 0;
-        for (unsigned int kart_id = start; kart_id < NUM_KARTS; ++kart_id)
-        {
-            position[kart_id]  = kart_id;
-            scores[kart_id]    = race_manager->getKartScore(kart_id);
-            race_time[kart_id] = race_manager->getOverallTime(kart_id);
-        }
-        
-        if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        {
-            // fill values for leader
-            position[0]  = -1;
-            scores[0]    = -1;
-            race_time[0] = -1; 
-            m_kart_status[0].m_gp_final_rank = -1;
-        }
-        
-        //Bubblesort
-        bool sorted;
-        do
-        {
-            sorted = true;
-            for( unsigned int i = start; i < NUM_KARTS - 1; ++i )
-            {
-                if( scores[i] < scores[i+1] || (scores[i] == scores[i+1] 
-                                                && race_time[i] > race_time[i+1]))
-                {
-                    int tmp_score[2];
-                    double tmp_time;
-                    
-                    tmp_score[0] = position[i];
-                    tmp_score[1] = scores[i];
-                    tmp_time = race_time[i];
-                    
-                    position[i] = position[i+1];
-                    scores[i] = scores[i+1];
-                    race_time[i] = race_time[i+1];
-                    
-                    position[i+1] = tmp_score[0];
-                    scores[i+1] = tmp_score[1];
-                    race_time[i+1] = tmp_time;
-                    
-                    sorted = false;
-                }
-            }
-        } while(!sorted);
-        
-        for (unsigned int i=start; i < NUM_KARTS; ++i)
-        {
-            //printf("setting kart %s to rank %i\n", race_manager->getKartName(position[i]).c_str(), i-start);
-            m_kart_status[position[i]].m_gp_final_rank = i - start;
-        }
-       // printf("kart %s has rank %i\n", 0, m_kart_status[0].m_gp_final_rank);
-        delete []scores;
-        delete []position;
-        delete []race_time;
-        
+        computeGPRanks();        
         unlock_manager->grandPrixFinished();
         
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
@@ -375,8 +398,8 @@ void RaceManager::exitRace()
         std::string winners[3];
         for (unsigned int i=0; i < m_kart_status.size(); ++i)
         {
-            std::cout << m_kart_status[i].m_ident << " has GP final rank " << m_kart_status[i].m_gp_final_rank << std::endl;
-            const int rank = m_kart_status[i].m_gp_final_rank;
+            std::cout << m_kart_status[i].m_ident << " has GP final rank " << m_kart_status[i].m_gp_rank << std::endl;
+            const int rank = m_kart_status[i].m_gp_rank;
             if (rank >= 0 && rank < 3)
             {
                 winners[rank] = m_kart_status[i].m_ident;
