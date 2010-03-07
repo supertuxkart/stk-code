@@ -241,8 +241,11 @@ public:
     virtual void kartHit(const int kart_id) {};
     
     /** Called by the race result GUI at the end of the race to know the final order
-        (fill in the 'order' array) */
-    virtual void raceResultOrder( int* order ) = 0;
+      * \param[out] order returns the order of karts. order[0] will contain the ID of
+      *                   the first kart, order[1] the ID of the second kart, etc...
+      *                   Array dimension must be the number of karts.
+      */
+    virtual void raceResultOrder( int order[] ) = 0;
 };
 
 #endif

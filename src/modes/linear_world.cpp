@@ -119,8 +119,29 @@ void LinearWorld::restartRace()
     // First all kart infos must be updated before  the kart position can be 
     // recomputed, since otherwise 'new' (initialised) valued will be compared
     // with old values.
-    for(unsigned int i=0; i<kart_amount; i++)
+    for (unsigned int i=0; i<kart_amount; i++)
+    {
         updateRacePosition(m_karts[i], m_kart_info[i]);
+    }
+    
+#ifdef DEBUG
+    //FIXME: this could be defined somewhere in a central header so it can be used everywhere
+#define assertExpr( ARG1, OP, ARG2 ) if (!(ARG1 OP ARG2)) \
+        { \
+            std::cerr << "Failed assert " << #ARG1 << #OP << #ARG2 << " @ " << __FILE__ << ":" << __LINE__ \
+                      << "; values are (" << ARG1 << #OP << ARG2 << ")\n"; \
+            assert(false); \
+        }
+    
+    for (unsigned int i=0; i<kart_amount; i++)
+    {
+        for (unsigned int j=i+1; j<kart_amount; j++)
+        {
+            assertExpr( m_karts[i]->getPosition(), !=, m_karts[j]->getPosition() );
+        }
+    }
+#endif
+    
 }   // restartRace
 
 //-----------------------------------------------------------------------------
@@ -409,12 +430,45 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
 // ----------------------------------------------------------------------------
 /** Sets up the mapping from kart position to kart index.
  */
-void LinearWorld::raceResultOrder( int* order )
+void LinearWorld::raceResultOrder( int order[] )
 {
     const unsigned int NUM_KARTS = getNumKarts();
-    for(unsigned int i=0; i < NUM_KARTS; i++)
+    
+#ifndef NDEBUG
+    for (unsigned int i=0; i < NUM_KARTS; i++)
     {
-        order[getKart(i)->getPosition()-1] = i; // even for eliminated karts
+        order[i] = -1;
+    }
+#endif
+    
+    for (unsigned int i=0; i < NUM_KARTS; i++)
+    {
+        const int position = getKart(i)->getPosition()-1;
+        
+#ifndef NDEBUG
+        // sanity checks
+        if (order[position] != -1)
+        {
+            std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
+            for (unsigned int j=0; j < NUM_KARTS; j++)
+            {
+                if (order[j] == -1)
+                {
+                    std::cout << "    No kart is yet set at position " << j << std::endl;
+                }
+                else
+                {
+                    std::cout << "    Kart " << order[j] << " is at position " << j << std::endl;
+                }
+            }
+            std::cout << "Kart " << i << " is being given posiiton " << (getKart(i)->getPosition()-1)
+                      << ", but this position is already taken\n";
+            assert(false);
+        }
+#endif
+        
+        // actually assign the position
+        order[position] = i; // even for eliminated karts
     }
 }   // raceResultOrder
 
@@ -521,7 +575,7 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
     const float my_progression     = getDistanceDownTrackForKart(my_id);
     for ( unsigned int j = 0 ; j < kart_amount ; j++ )
     {
-        if(j == kart->getWorldKartId()) continue; // don't compare a kart with itself
+        if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
         if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
 
         // Count karts ahead of the current kart, i.e. kart that are already
@@ -548,7 +602,9 @@ void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
                         p++;
         }
     } //next kart
+    
     kart->setPosition(p);
+    
     // Switch on faster music if not already done so, if the
     // first kart is doing its last lap, and if the estimated
     // remaining time is less than 30 seconds.
