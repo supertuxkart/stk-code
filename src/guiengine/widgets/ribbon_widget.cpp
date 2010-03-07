@@ -186,9 +186,19 @@ void RibbonWidget::add()
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
 
-            // if button too high to fit, scale down
+            // scale to fit (FIXME: calculate the right value directly...)
             float zoom = global_zoom;
-            while (button_y + image_h*zoom + needed_space_under_button > h) zoom -= 0.01f;
+            
+            if (button_y + image_h*zoom + needed_space_under_button > h)
+            {
+                // scale down
+                while (button_y + image_h*zoom + needed_space_under_button > h) zoom -= 0.01f;
+            }
+            else
+            {
+                // scale up
+                while (button_y + image_h*zoom + needed_space_under_button < h) zoom += 0.01f;
+            }
             
             // ---- add bitmap button part
             // backup and restore position in case the same object is added multiple times (FIXME: unclean)

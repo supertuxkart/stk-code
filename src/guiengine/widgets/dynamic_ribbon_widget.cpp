@@ -142,7 +142,7 @@ void DynamicRibbonWidget::add()
     // ---- Determine number of rows and columns
     
     // Find children size (and ratio)
-    m_child_width = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
+    m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
     m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
     
     if (m_child_width <= 0 || m_child_height <= 0)
@@ -258,7 +258,7 @@ void DynamicRibbonWidget::setSubElements()
             // stretch the *texture* within the widget (and the widget has the right aspect ratio)
             // (Yeah, that's complicated, but screenshots are saved compressed horizontally so it's hard to be clean)
             IconButtonWidget* icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_STRETCH, false, true);
-            icon->m_properties[PROP_ICON]="gui/main_help.png";
+            icon->m_properties[PROP_ICON]="textures/transparence.png";
             
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
@@ -705,7 +705,7 @@ void DynamicRibbonWidget::updateItemDisplay()
             }
             else
             {
-                icon->setImage( "/textures/transparence.png" );
+                icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
                 icon->m_properties[PROP_ID] = NO_ITEM_ID;
             }
         } // next column
