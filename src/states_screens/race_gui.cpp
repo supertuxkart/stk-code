@@ -47,17 +47,18 @@ using namespace irr;
  */
 RaceGUI::RaceGUI()
 {
-    m_marker_rendered_size =  32;
-    m_marker_ai_size       =  14;
-    m_marker_player_size   =  16;
-    m_map_rendered_width   = 128;
-    m_map_rendered_height  = 128;
-    m_map_width            = 100;
-    m_map_height           = 100;
-    m_map_left             =  10;
-    m_map_bottom           =  10;
-    m_max_font_height      = GUIEngine::getFontHeight() + 10;
-    
+    m_marker_rendered_size  =  32;
+    m_marker_ai_size        =  14;
+    m_marker_player_size    =  16;
+    m_map_rendered_width    = 128;
+    m_map_rendered_height   = 128;
+    m_map_width             = 100;
+    m_map_height            = 100;
+    m_map_left              =  10;
+    m_map_bottom            =  10;
+    m_max_font_height       = GUIEngine::getFontHeight() + 10;
+    m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
+
     // special case : when 3 players play, use available 4th space for such things
     if (race_manager->getNumLocalPlayers() == 3)
     {
@@ -653,7 +654,7 @@ void RaceGUI::drawAllMessages(const Kart* kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {    
-    int y = viewport.LowerRightCorner.Y - m_max_font_height;
+    int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
           
     const int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)/2;
     const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
@@ -668,9 +669,9 @@ void RaceGUI::drawAllMessages(const Kart* kart,
             if (msg.m_kart && msg.m_kart!=kart) continue;
             
             core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
-            GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
-                                       pos, msg.m_color, true /* hcenter */, true /* vcenter */);
-            y -= m_max_font_height;                    
+            GUIEngine::getSmallFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                                            pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+            y -= m_small_font_max_height;                    
         }
     }
     

@@ -52,6 +52,8 @@ class ScalableFont : public IGUIFontBitmap
     std::map<int /* texture file ID */, TextureInfo> m_texture_files;
     
     void lazyLoadTexture(int texID);
+    
+    bool m_is_hollow_copy;
 public:
 
     bool m_black_border;
@@ -63,6 +65,21 @@ public:
 	//! constructor
 	ScalableFont(IGUIEnvironment* env, const io::path& filename);
 
+    /** Creates a hollow copy of this font; i.e. the underlying font data is the *same* for
+      * both fonts. The advantage of doing this is that you can change "view" parameters
+      * in the copy, for example kerning or scale.
+      * The object returned by this method is 'new'ed and must be deleted. Deleting it will
+      * not delete the data of the original. Do *not* delete the original as long as this
+      * hollow copy is still used, since they share their data (and the original is the one
+      * that "owns" it).
+      */
+    ScalableFont* getHollowCopy() const
+    {
+        ScalableFont* out = new ScalableFont(*this);
+        out->m_is_hollow_copy = true;
+        return out;
+    }
+    
 	//! destructor
 	virtual ~ScalableFont();
 
@@ -132,7 +149,7 @@ private:
 	void setMaxHeight();
 
 	core::array<SFontArea>		Areas;
-	core::map<wchar_t, s32>		CharacterMap;
+	std::map<wchar_t, s32>		CharacterMap;
 	video::IVideoDriver*		Driver;
 	IGUISpriteBank*			SpriteBank;
 	IGUIEnvironment*		Environment;

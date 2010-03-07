@@ -43,12 +43,16 @@ namespace GUIEngine
         Skin* g_skin = NULL;
         IGUIFont* g_font;
         IGUIFont* g_title_font;
-
+        IGUIFont* g_small_font;
+        
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;
         Screen* g_current_screen = NULL;
         AbstractStateManager* g_state_manager = NULL;
         Widget* g_focus_for_player[MAX_PLAYER_COUNT];
+        
+        int font_height;
+        int small_font_height;
     }
     using namespace Private;
    
@@ -91,10 +95,14 @@ namespace GUIEngine
        
     int getFontHeight()
     {
-        // FIXME: this needs to be reset when changing resolution
-        static int fh = g_font->getDimension( L"X" ).Height;
-        return fh;
+        return Private::font_height;
     }
+    
+    int getSmallFontHeight()
+    {
+        return Private::small_font_height;
+    }
+    
 // -----------------------------------------------------------------------------  
 void clear()
 {
@@ -176,6 +184,8 @@ void cleanUp()
     g_font = NULL;
     delete g_title_font;
     g_title_font = NULL;
+    delete g_small_font;
+    g_small_font = NULL;
         
     // nothing else to delete for now AFAIK, irrlicht will automatically kill everything along the device
 }
@@ -218,6 +228,16 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     sfont->setKerningHeight(-5);
     g_font = sfont;
     
+    Private::font_height = g_font->getDimension( L"X" ).Height;
+
+    //ScalableFont* sfont_smaller = new ScalableFont(g_env, file_manager->getFontFile("StkFont.xml").c_str() );
+    ScalableFont* sfont_smaller = sfont->getHollowCopy();
+    sfont_smaller->setScale(normal_text_scale*0.8f);
+    sfont_smaller->setKerningHeight(-5);
+    g_small_font = sfont_smaller;
+    
+    Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
+
     ScalableFont* sfont2 = new ScalableFont(g_env, file_manager->getFontFile("title_font.xml").c_str() );
     sfont2->m_fallback_font = sfont;
     sfont2->m_fallback_font_scale = 4.0f; // because the fallback font is much smaller than the title font

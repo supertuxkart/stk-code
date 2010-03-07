@@ -258,6 +258,7 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
+        extern irr::gui::IGUIFont* g_small_font;
         extern irr::gui::IGUIFont* g_font;
         extern irr::gui::IGUIFont* g_title_font;
 
@@ -271,6 +272,7 @@ namespace GUIEngine
     inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }
     inline irr::gui::IGUIEnvironment* getGUIEnv()        { return Private::g_env;            }
     inline irr::video::IVideoDriver*  getDriver()        { return Private::g_driver;         }
+    inline irr::gui::IGUIFont*        getSmallFont()     { return Private::g_small_font;     }
     inline irr::gui::IGUIFont*        getFont()          { return Private::g_font;           }
     inline irr::gui::IGUIFont*        getTitleFont()     { return Private::g_title_font;     }
     inline Screen*                    getCurrentScreen() { return Private::g_current_screen; }
@@ -279,6 +281,8 @@ namespace GUIEngine
 
     /** Returns the height of the font in pixels */
     int   getFontHeight();
+    
+    int   getSmallFontHeight();
     
     float getLatestDt();
     

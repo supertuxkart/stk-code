@@ -26,6 +26,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_fallback_kerning_width = 0;
+    m_is_hollow_copy = false;
     
     m_black_border = false;
     
@@ -52,18 +53,20 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
 	setInvisibleCharacters ( L" " );
     
     load( file_manager->createXMLReader(filename.c_str()) );
+    assert(Areas.size() > 0);
 }
 
 
 //! destructor
 ScalableFont::~ScalableFont()
 {
-	if (Driver)
-		Driver->drop();
-
-	if (SpriteBank)
-		SpriteBank->drop();
+    if (!m_is_hollow_copy)
+    {
+        if (Driver)     Driver->drop();
+        if (SpriteBank) SpriteBank->drop();
+    }
 }
+    
 void ScalableFont::setShadow(irr::video::SColor col)
 {
     m_shadow = true;
@@ -193,7 +196,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
 				}
 				rectangle.LowerRightCorner.Y = val;
 
-				CharacterMap.insert(ch,Areas.size());
+				CharacterMap[ch] = Areas.size();
                 //std::cout << "Inserting character '" << ch << "' with area " << Areas.size() << std::endl;
 
 				// make frame
@@ -382,7 +385,7 @@ void ScalableFont::readPositions(video::IImage* image, s32& lowerRightPositions)
 				Areas.push_back(a);
 				// map letter to character
 				wchar_t ch = (wchar_t)(lowerRightPositions + 32);
-				CharacterMap.set(ch, lowerRightPositions);
+				CharacterMap[ch] = lowerRightPositions;
 
 				++lowerRightPositions;
 			}
@@ -443,11 +446,11 @@ u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
 
 s32 ScalableFont::getAreaFromCharacter(const wchar_t c, bool* fallback_font) const
 {
-	core::map<wchar_t, s32>::Node* n = CharacterMap.find(c);
-	if (n)
+	std::map<wchar_t, s32>::const_iterator n = CharacterMap.find(c);
+	if (n != CharacterMap.end())
     {
         if (fallback_font != NULL) *fallback_font = false;
-		return n->getValue();
+		return (*n).second;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
@@ -472,6 +475,8 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 //! returns the dimension of text
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
+    assert(Areas.size() > 0);
+    
 	core::dimension2d<u32> dim(0, 0);
 	core::dimension2d<u32> thisLine(0, (int)(MaxHeight*m_scale));
 
@@ -499,6 +504,7 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
         bool fallback = false;
         const int areaID = getAreaFromCharacter(*p, &fallback);
+        assert(areaID < (int)Areas.size());
 		const SFontArea &area = (fallback ? m_fallback_font->Areas[areaID] : Areas[areaID]);
 
         

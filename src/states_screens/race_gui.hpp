@@ -143,6 +143,7 @@ private:
 
     /** Used to display messages without overlapping */
     int              m_max_font_height;
+    int              m_small_font_max_height;
     
     void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius, 
