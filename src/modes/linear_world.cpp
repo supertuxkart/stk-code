@@ -229,7 +229,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     if(kart_info.m_race_lap+1 == race_manager->getNumLaps())
     {
         m_race_gui->addMessage(_("Final lap!"), m_karts[kart_index],
-                               3.0f, 40, video::SColor(255, 210, 100, 50));
+                               3.0f, 40, video::SColor(255, 210, 100, 50), true);
     }
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
@@ -259,7 +259,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         {
             setFastestLap(kart, time_per_lap);
             m_race_gui->addMessage(_("New fastest lap"), NULL,
-                                   2.0f, 40, video::SColor(255, 100, 210, 100));
+                                   2.0f, 40, video::SColor(255, 100, 210, 100), true);
             std::string s = StringUtils::timeToString(time_per_lap);
 
             irr::core::stringw m_fastest_lap_message;

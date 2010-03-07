@@ -710,10 +710,11 @@ void IrrDriver::displayFPS()
 {
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
-#define NO_TRUST_COUNT 25
+    const int NO_TRUST_COUNT = 25;
     static int no_trust = NO_TRUST_COUNT;
 
-    if(no_trust) {
+    if (no_trust)
+    {
         no_trust--;
         return;
     }
@@ -745,7 +746,7 @@ void IrrDriver::displayFPS()
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 255, 0, 0);
-    font->draw( fpsString.c_str(), core::rect< s32 >(0,0,600,200), fpsColor, true );
+    font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
 // ----------------------------------------------------------------------------

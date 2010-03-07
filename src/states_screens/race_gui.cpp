@@ -411,6 +411,7 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
     if(n>5) n=5;       // Display at most 5 items
 
     int nSize=(int)(64.0f*std::min(scaling.X, scaling.Y));
+        
     int x1 = (int)((UserConfigParams::m_width/2-32) * scaling.X) 
            + viewport.UpperLeftCorner.X;
     //int y1 = UserConfigParams::m_height - viewport.LowerRightCorner.Y 
@@ -420,7 +421,7 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
 
     video::ITexture *t=powerup->getIcon()->getTexture();
     core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
-
+    
     for ( int i = 0 ; i < n ; i++ )
     {
         int x2=(int)(x1+i*std::min(scaling.X, scaling.Y)*30);
@@ -652,11 +653,29 @@ void RaceGUI::drawAllMessages(const Kart* kart,
                               const core::recti &viewport, 
                               const core::vector2df &scaling)
 {    
-    // First line of text somewhat under the top of the screen. For now
-    // start just under the timer display
-    int y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
+    int y = viewport.LowerRightCorner.Y - m_max_font_height;
+          
     const int x = (viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X)/2;
     const int w = (viewport.LowerRightCorner.X + viewport.UpperLeftCorner.X)/2;
+    
+    // draw less important first, at the very top of the screen
+    for (AllMessageType::const_iterator i = m_messages.begin(); i != m_messages.end(); ++i)
+    {
+        TimedMessage const &msg = *i;
+        if (!msg.m_important)
+        {
+            // Display only messages for all karts, or messages for this kart
+            if (msg.m_kart && msg.m_kart!=kart) continue;
+            
+            core::rect<s32> pos(x - w/2, y, x + w/2, y + m_max_font_height);
+            GUIEngine::getFont()->draw(core::stringw(msg.m_message.c_str()).c_str(),
+                                       pos, msg.m_color, true /* hcenter */, true /* vcenter */);
+            y -= m_max_font_height;                    
+        }
+    }
+    
+    // First line of text somewhat under the top of the viewport.
+    y = (int)(viewport.UpperLeftCorner.Y + 164*scaling.Y);
 
     // The message are displayed in reverse order, so that a multi-line
     // message (addMessage("1", ...); addMessage("2",...) is displayed
@@ -665,6 +684,8 @@ void RaceGUI::drawAllMessages(const Kart* kart,
     {
         TimedMessage const &msg = *i;
 
+        if (!msg.m_important) continue; // less important messages were already displayed
+        
         // Display only messages for all karts, or messages for this kart
         if (msg.m_kart && msg.m_kart!=kart) continue;
 
@@ -681,9 +702,9 @@ void RaceGUI::drawAllMessages(const Kart* kart,
  *  once).
  **/
 void RaceGUI::addMessage(const core::stringw &msg, const Kart *kart, float time, 
-                         int font_size, const video::SColor &color)
+                         int font_size, const video::SColor &color, bool important)
 {
-    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color));
+    m_messages.push_back(TimedMessage(msg, kart, time, font_size, color, important));
 }   // addMessage
 
 //-----------------------------------------------------------------------------

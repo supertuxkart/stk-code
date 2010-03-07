@@ -326,7 +326,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
         irr::core::stringw hit_message;
         switch(m_type) {
             case POWERUP_CAKE:
-                hit_message += StringUtils::insertValues(_("%s eats too much %s's cake"),
+                hit_message += StringUtils::insertValues(_("%s eats too much of %s's cake"),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();
@@ -340,9 +340,9 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                                                         ).c_str();
             break;
             default:
-                hit_message = _("UFO hit someone, the bug is right here");
+                assert(false);
         }
-        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
     }
 
     m_has_hit_something=true;

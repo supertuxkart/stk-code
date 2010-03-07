@@ -219,7 +219,7 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
                                                  kart_hit->getName().c_str(),
                                                  m_owner.getName().c_str()
                                                 ).c_str();
-        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+        gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         return;
     }
 

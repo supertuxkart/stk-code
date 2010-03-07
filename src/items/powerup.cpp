@@ -146,7 +146,8 @@ void Powerup::use()
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
         // Apocalypse Now style
-        gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+        gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40,
+                        video::SColor(255, 255, 255, 255), false);
         break;
     case POWERUP_CAKE:
     case POWERUP_BOWLING:
@@ -203,7 +204,7 @@ void Powerup::use()
 
                 irr::core::stringw anchor_message;
                 anchor_message += StringUtils::insertValues(_("Arrr, the %s dropped anchor, Captain!"), kart->getName().c_str()).c_str();
-                gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+                gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
                 break;
             }
         }
@@ -240,7 +241,7 @@ void Powerup::use()
             m_sound_use->play();
 
             // Parachutist shout
-            gui->addMessage(_("Geronimo!!!"), NULL, 3.0f, 40, video::SColor(255, 210, 50, 50));
+            gui->addMessage(_("Geronimo!!!"), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         }
         break;
 

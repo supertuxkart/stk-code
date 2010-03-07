@@ -61,19 +61,21 @@ private:
         video::SColor      m_color;              //!< color of message
         int                m_font_size;          //!< size
         const Kart        *m_kart;
+        bool               m_important;          //!< Important msgs are displayed in the middle of the screen
         // -----------------------------------------------------
         // std::vector needs standard copy-ctor and std-assignment op.
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
         TimedMessage(const irr::core::stringw &message, 
                      const Kart *kart, float time, int size, 
-                     const video::SColor &color)
+                     const video::SColor &color, const bool important)
         {
             m_message        = message; 
             m_font_size      = size;
             m_kart           = kart;
             m_remaining_time = ( time < 0.0f ) ? -1.0f : time;
             m_color          = color;
+            m_important      = important;
         }   // TimedMessage
         // -----------------------------------------------------
         // in follow leader the clock counts backwards
@@ -90,6 +92,7 @@ private:
     Material        *m_plunger_face;
     typedef          std::vector<TimedMessage> AllMessageType;
     AllMessageType   m_messages;
+    
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
     video::ITexture *m_marker;
 
@@ -179,7 +182,8 @@ public:
     
     void addMessage(const irr::core::stringw &m, const Kart *kart, float time, 
                     int fonst_size, 
-                    const video::SColor &color=video::SColor(255, 255, 0, 255));
+                    const video::SColor &color=video::SColor(255, 255, 0, 255),
+                    bool important=true);
 
     void clearAllMessages() { m_messages.clear(); }
     
