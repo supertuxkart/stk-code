@@ -29,10 +29,7 @@ using namespace irr::gui;
 #  define round(x)  (floor(x+0.5f))
 #endif
 
-namespace GUIEngine
-{
-    const char* NO_ITEM_ID = "?";
-}
+const char* DynamicRibbonWidget::NO_ITEM_ID = "?";
 
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 {

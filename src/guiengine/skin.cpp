@@ -690,15 +690,15 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             widget->m_event_handler->m_event_handler->m_properties[PROP_SQUARE] == "true") use_glow = false;
         
         /* in combo ribbons, always show selection */
-        RibbonWidget* w = NULL;
+        RibbonWidget* parentRibbonWidget = NULL;
         
         if (widget->m_event_handler != NULL && widget->m_event_handler->m_type == WTYPE_RIBBON)
         {
-            w = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
-            if(w->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
+            parentRibbonWidget = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
+            if(parentRibbonWidget->getRibbonType() == RIBBON_COMBO) always_show_selection = true;
         }
         
-        const bool mark_focused = focused || (parent_focused && w != NULL && w->m_mouse_focus == widget) ||
+        const bool mark_focused = focused || (parent_focused && parentRibbonWidget != NULL && parentRibbonWidget->m_mouse_focus == widget) ||
                                   (mark_selected && !always_show_selection && parent_focused);
         
         /* draw "selection bubble" if relevant */
@@ -762,18 +762,21 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                 GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2, source_area,
                                                     0 /* no clipping */, 0, true /* alpha */);
             }
-            /* if we're not using glow */
+            // if we're not using glow, draw square focus instead
             else
             {
-                const bool show_focus = focused || parent_focused;
+                const bool show_focus = (focused || parent_focused);
                 
                 if (!always_show_selection && !show_focus) return;
+                
+                // don't mark filler items as focused
+                if (widget->m_properties[PROP_ID] == DynamicRibbonWidget::NO_ITEM_ID) return;
                 
                 //const int texture_w = m_tex_squarefocus->getSize().Width;
                 //const int texture_h = m_tex_squarefocus->getSize().Height;
                 //core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
                 
-                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo::neutral"]);
                 nPlayersOnThisItem++;
             }
         } // end if mark_focused
@@ -796,11 +799,11 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
                 rect2.UpperLeftCorner.Y -= enlarge;
                 rect2.LowerRightCorner.X += enlarge;
                 rect2.LowerRightCorner.Y += enlarge;
-                drawBoxFromStretchableTexture(w, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect2, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             else
             {
-                drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             
             nPlayersOnThisItem++;
@@ -808,13 +811,13 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         
         if (parentRibbon->isFocusedForPlayer(2) && parentRibbon->getSelectionIDString(2) == widget->m_properties[PROP_ID])
         {
-            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+            drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
             nPlayersOnThisItem++;
         }
         
         if (parentRibbon->isFocusedForPlayer(3) && parentRibbon->getSelectionIDString(3) == widget->m_properties[PROP_ID])
         {
-            drawBoxFromStretchableTexture(w, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+            drawBoxFromStretchableTexture(parentRibbonWidget, rect, SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
         }
         
         drawIconButton(rect, widget, pressed, focused);

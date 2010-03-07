@@ -1366,7 +1366,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         unlock_manager->playLockSound();
     }
     //FIXME: what does this do there???
-    else if (selected_kart_group == NO_ITEM_ID)
+    else if (selected_kart_group == DynamicRibbonWidget::NO_ITEM_ID)
     {
     }
     else

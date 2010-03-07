@@ -284,6 +284,12 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
     
+    // if we reached a filler item, move again
+    if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
+    {
+        rightPressed(playerID);
+    }
+    
     if (m_ribbon_type != RIBBON_TOOLBAR)
     {
         //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
@@ -317,6 +323,12 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
         }
+    }
+    
+    // if we reached a filler item, move again
+    if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
+    {
+        leftPressed(playerID);
     }
     
     if (m_ribbon_type != RIBBON_TOOLBAR)
