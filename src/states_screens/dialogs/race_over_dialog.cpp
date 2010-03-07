@@ -225,11 +225,32 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     // ---- Buttons at the bottom
     if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
     {
+        const int label_y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
+        
+        // button_h is used in the x coordinates not by mistake, but because the icon is square and
+        // scaled according to the available height.
+        core::rect< s32 > iconarea(20, label_y,
+                                   20 + button_h, label_y + button_h);
+        IGUIImage* img = GUIEngine::getGUIEnv()->addImage( iconarea, m_irrlicht_window );
+        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setScaleImage(true);
+        img->setTabStop(false);
+        img->setUseAlphaChannel(true);
+        
+        core::rect< s32 > icon2area(m_area.getWidth() - button_h - 20, label_y,
+                                   m_area.getWidth() - 20, label_y + button_h);
+        img = GUIEngine::getGUIEnv()->addImage( icon2area, m_irrlicht_window );
+        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setScaleImage(true);
+        img->setTabStop(false);
+        img->setUseAlphaChannel(true);
+        
         LabelWidget* unlocked_label = new LabelWidget();
         unlocked_label->m_properties[PROP_ID] = "label";
-        unlocked_label->x = 15;
-        unlocked_label->y = m_area.getHeight() - (button_h + margin_between_buttons)*2;
-        unlocked_label->w = m_area.getWidth() - 30;
+        unlocked_label->m_properties[PROP_TEXT_ALIGN] = "center";
+        unlocked_label->x = button_h + 30;
+        unlocked_label->y = label_y;
+        unlocked_label->w = m_area.getWidth() - button_h*2 - 60;
         unlocked_label->h = button_h;
         unlocked_label->m_text = _("You unlocked a new feature!");
         unlocked_label->setParent(m_irrlicht_window);
