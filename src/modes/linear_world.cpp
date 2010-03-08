@@ -119,10 +119,7 @@ void LinearWorld::restartRace()
     // First all kart infos must be updated before  the kart position can be 
     // recomputed, since otherwise 'new' (initialised) valued will be compared
     // with old values.
-    for (unsigned int i=0; i<kart_amount; i++)
-    {
-        updateRacePosition(m_karts[i], m_kart_info[i]);
-    }
+    updateRacePosition();
     
 #ifdef DEBUG
     //FIXME: this could be defined somewhere in a central header so it can be used everywhere
@@ -194,18 +191,23 @@ void LinearWorld::update(float delta)
     // updated their position and laps etc, otherwise inconsistencies
     // (like two karts at same position) can occur.
     // ---------------------------------------------------------------
-    for(unsigned int i=0; i<kart_amount; i++)
+    
+    updateRacePosition();
+    
+    for (unsigned int i=0; i<kart_amount; i++)
     {
         // ---------- update rank ------
-        if(m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) 
-            continue;
-        updateRacePosition(m_karts[i], m_kart_info[i]);
+        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) continue;
+
         // During the last lap update the estimated finish time.
         // This is used to play the faster music, and by the AI
-        if(m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
+        if (m_kart_info[i].m_race_lap == race_manager->getNumLaps()-1)
+        {
             m_kart_info[i].m_estimated_finish = estimateFinishTimeForKart(m_karts[i]);
+        }
         checkForWrongDirection(i);
     }
+    
 #ifdef DEBUG
     // FIXME: Debug output in case that the double position error
     // occurs again. It can most likely be removed.
@@ -563,61 +565,106 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 }   // moveKartAfterRescue
 
 //-----------------------------------------------------------------------------
-/** Find the position (rank) of 'kart' and update it accordingly
+/** Find the position (rank) of every kart
   */
-void LinearWorld::updateRacePosition ( Kart* kart, KartInfo& kart_info )
+void LinearWorld::updateRacePosition()
 {
-    int p = 1 ;
-
     const unsigned int kart_amount = m_karts.size();
-    const int my_id                = kart->getWorldKartId();
-    const int my_laps              = getLapForKart(my_id);
-    const float my_progression     = getDistanceDownTrackForKart(my_id);
-    for ( unsigned int j = 0 ; j < kart_amount ; j++ )
-    {
-        if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
-        if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
 
-        // Count karts ahead of the current kart, i.e. kart that are already
-        // finished (the current kart k has not yet finished!!), have done more
-        // laps, or the same number of laps, but a greater distance.
-        if(m_karts[j]->hasFinishedRace()) { p++; continue; }
-
-        /* has done more or less lapses */
-        assert(j==m_karts[j]->getWorldKartId());
-        int other_laps = getLapForKart(j);
-        if (other_laps !=  my_laps)
-        {
-            if(other_laps > my_laps) p++; // Other kart has more lapses
-            continue;
-        }
-        // Now both karts have the same number of lapses. Test progression.
-        // A kart is ahead if it's driven further, or driven the same
-        // distance, but started further to the back.
-        float other_progression = getDistanceDownTrackForKart(j);
-        if(other_progression > my_progression ||
-            (other_progression == my_progression &&
-            m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
-        {
-                        p++;
-        }
-    } //next kart
     
-    kart->setPosition(p);
+#ifdef DEBUG
+    bool rank_used[kart_amount+1];
+    for (unsigned int n=0; n<=kart_amount; n++) rank_used[n] = false;
+#endif
     
-    // Switch on faster music if not already done so, if the
-    // first kart is doing its last lap, and if the estimated
-    // remaining time is less than 30 seconds.
-    if(!m_faster_music_active                                  &&
-       kart_info.m_race_lap == race_manager->getNumLaps()-1    &&
-       p==1                                                    &&
-       useFastMusicNearEnd()                                   &&
-       kart_info.m_estimated_finish > 0                        &&
-       kart_info.m_estimated_finish - getTime() < 30.0f              )
+    for (unsigned int i=0; i<kart_amount; i++)
     {
-        sound_manager->switchToFastMusic();
-        m_faster_music_active=true;
-    }
+        Kart* kart          = m_karts[i];
+        KartInfo& kart_info = m_kart_info[i];
+        
+        int p = 1 ;
+
+        const int my_id                = kart->getWorldKartId();
+        const int my_laps              = getLapForKart(my_id);
+        const float my_progression     = getDistanceDownTrackForKart(my_id);
+        for (unsigned int j = 0 ; j < kart_amount ; j++)
+        {
+            if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
+            
+            //if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
+
+            // Count karts ahead of the current kart, i.e. kart that are already finished,
+            // have done more laps, or the same number of laps, but a greater distance.
+            if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace()) { p++; continue; }
+
+            /* has done more or less lapses */
+            assert(j==m_karts[j]->getWorldKartId());
+            int other_laps = getLapForKart(j);
+            if (other_laps !=  my_laps)
+            {
+                if(other_laps > my_laps) p++; // Other kart has more lapses
+                continue;
+            }
+            // Now both karts have the same number of lapses. Test progression.
+            // A kart is ahead if it's driven further, or driven the same
+            // distance, but started further to the back.
+            float other_progression = getDistanceDownTrackForKart(j);
+            if(other_progression > my_progression ||
+                (other_progression == my_progression &&
+                m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
+            {
+                            p++;
+            }
+        } //next kart
+        
+#ifdef DEBUG
+        if (rank_used[p])
+        {
+            std::cerr << "ERROR, same rank used twice!!\n";
+
+            std::cerr <<  "Info used to decide ranking :\n";
+            for (unsigned int d=0; d<kart_amount; d++)
+            {
+                std::cerr << "   kart " << m_karts[d]->getIdent() << " has finished(" << m_karts[d]->hasFinishedRace()
+                          << "), is at lap (" << getLapForKart(d) << "), is at distance("
+                          << getDistanceDownTrackForKart(d) << "), is eliminated(" << m_karts[d]->isEliminated() << ")" << std::endl;
+            }
+            
+            std::cerr <<  "Used ranks:\n";
+            for (unsigned int d=1; d<=kart_amount; d++)
+            {
+                std::cerr << "   rank " << d << " used : " << rank_used[d] << std::endl;
+            }
+            
+            std::cerr <<  "Who has each ranking so far :\n";
+            for (unsigned int d=0; d<i; d++)
+            {
+                std::cerr << "    " << m_karts[d]->getIdent() << " has rank " << m_karts[d]->getPosition() << std::endl;
+            }
+            
+            std::cerr << "    --> And " << kart->getIdent() << " is being set at rank " << p << std::endl;
+            assert(false);
+        }
+        rank_used[p] = true;
+#endif
+        
+        kart->setPosition(p);
+        
+        // Switch on faster music if not already done so, if the
+        // first kart is doing its last lap, and if the estimated
+        // remaining time is less than 30 seconds.
+        if(!m_faster_music_active                                  &&
+           kart_info.m_race_lap == race_manager->getNumLaps()-1    &&
+           p==1                                                    &&
+           useFastMusicNearEnd()                                   &&
+           kart_info.m_estimated_finish > 0                        &&
+           kart_info.m_estimated_finish - getTime() < 30.0f              )
+        {
+            sound_manager->switchToFastMusic();
+            m_faster_music_active=true;
+        }
+        }
+    
 }   // updateRacePosition
 
 //-----------------------------------------------------------------------------
