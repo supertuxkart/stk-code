@@ -149,8 +149,10 @@ ChallengeData::ChallengeData(const std::string& filename)
     
     std::vector< std::string > deps;
     root->get("depend-on", &deps);
-    for(unsigned int i=0; i<deps.size(); i++) addDependency(deps[i]);
-
+    for (unsigned int i=0; i<deps.size(); i++)
+    {
+        if (deps[i].size() > 0) addDependency(deps[i]);
+    }
     delete root;
 
 }   // ChallengeData
