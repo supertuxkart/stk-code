@@ -20,8 +20,8 @@
 #include "audio/sound_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
-#include "states_screens/race_gui.hpp"
 #include "items/powerup_manager.hpp"
+#include "states_screens/race_gui.hpp"
 #include "tracks/track.hpp"
 #include "utils/translation.hpp"
 
@@ -86,7 +86,25 @@ void FollowTheLeaderRace::countdownReachedZero()
         sound_manager->switchToFastMusic();
     }
     
-    // End of race is also detected from the World::update(), 
+    if (isRaceOver())
+    {
+        // mark leader as finished
+        m_karts[0]->finishedRace(getTime());
+        
+        // mark last human player as finished
+        for (unsigned int n=0; n<m_karts.size(); n++)
+        {
+            if (!m_karts[n]->isEliminated() && 
+                 m_karts[n]->getController()->getPlayer() != NULL) // if player kart
+            {
+                m_karts[n]->finishedRace(getTime());
+                //irr::core::stringw message(_("You won the race!"));
+                //getRaceGUI()->addMessage( message, m_karts[n], 2.0f, 60 );
+            }
+        }
+    }
+    // End of race is detected from World::updateWorld()
+    
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------

@@ -486,10 +486,17 @@ void Kart::finishedRace(float time)
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {        
+        // start end animation
+        setController(new EndController(this, m_controller->getPlayer()));
+        m_kart_properties->getKartModel()->setEndAnimation(true);
+        
+        // Not all karts have a camera
+        if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
+        
         RaceGUI* m = World::getWorld()->getRaceGUI();
         if(m)
         {
-            m->addMessage((getPosition() == 1 ? _("You won the race!") : _("You finished the race!")) ,
+            m->addMessage((getPosition() == 2 ? _("You won the race!") : _("You finished the race!")) ,
                           this, 2.0f, 60);
         }
     }
