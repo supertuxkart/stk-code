@@ -23,8 +23,9 @@ using namespace irr::gui;
 
 LabelWidget::LabelWidget(bool title)
 {
-    m_type = WTYPE_LABEL;
+    m_type       = WTYPE_LABEL;
     m_title_font = title;
+    m_has_color  = false;
 }
 // -----------------------------------------------------------------------------
 void LabelWidget::add()
@@ -41,6 +42,11 @@ void LabelWidget::add()
     IGUIStaticText* irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size, false, word_wrap, m_parent, -1);
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
+    
+    if (m_has_color)
+    {
+        irrwidget->setOverrideColor(m_color);
+    }
     
     if (m_title_font)
     {

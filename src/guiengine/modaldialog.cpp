@@ -53,7 +53,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight)
     assert((unsigned int)h <= frame_size.Height);
     
     m_area = core::rect< s32 >( core::position2d< s32 >(frame_size.Width/2 - w/2, frame_size.Height/2 - h/2),
-                               core::dimension2d< s32 >(w, h) );
+                                core::dimension2d< s32 >(w, h) );
     
     if (modalWindow != NULL) delete modalWindow;
     modalWindow = this;

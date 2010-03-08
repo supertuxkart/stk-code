@@ -3,8 +3,10 @@
 
 #include "audio/sound_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -69,6 +71,54 @@ void traverse(scene::ISceneNode* curr, int level=0)
 
 void GrandPrixOver::init()
 {
+    if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+    {
+        const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+
+        
+        core::stringw message = _("You unlocked a new feature!");
+        const int message_width = GUIEngine::getFont()->getDimension(message.c_str()).Width + 30;
+        
+        const int label_height = GUIEngine::getFontHeight() + 15;
+        
+        const int y_from       = frame_size.Height - label_height*2;
+        const int y_to         = frame_size.Height - label_height;
+        
+        const int label_x_from = frame_size.Width/2 - message_width/2;
+        const int label_x_to   = frame_size.Width/2 + message_width/2;
+
+        // button_h is used in the x coordinates not by mistake, but because the icon is square and
+        // scaled according to the available height.
+        core::rect< s32 > iconarea(label_x_from - label_height, y_from,
+                                   label_x_from,                y_to);
+        IGUIImage* img = GUIEngine::getGUIEnv()->addImage( iconarea );
+        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setScaleImage(true);
+        img->setTabStop(false);
+        img->setUseAlphaChannel(true);
+        
+        core::rect< s32 > icon2area(label_x_to,                y_from,
+                                    label_x_to + label_height, y_to);
+        img = GUIEngine::getGUIEnv()->addImage( icon2area );
+        img->setImage( irr_driver->getTexture( file_manager->getTextureFile("cup_gold.png") ) );
+        img->setScaleImage(true);
+        img->setTabStop(false);
+        img->setUseAlphaChannel(true);
+        
+        GUIEngine::LabelWidget* unlocked_label = new GUIEngine::LabelWidget();
+        unlocked_label->m_properties[GUIEngine::PROP_ID] = "label";
+        unlocked_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
+        unlocked_label->x = label_x_from;
+        unlocked_label->y = y_from;
+        unlocked_label->w = message_width;
+        unlocked_label->h = label_height;
+        unlocked_label->m_text = message;
+        //const irr::video::SColor orange(255, 255, 126, 21);
+        //unlocked_label->setColor(orange);
+        
+        unlocked_label->add();
+    }
+    
     sound_manager->startMusic(sound_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
 
     m_phase = 1;

@@ -30,6 +30,9 @@ namespace GUIEngine
     /** A simple label widget. See guiengine/engine.hpp for a detailed overview. */
     class LabelWidget : public Widget
     {
+        bool m_has_color;
+        irr::video::SColor m_color;
+
     public:
         LabelWidget(bool title=false);
         virtual ~LabelWidget() {}
@@ -38,6 +41,13 @@ namespace GUIEngine
         
         /** Change the text in the label */
         void setText(irr::core::stringw newText);
+        
+        void setColor(const irr::video::SColor& color)
+        {
+            m_color = color;
+            m_has_color = true;
+        }
+
     };
 }
 
