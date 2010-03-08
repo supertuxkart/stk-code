@@ -41,7 +41,7 @@ private:
     std::string                    m_gp_id;
     std::string                    m_track_name;
     int                            m_energy;
-    std::vector<std::string>       m_depends_on;
+    //std::vector<std::string>       m_depends_on;
     //std::vector<UnlockableFeature> m_unlock;
     std::string                    m_filename;
 
