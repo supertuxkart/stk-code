@@ -10,6 +10,7 @@
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -338,8 +339,26 @@ void GrandPrixOver::eventCallback(GUIEngine::Widget* widget,
 {
     if (name == "continue")
     {
-        // we assume the main menu was pushed before showing this menu
-        StateManager::get()->popMenu();
+        // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
+        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+        
+        if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
+        {
+            std::vector<const Challenge*> unlocked = unlock_manager->getRecentlyUnlockedFeatures();
+            unlock_manager->clearUnlocked();
+            
+            FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+            
+            assert(unlocked.size() > 0);
+            scene->addUnlockedThings(unlocked);
+            
+            StateManager::get()->replaceTopMostScreen(scene);
+        }
+        else
+        {
+            // we assume the main menu was pushed before showing this menu
+            StateManager::get()->popMenu();
+        }
     }
 }
 

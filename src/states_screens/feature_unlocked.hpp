@@ -6,7 +6,7 @@
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
-
+class Challenge;
 
 class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
@@ -88,6 +88,10 @@ public:
     
     /** Call before showing up the screen to make a picture come out of the chest */
     void addUnlockedPicture(irr::video::ITexture* picture, float w, float h, irr::core::stringw msg);
+    
+    /** Call before showing up the screen to make whatever the passed challenges unlocked
+      * come out of the chest */
+    void addUnlockedThings(const std::vector<const Challenge*> unlocked);
     
     /** override from base class to handle escape press */
     virtual bool onEscapePressed();

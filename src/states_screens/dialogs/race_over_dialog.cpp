@@ -31,8 +31,8 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "tracks/track_manager.hpp"
-#include "tracks/track.hpp"
+//#include "tracks/track_manager.hpp"
+//#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -411,62 +411,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
          */
 
         assert(unlocked.size() > 0);
-        for (unsigned int n=0; n<unlocked.size(); n++)
-        {
-            const std::vector<UnlockableFeature>& unlockedFeatures = unlocked[n]->getFeatures();
-            assert(unlockedFeatures.size() > 0);
-            
-            for (unsigned int i=0; i<unlockedFeatures.size(); i++)
-            {
-         
-                switch (unlockedFeatures[i].type)
-                {
-                    case UNLOCK_TRACK:
-                    {
-                        Track* track = track_manager->getTrack(unlockedFeatures[i].name);
-                        assert(track != NULL);
-                        const std::string sshot = track->getScreenshotFile();
-                        scene->addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 1.0f, 0.75f,
-                                                   unlockedFeatures[i].getUnlockedMessage() );
-                        break;
-                    }
-                    case UNLOCK_GP:
-                    {
-                        //TODO
-                        break;
-                    }
-                    case UNLOCK_MODE:
-                    {
-                        const RaceManager::MinorRaceModeType mode =
-                                RaceManager::getModeIDFromInternalName(unlockedFeatures[i].name.c_str());
-                        const std::string icon = file_manager->getDataDir() + "/" + RaceManager::getIconOf(mode);
-                        scene->addUnlockedPicture( irr_driver->getTexture(icon.c_str()), 0.8f, 0.8f,
-                                                   unlockedFeatures[i].getUnlockedMessage() );
-                        break;
-                    }
-                    case UNLOCK_KART:
-                    {
-                        const KartProperties* kart = kart_properties_manager->getKart(unlockedFeatures[i].name);
-                        assert(kart != NULL);
-                        
-                        // the passed kart will not be modified, that's why I allow myself to use const_cast
-                        scene->addUnlockedKart( const_cast<KartProperties*>(kart),
-                                                unlockedFeatures[i].getUnlockedMessage() );
-                        break;
-                    }
-                    case UNLOCK_DIFFICULTY:
-                    {
-                        //TODO
-                        break;
-                    }
-                    default:
-                    {
-                        assert(false);
-                    }
-                }
-                
-            } // next feature
-        } // next challenge
+        scene->addUnlockedThings(unlocked);
 
         ModalDialog::dismiss();
         

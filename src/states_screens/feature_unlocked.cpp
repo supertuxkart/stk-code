@@ -1,13 +1,17 @@
 
 #include "states_screens/feature_unlocked.hpp"
 
-
+#include "challenges/challenge.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
+#include "karts/kart.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <SColor.h>
@@ -288,6 +292,78 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
             message_y -= (fontH + MARGIN);
         }
     }
+}
+
+// -------------------------------------------------------------------------------------
+
+void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challenge*> unlocked)
+{
+    for (unsigned int n=0; n<unlocked.size(); n++)
+    {
+        const std::vector<UnlockableFeature>& unlockedFeatures = unlocked[n]->getFeatures();
+        assert(unlockedFeatures.size() > 0);
+        
+        for (unsigned int i=0; i<unlockedFeatures.size(); i++)
+        {
+            
+            switch (unlockedFeatures[i].type)
+            {
+                case UNLOCK_TRACK:
+                {
+                    Track* track = track_manager->getTrack(unlockedFeatures[i].name);
+                    assert(track != NULL);
+                    const std::string sshot = track->getScreenshotFile();
+                    addUnlockedPicture( irr_driver->getTexture(sshot.c_str()), 1.0f, 0.75f,
+                                         unlockedFeatures[i].getUnlockedMessage() );
+                    break;
+                }
+                case UNLOCK_GP:
+                {
+                    //TODO: implement
+                    std::cerr << "OK, I see you unlocked a GP, but this is not supported yet\n";
+                    
+                    video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                    addUnlockedPicture( tex, 1.0f, 0.75f,
+                                        unlockedFeatures[i].getUnlockedMessage() );
+                    break;
+                }
+                case UNLOCK_MODE:
+                {
+                    const RaceManager::MinorRaceModeType mode =
+                    RaceManager::getModeIDFromInternalName(unlockedFeatures[i].name.c_str());
+                    const std::string icon = file_manager->getDataDir() + "/" + RaceManager::getIconOf(mode);
+                    addUnlockedPicture( irr_driver->getTexture(icon.c_str()), 0.8f, 0.8f,
+                                        unlockedFeatures[i].getUnlockedMessage() );
+                    break;
+                }
+                case UNLOCK_KART:
+                {
+                    const KartProperties* kart = kart_properties_manager->getKart(unlockedFeatures[i].name);
+                    assert(kart != NULL);
+                    
+                    // the passed kart will not be modified, that's why I allow myself to use const_cast
+                    addUnlockedKart( const_cast<KartProperties*>(kart),
+                                     unlockedFeatures[i].getUnlockedMessage() );
+                    break;
+                }
+                case UNLOCK_DIFFICULTY:
+                {
+                    //TODO : implement
+                    std::cerr << "OK, I see you unlocked a difficulty, but this is not supported yet\n";
+
+                    video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                    addUnlockedPicture( tex, 1.0f, 0.75f,
+                                        unlockedFeatures[i].getUnlockedMessage() );
+                    break;
+                }
+                default:
+                {
+                    assert(false);
+                }
+            }
+            
+        } // next feature
+    } // next challenge
 }
 
 // -------------------------------------------------------------------------------------
