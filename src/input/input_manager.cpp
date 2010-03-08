@@ -153,6 +153,12 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(POWERUP_PARACHUTE, 10000);
             }
             break;
+        case KEY_F7:
+            if (race_manager->getNumPlayers() == 1)
+            {
+                Kart* kart = world->getLocalPlayerKart(0);
+                kart->setPowerup(POWERUP_ZIPPER, 10000);
+            }
 #endif
         case KEY_F12:
             UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
