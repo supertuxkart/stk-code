@@ -66,7 +66,7 @@ void History::initRecording()
 void History::allocateMemory(int number_of_frames)
 {
     m_all_deltas.resize   (number_of_frames);
-    unsigned int num_karts = World::getWorld()->getNumKarts();
+    unsigned int num_karts = race_manager->getNumberOfKarts();
     m_all_controls.resize (number_of_frames*num_karts);
     m_all_xyz.resize      (number_of_frames*num_karts);
     m_all_rotations.resize(number_of_frames*num_karts);
@@ -306,10 +306,15 @@ void History::Load()
                     &x, 
 #ifdef KEEP_OLD_FORMAT
                     &z, &y,
+                    //xyz
+                    //yxz 
+                    //yzx
+                    &rx, &rz, &ry, &rw
 #else
                     &y, &z,
+                    &rx, &ry, &rz, &rw
 #endif
-                    &rx, &ry, &rz, &rw);
+                    );
             m_all_xyz[i]       = Vec3(x,y,z);
             m_all_rotations[i] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[i].setButtonsCompressed(char(buttonsCompressed));
