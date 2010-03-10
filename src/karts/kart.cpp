@@ -173,6 +173,9 @@ btTransform Kart::getKartHeading(const float customPitch)
 }   // getKartHeading
 
 // ----------------------------------------------------------------------------
+/** Created the physical representation of this kart. Atm it uses the actual
+ *  extention of the kart model to determine the size of the collision body.
+ */
 void Kart::createPhysics()
 {
     // First: Create the chassis of the kart
@@ -632,9 +635,9 @@ void Kart::update(float dt)
     }
 
     // When really on air, free fly, when near ground, try to glide / adjust for landing
-    //if(!isNearGround())
-//FIXME        m_uprightConstraint->setLimit(M_PI);
-    //else
+    if(!isNearGround())
+        m_uprightConstraint->setLimit(M_PI);
+    else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
 
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;

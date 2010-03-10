@@ -24,6 +24,7 @@ subject to the following restrictions:
 #include "LinearMath/btTransformUtil.h"
 
 #include "karts/kart.hpp"
+
 //!
 //!
 //!
@@ -84,31 +85,31 @@ void btUprightConstraint::solveAngularLimit(
 
     btVector3 motorImp = clippedMotorImpulse * limit->m_axis;
     body0->applyTorqueImpulse(motorImp);
-}
+}   // solveAngularLimit
 
 //!
 //!
 //!
 
-btUprightConstraint::btUprightConstraint(const Kart *kart, 
+btUprightConstraint::btUprightConstraint(const Kart* kart, 
                                          const btTransform& frameInA)
                    : btTypedConstraint(D6_CONSTRAINT_TYPE, *(kart->getBody()))
                    , m_frameInA(frameInA)
 
 {
-      m_kart                          = kart;
-      m_ERP                           = 1.0f;
-      m_bounce                        = 0.0f;
-      m_damping                       = 1.0f;
-      m_limitSoftness                 = 1.0f;
-      m_maxLimitForce                 = 3000.0f;
-      m_disable_time                  = 0.0f;
-      m_limit[0].m_accumulatedImpulse = 0.0f;
-      m_limit[1].m_accumulatedImpulse = 0.0f;
-      m_limit[ 0 ].m_axis             = btVector3( 1, 0, 0 );
-      m_limit[ 1 ].m_axis             = btVector3( 0, 0, 1 );
-      setLimit( SIMD_PI * 0.4f );
-}
+    m_kart                          = kart;
+    m_ERP                           = 1.0f;
+    m_bounce                        = 0.0f;
+    m_damping                       = 1.0f;
+    m_limitSoftness                 = 1.0f;
+    m_maxLimitForce                 = 3000.0f;
+    m_disable_time                  = 0.0f;
+    m_limit[0].m_accumulatedImpulse = 0.0f;
+    m_limit[1].m_accumulatedImpulse = 0.0f;
+    m_limit[ 0 ].m_axis             = btVector3( 1, 0, 0 );
+    m_limit[ 1 ].m_axis             = btVector3( 0, 1, 0 );
+    setLimit( SIMD_PI * 0.4f );
+}   // btUprightConstraint
  
 //!
 //!
@@ -116,30 +117,26 @@ btUprightConstraint::btUprightConstraint(const Kart *kart,
 
 void btUprightConstraint::buildJacobian()
 {
-      btTransform worldTransform = m_rbA.getCenterOfMassTransform() * m_frameInA;
-      btVector3   upAxis         = worldTransform.getBasis().getColumn(1);
-      m_limit[ 0 ].m_angle       = m_kart->getHPR().getPitch();
-      m_limit[ 1 ].m_angle       = m_kart->getHPR().getRoll();
-      for ( int i = 0; i < 2; i++ )
-      {
-          if ( m_limit[ i ].m_angle < -SIMD_PI )
-                m_limit[ i ].m_angle += 2 * SIMD_PI;
-          if ( m_limit[ i ].m_angle > SIMD_PI )
-                m_limit[ i ].m_angle -= 2 * SIMD_PI;
+    btTransform worldTransform = m_rbA.getCenterOfMassTransform() * m_frameInA;
+    btVector3   upAxis         = worldTransform.getBasis().getColumn(2);
+    m_limit[ 0 ].m_angle       = m_kart->getPitch();
+    m_limit[ 1 ].m_angle       = m_kart->getHPR().getRoll();
 
-          new (&m_jacAng[ i ])      btJacobianEntry(  m_limit[ i ].m_axis,
-                                                      m_rbA.getCenterOfMassTransform().getBasis().transpose(),
-                                                      m_rbB.getCenterOfMassTransform().getBasis().transpose(),
-                                                      m_rbA.getInvInertiaDiagLocal(),
-                                                      m_rbB.getInvInertiaDiagLocal());
-      }
-}
+    for ( int i = 0; i < 2; i++ )
+    {
+        new (&m_jacAng[ i ])      btJacobianEntry(  m_limit[ i ].m_axis,
+            m_rbA.getCenterOfMassTransform().getBasis().transpose(),
+            m_rbB.getCenterOfMassTransform().getBasis().transpose(),
+            m_rbA.getInvInertiaDiagLocal(),
+            m_rbB.getInvInertiaDiagLocal());
+    }
+}   // buildJacobian
 
 //!
 //!
 //!
 
-void btUprightConstraint::solveConstraint(btScalar    timeStep)
+void btUprightConstraint::solveConstraint(btScalar timeStep)
 {
     m_timeStep = timeStep;
 
@@ -150,9 +147,7 @@ void btUprightConstraint::solveConstraint(btScalar    timeStep)
         if(m_disable_time>0.0f) return;
     }
 
-    solveAngularLimit( &m_limit[ 0 ], m_timeStep, 
-                       btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
-    solveAngularLimit( &m_limit[ 1 ], 
-                       m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
-}
+    solveAngularLimit( &m_limit[ 0 ], m_timeStep, btScalar(1.) / m_jacAng[ 0 ].getDiagonal(), &m_rbA );
+    solveAngularLimit( &m_limit[ 1 ], m_timeStep, btScalar(1.) / m_jacAng[ 1 ].getDiagonal(), &m_rbA );
+}   // solveConstraint
 
