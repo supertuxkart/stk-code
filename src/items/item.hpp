@@ -60,18 +60,15 @@ private:
     /** Time till a collected item reappears. */
     float         m_time_till_return;
 
-    /** Original coordinates, used mainly when collected items reappear. */
-    Coord         m_coord;
-    core::quaternion m_rotate_to_normal;
-    float            m_rotate_amount;
-
     /** Scene node of this item. */
     scene::IMeshSceneNode *m_node;
 
     /** Stores the original mesh in order to reset it. */
     scene::IMesh *m_original_mesh;
 
-    Vec3          m_normal;
+    /** The original position - saves calls to m_node->getPosition() 
+     * and then converting this value to a Vec3. */
+    Vec3          m_xyz;
 
     /** Index in item_manager field. */
     unsigned int  m_item_id;
@@ -79,11 +76,12 @@ private:
     /** Set to false if item should not rotate. */
     bool          m_rotate;       
     
-    /** optionally, set this if this item was laid by a particular kart. in this case,
-        the 'm_deactive_time' will also be set - see below. */ 
+    /** Optionally set this if this item was laid by a particular kart. in 
+     *  this case the 'm_deactive_time' will also be set - see below. */ 
     const Kart   *m_event_handler;
-    /** optionally, if item was placed by a kart, a timer can be used to temporarly
-       deactivate collision so a kart is not hit by its own item */
+
+    /** Optionally if item was placed by a kart, a timer can be used to 
+     *  temporarly deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
     
     void          setType(ItemType type);
@@ -102,7 +100,7 @@ public:
     bool hitKart (Kart* kart ) const
     {
         return (m_event_handler!=kart || m_deactive_time <=0) &&
-               (kart->getXYZ()-m_coord.getXYZ()).length2()<0.8f;
+               (kart->getXYZ()-m_xyz).length2()<0.8f;
     }   // hitKart
 
     // ------------------------------------------------------------------------
