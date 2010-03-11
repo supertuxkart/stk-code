@@ -108,8 +108,8 @@ void SlipStream::createMesh(const video::SMaterial &material)
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
             v.Pos.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
-            v.Pos.Y = distance[j];
-            v.Pos.Z = -cos((i+(j%2)*0.5f)*f)*radius[j];
+            v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
+            v.Pos.Z = distance[j];
             v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
             v.TCoords.X = curr_distance/length;
             v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment);
