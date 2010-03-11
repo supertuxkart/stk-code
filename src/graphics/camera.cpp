@@ -216,10 +216,6 @@ void Camera::setInitialTransform()
 void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
                               const Vec3 &wanted_target)
 {
-    //m_camera->setPosition(wanted_position.toIrrVector());
-    //m_camera->setTarget(wanted_target.toIrrVector());
-    //return;
-
     // Smoothly interpolate towards the position and target
     core::vector3df current_position = m_camera->getPosition();
     core::vector3df current_target   = m_camera->getTarget();
@@ -236,7 +232,7 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     // high above the kart straight down.
 #undef DEBUG_CAMERA
 #ifdef DEBUG_CAMERA
-    core::vector3df xyz = RaceManager::getKart(0)->getXYZ().toIrrVector();
+    core::vector3df xyz = m_kart->getXYZ().toIrrVector();
     m_camera->setTarget(xyz);
     xyz.Y = xyz.Y+30;
     m_camera->setPosition(xyz);
@@ -264,7 +260,7 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
     // quadratically to dampen small variations (but keep sign)
     float dampened_steer =  fabsf(steering) * steering; 
     float angle_around = m_kart->getHeading() 
-                       + m_rotation_range * dampened_steer * 0.5f;
+                       - m_rotation_range * dampened_steer * 0.5f;
     float angle_up     = m_kart->getPitch() + 30.0f*DEGREE_TO_RAD;
 
     wanted_position->setX(-sin(angle_around));
