@@ -107,7 +107,7 @@ void GraphNode::addSuccessor(unsigned int to)
  */
 void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
 {
-    core::vector2df xyz2d(xyz.getX(), xyz.getY());
+    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
     if(m_line.getPointOrientation(xyz2d)>0)
         result->setX( (closest-xyz2d).getLength());   // to the right
