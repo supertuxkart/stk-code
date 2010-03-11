@@ -381,7 +381,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad &q = getQuad(indx);
-        float dist    = xyz.getZ() - q.getMinHeight();
+        float dist    = xyz.getY() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small netative
         // numbers in case that the kart is partly in the track.
         if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
