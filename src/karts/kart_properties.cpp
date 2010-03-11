@@ -189,7 +189,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_speed_angle_increase = 0.0;
     else
         m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-        / (m_max_speed_turn - m_min_speed_turn);
+                               / (m_max_speed_turn - m_min_speed_turn);
 
 
     // Useful when tweaking kart parameters
