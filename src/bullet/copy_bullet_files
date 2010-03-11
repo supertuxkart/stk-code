@@ -25,3 +25,28 @@ cp $LOCATION/src/BulletDynamics/Vehicle/*.cpp          src/BulletDynamics/Vehicl
 cp $LOCATION/Demos/OpenGL/*.h Demos/OpenGL
 cp $LOCATION/Demos/OpenGL/*.cpp Demos/OpenGL
 
+echo "REMEMBER to patch this new bullet version:"
+echo "1) btDiscreteDynamicsWorld.cpp: 
+--- BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp (revision 4812)
++++ BulletDynamics/Dynamics/btDiscreteDynamicsWorld.cpp (working copy)
+@@ -262,7 +262,12 @@
+                        for (int v=0;v<m_vehicles[i]->getNumWheels();v++)
+                        {
+                                //synchronize the wheels with the (interpolated) chassis worldtransform
++                // updateWheelTransform resets m_isInContact to false. Since
++                // this field is needed in STK, we save it here and restore
++                // its value after the call to updateWheelTransform.
++                bool contact = m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact;
+                                m_vehicles[i]->updateWheelTransform(v,true);
++                m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact = contact;
+                        }
+                }
+        }
+"
+
+echo "2) btRaycastVehicle.cpp
+      From:
+                    rel_pos[2] *= wheelInfo.m_rollInfluence;
+      to
+                    rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
+"
