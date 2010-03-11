@@ -384,10 +384,6 @@ void Kart::reset()
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
-    // Reset is also called when the kart is created, at which time
-    // m_controller is not yet defined.
-    if(m_controller)
-        m_controller->reset();
     m_kart_properties->getKartModel()->setEndAnimation(false);
     m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
@@ -435,6 +431,12 @@ void Kart::reset()
     }
 
     TerrainInfo::update(getXYZ());
+
+    // Reset is also called when the kart is created, at which time
+    // m_controller is not yet defined, so this has to be tested here.
+    if(m_controller)
+        m_controller->reset();
+
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -1160,8 +1162,8 @@ void Kart::updatePhysics(float dt)
     }
     float steering = getMaxSteerAngle() * m_controls.m_steer*m_skidding;
 
-    m_vehicle->setSteeringValue(-steering, 0);
-    m_vehicle->setSteeringValue(-steering, 1);
+    m_vehicle->setSteeringValue(steering, 0);
+    m_vehicle->setSteeringValue(steering, 1);
 
     // Only compute the current speed if this is not the client. On a client the
     // speed is actually received from the server.
@@ -1369,7 +1371,7 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     float offset_heading = getSteerPercent()*m_kart_properties->getSkidVisual()
                          * speed_ratio * m_skidding*m_skidding;
     Moveable::updateGraphics(center_shift, 
-                             btQuaternion(-offset_heading, 0, 0));
+                             btQuaternion(offset_heading, 0, 0));
 }   // updateGraphics
 
 /* EOF */

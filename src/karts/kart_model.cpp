@@ -265,7 +265,7 @@ void KartModel::update(float rotation, float visual_steer,
     }   // for i<4
 
     core::vector3df wheel_rear (-rotation, 0, 0);
-    core::vector3df wheel_steer(0, -visual_steer, 0);
+    core::vector3df wheel_steer(0, visual_steer, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
 
     for(unsigned int i=0; i<4; i++)

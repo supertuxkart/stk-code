@@ -804,13 +804,13 @@ float DefaultAIController::steerToPoint(const Vec3 &point, float dt)
     const float dx        = point.getX() - m_kart->getXYZ().getX();
     const float dz        = point.getZ() - m_kart->getXYZ().getZ();
     /** Angle from the kart position to the point in world coordinates. */
-    float theta           = -atan2(dx, dz);
+    float theta           = atan2(dx, dz);
 
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
     float angle_2_point   = theta - m_kart->getHeading() 
-                          - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
+                          - dt*m_kart->getBody()->getAngularVelocity().getY()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;
 
@@ -830,7 +830,7 @@ float DefaultAIController::steerToPoint(const Vec3 &point, float dt)
     float sin_steer_angle = m_kart->getKartProperties()->getWheelBase()/radius;
 #ifdef DEBUG_OUTPUT
     printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
-        theta, angle_2_point, m_body->getAngularVelocity().getZ(),
+        theta, angle_2_point, m_body->getAngularVelocity().getY(),
         radius, sin_steer_angle);
 #endif
     // Add 0.1 since rouding errors will otherwise result in the kart

@@ -295,7 +295,7 @@ void NewAIController::handleBraking()
     //We may brake if we are about to get out of the road, but only if the
     //kart is on top of the road, and if we won't slow down below a certain
     //limit.
-    if (m_crashes.m_road && m_kart->getVelocityLC().getY() > MIN_SPEED && 
+    if (m_crashes.m_road && m_kart->getVelocityLC().getZ() > MIN_SPEED && 
         m_world->isOnRoad(m_kart->getWorldKartId()) )
     {
         float kart_ang_diff = 
@@ -337,7 +337,7 @@ void NewAIController::handleBraking()
         //Brake if the kart's speed is bigger than the speed we need
         //to go through the curve at the widest angle, or if the kart
         //is not going straight in relation to the road.
-        if(m_kart->getVelocityLC().getY() > m_curve_target_speed ||
+        if(m_kart->getVelocityLC().getZ() > m_curve_target_speed ||
            kart_ang_diff                  > MIN_TRACK_ANGLE         )
         {
 #ifdef AI_DEBUG
@@ -789,15 +789,15 @@ float NewAIController::steerToPoint(const Vec3 &point, float dt)
     // No sense steering if we are not driving.
     if(m_kart->getSpeed()==0) return 0.0f;
     const float dx        = point.getX() - m_kart->getXYZ().getX();
-    const float dy        = point.getY() - m_kart->getXYZ().getY();
+    const float dz        = point.getZ() - m_kart->getXYZ().getZ();
     /** Angle from the kart position to the point in world coordinates. */
-    float theta           = -atan2(dx, dy);
+    float theta           = atan2(dx, dz);
 
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
     float angle_2_point   = theta - m_kart->getHeading() 
-                          - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
+                          - dt*m_kart->getBody()->getAngularVelocity().getY()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;
 
@@ -817,7 +817,7 @@ float NewAIController::steerToPoint(const Vec3 &point, float dt)
     float sin_steer_angle = m_kart->getKartProperties()->getWheelBase()/radius;
 #ifdef DEBUG_OUTPUT
     printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
-        theta, angle_2_point, m_body->getAngularVelocity().getZ(),
+        theta, angle_2_point, m_body->getAngularVelocity().getY(),
         radius, sin_steer_angle);
 #endif
     // Add 0.1 since rouding errors will otherwise result in the kart
