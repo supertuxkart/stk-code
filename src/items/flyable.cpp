@@ -54,6 +54,7 @@ Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
     m_average_height               = (m_min_height+m_max_height)/2.0f;
     m_force_updown                 = m_st_force_updown[type];
     m_owner                        = kart;
+    m_type                         = type;
     m_has_hit_something            = false;
     m_exploded                     = false;
     m_shape                        = NULL;
@@ -366,6 +367,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
                                                         ).c_str();
             break;
             default:
+                printf("Failed message for %i\n", m_type);
                 assert(false);
         }
         gui->addMessage(hit_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
