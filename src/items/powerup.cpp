@@ -163,14 +163,14 @@ void Powerup::use()
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
         btVector3 pos = m_owner->getXYZ();
-        float z_coord = Track::NOHIT;
+        float up_coord = Track::NOHIT;
         Vec3 normal;
         const Material* unused2;        
-        world->getTrack()->getTerrainInfo(pos, &z_coord, &normal, &unused2);
+        world->getTrack()->getTerrainInfo(pos, &up_coord, &normal, &unused2);
         normal.normalize();
-        assert(z_coord != Track::NOHIT);
+        assert(up_coord != Track::NOHIT);
         
-        pos.setZ(z_coord-0.05f);
+        pos.setY(up_coord-0.05f);
         
         item_manager->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
         }
