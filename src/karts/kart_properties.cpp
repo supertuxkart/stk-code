@@ -64,7 +64,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_wheel_radius = m_chassis_linear_damping =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_jump_velocity =
-        m_z_rescue_offset = m_upright_tolerance = m_collision_side_impulse =
+        m_vert_rescue_offset = m_upright_tolerance = m_collision_side_impulse =
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max =
@@ -175,21 +175,21 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     if(m_gravity_center_shift.getX()==UNDEFINED)
     {
         m_gravity_center_shift.setX(0);
-        m_gravity_center_shift.setY(0);
         // Default: center at the very bottom of the kart.
-        m_gravity_center_shift.setZ(m_kart_model.getHeight()*0.5f);
+        m_gravity_center_shift.setY(m_kart_model.getHeight()*0.5f);
+        m_gravity_center_shift.setZ(0);
     }
     m_kart_model.setDefaultPhysicsPosition(m_gravity_center_shift,
-        m_wheel_radius);
-    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getY()
-        -m_kart_model.getWheelPhysicsPosition(2).getY());
+                                           m_wheel_radius           );
+    m_wheel_base = fabsf( m_kart_model.getWheelPhysicsPosition(0).getZ()
+                         -m_kart_model.getWheelPhysicsPosition(2).getZ());
     m_angle_at_min = asinf(m_wheel_base/m_min_radius);
     m_angle_at_max = asinf(m_wheel_base/m_max_radius);
     if(m_max_speed_turn == m_min_speed_turn)
         m_speed_angle_increase = 0.0;
     else
         m_speed_angle_increase = (m_angle_at_min   - m_angle_at_max)
-        / (m_max_speed_turn - m_min_speed_turn);
+                               / (m_max_speed_turn - m_min_speed_turn);
 
 
     // Useful when tweaking kart parameters
@@ -313,14 +313,14 @@ void KartProperties::getAllData(const XMLNode * root)
 
     //TODO: wheel width is not loaded, yet is listed as an attribute in the xml file after wheel-radius?
 
-    root->get("chassis-linear-damping", &m_chassis_linear_damping);
+    root->get("chassis-linear-damping",  &m_chassis_linear_damping);
     root->get("chassis-angular-damping", &m_chassis_angular_damping);
     root->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-    root->get("suspension-rest", &m_suspension_rest);
-    root->get("suspension-travel-cm", &m_suspension_travel_cm);
-    root->get("jump-velocity", &m_jump_velocity);
-    root->get("collision-side-impulse", &m_collision_side_impulse);
-    root->get("z-rescue-offset", &m_z_rescue_offset);
+    root->get("suspension-rest",         &m_suspension_rest);
+    root->get("suspension-travel-cm",    &m_suspension_travel_cm);
+    root->get("jump-velocity",           &m_jump_velocity);
+    root->get("collision-side-impulse",  &m_collision_side_impulse);
+    root->get("vert-rescue-offset",      &m_vert_rescue_offset);
 
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
@@ -443,7 +443,7 @@ void KartProperties::getAllData(const lisp::Lisp* lisp)
     lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
     lisp->get("collision-side-impulse",    m_collision_side_impulse   );
     lisp->get("jump-velocity",             m_jump_velocity            );
-    lisp->get("z-rescue-offset",           m_z_rescue_offset          );
+    lisp->get("vert-rescue-offset",        m_vert_rescue_offset       );
     lisp->get("upright-tolerance",         m_upright_tolerance        );
     lisp->get("upright-max-force",         m_upright_max_force        );
     lisp->get("track-connection-accel",    m_track_connection_accel   );
@@ -540,7 +540,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
     CHECK_NEG(m_collision_side_impulse,    "collision-side-impulse"     );
     CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
-    CHECK_NEG(m_z_rescue_offset,           "z-rescue-offset"            );
+    CHECK_NEG(m_vert_rescue_offset,        "vert-rescue-offset"         );
     CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
     CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
     CHECK_NEG(m_track_connection_accel,    "track-connection-accel"     );

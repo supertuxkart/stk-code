@@ -252,18 +252,19 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     const int start_spots_amount = world->getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
     
-    int smallest_distance_found = -1, closest_id_found = -1;
+    float smallest_distance_found = -1;
+    int  closest_id_found = -1;
     
-    const int kart_x = (int)(kart->getXYZ()[0]);
-    const int kart_y = (int)(kart->getXYZ()[1]);
+    const float kart_x = kart->getXYZ().getX();
+    const float kart_z = kart->getXYZ().getZ();
     
     for(int n=0; n<start_spots_amount; n++)
     {
         // no need for the overhead to compute exact distance with sqrt(), so using the
         // 'manhattan' heuristic which will do fine enough.
         const Vec3 &v=world->getTrack()->getStartPosition(n);
-        const int dist_n = abs((int)(kart_x - v.getX())) +
-                           abs((int)(kart_y - v.getY()));
+        const float dist_n= fabs(kart_x - v.getX()) +
+                            fabs(kart_z - v.getZ());
         if(dist_n < smallest_distance_found || closest_id_found == -1)
         {
             closest_id_found = n;
@@ -276,14 +277,14 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     kart->setXYZ( Vec3(v) );
     
     // FIXME - implement correct heading
-    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f), 
+    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f), 
                          world->getTrack()->getStartHeading(closest_id_found));
     kart->setRotation(heading);
 
     //position kart from same height as in World::resetAllKarts
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, 0.5f*kart->getKartHeight()));
-    pos.setRotation( btQuaternion(btVector3(0.0f, 0.0f, 1.0f), 0 /* angle */) );
+    pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
+    pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
 
     body->setCenterOfMassTransform(pos);
 
@@ -293,9 +294,9 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
                                 kart->getKartHeight();
-        body->translate(btVector3(0, 0, vertical_offset));
+        body->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {

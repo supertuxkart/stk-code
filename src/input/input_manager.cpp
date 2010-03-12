@@ -105,7 +105,6 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
-                projectile_manager->newExplosion(Vec3(0, 8, 0.5));
             }
             break;
         case KEY_F2:
@@ -129,16 +128,6 @@ void InputManager::handleStaticAction(int key, int value)
                 kart->setPowerup(POWERUP_SWITCH, 10000);
             }
             break;
-        case KEY_F11:
-            if(value && control_is_pressed)
-            {
-                UserConfigParams::m_bullet_debug = !UserConfigParams::m_bullet_debug;
-                if(UserConfigParams::m_bullet_debug)
-                    world->getPhysics()->activateDebug();
-                else
-                    world->getPhysics()->deactivateDebug();
-            }
-            break;
         case KEY_F5:
             if (race_manager->getNumPlayers() ==1 )
             {
@@ -159,6 +148,12 @@ void InputManager::handleStaticAction(int key, int value)
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_ZIPPER, 10000);
             }
+        case KEY_F11:
+            if(value && control_is_pressed)
+            {
+                world->getPhysics()->nextDebugMode();
+            }
+            break;
 #endif
         case KEY_F12:
             UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;

@@ -47,7 +47,6 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
     m_node = irr_driver->addMesh(m_mesh);
     //m_node->setParent(m_kart->getNode());
     m_node->setPosition(core::vector3df(0, 
-//                                        0*0.25f,
                                         0*0.25f+2.5,
                                         m_kart->getKartLength()) );
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));

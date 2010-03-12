@@ -52,10 +52,10 @@ GraphNode::GraphNode(unsigned int index)
                + (quad[3]-quad[2]).length() ) * 0.5f;
     Vec3 lower = (quad[0]+quad[1]) * 0.5f;
     Vec3 upper = (quad[2]+quad[3]) * 0.5f;
-    m_line     = core::line2df(lower.getX(), lower.getY(),
-                               upper.getX(), upper.getY() );
+    m_line     = core::line2df(lower.getX(), lower.getZ(),
+                               upper.getX(), upper.getZ() );
     // Only this 2d point is needed later
-    m_lower_center = core::vector2df(lower.getX(), lower.getY());
+    m_lower_center = core::vector2df(lower.getX(), lower.getZ());
 }   // GraphNode
 
 // ----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ void GraphNode::addSuccessor(unsigned int to)
     Vec3 diff     = next_quad.getCenter() - this_quad.getCenter();
     m_distance_to_next.push_back(d2.getLength());
     
-    float theta = -atan2(diff.getX(), diff.getY());
+    float theta = atan2(diff.getX(), diff.getZ());
     m_angle_to_next.push_back(theta);
 
     // The length of this quad is the average of the left and right side
@@ -103,15 +103,15 @@ void GraphNode::addSuccessor(unsigned int to)
  *  is it. All these computations are done in 2D only.
  *  \param xyz The coordinates of the point.
  *  \param result The X coordinate contains the sidewards distance, the
- *                y coordinate the forward distance.
+ *                Z coordinate the forward distance.
  */
 void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
 {
-    core::vector2df xyz2d(xyz.getX(), xyz.getY());
+    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
     if(m_line.getPointOrientation(xyz2d)>0)
         result->setX( (closest-xyz2d).getLength());   // to the right
     else
         result->setX(-(closest-xyz2d).getLength());   // to the left
-    result->setY( m_distance_from_start + (closest-m_lower_center).getLength());
+    result->setZ( m_distance_from_start + (closest-m_lower_center).getLength());
 }   // getDistances

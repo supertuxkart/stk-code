@@ -2,11 +2,32 @@
 <?xml version="1.0"?>
 
 <config>
-
+  <!--  Minimum and maximum kart versions that can be used by this binary.
+        Older version will be ignored. -->
+  <kart-version min="2" max="2"/>
+  <!-- Minimum and maxium track versions that be be read by this binary.
+       Older versions will be ignored. -->
+  <track-version min="2" max="2"/>
+  <!-- Maximum number of karts to be used at the same time. This limit
+       can easily be increased, but some tracks might not have valid start
+       positions for those additional karts. -->
+  <max-karts value="8"/>
+  <!-- 
+  <Scores =point="10 8 6 5 4 3 2 1"''>
+    grid-order="1"
+    title-music="main_theme.music"
+    mainmenu-background="st_title_screen.rgb st_title_screen2.rgb"
+    menu-background="menu_background.rgb menu_background2.rgb"
+    max-history="10000"
+    max-skidmarks="100"
+    skid-fadeout-time="60"
+    near-ground="2"
+    delay-finish-time="4"
+    music-credit-time="10"
+    final-camera-time="1.5"
+-->
 <!-- STK PARAMETERS
 
-min-kart-version and max-kart-version are the the minimum and maximum .kart
-files supported. Older/newer files are ignored.
 
 min-track-version and max-track-version are the minimum and maximum .track
 files supported, older/newer files are ignored.
@@ -34,10 +55,10 @@ final-camera-time is the time for the final camera to reach it's destination
 -->
 
 <stk-parameters
-    min-kart-version="1"
-    max-kart-version="1"
-    min-track-version="1"
-    max-track-version="1"
+    min-kart-version="2"
+    max-kart-version="2"
+    min-track-version="2"
+    max-track-version="2"
     max-karts="8"
     scores="10 8 6 5 4 3 2 1"
     grid-order="1"
@@ -158,7 +179,7 @@ a hit kart receives depends on the orientation - if a kart is pushed
 in the direction it is driving, it will be more (no friction from tires),
 while when pushed to the side, hardly anything happens.
  
-z-rescue-offset is the z-axis offset when kart is being put back on track
+vert-rescue-offset is the z-axis offset when kart is being put back on track
 after being rescued, it's a fraction of kart height
 
 gear-switch-ratio defines at what ratio of the maximum speed what gear is
@@ -189,7 +210,7 @@ rubber-band-duration is the duration a rubber band acts.
     time-full-steer-ai="0.1"
     corn-f ="4"
     corn-r="4"
-    gravity-center-shift="0 0 0.3"
+    gravity-center-shift="0 0.3 0"
     nitro-power-boost="3"
 
     skid-increase="1.05"
@@ -223,11 +244,11 @@ rubber-band-duration is the duration a rubber band acts.
     suspension-travel-cm="19"
     jump-velocity="3.0"
     collision-side-impulse="0"
-    z-rescue-offset="0.0"
-    wheel-front-right="0.38  0.6 0"
-    wheel-front-left="-0.38  0.6 0"
-    wheel-rear-right="0.38 -0.6 0"
-    wheel-rear-left="-0.38 -0.6 0"
+    vert-rescue-offset="0.0"
+    wheel-front-right="0.38 0 0.6"
+    wheel-front-left="-0.38 0 0.6"
+    wheel-rear-right="0.38 0  -0.6"
+    wheel-rear-left="-0.38 0 -0.6"
     gear-switch-ratio="0.25 0.7 1.0"
     gear-power-increase="2.2 1.7 1.3"
     upright-tolerance="0.2"

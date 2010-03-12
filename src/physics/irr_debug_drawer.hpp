@@ -30,9 +30,18 @@ using namespace irr;
 
 class IrrDebugDrawer : public btIDebugDraw
 {
-    /** The drawing mode to use. */
-    int                  m_debug_mode;
-
+    /** The drawing mode to use: 
+     *  If bit 0 is set, draw the bullet collision shape of karts
+     *  If bit 1 is set, don't draw the kart graphics
+     */
+    enum            DebugModeType { DM_NONE              = 0x00,
+                                    DM_KARTS_PHYSICS     = 0x01,
+                                    DM_NO_KARTS_GRAPHICS = 0x02
+                                  };
+    DebugModeType   m_debug_mode;
+protected:
+    virtual void    setDebugMode(int debug_mode) {}
+    virtual int     getDebugMode() const         { return DBG_DrawWireframe;}
 public:
                     IrrDebugDrawer();
     void            render(float dt);
@@ -47,11 +56,9 @@ public:
     virtual void    reportErrorWarning(const char* warningString) {}
     virtual void    draw3dText(const btVector3& location, 
                                const char* textString)            {}
-    virtual void    setDebugMode(int debug_mode) { m_debug_mode = debug_mode; }
-    virtual int     getDebugMode() const         { return m_debug_mode;       }
-    void            activate();
-    void            deactivate();
-
+    /** Returns true if debug mode is enabled. */
+    bool            debugEnabled() const         {return m_debug_mode!=0;}
+    void            nextDebugMode();
 };   // IrrDebugDrawer
 
 #endif

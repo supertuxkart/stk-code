@@ -21,59 +21,22 @@
 
 #include "utils/constants.hpp"
 
-void Vec3::setHPR(const btMatrix3x3& m)
+
+void Vec3::setHPR(const btQuaternion& q)
 {
-    float f[4][4];
-    m.getOpenGLSubMatrix((float*)f);
+    float W = q.getW();
+    float X = q.getX();
+    float Y = q.getY();
+    float Z = q.getZ();
+    float WSquared = W * W;
+    float XSquared = X * X;
+    float YSquared = Y * Y;
+    float ZSquared = Z * Z;
 
-    float s = m.getColumn(0).length();
-
-    if ( s <= 0.00001 )
-    {
-        fprintf(stderr,"setHPR: bad matrix\n");
-        setValue(0,0,0);
-        return ;
-    }
-    s=1/s;
-
-#define CLAMPTO1(x) x<-1 ? -1 : (x>1 ? 1 : x)
-
-    setY(asin(CLAMPTO1(m.getRow(2).getY())));
-
-    float cp = cos(getY());
-
-    /* If pointing nearly vertically up - then heading is ill-defined */
-
-
-    if ( cp > -0.00001 && cp < 0.00001 )
-    {
-        float cr = CLAMPTO1( m.getRow(1).getX()*s); 
-        float sr = CLAMPTO1(-m.getRow(1).getZ()*s);
-
-        setX(0.0f);
-        setZ(atan2(sr, cr ));
-    }
-    else
-    {
-        cp = s / cp ; // includes the scaling factor
-        float sr = CLAMPTO1( -m.getRow(2).getX() * cp );
-        float cr = CLAMPTO1(  m.getRow(2).getZ() * cp );
-        float sh = CLAMPTO1( -m.getRow(0).getY() * cp );
-        float ch = CLAMPTO1(  m.getRow(1).getY() * cp );
-
-        if ( (sh == 0.0f && ch == 0.0f) || (sr == 0.0f && cr == 0.0f) )
-        {
-            cr = CLAMPTO1( m.getRow(1).getX()*s);
-            sr = CLAMPTO1(-m.getRow(1).getZ()*s) ;
-
-            setX(0.0f);
-        }
-        else
-            setX(atan2(sh, ch ));
-
-        setZ(atan2(sr, cr ));
-    }
-}   // setHPR
+    setX(atan2f(2.0f * (Y * Z + X * W), -XSquared - YSquared + ZSquared + WSquared));
+    setY(asinf(-2.0f * (X * Z - Y * W)));
+    setZ(atan2f(2.0f * (X * Y + Z * W), XSquared - YSquared - ZSquared + WSquared));
+}   // setHPR(btQuaternion)
 
 // ----------------------------------------------------------------------------
 void Vec3::degreeToRad()
@@ -95,8 +58,8 @@ void Vec3::setPitchRoll(const Vec3 &normal)
     // Compute the angle between the normal of the plane and the line to
     // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
     // simplifying the computation of the scalar product.
-    float pitch = ( normal.getX()*X + normal.getY()*Y );  // use ( x,y,0)
-    float roll  = (-normal.getX()*Y + normal.getY()*X );  // use (-y,x,0)
+    float pitch = ( normal.getX()*X + normal.getZ()*Y );  // use ( x,y,0)
+    float roll  = (-normal.getX()*Y + normal.getZ()*X );  // use (-y,x,0)
 
     // The actual angle computed above is between the normal and the (x,y,0)
     // line, so to compute the actual angles 90 degrees must be subtracted.
@@ -111,22 +74,24 @@ void Vec3::setPitchRoll(const Vec3 &normal)
  */
 const core::vector3df Vec3::toIrrHPR() const
 {
-    core::vector3df r(RAD_TO_DEGREE*(-getY()),     // pitch
-                      RAD_TO_DEGREE*(-getX()),     // heading
-                      RAD_TO_DEGREE*(-getZ()) );   // roll
+    core::vector3df r(RAD_TO_DEGREE*(getX()),     // pitch
+                      RAD_TO_DEGREE*(getY()),     // heading
+                      RAD_TO_DEGREE*(getZ()) );   // roll
     return r;
 
 }  // toIrrHPR
 // ----------------------------------------------------------------------------
-const core::vector3df Vec3::toIrrVector() const
+/** Converts a vec3 into an irrlicht vector (which is a simple type cast).
+ */
+const core::vector3df& Vec3::toIrrVector() const
 {
-    core::vector3df v(m_x, m_z, m_y);
-    return v;
+    return (const core::vector3df&)*this;
 }   // toIrrVector
+
 // ----------------------------------------------------------------------------
 /** Returns the X and Y component as an irrlicht 2d vector. */
 const core::vector2df Vec3::toIrrVector2d() const
 {
-    core::vector2df v(m_x, m_y);
+    core::vector2df v(m_x, m_z);
     return v;
 }   // toIrrVector2d

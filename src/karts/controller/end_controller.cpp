@@ -301,7 +301,7 @@ float EndController::steerToAngle(const size_t SECTOR, const float ANGLE)
                                                m_successor_index[SECTOR]);
 
     //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - m_kart->getHPR().getHeading();
+    float steer_angle = angle - m_kart->getHeading();
 
     if(m_kart->hasViewBlockedByPlunger())
         steer_angle += ANGLE/5;
@@ -325,15 +325,15 @@ float EndController::steerToPoint(const Vec3 &point, float dt)
     // No sense steering if we are not driving.
     if(m_kart->getSpeed()==0) return 0.0f;
     const float dx        = point.getX() - m_kart->getXYZ().getX();
-    const float dy        = point.getY() - m_kart->getXYZ().getY();
+    const float dz        = point.getZ() - m_kart->getXYZ().getZ();
     /** Angle from the kart position to the point in world coordinates. */
-    float theta           = -atan2(dx, dy);
+    float theta           = atan2(dx, dz);
 
     // Angle is the point is relative to the heading - but take the current
     // angular velocity into account, too. The value is multiplied by two
     // to avoid 'oversteering' - experimentally found.
-    float angle_2_point   = theta - m_kart->getHPR().getHeading() 
-                          - dt*m_kart->getBody()->getAngularVelocity().getZ()*2.0f;
+    float angle_2_point   = theta - m_kart->getHeading() 
+                          - dt*m_kart->getBody()->getAngularVelocity().getY()*2.0f;
     angle_2_point         = normalizeAngle(angle_2_point);
     if(fabsf(angle_2_point)<0.1) return 0.0f;
 
@@ -353,7 +353,7 @@ float EndController::steerToPoint(const Vec3 &point, float dt)
     float sin_steer_angle = m_kart->getKartProperties()->getWheelBase()/radius;
 #ifdef DEBUG_OUTPUT
     printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
-        theta, angle_2_point, m_body->getAngularVelocity().getZ(),
+        theta, angle_2_point, m_body->getAngularVelocity().getY(),
         radius, sin_steer_angle);
 #endif
     // Add 0.1 since rouding errors will otherwise result in the kart
@@ -463,7 +463,7 @@ inline float EndController::normalizeAngle(float angle)
  */
 int EndController::calcSteps()
 {
-    int steps = int( m_kart->getVelocityLC().getY() / m_kart_length );
+    int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
     if( steps < m_min_steps ) steps = m_min_steps;
 
     //Increase the steps depending on the width, if we steering hard,
@@ -537,7 +537,7 @@ void EndController::findCurve()
 {
     float total_dist = 0.0f;
     int i;
-    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getY(); 
+    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getZ(); 
         i = m_next_node_index[i])
     {
         total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);

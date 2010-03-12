@@ -46,48 +46,46 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
     m_reverse_mode = kart->getControls().m_look_back;
 
     // find closest kart in front of the current one
-    const Kart *closest_kart=0;   btVector3 direction;   float kartDistSquared;
-    getClosestKart(&closest_kart, &kartDistSquared, &direction, kart /* search in front of this kart */, m_reverse_mode);
+    const Kart *closest_kart=0;   
+    Vec3        direction;
+    float       kartDistSquared;
+    getClosestKart(&closest_kart, &kartDistSquared, &direction,
+                   kart /* search in front of this kart */, m_reverse_mode);
 
     btTransform trans = kart->getTrans();
 
     btMatrix3x3 thisKartDirMatrix = kart->getKartHeading().getBasis();
-    btVector3 thisKartDirVector(thisKartDirMatrix[0][1],
-                                thisKartDirMatrix[1][1],
-                                thisKartDirMatrix[2][1]);
+    btVector3 thisKartDirVector(thisKartDirMatrix.getColumn(2));
 
-    float heading=atan2f(-thisKartDirVector.getX(), thisKartDirVector.getY());
+    float heading=kart->getHeading();
     float pitch = kart->getTerrainPitch(heading);
 
     // aim at this kart if it's not too far
     if(closest_kart != NULL && kartDistSquared < 30*30)
     {
         float fire_angle     = 0.0f;
-        float time_estimated = 0.0f;
-        getLinearKartItemIntersection (kart->getTrans().getOrigin(), closest_kart,
+        getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
                                        plunger_speed, gravity, y_offset,
-                                       &fire_angle, &up_velocity, &time_estimated);
+                                       &fire_angle, &up_velocity);
 
-        // apply transformation to the bullet object (without pitch)
-        btMatrix3x3 m;
-        m.setEulerZYX(0.0f, 0.0f, fire_angle);
-        trans.setBasis(m);
+        trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
 
-        m_initial_velocity = btVector3(0.0f, plunger_speed, up_velocity);
+        m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 
         createPhysics(y_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, false, &trans );
+                      new btCylinderShape(0.5f*m_extend), gravity, 
+                      /* rotates */false , /*turn around*/false, &trans );
     }
     else
     {
         trans = kart->getKartHeading();
 
-        createPhysics(y_offset, btVector3(pitch, plunger_speed, 0.0f),
+        createPhysics(y_offset, btVector3(pitch, 0.0f, plunger_speed),
                       new btCylinderShape(0.5f*m_extend), gravity, false /* rotates */, m_reverse_mode, &trans );
     }
 
     //adjust height according to terrain
-    setAdjustZVelocity(true);
+    setAdjustUpVelocity(true);
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
@@ -166,11 +164,10 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         }
 
         m_keep_alive = 0;
-        // Make this object invisible by placing it faaar down. Not that if this
+        // Make this object invisible by placing it faaar down. Note that if this
         // objects is simply removed from the scene graph, it might be auto-deleted
         // because the ref count reaches zero.
-        Vec3 hell(0, 0, -10000);
-        getNode()->setPosition(hell.toIrrVector());
+        getNode()->setVisible(false);
         World::getWorld()->getPhysics()->removeBody(getBody());
     }
     else
@@ -183,8 +180,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
         scene::ISceneNode *node = getNode();
         if(node)
         {
-            Vec3 hell(0, 0, -10000);
-            getNode()->setPosition(hell.toIrrVector());
+            node->setVisible(false);
         }
         World::getWorld()->getPhysics()->removeBody(getBody());
 

@@ -166,7 +166,7 @@ btTransform Track::getStartTransform(unsigned int pos) const
 
     Vec3 orig = pos<m_start_positions.size() 
               ? m_start_positions[pos]
-              : Vec3( (pos%2==0)?1.5f:-1.5f,  -1.5f*pos-1.5f, 1.0f);
+              : Vec3( (pos%2==0)?1.5f:-1.5f, 1.0f,  -1.5f*pos-1.5f);
     btTransform start;
     start.setOrigin(orig);
     start.setRotation(btQuaternion(btVector3(0, 0, 1), 
@@ -391,7 +391,7 @@ void Track::convertTrackToBullet(const scene::IMesh *mesh,
                 int indx=mbIndices[j+k];
                 core::vector3df v = mbVertices[indx].Pos;
                 mat.transformVect(v);
-                vertices[k] = Vec3(v);
+                vertices[k]=v;
             }   // for k
             if(tmesh) tmesh->addTriangle(vertices[0], vertices[1], 
                                          vertices[2], material     );
@@ -703,7 +703,7 @@ void Track::loadTrackModel(unsigned int mode_id)
             // Set some kind of default in case Z is not defined in the file
             // (with the new track exporter it always is defined anyway).
             // Z is the height from which the item is dropped on the track.
-            xyz.setZ(1000);
+            xyz.setY(1000);
             node->getXYZ(&xyz);
             bool drop=true;
             node->get("drop", &drop);
@@ -884,14 +884,14 @@ void Track::itemCommand(const Vec3 &xyz, Item::ItemType type,
     // if only 2d coordinates are given, let the item fall from very high
     if(drop)
     {
-        loc.setZ(getTerrainHeight(loc));
+        loc.setY(getTerrainHeight(loc));
     }
 
     // Don't tilt the items, since otherwise the rotation will look odd,
     // i.e. the items will not rotate around the normal, but 'wobble'
     // around.
     //Vec3 normal(0.7071f, 0, 0.7071f);
-    Vec3 normal(0, 0, 1);
+    Vec3 normal(0, 1, 0);
     item_manager->newItem(type, loc, normal);
 }   // itemCommand
 
@@ -900,7 +900,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
                             const Material **material) const
 {
     btVector3 to_pos(pos);
-    to_pos.setZ(-100000.f);
+    to_pos.setY(-100000.f);
 
     class MaterialCollision : public btCollisionWorld::ClosestRayResultCallback
     {
@@ -938,7 +938,7 @@ void  Track::getTerrainInfo(const Vec3 &pos, float *hot, Vec3 *normal,
         return;
     }
 
-    *hot      = rayCallback.m_hitPointWorld.getZ();
+    *hot      = rayCallback.m_hitPointWorld.getY();
     *normal   = rayCallback.m_hitNormalWorld;
     *material = rayCallback.m_material;
     // Note: material might be NULL. This happens if the ray cast does not

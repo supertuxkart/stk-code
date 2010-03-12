@@ -28,6 +28,8 @@
 
 History* history = 0;
 
+#define KEEP_OLD_FORMAT
+
 //-----------------------------------------------------------------------------
 /** Initialises the history object and sets the mode to none. 
  */
@@ -64,7 +66,7 @@ void History::initRecording()
 void History::allocateMemory(int number_of_frames)
 {
     m_all_deltas.resize   (number_of_frames);
-    unsigned int num_karts = World::getWorld()->getNumKarts();
+    unsigned int num_karts = race_manager->getNumberOfKarts();
     m_all_controls.resize (number_of_frames*num_karts);
     m_all_xyz.resize      (number_of_frames*num_karts);
     m_all_rotations.resize(number_of_frames*num_karts);
@@ -186,8 +188,12 @@ void History::Save()
                     m_all_controls[j].m_steer,
                     m_all_controls[j].m_accel,
                     m_all_controls[j].getButtonsCompressed(),
-                    m_all_xyz[j].getX(), m_all_xyz[j].getY(),
-                    m_all_xyz[j].getZ(),
+                    m_all_xyz[j].getX(), 
+#ifdef KEEP_OLD_FORMAT
+                    m_all_xyz[j].getZ(), m_all_xyz[j].getY(),
+#else
+                    m_all_xyz[j].getY(), m_all_xyz[j].getZ(),
+#endif
                     m_all_rotations[j].getX(), m_all_rotations[j].getY(),
                     m_all_rotations[j].getZ(), m_all_rotations[j].getW()  );
             j=(j+1)%m_size;
@@ -297,7 +303,18 @@ void History::Load()
                     &m_all_controls[i].m_steer,
                     &m_all_controls[i].m_accel,
                     &buttonsCompressed,
-                    &x, &y, &z, &rx, &ry, &rz, &rw);
+                    &x, 
+#ifdef KEEP_OLD_FORMAT
+                    &z, &y,
+                    //xyz
+                    //yxz 
+                    //yzx
+                    &rx, &rz, &ry, &rw
+#else
+                    &y, &z,
+                    &rx, &ry, &rz, &rw
+#endif
+                    );
             m_all_xyz[i]       = Vec3(x,y,z);
             m_all_rotations[i] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[i].setButtonsCompressed(char(buttonsCompressed));

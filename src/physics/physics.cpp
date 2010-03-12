@@ -45,20 +45,20 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
 {
     m_axis_sweep     = new btAxisSweep3(world_min, world_max);
     m_dynamics_world = new btDiscreteDynamicsWorld(m_dispatcher,
-                                                    m_axis_sweep,
+                                                   m_axis_sweep,
                                                    this,
                                                    m_collision_conf);
-    m_dynamics_world->setGravity(btVector3(0.0f, 0.0f,
-                                           -World::getWorld()->getTrack()->getGravity()));
+    m_dynamics_world->setGravity(btVector3(0.0f,
+                                           -World::getWorld()->getTrack()->getGravity(),
+                                           0.0f));
     m_debug_drawer = new IrrDebugDrawer();
-    m_debug_drawer->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
 }   // init
 
 //-----------------------------------------------------------------------------
 Physics::~Physics()
 {
-    if(UserConfigParams::m_bullet_debug) delete m_debug_drawer;
+    delete m_debug_drawer;
     delete m_dynamics_world;
     delete m_axis_sweep;
     delete m_dispatcher;
@@ -153,7 +153,7 @@ void Physics::update(float dt)
 
 bool Physics::projectKartDownwards(const Kart *k)
 {
-    btVector3 hell(0, 0, -10000);
+    btVector3 hell(0, -10000, 0);
     return k->getVehicle()->projectVehicleToSurface(hell, true /*allow translation*/);
 } //projectKartsDownwards
 
@@ -343,6 +343,9 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
 /** A debug draw function to show the track and all karts.                    */
 void Physics::draw()
 {
+    if(!m_debug_drawer->debugEnabled() ||
+        !World::getWorld()->isRacePhase()) return;
+
     video::SColor color(77,179,0,0);
     video::SMaterial material;
     material.Thickness = 2;

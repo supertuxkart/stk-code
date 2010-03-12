@@ -118,17 +118,17 @@ void PlayerController::action(PlayerAction action, int value)
     switch (action)
     {
     case PA_LEFT:
-        m_steer_val_l = -value;
+        m_steer_val_l = value;
         if (value)
-          m_steer_val = -value;
+          m_steer_val = value;
         else
           m_steer_val = m_steer_val_r;
 
         break;
     case PA_RIGHT:
-        m_steer_val_r = value;
+        m_steer_val_r = -value;
         if (value)
-          m_steer_val = value;
+          m_steer_val = -value;
         else
           m_steer_val = m_steer_val_l;
 

@@ -661,7 +661,7 @@ public:
             // Random kart
             scene::IMesh* model = item_manager->getItemModel(Item::ITEM_BONUS_BOX);
             w3->clearModels();
-            w3->addModel( model, Vec3(0.0f, 0.0f, -12.0f) );
+            w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f) );
             w3->update(0);
             m_parent->m_kart_widgets[playerID].kartName->setText( _("Random Kart") );
         }

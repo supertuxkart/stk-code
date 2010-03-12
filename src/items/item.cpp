@@ -31,13 +31,10 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     setType(type);
     m_event_handler    = NULL;
+    m_xyz              = xyz;
     m_deactive_time    = 0;
-    m_normal           = normal;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     Vec3  hpr          = Vec3(0, normal);
-    m_coord            = Coord(xyz, hpr);
-    m_rotate_to_normal = core::quaternion(hpr.toIrrVector());
-    m_rotate_amount    = 0;
     m_item_id          = item_id;
     m_original_type    = ITEM_NONE;
     m_collected        = false;
@@ -148,8 +145,6 @@ void Item::update(float dt)
             // Make it visible by scaling it from 0 to 1:
             m_node->setVisible(true);
             m_node->setScale(core::vector3df(1,1,1)*(1-m_time_till_return));
-            core::vector3df pos = m_coord.getXYZ().toIrrVector();
-            pos.Y = pos.Y+2.0f*m_time_till_return;
         }   // time till return < 1
     }   // if collected
     else
@@ -157,59 +152,13 @@ void Item::update(float dt)
         
         if(!m_rotate) return;
         // have it rotate
-        Vec3 rotation(dt*M_PI, 0, 0);
-        m_coord.setHPR(m_coord.getHPR()+rotation);
-        m_node->setRotation(m_coord.getHPR().toIrrHPR());
-        m_node->setPosition(m_coord.getXYZ().toIrrVector());
+        Vec3 rotation(0, dt*M_PI, 0);
+        core::vector3df r = m_node->getRotation();
+        r.Y += dt*180.0f;
+        if(r.Y>360.0f) r.Y -= 360.0f;
+        m_node->setRotation(r);
         return;
-
-        m_rotate_amount += dt*M_PI;
-        if(m_rotate_amount>2*M_PI) m_rotate_amount -= 2*M_PI;
-
-        core::quaternion qx;
-        qx.fromAngleAxis(m_rotate_amount, m_normal.toIrrVector());
-        core::quaternion qall = m_rotate_to_normal*qx;
-        core::vector3df qeuler;
-        qx.toEuler(qeuler);
-        qeuler *= 180/3.1415926f;
-        m_node->setRotation(qeuler);
-        return;
-
-
-        const core::matrix4 &m=m_node->getAbsoluteTransformation();
-        core::quaternion current_rotation(m);
-        float anglec;
-        core::vector3df axisc;
-        current_rotation.toAngleAxis(anglec, axisc);
-        printf("curre %f axis %f %f %f\n", anglec,axisc.X, axisc.Y, axisc.Z);
-        core::quaternion q2;
-        q2.fromAngleAxis(dt*M_PI, m_normal.toIrrVector());
-        float angle2;
-        core::vector3df axis2;
-        q2.toAngleAxis(angle2, axis2);
-        printf("new   %f axis %f %f %f\n", angle2,axis2.X, axis2.Y, axis2.Z);
-        core::quaternion all=current_rotation*q2;
-        float angle;
-        core::vector3df axis;
-        all.toAngleAxis(angle, axis);
-        printf("angle %f axis %f %f %f\n", angle,axis.X, axis.Y, axis.Z);
-        core::vector3df euler;
-        all.toEuler(euler);
-        euler *=180/3.1415926f;
-        m_node->setRotation(euler);
-
-        return;
-#ifdef xx
-
-        btQuaternion q(Vec3(0,0,1), t*0.1f);
-        btQuaternion q_orig(m_normal, 0);
-        btQuaternion result=q+q_orig;
-        btMatrix3x3 m(result);
-        float y, p, r;
-        m.getEuler(y, p, r);
-        m_node->setRotation(Vec3(y, p, r).toIrrHPR());
-#endif
-    }
+    }   // not m_collected
 }   // update
 
 //-----------------------------------------------------------------------------

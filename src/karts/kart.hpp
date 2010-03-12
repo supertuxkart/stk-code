@@ -204,7 +204,8 @@ public:
     unsigned int   getWorldKartId() const            { return m_world_kart_id;   }
     void           setWorldKartId(unsigned int n)    { m_world_kart_id=n;        }
     void           loadData();
-    virtual void   updateGraphics(const Vec3& off_xyz,  const Vec3& off_hpr);
+    virtual void   updateGraphics(const Vec3& off_xyz,  
+                                  const btQuaternion& off_rotation);
     const KartProperties* 
                    getKartProperties() const      { return m_kart_properties; }
     // ------------------------------------------------------------------------
@@ -272,7 +273,6 @@ public:
     /** Returns true if this kart has finished the race. */
     bool           hasFinishedRace     () const { return m_finished_race;    }
     void           endRescue           ();
-    void           getClosestKart      (float *cdist, int *closest);
 
     bool           hasViewBlockedByPlunger() const
                                                 { return m_view_blocked_by_plunger > 0; }

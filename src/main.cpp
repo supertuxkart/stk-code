@@ -245,10 +245,6 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_track_debug=1;
         }
-        else if(!strcmp(argv[i], "--bullet-debug"))
-        {
-            UserConfigParams::m_bullet_debug=1;
-        }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             UserConfigParams::m_print_kart_sizes=true;
@@ -443,10 +439,18 @@ int handleCmdLine(int argc, char **argv)
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
             history->doReplayHistory( (History::HistoryReplayMode)n);
+            // Force the no-start screen flag, since this initialises
+            // the player structures correctly.
+            UserConfigParams::m_no_start_screen = true;
+
         }
         else if( !strcmp(argv[i], "--history") )
         {
             history->doReplayHistory(History::HISTORY_POSITION);
+            // Force the no-start screen flag, since this initialises
+            // the player structures correctly.
+            UserConfigParams::m_no_start_screen = true;
+
         }
         else if( !strcmp(argv[i], "--item") && i+1<argc )
         {

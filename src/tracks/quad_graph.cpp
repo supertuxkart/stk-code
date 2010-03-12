@@ -79,7 +79,7 @@ void QuadGraph::setStartCoordinate(const CheckLine &cl)
     }
     Vec3 xyz;
     spatialToTrack(&xyz, start_point, sector);
-    m_offset_for_startline = xyz.getY();
+    m_offset_for_startline = xyz.getZ();
 }   // setStartCoordinate
 
 // -----------------------------------------------------------------------------
@@ -311,7 +311,7 @@ void QuadGraph::getSuccessors(int node_number, std::vector<unsigned int>& succ) 
  *  of the returned vector is how much of the track the point has gone
  *  through, the x-axis is on which side of the road it is. The Z axis
  *  is not changed.
- *  \param dst Returns the results in the X and Y coordinates.
+ *  \param dst Returns the results in the X and Z coordinates.
  *  \param xyz The position of the kart.
  *  \param sector The graph node the position is on.
  */
@@ -325,10 +325,10 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
     }
 
     getNode(sector).getDistances(xyz, dst);
-    float y=dst->getY();
-    y=y-m_offset_for_startline;
-    if(y<0) y+=m_lap_length;
-    dst->setY(y);
+    float z=dst->getZ();
+    z=z-m_offset_for_startline;
+    if(z<0) z+=m_lap_length;
+    dst->setZ(z);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
@@ -381,7 +381,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad &q = getQuad(indx);
-        float dist    = xyz.getZ() - q.getMinHeight();
+        float dist    = xyz.getY() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small netative
         // numbers in case that the kart is partly in the track.
         if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
@@ -489,15 +489,15 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     Vec3 center = (bb_max+bb_min)*0.5f;
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH(bb_max.getX()-bb_min.getX(), 
-                                            bb_max.getY()-bb_min.getY(),
-                                            -1, bb_max.getZ()-bb_min.getZ()+1);
+                                            bb_max.getZ()-bb_min.getZ(),
+                                            -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
     // Adjust z position by +1 for max, -1 for min - this helps in case that
     // the maximum z coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max z = min z) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_max.getZ()+1, center.getY()));
-    camera->setUpVector(core::vector3df(0,0,1));
-    camera->setTarget(core::vector3df(center.getX(),bb_min.getZ()-1,center.getY()));
+    camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
+    camera->setUpVector(core::vector3df(0, 0, 1));
+    camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
     
     video::ITexture *texture = rttProvider.renderToTexture();
     
@@ -505,7 +505,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
     m_scaling.setX(dimension.Width/(bb_max.getX()-bb_min.getX()));
-    m_scaling.setY(dimension.Width/(bb_max.getY()-bb_min.getY()));
+    m_scaling.setZ(dimension.Width/(bb_max.getZ()-bb_min.getZ()));
     return texture;
 }   // drawMiniMap
 
@@ -519,6 +519,6 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 void QuadGraph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 {
     draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling.getX());
-    draw_at->setY((xyz.getY()-m_min_coord.getY())*m_scaling.getY());
+    draw_at->setY((xyz.getZ()-m_min_coord.getZ())*m_scaling.getZ());
 
 }   // mapPoint

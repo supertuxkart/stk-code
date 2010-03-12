@@ -303,12 +303,20 @@ int LinearWorld::getSectorForKart(const int kart_id) const
 }   // getSectorForKart
 
 //-----------------------------------------------------------------------------
+/** Returns the distance the kart has travelled along the track since 
+ *  crossing the start line..
+ *  \param kart_id Index of the kart.
+ */
 float LinearWorld::getDistanceDownTrackForKart(const int kart_id) const
 {
-    return m_kart_info[kart_id].m_curr_track_coords.getY();
+    return m_kart_info[kart_id].m_curr_track_coords.getZ();
 }   // getDistanceDownTrackForKart
 
 //-----------------------------------------------------------------------------
+/** Gets the distance of the kart from the center of the driveline. Positive
+ *  is to the right of the center, negative values to the left.
+ *  \param kart_id Index of kart.
+ */
 float LinearWorld::getDistanceToCenterForKart(const int kart_id) const
 {
     return m_kart_info[kart_id].m_curr_track_coords.getX();
@@ -528,7 +536,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
 
     kart->setXYZ( m_track->trackToSpatial(info.m_track_sector) );
 
-    btQuaternion heading(btVector3(0.0f, 0.0f, 1.0f),
+    btQuaternion heading(btVector3(0.0f, 1.0f, 0.0f),
                          m_track->getAngle(info.m_track_sector) );
     kart->setRotation(heading);
 
@@ -539,8 +547,8 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     float epsilon = 0.5f * kart->getKartHeight();
 
     btTransform pos;
-    pos.setOrigin(kart->getXYZ()+btVector3(0, 0, kart->getKartHeight() + epsilon));
-    pos.setRotation(btQuaternion(btVector3(0.0f, 0.0f, 1.0f),
+    pos.setOrigin(kart->getXYZ()+btVector3(0, kart->getKartHeight() + epsilon, 0));
+    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                     m_track->getAngle(info.m_track_sector)));
 
     body->setCenterOfMassTransform(pos);
@@ -551,9 +559,9 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     if (kart_over_ground)
     {
         //add vertical offset so that the kart starts off above the track
-        float vertical_offset = kart->getKartProperties()->getZRescueOffset() *
+        float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
                                 kart->getKartHeight();
-        body->translate(btVector3(0, 0, vertical_offset));
+        body->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {
@@ -573,8 +581,9 @@ void LinearWorld::updateRacePosition()
 
     
 #ifdef DEBUG
-    bool rank_used[kart_amount+1];
-    for (unsigned int n=0; n<=kart_amount; n++) rank_used[n] = false;
+    std::vector<bool> rank_used;
+    for (unsigned int n=0; n<=kart_amount; n++) 
+        rank_used.push_back(false);
 #endif
     
     for (unsigned int i=0; i<kart_amount; i++)
@@ -663,7 +672,7 @@ void LinearWorld::updateRacePosition()
             sound_manager->switchToFastMusic();
             m_faster_music_active=true;
         }
-        }
+    }   // for i<kart_amount
     
 }   // updateRacePosition
 
@@ -688,7 +697,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
         return;
 
     // check if the player is going in the wrong direction
-    float angle_diff = kart->getHPR().getHeading() -
+    float angle_diff = kart->getHeading() -
                        m_track->getAngle(m_kart_info[i].m_track_sector);
     if(angle_diff > M_PI) angle_diff -= 2*M_PI;
     else if (angle_diff < -M_PI) angle_diff += 2*M_PI;

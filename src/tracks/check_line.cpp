@@ -60,7 +60,7 @@ void CheckLine::reset(const Track &track)
 Vec3 CheckLine::getCenterPoint() const
 {
     core::vector2df c=m_line.getMiddle();
-    Vec3 xyz(c.X, c.Y, m_min_height);
+    Vec3 xyz(c.X, m_min_height, c.Y);
     return xyz;
 }   // getCenterPoint
 
@@ -89,8 +89,8 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx)
         // between -1 and 4 units (negative numbers are unlikely, but help
         // in case that there is 'somewhat' inside of the track, or the
         // checklines are a bit off in Z direction.
-        result = new_pos.getZ()-m_min_height<4.0f   && 
-                 new_pos.getZ()-m_min_height>-1.0f;
+        result = new_pos.getY()-m_min_height<4.0f   && 
+                 new_pos.getY()-m_min_height>-1.0f;
     }
     else
         result = false;

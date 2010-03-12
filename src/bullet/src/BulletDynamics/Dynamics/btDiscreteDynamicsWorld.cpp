@@ -262,7 +262,12 @@ void	btDiscreteDynamicsWorld::synchronizeMotionStates()
 			for (int v=0;v<m_vehicles[i]->getNumWheels();v++)
 			{
 				//synchronize the wheels with the (interpolated) chassis worldtransform
+                // updateWheelTransform resets m_isInContact to false. Since
+                // this field is needed in STK, we save it here and restore
+                // its value after the call to updateWheelTransform.
+                bool contact = m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact;
 				m_vehicles[i]->updateWheelTransform(v,true);
+                m_vehicles[i]->getWheelInfo(v).m_raycastInfo.m_isInContact = contact;
 			}
 		}
 	}
