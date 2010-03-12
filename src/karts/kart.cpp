@@ -603,7 +603,7 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         float sign_d = (sign_bits & (0x1 << 11)) ? 1.0f : -1.0f;
         float sign_e = (sign_bits & (0x1 << 12)) ? 1.0f : -1.0f;
 
-        btVector3 diff(sign_a * float(rand()%16) / 16.0f, sign_b * float(rand()%16) / 16.0f, 2.0f);
+        btVector3 diff(sign_a * float(rand()%16) / 16.0f, 2.0f, sign_b * float(rand()%16) / 16.0f);
         diff.normalize();
         diff *= stk_config->m_explosion_impulse / 5.0f;
         m_uprightConstraint->setDisableTime(10.0f);
@@ -621,9 +621,9 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
     else  // only affected by a distant explosion
     {
         btVector3 diff=getXYZ()-pos;
-        //if the z component is negative, the resulting impulse could push the
-        // kart through the floor. So in this case ignore z.
-        if(diff.getZ()<0.0f) diff.setZ(0.0f);
+        // If the Y component is negative, the resulting impulse could push the
+        // kart through the floor. So in this case ignore Y.
+        if(diff.getY()<0.0f) diff.setY(0.0f);
         float len2=diff.length2();
 
         // Protect against "near zero" distances
@@ -640,9 +640,8 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
         // Even if just pushed, give some random rotation to simulate the lost of control by the shake
         float sign_a = (sign_bits & (0x1 << 8)) ? 1.0f : -1.0f;
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, 0, sign_a * float(rand()%32*5)));
-    }
-    
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, sign_a * float(rand()%32*5), 0));
+    } // if direct_hit
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
