@@ -148,6 +148,7 @@ void InputManager::handleStaticAction(int key, int value)
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_ZIPPER, 10000);
             }
+            break;
         case KEY_F11:
             if(value && control_is_pressed)
             {
