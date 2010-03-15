@@ -579,7 +579,6 @@ void LinearWorld::updateRacePosition()
 {
     const unsigned int kart_amount = m_karts.size();
 
-    
 #ifdef DEBUG
     std::vector<bool> rank_used;
     for (unsigned int n=0; n<=kart_amount; n++) 
@@ -589,6 +588,12 @@ void LinearWorld::updateRacePosition()
     for (unsigned int i=0; i<kart_amount; i++)
     {
         Kart* kart          = m_karts[i];
+        // Karts that are either eliminated or have finished the
+        // race already have their (final) position assigned. If
+        // these karts would get their rank updated, it could happen
+        // that a kart that finished first will be overtaken after
+        // crossing the finishing line and become second!
+        if(kart->isEliminated() || kart->hasFinishedRace()) continue;
         KartInfo& kart_info = m_kart_info[i];
         
         int p = 1 ;
@@ -658,7 +663,6 @@ void LinearWorld::updateRacePosition()
 #endif
         
         kart->setPosition(p);
-        
         // Switch on faster music if not already done so, if the
         // first kart is doing its last lap, and if the estimated
         // remaining time is less than 30 seconds.
