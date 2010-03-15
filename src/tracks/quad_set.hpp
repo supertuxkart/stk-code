@@ -38,19 +38,13 @@ private:
     void load    (const std::string &filename);
     void getPoint(const XMLNode *xml, const std::string &attribute_name, 
                   Vec3 *result) const;
-    float sideOfLine2D(const Vec3 &l1, const Vec3 &l2, const Vec3 &p) const;
 
 public:
     static const int QUAD_NONE=-1;
 
          QuadSet       (const std::string& filename);
-    int  getQuadAtPos  (const Vec3& p)                     const;
     const Quad& getQuad(int n) const {return *(m_all_quads[n]); }
     int  getCurrentQuad(const Vec3& p, int oldQuad)        const;
-    bool pointInQuad   (const Quad& q, const btVector3& p) const;
-    /** Returns true if the point p is in the n-th. quad. */
-    bool pointInQuad   (int n,         const btVector3& p) const
-                                {return pointInQuad(*m_all_quads[n],p);}
     /** Return the minimum and maximum coordinates of this quad set. */
     void getBoundingBox(Vec3 *min, Vec3 *max) { *min=m_min; *max=m_max;   }
     /** Returns the number of quads. */

@@ -95,36 +95,3 @@ void QuadSet::load(const std::string &filename) {
 }   // load
 
 // -----------------------------------------------------------------------------
-/** Returns wether a point is to the left or to the right of a line.
-    While all arguments are 3d, only the x and y coordinates are actually used.
-*/
-float QuadSet::sideOfLine2D(const Vec3 &l1, const Vec3 &l2, const Vec3 &p) const
-{
-    return (l2.getX()-l1.getX())*(p.getZ()-l1.getZ()) -
-           (l2.getZ()-l1.getZ())*(p.getX()-l1.getX());
-}   // sideOfLine
-
-// -----------------------------------------------------------------------------
-bool QuadSet::pointInQuad(const Quad& q, const btVector3& p) const {
-    if(sideOfLine2D(q[0], q[2], p)<0) {
-        return sideOfLine2D(q[0], q[1], p) >  0.0 &&
-               sideOfLine2D(q[1], q[2], p) >= 0.0;
-    } else {
-        return sideOfLine2D(q[2], q[3], p) >  0.0 &&
-               sideOfLine2D(q[3], q[0], p) >= 0.0;
-    }
-}   // pointInQuad
-
-// -----------------------------------------------------------------------------
-/** Determines the quad on which the position pos is. This is a rather slow
-    algorithm, used to get the initial quad position of a kart, but not for
-    constantly updating it.
-*/
-int QuadSet::getQuadAtPos(const Vec3 &pos) const {
-    for(unsigned int i=0; i<m_all_quads.size(); i++) {
-        if(pointInQuad(*(m_all_quads[i]), pos)) return i;
-    }
-    return QUAD_NONE;
-}   // getQuadAtPos
-
-// -----------------------------------------------------------------------------
