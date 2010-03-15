@@ -5,157 +5,128 @@
   <!--  Minimum and maximum kart versions that can be used by this binary.
         Older version will be ignored. -->
   <kart-version min="2" max="2"/>
+
   <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
   <track-version min="2" max="2"/>
+
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
        positions for those additional karts. -->
-  <max-karts value="8"/>
-  <!-- 
-  <Scores =point="10 8 6 5 4 3 2 1"''>
-    grid-order="1"
-    title-music="main_theme.music"
-    mainmenu-background="st_title_screen.rgb st_title_screen2.rgb"
-    menu-background="menu_background.rgb menu_background2.rgb"
-    max-history="10000"
-    max-skidmarks="100"
-    skid-fadeout-time="60"
-    near-ground="2"
-    delay-finish-time="4"
-    music-credit-time="10"
-    final-camera-time="1.5"
--->
-<!-- STK PARAMETERS
+  <karts max-number="8"/>
 
+  <!-- Scores are the number of points given when the race ends, 
+       order is most-points-first or most-points-last. -->
+  <grand-prix  scores="10 8 6 5 4 3 2 1"
+               order = "most-points-first"/>
+  <!-- Time in follow-the-leader after which karts are removed.
+       The last values applies for all remaining karts. -->
+  <follow-the-leader intervals="30 20 10"/>
 
-min-track-version and max-track-version are the minimum and maximum .track
-files supported, older/newer files are ignored.
+  <!-- The title music. -->
+  <music title="main_theme.music"/>
 
-max-karts is maximum number of karts.
-scores are the number of points given when the race ends.
-grid-order is the grand prix order, 1 = most points 1st, 0 = least points 1st.
-title-music is umm... the title music.
+  <!-- Mostly for debugging: maximum number of history entrie$a -->
+  <history max-frames="10000"/>
 
-mainmenu-background and menu-background must have the same length, containing
-all the possible main menu and background images.
+  <!-- Skidmark data: maximum number of skid marks, and
+       time for skidmars to fade out. -->
+  <skid-marks max-number="100"  fadeout-time="60"/>   
+ 
+  <!-- Defines when the upright constraint should be acctive, it's
+       disables when the kart is more than this value from the track. -->
+  <near-ground distance="2"/> 
 
-max-history is the maximum number of history frames.
+  <!-- How long the end animation will be shown. -->
+  <delay-finish time="4"/>
 
-max-skidmarks is the max. number o skidmarks per kart.
-skid-fadeout-time is the time till the skid marks fade out
+  <!-- How long the music credits are shown. -->
+  <credits music="10"/>
 
-near-ground is the distance above ground when the upright constraint will be
-disabled to allow more violent explosions.
+  <!-- weight is the additional weight an anvil adds to a kart.
+       speed-factor is the additional slowdown caused by the anvil.
+       time is the time an anvil is active. -->
+  <anvil time="2.0" weight="150"  speed-factor="0.2"/>
 
-delay-finish-time is the delay till the race results are displayed
-music-credit-time is the time for which the music credits are displayed
-final-camera-time is the time for the final camera to reach it's destination
+  <!-- friction is the friction increase when a parachute is attached.
+       time is the time an attached parachute is active
+       time-other is the time a parachute attached from other kart works
+       done-fraction is the fraction of speed when lost will detach parachute -->
+  <parachute friction="2.0" time="4.0" time-other="8.0" done-fraction="0.7"/>
 
--->
+  <!-- time is the time till a bomb explodes. time-increase is the time added 
+       to timer when bomb is passed on. -->
+  <bomb time="30.0" time-increase="-5.0"/>
 
-<stk-parameters
-    min-kart-version="2"
-    max-kart-version="2"
-    min-track-version="2"
-    max-track-version="2"
-    max-karts="8"
-    scores="10 8 6 5 4 3 2 1"
-    grid-order="1"
-    title-music="main_theme.music"
-    mainmenu-background="st_title_screen.rgb st_title_screen2.rgb"
-    menu-background="menu_background.rgb menu_background2.rgb"
-    max-history="10000"
-    max-skidmarks="100"
-    skid-fadeout-time="60"
-    near-ground="2"
-    delay-finish-time="4"
-    music-credit-time="10"
-    final-camera-time="1.5"
-/>
+  <!-- time is the time a zipper is active. force is the additional 
+       zipper force. speed-gain is the one time additional speed.
+       max-speed-fraction is a factor multiplied to the maximum 
+       speed on the terrain.  -->
+  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-fraction="2.0"/>
 
-<!-- ATTACHMENT PARAMETERS
+  <!-- time: How long a switch is being effective.
+       items for each item list the index of the item it is switched with.
+             Order: item, banana, big-nitro, small-nitro, bubble-bum -->
+  <switch time="5"  items="1 0 4 4 2"/>
 
-anvil-weight is the additional weight an anvil adds to a kart
-anvil-speed-factor is the additional slowdown caused by the anvil
-parachute-friction is the friction increase when a parachute is attached
-parachute-time is the time an attached parachute is active
-parachute-time-other is the time a parachute attached from other kart works
-parachute-done-fraction is the fraction of speed when lost will detach
-parachute
+  <!-- Physics default values for all karts
+       ==================================== -->
+  <physics>
+  
+    <!-- gravity-center-shift is the shift of the chassis with regards to the center of
+                              mass. E.g. with the the value commented out below the 
+                              chassis will be 30 cm higher than the  center of mass - 
+                              or the center of mass will be 30 cm lower than the  
+                              middle of the chassis. So this effectively lowers the 
+                              center of mass, making the kart more stable and less 
+                              likely to topple over. Default (if nothing is defined 
+                              here) is that the center of the mass is at the very bottom
+                              of the chassis.  -->
+    <dimensions wheel-base="1.2" heightCOG="0.2"/>
 
-bomb-time is the time till a bomb explodes
-bomb-time-increase is the time added to timer when bomb is passed on
-leader-intervals is the time till a kart is removed in follow leader mode
-anvil-time is the time an anvil is active
-zipper-time is the time a zipper is active
-zipper-force is the additional zipper force
-zipper-speed-gain is the one time additional speed  
-item-switch-time How long a switch is being effective.
-switch-items for each item list the index of the item it is switched with.
-             Order: item, banana, big-nitro, small-nitro, bubble-bum
--->
+    <!-- time-full-steer is the time when a player's input goes from neutral
+                         steering to extreme left or right.
+         time-full-steer-ai is the time for the AI to go from neutral steering to
+                         extreme left (or right). This can be used to reduce 
+                         'shaking' of AI karts caused by changing steering direction
+                         too often. It also helps with making it easier to push the
+                         AI karts (otherwise micro-corrections make this nearly
+                         impossible). A value of 1/maxFPS / 2 will guarantee that
+                         the wheel can go from -1 to +1 steering in one frame, 
+                         basically  disabling this mechanism.       -->
+    <steer time-full-steer="0.2" time-full-steer-ai="0.1" />
 
-<attachment-parameters
-    anvil-weight="150.0"
-    anvil-speed-factor="0.2"
-    parachute-friction="2.0"
-    parachute-time="4.0"
-    parachute-time-other="8.0"
-    parachute-done-fraction="0.7"
-    bomb-time="30.0"
-    bomb-time-increase="-5.0"
-    leader-intervals="30 20 10"
-    anvil-time="2.0"
-    zipper-time="3.5"
-    zipper-force="250.0"
-    zipper-speed-gain="4.5"
-    zipper-max-speed-fraction="2.0"
-    item-switch-time="5"
-    switch-items="1 0 4 4 2"
-/>
+    <!-- power-boost is the increase in engine power, i.e. 1=plus 100% -->
+    <nitro power-boost="3"/>
 
+    <!-- increase: multiplicative increase of skidding factor in each frame.
+         decrease: multiplicative decrease of skidding factor in each frame.
+         max: maximum skidding factor = maximum increase of steering angle.
+         time-till-max: Time till maximum skidding is reached.
+         visual: Additional graphical rotation of kart.  -->
+    <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.4"
+          visual="0.16"/>
+
+    <!-- length: How far behind a kart slipstream works
+         collect-time: How many seconds of sstream give  maximum benefit
+         use-time: How long the benefit will last.
+         add-power: Additional power due to sstreaming. 1 = +100%
+         min-speed: Minimum speed necessary for slipstream to take effect. -->
+    <slipstream length="10" collect-time="2" use-time="5"
+                add-power="3" min-speed="10" />
+
+    <!-- min-speed-radius and max-speed-radius define the smallest turn 
+         radius at lowest speed (4.64 m at speed 0) and at high speed
+         (13.5 m at speed 12 m/s). Maximum steering angles for speeds 
+         in between will be interpolated. This allows for tighter turns
+         at lower speeds. The actual steering  angle is dependent on the
+         wheel base of the kart: radius = wheel_base/sin(steering_angle)
+         By specifying the radius the steering behaviour can be defined 
+         independent of the kart size.  -->
+    <turn min-speed-radius="0 3" max-speed-radius="10 15.0"/>
+
+  </physics>
 <!-- GENERAL KART DEFAULTS
-
-time-full-steer = is the time when a player's input goes from neutral
-steering to extreme left or right.
-
-time-full-steer-ai is the time for the AI to go from neutral steering to
-extreme left (or right). This can be used to reduce 'shaking' of AI karts
-caused by changing steering direction too often. It also helps with making it
-easier to push the AI karts (otherwise micro-corrections make this nearly
-impossible). A value of 1/maxFPS / 2 will guarantee that the wheel can go from
--1 to +1 steering in one frame, basically  disabling this mechanism.
-
-gravity-center-shift is the shift of the chassis with regards to the center of
-mass. E.g. with the the value commented out below the chassis will be 30 cm
-higher than the  center of mass - or the center of mass will be 30 cm lower
-than the  middle of the chassis. So this effectively lowers the center of
-mass, making the kart more stable and less likely to topple over. Default (if
-nothing is defined here) is that the center of the mass is at the very bottom
-of the chassis!
-
-nitro-power-boost is the increase in engine power, i.e. 1=plus 100%
-
-skid-increase: multiplicative increase of skidding factor in each frame.
-skid-decrease: multiplicative decrease of skidding factor in each frame.
-skid-max: maximum skidding factor = maximum increase of steering angle.
-time-till-max-skid: Time till maximum skidding is reached.
-skid-visual: Additional graphical rotation of kart.
-slipstream slipstream-length: How far behind a kart slipstream works
-slipstream-collect-time: How many seconds of sstream give  maximum benefit
-slipstream-use-time: How long the benefit will last.
-slipstream-add-power: Additional power due to sstreaming. 1 = +100%
-slipstream-min-speed: Minimum speed necessary for slipstream to take effect.
-
-min-speed-radius and max-speed-radius define the smallest turn radius at
-lowest speed (4.64 m at speed 0) and at high speed (13.5 m at speed 12 m/s).
-Maximum steering angles for speeds in between will be interpolated. This
-allows for tighter turns at lower speeds. The actual steering  angle is
-dependent on the wheel base of the kart:
-radius = wheel_base/sin(steering_angle)
-By specifying the radius the steering behaviour can be defined independent
-of the kart size.
 
 
 engine-power and max-speed have 3 values, one for hard, medium and low

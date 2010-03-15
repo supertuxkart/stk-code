@@ -241,7 +241,7 @@ void RaceManager::startNextRace()
 
         std::sort(m_kart_status.begin()+offset, m_kart_status.end());
         //reverse kart order if flagged in stk_config
-        if (stk_config->m_grid_order)
+        if (stk_config->m_gp_order)
         {
             std::reverse(m_kart_status.begin()+offset, m_kart_status.end());
         } 

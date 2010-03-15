@@ -57,8 +57,6 @@ public:
     float m_zipper_max_speed_fraction;/**<Fraction of max speed allowed past
                                           regular max speed                  */
     float m_item_switch_time;        /**< Time items will be switched.       */
-    float m_final_camera_time;       /**<Time for the movement of the final
-                                      *  camera.                             */
     float m_explosion_impulse;       /**<Impulse affecting each non-hit kart.*/
     float m_explosion_impulse_objects;/**<Impulse of explosion on moving
                                          objects, e.g. road cones, ...       */
@@ -67,7 +65,7 @@ public:
     float m_music_credit_time;       /**<Time the music credits are
                                          displayed.                          */
     int   m_max_karts;               /**<Maximum number of karts.            */
-    int   m_grid_order;              /**<Whether grand prix grid is in point
+    int   m_gp_order;                /**<Whether grand prix grid is in point
                                          or reverse point order.             */
     int   m_max_history;             /**<Maximum number of frames to save in
                                          a history files.                    */
@@ -92,10 +90,6 @@ public:
 
     MusicInformation
          *m_title_music;             /**<Filename of the title music to play.*/
-    std::vector<std::string>
-          m_mainmenu_background;     /**<Picture used as menu background.    */
-    std::vector<std::string>
-          m_menu_background;         /**<Picture used as background for other menus.    */
 
     /** Empty constructor. The actual work is done in load. */
          STKConfig() {};
