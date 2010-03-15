@@ -37,6 +37,11 @@ private:
      *  This saves some computations at runtime. */
     Vec3 m_center;
 
+    /** The middle points of the 'lower' and 'upper' lines. The line
+     *  connecting these two points is used in projectionIsInside().
+     */
+    Vec3 m_lower_center, m_upper_center;
+
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
     float m_min_height;
@@ -51,6 +56,7 @@ public:
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     bool pointInQuad(const Vec3& p) const;
     void transform(const btTransform &t, Quad *result) const;
+    bool projectionIsInside(const Vec3 &xyz) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
     const Vec3& operator[](int i) const {return m_p[i];     }
