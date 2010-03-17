@@ -113,7 +113,7 @@ void SFXManager::loadSfx()
 {
     std::string sfx_config_name = file_manager->getSFXFile("sfx.xml");
     XMLNode* root = file_manager->createXMLTree(sfx_config_name);
-    if (!root)
+    if (!root || root->getName()!="sfx-config")
     {
         std::cerr << "Could not read sounf effects XML file " << sfx_config_name.c_str() << std::endl;
     }
@@ -355,7 +355,7 @@ void SFXManager::loadSingleSfx(const XMLNode* node)
  *  \param id Identifier of the sound effect to create.
  */
 SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info, 
-                                       const bool add_toS_FX_list)
+                                       const bool add_to_SFX_list)
 {
     bool positional = false;
 
