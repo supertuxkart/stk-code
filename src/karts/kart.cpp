@@ -640,7 +640,7 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
         getVehicle()->getRigidBody()->applyCentralImpulse(diff);
         // Even if just pushed, give some random rotation to simulate the lost of control by the shake
         float sign_a = (sign_bits & (0x1 << 8)) ? 1.0f : -1.0f;
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, sign_a * float(rand()%32*5), 0));
+        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, sign_a * float(rand()%32*5)/sqrt(len2), 0));
     } // if direct_hit
 }   // handleExplosion
 
