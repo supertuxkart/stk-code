@@ -426,7 +426,7 @@ public:
         playerName->elementRemoved();
         playerName = NULL;
         
-        SFXManager::quickSound( "wee" );
+        sfx_manager->quickSound( "wee" );
         
         modelView->setRotateTo(30.0f, 150.0f);
         

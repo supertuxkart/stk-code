@@ -111,7 +111,7 @@ private:
     static std::map<std::string, SFXBase*> m_quick_sounds;
 
     bool                      m_initialized;
-    float                     m_masterGain;
+    float                     m_master_gain;
 
     void                      loadSfx();
 
@@ -122,27 +122,29 @@ public:
     virtual                 ~SFXManager();
     bool                     sfxAllowed();
     bool                     addSingleSfx(  const char* sfx_name,
-                                            std::string    filename,
-                                            bool           positional,
-                                            float          rolloff,
-                                            float          gain);
+                                            std::string filename,
+                                            bool        positional,
+                                            float       rolloff,
+                                            float       gain);
 
-    SFXBase*                 createSoundSource(const SFXBufferInfo& info, const bool addToSFXList=true);
-    SFXBase*                 createSoundSource(const char* name, const bool addToSFXList=true);
+    SFXBase*                 createSoundSource(const SFXBufferInfo& info, 
+                                               const bool addToSFXList=true);
+    SFXBase*                 createSoundSource(const char* name, 
+                                               const bool addToSFXList=true);
     
     void                     deleteSFX(SFXBase *sfx);
     void                     pauseAll();
     void                     resumeAll();
     
     void                     setMasterSFXVolume(float gain);
-    float                    getMasterSFXVolume() const { return m_masterGain; }
+    float                    getMasterSFXVolume() const { return m_master_gain; }
     
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
     
     /** Positional sound is cool, but creating a new object just to play a simple
         menu sound is not. This function allows for 'quick sounds' in a single call.*/
-    static void              quickSound(const char* soundName);
+    void                     quickSound(const char* soundName);
 
 };
 

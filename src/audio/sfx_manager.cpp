@@ -44,7 +44,9 @@
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 
+
 SFXManager* sfx_manager= NULL;
+std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
 
 /** Initialises the SFX manager and loads the sfx from a config file.
  */
@@ -52,7 +54,7 @@ SFXManager::SFXManager()
 {
     // The sound manager initialises OpenAL
     m_initialized = sound_manager->initialized();
-    m_masterGain = 1.0f;
+    m_master_gain = 1.0f;
     if (!m_initialized) return;
     
     loadSfx();
@@ -64,8 +66,8 @@ SFXManager::SFXManager()
 SFXManager::~SFXManager()
 {
     // ---- clear m_all_sfx
-    const int sfxAmount = m_all_sfx.size();
-    for (int n=0; n<sfxAmount; n++)
+    const int sfx_amount = m_all_sfx.size();
+    for (int n=0; n<sfx_amount; n++)
     {
         delete m_all_sfx[n];
     }
@@ -102,7 +104,8 @@ bool SFXManager::sfxAllowed()
         return false;
     else
         return true;
-}
+}   // sfxAllowed
+
 //----------------------------------------------------------------------------
 /** Loads all sounds specified in the sound config file.
  */
@@ -120,11 +123,7 @@ void SFXManager::loadSfx()
     {
         const XMLNode* node = root->getNode(i);
         
-        if (node->getName() == "sfx-config")
-        {
-            // outer node, ignore
-        }
-        else if (node->getName() == "sfx")
+        if (node->getName() == "sfx")
         {
             loadSingleSfx(node);
         }
@@ -137,9 +136,11 @@ void SFXManager::loadSfx()
     
     delete root;
    }   // loadSfx
+
 //----------------------------------------------------------------------------
 /** Load a vorbis file into an OpenAL buffer
-    based on a routine by Peter Mulholland, used with permission (quote : "Feel free to use")
+ *  based on a routine by Peter Mulholland, used with permission (quote : 
+ *  "Feel free to use")
  */
 bool loadVorbisBuffer(const char *name, ALuint buffer)
 {
@@ -159,51 +160,55 @@ bool loadVorbisBuffer(const char *name, ALuint buffer)
     
     file = fopen(name, "rb");
     
-    if (file)
+    if(!file)
     {
-        if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) == 0)
-        {
-            info = ov_info(&oggFile, -1);
-            
-            long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
-            
-            char *data = (char *) malloc(len);
-            
-            if (data)
-            {
-                int bs = -1;
-                long todo = len;
-                char *bufpt = data;
-                
-                while (todo)
-                {
-                    int read = ov_read(&oggFile, bufpt, todo, ogg_endianness, 2, 1, &bs);
-                    todo -= read;
-                    bufpt += read;
-                }
-                
-                alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, data, len, info->rate);
-                success = true;
-                
-                free(data);
-            }
-            else
-                printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
-            
-            ov_clear(&oggFile);
-        }
-        else
-        {
-            fclose(file);
-            printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
-        }
-    }
-    else
         printf("LoadVorbisBuffer() - couldn't open file!");
+	return false;
+    }
+
+    if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
+    {
+        fclose(file);
+        printf("LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?");
+	return false;
+    }
+
+    info = ov_info(&oggFile, -1);
     
+    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
     
+    char *data = (char *) malloc(len);
+    if(!data)
+    {
+        ov_clear(&oggFile);
+        printf("Error : LoadVorbisBuffer() - couldn't allocate decode buffer");
+	return false;
+    }
+
+    int bs = -1;
+    long todo = len;
+    char *bufpt = data;
+    
+    while (todo)
+    {
+        int read = ov_read(&oggFile, bufpt, todo, ogg_endianness, 2, 1, &bs);
+        todo -= read;
+        bufpt += read;
+    }
+    
+    alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16 
+                                               : AL_FORMAT_STEREO16,
+                  data, len, info->rate);
+    success = true;
+    
+    free(data);
+    
+    ov_clear(&oggFile);
+
     return success;
 }
+
+// -----------------------------------------------------------------------------
 /*
 
 getCustomTagName(int id)
@@ -235,6 +240,8 @@ const char *SFXManager::getCustomTagName(int id)
     return "";
 } // getCustomTagName
 */
+
+// -----------------------------------------------------------------------------
 /*
 
 addSingleSfx()
@@ -249,37 +256,37 @@ addSingleSfx()
 
 */
 bool SFXManager::addSingleSfx(const char*    sfx_name,
-                              std::string    sfxFile,
+                              std::string    sfx_file,
                               bool           positional,
                               float          rolloff,
                               float          gain)
 {
     std::string filename;
     
-    SFXBufferInfo sfxInfo;
+    SFXBufferInfo sfx_info;
     
 
-    sfxInfo.m_sfx_rolloff    = rolloff;
-    sfxInfo.m_sfx_positional = positional;
-    sfxInfo.m_sfx_gain       = gain;
+    sfx_info.m_sfx_rolloff    = rolloff;
+    sfx_info.m_sfx_positional = positional;
+    sfx_info.m_sfx_gain       = gain;
     
-    printf("Loading SFX %s\n", sfxFile.c_str());
+    printf("Loading SFX %s\n", sfx_file.c_str());
     
     alGetError(); // clear errors from previously
     
-    alGenBuffers(1, &sfxInfo.m_sfx_buffer);
+    alGenBuffers(1, &sfx_info.m_sfx_buffer);
     if (!checkError("generating a buffer"))
     {
         return false;
     }
     
-    if (!loadVorbisBuffer(sfx_name, sfxInfo.m_sfx_buffer))
+    if (!loadVorbisBuffer(sfx_name, sfx_info.m_sfx_buffer))
     {
         fprintf(stderr, "Could not load sound effect %s\n", sfx_name);
         return false;
     }
     
-    m_all_sfx_types[sfx_name] = sfxInfo;
+    m_all_sfx_types[sfx_name] = sfx_info;
     
     return true;
 } // addSingleSFX
@@ -347,7 +354,8 @@ void SFXManager::loadSingleSfx(const XMLNode* node)
  *  call deleteSFX().
  *  \param id Identifier of the sound effect to create.
  */
-SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info, const bool addToSFXList)
+SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info, 
+                                       const bool add_toS_FX_list)
 {
     bool positional = false;
 
@@ -363,9 +371,9 @@ SFXBase* SFXManager::createSoundSource(const SFXBufferInfo& info, const bool add
     // debugging
     /*printf("newSfx(): id:%d buffer:%p, rolloff:%f, gain:%f %p\n", id, m_sfx_buffers[id], m_sfx_rolloff[id], m_sfx_gain[id], p);*/
     
-    sfx->volume(m_masterGain);
+    sfx->volume(m_master_gain);
     
-    if (addToSFXList) m_all_sfx.push_back(sfx);
+    if (add_to_SFX_list) m_all_sfx.push_back(sfx);
     
     return sfx;
 }   // createSoundSource
@@ -390,7 +398,7 @@ SFXBase* SFXManager::createSoundSource(const char* name, const bool addToSFXList
     }
     
     return createSoundSource( i->second, addToSFXList );
-}
+}  // createSoundSource
 
 //----------------------------------------------------------------------------
 /** Delete a sound effect object, and removes it from the internal list of
@@ -428,6 +436,7 @@ void SFXManager::pauseAll()
         (*i)->pause();
     }   // for i in m_all_sfx
 }   // pauseAll
+
 //----------------------------------------------------------------------------
 /** Resumes all paused SFXs.
  */
@@ -463,14 +472,14 @@ void SFXManager::setMasterSFXVolume(float gain)
     if (gain > 1.0)  gain = 1.0f;
     if (gain < 0.0f) gain = 0.0f;
 
-    m_masterGain = gain;
+    m_master_gain = gain;
 
     // regular SFX
     {
         for (std::vector<SFXBase*>::iterator i=m_all_sfx.begin();
             i!=m_all_sfx.end(); i++)
         {
-            (*i)->volume(m_masterGain);
+            (*i)->volume(m_master_gain);
         }   // for i in m_all_sfx
     }
     
@@ -479,7 +488,7 @@ void SFXManager::setMasterSFXVolume(float gain)
         std::map<std::string, SFXBase*>::iterator i = m_quick_sounds.begin();
         for (; i != m_quick_sounds.end(); i++)
         {
-            (*i).second->volume(m_masterGain);
+            (*i).second->volume(m_master_gain);
         }
     }
     
@@ -502,10 +511,9 @@ const std::string SFXManager::getErrorString(int err)
 
 //-----------------------------------------------------------------------------
 
-std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
-
 void SFXManager::quickSound(const char* soundType)
-{    
+{
+    if(!sfxAllowed()) return;
     std::map<std::string, SFXBase*>::iterator sound = m_quick_sounds.find(soundType);
     
     if (sound == m_quick_sounds.end())
