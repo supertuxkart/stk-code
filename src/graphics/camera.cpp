@@ -142,7 +142,6 @@ void Camera::setupCamera()
  */
 void Camera::setMode(Mode mode)
 {
-    World *world = World::getWorld();
     // If we switch from reverse view, move the camera immediately to the 
     // correct position. 
     if(m_mode==CM_REVERSE && mode==CM_NORMAL)
