@@ -336,7 +336,7 @@ void Kart::eliminate()
  */
 bool Kart::isInRest() const
 {
-    return fabs(m_body->getLinearVelocity ().z())<0.2;
+    return fabs(m_body->getLinearVelocity ().y())<0.2;
 }  // isInRest
 
 //-----------------------------------------------------------------------------
