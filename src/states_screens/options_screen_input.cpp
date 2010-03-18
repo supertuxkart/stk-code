@@ -36,10 +36,16 @@
 
 using namespace GUIEngine;
 
+DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
+
+// -----------------------------------------------------------------------------
+
 OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 {
 }
+
 // -----------------------------------------------------------------------------
+
 void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
 {
     
@@ -288,6 +294,7 @@ void OptionsScreenInput::rebuildDeviceList()
 }
 
 // -----------------------------------------------------------------------------
+
 static PlayerAction binding_to_set;
 static std::string binding_to_set_button;
 

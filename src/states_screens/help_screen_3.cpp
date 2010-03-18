@@ -21,12 +21,18 @@
 
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
+
 using namespace GUIEngine;
+
+DEFINE_SCREEN_SINGLETON( HelpScreen3 );
+
+// ------------------------------------------------------------------------------------------------------
 
 HelpScreen3::HelpScreen3() : Screen("help3.stkgui")
 {
 }
 
+// ------------------------------------------------------------------------------------------------------
 
 void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -44,6 +50,8 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
     }
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 void HelpScreen3::init()
 {
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
@@ -51,6 +59,10 @@ void HelpScreen3::init()
     if (w != NULL) w->select( "page3", GUI_PLAYER_ID );
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 void HelpScreen3::tearDown()
 {
 }
+
+// ------------------------------------------------------------------------------------------------------

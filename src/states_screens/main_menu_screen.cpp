@@ -39,10 +39,15 @@
 
 using namespace GUIEngine;
 
+DEFINE_SCREEN_SINGLETON( MainMenuScreen );
+
+// ------------------------------------------------------------------------------------------------------
+
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 {
 }
 
+// ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::init()
 {
@@ -52,9 +57,13 @@ void MainMenuScreen::init()
     input_manager->setMasterPlayerOnly(false);
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 void MainMenuScreen::tearDown()
 {
 }
+
+// ------------------------------------------------------------------------------------------------------
 
 void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -121,3 +130,4 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
 }
 
+// ------------------------------------------------------------------------------------------------------

@@ -34,6 +34,8 @@ using namespace irr::video;
 
 const char* ALL_TRACK_GROUPS_ID = "all";
 
+DEFINE_SCREEN_SINGLETON( TracksScreen );
+
 // -----------------------------------------------------------------------------------------------
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")

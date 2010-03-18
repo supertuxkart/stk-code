@@ -30,6 +30,7 @@
 
 
 using namespace GUIEngine;
+DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
 
 class GameModeRibbonListener : public DynamicRibbonHoverListener
 {

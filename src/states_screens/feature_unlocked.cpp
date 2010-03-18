@@ -20,6 +20,9 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+
+DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
+
 // -------------------------------------------------------------------------------------
 
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.stkgui")

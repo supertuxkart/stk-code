@@ -25,6 +25,8 @@ const float INITIAL_Y = -3.0f;
 const float INITIAL_PODIUM_Y = -3.6f;
 const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
 
+DEFINE_SCREEN_SINGLETON( GrandPrixOver );
+
 // -------------------------------------------------------------------------------------
 
 GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")

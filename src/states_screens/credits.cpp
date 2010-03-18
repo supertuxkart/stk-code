@@ -29,6 +29,8 @@ using irr::core::stringc;
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
+DEFINE_SCREEN_SINGLETON( GUIEngine::CreditsScreen );
+
 
 namespace GUIEngine
 {

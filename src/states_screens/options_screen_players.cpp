@@ -37,10 +37,16 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
+DEFINE_SCREEN_SINGLETON( OptionsScreenPlayers );
+
+// -----------------------------------------------------------------------------
+
 OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 {
 }
+
 // -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
@@ -56,9 +62,8 @@ void OptionsScreenPlayers::init()
     }
 }
 
-/**
- * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
- */
+// -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
 {
     stringc newNameC( newName );
@@ -88,6 +93,8 @@ void OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
     // TODO : need to re-save user config here?
 }
 
+// -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 {
     UserConfigParams::m_all_players.erase(player);
@@ -108,11 +115,13 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::tearDown()
 {
 }
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {    
     if (name == "options_choice")
@@ -151,3 +160,4 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     
 }
 
+// -----------------------------------------------------------------------------

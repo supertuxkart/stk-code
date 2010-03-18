@@ -50,6 +50,8 @@ const char* RANDOM_KART_ID = "randomkart";
 const char* ALL_KART_GROUPS_ID  = "all";
 const char* ID_DONT_USE = "x";
 
+DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
+
 class PlayerKartWidget;
     
 /** Currently, navigation for multiple players at the same time is implemented in

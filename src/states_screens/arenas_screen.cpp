@@ -29,10 +29,15 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::video;
 
+DEFINE_SCREEN_SINGLETON( ArenasScreen );
+
+// ------------------------------------------------------------------------------------------------------
+
 ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
 }
 
+// ------------------------------------------------------------------------------------------------------
 
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
@@ -63,6 +68,8 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     
 }
+
+// ------------------------------------------------------------------------------------------------------
 
 void ArenasScreen::init()
 {
@@ -99,9 +106,13 @@ void ArenasScreen::init()
     w->setSelection(w->getItems()[0].m_code_name, 0, true); 
 }
 
+// ------------------------------------------------------------------------------------------------------
+
 void ArenasScreen::tearDown()
 {
 }
+
+// ------------------------------------------------------------------------------------------------------
 
 void ArenasScreen::setFocusOnTrack(const std::string& trackName)
 {
@@ -111,3 +122,6 @@ void ArenasScreen::setFocusOnTrack(const std::string& trackName)
     // FIXME: don't hardcode player 0?
     w->setSelection(trackName, 0, true); 
 }
+
+// ------------------------------------------------------------------------------------------------------
+

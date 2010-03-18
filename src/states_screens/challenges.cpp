@@ -36,109 +36,120 @@
 using irr::core::stringw;
 using irr::core::stringc;
 
-namespace GUIEngine
+using namespace GUIEngine;
+
+DEFINE_SCREEN_SINGLETON( ChallengesScreen );
+
+// ------------------------------------------------------------------------------------------------------
+
+ChallengesScreen::ChallengesScreen() : Screen("challenges.stkgui")
 {
+           
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ChallengesScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
+{
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ChallengesScreen::init()
+{
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
+    assert( w != NULL );
     
-    ChallengesScreen::ChallengesScreen() : Screen("challenges.stkgui")
+    // Re-build track list everytime (accounts for locking changes, etc.)
+    w->clearItems();
+    
+    const std::vector<const Challenge*>& activeChallenges = unlock_manager->getActiveChallenges();
+    const std::vector<const Challenge*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
+    const std::vector<const Challenge*>& lockedChallenges = unlock_manager->getLockedChallenges();
+    
+    const int activeChallengeAmount = activeChallenges.size();
+    const int solvedChallengeAmount = solvedChallenges.size();
+    const int lockedChallengeAmount = lockedChallenges.size();
+    
+    for (int n=0; n<activeChallengeAmount; n++)
     {
-               
+        w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
+                   activeChallenges[n]->getId(), "/gui/challenge.png");
+    }
+    for (int n=0; n<solvedChallengeAmount; n++)
+    {
+        // TODO : add bronze/silver/gold difficulties to challenges
+        w->addItem(solvedChallenges[n]->getName() + L"\n" + solvedChallenges[n]->getChallengeDescription(),
+                   solvedChallenges[n]->getId(), "/textures/cup_gold.png");
+    }
+    for (int n=0; n<lockedChallengeAmount; n++)
+    {
+        w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
+                   "/gui/challenge.png", true);
     }
     
     
-    void ChallengesScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
-    {
-    }
     
-    void ChallengesScreen::init()
+    w->updateItemDisplay();  
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ChallengesScreen::tearDown()
+{
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
+{
+    if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
+    else if (name == "challenges")
     {
         DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
         assert( w != NULL );
         
-        // Re-build track list everytime (accounts for locking changes, etc.)
-        w->clearItems();
+        // FIXME : don't hardcode player 0?
+        const int playerID = 0;
+        std::string selection = w->getSelectionIDString( playerID );
         
-        const std::vector<const Challenge*>& activeChallenges = unlock_manager->getActiveChallenges();
-        const std::vector<const Challenge*>& solvedChallenges = unlock_manager->getUnlockedFeatures();
-        const std::vector<const Challenge*>& lockedChallenges = unlock_manager->getLockedChallenges();
-        
-        const int activeChallengeAmount = activeChallenges.size();
-        const int solvedChallengeAmount = solvedChallenges.size();
-        const int lockedChallengeAmount = lockedChallenges.size();
-        
-        for (int n=0; n<activeChallengeAmount; n++)
+        if (selection == "locked")
         {
-            w->addItem(activeChallenges[n]->getName() + L"\n" + activeChallenges[n]->getChallengeDescription(),
-                       activeChallenges[n]->getId(), "/gui/challenge.png");
+            unlock_manager->playLockSound();
         }
-        for (int n=0; n<solvedChallengeAmount; n++)
+        else if (!selection.empty())
         {
-            // TODO : add bronze/silver/gold difficulties to challenges
-            w->addItem(solvedChallenges[n]->getName() + L"\n" + solvedChallenges[n]->getChallengeDescription(),
-                       solvedChallenges[n]->getId(), "/textures/cup_gold.png");
-        }
-        for (int n=0; n<lockedChallengeAmount; n++)
-        {
-            w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
-                       "/gui/challenge.png", true);
-        }
-        
-        
-        
-        w->updateItemDisplay();  
-    }
-    
-    void ChallengesScreen::tearDown()
-    {
-    }
-    
-    void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
-    {
-        if (name == "back")
-        {
-            StateManager::get()->escapePressed();
-        }
-        else if (name == "challenges")
-        {
-            DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
-            assert( w != NULL );
-            
-            // FIXME : don't hardcode player 0?
-            const int playerID = 0;
-            std::string selection = w->getSelectionIDString( playerID );
-            
-            if (selection == "locked")
-            {
-                unlock_manager->playLockSound();
-            }
-            else if (!selection.empty())
-            {
-                //FIXME: simplify and centralize race start sequence!!
+            //FIXME: simplify and centralize race start sequence!!
 
-                // Use latest used device
-                InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
-                
-                // Create player and associate player with device (FIXME: ask for player ident)
-                StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
-                
-                // Set up race manager appropriately
-                race_manager->setNumLocalPlayers(1);
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-                
-                // ASSIGN should make sure that only input from assigned devices is read.
-                input_manager->getDeviceList()->setAssignMode(ASSIGN);
-                
-                // Go straight to the race
-                StateManager::get()->enterGameState();                
-                
-                //FIXME: why do we need to invoke the network manager for local games??
-                network_manager->initCharacterDataStructures();
-                network_manager->setupPlayerKartInfo();
-                
-                // Launch challenge
-                unlock_manager->getChallenge(selection)->setRace();
-                race_manager->startNew();
-            }
+            // Use latest used device
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            
+            // Create player and associate player with device (FIXME: ask for player ident)
+            StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+            
+            // Set up race manager appropriately
+            race_manager->setNumLocalPlayers(1);
+            race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+            
+            // ASSIGN should make sure that only input from assigned devices is read.
+            input_manager->getDeviceList()->setAssignMode(ASSIGN);
+            
+            // Go straight to the race
+            StateManager::get()->enterGameState();                
+            
+            //FIXME: why do we need to invoke the network manager for local games??
+            network_manager->initCharacterDataStructures();
+            network_manager->setupPlayerKartInfo();
+            
+            // Launch challenge
+            unlock_manager->getChallenge(selection)->setRace();
+            race_manager->startNew();
         }
     }
-    
-} // end namespace
+}
+
+// ------------------------------------------------------------------------------------------------------
+

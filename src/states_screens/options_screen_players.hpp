@@ -38,6 +38,9 @@ public:
     
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
+    /**
+     * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
+     */
     void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
     

@@ -33,11 +33,16 @@
 
 using namespace GUIEngine;
 
+DEFINE_SCREEN_SINGLETON( OptionsScreenAV );
+
+// -----------------------------------------------------------------------------
 
 OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 {
 }
+
 // -----------------------------------------------------------------------------
+
 void OptionsScreenAV::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
@@ -132,6 +137,7 @@ void OptionsScreenAV::init()
 }
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "options_choice")
@@ -219,7 +225,9 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
 }
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenAV::tearDown()
 {
 }
 
+// -----------------------------------------------------------------------------
