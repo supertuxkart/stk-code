@@ -97,8 +97,11 @@ float Quad::sideOfLine2D(const Vec3& l1, const Vec3& l2, const Vec3& p) const
 // ----------------------------------------------------------------------------
 bool Quad::pointInQuad(const Vec3& p) const 
 {
+    // If a point is exactly on the line of two quads (e.g. between points
+    // 0,1 on one quad, and 3,2 of the previous quad), assign this point
+    // to be on the 'later' quad, i.e. on the line between points 0 and 1.
     if(sideOfLine2D(m_p[0], m_p[2], p)<0) {
-        return sideOfLine2D(m_p[0], m_p[1], p) >  0.0 &&
+        return sideOfLine2D(m_p[0], m_p[1], p) >= 0.0 &&
                sideOfLine2D(m_p[1], m_p[2], p) >= 0.0;
     } else {
         return sideOfLine2D(m_p[2], m_p[3], p) >  0.0 &&
