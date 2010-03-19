@@ -100,6 +100,11 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();
+    
+    if (screenshot == NULL)
+    {
+        screenshot = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+    }
     screenshotWidget->setImage(screenshot);
     m_children.push_back(screenshotWidget);
     
