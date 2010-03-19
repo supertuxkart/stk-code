@@ -745,7 +745,7 @@ void Kart::update(float dt)
     // partly tunnels through the track). While tunneling should not be
     // happening (since Z velocity is clamped), the epsilon is left in place
     // just to be on the safe side (it will not hit the chassis itself).
-    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0,0.3f);
+    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0.3f,0);
     // These values cause the track not to be hit in tuxtrack. I leave
     // them in as a test case if additional debugging should be needed.
     // Note: it might be that the kart chassis is actually 'in' the track,
