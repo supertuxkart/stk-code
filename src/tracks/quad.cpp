@@ -45,8 +45,6 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                                std::min(p0.getY(), p1.getY())  );
      m_invisible = invisible;
 
-     m_lower_center = 0.5f*(m_p[0]+m_p[1]);
-     m_upper_center = 0.5f*(m_p[2]+m_p[3]);
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -125,18 +123,3 @@ void Quad::transform(const btTransform &t, Quad *result) const
     result->m_p[2] = t(m_p[2]);
     result->m_p[3] = t(m_p[3]);
 }   // transform
-
-// ----------------------------------------------------------------------------
-/** Returns true if the orthognal projection of the point xyz on the center
- *  line of this quad is inside this quad. This is used when determining
- *  on which quad a kart is if it is off-track.
- *  \param xyz The coordinates to project.
- *  \return True if the orthognal projection is inside this quad.
- */
-bool Quad::projectionIsInside(const Vec3 &xyz) const
-{
-    Vec3 v1 = xyz-m_lower_center;
-    Vec3 v2 = m_upper_center - m_lower_center;
-    float ratio =  v1.dot(v2) / (m_upper_center-m_lower_center).length2();
-    return ratio>=0 && ratio <=1.0f;
-}   // projectionIsInside

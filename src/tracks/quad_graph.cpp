@@ -447,25 +447,11 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
             next_sector  = current_sector+1 == (int)getNumNodes() ? 0 : current_sector+1;
 
         // A first simple test uses the 2d distance to the center of the quad.
-        float dist_2 = xyz.distance2(getQuad(next_sector).getCenter()-xyz);
+        float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
         if(dist_2<min_dist_2)
         {
-            // If the current quad's center is closer to the kart than the
-            // previously determined minimum, test if the kart's projected
-            // position on the center line of the quad is still in the
-            // same quad. Consider the following situation:
-            // +-----------------+-----+
-            // |        A        |  B  |
-            // +-----------------+-----+
-            //                  X
-            // A kart at position X will be closer to the center of quad B
-            // than to quad A, but it should be considered to be on quad
-            // A!
-            if(getQuad(next_sector).projectionIsInside(xyz))
-            {
-                min_dist_2 = dist_2;
-                min_sector = next_sector;
-            }
+            min_dist_2 = dist_2;
+            min_sector = next_sector;
         }
         current_sector = next_sector;
     }   // for j

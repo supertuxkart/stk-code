@@ -81,6 +81,7 @@ public:
                  GraphNode(unsigned int index);
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
+    float        getDistance2FromPoint(const Vec3 &xyz);
 
     /** Returns the i-th successor. */
     unsigned int getSuccessor(unsigned int i)  const 

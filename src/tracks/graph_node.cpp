@@ -115,3 +115,17 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
         result->setX(-(closest-xyz2d).getLength());   // to the left
     result->setZ( m_distance_from_start + (closest-m_lower_center).getLength());
 }   // getDistances
+
+// ----------------------------------------------------------------------------
+/** Returns the square of the distance between the given point and any point
+ *  on the 'centre' line, i.e. the finite line from the middle point of the
+ *  lower end of the quad node to the middle point of the upper end of the
+ *  quad which belongs to this graph node. The value is computed in 2d only!
+ *  \param xyz The point for which the distance to the line is computed.
+ */
+float GraphNode::getDistance2FromPoint(const Vec3 &xyz)
+{
+    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
+    core::vector2df closest = m_line.getClosestPoint(xyz2d);
+    return (closest-xyz2d).getLengthSQ();
+}   // getDistance2FromPoint
