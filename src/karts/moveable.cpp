@@ -106,6 +106,7 @@ void Moveable::update(float dt)
     // y to positive values, i.e. no pitch of more than pi/2.
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
+    m_roll        = atan2(up.getX(), up.getY());
 
     updateGraphics(Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
     m_first_time = false ;

@@ -120,8 +120,7 @@ void btUprightConstraint::buildJacobian()
     btTransform worldTransform = m_rbA.getCenterOfMassTransform() * m_frameInA;
     btVector3   upAxis         = worldTransform.getBasis().getColumn(2);
     m_limit[ 0 ].m_angle       = m_kart->getPitch();
-    m_limit[ 1 ].m_angle       = m_kart->getHPR().getRoll();
-
+    m_limit[ 1 ].m_angle       = m_kart->getRoll();
     for ( int i = 0; i < 2; i++ )
     {
         new (&m_jacAng[ i ])      btJacobianEntry(  m_limit[ i ].m_axis,

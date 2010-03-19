@@ -42,10 +42,10 @@ float KartProperties::UNDEFINED = -99.9f;
  */
 KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
 {
-    m_name          = "Tux";
-    m_ident         = "tux";
-    m_icon_file     = "tuxicon.png";
-    m_shadow_file   = "generickartshadow.png";
+    m_name          = "NONAME";
+    m_ident         = "NONAME";
+    m_icon_file     = "";
+    m_shadow_file   = "";
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);

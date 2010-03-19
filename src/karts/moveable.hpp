@@ -48,6 +48,8 @@ private:
     float                  m_heading;
     /** The pitch between -90 and 90 degrees. */
     float                  m_pitch;
+    /** The roll between -180 and 180 degrees. */
+    float                  m_roll;
 
 protected:
     UserPointer            m_user_pointer;
@@ -79,6 +81,9 @@ public:
     /** Returns the pitch of the kart, restricted to between -90 and 90 degrees.
      *  Note that using getHPR().getPitch can result in a different value! */
     float         getPitch()      const        {return m_pitch;                    }
+    /** Returns the roll of the kart between -180 and 180 degrees. Note that
+     *  using getHPR.getRoll can result in a different value!  */
+    float         getRoll()       const        {return m_roll;                     }
     const btQuaternion 
                   getRotation()   const        {return m_transform.getRotation();  }
 
