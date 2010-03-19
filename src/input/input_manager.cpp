@@ -183,26 +183,46 @@ void InputManager::handleStaticAction(int key, int value)
   */
 void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
 {
+#if INPUT_MODE_DEBUG
+    std::cout << "INPUT SENSING... ";
+#endif
+    
     bool store_new = true;
         
     // don't store if we're trying to do something like bindings keyboard keys on a gamepad
-    if(m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD) store_new = false;
-    if(m_mode == INPUT_SENSE_GAMEPAD && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON) store_new = false;
-    
-    if(store_new)
+    if (m_mode == INPUT_SENSE_KEYBOARD && type != Input::IT_KEYBOARD)
     {
+        store_new = false;
+    }
+    if (m_mode == INPUT_SENSE_GAMEPAD  && type != Input::IT_STICKMOTION && type != Input::IT_STICKBUTTON)
+    {
+        store_new = false;
+    }
+
+#if INPUT_MODE_DEBUG
+    std::cout << (store_new ? "storing it" : "ignoring it") << "\n";
+#endif
+    
+    if (store_new)
+    {
+        
         m_sensed_input->type = type;
         m_sensed_input->deviceID = deviceID;
         m_sensed_input->btnID = btnID;
         m_sensed_input->axisDirection = axisDirection;
 
-        if(type == Input::IT_STICKMOTION)
+        if (type == Input::IT_KEYBOARD)
+        {
+            OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+            return;
+        }
+        else if (type == Input::IT_STICKMOTION)
         {
             std::cout << "%% storing new axis binding, value=" << value <<
                     " deviceID=" << deviceID << " btnID=" << btnID << " axisDirection=" <<
                     (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
         }
-        else if(type == Input::IT_STICKBUTTON)
+        else if (type == Input::IT_STICKBUTTON)
         {
             std::cout << "%% storing new gamepad button binding value=" << value <<
             " deviceID=" << deviceID << " btnID=" << btnID << "\n";
@@ -214,7 +234,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
             }
         }
         
-        if( type == Input::IT_STICKMOTION )
+        if (type == Input::IT_STICKMOTION)
         {
             // It is necessary to test both ids because the center position is always positive (0)
             const int input_id = axisDirection*50 + btnID;
