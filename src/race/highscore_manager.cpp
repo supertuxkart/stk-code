@@ -156,6 +156,16 @@ void HighscoreManager::Save()
 {
     // Print error message only once
     if(!m_can_write) return;
+#if 0
+    try
+    {
+        std::ofstream highscore_file;
+        highscore_file.open(m_filename);
+        highscore_file << "<?xml version=\"1.0\"?>\n";
+    configfile << "<stkconfig version=\"" << CURRENT_CONFIG_VERSION << "\" >\n\n";
+
+    }
+#else
     try
     {
         lisp::Writer writer(m_filename);
@@ -185,6 +195,7 @@ void HighscoreManager::Save()
         puts(e.what());
         m_can_write=false;
     }
+#endif
 }   // Save
 
 // -----------------------------------------------------------------------------

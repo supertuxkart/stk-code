@@ -29,8 +29,6 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
-#include "lisp/parser.hpp"
-#include "lisp/lisp.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -71,7 +69,6 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_rubber_band_max_length = m_rubber_band_force =
         m_rubber_band_duration = m_time_till_max_skid =
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
-        m_camera_max_accel = m_camera_max_brake =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_camera_distance = UNDEFINED;
@@ -83,7 +80,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
     m_engine_sfx_type        = "engine_small";
     
     // The default constructor for stk_config uses filename=""
-    if (filename != "") load(filename);
+    if (filename != "") load(filename, "kart");
 }   // KartProperties
 
 //-----------------------------------------------------------------------------
@@ -95,25 +92,22 @@ KartProperties::~KartProperties()
 //-----------------------------------------------------------------------------
 /** Loads the kart properties from a file.
  *  \param filename Filename to load.
- *  \param node Name of the lisp node to load the data from
- *              (default: tuxkart-kart)
+ *  \param node Name of the xml node to load the data from
  */
 void KartProperties::load(const std::string &filename, const std::string &node)
 {
-
    // Get the default values from STKConfig:
    *this = stk_config->getDefaultKartProperties();
 
-#if 0
     const XMLNode * root = 0;
-    m_ident = StringUtils::basename(StringUtils::without_extension(filename));
-
+    m_root  = StringUtils::getPath(filename);
+    m_ident = StringUtils::getBasename(StringUtils::removeExtension(filename));
+    m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     try
     {
         root = new XMLNode(filename);
         if(!root || root->getName()!="kart")
         {
-            if(root) delete root;
             std::ostringstream msg;
             msg << "Couldn't load kart properties '" << filename <<
                 "': no kart node.";
@@ -121,33 +115,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         }
         getAllData(root);
     }
-#else
-    const lisp::Lisp* root = 0;
-    m_root = StringUtils::getPath(filename);
-    m_ident = StringUtils::getBasename(m_root);
-
-    try
-    {
-        lisp::Parser parser;
-        root = parser.parse(filename);
-
-        const lisp::Lisp* const LISP = root->getLisp(node);
-        if(!LISP)
-        {
-            std::ostringstream msg;
-            msg <<  "No '" << node << "' node found.";
-            throw std::runtime_error(msg.str());
-        }
-        getAllData(LISP);
-    }
-#endif
     catch(std::exception& err)
     {
         fprintf(stderr, "Error while parsing KartProperties '%s':\n",
                 filename.c_str());
         fprintf(stderr, "%s\n", err.what());
     }
-    delete root;
+    if(root) delete root;
 
     // Set a default group (that has to happen after init_default and load)
     if(m_groups.size()==0)
@@ -210,277 +184,205 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("version", &m_version);
     
     std::string temp_name;
-    root->get("name", &temp_name);
+    root->get("name",        &temp_name    );
     m_name = _(temp_name.c_str());
     
-    root->get("icon-file", &m_icon_file);
+    root->get("icon-file",   &m_icon_file  );
     root->get("shadow-file", &m_shadow_file);
-
     Vec3 c;
-    root->get("rgb", &c);
+    root->get("rgb",         &c            );
+    root->get("groups",      &m_groups     );
 
-    std::string sfx_type_string;
-    root->get("engine-sound", &sfx_type_string);
+    //m_kart_model.loadInfo(lisp);
 
-    if      (sfx_type_string == "large")
+    if(const XMLNode *dimensions_node = root->getNode("center"))
+        dimensions_node->get("gravity-shift", &m_gravity_center_shift);
+
+    if(const XMLNode *nitro_node = root->getNode("nitro"))
+        nitro_node->get("power-boost", &m_nitro_power_boost);
+
+    if(const XMLNode *skid_node = root->getNode("skid"))
     {
-        m_engine_sfx_type = "engine_large";
+        skid_node->get("increase",      &m_skid_increase     );
+        skid_node->get("decrease",      &m_skid_decrease     );
+        skid_node->get("max",           &m_skid_max          );
+        skid_node->get("time-till-max", &m_time_till_max_skid);
+        skid_node->get("visual",        &m_skid_visual       );
+        skid_node->get("enable",        &m_has_skidmarks     );
     }
-    else if (sfx_type_string == "small")
+
+    if(const XMLNode *slipstream_node = root->getNode("slipstream"))
     {
-        m_engine_sfx_type = "engine_small";
+        slipstream_node->get("length",       &m_slipstream_length      );
+        slipstream_node->get("collect-time", &m_slipstream_collect_time);
+        slipstream_node->get("use-time",     &m_slipstream_use_time    );
+        slipstream_node->get("add-power",    &m_slipstream_add_power   );
+        slipstream_node->get("min-speed",    &m_slipstream_min_speed   );
     }
 
-    root->get("has-skidmarks", &m_has_skidmarks);
-    root->get("groups", &m_groups);
-    root->get("time-full-steer", &m_time_full_steer);
-    root->get("time-full-steer-ai", &m_time_full_steer_ai);
-    root->get("gravity-center-shift", &m_gravity_center_shift);
-    root->get("nitro-power-boost", &m_nitro_power_boost);
-    root->get("skid-increase", &m_skid_increase);
-    root->get("skid-decrease", &m_skid_decrease);
-    root->get("skid-max", &m_skid_max);
-    root->get("time-till-max-skid", &m_time_till_max_skid);
-    root->get("skid-visual", &m_skid_visual);
-    root->get("slipstream-length", &m_slipstream_length);
-    root->get("slipstream-collect-time", &m_slipstream_collect_time);
-    root->get("slipstream-use-time", &m_slipstream_use_time);
-    root->get("slipstream-add-power", &m_slipstream_add_power);
-    root->get("slipstream-min-speed", &m_slipstream_min_speed);
-    root->get("brake-factor", &m_brake_factor);
-
-    std::vector<float> v;
-    if(root->get("min-speed-radius", &v))
+    if(const XMLNode *turn_node = root->getNode("turn"))
     {
-        if(v.size()!=2)
-            printf("Incorrect min-speed-radius specifications for kart '%s'\n",
-                   getIdent().c_str());
-        else
+        turn_node->get("time-full-steer",      &m_time_full_steer   );
+        turn_node->get("time-full-steer-ai",   &m_time_full_steer_ai);
+        std::vector<float> v;
+        if(turn_node->get("min-speed-radius", &v))
         {
-            m_min_speed_turn = v[0];
-            m_min_radius     = v[1];
+            if(v.size()!=2)
+                printf("Incorrect min-speed-radius specifications for kart '%s'\n",
+                getIdent().c_str());
+            else
+            {
+                m_min_speed_turn = v[0];
+                m_min_radius     = v[1];
+            }
         }
-    }
 
-    v.clear();
-    if(root->get("max-speed-radius", &v))
-    {
-        if(v.size()!=2)
-            printf("Incorrect max-speed-radius specifications for kart '%s'\n",
-                   getIdent().c_str());
-        else
+        v.clear();
+        if(turn_node->get("max-speed-radius", &v))
         {
-            m_max_speed_turn = v[0];
-            m_max_radius     = v[1];
+            if(v.size()!=2)
+                printf("Incorrect max-speed-radius specifications for kart '%s'\n",
+                getIdent().c_str());
+            else
+            {
+                m_max_speed_turn = v[0];
+                m_max_radius     = v[1];
+            }
         }
-    }
+    }   // if turn_node
 
-    v.clear();
-    if( root->get("engine-power", &v))
+    if(const XMLNode *engine_node = root->getNode("engine"))
     {
-        if(v.size()!=3)
-            printf("Incorrect engine-power specifications for kart '%s'\n",
-                   getIdent().c_str());
-        else
+        engine_node->get("brake-factor", &m_brake_factor);
+        engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
+        std::vector<float> v;
+        if( engine_node->get("power", &v))
         {
-            m_engine_power[0] = v[0];
-            m_engine_power[1] = v[1];
-            m_engine_power[2] = v[2];
-        }
-    }
+            if(v.size()!=3)
+                printf("Incorrect engine-power specifications for kart '%s'\n",
+                getIdent().c_str());
+            else
+            {
+                m_engine_power[0] = v[0];
+                m_engine_power[1] = v[1];
+                m_engine_power[2] = v[2];
+            }
+        }   // if engine-power
+        v.clear();
+        if( engine_node->get("max-speed", &v))
+        {
+            if(v.size()!=3)
+                printf("Incorrect max-speed specifications for kart '%s'\n",
+                getIdent().c_str());
+            else
+            {
+                m_max_speed[0] = v[0];
+                m_max_speed[1] = v[1];
+                m_max_speed[2] = v[2];
+            }
+        }   // if max-speed
+    }   // if getNode("engine")
 
-    v.clear();
-    if( root->get("max-speed", &v))
+    if(const XMLNode *gear_node = root->getNode("gear"))
     {
-        if(v.size()!=3)
-            printf("Incorrect max-speed specifications for kart '%s'\n",
-                   getIdent().c_str());
-        else
-        {
-            m_max_speed[0] = v[0];
-            m_max_speed[1] = v[1];
-            m_max_speed[2] = v[2];
-        }
+        gear_node->get("switch-ratio",   &m_gear_switch_ratio  );
+        gear_node->get("power-increase", &m_gear_power_increase);
     }
 
-    root->get("mass", &m_mass);
-    root->get("suspension-stiffness", &m_suspension_stiffness);
-    root->get("wheel-damping-relaxation", &m_wheel_damping_relaxation);
-    root->get("wheel-damping-compression", &m_wheel_damping_compression);
-    root->get("friction-slip", &m_friction_slip);
-    root->get("roll-influence", &m_roll_influence);
-    root->get("wheel-radius", &m_wheel_radius);
+    if(const XMLNode *mass_node = root->getNode("mass"))
+        mass_node->get("value", &m_mass);
 
-    //TODO: wheel width is not loaded, yet is listed as an attribute in the xml file after wheel-radius?
 
-    root->get("chassis-linear-damping",  &m_chassis_linear_damping);
-    root->get("chassis-angular-damping", &m_chassis_angular_damping);
-    root->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-    root->get("suspension-rest",         &m_suspension_rest);
-    root->get("suspension-travel-cm",    &m_suspension_travel_cm);
-    root->get("jump-velocity",           &m_jump_velocity);
-    root->get("collision-side-impulse",  &m_collision_side_impulse);
-    root->get("vert-rescue-offset",      &m_vert_rescue_offset);
+    if(const XMLNode *suspension_node = root->getNode("suspension"))
+    {
+        suspension_node->get("stiffness", &m_suspension_stiffness);
+        suspension_node->get("rest",      &m_suspension_rest     );
+        suspension_node->get("travel-cm", &m_suspension_travel_cm);
+    }
+
+    if(const XMLNode *wheels_node = root->getNode("wheels"))
+    {
+        wheels_node->get("damping-relaxation",  &m_wheel_damping_relaxation );
+        wheels_node->get("damping-compression", &m_wheel_damping_compression);
+        wheels_node->get("radius",              &m_wheel_radius             );
+    }
+
+    if(const XMLNode *friction_node = root->getNode("friction"))
+        friction_node->get("slip", &m_friction_slip);
+
+    if(const XMLNode *stability_node = root->getNode("stability"))
+    {
+        stability_node->get("roll-influence",          &m_roll_influence);
+        stability_node->get("chassis-linear-damping",  &m_chassis_linear_damping);
+        stability_node->get("chassis-angular-damping", &m_chassis_angular_damping);
+    }
+
+    if(const XMLNode *upright_node = root->getNode("upright"))
+    {
+        upright_node->get("tolerance", &m_upright_tolerance);
+        upright_node->get("max-force", &m_upright_max_force);
+    }
+
+    if(const XMLNode *track_connection_node = root->getNode("track-connection-accel"))
+        track_connection_node->get("value", &m_track_connection_accel);
+
+    if(const XMLNode *jump_node = root->getNode("jump"))
+        jump_node->get("velocity", &m_jump_velocity);
+
+    if(const XMLNode *collision_node = root->getNode("collision"))
+        collision_node->get("side-impulse",  &m_collision_side_impulse);
+
+    if(const XMLNode *rescue_node = root->getNode("rescue"))
+        rescue_node->get("vert-offset", &m_vert_rescue_offset);
 
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
 
-    root->get("gear-switch-ratio", &m_gear_switch_ratio);
-    root->get("gear-power-increase", &m_gear_power_increase);
-    root->get("upright-tolerance", &m_upright_tolerance);
-    root->get("upright-max-force", &m_upright_max_force);
-    root->get("track-connection-accel", &m_track_connection_accel);
-    root->get("rubber-band-max-length", &m_rubber_band_max_length);
-    root->get("rubber-band-force", &m_rubber_band_force);
-    root->get("rubber-band-duration", &m_rubber_band_duration);
-    root->get("camera-max-accel", &m_camera_max_accel);
-    root->get("camera-max-brake", &m_camera_max_brake);
-    root->get("camera-distance", &m_camera_distance);
-}
-
-// ----------------------------------------------------------------------------
-void KartProperties::getAllData(const lisp::Lisp* lisp)
-{
-    lisp->get("version",                    m_version);
-    // Only load the kart_model data if the .kart file has the appropriate
-    if(m_version>=1)
-        m_kart_model.loadInfo(lisp);
-    
-    std::string temp_name;
-    lisp->get("name",                       temp_name);
-    m_name = _(temp_name.c_str());
-    
-    lisp->get("icon-file",                  m_icon_file);
-    lisp->get("shadow-file",                m_shadow_file);
-    Vec3 c;
-    lisp->get("rgb",                        c);
-    m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
-    lisp->get("shape",                      m_shape);
-    lisp->get("engine-power",               m_engine_power, 3);
-    lisp->get("time-full-steer",            m_time_full_steer);
-    lisp->get("time-full-steer-ai",         m_time_full_steer_ai);
-    lisp->get("brake-factor",               m_brake_factor);
-    lisp->get("mass",                       m_mass);
-
-    /*
-    // Load custom kart SFX files (TODO: enable back when it's implemented properly)
-    for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
+    if(const XMLNode *rubber_band_node= root->getNode("rubber-band"))
     {
-        std::string tempFile;
-        // Get filename associated with each custom sfx tag in sfx config
-        if (lisp->get(sfx_manager->getCustomTagName(i), tempFile))
-        {
-            // determine absolute filename
-            // TODO: will this work with add-on packs (is data dir the same)?
-            tempFile = file_manager->getDataDir() + "/karts/" + getIdent() + "/" + tempFile;
-
-            // Create sfx in sfx manager and store id
-            m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
-
-            // debugging
-            //printf("%s custom sfx %s:\t %s\n", getIdent().c_str(), sfx_manager->getCustomTagName(i), tempFile.c_str());
-        }
-        else
-        {
-            // if there is no filename associated with a given tag
-            m_custom_sfx_id[i] = -1;
-        }
-    }
-*/
-    std::string sfx_type_string;
-    lisp->get("engine-sound",                 sfx_type_string);
-    if(sfx_type_string == "large")
-    {
-        m_engine_sfx_type = "engine_large";
-    }
-    else if(sfx_type_string == "small")
-    {
-        m_engine_sfx_type = "engine_small";
+        rubber_band_node->get("max-length", &m_rubber_band_max_length);
+        rubber_band_node->get("force",      &m_rubber_band_force     );
+        rubber_band_node->get("duration",   &m_rubber_band_duration  );
     }
 
-    std::vector<float> v;
-    if(lisp->getVector("max-speed-radius",      v))
+    if(const XMLNode *camera_node= root->getNode("camera"))
+        camera_node->get("distance", &m_camera_distance);
+
+    if(const XMLNode *sounds_node= root->getNode("sounds"))
     {
-        if (v.size()!=2)
+        std::string s;
+        sounds_node->get("engine", &s);
+        if      (s == "large") m_engine_sfx_type = "engine_large";
+        else if (s== "small")  m_engine_sfx_type = "engine_small";
+
+#ifdef WILL_BE_ENABLED_ONCE_DONE_PROPERLY
+        // Load custom kart SFX files (TODO: enable back when it's implemented properly)
+        for (int i = 0; i < SFXManager::NUM_CUSTOMS; i++)
         {
-            printf("Incorrect max-speed-angle specifications for kart '%s'\n",
-                   getIdent().c_str());
-        }
-        else
-        {
-            m_max_speed_turn = v[0];
-            m_max_radius     = v[1];
-        }
-    }
-    v.clear();
-    if(lisp->getVector("min-speed-radius",      v))
-    {
-        if(v.size()!=2)
-            printf("Incorrect min-speed-angle specifications for kart '%s'\n",
-                   getIdent().c_str());
-        else
-        {
-            m_min_speed_turn = v[0];
-            m_min_radius     = v[1];
-        }
-    }
+            std::string tempFile;
+            // Get filename associated with each custom sfx tag in sfx config
+            if (sounds_node->get(sfx_manager->getCustomTagName(i), tempFile))
+            {
+                // determine absolute filename
+                // FIXME: will not work with add-on packs (is data dir the same)?
+                tempFile = file_manager->getKartFile(tempFile, getIdent());
 
-    lisp->get("nitro-power-boost",         m_nitro_power_boost       );
+                // Create sfx in sfx manager and store id
+                m_custom_sfx_id[i] = sfx_manager->addSingleSfx(tempFile, 1, 0.2f,1.0f);
+            }
+            else
+            {
+                // if there is no filename associated with a given tag
+                m_custom_sfx_id[i] = -1;
+            }   // if custom sound
+        }   // for i<SFXManager::NUM_CUSTOMS
+#endif
+    }   // if sounds-node exist
 
-    //bullet physics data
-    lisp->get("suspension-stiffness",      m_suspension_stiffness     );
-    lisp->get("wheel-damping-relaxation",  m_wheel_damping_relaxation );
-    lisp->get("wheel-damping-compression", m_wheel_damping_compression);
-    lisp->get("friction-slip",             m_friction_slip            );
-    lisp->get("roll-influence",            m_roll_influence           );
-    lisp->get("wheel-radius",              m_wheel_radius             );
-    lisp->get("chassis-linear-damping",    m_chassis_linear_damping   );
-    lisp->get("chassis-angular-damping",   m_chassis_angular_damping  );
-    lisp->get("max-speed-reverse-ratio",   m_max_speed_reverse_ratio  );
-    lisp->get("max-speed",                 m_max_speed, 3             );
-    lisp->get("gravity-center-shift",      m_gravity_center_shift     );
-    lisp->get("suspension-rest",           m_suspension_rest          );
-    lisp->get("suspension-travel-cm",      m_suspension_travel_cm     );
-    lisp->get("collision-side-impulse",    m_collision_side_impulse   );
-    lisp->get("jump-velocity",             m_jump_velocity            );
-    lisp->get("vert-rescue-offset",        m_vert_rescue_offset       );
-    lisp->get("upright-tolerance",         m_upright_tolerance        );
-    lisp->get("upright-max-force",         m_upright_max_force        );
-    lisp->get("track-connection-accel",    m_track_connection_accel   );
-    lisp->get("rubber-band-max-length",    m_rubber_band_max_length   );
-    lisp->get("rubber-band-force",         m_rubber_band_force        );
-    lisp->get("rubber-band-duration",      m_rubber_band_duration     );
-
-    lisp->get("skid-increase",             m_skid_increase            );
-    lisp->get("skid-decrease",             m_skid_decrease            );
-    lisp->get("time-till-max-skid",        m_time_till_max_skid       );
-    lisp->get("has-skidmarks",             m_has_skidmarks            );
-    lisp->get("skid-max",                  m_skid_max                 );
-    lisp->get("skid-visual",               m_skid_visual              );
-    lisp->get("slipstream-length",         m_slipstream_length        );
-    lisp->get("slipstream-collect-time",   m_slipstream_collect_time  );
-    lisp->get("slipstream-use-time",       m_slipstream_use_time      );
-    lisp->get("slipstream-add-power",      m_slipstream_add_power     );
-    lisp->get("slipstream-min-speed",      m_slipstream_min_speed     );
-
-    lisp->getVector("groups",              m_groups                   );
-
-    // getVector appends to existing vectors, so a new one must be used to load
-    std::vector<float> temp;
-    lisp->getVector("gear-switch-ratio",   temp);
-    if(temp.size()>0) m_gear_switch_ratio = temp;
-    temp.clear();
-    lisp->getVector("gear-power-increase", temp);
-    if(temp.size()>0) m_gear_power_increase = temp;
-
-    // Camera
-    lisp->get("camera-max-accel",             m_camera_max_accel);
-    lisp->get("camera-max-brake",             m_camera_max_brake);
-    lisp->get("camera-distance",              m_camera_distance );
-
+    m_kart_model.loadInfo(*root);
 }   // getAllData
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Checks if all necessary physics values are indeed defines. This helps
  *  finding bugs early, e.g. missing default in stk_config.dat file.
  *  \param filename File from which the data was read (only used to print
@@ -554,13 +456,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_skid_visual,               "skid-visual"                );
     CHECK_NEG(m_slipstream_length,         "slipstream-length"          );
     CHECK_NEG(m_slipstream_collect_time,   "slipstream-collect-time"    );
-    CHECK_NEG(m_slipstream_use_time,       "slipstream-use-time"         );
+    CHECK_NEG(m_slipstream_use_time,       "slipstream-use-time"        );
     CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"       );
     CHECK_NEG(m_slipstream_min_speed,      "slipstream-min-speed"       );
-
-    CHECK_NEG(m_camera_max_accel,          "camera-max-accel"           );
-    CHECK_NEG(m_camera_max_brake,          "camera-max-brake"           );
-    CHECK_NEG(m_camera_distance,           "camera-distance"            );
+    CHECK_NEG(m_camera_distance,           "camera distance"            );
 
 }   // checkAllSet
 

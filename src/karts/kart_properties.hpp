@@ -28,7 +28,6 @@ using namespace irr;
 
 #include "audio/sfx_manager.hpp"
 #include "karts/kart_model.hpp"
-#include "lisp/lisp.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/vec3.hpp"
@@ -156,11 +155,7 @@ private:
                                        *   reached. */
     bool  m_has_skidmarks;            /**< Kart leaves skid marks. */
 
-    // Camera related setting
-    // ----------------------
-    float m_camera_max_accel;         // maximum acceleration of camera
-    float m_camera_max_brake;         // maximum braking of camera
-    float m_camera_distance;          // distance of normal camera from kart
+    float m_camera_distance;          /**< Distance of normal camera from kart. */
 
     /** The following two vectors define at what ratio of the maximum speed what
      * gear is selected.  E.g. 0.25 means: if speed <=0.25*maxSpeed --> gear 1,
@@ -171,12 +166,11 @@ private:
                        m_gear_power_increase;
 
     void  load              (const std::string &filename,
-                             const std::string &node="tuxkart-kart");
+                             const std::string &node);
 
 public:
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
-    void  getAllData        (const lisp::Lisp* lisp);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet(const std::string &filename);
 
@@ -271,9 +265,10 @@ public:
           getGearSwitchRatio        () const {return m_gear_switch_ratio;        }
     const std::vector<float>&
           getGearPowerIncrease      () const {return m_gear_power_increase;      }
-    float getCameraMaxAccel         () const {return m_camera_max_accel;         }
-    float getCameraMaxBrake         () const {return m_camera_max_brake;         }
-    float getCameraDistance         () const {return m_camera_distance;          }
+
+    /** Returns distance between kart and camera. */
+    float getCameraDistance         () const {return m_camera_distance;          }    
+
     /** Returns the full path where the files for this kart are stored. */
     const std::string& getKartDir   () const {return m_root;                     }
 };

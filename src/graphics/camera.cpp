@@ -38,7 +38,7 @@ Camera::Camera(int camera_index, const Kart* kart)
     m_index    = camera_index;
     m_camera   = irr_driver->addCameraSceneNode();
     setupCamera();
-    m_distance = kart->getKartProperties()->getCameraDistance() * 0.5f;
+    m_distance = kart->getKartProperties()->getCameraDistance();
     m_kart     = kart;
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 

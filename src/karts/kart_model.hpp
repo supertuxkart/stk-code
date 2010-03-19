@@ -25,11 +25,11 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "lisp/lisp.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class KartProperties;
+class XMLNode;
 
 /** This class stores a 3D kart model. It takes especially care of attaching
  *  the wheels, which are loaded as separate objects. The wheels can turn
@@ -107,13 +107,13 @@ private:
     float m_z_offset;                 /**< Models are usually not at z=0 (due
                                        *   to the wheels), so this value moves
                                        *   the karts down appropriately. */
-    void  loadWheelInfo(const lisp::Lisp* const lisp,
+    void  loadWheelInfo(const XMLNode &node, 
                         const std::string &wheel_name, int index);
 
 public:
          KartModel();
         ~KartModel();
-    void loadInfo(const lisp::Lisp* lisp);
+    void loadInfo(const XMLNode &node);
     void loadModels(const KartProperties &kart_properties);
     void attachModel(scene::ISceneNode **node);
     scene::IAnimatedMesh* getModel() const { return m_mesh; }

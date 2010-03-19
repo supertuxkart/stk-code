@@ -248,21 +248,18 @@ void STKConfig::getAllData(const XMLNode * root)
         switch_node->get("time",  &m_item_switch_time);
     }
 
-    const XMLNode *node = root -> getNode("misc-defaults");
-    if(!node)
+    if(const XMLNode *explosion_node= root->getNode("explosion"))
     {
-        std::ostringstream msg;
-        msg << "Couldn't load misc-defaults: no node.";
-        throw std::runtime_error(msg.str());
+        explosion_node->get("impulse",         &m_explosion_impulse        );
+        explosion_node->get("impulse-objects", &m_explosion_impulse_objects);
     }
 
-    node->get("explosion-impulse", &m_explosion_impulse);
-    node->get("explosion-impulse-objects", &m_explosion_impulse_objects);
-    node->get("enable-networking", &m_enable_networking);
+    if(const XMLNode *networking_node= root->getNode("networking"))
+        networking_node->get("enable", &m_enable_networking);
 
     // Get the default KartProperties
     // ------------------------------
-    node = root -> getNode("general-kart-defaults");
+    const XMLNode *node = root -> getNode("general-kart-defaults");
     if(!node)
     {
         std::ostringstream msg;

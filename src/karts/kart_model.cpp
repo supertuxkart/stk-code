@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "io/xml_node.hpp"
 #include "utils/constants.hpp"
 
 float KartModel::UNDEFINED = -99.9f;
@@ -54,24 +55,30 @@ KartModel::KartModel()
 }   // KartModel
 
 // ----------------------------------------------------------------------------
-/** This function loads the information about the kart from a lisp file. It 
+/** This function loads the information about the kart from a xml file. It 
  *  does not actually load the models (see load()).
- *  \param lisp  Lisp object of configuration file.
+ *  \param node  XML object of configuration file.
  */
-void KartModel::loadInfo(const lisp::Lisp* lisp)
+void KartModel::loadInfo(const XMLNode &node)
 {
-    lisp->get("model-file",              m_model_filename               );
-    lisp->get("animation-left",          m_animation_frame[AF_LEFT]     );
-    lisp->get("animation-straight",      m_animation_frame[AF_STRAIGHT] );
-    lisp->get("animation-right",         m_animation_frame[AF_RIGHT]    );
-    lisp->get("animation-start-winning", m_animation_frame[AF_WIN_START]);
-    lisp->get("animation-end-winning",   m_animation_frame[AF_WIN_END]  );
-    lisp->get("animation-speed",         m_animation_speed              );
+    node.get("model-file", &m_model_filename);
+    if(const XMLNode *animation_node=node.getNode("animations"))
+    {
+        animation_node->get("left",          &m_animation_frame[AF_LEFT]     );
+        animation_node->get("straight",      &m_animation_frame[AF_STRAIGHT] );
+        animation_node->get("right",         &m_animation_frame[AF_RIGHT]    );
+        animation_node->get("start-winning", &m_animation_frame[AF_WIN_START]);
+        animation_node->get("end-winning",   &m_animation_frame[AF_WIN_END]  );
+        animation_node->get("speed",         &m_animation_speed              );
+    }
 
-    loadWheelInfo(lisp, "wheel-front-right", 0);
-    loadWheelInfo(lisp, "wheel-front-left",  1);
-    loadWheelInfo(lisp, "wheel-rear-right",  2);
-    loadWheelInfo(lisp, "wheel-rear-left",   3);
+    if(const XMLNode *wheels_node=node.getNode("wheels"))
+    {
+        loadWheelInfo(*wheels_node, "front-right", 0);
+        loadWheelInfo(*wheels_node, "front-left",  1);
+        loadWheelInfo(*wheels_node, "rear-right",  2);
+        loadWheelInfo(*wheels_node, "rear-left",   3);
+    }
 }   // init
 // ----------------------------------------------------------------------------
 /** Destructor.
@@ -156,11 +163,11 @@ void KartModel::loadModels(const KartProperties &kart_properties)
  *  \param wheel_name Name of the wheel, e.g. wheel-rear-left.
  *  \param index Index of this wheel in the global m_wheel* fields.
  */
-void KartModel::loadWheelInfo(const lisp::Lisp* const lisp,
+void KartModel::loadWheelInfo(const XMLNode &node,
                               const std::string &wheel_name, int index)
 {
-    const lisp::Lisp* const wheel = lisp->getLisp(wheel_name);
-    if(!wheel)
+    const XMLNode *wheel_node = node.getNode(wheel_name);
+    if(!wheel_node)
     {
         // Only print the warning if a model filename is given. Otherwise the
         // stk_config file is read (which has no model information).
@@ -172,11 +179,11 @@ void KartModel::loadWheelInfo(const lisp::Lisp* const lisp,
         }
         return;
     }
-    wheel->get("model",            m_wheel_filename[index]         );
-    wheel->get("position",         m_wheel_graphics_position[index]);
-    wheel->get("physics-position", m_wheel_physics_position[index] );
-    wheel->get("min-suspension",   m_min_suspension[index]         );
-    wheel->get("max-suspension",   m_max_suspension[index]         );
+    wheel_node->get("model",            &m_wheel_filename[index]         );
+    wheel_node->get("position",         &m_wheel_graphics_position[index]);
+    wheel_node->get("physics-position", &m_wheel_physics_position[index] );
+    wheel_node->get("min-suspension",   &m_min_suspension[index]         );
+    wheel_node->get("max-suspension",   &m_max_suspension[index]         );
 }   // loadWheelInfo
 
 // ----------------------------------------------------------------------------
