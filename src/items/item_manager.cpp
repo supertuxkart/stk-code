@@ -280,15 +280,3 @@ void ItemManager::switchItems()
     m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
 
 }   // switchItems
-
-//-----------------------------------------------------------------------------
-void ItemManager::setItem(const lisp::Lisp *item_node,
-                          const char *colour, Item::ItemType type)
-{
-    std::string name;
-    item_node->get(colour, name);
-    if(name.size()>0)
-    {
-        m_item_mesh[type]=m_all_meshes[name];
-    }
-}   // setItem
