@@ -40,7 +40,7 @@ msgstr "%s. Autor: %s"
 #: src/items/flyable.cpp:329
 #, c-format
 msgid "%s eats too much of %s's cake"
-msgstr "%s zjadł za duża ciasta %s"
+msgstr "%s zjadł za duża ciasta od %s"
 
 #: src/items/plunger.cpp:161
 #, c-format
@@ -188,7 +188,7 @@ msgstr "Areny"
 #: src/items/powerup.cpp:206
 #, c-format
 msgid "Arrr, the %s dropped anchor, Captain!"
-msgstr "Arrr, %s spuścił kotwocę, Kapitanie!"
+msgstr "Arrr, %s spuścił kotwicę, Kapitanie!"
 
 #. I18N: ./data/grandprix/atworldsend.grandprix
 #: data/po/gui_strings.h:481
@@ -270,7 +270,7 @@ msgstr "Hamulec"
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:104
 msgid "BubbleGum - leave a sticky pink puddle behind you"
-msgstr "Guma do żucia - pozostawia lepką, ożawą maź za tobą."
+msgstr "Guma do żucia - pozostawia lepką maź za tobą."
 
 #. I18N: ./data/gui/help2.stkgui
 #: data/po/gui_strings.h:107
@@ -381,7 +381,7 @@ msgstr "Autorzy"
 #: src/states_screens/dialogs/player_info_dialog.cpp:135
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
-msgstr "Czy na prawdę chcesz usunąć gracz %s?"
+msgstr "Czy na prawdę chcesz usunąć gracza: %s?"
 
 #. I18N: ./data/gui/options_av.stkgui
 #. I18N: Next to checkbox in settings menu
@@ -457,13 +457,13 @@ msgstr "Zakończ trasę 'Zmienne Piaski' w czasie ponizej 2:20 i zbierz przynajm
 #. I18N: Shown at the end of a race
 #: src/states_screens/race_gui.cpp:77
 msgid "Finished"
-msgstr "Koniec wyścigu"
+msgstr "Koniec"
 
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Key binding
 #: data/po/gui_strings.h:299
 msgid "Fire"
-msgstr "Broń"
+msgstr "Ognia"
 
 #. I18N: Game mode
 #: src/race/race_manager.hpp:132
@@ -622,7 +622,7 @@ msgstr "Spojrzenie w tył"
 
 #: src/items/powerup.cpp:149
 msgid "Magic, son. Nothing else in the world smells like that."
-msgstr "Magia, synu. Nic na swiecie nie śmierdzi jak to."
+msgstr "Magia, synu. Nic na świecie nie śmierdzi jak to."
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: In the help menu
