@@ -118,6 +118,7 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 
 void OptionsScreenPlayers::tearDown()
 {
+    user_config->saveConfig();
 }
 
 // -----------------------------------------------------------------------------
@@ -148,11 +149,14 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         
         std::string selectedPlayer = players->getSelectionName();
         const int playerAmount = UserConfigParams::m_all_players.size();
-        for(int n=0; n<playerAmount; n++)
+        for (int n=0; n<playerAmount; n++)
         {
-            if(UserConfigParams::m_all_players[n].getName() == selectedPlayer)
+            if (UserConfigParams::m_all_players[n].getName() == selectedPlayer)
             {
-                new PlayerInfoDialog( &UserConfigParams::m_all_players[n], 0.5f, 0.6f );
+                if (!(UserConfigParams::m_all_players[n].isGuestAccount()))
+                {
+                    new PlayerInfoDialog( &UserConfigParams::m_all_players[n], 0.5f, 0.6f );
+                }
                 return;
             }
         } // end for

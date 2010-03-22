@@ -326,6 +326,7 @@ UserConfig::UserConfig()
     if(!loadConfig() || UserConfigParams::m_all_players.size() == 0)
     {
         addDefaultPlayer();
+        saveConfig();
     }
 }   // UserConfig
 
