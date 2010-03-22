@@ -186,7 +186,7 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *leader_node= root->getNode("follow-the-leader"))
         leader_node->get("intervals", &m_leader_intervals);
 
-    if(const XMLNode *music_node = root->getNode("grand-prix"))
+    if(const XMLNode *music_node = root->getNode("music"))
     {
         std::string title_music;
         music_node->get("title", &title_music);

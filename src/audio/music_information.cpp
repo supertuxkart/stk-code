@@ -99,6 +99,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
                 throw std::runtime_error("Incomplete or corrupt music XML file");
                 return;
             }
+            assert(m_normal_filename.size() > 0);
         }
         else if (node->getName() == "gain")
         {
@@ -153,6 +154,7 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
     m_normal_filename = path + "/" + m_normal_filename;
+    std::cout << "m_normal_filename=<" << m_normal_filename.c_str() << ">\n";
 
     // Get the path from the filename and add it to the ogg filename
     if (m_fast_filename != "")
@@ -179,13 +181,16 @@ void MusicInformation::startMusic()
     m_time_since_faster  = 0.0f;
     m_mode               = SOUND_NORMAL;
 
+    std::cout << "startMusic : m_normal_filename=<" << m_normal_filename.c_str() << ">\n";
+
+    
     if (m_normal_filename== "") return;
 
     // First load the 'normal' music
     // -----------------------------
-    if(StringUtils::getExtension(m_normal_filename)!="ogg")
+    if (StringUtils::getExtension(m_normal_filename) != "ogg")
     {
-        fprintf(stderr, "WARNING: music file %s format not recognized.\n", 
+        fprintf(stderr, "WARNING: music file %s is not found or file format is not recognized.\n", 
                 m_normal_filename.c_str());
         return;
     }
