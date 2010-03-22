@@ -55,7 +55,6 @@ protected:
     UserPointer            m_user_pointer;
     scene::IMesh          *m_mesh;
     scene::ISceneNode     *m_node;
-    int                    m_first_time ;
     btRigidBody           *m_body;
     KartMotionState       *m_motion_state;
 

@@ -30,7 +30,6 @@ Moveable::Moveable()
 {
     m_body            = 0;
     m_motion_state    = 0;
-    m_first_time      = true;
     m_mesh            = NULL;
     m_node            = NULL;
 }   // Moveable
@@ -109,7 +108,6 @@ void Moveable::update(float dt)
     m_roll        = atan2(up.getX(), up.getY());
 
     updateGraphics(Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
-    m_first_time = false ;
 }   // update
 
 //-----------------------------------------------------------------------------
