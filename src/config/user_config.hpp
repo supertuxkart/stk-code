@@ -38,7 +38,7 @@
       cause an undefined game action now
    6: Added stick configurations.
 */
-const int CURRENT_CONFIG_VERSION = 7;
+const int CURRENT_CONFIG_VERSION = 8;
 
 #include <string>
 #include <map>

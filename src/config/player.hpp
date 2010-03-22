@@ -30,25 +30,30 @@
   */
 class PlayerProfile
 {
-private:
+protected:
     
     /** For saving to config file. */
     GroupUserConfigParam  m_player_group;
     
     StringUserConfigParam m_name;
     
+    BoolUserConfigParam   m_is_guest_account;
+    
 public:
     
     PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
-                                      m_name(name, "name", &m_player_group) //, m_last_kart_id(-1)
+                                      m_name(name, "name", &m_player_group), //, m_last_kart_id(-1)
+                                      m_is_guest_account(false, "guest", &m_player_group)
     {
     }
     
     
-    void setName(const std::string &name_){ m_name = name_;}
+    void setName(const std::string &name_){ m_name = name_;  }
 
-    const char* getName() const { return m_name.c_str(); }
+    const char* getName() const { return m_name.c_str();     }
 
+    bool isGuestAccount() const { return m_is_guest_account; }
+    
     //int getLastKartId(){ return m_last_kart_id; }
     //void setLastKartId(int newLastKartId){ m_last_kart_id = newLastKartId; }
 };

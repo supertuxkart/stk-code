@@ -347,6 +347,19 @@ void UserConfig::addDefaultPlayer()
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
 
+    
+    class GuestPlayerProfile : public PlayerProfile
+    {
+    public:
+        GuestPlayerProfile() : PlayerProfile("Guest")
+        {
+            m_is_guest_account = true;
+        }
+    };
+    
+    // add default guest player
+    UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
+
     // Set the name as the default name for all players.
     UserConfigParams::m_all_players.push_back( new PlayerProfile(username.c_str()) );
 

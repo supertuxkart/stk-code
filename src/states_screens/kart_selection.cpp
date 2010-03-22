@@ -1053,10 +1053,13 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if (n == playerID) continue; // don't check a kart against itself
             
-            if (m_kart_widgets[n].isReady() &&
-                (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                 m_kart_widgets[playerID].getAssociatedPlayer()->getProfile() ||
-                 sameKart(m_kart_widgets[n], m_kart_widgets[playerID])))
+            const bool player_ready   = m_kart_widgets[n].isReady();
+            const bool ident_conflict = !m_kart_widgets[n].getAssociatedPlayer()->getProfile()->isGuestAccount() &&
+                                        m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                                        m_kart_widgets[playerID].getAssociatedPlayer()->getProfile();
+            const bool kart_conflict  = sameKart(m_kart_widgets[n], m_kart_widgets[playerID]);
+            
+            if (player_ready && (ident_conflict || kart_conflict))
             {
                 printf("\n***\n*** You can't select this identity or kart, someone already took it!! ***\n***\n\n");
                 
@@ -1225,12 +1228,22 @@ bool KartSelectionScreen::validateIdentChoices()
         }
     }
     
+    // perform actual checking
     for (int n=0; n<amount; n++)
     {        
+        // skip players that took a guest account, they can be many on the same identity in this case
+        if (m_kart_widgets[n].getAssociatedPlayer()->getProfile()->isGuestAccount())
+        {
+            continue;
+        }
+
+        // check if another kart took the same identity as the current one
         for (int m=n+1; m<amount; m++)
         {            
+                
             // check if 2 players took the same name
-            if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() == m_kart_widgets[m].getAssociatedPlayer()->getProfile())
+            if (m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                m_kart_widgets[m].getAssociatedPlayer()->getProfile())
             {
                 printf("\n***\n*** Identity conflict!! ***\n***\n\n");
                 std::cout << " Player " << n << " chose " << m_kart_widgets[n].getAssociatedPlayer()->getProfile()->getName() << std::endl;
