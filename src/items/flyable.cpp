@@ -280,22 +280,22 @@ void Flyable::update(float dt)
 
     if(m_exploded) return;
 
-    Vec3 pos=getBody()->getWorldTransform().getOrigin();
-    TerrainInfo::update(pos);
-
+    Vec3 xyz=getBody()->getWorldTransform().getOrigin();
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
     World::getWorld()->getTrack()->getAABB(&min, &max);
-    Vec3 xyz = getXYZ();
     if(xyz[0]<(*min)[0] || xyz[2]<(*min)[2] || xyz[1]<(*min)[1] ||
        xyz[0]>(*max)[0] || xyz[2]>(*max)[2]                         )
     {
         hit(NULL);    // flyable out of track boundary
         return;
     }
+
+    TerrainInfo::update(xyz);
+
     if(m_adjust_up_velocity)
     {
-        float hat = pos.getY()-getHoT();
+        float hat = xyz.getY()-getHoT();
 
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat
