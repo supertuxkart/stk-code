@@ -89,8 +89,8 @@ void WaterSplash::update(float t)
 
     // FIXME: the X position is not yet always accurate.
     m_node->setPosition(core::vector3df(c.getX()+ m_particle_size*0.25f * (left?+1:-1),
-                                        c.getZ()+m_particle_size*0.25f,
-                                        c.getY()));
+                                        c.getY(),
+                                        c.getZ()+m_particle_size*0.25f));
 
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.

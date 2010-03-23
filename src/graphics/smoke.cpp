@@ -78,16 +78,16 @@ void Smoke::update(float t)
     Vec3 c=wi.m_raycastInfo.m_contactPointWS;
 
     // FIXME: the X position is not yet always accurate.
-    m_node->setPosition(core::vector3df(c.getX()+ m_particle_size*0.25f * (left?+1:-1),
-                                        c.getZ()+m_particle_size*0.25f,
-                                        c.getY()));
+    m_node->setPosition(core::vector3df(c.getX()+m_particle_size*0.25f * (left?+1:-1),
+                                        c.getY(),
+                                        c.getZ()+m_particle_size*0.25f));
 
     // There seems to be no way to randomise the velocity for particles,
     // so we have to do this manually, by changing the default velocity.
     // Irrlicht expects velocity (called 'direction') in m/ms!!
     Vec3 dir(cos(DEGREE_TO_RAD*(rand()%180))*0.002f,
-             sin(DEGREE_TO_RAD*(rand()%180))*0.002f,
-             sin(DEGREE_TO_RAD*(rand()%100))*0.002f);
+             sin(DEGREE_TO_RAD*(rand()%100))*0.002f,
+             sin(DEGREE_TO_RAD*(rand()%180))*0.002f);
     m_emitter->setDirection(dir.toIrrVector());
 }   // update
 
