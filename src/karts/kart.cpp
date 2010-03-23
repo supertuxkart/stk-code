@@ -773,8 +773,9 @@ void Kart::update(float dt)
     if (getHoT()==Track::NOHIT)   // kart falling off the track
     {
         // let kart fall a bit before rescuing
-        if(fabs( getXYZ().getZ()
-	        -World::getWorld()->getTrack()->getQuadGraph().getQuad(0).getCenter().getZ() ) > 17)
+        const Vec3 *min, *max;
+        World::getWorld()->getTrack()->getAABB(&min, &max);
+        if(min->getY() - getXYZ().getY() > 17)
             forceRescue();
     }
     else if(material)
