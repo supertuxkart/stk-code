@@ -89,6 +89,10 @@ void Moveable::reset()
 
     Coord c(m_transform);
     m_hpr.setHPR(m_transform.getRotation());
+    Vec3 up       = getTrans().getBasis().getColumn(1);
+    m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
+    m_roll        = atan2(up.getX(), up.getY());
+
 }   // reset
 
 //-----------------------------------------------------------------------------
