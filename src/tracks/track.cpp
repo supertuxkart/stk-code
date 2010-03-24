@@ -417,7 +417,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 track_node->getName().c_str(), model_name.c_str());
         exit(-1);
     }
-
+    
     m_all_meshes.push_back(mesh);
     //scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
     scene::ISceneNode *scene_node = irr_driver->addOctTree(mesh);
@@ -471,7 +471,6 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_meshes.size(); i++)
-    //for(unsigned int i=0; i<1; i++)
     {
         convertTrackToBullet(m_all_meshes[i], m_all_nodes[i]);
     }
@@ -666,31 +665,6 @@ void Track::loadTrackModel(unsigned int mode_id)
         {
             createWater(*node);
         }
-        else if(name=="model")
-        {
-            std::string model_name;
-            node->get("model", &model_name);
-            std::string full_path = m_root+"/"+model_name;
-            scene::IMesh *mesh = irr_driver->getAnimatedMesh(full_path);
-            if(!mesh)
-            {
-                fprintf(stderr, "Warning: model '%s' in '%s' not found, aborting.\n",
-                    node->getName().c_str(), model_name.c_str());
-                exit(-1);
-            }
-            mesh->setHardwareMappingHint(scene::EHM_STATIC);
-            m_all_meshes.push_back(mesh);
-            scene::ISceneNode *scene_node = irr_driver->addMesh(mesh);
-            core::vector3df xyz(0,0,0);
-            node->getXYZ(&xyz);
-            core::vector3df hpr(0,0,0);
-            node->getHPR(&hpr);
-            scene_node->setPosition(xyz);
-            scene_node->setRotation(hpr);
-            handleAnimatedTextures(scene_node, *node);
-            m_all_nodes.push_back(scene_node);
-            scene_node->setMaterialFlag(video::EMF_LIGHTING, true);
-        }
         else if(name=="banana"      || name=="item" || 
                 name=="small-nitro" || name=="big-nitro")
         {
@@ -800,7 +774,7 @@ void Track::loadTrackModel(unsigned int mode_id)
                                                                m_sun_diffuse_color);
     m_sun->setLightType(video::ELT_DIRECTIONAL);
     m_sun->setRotation( core::vector3df(180, 45, 45) ); // TODO: make sun orientation configurable (calculate from m_sun_position)
-    
+
     // We should NOT give the sun an ambient color, we already have a scene-wide ambient color.
     // No need for two ambient colors.
     //m_sun->getLightData().AmbientColor  = m_sun_ambient_color;
@@ -822,9 +796,13 @@ void Track::loadTrackModel(unsigned int mode_id)
         irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
     }
     
-    // Note: the physics world for irrlicht is created in loadMainTrack
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
+
+    // Enable for for all track nodes if fog is used
+    if(m_use_fog)
+        for(unsigned int i=0; i<m_all_nodes.size(); i++)
+            m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
