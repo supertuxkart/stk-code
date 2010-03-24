@@ -2,6 +2,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//                2010 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,6 +63,7 @@ Material::Material(const XMLNode *node, int index)
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown",         &m_slowdown          );
     node->get("anisotropic",      &m_anisotropic       );
+    node->get("backface-culling", &m_backface_culling  );
     std::string s("");
     node->get("graphical-effect", &s                   );
     if(s=="water")
@@ -105,6 +107,7 @@ void Material::init(unsigned int index)
     m_alpha_blending     = false;
     m_lighting           = true;
     m_anisotropic        = false;
+    m_backface_culling   = true;
     m_sphere_map         = false;
     m_friction           = 1.0f;
     m_ignore             = false;
@@ -199,5 +202,8 @@ void  Material::setMaterialProperties(video::SMaterial *m) const
     }
 
 #endif
-    // FIXME: more parameters need to be set!
+
+    if(!m_backface_culling)
+        m->setFlag(video::EMF_BACK_FACE_CULLING, false);
+
 }   // setMaterialProperties

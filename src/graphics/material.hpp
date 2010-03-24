@@ -46,6 +46,9 @@ private:
     bool             m_sphere_map;
     bool             m_alpha_testing;
     bool             m_alpha_blending;
+
+    /** True if backface culliing should be enabled. */
+    bool             m_backface_culling;
      
     /** Whether to use anisotropic filtering for this texture */
     bool             m_anisotropic;
