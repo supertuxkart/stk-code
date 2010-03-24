@@ -156,7 +156,11 @@ void RaceManager::setTrack(const std::string& track)
 void RaceManager::computeRandomKartList()
 {
     int n = m_num_karts - m_player_karts.size();
-    std::cout << "AI karts count = " << n << " for m_num_karts=" << m_num_karts << " and m_player_karts.size()=" << m_player_karts.size() << std::endl;
+    if(UserConfigParams::m_verbosity>=5)
+        std::cout << "AI karts count = " << n << " for m_num_karts=" 
+                  << m_num_karts << " and m_player_karts.size()=" 
+                  << m_player_karts.size() << std::endl;
+
     // If less kart selected than there are player karts, adjust the number of
     // karts to the minimum
     if(n<0)
@@ -398,7 +402,10 @@ void RaceManager::exitRace()
         std::string winners[3];
         for (unsigned int i=0; i < m_kart_status.size(); ++i)
         {
-            std::cout << m_kart_status[i].m_ident << " has GP final rank " << m_kart_status[i].m_gp_rank << std::endl;
+            if(UserConfigParams::m_verbosity>=5)
+                std::cout << m_kart_status[i].m_ident << " has GP final rank "
+                          << m_kart_status[i].m_gp_rank << std::endl;
+
             const int rank = m_kart_status[i].m_gp_rank;
             if (rank >= 0 && rank < 3)
             {

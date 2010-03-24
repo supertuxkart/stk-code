@@ -32,16 +32,20 @@ bool DeviceManager::initialize()
     // Shutdown in case the device manager is being re-initialized
     shutdown();
 
-    printf("Initializing Device Manager\n");
-    printf("---------------------------\n");
+    if(UserConfigParams::m_verbosity>=5)
+    {
+        printf("Initializing Device Manager\n");
+        printf("---------------------------\n");
+    }
 
     deserialize();
 
     // Assign a configuration to the keyboard, or create one if we haven't yet
-    printf("Initializing keyboard support.\n");
+    if(UserConfigParams::m_verbosity>=5) printf("Initializing keyboard support.\n");
     if (m_keyboard_configs.size() == 0)
     {
-        printf("No keyboard configuration exists, creating one.\n");
+        if(UserConfigParams::m_verbosity>=5) 
+            printf("No keyboard configuration exists, creating one.\n");
         m_keyboard_configs.push_back(new KeyboardConfig());
         created = true;
     }
@@ -54,25 +58,36 @@ bool DeviceManager::initialize()
         m_keyboard_configs.get(n)->setInUse(n == 0);
     }
     
-    printf("Initializing gamepad support.\n");
+        if(UserConfigParams::m_verbosity>=5) 
+            printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     numGamepads = m_irrlicht_gamepads.size();    
-    printf("Irrlicht reports %d gamepads are attached to the system.\n", numGamepads);
+    if(UserConfigParams::m_verbosity>=4)
+    {
+        printf("Irrlicht reports %d gamepads are attached to the system.\n", 
+               numGamepads);
+    }
 
     // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
     for (int id = 0; id < numGamepads; id++)
     {
-        printf("#%d: %s detected...", id, m_irrlicht_gamepads[id].Name.c_str());
+        if(UserConfigParams::m_verbosity>=4)
+        {
+            printf("#%d: %s detected...", id, 
+                   m_irrlicht_gamepads[id].Name.c_str());
+        }
         // Returns true if new configuration was created
         if (getConfigForGamepad(id, &gamepadConfig) == true)
         {
-            printf("creating new configuration.\n");
+            if(UserConfigParams::m_verbosity>=4) 
+                printf("creating new configuration.\n");
             created = true;
         }
         else
         {
-            printf("using existing configuration.\n");
+            if(UserConfigParams::m_verbosity>=4)
+                printf("using existing configuration.\n");
         }
 
         gamepadConfig->setInUse(true);
@@ -303,11 +318,13 @@ bool DeviceManager::deserialize()
 {
     static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
     
-    printf("Deserializing input.xml...\n");
+    if(UserConfigParams::m_verbosity>=5)
+        printf("Deserializing input.xml...\n");
 
     if(!file_manager->fileExists(filepath))
     {
-        printf("Warning: no configuration file exists.\n");
+        if(UserConfigParams::m_verbosity>=4)
+            printf("Warning: no configuration file exists.\n");
     }
     else
     {
@@ -381,8 +398,11 @@ bool DeviceManager::deserialize()
                 
             } // end switch
         } // end while
-
-        printf("Found %d keyboard and %d gamepad configurations.\n", m_keyboard_configs.size(), m_gamepad_configs.size());
+        if(UserConfigParams::m_verbosity>=4)
+        {
+            printf("Found %d keyboard and %d gamepad configurations.\n", 
+                   m_keyboard_configs.size(), m_gamepad_configs.size());
+        }
         // For Debugging....
         /*
         for (int n = 0; n < m_keyboard_configs.size(); n++)
@@ -399,7 +419,7 @@ bool DeviceManager::deserialize()
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getConfigDir() + "/" + INPUT_FILE_NAME;
-    printf("Serializing input.xml...\n");
+    if(UserConfigParams::m_verbosity>=5) printf("Serializing input.xml...\n");
 
     
     std::ofstream configfile;
@@ -425,7 +445,7 @@ void DeviceManager::serialize()
     
     configfile << "</input>\n";
     configfile.close(); 
-    printf("Serialization complete.\n\n");
+    if(UserConfigParams::m_verbosity>=5) printf("Serialization complete.\n\n");
 }
                     
 // -----------------------------------------------------------------------------

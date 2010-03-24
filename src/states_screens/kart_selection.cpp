@@ -537,8 +537,12 @@ public:
         // update player profile when spinner changed
         if (originator == spinnerID)
         {
-            std::cout << "Identity changed for player " << m_playerID
-                      << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() << std::endl;
+            if(UserConfigParams::m_verbosity>=5)
+            {
+                std::cout << "Identity changed for player " << m_playerID
+                          << " : " << irr::core::stringc(playerName->getStringValue().c_str()).c_str() 
+                          << std::endl;
+            }
             m_associatedPlayer->setPlayerProfile( UserConfigParams::m_all_players.get(playerName->getValue()) );
         }
 
@@ -811,7 +815,7 @@ void KartSelectionScreen::forgetWhatWasLoaded()
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
-    std::cout << "playerJoin() ==========\n";
+    if(UserConfigParams::m_verbosity>=5) std::cout << "playerJoin() ==========\n";
 
     if (g_dispatcher == NULL)
     {
@@ -928,7 +932,8 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
         std::cout << "void playerQuit(ActivePlayer* player) : cannot find passed player\n";
         return false;
     }
-    std::cout << "playerQuit( " << playerID << " )\n";
+    if(UserConfigParams::m_verbosity>=5)
+        std::cout << "playerQuit( " << playerID << " )\n";
 
     // Just a cheap way to check if there is any discrepancy 
     // between g_player_karts and the active player array
@@ -1131,13 +1136,16 @@ void KartSelectionScreen::allPlayersDone()
     const ptr_vector< StateManager::ActivePlayer, HOLD >& players = StateManager::get()->getActivePlayers();
     
     // ---- Print selection (for debugging purposes)
-    std::cout << "==========\n" << players.size() << " players :\n";
-    for (int n=0; n<players.size(); n++)
+    if(UserConfigParams::m_verbosity>=4)
     {
-        std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
-        << " on " << players[n].getDevice()->m_name << std::endl;
+        std::cout << "==========\n" << players.size() << " players :\n";
+        for (int n=0; n<players.size(); n++)
+        {
+            std::cout << "     Player " << n << " is " << players[n].getConstProfile()->getName()
+                << " on " << players[n].getDevice()->m_name << std::endl;
+        }
+        std::cout << "==========\n";
     }
-    std::cout << "==========\n";
     
     // ---- Give player info to race manager
     race_manager->setNumPlayers( players.size() );
@@ -1413,7 +1421,8 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 // FIXME : clean this mess, this file should not contain so many classes spread all over the place
 EventPropagation FocusDispatcher::focused(const int playerID)
 { 
-    std::cout << "FocusDispatcher focused by player " << playerID << std::endl;
+    if(UserConfigParams::m_verbosity>=5)
+        std::cout << "FocusDispatcher focused by player " << playerID << std::endl;
     
     // since this screen is multiplayer, redirect focus to the right widget
     const int amount = m_parent->m_kart_widgets.size();

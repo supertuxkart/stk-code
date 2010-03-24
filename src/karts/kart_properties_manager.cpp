@@ -149,14 +149,12 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 
 //-----------------------------------------------------------------------------
 const int KartPropertiesManager::getKartId(const std::string &ident) const
-{
-    //std::cout << "======\n";
-    //std::cout << "Searching for kart " << ident.c_str() << std::endl;
-    
+{    
     for(KartPropertiesVector::const_iterator i  = m_karts_properties.begin();
         i != m_karts_properties.end(); ++i)
     {
-        std::cout << " -- " << (*i)->getIdent().c_str() << std::endl;
+        if(UserConfigParams::m_verbosity>=5)
+            std::cout << " -- " << (*i)->getIdent().c_str() << std::endl;
         if ((*i)->getIdent() == ident)
             return i-m_karts_properties.begin();
     }

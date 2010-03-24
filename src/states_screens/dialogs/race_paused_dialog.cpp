@@ -145,7 +145,6 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_children.push_back(m_choice_ribbon);
     m_choice_ribbon->add();   
 }
-
 // ------------------------------------------------------------------------------------------------------
 
 void RacePausedDialog::onEnterPressedInternal()
@@ -156,7 +155,9 @@ void RacePausedDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& eventSource)
 {
-    std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str() << ")\n";
+    if(UserConfigParams::m_verbosity>=5)
+       std::cout << "RacePausedDialog::processEvent(" 
+                 << eventSource.c_str() << ")\n";
     
     if (eventSource == "backbtn")
     {
@@ -168,8 +169,9 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& ev
     {
         const std::string& selection = m_choice_ribbon->getSelectionIDString(GUI_PLAYER_ID);
         
-        std::cout << "RacePausedDialog::processEvent(" << eventSource.c_str()
-                  << " : " << selection << ")\n";
+        if(UserConfigParams::m_verbosity>=5)
+            std::cout << "RacePausedDialog::processEvent(" 
+                      << eventSource.c_str() << " : " << selection << ")\n";
 
         if (selection == "exit")
         {

@@ -229,11 +229,20 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "renderer", &m_video_group,
                                                "Type of the renderer.") );
 
-    // ---- Debug
-    PARAM_PREFIX BoolUserConfigParam        m_gamepad_debug     PARAM_DEFAULT( BoolUserConfigParam(false, "gamepad_debug") );
-    PARAM_PREFIX IntUserConfigParam         m_track_debug       PARAM_DEFAULT( IntUserConfigParam(false, "track_debug") );
+    // ---- Debug - not saved to config file
+    // If gamepad debugging is enabled.
+    PARAM_PREFIX bool                       m_gamepad_debug     PARAM_DEFAULT( false );
+
+    // If track debugging is enabled
+    PARAM_PREFIX int                        m_track_debug       PARAM_DEFAULT( false );
+
+    // If the kart sizes should be printed at startup
     PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
     
+    /** Verbosity level for debug messages. Note that error and important warnings
+     *  must always be printed. */
+    PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
+
     // ---- Networking
     PARAM_PREFIX StringUserConfigParam      m_server_address
             PARAM_DEFAULT(  StringUserConfigParam("localhost", "server_adress", "Information about last server used") );
@@ -259,7 +268,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "log_errors", "Enable logging of stdout and stderr to logfile") );
     
     PARAM_PREFIX IntUserConfigParam         m_reverse_look_threshold
-            PARAM_DEFAULT(  IntUserConfigParam(9, "reverse_look_threshold") );
+            PARAM_DEFAULT(  IntUserConfigParam(0, "reverse_look_threshold", 
+            "If the kart is driving backwards faster than this value,\n"
+            "switch automatically to reverse camera (set to 0 to disable).") );
     
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );

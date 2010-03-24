@@ -79,7 +79,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (w2 != NULL)
         {
             const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
-            std::cout << "Clicked on track " << selection.c_str() << std::endl;
+            if(UserConfigParams::m_verbosity>=5)
+                std::cout << "Clicked on track " << selection.c_str() 
+                          << std::endl;
             
             if (selection == "random_track")
             {

@@ -35,39 +35,37 @@ DEFINE_SCREEN_SINGLETON( ArenasScreen );
 
 ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
-}
+}   // ArenasScreen
 
 // ------------------------------------------------------------------------------------------------------
 
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "tracks")
+    if(name!="tracks") return;
+
+    DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
+    if(w2==NULL) return;
+
+    const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
+    if(UserConfigParams::m_verbosity>=5)
+        std::cout << "Clicked on arena " << selection.c_str() << std::endl;
+
+    if (selection == "random_track")
     {
-        DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if (w2 != NULL)
-        {
-            const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
-            std::cout << "Clicked on arena " << selection.c_str() << std::endl;
-            
-            if (selection == "random_track")
-            {
-                // TODO
-            }
-            else
-            {
-                Track* clickedTrack = track_manager->getTrack(selection);
-                if (clickedTrack != NULL)
-                {
-                    ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-                    
-                    new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
-                                         screenshot, 0.8f, 0.7f);
-                }
-            }
-        }
+        // TODO
     }
-    
-}
+    else
+    {
+        Track* clickedTrack = track_manager->getTrack(selection);
+        if (clickedTrack != NULL)
+        {
+            ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
+
+            new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                screenshot, 0.8f, 0.7f);
+        }   // clickedTrack !=  NULL
+    }   // if random_track
+}   // eventCallback
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -104,13 +102,13 @@ void ArenasScreen::init()
     
     // FIXME: don't hardcode player 0?
     w->setSelection(w->getItems()[0].m_code_name, 0, true); 
-}
+}   // init
 
 // ------------------------------------------------------------------------------------------------------
 
 void ArenasScreen::tearDown()
 {
-}
+}   // tearDown
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -121,7 +119,7 @@ void ArenasScreen::setFocusOnTrack(const std::string& trackName)
     
     // FIXME: don't hardcode player 0?
     w->setSelection(trackName, 0, true); 
-}
+}   // setFOxuOnTrack
 
 // ------------------------------------------------------------------------------------------------------
 

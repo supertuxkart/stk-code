@@ -432,9 +432,14 @@ int handleCmdLine(int argc, char **argv)
         }
         else if( !strcmp(argv[i], "--profile") )
         {
-                printf("Profiling: %d seconds.\n", n);
-                ProfileWorld::setProfileModeTime(20);
-                race_manager->setNumLaps(999999); // profile end depends on time
+            printf("Profiling: %d seconds.\n", n);
+            ProfileWorld::setProfileModeTime(20);
+            race_manager->setNumLaps(999999); // profile end depends on time
+        }
+        else if ( !strcmp(argv[i], "-v") && i+1<argc )
+        {
+            UserConfigParams::m_verbosity = atoi(argv[i+1]);
+            i++;
         }
         else if( sscanf(argv[i], "--history=%d",  &n)==1)
         {
