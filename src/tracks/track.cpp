@@ -787,15 +787,17 @@ void Track::loadTrackModel(unsigned int mode_id)
     video::SLight light;
     // HACK & TEST: checking how ambient looks for some things, must be properly done once we reach an agreement
     light.AmbientColor = irr::video::SColorf(0.666666f, 0.666666f, 0.666666f, 0.0f);
+    light.AmbientColor = irr::video::SColorf(0.5f, 0.666666f, 0.75f, 0.0f);
     m_light->setLightData(light);
      */
 
     // ---- Fog
     if (m_use_fog)
     {
+        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start and end do not matter */
         irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
     }
-    
+
     createPhysicsModel(main_track_count);
     if (UserConfigParams::m_track_debug) m_quad_graph->createDebugMesh();
 
