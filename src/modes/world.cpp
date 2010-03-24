@@ -175,7 +175,6 @@ Kart *World::createKart(const std::string &kart_ident, int index,
     switch(race_manager->getKartType(index))
     {
     case RaceManager::KT_PLAYER:
-        std::cout << "===== World : creating player controller for kart #" << index << " which has local_player_id " << local_player_id << " ===========\n";
         controller = new PlayerController(new_kart, 
                                           StateManager::get()->getActivePlayer(local_player_id),
                                           local_player_id);
@@ -188,8 +187,6 @@ Kart *World::createKart(const std::string &kart_ident, int index,
         //m_num_players++;
         //break;
     case RaceManager::KT_AI:
-        std::cout << "===== World : creating AI controller for #" << index << "===========\n";
-
         controller = loadAIController(new_kart);
         break;
     case RaceManager::KT_GHOST:
