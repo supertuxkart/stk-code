@@ -66,8 +66,13 @@ public:
     void                    setMasterMusicVolume(float gain);
     float                   getMasterMusicVolume() const { return m_masterGain; }
     
-    MusicInformation       *getCurrentMusic() {return m_current_music; }    
-    MusicInformation       *getMusicInformation(const std::string& filename) throw (std::runtime_error);
+    MusicInformation       *getCurrentMusic() {return m_current_music; }   
+    
+    /**
+      * @throw runtime_error if the music file could not be found/opened
+      */ 
+    MusicInformation       *getMusicInformation(const std::string& filename);
+    
     void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 
