@@ -55,9 +55,9 @@ SFXManager::SFXManager()
     // The sound manager initialises OpenAL
     m_initialized = sound_manager->initialized();
     m_master_gain = 1.0f;
-    if (!m_initialized) return;
     
     loadSfx();
+    if (!sfxAllowed()) return;
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     
 }  // SoundManager
@@ -321,21 +321,22 @@ void SFXManager::loadSingleSfx(const XMLNode* node)
     if(UserConfigParams::m_verbosity>=5) 
         printf("Loading SFX %s\n", path.c_str());
 
-    alGenBuffers(1, &sfxInfo.m_sfx_buffer);
-    if (!checkError("generating a buffer")) return;
-
-    assert( alIsBuffer(sfxInfo.m_sfx_buffer) );
-
-    if (!loadVorbisBuffer(path.c_str(), sfxInfo.m_sfx_buffer))
+    // Only try loading if the sound manager was properly initialised.
+    if(m_initialized)
     {
-        fprintf(stderr, "Could not load sound effect %s\n", path.c_str());
-        return;
-    }
-    
+        alGenBuffers(1, &sfxInfo.m_sfx_buffer);
+        if (!checkError("generating a buffer")) return;
+
+        assert( alIsBuffer(sfxInfo.m_sfx_buffer) );
+
+        if (!loadVorbisBuffer(path.c_str(), sfxInfo.m_sfx_buffer))
+        {
+            fprintf(stderr, "Could not load sound effect %s\n", path.c_str());
+            return;
+        }
+    }   // if m_initialized
     m_all_sfx_types[sfx_name.c_str()] = sfxInfo;
     
-    assert( alIsBuffer(m_all_sfx_types[sfx_name.c_str()].m_sfx_buffer) );
-
     /*
     std::map<std::string, SFXBufferInfo>::iterator i = m_all_sfx_types.begin();
     for (; i != m_all_sfx_types.end(); i++ )

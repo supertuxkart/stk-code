@@ -42,31 +42,37 @@ SFXOpenAL::SFXOpenAL(ALuint buffer, bool positional, float rolloff, float gain) 
     m_positional  = false;
     m_defaultGain = gain;
 
-    alGenSources(1, &m_soundSource );
-    if (!SFXManager::checkError("generating a source")) return;
+    // Don't initialise anything else if the sfx manager was not correctly
+    // initialised. First of all the initialisation will not work, and it
+    // will not be used anyway.
+    if(sfx_manager->sfxAllowed())
+    {
+        alGenSources(1, &m_soundSource );
+        if (!SFXManager::checkError("generating a source")) return;
 
-    assert( alIsBuffer(m_soundBuffer) );
-    assert( alIsSource(m_soundSource) );
+        assert( alIsBuffer(m_soundBuffer) );
+        assert( alIsSource(m_soundSource) );
 
-    //std::cout << "Setting a source with buffer " << m_soundBuffer << ", rolloff " << rolloff
-    //          << ", gain=" << m_defaultGain << ", positional=" << (positional ? "true" : "false") << std::endl;
+        //std::cout << "Setting a source with buffer " << m_soundBuffer << ", rolloff " << rolloff
+        //          << ", gain=" << m_defaultGain << ", positional=" << (positional ? "true" : "false") << std::endl;
+
+        alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
+
+        if (!SFXManager::checkError("attaching the buffer to the source")) return;
     
-    alSourcei (m_soundSource, AL_BUFFER,          m_soundBuffer);
-    
-    if (!SFXManager::checkError("attaching the buffer to the source")) return;
-    
-    alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
-    alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
-    alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff      );
-    alSourcef (m_soundSource, AL_GAIN,            m_defaultGain);
+        alSource3f(m_soundSource, AL_POSITION,        0.0, 0.0, 0.0);
+        alSource3f(m_soundSource, AL_VELOCITY,        0.0, 0.0, 0.0);
+        alSource3f(m_soundSource, AL_DIRECTION,       0.0, 0.0, 0.0);
+        alSourcef (m_soundSource, AL_ROLLOFF_FACTOR,  rolloff      );
+        alSourcef (m_soundSource, AL_GAIN,            m_defaultGain);
     
 
-    if (positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
-    else            alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
+        if (positional) alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_FALSE);
+        else            alSourcei (m_soundSource, AL_SOURCE_RELATIVE, AL_TRUE);
 
-    m_positional = positional;
-    m_ok = SFXManager::checkError("setting up the source");
+        m_positional = positional;
+        m_ok = SFXManager::checkError("setting up the source");
+    }
 }   // SFXOpenAL
 
 //-----------------------------------------------------------------------------
@@ -81,7 +87,7 @@ SFXOpenAL::~SFXOpenAL()
  */
 void SFXOpenAL::speed(float factor)
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+    if(!m_ok) return;
 
     //OpenAL only accepts pitches in the range of 0.5 to 2.0
     if(factor > 2.0f)
@@ -124,7 +130,7 @@ void SFXOpenAL::loop()
  */
 void SFXOpenAL::stop()
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+    if(!m_ok) return;
 
     alSourcei(m_soundSource, AL_LOOPING, AL_FALSE);
     alSourceStop(m_soundSource);
@@ -137,6 +143,7 @@ void SFXOpenAL::stop()
  */
 void SFXOpenAL::pause()
 {
+    if(!m_ok) return;
     alSourcePause(m_soundSource);
     SFXManager::checkError("pausing");
 }   // pause
@@ -146,7 +153,7 @@ void SFXOpenAL::pause()
  */
 void SFXOpenAL::resume()
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+    if(!m_ok) return;
 
     alSourcePlay(m_soundSource);
     SFXManager::checkError("resuming");
@@ -157,7 +164,7 @@ void SFXOpenAL::resume()
  */
 void SFXOpenAL::play()
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return;
+    if(!m_ok) return;
 
     alSourcePlay(m_soundSource);
     SFXManager::checkError("playing");
@@ -169,7 +176,7 @@ void SFXOpenAL::play()
  */
 void SFXOpenAL::position(const Vec3 &position)
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok||!m_positional) return;
+    if(!m_ok||!m_positional) return;
 
     alSource3f(m_soundSource, AL_POSITION,
                (float)position.getX(), (float)position.getY(), (float)position.getZ());
@@ -181,7 +188,7 @@ void SFXOpenAL::position(const Vec3 &position)
  */
 SFXManager::SFXStatus SFXOpenAL::getStatus()
 {
-    if(!sfx_manager->sfxAllowed()||!m_ok) return SFXManager::SFX_UNKNOWN;
+    if(!m_ok) return SFXManager::SFX_UNKNOWN;
 
     int state = 0;
     alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
