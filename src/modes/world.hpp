@@ -179,7 +179,7 @@ public:
     float           getFastestLapTime()         const { return m_fastest_lap;               }
     void            setFastestLap(Kart *k, float time){ m_fastest_kart = k;
                                                         m_fastest_lap  = time;              }
-    HighscoreEntry *getHighscores() const;
+    Highscores *getHighscores() const;
 
     virtual void terminateRace();
     

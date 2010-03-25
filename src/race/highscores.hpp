@@ -22,15 +22,17 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <fstream>
 
-#include "lisp/lisp.hpp"
-#include "lisp/writer.hpp"
 #include "race/race_manager.hpp"
 
+class XMLNode;
+
 /**
-  * Represents one highscore entry.
-  */
-class HighscoreEntry
+ *  Represents one highscore entry, i.e. the (atm up to three) highscores
+ *  for a particular setting (track, #karts, difficulty etc).
+ */
+class Highscores
 {
 public:
     typedef std::string HighscoreType;
@@ -48,15 +50,15 @@ private:
 public:
     /** Creates a new entry
       */
-    HighscoreEntry (const HighscoreEntry::HighscoreType highscore_type,
-                    int num_karts, const RaceManager::Difficulty difficulty, 
-                    const std::string trackName, const int number_of_laps);
+    Highscores (const Highscores::HighscoreType highscore_type,
+                int num_karts, const RaceManager::Difficulty difficulty, 
+                const std::string trackName, const int number_of_laps);
     /** Creates an entry from a file
      */
-    HighscoreEntry (const lisp::Lisp* const node);
+    Highscores (const XMLNode &node);
     
-    void Read      (const lisp::Lisp* const node);
-    void Write     (lisp::Writer* writer);
+    void readEntry (const XMLNode &node);
+    void writeEntry(std::ofstream &writer);
     int  matches   (HighscoreType highscore_type, int num_karts,
                     const RaceManager::Difficulty difficulty, 
                     const std::string track, const int number_of_laps);
@@ -65,6 +67,6 @@ public:
     int  getNumberEntries() const;
     void getEntry  (int number, std::string &kart_name,
                     std::string &name, float *const time) const;
-};  // HighscoreEntry
+};  // Highscores
 
 #endif

@@ -25,9 +25,6 @@
 #include <map>
 
 #include "race/highscores.hpp"
-#include "lisp/lisp.hpp"
-
-const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;
 
 /**
   * This class reads and writes the 'highscores.data' file, and also takes
@@ -38,22 +35,25 @@ class HighscoreManager
 {
 public:
 private:
-    typedef std::vector<HighscoreEntry*> type_all_scores;
-    type_all_scores m_allScores;
+    static const unsigned int CURRENT_HSCORE_FILE_VERSION = 1;
+    typedef std::vector<Highscores*> type_all_scores;
+    type_all_scores m_all_scores;
     
     std::string m_filename;
     bool        m_can_write;
 
-    void Load();
-    void SetFilename();
+    void loadHighscores();
+    void setFilename();
 
 public:
-    HighscoreManager();
-    ~HighscoreManager();
-    void Save();
-    HighscoreEntry *getHighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
-                                      int num_karts, const RaceManager::Difficulty difficulty, 
-                                      const std::string trackName, const int number_of_laps);
+                HighscoreManager();
+               ~HighscoreManager();
+    void        saveHighscores();
+    Highscores *getHighscores(const Highscores::HighscoreType highscore_type,
+                              int num_karts, 
+                              const RaceManager::Difficulty difficulty, 
+                              const std::string trackName, 
+                              const int number_of_laps);
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

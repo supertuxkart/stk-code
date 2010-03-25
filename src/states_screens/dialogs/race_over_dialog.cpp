@@ -181,7 +181,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     // ---- Highscores
     if (show_highscores)
     {
-        const HighscoreEntry *hs = World::getWorld()->getHighscores();
+        const Highscores *hs = World::getWorld()->getHighscores();
         if (hs != NULL)
         {
             core::rect< s32 > hsarea(m_area.getWidth()*2/3, 0, m_area.getWidth(), text_height);

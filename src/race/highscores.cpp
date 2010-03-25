@@ -20,14 +20,17 @@
 #include "race/highscores.hpp"
 
 #include <stdexcept>
-#include <sstream>
+#include <fstream>
 
+#include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
-HighscoreEntry::HighscoreEntry(const HighscoreEntry::HighscoreType highscore_type,
-                               int num_karts, const RaceManager::Difficulty difficulty, 
-                               const std::string trackName, const int number_of_laps)
+Highscores::Highscores(const HighscoreType highscore_type,
+                       int num_karts, 
+                       const RaceManager::Difficulty difficulty,
+                       const std::string trackName, 
+                       const int number_of_laps)
 {
     m_track           = trackName; 
     m_highscore_type  = highscore_type;
@@ -43,7 +46,7 @@ HighscoreEntry::HighscoreEntry(const HighscoreEntry::HighscoreType highscore_typ
     }
 }
 // -----------------------------------------------------------------------------
-HighscoreEntry::HighscoreEntry(const lisp::Lisp* const node)
+Highscores::Highscores(const XMLNode &node)
 {
     m_track           = ""; 
     m_highscore_type  = "HST_UNDEFINED";
@@ -58,54 +61,62 @@ HighscoreEntry::HighscoreEntry(const lisp::Lisp* const node)
         m_time[i]      = -9.9f;
     }
     
-    Read(node);
-}
+    readEntry(node);
+}   // Highscores
+
 // -----------------------------------------------------------------------------
-void HighscoreEntry::Read(const lisp::Lisp* const node)
+void Highscores::readEntry(const XMLNode &node)
 {
-    node->get("track-name",     m_track               );
-    node->get("number-karts",   m_number_of_karts     );
+    node.get("track-name",     &m_track               );
+    node.get("number-karts",   &m_number_of_karts     );
     std::string hst="HST_UNDEFINED";
-    node->get("hscore-type",    hst                   );
+    node.get("hscore-type",    &hst                   );
     m_highscore_type = (HighscoreType)hst;
-    node->get("difficulty",     m_difficulty          );
-    node->get("number-of-laps", m_number_of_laps      );
+    node.get("difficulty",     &m_difficulty          );
+    node.get("number-of-laps", &m_number_of_laps      );
+
+    for(unsigned int i=0; i<node.getNumNodes(); i++) 
+    {
+        const XMLNode *entry = node.getNode(i);
+        entry->get("time",      &m_time[i]            );
+        entry->get("name",      &m_name[i]            );
+        entry->get("kart-name", &m_kart_name[i]       );
+    }
+}   // readEntry
+
+// -----------------------------------------------------------------------------
+/** Writes the highscores in this entry to the writer. It will only write
+ *  anything if there is actually a highscore recored (i.e. time >=0). Empty
+ *  entries are created e.g. when changing the number of laps in the GUI,
+ *  resulting in empty entries here.
+ *  \param writer The file stream to write the data to.
+ */
+void Highscores::writeEntry(std::ofstream &writer)
+{
+    // Only
+    bool one_is_set = false;
+    for(unsigned int i=0; i<HIGHSCORE_LEN; i++)
+        one_is_set |= m_time[i]>=0;
+    if(!one_is_set) return;
+
+    writer << "  <highscore track-name    =\"" <<m_track          <<"\"\n";
+    writer << "             number-karts  =\"" <<m_number_of_karts<<"\"\n";
+    writer << "             difficulty    =\"" <<m_difficulty     <<"\"\n";
+    writer << "             hscore-type   =\"" <<m_highscore_type <<"\"\n";
+    writer << "             number-of-laps=\"" <<m_number_of_laps <<"\">\n";
 
     for(int i=0; i<HIGHSCORE_LEN; i++) 
     {
-        std::ostringstream s;
-        s << "time-" << i;
-        node->get(s.str(),m_time[i]                  );
-        s.str(""); s << "name-" << i;
-        node->get(s.str(),m_name[i]                  );
-        s.str(""); s << "kartname-" << i;
-        node->get(s.str(), m_kart_name[i]            );
-    }
-}   // Read
+        writer << "             <entry time    =\""<<m_time[i]<<"\"\n";
+        writer << "                    name    =\""<<m_name[i]<<"\"\n";
+        writer << "                    kartname=\""<<m_kart_name[i]
+               << "\"/>\n";
+    }   // for i
+    writer << "  </highscore>\n";
+}   // writeEntry
 
 // -----------------------------------------------------------------------------
-void HighscoreEntry::Write(lisp::Writer *writer)
-{
-    writer->write("track-name\t",     m_track            );
-    writer->write("number-karts\t",   m_number_of_karts  );
-    writer->write("difficulty\t\t",   m_difficulty       );
-    writer->write("hscore-type\t\t",  m_highscore_type   );
-    writer->write("number-of-laps\t", m_number_of_laps   );
-    for(int j=0; j<HIGHSCORE_LEN; j++) 
-    {
-        std::ostringstream s;
-        s << "time-" << j << "\t\t";
-        writer->write(s.str(), m_time[j]                 );
-        s.str(""); s << "name-" << j << "\t\t";
-        writer->write(s.str(), m_name[j]                 );
-        s.str(""); s << "kartname-" << j << "\t\t";
-        writer->write(s.str(), m_kart_name[j]            );
-    }   // for j
-    
-}   // Write
-
-// -----------------------------------------------------------------------------
-int HighscoreEntry::matches(HighscoreType highscore_type,
+int Highscores::matches(HighscoreType highscore_type,
                             int num_karts, RaceManager::Difficulty difficulty,
                             const std::string track, const int number_of_laps)
 {
@@ -115,13 +126,14 @@ int HighscoreEntry::matches(HighscoreType highscore_type,
             m_number_of_laps  == number_of_laps   &&
             m_number_of_karts == num_karts          );
 }   // matches
+
 // -----------------------------------------------------------------------------
 /** Inserts the data into the highscore list. 
  *  If the new entry is fast enough to
  *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
  *  otherwise a 0.
  */
-int HighscoreEntry::addData(const std::string& kart_name,
+int Highscores::addData(const std::string& kart_name,
                             const std::string& name, const float time)
 {
     int position=-1;
@@ -163,7 +175,7 @@ int HighscoreEntry::addData(const std::string& kart_name,
 }   // addData
 
 // -----------------------------------------------------------------------------
-int HighscoreEntry::getNumberEntries() const
+int Highscores::getNumberEntries() const
 {
     for(int i=HIGHSCORE_LEN-1; i>=0; i--)
     {
@@ -173,7 +185,7 @@ int HighscoreEntry::getNumberEntries() const
 }   // getNumberEntries
 
 // -----------------------------------------------------------------------------
-void HighscoreEntry::getEntry(int number, std::string &kart_name,
+void Highscores::getEntry(int number, std::string &kart_name,
                           std::string &name, float *const time) const
 {
     if(number<0 || number>getNumberEntries())

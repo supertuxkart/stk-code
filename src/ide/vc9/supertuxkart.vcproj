@@ -286,26 +286,6 @@
 				</Filter>
 			</Filter>
 			<Filter
-				Name="lisp"
-				>
-				<File
-					RelativePath="../../../src\lisp\lexer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\lisp.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\parser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\writer.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="challenges"
 				>
 				<File
@@ -1018,26 +998,6 @@
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="lisp"
-				>
-				<File
-					RelativePath="../../../src\lisp\lexer.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\lisp.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\parser.hpp"
-					>
-				</File>
-				<File
-					RelativePath="../../../src\lisp\writer.hpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="challenges"

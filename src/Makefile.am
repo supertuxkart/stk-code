@@ -172,14 +172,6 @@ supertuxkart_SOURCES = \
  karts/kart_properties_manager.hpp    \
  karts/moveable.cpp \
  karts/moveable.hpp \
- lisp/lexer.cpp \
- lisp/lexer.hpp \
- lisp/lisp.cpp \
- lisp/lisp.hpp \
- lisp/parser.cpp \
- lisp/parser.hpp \
- lisp/writer.cpp \
- lisp/writer.hpp \
  modes/follow_the_leader.cpp \
  modes/follow_the_leader.hpp \
  modes/linear_world.cpp \

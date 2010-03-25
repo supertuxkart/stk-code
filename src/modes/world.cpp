@@ -445,18 +445,18 @@ void World::update(float dt)
 
 // ----------------------------------------------------------------------------
 
-HighscoreEntry* World::getHighscores() const
+Highscores* World::getHighscores() const
 {
     if(!m_use_highscores) return NULL;
 
-    const HighscoreEntry::HighscoreType type = "HST_" + getIdent();
+    const Highscores::HighscoreType type = "HST_" + getIdent();
 
-    HighscoreEntry* highscores =
-        highscore_manager->getHighscoreEntry(type,
-                                             getNumKarts(),
-                                             race_manager->getDifficulty(),
-                                             race_manager->getTrackName(),
-                                             race_manager->getNumLaps());
+    Highscores * highscores =
+        highscore_manager->getHighscores(type,
+                                         getNumKarts(),
+                                         race_manager->getDifficulty(),
+                                         race_manager->getTrackName(),
+                                         race_manager->getNumLaps());
 
     return highscores;
 }   // getHighscores
@@ -515,14 +515,14 @@ void World::updateHighscores()
         assert(index[pos] < m_karts.size());
         Kart *k = (Kart*)m_karts[index[pos]];
 
-        HighscoreEntry* highscores = getHighscores();
+        Highscores* highscores = getHighscores();
 
         PlayerController *controller = (PlayerController*)(k->getController());
         if(highscores->addData(k->getIdent(),
                                controller->getPlayer()->getProfile()->getName(),
                                k->getFinishTime())>0 )
         {
-            highscore_manager->Save();
+            highscore_manager->saveHighscores();
         }
     } // next position
     delete []index;
