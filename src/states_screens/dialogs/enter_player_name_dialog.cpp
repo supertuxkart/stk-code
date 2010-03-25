@@ -120,7 +120,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     if (playerName.size() > 0)
     {
         const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
-        if (not success)
+        if (!success)
         {
             m_label_ctrl->setText(_("Cannot add a player with this name."));
             sfx_manager->quickSound( "use_anvil" );
