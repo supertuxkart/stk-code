@@ -60,7 +60,6 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     XMLNode* root = file_manager->createXMLTree(filename);
     if (!root)
     {
-        std::cerr << "Could not read music XML file " << filename.c_str() << std::endl;
         throw std::runtime_error("Can open music XML file");
     }
     
@@ -154,7 +153,6 @@ MusicInformation::MusicInformation(const std::string& filename) throw (std::runt
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
     m_normal_filename = path + "/" + m_normal_filename;
-    std::cout << "m_normal_filename=<" << m_normal_filename.c_str() << ">\n";
 
     // Get the path from the filename and add it to the ogg filename
     if (m_fast_filename != "")

@@ -176,22 +176,13 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
     MusicInformation* mi = m_allMusic[basename];
     if(!mi)
     {
-        try
-        {
-            mi = new MusicInformation(filename);
-            m_allMusic[basename] = mi;
-        }
-        catch (std::exception &e)
-        {
-            (void)e;
-            printf("Can't open music file '%s'.\n", filename.c_str());
-            return NULL;
-        }
-
+        // Note that this might raise an exception
+        mi = new MusicInformation(filename);
+        m_allMusic[basename] = mi;
     }
     mi->volumeMusic(m_masterGain);
     return mi;
-}   // SoundManager
+}   // getMusicInformation
 
 //----------------------------------------------------------------------------
 void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)

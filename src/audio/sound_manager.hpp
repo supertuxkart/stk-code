@@ -67,7 +67,7 @@ public:
     float                   getMasterMusicVolume() const { return m_masterGain; }
     
     MusicInformation       *getCurrentMusic() {return m_current_music; }    
-    MusicInformation       *getMusicInformation(const std::string& filename);
+    MusicInformation       *getMusicInformation(const std::string& filename) throw (std::runtime_error);
     void                    loadMusicFromOneDir(const std::string& dir);
     void                    addMusicToTracks();
 

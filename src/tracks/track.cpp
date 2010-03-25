@@ -267,7 +267,22 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         }
         catch(std::runtime_error)
         {
-            mi = sound_manager->getMusicInformation(m_root+"/"+filenames[i]);
+            mi = NULL;
+        }
+        if(!mi)
+        {
+            std::string shared_name = file_manager->getMusicFile(filenames[i]);
+            if(shared_name!="")
+            {
+                try
+                {
+                    mi = sound_manager->getMusicInformation(shared_name);
+                }
+                catch(std::runtime_error)
+                {
+                    mi = NULL;
+                }
+            }   // shared_name!=""
         }
         if(!mi)
         {

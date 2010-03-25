@@ -270,7 +270,8 @@ bool SFXManager::addSingleSfx(const char*    sfx_name,
     sfx_info.m_sfx_positional = positional;
     sfx_info.m_sfx_gain       = gain;
     
-    printf("Loading SFX %s\n", sfx_file.c_str());
+    if(UserConfigParams::m_verbosity>=5) 
+        printf("Loading SFX %s\n", sfx_file.c_str());
     
     alGetError(); // clear errors from previously
     
@@ -317,7 +318,8 @@ void SFXManager::loadSingleSfx(const XMLNode* node)
     node->get("volume",      &sfxInfo.m_sfx_gain        );
 
     std::string path = file_manager->getSFXFile(filename);
-    printf("Loading SFX %s\n", path.c_str());
+    if(UserConfigParams::m_verbosity>=5) 
+        printf("Loading SFX %s\n", path.c_str());
 
     alGenBuffers(1, &sfxInfo.m_sfx_buffer);
     if (!checkError("generating a buffer")) return;
@@ -329,8 +331,6 @@ void SFXManager::loadSingleSfx(const XMLNode* node)
         fprintf(stderr, "Could not load sound effect %s\n", path.c_str());
         return;
     }
-    
-    //printf(">>>>>> Addind sound effect '%s' to the map\n", sfx_name.c_str());
     
     m_all_sfx_types[sfx_name.c_str()] = sfxInfo;
     
