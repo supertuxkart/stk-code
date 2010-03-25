@@ -74,30 +74,29 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
     
     if (selection == "network")
     {
-        // FIXME : remove, temporary test
-        /*
-        GrandPrixOver* scene = GrandPrixOver::getInstance();
-        const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
-        scene->setKarts( winners );
-        StateManager::get()->pushScreen(scene);
-         */
-        
         FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
         
         static int i = 0;
         i++;
         
-        if (i % 2 == 0)
+        if (i % 3 == 0)
         {
             // the passed kart will not be modified, that's why I allow myself to use const_cast
             scene->addUnlockedKart( const_cast<KartProperties*>(kart_properties_manager->getKart("gnu")),
                                    L"Unlocked");
             StateManager::get()->pushScreen(scene);
         }
+        else if (i % 3 == 1)
+        {
+            scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
+                                      1.0, 0.75, L"You did it");
+            StateManager::get()->pushScreen(scene);
+        }
         else
         {
-            scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()),
-                                      1.0, 0.75, L"You did it");
+            GrandPrixOver* scene = GrandPrixOver::getInstance();
+            const std::string winners[] = { "mriceblock", "nolok", "pidgin" };
+            scene->setKarts( winners );
             StateManager::get()->pushScreen(scene);
         }
     }

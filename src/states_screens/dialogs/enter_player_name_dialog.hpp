@@ -25,12 +25,15 @@ namespace GUIEngine
 {
     class TextBoxWidget;
     class ButtonWidget;
+    class LabelWidget;
 }
 
 class EnterPlayerNameDialog : public GUIEngine::ModalDialog
 {
+    GUIEngine::LabelWidget*   m_label_ctrl;
     GUIEngine::TextBoxWidget* textCtrl;
-    GUIEngine::ButtonWidget* cancelButton;
+    GUIEngine::ButtonWidget*  cancelButton;
+    
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

@@ -64,15 +64,23 @@ void OptionsScreenPlayers::init()
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
+bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfile* player)
 {
     stringc newNameC( newName );
     ListWidget* players = this->getWidget<ListWidget>("players");
-    if(players == NULL) return;
+    if (players == NULL) return false;
     
     // ---- Add new player
-    if(player == NULL)
+    if (player == NULL)
     {
+        // check for duplicates
+        const int amount = UserConfigParams::m_all_players.size();
+        for (int n=0; n<amount; n++)
+        {
+            if (stringw(UserConfigParams::m_all_players[n].getName()) == newName) return false;
+        }
+        
+        // add new player
         UserConfigParams::m_all_players.push_back( new PlayerProfile(newNameC.c_str()) );
         
         players->addItem( newNameC.c_str() );
@@ -90,7 +98,10 @@ void OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         }
         
     }
+    
     // TODO : need to re-save user config here?
+    
+    return true;
 }
 
 // -----------------------------------------------------------------------------

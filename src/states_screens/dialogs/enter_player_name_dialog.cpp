@@ -15,9 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/enter_player_name_dialog.hpp"
+
+#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widget.hpp"
-#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -32,20 +34,20 @@ using namespace irr::gui;
 EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    LabelWidget* widget = new LabelWidget();
+    m_label_ctrl = new LabelWidget();
     
     //I18N: In the 'add new player' dialog
-    widget->m_text = _("Enter the new player's name");
+    m_label_ctrl->m_text = _("Enter the new player's name");
     
-    widget->m_properties[PROP_TEXT_ALIGN] = "center";
-    widget->x = 0;
-    widget->y = 0;
-    widget->w = m_area.getWidth();
-    widget->h = m_area.getHeight()/3;
-    widget->setParent(m_irrlicht_window);
+    m_label_ctrl->m_properties[PROP_TEXT_ALIGN] = "center";
+    m_label_ctrl->x = 0;
+    m_label_ctrl->y = 0;
+    m_label_ctrl->w = m_area.getWidth();
+    m_label_ctrl->h = m_area.getHeight()/3;
+    m_label_ctrl->setParent(m_irrlicht_window);
     
-    m_children.push_back(widget);
-    widget->add();
+    m_children.push_back(m_label_ctrl);
+    m_label_ctrl->add();
     
     // ----
     
@@ -105,7 +107,7 @@ GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::strin
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
-    const int playerID = 0; // FIXME: don't ahrdcode player 0?
+    const int playerID = 0; // FIXME: don't hardcode player 0?
     if (GUIEngine::isFocusedForPlayer(cancelButton, playerID))
     {
         std::string fakeEvent = "cancel";
@@ -117,7 +119,13 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     stringw playerName = textCtrl->getText();
     if (playerName.size() > 0)
     {
-        OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
+        const bool success = OptionsScreenPlayers::getInstance()->gotNewPlayerName( playerName );
+        if (not success)
+        {
+            m_label_ctrl->setText(_("Cannot add a player with this name."));
+            sfx_manager->quickSound( "use_anvil" );
+            return;
+        }
     }
     
     // irrLicht is too stupid to remove focus from deleted widgets

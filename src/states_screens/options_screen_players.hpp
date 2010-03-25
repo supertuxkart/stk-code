@@ -40,8 +40,9 @@ public:
     
     /**
      * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
+     * @return  whether adding was successful (can fail e.g. if trying to add a duplicate)
      */
-    void gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
+    bool gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
     
     void init();
