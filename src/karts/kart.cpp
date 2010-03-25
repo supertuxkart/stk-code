@@ -672,7 +672,8 @@ void Kart::update(float dt)
     }
 
     // When really on air, free fly, when near ground, try to glide / adjust for landing
-    if(!isNearGround())
+    // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
+    if(!isNearGround() && !(m_zipper_time_left > 0.0f))
         m_uprightConstraint->setLimit(M_PI);
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
@@ -1227,14 +1228,16 @@ void Kart::updatePhysics(float dt)
     }
 
     // To avoid tunneling (which can happen on long falls), clamp the
-    // velocity in Z direction. Tunneling can happen if the Z velocity
+    // velocity in Y direction. Tunneling can happen if the Y velocity
     // is larger than the maximum suspension travel (per frame), since then
     // the wheel suspension can not stop/slow down the fall (though I am
     // not sure if this is enough in all cases!). So the speed is limited
     // to suspensionTravel / dt with dt = 1/60 (since this is the dt
     // bullet is using).
+    // Only apply if near ground instead of purely based on speed avoiding
+    // the "parachute on top" look.
     const Vec3 &v = m_body->getLinearVelocity();
-    if(v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
+    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravelCM()*0.01f*60)
     {
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
