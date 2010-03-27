@@ -133,7 +133,8 @@ void Widget::elementRemoved()
 // -----------------------------------------------------------------------------
 namespace GUIEngine
 {
-    static unsigned int id_counter = 0;
+    // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values... xD
+    static unsigned int id_counter = 100;
     
     /** // for items that can't be reached with keyboard navigation but can be clicked */
     static unsigned int id_counter_2 = 1000;
@@ -154,7 +155,7 @@ int Widget::getNewNoFocusID()
  * (so we start again from ID 0, and don't grow to big numbers) */
 void Widget::resetIDCounters()
 {
-    id_counter = 0;
+    id_counter = 100;
     id_counter_2 = 1000;
 }
 
