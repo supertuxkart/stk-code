@@ -498,7 +498,7 @@ void World::updateHighscores()
             // the kart location data is wrong
 
 #ifdef DEBUG
-            fprintf(stderr, "Error, incorrect kart positions:");
+            fprintf(stderr, "Error, incorrect kart positions:\n");
             for (unsigned int i=0; i<m_karts.size(); i++ )
             {
                 fprintf(stderr, "i=%d position %d\n",i, m_karts[i]->getPosition());

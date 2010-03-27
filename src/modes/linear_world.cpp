@@ -449,6 +449,8 @@ void LinearWorld::raceResultOrder( int order[] )
     {
         order[i] = -1;
     }
+    
+    bool positions_ok = true;
 #endif
     
     for (unsigned int i=0; i < NUM_KARTS; i++)
@@ -473,13 +475,18 @@ void LinearWorld::raceResultOrder( int order[] )
             }
             std::cout << "Kart " << i << " is being given posiiton " << (getKart(i)->getPosition()-1)
                       << ", but this position is already taken\n";
-            assert(false);
+            positions_ok = false;
         }
 #endif
         
         // actually assign the position
         order[position] = i; // even for eliminated karts
     }
+    
+#ifndef NDEBUG
+    assert(positions_ok);
+#endif
+    
 }   // raceResultOrder
 
 //-----------------------------------------------------------------------------
