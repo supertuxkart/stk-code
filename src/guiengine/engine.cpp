@@ -66,6 +66,12 @@ namespace GUIEngine
         return dt;
     }
     
+    float masterOnlyMessageTime = 0.0f;
+    void showMasterOnlyString()
+    {
+        masterOnlyMessageTime = 5.0f;
+    }
+    
     Widget* getFocusForPlayer(const int playerID)
     {
         assert(playerID >= 0);
@@ -305,6 +311,24 @@ void render(float elapsed_time)
     {
         if (ModalDialog::isADialogActive()) ModalDialog::getCurrent()->onUpdate(dt);
         else                                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
+    }
+    
+    
+    if (masterOnlyMessageTime > 0)
+    {
+        masterOnlyMessageTime -= dt;
+        
+        core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
+        const int text_height = getFontHeight() + 20;
+        const int y_from = screen_size.Height - text_height;
+        
+        //I18N: message shown when a player that isn't game master tries to modify options that
+        //I18N: only the game master is allowed to
+        Private::g_font->draw(_("Only the Game Master may act at this point!"),
+                              core::rect<s32>( core::position2d<s32>(0,y_from),
+                                               core::dimension2d<s32>(screen_size.Width, text_height) ),
+                              video::SColor(255, 255, 0, 0),
+                              true /* hcenter */, true /* vcenter */);
     }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)

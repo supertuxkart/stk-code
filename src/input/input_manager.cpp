@@ -420,7 +420,11 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
 
             // When in master-only mode, we can safely assume that players are set up, contrarly to
             // early menus where we accept every input because players are not set-up yet
-            if (m_master_player_only && player == NULL) return;
+            if (m_master_player_only && player == NULL)
+            {
+                GUIEngine::showMasterOnlyString();
+                return;
+            }
             
             // menu input
             if (!m_timer_in_use)
@@ -434,7 +438,12 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 int playerID = (player == NULL ? 0 : player->getID());
                 
                 // If only the master player can act, and this player is not the master, ignore his input
-                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0) return;
+                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0)
+                {
+                    GUIEngine::showMasterOnlyString();
+                    return;
+                }
+                
                 GUIEngine::EventHandler::get()->processAction(action, abs(value), type, playerID);
             }
         }

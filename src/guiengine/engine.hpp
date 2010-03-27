@@ -286,8 +286,11 @@ namespace GUIEngine
     
     float getLatestDt();
     
+    /** show a warning message to explain to the player that only the game master cn act at this point */
+    void  showMasterOnlyString();
+    
     /** Add a cutscene to the list of screens known by the gui engine */
-    void addScreenToList(Screen* screen);
+    void  addScreenToList(Screen* screen);
     
     // Widgets that need to be notified at every frame can add themselves there
     extern ptr_vector<Widget, REF> needsUpdate;
