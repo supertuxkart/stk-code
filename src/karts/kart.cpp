@@ -678,6 +678,21 @@ void Kart::update(float dt)
     else
         m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
 
+    // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
+    // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
+    // straight after jumping, but still allowing some "boat shake" (roll and pitch).
+    // Otherwise many non perfect jumps end in a total roll over or a serious change of
+    // direction, sometimes 90 or even full U turn (real but less fun for a karting game).
+    // As side effect steering becames a bit less responsive (any wheel on air), but not too bad.
+    if(!isOnGround()) {
+        btVector3 speed = m_body->getAngularVelocity();
+        speed.setY(speed.getY() * 0.25f); // Progressive attenuation
+        m_body->setAngularVelocity(speed);
+        // This one keeps the kart pointing "100% as launched" instead,
+        // like in ski jump sports, too boring but also works.
+        //m_body->setAngularVelocity(btVector3(0,0,0));
+    }
+
     m_zipper_time_left = m_zipper_time_left>0.0f ? m_zipper_time_left-dt : 0.0f;
 
     //m_wheel_rotation gives the rotation around the X-axis, and since velocity's
