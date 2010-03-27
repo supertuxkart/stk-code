@@ -21,18 +21,23 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ListWidget::ListWidget()
-{
-    m_type = WTYPE_LIST;
-}
 // -----------------------------------------------------------------------------
+
+ListWidget::ListWidget() : Widget(WTYPE_LIST)
+{
+}
+
+// -----------------------------------------------------------------------------
+
 void ListWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     
     m_element = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
 }
+
 // -----------------------------------------------------------------------------
+
 void ListWidget::clear()
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
@@ -40,6 +45,7 @@ void ListWidget::clear()
     
     list->clear();
 }
+
 // -----------------------------------------------------------------------------
 /* // Doesn't work, I would need to override CGUIListBox, but this class is private
 bool ListWidget::OnEvent (const SEvent &event)
@@ -57,28 +63,36 @@ bool ListWidget::OnEvent (const SEvent &event)
     }
 }
  */
+
 // -----------------------------------------------------------------------------
+
 void ListWidget::addItem(const char* item)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     list->addItem( stringw(item).c_str() );
 }
+
 // -----------------------------------------------------------------------------
+
 int ListWidget::getSelection() const
 {
     const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     return list->getSelected();
 }
+
 // -----------------------------------------------------------------------------
+
 std::string ListWidget::getSelectionName() const
 {
     const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     return stringc( list->getListItem( list->getSelected() ) ).c_str();
 }
+
 // -----------------------------------------------------------------------------
+
 void ListWidget::unfocused(const int playerID)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
@@ -87,3 +101,4 @@ void ListWidget::unfocused(const int playerID)
     if (list != NULL) list->setSelected(-1);
 }
 
+// -----------------------------------------------------------------------------

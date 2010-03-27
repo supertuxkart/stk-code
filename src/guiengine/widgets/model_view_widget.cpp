@@ -22,8 +22,10 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-ModelViewWidget::ModelViewWidget() : IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
+ModelViewWidget::ModelViewWidget() :
+    IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
+    //FIXME: find nicer way than overriding what IconButtonWidget's constructor already set...
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;

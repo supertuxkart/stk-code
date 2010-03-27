@@ -23,11 +23,13 @@ using namespace irr::core;
 using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
-TextBoxWidget::TextBoxWidget()
+
+TextBoxWidget::TextBoxWidget() : Widget(WTYPE_TEXTBOX)
 {
-    m_type = WTYPE_TEXTBOX;
 }
+
 // -----------------------------------------------------------------------------
+
 void TextBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -40,7 +42,9 @@ void TextBoxWidget::add()
     m_element->setTabGroup(false);
     m_element->setTabStop(true);
 }
+
 // -----------------------------------------------------------------------------
+
 stringw TextBoxWidget::getText() const
 {
     const IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
@@ -48,7 +52,9 @@ stringw TextBoxWidget::getText() const
     
     return stringw(textCtrl->getText());
 }
+
 // -----------------------------------------------------------------------------
+
 EventPropagation TextBoxWidget::focused(const int playerID)
 {
     assert(playerID == 0); // No support for multiple players in text areas!
@@ -58,7 +64,9 @@ EventPropagation TextBoxWidget::focused(const int playerID)
     setWithinATextBox(true);
     return EVENT_LET;
 }
+
 // -----------------------------------------------------------------------------
+
 void TextBoxWidget::unfocused(const int playerID)
 {
     assert(playerID == 0); // No support for multiple players in text areas!

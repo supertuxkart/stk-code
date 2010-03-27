@@ -402,9 +402,9 @@ Widget* Screen::getWidget(const char* name, ptr_vector<Widget>* within_vector)
     {
         Widget& widget = (*within_vector)[n];
         
-        if(widget.m_properties[PROP_ID] == name) return &widget;
+        if (widget.m_properties[PROP_ID] == name) return &widget;
         
-        if(widget.m_type == WTYPE_DIV)
+        if (widget.searchInsideMe() && widget.m_children.size() > 0)
         {
             Widget* el = getWidget(name, &(widget.m_children));
             if(el != NULL) return el;
@@ -422,9 +422,9 @@ Widget* Screen::getWidget(const int id, ptr_vector<Widget>* within_vector)
     {
         Widget& widget = (*within_vector)[n];
         
-        if(widget.m_element != NULL && widget.m_element->getID() == id) return &widget;
+        if (widget.m_element != NULL && widget.m_element->getID() == id) return &widget;
         
-        if(widget.m_children.size() > 0)
+        if (widget.searchInsideMe() && widget.m_children.size() > 0)
         {
             // std::cout << "widget = <" << widget.m_properties[PROP_ID].c_str() << ">  widget.m_children.size()=" << widget.m_children.size() << std::endl;
             Widget* el = getWidget(id, &(widget.m_children));
@@ -443,7 +443,7 @@ Widget* Screen::getFirstWidget(ptr_vector<Widget>* within_vector)
     {
         if (!within_vector->get(i)->m_focusable) continue;
         
-        // if container, also checks children
+        // if container, also checks children (FIXME: don't hardcode which types to avoid descending into)
         if (within_vector->get(i)->m_children.size() > 0 &&
             within_vector->get(i)->m_type != WTYPE_RIBBON &&
             within_vector->get(i)->m_type != WTYPE_SPINNER)

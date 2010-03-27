@@ -49,8 +49,8 @@ OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 
 void OptionsScreenPlayers::init()
 {
-    RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL) ribbon->select( "players", GUI_PLAYER_ID );
+    RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
+    if (tabBar != NULL) tabBar->select( "tab_players", GUI_PLAYER_ID );
     
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
@@ -140,9 +140,9 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
         
-        if (selection == "audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
-        else if (selection == "players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
-        else if (selection == "controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
+        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+        else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if (name == "back")
     {

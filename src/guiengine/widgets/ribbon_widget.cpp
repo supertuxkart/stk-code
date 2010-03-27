@@ -33,7 +33,8 @@ using namespace irr::gui;
 #endif
 
 // -----------------------------------------------------------------------------
-RibbonWidget::RibbonWidget(const RibbonType type)
+
+RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 {
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
     {
@@ -41,11 +42,12 @@ RibbonWidget::RibbonWidget(const RibbonType type)
     }
     m_selection[0] = 0; // only player 0 has a selection by default
     
-    m_type = WTYPE_RIBBON;
     m_ribbon_type = type;
     m_mouse_focus = NULL;
-    m_listener = NULL;
+    m_listener    = NULL;
 
+    m_check_inside_me = true;
+    
     updateSelection();
 }
 // -----------------------------------------------------------------------------

@@ -20,13 +20,16 @@
 using namespace GUIEngine;
 using namespace irr::core;
 
-CheckBoxWidget::CheckBoxWidget()
+// -----------------------------------------------------------------------------
+
+CheckBoxWidget::CheckBoxWidget() : Widget(WTYPE_CHECKBOX)
 {
     m_state = true;
     m_event_handler = this;
-    m_type = WTYPE_CHECKBOX;
 }
+
 // -----------------------------------------------------------------------------
+
 void CheckBoxWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);

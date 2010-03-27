@@ -116,7 +116,14 @@ namespace GUIEngine
         /** returns an object by name, casted to specified type, or NULL if not found/wrong type */
         template <typename T> T* getWidget(const char* name)
         {
-            return dynamic_cast<T*>( getWidget(name) );
+            Widget* out = getWidget(name);
+            T* outCasted = dynamic_cast<T*>( out );
+            if (out != NULL && outCasted == NULL)
+            {
+                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
+                                "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
+            }
+            return outCasted;
         }
         
         static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);

@@ -57,7 +57,7 @@ using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-Widget::Widget(bool reserve_id)
+Widget::Widget(WidgetType type, bool reserve_id)
 {
     m_magic_number = 0xCAFEC001;
     
@@ -68,7 +68,7 @@ Widget::Widget(bool reserve_id)
     id = -1;
     m_element = NULL;
     m_title_font = false;
-    m_type = WTYPE_NONE;
+    m_type = type;
     m_focusable = true;
     
     m_event_handler = NULL;
@@ -85,9 +85,12 @@ Widget::Widget(bool reserve_id)
         m_selected[n] = false;
     }
     
-    m_reserved_id = -1;
-    m_deactivated = false;
-    m_badges      = 0;
+    m_reserved_id     = -1;
+    m_deactivated     = false;
+    m_badges          = 0;
+    
+    // set a default value, derivates can override this as they wish
+    m_check_inside_me = (m_type == WTYPE_DIV);
 }
 
 // -----------------------------------------------------------------------------

@@ -21,13 +21,16 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
-LabelWidget::LabelWidget(bool title)
+// -----------------------------------------------------------------------------
+
+LabelWidget::LabelWidget(bool title) : Widget(WTYPE_LABEL)
 {
-    m_type       = WTYPE_LABEL;
     m_title_font = title;
     m_has_color  = false;
 }
+
 // -----------------------------------------------------------------------------
+
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);

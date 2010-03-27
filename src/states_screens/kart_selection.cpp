@@ -66,10 +66,8 @@ class FocusDispatcher : public Widget
     KartSelectionScreen* m_parent;
     int m_reserved_id;
 public:
-    FocusDispatcher(KartSelectionScreen* parent)
+    FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUTTON)
     {
-        //m_type = WTYPE_LABEL;
-        m_type = WTYPE_BUTTON;
         m_parent = parent;
         m_reserved_id = -1;
         
@@ -205,7 +203,7 @@ public:
     std::string m_kartInternalName;
     
     PlayerKartWidget(KartSelectionScreen* parent,StateManager:: ActivePlayer* associatedPlayer,
-                     Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget()
+                     Widget* area, const int m_playerID, const int irrlichtWidgetID=-1) : Widget(WTYPE_DIV)
     {
         m_associatedPlayer = associatedPlayer;
         x_speed = 1.0f;

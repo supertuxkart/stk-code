@@ -25,11 +25,10 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
-                                   const bool focusable, IconPathType pathType)
+                                   const bool focusable, IconPathType pathType) : Widget(WTYPE_ICON_BUTTON)
 {
     m_label = NULL;
     m_texture = NULL;
-    m_type = WTYPE_ICON_BUTTON;
     m_custom_aspect_ratio = 1.0f;
 
     m_tab_stop = tab_stop;

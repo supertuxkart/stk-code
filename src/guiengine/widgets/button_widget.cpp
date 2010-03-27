@@ -20,11 +20,14 @@
 using namespace GUIEngine;
 using namespace irr::core;
 
-ButtonWidget::ButtonWidget()
-{
-    m_type = WTYPE_BUTTON;
-}
 // -----------------------------------------------------------------------------
+
+ButtonWidget::ButtonWidget() : Widget(WTYPE_BUTTON)
+{
+}
+
+// -----------------------------------------------------------------------------
+
 void ButtonWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
@@ -35,10 +38,14 @@ void ButtonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
 }
+
 // -----------------------------------------------------------------------------
+
 void ButtonWidget::setLabel(irr::core::stringw label)
 {
     m_element->setText( label.c_str() );
     m_text = label;
 }
+
+// -----------------------------------------------------------------------------
 

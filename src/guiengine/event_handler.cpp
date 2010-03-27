@@ -153,14 +153,9 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 // we don't want that since we do our own custom processing for keys
                 if (w->m_type == WTYPE_LIST)
                 {
-                    // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
-                    // Obviously will not work if the list if the first item of the screen.
-                    GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
-                    return EVENT_BLOCK; // confirms to irrLicht that we processed it
+                    return EVENT_BLOCK;
                 }
-                
-                //return w->focused(0); // is this still used with the new focus implementation?
-                
+                                
                 break;
             }
             case EGET_EDITBOX_ENTER:

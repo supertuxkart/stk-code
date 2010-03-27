@@ -31,7 +31,7 @@ using namespace irr::gui;
 
 const char* DynamicRibbonWidget::NO_ITEM_ID = "?";
 
-DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
+DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {
     m_scroll_offset       = 0;
     m_needed_cols         = 0;
@@ -42,7 +42,8 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_has_label           = false;
     m_left_widget         = NULL;
     m_right_widget        = NULL;
-    m_type                = WTYPE_DYNAMIC_RIBBON;
+    
+    m_check_inside_me     = true;
     
     // by default, set all players to have no selection in this ribbon
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -101,8 +102,8 @@ void DynamicRibbonWidget::add()
         delete m_left_widget;
         delete m_right_widget;
     }
-    m_left_widget = new Widget();
-    m_right_widget = new Widget();
+    m_left_widget  = new Widget(WTYPE_NONE);
+    m_right_widget = new Widget(WTYPE_NONE);
     
     const int average_y = y + (h-m_label_height)/2;
     m_arrows_w = 30;

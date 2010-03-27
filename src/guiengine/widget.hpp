@@ -121,6 +121,12 @@ namespace GUIEngine
         bool m_selected[MAX_PLAYER_COUNT];
         
         /**
+          * Whether to descend in the children of this widget when searching a widget
+          * from its ID or name. (children classes can override this value as they please)
+          */
+        bool m_check_inside_me;
+        
+        /**
           * called when left/right keys pressed and focus is on widget. 
           * Returns 'EVENT_LET' if user's event handler should be notified of a change.
           * Override in children to be notified of left/right events and/or make
@@ -191,6 +197,10 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 0; }
         
+        
+        /** Type of this widget */
+        WidgetType m_type;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -241,7 +251,7 @@ namespace GUIEngine
         /** A simple flag that can be raised to hide this widget */
         bool m_deactivated;
         
-        Widget(bool reserve_id = false);
+        Widget(WidgetType type, bool reserve_id = false);
         virtual ~Widget();
         
         /**
@@ -278,10 +288,7 @@ namespace GUIEngine
           * one irrlicht widgets (e.g. Spinner)
           */
         ptr_vector<Widget> m_children;
-        
-        /** Type of this widget */
-        WidgetType m_type;
-        
+
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;
         
@@ -309,6 +316,8 @@ namespace GUIEngine
           */
         virtual void move(const int x, const int y, const int w, const int h);
         
+        /** \return Type of this widget */
+        WidgetType getType() const { return m_type; }
         
         bool isSelected(const int playerID) const { return m_selected[playerID]; }
         
@@ -344,6 +353,8 @@ namespace GUIEngine
           * Called when irrLicht widgets cleared. Forget all references to them, they're no more valid.
           */
         virtual void elementRemoved();
+        
+        bool searchInsideMe() const { return m_check_inside_me; }
     };
 
     

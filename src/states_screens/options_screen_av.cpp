@@ -46,7 +46,7 @@ OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 void OptionsScreenAV::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "audio_video", GUI_PLAYER_ID );
+    if (ribbon != NULL)  ribbon->select( "tab_audio_video", GUI_PLAYER_ID );
     
     // ---- sfx volume
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
@@ -144,9 +144,9 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
         
-        if (selection == "audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
-        else if (selection == "players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
-        else if (selection == "controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
+        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+        else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if(name == "back")
     {
