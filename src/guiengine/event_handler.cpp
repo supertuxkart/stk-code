@@ -143,21 +143,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                  */
 
             case EGET_ELEMENT_FOCUSED: 
-            {
-                Widget* w = GUIEngine::getWidget(id);
-                if (w == NULL) break;
-                
-                //std::cout << "==== irrlicht widget focused : " << w->m_properties[PROP_ID] << std::endl;
-
-                // forbid list for gaining "irrLicht focus", then they will process key events and
-                // we don't want that since we do our own custom processing for keys
-                if (w->m_type == WTYPE_LIST)
-                {
-                    return EVENT_BLOCK;
-                }
-                                
                 break;
-            }
+                
             case EGET_EDITBOX_ENTER:
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
