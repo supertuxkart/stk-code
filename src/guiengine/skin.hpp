@@ -235,7 +235,7 @@ namespace GUIEngine
 
         void drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect);
         void drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect);
-        void drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed);
+        void drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed, const bool bottomArrow);
 
     public:
         

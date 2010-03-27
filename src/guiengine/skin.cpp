@@ -184,6 +184,12 @@ BoxRenderParams::BoxRenderParams()
 }
 void BoxRenderParams::setTexture(ITexture* image)
 {
+    if (image == NULL)
+    {
+        fprintf(stderr, "/!\\ WARNING: missing image in skin\n");
+        return;
+    }
+    
     this->image = image;
     /*
      The source texture is split this way to allow for a stretchable center and borders that don't stretch :
@@ -322,8 +328,8 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rec
                                          BoxRenderParams& params, bool deactivated)
 {
     // check if widget moved. if so, recalculate coords
-    if(w->x != dest.UpperLeftCorner.X || w->y != dest.UpperLeftCorner.Y ||
-       w->w != dest.getWidth() || w->h != dest.getHeight())
+    if (w->x != dest.UpperLeftCorner.X || w->y != dest.UpperLeftCorner.Y ||
+        w->w != dest.getWidth() || w->h != dest.getHeight())
     {
         w->dest_areas_inited = false;
         w->dest_areas_yflip_inited = false;
@@ -1091,23 +1097,87 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
 
 void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
 {
-    //TODO: allow skinning scrollbar
-    GUIEngine::getDriver()->draw2DRectangle( video::SColor(255,200,200,200), rect );
+    // leave square space at both ends for up/down buttons (yeah, irrlicht doesn't handle that)
+    core::rect<s32> rect2 = rect;
+    rect2.UpperLeftCorner.Y  += rect.getWidth();
+    rect2.LowerRightCorner.Y -= rect.getWidth();
+    
+    BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_background::neutral"];
+    
+    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect2, p.source_area_center,
+                                        0 /* no clipping */, 0, true /* alpha */);
+    
+    //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_background::neutral"]);
 }
 
 void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
 {
-    //TODO: allow skinning scrollbar
-    GUIEngine::getDriver()->draw2DRectangle( video::SColor(255,0,150,0), rect );
+    BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_thumb::neutral"];
+
+    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+                                        0 /* no clipping */, 0, true /* alpha */);
+    
+    //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_thumb::neutral"]);
 }
 
-void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed)
+void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed,
+                               const bool bottomArrow)
 {
+    /*
     //TODO: allow skinning scrollbar
     GUIEngine::getDriver()->draw2DRectangle( (pressed ?
                                               video::SColor(255, 0,   175, 0) :
                                               video::SColor(255, 150, 150, 150)),
                                              rect );
+     */
+    
+    if (pressed)
+    {
+        BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_button::down"];
+
+        if (!bottomArrow)
+        {
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        else
+        {
+            // flip image
+            const irr::core::rect<irr::s32>& source_area = p.source_area_center;
+            const int x0 = source_area.UpperLeftCorner.X;
+            const int x1 = source_area.LowerRightCorner.X;
+            const int y0 = source_area.UpperLeftCorner.Y;
+            const int y1 = source_area.LowerRightCorner.Y;
+            
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, core::rect<irr::s32>(x0, y1, x1, y0),
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_background::down"]);
+    }
+    else
+    {
+        BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_button::neutral"];
+
+        if (!bottomArrow)
+        {
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, p.source_area_center,
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        else
+        {   
+            // flip image
+            const irr::core::rect<irr::s32>& source_area = p.source_area_center;
+            const int x0 = source_area.UpperLeftCorner.X;
+            const int x1 = source_area.LowerRightCorner.X;
+            const int y0 = source_area.UpperLeftCorner.Y;
+            const int y1 = source_area.LowerRightCorner.Y;
+            
+            GUIEngine::getDriver()->draw2DImage(p.getImage(), rect, core::rect<irr::s32>(x0, y1, x1, y0),
+                                                0 /* no clipping */, 0, true /* alpha */);
+        }
+        //drawBoxFromStretchableTexture(NULL, rect, SkinConfig::m_render_params["scrollbar_background::neutral"]);
+    }
+    
 }
 
 #if 0
@@ -1155,7 +1225,12 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         if (element->getType() == gui::EGUIET_BUTTON && element->getParent() != NULL &&
             element->getParent()->getType() == EGUIET_SCROLL_BAR)
         {
-            drawScrollbarButton(rect, pressed);
+            const int parentHeight = element->getParent()->getRelativePosition().getHeight();
+            const int y = element->getRelativePosition().UpperLeftCorner.Y;
+            
+            const bool bottomButton = (y > parentHeight/2);
+
+            drawScrollbarButton(rect, pressed, bottomButton);
         }
 
         return;
