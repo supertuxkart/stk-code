@@ -233,7 +233,12 @@ namespace GUIEngine
         void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawIconButton(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
 
+        void drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect);
+        void drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect);
+        void drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed);
+
     public:
+        
         // dirty way to have dialogs that zoom in
         bool m_dialog;
         float m_dialog_size;

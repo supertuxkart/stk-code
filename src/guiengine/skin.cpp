@@ -1089,6 +1089,27 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
     
 }
 
+void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
+{
+    //TODO: allow skinning scrollbar
+    GUIEngine::getDriver()->draw2DRectangle( video::SColor(255,200,200,200), rect );
+}
+
+void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
+{
+    //TODO: allow skinning scrollbar
+    GUIEngine::getDriver()->draw2DRectangle( video::SColor(255,0,150,0), rect );
+}
+
+void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed)
+{
+    //TODO: allow skinning scrollbar
+    GUIEngine::getDriver()->draw2DRectangle( (pressed ?
+                                              video::SColor(255, 0,   175, 0) :
+                                              video::SColor(255, 150, 150, 150)),
+                                             rect );
+}
+
 #if 0
 #pragma mark -
 #pragma mark irrlicht skin functions
@@ -1097,6 +1118,12 @@ void Skin::renderSections(ptr_vector<Widget>* within_vector)
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
     if (GUIEngine::getStateManager()->getGameState() == GUIEngine::GAME) return; // ignore in game mode
+    
+    if (element->getType()==gui::EGUIET_SCROLL_BAR)
+    {
+        drawScrollbarBackground(rect);
+        return;
+    }
     
     const int id = element->getID();
     
@@ -1107,7 +1134,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
     
     const WidgetType type = widget->m_type;
-    if(type == WTYPE_LIST)
+    if (type == WTYPE_LIST)
     {
         // list selection background
         drawListSelection(rect, widget, focused);
@@ -1123,7 +1150,16 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
     Widget* widget = NULL;
     if (id != -1) widget = GUIEngine::getWidget(id);
 
-    if (widget == NULL) return;
+    if (widget == NULL)
+    {
+        if (element->getType() == gui::EGUIET_BUTTON && element->getParent() != NULL &&
+            element->getParent()->getType() == EGUIET_SCROLL_BAR)
+        {
+            drawScrollbarButton(rect, pressed);
+        }
+
+        return;
+    }
     
     const int playerID = 0; // FIXME: don't hardcode player 0?
     const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
@@ -1252,7 +1288,14 @@ void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 
 
 void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {
-    process3DPane(element, rect, false /* pressed */ );
+    if (element->getType()==gui::EGUIET_SCROLL_BAR)
+    {
+        drawScrollbarThumb(rect);
+    }
+    else
+    {
+        process3DPane(element, rect, false /* pressed */ );
+    }
 }
 
 // -----------------------------------------------------------------------------
