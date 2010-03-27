@@ -367,6 +367,14 @@ void UserConfig::addDefaultPlayer()
 }
 
 // -----------------------------------------------------------------------------
+
+/** comparison function used to sort players */
+bool comparePlayers(PlayerProfile* a, PlayerProfile* b)
+{
+    return a->m_use_frequency > b->m_use_frequency;
+}
+
+// -----------------------------------------------------------------------------
 /** Load configuration values from file. */
 bool UserConfig::loadConfig()
 {
@@ -445,13 +453,18 @@ bool UserConfig::loadConfig()
         //std::string name;
         //players[i]->get("name", &name);
         UserConfigParams::m_all_players.push_back( new PlayerProfile(players[i]) );
-    }    
+    }
+    
+    // sort players by frequency of use
+    std::sort (UserConfigParams::m_all_players.contentsVector.begin(),
+               UserConfigParams::m_all_players.contentsVector.end(), comparePlayers);
     
     
     delete root;
 
     return true;
 }   // loadConfig
+
 
 // -----------------------------------------------------------------------------
 /** Write settings to config file. */

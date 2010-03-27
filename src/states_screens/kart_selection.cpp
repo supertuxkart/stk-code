@@ -273,6 +273,9 @@ public:
         //playerName->m_event_handler = this;
         m_children.push_back(playerName);
         
+        //TODO: select the right player profile in the spinner
+        //associatedPlayer->getProfile()->getName()
+        
         // ----- Kart model view
         modelView = new ModelViewWidget();
         
@@ -815,7 +818,7 @@ void KartSelectionScreen::forgetWhatWasLoaded()
 // Return true if event was handled successfully
 bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 {
-    if(UserConfigParams::m_verbosity>=5) std::cout << "playerJoin() ==========\n";
+    if (UserConfigParams::m_verbosity>=5) std::cout << "playerJoin() ==========\n";
 
     if (g_dispatcher == NULL)
     {
@@ -847,7 +850,22 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     kartsArea.x = irr_driver->getFrameSize().Width; // start at the rightmost of the screen
     
     // ---- Create new active player
-    const int new_player_id = StateManager::get()->createActivePlayer( UserConfigParams::m_all_players.get(0), device );
+    PlayerProfile* profileToUse = UserConfigParams::m_all_players.get(0);
+    
+    if (!firstPlayer)
+    {
+        const int playerProfileCount = UserConfigParams::m_all_players.size();
+        for (int n=0; n<playerProfileCount; n++)
+        {
+            if (UserConfigParams::m_all_players[n].isGuestAccount())
+            {
+                profileToUse = UserConfigParams::m_all_players.get(n);
+                break;
+            }
+        }
+    }
+    
+    const int new_player_id = StateManager::get()->createActivePlayer( profileToUse, device );
     StateManager::ActivePlayer* aplayer = StateManager::get()->getActivePlayer(new_player_id);
     
     // ---- Create focus dispatcher
