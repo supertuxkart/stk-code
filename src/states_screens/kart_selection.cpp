@@ -273,8 +273,6 @@ public:
         //playerName->m_event_handler = this;
         m_children.push_back(playerName);
         
-        //TODO: select the right player profile in the spinner
-        //associatedPlayer->getProfile()->getName()
         
         // ----- Kart model view
         modelView = new ModelViewWidget();
@@ -388,11 +386,15 @@ public:
         
         playerName->clearLabels();
         const int playerAmount = UserConfigParams::m_all_players.size();
-        for(int n=0; n<playerAmount; n++)
+        for (int n=0; n<playerAmount; n++)
         {
             playerName->addLabel( UserConfigParams::m_all_players[n].getName() );
         }
         
+        // select the right player profile in the spinner
+        playerName->setValue(m_associatedPlayer->getProfile()->getName());
+        
+        assert(playerName->getStringValue() == m_associatedPlayer->getProfile()->getName());
     }
     
     /** Get the associated ActivePlayer object*/

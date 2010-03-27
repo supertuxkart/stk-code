@@ -63,6 +63,11 @@ namespace GUIEngine
         void add();
         void setValue(const int new_value);
 
+        /**
+          * @precondition the 'new_value' string passed must be the name of an item in the spinner
+          */
+        void setValue(irr::core::stringw new_value);
+        
         bool isGauge()  const { return m_gauge; }
         int  getValue() const { return m_value; }
         int  getMax()   const { return m_max;   }
