@@ -74,13 +74,14 @@ World* World::m_world = NULL;
  *  after the constructor. Those functions must be called in the init() 
  *  function, which is called immediately after the constructor.
  */
-World::World() : WorldStatus()
+World::World() : WorldStatus(), m_clear_color(255,100,101,140)
 {
-    m_physics        = NULL;
-    m_race_gui       = NULL;
-    m_use_highscores = true;
-    m_track          = NULL;
-
+    m_physics           = NULL;
+    m_race_gui          = NULL;
+    m_use_highscores    = true;
+    m_track             = NULL;
+    m_clear_back_buffer = false;
+    
     WorldStatus::setClockMode(CLOCK_CHRONO);
 }   // World
 
@@ -125,7 +126,7 @@ void World::init()
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
-    m_track->loadTrackModel();
+    m_track->loadTrackModel(this);
 
     for(unsigned int i=0; i<num_karts; i++)
     {

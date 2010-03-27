@@ -625,7 +625,7 @@ void Track::createWater(const XMLNode &node)
  *  \param mode_id Which of the modes of a track to use. This determines which
  *         scene, quad, and graph file to load.
  */
-void Track::loadTrackModel(unsigned int mode_id)
+void Track::loadTrackModel(World* parent, unsigned int mode_id)
 {
     //m_is_arena             = false;
     m_track_object_manager = new TrackObjectManager();
@@ -733,14 +733,14 @@ void Track::loadTrackModel(unsigned int mode_id)
             node->get("fog-start",     &m_fog_start);
             node->get("fog-end",       &m_fog_end);
         }
-        else if(name=="sky-dome" || name=="sky-box")
+        else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
         {
             handleSky(*node, path);
         }
         else
         {
-            fprintf(stderr, "Warning: element '%s' not found.\n",
-                    node->getName().c_str());
+            fprintf(stderr, "Warning: while loading track '%s', element '%s' was met but is unknown.\n",
+                    m_ident.c_str(), node->getName().c_str());
         }
 
     }
@@ -775,6 +775,11 @@ void Track::loadTrackModel(unsigned int mode_id)
     else if(m_sky_type==SKY_BOX)
     {
         m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
+    }
+    else if(m_sky_type==SKY_COLOR)
+    {
+        parent->setClearBackBuffer(true);
+        parent->setClearbackBufferColor(m_sky_color);
     }
 
     file_manager->popTextureSearchPath();
@@ -857,6 +862,12 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         {
             m_sky_type = SKY_BOX;
         }
+    }
+    else if (xml_node.getName() == "sky-color")
+    {
+        m_sky_type = SKY_COLOR;
+        xml_node.get("rgb", &m_sky_color);
+        
     }   // if sky-box
 }   // handleSky
 

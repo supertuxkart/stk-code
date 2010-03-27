@@ -768,11 +768,21 @@ void IrrDriver::update(float dt)
     World *world = World::getWorld();
     
     const bool inRace = world!=NULL;
+    
     // With bullet debug view we have to clear the back buffer, but
     // that's not necessary for non-debug
-    bool back_buffer_clear = inRace && world->getPhysics()->isDebug();
-    m_device->getVideoDriver()->beginScene(back_buffer_clear,
-                                           true, video::SColor(255,100,101,140));
+    bool back_buffer_clear = inRace && (world->getPhysics()->isDebug() || world->clearBackBuffer());
+    
+    if (world != NULL)
+    {
+        m_device->getVideoDriver()->beginScene(back_buffer_clear,
+                                               true, world->getClearColor());
+    }
+    else
+    {
+        m_device->getVideoDriver()->beginScene(back_buffer_clear,
+                                               true, video::SColor(255,100,101,140));
+    }
 
     {   // Just to mark the begin/end scene block
         GUIEngine::GameState state = StateManager::get()->getGameState();

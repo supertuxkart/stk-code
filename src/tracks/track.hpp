@@ -48,6 +48,7 @@ class MovingTexture;
 class PhysicalObject;
 class TrackObjectManager;
 class TriangleMesh;
+class World;
 class XMLNode;
 
 class Track
@@ -91,12 +92,15 @@ private:
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX, 
-          SKY_DOME}          m_sky_type;
+          SKY_DOME, SKY_COLOR}          m_sky_type;
 
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
     std::vector<std::string> m_sky_textures;
 
+    /** Used if m_sky_type is SKY_COLOR only */
+    irr::video::SColor m_sky_color;
+    
     /** The list of all animated textures. */
     std::vector<MovingTexture*> m_animated_textures;
 
@@ -181,7 +185,7 @@ public:
     /** Returns the texture with the mini map for this track. */
     const video::ITexture*getMiniMap     () const { return m_mini_map; }
     const Vec3&        trackToSpatial    (const int SECTOR) const;
-    void               loadTrackModel    (unsigned int mode_id=0);
+    void               loadTrackModel    (World* parent, unsigned int mode_id=0);
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);       }
     float              getGravity        () const {return m_gravity;            }

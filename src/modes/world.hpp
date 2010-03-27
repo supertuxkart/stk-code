@@ -121,6 +121,10 @@ protected:
     /** Pointer to the race GUI. The race GUI is handedl by world. */
     RaceGUI *m_race_gui;
 
+    bool     m_clear_back_buffer;
+    
+    irr::video::SColor m_clear_color;
+    
     virtual void    onGo();
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool    isRaceOver() = 0;
@@ -246,6 +250,13 @@ public:
       *                   Array dimension must be the number of karts.
       */
     virtual void raceResultOrder( int order[] ) = 0;
+    
+    bool         clearBackBuffer() const { return m_clear_back_buffer; }
+    
+    const irr::video::SColor& getClearColor() const { return m_clear_color; }
+    void         setClearBackBuffer(bool enabled) { m_clear_back_buffer = enabled; }
+    void         setClearbackBufferColor(irr::video::SColor color) { m_clear_color = color; }
+    
 };
 
 #endif
