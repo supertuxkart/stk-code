@@ -62,8 +62,8 @@ protected:
 public:
     virtual ~UserConfigParam();
     virtual void write(std::ofstream& stream) const = 0;
-    virtual void readAsNode(const XMLNode* node) = 0;
-    virtual void readAsProperty(const XMLNode* node) = 0;
+    virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
+    virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual std::string toString() const = 0;
 };
 
@@ -73,8 +73,8 @@ class GroupUserConfigParam : public UserConfigParam
 public:
     GroupUserConfigParam(const char* name, const char* comment=NULL);
     void write(std::ofstream& stream) const;
-    void readAsNode(const XMLNode* node);
-    void readAsProperty(const XMLNode* node);
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
 
     void addChild(UserConfigParam* child);
     std::string toString() const;
@@ -88,12 +88,13 @@ public:
     IntUserConfigParam(int defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
     void write(std::ofstream& stream) const;
-    void readAsNode(const XMLNode* node);
-    void readAsProperty(const XMLNode* node);
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
     
     operator int() const { return value; }
+    int& operator++(int dummy) { value++; return value; }
     int& operator=(const int& v) { value = v; return value; }
     int& operator=(const IntUserConfigParam& v) { value = (int)v; return value; }
 };
@@ -107,8 +108,8 @@ public:
 
     
     void write(std::ofstream& stream) const;
-    void readAsNode(const XMLNode* node);
-    void readAsProperty(const XMLNode* node);
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
     
@@ -128,8 +129,8 @@ public:
 
     
     void write(std::ofstream& stream) const;
-    void readAsNode(const XMLNode* node);
-    void readAsProperty(const XMLNode* node);
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
     
@@ -146,8 +147,8 @@ public:
     FloatUserConfigParam(float defaultValue, const char* paramName, GroupUserConfigParam* group, const char* comment = NULL);
 
     void write(std::ofstream& stream) const;
-    void readAsNode(const XMLNode* node);
-    void readAsProperty(const XMLNode* node);
+    void findYourDataInAChildOf(const XMLNode* node);
+    void findYourDataInAnAttributeOf(const XMLNode* node);
     
     std::string toString() const;
     

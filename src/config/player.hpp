@@ -38,13 +38,35 @@ protected:
     StringUserConfigParam m_name;
     
     BoolUserConfigParam   m_is_guest_account;
-    
+        
 public:
     
+    IntUserConfigParam    m_use_frequency;
+
+    /**
+      * Constructor to create a new player that didn't exist before
+      */
     PlayerProfile(const char* name) : m_player_group("Player", "Represents one human player"),
                                       m_name(name, "name", &m_player_group), //, m_last_kart_id(-1)
-                                      m_is_guest_account(false, "guest", &m_player_group)
+                                      m_is_guest_account(false, "guest", &m_player_group),
+                                      m_use_frequency(0, "use_frequency", &m_player_group)
     {
+    }
+    
+    /**
+      * Constructor to deserialize a player that was saved to a XML file
+      * (...UserConfigParam classes will automagically take care of serializing all
+      * create players to the user's config file)
+      */
+    PlayerProfile(const XMLNode* node) : m_player_group("Player", "Represents one human player"),
+                                         m_name("-", "name", &m_player_group), //, m_last_kart_id(-1)
+                                         m_is_guest_account(false, "guest", &m_player_group),
+                                         m_use_frequency(0, "use_frequency", &m_player_group)
+    {
+        //m_player_group.findYourDataInAChildOf(node);
+        m_name.findYourDataInAnAttributeOf(node);
+        m_is_guest_account.findYourDataInAnAttributeOf(node);
+        m_use_frequency.findYourDataInAnAttributeOf(node);
     }
     
     

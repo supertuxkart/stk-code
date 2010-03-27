@@ -83,23 +83,23 @@ void GroupUserConfigParam::write(std::ofstream& stream) const
     stream << "        />\n\n";
 }
 
-void GroupUserConfigParam::readAsNode(const XMLNode* node)
+void GroupUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
-    if(child == NULL)
+    if (child == NULL)
     {
-        //std::cout << "Couldn't find parameter group " << paramName << std::endl;
+        //std::cerr << "/!\\ User Config : Couldn't find parameter group " << paramName << std::endl;
         return;
     }
 
     const int children_amount = m_children.size();
-    for(int n=0; n<children_amount; n++)
+    for (int n=0; n<children_amount; n++)
     {
-        m_children[n]->readAsProperty(child);
+        m_children[n]->findYourDataInAnAttributeOf(child);
     }
 
 }
-void GroupUserConfigParam::readAsProperty(const XMLNode* node)
+void GroupUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
 }
 std::string GroupUserConfigParam::toString() const
@@ -142,7 +142,7 @@ std::string IntUserConfigParam::toString() const
     return buffer;
 }
 
-void IntUserConfigParam::readAsNode(const XMLNode* node)
+void IntUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL)
@@ -154,7 +154,7 @@ void IntUserConfigParam::readAsNode(const XMLNode* node)
     child->get( "value", &value );
     //std::cout << "read int " << paramName << ", value=" << value << std::endl;
 }
-void IntUserConfigParam::readAsProperty(const XMLNode* node)
+void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     node->get( paramName, &value );
 }
@@ -183,14 +183,14 @@ void StringUserConfigParam::write(std::ofstream& stream) const
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
     stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
-void StringUserConfigParam::readAsNode(const XMLNode* node)
+void StringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
 
     child->get( "value", &value );
 }
-void StringUserConfigParam::readAsProperty(const XMLNode* node)
+void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     node->get( paramName, &value );
 }
@@ -224,7 +224,7 @@ void BoolUserConfigParam::write(std::ofstream& stream) const
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
     stream << "    <" << paramName << " value=\"" << (value ? "true" : "false" ) << "\" />\n\n";
 }
-void BoolUserConfigParam::readAsNode(const XMLNode* node)
+void BoolUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
@@ -243,7 +243,7 @@ void BoolUserConfigParam::readAsNode(const XMLNode* node)
     else
         std::cerr << "Unknown value for " << paramName << "; expected true or false\n";
 }
-void BoolUserConfigParam::readAsProperty(const XMLNode* node)
+void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     std::string textValue = "";
     node->get( paramName, &textValue );
@@ -289,14 +289,14 @@ void FloatUserConfigParam::write(std::ofstream& stream) const
     if(comment.size() > 0) stream << "    <!-- " << comment.c_str() << " -->\n";
     stream << "    <" << paramName << " value=\"" << value << "\" />\n\n";
 }
-void FloatUserConfigParam::readAsNode(const XMLNode* node)
+void FloatUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( paramName );
     if(child == NULL) return;
 
     child->get( "value", &value );
 }
-void FloatUserConfigParam::readAsProperty(const XMLNode* node)
+void FloatUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     node->get( paramName, &value );
 }
@@ -352,7 +352,7 @@ void UserConfig::addDefaultPlayer()
     class GuestPlayerProfile : public PlayerProfile
     {
     public:
-        GuestPlayerProfile() : PlayerProfile("Guest")
+        GuestPlayerProfile() : PlayerProfile("Guest") //TODO: i18n
         {
             m_is_guest_account = true;
         }
@@ -423,26 +423,33 @@ bool UserConfig::loadConfig()
         // Keep on reading the config files as far as possible
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
 
-    // ---- Read all other parameters
+    // ---- Read parameters values (all parameter objects must have been created before this point if
+    //      you want them automatically read from the config file)
     const int paramAmount = all_params.size();
     for(int i=0; i<paramAmount; i++)
     {
-        all_params[i].readAsNode(root);
+        all_params[i].findYourDataInAChildOf(root);
     }
-
+    
+    
     // ---- Read players
+    // we create those AFTER other values are being read simply because we have many Player
+    // nodes that all bear the same name, so the generic loading code won't work here
     UserConfigParams::m_all_players.clearAndDeleteAll();
-
+    
     std::vector<XMLNode*> players;
     root->getNodes("Player", players);
     const int amount = players.size();
-    for(int i=0; i<amount; i++)
+    for (int i=0; i<amount; i++)
     {
-        std::string name;
-        players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(name.c_str()) );
+        //std::string name;
+        //players[i]->get("name", &name);
+        UserConfigParams::m_all_players.push_back( new PlayerProfile(players[i]) );
     }    
+    
+    
     delete root;
+
     return true;
 }   // loadConfig
 
