@@ -126,7 +126,12 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (input_manager->masterPlayerOnly() && playerID != 0) break;
                     if (playerID != -1)
                     {
-                        w->setFocusForPlayer(playerID);
+                        // lists don't like that combined with scrollbars
+                        // (FIXME: find why instead of working around)
+                        if (w->getType() != WTYPE_LIST)
+                        {
+                            w->setFocusForPlayer(playerID);
+                        }
                     }
                 }
                 
@@ -143,8 +148,36 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                  */
 
             case EGET_ELEMENT_FOCUSED: 
-                break;
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
                 
+                // forbid list for gaining "irrLicht focus", then they will process key events and
+                // we don't want that since we do our own custom processing for keys
+                if (w->m_type == WTYPE_LIST)
+                {
+                    // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
+                    // Obviously will not work if the list if the first item of the screen.
+                    GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
+                    return EVENT_BLOCK; // confirms to irrLicht that we processed it
+                }
+                
+                
+                break;
+            }
+                
+            case EGET_LISTBOX_CHANGED:
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
+                assert(w->getType() == WTYPE_LIST);
+                
+                const int playerID = input_manager->getPlayerKeyboardID();
+                if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                if (!w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
+
+                break;
+            }
             case EGET_EDITBOX_ENTER:
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
