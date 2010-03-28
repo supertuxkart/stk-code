@@ -157,7 +157,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (w->m_type == WTYPE_LIST)
                 {
                     // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
-                    // Obviously will not work if the list if the first item of the screen.
+                    // Obviously will not work if the list is the first item of the screen.
                     GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
                     return EVENT_BLOCK; // confirms to irrLicht that we processed it
                 }
