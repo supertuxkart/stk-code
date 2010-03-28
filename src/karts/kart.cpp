@@ -1230,7 +1230,9 @@ void Kart::updatePhysics(float dt)
         m_speed *= -1.f;
 
     //cap at maximum velocity
-    const float max_speed = getMaxSpeedOnTerrain();
+    float max_speed = getMaxSpeedOnTerrain();
+    if (m_zipper_time_left > 0.0f)
+        max_speed *= (1.0f + stk_config->m_zipper_max_speed_fraction);
     if ( m_speed >  max_speed )
     {
         const float velocity_ratio = max_speed/m_speed;
