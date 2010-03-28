@@ -686,7 +686,9 @@ void Kart::update(float dt)
     // As side effect steering becames a bit less responsive (any wheel on air), but not too bad.
     if(!isOnGround()) {
         btVector3 speed = m_body->getAngularVelocity();
-        speed.setY(speed.getY() * 0.25f); // Progressive attenuation
+        speed.setX(speed.getX() * 0.95f);
+        speed.setY(speed.getY() * 0.25f); // or 0.0f for sharp neutralization of yaw
+        speed.setZ(speed.getZ() * 0.95f);
         m_body->setAngularVelocity(speed);
         // This one keeps the kart pointing "100% as launched" instead,
         // like in ski jump sports, too boring but also works.
