@@ -21,7 +21,8 @@
 #include <sstream>
 
 #include "audio/sound_manager.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_manager.hpp" 
+#include "race/history.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -484,6 +485,7 @@ void LinearWorld::raceResultOrder( int order[] )
     }
     
 #ifndef NDEBUG
+    if (!positions_ok) history->Save();
     assert(positions_ok);
 #endif
     
