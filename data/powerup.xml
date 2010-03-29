@@ -14,7 +14,7 @@
   <item name="anchor"         icon="anchor-icon.png"
         model="anchor.b3d"                              />
   <item name="switch"         icon="swap-icon.png"      />
-  <item name="parachute"      icon="parachute.png"
+  <item name="parachute"      icon="parachute-icon.png"
         model="parachute.b3d"                           />
   <item name="plunger"        icon="plunger-icon.png"
         model="plunger.b3d"   speed="35"
