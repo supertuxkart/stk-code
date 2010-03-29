@@ -1,9 +1,0 @@
-;; -*- mode: lisp -*-
-
-(tuxkart-collectable
- (name  "swap")
- (mesh  "zipper.b3d")
- (icon  "swap-icon.png")
-)
-
-;; EOF ;;

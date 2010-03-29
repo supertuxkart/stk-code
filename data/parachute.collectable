@@ -1,9 +1,0 @@
-;; -*- mode: lisp -*-
-
-(tuxkart-collectable
- (name  "parachute")
- (mesh  "parachute.b3d")
- (icon  "parachute.png")
-)
-
-;; EOF ;;
