@@ -134,7 +134,7 @@ float AIBaseController::steerToPoint(const Vec3 &point)
  *  \param angle Angle to normalise.
  *  \return Normalised angle.
  */
-inline float AIBaseController::normalizeAngle(float angle)
+float AIBaseController::normalizeAngle(float angle)
 {
     while( angle >  2*M_PI ) angle -= 2*M_PI;
     while( angle < -2*M_PI ) angle += 2*M_PI;
