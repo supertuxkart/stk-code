@@ -230,7 +230,7 @@ void ChallengeData::getUnlocks(const XMLNode *root, const std:: string type,
                             }
     case UNLOCK_DIFFICULTY:
                             {
-                            irr::core::stringw user_name = "?"; // TODO
+                            irr::core::stringw user_name = "?"; //TODO: difficulty names when unlocking
                             addUnlockDifficultyReward(attrib, user_name);
                             break;
                             }

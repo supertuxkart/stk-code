@@ -164,7 +164,7 @@ void InputManager::handleStaticAction(int key, int value)
             // to reload all textures, display lists etc. Fullscreen can
             // be toggled from the main menu (options->display).
         case KEY_F9:
-            // TODO
+            // TODO; toggle fullscreen
             //irrDriver->toggleFullscreen(false);   // 0: do not reset textures
             // Fall through to put the game into pause mode.
 #endif

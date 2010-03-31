@@ -638,7 +638,8 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool 
 
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    //TODO: do something better than hide it when a widget is deactivated?
+    // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
+    // we ever need to...
     if (widget->m_deactivated) return;
     
     const int playerID = 0; // FIXME : don't hardcode player 0 ?
@@ -957,7 +958,8 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
 
 void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
-    //TODO: do something better than hide it when a widget is deactivated?
+    // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
+    // we ever need to...
     if (widget->m_deactivated) return;
     
     
@@ -1024,7 +1026,8 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
 
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
 { 
-    //TODO: do something better than hide it when a widget is deactivated?
+    // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
+    // we ever need to...
     if (widget->m_deactivated) return;
     
     CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
@@ -1123,14 +1126,7 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
 void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bool pressed,
                                const bool bottomArrow)
 {
-    /*
-    //TODO: allow skinning scrollbar
-    GUIEngine::getDriver()->draw2DRectangle( (pressed ?
-                                              video::SColor(255, 0,   175, 0) :
-                                              video::SColor(255, 150, 150, 150)),
-                                             rect );
-     */
-    
+
     if (pressed)
     {
         BoxRenderParams& p = SkinConfig::m_render_params["scrollbar_button::down"];

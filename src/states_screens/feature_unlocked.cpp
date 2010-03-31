@@ -322,7 +322,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                 }
                 case UNLOCK_GP:
                 {
-                    //TODO: implement
+                    //TODO: implement gp reward
                     std::cerr << "OK, I see you unlocked a GP, but this is not supported yet\n";
                     
                     video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
@@ -351,7 +351,7 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                 }
                 case UNLOCK_DIFFICULTY:
                 {
-                    //TODO : implement
+                    //TODO : implement difficulty reward
                     std::cerr << "OK, I see you unlocked a difficulty, but this is not supported yet\n";
 
                     video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");

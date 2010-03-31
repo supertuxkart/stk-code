@@ -181,7 +181,6 @@ void TracksScreen::init()
             Track* curr = track_manager->getTrack(tracks[t]);
             if (curr == NULL)
             {
-                //TODO: show warning to user? don't add GP to GUI?
                 std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' refers to track '"
                           << tracks[t] << "', which does not exist.\n";
             }
@@ -192,7 +191,6 @@ void TracksScreen::init()
         }
         if (sshot_files.size() == 0)
         {
-            //TODO: show warning to user? don't add GP to GUI?
             std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' does not contain any valid track.\n";
             sshot_files.push_back("gui/main_help.png");
         }

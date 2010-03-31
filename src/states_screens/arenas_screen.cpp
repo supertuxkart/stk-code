@@ -52,7 +52,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
 
     if (selection == "random_track")
     {
-        // TODO
+        // TODO: random arena selection
     }
     else
     {

@@ -98,9 +98,6 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         }
         
     }
-    
-    // TODO : need to re-save user config here?
-    
     return true;
 }
 
@@ -120,8 +117,6 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
     {
         players->addItem(UserConfigParams::m_all_players[n].getName());
     }
-    
-    // TODO : need to re-save user config here?
 }
 
 
