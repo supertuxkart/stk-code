@@ -765,6 +765,11 @@ void IrrDriver::update(float dt)
         if (m_res_switching)    m_res_switching = false;
         else                    main_loop->abort();
     }
+    else if (m_res_switching)
+    {
+        m_res_switching = false;
+    }
+    
     World *world = World::getWorld();
     
     const bool inRace = world!=NULL;
