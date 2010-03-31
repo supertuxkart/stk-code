@@ -191,6 +191,8 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-file", &m_shadow_file);
     Vec3 c;
     root->get("rgb",         &c            );
+    m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
+
     root->get("groups",      &m_groups     );
 
     //m_kart_model.loadInfo(lisp);
