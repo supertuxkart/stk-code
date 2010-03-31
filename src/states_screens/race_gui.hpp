@@ -39,16 +39,21 @@ class RaceGUI
 {
 public:
     /**
-    * Used to display the list of karts and their times or
-    * whatever other info is relevant to the current mode.
-    */
+      * Used to display the list of karts and their times or
+      * whatever other info is relevant to the current mode.
+      */
     struct KartIconDisplayInfo
     {
-        irr::core::stringw time;
+        /** text to display next to icon, if any */
+        irr::core::stringw m_text;
+        
+        /** text color, if any text */
         float r, g, b;
+        
+        /** if this kart has a special title, e.g. "leader" in follow-the-leader */
         irr::core::stringw special_title;
-        /** Current lap of this kart, or -1 if irrelevant
-        */
+        
+        /** Current lap of this kart, or -1 if irrelevant */
         int lap;
     };   // KartIconDisplayInfo
 

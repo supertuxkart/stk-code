@@ -238,7 +238,7 @@ RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
         char lives[4];
         sprintf(lives, "%i", m_kart_info[i].m_lives);
         
-        rank_info.time = lives; // FIXME - rename 'time' to something more generic
+        rank_info.m_text = lives;
     }
     
     return m_kart_display_info;

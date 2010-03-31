@@ -415,11 +415,11 @@ RaceGUI::KartIconDisplayInfo* LinearWorld::getKartsDisplayInfo()
                            - time_of_leader;
                 str = "+" + StringUtils::timeToString(timeBehind);
             }
-            rank_info.time = irr::core::stringw(str.c_str());
+            rank_info.m_text = irr::core::stringw(str.c_str());
         }
         else
         {
-            rank_info.time = "";
+            rank_info.m_text = "";
         }
 
         int numLaps = race_manager->getNumLaps();
