@@ -488,6 +488,10 @@
 					Name="controller"
 					>
 					<File
+						RelativePath="..\..\karts\controller\ai_base_controller.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\karts\controller\controller.cpp"
 						>
 					</File>
@@ -1287,10 +1291,6 @@
 				Name="karts"
 				>
 				<File
-					RelativePath="..\..\karts\auto_kart.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\karts\kart.hpp"
 					>
 				</File>
@@ -1317,6 +1317,10 @@
 				<Filter
 					Name="controller"
 					>
+					<File
+						RelativePath="..\..\karts\controller\ai_base_controller.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\karts\controller\controller.hpp"
 						>

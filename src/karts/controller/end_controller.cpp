@@ -1,7 +1,9 @@
+// $Id$
+//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2008      Joerg Henrichs
+//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2010 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,14 +47,8 @@
 #include "utils/constants.hpp"
 
 EndController::EndController(Kart *kart, StateManager::ActivePlayer *player) 
-             : Controller(kart, player)
+             : AIBaseController(kart, player)
 {
-    m_kart_length = m_kart->getKartProperties()->getKartModel()->getLength();
-    m_kart_width  = m_kart->getKartProperties()->getKartModel()->getWidth();
-    m_world       = dynamic_cast<LinearWorld*>(World::getWorld());    
-    m_track       = m_world->getTrack();
-
-    m_quad_graph  = &m_track->getQuadGraph();
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
 
@@ -112,7 +108,7 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
 
     m_max_handicap_accel = 1.0f;
     m_min_steps          = 2;
-    m_skidding_threshold = 1.3f;
+    setSkiddingFraction(1.3f);
 
 #ifdef AI_DEBUG
     m_debug_sphere = irr_driver->getSceneManager()->addSphereSceneNode(1);
@@ -214,8 +210,7 @@ void EndController::handleSteering(float dt)
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
        0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
     {
-        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter(), 
-                                   dt );
+        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter());
 
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
@@ -234,7 +229,7 @@ void EndController::handleSteering(float dt)
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(straight_point.toIrrVector());
 #endif
-        steer_angle = steerToPoint(straight_point, dt);
+        steer_angle = steerToPoint(straight_point);
     }
 
 #ifdef AI_DEBUG
@@ -292,77 +287,6 @@ void EndController::handleRescue(const float DELTA)
         m_time_since_stuck = 0.0f;
     }
 }   // handleRescue
-
-
-//-----------------------------------------------------------------------------
-float EndController::steerToAngle(const size_t SECTOR, const float ANGLE)
-{
-    float angle = m_quad_graph->getAngleToNext(SECTOR,
-                                               m_successor_index[SECTOR]);
-
-    //Desired angle minus current angle equals how many angles to turn
-    float steer_angle = angle - m_kart->getHeading();
-
-    if(m_kart->hasViewBlockedByPlunger())
-        steer_angle += ANGLE/5;
-    else
-        steer_angle += ANGLE;
-    steer_angle = normalizeAngle( steer_angle );
-
-    return steer_angle;
-}   // steerToAngle
-
-//-----------------------------------------------------------------------------
-/** Computes the steering angle to reach a certain point. Note that the
- *  steering angle depends on the velocity of the kart (simple setting the
- *  steering angle towards the angle the point has is not correct: a slower
- *  kart will obviously turn less in one time step than a faster kart).
- *  \param point Point to steer towards.
- *  \param dt    Time step.
- */
-float EndController::steerToPoint(const Vec3 &point, float dt)
-{
-    // No sense steering if we are not driving.
-    if(m_kart->getSpeed()==0) return 0.0f;
-    const float dx        = point.getX() - m_kart->getXYZ().getX();
-    const float dz        = point.getZ() - m_kart->getXYZ().getZ();
-    /** Angle from the kart position to the point in world coordinates. */
-    float theta           = atan2(dx, dz);
-
-    // Angle is the point is relative to the heading - but take the current
-    // angular velocity into account, too. The value is multiplied by two
-    // to avoid 'oversteering' - experimentally found.
-    float angle_2_point   = theta - m_kart->getHeading() 
-                          - dt*m_kart->getBody()->getAngularVelocity().getY()*2.0f;
-    angle_2_point         = normalizeAngle(angle_2_point);
-    if(fabsf(angle_2_point)<0.1) return 0.0f;
-
-    /** To understand this code, consider how a given steering angle determines
-     *  the angle the kart is facing after one timestep:
-     *  sin(steer_angle) = wheel_base / radius;  --> compute radius of turn
-     *  circumference    = radius * 2 * M_PI;    --> circumference of turn circle
-     *  The kart drives dt*V units during a timestep of size dt. So the ratio
-     *  of the driven distance to the circumference is the same as the angle
-     *  the whole circle, or:
-     *  angle / (2*M_PI) = dt*V / circumference
-     *  Reversly, if the angle to drive to is given, the circumference can be
-     *  computed, and from that the turn radius, and then the steer angle.
-     *  (note: the 2*M_PI can be removed from the computations)
-     */
-    float radius          = dt*m_kart->getSpeed()/angle_2_point;
-    float sin_steer_angle = m_kart->getKartProperties()->getWheelBase()/radius;
-#ifdef DEBUG_OUTPUT
-    printf("theta %f a2p %f angularv %f radius %f ssa %f\n",
-        theta, angle_2_point, m_body->getAngularVelocity().getY(),
-        radius, sin_steer_angle);
-#endif
-    // Add 0.1 since rouding errors will otherwise result in the kart
-    // not using drifting.
-    if(sin_steer_angle <= -1.0f) return -m_kart->getMaxSteerAngle()*m_skidding_threshold-0.1f;
-    if(sin_steer_angle >=  1.0f) return  m_kart->getMaxSteerAngle()*m_skidding_threshold+0.1f;
-    float steer_angle     = asin(sin_steer_angle);    
-    return steer_angle;
-}   // steerToPoint
 
 //-----------------------------------------------------------------------------
 /** Find the sector that at the longest distance from the kart, that can be
@@ -445,18 +369,6 @@ void EndController::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-inline float EndController::normalizeAngle(float angle)
-{
-    while( angle >  2*M_PI ) angle -= 2*M_PI;
-    while( angle < -2*M_PI ) angle += 2*M_PI;
-
-    if( angle > M_PI ) angle -= 2*M_PI;
-    else if( angle < -M_PI ) angle += 2*M_PI;
-
-    return angle;
-}
-
-//-----------------------------------------------------------------------------
 /** calc_steps() divides the velocity vector by the lenght of the kart,
  *  and gets the number of steps to use for the sight line of the kart.
  *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
@@ -484,47 +396,6 @@ int EndController::calcSteps()
 #endif
     return steps;
 }   // calcSteps
-
-//-----------------------------------------------------------------------------
-/** Converts the steering angle to a lr steering in the range of -1 to 1. 
- *  If the steering angle is too great, it will also trigger skidding. This 
- *  function uses a 'time till full steer' value specifying the time it takes
- *  for the wheel to reach full left/right steering similar to player karts 
- *  when using a digital input device. This is done to remove shaking of
- *  AI karts (which happens when the kart frequently changes the direction
- *  of a turn). The parameter is defined in the kart properties.
- *  \param angle Steering angle.
- *  \param dt Time step.
- */
-void EndController::setSteering(float angle, float dt)
-{
-    float steer_fraction = angle / m_kart->getMaxSteerAngle();
-    m_controls->m_drift   = fabsf(steer_fraction)>=m_skidding_threshold;
-    if(m_kart->hasViewBlockedByPlunger()) m_controls->m_drift = false;
-    float old_steer      = m_controls->m_steer;
-
-    if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
-    else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
-
-    if(m_kart->hasViewBlockedByPlunger())
-    {
-        if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
-        else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
-    }
-    
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_kart->getKartProperties()->getTimeFullSteerAI();
-    if(old_steer < steer_fraction)
-    {
-        m_controls->m_steer = (old_steer+max_steer_change > steer_fraction) 
-                           ? steer_fraction : old_steer+max_steer_change;
-    }
-    else
-    {
-        m_controls->m_steer = (old_steer-max_steer_change < steer_fraction) 
-                           ? steer_fraction : old_steer-max_steer_change;
-    }
-}   // setSteering
 
 //-----------------------------------------------------------------------------
 /**FindCurve() gathers info about the closest sectors ahead: the curve

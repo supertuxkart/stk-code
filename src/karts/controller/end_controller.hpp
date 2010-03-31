@@ -1,6 +1,9 @@
+// $Id$
+//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
+//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
+//  Copyright (C) 2010      Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,16 +19,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_END_KART_HPP
-#define HEADER_END_KART_HPP
+#ifndef HEADER_END_CONTROLLER_HPP
+#define HEADER_END_CONTROLLER_HPP
 
-#include "karts/controller/controller.hpp"
-#include "modes/profile_world.hpp"
-#include "utils/vec3.hpp"
+#include "karts/controller/ai_base_controller.hpp"
 
-class Track;
 class LinearWorld;
 class QuadGraph;
+class Track;
+class Vec3;
 
 namespace irr
 {
@@ -35,7 +37,7 @@ namespace irr
     }
 }
 
-class EndController : public Controller
+class EndController : public AIBaseController
 {
 private:
     /** Stores the type of the previous controller. This is necessary so that
@@ -64,18 +66,11 @@ private:
     float m_curve_target_speed;
     float m_curve_angle;
 
-    /** Keep a pointer to the track to reduce calls */
-    Track       *m_track;
-
-    /** Keep a pointer to world. */
-    LinearWorld *m_world;
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
      *  chosen by the AI). */
     int   m_track_node;
-    /** The graph of qudas of this track. */
-    const QuadGraph *m_quad_graph;
     
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
@@ -93,21 +88,9 @@ private:
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-    /** Length of the kart, storing it here saves many function calls. */
-    float m_kart_length;
-
-    /** Cache width of kart. */
-    float m_kart_width;
-
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
-
-    /** The minimum steering angle at which the AI adds skidding. Lower values
-     *  tend to improve the line the AI is driving. This is used to adjust for
-     *  different AI levels.
-     */
-    float m_skidding_threshold;
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
@@ -118,15 +101,10 @@ private:
     void         handleSteering(float dt);
     void         handleRescue(const float DELTA);
     void         handleBraking();
-    /*Lower level functions not called directly from update()*/
-    float        steerToAngle(const size_t SECTOR, const float ANGLE);
-    float        steerToPoint(const Vec3 &point, float dt);
 
     void         checkCrashes(const int STEPS, const Vec3& pos);
     void         findNonCrashingPoint(Vec3 *result);
-    float        normalizeAngle(float angle);
     int          calcSteps();
-    void         setSteering(float angle, float dt);
     void         findCurve();
 public:
                  EndController(Kart *kart, StateManager::ActivePlayer* player);

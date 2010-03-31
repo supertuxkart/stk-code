@@ -35,7 +35,6 @@
 #include "states_screens/race_gui.hpp"
 #include "io/file_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/auto_kart.hpp"
 #include "karts/controller/default_ai_controller.hpp"
 #include "karts/controller/new_ai_controller.hpp"
 #include "karts/controller/player_controller.hpp"

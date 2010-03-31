@@ -1,3 +1,5 @@
+// $Id$
+//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
 //  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
@@ -17,14 +19,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DEFAULT_SI_CONTROLLER_HPP
+#ifndef HEADER_DEFAULT_AI_CONTROLLER_HPP
 #define HEADER_DEFAULT_AI_CONTROLLER_HPP
 
-#include "karts/controller/controller.hpp"
-
-//#include "karts/auto_kart.hpp"
-//#include "modes/profile_world.hpp"
-//#include "utils/vec3.hpp"
+#include "karts/controller/ai_base_controller.hpp"
 
 class Track;
 class LinearWorld;
@@ -38,7 +36,7 @@ namespace irr
     }
 }
 
-class DefaultAIController : public Controller
+class DefaultAIController : public AIBaseController
 {
 private:
     enum FallbackTactic
@@ -123,18 +121,11 @@ private:
     float m_curve_target_speed;
     float m_curve_angle;
 
-    /** Keep a pointer to the track to reduce calls */
-    Track       *m_track;
-
-    /** Keep a pointer to world. */
-    LinearWorld *m_world;
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
      *  chosen by the AI). */
     int   m_track_node;
-    /** The graph of qudas of this track. */
-    const QuadGraph *m_quad_graph;
     
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
@@ -162,12 +153,6 @@ private:
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
-    /** The minimum steering angle at which the AI adds skidding. Lower values
-     *  tend to improve the line the AI is driving. This is used to adjust for
-     *  different AI levels.
-     */
-    float m_skidding_threshold;
-
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
      *variable, except handle_race_start() that isn't associated with any
@@ -182,17 +167,13 @@ private:
     void  handleNitroAndZipper();
     void  computeNearestKarts();
 
-    /*Lower level functions not called directly from update()*/
-    float steerToAngle(const size_t SECTOR, const float ANGLE);
-    float steerToPoint(const Vec3 &point, float dt);
-
     void  checkCrashes(const int STEPS, const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
 
-    float normalizeAngle(float angle);
     int   calcSteps();
-    void  setSteering(float angle, float dt);
     void  findCurve();
+protected:
+    virtual unsigned int getNextSector(unsigned int index);
 
 public:
                  DefaultAIController(Kart *kart);

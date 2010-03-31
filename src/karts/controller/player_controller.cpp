@@ -232,6 +232,35 @@ void PlayerController::steer(float dt, int steer_val)
  */
 void PlayerController::update(float dt)
 {
+#ifdef THIS_CAN_BE_REMOVED
+    m_controls->m_look_back = false;
+    m_controls->m_nitro     = false;
+
+    static float min_x =  99999;
+    static float max_x = -99999;
+    static float min_z =  99999;
+    static float max_z = -99999;
+    const Vec3 &xyz = m_kart->getXYZ();
+    min_x = std::min(min_x, xyz.getX());
+    max_x = std::max(max_x, xyz.getX());
+    min_z = std::min(min_z, xyz.getZ());
+    max_z = std::max(max_z, xyz.getZ());
+    m_controls->m_accel = 1.0f;
+    m_controls->m_brake = false;
+    m_controls->m_steer = 1.0f;
+    printf("xyz %f %f %f  hpr  %f %f %f x %f %f y %f %f r %f %f\n",
+        m_kart->getXYZ().getX(),
+        m_kart->getXYZ().getY(),
+        m_kart->getXYZ().getZ(),
+        m_kart->getHeading(),
+        m_kart->getPitch(),
+        m_kart->getRoll(),
+        min_x, max_x, min_z, max_z,
+        0.5f*(max_x-min_x),
+        0.5f*(max_z-min_z)
+        );
+    return;
+#endif
     // Don't do steering if it's replay. In position only replay it doesn't 
     // matter, but if it's physics replay the gradual steering causes 
     // incorrect results, since the stored values are already adjusted.

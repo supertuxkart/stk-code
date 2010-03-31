@@ -150,6 +150,8 @@ supertuxkart_SOURCES = \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
  karts/auto_kart.hpp \
+ karts/controller/ai_base_controller.cpp \
+ karts/controller/ai_base_controller.hpp \
  karts/controller/controller.cpp \
  karts/controller/controller.hpp \
  karts/controller/default_ai_controller.cpp \
