@@ -779,7 +779,7 @@ void DefaultAIController::handleNitroAndZipper()
 }   // handleNitroAndZipper
 
 //-----------------------------------------------------------------------------
-void DefaultAIController::checkCrashes( const int STEPS, const Vec3& pos )
+void DefaultAIController::checkCrashes(int steps, const Vec3& pos )
 {
     //Right now there are 2 kind of 'crashes': with other karts and another
     //with the track. The sight line is used to find if the karts crash with
@@ -802,13 +802,13 @@ void DefaultAIController::checkCrashes( const int STEPS, const Vec3& pos )
     vel_normal/=speed;
 
     int current_node = m_track_node;
-    if(STEPS<1 || STEPS>1000)
+    if(steps<1 || steps>1000)
     {
         printf("Warning, incorrect STEPS=%d. kart_length %f velocity %f\n",
-            STEPS, m_kart_length, m_kart->getVelocityLC().getZ());
-        STEPS=1000;
+            steps, m_kart_length, m_kart->getVelocityLC().getZ());
+        steps=1000;
     }
-    for(int i = 1; STEPS > i; ++i)
+    for(int i = 1; steps > i; ++i)
     {
         Vec3 step_coord = pos + vel_normal* m_kart_length * float(i);
 

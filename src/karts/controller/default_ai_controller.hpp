@@ -167,7 +167,7 @@ private:
     void  handleNitroAndZipper();
     void  computeNearestKarts();
 
-    void  checkCrashes(const int STEPS, const Vec3& pos);
+    void  checkCrashes(int steps, const Vec3& pos);
     void  findNonCrashingPoint(Vec3 *result);
 
     int   calcSteps();
