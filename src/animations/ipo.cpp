@@ -141,6 +141,9 @@ float Ipo::get() const
     // FIXME: we should store the last point to speed this up!
     while(n<m_points.size()-1 && m_time >=m_points[n].X)
         n++;
+    // Avoid crash in case that only one point is given for this IPO.
+    if(n==0) 
+        return m_points[0].Y;
     n--;
     switch(m_interpolation)
     {
