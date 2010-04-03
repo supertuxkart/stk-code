@@ -75,7 +75,11 @@ Ipo::Ipo(const XMLNode &curve, float fps)
             m_handle2.push_back(handle);
         }
     }   // for i<getNumNodes()
-    
+
+    // ATM no other extends are supported, so hardcode the only one
+    // that works!
+    m_extend = ET_CYCLIC;
+
     reset();
 }   // Ipo
 
