@@ -156,6 +156,10 @@ void History::Save()
     int  num_karts = world->getNumKarts();
 #ifdef VERSION
     fprintf(fd, "Version:  %s\n",   VERSION);
+#else ifdef SVNVERSION
+    fprintf(fd, "Version:  %s\n",   SVNVERSION);
+#else
+    fprintf(fd, "Version:  unknown\n",   SVNVERSION);
 #endif
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
