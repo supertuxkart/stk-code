@@ -143,9 +143,6 @@ private:
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-    /** Length of the kart, storing it here saves many function calls. */
-    float m_kart_length;
-
     /** Cache width of kart. */
     float m_kart_width;
 
