@@ -43,7 +43,7 @@ private:
     /** The type of this IPO. */
     IpoChannelType m_channel;
 
-        /** The three interpolations defined by blender. */
+    /** The three interpolations defined by blender. */
     enum {IP_CONST, IP_LINEAR, IP_BEZIER}                   m_interpolation;
     /** The four extend types. */
     enum {ET_CONST, ET_EXTRAP, ET_CYCLIC_EXTRAP, ET_CYCLIC} m_extend;
