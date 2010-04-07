@@ -143,9 +143,6 @@ private:
 
     int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
 
-    /** Cache width of kart. */
-    float m_kart_width;
-
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
