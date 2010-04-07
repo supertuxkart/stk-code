@@ -211,21 +211,37 @@ void History::Load()
     char s[1024], s1[1024];
     int  n;
     FILE *fd = fopen("history.dat","r");
-
-    fgets(s, 1023, fd);
+    if (fd == NULL)
+    {
+        fprintf(stderr, "ERROR: could not open history.dat\n");
+        exit(-2);
+    }
+    
+    if (fgets(s, 1023, fd) == NULL)
+    {
+        fprintf(stderr, "ERROR: could not read history.dat\n");
+        exit(-2);
+    }
+    
     if(sscanf(s,"Version: %s",s1)!=1)
     {
         fprintf(stderr, "WARNING: no Version information found in history file.\n");
+        
+#ifdef VERSION
+        if(strcmp(s1,VERSION))
+        {
+            fprintf(stderr, "WARNING: history is version '%s'\n",s1);
+            fprintf(stderr, "         STK version is '%s'\n",VERSION);
+        }
+#endif
+    }
+    
+    if (fgets(s, 1023, fd) == NULL)
+    {
+        fprintf(stderr, "ERROR: could not read history.dat\n");
         exit(-2);
     }
-#ifdef VERSION
-    if(strcmp(s1,VERSION))
-    {
-        fprintf(stderr, "WARNING: history is version '%s'\n",s1);
-        fprintf(stderr, "         tuxracer version is '%s'\n",VERSION);
-    }
-#endif
-    fgets(s, 1023, fd);
+    
     unsigned int num_karts;
     if(sscanf(s, "numkarts: %d",&num_karts)!=1)
     {
