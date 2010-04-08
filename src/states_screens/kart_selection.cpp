@@ -1410,11 +1410,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         unlock_manager->playLockSound();
     }
-    //FIXME: what does this do there???
-    else if (selected_kart_group == DynamicRibbonWidget::NO_ITEM_ID)
-    {
-    }
-    else
+    else if (selected_kart_group != DynamicRibbonWidget::NO_ITEM_ID)
     {        
         std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
         const int kart_amount = group.size();
