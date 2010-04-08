@@ -86,10 +86,6 @@ ItemManager::~ItemManager()
 {
     for(CI_type i=m_all_meshes.begin(); i!=m_all_meshes.end(); ++i)
     {
-        // FIXME: What about this plib comment:
-        // We can't use ssgDeRefDelete here, since then the object would be
-        // freed, and when m_all_models is deleted, we have invalid memory
-        // accesses.
         i->second->drop();
     }
     m_all_meshes.clear();
