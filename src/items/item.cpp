@@ -20,7 +20,6 @@
 #include "items/item.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "items/item_manager.hpp"   // FIXME: DEBUG ONLY
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"
