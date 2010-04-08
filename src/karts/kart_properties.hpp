@@ -43,17 +43,25 @@ class KartProperties
 {
 private:
     /** Base directory for this kart. */
-    std::string  m_root;
-    Material                *m_icon_material;  /**< The icon texture to use. */
+    std::string              m_root;
+
+    /** The icon texture to use. */
+    Material                *m_icon_material;
+
     /** The kart model and wheels. It is mutable since the wheels of the
-     *  KartModel can rotate and turn, but otherwise the kart_properties
-     *  object is const. */
-    mutable KartModel        m_kart_model;
-    std::vector<std::string> m_groups;         /**< List of all groups the kart
-                                                    belongs to. */
+     *  KartModel can rotate and turn, and animations are played, but otherwise
+     *  the kart_properties object is const. */
+   mutable KartModel        m_kart_model;
+
+    /** List of all groups the kart belongs to. */
+    std::vector<std::string> m_groups;
     static float UNDEFINED;
-    float m_speed_angle_increase;     /**< Increase of turn angle with speed. */
-    int   m_version;                  /**< Version of the .kart file.         */
+
+    /** Increase of turn angle with speed. */
+    float m_speed_angle_increase;
+
+    /** Version of the .kart file. */
+    int   m_version;
 
     // SFX files
     // ---------------

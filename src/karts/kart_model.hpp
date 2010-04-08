@@ -38,17 +38,22 @@ class XMLNode;
  */
 class KartModel
 {
-private:
+public:
     enum   AnimationFrameType
-           {AF_BEGIN,            // First animation frame
-            AF_LEFT = AF_BEGIN,  // Steering to the left
-            AF_STRAIGHT,         // Going straight
-            AF_RIGHT,            // Steering to the right
-            AF_WIN_START,        // Begin of win animation
-            AF_WIN_END,          // End of win animation
-            AF_END=AF_WIN_END,   // Last animation frame 
-            AF_COUNT};           // Number of entries here
-
+           {AF_BEGIN,              // First animation frame
+            AF_DEFAULT = AF_BEGIN, // Default, i.e. steering animation
+            AF_LEFT,               // Steering to the left
+            AF_STRAIGHT,           // Going straight
+            AF_RIGHT,              // Steering to the right
+            AF_LOSE_START,         // Begin losing animation
+            AF_LOSE_END,           // End losing animation
+            AF_BEGIN_EXPLOSION,    // Begin explosion animation
+            AF_END_EXPLOSION,      // End explosion animation
+            AF_WIN_START,          // Begin of win animation
+            AF_WIN_END,            // End of win animation
+            AF_END=AF_WIN_END,     // Last animation frame 
+            AF_COUNT};             // Number of entries here
+private:
     /** Which frame number starts/end which animation. */
     int m_animation_frame[AF_COUNT];
 
@@ -69,7 +74,7 @@ private:
     std::string   m_model_filename;
 
     /** The four wheel models. */
-    scene::IMesh      *m_wheel_model[4];
+    scene::IMesh *m_wheel_model[4];
 
     /** The four scene nodes the wheels are attached to */
     scene::ISceneNode *m_wheel_node[4];
@@ -99,8 +104,11 @@ private:
         of wheels in bullet is too large and looks strange). 1=no change, 2=half the amplitude */
     float         m_dampen_suspension_amplitude[4];
 
-    /** True if the end animation is being shown. */
-    bool  m_end_animation;
+    /** Which animation is currently being played. This is used to overwrite
+     *  the default steering animations while being in race. If this is set
+     *  to AF_DEFAULT the default steering animation is shown. */
+    AnimationFrameType m_current_animation;
+
     float m_kart_width;               /**< Width of kart.  */
     float m_kart_length;              /**< Length of kart. */
     float m_kart_height;              /**< Height of kart. */
@@ -154,6 +162,6 @@ public:
     void  setDefaultPhysicsPosition(const Vec3 &center_shift, float wheel_radius);
 
     /** Enables- or disables the end animation. */
-    void  setEndAnimation(bool status);
+    void  setAnimation(AnimationFrameType type);
 };   // KartModel
 #endif

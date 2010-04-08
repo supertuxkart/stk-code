@@ -46,10 +46,10 @@
 #include "physics/btKart.hpp"
 #include "physics/btUprightConstraint.hpp"
 #include "physics/physics.hpp"
+#include "race/history.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/coord.hpp"
-#include "audio/sfx_manager.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
@@ -388,7 +388,7 @@ void Kart::reset()
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
-    m_kart_properties->getKartModel()->setEndAnimation(false);
+    m_kart_properties->getKartModel()->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
     m_attachment.clear();
     m_powerup.reset();
@@ -469,7 +469,11 @@ void Kart::finishedRace(float time)
     {
         // in modes that support it, start end animation
         setController(new EndController(this, m_controller->getPlayer()));
-        m_kart_properties->getKartModel()->setEndAnimation(true);
+        if(m_race_position<=0.5f*race_manager->getNumberOfKarts() ||
+            m_race_position==1)
+            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_WIN_START);
+        else 
+            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
         
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
@@ -485,8 +489,11 @@ void Kart::finishedRace(float time)
     {        
         // start end animation
         setController(new EndController(this, m_controller->getPlayer()));
-        m_kart_properties->getKartModel()->setEndAnimation(true);
-        
+        if(m_race_position<=2)
+            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_WIN_START);
+        else if(m_race_position>=0.7f*race_manager->getNumberOfKarts())
+            m_kart_properties->getKartModel()->setAnimation(KartModel::AF_LOSE_START);
+            
         // Not all karts have a camera
         if (m_camera) m_camera->setMode(Camera::CM_REVERSE);
         
@@ -647,7 +654,8 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 //-----------------------------------------------------------------------------
 void Kart::update(float dt)
 {
-    m_controller->update(dt);
+    if(!history->replayHistory())
+        m_controller->update(dt);
     if(m_camera)
         m_camera->update(dt);
     // if its view is blocked by plunger, decrease remaining time

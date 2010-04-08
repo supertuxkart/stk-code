@@ -52,6 +52,7 @@ KartModel::KartModel()
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
     m_animation_speed   = 15;
+    m_current_animation = AF_DEFAULT;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -64,12 +65,16 @@ void KartModel::loadInfo(const XMLNode &node)
     node.get("model-file", &m_model_filename);
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
-        animation_node->get("left",          &m_animation_frame[AF_LEFT]     );
-        animation_node->get("straight",      &m_animation_frame[AF_STRAIGHT] );
-        animation_node->get("right",         &m_animation_frame[AF_RIGHT]    );
-        animation_node->get("start-winning", &m_animation_frame[AF_WIN_START]);
-        animation_node->get("end-winning",   &m_animation_frame[AF_WIN_END]  );
-        animation_node->get("speed",         &m_animation_speed              );
+        animation_node->get("left",           &m_animation_frame[AF_LEFT]      );
+        animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]  );
+        animation_node->get("right",          &m_animation_frame[AF_RIGHT]     );
+        animation_node->get("start-winning",  &m_animation_frame[AF_WIN_START] );
+        animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
+        animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
+        animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
+        animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
+        animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
+        animation_node->get("speed",          &m_animation_speed               );
     }
 
     if(const XMLNode *wheels_node=node.getNode("wheels"))
@@ -113,6 +118,12 @@ void KartModel::loadModels(const KartProperties &kart_properties)
     std::string  full_path = kart_properties.getKartDir()+"/"+m_model_filename;
     m_mesh                 = irr_driver->getAnimatedMesh(full_path);
     Vec3 min, max;
+    if(!m_mesh)
+    {
+        printf("Problems loading mesh '%s' - aborting.\n",
+            full_path.c_str());
+        exit(-2);
+    }
     MeshTools::minMax3D(m_mesh, &min, &max);
     Vec3 size = max-min;
     m_z_offset    = min.getZ();
@@ -222,21 +233,21 @@ void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
 /** Enables- or disables the end animation. 
  *  \param status True if end animation should be played, false otherwise.
  */
-void KartModel::setEndAnimation(bool status)
+void KartModel::setAnimation(AnimationFrameType type)
 {
-    m_end_animation = status;
-    if(!m_end_animation)
+    m_current_animation = type;
+    if(!m_current_animation==AF_DEFAULT)
     {
         m_node->setLoopMode(false);
         m_node->setFrameLoop(m_animation_frame[AF_STRAIGHT],
                              m_animation_frame[AF_STRAIGHT] );
     }
 
-    if(m_end_animation && m_animation_frame[AF_WIN_START]>-1 &&
-        m_animation_frame[AF_WIN_END]>-1)
+    if(m_current_animation!=AF_DEFAULT &&  m_animation_frame[type]>-1)
     {
-        m_node->setFrameLoop(m_animation_frame[AF_WIN_START], 
-                             m_animation_frame[AF_WIN_END]    );
+        AnimationFrameType end = (AnimationFrameType)(type+1);
+        m_node->setFrameLoop(m_animation_frame[type], 
+                             m_animation_frame[end]    );
         m_node->setLoopMode(true);
         m_node->setAnimationSpeed(m_animation_speed);
     }
@@ -288,7 +299,7 @@ void KartModel::update(float rotation, float visual_steer,
 
     // Check if the end animation is being played, if so, don't
     // play steering animation.
-    if(m_end_animation) return;
+    if(m_current_animation!=AF_DEFAULT) return;
 
     if(m_animation_frame[AF_LEFT]<0) return;   // no animations defined
 
