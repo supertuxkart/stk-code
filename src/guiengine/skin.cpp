@@ -23,6 +23,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include <cassert>
 #include <iostream>
 
@@ -592,6 +593,9 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     
 }
 
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawButton(Widget* w, const core::rect< s32 > &rect, const bool pressed, const bool focused)
 {
     // if within an appearing dialog, grow
@@ -636,21 +640,24 @@ void Skin::drawRibbon(const core::rect< s32 > &rect, Widget* widget, const bool 
 {
 }
 
+/**
+  * @param focused whether this element is focus by the master player (whether the widget is
+  *                focused for other players is automatically determined)
+  * FIXME: ugly to pass some focuses through parameter and others not xD
+  */
 void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
     // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
     // we ever need to...
     if (widget->m_deactivated) return;
     
-    const int playerID = 0; // FIXME : don't hardcode player 0 ?
-
-    bool mark_selected = widget->isSelected(playerID);
+    bool mark_selected = widget->isSelected(GUI_PLAYER_ID);
     bool always_show_selection = false;
         
     IGUIElement* focusedElem = NULL;
-    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    if (GUIEngine::getFocusForPlayer(GUI_PLAYER_ID) != NULL)
     {
-        focusedElem = GUIEngine::getFocusForPlayer(playerID)->getIrrlichtElement();
+        focusedElem = GUIEngine::getFocusForPlayer(GUI_PLAYER_ID)->getIrrlichtElement();
     }
     
     const bool parent_focused = (focusedElem == widget->m_event_handler->m_element);
@@ -832,6 +839,11 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     
 }
 
+/**
+ * @param focused whether this element is focus by the master player (whether the widget is
+ *                focused for other players is automatically determined)
+ * FIXME: ugly to pass some focuses through parameter and others not xD
+ */
 void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
     if (!focused)
@@ -931,6 +943,9 @@ void Skin::drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget, const 
     
 }
 
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {    
     if (pressed)
@@ -945,8 +960,8 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
         else return;
         
         core::rect< s32 > rect2 = core::rect< s32 >( spinner->x, spinner->y,
-                                                    spinner->x + spinner->w,
-                                                    spinner->y + spinner->h  );
+                                                     spinner->x + spinner->w,
+                                                     spinner->y + spinner->h  );
         
         BoxRenderParams& params = SkinConfig::m_render_params["spinner::down"];
         params.areas = areas;
@@ -955,6 +970,9 @@ void Skin::drawSpinnerChild(const core::rect< s32 > &rect, Widget* widget, const
     
 }
 
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const bool pressed, bool focused)
 {
     // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
@@ -1023,6 +1041,9 @@ void Skin::drawIconButton(const core::rect< s32 > &rect, Widget* widget, const b
 }
         
 
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focused)
 { 
     // for now, when this kind of widget is disabled, just hide it. we can change that behaviour if
@@ -1053,24 +1074,32 @@ void Skin::drawCheckBox(const core::rect< s32 > &rect, Widget* widget, bool focu
                                         0 /* no clipping */, 0, true /* alpha */);
 }
 
-
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawList(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
     drawBoxFromStretchableTexture(widget, rect, SkinConfig::m_render_params["list::neutral"]);
     
 }
+
+/**
+ * @param focused whether this element is focus by the master player (focus for other players is not supported)
+ */
 void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused)
 {
     ListWidget* list = dynamic_cast<ListWidget*>(widget);
     assert(list != NULL);
     
-    if(focused)
+    if (focused)
         drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect, SkinConfig::m_render_params["listitem::focused"]);
     else
         drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect, SkinConfig::m_render_params["listitem::down"]);
 }
 
-/** recusrive function to render all sections (recursion allows to easily travesre the tree of children and sub-children) */
+/** recusrive function to render all sections (recursion allows to easily travesre the tree of children
+  * and sub-children)
+  */
 void Skin::renderSections(ptr_vector<Widget>* within_vector)
 {
     if (within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
@@ -1180,7 +1209,8 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect, const bo
 #pragma mark irrlicht skin functions
 #endif
 
-void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, const core::rect< s32 > &rect,
+                            const core::rect< s32 > *clip)
 {
     if (GUIEngine::getStateManager()->getGameState() == GUIEngine::GAME) return; // ignore in game mode
     
@@ -1194,14 +1224,13 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     
     Widget* widget = GUIEngine::getWidget(id);
     if (widget == NULL) return;
-    
-    const int playerID = 0; // FIXME: don't hardcode player 0?
-    const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
-    
+        
     const WidgetType type = widget->m_type;
     if (type == WTYPE_LIST)
     {
-        // list selection background
+        // lists not supported in multiplayer screens
+        const bool focused = GUIEngine::isFocusedForPlayer(widget, GUI_PLAYER_ID);
+
         drawListSelection(rect, widget, focused);
     }  
 }
@@ -1231,11 +1260,11 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         return;
     }
     
-    const int playerID = 0; // FIXME: don't hardcode player 0?
-    const bool focused = GUIEngine::isFocusedForPlayer(widget, playerID);
+    const bool focused = GUIEngine::isFocusedForPlayer(widget, GUI_PLAYER_ID);
 
     /*
-    std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str()) << std::endl;
+    std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str())
+              << std::endl;
     if (widget == NULL) std::cout << "Null widget: ID=" << id << " type=" << element->getTypeName() <<
         " x=" << rect.UpperLeftCorner.X <<
         " y=" << rect.UpperLeftCorner.Y << 
@@ -1349,14 +1378,16 @@ void Skin::drawBadgeOn(const Widget* widget, const core::rect<s32>& rect)
 }
 // -----------------------------------------------------------------------------
 
-void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::draw3DButtonPanePressed (IGUIElement *element, const core::rect< s32 > &rect,
+                                    const core::rect< s32 > *clip)
 {
     process3DPane(element, rect, true /* pressed */ );
 }
 
 // -----------------------------------------------------------------------------
 
-void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32 > &rect,
+                                     const core::rect< s32 > *clip)
 {
     if (element->getType()==gui::EGUIET_SCROLL_BAR)
     {
@@ -1370,7 +1401,8 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element, const core::rect< s32
 
 // -----------------------------------------------------------------------------
 
-void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround, const core::rect< s32 > &rect, const core::rect< s32 > *clip)
+void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool flat, bool fillBackGround,
+                             const core::rect< s32 > &rect, const core::rect< s32 > *clip)
 {    
     const int id = element->getID();
     Widget* widget = GUIEngine::getWidget(id);
@@ -1378,13 +1410,11 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     if (widget == NULL) return;
     
     const WidgetType type = widget->m_type;
-    
-    const int playerID = 0; // FIXME : don't hardcode player 0 ?
-    
+        
     IGUIElement* focusedElem = NULL;
-    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    if (GUIEngine::getFocusForPlayer(GUI_PLAYER_ID) != NULL)
     {
-        focusedElem = GUIEngine::getFocusForPlayer(playerID)->getIrrlichtElement();
+        focusedElem = GUIEngine::getFocusForPlayer(GUI_PLAYER_ID)->getIrrlichtElement();
     }
     
     const bool focused = (focusedElem == element);
@@ -1401,7 +1431,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
             borderArea.LowerRightCorner += position2d< s32 >( 2, 2 );
             
             // if within an appearing dialog, grow
-            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
+                widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
                 const float texture_size = sin(m_dialog_size*M_PI*0.5f);
@@ -1421,7 +1452,8 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
         else
         {
             // if within an appearing dialog, grow
-            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL && widget->m_parent->getType() == gui::EGUIET_WINDOW)
+            if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
+                widget->m_parent->getType() == gui::EGUIET_WINDOW)
             {
                 core::position2d<u32> center = core::position2d<u32>(irr_driver->getFrameSize()/2);
                 const float texture_size = sin(m_dialog_size*M_PI*0.5f);

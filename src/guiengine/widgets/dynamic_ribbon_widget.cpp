@@ -18,6 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <sstream>
 
@@ -629,8 +630,8 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 {
     if (!m_has_label) return;
     
-    // FIXME? Don't hardcode player 0 (even though label can only work with a single player)
-    const int playerID = 0;
+    // only the master player can update the label
+    const int playerID = GUI_PLAYER_ID;
     
     RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon(playerID);
     if (row == NULL) return;
