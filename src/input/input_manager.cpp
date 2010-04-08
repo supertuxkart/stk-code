@@ -264,7 +264,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 int InputManager::getPlayerKeyboardID() const
 {
     // In no-assign mode, just return the GUI player ID (devices not assigned yet)
-    if (m_device_manager->getAssignMode() == NO_ASSIGN) return GUI_PLAYER_ID;
+    if (m_device_manager->getAssignMode() == NO_ASSIGN) return PLAYER_ID_GAME_MASTER;
     
     // Otherwise, after devices are assigned, we can check in more depth
     // Return the first keyboard that is actually being used

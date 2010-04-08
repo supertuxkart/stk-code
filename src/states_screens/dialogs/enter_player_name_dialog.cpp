@@ -65,7 +65,7 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(const float w, const float h) :
     textCtrl->setParent(m_irrlicht_window);
     m_children.push_back(textCtrl);
     textCtrl->add();
-    textCtrl->setFocusForPlayer(GUI_PLAYER_ID);
+    textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     
     // TODO : add Ok button
 

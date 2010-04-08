@@ -263,7 +263,7 @@ void OptionsScreenInput::buildDeviceList()
 void OptionsScreenInput::init()
 {
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL)  tabBar->select( "tab_controls", GUI_PLAYER_ID );
+    if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
     
     
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
@@ -278,7 +278,7 @@ void OptionsScreenInput::init()
     
     // trigger displaying bindings for default selected device
     const std::string name2("devices");
-    eventCallback(devices, name2, GUI_PLAYER_ID);
+    eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
 }
 
 // -----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
     
-    std::string deviceID = devices->getSelectionIDString(GUI_PLAYER_ID);
+    std::string deviceID = devices->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     const bool keyboard = sensedInput->type == Input::IT_KEYBOARD && deviceID.find("keyboard") != std::string::npos;
     const bool gamepad =  (sensedInput->type == Input::IT_STICKMOTION ||
@@ -327,7 +327,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
         
         // extract keyboard ID from name
         int configID = -1;
-        sscanf( devices->getSelectionIDString(GUI_PLAYER_ID).c_str(), "keyboard%i", &configID );
+        sscanf( devices->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str(), "keyboard%i", &configID );
         
         KeyboardConfig* keyboard = input_manager->getDeviceList()->getKeyboardConfig(configID);
         keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
@@ -354,7 +354,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
         
         // extract gamepad ID from name
         int configID = -1;
-        sscanf( devices->getSelectionIDString(GUI_PLAYER_ID).c_str(), "gamepad%i", &configID );
+        sscanf( devices->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str(), "gamepad%i", &configID );
         
         GamepadConfig* config =  input_manager->getDeviceList()->getGamepadConfig(configID);
         config->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
@@ -373,7 +373,7 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     
     // re-select the previous button
     ButtonWidget* btn = this->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-    if(btn != NULL) btn->setFocusForPlayer(GUI_PLAYER_ID);
+    if(btn != NULL) btn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     
     // save new binding to file
     input_manager->getDeviceList()->serialize();
@@ -391,7 +391,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
     
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
         if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -410,7 +410,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
         assert(devices != NULL);
         
-        const std::string& selection = devices->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string& selection = devices->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection.find("gamepad") != std::string::npos)
         {
             int i = -1, read = 0;
@@ -490,11 +490,11 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         
         DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
         assert( devices != NULL );
-        std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString(GUI_PLAYER_ID).c_str() << std::endl;
+        std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str() << std::endl;
         
         new PressAKeyDialog(0.4f, 0.4f);
         
-        std::string selection = devices->getSelectionIDString(GUI_PLAYER_ID);
+        std::string selection = devices->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection.find("keyboard") != std::string::npos)
         {
             input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);

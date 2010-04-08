@@ -631,7 +631,7 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
     if (!m_has_label) return;
     
     // only the master player can update the label
-    const int playerID = GUI_PLAYER_ID;
+    const int playerID = PLAYER_ID_GAME_MASTER;
     
     RibbonWidget* row = from_this_ribbon ? from_this_ribbon : (RibbonWidget*)getSelectedRibbon(playerID);
     if (row == NULL) return;

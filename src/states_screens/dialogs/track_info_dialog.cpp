@@ -153,7 +153,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);
     
-    okBtn->setFocusForPlayer( GUI_PLAYER_ID );
+    okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
 }
 

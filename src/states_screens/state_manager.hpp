@@ -33,7 +33,7 @@ namespace GUIEngine
     class Widget;
 }
 
-const static int GUI_PLAYER_ID = 0;
+const static int PLAYER_ID_GAME_MASTER = 0;
 
 class StateManager : public GUIEngine::AbstractStateManager
 {

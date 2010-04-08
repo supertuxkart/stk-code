@@ -46,7 +46,7 @@ OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 void OptionsScreenAV::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_audio_video", GUI_PLAYER_ID );
+    if (ribbon != NULL)  ribbon->select( "tab_audio_video", PLAYER_ID_GAME_MASTER );
     
     // ---- sfx volume
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
@@ -128,7 +128,7 @@ void OptionsScreenAV::init()
             {
                 //std::cout << "************* Detected right resolution!!! " << n << "\n";
                 // that's the current one
-                res->setSelection(n, GUI_PLAYER_ID, false);
+                res->setSelection(n, PLAYER_ID_GAME_MASTER, false);
                 break;
             }
         }  // end for
@@ -142,7 +142,7 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
         if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
@@ -206,7 +206,7 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
         DynamicRibbonWidget* w1 = this->getWidget<DynamicRibbonWidget>("resolutions");
         assert(w1 != NULL);
         
-        const std::string& res = w1->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string& res = w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         int w = -1, h = -1;
         if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)

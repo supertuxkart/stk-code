@@ -651,13 +651,13 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
     // we ever need to...
     if (widget->m_deactivated) return;
     
-    bool mark_selected = widget->isSelected(GUI_PLAYER_ID);
+    bool mark_selected = widget->isSelected(PLAYER_ID_GAME_MASTER);
     bool always_show_selection = false;
         
     IGUIElement* focusedElem = NULL;
-    if (GUIEngine::getFocusForPlayer(GUI_PLAYER_ID) != NULL)
+    if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
-        focusedElem = GUIEngine::getFocusForPlayer(GUI_PLAYER_ID)->getIrrlichtElement();
+        focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)->getIrrlichtElement();
     }
     
     const bool parent_focused = (focusedElem == widget->m_event_handler->m_element);
@@ -1229,7 +1229,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
     if (type == WTYPE_LIST)
     {
         // lists not supported in multiplayer screens
-        const bool focused = GUIEngine::isFocusedForPlayer(widget, GUI_PLAYER_ID);
+        const bool focused = GUIEngine::isFocusedForPlayer(widget, PLAYER_ID_GAME_MASTER);
 
         drawListSelection(rect, widget, focused);
     }  
@@ -1260,7 +1260,7 @@ void Skin::process3DPane(IGUIElement *element, const core::rect< s32 > &rect, co
         return;
     }
     
-    const bool focused = GUIEngine::isFocusedForPlayer(widget, GUI_PLAYER_ID);
+    const bool focused = GUIEngine::isFocusedForPlayer(widget, PLAYER_ID_GAME_MASTER);
 
     /*
     std::cout << "Skin  (3D Pane) : " << (widget == NULL ? "NULL!!" : widget->m_properties[PROP_ID].c_str())
@@ -1412,9 +1412,9 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor, bool f
     const WidgetType type = widget->m_type;
         
     IGUIElement* focusedElem = NULL;
-    if (GUIEngine::getFocusForPlayer(GUI_PLAYER_ID) != NULL)
+    if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
-        focusedElem = GUIEngine::getFocusForPlayer(GUI_PLAYER_ID)->getIrrlichtElement();
+        focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)->getIrrlichtElement();
     }
     
     const bool focused = (focusedElem == element);

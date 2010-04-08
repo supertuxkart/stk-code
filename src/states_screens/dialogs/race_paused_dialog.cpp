@@ -76,7 +76,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     m_children.push_back(back_btn);
     back_btn->add();
     
-    back_btn->setFocusForPlayer( GUI_PLAYER_ID );
+    back_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
     // ---- Choice ribbon
     m_choice_ribbon = new RibbonWidget(RIBBON_TOOLBAR);
@@ -167,7 +167,7 @@ GUIEngine::EventPropagation RacePausedDialog::processEvent(const std::string& ev
     }
     else if (eventSource == "choiceribbon")
     {
-        const std::string& selection = m_choice_ribbon->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string& selection = m_choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if(UserConfigParams::m_verbosity>=5)
             std::cout << "RacePausedDialog::processEvent(" 

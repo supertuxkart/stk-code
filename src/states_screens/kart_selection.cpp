@@ -1032,7 +1032,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
         
         setKartsFromCurrentGroup();
 
-        const std::string selected_kart_group = tabs->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
                        
         // update players selections (FIXME: don't hardcode player 0 below)
         const int num_players = m_kart_widgets.size();
@@ -1386,7 +1386,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
     assert(tabs != NULL);
     
-    const std::string selected_kart_group = tabs->getSelectionIDString(GUI_PLAYER_ID);
+    const std::string selected_kart_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();

@@ -158,7 +158,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->getIrrlichtElement()->setTabStop(true);
     okBtn->getIrrlichtElement()->setTabGroup(false);
     
-    okBtn->setFocusForPlayer( GUI_PLAYER_ID );
+    okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     
 }
 

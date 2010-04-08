@@ -50,7 +50,7 @@ OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 void OptionsScreenPlayers::init()
 {
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL) tabBar->select( "tab_players", GUI_PLAYER_ID );
+    if (tabBar != NULL) tabBar->select( "tab_players", PLAYER_ID_GAME_MASTER );
     
     ListWidget* players = this->getWidget<ListWidget>("players");
     assert(players != NULL);
@@ -133,7 +133,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
 {    
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
         if (selection == "tab_audio_video") StateManager::get()->replaceTopMostScreen(OptionsScreenAV::getInstance());
         else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());

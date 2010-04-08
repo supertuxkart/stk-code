@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 
 #include <cmath>
@@ -279,8 +280,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        const int MASTER_PLAYER = 0; // FIXME: unclean
-        if (playerID == mousePlayerID || playerID == MASTER_PLAYER)
+        if (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER)
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
         }
@@ -320,8 +320,7 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        const int MASTER_PLAYER = 0; // FIXME: unclean
-        if (playerID == mousePlayerID || playerID == MASTER_PLAYER)
+        if (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER)
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
         }
@@ -353,8 +352,8 @@ EventPropagation RibbonWidget::focused(const int playerID)
     if (m_ribbon_type == RIBBON_COMBO)
     {
         const int mousePlayerID = input_manager->getPlayerKeyboardID();
-        const int MASTER_PLAYER = 0; // FIXME: unclean
-        if (m_mouse_focus == NULL && m_selection[playerID] != -1  && (playerID == mousePlayerID || playerID == MASTER_PLAYER))
+        if (m_mouse_focus == NULL && m_selection[playerID] != -1  &&
+            (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER))
         {
             m_mouse_focus = m_children.get(m_selection[playerID]);
         }

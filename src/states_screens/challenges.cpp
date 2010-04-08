@@ -112,9 +112,8 @@ void ChallengesScreen::eventCallback(GUIEngine::Widget* widget, const std::strin
         DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("challenges");
         assert( w != NULL );
         
-        // FIXME : don't hardcode player 0?
-        const int playerID = 0;
-        std::string selection = w->getSelectionIDString( playerID );
+        // only player 0 can start a challenge (i.e. we have no multiplayer challenges)
+        std::string selection = w->getSelectionIDString( PLAYER_ID_GAME_MASTER );
         
         if (selection == "locked")
         {

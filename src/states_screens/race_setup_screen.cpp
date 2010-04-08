@@ -64,7 +64,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     {
         RibbonWidget* w = dynamic_cast<RibbonWidget*>(widget);
         assert(w != NULL);
-        const std::string& selection = w->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string& selection = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if (selection == "novice")
         {
@@ -85,7 +85,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
     else if (name == "gamemode")
     {
         DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
-        const std::string selectedMode = w->getSelectionIDString(GUI_PLAYER_ID);
+        const std::string selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if (selectedMode == "normal")
         {
@@ -155,7 +155,7 @@ void RaceSetupScreen::init()
 {
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
-    w->setSelection( race_manager->getDifficulty(), GUI_PLAYER_ID );
+    w->setSelection( race_manager->getDifficulty(), PLAYER_ID_GAME_MASTER );
     
     SpinnerWidget* kartamount = getWidget<SpinnerWidget>("aikartamount");
     kartamount->setValue( race_manager->getNumberOfKarts() - race_manager->getNumPlayers() );

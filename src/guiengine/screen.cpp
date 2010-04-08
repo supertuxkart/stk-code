@@ -315,7 +315,7 @@ void Screen::addWidgets()
     // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
-    if (w != NULL) w->setFocusForPlayer( GUI_PLAYER_ID );
+    if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     else std::cerr << "Couldn't select first widget, NULL was returned\n";
 }
 // -----------------------------------------------------------------------------

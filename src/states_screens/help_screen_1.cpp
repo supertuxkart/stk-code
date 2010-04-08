@@ -38,7 +38,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "category")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(GUI_PLAYER_ID).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         
         //if (selection == "page1") StateManager::get()->replaceTopMostScreen(Help1Screen::getInstance());
         //else
@@ -57,7 +57,7 @@ void HelpScreen1::init()
 {
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     
-    if (w != NULL)  w->select( "page1", GUI_PLAYER_ID );
+    if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }
 
 // ------------------------------------------------------------------------------------------------------

@@ -78,7 +78,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (w2 != NULL)
         {
-            const std::string selection = w2->getSelectionIDString(GUI_PLAYER_ID);
+            const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
             if(UserConfigParams::m_verbosity>=5)
                 std::cout << "Clicked on track " << selection.c_str() 
                           << std::endl;
@@ -128,7 +128,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
         DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (gps_widget != NULL)
         {
-            std::string selection = gps_widget->getSelectionIDString(GUI_PLAYER_ID);
+            std::string selection = gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
             
             if (selection == "locked")
             {
@@ -211,8 +211,8 @@ void TracksScreen::init()
     
     buildTrackList();
        
-    // FIXME: don't hardcode player 0?
-    tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, 0, true);
+    // select something for the game master
+    tracks_widget->setSelection(tracks_widget->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -262,7 +262,6 @@ void TracksScreen::buildTrackList()
     }
     else
     {
-        //FIXME: don't hardcode player 0?
         const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
         const int trackAmount = curr_group.size();
         
@@ -280,13 +279,13 @@ void TracksScreen::buildTrackList()
             else
             {
                 tracks_widget->addItem( curr->getName(), curr->getIdent(), curr->getScreenshotFile(),
-                                       0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+                                       0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             }
         }
     }
     
     tracks_widget->addItem(_("Random Track"), "random_track", "/gui/track_random.png",
-                           0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+                           0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     
     tracks_widget->updateItemDisplay();       
 }
@@ -298,8 +297,8 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
     
-    // FIXME: don't hardcode player 0?
-    tracks_widget->setSelection(trackName, 0, true); 
+    // only the game master can select tracks, so it's safe to use 'PLAYER_ID_GAME_MASTER'
+    tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true); 
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -309,8 +308,8 @@ void TracksScreen::setFocusOnGP(const std::string& gpName)
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
     assert( gps_widget != NULL );
     
-    // FIXME: don't hardcode player 0?
-    gps_widget->setSelection(gpName, 0, true); 
+    // only the game master can select tracks/GPs, so it's safe to use 'PLAYER_ID_GAME_MASTER'
+    gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true); 
 }
 
 // -----------------------------------------------------------------------------------------------

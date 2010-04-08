@@ -82,7 +82,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.7f, 0.7f)
         m_children.push_back(widget);
         widget->add();
         
-        widget->setFocusForPlayer( GUI_PLAYER_ID );    
+        widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );    
 
     }
     

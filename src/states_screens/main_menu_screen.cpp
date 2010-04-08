@@ -69,7 +69,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
 {
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
     if (ribbon == NULL) return; // only interesting stuff in main menu is the ribbons
-    std::string selection = ribbon->getSelectionIDString(GUI_PLAYER_ID);
+    std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     
     
     if (selection == "network")

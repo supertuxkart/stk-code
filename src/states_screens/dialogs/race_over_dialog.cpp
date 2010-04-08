@@ -270,7 +270,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         m_children.push_back(whats_next_btn);
         whats_next_btn->add();
         
-        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+        whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
@@ -309,7 +309,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         m_children.push_back(whats_next_btn);
         whats_next_btn->add();
         
-        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+        whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -326,7 +326,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         m_children.push_back(whats_next_btn);
         whats_next_btn->add();
         
-        whats_next_btn->setFocusForPlayer( GUI_PLAYER_ID );
+        whats_next_btn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
         
         
         ButtonWidget* abort_gp = new ButtonWidget();
