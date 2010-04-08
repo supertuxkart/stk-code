@@ -54,11 +54,9 @@ bool DeviceManager::initialize()
     for (int n=0; n<keyboard_amount; n++)
     {
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
-        // TODO: Detect keyboard presence, if there is no keyboard, this should be false
-        m_keyboard_configs.get(n)->setInUse(n == 0);
     }
     
-        if(UserConfigParams::m_verbosity>=5) 
+    if(UserConfigParams::m_verbosity>=5) 
             printf("Initializing gamepad support.\n");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
