@@ -799,7 +799,6 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         {            
             if (nPlayersOnThisItem > 0)
             {
-                // TODO: use the same stretching got players 2, 3, etc.
                 core::rect< s32 > rect2 =  rect;
                 const int enlarge = nPlayersOnThisItem*6;
                 rect2.UpperLeftCorner.X -= enlarge;
