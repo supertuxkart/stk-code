@@ -130,7 +130,9 @@ void World::init()
     for(unsigned int i=0; i<num_karts; i++)
     {
         btTransform init_pos=m_track->getStartTransform(i);
-        const std::string& kart_ident = race_manager->getKartIdent(i);
+        const std::string& kart_ident = 
+             history->replayHistory() ? history->getKartIdent(i)
+                                      : race_manager->getKartIdent(i);
         int local_player_id           = race_manager->getKartLocalPlayerId(i);
         int global_player_id          = race_manager->getKartGlobalPlayerId(i);
         Kart* newkart = createKart(kart_ident, i, local_player_id,  

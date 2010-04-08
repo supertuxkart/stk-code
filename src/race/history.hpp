@@ -52,6 +52,9 @@ private:
     std::vector<KartControl>  m_all_controls;
     std::vector<Vec3>         m_all_xyz;
     std::vector<btQuaternion> m_all_rotations;
+
+    /** The identities of the karts to use. */
+    std::vector<std::string>  m_kart_ident;
     void  allocateMemory(int number_of_frames);
     void  updateSaving(float dt);
     void  updateReplay(float dt);
@@ -62,6 +65,15 @@ public:
     void  update         (float dt);
     void  Save           ();
     void  Load           ();
+
+    // ------------------------------------------------------------------------
+    /** Returns the identifier of the n-th kart. */
+    const std::string& getKartIdent(unsigned int n)
+    {
+        return m_kart_ident[n];
+    }
+    // ------------------------------------------------------------------------
+    /** Returns the size of the next timestep. */
     float getNextDelta   () const { return m_all_deltas[m_current];         }
 
     // ------------------------------------------------------------------------

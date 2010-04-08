@@ -28,8 +28,6 @@
 
 History* history = 0;
 
-#define KEEP_OLD_FORMAT
-
 //-----------------------------------------------------------------------------
 /** Initialises the history object and sets the mode to none. 
  */
@@ -105,13 +103,13 @@ void History::updateSaving(float dt)
 
     World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
+    unsigned int index     = m_current*num_karts;
     for(unsigned int i=0; i<num_karts; i++)
     {
-        unsigned int index     = m_current*num_karts+i;
-        const Kart *kart       = world->getKart(i);
-        m_all_controls[index]  = kart->getControls();
-        m_all_xyz[index]       = kart->getXYZ();
-        m_all_rotations[index] = kart->getRotation();
+        const Kart *kart         = world->getKart(i);
+        m_all_controls[index+i]  = kart->getControls();
+        m_all_xyz[index+i]       = kart->getXYZ();
+        m_all_rotations[index+i] = kart->getRotation();
     }   // for i
 }   // updateSaving
 
@@ -173,35 +171,30 @@ void History::Save()
     }
     fprintf(fd, "size:     %d\n", m_size);
 
-    int j = m_wrapped ? m_current : 0;
+    int index = m_wrapped ? m_current : 0;
     for(int i=0; i<m_size; i++)
     {
-        fprintf(fd, "delta: %f\n",m_all_deltas[i]);
-        j=(j+1)%m_size;
+        fprintf(fd, "delta: %f\n",m_all_deltas[index]);
+        index=(index+1)%m_size;
     }
 
-    for(int k=0; k<num_karts; k++)
+    index = num_karts * (m_wrapped ? m_current : 0);
+    for(int i=0; i<m_size; i++)
     {
-        //Kart* kart= RaceManager::getKart(k);
-        j = m_wrapped ? m_current : 0;
-        for(int i=0; i<m_size; i++)
+        for(int k=0; k<num_karts; k++)
         {
-            // FIXME: kart number is not really necessary
-            fprintf(fd, "%d %f %f %d  %f %f %f  %f %f %f %f\n",
-                    k,
-                    m_all_controls[j].m_steer,
-                    m_all_controls[j].m_accel,
-                    m_all_controls[j].getButtonsCompressed(),
-                    m_all_xyz[j].getX(), 
-#ifdef KEEP_OLD_FORMAT
-                    m_all_xyz[j].getZ(), m_all_xyz[j].getY(),
-#else
-                    m_all_xyz[j].getY(), m_all_xyz[j].getZ(),
-#endif
-                    m_all_rotations[j].getX(), m_all_rotations[j].getY(),
-                    m_all_rotations[j].getZ(), m_all_rotations[j].getW()  );
-            j=(j+1)%m_size;
+            fprintf(fd, "%f %f %d  %f %f %f  %f %f %f %f\n",
+                    m_all_controls[index+k].m_steer,
+                    m_all_controls[index+k].m_accel,
+                    m_all_controls[index+k].getButtonsCompressed(),
+                    m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
+                    m_all_xyz[index+k].getZ(),
+                    m_all_rotations[index+k].getX(), 
+                    m_all_rotations[index+k].getY(),
+                    m_all_rotations[index+k].getZ(), 
+                    m_all_rotations[index+k].getW()  );
         }   // for i
+        index=(index+num_karts)%(num_karts*m_size);
     }   // for k
     fprintf(fd, "History file end.\n");
     fclose(fd);
@@ -292,6 +285,7 @@ void History::Load()
                     i);
             exit(-2);
         }
+        m_kart_ident.push_back(s1);
         if(i<race_manager->getNumPlayers())
         {
             race_manager->setLocalKartInfo(i, s1);
@@ -313,10 +307,10 @@ void History::Load()
         sscanf(s, "delta: %f\n",&m_all_deltas[i]);
     }
 
-    for(unsigned int k=0; k<num_karts; k++)
+    for(int i=0; i<m_size; i++)
     {
         int j=0;
-        for(int i=0; i<m_size; i++)
+        for(unsigned int k=0; k<num_karts; k++)
         {
             fgets(s, 1023, fd);
             int buttonsCompressed;
@@ -326,21 +320,13 @@ void History::Load()
                     &m_all_controls[i].m_steer,
                     &m_all_controls[i].m_accel,
                     &buttonsCompressed,
-                    &x, 
-#ifdef KEEP_OLD_FORMAT
-                    &z, &y,
-                    //xyz
-                    //yxz 
-                    //yzx
-                    &rx, &rz, &ry, &rw
-#else
-                    &y, &z,
+                    &x, &y, &z,
                     &rx, &ry, &rz, &rw
-#endif
                     );
-            m_all_xyz[i]       = Vec3(x,y,z);
-            m_all_rotations[i] = btQuaternion(rx,ry,rz,rw);
-            m_all_controls[i].setButtonsCompressed(char(buttonsCompressed));
+            unsigned int index     = num_karts * i+k;
+            m_all_xyz[index]       = Vec3(x,y,z);
+            m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
+            m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));
         }   // for i
     }   // for k
     fprintf(fd, "History file end.\n");
