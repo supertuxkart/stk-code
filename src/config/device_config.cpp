@@ -228,7 +228,6 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
     setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
     setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
-    //TODO - mappings for clear/enter/leave GA_CLEAR_MAPPING, GA_ENTER, GA_LEAVE?
 }
 
 //------------------------------------------------------------------------------
