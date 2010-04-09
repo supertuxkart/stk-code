@@ -62,8 +62,8 @@ Cake::Cake (Kart *kart) : Flyable(kart, POWERUP_CAKE)
     float pitch = kart->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const Kart *closest_kart=0;   
-    Vec3         direction;
+    const Kart *closest_kart=NULL;
+    Vec3        direction;
     float       kartDistSquared;
     getClosestKart(&closest_kart, &kartDistSquared, &direction, 
                    kart /* search in front of this kart */);

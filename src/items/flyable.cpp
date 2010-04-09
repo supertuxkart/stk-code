@@ -167,7 +167,7 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     btTransform tProjectile = (inFrontOf != NULL ? inFrontOf->getTrans() 
                                                  : getTrans());
 
-    *minDistSquared = -1.0f;
+    *minDistSquared = 999999.9f;
     *minKart = NULL;
 
     World *world = World::getWorld();
@@ -198,11 +198,11 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
             float s = sqrt(v.length2() * to_target.length2());
             float c = to_target.dot(v)/s;
             // Original test was: fabsf(acos(c))>1,  which is the same as
-            // fabsf(c)<cos(1)
-            if(fabsf(c)<0.54) continue;
+            // c<cos(1) (acos returns values in [0, pi] anyway) 
+            if(c<0.54) continue;
         }
 
-        if(distance2 < *minDistSquared || *minDistSquared < 0 /* not yet set */)
+        if(distance2 < *minDistSquared)
         {
             *minDistSquared = distance2;
             *minKart  = kart;
