@@ -814,8 +814,10 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
     // ---- Fog
     if (m_use_fog)
     {
-        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start and end do not matter */
-        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, m_fog_start, m_fog_end, m_fog_density);
+        /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start 
+           and end do not matter */
+        irr_driver->getVideoDriver()->setFog(m_fog_color, video::EFT_FOG_LINEAR, 
+                                             m_fog_start, m_fog_end, m_fog_density);
     }
 
     createPhysicsModel(main_track_count);
@@ -827,6 +829,15 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
             m_all_nodes[i]->setMaterialFlag(video::EMF_FOG_ENABLE, true);
 }   // loadTrackModel
 
+//-----------------------------------------------------------------------------
+/** Changes all materials of the given scene node to use the current fog
+ *  setting (true/false).
+ *  \param node Scene node for which fog should be en/dis-abled.
+ */
+void Track::adjustForFog(scene::ISceneNode *node)
+{
+    node->setMaterialFlag(video::EMF_FOG_ENABLE, m_use_fog);
+}   // adjustForFog
 //-----------------------------------------------------------------------------
 void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 {

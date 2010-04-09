@@ -226,6 +226,7 @@ public:
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
+    void               adjustForFog(scene::ISceneNode *node);
     void               handleExplosion(const Vec3 &pos, const PhysicalObject *mp) const;
     /** Sets pointer to the aabb of this track. */
     void               getAABB(const Vec3 **min, const Vec3 **max) const

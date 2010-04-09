@@ -139,6 +139,7 @@ void World::init()
                                    global_player_id, init_pos);
         m_karts.push_back(newkart);
         newkart->setWorldKartId(m_karts.size()-1);
+        m_track->adjustForFog(newkart->getNode());
     }  // for i
 
     resetAllKarts();
