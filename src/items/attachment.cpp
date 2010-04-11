@@ -36,7 +36,12 @@ Attachment::Attachment(Kart* kart)
     m_kart           = kart;
     m_previous_owner = NULL;
 
-    m_node           = NULL;
+    // If we attach a NULL mesh, we get a NULL scene node back. So we
+    // have to attach some kind of mesh, but make it invisible.
+    m_node           = irr_driver->addAnimatedMesh(
+                            attachment_manager->getMesh(ATTACH_BOMB));
+    m_node->setParent(m_kart->getNode());
+    m_node->setVisible(false);
 }   // Attachment
 
 //-----------------------------------------------------------------------------
@@ -50,8 +55,12 @@ Attachment::~Attachment()
 void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
-    m_node           = irr_driver->addMesh(attachment_manager->getMesh(type));
-    m_node->setParent(m_kart->getNode());
+    m_node->setMesh(attachment_manager->getMesh(type));
+    if(type==ATTACH_BOMB)
+    {
+        int num_frames = m_node->getEndFrame() - m_node->getStartFrame()+1;
+        m_node->setAnimationSpeed(num_frames / time);
+    }
     m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;
@@ -63,7 +72,7 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
         m_initial_speed = m_kart->getSpeed();
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5; // if going very slowly or backwards, braking won't remove parachute
     }
-
+    m_node->setVisible(true);
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -75,11 +84,7 @@ void Attachment::clear()
 {
     m_type=ATTACH_NOTHING; 
     m_time_left=0.0;
-    if(m_node)
-    {
-        irr_driver->removeNode(m_node);
-        m_node = NULL;
-    }
+    m_node->setVisible(false);
 
     // Resets the weight of the kart if the previous attachment affected it 
     // (e.g. anvil). This must be done *after* setting m_type to
@@ -159,10 +164,9 @@ void Attachment::hitBanana(const Item &item, int new_attachment)
 //** Moves a bomb from kart FROM to kart TO.
 void Attachment::moveBombFromTo(Kart *from, Kart *to)
 {
-    to->setAttachmentType(ATTACH_BOMB,
-                          from->getAttachment()->getTimeLeft()+
-                          stk_config->m_bomb_time_increase, from);
-
+    to->getAttachment()->set(ATTACH_BOMB,
+                             from->getAttachment()->getTimeLeft()+
+                             stk_config->m_bomb_time_increase, from);
     from->getAttachment()->clear();
 }   // moveBombFromTo
 

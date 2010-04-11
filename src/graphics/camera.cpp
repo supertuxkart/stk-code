@@ -211,6 +211,7 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
 #undef DEBUG_CAMERA
 #ifdef DEBUG_CAMERA
     core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+    xyz = core::vector3df(17.5, 0, 0);
     m_camera->setTarget(xyz);
     xyz.Y = xyz.Y+30;
     m_camera->setPosition(xyz);

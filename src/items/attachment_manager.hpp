@@ -25,12 +25,12 @@
 class AttachmentManager
 {
 private:
-    scene::IMesh *m_attachments[ATTACH_MAX];
+    scene::IAnimatedMesh *m_attachments[ATTACH_MAX];
 public:
     AttachmentManager() {};
     /** Returns the mest for a certain attachment.
      *  \param type Type of the attachment needed. */
-    scene::IMesh *getMesh(attachmentType type) const {return m_attachments[type]; }
+    scene::IAnimatedMesh *getMesh(attachmentType type) const {return m_attachments[type]; }
     void       removeTextures   ();
     void       loadModels       ();
 };

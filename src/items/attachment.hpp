@@ -50,14 +50,14 @@ private:
     float           m_initial_speed;   // for parachutes only
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
-    scene::ISceneNode *m_node;
+    scene::IAnimatedMeshSceneNode 
+                   *m_node;
     Kart           *m_previous_owner;  // used by bombs so that it's not passed
                                        // back to previous owner
     RandomGenerator m_random;
 public:
-    Attachment(Kart* _kart);
-    ~Attachment();
-
+         Attachment(Kart* _kart);
+        ~Attachment();
     void set (attachmentType _type, float time, Kart *previous_kart=NULL);
     void set (attachmentType _type) { set(_type, m_time_left); }
     void clear ();

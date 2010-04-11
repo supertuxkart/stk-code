@@ -22,7 +22,7 @@
 
 //The AI debugging works best with just 1 AI kart, so set the number of karts
 //to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#undef AI_DEBUG
+#define AI_DEBUG
 
 #include "karts/controller/new_ai_controller.hpp"
 
@@ -837,13 +837,9 @@ float NewAIController::findNonCrashingAngle()
     Vec3 final_left   = q[3];
 
     float very_right  = -atan2(right.getX()-xyz.getX(),
-                              right.getZ()-xyz.getZ())
-                        ;//- m_kart->getHeading();
+                              right.getZ()-xyz.getZ());
     float very_left   = -atan2(left.getX()-xyz.getX(),
-                              left.getZ()-xyz.getZ())
-                        ;//- m_kart->getHeading();
-    very_left         = normalizeAngle(very_left);
-    very_right        = normalizeAngle(very_right);
+                              left.getZ()-xyz.getZ());
     float dist        = 0;
 
     while(dist<40.0f)
@@ -858,8 +854,6 @@ float NewAIController::findNonCrashingAngle()
         float angle_left  = -atan2(left.getX()-xyz.getX(),
                                   left.getZ()-xyz.getZ())
                                   ;//- m_kart->getHeading();
-        angle_left  = normalizeAngle(angle_left);
-        angle_right = normalizeAngle(angle_right);
 
         // Stop if the left and the right beam overlap.
         if(angle_left<very_right ||

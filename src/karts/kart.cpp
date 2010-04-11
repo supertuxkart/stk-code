@@ -59,7 +59,7 @@
 Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
-       Moveable(), m_powerup(this), m_attachment(this)
+       Moveable(), m_powerup(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
@@ -390,7 +390,7 @@ void Kart::reset()
     }
     m_kart_properties->getKartModel()->setAnimation(KartModel::AF_DEFAULT);
     m_view_blocked_by_plunger = 0.0;
-    m_attachment.clear();
+    m_attachment->clear();
     m_powerup.reset();
 
     m_race_position        = 9;
@@ -519,7 +519,7 @@ void Kart::collectedItem(const Item &item, int add_info)
     switch (type)
     {
     case Item::ITEM_BANANA: 
-        m_attachment.hitBanana(item, add_info); 
+        m_attachment->hitBanana(item, add_info); 
         break;
 
     case Item::ITEM_NITRO_SMALL: m_collected_energy++;    break;
@@ -715,9 +715,9 @@ void Kart::update(float dt)
         // Let the kart raise 2m in the 2 seconds of the rescue
         const float rescue_time   = 2.0f;
         const float rescue_height = 2.0f;
-        if(m_attachment.getType() != ATTACH_TINYTUX)
+        if(m_attachment->getType() != ATTACH_TINYTUX)
         {
-            m_attachment.set( ATTACH_TINYTUX, rescue_time ) ;
+            m_attachment->set( ATTACH_TINYTUX, rescue_time ) ;
             m_rescue_pitch = getHPR().getPitch();
             m_rescue_roll  = getHPR().getRoll();
             race_state->itemCollected(getWorldKartId(), -1, -1);
@@ -731,7 +731,7 @@ void Kart::update(float dt)
         setXYZRotation(getXYZ()+Vec3(0, rescue_height*dt/rescue_time, 0),
                        getRotation()*q_roll*q_pitch);
     }   // if rescue mode
-    m_attachment.update(dt);
+    m_attachment->update(dt);
 
     //smoke drawing control point
     if ( UserConfigParams::m_graphical_effects )
@@ -1091,7 +1091,7 @@ void Kart::updatePhysics(float dt)
     m_bounce_back_time-=dt;
     float engine_power = getActualWheelForce() + handleNitro(dt)
                                                + handleSlipstream(dt);
-    if(m_attachment.getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
+    if(m_attachment->getType()==ATTACH_PARACHUTE) engine_power*=0.2f;
 
     if(m_controls.m_accel)   // accelerating
     {   // For a short time after a collision disable the engine,
@@ -1335,6 +1335,11 @@ void Kart::endRescue()
 void Kart::loadData()
 {
     m_kart_properties->getKartModel()->attachModel(&m_node);
+    // Attachment must be created after attachModel, since only then the
+    // scene node will exist (to which the attachment is added). But the
+    // attachment is needed in createPhysics (which gets the mass, which
+    // is dependent on the attachment).
+    m_attachment = new Attachment(this);
     createPhysics();
 
     // Attach Particle System

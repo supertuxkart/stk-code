@@ -50,7 +50,7 @@ Moveable::~Moveable()
  */
 void Moveable::setNode(scene::ISceneNode *n)
 {
-    m_node          = n; 
+    m_node          = n;
 }   // setNode
 
 //-----------------------------------------------------------------------------

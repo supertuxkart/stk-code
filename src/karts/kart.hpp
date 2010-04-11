@@ -89,7 +89,7 @@ protected:       // Used by the AI atm
     KartControl  m_controls;           // The kart controls (e.g. steering, fire, ...)
     Powerup      m_powerup;
     float        m_zipper_time_left;   /**<Zipper time left. */
-    Attachment   m_attachment;
+    Attachment   *m_attachment;
     /** Easier access for player_kart. */
     Camera       *m_camera;
 private:
@@ -218,7 +218,7 @@ public:
     /** Sets the attachment and time it stays attached. */
     void attach(attachmentType attachment_, float time)
     { 
-        m_attachment.set(attachment_, time); 
+        m_attachment->set(attachment_, time); 
     }
     // ------------------------------------------------------------------------
     /** Sets a new powerup. */
@@ -236,47 +236,60 @@ public:
     }   // setPosition
 
     // ------------------------------------------------------------------------
+    /** Returns the current attachment. */
     Attachment *getAttachment() 
     {
-        return &m_attachment;          
+        return m_attachment;          
     }   // getAttachment
 
-    // ------------------------------------------------------------------------
-    void setAttachmentType(attachmentType t, float time_left=0.0f, Kart*k=NULL)
-    {
-        m_attachment.set(t, time_left, k);   
-    }
     // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
      *  to this kart). */
     Camera*        getCamera         ()       {return m_camera;}
+    // ------------------------------------------------------------------------
     /** Returns the camera of this kart (or NULL if no camera is attached
      *  to this kart) - const version. */
     const Camera*  getCamera         () const {return m_camera;}
+    // ------------------------------------------------------------------------
     /** Sets the camera for this kart. */
     void           setCamera(Camera *camera) {m_camera=camera; }
 
+    // ------------------------------------------------------------------------
+    /** Returns the current powerup. */
     const Powerup *getPowerup          () const { return &m_powerup;         }
+    // ------------------------------------------------------------------------
+    /** Returns the current powerup. */
     Powerup       *getPowerup          ()       { return &m_powerup;         }
+    // ------------------------------------------------------------------------
     /** Returns the number of powerups. */
     int            getNumPowerup       () const { return m_powerup.getNum(); }
+    // ------------------------------------------------------------------------
     /** Returns the time left for a zipper. */
     float          getZipperTimeLeft   () const { return m_zipper_time_left; }
+    // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     float          getEnergy           () const { return m_collected_energy; }
+    // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     int            getPosition         () const { return m_race_position;    }
+    // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
     int            getInitialPosition  () const { return m_initial_position; }
+    // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
     float          getFinishTime       () const { return m_finish_time;      }
+    // ------------------------------------------------------------------------
     /** Returns true if this kart has finished the race. */
     bool           hasFinishedRace     () const { return m_finished_race;    }
+    // ------------------------------------------------------------------------
     void           endRescue           ();
-
+    // ------------------------------------------------------------------------
+    /** Returns true if the kart has a plunger attached to its face. */
     bool           hasViewBlockedByPlunger() const
-                                                { return m_view_blocked_by_plunger > 0; }
-    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 10; }
+                                     { return m_view_blocked_by_plunger > 0; }
+    // ------------------------------------------------------------------------
+    /** Sets that the view is blocked by a plunger. */
+    void           blockViewWithPlunger()       { m_view_blocked_by_plunger = 10;}
     
    /** Returns a bullet transform object located at the kart's position
        and oriented in the direction the kart is going. Can be useful
@@ -292,7 +305,7 @@ public:
     float          getMass          () const
     {
         return m_kart_properties->getMass()
-               + m_attachment.weightAdjust();
+               + m_attachment->weightAdjust();
     }
     float          getMaxPower      () const {return m_kart_properties->getMaxPower();}
     float          getTimeFullSteer () const {return m_kart_properties->getTimeFullSteer();}
