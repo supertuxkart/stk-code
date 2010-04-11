@@ -256,6 +256,66 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         } // end if hs != NULL
     } // end if not GP
     
+    // ---- GP ranks
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        const int gp_rank_y = m_area.getHeight() - (button_h + margin_between_buttons)*3;
+
+        //I18N: warning, this string needs to be SHORT!
+        stringw header = _("GP scores :");
+        const int headerWidth = GUIEngine::getFont()->getDimension(header.c_str()).Width + 5;
+        const int remainingWidth = m_area.getWidth() - headerWidth;
+        
+        core::rect< s32 > hsarea(5, gp_rank_y, m_area.getWidth(), gp_rank_y + line_h);
+        IGUIStaticText* highscores = GUIEngine::getGUIEnv()->addStaticText( header.c_str(),
+                                                                           hsarea, false, false, // border, word warp
+                                                                           m_irrlicht_window);
+        highscores->setTabStop(false);
+        highscores->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_CENTER);
+        
+        // I assume it's harmless to call it here?
+        race_manager->computeGPRanks();
+        
+        //FIXME: handle when there are too many karts to fit...
+        const int entry_width = std::min(int(remainingWidth/num_karts), line_h*2);
+        
+        for (unsigned int i = 0; i < num_karts; ++i)
+        {
+            //if (order[i] == -1) continue;
+            const int gp_rank = race_manager->getKartGPRank(i);
+            
+            const Kart *current_kart = world->getKart(i);
+            const KartProperties* prop = current_kart->getKartProperties();
+            std::string icon_path = file_manager->getDataDir() ;
+            icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+            ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                    
+            
+            std::ostringstream gp_score_str;
+            gp_score_str << race_manager->getKartScore(i);
+            
+            const int x_from = headerWidth + gp_rank*entry_width;
+            core::rect< s32 > entry_area(x_from + line_h + 5              , gp_rank_y,
+                                         x_from + entry_width + line_h + 5, gp_rank_y + line_h);
+            core::rect< s32 > icon_area (x_from                           , gp_rank_y,
+                                         x_from + line_h                  , gp_rank_y + line_h);
+                 
+            gui::IGUIStaticText* label =
+                GUIEngine::getGUIEnv()->addStaticText( stringw(gp_score_str.str().c_str()).c_str(), entry_area,
+                                                       false , true , // border, word warp
+                                                       m_irrlicht_window);
+            label->setTabStop(false);
+            label->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_CENTER);
+            
+            IGUIImage* img = GUIEngine::getGUIEnv()->addImage( icon_area, m_irrlicht_window );
+            img->setImage(kart_icon_texture);
+            img->setScaleImage(true);
+            img->setTabStop(false);
+            img->setUseAlphaChannel(true);
+        }
+        
+    }
+    
     // ---- Buttons at the bottom
     if (unlock_manager->getRecentlyUnlockedFeatures().size() > 0)
     {
