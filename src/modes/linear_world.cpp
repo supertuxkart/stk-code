@@ -210,8 +210,7 @@ void LinearWorld::update(float delta)
     }
     
 #ifdef DEBUG
-    // FIXME: Debug output in case that the double position error
-    // occurs again. It can most likely be removed.
+    // FIXME: Debug output in case that the double position error occurs again.
     int pos_used[10];
     for(int i=0; i<10; i++) pos_used[i]=-99;
     for(unsigned int i=0; i<kart_amount; i++)
@@ -602,7 +601,13 @@ void LinearWorld::updateRacePosition()
         // these karts would get their rank updated, it could happen
         // that a kart that finished first will be overtaken after
         // crossing the finishing line and become second!
-        if(kart->isEliminated() || kart->hasFinishedRace()) continue;
+        if(kart->isEliminated() || kart->hasFinishedRace())
+        {
+#ifdef DEBUG
+            rank_used[kart->getPosition()] = true;
+#endif
+            continue;
+        }
         KartInfo& kart_info = m_kart_info[i];
         
         int p = 1 ;
@@ -666,6 +671,7 @@ void LinearWorld::updateRacePosition()
             }
             
             std::cerr << "    --> And " << kart->getIdent() << " is being set at rank " << p << std::endl;
+            history->Save();
             assert(false);
         }
         rank_used[p] = true;
