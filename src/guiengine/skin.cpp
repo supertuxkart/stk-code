@@ -718,6 +718,8 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
         {
+            //GUIEngine::getDriver()->draw2DRectangle( SColor(255, 255,0,0), rect );
+
             ITexture* tex_bubble = SkinConfig::m_render_params["selectionHalo::neutral"].getImage();   
             
             const int texture_w = tex_bubble->getSize().Width;
@@ -727,15 +729,17 @@ void Skin::drawRibbonChild(const core::rect< s32 > &rect, Widget* widget, const 
             core::rect<s32> source_area = core::rect<s32>(0, 0, texture_w, texture_h);
             
             const float outgrow = 0.35f; // make slightly bigger than the icon it's on
-            const int rectHeight = (int)(rect.getHeight() * (1.0f + outgrow));
-            const int rectWidth = (int)(rectHeight * aspectRatio);
+            const int rectHeight = int(rect.getHeight() * (1.0f + outgrow));
+            const int rectWidth = int(rectHeight * aspectRatio);
             const int x_gap = (rect.getWidth() - rectWidth)/2;
-            const int y_shift_up = (int)(rect.getHeight() * (outgrow/2.0f));
+            const int y_shift_up = int((rectHeight - rect.getHeight()) / 2.0f);
             
             core::rect< s32 > rect2( position2d< s32 >(rect.UpperLeftCorner.X + x_gap,
                                                        rect.UpperLeftCorner.Y - y_shift_up),
-                                    dimension2d< s32 >(rectWidth, rectHeight) );
+                                     dimension2d< s32 >(rectWidth, rectHeight) );
             
+            //GUIEngine::getDriver()->draw2DRectangleOutline( rect2, SColor(255, 0,255,0) );
+
             GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2, source_area,
                                                 0 /* no clipping */, 0, true /* alpha */);
         }
