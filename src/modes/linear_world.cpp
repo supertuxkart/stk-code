@@ -615,22 +615,40 @@ void LinearWorld::updateRacePosition()
         const int my_id                = kart->getWorldKartId();
         const int my_laps              = getLapForKart(my_id);
         const float my_progression     = getDistanceDownTrackForKart(my_id);
+        
+#if _DEBUG_PRINTS_LIKE_MAD_
+        std::cout << "counting karts ahead of " << kart->getIdent() << "\n";
+#endif
+        
+        // Count karts ahead of the current kart, i.e. kart that are already finished,
+        // have done more laps, or the same number of laps, but a greater distance.
         for (unsigned int j = 0 ; j < kart_amount ; j++)
         {
             if(j == kart->getWorldKartId())  continue; // don't compare a kart with itself
             
             //if(m_karts[j]->isEliminated())   continue; // dismiss eliminated karts
 
-            // Count karts ahead of the current kart, i.e. kart that are already finished,
-            // have done more laps, or the same number of laps, but a greater distance.
-            if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace()) { p++; continue; }
+            if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
+            {
+                p++;
+#if _DEBUG_PRINTS_LIKE_MAD_
+                std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has finished.\n";
+#endif
+                continue;
+            }
 
             /* has done more or less lapses */
             assert(j==m_karts[j]->getWorldKartId());
             int other_laps = getLapForKart(j);
             if (other_laps !=  my_laps)
             {
-                if(other_laps > my_laps) p++; // Other kart has more lapses
+                if(other_laps > my_laps)
+                {
+                    p++; // Other kart has more lapses
+#if _DEBUG_PRINTS_LIKE_MAD_
+                    std::cout << "    " << p << " : " << m_karts[j]->getIdent() << " because he has more laps than me.\n";
+#endif
+                }
                 continue;
             }
             // Now both karts have the same number of lapses. Test progression.
@@ -641,7 +659,12 @@ void LinearWorld::updateRacePosition()
                 (other_progression == my_progression &&
                 m_karts[j]->getInitialPosition() > kart->getInitialPosition()) )
             {
-                            p++;
+                p++;
+#if _DEBUG_PRINTS_LIKE_MAD_
+                std::cout << "    " << p << " : " << m_karts[j]->getIdent() <<
+                        " because he has is further within the track (my progression is " <<
+                        my_progression << ", his progression is " << other_progression << ")\n";
+#endif
             }
         } //next kart
         
