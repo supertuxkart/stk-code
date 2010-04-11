@@ -604,7 +604,16 @@ void DynamicRibbonWidget::propagateSelection()
         if (selected_ribbon == NULL) continue;
         
         const int relative_selection = selected_ribbon->m_selection[p];
-        const float where = (float)relative_selection / (float)(selected_ribbon->m_children.size() - 1);
+        float where = 0.0f;
+        
+        if (selected_ribbon->m_children.size() > 1)
+        {
+            where = (float)relative_selection / (float)(selected_ribbon->m_children.size() - 1);
+        }
+        else
+        {
+            where = 0.0f;
+        }
         assert(where >= 0.0f);
         assert(where <= 1.0f);
 
