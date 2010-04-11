@@ -41,6 +41,40 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+
+/**
+ 
+ This dialog can take many different shapes. Here's the global layout :
+ 
+ 
+ +-----------------------------------------------+
+ |      rankings                 |   highscores  |
+ |                               |   (optional)  |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ |                               |               |
+ +-------------------------------+---------------+   <-- m_buttons_y_from
+ |                  (New race)                   |
+ +-----------------------------------------------+
+ | Unlock message  (Race again)    (continue GP) |
+ +-----------------------------------------------+
+ | (See unlocked) (Back to menu)     (abort GP)  |
+ +-----------------------------------------------+
+ 
+       (1)              (2)             (3)
+ 
+ There are 3 possible sets of buttons/labels that can appear at the bottom :
+ (1) these buttons are shown when some feature is unlocked
+ (2) these buttons are shown at the end of a single race (and no features have been unlocked)
+ (3) these buttons are shown at the end of a race within a GP (and no features have been unlocked)
+
+ */
+
 // ------------------------------------------------------------------------------------------------------
 
 RaceOverDialog::RaceOverDialog(const float percentWidth, 
@@ -84,7 +118,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
     
     // make things more compact if we're missing space
     while (lines_from_y + (int)num_karts*line_h > m_buttons_y_from) // cheap way to avoid calculating the               
-    {                                                             // required size with proper maths
+    {                                                               // required size with proper maths (FIXME)
         line_h = (int)(line_h*0.9f);
     }
     
