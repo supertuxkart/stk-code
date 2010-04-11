@@ -604,7 +604,10 @@ void DynamicRibbonWidget::propagateSelection()
         if (selected_ribbon == NULL) continue;
         
         const int relative_selection = selected_ribbon->m_selection[p];
-        
+        const float where = (float)relative_selection / (float)(selected_ribbon->m_children.size() - 1);
+        assert(where >= 0.0f);
+        assert(where <= 1.0f);
+
         if (m_combo)
         {
             m_selected_item[p] = relative_selection + m_scroll_offset;
@@ -618,7 +621,7 @@ void DynamicRibbonWidget::propagateSelection()
             RibbonWidget* ribbon = m_rows.get(n);
             if (ribbon != selected_ribbon)
             {
-                ribbon->m_selection[p] = std::min(relative_selection, ribbon->m_children.size()-1);
+                ribbon->m_selection[p] = (int)round(where*(ribbon->m_children.size()-1));
                 ribbon->updateSelection();
             }
         }
