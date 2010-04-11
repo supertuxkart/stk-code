@@ -35,6 +35,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_gauge = gauge;
     
     m_check_inside_me = true; //FIXME: not sure this is necessary
+    m_supports_multiplayer = true;
 }
 
 // -----------------------------------------------------------------------------

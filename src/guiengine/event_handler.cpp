@@ -23,6 +23,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input_manager.hpp"
+#include "states_screens/state_manager.hpp"
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -351,7 +352,11 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         return;
     
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
-    if (w != NULL) el = w->getIrrlichtElement();
+    if (w != NULL)
+    {
+        el = w->getIrrlichtElement();
+    }
+
     
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
@@ -378,6 +383,7 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     {
         Widget* up = GUIEngine::getWidget( w->m_tab_up_root );
         assert( up != NULL );
+
         el = up->getIrrlichtElement();
         
         if (el == NULL)
@@ -398,13 +404,17 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         el->getTabGroup()->getNextElement(el->getTabOrder(), true /* reverse */, false /* group */, first, closest))
     {
         //std::cout << "Navigating up to " << closest->getID() << std::endl;
-        Widget* w = GUIEngine::getWidget( closest->getID() );
-        w->setFocusForPlayer(playerID);
+        Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
+        if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+
+        //FIXME: something's wrong here, I use 'closestWidget', THEN verify it's not NULL xD
+        
+        closestWidget->setFocusForPlayer(playerID);
         
         // when focusing a list by going up, select the last item of the list
-        if (w != NULL && w->m_type == WTYPE_LIST)
+        if (closestWidget != NULL && closestWidget->m_type == WTYPE_LIST)
         {
-            IGUIListBox* list = (IGUIListBox*)(w->m_element);
+            IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
             assert(list != NULL);
             
             list->setSelected( list->getItemCount()-1 );
@@ -420,20 +430,20 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         //else if (!el->getTabGroup()->getNextElement(el->getTabOrder(), true, false, first, closest))std::cout << "    because el (" << core::stringc(el->getText()).c_str() << ", tab order " << el->getTabOrder() << ") has no known previous\n"; 
         
         // select the last widget
-        Widget* w = NULL;
+        Widget* lastWidget = NULL;
         
         if (ModalDialog::isADialogActive())
         {
-            w = ModalDialog::getCurrent()->getLastWidget();
+            lastWidget = ModalDialog::getCurrent()->getLastWidget();
         }
         else
         {
             Screen* screen = GUIEngine::getCurrentScreen();
             if (screen == NULL) return;
-            w = screen->getLastWidget();
+            lastWidget = screen->getLastWidget();
         }
         
-        if (w != NULL) w->setFocusForPlayer(playerID);
+        if (lastWidget != NULL) lastWidget->setFocusForPlayer(playerID);
     }
 }
 
@@ -449,7 +459,10 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         return;
     
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
-    if (w != NULL) el = w->getIrrlichtElement();
+    if (w != NULL)
+    {
+        el = w->getIrrlichtElement();
+    }
     //std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
     
     // list widgets are a bit special, because up/down keys are also used
@@ -495,14 +508,16 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     if (el != NULL && el->getTabGroup() != NULL &&
        el->getTabGroup()->getNextElement(el->getTabOrder(), false, false, first, closest))
     {
-        Widget* w = GUIEngine::getWidget( closest->getID() );
-        assert( w != NULL );
-        w->setFocusForPlayer(playerID);
+        Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
+        if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
+        
+        assert( closestWidget != NULL );
+        closestWidget->setFocusForPlayer(playerID);
         
         // another list exception : when entering a list, select the first item
-        if (w->m_type == WTYPE_LIST)
+        if (closestWidget->m_type == WTYPE_LIST)
         {
-            IGUIListBox* list = (IGUIListBox*)(w->m_element);
+            IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
             assert(list != NULL);
 
             list->setSelected(0);
@@ -512,21 +527,21 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     {
 
         // select the first widget
-        Widget* w = NULL;
+        Widget* firstWidget = NULL;
         
         if (ModalDialog::isADialogActive())
         {
-            std::cout <<  "w = ModalDialog::getCurrent()->getFirstWidget();\n";
-            w = ModalDialog::getCurrent()->getFirstWidget();
+            //std::cout <<  "w = ModalDialog::getCurrent()->getFirstWidget();\n";
+            firstWidget = ModalDialog::getCurrent()->getFirstWidget();
         }
         else
         {
             Screen* screen = GUIEngine::getCurrentScreen();
             if (screen == NULL) return;
-            w = screen->getFirstWidget();  
+            firstWidget = screen->getFirstWidget();  
         }
         
-        if (w != NULL)  w->setFocusForPlayer(playerID);
+        if (firstWidget != NULL)  firstWidget->setFocusForPlayer(playerID);
     }
 }
 

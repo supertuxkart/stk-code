@@ -34,17 +34,17 @@ const char* DynamicRibbonWidget::NO_ITEM_ID = "?";
 
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {
-    m_scroll_offset       = 0;
-    m_needed_cols         = 0;
-    m_col_amount          = 0;
-    m_previous_item_count = 0;
-    m_multi_row           = multi_row;
-    m_combo               = combo;
-    m_has_label           = false;
-    m_left_widget         = NULL;
-    m_right_widget        = NULL;
-    
-    m_check_inside_me     = true;
+    m_scroll_offset        = 0;
+    m_needed_cols          = 0;
+    m_col_amount           = 0;
+    m_previous_item_count  = 0;
+    m_multi_row            = multi_row;
+    m_combo                = combo;
+    m_has_label            = false;
+    m_left_widget          = NULL;
+    m_right_widget         = NULL;
+    m_check_inside_me      = true;
+    m_supports_multiplayer = true;
     
     // by default, set all players to have no selection in this ribbon
     for (int n=0; n<MAX_PLAYER_COUNT; n++)

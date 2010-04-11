@@ -212,6 +212,12 @@ namespace GUIEngine
         Widget* m_event_handler;
         
         
+        /**
+          * Whether this widget supports multiplayer interaction (i.e. whether this widget can be
+          * used by players other than by the game master)
+          */
+        bool m_supports_multiplayer;
+        
         /** Instead of searching for widget IDs smaller/greater than that of this object, navigation
             through widgets will start from these IDs (if they are set). */
         int m_tab_down_root;

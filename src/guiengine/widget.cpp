@@ -75,6 +75,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_show_bounding_box = false;
     m_parent = NULL;
     m_reserve_id = reserve_id;
+    m_supports_multiplayer = false;
     
     m_tab_down_root = -1;
     m_tab_up_root = -1;

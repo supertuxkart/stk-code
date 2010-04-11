@@ -48,6 +48,7 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
     m_listener    = NULL;
 
     m_check_inside_me = true;
+    m_supports_multiplayer = (type == RIBBON_TOOLBAR);
     
     updateSelection();
 }

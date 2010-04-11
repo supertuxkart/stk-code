@@ -70,6 +70,7 @@ public:
     {
         m_parent = parent;
         m_reserved_id = -1;
+        m_supports_multiplayer = true;
         
         x = 0;
         y = 0;
