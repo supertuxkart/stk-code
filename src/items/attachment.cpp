@@ -189,7 +189,7 @@ void Attachment::update(float dt)
     case ATTACH_BOMB:
         if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
         {
-            m_node->setCurrentFrame((m_node->getEndFrame() - m_node->getStartFrame() - 1) - (int) m_time_left);
+            m_node->setCurrentFrame(m_node->getEndFrame() - m_node->getStartFrame() - 1 -m_time_left);
         }
         if(m_time_left<=0.0)
         {
