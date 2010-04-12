@@ -52,11 +52,6 @@ private:
     /** Scaling for mini map, only x and y components are used. */
     Vec3                     m_scaling;
 
-    /** This is the track coordinate for the start line. This offset is
-     *  added to the Y value of spatialToTrack. It guarantees that the
-     *  start line is always at track coordinates 0 (for Y).            */
-    float                    m_offset_for_startline;
-
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
 

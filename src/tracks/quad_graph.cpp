@@ -40,7 +40,6 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_offset_for_startline = 0;
     m_all_quads            = new QuadSet(quad_file_name);
     m_quad_filename        = quad_file_name;
     GraphNode::m_all_quads = m_all_quads;
@@ -79,7 +78,6 @@ void QuadGraph::setStartCoordinate(const CheckLine &cl)
     }
     Vec3 xyz;
     spatialToTrack(&xyz, start_point, sector);
-    m_offset_for_startline = xyz.getZ();
 }   // setStartCoordinate
 
 // -----------------------------------------------------------------------------
@@ -325,10 +323,6 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
     }
 
     getNode(sector).getDistances(xyz, dst);
-    float z=dst->getZ();
-    z=z-m_offset_for_startline;
-    if(z<0) z+=m_lap_length;
-    dst->setZ(z);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
