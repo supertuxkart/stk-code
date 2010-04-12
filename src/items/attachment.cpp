@@ -56,11 +56,6 @@ void Attachment::set(attachmentType type, float time, Kart *current_kart)
 {
     clear();
     m_node->setMesh(attachment_manager->getMesh(type));
-    if(type==ATTACH_BOMB)
-    {
-        int num_frames = m_node->getEndFrame() - m_node->getStartFrame()+1;
-        m_node->setAnimationSpeed(num_frames / time);
-    }
     m_type           = type;
     m_time_left      = time;
     m_previous_owner = current_kart;
@@ -192,7 +187,11 @@ void Attachment::update(float dt)
     case ATTACH_MAX:
         break;
     case ATTACH_BOMB:
-        if(m_time_left<=0.0) 
+        if(m_time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
+        {
+            m_node->setCurrentFrame((m_node->getEndFrame() - m_node->getStartFrame() - 1) - (int) m_time_left);
+        }
+        if(m_time_left<=0.0)
         {
             projectile_manager->newExplosion(m_kart->getXYZ());
             m_kart->handleExplosion(m_kart->getXYZ(), 
