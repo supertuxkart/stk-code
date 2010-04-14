@@ -46,7 +46,7 @@ void LinearWorld::init()
     {
         KartInfo info;
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = 0;
         info.m_last_valid_race_lap  = -1;
         info.m_lap_start_time       = 0;
         m_track->getQuadGraph().findRoadSector(m_karts[n]->getXYZ(),
@@ -94,7 +94,7 @@ void LinearWorld::restartRace()
     {
         KartInfo& info = m_kart_info[i];
         info.m_track_sector         = QuadGraph::UNKNOWN_SECTOR;
-        info.m_last_valid_sector    = QuadGraph::UNKNOWN_SECTOR;
+        info.m_last_valid_sector    = 0;
         info.m_lap_start_time       = 0;
         m_track->getQuadGraph().findRoadSector(m_karts[i]->getXYZ(),
                                                &info.m_track_sector);
