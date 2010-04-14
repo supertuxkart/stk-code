@@ -90,7 +90,7 @@ void PhysicalObject::init()
     {
     case MP_CONE:   {
                     if(m_radius<0) m_radius = 0.5f*extend.length_2d();
-                    m_shape = new btConeShapeZ(m_radius, extend.getZ());
+                    m_shape = new btConeShape(m_radius, extend.getY());
                     break;
                     }
     case MP_BOX:    m_shape = new btBoxShape(0.5*extend);
@@ -121,7 +121,7 @@ void PhysicalObject::init()
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin()+btVector3(0,0,extend.getZ()*0.5f));
+    m_init_pos.setOrigin(m_init_pos.getOrigin()+btVector3(0,extend.getY()*0.5f, 0));
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
     m_shape->calculateLocalInertia(m_mass, inertia);
@@ -142,20 +142,19 @@ void PhysicalObject::update(float dt)
     btTransform t;
     m_motion_state->getWorldTransform(t);
 
-    Coord c(t);
-    if(c.getXYZ().getZ()<-100)
+    Vec3 xyz = t.getOrigin();
+    if(xyz.getY()<-100)
     {
         m_body->setCenterOfMassTransform(m_init_pos);
-        c.setXYZ(m_init_pos.getOrigin());
+        m_body->setLinearVelocity (btVector3(0,0,0));
+        m_body->setAngularVelocity(btVector3(0,0,0));
+        xyz = Vec3(m_init_pos.getOrigin());
     }
-    m_animated_node->setPosition(c.getXYZ().toIrrVector());
-    btQuaternion q=t.getRotation();
-    core::quaternion qirr(q.getX(), q.getZ(), q.getY(), -q.getW());
-    core::vector3df r;
-    qirr.toEuler(r);
-    m_animated_node->setRotation(r*RAD_TO_DEGREE);
+    m_animated_node->setPosition(xyz.toIrrVector());
+    Vec3 hpr;
+    hpr.setHPR(t.getRotation());
+    m_animated_node->setRotation(hpr.toIrrHPR());
     return;
-
 }   // update
 
 // -----------------------------------------------------------------------------
