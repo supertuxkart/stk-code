@@ -254,6 +254,28 @@ void LinearWorld::newLap(unsigned int kart_index)
         m_race_gui->addMessage(_("Final lap!"), m_karts[kart_index],
                                3.0f, 40, video::SColor(255, 210, 100, 50), true);
     }
+
+    // The race positions must be updated here: consider the situation where 
+    // the first kart does not cross the finish line in its last lap, instead 
+    // it passes it, the kart reverses and crosses the finishing line 
+    // backwards. Just before crossing the finishing line the kart will be on
+    // the last lap, but with a distance along the track close to zero. 
+    // Therefore its position will be wrong. If the race position gets updated
+    // after increasing the number of laps (but before tagging the kart to have
+    // finished the race) the position will be correct (since the kart now
+    // has one additional lap it will be ahead of the other karts).
+    // Without this call the incorrect position for this kart would remain
+    // (since a kart that has finished the race does not get its position
+    // changed anymore), potentially resulting in a duplicated race position
+    // (since the first kart does not have position 1, no other kart can get
+    // position 1, so one rank will be duplicated).
+    // Similarly the situation can happen if the distance along track should
+    // go back to zero before actually crossing the finishing line. While this
+    // should not happen, it could potentially be caused by floating point
+    // errors. In this case the call to updateRacePosion will avoid duplicated
+    // race positions as well.
+    updateRacePosition();
+
     // Race finished
     if(kart_info.m_race_lap >= race_manager->getNumLaps() && raceHasLaps())
     {
