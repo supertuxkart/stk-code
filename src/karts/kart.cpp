@@ -56,6 +56,12 @@
 #  pragma warning(disable:4355)
 #endif
 
+/** The kart constructor. 
+ *  \param ident  The identifier for the kart model to use.
+ *  \param position The position (or rank) for this kart (between 1 and
+ *         number of karts). This is used to determine the start position.
+ *  \param init_transform  The initial position and rotation for this kart.
+ */
 Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
@@ -158,7 +164,12 @@ void Kart::setController(Controller *controller)
 }   // setController
 
 // -----------------------------------------------------------------------------
-
+/** Returns a transform that will align an object with the kart: the heading 
+ *  and the pitch will be set appropriately. A custom pitch value can be 
+ *  specified in order to overwrite the terrain pitch (which would be used
+ *  otherwise).
+ *  \param customPitch Pitch value to overwrite the terrain pitch.
+ */
 btTransform Kart::getKartHeading(const float customPitch)
 {
     btTransform trans = getTrans();
@@ -173,7 +184,7 @@ btTransform Kart::getKartHeading(const float customPitch)
 }   // getKartHeading
 
 // ----------------------------------------------------------------------------
-/** Created the physical representation of this kart. Atm it uses the actual
+/** Creates the physical representation of this kart. Atm it uses the actual
  *  extention of the kart model to determine the size of the collision body.
  */
 void Kart::createPhysics()
@@ -268,7 +279,11 @@ void Kart::createPhysics()
     }
 }   // createPhysics
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** The destructor frees the memory of this kart, but note that the actual kart
+ *  model is still stored in the kart_properties (m_kart_model variable), so 
+ *  it is not reloaded).
+ */
 Kart::~Kart()
 {
     //stop the engine sound
@@ -325,14 +340,11 @@ void Kart::eliminate()
     }
     m_kart_mode = KM_ELIMINATED;
 
-    // make the kart invisible by placing it way under the track
     getNode()->setVisible(false);
 }   // eliminate
 
 //-----------------------------------------------------------------------------
-/** Returns true if the kart is 'resting'
- *
- * Returns true if the kart is 'resting', i.e. (nearly) not moving.
+/** Returns true if the kart is 'resting', i.e. (nearly) not moving.
  */
 bool Kart::isInRest() const
 {
@@ -364,7 +376,8 @@ void Kart::updatedWeight()
 }   // updatedWeight
 
 //-----------------------------------------------------------------------------
-/** Reset before a new race.
+/** Reset before a new race. It will remove all attachments, and
+ *  puts the kart back at its original start position.
  */
 void Kart::reset()
 {
@@ -381,6 +394,8 @@ void Kart::reset()
         m_camera->setInitialTransform();
     }
     
+    // Stop any animations currently being played.
+    m_kart_properties->getKartModel()->setAnimation(KartModel::AF_DEFAULT);
     // If the controller was replaced (e.g. replaced by end controller), 
     //  restore the original controller. 
     if(m_saved_controller)
@@ -511,6 +526,13 @@ void Kart::finishedRace(float time)
 }   // finishedRace
 
 //-----------------------------------------------------------------------------
+/** Called when an item is collected. It will either adjust the collected
+ *  energy, or update the attachment or powerup for this kart.
+ *  \param item The item that was hit.
+ *  \param add_info Additional info, used in networking games to force
+ *         a specific item to be used (instead of a random item) to keep
+ *         all karts in synch.
+ */
 void Kart::collectedItem(const Item &item, int add_info)
 {
     float old_energy          = m_collected_energy;
@@ -559,7 +581,9 @@ void Kart::collectedItem(const Item &item, int add_info)
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
-// Simulates gears
+/** Simulates gears by adjusting the force of the engine. It also takes the
+ *  effect of the zipper into account.
+ */
 float Kart::getActualWheelForce()
 {
     float zipperF=(m_zipper_time_left>0.0f) ? stk_config->m_zipper_force : 0.0f;
@@ -568,8 +592,8 @@ float Kart::getActualWheelForce()
     {
         if(m_speed <= getMaxSpeed()*gear_ratio[i])
         {
-            m_current_gear_ratio = gear_ratio[i];
-            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]+zipperF;
+            return getMaxPower()*m_kart_properties->getGearPowerIncrease()[i]
+                  +zipperF;
         }
     }
     return getMaxPower()+zipperF;
@@ -577,8 +601,8 @@ float Kart::getActualWheelForce()
 }   // getActualWheelForce
 
 //-----------------------------------------------------------------------------
-/** The kart is on ground if all 4 wheels touch the ground
-*/
+/** The kart is on ground if all 4 wheels touch the ground.
+ */
 bool Kart::isOnGround() const
 {
     return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels());
@@ -588,7 +612,6 @@ bool Kart::isOnGround() const
  *  is used to determine when to switch off the upright constraint, so that
  *  explosions can be more violent, while still
 */
-
 bool Kart::isNearGround() const
 {
     if(getHoT()==Track::NOHIT)
@@ -597,6 +620,11 @@ bool Kart::isNearGround() const
         return ((getXYZ().getZ() - getHoT()) < stk_config->m_near_ground);
 }   // isNearGround
 //-----------------------------------------------------------------------------
+/** Called when an explosion happens.
+ *  \param pos Position of the explosion.
+ *  \param direct_hit True if this kart was hit directly (and should therefore
+ *         be more severly affected).
+ */
 void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 {
     int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
@@ -652,6 +680,10 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
 }   // handleExplosion
 
 //-----------------------------------------------------------------------------
+/** Updates the kart in each time step. It updates the physics setting,
+ *  particle effects, camera position, etc.
+ *  \param dt Time step size.
+ */
 void Kart::update(float dt)
 {
     if(!history->replayHistory())
@@ -713,23 +745,16 @@ void Kart::update(float dt)
     if ( m_kart_mode==KM_RESCUE )
     {
         // Let the kart raise 2m in the 2 seconds of the rescue
-        const float rescue_time   = 2.0f;
+        const float rescue_time   = m_kart_properties->getRescueTime();
         const float rescue_height = 2.0f;
-        if(m_attachment->getType() != ATTACH_TINYTUX)
-        {
-            m_attachment->set( ATTACH_TINYTUX, rescue_time ) ;
-            m_rescue_pitch = getHPR().getPitch();
-            m_rescue_roll  = getHPR().getRoll();
-            race_state->itemCollected(getWorldKartId(), -1, -1);
-        }
-        World::getWorld()->getPhysics()->removeKart(this);
-
         btQuaternion q_roll (btVector3(0.0f, 0.0f, 1.0f),
-                             -m_rescue_roll*dt/rescue_time*M_PI/180.0f);
+                             -m_rescue_roll*dt/rescue_time*DEGREE_TO_RAD);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
-                             -m_rescue_pitch*dt/rescue_time*M_PI/180.0f);
-        setXYZRotation(getXYZ()+Vec3(0, rescue_height*dt/rescue_time, 0),
-                       getRotation()*q_roll*q_pitch);
+                             -m_rescue_pitch*dt/rescue_time*DEGREE_TO_RAD);
+        setXYZ(getXYZ()+Vec3(0, 
+                             m_kart_properties->getRescueHeight()*dt/rescue_time,
+                             0));
+        setRotation(getRotation()*q_roll*q_pitch);
     }   // if rescue mode
     m_attachment->update(dt);
 
@@ -772,13 +797,6 @@ void Kart::update(float dt)
     // happening (since Z velocity is clamped), the epsilon is left in place
     // just to be on the safe side (it will not hit the chassis itself).
     Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0.3f,0);
-    // These values cause the track not to be hit in tuxtrack. I leave
-    // them in as a test case if additional debugging should be needed.
-    // Note: it might be that the kart chassis is actually 'in' the track,
-    // i.e. it's a tunneling problem!
-    //btVector3 pos_plus_epsilon (-54.449902, -139.99402, -3.4524240);
-    // motionstate:               -52.449902, -139.99402, -3.6524241
-    // collision object           -52.221024, -139.99614, -3.5276926
 
     // Make sure that the ray doesn't hit the kart. This is done by
     // resetting the collision filter group, so that this collision
@@ -1084,10 +1102,13 @@ bool Kart::playCustomSFX(unsigned int type)
     return ret;
      */
 }
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Updates the physics for this kart: computing the driving force, set 
+ *  steering, handles skidding, terrain impact on kart, ...
+ *  \param dt Time step size.
+ */
 void Kart::updatePhysics(float dt)
 {
-
     m_bounce_back_time-=dt;
     float engine_power = getActualWheelForce() + handleNitro(dt)
                                                + handleSlipstream(dt);
@@ -1304,11 +1325,23 @@ void Kart::updatePhysics(float dt)
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------
-/** Sets the mode of the kart to being rescued.
+/** Sets the mode of the kart to being rescued, attaches the rescue model
+ *  and saves the current pitch and roll (for the rescue animation). It
+ *  also removes the kart from the physics world.
  */
 void Kart::forceRescue()
 {
     m_kart_mode=KM_RESCUE;
+    // Just in case that rescue is pressed while the kart is being rescued
+    if(m_attachment->getType() != ATTACH_TINYTUX)
+    {
+        m_attachment->set( ATTACH_TINYTUX, m_kart_properties->getRescueTime());
+        m_rescue_pitch = getPitch();
+        m_rescue_roll  = getRoll();
+        race_state->itemCollected(getWorldKartId(), -1, -1);
+        World::getWorld()->getPhysics()->removeKart(this);
+    }
+
 }   // forceRescue
 
 //-----------------------------------------------------------------------------
@@ -1331,7 +1364,9 @@ void Kart::endRescue()
 }   // endRescue
 
 //-----------------------------------------------------------------------------
-
+/** Attaches the right model, creates the physics and loads all special 
+ *  effects (particle systems etc.)
+ */
 void Kart::loadData()
 {
     m_kart_properties->getKartModel()->attachModel(&m_node);
@@ -1400,8 +1435,6 @@ void Kart::applyEngineForce(float force)
 }   // applyEngineForce
 
 //-----------------------------------------------------------------------------
-void Kart::updateGraphics(const Vec3& offset_xyz, 
-                          const btQuaternion& rotation)
 /** Updates the graphics model. Mainly set the graphical position to be the
  *  same as the physics position, but uses offsets to position and rotation
  *  for special gfx effects (e.g. skidding will turn the karts more). These
@@ -1410,6 +1443,8 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
  *  \param offset_xyz Offset to be added to the position.
  *  \param rotation Additional rotation.
  */
+void Kart::updateGraphics(const Vec3& offset_xyz, 
+                          const btQuaternion& rotation)
 {
     float wheel_up_axis[4];
     KartModel *kart_model = m_kart_properties->getKartModel();

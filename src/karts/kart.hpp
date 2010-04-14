@@ -174,7 +174,6 @@ private:
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
     float         m_speed;
-    float         m_current_gear_ratio;
     /** Different kart modes: normal racing, being rescued, showing end
      *  animation, explosions, kart eliminated. */
     enum          {KM_RACE, KM_RESCUE, KM_END_ANIM, KM_EXPLOSION, 

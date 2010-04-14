@@ -100,14 +100,6 @@ public:
         m_motion_state->setWorldTransform(m_transform);
     }
     // ------------------------------------------------------------------------
-    /** Sets XYZ position and rotation of this moveable. */
-    void setXYZRotation(const Vec3& xyz, const btQuaternion& a)
-    {
-        m_transform.setRotation(a);
-        m_transform.setOrigin(xyz);
-        m_motion_state->setWorldTransform(m_transform);
-    }
-    // ------------------------------------------------------------------------
     virtual void  handleZipper ()  {};
     virtual void  updateGraphics(const Vec3& off_xyz,  
                                  const btQuaternion& off_rotation);

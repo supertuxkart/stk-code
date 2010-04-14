@@ -69,7 +69,7 @@ private:
 
     // Display and gui
     // ---------------
-    irr::core::stringw m_name;       /**< The human readable Name of the kart
+    irr::core::stringw m_name;        /**< The human readable Name of the kart
                                        *   driver. */
     std::string m_ident;              /**< The computer readable-name of the
                                        *   kart driver. */
@@ -106,6 +106,15 @@ private:
                                            kart length. */
           m_max_radius;               /**< Largest turn radius. */
 
+    /** Time a kart is moved upwards after when it is rescued. */
+    float m_rescue_time;
+
+    /** Distance the kart is raised before dropped. */
+    float m_rescue_height;
+
+    /** Vertical offset after rescue. */
+    float m_rescue_vert_offset;
+
     std::string m_wheel_filename[4];   /**< Filename of the wheel models.    */
                                        /**  Radius of the graphical wheels.  */
     float       m_wheel_graphics_radius[4];
@@ -138,7 +147,6 @@ private:
      *  out of the way of the faster kart in case of a collision. */
     float m_collision_side_impulse;
     float m_jump_velocity;            /**< Vertical velocity set when jumping. */
-    float m_vert_rescue_offset;       /**< Vertical offset after rescue. */
     float m_upright_tolerance;
     float m_upright_max_force;
 
@@ -234,7 +242,11 @@ public:
     float getCollisionSideImpulse   () const {return m_collision_side_impulse;   }
     /** Returns the vertical offset when rescuing karts to avoid karts being
      *  rescued in (or under) the track. */
-    float getVertRescueOffset       () const {return m_vert_rescue_offset;       }
+    float getVertRescueOffset       () const {return m_rescue_vert_offset;       }
+    /** Returns the time a kart is rised during a rescue. */
+    float getRescueTime             () const {return m_rescue_time;              }
+    /** Returns the height a kart is moved to during a rescue. */
+    float getRescueHeight           () const {return m_rescue_height;            }
     float getUprightTolerance       () const {return m_upright_tolerance;        }
     float getUprightMaxForce        () const {return m_upright_max_force;        }
     float getTrackConnectionAccel   () const {return m_track_connection_accel;   }

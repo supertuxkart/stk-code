@@ -62,7 +62,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_wheel_radius = m_chassis_linear_damping =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_jump_velocity =
-        m_vert_rescue_offset = m_upright_tolerance = m_collision_side_impulse =
+        m_rescue_vert_offset = m_upright_tolerance = m_collision_side_impulse =
         m_upright_max_force = m_suspension_travel_cm =
         m_track_connection_accel = m_min_speed_turn = m_angle_at_min =
         m_max_speed_turn = m_angle_at_max =
@@ -71,7 +71,8 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_skid_decrease = m_skid_increase = m_skid_visual = m_skid_max =
         m_slipstream_length = m_slipstream_collect_time = 
         m_slipstream_use_time = m_slipstream_add_power =
-        m_slipstream_min_speed = m_camera_distance = UNDEFINED;
+        m_slipstream_min_speed = m_camera_distance = 
+        m_rescue_time = m_rescue_height = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -179,6 +180,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 }   // load
 
 //-----------------------------------------------------------------------------
+/** Actually reads in the data from the xml file.
+ *  \param root Root of the xml tree.
+ */
 void KartProperties::getAllData(const XMLNode * root)
 {
     root->get("version", &m_version);
@@ -202,6 +206,13 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))
         nitro_node->get("power-boost", &m_nitro_power_boost);
+
+    if(const XMLNode *rescue_node = root->getNode("rescue"))
+    {
+        rescue_node->get("vert-offset", &m_rescue_vert_offset);
+        rescue_node->get("time",        &m_rescue_time       );
+        rescue_node->get("height",      &m_rescue_height     );
+    }
 
     if(const XMLNode *skid_node = root->getNode("skid"))
     {
@@ -334,9 +345,6 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *collision_node = root->getNode("collision"))
         collision_node->get("side-impulse",  &m_collision_side_impulse);
 
-    if(const XMLNode *rescue_node = root->getNode("rescue"))
-        rescue_node->get("vert-offset", &m_vert_rescue_offset);
-
     //TODO: wheel front right and wheel front left is not loaded, yet is listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
 
@@ -414,54 +422,53 @@ void KartProperties::checkAllSet(const std::string &filename)
                 strA,filename.c_str());exit(-1);                       \
     }
 
-    CHECK_NEG(m_mass,                    "mass"                         );
-    CHECK_NEG(m_engine_power[0],         "engine-power[0]"              );
-    CHECK_NEG(m_engine_power[1],         "engine-power[1]"              );
-    CHECK_NEG(m_engine_power[2],         "engine-power[2]"              );
-    CHECK_NEG(m_min_speed_turn,          "min-speed-angle"              );
-    CHECK_NEG(m_min_radius,              "min-speed-angle"              );
-    CHECK_NEG(m_max_speed_turn,          "max-speed-angle"              );
-    CHECK_NEG(m_max_radius,              "max-speed-angle"              );
-    CHECK_NEG(m_brake_factor,            "brake-factor"                 );
-    CHECK_NEG(m_time_full_steer,         "time-full-steer"              );
-    CHECK_NEG(m_time_full_steer_ai,      "time-full-steer-ai"           );
-
-    //bullet physics data
-    CHECK_NEG(m_suspension_stiffness,      "suspension-stiffness"       );
-    CHECK_NEG(m_wheel_damping_relaxation,  "wheel-damping-relaxation"   );
-    CHECK_NEG(m_wheel_damping_compression, "wheel-damping-compression"  );
-    CHECK_NEG(m_friction_slip,             "friction-slip"              );
-    CHECK_NEG(m_roll_influence,            "roll-influence"             );
-    CHECK_NEG(m_wheel_radius,              "wheel-radius"               );
-    // Don't check m_wheel_base here, it is computed later!
-    CHECK_NEG(m_chassis_linear_damping,    "chassis-linear-damping"     );
-    CHECK_NEG(m_chassis_angular_damping,   "chassis-angular-damping"    );
-    CHECK_NEG(m_max_speed[0],              "maximum-speed[0]"           );
-    CHECK_NEG(m_max_speed[1],              "maximum-speed[1]"           );
-    CHECK_NEG(m_max_speed[2],              "maximum-speed[2]"           );
-    CHECK_NEG(m_max_speed_reverse_ratio,   "max-speed-reverse-ratio"    );
-    CHECK_NEG(m_suspension_rest,           "suspension-rest"            );
-    CHECK_NEG(m_suspension_travel_cm,      "suspension-travel-cm"       );
-    CHECK_NEG(m_collision_side_impulse,    "collision-side-impulse"     );
-    CHECK_NEG(m_jump_velocity,             "jump-velocity"              );
-    CHECK_NEG(m_vert_rescue_offset,        "vert-rescue-offset"         );
-    CHECK_NEG(m_upright_tolerance,         "upright-tolerance"          );
-    CHECK_NEG(m_upright_max_force,         "upright-max-force"          );
-    CHECK_NEG(m_track_connection_accel,    "track-connection-accel"     );
-    CHECK_NEG(m_rubber_band_max_length,    "rubber-band-max-length"     );
-    CHECK_NEG(m_rubber_band_force,         "rubber-band-force"          );
-    CHECK_NEG(m_rubber_band_duration,      "rubber-band-duration"       );
-    CHECK_NEG(m_skid_decrease,             "skid-decrease"              );
-    CHECK_NEG(m_time_till_max_skid,        "time-till-max-skid"         );
-    CHECK_NEG(m_skid_increase,             "skid-increase"              );
-    CHECK_NEG(m_skid_max,                  "skid-max"                   );
-    CHECK_NEG(m_skid_visual,               "skid-visual"                );
-    CHECK_NEG(m_slipstream_length,         "slipstream-length"          );
-    CHECK_NEG(m_slipstream_collect_time,   "slipstream-collect-time"    );
-    CHECK_NEG(m_slipstream_use_time,       "slipstream-use-time"        );
-    CHECK_NEG(m_slipstream_add_power,      "slipstream-add-power"       );
-    CHECK_NEG(m_slipstream_min_speed,      "slipstream-min-speed"       );
-    CHECK_NEG(m_camera_distance,           "camera distance"            );
+    CHECK_NEG(m_mass,                      "mass"                          );
+    CHECK_NEG(m_min_speed_turn,            "turn min-speed-angle"          );
+    CHECK_NEG(m_min_radius,                "turn min-speed-angle"          );
+    CHECK_NEG(m_max_speed_turn,            "turn max-speed-angle"          );
+    CHECK_NEG(m_max_radius,                "turn max-speed-angle"          );
+    CHECK_NEG(m_time_full_steer,           "turn time-full-steer"          );
+    CHECK_NEG(m_time_full_steer_ai,        "turn time-full-steer-ai"       );
+    CHECK_NEG(m_wheel_damping_relaxation,  "wheels damping-relaxation"     );
+    CHECK_NEG(m_wheel_damping_compression, "wheels damping-compression"    );
+    CHECK_NEG(m_wheel_radius,              "wheels radius"                 );
+    CHECK_NEG(m_friction_slip,             "friction slip"                 );
+    CHECK_NEG(m_roll_influence,            "stability roll-influence"      );
+    CHECK_NEG(m_chassis_linear_damping,    "stability chassis-linear-damping");
+    CHECK_NEG(m_chassis_angular_damping,   "stability chassis-angular-damping");
+    CHECK_NEG(m_engine_power[0],           "engine power[0]"               );
+    CHECK_NEG(m_engine_power[1],           "engine power[1]"               );
+    CHECK_NEG(m_engine_power[2],           "engine power[2]"               );
+    CHECK_NEG(m_max_speed[0],              "engine maximum-speed[0]"       );
+    CHECK_NEG(m_max_speed[1],              "engine maximum-speed[1]"       );
+    CHECK_NEG(m_max_speed[2],              "engine maximum-speed[2]"       );
+    CHECK_NEG(m_max_speed_reverse_ratio,   "engine max-speed-reverse-ratio");
+    CHECK_NEG(m_brake_factor,              "engine brake-factor"           );
+    CHECK_NEG(m_suspension_stiffness,      "suspension stiffness"          );
+    CHECK_NEG(m_suspension_rest,           "suspension rest"               );
+    CHECK_NEG(m_suspension_travel_cm,      "suspension travel-cm"          );
+    CHECK_NEG(m_collision_side_impulse,    "collision side-impulse"        );
+    CHECK_NEG(m_jump_velocity,             "jump velocity"                 );
+    CHECK_NEG(m_upright_tolerance,         "upright tolerance"             );
+    CHECK_NEG(m_upright_max_force,         "upright max-force"             );
+    CHECK_NEG(m_track_connection_accel,    "track-connection-accel"        );
+    CHECK_NEG(m_rubber_band_max_length,    "rubber-band max-length"        );
+    CHECK_NEG(m_rubber_band_force,         "rubber-band force"             );
+    CHECK_NEG(m_rubber_band_duration,      "rubber-band duration"          );
+    CHECK_NEG(m_skid_decrease,             "skid decrease"                 );
+    CHECK_NEG(m_time_till_max_skid,        "skid time-till-max"            );
+    CHECK_NEG(m_skid_increase,             "skid increase"                 );
+    CHECK_NEG(m_skid_max,                  "skid max"                      );
+    CHECK_NEG(m_skid_visual,               "skid visual"                   );
+    CHECK_NEG(m_slipstream_length,         "slipstream length"             );
+    CHECK_NEG(m_slipstream_collect_time,   "slipstream collect-time"       );
+    CHECK_NEG(m_slipstream_use_time,       "slipstream use-time"           );
+    CHECK_NEG(m_slipstream_add_power,      "slipstream add-power"          );
+    CHECK_NEG(m_slipstream_min_speed,      "slipstream min-speed"          );
+    CHECK_NEG(m_camera_distance,           "camera distance"               );
+    CHECK_NEG(m_rescue_height,             "rescue height"                 );
+    CHECK_NEG(m_rescue_time,               "rescue time"                   );
+    CHECK_NEG(m_rescue_vert_offset,        "rescue vert-offset"            );
 
 }   // checkAllSet
 
