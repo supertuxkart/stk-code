@@ -909,7 +909,8 @@ IrrDriver::RTTProvider::RTTProvider(const core::dimension2du &dimension,
     m_video_driver = irr_driver->getVideoDriver();
     
     m_render_target_texture = m_video_driver->addRenderTargetTexture(dimension, 
-                                                                     name.c_str());
+                                                                     name.c_str(),
+                                                                     video::ECF_A8R8G8B8);
     m_video_driver->setRenderTarget(m_render_target_texture);
     
     m_rtt_main_node = NULL;
