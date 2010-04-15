@@ -184,9 +184,7 @@ void FileManager::setDevice(IrrlichtDevice *device)
     pushTextureSearchPath(m_root_dir+"/data/textures/");
     pushModelSearchPath  (m_root_dir+"/data/models/"  );
     pushMusicSearchPath  (m_root_dir+"/data/music/"   );
-    m_file_system->addFileArchive("data/models/", 
-                                        /*ignoreCase*/false, 
-                                        /*ignorePaths*/false);
+
     // Add more paths from the STK_MUSIC_PATH environment variable
     if(getenv("SUPERTUXKART_MUSIC_PATH")!=NULL)
     {
