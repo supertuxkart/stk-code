@@ -49,7 +49,6 @@
 #include "race/history.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/coord.hpp"
 
 #if defined(WIN32) && !defined(__CYGWIN__)
    // Disable warning for using 'this' in base member initializer list
@@ -748,9 +747,9 @@ void Kart::update(float dt)
         const float rescue_time   = m_kart_properties->getRescueTime();
         const float rescue_height = 2.0f;
         btQuaternion q_roll (btVector3(0.0f, 0.0f, 1.0f),
-                             -m_rescue_roll*dt/rescue_time*DEGREE_TO_RAD);
+                             m_rescue_roll*dt/rescue_time);
         btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
-                             -m_rescue_pitch*dt/rescue_time*DEGREE_TO_RAD);
+                             m_rescue_pitch*dt/rescue_time);
         setXYZ(getXYZ()+Vec3(0, 
                              m_kart_properties->getRescueHeight()*dt/rescue_time,
                              0));
@@ -1338,6 +1337,8 @@ void Kart::forceRescue()
         m_attachment->set( ATTACH_TINYTUX, m_kart_properties->getRescueTime());
         m_rescue_pitch = getPitch();
         m_rescue_roll  = getRoll();
+        //m_rescue_pitch = getHPR().getPitch();
+        //m_rescue_roll  = getHPR().getRoll();
         race_state->itemCollected(getWorldKartId(), -1, -1);
         World::getWorld()->getPhysics()->removeKart(this);
     }
