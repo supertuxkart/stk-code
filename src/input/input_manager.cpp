@@ -530,28 +530,6 @@ EventPropagation InputManager::input(const SEvent& event)
         }
 
     }
-    else if (event.EventType == EET_LOG_TEXT_EVENT)
-    {
-        // Ignore 'normal' messages
-        if (event.LogEvent.Level>0)
-        {
-            // Unfortunatly irrlicht produces some internal error/warnings
-            // messages that can't be avoided (see COpenGLTexture where
-            // the constructor of COpenGLFBOTexture is used without
-            // specifying a color format, so the detault format (ECF_UNKOWNO)
-            // is used, which produces this error message). In non-debug
-            // mode ignore this error message, but leave it in for debugging.
-            if(std::string(event.LogEvent.Text)=="Unsupported texture format")
-#ifdef DEBUG
-                printf("The following message will not be printed in release mode:\n");
-#else
-                return EVENT_BLOCK;
-#endif
-            printf("Level %d: %s\n",
-                event.LogEvent.Level,event.LogEvent.Text);
-        }
-        return EVENT_BLOCK;
-    }
     else if (event.EventType == EET_KEY_INPUT_EVENT)
     {
         const int key = event.KeyInput.Key;
