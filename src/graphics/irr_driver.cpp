@@ -149,8 +149,7 @@ void IrrDriver::initDevice()
                                     bits, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
-                                    false,  // vsync
-                                    this    // event receiver
+                                    false   // vsync
                                     );
             if(m_device) break;
         }   // for bits=24, 16
@@ -856,37 +855,6 @@ void IrrDriver::update(float dt)
     // E.g. number of triangles rendered, culled etc.
     //printRenderStats();
 }   // update
-
-// ----------------------------------------------------------------------------
-// Irrlicht Event handler.
-bool IrrDriver::OnEvent(const irr::SEvent &event)
-{
-    switch (event.EventType)
-    {
-    case   irr::EET_KEY_INPUT_EVENT: {
-        printf("key input event\n");
-               break;
-           }  // keyboard
-      case irr::EET_GUI_EVENT:         {
-               return false;           }
-      case irr::EET_MOUSE_INPUT_EVENT: {
-               return false;           }
-      case irr::EET_LOG_TEXT_EVENT:
-          {
-              // Ignore 'normal' messages
-              if(event.LogEvent.Level>0)
-              {
-                  printf("Level %d: %s\n",
-                         event.LogEvent.Level,event.LogEvent.Text);
-              }
-              return true;
-           }
-      default:
-          printf("Event: %d -> ",event.EventType);
-          return false;
-    }   // switch
-    return false;
-}   // OnEvent
 
 // ----------------------------------------------------------------------------
 
