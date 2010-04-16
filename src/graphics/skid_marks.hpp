@@ -27,7 +27,6 @@ using namespace irr;
 
 #include "utils/vec3.hpp"
 
-class Coord;
 class Kart;
 
 /** This class is responsible for drawing skid marks for a kart. */

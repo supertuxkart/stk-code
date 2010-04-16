@@ -22,7 +22,6 @@
 #include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
 #include "utils/constants.hpp"
-#include "utils/coord.hpp"
 #include "utils/vec3.hpp"
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,

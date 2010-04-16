@@ -22,7 +22,6 @@
 #include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
 #include "physics/btKart.hpp"
-#include "utils/coord.hpp"
 
 float SkidMarks::m_avoid_z_fighting  = 0.0f;
 const int SkidMarks::m_start_alpha = 128;

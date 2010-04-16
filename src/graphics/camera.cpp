@@ -30,7 +30,6 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/coord.hpp"
 
 Camera::Camera(int camera_index, const Kart* kart)
 {

@@ -24,7 +24,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "utils/coord.hpp"
 
 Moveable::Moveable()
 {
@@ -87,7 +86,6 @@ void Moveable::reset()
     }
     m_node->setVisible(true);  // In case that the objects was eliminated
 
-    Coord c(m_transform);
     m_hpr.setHPR(m_transform.getRotation());
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));

@@ -24,7 +24,6 @@
 using namespace irr;
 
 #include "karts/kart.hpp"
-#include "utils/coord.hpp"
 
 // -----------------------------------------------------------------------------
 class Item

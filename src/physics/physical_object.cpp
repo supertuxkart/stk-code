@@ -32,7 +32,6 @@ using namespace irr;
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/coord.hpp"
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------

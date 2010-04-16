@@ -1107,10 +1107,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\utils\coord.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\utils\no_copy.hpp"
 					>
 				</File>
