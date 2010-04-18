@@ -81,7 +81,7 @@ bool EventHandler::OnEvent (const SEvent &event)
             printf("Level %d: %s\n",
                    event.LogEvent.Level,event.LogEvent.Text);
         }
-        return EVENT_BLOCK;
+        return true;
     }
     
     
