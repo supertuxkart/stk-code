@@ -79,13 +79,19 @@ Kart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                int local_player_id, int global_player_id,
                                const btTransform &init_pos)
 {
-    // Create a camera for the last kart (since this way more of the
-    // karts can be seen.
-    Kart *new_kart         = new Kart(kart_ident, index+1, init_pos);
+    // Ignore the kart identifier specified for this kart, instead load
+    // _only_ the kart specified for the player. This allows to measure
+    // the impact different karts have on performance.
+    const std::string prof_kart_id = race_manager->getKartIdent(
+                                           race_manager->getNumberOfKarts()-1);
+    Kart *new_kart         = new Kart(prof_kart_id, index+1, init_pos);
+
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
 
-    if (index == (int)getNumKarts()-1)
+    // Create a camera for the last kart (since this way more of the
+    // karts can be seen.
+    if (index == (int)race_manager->getNumberOfKarts()-1)
     {
         new_kart->setCamera(new Camera(index, new_kart));
     }
@@ -106,7 +112,7 @@ bool ProfileWorld::isRaceOver()
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
-/** Counts the number of framces and aborts if the end condition is fulfilled.
+/** Counts the number of framces.
  */
 void ProfileWorld::update(float dt)
 {
@@ -121,6 +127,30 @@ void ProfileWorld::update(float dt)
  */
 void ProfileWorld::enterRaceOverState()
 {
+    // If in timing mode, the number of laps is way too high (which avoids
+    // aborting too early). So in this case determine the maximum number
+    // of laps and set this +1 as the number of laps to get more meaningful
+    // time estimations.
+    if(m_profile_mode==PROFILE_TIME)
+    {
+        int max_laps = -2;
+        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        {
+            if(m_kart_info[i].m_race_lap>max_laps)
+                max_laps = m_kart_info[i].m_race_lap;
+        }   // for i<getNumberOfKarts
+        race_manager->setNumLaps(max_laps+1);
+    }
+
+    StandardRace::enterRaceOverState();
+    // Estimate finish time and set all karts to be finished.
+    for (unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    {
+        // ---------- update rank ------
+        if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated()) continue;
+        m_karts[i]->finishedRace(estimateFinishTimeForKart(m_karts[i]));
+    }
+
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
@@ -130,9 +160,12 @@ void ProfileWorld::enterRaceOverState()
     {
         max_t = std::max(max_t, m_karts[i]->getFinishTime());
         min_t = std::min(min_t, m_karts[i]->getFinishTime());
-        av_t += m_karts[i]->getFinishTime();
+        if(m_profile_mode==PROFILE_TIME)
+            av_t += getTime();
+        else
+            av_t += m_karts[i]->getFinishTime();
         printf("%ls  start %d  end %d time %f\n",
-            m_karts[i]->getName().c_str(),(int)i,
+            m_karts[i]->getName().c_str(),1+(int)i,
             m_karts[i]->getPosition(),
             m_karts[i]->getFinishTime());
     }
