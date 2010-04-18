@@ -247,7 +247,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 
     float target_kart_heading = target_kart->getHeading();
 
-    float dist = -(target_kart_speed / item_XZ_speed) * (dx * cosf(target_kart_heading) +
+    float dist = -(target_kart_speed / item_XZ_speed) * (dx * cosf(target_kart_heading) -
                                                          dz * sinf(target_kart_heading));
 
     float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist)) / (dx*dx + dz*dz);
