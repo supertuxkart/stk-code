@@ -30,8 +30,9 @@
  *         resetting e.g. new lap counters. 
  *  \param node XML node containing the parameters for this checkline.
  */
-CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node) 
-         : CheckStructure(check_manager, node)
+CheckLine::CheckLine(CheckManager *check_manager, const XMLNode &node, 
+                     unsigned int index) 
+         : CheckStructure(check_manager, node, index)
 {
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()

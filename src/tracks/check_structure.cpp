@@ -25,8 +25,9 @@
 
 
 CheckStructure::CheckStructure(CheckManager *check_manager, 
-                               const XMLNode &node)
+                               const XMLNode &node, unsigned int index)
 {
+    m_index              = index;
     m_check_manager      = check_manager;
     std::string kind;
     node.get("kind", &kind);
@@ -86,6 +87,9 @@ void CheckStructure::update(float dt)
         // Only check active checklines.
         if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
         {
+            if(UserConfigParams::m_check_debug)
+                printf("CHECK: Check structure %d triggered for kart %s.\n",
+                       m_index, world->getKart(i)->getIdent().c_str());
             trigger(i);
         }
         m_previous_position[i] = xyz;
@@ -102,17 +106,36 @@ void CheckStructure::trigger(unsigned int kart_index)
     {
     case CT_NEW_LAP : World::getWorld()->newLap(kart_index); 
                       m_is_active[kart_index] = false;
+                      if(UserConfigParams::m_check_debug)
+                      {
+                          printf("CHECK: %s new lap %d triggered, now deactivated.\n",
+                              World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                              m_index);
+                      }
                       break;
     case CT_ACTIVATE: {
                           CheckStructure *cs=
                             m_check_manager->getCheckStructure(m_activate_check_index);
                           cs->m_is_active[kart_index] = true;
+                          if(UserConfigParams::m_check_debug)
+                          {
+                              printf("CHECK: %s %d triggered, activating %d.\n",
+                                     World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                                     m_index, m_activate_check_index);
+                          }
                           break;
                       }
     case CT_TOGGLE:   {
                           CheckStructure *cs=
                             m_check_manager->getCheckStructure(m_activate_check_index);
                           cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
+                          if(UserConfigParams::m_check_debug)
+                          {
+                              printf("CHECK: %s %d triggered, setting %d to %d.\n",
+                                     World::getWorld()->getKart(kart_index)->getIdent().c_str(),
+                                     m_index, m_activate_check_index,
+                                     cs->m_is_active);
+                          }
                           break;
                       }
     default:          break;

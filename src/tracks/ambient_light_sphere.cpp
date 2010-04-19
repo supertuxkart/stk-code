@@ -34,8 +34,9 @@
  *  \param node XML node containing the parameters for this checkline.
  */
 AmbientLightSphere::AmbientLightSphere(CheckManager *check_manager, 
-                                       const XMLNode &node) 
-                  : CheckSphere(check_manager, node)
+                                       const XMLNode &node, 
+                                       unsigned int index) 
+                  : CheckSphere(check_manager, node, index)
 {
     m_ambient_color = video::SColor(255, 0, 255, 0);   // green
     m_inner_radius2 = 1;

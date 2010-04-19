@@ -231,13 +231,16 @@ namespace UserConfigParams
                                                "Type of the renderer.") );
 
     // ---- Debug - not saved to config file
-    // If gamepad debugging is enabled.
+    /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool                       m_gamepad_debug     PARAM_DEFAULT( false );
 
-    // If track debugging is enabled
+    /** If track debugging is enabled. */
     PARAM_PREFIX int                        m_track_debug       PARAM_DEFAULT( false );
 
-    // If the kart sizes should be printed at startup
+    /** True if check structures should be debugged. */
+    PARAM_PREFIX bool                       m_check_debug       PARAM_DEFAULT( false );
+
+    /** If the kart sizes should be printed at startup. */
     PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
     
     /** Verbosity level for debug messages. Note that error and important warnings

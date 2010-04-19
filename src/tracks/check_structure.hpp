@@ -73,6 +73,11 @@ private:
 
     /** The type of this checkline. */
     CheckType         m_check_type;
+
+    /** Stores the index of this check structure. This is only used for
+     *  debugging (use --check-debug option). */
+    unsigned int      m_index;
+
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
 
@@ -80,7 +85,8 @@ private:
      *  the index of the corresponding check structure that is triggered. */
     int               m_activate_check_index;
 public:
-                CheckStructure(CheckManager *check_manager, const XMLNode &node);
+                CheckStructure(CheckManager *check_manager, const XMLNode &node,
+                               unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
     /** True if going from old_pos to new_pos crosses this checkline. This function
@@ -94,6 +100,7 @@ public:
     virtual void trigger(unsigned int kart_index);
     virtual void reset(const Track &track);
     virtual Vec3 getCenterPoint() const=0;
+
     /** Returns the type of this check structure. */
     CheckType getType() const { return m_check_type; }
 };   // CheckStructure

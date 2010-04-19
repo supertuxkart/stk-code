@@ -47,7 +47,7 @@ private:
     video::SColor m_ambient_color;
 public:
                   AmbientLightSphere(CheckManager *check_manager, 
-                                     const XMLNode &node);
+                                     const XMLNode &node, unsigned int index);
     virtual      ~AmbientLightSphere() {};
     virtual void  update(float dt);
     virtual bool  isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, 

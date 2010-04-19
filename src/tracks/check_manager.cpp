@@ -35,7 +35,7 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         const std::string &type = check_node->getName();
         if(type=="check-line")
         {
-            CheckLine *cl = new CheckLine(this, *check_node);
+            CheckLine *cl = new CheckLine(this, *check_node, i);
             m_all_checks.push_back(cl);
             if(cl->getType()==CheckStructure::CT_NEW_LAP)
             {
@@ -44,9 +44,12 @@ CheckManager::CheckManager(const XMLNode &node, Track *track)
         }   // checkline
         else if(type=="check-sphere")
         {
-            AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node);
+            AmbientLightSphere *cs = new AmbientLightSphere(this, *check_node,
+                                                            i);
             m_all_checks.push_back(cs);
         }   // checksphere
+        else
+            printf("Unknown check structure '%s' - ignored.\n", type.c_str());
     }   // for i<node.getNumNodes
 }   // CheckManager
 

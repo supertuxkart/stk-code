@@ -49,7 +49,8 @@ private:
      *  or to the right of the line. */
     std::vector<bool> m_previous_sign;
 public:
-                 CheckLine(CheckManager *check_manager, const XMLNode &node);
+                 CheckLine(CheckManager *check_manager, const XMLNode &node,
+                           unsigned int index);
     virtual     ~CheckLine() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos, int indx);
     virtual void reset(const Track &track);
