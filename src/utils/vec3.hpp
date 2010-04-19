@@ -50,7 +50,7 @@ public:
      *  \param heading The heading to set.
      *  \param normal The normal from which pitch and roll should be computed. */
     inline Vec3(float heading, const Vec3& normal)
-        {m_x=heading;
+        {setHeading(heading);
          setPitchRoll(normal);}
 
     void                   setHPR(const btQuaternion& q);

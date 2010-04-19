@@ -53,18 +53,18 @@ void Vec3::degreeToRad()
  */
 void Vec3::setPitchRoll(const Vec3 &normal)
 {
-    const float X = sin(m_x);
-    const float Z = cos(m_x);
+    const float X = sin(getHeading());
+    const float Z = cos(getHeading());
     // Compute the angle between the normal of the plane and the line to
-    // (x,y,0).  (x,y,0) is normalised, so are the coordinates of the plane,
-    // simplifying the computation of the scalar product.
+    // (x,0,z).  (x,0,z) is normalised, so are the coordinates of the plane,
+    // which simplifies the computation of the scalar product.
     float pitch = ( normal.getX()*X + normal.getZ()*Z );  // use ( x,0,z)
     float roll  = (-normal.getX()*Z + normal.getZ()*X );  // use (-z,0,x)
 
     // The actual angle computed above is between the normal and the (x,y,0)
     // line, so to compute the actual angles 90 degrees must be subtracted.
-    m_y = acosf(pitch) - NINETY_DEGREE_RAD;
-    m_z =-acosf(roll)  + NINETY_DEGREE_RAD;
+    setPitch(-acosf(pitch) + NINETY_DEGREE_RAD);
+    setRoll (-acosf(roll)  + NINETY_DEGREE_RAD);
 }   // setPitchRoll
 
 // ----------------------------------------------------------------------------
