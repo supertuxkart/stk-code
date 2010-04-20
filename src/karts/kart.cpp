@@ -64,7 +64,7 @@
 Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
-       Moveable(), m_powerup(this)
+       Moveable(), ExplosionAnimation(this), m_powerup(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
@@ -600,12 +600,15 @@ float Kart::getActualWheelForce()
 }   // getActualWheelForce
 
 //-----------------------------------------------------------------------------
-/** The kart is on ground if all 4 wheels touch the ground.
+/** The kart is on ground if all 4 wheels touch the ground, and if no special
+ *  animation (rescue or explosion) is happening).
  */
 bool Kart::isOnGround() const
 {
-    return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels());
+    return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
+          && m_kart_mode!=KM_RESCUE && m_kart_mode!=KM_EXPLOSION);
 }   // isOnGround
+
 //-----------------------------------------------------------------------------
 /** The kart is near the ground, but not necesarily on it (small jumps). This
  *  is used to determine when to switch off the upright constraint, so that
@@ -618,6 +621,7 @@ bool Kart::isNearGround() const
     else
         return ((getXYZ().getZ() - getHoT()) < stk_config->m_near_ground);
 }   // isNearGround
+
 //-----------------------------------------------------------------------------
 /** Called when an explosion happens.
  *  \param pos Position of the explosion.
@@ -629,8 +633,13 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
     int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
     if(direct_hit)
     {
+        printf("he: ");
+        ExplosionAnimation::handleExplosion(pos, direct_hit);
+        m_kart_mode = KM_EXPLOSION;
         // Play associated kart sound
         playCustomSFX(SFXManager::CUSTOM_EXPLODE);
+        return;
+
         float sign_a = (sign_bits & (0x1 <<  8)) ? 1.0f : -1.0f;
         float sign_b = (sign_bits & (0x1 <<  9)) ? 1.0f : -1.0f;
         float sign_c = (sign_bits & (0x1 << 10)) ? 1.0f : -1.0f;
@@ -755,6 +764,12 @@ void Kart::update(float dt)
                              0));
         setRotation(getRotation()*q_roll*q_pitch);
     }   // if rescue mode
+    else if ( m_kart_mode==KM_EXPLOSION)
+    {
+        if(!ExplosionAnimation::update(dt))
+            m_kart_mode = KM_RACE;
+    }
+
     m_attachment->update(dt);
 
     //smoke drawing control point
@@ -764,6 +779,9 @@ void Kart::update(float dt)
         m_water_splash_system->update(dt);
         m_nitro->update(dt);
         m_slip_stream->update(dt);
+        // update star effect (call will do nothing if stars are not activated)
+        m_stars_effect->update(dt);
+
     }  // UserConfigParams::m_graphical_effects
 
     updatePhysics(dt);
@@ -1319,8 +1337,6 @@ void Kart::updatePhysics(float dt)
        );
 #endif
     
-    // update star effect (call will do nothing if stars are not activated)
-    m_stars_effect->update(dt);
 }   // updatePhysics
 
 //-----------------------------------------------------------------------------

@@ -94,6 +94,10 @@ void Moveable::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Updates the current position and rotation from the corresponding physics
+ *  body, and then calls updateGraphics to position the model correctly.
+ *  \param float dt Time step size.
+ */
 void Moveable::update(float dt)
 {
     m_motion_state->getWorldTransform(m_transform);
@@ -113,6 +117,11 @@ void Moveable::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Creates the bullet rigid body for this moveable.
+ *  \param mass Mass of this object.
+ *  \param trans Transform (=position and orientation) for this object).
+ *  \param shape Bullet collision shape for this object.
+ */
 void Moveable::createBody(float mass, btTransform& trans,
                           btCollisionShape *shape) {
     btVector3 inertia;

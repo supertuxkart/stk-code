@@ -105,6 +105,7 @@ void InputManager::handleStaticAction(int key, int value)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
                 kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
+                kart->handleExplosion(kart->getXYZ(), true);
             }
             break;
         case KEY_F2:

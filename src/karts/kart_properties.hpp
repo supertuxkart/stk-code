@@ -112,6 +112,12 @@ private:
     /** Distance the kart is raised before dropped. */
     float m_rescue_height;
 
+    /** Time an animated explosion is shown. Longer = more delay for kart. */
+    float m_explosion_time;
+
+    /** Height of an explosion animation. */
+    float m_explosion_height;
+
     /** Vertical offset after rescue. */
     float m_rescue_vert_offset;
 
@@ -247,8 +253,16 @@ public:
     float getRescueTime             () const {return m_rescue_time;              }
     /** Returns the height a kart is moved to during a rescue. */
     float getRescueHeight           () const {return m_rescue_height;            }
+    /** Returns the time an explosion animation is shown. */
+    float getExplosionTime          () const {return m_explosion_time;           }
+    /** Returns the height of the explosion animation. */
+    float getExplosionHeight        () const {return m_explosion_height;         }
+    /** Returns how much a kart can roll/pitch before the upright constraint
+     *  counteracts. */
     float getUprightTolerance       () const {return m_upright_tolerance;        }
+    /** Returns the maximum value of the upright counteracting force. */
     float getUprightMaxForce        () const {return m_upright_max_force;        }
+    /** Returns artificial acceleration to keep wheels on track. */
     float getTrackConnectionAccel   () const {return m_track_connection_accel;   }
     /** Returns the maximum length of a rubber band before it breaks. */
     float getRubberBandMaxLength    () const {return m_rubber_band_max_length;   }

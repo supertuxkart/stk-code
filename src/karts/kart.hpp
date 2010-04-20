@@ -26,6 +26,7 @@
 #include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/moveable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
@@ -55,7 +56,7 @@ class Stars;
  *  is an object that is moved on the track, and has position and rotations)
  *  and TerrainInfo, which manages the terrain the kart is on.
  */
-class Kart : public TerrainInfo, public Moveable
+class Kart : public TerrainInfo, public Moveable, public ExplosionAnimation
 {
 private:
     /** Reset position. */
