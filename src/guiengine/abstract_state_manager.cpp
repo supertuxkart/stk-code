@@ -178,10 +178,25 @@ void AbstractStateManager::popMenu()
 // -----------------------------------------------------------------------------
 void AbstractStateManager::setGameState(GameState state)
 {
+    if (m_game_mode == state) return; // no change
+    
     m_game_mode = state;
     
-    if (m_game_mode == GAME) irr_driver->hidePointer();
-    else                     irr_driver->showPointer();
+    if (m_game_mode == GAME)
+    {
+        irr_driver->hidePointer();
+    }
+    else
+    {
+        // menu
+        irr_driver->showPointer();
+        
+        if (m_game_mode == MENU)
+        {
+            //FIXME: not up to the *abstract* state manager to do this
+            sound_manager->startMusic(stk_config->m_title_music);
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------

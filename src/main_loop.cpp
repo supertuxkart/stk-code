@@ -132,6 +132,7 @@ void MainLoop::run()
 
         if (!music_on && !World::getWorld())
         {
+            //FIXME: that code can't really work, I don't think "music_on" is updated everytime it should
             sound_manager->stopMusic();   // stop potential 'left over' music from race
             sound_manager->startMusic(stk_config->m_title_music);
             music_on = true;
