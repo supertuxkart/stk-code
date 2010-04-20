@@ -28,7 +28,8 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     friend class GUIEngine::ScreenSingleton<ArenasScreen>;
     
     ArenasScreen();
-    
+    void buildTrackList();
+
 public:
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     void init();
