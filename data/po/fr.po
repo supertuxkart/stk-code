@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-06 21:12-0500\n"
-"PO-Revision-Date: 2010-03-06 21:22-0500\n"
+"PO-Revision-Date: 2010-04-20 10:22-0500\n"
 "Last-Translator: Marianne Gagnon (Auria) <auria.mg@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -733,7 +733,7 @@ msgstr "Temps de pénalité !"
 #. I18N: ./data/grandprix/penguinplayground.grandprix
 #: data/po/gui_strings.h:487
 msgid "Penguin Playground"
-msgstr "Pour jeunes pingouins"
+msgstr "Pour jeunes manchots"
 
 #. I18N: In kart selection screen (Will read like 'Player 1 (foobartech gamepad)')
 #: src/states_screens/kart_selection.cpp:240
@@ -1007,12 +1007,12 @@ msgstr "Armes"
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:406
 msgid "Win Penguin Playground Grand Prix"
-msgstr "Gagne le Grand Prix 'Pour jeunes pingouins'"
+msgstr "Gagne le Grand Prix 'Pour jeunes manchots'"
 
 #. I18N: ./data/followtheleader.challenge
 #: data/po/gui_strings.h:409
 msgid "Win Penguin Playground Grand Prix with 3 'Racer' Level AI karts."
-msgstr "Remporte le grand prix 'Jusqu'à la lune' contre 3 opposants virtuels expérimentés."
+msgstr "Remporte le grand prix 'Pour jeunes manchots' contre 3 opposants virtuels expérimentés."
 
 #. I18N: ./data/grandprix/snagdrive.challenge
 #: data/po/gui_strings.h:424
@@ -1095,76 +1095,105 @@ msgstr "[aucun]"
 
 #~ msgid "All tracks included in SuperTuxKart"
 #~ msgstr "Toutes les pistes de SuperTuxKart"
+
 #~ msgid "First grand prix, easy to get started"
 #~ msgstr "Premier grand prix, facile pour commencer"
+
 #~ msgid "Last grand prix, longer and harder"
 #~ msgstr "Dernier grand prix, plus long et difficile"
+
 #~ msgid "Second grand prix"
 #~ msgstr "Second grand prix"
+
 #~ msgid "Third grand prix"
 #~ msgstr "Troisième grand prix"
+
 #~ msgid "Special"
 #~ msgstr "Spécial"
+
 #~ msgid "Amazonian Journey"
 #~ msgstr "Voyage en Amazonie"
+
 #~ msgid "Around the Lighthouse"
 #~ msgstr "Autour du phare"
+
 #~ msgid "At world's end"
 #~ msgstr "Au bout du monde"
+
 #~ msgid "Canyon"
 #~ msgstr "Canyon"
+
 #~ msgid "Cave X"
 #~ msgstr "Caverne X"
+
 #~ msgid "City"
 #~ msgstr "Ville"
+
 #~ msgid ""
 #~ "Created by Ingo Ruhnke,\n"
 #~ "modified by M. Gagnon"
 #~ msgstr ""
 #~ "Créé par Ingo Ruhnke,\n"
 #~ "modifié par M. Gagnon"
+
 #~ msgid ""
 #~ "Created by Oliver & Steve Baker\n"
 #~ "modified by Marianne Gagnon"
 #~ msgstr ""
 #~ "Créé par Oliver & Steve Baker\n"
 #~ "modifié par Marianne Gagnon"
+
 #~ msgid "Crescent Crossing"
 #~ msgstr "Sous la pleine lune"
+
 #~ msgid "Fort Magma"
 #~ msgstr "Fort Magma"
+
 #~ msgid "King Weird's Castle"
 #~ msgstr "Château du Roi Tordu"
+
 #~ msgid "Oliver's Math Class"
 #~ msgstr "Classe de maths d'Oliver"
+
 #~ msgid "On the Beach"
 #~ msgstr "Sur la plage"
+
 #~ msgid "Prehistoric Island"
 #~ msgstr "Île préhistorique"
+
 #~ msgid "Racetrack"
 #~ msgstr "Piste de course"
+
 #~ msgid "Secret Garden"
 #~ msgstr "Jardin Secret"
+
 #~ msgid "Shifting Sands"
 #~ msgstr "Sables mouvants"
+
 #~ msgid "Snow Mountain"
 #~ msgstr "Sommet enneigé"
+
 #~ msgid "SnowTux Peak"
 #~ msgstr "Mont Bonhomme-Tux"
+
 #~ msgid "Star Track"
 #~ msgstr "Dans les étoiles"
+
 #~ msgid "Sub Sea"
 #~ msgstr "Fonds marins"
+
 #~ msgid "The Island"
 #~ msgstr "L'île"
+
 #~ msgid "The old mine"
 #~ msgstr "La vieille mine"
+
 #~ msgid "Tux Tollway"
 #~ msgstr "Autoroute de Tux"
+
 #~ msgid "XR591"
 #~ msgstr "XR591"
 
 #, fuzzy
 #~ msgid "Player %i ("
 #~ msgstr "Joueur %i ("
-
