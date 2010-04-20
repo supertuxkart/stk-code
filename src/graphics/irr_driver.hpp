@@ -37,7 +37,7 @@ struct VideoMode
     int width, height;
 };
 
-class IrrDriver
+class IrrDriver : public IEventReceiver
 {
 private:
     /** The irrlicht device. */
@@ -89,6 +89,12 @@ public:
     /** Returns the gui environment, used to add widgets to a screen. */
     gui::IGUIEnvironment *getGUI() const { return m_gui_env; }
     //irr::gui::IGUIFont   *getRaceFont() const { return m_race_font; }
+    
+    /** this is not really used to process events, it's only used to shut down irrLicht's
+      * chatty logging until the event handler is ready to take the task
+      */
+    bool                  OnEvent(const irr::SEvent &event);
+    
     void                  setAmbientLight(const video::SColor &light);
     video::ITexture      *getTexture(const std::string &filename);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL, 

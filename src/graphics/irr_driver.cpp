@@ -149,7 +149,8 @@ void IrrDriver::initDevice()
                                     bits, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
-                                    false   // vsync
+                                    false,  // vsync
+                                    this    // event receiver
                                     );
             if(m_device) break;
         }   // for bits=24, 16
@@ -855,6 +856,31 @@ void IrrDriver::update(float dt)
     // E.g. number of triangles rendered, culled etc.
     //printRenderStats();
 }   // update
+
+// ----------------------------------------------------------------------------
+// Irrlicht Event handler.
+bool IrrDriver::OnEvent(const irr::SEvent &event)
+{
+    //TODO: ideally we wouldn't use this object to STFU irrlicht's chatty debugging, we'd
+    //      just create the EventHandler earlier so it can act upon it
+    switch (event.EventType)
+    {
+        case irr::EET_LOG_TEXT_EVENT:
+        {
+            // Ignore 'normal' messages
+            if (event.LogEvent.Level>0)
+            {
+                printf("Level %d: %s\n",
+                       event.LogEvent.Level,event.LogEvent.Text);
+            }
+            return true;
+        }
+        default:
+            return false;
+    }   // switch
+    
+    return false;
+}   // OnEvent
 
 // ----------------------------------------------------------------------------
 
