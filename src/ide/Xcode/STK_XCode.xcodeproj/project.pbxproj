@@ -844,7 +844,6 @@
 		95C2B1D10F296545000D3E5D /* track_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_manager.cpp; path = ../../tracks/track_manager.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1D20F296545000D3E5D /* track_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_manager.hpp; path = ../../tracks/track_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E00F296546000D3E5D /* constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = constants.hpp; path = ../../utils/constants.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1E10F296546000D3E5D /* coord.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = coord.hpp; path = ../../utils/coord.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E20F296546000D3E5D /* random_generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_generator.cpp; path = ../../utils/random_generator.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E30F296546000D3E5D /* random_generator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = random_generator.hpp; path = ../../utils/random_generator.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1E60F296546000D3E5D /* string_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = string_utils.cpp; path = ../../utils/string_utils.cpp; sourceTree = SOURCE_ROOT; };
@@ -1983,7 +1982,6 @@
 			children = (
 				9553823910FD4FEC00737979 /* constants.cpp */,
 				95C2B1E00F296546000D3E5D /* constants.hpp */,
-				95C2B1E10F296546000D3E5D /* coord.hpp */,
 				9540E2570FD5F8FD002985B8 /* no_copy.hpp */,
 				9540E2560FD5F8FD002985B8 /* ptr_vector.hpp */,
 				95C2B1E20F296546000D3E5D /* random_generator.cpp */,
