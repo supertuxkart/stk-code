@@ -1071,6 +1071,15 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "karts")
     {
+        DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
+        assert(w != NULL);
+        const std::string selection = w->getSelectionIDString(playerID);
+        if (selection == "locked")
+        {
+            unlock_manager->playLockSound();
+            return;
+        }
+        
         // make sure no other player selected the same identity or kart
         const int amount = m_kart_widgets.size();
         for (int n=0; n<amount; n++)
@@ -1125,6 +1134,7 @@ void KartSelectionScreen::eventCallback(Widget* widget, const std::string& name,
     else
     {
         // Transmit to all subwindows, maybe *they* care about this event
+        //FIXME: this may now be done automatically by the caller, so maybe I nee to remove this
         const int amount = m_kart_widgets.size();
         for (int n=0; n<amount; n++)
         {
@@ -1398,12 +1408,20 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     {
         const int kart_amount = kart_properties_manager->getNumberOfKarts();
         
-        for(int n=0; n<kart_amount; n++)
+        for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(n);
-            
             std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+
+            if (unlock_manager->isLocked(prop->getIdent()))
+            {
+                w->addItem( _("Locked : solve active challenges to gain access to more!"),
+                           "locked", icon_path, LOCKED_BADGE);
+            }
+            else
+            {
+                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+            }
         }
     }
     //FIXME: what does this do there???
@@ -1416,12 +1434,21 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
         const int kart_amount = group.size();
         
+        
         for (int n=0; n<kart_amount; n++)
         {
             const KartProperties* prop = kart_properties_manager->getKartById(group[n]);
-            
             std::string icon_path = "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
-            w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+
+            if (unlock_manager->isLocked(prop->getIdent()))
+            {
+                w->addItem( _("Locked : solve active challenges to gain access to more!"),
+                            "locked", icon_path, LOCKED_BADGE);
+            }
+            else
+            {
+                w->addItem(prop->getName().c_str(), prop->getIdent().c_str(), icon_path.c_str());
+            }
         }
     }
     // add random
