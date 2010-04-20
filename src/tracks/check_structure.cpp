@@ -134,7 +134,7 @@ void CheckStructure::trigger(unsigned int kart_index)
                               printf("CHECK: %s %d triggered, setting %d to %d.\n",
                                      World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                                      m_index, m_activate_check_index,
-                                     cs->m_is_active);
+                                     cs->m_is_active[kart_index]);
                           }
                           break;
                       }
