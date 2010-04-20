@@ -85,7 +85,7 @@ void ChallengesScreen::init()
     for (int n=0; n<lockedChallengeAmount; n++)
     {
         w->addItem( _("Locked : solve active challenges to gain access to more!"), "locked",
-                   "/gui/challenge.png", true);
+                   "/gui/challenge.png", LOCKED_BADGE);
     }
     
     

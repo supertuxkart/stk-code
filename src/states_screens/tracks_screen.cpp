@@ -249,7 +249,7 @@ void TracksScreen::buildTrackList()
             if (unlock_manager->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), true,
+                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
@@ -273,7 +273,7 @@ void TracksScreen::buildTrackList()
             if (unlock_manager->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), true,
+                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             }
             else
