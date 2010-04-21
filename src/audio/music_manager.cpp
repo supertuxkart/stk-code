@@ -44,6 +44,7 @@ MusicManager::MusicManager()
     m_current_music= NULL;
     setMasterMusicVolume(UserConfigParams::m_music_volume);
 
+    //FIXME: I'm not sure that this code goes here
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
     {
