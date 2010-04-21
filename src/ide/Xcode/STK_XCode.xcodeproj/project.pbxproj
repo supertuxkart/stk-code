@@ -283,6 +283,7 @@
 		95ECA10710124C5000D47C5F /* ribbon_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FA10124C5000D47C5F /* ribbon_widget.cpp */; };
 		95ECA10810124C5000D47C5F /* spinner_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FC10124C5000D47C5F /* spinner_widget.cpp */; };
 		95ECA10910124C5000D47C5F /* text_box_widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95ECA0FE10124C5000D47C5F /* text_box_widget.cpp */; };
+		95F912CD117E761700EA9F20 /* explosion_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95F912CB117E761600EA9F20 /* explosion_animation.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1064,6 +1065,8 @@
 		95F423120E26E3DC00692113 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		95F4231E0E26E44800692113 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		95F423400E26E65B00692113 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		95F912CB117E761600EA9F20 /* explosion_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = explosion_animation.cpp; path = games/supertuxkart/src/karts/explosion_animation.cpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		95F912CC117E761700EA9F20 /* explosion_animation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = explosion_animation.hpp; path = games/supertuxkart/src/karts/explosion_animation.hpp; sourceTree = SYSTEM_DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1812,6 +1815,8 @@
 			isa = PBXGroup;
 			children = (
 				956C6EC71128D3FB004336C8 /* controller */,
+				95F912CB117E761600EA9F20 /* explosion_animation.cpp */,
+				95F912CC117E761700EA9F20 /* explosion_animation.hpp */,
 				95C2B1180F296545000D3E5D /* kart.cpp */,
 				95C2B1190F296545000D3E5D /* kart.hpp */,
 				95C2B11B0F296545000D3E5D /* kart_model.cpp */,
@@ -2558,6 +2563,7 @@
 				959D42FD1130C4F2005077E2 /* grand_prix_over.cpp in Sources */,
 				956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */,
 				957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */,
+				95F912CD117E761700EA9F20 /* explosion_animation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
