@@ -157,7 +157,7 @@ CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
 # search for the libraries needed to use ogg vorbis
-AC_SEARCH_LIBS(ov_open, vorbisfile, have_vorbisfile_lib=yes)
+AC_SEARCH_LIBS(ov_open, [vorbisfile], have_vorbisfile_lib=yes, have_vorbisfile_lib=no, [-lvorbis])
 
 if test x$have_vorbisfile_lib = xyes; then       
     # check for the headers needed by ogg vorbis
@@ -183,9 +183,9 @@ LIBS=$save_LIBS
 AC_LANG_PUSH(C++)
 
 
-# ===============================
-# Check for irrlicht (if enabled)
-# ===============================
+# ==================
+# Check for irrlicht
+# ==================
 AC_ARG_WITH(irrlicht, [AS_HELP_STRING(--with-irrlicht=PREFIX,
                                   [specify the prefix path to irrlicht])])
 if test "x$with_irrlicht" != "x" ; then
@@ -235,32 +235,33 @@ case "${host}" in
   irrlicht_LIBS="-L/$with_irrlicht/lib/Linux -L/$with_irrlicht/lib -lIrrlicht"
   ;;
 *darwin*|*macosx*)
-  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht -framework Cocoa"
   ;;
 *freebsd*)
-  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht"
+  irrlicht_LIBS="-L/$with_irrlicht/lib/ -lIrrlicht -lpthread"
 esac
 
-# Check these flags do work by building a small irrLicht sample
-echo "checking for irrlicht libraries."
+# ---- Check these flags do work by building a small irrLicht sample
+echo "checking for irrlicht libraries..."
 save_LIBS=$LIBS
 LIBS="$LIBS $irrlicht_LIBS $opengl_LIBS"
 
+irrlicht_sample_built_fine="false"
+
+AC_TRY_RUN(
+    [
+        #  include "irrlicht.h"
+        int main() {
+        irr::createDevice(irr::video::EDT_NULL);
+        return 0;
+        }
+    ],
+    irrlicht_sample_built_fine="true",
+    irrlicht_sample_built_fine="false"
+)
+  
 case "${host}" in
 *-*-linux* )
-  irrlicht_sample_built_fine="false"
-
-  AC_TRY_RUN([
-   #  include "irrlicht.h"
-   int main() {
-   irr::createDevice(irr::video::EDT_NULL);
-   return 0;
-   }
-  ],
-  irrlicht_sample_built_fine="true",
-  irrlicht_sample_built_fine="false"
-  )
-  
   # If base irrLicht flags failed, try again with Xxf86vm
   # FIXME: this program when run prints out two lines (version numbers) to stdout
   if test x$irrlicht_sample_built_fine = xfalse; then
@@ -281,26 +282,39 @@ case "${host}" in
       irrlicht_sample_built_fine="true"
     fi
   fi
-  
-  if test x$irrlicht_sample_built_fine = xfalse; then
-    AC_MSG_ERROR([Can't build test irrLicht program, chech config.log to see the errors])
-  fi
   ;;
-*darwin*|*macosx*)
-  AC_TRY_RUN([
-   #  include "irrlicht.h"
-   int main() {
-   irr::createDevice(irr::video::EDT_NULL);
-   return 0;
-   }
-  ],
-      ,
-  irrlicht_LIBS="$irrlicht_LIBS"
-    )
-  ;;
-*freebsd*)
-   LDFLAGS="$LDFLAGS -lpthread"
 esac
+  
+if test x$irrlicht_sample_built_fine = xfalse; then
+AC_MSG_ERROR([Can't build test irrLicht program. Check config.log to see the errors])
+fi
+
+# ---- Check we have the minimum required irrLicht version
+echo -n "checking irrlicht version is recent enough... "
+
+irrlicht_min_version_met="false"
+
+AC_TRY_RUN(
+    [
+        #  include "irrlicht.h"
+        int main() {
+        #if (IRRLICHT_VERSION_MAJOR > 1) || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 6)
+            // ok
+        #else
+        #error "You need irrLicht 1.6+ to build STK"
+        #endif
+        return 0;
+        }
+    ],
+    irrlicht_min_version_met="true",
+    irrlicht_min_version_met="false"
+)
+
+if test x$irrlicht_min_version_met = xfalse; then
+    AC_MSG_ERROR([Your irrLicht is too old, please update irrLicht.])
+else
+    echo "yes"
+fi
 
 LIBS=$save_LIBS
 
