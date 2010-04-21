@@ -8,6 +8,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/world.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -48,6 +49,16 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
     assert(picture != NULL);
 
     m_unlocked_stuff.push_back( new UnlockedThing(picture, w, h, msg) );
+}
+
+// -------------------------------------------------------------------------------------
+
+void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITexture*> pictures,
+                                                  float w, float h, irr::core::stringw msg)
+{
+    assert(!pictures.empty());
+    
+    m_unlocked_stuff.push_back( new UnlockedThing(pictures, w, h, msg) );
 }
 
 // -------------------------------------------------------------------------------------
@@ -110,12 +121,12 @@ void FeatureUnlockedCutScene::init()
             
             m_unlocked_stuff[n].m_root_gift_node = kart_node;
         }
-        else if (m_unlocked_stuff[n].m_picture != NULL)
+        else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
             video::SMaterial m;
             m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
             m.BackfaceCulling = false;
-            m.setTexture(0, m_unlocked_stuff[n].m_picture);
+            m.setTexture(0, m_unlocked_stuff[n].m_pictures[0]);
             m.AmbientColor  = video::SColor(255, 255, 255, 255);
             m.DiffuseColor  = video::SColor(255, 255, 255, 255);
             m.EmissiveColor = video::SColor(255, 255, 255, 255);
@@ -255,7 +266,42 @@ void FeatureUnlockedCutScene::onUpdate(float dt, irr::video::IVideoDriver* drive
                                                30.0f,
                                                sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
     }
-
+    
+    for (int n=0; n<unlockedStuffCount; n++)
+    {
+        if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
+        
+        if (!m_unlocked_stuff[n].m_pictures.empty())
+        {
+            const int pictureCount = m_unlocked_stuff[n].m_pictures.size();
+            
+            if (pictureCount > 1)
+            {
+                const int previousTextureID = m_unlocked_stuff[n].m_curr_image;
+                const int textureID = int(m_global_time/1.2f) % pictureCount;
+                
+                if (textureID != previousTextureID)
+                {
+                    scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)m_unlocked_stuff[n].m_root_gift_node;
+                    scene::IMesh* mesh = node->getMesh();
+                    
+                    assert(mesh->getMeshBufferCount() == 1);
+                    
+                    scene::IMeshBuffer* mb = mesh->getMeshBuffer(0);
+                    
+                    SMaterial& m = mb->getMaterial();
+                    m.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
+                    
+                    // FIXME: this mesh is already associated with this node. I'm calling this
+                    // to force irrLicht to refresh the display, now that Material has changed.
+                    node->setMesh(mesh);
+                    
+                    m_unlocked_stuff[n].m_curr_image = textureID;
+                }
+            }
+        }
+    }
+    
     assert(m_unlocked_stuff.size() > 0);
     if (m_unlocked_stuff[0].m_root_gift_node != NULL)
     {
@@ -322,11 +368,38 @@ void FeatureUnlockedCutScene::addUnlockedThings(const std::vector<const Challeng
                 }
                 case UNLOCK_GP:
                 {
-                    //TODO: implement gp reward
-                    std::cerr << "OK, I see you unlocked a GP, but this is not supported yet\n";
-                    
-                    video::ITexture* tex = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
-                    addUnlockedPicture( tex, 1.0f, 0.75f,
+                    std::vector<ITexture*> images;
+                    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(unlockedFeatures[i].name);
+                    if (gp == NULL)
+                    {
+                        std::cerr << "ERROR: Unlocked GP does not exist???\n";
+                        video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                        images.push_back(WTF_image);
+                    }
+                    else
+                    {
+                        const std::vector<std::string>& gptracks = gp->getTracks();
+                        const int trackAmount = gptracks.size();
+                        
+                        if (trackAmount == 0)
+                        {
+                            std::cerr << "ERROR: Unlocked GP is empty???\n";
+                            video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getGUIDir() + "/main_help.png");
+                            images.push_back(WTF_image);
+                        }
+                        
+                        for (int t=0; t<trackAmount; t++)
+                        {
+                            Track* track = track_manager->getTrack(gptracks[t]);
+                            
+                            ITexture* tex = irr_driver->getTexture(track  != NULL ?
+                                                                   track->getScreenshotFile().c_str() :
+                                                                   file_manager->getDataDir() + "gui/main_help.png");
+                            images.push_back(tex);
+                        }
+                    }
+
+                    addUnlockedPictures(images, 1.0f, 0.75f,
                                         unlockedFeatures[i].getUnlockedMessage() );
                     break;
                 }

@@ -88,8 +88,19 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name, cons
         }
         else if (i % 3 == 1)
         {
+            std::vector<video::ITexture*> textures;
+            textures.push_back(irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(track_manager->getTrack("beach")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(track_manager->getTrack("sandtrack")->getScreenshotFile().c_str()));
+            textures.push_back(irr_driver->getTexture(track_manager->getTrack("snowmountain")->getScreenshotFile().c_str()));
+
+            scene->addUnlockedPictures(textures, 1.0, 0.75, L"You did it");
+            
+            /*
             scene->addUnlockedPicture( irr_driver->getTexture(track_manager->getTrack("lighthouse")->getScreenshotFile().c_str()),
                                       1.0, 0.75, L"You did it");
+            */
+            
             StateManager::get()->pushScreen(scene);
         }
         else
