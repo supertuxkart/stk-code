@@ -213,7 +213,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     input_manager->setMode(InputManager::MENU);
     m_menu_stack.push_back(name);
     setGameState(MENU);
-    sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+    sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
     switchToScreen(name.c_str());
     getCurrentScreen()->init();
 }
@@ -237,7 +237,7 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     
     setGameState(MENU);
     
-    sound_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+    sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
     switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
     getCurrentScreen()->init();
 }

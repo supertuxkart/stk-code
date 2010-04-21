@@ -110,6 +110,9 @@ private:
     /** To play non-positional sounds without having to create a new object for each */
     static std::map<std::string, SFXBase*> m_quick_sounds;
 
+    /** listener vector (position vector + up vector) */
+    float                     m_listenerVec[6];
+
     bool                      m_initialized;
     float                     m_master_gain;
 
@@ -142,6 +145,8 @@ public:
     static bool              checkError(const std::string &context);
     static const std::string getErrorString(int err);
     
+    void                     positionListener(const Vec3 &position, const Vec3 &front);
+
     /** Positional sound is cool, but creating a new object just to play a simple
         menu sound is not. This function allows for 'quick sounds' in a single call.*/
     void                     quickSound(const char* soundName);

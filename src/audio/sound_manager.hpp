@@ -43,14 +43,12 @@ private:
                              m_allMusic;
 
     void                     loadMusicInformation();
-    float                    m_listenerVec[6];
     float                    m_masterGain;
 
 public:
     SoundManager();
     virtual ~SoundManager();
 
-    void                    positionListener(const Vec3 &position, const Vec3 &front);
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
     bool                    initialized() const {return m_initialized;                 }

@@ -166,6 +166,7 @@ void SoundManager::setMasterMusicVolume(float gain)
 }
 
 //-----------------------------------------------------------------------------
+
 MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 {
     if(filename=="")
@@ -185,19 +186,3 @@ MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
 }   // getMusicInformation
 
 //----------------------------------------------------------------------------
-void SoundManager::positionListener(const Vec3 &position, const Vec3 &front)
-{
-    if(!UserConfigParams::m_sfx || !m_initialized) return;
-
-    //forward vector
-    m_listenerVec[0] = front.getX(); 
-    m_listenerVec[1] = front.getY();
-    m_listenerVec[2] = front.getZ(); 
-    //up vector
-    m_listenerVec[3] = 0; 
-    m_listenerVec[4] = 0;
-    m_listenerVec[5] = 1;
-
-    alListener3f(AL_POSITION, position.getX(), position.getY(), position.getZ());
-    alListenerfv(AL_ORIENTATION, m_listenerVec);
-}

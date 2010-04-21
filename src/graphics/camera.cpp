@@ -201,9 +201,10 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);
 
-    if(race_manager->getNumLocalPlayers() < 2)
-        sound_manager->positionListener(current_position, 
-                                        current_target - current_position);
+    if (race_manager->getNumLocalPlayers() < 2)
+    {
+        sfx_manager->positionListener(current_position,  current_target - current_position);
+    }
 
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
