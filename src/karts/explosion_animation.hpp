@@ -40,8 +40,12 @@ private:
     /** The coordinates where the kart was hit originally. */
     Vec3 m_xyz;
 
-    /** The rotation of the kart at the time of the explosion. */
-    Vec3 m_hpr;
+    /** The kart's current rotation. */
+    Vec3 m_curr_rotation;
+
+    /** The artificial rotation to toss the kart around. It's in units
+     *  of rotation per second. */
+    Vec3 m_add_rotation;
 
     /** The upwards velocity. */
     float m_up_velocity;

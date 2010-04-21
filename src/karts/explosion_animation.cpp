@@ -24,9 +24,6 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
-Vec3 m_add_rotation;
-Vec3 m_curr_rotation;
-
 /** The constructor stores a pointer to the kart this object is animating,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.

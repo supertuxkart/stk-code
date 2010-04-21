@@ -633,7 +633,6 @@ void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
     int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
     if(direct_hit)
     {
-        printf("he: ");
         ExplosionAnimation::handleExplosion(pos, direct_hit);
         m_kart_mode = KM_EXPLOSION;
         // Play associated kart sound
