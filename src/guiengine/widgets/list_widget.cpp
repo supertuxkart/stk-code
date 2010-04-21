@@ -17,6 +17,9 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+
+#include "io/file_manager.hpp"
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -25,6 +28,7 @@ using namespace irr::gui;
 
 ListWidget::ListWidget() : Widget(WTYPE_LIST)
 {
+    m_use_icons = false; //TODO: make configurable if needed
 }
 
 // -----------------------------------------------------------------------------
@@ -33,7 +37,22 @@ void ListWidget::add()
 {
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     
-    m_element = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
+    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
+    
+    if (m_use_icons)
+    {
+        //TODO: allow choosing which icons to use
+        video::ITexture* icon = irr_driver->getTexture( file_manager->getGUIDir() + "/difficulty_medium.png" );
+        
+        //FIXME: I have no clue what the parameter to 'addEmptySpriteBank' is for
+        //FIXME: remember the created bank for future 'add's, since a bank must be created once only
+        IGUISpriteBank* bank = GUIEngine::getGUIEnv()->addEmptySpriteBank( file_manager->getGUIDir().c_str() );
+        bank->addTextureAsSprite(icon);
+        list->setSpriteBank(bank);
+        list->setItemHeight( icon->getSize().Height );
+    }
+    
+    m_element = list;
 }
 
 // -----------------------------------------------------------------------------
@@ -47,30 +66,23 @@ void ListWidget::clear()
 }
 
 // -----------------------------------------------------------------------------
-/* // Doesn't work, I would need to override CGUIListBox, but this class is private
-bool ListWidget::OnEvent (const SEvent &event)
-{
-    // block input events, we will handle them (vertical navigation) ourselves
-    if (event.EventType == EET_KEY_INPUT_EVENT ||
-        event.EventType == EET_JOYSTICK_INPUT_EVENT ||
-        event.EventType == EET_MOUSE_INPUT_EVENT)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
- */
-
-// -----------------------------------------------------------------------------
 
 void ListWidget::addItem(const char* item)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
-    list->addItem( stringw(item).c_str() );
+    
+    if (m_use_icons)
+    {
+        //TODO: allow choosing which icon to use
+        u32 newItem = list->addItem( stringw(item).c_str(), 0 /* icon */ );
+        list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
+        list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
+    }
+    else
+    {
+        list->addItem( stringw(item).c_str() );
+    }
 }
 
 // -----------------------------------------------------------------------------

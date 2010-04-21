@@ -30,6 +30,8 @@ namespace GUIEngine
     /** A vertical list widget with text entries. See guiengine/engine.hpp for a detailed overview */
     class ListWidget : public Widget
     {
+        bool m_use_icons;
+        
     public:
         ListWidget();
         
