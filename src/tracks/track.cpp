@@ -28,7 +28,7 @@
 using namespace irr;
 
 #include "animations/animation_manager.hpp"
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -263,7 +263,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
         MusicInformation* mi;
         try
         {
-            mi = sound_manager->getMusicInformation(full_path);
+            mi = music_manager->getMusicInformation(full_path);
         }
         catch(std::runtime_error)
         {
@@ -276,7 +276,7 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
             {
                 try
                 {
-                    mi = sound_manager->getMusicInformation(shared_name);
+                    mi = music_manager->getMusicInformation(shared_name);
                 }
                 catch(std::runtime_error)
                 {
@@ -299,7 +299,7 @@ void Track::startMusic() const
 {
     // In case that the music wasn't found (a warning was already printed)
     if(m_music.size()>0)
-        sound_manager->startMusic(m_music[rand()% m_music.size()]);
+        music_manager->startMusic(m_music[rand()% m_music.size()]);
 }   // startMusic
 
 //-----------------------------------------------------------------------------

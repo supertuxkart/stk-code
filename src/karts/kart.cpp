@@ -23,7 +23,7 @@
 #include <math.h>
 #include <iostream>
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"

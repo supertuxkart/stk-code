@@ -25,7 +25,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
@@ -167,7 +167,7 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_track_avail.push_back(true);
     updateGroups(track);
     // Read music files in that dir as well
-    sound_manager->loadMusicFromOneDir(dirname);
+    music_manager->loadMusicFromOneDir(dirname);
     return true;
 }   // loadTrack
 

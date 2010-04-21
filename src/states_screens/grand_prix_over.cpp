@@ -1,7 +1,7 @@
 
 #include "states_screens/grand_prix_over.hpp"
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -122,7 +122,7 @@ void GrandPrixOver::init()
         unlocked_label->add();
     }
     
-    sound_manager->startMusic(sound_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
+    music_manager->startMusic(music_manager->getMusicInformation(file_manager->getMusicFile("win_theme.music")));
 
     m_phase = 1;
     m_sky_angle = 0.0f;
@@ -201,10 +201,6 @@ void GrandPrixOver::tearDown()
         if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
         m_kart_node[n] = NULL;
     }
-
-    // restore menu music when leaving (FIXME: this assume we always go to menu after)
-    sound_manager->stopMusic();
-    sound_manager->startMusic(stk_config->m_title_music);
 
 }
 

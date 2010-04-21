@@ -21,7 +21,7 @@
 
 #include <assert.h>
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -133,8 +133,8 @@ void MainLoop::run()
         if (!music_on && !World::getWorld())
         {
             //FIXME: that code can't really work, I don't think "music_on" is updated everytime it should
-            sound_manager->stopMusic();   // stop potential 'left over' music from race
-            sound_manager->startMusic(stk_config->m_title_music);
+            music_manager->stopMusic();   // stop potential 'left over' music from race
+            music_manager->startMusic(stk_config->m_title_music);
             music_on = true;
         }
         network_manager->update(dt);
@@ -148,7 +148,7 @@ void MainLoop::run()
             music_on = false; 
         }   // if race is active
 
-        sound_manager->update(dt);
+        music_manager->update(dt);
         input_manager->update(dt);
         irr_driver->update(dt);
     }  // while !m_exit

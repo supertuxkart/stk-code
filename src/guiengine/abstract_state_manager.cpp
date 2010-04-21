@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "main_loop.hpp"
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
@@ -194,7 +194,7 @@ void AbstractStateManager::setGameState(GameState state)
         if (m_game_mode == MENU)
         {
             //FIXME: not up to the *abstract* state manager to do this
-            sound_manager->startMusic(stk_config->m_title_music);
+            music_manager->startMusic(stk_config->m_title_music);
         }
     }
 }

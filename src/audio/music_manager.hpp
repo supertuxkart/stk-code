@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SOUNDMANAGER_HPP
-#define HEADER_SOUNDMANAGER_HPP
+#ifndef HEADER_MUSICMANAGER_HPP
+#define HEADER_MUSICMANAGER_HPP
 
 #include <map>
 #include <vector>
@@ -30,7 +30,7 @@
 
 class Vec3;
 
-class SoundManager
+class MusicManager
 {
 private:        
     MusicInformation        *m_current_music;
@@ -46,8 +46,8 @@ private:
     float                    m_masterGain;
 
 public:
-    SoundManager();
-    virtual ~SoundManager();
+    MusicManager();
+    virtual ~MusicManager();
 
     void                    startMusic(MusicInformation* mi);
     void                    stopMusic();
@@ -76,7 +76,7 @@ public:
 
 };
 
-extern SoundManager* sound_manager;
+extern MusicManager* music_manager;
 
 #endif // HEADER_SOUNDMANAGER_HPP
 

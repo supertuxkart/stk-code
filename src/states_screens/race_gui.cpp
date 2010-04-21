@@ -23,7 +23,7 @@
 #include "irrlicht.h"
 using namespace irr;
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
@@ -739,7 +739,7 @@ void RaceGUI::drawGlobalMusicDescription()
     const float resize3 = resize*resize*resize;
     
     // ---- Get song name, and calculate its size, allowing us to position stuff
-    const MusicInformation* mi=sound_manager->getCurrentMusic();
+    const MusicInformation* mi = music_manager->getCurrentMusic();
     if (!mi) return;
     
     std::string s="\""+mi->getTitle()+"\"";

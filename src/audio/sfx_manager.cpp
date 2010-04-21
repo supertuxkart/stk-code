@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 
 #include <sstream>
 #include <stdexcept>
@@ -53,7 +53,7 @@ std::map<std::string, SFXBase*> SFXManager::m_quick_sounds;
 SFXManager::SFXManager()
 {
     // The sound manager initialises OpenAL
-    m_initialized = sound_manager->initialized();
+    m_initialized = music_manager->initialized();
     m_master_gain = 1.0f;
     
     loadSfx();

@@ -19,7 +19,7 @@
 #include "states_screens/options_screen_av.hpp"
 #include "states_screens/options_screen_players.hpp"
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "guiengine/screen.hpp"
@@ -57,7 +57,7 @@ void OptionsScreenAV::init()
     
     gauge = this->getWidget<SpinnerWidget>("music_volume");
     assert(gauge != NULL);
-    gauge->setValue( (int)(sound_manager->getMasterMusicVolume()*10.f) );
+    gauge->setValue( (int)(music_manager->getMasterMusicVolume()*10.f) );
     
     // ---- music volume
     CheckBoxWidget* sfx = this->getWidget<CheckBoxWidget>("sfx_enabled");
@@ -157,7 +157,7 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
         
-        sound_manager->setMasterMusicVolume( w->getValue()/10.0f );
+        music_manager->setMasterMusicVolume( w->getValue()/10.0f );
     }
     else if(name == "sfx_volume")
     {
@@ -189,9 +189,9 @@ void OptionsScreenAV::eventCallback(Widget* widget, const std::string& name, con
         std::cout << "music state is now " << (bool)UserConfigParams::m_music << std::endl;
         
         if(w->getState() == false)
-            sound_manager->stopMusic();
+            music_manager->stopMusic();
         else
-            sound_manager->startMusic(sound_manager->getCurrentMusic());
+            music_manager->startMusic(music_manager->getCurrentMusic());
     }
     else if(name == "sfx_enabled")
     {

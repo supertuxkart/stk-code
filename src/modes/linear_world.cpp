@@ -20,7 +20,7 @@
 
 #include <sstream>
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "network/network_manager.hpp" 
 #include "race/history.hpp"
 #include "tracks/track.hpp"
@@ -733,7 +733,7 @@ void LinearWorld::updateRacePosition()
            kart_info.m_estimated_finish > 0                        &&
            kart_info.m_estimated_finish - getTime() < 30.0f              )
         {
-            sound_manager->switchToFastMusic();
+            music_manager->switchToFastMusic();
             m_faster_music_active=true;
         }
     }   // for i<kart_amount

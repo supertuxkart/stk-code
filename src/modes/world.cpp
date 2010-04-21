@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <ctime>
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -251,7 +251,7 @@ World::~World()
     if(m_physics)
         delete m_physics;
 
-    sound_manager -> stopMusic();
+    music_manager->stopMusic();
     m_world = NULL;
 }   // ~World
 
@@ -634,7 +634,7 @@ void World::restartRace()
     resetAllKarts();
 
     // Start music from beginning
-    sound_manager->stopMusic();
+    music_manager->stopMusic();
     m_track->reset();
     m_track->startMusic();
 
@@ -648,7 +648,7 @@ void World::restartRace()
 //-----------------------------------------------------------------------------
 void  World::pause()
 {
-    sound_manager->pauseMusic();
+    music_manager->pauseMusic();
     sfx_manager->pauseAll();
     WorldStatus::pause();
 }   // pause
@@ -656,7 +656,7 @@ void  World::pause()
 //-----------------------------------------------------------------------------
 void World::unpause()
 {
-    sound_manager->resumeMusic() ;
+    music_manager->resumeMusic() ;
     sfx_manager->resumeAll();
     WorldStatus::unpause();
     for(unsigned int i=0; i<m_karts.size(); i++)

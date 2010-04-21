@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 
 #include <assert.h>
 #include <fstream>
@@ -36,10 +36,10 @@
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
-SoundManager* sound_manager= NULL;
+MusicManager* music_manager= NULL;
 
 
-SoundManager::SoundManager()
+MusicManager::MusicManager()
 {
     m_current_music= NULL;
     setMasterMusicVolume(UserConfigParams::m_music_volume);
@@ -70,10 +70,10 @@ SoundManager::SoundManager()
     alGetError(); //Called here to clear any non-important errors found
 
     loadMusicInformation();
-}  // SoundManager
+}  // MusicManager
 
 //-----------------------------------------------------------------------------
-SoundManager::~SoundManager()
+MusicManager::~MusicManager()
 {
     stopMusic();
 
@@ -87,10 +87,10 @@ SoundManager::~SoundManager()
 
         alcCloseDevice( device );
     }
-}   // ~SoundManager
+}   // ~MusicManager
 
 //-----------------------------------------------------------------------------
-void SoundManager::loadMusicInformation()
+void MusicManager::loadMusicInformation()
 {
     // Load music files from data/music, and dirs defined in SUPERTUXKART_MUSIC_PATH
     std::vector<std::string> allMusicDirs=file_manager->getMusicDirs();
@@ -102,7 +102,7 @@ void SoundManager::loadMusicInformation()
 }   // loadMusicInformation
 
 //-----------------------------------------------------------------------------
-void SoundManager::loadMusicFromOneDir(const std::string& dir)
+void MusicManager::loadMusicFromOneDir(const std::string& dir)
 {
     std::set<std::string> files;
     file_manager->listFiles(files, dir, /*is_full_path*/ true,
@@ -115,7 +115,7 @@ void SoundManager::loadMusicFromOneDir(const std::string& dir)
 } // loadMusicFromOneDir
 
 //-----------------------------------------------------------------------------
-void SoundManager::addMusicToTracks()
+void MusicManager::addMusicToTracks()
 {
     for(std::map<std::string,MusicInformation*>::iterator i=m_allMusic.begin();
                                                           i!=m_allMusic.end(); i++)
@@ -131,7 +131,7 @@ void SoundManager::addMusicToTracks()
 }   // addMusicToTracks
 
 //-----------------------------------------------------------------------------
-void SoundManager::startMusic(MusicInformation* mi)
+void MusicManager::startMusic(MusicInformation* mi)
 {
     // It is possible here that startMusic() will be called without first calling stopMusic().
     // This would cause a memory leak by overwriting m_current_music without first releasing it's resources. 
@@ -146,13 +146,13 @@ void SoundManager::startMusic(MusicInformation* mi)
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-void SoundManager::stopMusic()
+void MusicManager::stopMusic()
 {
     if(m_current_music) m_current_music->stopMusic();
 }   // stopMusic
 
 //-----------------------------------------------------------------------------
-void SoundManager::setMasterMusicVolume(float gain)
+void MusicManager::setMasterMusicVolume(float gain)
 {
     if(gain > 1.0)
         gain = 1.0f;
@@ -167,7 +167,7 @@ void SoundManager::setMasterMusicVolume(float gain)
 
 //-----------------------------------------------------------------------------
 
-MusicInformation* SoundManager::getMusicInformation(const std::string& filename)
+MusicInformation* MusicManager::getMusicInformation(const std::string& filename)
 {
     if(filename=="")
     {

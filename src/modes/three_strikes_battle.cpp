@@ -20,7 +20,7 @@
 #include <string>
 
 #include "states_screens/race_gui.hpp"
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void ThreeStrikesBattle::kartHit(const int kart_id)
     // when almost over, use fast music
     if (num_karts_many_lives<=1 && !m_faster_music_active)
     {
-        sound_manager->switchToFastMusic();
+        music_manager->switchToFastMusic();
         m_faster_music_active = true;
     }
 }   // kartHit

@@ -22,7 +22,7 @@
 
 #include "math.h"
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"

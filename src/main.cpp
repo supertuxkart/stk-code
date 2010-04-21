@@ -40,7 +40,7 @@
 #include <algorithm>
 
 #include "main_loop.hpp"
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/stk_config.hpp"
@@ -509,7 +509,7 @@ void initUserConfig(char *argv[])
 void initRest()
 {
     irr_driver              = new IrrDriver();
-    sound_manager           = new SoundManager();
+    music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
@@ -528,7 +528,7 @@ void initRest()
 
     stk_config->load(file_manager->getConfigFile("stk_config.xml"));
     track_manager->loadTrackList();
-    sound_manager->addMusicToTracks();
+    music_manager->addMusicToTracks();
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
@@ -565,7 +565,7 @@ void cleanTuxKart()
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
     if(sfx_manager)             delete sfx_manager;
-    if(sound_manager)           delete sound_manager;
+    if(music_manager)           delete music_manager;
     if(user_config)             delete user_config;
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;

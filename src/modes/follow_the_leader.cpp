@@ -17,7 +17,7 @@
 
 #include "modes/follow_the_leader.hpp"
 
-#include "audio/sound_manager.hpp"
+#include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/powerup_manager.hpp"
@@ -83,7 +83,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     // almost over, use fast music
     if(getCurrentNumKarts()==3)
     {
-        sound_manager->switchToFastMusic();
+        music_manager->switchToFastMusic();
     }
     
     if (isRaceOver())

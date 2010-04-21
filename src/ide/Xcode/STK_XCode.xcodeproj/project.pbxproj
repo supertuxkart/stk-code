@@ -53,7 +53,6 @@
 		9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2A0F296540000D3E5D /* music_ogg.cpp */; };
 		9551C8290FC1B72500DB481B /* sfx_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2D0F296540000D3E5D /* sfx_manager.cpp */; };
 		9551C82A0FC1B72500DB481B /* sfx_openal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC2F0F296540000D3E5D /* sfx_openal.cpp */; };
-		9551C82B0FC1B72500DB481B /* sound_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AC310F296540000D3E5D /* sound_manager.cpp */; };
 		9551C8350FC1B72500DB481B /* btAxisSweep3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AD2E0F296541000D3E5D /* btAxisSweep3.cpp */; };
 		9551C8360FC1B72500DB481B /* btBroadphaseProxy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AD310F296541000D3E5D /* btBroadphaseProxy.cpp */; };
 		9551C8370FC1B72500DB481B /* btCollisionAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2AD330F296541000D3E5D /* btCollisionAlgorithm.cpp */; };
@@ -258,6 +257,7 @@
 		95833240101243ED00C5137E /* player_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95833239101243ED00C5137E /* player_info_dialog.cpp */; };
 		95833241101243ED00C5137E /* press_a_key_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323B101243ED00C5137E /* press_a_key_dialog.cpp */; };
 		95833242101243ED00C5137E /* track_info_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9583323D101243ED00C5137E /* track_info_dialog.cpp */; };
+		958BD770117F6AE90095B483 /* music_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958BD76E117F6AE90095B483 /* music_manager.cpp */; };
 		958D8C54104F523000A81934 /* race_paused_dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 958D8C53104F523000A81934 /* race_paused_dialog.cpp */; };
 		959482D310EBC0790031BADF /* track_object_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482CF10EBC0790031BADF /* track_object_manager.cpp */; };
 		959482D410EBC0790031BADF /* track_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 959482D110EBC0790031BADF /* track_object.cpp */; };
@@ -466,6 +466,8 @@
 		9583323C101243ED00C5137E /* press_a_key_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = press_a_key_dialog.hpp; path = ../../states_screens/dialogs/press_a_key_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		9583323D101243ED00C5137E /* track_info_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_info_dialog.cpp; path = ../../states_screens/dialogs/track_info_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		9583323E101243ED00C5137E /* track_info_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = track_info_dialog.hpp; path = ../../states_screens/dialogs/track_info_dialog.hpp; sourceTree = SOURCE_ROOT; };
+		958BD76E117F6AE90095B483 /* music_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = music_manager.cpp; path = ../../audio/music_manager.cpp; sourceTree = SOURCE_ROOT; };
+		958BD76F117F6AE90095B483 /* music_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = music_manager.hpp; path = ../../audio/music_manager.hpp; sourceTree = SOURCE_ROOT; };
 		958D8C52104F523000A81934 /* race_paused_dialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = race_paused_dialog.hpp; path = ../../states_screens/dialogs/race_paused_dialog.hpp; sourceTree = SOURCE_ROOT; };
 		958D8C53104F523000A81934 /* race_paused_dialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = race_paused_dialog.cpp; path = ../../states_screens/dialogs/race_paused_dialog.cpp; sourceTree = SOURCE_ROOT; };
 		959482CF10EBC0790031BADF /* track_object_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = track_object_manager.cpp; path = ../../tracks/track_object_manager.cpp; sourceTree = SOURCE_ROOT; };
@@ -493,8 +495,6 @@
 		95C2AC2E0F296540000D3E5D /* sfx_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sfx_manager.hpp; path = ../../audio/sfx_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2AC2F0F296540000D3E5D /* sfx_openal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sfx_openal.cpp; path = ../../audio/sfx_openal.cpp; sourceTree = SOURCE_ROOT; };
 		95C2AC300F296540000D3E5D /* sfx_openal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sfx_openal.hpp; path = ../../audio/sfx_openal.hpp; sourceTree = SOURCE_ROOT; };
-		95C2AC310F296540000D3E5D /* sound_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sound_manager.cpp; path = ../../audio/sound_manager.cpp; sourceTree = SOURCE_ROOT; };
-		95C2AC320F296540000D3E5D /* sound_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sound_manager.hpp; path = ../../audio/sound_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2ACD30F296541000D3E5D /* btBulletCollisionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btBulletCollisionCommon.h; path = ../../bullet/src/btBulletCollisionCommon.h; sourceTree = SOURCE_ROOT; };
 		95C2ACD40F296541000D3E5D /* btBulletDynamicsCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btBulletDynamicsCommon.h; path = ../../bullet/src/btBulletDynamicsCommon.h; sourceTree = SOURCE_ROOT; };
 		95C2AD2A0F296541000D3E5D /* Bullet-C-Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bullet-C-Api.h"; path = "../../bullet/src/Bullet-C-Api.h"; sourceTree = SOURCE_ROOT; };
@@ -1377,6 +1377,8 @@
 				95C2AC270F296540000D3E5D /* music.hpp */,
 				95C2AC280F296540000D3E5D /* music_information.cpp */,
 				95C2AC290F296540000D3E5D /* music_information.hpp */,
+				958BD76E117F6AE90095B483 /* music_manager.cpp */,
+				958BD76F117F6AE90095B483 /* music_manager.hpp */,
 				95C2AC2A0F296540000D3E5D /* music_ogg.cpp */,
 				95C2AC2B0F296540000D3E5D /* music_ogg.hpp */,
 				95C2AC2C0F296540000D3E5D /* sfx_base.hpp */,
@@ -1384,8 +1386,6 @@
 				95C2AC2E0F296540000D3E5D /* sfx_manager.hpp */,
 				95C2AC2F0F296540000D3E5D /* sfx_openal.cpp */,
 				95C2AC300F296540000D3E5D /* sfx_openal.hpp */,
-				95C2AC310F296540000D3E5D /* sound_manager.cpp */,
-				95C2AC320F296540000D3E5D /* sound_manager.hpp */,
 			);
 			name = audio;
 			path = ../../audio;
@@ -2306,7 +2306,6 @@
 				9551C8280FC1B72500DB481B /* music_ogg.cpp in Sources */,
 				9551C8290FC1B72500DB481B /* sfx_manager.cpp in Sources */,
 				9551C82A0FC1B72500DB481B /* sfx_openal.cpp in Sources */,
-				9551C82B0FC1B72500DB481B /* sound_manager.cpp in Sources */,
 				9551C8350FC1B72500DB481B /* btAxisSweep3.cpp in Sources */,
 				9551C8360FC1B72500DB481B /* btBroadphaseProxy.cpp in Sources */,
 				9551C8370FC1B72500DB481B /* btCollisionAlgorithm.cpp in Sources */,
@@ -2564,6 +2563,7 @@
 				956830E01132EC9E00088D14 /* irr_debug_drawer.cpp in Sources */,
 				957ED4801163FF18002AB42C /* ai_base_controller.cpp in Sources */,
 				95F912CD117E761700EA9F20 /* explosion_animation.cpp in Sources */,
+				958BD770117F6AE90095B483 /* music_manager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
