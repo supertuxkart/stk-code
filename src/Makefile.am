@@ -32,8 +32,6 @@ supertuxkart_SOURCES = \
  audio/sfx_base.hpp \
  audio/sfx_openal.cpp \
  audio/sfx_openal.hpp \
- audio/sound_manager.cpp \
- audio/sound_manager.hpp \
  challenges/challenge.cpp \
  challenges/challenge.hpp \
  challenges/challenge_data.cpp \
