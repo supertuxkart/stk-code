@@ -298,10 +298,10 @@ AC_TRY_RUN(
     [
         #  include "irrlicht.h"
         int main() {
-        #if (IRRLICHT_VERSION_MAJOR > 1) || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 6)
+        #if (IRRLICHT_VERSION_MAJOR > 1) || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 7)
             // ok
         #else
-        #error "You need irrLicht 1.6+ to build STK"
+        #error "You need irrLicht 1.7+ to build STK"
         #endif
         return 0;
         }
