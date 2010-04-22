@@ -73,7 +73,7 @@ KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
         m_slipstream_use_time = m_slipstream_add_power =
         m_slipstream_min_speed = m_camera_distance = 
         m_rescue_time = m_rescue_height = m_explosion_time =
-        m_explosion_height = UNDEFINED;
+        m_explosion_radius = UNDEFINED;
     m_gravity_center_shift   = Vec3(UNDEFINED);
     m_has_skidmarks          = true;
     m_version                = 0;
@@ -218,7 +218,7 @@ void KartProperties::getAllData(const XMLNode * root)
     if(const XMLNode *explosion_node = root->getNode("explosion"))
     {
         explosion_node->get("time",   &m_explosion_time  );
-        explosion_node->get("height", &m_explosion_height);
+        explosion_node->get("radius", &m_explosion_radius);
     }
 
     if(const XMLNode *skid_node = root->getNode("skid"))
@@ -477,7 +477,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_rescue_time,               "rescue time"                   );
     CHECK_NEG(m_rescue_vert_offset,        "rescue vert-offset"            );
     CHECK_NEG(m_explosion_time,            "explosion time"                );
-    CHECK_NEG(m_explosion_height,          "explosion height"              );
+    CHECK_NEG(m_explosion_radius,          "explosion radius"              );
 
 }   // checkAllSet
 

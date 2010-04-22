@@ -229,7 +229,7 @@ public:
     /** Since each mode will have a different way of deciding where a rescued
       * kart is dropped, this method will be called and each mode can implement it.
       */
-    virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body) = 0;
+    virtual void moveKartAfterRescue(Kart* kart) = 0;
     
     /** Called when it is needed to know whether this kind of race involves counting laps.
       */

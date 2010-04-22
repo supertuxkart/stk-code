@@ -115,8 +115,8 @@ private:
     /** Time an animated explosion is shown. Longer = more delay for kart. */
     float m_explosion_time;
 
-    /** Height of an explosion animation. */
-    float m_explosion_height;
+    /** How far away from an explosion karts will still be affected. */
+    float m_explosion_radius;
 
     /** Vertical offset after rescue. */
     float m_rescue_vert_offset;
@@ -256,7 +256,7 @@ public:
     /** Returns the time an explosion animation is shown. */
     float getExplosionTime          () const {return m_explosion_time;           }
     /** Returns the height of the explosion animation. */
-    float getExplosionHeight        () const {return m_explosion_height;         }
+    float getExplosionRadius        () const {return m_explosion_radius;         }
     /** Returns how much a kart can roll/pitch before the upright constraint
      *  counteracts. */
     float getUprightTolerance       () const {return m_upright_tolerance;        }

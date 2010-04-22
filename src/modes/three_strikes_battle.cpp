@@ -245,7 +245,7 @@ RaceGUI::KartIconDisplayInfo* ThreeStrikesBattle::getKartsDisplayInfo()
 }   // getKartDisplayInfo
 
 //-----------------------------------------------------------------------------
-void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
+void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart)
 {
     // find closest point to drop kart on
     World *world = World::getWorld();
@@ -286,7 +286,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     pos.setOrigin(kart->getXYZ()+btVector3(0, 0.5f*kart->getKartHeight(), 0.0f));
     pos.setRotation( btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0 /* angle */) );
 
-    body->setCenterOfMassTransform(pos);
+    kart->getBody()->setCenterOfMassTransform(pos);
 
     //project kart to surface of track
     bool kart_over_ground = m_physics->projectKartDownwards(kart);
@@ -296,7 +296,7 @@ void ThreeStrikesBattle::moveKartAfterRescue(Kart* kart, btRigidBody* body)
         //add vertical offset so that the kart starts off above the track
         float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
                                 kart->getKartHeight();
-        body->translate(btVector3(0, vertical_offset, 0));
+        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {

@@ -88,7 +88,7 @@ public:
 
     virtual  RaceGUI::KartIconDisplayInfo* 
                   getKartsDisplayInfo();
-    virtual void  moveKartAfterRescue(Kart* kart, btRigidBody* body);
+    virtual void  moveKartAfterRescue(Kart* kart);
     
     virtual void  restartRace();
     

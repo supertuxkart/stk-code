@@ -64,7 +64,7 @@
 Kart::Kart (const std::string& ident, int position,
             const btTransform& init_transform)
      : TerrainInfo(1),
-       Moveable(), ExplosionAnimation(this), m_powerup(this)
+       Moveable(), EmergencyAnimation(this), m_powerup(this)
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 #  pragma warning(1:4355)
@@ -104,12 +104,6 @@ Kart::Kart (const std::string& ident, int position,
     m_max_speed_reverse_ratio = m_kart_properties->getMaxSpeedReverseRatio();
     m_speed                   = 0.0f;
 
-    // Re-setting kart mode is important! If the mode should be rescue when 
-    // reset() is called, it is assumed that this was triggered by a restart, 
-    // and that the vehicle must be added back to the physics world. Since 
-    // reset() is also called at the very start, it must be guaranteed that 
-    // rescue is not set.
-    m_kart_mode               = KM_RACE;
     m_wheel_rotation          = 0;
 
     // Create SFXBase for each custom sound (TODO: add back when properly done)
@@ -333,11 +327,11 @@ Kart::~Kart()
  */
 void Kart::eliminate()
 {
-    if (m_kart_mode!=KM_RESCUE)
+    if (!playingEmergencyAnimation())
     {
         World::getWorld()->getPhysics()->removeKart(this);
     }
-    m_kart_mode = KM_ELIMINATED;
+    m_eliminated = true;
 
     getNode()->setVisible(false);
 }   // eliminate
@@ -380,13 +374,7 @@ void Kart::updatedWeight()
  */
 void Kart::reset()
 {
-    // If the kart was eliminated or rescued, the body was removed from the
-    // physics world. Add it again.
-    if(m_kart_mode==KM_ELIMINATED || m_kart_mode==KM_RESCUE)
-    {
-        World::getWorld()->getPhysics()->addKart(this);
-    }
-
+    EmergencyAnimation::reset();
     if (m_camera)
     {
         m_camera->reset();
@@ -408,8 +396,8 @@ void Kart::reset()
     m_powerup.reset();
 
     m_race_position        = 9;
+    m_eliminated           = false;
     m_finished_race        = false;
-    m_kart_mode            = KM_RACE;
     m_finish_time          = 0.0f;
     m_zipper_time_left     = 0.0f;
     m_collected_energy     = 0;
@@ -474,7 +462,6 @@ void Kart::finishedRace(float time)
     if(m_finished_race) return;
     m_finished_race = true;
     m_finish_time   = time;
-    m_kart_mode     = KM_END_ANIM;
     m_controller->finishedRace(time);
     race_manager->kartFinishedRace(this, time);
     
@@ -601,12 +588,12 @@ float Kart::getActualWheelForce()
 
 //-----------------------------------------------------------------------------
 /** The kart is on ground if all 4 wheels touch the ground, and if no special
- *  animation (rescue or explosion) is happening).
+ *  animation (rescue, explosion etc.) is happening).
  */
 bool Kart::isOnGround() const
 {
     return (m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
-          && m_kart_mode!=KM_RESCUE && m_kart_mode!=KM_EXPLOSION);
+          && !playingEmergencyAnimation());
 }   // isOnGround
 
 //-----------------------------------------------------------------------------
@@ -621,70 +608,6 @@ bool Kart::isNearGround() const
     else
         return ((getXYZ().getZ() - getHoT()) < stk_config->m_near_ground);
 }   // isNearGround
-
-//-----------------------------------------------------------------------------
-/** Called when an explosion happens.
- *  \param pos Position of the explosion.
- *  \param direct_hit True if this kart was hit directly (and should therefore
- *         be more severly affected).
- */
-void Kart::handleExplosion(const Vec3& pos, bool direct_hit)
-{
-    int sign_bits = rand(); // To select plus or minus randomnly, assuming 15 bit at least
-    if(direct_hit)
-    {
-        ExplosionAnimation::handleExplosion(pos, direct_hit);
-        m_kart_mode = KM_EXPLOSION;
-        // Play associated kart sound
-        playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-        return;
-
-        float sign_a = (sign_bits & (0x1 <<  8)) ? 1.0f : -1.0f;
-        float sign_b = (sign_bits & (0x1 <<  9)) ? 1.0f : -1.0f;
-        float sign_c = (sign_bits & (0x1 << 10)) ? 1.0f : -1.0f;
-        float sign_d = (sign_bits & (0x1 << 11)) ? 1.0f : -1.0f;
-        float sign_e = (sign_bits & (0x1 << 12)) ? 1.0f : -1.0f;
-
-        btVector3 diff(sign_a * float(rand()%16) / 16.0f, 2.0f, sign_b * float(rand()%16) / 16.0f);
-        diff.normalize();
-        diff *= stk_config->m_explosion_impulse / 5.0f;
-        m_uprightConstraint->setDisableTime(10.0f);
-        getVehicle()->getRigidBody()->applyCentralImpulse(diff);
-
-        float torqueX = sign_c * (20.0f + float(rand()%32) * 5.0f);
-        float torqueY = sign_d * (20.0f + float(rand()%32) * 5.0f);
-        float torqueZ = sign_e * (20.0f + float(rand()%32) * 5.0f);
-
-        btVector3 torque(torqueX, torqueY, torqueZ);
-        getVehicle()->getRigidBody()->applyTorqueImpulse(torque);
-
-        m_stars_effect->showFor(6.0f);
-    }
-    else  // only affected by a distant explosion
-    {
-        btVector3 diff=getXYZ()-pos;
-        // If the Y component is negative, the resulting impulse could push the
-        // kart through the floor. So in this case ignore Y.
-        if(diff.getY()<0.0f) diff.setY(0.0f);
-        float len2=diff.length2();
-
-        // Protect against "near zero" distances
-        len2 = (len2 > 0.5f) ? len2 : 0.5f;
-
-        // The correct formulae would be to first normalise diff,
-        // then apply the impulse (which decreases 1/r^2 depending
-        // on the distance r), so:
-        // diff/len(diff) * impulseSize/len(diff)^2
-        // = diff*impulseSize/len(diff)^3
-        // We use diff*impulseSize/len(diff)^2 here, this makes the impulse
-        // somewhat larger, which is actually more fun :)
-        diff *= stk_config->m_explosion_impulse/len2;
-        getVehicle()->getRigidBody()->applyCentralImpulse(diff);
-        // Even if just pushed, give some random rotation to simulate the lost of control by the shake
-        float sign_a = (sign_bits & (0x1 << 8)) ? 1.0f : -1.0f;
-        getVehicle()->getRigidBody()->applyTorqueImpulse(btVector3(0, sign_a * float(rand()%32*5)/sqrt(len2), 0));
-    } // if direct_hit
-}   // handleExplosion
 
 //-----------------------------------------------------------------------------
 /** Updates the kart in each time step. It updates the physics setting,
@@ -710,7 +633,7 @@ void Kart::update(float dt)
 
     // On a client fiering is done upon receiving the command from the server.
     if ( m_controls.m_fire && network_manager->getMode()!=NetworkManager::NW_CLIENT
-         && !isRescue())
+        && !playingEmergencyAnimation())
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
@@ -749,25 +672,7 @@ void Kart::update(float dt)
     m_wheel_rotation += m_speed*dt / m_kart_properties->getWheelRadius();
     m_wheel_rotation=fmodf(m_wheel_rotation, 2*M_PI);
 
-    if ( m_kart_mode==KM_RESCUE )
-    {
-        // Let the kart raise 2m in the 2 seconds of the rescue
-        const float rescue_time   = m_kart_properties->getRescueTime();
-        const float rescue_height = 2.0f;
-        btQuaternion q_roll (btVector3(0.0f, 0.0f, 1.0f),
-                             m_rescue_roll*dt/rescue_time);
-        btQuaternion q_pitch(btVector3(1.f, 0.f, 0.f),
-                             m_rescue_pitch*dt/rescue_time);
-        setXYZ(getXYZ()+Vec3(0, 
-                             m_kart_properties->getRescueHeight()*dt/rescue_time,
-                             0));
-        setRotation(getRotation()*q_roll*q_pitch);
-    }   // if rescue mode
-    else if ( m_kart_mode==KM_EXPLOSION)
-    {
-        if(!ExplosionAnimation::update(dt))
-            m_kart_mode = KM_RACE;
-    }
+    EmergencyAnimation::update(dt);
 
     m_attachment->update(dt);
 
@@ -872,12 +777,12 @@ void Kart::update(float dt)
     // is rescued isOnGround might still be true, since the kart rigid
     // body was removed from the physics, but still retain the old
     // values for the raycasts).
-    if( (!isOnGround() || m_kart_mode==KM_RESCUE) && m_shadow_enabled)
+    if( (!isOnGround() || playingEmergencyAnimation()) && m_shadow_enabled)
     {
         m_shadow_enabled = false;
         m_shadow->disableShadow();
     }
-    if(!m_shadow_enabled && isOnGround() && m_kart_mode!=KM_RESCUE)
+    if(!m_shadow_enabled && isOnGround() && !playingEmergencyAnimation())
     {
         m_shadow->enableShadow();
         m_shadow_enabled = true;
@@ -1338,46 +1243,6 @@ void Kart::updatePhysics(float dt)
     
 }   // updatePhysics
 
-//-----------------------------------------------------------------------------
-/** Sets the mode of the kart to being rescued, attaches the rescue model
- *  and saves the current pitch and roll (for the rescue animation). It
- *  also removes the kart from the physics world.
- */
-void Kart::forceRescue()
-{
-    m_kart_mode=KM_RESCUE;
-    // Just in case that rescue is pressed while the kart is being rescued
-    if(m_attachment->getType() != ATTACH_TINYTUX)
-    {
-        m_attachment->set( ATTACH_TINYTUX, m_kart_properties->getRescueTime());
-        m_rescue_pitch = getPitch();
-        m_rescue_roll  = getRoll();
-        //m_rescue_pitch = getHPR().getPitch();
-        //m_rescue_roll  = getHPR().getRoll();
-        race_state->itemCollected(getWorldKartId(), -1, -1);
-        World::getWorld()->getPhysics()->removeKart(this);
-    }
-
-}   // forceRescue
-
-//-----------------------------------------------------------------------------
-/** Drops a kart which was rescued back on the track.
- */
-void Kart::endRescue()
-{
-    m_kart_mode = KM_RACE;
-
-    World::getWorld()->getPhysics()->addKart(this);
-    
-    m_body->setLinearVelocity (btVector3(0.0f,0.0f,0.0f));
-    m_body->setAngularVelocity(btVector3(0.0f,0.0f,0.0f));
-
-    m_vehicle->deactivateZipper();
-
-    // let the mode decide where to put the kart
-    World::getWorld()->moveKartAfterRescue(this, m_body);
-    
-}   // endRescue
 
 //-----------------------------------------------------------------------------
 /** Attaches the right model, creates the physics and loads all special 

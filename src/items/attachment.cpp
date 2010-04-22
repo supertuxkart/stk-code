@@ -199,7 +199,7 @@ void Attachment::update(float dt)
         }
         break;
     case ATTACH_TINYTUX:
-        if(m_time_left<=0.0) m_kart->endRescue();
+        // Nothing to do for tiny tux, this is all handled in EmergencyAnimation
         break;
     }   // switch
 

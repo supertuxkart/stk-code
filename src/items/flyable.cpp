@@ -174,7 +174,8 @@ void Flyable::getClosestKart(const Kart **minKart, float *minDistSquared,
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
         Kart *kart = world->getKart(i);
-        if(kart->isEliminated() || kart == m_owner || kart->isRescue() ) continue;
+        if(kart->isEliminated() || kart == m_owner || 
+            kart->playingEmergencyAnimation() ) continue;
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-tProjectile.getOrigin();

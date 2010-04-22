@@ -159,7 +159,7 @@ void LinearWorld::update(float delta)
         Kart* kart = m_karts[n];
 
         // Nothing to do for karts that are currently being rescued or eliminated
-        if(kart->isRescue() || kart->isEliminated()) continue;
+        if(kart->playingEmergencyAnimation()) continue;
 
         // ---------- deal with sector data ---------
 
@@ -541,7 +541,7 @@ float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 //-----------------------------------------------------------------------------
 /** Decide where to drop a rescued kart
   */
-void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
+void LinearWorld::moveKartAfterRescue(Kart* kart)
 {
     KartInfo& info = m_kart_info[kart->getWorldKartId()];
 
@@ -581,7 +581,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
     pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
                     m_track->getAngle(info.m_track_sector)));
 
-    body->setCenterOfMassTransform(pos);
+    kart->getBody()->setCenterOfMassTransform(pos);
 
     //project kart to surface of track
     bool kart_over_ground = m_physics->projectKartDownwards(kart);
@@ -591,7 +591,7 @@ void LinearWorld::moveKartAfterRescue(Kart* kart, btRigidBody* body)
         //add vertical offset so that the kart starts off above the track
         float vertical_offset = kart->getKartProperties()->getVertRescueOffset() *
                                 kart->getKartHeight();
-        body->translate(btVector3(0, vertical_offset, 0));
+        kart->getBody()->translate(btVector3(0, vertical_offset, 0));
     }
     else
     {

@@ -66,7 +66,7 @@ public:
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
-    virtual void moveKartAfterRescue(Kart* kart, btRigidBody* body);
+    virtual void moveKartAfterRescue(Kart* kart);
     virtual bool acceptPowerup(const PowerupType type) const;
     
     virtual std::string getIdent() const;

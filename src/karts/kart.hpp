@@ -26,7 +26,7 @@
 #include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
-#include "karts/explosion_animation.hpp"
+#include "karts/emergency_animation.hpp"
 #include "karts/moveable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
@@ -56,7 +56,7 @@ class Stars;
  *  is an object that is moved on the track, and has position and rotations)
  *  and TerrainInfo, which manages the terrain the kart is on.
  */
-class Kart : public TerrainInfo, public Moveable, public ExplosionAnimation
+class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation
 {
 private:
     /** Reset position. */
@@ -175,11 +175,9 @@ private:
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
     float         m_speed;
-    /** Different kart modes: normal racing, being rescued, showing end
-     *  animation, explosions, kart eliminated. */
-    enum          {KM_RACE, KM_RESCUE, KM_END_ANIM, KM_EXPLOSION, 
-                   KM_ELIMINATED}
-                  m_kart_mode;
+
+    /** True if this kart has been eliminated. */
+    bool          m_eliminated;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
@@ -193,7 +191,6 @@ private:
     void          updatePhysics(float dt);
 
 protected:
-    float                 m_rescue_pitch, m_rescue_roll;
     const KartProperties *m_kart_properties;
 
     
@@ -282,8 +279,6 @@ public:
     /** Returns true if this kart has finished the race. */
     bool           hasFinishedRace     () const { return m_finished_race;    }
     // ------------------------------------------------------------------------
-    void           endRescue           ();
-    // ------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
     bool           hasViewBlockedByPlunger() const
                                      { return m_view_blocked_by_plunger > 0; }
@@ -358,15 +353,11 @@ public:
      *  the upright constraint to allow for more realistic explosions. */
     bool           isNearGround     () const;
     /** Returns true if the kart is eliminated. */
-    bool           isEliminated     () const {return m_kart_mode==KM_ELIMINATED;}
-    /** Returns true if the kart is being rescued. */
-    bool           isRescue         () const {return m_kart_mode==KM_RESCUE;}
+    bool           isEliminated     () const {return m_eliminated;}
     void           eliminate        ();
     void           resetBrakes      ();
     void           adjustSpeed      (float f);
     void           updatedWeight    ();
-    void           forceRescue      ();
-    void           handleExplosion  (const Vec3& pos, bool direct_hit);
     /** Returns a name to be displayed for this kart. */
     virtual const irr::core::stringw& getName() const {return m_kart_properties->getName();}
     const std::string& getIdent     () const {return m_kart_properties->getIdent();}

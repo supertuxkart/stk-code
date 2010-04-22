@@ -454,7 +454,8 @@ void NewAIController::handleSteering(float dt)
 void NewAIController::handleItems( const float DELTA, const int STEPS )
 {
     m_controls->m_fire = false;
-    if(m_kart->isRescue() || m_kart->getPowerup()->getType() == POWERUP_NOTHING ) return;
+    if(m_kart->playingEmergencyAnimation() || 
+        m_kart->getPowerup()->getType() == POWERUP_NOTHING ) return;
 
     m_time_since_last_shot += DELTA;
 
@@ -660,7 +661,8 @@ void NewAIController::handleRaceStart()
 void NewAIController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->isRescue() && !m_world->isStartPhase())
+    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() &&
+        !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)

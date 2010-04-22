@@ -302,7 +302,7 @@ void PlayerController::update(float dt)
         return;
     }
 
-    if ( m_controls->m_fire && !m_kart->isRescue())
+    if ( m_controls->m_fire && !m_kart->playingEmergencyAnimation())
     {
         if (m_kart->getPowerup()->getType()==POWERUP_NOTHING) 
             m_kart->beep();
@@ -324,7 +324,8 @@ void PlayerController::update(float dt)
         m_kart->forceRescue();
         m_controls->m_rescue=false;
     }
-    if (m_kart->isRescue() && m_kart->getAttachment()->getType() != ATTACH_TINYTUX)
+    if (m_kart->playingEmergencyAnimation() && 
+        m_kart->getAttachment()->getType() != ATTACH_TINYTUX)
     {
         m_bzzt_sound->play();
     }

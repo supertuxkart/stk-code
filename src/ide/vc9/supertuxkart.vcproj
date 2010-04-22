@@ -333,6 +333,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\audio\music_manager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\audio\music_ogg.cpp"
 					>
 				</File>
@@ -342,10 +346,6 @@
 				</File>
 				<File
 					RelativePath="..\..\audio\sfx_openal.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\audio\sound_manager.cpp"
 					>
 				</File>
 			</Filter>
@@ -465,7 +465,7 @@
 				Name="karts"
 				>
 				<File
-					RelativePath="..\..\karts\explosion_animation.cpp"
+					RelativePath="..\..\karts\emergency_animation.cpp"
 					>
 				</File>
 				<File
@@ -1147,6 +1147,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\audio\music_manager.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\audio\music_ogg.hpp"
 					>
 				</File>
@@ -1160,10 +1164,6 @@
 				</File>
 				<File
 					RelativePath="..\..\audio\sfx_openal.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\audio\sound_manager.hpp"
 					>
 				</File>
 			</Filter>
@@ -1291,7 +1291,7 @@
 				Name="karts"
 				>
 				<File
-					RelativePath="..\..\karts\explosion_animation.hpp"
+					RelativePath="..\..\karts\emergency_animation.hpp"
 					>
 				</File>
 				<File

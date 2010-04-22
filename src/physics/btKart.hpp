@@ -23,7 +23,6 @@ class btKart : public btRaycastVehicle
 {
     void         defaultInit(const btVehicleTuning& tuning);
     btScalar     m_track_connect_accel;
-    btScalar     m_skidding_factor;
     int          m_num_wheels_on_ground;
     bool         m_zipper_active;
     btScalar     m_zipper_velocity;
@@ -34,7 +33,6 @@ public:
     btScalar     rayCast(btWheelInfo& wheel);
     btScalar     rayCast(btWheelInfo& wheel, const btVector3& ray);
     bool         projectVehicleToSurface(const btVector3& ray, bool translate_vehicle);
-    void         setSkidding(btScalar sf) { m_skidding_factor = sf; }
     virtual void updateVehicle(btScalar step);
     void         resetSuspension();
     int          getNumWheelsOnGround() const { return m_num_wheels_on_ground; }
