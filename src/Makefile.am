@@ -158,8 +158,8 @@ supertuxkart_SOURCES = \
  karts/controller/default_ai_controller.hpp \
  karts/controller/end_controller.cpp \
  karts/controller/end_controller.hpp \
- karts/explosion_animation.cpp \
- karts/explosion_animation.hpp \
+ karts/emergency_animation.cpp \
+ karts/emergency_animation.hpp \
  karts/controller/kart_control.hpp \
  karts/controller/new_ai_controller.cpp \
  karts/controller/new_ai_controller.hpp \
