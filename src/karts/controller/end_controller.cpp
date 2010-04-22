@@ -51,35 +51,17 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
 {
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
-
-    // Initialise the fields
+    std::vector<unsigned int> next;
     for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
     {
-        m_next_node_index.push_back(-1);
         // 0 is always a valid successor - so even if the kart should end
         // up by accident on a non-selected path, it will keep on working.
         m_successor_index.push_back(0);
-    }
-    // For now pick one part on random, which is not adjusted during the run
-    std::vector<unsigned int> next;
-    int count=0;
-    int current_node=0;
-    while (1)
-    {
+
         next.clear();
-        m_quad_graph->getSuccessors(current_node, next);
-        int indx = rand() % next.size();
-        m_successor_index[current_node] = indx;
-        m_next_node_index[current_node] = next[indx];
-        current_node = next[indx];
-        if(current_node==0) break;
-        count++;
-        if(count>(int)m_quad_graph->getNumNodes())
-        {
-            fprintf(stderr, "AI can't find a loop going back to node 0, aborting.\n");
-            exit(-1);
-        }
-    };
+        m_quad_graph->getSuccessors(i, next);
+        m_next_node_index.push_back(next[0]);
+    }
 
     const unsigned int look_ahead=10;
     // Now compute for each node in the graph the list of the next 'look_ahead'
@@ -97,7 +79,6 @@ EndController::EndController(Kart *kart, StateManager::ActivePlayer *player)
         for(unsigned int j=0; j<look_ahead; j++)
         {
             int next = m_next_node_index[current];
-            if(next==-1) break;
             l.push_back(m_next_node_index[current]);
             current = m_next_node_index[current];
         }   // for j<look_ahead
@@ -127,13 +108,31 @@ EndController::~EndController()
 }   // ~EndController
 
 //-----------------------------------------------------------------------------
-//TODO: if the AI is crashing constantly, make it move backwards in a straight
-//line, then move forward while turning.
+void EndController::reset()
+{
+    m_crash_time                 = 0.0f;
+    m_time_since_stuck           = 0.0f;
+
+    Controller::reset();
+    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
+    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
+
+    // Node that this can happen quite easily, e.g. an AI kart is
+    // taken over by the end controller while it is off track.
+    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+    {
+        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
+    }
+}   // reset
+
+//-----------------------------------------------------------------------------
 void EndController::update(float dt)
 {
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
+    m_controls->m_brake     = false;
+    m_controls->m_accel     = 1.0f;
 
     // Update the current node:
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
@@ -151,13 +150,6 @@ void EndController::update(float dt)
     {
         m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
     }
-    // The client does not do any AI computations.
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT) 
-    {
-        Controller::update(dt);
-        return;
-    }
-
 
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
@@ -165,43 +157,18 @@ void EndController::update(float dt)
 
     steps = calcSteps();
 
-    findCurve();
-
     /*Response handling functions*/
-    handleAcceleration(dt);
     handleSteering(dt);
     handleRescue(dt);
-    handleBraking();
 
     /*And obviously general kart stuff*/
     Controller::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
-void EndController::handleBraking()
-{
-    // In follow the leader mode, the kart should brake if they are ahead of
-    // the leader (and not the leader, i.e. don't have initial position 1)
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_kart->getPosition() < m_world->getKart(0)->getPosition()         &&
-        m_kart->getInitialPosition()>1                                          )
-    {
-        m_controls->m_brake = true;
-        return;
-    }
-        
-    //We may brake if we are about to get out of the road, but only if the
-    //kart is on top of the road, and if we won't slow down below a certain
-    //limit.
-    m_controls->m_brake = false;
-}   // handleBraking
-
-//-----------------------------------------------------------------------------
 void EndController::handleSteering(float dt)
 {
-    const int next = m_next_node_index[m_track_node];
-    
-    float steer_angle = 0.0f;
+    Vec3  target_point;
 
     /*The AI responds based on the information we just gathered, using a
      *finite state machine.
@@ -210,70 +177,30 @@ void EndController::handleSteering(float dt)
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
        0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+0.5f )
     {
-        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter());
-
+        const int next = m_next_node_index[m_track_node];
+        target_point = m_quad_graph->getQuad(next).getCenter();
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
         std::cout << "- Outside of road: steer to center point." <<
             std::endl;
 #endif
     }
-    //If we are going to crash against a kart, avoid it if it doesn't
-    //drives the kart out of the road
-
     else
     {
-        m_start_kart_crash_direction = 0;
-        Vec3 straight_point;
-        findNonCrashingPoint(&straight_point);
-#ifdef AI_DEBUG
-        m_debug_sphere->setPosition(straight_point.toIrrVector());
-#endif
-        steer_angle = steerToPoint(straight_point);
+        findNonCrashingPoint(&target_point);
     }
-
 #ifdef AI_DEBUG
-    std::cout << "- Fallback."  << std::endl;
+    m_debug_sphere->setPosition(target_point.toIrrVector());
 #endif
 
-
-    setSteering(steer_angle, dt);
+    setSteering(steerToPoint(target_point), dt);
 }   // handleSteering
-
-//-----------------------------------------------------------------------------
-void EndController::handleAcceleration( const float DELTA )
-{
-    //Do not accelerate until we have delayed the start enough
-    if( m_time_till_start > 0.0f )
-    {
-        m_time_till_start -= DELTA;
-        m_controls->m_accel = 0.0f;
-        return;
-    }
-
-    if( m_controls->m_brake == true )
-    {
-        m_controls->m_accel = 0.0f;
-        return;
-    }
-
-    if(m_kart->hasViewBlockedByPlunger())
-    {
-        if(!(m_kart->getSpeed() > m_kart->getMaxSpeedOnTerrain() / 2))
-            m_controls->m_accel = 0.05f;
-        else 
-            m_controls->m_accel = 0.0f;
-        return;
-    }
-    
-    m_controls->m_accel = 1.0f;
-}   // handleAcceleration
 
 //-----------------------------------------------------------------------------
 void EndController::handleRescue(const float DELTA)
 {
     // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->isRescue() && !m_world->isStartPhase())
+    if(m_kart->getSpeed()<2.0f && !m_kart->playingEmergencyAnimation() &&
+        !m_world->isStartPhase())
     {
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
@@ -347,28 +274,6 @@ void EndController::findNonCrashingPoint(Vec3 *result)
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
-void EndController::reset()
-{
-    m_start_kart_crash_direction = 0;
-    m_curve_target_speed         = m_kart->getMaxSpeedOnTerrain();
-    m_curve_angle                = 0.0;
-    m_time_till_start            = -1.0f;
-    m_crash_time                 = 0.0f;
-    m_time_since_stuck           = 0.0f;
-
-    Controller::reset();
-    m_track_node               = QuadGraph::UNKNOWN_SECTOR;
-    m_quad_graph->findRoadSector(m_kart->getXYZ(), &m_track_node);
-    if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
-    {
-        fprintf(stderr, "Invalid starting position for '%s' - not on track - can be ignored.\n",
-                m_kart->getIdent().c_str());
-        m_track_node = m_quad_graph->findOutOfRoadSector(m_kart->getXYZ());
-    }
-
-}   // reset
-
-//-----------------------------------------------------------------------------
 /** calc_steps() divides the velocity vector by the lenght of the kart,
  *  and gets the number of steps to use for the sight line of the kart.
  *  The calling sequence guarantees that m_future_sector is not UNKNOWN.
@@ -378,47 +283,6 @@ int EndController::calcSteps()
     int steps = int( m_kart->getVelocityLC().getZ() / m_kart_length );
     if( steps < m_min_steps ) steps = m_min_steps;
 
-    //Increase the steps depending on the width, if we steering hard,
-    //mostly for curves.
-#if 0
-    // FIXME: I don't understand this: if we are steering hard, we check
-    //        for more steps if we hit another kart?? If we steer hard,
-    //        the approximation used (pos + velocity*dt) will be even
-    //        worse, since it doesn't take steering into account.
-    if( fabsf(m_controls->m_steer) > 0.95 )
-    {
-        const int WIDTH_STEPS = 
-            (int)( m_quad_graph->getNode(m_future_sector).getPathWidth()
-                   /( m_kart_length * 2.0 ) );
-
-        steps += WIDTH_STEPS;
-    }
-#endif
     return steps;
 }   // calcSteps
 
-//-----------------------------------------------------------------------------
-/**FindCurve() gathers info about the closest sectors ahead: the curve
- * angle, the direction of the next turn, and the optimal speed at which the
- * curve can be travelled at it's widest angle.
- *
- * The number of sectors that form the curve is dependant on the kart's speed.
- */
-void EndController::findCurve()
-{
-    float total_dist = 0.0f;
-    int i;
-    for(i = m_track_node; total_dist < m_kart->getVelocityLC().getZ(); 
-        i = m_next_node_index[i])
-    {
-        total_dist += m_quad_graph->getDistanceToNext(i, m_successor_index[i]);
-    }
-
-
-    m_curve_angle = 
-        normalizeAngle(m_quad_graph->getAngleToNext(i, m_successor_index[i])
-                      -m_quad_graph->getAngleToNext(m_track_node, 
-                                                    m_successor_index[m_track_node]) );
-    
-    m_curve_target_speed = m_kart->getMaxSpeedOnTerrain();
-}   // findCurve

@@ -58,14 +58,6 @@ private:
     //if the AI has been crashing for some time, use the rescue.
     float m_crash_time;
 
-    float m_time_till_start; //Used to simulate a delay at the start of the
-                             //race, since human players don't accelerate
-                             //at the same time and rarely repeat the a
-                             //previous timing.
-
-    float m_curve_target_speed;
-    float m_curve_angle;
-
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
@@ -86,26 +78,20 @@ private:
 
     float m_time_since_stuck;
 
-    int m_start_kart_crash_direction; //-1 = left, 1 = right, 0 = no crash.
-
     /** For debugging purpose: a sphere indicating where the AI 
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
     /*Functions called directly from update(). They all represent an action
      *that can be done, and end up setting their respective m_controls
-     *variable, except handle_race_start() that isn't associated with any
-     *specific action (more like, associated with inaction).
+     *variable.
      */
-    void         handleAcceleration(const float DELTA);
     void         handleSteering(float dt);
     void         handleRescue(const float DELTA);
-    void         handleBraking();
 
     void         checkCrashes(const int STEPS, const Vec3& pos);
     void         findNonCrashingPoint(Vec3 *result);
     int          calcSteps();
-    void         findCurve();
 public:
                  EndController(Kart *kart, StateManager::ActivePlayer* player);
                 ~EndController();
