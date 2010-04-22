@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materials>
+  <material name="banana.png" alpha="0.5" collide="N"/>
+  <material name="gift-box.png"  sphere="N" collide="N"/>
+  <material name="gift-loop.png"  sphere="Y" collide="N"/>
+  <material name="gold.png"  light="Y" sphere="Y" collide="N"/>
+  <material name="nitro-tank.png" clampV="Y" transparency="Y" alpha="0.5" collide="N"/>
+  <material name="tank-blue.png"  sphere="Y" collide="N"/>
+  <material name="tank-green.png"  sphere="Y" collide="N"/>
+  <material name="tank-cyan.png"  sphere="Y" collide="N"/>
+  <material name="parachute.png" backface-culling="n" ignore="Y" collide="N"/>
+  <material name="zipper.png"  light="N" zipper="Y" collide="N"/>
+</materials>
+
