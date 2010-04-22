@@ -2,5 +2,5 @@
 
 pkgdatadir = $(datadir)/games/$(PACKAGE)/data/fonts
 
-dist_pkgdata_DATA =  $(shell find $(srcdir) -name "*.png" -print0) \
+dist_pkgdata_DATA =  $(shell find $(srcdir) -name "*.png") \
                      $(shell find $(srcdir) -name "*.xml")
