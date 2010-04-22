@@ -226,7 +226,7 @@
     <!-- Kart-specific explosion parameters. Height: how high this
          this kart is being pushed in the sky by an explosion.
          Time: how long it takes before the kart can drive again.  -->
-  <explosion time="2" height="2" />
+  <explosion time="2" radius="5" />
     
   </general-kart-defaults>
 </config>
