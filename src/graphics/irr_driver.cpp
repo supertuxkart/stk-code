@@ -688,6 +688,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename)
 #ifndef NDEBUG
     if (out == NULL)
     {
+        printf("Texture '%s' not found.\n", filename.c_str());
         printf("Put a breakpoint at line %s:%i to debug!\n", __FILE__, __LINE__ );
     }
 #endif
