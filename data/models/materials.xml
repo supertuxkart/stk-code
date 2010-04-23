@@ -1,14 +1,21 @@
 <?xml version="1.0"?>
 <materials>
-  <material name="banana.png" alpha="0.5" collide="N"/>
-  <material name="gift-box.png"  sphere="N" collide="N"/>
-  <material name="gift-loop.png"  sphere="Y" collide="N"/>
-  <material name="gold.png"  light="Y" sphere="Y" collide="N"/>
-  <material name="nitro-tank.png" clampV="Y" transparency="Y" alpha="0.5" collide="N"/>
-  <material name="tank-blue.png"  sphere="Y" collide="N"/>
-  <material name="tank-green.png"  sphere="Y" collide="N"/>
-  <material name="tank-cyan.png"  sphere="Y" collide="N"/>
-  <material name="parachute.png" backface-culling="n" ignore="Y" collide="N"/>
-  <material name="zipper.png"  light="N" zipper="Y" collide="N"/>
+  <material name="banana.png" alpha="0.5"/>
+  <material name="gift-box.png"/>
+  <material name="gift-loop.png"  sphere="Y"/>
+  <material name="gold.png"  light="Y" sphere="Y"/>
+  <material name="nitro-tank.png" clampV="Y" transparency="Y" alpha="0.5"/>
+  <material name="tank-blue.png"  sphere="Y"/>
+  <material name="tank-green.png"  sphere="Y"/>
+  <material name="tank-cyan.png"  sphere="Y"/>
+  <material name="parachute.png" backface-culling="n" ignore="Y"/>
+  <material name="zipper.png"  light="N" zipper="Y"/>
+  <material name="zipper_collect.png"  light="N" zipper="Y"/>
+  <material name="bowling-icon.png" transparency="Y"  light="N"/>
+  <material name="bubblegum-icon.png" transparency="Y"  light="N"/>
+  <material name="cake-icon.png" transparency="Y"  light="N" />
+  <material name="anchor-icon.png" clampU="Y" clampV="Y" transparency="Y" light="N" ignore="Y"/>
+  <material name="plunger-icon.png" transparency="Y"  light="N"/>
+  <material name="parachute-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
 </materials>
 

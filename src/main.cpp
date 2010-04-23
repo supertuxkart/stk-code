@@ -615,8 +615,22 @@ int main(int argc, char *argv[] )
         kart_properties_manager -> loadAllKarts    ();
         unlock_manager          = new UnlockManager();
         projectile_manager      -> loadData        ();
-        powerup_manager         -> loadAllPowerups ();
-        item_manager            -> loadDefaultItems();
+
+        // Both item_manager and powerup_manager load models and therefore
+        // textures from the model directory. To avoid reading the 
+        // materials.xml twice, we do this here once for both:
+        file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
+        const std::string materials_file = file_manager->getModelFile("materials.xml");
+        if(materials_file!="")
+            material_manager->pushTempMaterial(materials_file);
+        {
+            powerup_manager         -> loadAllPowerups ();
+            item_manager            -> loadDefaultItems();
+        }
+        if(materials_file!="")
+            material_manager->popTempMaterial();
+        file_manager->popTextureSearchPath();
+
         attachment_manager      -> loadModels      ();
 
         // Init GUI prepare main menu

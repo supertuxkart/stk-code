@@ -94,11 +94,6 @@ ItemManager::~ItemManager()
 //-----------------------------------------------------------------------------
 void ItemManager::loadDefaultItems()
 {
-    file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
-    const std::string materials_file = file_manager->getModelFile("materials.xml");
-    if(materials_file!="")
-        material_manager->pushTempMaterial(materials_file);
-
     // The names must be given in the order of the definition of ItemType
     // in item.hpp. Note that bubblegum strictly isn't an item,
     // it is implemented as one, and so loaded here, too.
@@ -130,9 +125,6 @@ void ItemManager::loadDefaultItems()
         m_item_mesh[i]          = mesh;
         mesh->grab();
     }   // for i
-    if(materials_file!="")
-        material_manager->popTempMaterial();
-    file_manager->popTextureSearchPath();
 }   // loadDefaultItems
 
 //-----------------------------------------------------------------------------
