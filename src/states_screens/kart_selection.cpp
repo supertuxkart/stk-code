@@ -269,6 +269,8 @@ public:
         playerName->m_properties[PROP_MIN_VALUE] = "0";
         playerName->m_properties[PROP_MAX_VALUE] = (playerAmount-1);
         playerName->m_properties[PROP_ID] = spinnerID;
+        playerName->m_properties[PROP_WARP_AROUND] = "true";
+
         //playerName->m_event_handler = this;
         m_children.push_back(playerName);
         

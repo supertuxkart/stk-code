@@ -166,7 +166,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(child_width,    PROP_CHILD_WIDTH);
                 READ_PROPERTY(child_height,   PROP_CHILD_HEIGHT);
                 READ_PROPERTY(word_wrap,      PROP_WORD_WRAP);
-                READ_PROPERTY(grow_with_text, PROP_GROW_WITH_TEXT);
+                //READ_PROPERTY(grow_with_text, PROP_GROW_WITH_TEXT);
                 READ_PROPERTY(x,              PROP_X);
                 READ_PROPERTY(y,              PROP_Y);
                 READ_PROPERTY(layout,         PROP_LAYOUT);
@@ -183,6 +183,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(extend_label,   PROP_EXTEND_LABEL);
                 READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
+                READ_PROPERTY(warp_around,    PROP_WARP_AROUND);
 #undef READ_PROPERTY
                                 
                 const char* text = xml->getAttributeValue( "text" );

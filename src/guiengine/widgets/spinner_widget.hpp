@@ -31,13 +31,30 @@ namespace GUIEngine
     class SpinnerWidget : public Widget
     {
         int m_value, m_min, m_max;
+        
+        /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
+        
+        /** Whether the value of this spinner is displayed using an icon rather than with a plain label */
         bool m_graphical;
+        
+        /** \brief Whether this widget is a gauge
+          * the behaviour is the same but the look is a bit different, instead of displaying a number,
+          * it displays how close the value is to the maximum by filling a line
+          */
         bool m_gauge;
         
-        EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
-        EventPropagation rightPressed(const int playerID);
-        EventPropagation leftPressed(const int playerID);
+        /** \brief Whether to warp back to the first value when going "beyond" the last value */
+        bool m_warp_around;
+        
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation transmitEvent(Widget* w, std::string& originator, const int playerID);
+        
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation rightPressed(const int playerID);
+        
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation leftPressed(const int playerID);
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -58,19 +75,49 @@ namespace GUIEngine
                 
         void addLabel(irr::core::stringw label);
         void clearLabels();
-        irr::core::stringw getStringValue() const;
+        
 
-        void add();
-        void setValue(const int new_value);
+        /** \brief implement method from base class Widget */
+        virtual void add();
 
         /**
-          * @precondition the 'new_value' string passed must be the name of an item in the spinner
+         * \brief            sets the current value of the spinner
+         * \param new_value  the new value that will be become the current value of this spinner.
+         */
+        void setValue(const int new_value);
+        
+        /**
+          * \brief        sets the current value of the spinner
+          * \precondition the 'new_value' string passed must be the name of an item
+          *               (added through SpinnerWidget::addLabel)in the spinner
           */
         void setValue(irr::core::stringw new_value);
         
+        /**
+          * \return whether this spinner is of "gauge" type
+          */
         bool isGauge()  const { return m_gauge; }
+        
+        /** 
+         * \brief retrieve the current value of the spinner
+         * \return the current value of the spinner, in a int form
+         */
         int  getValue() const { return m_value; }
+        
+        /** 
+          * \brief retrieve the current value of the spinner
+          * \return the current value of the spinner, in a string form
+          */
+        irr::core::stringw getStringValue() const;
+
+        /**
+          * \return the maximum value the spinner can take
+          */
         int  getMax()   const { return m_max;   }
+        
+        /**
+          * \return the minimum value the spinner can take
+          */
         int  getMin()   const { return m_min;   }
     };
     

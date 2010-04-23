@@ -36,6 +36,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -45,6 +46,9 @@ void SpinnerWidget::add()
     // retrieve min and max values
     std::string min_s = m_properties[PROP_MIN_VALUE];
     std::string max_s = m_properties[PROP_MAX_VALUE];
+    
+    m_warp_around = (m_properties[PROP_WARP_AROUND] == "true");
+    std::cout << "SpinnerWidget::add() : m_warp_around=" << m_warp_around << " (" << m_properties[PROP_WARP_AROUND].c_str() << ")"<< std::endl;
     
     {
         int i;
@@ -195,7 +199,14 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     if (m_deactivated) return EVENT_BLOCK;
     
     //std::cout  << "Right pressed\n";
-    if (m_value+1 <= m_max) setValue(m_value+1);
+    if (m_value+1 <= m_max)
+    {
+        setValue(m_value+1);
+    }
+    else if (m_warp_around)
+    {
+        setValue(m_min);
+    }
     
     //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
     
@@ -210,7 +221,14 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     if (m_deactivated) return EVENT_BLOCK;
     
     //std::cout  << "Left pressed\n";
-    if (m_value-1 >= m_min) setValue(m_value-1);
+    if (m_value-1 >= m_min)
+    {
+        setValue(m_value-1);
+    }
+    else if (m_warp_around)
+    {
+        setValue(m_max);
+    }
     
     //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
     

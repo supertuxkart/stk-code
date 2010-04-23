@@ -15,6 +15,358 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+/**
+ 
+ 
+ \page gui_overview GUI Module Overview
+ 
+ In XML files, widgets are declared in the following fashion :
+ 
+ \code
+ <widget_name property1="value1" property2="value2" />
+ \endcode
+ 
+ or, for widgets of "spawn" type, with children :
+ 
+ \code
+ <widget_name property1="value1" property2="value2" />
+ <child1 />
+ <child2 />
+ </widget_name>
+ \endcode
+ 
+ The first section of this document describes the widgets you can use; the second describes the properties
+ widgets can take. Not all properties can be applied to all widgets, see the docs for a given widget and a
+ given property for full information.
+ 
+ \section toc Table of Contents
+ \ref widgets
+ \li \ref widget1
+ \li \ref widget2
+ \li \ref widget3
+ \li \ref widget4
+ \li \ref widget5
+ \li \ref widget6
+ \li \ref widget7
+ \li \ref widget8
+ \li \ref widget9
+ \li \ref widget10
+ \li \ref widget11
+
+ \ref props
+ \li \ref prop1
+ \li \ref prop2
+ \li \ref prop3
+ \li \ref prop4
+ \li \ref prop5
+ \li \ref prop6
+ \li \ref prop7
+ \li \ref prop8
+ \li \ref prop9
+ \li \ref prop10
+ \li \ref prop11
+ \li \ref prop12
+ \li \ref prop13
+ \li \ref prop14
+ \li \ref prop15
+ \li \ref prop16
+ \li \ref prop17
+ \li \ref prop18
+
+ \ref code
+ 
+ \n
+ \n
+ \section widgets Widgets
+ 
+ This section describes the widgets you can use in STK's GUI XML files. The upper-case name starting with
+ WTYPE_* is the internal name of the widget  (see the GUIEngine::WidgetType enum).
+ 
+ 
+ \subsection widget1 WTYPE_RIBBON
+ <em> Names in XML files: </em> \c "ribbon", \c "buttonbar", \c "tabs" 
+ 
+ Appears as an horizontal bar containing elements laid in a row, each being and icon and/or a label
+ 
+ \li The "ribbon" subcategory will behave a bit like a radio button group, i.e. one element must selected.
+ events are triggered as soon as a choice is selected (can be simply by hovering).
+ \li The "buttonbar" subcategory treats children buttons as action buttons, which means they can't have a
+ 'selected' state, only focused or not (i.e. there is no selection that remains if you leave this area).
+ events are triggered only on enter/fire.
+ \li The "tabs" subcategory will show a tab bar. behaviour is same as normal ribbon, only looks are different.
+ Orientation of tabs (up or down) is automatically inferred from on-screen position
+ 
+ \note Ribbon widgets are of spawn type (\<ribbon\> ... \</ribbon\>) and may contain icon-buttons or buttons as children.
+ \note Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
+ affect the type of highlighting used)
+ \note All elements within a ribbon must have an 'ID' property
+ 
+ \n
+ \subsection widget2 WTYPE_SPINNER
+ Names in XML files: </em> \c "spinner", \c "gauge"
+ 
+ A spinner component (lets you choose numbers).
+ 
+ Specify PROP_MIN_VALUE and PROP_MAX_VALUE to have control over values (default will be from 0 to 10).
+ You can specify an icon; then, include a sprintf format string like %i in the name, and at runtime the
+ current number will be inserted into the given name to find the
+ right file for each possible value the spinner can take. It may also display arbitrary text instead of
+ numbers, though this cannot be achieve in the XML file; use the -\>addLabel(...) method in code to do this.
+ It can also display arbitrary text containing the value; just define the PROP_TEXT property to contain
+ the text you want, including a format string %i where the value should appear.
+ \note The "gauge" variant behaves similarly, but a fill band shows how close to the max the value is.
+ 
+ \n
+ \subsection widget3 WTYPE_BUTTON
+ <em> Name in XML files: </em> \c "button" 
+ 
+ A plain text button.
+ 
+ \n
+ \subsection widget4 WTYPE_ICON_BUTTON
+ <em> Names in XML files: </em> \c "icon-button", \c "icon" 
+ 
+ A component with an image, and optional text to go under it.
+ 
+ \note The "icon" variant will have no border and will not be clickable. PROP_ICON is mandatory for this component.
+ There are three ways to place the texture within the allocated space; the default (and only way currently accessible
+ through xml files) is to scale the texture to fit, while preserving its aspect ratio; other methods, currently only
+ accessible through C++ code, are to stretch the texture to fill the area without caring for aspect ratio, and another
+ to respect an aspect ratio other than the texture's (useful for track screenshots, which are 4:3 compressed to fit
+ in a power-of-two 256x256 texture)
+ 
+ \n
+ \subsection widget5 WTYPE_CHECKBOX
+ <em> Name in XML files: </em> \c "checkbox" 
+ 
+ A checkbox.
+ 
+ \n
+ \subsection widget6 WTYPE_LABEL
+ <em> Names in XML files: </em> \c "label", \c "header" 
+ 
+ A plain label.
+ 
+ Supports properties PROP_WORD_WRAP and PROP_TEXT_ALIGN.
+ \note The "Header" variant uses a bigger and more colourful font.
+ 
+ \n
+ \subsection widget7 WTYPE_SPACER
+ <em> Name in XML files: </em> \c "spacer" 
+ 
+ Some blank space; not visible on screen.
+ 
+ \n
+ \subsection widget8 WTYPE_DIV
+ <em> Name sin XML files: </em> \c "div", \c "box" 
+ 
+ An invisible container.
+ 
+ \li Divs do not do much on themselves, but are useful to lay out children automatically (Supports property PROP_LAYOUT)
+ \li Divs can be nested.
+ \li Of spawn type (\<div\>...\</div\>, place children within)
+ \note "box" is a variant that acts exactly the same but is visible on-screen
+ 
+ \n
+ \subsection widget9 WTYPE_DYNAMIC_RIBBON
+ Names in XML files: </em> \c  "ribbon_grid", \c "scrollable_ribbon", \c "scrollable_toolbar"
+ 
+ Builds upon the basic Ribbon to be more dynamic (dynamics contents, possibly with scrolling, possibly multi-line)
+ 
+ \li NOT of spawn type (\<ribbon_grid .../\>), i.e. children are not specified in the XML file but
+ programmatically at runtime.
+ \li PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT are mandatory (so at least aspect ratio of elements that will later be
+ added is known) An interesting aspect of PROP_CHILD_WIDTH and PROP_CHILD_HEIGHT is that you can use them to
+ show textures to any aspect ratio you want (so you can e.g. save textures to a power-of-two size like 256x256,
+ but then show it in 4:3 ratio).
+ \li Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or icons (this will
+ affect the type of highlighting used).
+ \li Supports an optional label at the bottom if PROP_LABELS_LOCATION is set (see more on PROP_LABELS_LOCATION below).
+ \note The "scrollable_ribbon" and "scrollable_toolbar" subtypes are single-line scrollable ribbons.
+ The difference between both is that 'scrollable_ribbon' always has a value selected (like in
+ a combo box, or radio buttons), while 'scrollable_toolbar' is a scrollable list of buttons that can be
+ pressed to trigger actions.
+ 
+ \n
+ \subsection widget10 WTYPE_MODEL_VIEW
+ <em> Name in XML files: </em> \c "model" 
+ 
+ Displays a 3D model.
+ 
+ \note Contents must be set programmatically.
+ 
+ \n
+ \subsection widget11 WTYPE_LIST
+ <em> Name in XML files: </em> \c "list" 
+ 
+ Displays a list.
+ 
+ \note Contents must be set programmatically.
+ 
+ 
+ \n
+ \n
+ \section props Properties
+ 
+ \subsection prop1 PROP_ID
+ <em> Name in XML files: </em> \c "id" 
+ 
+ Gives a unique internal name to each object using this property. It will be
+ used in events callbacks to determine what action occurred. Can be omitted
+ on components that do not trigger events (e.g. labels)
+ 
+ \n
+ \subsection prop2 PROP_TEXT
+ <em> Name in XML files: </em> \c "text" 
+ 
+ gives text (a label) to the widget where supported. Ribbon-grids give a special meaning
+ to this parameter, see ribbon-grid docs above.
+ 
+ \n
+ \subsection prop3 PROP_ICON
+ <em> Name in XML files: </em> \c "icon" 
+ 
+ give an icon to the widget. Property contents is the path to the file, by default relative
+ relative to the /data directory of STK (several methods of IconButtonWidget and DynamicRibbon
+ can enable you to use absolute paths if you wish, however).
+ 
+ \n
+ \subsection prop4 PROP_TEXT_ALIGN
+ <em> Name in XML files: </em> \c "text_align" 
+ 
+ used exclusively by label components. Value can be "right" or "center" (left used if not specified).
+ 
+ \n
+ \subsection prop5 PROP_WORD_WRAP
+ <em> Name in XML files: </em> \c "word_wrap" 
+ 
+ used exclusively by label components. Value can be "true" to indicate that long text should spawn on
+ multiple lines.
+ 
+ \n
+ \subsection prop6 PROP_MIN_VALUE, PROP_MAX_VALUE
+ <em> Name in XML files: </em> \c "min_value", \c "max_value" 
+ 
+ used to specify a minimum and maximum value for numeric widgets (c.f. spinner)
+ 
+ \n
+ \subsection prop7 PROP_X, PROP_Y       
+ <em> Name in XML files: </em> \c "x", "y" 
+ 
+ sets the position (location) of a widget, relative to its parent (container \<div\> or screen if none).
+ A plain number will be interpreted as an aabsolute position in pixels. A '%' sign may be added to the
+ given number to mean that the location is specified in terms of a percentage of parent size (parent size
+ means the parent \<div\> or the whole screen if none). A negative value can also be passed to start coordinate
+ from right and/or bottom, instead of starting from top-left corner as usual.
+ Note that in many cases, it is not necessary to manually a position. Div layouts will often manage that
+ for you (see PROP_LAYOUT). Other widgets will also automativally manage the position and size of their children,
+ for instance ribbons.
+ 
+ \n
+ \subsection prop8 PROP_WIDTH, PROP_HEIGHT       
+ <em> Name in XML files: </em> \c "width", \c "height" 
+ 
+ give dimensions to the widget. A plain number will be interpreted as an aabsolute position in pixels.
+ A '%' sign may be added to the given number to mean that the size is specified in terms of a percentage
+ of parent size (parent size means the parent \<div\> or the whole screen if none).
+ Note that in many cases, it is not necessary to manually a size. Div layouts will often manage that
+ for you (see PROP_LAYOUT). In addition, sizes are automatically calculated for widgets made of icons
+ and/or text like labels and plain icons. Other widgets will also automativally manage the position and
+ size of their children, for instance ribbons.
+ 
+ \n
+ \subsection prop9 PROP_MAX_WIDTH, PROP_MAX_HEIGHT    
+ <em> Names in XML files: </em> \c "max_width", \c "max_height" 
+ 
+ The maximum size a widget can take; especially useful when using percentages and proportions.
+ 
+ \n
+ \subsection prop10 PROP_CHILD_WIDTH, PROP_CHILD_HEIGHT
+ <em> Names in XML files: </em> \c "child_width", \c "child_height" 
+ 
+ Used exclusively by the ribbon grid widget. See docs for this widget above.
+ 
+ \n
+ \subsection prop11 PROP_LAYOUT
+ <em> Name in XML files: </em> \c "layout"
+ 
+ Valid on 'div' containers. Value can be "horizontal-row" or "vertical-row". This means x and y coordinates
+ of all children will automatically be calculated at runtime, so they are laid in a row. Width and height can
+ be set absolutely as usual, but can also be determined dynamically according to available screen space. Also
+ see PROP_ALIGN and PROP_PROPORTION to known more about controlling layouts. Note that all components within a
+ layed-out div will ignore all x/y coordinates you may give them as parameter.
+ 
+ \n
+ \subsection prop12 PROP_ALIGN
+ <em> Name in XML files: </em> \c "align" 
+ 
+ For widgets located inside a vertical-row layout div : Changes how the x coord of the widget is determined.
+ value can be "left", "center" or "right".
+ For widgets located inside a horizontal-row layout div : Changes how the y coord of the widget is determined.
+ value can be "top", "center" or "bottom".
+ 
+ \n
+ \subsection prop13 PROP_PROPORTION
+ <em> Name in XML files: </em> \c "proportion"
+ 
+ Helps  determining widget size dynamically (according to available screen space) in layed-out divs. In a
+ vertical row layout, proportion sets the height of the item. In an horizontal row, it sets the width of
+ the item. Proportions are always evaluated relative to the proportions of other widgets in the same div.
+ If one div contains 4 widgets, and their proportions are 1-2-1-1, it means the second must take twice as
+ much space as the 3 others. In this case, 10-20-10-10 would do the exact same effect. 1-1-1-1 would mean
+ all take 1/4 of the available space. Note that it is allowed to mix absolute widget sizes and proportions;
+ in this case, widgets with absolute size are evaluated first, and the dynamically-sized ones split the
+ remaining space according to their proportions.
+ 
+ \n
+ \subsection prop14 PROP_SQUARE
+ <em> Name in XML files: </em> \c "square_items"
+ 
+ Valid on Ribbons or RibbonGrids. Can be "true" (omitting it means "false"). Indicates whether the contents
+ use rectangular icons as opposed to "round" icons (this will affect the type of focus/highlighting used)
+ 
+ \n
+ \subsection prop15 PROP_EXTEND_LABEL
+ <em> Name in XML files: </em> \c "extend_label"
+ 
+ How many pixels the label is allowed to expand beyond the boundaries of the widget itself. Currently only
+ allowed on icon widgets.
+ 
+ \n
+ \subsection prop16 PROP_LABELS_LOCATION
+ <em> Name in XML files: </em> \c "label_location"
+ 
+ Currently only used by dynamic ribbons. Decides where the label is. Value can be "each", "bottom", or "none"
+ (if ommitted, "none" is the default). "each" means that every item has its own label. "bottom" means there
+ is a single label for all at the bottom, that displays the name of the current item.
+ 
+ \n
+ \subsection prop17 PROP_MAX_ROWS
+ <em> Name in XML files: </em> \c "max_rows" 
+ 
+ Currently used for ribbon grids only. Indicates the maximum amount of rows this ribbon can have.
+ 
+ \n
+ \subsection prop18 PROP_WARP_AROUND
+ <em> Name in XML files: </em> \c "warp_around" 
+ 
+ Currently used for spinners only. Value can be "true" or "false"
+ 
+ 
+ \n
+ \section code Using the engine in code
+ 
+ The first thing to do is to derive a class of your own from AbstractStateManager. There are a few callbacks
+ you will need to override. Once it's done, you have all AbstractStateManager methods ready to be used to
+ push/pop/set menus on the screen stack.
+ Once you have instanciated your state manager class, call GUIEngine::init and pass it as argument.
+ One of the most important callbacks is 'eventCallback', which will be called everytime sometimes happens.
+ Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
+ name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
+ bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
+ being left, allowing for setup/clean-up.
+ 
+ */
 
 #include "guiengine/engine.hpp"
 

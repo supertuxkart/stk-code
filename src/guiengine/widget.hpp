@@ -65,7 +65,7 @@ namespace GUIEngine
         PROP_CHILD_WIDTH,
         PROP_CHILD_HEIGHT,
         PROP_WORD_WRAP,
-        PROP_GROW_WITH_TEXT, // yet unused
+        //PROP_GROW_WITH_TEXT, // yet unused
         PROP_X,
         PROP_Y,
         PROP_LAYOUT,
@@ -80,7 +80,8 @@ namespace GUIEngine
         PROP_SQUARE,
         PROP_EXTEND_LABEL,
         PROP_LABELS_LOCATION,
-        PROP_MAX_ROWS
+        PROP_MAX_ROWS,
+        PROP_WARP_AROUND
     };
     
     bool isWithinATextBox();
@@ -127,12 +128,19 @@ namespace GUIEngine
         bool m_check_inside_me;
         
         /**
-          * called when left/right keys pressed and focus is on widget. 
+          * called when right key is pressed and focus is on widget. 
           * Returns 'EVENT_LET' if user's event handler should be notified of a change.
           * Override in children to be notified of left/right events and/or make
           * the event propagate to the user's event handler.
           */
         virtual EventPropagation rightPressed(const int playerID) { return EVENT_BLOCK; }
+        
+        /**
+         * called when left key is pressed and focus is on widget. 
+         * Returns 'EVENT_LET' if user's event handler should be notified of a change.
+         * Override in children to be notified of left/right events and/or make
+         * the event propagate to the user's event handler.
+         */
         virtual EventPropagation leftPressed (const int playerID) { return EVENT_BLOCK; }
         
         /** used when you set eventSupervisors - see m_event_handler explainations below
