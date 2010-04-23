@@ -26,6 +26,9 @@ using namespace irr;
 #include "graphics/moving_texture.hpp"
 class Kart;
 
+/**
+  * \ingroup graphics
+  */
 class SlipStream : public MovingTexture
 {
 private:

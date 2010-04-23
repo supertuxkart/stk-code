@@ -40,20 +40,22 @@ enum attachmentType
     ATTACH_NOTHING
 };
 
-
+/**
+  * \ingroup items
+  */
 class Attachment
 {
 private:
-    attachmentType  m_type;            // attachment type
-    Kart           *m_kart;            // kart the attachment is attached to
-    float           m_time_left;       // time left till attachment expires
-    float           m_initial_speed;   // for parachutes only
+    attachmentType  m_type;            //!< attachment type
+    Kart           *m_kart;            //!< kart the attachment is attached to
+    float           m_time_left;       //!< time left till attachment expires
+    float           m_initial_speed;   //!< for parachutes only
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
     scene::IAnimatedMeshSceneNode 
                    *m_node;
-    Kart           *m_previous_owner;  // used by bombs so that it's not passed
-                                       // back to previous owner
+    Kart           *m_previous_owner;  //!< used by bombs so that it's not passed
+                                       //!< back to previous owner
     RandomGenerator m_random;
 public:
          Attachment(Kart* _kart);
@@ -83,9 +85,9 @@ public:
 
     /** Randomly selects the new attachment. For a server process, the
      *  attachment can be passed into this function.
-        \param item The item that was collected.
-        \param new_attachment Optional: only used on the clients, it
-                              specifies the new attachment to use
+     *  \param item The item that was collected.
+     *  \param new_attachment Optional: only used on the clients, it
+     *                        specifies the new attachment to use
      */
     void  hitBanana(const Item &item, int new_attachment=-1);
     void  update (float dt);

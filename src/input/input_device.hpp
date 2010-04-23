@@ -10,12 +10,20 @@
 #include "io/xml_node.hpp"
 #include "states_screens/state_manager.hpp"
 
+/**
+  * \brief Input device type
+  * \ingroup input
+  */
 enum DeviceType
 {
     DT_KEYBOARD,
     DT_GAMEPAD
 };
 
+/**
+  * \brief base class for input devices
+  * \ingroup input
+  */
 class InputDevice
 {
     friend class DeviceManager;
@@ -35,12 +43,12 @@ public:
     
     void setPlayer(StateManager::ActivePlayer* owner);
     StateManager::ActivePlayer *getPlayer() { return m_player; }
-    
-    /**
-      * returns a human-readable string for the key binded with the given action
-      */
 };
 
+/**
+  * \brief specialisation of InputDevice for keyboard type devices
+  * \ingroup input
+  */
 class KeyboardDevice : public InputDevice
 {
 public:
@@ -59,6 +67,10 @@ public:
     
 };
 
+/**
+  * \brief specialisation of Inputdevice for gamepad type devices
+  * \ingroup input
+  */
 class GamePadDevice : public InputDevice
 {
     void resetAxisDirection(const int axis, Input::AxisDirection direction, StateManager::ActivePlayer* player);

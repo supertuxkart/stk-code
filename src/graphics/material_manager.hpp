@@ -29,6 +29,9 @@ using namespace irr;
 class Material;
 class XMLReader;
 
+/**
+  * \ingroup graphics
+  */
 class MaterialManager
 {
 private:

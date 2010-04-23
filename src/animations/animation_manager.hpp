@@ -27,7 +27,10 @@ class AnimationBase;
 class Track;
 class XMLNode;
 
-/** Controls all animations of a track. */
+/**
+  * \brief Controls all animations of a track.
+  * \ingroup animations
+  */
 class AnimationManager
 {
 private:

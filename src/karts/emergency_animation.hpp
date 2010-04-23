@@ -24,7 +24,8 @@
 
 class Kart;
 
-/** This class is a 'mixin' for kart, and handles the animated explosion.
+/** 
+ * \brief This class is a 'mixin' for kart, and handles the animated explosion.
  *  I.e. it will throw the kart a certain amount in the air, rotate it
  *  randomly, and after the specified time period let it land at the
  *  same spot where it was hit, therefore avoiding any problems of 
@@ -33,6 +34,7 @@ class Kart;
  *  a benefit by pushing you forwards.
  *  The object is a base class for kart, but will only be used if an
  *  explosion happens.
+ * \ingroup karts
  */
 class EmergencyAnimation
 {

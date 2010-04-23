@@ -39,6 +39,10 @@
 #endif
 #include "audio/music.hpp"
 
+/**
+  * \brief ogg files based implementation of the Music interface
+  * \ingroup audio
+  */
 class MusicOggStream : public Music
 {
 public:

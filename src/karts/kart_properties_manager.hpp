@@ -26,6 +26,9 @@
 
 class KartProperties;
 
+/**
+  * \ingroup karts
+  */
 class KartPropertiesManager
 {
 private:

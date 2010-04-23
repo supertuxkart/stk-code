@@ -20,6 +20,10 @@
 #ifndef HEADER_ANIMATION_BASE_HPP
 #define HEADER_ANIMATION_BASE_HPP
 
+/**
+ * \defgroup animations
+ */
+
 #include <vector>
 
 #include "irrlicht.h"
@@ -30,7 +34,10 @@ using namespace irr;
 class XMLNode;
 class Ipo;
 
-/** A base class for all animations. */
+/**
+  * \brief A base class for all animations.
+  * \ingroup animations
+  */
 class AnimationBase : public TrackObject
 {
 private:

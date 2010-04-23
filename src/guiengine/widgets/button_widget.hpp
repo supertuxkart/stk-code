@@ -20,6 +20,10 @@
 #ifndef HEADER_BUTTON_HPP
 #define HEADER_BUTTON_HPP
 
+/**
+  * \defgroup widgets Guiengine/Widgets
+  */
+
 #include <irrlicht.h>
 
 #include "guiengine/widget.hpp"
@@ -27,7 +31,10 @@
 
 namespace GUIEngine
 {
-    /** A text button widget. See guiengine/engine.hpp for a detailed overview */
+    /** 
+      * \brief A text button widget.
+      * \ingroup widgets
+      */
     class ButtonWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to

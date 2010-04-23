@@ -31,6 +31,9 @@ class Kart;
 class Explosion;
 class Flyable;
 
+/**
+  * \ingroup items
+  */
 class ProjectileManager
 {
 private:

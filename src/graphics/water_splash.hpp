@@ -25,6 +25,10 @@ using namespace irr;
 
 class Kart;
 
+/**
+  * \brief Handles a water-splash particle effect
+  * \ingroup graphics
+  */
 class WaterSplash
 {
 private:

@@ -27,7 +27,10 @@
 class Track;
 class XMLNode;
 
-/** A 2d billboard animation. */
+/**
+  * \brief A 2d billboard animation.
+  * \ingroup animations
+  */
 class BillboardAnimation : public AnimationBase
 {
 private:

@@ -20,14 +20,16 @@
 #ifndef HEADER_RUBBER_BAND_HPP
 #define HEADER_RUBBER_BAND_HPP
 
-/** This class is used together with the pluger to display a rubber band from
- *  the shooting kart to the plunger.
- */
+
 
 #include "utils/vec3.hpp"
 class Kart;
 class Plunger;
 
+/** This class is used together with the pluger to display a rubber band from
+ *  the shooting kart to the plunger.
+ * \ingroup items
+ */
 class RubberBand
 {
 private:

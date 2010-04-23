@@ -25,10 +25,14 @@ using namespace irr;
 
 class Kart;
 
+/**
+  * \brief Handles nitro particle effects
+  * \ingroup graphics
+  */
 class Nitro
 {
 private:
-    /** The kart to which this smoke belongs. */
+    /** The kart to which this nitro belongs. */
     Kart           *m_kart;
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node;

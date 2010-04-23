@@ -28,7 +28,9 @@
 
 namespace GUIEngine
 {
-    /** A model view widget. See guiengine/engine.hpp for a detailed overview */
+    /** \brief A model view widget.
+      * \ingroup widgets
+      */
     class ModelViewWidget : public IconButtonWidget
     {
         enum RotationMode

@@ -25,6 +25,10 @@ using namespace irr;
 
 class Kart;
 
+/**
+  * \brief manages smoke particle effects
+  * \ingroup graphics
+  */
 class Smoke
 {
 private:

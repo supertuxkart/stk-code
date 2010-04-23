@@ -13,16 +13,19 @@ enum PlayerAssignMode
 };
 
 /**
- * This class holds the list of all known devices (ands their configurations), as well as the list
- * of currently plugged (used) devices. It thus takes care of finding to which device any given
- * input belongs, and what action each keypress is bound to, if any (and, since each device is associated
- * to a player, it also finds which player triggered this action)
+ * \brief This class holds the list of all known devices (ands their configurations), as well as the
+ * list of currently plugged (used) devices.
+ * It thus takes care of finding to which device any given
+ * input belongs, and what action each keypress is bound to, if any (and, since each device is
+ * associated to a player, it also finds which player triggered this action)
  * These input mapping capabilities should *only* be used through the InputManager, not directly.
  *
  * The device manager starts in "no-assign" mode, which means no input configuration is associated
  * to any player. So all devices will react. This is used in menus before player set-up is done.
  * Switching back to no-assign mode will also clear anything in devices that was associated with
  * players in assign mode.
+ *
+ * \ingroup input
  */
 class DeviceManager
 {

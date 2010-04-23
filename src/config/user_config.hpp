@@ -172,6 +172,10 @@ public:
 #define PARAM_DEFAULT(X)
 #endif
 
+/**
+  * \brief Contains all parameters that are stored in the user's config file
+  * \ingroup config
+  */
 namespace UserConfigParams
 {
 
@@ -302,7 +306,10 @@ namespace UserConfigParams
 #undef PARAM_PREFIX
 #undef PARAM_SUFFIX
 
-/** Class for managing general STK user configuration data. */
+/**
+  * \brief Class for managing general STK user configuration data.
+  * \ingroup config
+  */
 class UserConfig
 {
 private:

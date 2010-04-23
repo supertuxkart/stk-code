@@ -29,6 +29,9 @@
 
 class XMLNode;
 
+/**
+  * \ingroup items
+  */
 class Cake : public Flyable
 {
 private:

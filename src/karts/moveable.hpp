@@ -36,7 +36,9 @@ class Material;
 
 #define MAX_ITEMS_COLLECTED    20
 
-
+/**
+  * \ingroup karts
+  */
 class Moveable
 {
 private:

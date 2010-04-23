@@ -34,7 +34,9 @@ class BezierCurve;
 class Track;
 class XMLNode;
 
-/** A virtual base class for all animations. */
+/** \brief A virtual base class for all animations.
+  * \ingroup animations
+  */
 class ThreeDAnimation : public AnimationBase
 {
 private:

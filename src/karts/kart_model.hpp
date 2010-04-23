@@ -31,10 +31,13 @@ using namespace irr;
 class KartProperties;
 class XMLNode;
 
-/** This class stores a 3D kart model. It takes especially care of attaching
+/**
+ * \brief This class stores a 3D kart model.
+ * It takes especially care of attaching
  *  the wheels, which are loaded as separate objects. The wheels can turn
  *  and (for the front wheels) rotate. The implementation is dependent on the
  *  OpenGL library used. 
+ * \ingroup karts
  */
 class KartModel
 {

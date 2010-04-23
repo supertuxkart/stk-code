@@ -25,9 +25,11 @@
 #include "irrlicht.h"
 using namespace irr;
 
-/** This class is used to enable a shadow for a kart. For now it uses
- *  a simple texture to simulate the shadow, real time shadows will be
- *  added later.
+/** 
+ * \brief This class is used to enable a shadow for a kart.
+ * For now it uses a simple texture to simulate the shadow, real time shadows might
+ * be added later.
+ * \ingroup graphics
  */
 class Shadow
 {

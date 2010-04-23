@@ -8,6 +8,9 @@
 #include "io/xml_node.hpp"
 #include <irrString.h>
 
+/**
+  * \ingroup config
+  */
 struct KeyBinding
 {
     
@@ -20,13 +23,16 @@ struct KeyBinding
 
 //==== D E V I C E C O N F I G =================================================
 
+/**
+  * \brief contains the key bindings information related to one input device
+  * \ingroup config
+  */
 class DeviceConfig
 {
 private:
     
     KeyBinding  m_bindings[PA_COUNT];
-    bool        m_inuse;  // Is there a device connected to the system 
-    // which uses this config?
+    bool        m_inuse;  //!< Is there a device connected to the system which uses this config?
     
 protected:
     
@@ -49,7 +55,11 @@ public:
     void        setInUse            (bool inuse) {m_inuse = inuse;}
     bool        isInUse            () {return m_inuse;}
     
-    // Don't call this directly unless you are KeyboardDevice or GamepadDevice
+    /**
+      * Don't call this directly unless you are KeyboardDevice or GamepadDevice
+      * \param[out] action  the result, only set if method returned true
+      * \return             whether finding an action associated to this input was successful
+      */
     bool        getAction           (Input::InputType       type, 
                                      const int              id,
                                      const int              value,
@@ -62,24 +72,28 @@ public:
 
 //==== K E Y B O A R D C O N F I G =============================================
 
+/**
+  * \brief specialisation of DeviceConfig for keyboard type devices
+  * \ingroup config
+  */
 class KeyboardConfig : public DeviceConfig
 {
-private:
-    
-protected:
-    
+
 public:
     
     void        setDefaultBinds     ();
     void        serialize           (std::ofstream& stream);
     
-    //        KeyboardConfig                  (irr::io::IrrXMLReader* xml);
     KeyboardConfig                  ();
 };
 
 
 //==== G A M E P A D C O N F I G ===============================================
 
+/**
+  * \brief specialisation of DeviceConfig for gamepad type devices
+  * \ingroup config
+  */
 class GamepadConfig : public DeviceConfig
 {
     

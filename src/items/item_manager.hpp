@@ -28,6 +28,9 @@
 
 class Kart;
 
+/**
+  * \ingroup items
+  */
 class ItemManager
 {
 

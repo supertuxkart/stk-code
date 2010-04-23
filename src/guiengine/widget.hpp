@@ -88,8 +88,9 @@ namespace GUIEngine
     void setWithinATextBox(bool in);
     
     /**
-      * The nearly-abstract base of all widgets (not fully abstract since a bare Widget
-      * can be created for the sore goal of containing children widgets in a group)
+      * \brief The nearly-abstract base of all widgets
+      * (not fully abstract since a bare Widget can be created for the sore goal of containing
+      * children widgets in a group)
       *
       * Provides basic common functionnality, as well as providing a few callbacks
       * for children to override if they need to do something special on event.
@@ -98,6 +99,8 @@ namespace GUIEngine
       * and also optionally one or many children.
       *
       * Each widget also has a set of properties stored in a map (see enum above)
+      *
+      * \ingroup guiengine
       */
     class Widget : public SkinWidgetContainer
     {

@@ -22,6 +22,9 @@
 #include "irrlicht.h"
 #include "items/attachment.hpp"
 
+/**
+  * \ingroup items
+  */
 class AttachmentManager
 {
 private:

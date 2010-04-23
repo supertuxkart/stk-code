@@ -21,9 +21,15 @@
 #include "irrlicht.h"
 #include "input/input.hpp"
 
+/**
+ * \ingroup guiengine
+ */
 namespace GUIEngine
 {
-
+    
+    /**
+      * \ingroup guiengine
+      */
     enum EventPropagation
     {
         EVENT_BLOCK,
@@ -32,43 +38,46 @@ namespace GUIEngine
     
     class Widget;
     
-/**
-  * Class to handle irrLicht events (GUI and input as well : input events will be redirected to the input
-  * module in game mode). In menu mode, input is mapped to game actions with the help of the input
-  * module, then calls are made to move focus / trigger an event / etc.
-  *
-  * This is really only the irrLicht events bit, not to be confused with my own simple events dispatched
-  * mainly through AbstractStateManager, and also to widgets (this class is some kind of bridge between
-  * the base irrLicht GUI engine and the STK layer on top of it)
-  */
-class EventHandler : public irr::IEventReceiver
-{
-    EventPropagation onGUIEvent(const irr::SEvent& event);
-    EventPropagation onWidgetActivated(Widget* w, const int playerID);
-    void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
-    void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
-    
-public:
-    EventHandler();
-    ~EventHandler();
-    
     /**
-      * All irrLicht events will go through this (input as well GUI; input events are
-      * immediately delegated to the input module, GUI events are processed here)
-      */
-    bool OnEvent (const irr::SEvent &event);
+     * \brief Class to handle irrLicht events (GUI and input as well)
+     * input events will be redirected to the input module in game mode.
+     * In menu mode, input is mapped to game actions with the help of the input
+     * module, then calls are made to move focus / trigger an event / etc.
+     *
+     * This is really only the irrLicht events bit, not to be confused with my own simple events dispatched
+     * mainly through AbstractStateManager, and also to widgets (this class is some kind of bridge between
+     * the base irrLicht GUI engine and the STK layer on top of it)
+     *
+     * \ingroup guiengine
+     */
+    class EventHandler : public irr::IEventReceiver
+    {
+        EventPropagation onGUIEvent(const irr::SEvent& event);
+        EventPropagation onWidgetActivated(Widget* w, const int playerID);
+        void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
+        void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
+        
+    public:
+        EventHandler();
+        ~EventHandler();
+        
+        /**
+         * All irrLicht events will go through this (input as well GUI; input events are
+         * immediately delegated to the input module, GUI events are processed here)
+         */
+        bool OnEvent (const irr::SEvent &event);
+        
+        /**
+         * When the input module is done processing an input and mapped it to an action,
+         * and this action needs to be applied to the GUI (e.g. fire pressed, left
+         * pressed, etc.) this method is called back by the input module.
+         */
+        void processAction(const int action, const unsigned int value, Input::InputType type, const int playerID);
+        
+        /** singleton access */
+        static EventHandler* get();
+    };
     
-    /**
-      * When the input module is done processing an input and mapped it to an action,
-      * and this action needs to be applied to the GUI (e.g. fire pressed, left
-      * pressed, etc.) this method is called back by the input module.
-      */
-    void processAction(const int action, const unsigned int value, Input::InputType type, const int playerID);
-
-    // singleton
-    static EventHandler* get();
-};
-
 }
 
 #endif

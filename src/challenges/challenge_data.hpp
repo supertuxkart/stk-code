@@ -28,6 +28,9 @@
 #include "challenges/challenge.hpp"
 #include "race/race_manager.hpp"
 
+/**
+  * \ingroup challenges
+  */
 class ChallengeData : public Challenge
 {
 private:

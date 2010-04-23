@@ -20,18 +20,28 @@
 #ifndef HEADER_ITEM_HPP
 #define HEADER_ITEM_HPP
 
+/**
+  * \defgroup items
+  */
+
 #include "irrlicht.h"
 using namespace irr;
 
 #include "karts/kart.hpp"
 
 // -----------------------------------------------------------------------------
+
+/**
+  * \ingroup items
+  */
 class Item
 {
 public:
-    // The list of all items. Important for the switch item function:
-    // bubblegum must be the last item (since bubble gum can't be
-    // switched with any other item, since it's a different objecct).
+    /**
+      * The list of all items. Important for the switch item function:
+      * bubblegum must be the last item (since bubble gum can't be
+      * switched with any other item, since it's a different objecct).
+      */
     enum ItemType
     {
         ITEM_FIRST,

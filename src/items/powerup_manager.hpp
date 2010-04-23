@@ -41,6 +41,9 @@ enum PowerupType {POWERUP_NOTHING,
                   POWERUP_LAST=POWERUP_ANVIL,
                   POWERUP_MAX};
 
+/**
+  * \ingroup items
+  */
 class PowerupManager
 {
 private:

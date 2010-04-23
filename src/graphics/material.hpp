@@ -27,6 +27,9 @@ using namespace irr;
 
 class XMLNode;
 
+/**
+  * \ingroup graphics
+  */
 class Material
 {
 public:

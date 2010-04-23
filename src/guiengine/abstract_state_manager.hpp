@@ -4,11 +4,17 @@
 #include <vector>
 #include <string>
 
+/**
+  * \ingroup guiengine
+  */
 namespace GUIEngine
 {
     class Widget;
     class Screen;
-
+    
+    /**
+      * \ingroup guiengine
+      */
     enum GameState
     {
         MENU,
@@ -16,60 +22,61 @@ namespace GUIEngine
         INGAME_MENU
     };
     
-/**
-  * Abstract base class you must override from to use the GUI engine
-  */
-class AbstractStateManager
-{
-protected:
     /**
-      * Whether we are in game mode
-      */
-    GameState m_game_mode;
-    
-    /**
-     * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
+     * \brief Abstract base class you must override from to use the GUI engine
+     * \ingroup guiengine
      */
-    std::vector<std::string> m_menu_stack;
+    class AbstractStateManager
+    {
+    protected:
+        /**
+         * Whether we are in game mode
+         */
+        GameState m_game_mode;
+        
+        /**
+         * This stack will contain menu names (e.g. main.stkgui), and/or 'race'.
+         */
+        std::vector<std::string> m_menu_stack;
+        
+        void pushMenu(std::string name);
+        
+        void setGameState(GameState state);
+        
+    public:
+        AbstractStateManager();
+        virtual ~AbstractStateManager() { }
+        
+        void pushScreen(Screen* screen);
+        
+        void replaceTopMostScreen(Screen* screen);
+        void popMenu();
+        void resetAndGoToScreen(Screen* screen);
+        
+        /**
+         * Sets the whole menu stack. Only the topmost screen will be inited/shown, but others remain
+         * under for cases where the user wants to go back.
+         * @param screens an array containing the menus that should go into stack. The first item will be
+         *                the bottom item in the stack, the last item will be the stack top. Array must be
+         *                NULL-terminated.
+         */
+        void resetAndSetStack(Screen* screens[]);
+        void enterGameState();
+        
+        GameState getGameState();
+        
+        void reshowTopMostMenu();
+        
+        /*  ***********************************
+         * methods to override in children *
+         *********************************** */
+        
+        /**
+         * callback called whenever escape was pressed (or any similar cancel operation)
+         */
+        virtual void escapePressed() = 0;
+        
+    };
     
-    void pushMenu(std::string name);
-    
-    void setGameState(GameState state);
-    
-public:
-    AbstractStateManager();
-    virtual ~AbstractStateManager() { }
-    
-    void pushScreen(Screen* screen);
-
-    void replaceTopMostScreen(Screen* screen);
-    void popMenu();
-    void resetAndGoToScreen(Screen* screen);
-    
-    /**
-      * Sets the whole menu stack. Only the topmost screen will be inited/shown, but others remain
-      * under for cases where the user wants to go back.
-      * @param screens an array containing the menus that should go into stack. The first item will be
-      *                the bottom item in the stack, the last item will be the stack top. Array must be
-      *                NULL-terminated.
-      */
-    void resetAndSetStack(Screen* screens[]);
-    void enterGameState();
-    
-    GameState getGameState();
-    
-    void reshowTopMostMenu();
-
-    /*  ***********************************
-        * methods to override in children *
-        *********************************** */
-    
-    /**
-      * callback called whenever escape was pressed (or any similar cancel operation)
-      */
-    virtual void escapePressed() = 0;
-
-};
-
 }
 #endif

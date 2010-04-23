@@ -30,22 +30,27 @@
 #include "input/input.hpp"
 #include "utils/ptr_vector.hpp"
 
+/**
+ * \ingroup guiengine
+ */
 namespace GUIEngine
 {
 #define DEFINE_SCREEN_SINGLETON( ClassName )  template<> ClassName* GUIEngine::ScreenSingleton< ClassName >::singleton = NULL
-   
+    
     /**
-      * Declares a class to be a singleton. Normally, all screens will be singletons.
-      * Note that you need to use the 'DEFINE_SCREEN_SINGLETON' macro in a .cpp file to
-      * actually define the instance (as this can't be done in a .h)
-      */
+     * \brief Declares a class to be a singleton.
+     * Normally, all screens will be singletons.
+     * Note that you need to use the 'DEFINE_SCREEN_SINGLETON' macro in a .cpp file to
+     * actually define the instance (as this can't be done in a .h)
+     * \ingroup guiengine
+     */
     template<typename SCREEN>
     class ScreenSingleton
     {
         static SCREEN* singleton;
         
     public:
-
+        
         ~ScreenSingleton()
         {
             singleton = NULL;
@@ -64,14 +69,20 @@ namespace GUIEngine
         
     };
     
+    /**
+     * \ingroup guiengine
+     */
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     
     /**
-      * Represents a single screen. Mainly responsible of its children widgets; Screen lays them
-      * out, asks them to add themselves, asks them to remove themselves, etc.
-      *
-      * Also initiates the read of GUI files, even though most of that work is done in "screen_loader.cpp"
-      */
+     * \brief Represents a single GUI screen.
+     * Mainly responsible of its children widgets; Screen lays them
+     * out, asks them to add themselves, asks them to remove themselves, etc.
+     *
+     * Also initiates the read of GUI files, even though most of that work is done in "screen_loader.cpp"
+     *
+     * \ingroup guiengine
+     */
     class Screen
     {
         friend class Skin;
@@ -79,7 +90,7 @@ namespace GUIEngine
         bool m_loaded;
         std::string m_filename;
         void loadFromFile();
-
+        
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         
@@ -92,17 +103,17 @@ namespace GUIEngine
         bool throttleFPS;
         
         ptr_vector<Widget, HOLD> m_widgets;
-
+        
         // current mouse position, read-only...
         int m_mouse_x, m_mouse_y;
         
         /** this variable is not used by the Screen object itself; it's the routines creating
-          * screens that may use it to perform some operations only once. initialized to false.
-          */
+         * screens that may use it to perform some operations only once. initialized to false.
+         */
         bool m_inited;
         
         /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
-            (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
+         (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
         virtual void forgetWhatWasLoaded();
         
         Screen(); /**< creates a dummy incomplete object; only use to override behaviour in sub-class */
@@ -122,7 +133,7 @@ namespace GUIEngine
             if (out != NULL && outCasted == NULL)
             {
                 fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
-                                "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
+                        "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
             }
             return outCasted;
         }
@@ -135,10 +146,10 @@ namespace GUIEngine
         
         virtual void addWidgets();
         virtual void calculateLayout();
-                
+        
         void manualAddWidget(Widget* w);
         void manualRemoveWidget(Widget* w);
-
+        
         const std::string& getName() const { return m_filename; }
         
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
@@ -151,7 +162,7 @@ namespace GUIEngine
         virtual void tearDown() = 0;
         
         /** Called when escape is pressed.
-          * @return true if the screen should be closed, false if you handled the press another way */
+         * @return true if the screen should be closed, false if you handled the press another way */
         virtual bool onEscapePressed() { return true; }
         
         /**

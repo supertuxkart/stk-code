@@ -27,7 +27,10 @@
 
 namespace GUIEngine
 {
-    /** A checkbox widget. See guiengine/engine.hpp for a detailed overview */
+    /**
+      * \brief A checkbox widget.
+      * \ingroup widgets
+      */
     class CheckBoxWidget : public Widget
     {
         bool m_state;

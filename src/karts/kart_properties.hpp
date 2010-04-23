@@ -35,9 +35,13 @@ using namespace irr;
 class Material;
 class XMLNode;
 
-/** This class stores the properties of a kart. This includes size, name,
- *  identifier, physical properties etc. It is atm also the base class for
- *  STKConfig, which stores the default values for all physics constants.
+/** 
+ * \brief This class stores the properties of a kart.
+ * This includes size, name, identifier, physical properties etc.
+ * It is atm also the base class for STKConfig, which stores the default values
+ * for all physics constants.
+ *
+ * \ingroup karts
  */
 class KartProperties
 {

@@ -29,7 +29,9 @@ using namespace irr;
 
 class Kart;
 
-/** This class is responsible for drawing skid marks for a kart. */
+/** \brief This class is responsible for drawing skid marks for a kart.
+  * \ingroup graphics
+  */
 class SkidMarks
 {
 private:

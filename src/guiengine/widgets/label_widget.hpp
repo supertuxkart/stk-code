@@ -27,7 +27,9 @@
 
 namespace GUIEngine
 {
-    /** A simple label widget. See guiengine/engine.hpp for a detailed overview. */
+    /** \brief A simple label widget.
+      * \ingroup widgets
+      */
     class LabelWidget : public Widget
     {
         bool m_has_color;

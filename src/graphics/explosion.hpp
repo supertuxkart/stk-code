@@ -26,6 +26,9 @@ using namespace irr;
 class Vec3;
 class SFXBase;
 
+/**
+  * \ingroup graphics
+  */
 class Explosion 
 {
 private:

@@ -24,9 +24,10 @@
 #include "config/user_config.hpp"
 
 /**
-  * class for managing player profiles (name, control configuration, etc.)
+  * \brief Class for managing player profiles (name, control configuration, etc.)
   * A list of all possible players is stored as PlayerProfiles in the user config.
   * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
+  * \ingroup config
   */
 class PlayerProfile
 {

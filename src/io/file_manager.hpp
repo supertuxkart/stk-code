@@ -20,6 +20,10 @@
 #ifndef HEADER_FILE_MANAGER_HPP
 #define HEADER_FILE_MANAGER_HPP
 
+/**
+ * \defgroup io
+ */
+
 #include <string>
 #include <vector>
 #include <set>
@@ -29,6 +33,10 @@ using namespace irr;
 
 #include "io/xml_node.hpp"
 
+/**
+  * \brief class handling files and paths
+  * \ingroup io
+  */
 class FileManager 
 {
 private:

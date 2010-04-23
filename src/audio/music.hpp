@@ -22,6 +22,10 @@
 
 #include <string>
 
+/**
+  * \brief Abstract interface for classes that can handle music playback
+  * \ingroup audio
+  */
 class Music
 {
 public:

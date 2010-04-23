@@ -32,6 +32,9 @@ class PhysicalObject;
 class RubberBand;
 class XMLNode;
 
+/**
+  * \ingroup items
+  */
 class Plunger : public Flyable
 {
 private:

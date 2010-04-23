@@ -27,6 +27,9 @@ using namespace irr;
 
 class XMLNode;
 
+/**
+  * \ingroup items
+  */
 class Bowling : public Flyable
 {
 private:

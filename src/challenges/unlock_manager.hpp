@@ -28,6 +28,10 @@
 class XMLNode;
 class SFXBase;
 
+/**
+  * \brief main class to handle locking/challenges
+  * \ingroup challenges
+  */
 class UnlockManager
 {
 private:

@@ -26,6 +26,10 @@ using namespace irr;
 
 class XMLNode;
 
+/**
+  * \brief Handles animated textures (textures that move)
+  * \ingroup graphics
+  */
 class MovingTexture
 {
 private:

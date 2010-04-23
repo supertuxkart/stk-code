@@ -23,42 +23,54 @@
 #include "utils/ptr_vector.hpp"
 
 /**
- Here lies the skin handling. It loads images and their sizing from a XML file.
- Since the irrLicht way of handling skin is quite "boxy" and results in games
+ \page skin Overview of GUI skin
+ 
+ The GUIEngine::Skin is the one handling skinning. It loads images and their sizing from a XML
+ file. Since the irrLicht way of handling skin is quite "boxy" and results in games
  looking like Window 95, this class overrides it very much; in pretty much all
  callbacks, rather drawing plainly what irrLicht asks it to draw, it first
  checks which widget we're asked to render and redirects the call to a more
  specific method.
+ 
  Furthermore, since irrLicht widgets were quite basic, a few widgets were created
  by combining several irrLicht widgets (e.g. 2 buttons and a label in a box make
  a spinner). Because of this, some jumping through hoops is performed (we get a
  callback for each of these sub-widgets, but want to draw the whole thing as a single
  block)
 
- = Rendering =
  There are two types of images : some will be simply stretched as a whole, others will
  have non-stretchable borders (you cannot choose which one you must use, it's hardcoded
  for each element type; though, as you will see below, for all "advanced stretching" images
  you can easily fake "simple stretch")
  
+ \section Describing a skin in a XML file
+ 
  All elements will have at least 2 properties :
- type="X"                                sets what you're skinning with this entry
- image="skinDirectory/imageName.png"     sets which image is used for this element
+ \li \c type="X" : sets what you're skinning with this entry
+ \li \c image="skinDirectory/imageName.png" : sets which image is used for this element
+ 
+ For more information, I highly recommend simply looking at existing skins, they will show
+ the format of the XML file describing a skin quite well.
+ 
+ \section states Widget States
  
  Most elements also support states :
- state="neutral"
- state="focused"
- state="down"
+ \li \c state="neutral"
+ \li \c state="focused"
+ \li \c state="down"
+ 
  You can thus give different looks for different states.  Not all widgets support all states,
  see entries and comments below to know what's supported.
  Note that checkboxes are an exception and have the following styles :
- "neutral+unchecked"
- "neutral+checked"
- "focused+unchecked"
- "focused+checked"
+ \li \lc "neutral+unchecked"
+ \li \lc "neutral+checked"
+ \li \lc "focused+unchecked"
+ \li \lc "focused+checked"
  
+ \section stretch Advanced stretching
  "Advanced stretching" images are split this way :
  
+ \code
  +----+--------------------+----+
  |    |                    |    |
  +----+--------------------+----+
@@ -68,6 +80,7 @@
  +----+--------------------+----+
  |    |                    |    | 
  +----+--------------------+----+
+ \endcode
  
  The center border will be stretched in all directions. The 4 corners will not stretch at all.
  Horizontal borders will stretch horizontally, verticallt borders will stretch vertically.
@@ -85,18 +98,23 @@
  area (this might include stuff like shadows, etc.). The 'h' one is for horizontal borders,
  the 'v' one is for vertical borders.
  
- Finnally : the image is split, as shown above, into 9 areas. In osme cases, you may not want
+ Finnally : the image is split, as shown above, into 9 areas. In some cases, you may not want
  all areas to be rendered. Then you can pass parameter areas="body+left+right+top+bottom"
  and explicitely specify which parts you want to see. The 4 corner areas are only visible
  when the border that intersect at this corner are enabled.
  
   */
+
+/**
+ * \ingroup guiengine
+ */
 namespace GUIEngine
 {
     
     /**
       * In order to avoid calculating render information every frame, it's stored in a
       * SkinWidgetContainer for each widget (or each widget part if it requires many)
+      * \ingroup guiengine
       */
     class SkinWidgetContainer
     {
@@ -152,7 +170,10 @@ namespace GUIEngine
     
     class Widget;
     
-    /** class containing render params for the 'drawBoxFromStretchableTexture' function */
+    /**
+      * \brief class containing render params for the 'drawBoxFromStretchableTexture' function
+      * \ingroup guiengine
+      */
     class BoxRenderParams
     {
         irr::video::ITexture* image;
@@ -208,6 +229,10 @@ namespace GUIEngine
         void calculateYFlipIfNeeded();
     };
     
+    /**
+      * \brief Object used to render the GUI widgets
+      * \ingroup guiengine
+      */
     class Skin : public irr::gui::IGUISkin
     {
         irr::gui::IGUISkin* m_fallback_skin;

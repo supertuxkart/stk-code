@@ -20,6 +20,10 @@
 #ifndef HEADER_IRR_DRIVER_HPP
 #define HEADER_IRR_DRIVER_HPP
 
+/**
+ * \defgroup graphics
+ */
+
 #include <string>
 #include <vector>
 
@@ -37,6 +41,10 @@ struct VideoMode
     int width, height;
 };
 
+/**
+  * \brief class that creates the irrLicht device and offers higher-level ways to manage the 3D scene
+  * \ingroup graphics
+  */
 class IrrDriver : public IEventReceiver
 {
 private:

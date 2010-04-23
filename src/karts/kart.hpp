@@ -21,6 +21,8 @@
 #ifndef HEADER_KART_HPP
 #define HEADER_KART_HPP
 
+/** \defgroup karts */
+
 #include "btBulletDynamicsCommon.h"
 
 #include "graphics/camera.hpp"
@@ -55,6 +57,7 @@ class Stars;
  *  Kart has two base classes: the most important one is moveable (which
  *  is an object that is moved on the track, and has position and rotations)
  *  and TerrainInfo, which manages the terrain the kart is on.
+ * \ingroup karts
  */
 class Kart : public TerrainInfo, public Moveable, public EmergencyAnimation
 {

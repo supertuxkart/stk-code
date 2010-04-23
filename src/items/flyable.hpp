@@ -36,6 +36,9 @@ class Kart;
 class PhysicalObject;
 class XMLNode;
 
+/**
+  * \ingroup items
+  */
 class Flyable : public Moveable, public TerrainInfo
 {
 public:

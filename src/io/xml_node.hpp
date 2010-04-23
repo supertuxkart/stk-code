@@ -28,6 +28,10 @@ using namespace irr;
 
 class Vec3;
 
+/**
+  * \brief utility class used to parse XML files
+  * \ingroup io
+  */
 class XMLNode
 {
 private:

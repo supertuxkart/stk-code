@@ -35,8 +35,10 @@ namespace GUIEngine
         RIBBON_TABS /* a tab bar */
     };
 
-    /** A static text/icons/tabs bar widget. The contents of this ribbon are static.
-        See guiengine/engine.hpp for a detailed overview */
+    /** \brief A static text/icons/tabs bar widget.
+      * The contents of this ribbon are static.
+      * \ingroup widgets
+      */
     class RibbonWidget : public Widget
     {
     public:

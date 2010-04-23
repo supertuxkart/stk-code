@@ -57,8 +57,12 @@ namespace GUIEngine
         unsigned int m_badges;
     };
     
-    /** A dynamic ribbon (builds upon RibbonWidget, adding dynamic contents creation and sizing, scrolling, multiple-row
-        layouts). See guiengine/engine.hpp for a detailed overview */
+    /** 
+      * \brief An extended version of RibbonWidget, with more capabilities.
+      * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
+      * scrolling, multiple-row layouts.
+      * \ingroup widgets
+      */
     class DynamicRibbonWidget : public Widget, public RibbonWidget::IRibbonListener
     {
         friend class RibbonWidget;

@@ -23,7 +23,8 @@
 using namespace irr;
 
 /**
-  * This class is used to display rotating stars around a kart's head.
+  * \brief This class is used to display rotating stars around a kart's head.
+  * \ingroup graphics
   */
 class Stars
 {

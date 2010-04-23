@@ -20,16 +20,22 @@
 #ifndef HEADER_STK_CONFIG_HPP
 #define HEADER_STK_CONFIG_HPP
 
+/**
+ * \defgroup config
+ */
+
 #include "karts/kart_properties.hpp"
 
 //class Lisp;
 class XMLNode;
 class MusicInformation;
 
-/** Global STK configuration information. Parameters here can be tuned without
- *  recompilation, but the user shouldn't actually modify them. It also
- *  includes the list of default kart physics parameters which are used for
- *  each kart (but which can be overwritten for each kart, too).
+/** 
+ * \brief Global STK configuration information.
+ * Parameters here can be tuned without recompilation, but the user shouldn't actually modify
+ * them. It also includes the list of default kart physics parameters which are used for
+ * each kart (but which can be overwritten for each kart, too).
+ * \ingroup config
  */
 class STKConfig
 {

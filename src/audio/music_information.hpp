@@ -26,6 +26,12 @@
 
 class Music;
 
+/**
+  * \brief Wrapper around an instance of the Music interface
+  * Adds information like composer, song title, etc...
+  * Delegates many calls to the underlying Music instance.
+  * \ingroup audio
+  */
 class MusicInformation
 {
 private:
@@ -42,16 +48,17 @@ private:
                                                 
     float                    m_gain;
     float                    m_adjustedGain;
-    float                    m_faster_time;    // Either time for fading faster
-                                               // music in, or time to change pitch
-    float                    m_max_pitch;      // maximum pitch for faster music
+    
+    /** Either time for fading faster music in, or time to change pitch */
+    float                    m_faster_time;
+    float                    m_max_pitch;      //!< maximum pitch for faster music
     static const int         LOOP_FOREVER=-1;
     Music                   *m_normal_music,
                             *m_fast_music;
-    enum {SOUND_NORMAL,                        // normal music is played
-          SOUND_FADING,                        // normal music fading out, faster fading in
-          SOUND_FASTER,                        // change pitch of normal music
-          SOUND_FAST}                          // playing faster music or max pitch reached
+    enum {SOUND_NORMAL,                        //!< normal music is played
+          SOUND_FADING,                        //!< normal music fading out, faster fading in
+          SOUND_FASTER,                        //!< change pitch of normal music
+          SOUND_FAST}                          //!< playing faster music or max pitch reached
                              m_mode; 
     float                    m_time_since_faster;
 

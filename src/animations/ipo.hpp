@@ -30,7 +30,9 @@ using namespace irr;
 
 class XMLNode;
 
-/** A class to manage a single blender IPO curve. */
+/** \brief A class to manage a single blender IPO curve.
+  * \ingroup animations
+  */
 class Ipo
 {
 public:

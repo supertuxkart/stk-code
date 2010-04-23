@@ -27,8 +27,9 @@
 
 namespace GUIEngine
 {
-    /** A button widget with an icon and optionnaly a label beneath (from its properties in base class Widget)
-        See guiengine/engine.hpp for a detailed overview */
+    /** \brief A button widget with an icon and optionnaly a label beneath
+      * \ingroup widgets
+      */
     class IconButtonWidget : public Widget
     {
     public:

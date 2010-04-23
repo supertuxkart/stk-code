@@ -20,6 +20,11 @@
 #ifndef HEADER_CHALLENGE_HPP
 #define HEADER_CHALLENGE_HPP
 
+/**
+  * \defgroup challenges
+  */
+
+
 #include <string>
 #include <vector>
 #include <fstream>
@@ -43,7 +48,10 @@ struct UnlockableFeature
     const irr::core::stringw getUnlockedMessage() const;
 };
 
-// A base class for all challenges
+/**
+  * \brief A class for all challenges
+  * \ingroup challenges
+  */
 class Challenge
 {
 private:

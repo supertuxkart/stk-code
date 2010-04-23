@@ -19,6 +19,11 @@
 #ifndef HEADER_ENGINE_HPP
 #define HEADER_ENGINE_HPP
 
+/**
+ * \defgroup guiengine
+ */
+
+
 #include <irrlicht.h>
 #include <string>
 
@@ -26,6 +31,10 @@
 #include "guiengine/widgets.hpp"
 #include "utils/ptr_vector.hpp"
 
+/**
+ * \ingroup guiengine
+ * \brief Contains all GUI engine related classes
+ */
 namespace GUIEngine
 {    
     class Screen;

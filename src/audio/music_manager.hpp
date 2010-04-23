@@ -30,6 +30,10 @@
 
 class Vec3;
 
+/**
+  * \brief Central place to request for musics to be loaded, played, stopped, etc...
+  * \ingroup audio
+  */
 class MusicManager
 {
 private:        

@@ -27,7 +27,9 @@
 
 namespace GUIEngine
 {
-    /** A text field widget. See guiengine/engine.hpp for a detailed overview */
+    /** \brief A text field widget. 
+      * \ingroup widgets
+      */
     class TextBoxWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to

@@ -34,9 +34,12 @@
 class SFXBase;
 class XMLNode;
 
-/** Manager of all sound effects. The manager reads all sound effects and
+/**
+ * \brief Manager of all sound effects.
+ * The manager reads all sound effects and
  *  maintains the corresponding buffers. Each sound effect objects uses
  *  on of the (shared) buffers from the sound manager.
+ * \ingroup audio
  */
 class SFXManager
 {

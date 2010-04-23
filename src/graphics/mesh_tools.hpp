@@ -25,6 +25,9 @@ using namespace irr;
 
 #include "utils/vec3.hpp"
 
+/**
+  * \ingroup graphics
+  */
 namespace MeshTools
 {
     void minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max);

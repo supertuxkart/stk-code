@@ -25,62 +25,66 @@
 
 class PlayerProfile;
 
+/**
+ * \ingroup guiengine
+ */
 namespace GUIEngine
 {
     class Widget;
     class TextBoxWidget;
     class ButtonWidget;
     
-/**
-  * Base class, derive your own.
-  * Only once instance at a time (if you create a 2nd the first will be destroyed).
-  * You can call static function 'dismiss' to simply close current dialog (so you don't
-  * need to keep track of instances yourself)
-  */
-class ModalDialog : public SkinWidgetContainer
-{
-protected:
-    irr::gui::IGUIWindow* m_irrlicht_window;
-    irr::core::rect< irr::s32 > m_area;
-    
     /**
-     * Creates a modal dialog with given percentage of screen width and height
+     * \brief Abstract base class representing a modal dialog.
+     * Only once instance at a time (if you create a 2nd the first will be destroyed).
+     * You can call static function 'dismiss' to simply close current dialog (so you don't
+     * need to keep track of instances yourself)
+     * \ingroup guiengine
      */
-    ModalDialog(const float percentWidth, const float percentHeight);
-    
-    virtual void onEnterPressedInternal();
-    void clearWindow();
-    
-public:
-    ptr_vector<Widget> m_children;
-    
-    virtual ~ModalDialog();
-    
-    /** Returns whether to block event propagation (usually, you will want to block events you processed) */
-    virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
-    
-    bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
-    bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
-
-    Widget* getFirstWidget();
-    Widget* getLastWidget();
-
-    irr::gui::IGUIWindow* getIrrlichtElement()
+    class ModalDialog : public SkinWidgetContainer
     {
-        return m_irrlicht_window;
-    }
-    
-    static void dismiss();
-    static void onEnterPressed();
-    static ModalDialog* getCurrent();
-    static bool isADialogActive();
-    
-    /** Override to change what happens on escape pressed */
-    virtual void escapePressed() { dismiss(); }
-    
-    /** Override to be notified of updates */
-    virtual void onUpdate(float dt) { }
-};  
+    protected:
+        irr::gui::IGUIWindow* m_irrlicht_window;
+        irr::core::rect< irr::s32 > m_area;
+        
+        /**
+         * Creates a modal dialog with given percentage of screen width and height
+         */
+        ModalDialog(const float percentWidth, const float percentHeight);
+        
+        virtual void onEnterPressedInternal();
+        void clearWindow();
+        
+    public:
+        ptr_vector<Widget> m_children;
+        
+        virtual ~ModalDialog();
+        
+        /** Returns whether to block event propagation (usually, you will want to block events you processed) */
+        virtual EventPropagation processEvent(const std::string& eventSource){ return EVENT_LET; }
+        
+        bool isMyChild(Widget* widget) const { return m_children.contains(widget); }
+        bool isMyChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
+        
+        Widget* getFirstWidget();
+        Widget* getLastWidget();
+        
+        irr::gui::IGUIWindow* getIrrlichtElement()
+        {
+            return m_irrlicht_window;
+        }
+        
+        static void dismiss();
+        static void onEnterPressed();
+        static ModalDialog* getCurrent();
+        static bool isADialogActive();
+        
+        /** Override to change what happens on escape pressed */
+        virtual void escapePressed() { dismiss(); }
+        
+        /** Override to be notified of updates */
+        virtual void onUpdate(float dt) { }
+    };  
     
 }
 #endif

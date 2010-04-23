@@ -20,6 +20,8 @@
 #ifndef HEADER_INPUT_HPP
 #define HEADER_INPUT_HPP
 
+/** \defgroup input */
+
 #include <string>
 #include <irrString.h>
 
@@ -28,17 +30,22 @@ const int DEADZONE_MOUSE_SENSE =  200;
 const int DEADZONE_JOYSTICK    = 2000;
 const int MULTIPLIER_MOUSE     =  750;
 
+/**
+  * \ingroup input
+  */
 struct Input
 {
     static const int MAX_VALUE = 32768;
     
-    enum AxisDirection {
+    enum AxisDirection
+    {
         AD_NEGATIVE,
         AD_POSITIVE,
         AD_NEUTRAL
     };
 
-    enum InputType {
+    enum InputType
+    {
         IT_NONE = 0,
         IT_KEYBOARD,
         IT_STICKMOTION,
@@ -93,6 +100,10 @@ struct Input
 
 };
 
+/**
+  * \brief types of input events / what actions the players can do
+  * \ingroup input
+  */
 enum PlayerAction
 {
     PA_FIRST = -1,
@@ -110,6 +121,10 @@ enum PlayerAction
     PA_COUNT
 };
 
+/**
+  * \brief  human-readable strings for each PlayerAction
+  * \ingroup input
+  */
 static std::string KartActionStrings[PA_COUNT] = {std::string("left"), 
                                                   std::string("right"),
                                                   std::string("accel"),

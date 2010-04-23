@@ -29,6 +29,10 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 
+/**
+  * \brief OpenAL implementation of the abstract SFXBase interface
+  * \ingroup audio
+  */
 class SFXOpenAL : public SFXBase
 {
 private:

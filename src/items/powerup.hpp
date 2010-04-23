@@ -29,6 +29,9 @@ class Kart;
 class Item;
 class SFXBase;
 
+/**
+  * \ingroup items
+  */
 class Powerup
 {
 private:

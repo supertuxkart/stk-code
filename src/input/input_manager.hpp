@@ -30,12 +30,15 @@
 
 class DeviceManager;
 
-/** Class to handle input. 
- */
+/** 
+  * \brief Class to handle input. 
+  * \ingroup input
+  */
 class InputManager
 {
 public:
-    enum InputDriverMode {
+    enum InputDriverMode
+    {
         MENU = 0,
         INGAME,
         INPUT_SENSE_KEYBOARD,
