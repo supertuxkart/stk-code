@@ -141,14 +141,31 @@ void RaceGUI::createMarkerTexture()
         //core::array<core::vector2df> vertices;
         video::S3DVertex *vertices = new video::S3DVertex[count+1];
         unsigned short int *index  = new unsigned short int[count+1];
-        video::SColor color        = kp->getColor();
-        createRegularPolygon(count, (float)radius, center, color, 
-                             vertices, index);
-
-        irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
-            index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-        delete vertices;
-        delete index;
+        video::ITexture *t = kp->getMinimapIcon();
+        if(t)
+        {
+            video::ITexture *t = kp->getIconMaterial()->getTexture();
+            core::recti dest_rect(i*m_marker_rendered_size, 
+                                  0,
+                                  (i+1)*m_marker_rendered_size,
+                                  m_marker_rendered_size);
+            core::recti source_rect(core::vector2di(0,0), t->getSize());
+            irr_driver->getVideoDriver()->draw2DImage(t, dest_rect, 
+                                                      source_rect,
+                                                      /*clipRect*/0,
+                                                      /*color*/   0,
+                                                      /*useAlpha*/true);
+        }
+        else   // no special minimap icon defined
+        {
+            video::SColor color        = kp->getColor();
+            createRegularPolygon(count, (float)radius, center, color, 
+                vertices, index);
+            irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
+                index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
+            delete vertices;
+            delete index;
+        }   // if special minimap icon defined
     }
 
     m_marker = rttProvider.renderToTexture(-1, /*is_2d_render*/true);

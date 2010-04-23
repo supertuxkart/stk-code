@@ -40,8 +40,10 @@ float KartProperties::UNDEFINED = -99.9f;
  *  Otherwise the defaults are taken from STKConfig (and since they are all
  *  defined, it is guaranteed that each kart has well defined physics values.
  */
-KartProperties::KartProperties(const std::string &filename) : m_icon_material(0)
+KartProperties::KartProperties(const std::string &filename)
 {
+    m_icon_material = NULL;
+    m_minimap_icon  = NULL;
     m_name          = "NONAME";
     m_ident         = "NONAME";
     m_icon_file     = "";
@@ -142,7 +144,12 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     //  would get deleted, too.
     m_icon_material = material_manager->getMaterial(m_icon_file,
                                                     /*is_full+path*/false, 
+                             
                                                     /*make_permanent*/true);
+    if(m_minimap_icon_file!="")
+        m_minimap_icon = irr_driver->getTexture(m_minimap_icon_file);
+    else
+        m_minimap_icon = NULL;
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
@@ -189,16 +196,19 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("version", &m_version);
     
     std::string temp_name;
-    root->get("name",        &temp_name    );
+    root->get("name",              &temp_name          );
     m_name = _(temp_name.c_str());
     
-    root->get("icon-file",   &m_icon_file  );
-    root->get("shadow-file", &m_shadow_file);
+    root->get("icon-file",         &m_icon_file        );
+    
+    root->get("minimap-icon-file", &m_minimap_icon_file);
+
+    root->get("shadow-file",       &m_shadow_file      );
     Vec3 c;
-    root->get("rgb",         &c            );
+    root->get("rgb",               &c                  );
     m_color.set(255, (int)(255*c.getX()), (int)(255*c.getY()), (int)(255*c.getZ()));
 
-    root->get("groups",      &m_groups     );
+    root->get("groups",            &m_groups           );
 
     //m_kart_model.loadInfo(lisp);
 
