@@ -26,8 +26,10 @@
 
 class XMLNode;
 
-/** A class to manage bezier curves and interpolation.
- */
+/** 
+  * A class to manage bezier curves and interpolation.
+  * \ingroup tracks
+  */
 class BezierCurve
 {
 private:

@@ -28,8 +28,10 @@ class XMLNode;
 class Track;
 class CheckManager;
 
-/** Virtual base class for a check structure. A check structure has a certain
- *  type:
+/** 
+ * \brief Virtual base class for a check structure.
+ *
+ * A check structure has a certain ype:
  *  CT_NEW_LAP  : triggering this check structure will cause a new lap to be
  *                counted. If this type is triggered, it will set itselt to
  *                inactive (which means it is not possible to count several
@@ -42,6 +44,8 @@ class CheckManager;
  * Each check structure can be active or inactive. A new_la counter is 
  * initialised as non-active, so that karts have to trigger a reset check
  * before a lap can be counted.
+ *
+ * \ingroup tracks
  */
 class CheckStructure
 {

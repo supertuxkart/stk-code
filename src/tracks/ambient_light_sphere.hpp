@@ -28,11 +28,15 @@ using namespace irr;
 class XMLNode;
 class CheckManager;
 
-/** This class implements a check sphere that is used to change the ambient
- *  light if a kart is inside this sphere. Besides a normal radius this
- *  sphere also has a 2nd 'inner' radius: player karts inside the inner 
- *  radius will have the full new ambient light, karts outside the default
- *  light, and karts in between will mix the light dependent on distance.
+/**
+ * \brief This class implements a check sphere that is used to change the ambient
+ *  light if a kart is inside this sphere.
+ *
+ *  Besides a normal radius this sphere also has a 2nd 'inner' radius: player karts
+ *  inside the inner radius will have the full new ambient light, karts outside the
+ *  default light, and karts in between will mix the light dependent on distance.
+ *
+ * \ingroup tracks
  */
 class AmbientLightSphere : public CheckSphere
 {

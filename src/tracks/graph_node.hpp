@@ -30,9 +30,10 @@
 class QuadSet;
 class QuadGraph;
 
-/** This class stores a node of the graph, i.e. a list of successor 
- *  edges. 
- */
+/** 
+  * \brief This class stores a node of the graph, i.e. a list of successor edges.
+  * \ingroup tracks
+  */
 class GraphNode 
 {
     /** Index of this node in the set of quads. Several graph nodes can use

@@ -26,7 +26,10 @@ class XMLNode;
 class CheckStructure;
 class Track;
 
-/** Controls all checks structures of a track. */
+/**
+  * \brief Controls all checks structures of a track.
+  * \ingroup tracks
+  */
 class CheckManager
 {
 private:

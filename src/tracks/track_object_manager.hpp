@@ -28,12 +28,17 @@ class TrackObject;
 class Vec3;
 class XMLNode;
 
+/**
+  * \ingroup tracks
+  */
 class TrackObjectManager
 {
 public:
-    // The different type of track objects: physical objects, graphical 
-    // objects (without a physical representation) - the latter might be
-    // eye candy (to reduce work for physics), ...
+    /**
+      * The different type of track objects: physical objects, graphical 
+      * objects (without a physical representation) - the latter might be
+      * eye candy (to reduce work for physics), ...
+      */
     enum TrackObjectType {TO_PHYSICAL, TO_GRAPHICAL};
     std::vector<TrackObject*> m_all_objects;
 public:

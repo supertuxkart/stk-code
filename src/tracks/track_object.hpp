@@ -28,6 +28,9 @@ using namespace irr;
 
 class XMLNode;
 
+/**
+  * \ingroup tracks
+  */
 class TrackObject : public scene::IAnimationEndCallBack
 {
 //public:

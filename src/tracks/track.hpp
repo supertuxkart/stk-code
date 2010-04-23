@@ -18,6 +18,8 @@
 #ifndef HEADER_TRACK_HPP
 #define HEADER_TRACK_HPP
 
+/** \defgroup tracks */
+
 #ifdef __APPLE__
 #  include <OpenGL/gl.h>
 #else
@@ -51,6 +53,9 @@ class TriangleMesh;
 class World;
 class XMLNode;
 
+/**
+  * \ingroup tracks
+  */
 class Track
 {
 private:

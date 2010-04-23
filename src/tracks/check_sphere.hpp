@@ -33,6 +33,8 @@ class CheckManager;
  *  sphere also has a 2nd 'inner' radius: player karts inside the inner 
  *  radius will have the full new ambient light, karts outside the default
  *  light, and karts in between will mix the light dependent on distance.
+ *
+ * \ingroup tracks
  */
 class CheckSphere : public CheckStructure
 {

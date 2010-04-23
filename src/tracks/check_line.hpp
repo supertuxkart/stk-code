@@ -28,12 +28,16 @@ using namespace irr;
 class XMLNode;
 class CheckManager;
 
-/** Implements a simple checkline. It's a finite line with 2 endpoints in 2d 
+/** 
+ *  \brief Implements a simple checkline.
+ *  It's a finite line with 2 endpoints in 2d 
  *  and a minimum height (i.e. the minimum Y coordinate of the two points). 
  *  If a kart crosses the line (in the projection on the 2d plane) and has an
  *  appropriate height, the checkline will be triggered. This allows for very
  *  easy checking of checklines, and should be sufficient for most check 
  *  structure. 
+ *
+ * \ingroup tracks
  */
 class CheckLine : public CheckStructure
 {

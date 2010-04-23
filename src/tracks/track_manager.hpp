@@ -26,8 +26,10 @@
 
 class Track;
 
-/** Simple class to load and manage track data, track names and
-    such */
+/**
+  * \brief Simple class to load and manage track data, track names and such
+  * \ingroup tracks
+  */
 class TrackManager
 {
 private:

@@ -28,8 +28,12 @@
 
 class CheckLine;
 
-/** This class stores a graph of quads. */
-class QuadGraph {
+/**
+  * \brief This class stores a graph of quads.
+  * \ingroup tracks
+  */
+class QuadGraph
+{
     
 private:
     /** The actual graph data structure. */

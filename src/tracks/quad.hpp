@@ -27,6 +27,10 @@
 #include "utils/vec3.hpp"
 
 class btTransform;
+
+/**
+  * \ingroup tracks
+  */
 class Quad 
 {
 private:

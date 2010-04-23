@@ -28,7 +28,11 @@
 
 class XMLNode;
 
-class QuadSet {
+/**
+  * \ingroup tracks
+  */
+class QuadSet
+{
 private:
     /** The 2d bounding box, used for hashing. */
     Vec3                m_min;

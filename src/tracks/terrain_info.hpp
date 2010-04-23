@@ -25,6 +25,7 @@
 
 /** This class stores information about the triangle that's under an object, i.e.:
  *  the normal, a pointer to the material, and the height above th
+ * \ingroup tracks
  */
 class TerrainInfo
 {
