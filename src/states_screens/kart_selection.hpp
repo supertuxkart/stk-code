@@ -29,6 +29,10 @@ class InputDevice;
 class PlayerKartWidget;
 class KartHoverListener;
 
+/**
+  * \brief screen where players can choose their kart
+  * \ingroup states_screens
+  */
 class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<KartSelectionScreen>
 {
     friend class KartHoverListener;

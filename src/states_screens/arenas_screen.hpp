@@ -23,6 +23,10 @@
 
 namespace GUIEngine { class Widget; }
 
+/**
+  * \brief Handles the screen where a battle arena choice is offered
+  * \ingroup states_screens
+  */
 class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<ArenasScreen>
 {
     friend class GUIEngine::ScreenSingleton<ArenasScreen>;

@@ -25,7 +25,10 @@
 #include "modes/world.hpp"
 #include "states_screens/race_gui.hpp"
 
-
+/**
+ * \brief An implementation of World, to provide the 3 strikes battle game mode
+ * \ingroup modes
+ */
 class ThreeStrikesBattle : public World
 {
 private:

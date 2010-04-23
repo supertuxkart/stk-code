@@ -8,6 +8,10 @@ namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; clas
 class KartProperties;
 class Challenge;
 
+/**
+  * \brief Screen shown when a feature has been unlocked
+  * \ingroup states_screens
+ */
 class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
     friend class GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>;

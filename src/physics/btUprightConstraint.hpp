@@ -24,7 +24,9 @@ subject to the following restrictions:
 class btRigidBody;
 class Kart;
 
-
+/**
+  * \ingroup physics
+  */
 class btUprightConstraint : public btTypedConstraint
 {
 private:

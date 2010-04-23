@@ -27,9 +27,10 @@
 #include "race/highscores.hpp"
 
 /**
-  * This class reads and writes the 'highscores.data' file, and also takes
+  * This class reads and writes the 'highscores.xml' file, and also takes
   * care of dealing with new records. One 'HighscoreEntry' object is created
   * for each highscore entry.
+  * \ingroup race
   */
 class HighscoreManager
 {

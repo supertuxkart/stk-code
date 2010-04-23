@@ -30,6 +30,9 @@
 
 class XMLNode;
 
+/**
+  * \ingroup physics
+  */
 class PhysicalObject : public TrackObject
 {
 public:

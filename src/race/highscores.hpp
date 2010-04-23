@@ -31,6 +31,7 @@ class XMLNode;
 /**
  *  Represents one highscore entry, i.e. the (atm up to three) highscores
  *  for a particular setting (track, #karts, difficulty etc).
+ * \ingroup race
  */
 class Highscores
 {

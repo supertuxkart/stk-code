@@ -28,6 +28,9 @@ using namespace irr;
 #include "graphics/irr_driver.hpp"
 #include "utils/vec3.hpp"
 
+/**
+  * \ingroup physics
+  */
 class IrrDebugDrawer : public btIDebugDraw
 {
     /** The drawing mode to use: 

@@ -26,6 +26,7 @@
  * A 'linear world' is a subcategory of world used in 'standard' races, i.e.
  * with a start line and a road that loops. This includes management of drivelines
  * and lap counting.
+ * \ingroup modes
  */
 class LinearWorld : public World
 {

@@ -24,6 +24,10 @@
 
 class Kart;
 
+/**
+ * \brief An implementation of World, used for profiling only
+ * \ingroup modes
+ */
 class ProfileWorld : public StandardRace
 {
 private:

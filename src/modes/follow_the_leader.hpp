@@ -21,6 +21,10 @@
 #include "modes/linear_world.hpp"
 #include "states_screens/race_gui.hpp"
 
+/**
+  * \brief An implementation of World, based on LinearWorld, to provide the Follow-the-leader game mode
+  * \ingroup modes
+  */
 class FollowTheLeaderRace : public LinearWorld
 {
 private:

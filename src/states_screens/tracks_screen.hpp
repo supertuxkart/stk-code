@@ -23,6 +23,10 @@
 
 namespace GUIEngine { class Widget; }
 
+/**
+  * \brief screen where the user can select a track
+  * \ingroup states_screens
+  */
 class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TracksScreen>
 {
     friend class GUIEngine::ScreenSingleton<TracksScreen>;

@@ -28,6 +28,10 @@ namespace GUIEngine { class Widget; }
 
 struct Input;
 
+/**
+  * \brief Audio/video options screen
+  * \ingroup states_screens
+  */
 class OptionsScreenAV : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenAV>
 {
     OptionsScreenAV();

@@ -29,6 +29,9 @@
 
 class Kart;
 
+/**
+  * \ingroup race
+  */
 class History
 {
 public:

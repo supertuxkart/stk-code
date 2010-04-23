@@ -27,8 +27,9 @@
 
 class Material;
 
-/** A special class to store a triangle mesh with a separate material
- *  per triangle.
+/** 
+ * \brief A special class to store a triangle mesh with a separate material per triangle.
+ * \ingroup physics
  */
 class TriangleMesh
 {

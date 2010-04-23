@@ -21,8 +21,9 @@
 class SFXBase;
 
 /**
- * A class that manages the clock (countdown, chrono, etc.) Also manages stuff
- * like the 'ready/set/go' text at the beginning or the delay at the end of a race.
+ * \brief A class that manages the clock (countdown, chrono, etc.)
+ * Also manages stuff like the 'ready/set/go' text at the beginning or the delay at the end of a race.
+ * \ingroup modes
  */
 class WorldStatus
 {

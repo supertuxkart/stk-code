@@ -23,21 +23,23 @@
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
 
-namespace GUIEngine
+ 
+/**
+  * \brief Handles the screen where the player is shown active and solved challenges
+  * \ingroup states_screens
+  */
+class ChallengesScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<ChallengesScreen>
 {
+    friend class GUIEngine::ScreenSingleton<ChallengesScreen>;
+    ChallengesScreen();
     
-    class ChallengesScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<ChallengesScreen>
-    {
-        friend class GUIEngine::ScreenSingleton<ChallengesScreen>;
-        ChallengesScreen();
-        
-    public:
+public:
 
-        void onUpdate(float dt, irr::video::IVideoDriver*);
-        
-        void init();
-        void tearDown();
-        void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    };
-}
+    void onUpdate(float dt, irr::video::IVideoDriver*);
+    
+    void init();
+    void tearDown();
+    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+};
+
 #endif

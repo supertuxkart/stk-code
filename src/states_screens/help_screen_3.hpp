@@ -22,6 +22,10 @@
 
 namespace GUIEngine { class Widget; }
 
+/**
+  * \brief Help screen, part 3
+  * \ingroup states_screens
+  */
 class HelpScreen3 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<HelpScreen3>
 {
     friend class GUIEngine::ScreenSingleton<HelpScreen3>;

@@ -29,6 +29,10 @@ namespace GUIEngine { class Widget; }
 struct Input;
 class PlayerProfile;
 
+/**
+  * \brief Player management options screen
+  * \ingroup states_screens
+  */
 class OptionsScreenPlayers : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenPlayers>
 {
 

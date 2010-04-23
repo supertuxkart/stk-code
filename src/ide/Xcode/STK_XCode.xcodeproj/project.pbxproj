@@ -1916,12 +1916,12 @@
 				956830DE1132EC9E00088D14 /* irr_debug_drawer.cpp */,
 				956830DF1132EC9E00088D14 /* irr_debug_drawer.hpp */,
 				95C2B1840F296545000D3E5D /* kart_motion_state.hpp */,
-				95CA59F60F82FCB7003323DB /* physical_object.hpp */,
 				95CA59F70F82FCB7003323DB /* physical_object.cpp */,
+				95CA59F60F82FCB7003323DB /* physical_object.hpp */,
 				95C2B1870F296545000D3E5D /* physics.cpp */,
 				95C2B1880F296545000D3E5D /* physics.hpp */,
-				953EAAB00F30A4410000D57D /* triangle_mesh.hpp */,
 				953EAAB10F30A4410000D57D /* triangle_mesh.cpp */,
+				953EAAB00F30A4410000D57D /* triangle_mesh.hpp */,
 			);
 			name = physics;
 			path = ../../physics;

@@ -23,8 +23,9 @@
 namespace GUIEngine { class Widget; }
 
 /**
- * Callback handling events from the main menu
- */
+  * \brief Handles the main menu
+  * \ingroup states_screens
+  */
 class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<MainMenuScreen>
 {
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;

@@ -25,6 +25,9 @@
 
 #include "race/grand_prix_data.hpp"
 
+/**
+  * \ingroup race
+  */
 class GrandPrixManager
 {
 private:

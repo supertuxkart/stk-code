@@ -20,6 +20,8 @@
 #ifndef HEADER_RACEMANAGER_HPP
 #define HEADER_RACEMANAGER_HPP
 
+/** \defgroup race */
+
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -38,7 +40,8 @@ static const char* IDENT_TTRIAL  = "STD_TIMETRIAL";
 static const char* FTL_IDENT     = "FOLLOW_LEADER";
 static const char* STRIKES_IDENT = "BATTLE_3_STRIKES";
 
-/** The race manager has two functions:
+/** 
+ * The race manager has two functions:
  *  1) it stores information about the race the user selected (e.g. number
  *     of karts, track, race mode etc.). Most of the values are just stored
  *     from the menus, and just read back, except for GP mode (the race
@@ -67,6 +70,8 @@ static const char* STRIKES_IDENT = "BATTLE_3_STRIKES";
  *  The race manager handles all race types as a kind of grand prix. E.g.:
  *  a quick race is basically a GP with only one track (so the race manager
  *  keeps track of scores even though no scores are used in a quick race).
+ *
+ * \ingroup race
  */
 class RaceManager
 {

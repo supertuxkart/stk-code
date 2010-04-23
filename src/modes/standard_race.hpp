@@ -21,8 +21,9 @@
 #include "modes/linear_world.hpp"
 
 /**
-  * Represents a standard race, i.e. with a start, end and laps.
+  * \brief Represents a standard race, i.e. with a start, end and laps.
   * Used in Grand Prix, Quick Race and Time Trial.
+  * \ingroup modes
   */
 class StandardRace : public LinearWorld
 {

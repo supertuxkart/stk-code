@@ -25,6 +25,7 @@
 /** This is a very simple motion state implementation for bullet, which does
  *  not support any transformation from physics transform to graphics 
  *  transform. 
+ * \ingroup physics
  */
 
 class KartMotionState : public btMotionState

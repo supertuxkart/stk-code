@@ -19,6 +19,8 @@
 #ifndef STATE_MANAGER_HPP
 #define STATE_MANAGER_HPP
 
+/** \defgroup states_screens */
+
 #include <string>
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -33,8 +35,17 @@ namespace GUIEngine
     class Widget;
 }
 
+/**
+  * \brief the player ID of the "game master" player
+  * the game master is the player that can perform the game setup
+  * \ingroup states_screens
+  */
 const static int PLAYER_ID_GAME_MASTER = 0;
 
+/**
+  * \brief A concrete scene manager, derived from GUIEngine's AbastractSceneManager
+  * \ingroup states_screens
+  */
 class StateManager : public GUIEngine::AbstractStateManager
 {
     

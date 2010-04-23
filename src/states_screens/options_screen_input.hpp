@@ -29,6 +29,10 @@ class DeviceConfig;
 
 struct Input;
 
+/**
+  * \brief Input options screen
+  * \ingroup states_screens
+  */
 class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput>
 {
     OptionsScreenInput();

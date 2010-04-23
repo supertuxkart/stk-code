@@ -32,307 +32,304 @@ using irr::core::stringc;
 DEFINE_SCREEN_SINGLETON( GUIEngine::CreditsScreen );
 
 
-namespace GUIEngine
+const float TIME_SECTION_FADE = 0.8f;
+const float ENTRIES_FADE_TIME = 0.3f;
+
+class CreditsEntry
 {
-    const float TIME_SECTION_FADE = 0.8f;
-    const float ENTRIES_FADE_TIME = 0.3f;
-
-    class CreditsEntry
-    {
-    public:
-        stringw m_name;
-        std::vector<stringw> m_subentries;
-        
-        CreditsEntry(stringw& name)
-        {
-            m_name = name;
-        }
-    };
+public:
+    stringw m_name;
+    std::vector<stringw> m_subentries;
     
-    
-    class CreditsSection
+    CreditsEntry(stringw& name)
     {
-    public:
-        // read-only
-        std::vector<CreditsEntry> m_entries;
-        stringw m_name;
-        
-        CreditsSection(stringw name)
-        {
-            this->m_name = name;
-        }
-        void addEntry(CreditsEntry& entry)
-        {
-            m_entries.push_back(entry);
-        }
-        void addSubEntry(stringw& subEntryString)
-        {
-            m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
-        }
-    };
-    
-    CreditsSection* CreditsScreen::getCurrentSection()
-    {
-        return m_sections.get(m_sections.size()-1);
+        m_name = name;
     }
-    
-    bool getWideLine(std::ifstream& file, stringw* out)
-    {
-        if (!file.good())
-        {
-            //std::cout << "File is not good!\n";
-            return false;
-        }
-        wchar_t wide_char;
+};
 
-        bool found_eol = false;
-        stringw line;
-        
-        char buff[2];
-        
-        while (true)
+
+class CreditsSection
+{
+public:
+    // read-only
+    std::vector<CreditsEntry> m_entries;
+    stringw m_name;
+    
+    CreditsSection(stringw name)
+    {
+        this->m_name = name;
+    }
+    void addEntry(CreditsEntry& entry)
+    {
+        m_entries.push_back(entry);
+    }
+    void addSubEntry(stringw& subEntryString)
+    {
+        m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
+    }
+};
+
+CreditsSection* CreditsScreen::getCurrentSection()
+{
+    return m_sections.get(m_sections.size()-1);
+}
+
+bool getWideLine(std::ifstream& file, stringw* out)
+{
+    if (!file.good())
+    {
+        //std::cout << "File is not good!\n";
+        return false;
+    }
+    wchar_t wide_char;
+    
+    bool found_eol = false;
+    stringw line;
+    
+    char buff[2];
+    
+    while (true)
+    {
+        file.read( buff, 2 );
+        if (file.good())
         {
-            file.read( buff, 2 );
-            if (file.good())
+            //std::cout << buff[0] << ", " << buff[1]
+            //          << "(" << std::hex << (unsigned)buff[0] << ", " << std::hex << (unsigned)buff[1] << ")\n";
+            
+            // FIXME: endianness issues possible here?
+            wide_char = unsigned(buff[0] & 0xFF) | (unsigned(buff[1] & 0xFF) << 8);
+            line += wide_char;
+            //std::cout << "Read char " << (char)(wide_char) << " (" << std::hex << wide_char << ")" << std::endl;
+            if (wide_char == L'\n')
             {
-                //std::cout << buff[0] << ", " << buff[1]
-                //          << "(" << std::hex << (unsigned)buff[0] << ", " << std::hex << (unsigned)buff[1] << ")\n";
-                
-                // FIXME: endianness issues possible here?
-                wide_char = unsigned(buff[0] & 0xFF) | (unsigned(buff[1] & 0xFF) << 8);
-                line += wide_char;
-                //std::cout << "Read char " << (char)(wide_char) << " (" << std::hex << wide_char << ")" << std::endl;
-                if (wide_char == L'\n')
-                {
-                    //std::cout << "EOL\n";
-                    found_eol = true;
-                    break;
-                }
-            }
-            else
-            {
-                //std::cout << "- file not good -\n";
-                //file.get(); // if we stopped on EOL, try to skip it
+                //std::cout << "EOL\n";
+                found_eol = true;
                 break;
             }
         }
-        
-        if (!found_eol) return false;
-        *out = line;
-        //std::cout << "Read line <" << stringc(line.c_str()).c_str() << ">\n";
-        return true;
+        else
+        {
+            //std::cout << "- file not good -\n";
+            //file.get(); // if we stopped on EOL, try to skip it
+            break;
+        }
     }
     
-    CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
-    {
-        reset();
-        
-        throttleFPS = false;
-        
-        std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
+    if (!found_eol) return false;
+    *out = line;
+    //std::cout << "Read line <" << stringc(line.c_str()).c_str() << ">\n";
+    return true;
+}
 
-        std::ifstream file( creditsfile.c_str() ) ;
-        stringw line;
+CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
+{
+    reset();
+    
+    throttleFPS = false;
+    
+    std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
+    
+    std::ifstream file( creditsfile.c_str() ) ;
+    stringw line;
+    
+    // skip Unicode header
+    file.get();
+    file.get();
+    
+    // let's assume the file is encoded as UTF-16
+    while (getWideLine( file, &line ))
+    {
+        line = line.trim();
         
-        // skip Unicode header
-        file.get();
-        file.get();
+        if (line.size() < 1) continue; // empty line
         
-        // let's assume the file is encoded as UTF-16
-        while (getWideLine( file, &line ))
+        if ((line[0] & 0xFF) == '=' && (line[line.size()-1] & 0xFF) == '=')
         {
+            line = stringw( line.subString(1, line.size()-2).c_str() );
             line = line.trim();
             
-            if (line.size() < 1) continue; // empty line
-            
-            if ((line[0] & 0xFF) == '=' && (line[line.size()-1] & 0xFF) == '=')
-            {
-                line = stringw( line.subString(1, line.size()-2).c_str() );
-                line = line.trim();
-                
-                //stringc cversion = line.c_str();
-                //std::cout << "Section : " << (char*)(cversion.c_str()) << std::endl;
-                m_sections.push_back( new CreditsSection(line)  );
-            }
-            else if ((line[0] & 0xFF) == '-')
-            {
-                line = stringw( line.subString(1, line.size()-1).c_str() );
-                //line = line.trim();
-                
-                //stringc cversion = line.c_str();
-                //std::cout << "---- Sub-Entry : " << (char*)(cversion.c_str()) << std::endl;
-                
-                getCurrentSection()->addSubEntry( line );
-            }
-            else
-            {
-                //tringc cversion = line.c_str();
-                //std::cout << "-- Entry : " << (char*)(cversion.c_str()) << std::endl;
-                
-                CreditsEntry entry(line);
-                getCurrentSection()->addEntry( entry );
-            }
-        } // end while
-        assert(m_sections.size() > 0);
-        
-    }
-    
-    void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
-    {
-        this->x = x;
-        this->y = y;
-        this->w = w;
-        this->h = h;
-        
-        m_section_rect = core::rect< s32 >( x, y, x+w, y+h/6 );
-    }
-
-    void CreditsScreen::reset()
-    {
-        m_curr_section = 0;
-        m_curr_element = -1;
-        time_before_next_step = TIME_SECTION_FADE;
-        m_time_element = 2.5f;
-    }
-    
-    void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
-    {
-        time_before_next_step -= elapsed_time*0.8f; // multiply by 0.8 to slow it down a bit as a whole
-
-        const bool before_first_elem = (m_curr_element == -1);
-        const bool after_last_elem   = (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
-
-        
-        // ---- section name
-        video::SColor color( 255 /* a */, 0 /* r */, 0 /* g */ , 75 /* b */ );
-        video::SColor white_color( 255, 255, 255, 255 );
-
-        // manage fade-in
-        if (before_first_elem)
+            //stringc cversion = line.c_str();
+            //std::cout << "Section : " << (char*)(cversion.c_str()) << std::endl;
+            m_sections.push_back( new CreditsSection(line)  );
+        }
+        else if ((line[0] & 0xFF) == '-')
         {
-            // I use 425 instead of 255 so that there is a little pause after
-            int alpha = 425 - (int)(time_before_next_step/TIME_SECTION_FADE * 425);
+            line = stringw( line.subString(1, line.size()-1).c_str() );
+            //line = line.trim();
+            
+            //stringc cversion = line.c_str();
+            //std::cout << "---- Sub-Entry : " << (char*)(cversion.c_str()) << std::endl;
+            
+            getCurrentSection()->addSubEntry( line );
+        }
+        else
+        {
+            //tringc cversion = line.c_str();
+            //std::cout << "-- Entry : " << (char*)(cversion.c_str()) << std::endl;
+            
+            CreditsEntry entry(line);
+            getCurrentSection()->addEntry( entry );
+        }
+    } // end while
+    assert(m_sections.size() > 0);
+    
+}
+
+void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
+{
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    
+    m_section_rect = core::rect< s32 >( x, y, x+w, y+h/6 );
+}
+
+void CreditsScreen::reset()
+{
+    m_curr_section = 0;
+    m_curr_element = -1;
+    time_before_next_step = TIME_SECTION_FADE;
+    m_time_element = 2.5f;
+}
+
+void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
+{
+    time_before_next_step -= elapsed_time*0.8f; // multiply by 0.8 to slow it down a bit as a whole
+    
+    const bool before_first_elem = (m_curr_element == -1);
+    const bool after_last_elem   = (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
+    
+    
+    // ---- section name
+    video::SColor color( 255 /* a */, 0 /* r */, 0 /* g */ , 75 /* b */ );
+    video::SColor white_color( 255, 255, 255, 255 );
+    
+    // manage fade-in
+    if (before_first_elem)
+    {
+        // I use 425 instead of 255 so that there is a little pause after
+        int alpha = 425 - (int)(time_before_next_step/TIME_SECTION_FADE * 425);
+        if      (alpha < 0) alpha = 0;
+        else if (alpha > 255) alpha = 255;
+        white_color.setAlpha( alpha );
+    }
+    // manage fade-out
+    else if (after_last_elem)
+    {
+        // I use 425 instead of 255 so that there is a little pause after
+        int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 425) - (425-255);
+        if      (alpha < 0)   alpha = 0;
+        else if (alpha > 255) alpha = 255;
+        white_color.setAlpha( alpha );
+    }
+    
+    GUIEngine::getTitleFont()->draw(m_sections[m_curr_section].m_name.c_str(), m_section_rect, white_color,
+                                    true /* center h */, true /* center v */ );
+    
+    // draw entries
+    if (!before_first_elem && !after_last_elem)
+    {
+        int text_offset  = 0;
+        
+        // fade in
+        if (time_before_next_step < ENTRIES_FADE_TIME)
+        {
+            const float fade_in = time_before_next_step / ENTRIES_FADE_TIME;
+            
+            int alpha =  (int)(fade_in * 255);
+            
             if      (alpha < 0) alpha = 0;
             else if (alpha > 255) alpha = 255;
-            white_color.setAlpha( alpha );
+            
+            color.setAlpha( alpha );
+            
+            text_offset = (int)((1.0f - fade_in) * 100);
         }
-        // manage fade-out
-        else if (after_last_elem)
+        // fade out
+        else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
         {
-            // I use 425 instead of 255 so that there is a little pause after
-            int alpha = (int)(time_before_next_step/TIME_SECTION_FADE * 425) - (425-255);
-            if      (alpha < 0)   alpha = 0;
-            else if (alpha > 255) alpha = 255;
-            white_color.setAlpha( alpha );
-        }
-        
-        GUIEngine::getTitleFont()->draw(m_sections[m_curr_section].m_name.c_str(), m_section_rect, white_color,
-                                   true /* center h */, true /* center v */ );
-        
-        // draw entries
-        if (!before_first_elem && !after_last_elem)
-        {
-            int text_offset  = 0;
+            const float fade_out = (time_before_next_step - (m_time_element - ENTRIES_FADE_TIME)) / ENTRIES_FADE_TIME;
             
-            // fade in
-            if (time_before_next_step < ENTRIES_FADE_TIME)
-            {
-                const float fade_in = time_before_next_step / ENTRIES_FADE_TIME;
-                
-                int alpha =  (int)(fade_in * 255);
-                
-                if      (alpha < 0) alpha = 0;
-                else if (alpha > 255) alpha = 255;
-                
-                color.setAlpha( alpha );
-                
-                text_offset = (int)((1.0f - fade_in) * 100);
-            }
-            // fade out
-            else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
-            {
-                const float fade_out = (time_before_next_step - (m_time_element - ENTRIES_FADE_TIME)) / ENTRIES_FADE_TIME;
-                
-                int alpha = 255 - (int)(fade_out * 255);
-                if(alpha < 0) alpha = 0;
-                else if(alpha > 255) alpha = 255;
-                color.setAlpha( alpha );
-                
-                text_offset = -(int)(fade_out * 100);
-            }
+            int alpha = 255 - (int)(fade_out * 255);
+            if(alpha < 0) alpha = 0;
+            else if(alpha > 255) alpha = 255;
+            color.setAlpha( alpha );
             
-            
-            GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_name.c_str(),
-                                       core::rect< s32 >( x + text_offset, y+h/6, x+w+text_offset, y+h/3 ), color,
-                                       false /* center h */, true /* center v */ );
-            
-            const int subamount = m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
-            int suby = y+h/3;
-            const int inc = subamount == 0 ? h/8 : std::min(h/8, (h - h/3)/(subamount+1));
-            for(int i=0; i<subamount; i++)
-            {
-               GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_subentries[i].c_str(),
-                                          core::rect< s32 >( x + 32, suby + text_offset/(1+1), x+w+32, suby+h/8 + text_offset/(1+1) ),
-                                          color,
-                                          false/* center h */, true /* center v */ );
-                suby += inc;
-            }
-
+            text_offset = -(int)(fade_out * 100);
         }
         
-        // is it time to move on?
-        if(time_before_next_step < 0)
+        
+        GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_name.c_str(),
+                                   core::rect< s32 >( x + text_offset, y+h/6, x+w+text_offset, y+h/3 ), color,
+                                   false /* center h */, true /* center v */ );
+        
+        const int subamount = m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size();
+        int suby = y+h/3;
+        const int inc = subamount == 0 ? h/8 : std::min(h/8, (h - h/3)/(subamount+1));
+        for(int i=0; i<subamount; i++)
         {
-            if(after_last_elem)
-            {
-                // switch to next element
-                m_curr_section++;
-                m_curr_element = -1;
+            GUIEngine::getFont()->draw(m_sections[m_curr_section].m_entries[m_curr_element].m_subentries[i].c_str(),
+                                       core::rect< s32 >( x + 32, suby + text_offset/(1+1), x+w+32, suby+h/8 + text_offset/(1+1) ),
+                                       color,
+                                       false/* center h */, true /* center v */ );
+            suby += inc;
+        }
+        
+    }
+    
+    // is it time to move on?
+    if(time_before_next_step < 0)
+    {
+        if(after_last_elem)
+        {
+            // switch to next element
+            m_curr_section++;
+            m_curr_element = -1;
+            time_before_next_step = TIME_SECTION_FADE;
+            
+            if(m_curr_section >= (int)m_sections.size()) reset();
+        }
+        else
+        {
+            // move on
+            m_curr_element++;
+            
+            if(m_curr_element >= (int)m_sections[m_curr_section].m_entries.size())
                 time_before_next_step = TIME_SECTION_FADE;
-                
-                if(m_curr_section >= (int)m_sections.size()) reset();
-            }
             else
             {
-                // move on
-                m_curr_element++;
-                
-                if(m_curr_element >= (int)m_sections[m_curr_section].m_entries.size())
-                    time_before_next_step = TIME_SECTION_FADE;
-                else
-                {
-                    m_time_element = 1.6f + (int)m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size()*0.5f;
-                    time_before_next_step = m_time_element;
-                }
+                m_time_element = 1.6f + (int)m_sections[m_curr_section].m_entries[m_curr_element].m_subentries.size()*0.5f;
+                time_before_next_step = m_time_element;
             }
         }
-        
-        /*
-         draw (const wchar_t *text, const core::rect< s32 > &position, video::SColor color,
-         bool hcenter=false,
-         bool vcenter=false, const core::rect< s32 > *clip=0)=0
-         */
     }
     
-    void CreditsScreen::init()
+    /*
+     draw (const wchar_t *text, const core::rect< s32 > &position, video::SColor color,
+     bool hcenter=false,
+     bool vcenter=false, const core::rect< s32 > *clip=0)=0
+     */
+}
+
+void CreditsScreen::init()
+{
+    Widget* w = getWidget<Widget>("animated_area");
+    assert(w != NULL);
+    
+    reset();
+    setArea(w->x, w->y, w->w, w->h);
+}
+
+void CreditsScreen::tearDown()
+{
+}
+
+void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
+{
+    if(name == "back")
     {
-        Widget* w = getWidget<Widget>("animated_area");
-        assert(w != NULL);
-        
-        reset();
-        setArea(w->x, w->y, w->w, w->h);
+        StateManager::get()->escapePressed();
     }
-    
-    void CreditsScreen::tearDown()
-    {
-    }
-    
-    void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
-    {
-        if(name == "back")
-        {
-            StateManager::get()->escapePressed();
-        }
-    }
-    
-} // end namespace
+}
+

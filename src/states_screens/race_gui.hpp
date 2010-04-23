@@ -35,6 +35,10 @@ class Kart;
 class Material;
 class RaceSetup;
 
+/**
+  * \brief Handles the in-race GUI (messages, mini-map, rankings, timer, etc...)
+  * \ingroup states_screens
+  */
 class RaceGUI
 {
 public:

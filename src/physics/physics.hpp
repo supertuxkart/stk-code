@@ -20,6 +20,8 @@
 #ifndef HEADER_PHYSICS_HPP
 #define HEADER_PHYSICS_HPP
 
+/** \defgroup physics */
+
 #include <set>
 #include <vector>
 
@@ -31,6 +33,9 @@
 class Vec3;
 class Kart;
 
+/**
+  * \ingroup physics
+  */
 class Physics : public btSequentialImpulseConstraintSolver
 {
 private:

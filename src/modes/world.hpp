@@ -20,6 +20,8 @@
 #ifndef HEADER_WORLD_HPP
 #define HEADER_WORLD_HPP
 
+/** \defgroup modes */
+
 #include <vector>
 
 #include "modes/world_status.hpp"
@@ -34,7 +36,9 @@ class Kart;
 class SFXBase;
 class Track;
 
-/** This class is responsible for running the actual race. A world is created
+/** 
+ *  \brief base class for all game modes
+ *  This class is responsible for running the actual race. A world is created
  *  by the race manager on the start of each race (so a new world is created
  *  for each race of a Grand Prix). It creates the 
  *  physics, loads the track, creates all karts, and initialises the race
@@ -72,6 +76,7 @@ class Track;
  *        creating a special kart type (see RaceManager::KartType), scoring
  *        would be done in the mode specific world (instead of in the
  *        RaceManager).
+ * \ingroup modes
  */
 
 class World : public WorldStatus

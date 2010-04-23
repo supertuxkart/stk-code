@@ -15,9 +15,11 @@
 
 class btDynamicsWorld;
 struct btWheelInfo;
+
 /** The btKart is a raycast vehicle, that does not skid. It therefore solves
  *  the problems with the plain bullet physics that karts would often rotate
  *  on a spot if one of the wheels loses contact with the ground.
+ * \ingroup physics
  */
 class btKart : public btRaycastVehicle
 {

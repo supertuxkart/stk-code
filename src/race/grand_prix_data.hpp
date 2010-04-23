@@ -28,7 +28,9 @@
 #include <stdexcept>
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
-    of races that has to be completed one after the other */
+  * of races that has to be completed one after the other
+  * \ingroup race
+  */
 class GrandPrixData
 {
     irr::core::stringw m_name;         //!< The name of the grand prix - might be translated!

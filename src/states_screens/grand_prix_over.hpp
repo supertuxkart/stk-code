@@ -6,7 +6,10 @@
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; } }
 class KartProperties;
 
-
+/**
+  * \brief Screen shown at the end of a Grand Prix
+  * \ingroup states_screens
+  */
 class GrandPrixOver : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixOver>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixOver>;
