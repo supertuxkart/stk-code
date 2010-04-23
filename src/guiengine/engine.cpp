@@ -301,9 +301,10 @@
  <em> Name in XML files: </em> \c "align" 
  
  For widgets located inside a vertical-row layout div : Changes how the x coord of the widget is determined.
- value can be "left", "center" or "right".
+ value can be \c "left", \c "center" or \c "right".
+ 
  For widgets located inside a horizontal-row layout div : Changes how the y coord of the widget is determined.
- value can be "top", "center" or "bottom".
+ value can be \c "top", \c "center" or \c "bottom".
  
  \n
  \subsection prop13 PROP_PROPORTION
