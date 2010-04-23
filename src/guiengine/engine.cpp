@@ -363,7 +363,7 @@
  One of the most important callbacks is 'eventCallback', which will be called everytime sometimes happens.
  Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
  name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
- bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
+ bear the names "init" and "tearDown", called respectively when a screen is being made visible and when it's
  being left, allowing for setup/clean-up.
  
  */
