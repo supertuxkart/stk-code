@@ -15,7 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
+#include "guiengine/screen.hpp"
+#include "guiengine/widget.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -29,9 +30,11 @@ using irr::core::stringc;
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
-DEFINE_SCREEN_SINGLETON( GUIEngine::CreditsScreen );
+DEFINE_SCREEN_SINGLETON( CreditsScreen );
 
 
+
+using namespace GUIEngine;
 const float TIME_SECTION_FADE = 0.8f;
 const float ENTRIES_FADE_TIME = 0.3f;
 
