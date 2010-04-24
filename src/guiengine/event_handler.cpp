@@ -141,7 +141,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (playerID == -1) break;
                     if (input_manager->masterPlayerOnly() && playerID != 0) break;
                     
-                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) transmitEvent(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
                 }
@@ -265,10 +265,10 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
                 if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
             }
             
-            transmitEvent(parent, parent->m_properties[PROP_ID], playerID);
+            sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
         }
     }
-    else transmitEvent(w, w->m_properties[PROP_ID], playerID);
+    else sendEventToUser(w, w->m_properties[PROP_ID], playerID);
     
     return EVENT_BLOCK;
 }
@@ -301,7 +301,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             {
                 if (widget_to_call->leftPressed(playerID) == EVENT_LET)
                 {
-                    transmitEvent(w, w->m_properties[PROP_ID], playerID);
+                    sendEventToUser(w, w->m_properties[PROP_ID], playerID);
                 }
                 widget_to_call = widget_to_call->m_event_handler;
             }
@@ -309,7 +309,7 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             
             if (widget_to_call->leftPressed(playerID) == EVENT_LET)
             {
-                transmitEvent(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
+                sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
             }
         }
         break;
@@ -328,14 +328,14 @@ void EventHandler::processAction(const int action, const unsigned int value, Inp
             {
                 if (widget_to_call->rightPressed(playerID) == EVENT_LET)
                 {
-                    transmitEvent(widget_to_call, w->m_properties[PROP_ID], playerID);
+                    sendEventToUser(widget_to_call, w->m_properties[PROP_ID], playerID);
                 }
                 widget_to_call = widget_to_call->m_event_handler;
             }
             
             if (widget_to_call->rightPressed(playerID) == EVENT_LET)
             {
-                transmitEvent(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
+                sendEventToUser(widget_to_call, widget_to_call->m_properties[PROP_ID], playerID);
             }
         }
         break;
@@ -568,6 +568,13 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
         
         if (firstWidget != NULL)  firstWidget->setFocusForPlayer(playerID);
     }
+}
+
+// -----------------------------------------------------------------------------
+
+void EventHandler::sendEventToUser(Widget* widget, std::string& name, const int playerID)
+{
+    getCurrentScreen()->eventCallback(widget, name, playerID);
 }
 
 // -----------------------------------------------------------------------------

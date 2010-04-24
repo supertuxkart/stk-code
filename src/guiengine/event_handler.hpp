@@ -57,6 +57,13 @@ namespace GUIEngine
         void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
         void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
         
+        /** \brief          send an event to the GUI module user's event callback
+          * \param widget   the widget that triggerred this event
+          * \param name     the name/ID (PROP_ID) of the widget that triggerred this event
+          * \param playerID ID of the player that triggerred this event
+          */
+        void sendEventToUser(Widget* widget, std::string& name, const int playerID);
+        
     public:
         EventHandler();
         ~EventHandler();

@@ -33,7 +33,7 @@
 
 /**
  * \ingroup guiengine
- * \brief Contains all GUI engine related classes
+ * \brief Contains all GUI engine related classes and functions
  */
 namespace GUIEngine
 {    
@@ -41,26 +41,31 @@ namespace GUIEngine
     class CutScene;
     class Widget;
     
-    /** Returns the widget currently focused by given player, or NULL if none.
-        Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-        needs, so we use ours. (i.e. always call these functions are never those
-        in IGUIEnvironment) */
+    /** \brief Returns the widget currently focused by given player, or NULL if none.
+      * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       in IGUIEnvironment)
+      */
     Widget* getFocusForPlayer(const int playerID);
 
-    /** Focuses nothing for given player (removes any selection for this player).
-     Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-     needs, so we use ours. (i.e. always call these functions are never those
-     in IGUIEnvironment) */
+    /** \brief Focuses nothing for given player (removes any selection for this player).
+      * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       in IGUIEnvironment)
+      */
     void focusNothingForPlayer(const int playerID);
 
-    /** Returns whether given the widget is currently focused by given player.
-     Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-     needs, so we use ours. (i.e. always call these functions are never those
-     in IGUIEnvironment) */
+    /** \brief Returns whether given the widget is currently focused by given player.
+      * \note  Do NOT use irrLicht's GUI focus facilities; it's too limited for our
+      *        needs, so we use ours. (i.e. always call these functions are never those
+      *        in IGUIEnvironment)
+      */
     bool isFocusedForPlayer(const Widget*w, const int playerID);
     
-    // In an attempt to make getters as fast as possible by possibly allowing inlining
-    // These fields should never be accessed outside of the GUI engine.
+    /**
+      * In an attempt to make getters as fast as possible, by possibly still allowing inlining
+      * These fields should never be accessed outside of the GUI engine.
+      */
     namespace Private
     {
         extern irr::gui::IGUIEnvironment* g_env;
@@ -76,48 +81,127 @@ namespace GUIEngine
         extern Widget* g_focus_for_player[MAX_PLAYER_COUNT];
     }
     
-    inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }
-    inline irr::gui::IGUIEnvironment* getGUIEnv()        { return Private::g_env;            }
-    inline irr::video::IVideoDriver*  getDriver()        { return Private::g_driver;         }
-    inline irr::gui::IGUIFont*        getSmallFont()     { return Private::g_small_font;     }
-    inline irr::gui::IGUIFont*        getFont()          { return Private::g_font;           }
-    inline irr::gui::IGUIFont*        getTitleFont()     { return Private::g_title_font;     }
-    inline Screen*                    getCurrentScreen() { return Private::g_current_screen; }
-    inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
-    inline Skin*                      getSkin()          { return Private::g_skin;           }
-
-    /** Returns the height of the font in pixels */
-    int   getFontHeight();
-    
-    int   getSmallFontHeight();
-    
-    float getLatestDt();
-    
-    /** show a warning message to explain to the player that only the game master cn act at this point */
-    void  showMasterOnlyString();
-    
-    /** Add a cutscene to the list of screens known by the gui engine */
-    void  addScreenToList(Screen* screen);
-    
-    // Widgets that need to be notified at every frame can add themselves there
+    /** Widgets that need to be notified at every frame can add themselves there (FIXME: unclean) */
     extern ptr_vector<Widget, REF> needsUpdate;
     
+    /**
+      * \brief               Call this method to init the GUI engine.
+      * \precondition        A irrlicht device and its corresponding video drivers must have been created
+      * \param device        An initialized irrlicht device object
+      * \param driver        An initialized irrlicht driver object
+      * \param state_manager An instance of a class derived from abstract base AbstractStateManager
+      */
     void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
+    
+    /**
+      * \brief frees all resources allocated by GUIEngine::init and subsequent uses of the GUI engine.
+      */
     void cleanUp();
     
-    /** Low-level mean to change current screen. Use a state manager instead to get higher-level functionnality. */
+    
+    /**
+      * \return the irrlicht device object
+      */
+    inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }
+    
+    /**
+      * \return the irrlicht GUI environment object
+      */
+    inline irr::gui::IGUIEnvironment* getGUIEnv()        { return Private::g_env;            }
+    
+    /**
+      * \return the irrlicht video driver object
+     */
+    inline irr::video::IVideoDriver*  getDriver()        { return Private::g_driver;         }
+    
+    /**
+      * \return the smaller font (useful for less important messages)
+      */
+    inline irr::gui::IGUIFont*        getSmallFont()     { return Private::g_small_font;     }
+    
+    /**
+      * \return the "normal" font (useful for text)
+      */
+    inline irr::gui::IGUIFont*        getFont()          { return Private::g_font;           }
+    
+    /**
+      * \return the "title" font (it's bigger and orange, useful for headers/captions)
+      */
+    inline irr::gui::IGUIFont*        getTitleFont()     { return Private::g_title_font;     }
+    
+    /**
+      * \return the currently shown screen, or NULL if none
+      */
+    inline Screen*                    getCurrentScreen() { return Private::g_current_screen; }
+    
+    /**
+      * \return the state manager being used, as passed to GUIEngine::init
+      */
+    inline AbstractStateManager*      getStateManager()  { return Private::g_state_manager;  }
+    
+    /**
+      * \precondition GUIEngine::init must have been called first
+      * \return       the skin object used to render widgets
+      */
+    inline Skin*                      getSkin()          { return Private::g_skin;           }
+
+    /** \return the height of the font in pixels */
+    int   getFontHeight();
+    
+    /** \return the height of the small font in pixels */
+    int   getSmallFontHeight();
+    
+    /**
+      * \precondition the value returned by this function is only valid when invoked from GUIEngine::render
+      * \return the time delta between the last two frames
+      */
+    float getLatestDt();
+    
+    /** \brief show a warning message to explain to the player that only the game master
+      *        can act at this point
+      */
+    void  showMasterOnlyString();
+    
+    /** \brief Add a screen to the list of screens known by the gui engine */
+    void  addScreenToList(Screen* screen);
+    
+    /** \brief Low-level mean to change current screen.
+      * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
+      */
     void switchToScreen(const char* );
+    
+    /** \brief erases the currently displayed screen, removing all added irrLicht widgets
+      * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
+      */
     void clear();
+    
+    /** \brief like GUIEngine::clear, but to be called before going into game */
     void cleanForGame();
     
+    /** \brief to be called after e.g. a resolution switch */
     void reshowCurrentScreen();
     
+    /**
+      * \brief called on every frame to trigger the rendering of the GUI
+      */
     void render(float dt);
+    
+    /** \brief renders a "loading" screen */
     void renderLoading();
     
-    void transmitEvent(Widget* widget, std::string& name, const int playerID);
+    //void transmitEvent(Widget* widget, std::string& name, const int playerID);
     
+    /** \brief      Finds a widget from its name (PROP_ID) in the current screen/dialog
+      * \param name the name (PROP_ID) of the widget to search for
+      * \return     the widget that bears that name, or NULL if it was not found
+      */
     Widget* getWidget(const char* name);
+    
+    /** \brief      Finds a widget from its irrlicht widget ID in the current screen/dialog
+      * \param name the irrlicht widget ID (not to be confused with PROP_ID, which is a string)
+      *             of the widget to search for
+      * \return     the widget that bears that irrlicht ID, or NULL if it was not found
+      */
     Widget* getWidget(const int id);
 }
 

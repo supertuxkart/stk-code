@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "main_loop.hpp"
-#include "audio/music_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
@@ -41,27 +40,22 @@ AbstractStateManager::AbstractStateManager()
 #pragma mark Other
 #endif
 
-/*
-void initGUI()
-{
-    IrrlichtDevice* device = irr_driver->getDevice();
-    video::IVideoDriver* driver = device->getVideoDriver();
-    GUIEngine::init(device, driver, &eventCallback);
-}
- */
-
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::enterGameState()
 {
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.push_back("race");
     setGameState(GAME);
-    cleanForGame();
+    GUIEngine::cleanForGame();
+    
+    //FIXME: this probably doesn't belong in the *abstract* state manager
     input_manager->setMode(InputManager::INGAME);
 }
 
 // -----------------------------------------------------------------------------
+
 GameState AbstractStateManager::getGameState()
 {
     return m_game_mode;
@@ -87,6 +81,8 @@ void AbstractStateManager::pushMenu(std::string name)
     if (m_game_mode == GAME)
     {
         setGameState(INGAME_MENU);
+        
+        //FIXME: this doesn't go in the *abstract* state manager
         if (World::getWorld() != NULL) World::getWorld()->pause();
     }
     else
@@ -113,7 +109,9 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     // Send tear-down event to previous menu
     if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
     
+    //FIXME: this doesn't go in the *abstract* state manager
     input_manager->setMode(InputManager::MENU);
+    
     m_menu_stack[m_menu_stack.size()-1] = name;
     switchToScreen(name.c_str());
     
@@ -150,6 +148,7 @@ void AbstractStateManager::popMenu()
     
     if (m_menu_stack.size() == 0)
     {
+        //FIXME: this doesn't go in the *abstract* state manager
         main_loop->abort();
         return;
     }
@@ -161,10 +160,13 @@ void AbstractStateManager::popMenu()
         m_menu_stack.push_back("race");
         if (m_game_mode == INGAME_MENU)
         {
+            //FIXME: this doesn't go in the *abstract* state manager
             if (World::getWorld() != NULL) World::getWorld()->unpause();
         }
         setGameState(GAME);
-        cleanForGame();
+        GUIEngine::cleanForGame();
+        
+        //FIXME: this doesn't go in the *abstract* state manager
         input_manager->setMode(InputManager::INGAME);
     }
     else
@@ -180,23 +182,10 @@ void AbstractStateManager::setGameState(GameState state)
 {
     if (m_game_mode == state) return; // no change
     
+    GameState previous = m_game_mode;
     m_game_mode = state;
     
-    if (m_game_mode == GAME)
-    {
-        irr_driver->hidePointer();
-    }
-    else
-    {
-        // menu
-        irr_driver->showPointer();
-        
-        if (m_game_mode == MENU)
-        {
-            //FIXME: not up to the *abstract* state manager to do this
-            music_manager->startMusic(stk_config->m_title_music);
-        }
-    }
+    onGameStateChange(previous, state);
 }
 
 // -----------------------------------------------------------------------------
@@ -205,15 +194,21 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
 {
     std::string name = screen->getName();
 
+    //FIXME: this doesn't go in the *abstract* state manager
     assert(World::getWorld()==NULL);
     
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
 
+    //FIXME: this doesn't go in the *abstract* state manager
     input_manager->setMode(InputManager::MENU);
+    
     m_menu_stack.push_back(name);
     setGameState(MENU);
+    
+    //FIXME: this doesn't go in the *abstract* state manager
     sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+    
     switchToScreen(name.c_str());
     getCurrentScreen()->init();
 }
@@ -225,6 +220,7 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     assert(screens != NULL);
     assert(screens[0] != NULL);
     
+    //FIXME: this doesn't go in the *abstract* state manager
     input_manager->setMode(InputManager::MENU);
     
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
@@ -237,7 +233,9 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     
     setGameState(MENU);
     
+    //FIXME: this doesn't go in the *abstract* state manager
     sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+    
     switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
     getCurrentScreen()->init();
 }

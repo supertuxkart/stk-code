@@ -18,6 +18,8 @@
 
 #include "states_screens/state_manager.hpp"
 
+#include "audio/music_manager.hpp"
+#include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
@@ -170,6 +172,27 @@ void StateManager::escapePressed()
     }
 }
 
+// ----------------------------------------------------------------------------
+
+void StateManager::onGameStateChange(GameState previousState, GameState newState)
+{
+    if (newState == GAME)
+    {
+        irr_driver->hidePointer();
+    }
+    else  // menu (including in-game menu)
+    {
+        irr_driver->showPointer();
+        
+        if (m_game_mode == MENU)
+        {
+            music_manager->startMusic(stk_config->m_title_music);
+        }
+    }    
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
@@ -191,12 +214,14 @@ StateManager::ActivePlayer::~ActivePlayer()
 }   // ~ActivePlayer
 
 // ----------------------------------------------------------------------------
+
 void StateManager::ActivePlayer::setPlayerProfile(PlayerProfile* player)
 {
     m_player = player;
 }   // setPlayerProfile
 
 // ----------------------------------------------------------------------------
+
 void StateManager::ActivePlayer::setDevice(InputDevice* device)
 {
     // unset player from previous device he was assigned to, if any

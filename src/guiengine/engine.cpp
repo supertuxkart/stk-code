@@ -410,6 +410,8 @@ namespace GUIEngine
     using namespace Private;
    
     ptr_vector<Widget, REF> needsUpdate;
+    
+    //FIXME: the contents of this vector are never ever freed
     ptr_vector<Screen, REF> g_loaded_screens;
 
     float dt = 0;
@@ -469,12 +471,16 @@ void clear()
     if (g_current_screen != NULL) g_current_screen->elementsWereDeleted();
     g_current_screen = NULL;
 }
-// -----------------------------------------------------------------------------  
+// ----------------------------------------------------------------------------- 
+    
 void cleanForGame()
 {
     clear();
+    
+    //FIXME: I'm not very sure why this isn't called in the regular clear() method??
     needsUpdate.clearWithoutDeleting();
 }
+    
 // -----------------------------------------------------------------------------  
 void switchToScreen(const char* screen_name)
 {    
@@ -512,18 +518,21 @@ void switchToScreen(const char* screen_name)
     g_current_screen->addWidgets();
 }
 // -----------------------------------------------------------------------------
+    
 void addScreenToList(Screen* cutscene)
 {
     g_loaded_screens.push_back(cutscene);
 }
+    
 // -----------------------------------------------------------------------------
-/** to be called after e.g. a resolution switch */
+
 void reshowCurrentScreen()
 {
     needsUpdate.clearWithoutDeleting();
     g_state_manager->reshowTopMostMenu();
     //g_current_screen->addWidgets();
 }
+    
 // -----------------------------------------------------------------------------
 void cleanUp()
 {
@@ -614,15 +623,9 @@ void init(IrrlichtDevice* device_a, IVideoDriver* driver_a, AbstractStateManager
     // set event receiver
     g_device->setEventReceiver(EventHandler::get());
 }
+
 // -----------------------------------------------------------------------------
-/** transmit event to user event callback (out of encapsulated GUI module) */
-void transmitEvent(Widget* widget, std::string& name, const int playerID)
-{
-    assert(g_state_manager != NULL);
-    getCurrentScreen()->eventCallback(widget, name, playerID);
-}
     
-// -----------------------------------------------------------------------------    
 void render(float elapsed_time)
 {    
     GUIEngine::dt = elapsed_time;

@@ -119,17 +119,25 @@ public:
       * so no need to delete it yourself.
       */
 //    void addActivePlayer(ActivePlayer* p);
+    
     int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
 
     int activePlayerCount();
     void resetActivePlayers();
     
+    /** \return whether to reduce FPS at the moment
+      * \note   this can be useful to avoid being too CPU/GPU intensive in parts of the
+      *         game that don't require high framerates, like menus
+      */
     bool throttleFPS();
     
+    /** \brief implementing callback from base class AbstractStateManager */
     void escapePressed();
-    
-    //void eventCallback(GUIEngine::Widget* widget, const std::string& name);
+
+    /** \brief implementing callback from base class AbstractStateManager */
+    virtual void onGameStateChange(GUIEngine::GameState previousState, GUIEngine::GameState newState);
+
     
     // singleton
     static StateManager* get();
