@@ -109,6 +109,13 @@ namespace GUIEngine
           */
         virtual void onGameStateChange(GameState previousState, GameState newState) = 0;
         
+        /**
+          * \brief callback invoked when the stack is emptied (all menus are popped out)
+          * This is essentially a request to close the application (since a game can't run
+          * without a state)
+          */
+        virtual void onStackEmptied() = 0;
+        
     };
     
 }

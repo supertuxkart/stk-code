@@ -19,13 +19,12 @@
 #include "guiengine/abstract_state_manager.hpp"
 
 #include <vector>
-
-#include "main_loop.hpp"
+ 
+#include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "modes/world.hpp"
 
 using namespace GUIEngine;
 
@@ -61,13 +60,15 @@ GameState AbstractStateManager::getGameState()
     return m_game_mode;
 }
 
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
 #pragma mark Push/pop menus
 #endif
 
-// -----------------------------------------------------------------------------
+
 void AbstractStateManager::pushMenu(std::string name)
 {
     // currently, only a single in-game menu is supported
@@ -81,9 +82,6 @@ void AbstractStateManager::pushMenu(std::string name)
     if (m_game_mode == GAME)
     {
         setGameState(INGAME_MENU);
-        
-        //FIXME: this doesn't go in the *abstract* state manager
-        if (World::getWorld() != NULL) World::getWorld()->pause();
     }
     else
     {
@@ -93,6 +91,7 @@ void AbstractStateManager::pushMenu(std::string name)
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::pushScreen(Screen* screen)
 {
     pushMenu(screen->getName());
@@ -100,6 +99,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 {
     assert(m_game_mode != GAME);
@@ -110,6 +110,9 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
     
     //FIXME: this doesn't go in the *abstract* state manager
+    //FIXME: I don't understand this line. since this can't be called in game mode, why
+    //       is a switch necessary? why don't we check what the new topmost menu is before
+    //       changing input mode? why do we change input mode but NOT game mode?
     input_manager->setMode(InputManager::MENU);
     
     m_menu_stack[m_menu_stack.size()-1] = name;
@@ -120,6 +123,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::reshowTopMostMenu()
 {
     assert(m_game_mode != GAME);
@@ -138,6 +142,7 @@ void AbstractStateManager::reshowTopMostMenu()
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::popMenu()
 {
     assert(m_game_mode != GAME);
@@ -148,8 +153,7 @@ void AbstractStateManager::popMenu()
     
     if (m_menu_stack.size() == 0)
     {
-        //FIXME: this doesn't go in the *abstract* state manager
-        main_loop->abort();
+        onStackEmptied();
         return;
     }
         
@@ -157,12 +161,9 @@ void AbstractStateManager::popMenu()
     
     if (m_menu_stack[m_menu_stack.size()-1] == "race")
     {
+        //FIXME: I check that the top item is 'race', then push it again so it's there twice??? WTF??
         m_menu_stack.push_back("race");
-        if (m_game_mode == INGAME_MENU)
-        {
-            //FIXME: this doesn't go in the *abstract* state manager
-            if (World::getWorld() != NULL) World::getWorld()->unpause();
-        }
+
         setGameState(GAME);
         GUIEngine::cleanForGame();
         
@@ -178,6 +179,7 @@ void AbstractStateManager::popMenu()
 }
 
 // -----------------------------------------------------------------------------
+
 void AbstractStateManager::setGameState(GameState state)
 {
     if (m_game_mode == state) return; // no change
@@ -195,7 +197,7 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     std::string name = screen->getName();
 
     //FIXME: this doesn't go in the *abstract* state manager
-    assert(World::getWorld()==NULL);
+    //assert(World::getWorld()==NULL);
     
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();

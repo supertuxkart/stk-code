@@ -138,6 +138,8 @@ public:
     /** \brief implementing callback from base class AbstractStateManager */
     virtual void onGameStateChange(GUIEngine::GameState previousState, GUIEngine::GameState newState);
 
+    /** \brief implementing callback from base class AbstractStateManager */
+    virtual void onStackEmptied();
     
     // singleton
     static StateManager* get();

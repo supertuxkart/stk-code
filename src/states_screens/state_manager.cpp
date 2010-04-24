@@ -25,6 +25,8 @@
 #include "guiengine/screen.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
+#include "main_loop.hpp"
+#include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "utils/translation.hpp"
 
@@ -179,16 +181,34 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
     if (newState == GAME)
     {
         irr_driver->hidePointer();
+        
+        if (previousState == INGAME_MENU)
+        {
+            // unpause the world
+            if (World::getWorld() != NULL) World::getWorld()->unpause();
+        }
     }
     else  // menu (including in-game menu)
     {
         irr_driver->showPointer();
         
-        if (m_game_mode == MENU)
+        if (newState == MENU)
         {
             music_manager->startMusic(stk_config->m_title_music);
         }
+        else if (newState == INGAME_MENU)
+        {
+            // pause game when an in-game menu is shown
+            if (World::getWorld() != NULL) World::getWorld()->pause();
+        }
     }    
+}
+
+// ----------------------------------------------------------------------------
+
+void StateManager::onStackEmptied()
+{
+    main_loop->abort();
 }
 
 // ----------------------------------------------------------------------------
