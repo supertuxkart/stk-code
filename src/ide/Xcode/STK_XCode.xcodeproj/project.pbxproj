@@ -173,10 +173,6 @@
 		9551C8B10FC1B72500DB481B /* kart_properties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B11D0F296545000D3E5D /* kart_properties.cpp */; };
 		9551C8B20FC1B72500DB481B /* kart_properties_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B11F0F296545000D3E5D /* kart_properties_manager.cpp */; };
 		9551C8B30FC1B72500DB481B /* moveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1210F296545000D3E5D /* moveable.cpp */; };
-		9551C8B50FC1B72500DB481B /* lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B12A0F296545000D3E5D /* lexer.cpp */; };
-		9551C8B60FC1B72500DB481B /* lisp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B12C0F296545000D3E5D /* lisp.cpp */; };
-		9551C8B70FC1B72500DB481B /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B12E0F296545000D3E5D /* parser.cpp */; };
-		9551C8B80FC1B72500DB481B /* writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1300F296545000D3E5D /* writer.cpp */; };
 		9551C8B90FC1B72500DB481B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1360F296545000D3E5D /* main.cpp */; };
 		9551C8BA0FC1B72500DB481B /* main_loop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B1380F296545000D3E5D /* main_loop.cpp */; };
 		9551C8BE0FC1B72500DB481B /* follow_the_leader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95C2B14A0F296545000D3E5D /* follow_the_leader.cpp */; };
@@ -777,14 +773,6 @@
 		95C2B1200F296545000D3E5D /* kart_properties_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = kart_properties_manager.hpp; path = ../../karts/kart_properties_manager.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1210F296545000D3E5D /* moveable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = moveable.cpp; path = ../../karts/moveable.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1220F296545000D3E5D /* moveable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = moveable.hpp; path = ../../karts/moveable.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B12A0F296545000D3E5D /* lexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lexer.cpp; path = ../../lisp/lexer.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B12B0F296545000D3E5D /* lexer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = lexer.hpp; path = ../../lisp/lexer.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B12C0F296545000D3E5D /* lisp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lisp.cpp; path = ../../lisp/lisp.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B12D0F296545000D3E5D /* lisp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = lisp.hpp; path = ../../lisp/lisp.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B12E0F296545000D3E5D /* parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = parser.cpp; path = ../../lisp/parser.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B12F0F296545000D3E5D /* parser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = parser.hpp; path = ../../lisp/parser.hpp; sourceTree = SOURCE_ROOT; };
-		95C2B1300F296545000D3E5D /* writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = writer.cpp; path = ../../lisp/writer.cpp; sourceTree = SOURCE_ROOT; };
-		95C2B1310F296545000D3E5D /* writer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = writer.hpp; path = ../../lisp/writer.hpp; sourceTree = SOURCE_ROOT; };
 		95C2B1360F296545000D3E5D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1380F296545000D3E5D /* main_loop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main_loop.cpp; path = ../../main_loop.cpp; sourceTree = SOURCE_ROOT; };
 		95C2B1390F296545000D3E5D /* main_loop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = main_loop.hpp; path = ../../main_loop.hpp; sourceTree = SOURCE_ROOT; };
@@ -1354,7 +1342,6 @@
 				95C2B0F50F296545000D3E5D /* items */,
 				95A118280F77EA3100B18B3D /* input */,
 				95C2B1160F296545000D3E5D /* karts */,
-				95C2B1290F296545000D3E5D /* lisp */,
 				95C2B1470F296545000D3E5D /* modes */,
 				95C2B1590F296545000D3E5D /* network */,
 				95C2B17F0F296545000D3E5D /* physics */,
@@ -1830,22 +1817,6 @@
 			);
 			name = karts;
 			path = ../../karts;
-			sourceTree = SOURCE_ROOT;
-		};
-		95C2B1290F296545000D3E5D /* lisp */ = {
-			isa = PBXGroup;
-			children = (
-				95C2B12A0F296545000D3E5D /* lexer.cpp */,
-				95C2B12B0F296545000D3E5D /* lexer.hpp */,
-				95C2B12C0F296545000D3E5D /* lisp.cpp */,
-				95C2B12D0F296545000D3E5D /* lisp.hpp */,
-				95C2B12E0F296545000D3E5D /* parser.cpp */,
-				95C2B12F0F296545000D3E5D /* parser.hpp */,
-				95C2B1300F296545000D3E5D /* writer.cpp */,
-				95C2B1310F296545000D3E5D /* writer.hpp */,
-			);
-			name = lisp;
-			path = ../../lisp;
 			sourceTree = SOURCE_ROOT;
 		};
 		95C2B1470F296545000D3E5D /* modes */ = {
@@ -2425,10 +2396,6 @@
 				9551C8B10FC1B72500DB481B /* kart_properties.cpp in Sources */,
 				9551C8B20FC1B72500DB481B /* kart_properties_manager.cpp in Sources */,
 				9551C8B30FC1B72500DB481B /* moveable.cpp in Sources */,
-				9551C8B50FC1B72500DB481B /* lexer.cpp in Sources */,
-				9551C8B60FC1B72500DB481B /* lisp.cpp in Sources */,
-				9551C8B70FC1B72500DB481B /* parser.cpp in Sources */,
-				9551C8B80FC1B72500DB481B /* writer.cpp in Sources */,
 				9551C8B90FC1B72500DB481B /* main.cpp in Sources */,
 				9551C8BA0FC1B72500DB481B /* main_loop.cpp in Sources */,
 				9551C8BE0FC1B72500DB481B /* follow_the_leader.cpp in Sources */,
