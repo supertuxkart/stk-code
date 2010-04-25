@@ -50,7 +50,13 @@ void IconButtonWidget::add()
         m_texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +m_properties[PROP_ICON]).c_str());
     }
     
-    assert(m_texture != NULL);
+    if (m_texture == NULL)
+    {
+        std::cerr << "IconButtonWidget::add() : error, cannot find texture "
+                  << m_properties[PROP_ICON].c_str() << std::endl;
+        assert(false); // catch this error in debug mode
+        return;
+    }
     m_texture_w = m_texture->getSize().Width;
     m_texture_h = m_texture->getSize().Height;
 
