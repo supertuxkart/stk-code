@@ -172,6 +172,7 @@ namespace GUIEngine
     
     /**
       * \brief class containing render params for the 'drawBoxFromStretchableTexture' function
+      * see \ref skin for more information about skinning in STK
       * \ingroup guiengine
       */
     class BoxRenderParams
@@ -231,6 +232,7 @@ namespace GUIEngine
     
     /**
       * \brief Object used to render the GUI widgets
+      * see \ref skin for more information about skinning in STK
       * \ingroup guiengine
       */
     class Skin : public irr::gui::IGUISkin
@@ -242,7 +244,8 @@ namespace GUIEngine
         
 
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w, const irr::core::rect< irr::s32 > &dest,
-                                           BoxRenderParams& params, bool deactivated=false);
+                                           BoxRenderParams& params, bool deactivated=false,
+                                           const irr::core::rect<irr::s32>* clipRect=NULL);
         
         // my utility methods, to work around irrlicht's very Windows-95-like-look-enforcing skin system
         void process3DPane(irr::gui::IGUIElement *element, const irr::core::rect< irr::s32 > &rect, const bool pressed);
@@ -255,7 +258,7 @@ namespace GUIEngine
         void drawGaugeFill(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawCheckBox(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
         void drawList(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
-        void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused);
+        void drawListSelection(const irr::core::rect< irr::s32 > &rect, Widget* widget, bool focused, const irr::core::rect< irr::s32 > *clip);
         void drawIconButton(const irr::core::rect< irr::s32 > &rect, Widget* widget, const bool pressed, bool focused);
 
         void drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect);

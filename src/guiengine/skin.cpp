@@ -326,7 +326,8 @@ void Skin::drawBgImage()
 }
 
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w, const core::rect< s32 > &dest,
-                                         BoxRenderParams& params, bool deactivated)
+                                         BoxRenderParams& params, bool deactivated,
+                                         const core::rect<s32>* clipRect)
 {
     // check if widget moved. if so, recalculate coords
     if (w->x != dest.UpperLeftCorner.X || w->y != dest.UpperLeftCorner.Y ||
@@ -539,51 +540,51 @@ X##_yflip.LowerRightCorner.Y = w->dest_y + (w->dest_y2 - w->dest_y) - y1;}
     if ((areas & BoxRenderParams::LEFT) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_left, source_area_left,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::BODY) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_center, source_area_center,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::RIGHT) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_right, source_area_right,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     
     if ((areas & BoxRenderParams::TOP) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top, source_area_top,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     if ((areas & BoxRenderParams::BOTTOM) != 0)
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom, source_area_bottom,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     
     if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left, source_area_top_left,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::TOP) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right, source_area_top_right,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::LEFT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left, source_area_bottom_left,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) && ((areas & BoxRenderParams::BOTTOM) != 0) )
     {
         GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right, source_area_bottom_right,
-                                            0 /* no clipping */, colorptr, true /* alpha */);
+                                            clipRect, colorptr, true /* alpha */);
     }
     
     if (colorptr != NULL)
@@ -1090,15 +1091,22 @@ void Skin::drawList(const core::rect< s32 > &rect, Widget* widget, bool focused)
 /**
  * @param focused whether this element is focus by the master player (focus for other players is not supported)
  */
-void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused)
+void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool focused,
+                             const core::rect< s32 > *clip)
 {
     ListWidget* list = dynamic_cast<ListWidget*>(widget);
     assert(list != NULL);
     
     if (focused)
-        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect, SkinConfig::m_render_params["listitem::focused"]);
+    {
+        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
+                                      SkinConfig::m_render_params["listitem::focused"], false, clip);
+    }
     else
-        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect, SkinConfig::m_render_params["listitem::down"]);
+    {
+        drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
+                                      SkinConfig::m_render_params["listitem::down"], false, clip);
+    }
 }
 
 /** recursive function to render all sections (recursion allows to easily traverse the tree of children
@@ -1235,7 +1243,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color, co
         // lists not supported in multiplayer screens
         const bool focused = GUIEngine::isFocusedForPlayer(widget, PLAYER_ID_GAME_MASTER);
 
-        drawListSelection(rect, widget, focused);
+        drawListSelection(rect, widget, focused, clip);
     }  
 }
 
