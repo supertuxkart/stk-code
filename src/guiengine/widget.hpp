@@ -50,10 +50,17 @@ namespace GUIEngine
         WTYPE_TEXTBOX
     };
     
-    const int LOCKED_BADGE = 0x1;
-    const int OK_BADGE     = 0x2;
-    const int BAD_BADGE    = 0x4;
-    const int TROPHY_BADGE = 0x8;
+    enum BadgeType
+    {
+        /** display a lock on the widget, to mean a certain game feature is locked */
+        LOCKED_BADGE = 0x1,
+        /** display a green check on a widget, useful e.g. to display confirmation */
+        OK_BADGE     = 0x2,
+        /** display a red mark badge on the widget, useful e.g. to warn of an invalid choice */
+        BAD_BADGE    = 0x4,
+        /** display a trophy badge on the widget, useful e.g. for challenges */
+        TROPHY_BADGE = 0x8
+    };
     
     
     enum Property
@@ -105,6 +112,8 @@ namespace GUIEngine
     class Widget : public SkinWidgetContainer
     {
     protected:
+        friend void GUIEngine::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
+        
         unsigned int m_magic_number;
 
         friend class EventHandler;
@@ -212,6 +221,17 @@ namespace GUIEngine
         /** Type of this widget */
         WidgetType m_type;
         
+        /**
+         * If this widget has any children, they go here. Children can be either
+         * specified in the XML file (e.g. Ribbon or Div children), or can also
+         * be created automatically for logical widgets built with more than
+         * one irrlicht widgets (e.g. Spinner)
+         */
+        ptr_vector<Widget> m_children;
+        
+        /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
+        int m_badges;
+        
     public:
         /**
          * This is set to NULL by default; set to something else in a widget to mean
@@ -222,7 +242,6 @@ namespace GUIEngine
          */
         Widget* m_event_handler;
         
-        
         /**
           * Whether this widget supports multiplayer interaction (i.e. whether this widget can be
           * used by players other than by the game master)
@@ -232,6 +251,9 @@ namespace GUIEngine
         /** Instead of searching for widget IDs smaller/greater than that of this object, navigation
             through widgets will start from these IDs (if they are set). */
         int m_tab_down_root;
+        
+        /** Instead of searching for widget IDs smaller/greater than that of this object, navigation
+         through widgets will start from these IDs (if they are set). */
         int m_tab_up_root;
         
         /** Coordinates of the widget once added (the difference between those x/h and PROP_WIDTH/PROP_HEIGHT is
@@ -242,16 +264,30 @@ namespace GUIEngine
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
         
-        /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
-        int m_badges;
         
-        void setBadge(int badge_bit)
+        /** \brief adds a particular badge to this widget
+         * The STK widget toolkit has support for "badges". Badges are icon overlays displayed
+         * on the corner of a widget; they are useful to convey information visually.
+         */
+        void setBadge(BadgeType badge_bit)
         {
-            m_badges |= badge_bit;
+            m_badges |= int(badge_bit);
         }
-        void unsetBadge(int badge_bit)
+        
+        /** \brief removes a particular bade from this widget, if it had it
+         * \see GUIEngine::Widget::setBadge for more info on badge support
+         */
+        void unsetBadge(BadgeType badge_bit)
         {
-            m_badges &= (~badge_bit);
+            m_badges &= (~int(badge_bit));
+        }
+        
+        /** \brief sets this widget to have no badge
+          * \see GUIEngine::Widget::setBadge for more info on badge support
+          */
+        void resetAllBadges()
+        {
+            m_badges = 0;
         }
         
         /** Set to false if widget is something that should not receieve focus */
@@ -298,13 +334,6 @@ namespace GUIEngine
 
         void setParent(irr::gui::IGUIElement* parent);
         
-        /**
-          * If this widget has any children, they go here. Children can be either
-          * specified in the XML file (e.g. Ribbon or Div children), or can also
-          * be created automatically for logical widgets built with more than
-          * one irrlicht widgets (e.g. Spinner)
-          */
-        ptr_vector<Widget> m_children;
 
         /** A map that holds values for all specified widget properties (in the XML file)*/
         std::map<Property, std::string> m_properties;

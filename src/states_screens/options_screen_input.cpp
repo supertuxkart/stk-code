@@ -72,7 +72,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -88,7 +88,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -104,7 +104,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -120,7 +120,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     
@@ -149,7 +149,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -165,7 +165,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -181,7 +181,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -197,7 +197,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     {
@@ -213,7 +213,7 @@ void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
         else
         {
             existing_bindings.insert(binding_name);
-            btn->m_badges = 0;
+            btn->resetAllBadges();
         }
     }
     

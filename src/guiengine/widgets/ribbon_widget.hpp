@@ -134,6 +134,11 @@ namespace GUIEngine
         void addIconChild(const wchar_t* text, const std::string id,
                           const int w, const int h, const std::string icon,
                           const IconButtonWidget::IconPathType iconPathType=IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+    
+        /**
+          * \brief clear all children of this ribbon (likely because new ones will be added soon after)
+          */
+        void clearAllChildren();
     };
 
 }

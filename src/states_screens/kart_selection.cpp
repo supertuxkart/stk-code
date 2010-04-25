@@ -716,7 +716,7 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     
-    tabs->m_children.clearAndDeleteAll();
+    tabs->clearAllChildren();
     
     const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
     

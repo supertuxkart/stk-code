@@ -44,7 +44,7 @@ TracksScreen::TracksScreen() : Screen("tracks.stkgui")
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
     
-    tabs->m_children.clearAndDeleteAll();
+    tabs->clearAllChildren();
     
     const std::vector<std::string>& groups = track_manager->getAllGroups();
     

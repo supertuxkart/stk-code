@@ -279,6 +279,13 @@ void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
 
 // -----------------------------------------------------------------------------
 
+void RibbonWidget::clearAllChildren()
+{
+    m_children.clearAndDeleteAll();
+}
+
+// -----------------------------------------------------------------------------
+
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_children.size();

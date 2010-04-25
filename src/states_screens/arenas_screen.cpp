@@ -42,7 +42,7 @@ ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );
     
-    tabs->m_children.clearAndDeleteAll();
+    tabs->clearAllChildren();
     
     //FIXME: this returns groups for arenas but tracks too. this means that some of them
     //       may contain only tracks, no arenas, and thus add an empty tab here...
