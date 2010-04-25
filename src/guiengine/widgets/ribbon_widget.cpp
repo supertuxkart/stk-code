@@ -248,6 +248,18 @@ void RibbonWidget::add()
 }
 
 // -----------------------------------------------------------------------------
+
+void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
+{
+    ButtonWidget* item = new ButtonWidget();
+    item->m_text = text;
+    item->m_properties[PROP_ID] = id;
+    
+    m_children.push_back(item);
+}
+
+// -----------------------------------------------------------------------------
+
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_children.size();

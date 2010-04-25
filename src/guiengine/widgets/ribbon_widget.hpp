@@ -118,6 +118,12 @@ namespace GUIEngine
         
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);
+        
+        /** \brief        dynamically (at runtime) add a text item to this ribbon
+          * \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
+          * \precondition only valid for ribbons that take text-only contents (e.g. tab bars)
+          */
+        void addTextChild(const wchar_t* text, const std::string id);
     };
 
 }

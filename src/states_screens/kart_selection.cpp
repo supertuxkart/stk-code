@@ -713,7 +713,6 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     m_player_confirmed = false;
     
     // Dynamically add tabs
-    // FIXME: it's not very well documented that RibbonWidgets can have dynamically generated contents
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
     
@@ -724,19 +723,14 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     const int group_amount = groups.size();
     for (int n=0; n<group_amount; n++)
     {
-        ButtonWidget* item = new ButtonWidget();
-        item->m_text = groups[n].c_str(); // FIXME: i18n ?
-        item->m_properties[PROP_ID] = groups[n];
-        tabs->m_children.push_back(item);
+        //FIXME: group name not translated
+        tabs->addTextChild( stringw(groups[n].c_str()).c_str() , groups[n]);
     }
     
     if (group_amount > 1)
     {
-        ButtonWidget* item = new ButtonWidget();
         //I18N: name of the tab that will show tracks from all groups
-        item->m_text = _("All");
-        item->m_properties[PROP_ID] = ALL_KART_GROUPS_ID;
-        tabs->m_children.push_back(item);
+        tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
     }
 }
 

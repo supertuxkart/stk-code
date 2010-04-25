@@ -96,10 +96,15 @@
  \li The "tabs" subcategory will show a tab bar. behaviour is same as normal ribbon, only looks are different.
  Orientation of tabs (up or down) is automatically inferred from on-screen position
  
- \note Ribbon widgets are of spawn type (\<ribbon\> ... \</ribbon\>) and may contain icon-buttons or buttons as children.
- \note Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not (this will
- affect the type of highlighting used)
+ \note Ribbon widgets are of spawn type (\<ribbon\> ... \</ribbon\>) and may contain icon-buttons or buttons
+       as children.
+ \note Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not
+       (this will affect the type of highlighting used)
  \note All elements within a ribbon must have an 'ID' property
+ \note Text-only ribbons (e.g. tabs) can have their elements dynamically added at runtime, too. Just add
+       no children to the ribbon in the XML file, and add them at runtime through the method for this.
+       Dynamic contents creation for other types RibbonWidget is currently NOT implemented because we had
+       no need for it. It can be added as needed.
  
  \n
  \subsection widget2 WTYPE_SPINNER
