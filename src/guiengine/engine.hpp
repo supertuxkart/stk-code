@@ -157,10 +157,12 @@ namespace GUIEngine
       */
     float getLatestDt();
     
-    /** \brief show a warning message to explain to the player that only the game master
-      *        can act at this point
+    /**
+      * \brief shows a message at the bottom of the screen for a while
+      * \param message  the message to display
+      * \param time     the time to display the message, in seconds
       */
-    void  showMasterOnlyString();
+    void showMessage(const wchar_t* message, const float time=5.0f);
     
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);

@@ -421,10 +421,20 @@ namespace GUIEngine
         return dt;
     }
     
-    float masterOnlyMessageTime = 0.0f;
-    void showMasterOnlyString()
+    struct MenuMessage
     {
-        masterOnlyMessageTime = 5.0f;
+        irr::core::stringw m_message;
+        float m_time;
+        
+        MenuMessage(const wchar_t* message, const float time) : m_message(message), m_time(time)
+        {
+        }
+    };
+    std::vector<MenuMessage> gui_messages;
+    
+    void showMessage(const wchar_t* message, const float time)
+    {
+        gui_messages.push_back( MenuMessage(message, time) );
     }
     
     Widget* getFocusForPlayer(const int playerID)
@@ -669,22 +679,35 @@ void render(float elapsed_time)
         else                                World::getWorld()->getRaceGUI()->renderGlobal(elapsed_time);
     }
     
-    
-    if (masterOnlyMessageTime > 0)
+    if (gamestate != GAME && !gui_messages.empty())
     {
-        masterOnlyMessageTime -= dt;
-        
         core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
         const int text_height = getFontHeight() + 20;
         const int y_from = screen_size.Height - text_height;
         
-        //I18N: message shown when a player that isn't game master tries to modify options that
-        //I18N: only the game master is allowed to
-        Private::g_font->draw(_("Only the Game Master may act at this point!"),
-                              core::rect<s32>( core::position2d<s32>(0,y_from),
-                                               core::dimension2d<s32>(screen_size.Width, text_height) ),
-                              video::SColor(255, 255, 0, 0),
-                              true /* hcenter */, true /* vcenter */);
+        int count = 0;
+        
+        std::vector<MenuMessage>::iterator it;
+        for (it=gui_messages.begin(); it != gui_messages.end();)
+        {
+            if ((*it).m_time > 0.0f)
+            {
+                (*it).m_time -= dt;
+                
+                
+                Private::g_font->draw((*it).m_message.c_str(),
+                                      core::rect<s32>( core::position2d<s32>(0, y_from - count*text_height),
+                                                      core::dimension2d<s32>(screen_size.Width, text_height) ),
+                                      video::SColor(255, 255, 0, 0),
+                                      true /* hcenter */, true /* vcenter */);  
+                count++;
+                it++;
+            }
+            else
+            {
+                it = gui_messages.erase(it);
+            }
+        }
     }
     
 #if (IRRLICHT_VERSION_MAJOR == 1) && (IRRLICHT_VERSION_MINOR >= 7)

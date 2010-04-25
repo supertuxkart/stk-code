@@ -423,7 +423,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
             // early menus where we accept every input because players are not set-up yet
             if (m_master_player_only && player == NULL)
             {
-                GUIEngine::showMasterOnlyString();
+                //I18N: message shown when a player that isn't game master tries to modify options that
+                //I18N: only the game master is allowed to               
+                GUIEngine::showMessage(_("Only the Game Master may act at this point!"));
                 return;
             }
             
@@ -441,7 +443,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 // If only the master player can act, and this player is not the master, ignore his input
                 if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0)
                 {
-                    GUIEngine::showMasterOnlyString();
+                    //I18N: message shown when a player that isn't game master tries to modify options that
+                    //I18N: only the game master is allowed to        
+                    GUIEngine::showMessage(_("Only the Game Master may act at this point!"));
                     return;
                 }
                 

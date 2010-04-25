@@ -40,6 +40,7 @@ static ptr_vector<UserConfigParam, REF> all_params;
 
 #include "config/player.hpp"
 #include "config/stk_config.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
@@ -390,45 +391,21 @@ bool UserConfig::loadConfig()
     int configFileVersion = CURRENT_CONFIG_VERSION;
     if(root->get("version", &configFileVersion) < 1)
     {
+        GUIEngine::showMessage( _("Your config file was malformed, so it was deleted and a new one will be created."), 10.0f);
         std::cerr << "Warning, malformed user config file! Contains no version\n";
     }
     if (configFileVersion < CURRENT_CONFIG_VERSION)
     {
-        // Give some feedback to the user about what was changed.
-        // Do NOT add a break after the case, so that all changes will be printed
-        printf("\nConfig file version '%d' is too old.\n"
-               "The following changes have been applied in the current SuperTuxKart version:\n",
-               configFileVersion);
-        int needToAbort=0;
-        switch(configFileVersion)
-        {
-            case 0:  printf("- Single window menu, old status display,new keyboard style settings were removed\n");
-                needToAbort=std::max(needToAbort,0);
-            case 1:  printf("- Key bindings were changed, please check the settings. All existing values were discarded.\n");
-                needToAbort=std::max(needToAbort,1);// old keybinds wouldn't make any sense
-            case 2:  printf("Added username.\n");
-                needToAbort=std::max(needToAbort,0);
-            case 3:  printf("Added username for all players.\n");
-                needToAbort=std::max(needToAbort,0);
-            case 4:  printf("Added jumping, which invalidates all key bindings.\n");
-                needToAbort=std::max(needToAbort,0);
-            case 6:  printf("Added nitro and drifting, removed jumping and wheelie.\n");
-                //nitro_name="wheelie";
-                //drift_name="jump";
-                needToAbort=std::max(needToAbort,0);
-            case 99: break;
-            default: printf("Config file version '%d' is too old. Discarding your configuration. Sorry. :(\n", configFileVersion);
-                needToAbort=1;
-                break;
-        }
-        if(needToAbort)
-        {
-            printf("The old config file is deleted, a new one will be created.\n");
-            delete root;
-            return false;
-        }
-        printf("This warning can be ignored, the config file will be automatically updated.\n");
-        // Keep on reading the config files as far as possible
+        // current version (8) is 100% incompatible with other versions (which were lisp)
+        // so we just delete the old config. in the future, for smaller updates, we can
+        // add back the code previously there that upgraded the config file to the new
+        // format instead of overwriting it.
+        
+        GUIEngine::showMessage( _("Your config file was too old, so it was deleted and a new one will be created."), 10.0f);
+        printf("Your config file was too old, so it was deleted and a new one will be created.");
+        delete root;
+        return false;
+
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
 
     // ---- Read parameters values (all parameter objects must have been created before this point if
