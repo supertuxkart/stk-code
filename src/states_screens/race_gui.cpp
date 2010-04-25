@@ -619,7 +619,11 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
                            + (int)(0.15f*UserConfigParams::m_width*scaling.X);
     pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
     gui::IGUIFont* font    = GUIEngine::getFont();
+    
+    //FIXME: font height is multiplied by "scaling.Y" here, but the font itself is actually not scaled,
+    //       resulting in overlapping of the two lines
     int font_height        = (int)(font->getDimension(L"X").Height*scaling.Y);
+    
     if (kart->hasFinishedRace())
     {
         static video::SColor color = video::SColor(255, 255, 255, 255);
