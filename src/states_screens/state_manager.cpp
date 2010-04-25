@@ -18,6 +18,7 @@
 
 #include "states_screens/state_manager.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
@@ -181,7 +182,8 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
     if (newState == GAME)
     {
         irr_driver->hidePointer();
-        
+        input_manager->setMode(InputManager::INGAME);
+
         if (previousState == INGAME_MENU)
         {
             // unpause the world
@@ -191,6 +193,8 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
     else  // menu (including in-game menu)
     {
         irr_driver->showPointer();
+        input_manager->setMode(InputManager::MENU);
+        sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
         
         if (newState == MENU)
         {
