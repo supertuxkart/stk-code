@@ -36,7 +36,7 @@ AbstractStateManager::AbstractStateManager()
 
 #if 0
 #pragma mark -
-#pragma mark Other
+#pragma mark Game State Management
 #endif
 
 // -----------------------------------------------------------------------------
@@ -59,6 +59,19 @@ GameState AbstractStateManager::getGameState()
 {
     return m_game_mode;
 }
+
+// -----------------------------------------------------------------------------
+
+void AbstractStateManager::setGameState(GameState state)
+{
+    if (m_game_mode == state) return; // no change
+    
+    GameState previous = m_game_mode;
+    m_game_mode = state;
+    
+    onGameStateChange(previous, state);
+}
+
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -108,12 +121,6 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     
     // Send tear-down event to previous menu
     if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
-    
-    //FIXME: this doesn't go in the *abstract* state manager
-    //FIXME: I don't understand this line. since this can't be called in game mode, why
-    //       is a switch necessary? why don't we check what the new topmost menu is before
-    //       changing input mode? why do we change input mode but NOT game mode?
-    input_manager->setMode(InputManager::MENU);
     
     m_menu_stack[m_menu_stack.size()-1] = name;
     switchToScreen(name.c_str());
@@ -176,18 +183,6 @@ void AbstractStateManager::popMenu()
         switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
         getCurrentScreen()->init();
     }
-}
-
-// -----------------------------------------------------------------------------
-
-void AbstractStateManager::setGameState(GameState state)
-{
-    if (m_game_mode == state) return; // no change
-    
-    GameState previous = m_game_mode;
-    m_game_mode = state;
-    
-    onGameStateChange(previous, state);
 }
 
 // -----------------------------------------------------------------------------
