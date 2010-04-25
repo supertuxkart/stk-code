@@ -750,9 +750,6 @@ void LinearWorld::checkForWrongDirection(unsigned int i)
     if(!m_karts[i]->getController()->isPlayerController()) return;
     if(!m_kart_info[i].m_on_road) return;
 
-    // FIXME: Don't do this if the in-game option menu is on the screen!
-    // if(option_menu) return;
-
     const Kart *kart=m_karts[i];
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
