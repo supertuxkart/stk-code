@@ -71,6 +71,9 @@ namespace GUIEngine
     
     /**
      * \ingroup guiengine
+     * \brief Loads a GUI screen from its XML file.
+     * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
+     * with little analysis or layout performed on them.
      */
     void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
     

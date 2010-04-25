@@ -34,15 +34,7 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
-/**
-  * Loads a GUI screen from its XML file. Builds a hierarchy of Widget objects whose
-  * contents are a direct transcription of the XML file, with little analysis or layout
-  * performed on them.
-  */
-namespace GUIEngine
-{
-    
-void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to)
+void GUIEngine::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to)
 {
     // parse XML file
     while(xml && xml->read())
@@ -171,13 +163,13 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(y,              PROP_Y);
                 READ_PROPERTY(layout,         PROP_LAYOUT);
                 READ_PROPERTY(align,          PROP_ALIGN);
-
+                
                 READ_PROPERTY(icon,           PROP_ICON);
                 READ_PROPERTY(text_align,     PROP_TEXT_ALIGN);
                 READ_PROPERTY(min_value,      PROP_MIN_VALUE);
                 READ_PROPERTY(max_value,      PROP_MAX_VALUE);
                 READ_PROPERTY(square_items,   PROP_SQUARE);
- 
+                
                 READ_PROPERTY(max_width,      PROP_MAX_WIDTH);
                 READ_PROPERTY(max_height,     PROP_MAX_HEIGHT);
                 READ_PROPERTY(extend_label,   PROP_EXTEND_LABEL);
@@ -185,13 +177,13 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
                 READ_PROPERTY(warp_around,    PROP_WARP_AROUND);
 #undef READ_PROPERTY
-                                
+                
                 const char* text = xml->getAttributeValue( "text" );
                 if (text != NULL)
                 {
                     widget.m_text = _(text);
                 }
-
+                
                 /* a new div starts here, continue parsing with this new div as new parent */
                 if (widget.getType() == WTYPE_DIV || widget.getType() == WTYPE_RIBBON)
                 {
@@ -222,5 +214,4 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = prop_name; else widget.m_
         }//end switch
     } // end while
 } // end function
-    
-} // end namespace
+
