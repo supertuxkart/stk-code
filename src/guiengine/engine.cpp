@@ -363,9 +363,24 @@
  Once you have instanciated your state manager class, call GUIEngine::init and pass it as argument.
  One of the most important callbacks is 'eventCallback', which will be called everytime sometimes happens.
  Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
- name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
- bear the names "init" and "tearDown", called respectively when a screen is being made visible and when it's
- being left, allowing for setup/clean-up.
+ name, so you get its new state and/or act.
+ 
+ When you have described the general layout of a Screen in a XML file, as described above, you may use it
+ in the code by creating a class deriving from GUIEngine::Screen, passing the name of the XML file to the
+ constructor of the base class. The derived class will most notably be used for event callbacks, to allow
+ creating interactive menus. The derived class must also implement the GUIEngine::Screen::init and
+ GUIEngine::Screen::tearDown methods, that will be called, respectively, when a menu is entered/left. For
+ simple menus, it is not unexpected that those methods do nothing.
+ 
+ Note that the same instance of your object may be entered/left more than once, so make sure that one instance
+ of your object can be used several times if the same screen is visited several times.
+ 
+ You can also explore the various methods in GUIEngine::Screen to discover more optional callbacks you
+ can use.
+ 
+ You can also create dialogs by deriving from GUIEngine::ModalDialog. Unfortunately, it is currently not
+ possible to specify modal dialogs through XML files (FIXME), so you will need to simulate the init
+ sequence of a GUI screen, which I admit is not too easy. This is to improve in the future.
  
  */
 

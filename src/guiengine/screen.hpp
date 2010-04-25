@@ -119,8 +119,16 @@ namespace GUIEngine
          (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
         virtual void forgetWhatWasLoaded();
         
-        Screen(); /**< creates a dummy incomplete object; only use to override behaviour in sub-class */
+        /** \brief creates a dummy incomplete object; only use to override behaviour in sub-class */
+        Screen();
+        
+        /** 
+          * \brief          creates a screen populated by the widgets described in a STK GUI file
+          * \param filename name of the XML file describing the screen. this is NOT a path.
+          *                 The passed file name will be searched for in the STK data/gui directory
+          */
         Screen(const char* filename);
+        
         virtual ~Screen();
         
         bool operator ==(const char* filename) const { return m_filename == filename; }
@@ -147,25 +155,58 @@ namespace GUIEngine
         Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
         Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
         
-        virtual void addWidgets();
-        virtual void calculateLayout();
+        /** \brief adds the irrLicht widgets corresponding to this screen to the IGUIEnvironment */
+        void addWidgets();
         
+        /** called after all widgets have been added. namely expands layouts into absolute positions */
+        void calculateLayout();
+        
+        /** \brief can be used for custom purposes for which the load-screen-from-XML code won't make it */
         void manualAddWidget(Widget* w);
+        
+        /** \brief can be used for custom purposes for which the load-screen-from-XML code won't make it */
         void manualRemoveWidget(Widget* w);
         
+        /** \return the name of this menu (which is the name of the file) */
         const std::string& getName() const { return m_filename; }
         
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
         
         /** Will be called to determine if the 3D scene must be rendered when at this screen */
         bool needs3D() { return m_render_3d; }
+        
+        /** \brief invoke this method for screens that use a 3D scene as background
+          *
+          * (if this method is not invoked with 'true' as parameter, the menu background will
+          *  be rendered instead).
+          *
+          * \note to create the 3D background, use the facilities provided by the irrLicht scene
+          *       manager, this class will not set up any 3D scene.
+          */
         void setNeeds3D(bool needs3D) { m_render_3d = needs3D; }
         
+        /** 
+          * \brief callback invoked when entering this menu
+          *
+          * @note the same instance of your object may be entered/left more than once, so make sure that
+          * one instance of your object can be used several times if the same screen is visited several
+          * times.
+          */
         virtual void init() = 0;
+        
+        /** 
+          * \brief callback invoked before leaving this menu
+          *
+          * @note the same instance of your object may be entered/left more than once, so make sure that
+          * one instance of your object can be used several times if the same screen is visited several
+          * times.
+          */
         virtual void tearDown() = 0;
         
-        /** Called when escape is pressed.
-         * @return true if the screen should be closed, false if you handled the press another way */
+        /** 
+          * \brief  Called when escape is pressed.
+          * \return true if the screen should be closed, false if you handled the press another way
+          */
         virtual bool onEscapePressed() { return true; }
         
         /**

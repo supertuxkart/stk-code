@@ -135,9 +135,10 @@ void Widget::elementRemoved()
 namespace GUIEngine
 {
     // IDs must not start at 0, since it appears their GUI engine hardcodes some ID values... xD
+    /** Used to assign irrLicht IDs to widgets dynamically */
     static unsigned int id_counter = 100;
     
-    /** // for items that can't be reached with keyboard navigation but can be clicked */
+    /** for items that can't be reached with keyboard navigation but can be clicked */
     static unsigned int id_counter_2 = 1000;
 }
 

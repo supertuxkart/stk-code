@@ -34,6 +34,8 @@
 /**
  * \ingroup guiengine
  * \brief Contains all GUI engine related classes and functions
+ *
+ * See \ref gui_overview for more information.
  */
 namespace GUIEngine
 {    
