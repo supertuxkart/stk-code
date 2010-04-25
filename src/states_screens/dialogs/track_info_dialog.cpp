@@ -84,9 +84,10 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     b->setTabStop(false);
 
     
+    
     // ---- Track screenshot
     IconButtonWidget* screenshotWidget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                                                              false, false);
+                                                              false /* tab stop */, false /* focusable */);
     // images are saved squared, but must be stretched to 4:
     screenshotWidget->setCustomAspectRatio(4.0f / 3.0f);
     core::rect< s32 > area_right(m_area.getWidth()/2, y1, m_area.getWidth(), y2-10);
@@ -96,16 +97,15 @@ TrackInfoDialog::TrackInfoDialog(const std::string& trackIdent, const irr::core:
     screenshotWidget->w = area_right.getWidth();
     screenshotWidget->h = area_right.getHeight();
     
-    // temporary icon, will replace it just after (hack to support absolute paths [FIXME])
+    // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshotWidget->m_properties[PROP_ICON] = "gui/main_help.png"; 
     screenshotWidget->setParent(m_irrlicht_window);
     screenshotWidget->add();
     
-    if (screenshot == NULL)
+    if (screenshot != NULL)
     {
-        screenshot = irr_driver->getTexture((file_manager->getDataDir() + "/gui/main_help.png").c_str());
+        screenshotWidget->setImage(screenshot);
     }
-    screenshotWidget->setImage(screenshot);
     m_children.push_back(screenshotWidget);
     
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
