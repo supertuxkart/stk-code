@@ -1101,7 +1101,7 @@ void Skin::drawListSelection(const core::rect< s32 > &rect, Widget* widget, bool
         drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect, SkinConfig::m_render_params["listitem::down"]);
 }
 
-/** recursive function to render all sections (recursion allows to easily travesre the tree of children
+/** recursive function to render all sections (recursion allows to easily traverse the tree of children
   * and sub-children)
   */
 void Skin::renderSections(ptr_vector<Widget>* within_vector)
