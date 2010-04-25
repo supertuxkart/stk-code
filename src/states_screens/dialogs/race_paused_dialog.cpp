@@ -90,58 +90,25 @@ RacePausedDialog::RacePausedDialog(const float percentWidth, const float percent
     
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
-        IconButtonWidget* ribbon_item = new IconButtonWidget();
-        ribbon_item->m_properties[PROP_ID] = "newrace";
-        ribbon_item->m_properties[PROP_ICON] = "gui/main_race.png";
-        ribbon_item->m_properties[PROP_WIDTH] = "128";
-        ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = _("Setup New Race");
-        m_choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->addIconChild(_("Setup New Race"), "newrace", 128, 128, "gui/main_race.png");
     }
     
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_SINGLE)
     {
-        IconButtonWidget* ribbon_item = new IconButtonWidget();
-        ribbon_item->m_properties[PROP_ID] = "restart";
-        ribbon_item->m_properties[PROP_ICON] = "gui/restart.png";
-        ribbon_item->m_properties[PROP_WIDTH] = "128";
-        ribbon_item->m_properties[PROP_HEIGHT] = "128";
         //I18N: In the 'paused' screen
-        ribbon_item->m_text = _("Restart Race");
-        m_choice_ribbon->m_children.push_back(ribbon_item);
+        m_choice_ribbon->addIconChild(_("Restart Race"), "restart", 128, 128, "gui/restart.png");
     }
-    {
-        IconButtonWidget* ribbon_item = new IconButtonWidget();
-        ribbon_item->m_properties[PROP_ID] = "options";
-        ribbon_item->m_properties[PROP_ICON] = "gui/main_options.png";
-        ribbon_item->m_properties[PROP_WIDTH] = "128";
-        ribbon_item->m_properties[PROP_HEIGHT] = "128";
-        //I18N: In the 'paused' screen
-        ribbon_item->m_text = _("Options");
-        m_choice_ribbon->m_children.push_back(ribbon_item);
-    }
-    {
-        IconButtonWidget* ribbon_item = new IconButtonWidget();
-        ribbon_item->m_properties[PROP_ID] = "help";
-        ribbon_item->m_properties[PROP_ICON] = "gui/main_help.png";
-        ribbon_item->m_properties[PROP_WIDTH] = "128";
-        ribbon_item->m_properties[PROP_HEIGHT] = "128";
-        //I18N: In the 'paused' screen
-        ribbon_item->m_text = _("Help");
-        m_choice_ribbon->m_children.push_back(ribbon_item);
-    }
-    {
-        IconButtonWidget* ribbon_item = new IconButtonWidget();
-        ribbon_item->m_properties[PROP_ID] = "exit";
-        ribbon_item->m_properties[PROP_ICON] = "gui/main_quit.png";
-        ribbon_item->m_properties[PROP_WIDTH] = "128";
-        ribbon_item->m_properties[PROP_HEIGHT] = "128";
-        //I18N: In the 'paused' screen
-        ribbon_item->m_text = _("Exit Race");
-        m_choice_ribbon->m_children.push_back(ribbon_item);
-    }
-    
+
+    //I18N: In the 'paused' screen
+    m_choice_ribbon->addIconChild(_("Options"), "options", 128, 128, "gui/main_options.png");
+
+    //I18N: In the 'paused' screen
+    m_choice_ribbon->addIconChild(_("Help"), "help", 128, 128, "gui/main_help.png");
+
+    //I18N: In the 'paused' screen
+    m_choice_ribbon->addIconChild(_("Exit Race"), "exit", 128, 128, "gui/main_quit.png");
+
     m_children.push_back(m_choice_ribbon);
     m_choice_ribbon->add();   
 }

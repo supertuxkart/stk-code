@@ -260,6 +260,25 @@ void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
 
 // -----------------------------------------------------------------------------
 
+void RibbonWidget::addIconChild(const wchar_t* text, const std::string id,
+                                const int w, const int h, const std::string icon,
+                                const IconButtonWidget::IconPathType iconPathType)
+{
+    IconButtonWidget* ribbon_item = new IconButtonWidget();
+    
+    ribbon_item->m_properties[PROP_ID] = id;
+    
+    ribbon_item->setImage(icon.c_str(), iconPathType);
+    
+    ribbon_item->m_properties[PROP_WIDTH]  = StringUtils::toString(w);
+    ribbon_item->m_properties[PROP_HEIGHT] = StringUtils::toString(h);
+
+    ribbon_item->m_text = text;
+    m_children.push_back(ribbon_item);
+}
+
+// -----------------------------------------------------------------------------
+
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_children.size();

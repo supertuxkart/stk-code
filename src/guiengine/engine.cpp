@@ -101,10 +101,8 @@
  \note Property PROP_SQUARE can be set to tell the engine if the ribbon's contents are rectangular or not
        (this will affect the type of highlighting used)
  \note All elements within a ribbon must have an 'ID' property
- \note Text-only ribbons (e.g. tabs) can have their elements dynamically added at runtime, too. Just add
+ \note Ribbons (e.g. tabs) can have their elements dynamically added at runtime, too. Just add
        no children to the ribbon in the XML file, and add them at runtime through the method for this.
-       Dynamic contents creation for other types RibbonWidget is currently NOT implemented because we had
-       no need for it. It can be added as needed.
  
  \n
  \subsection widget2 WTYPE_SPINNER

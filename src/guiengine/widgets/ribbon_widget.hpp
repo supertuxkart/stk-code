@@ -23,6 +23,7 @@
 #include <irrlicht.h>
 
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine
@@ -124,6 +125,15 @@ namespace GUIEngine
           * \precondition only valid for ribbons that take text-only contents (e.g. tab bars)
           */
         void addTextChild(const wchar_t* text, const std::string id);
+        
+        
+        /** \brief        dynamically (at runtime) add an icon item to this ribbon
+         *  \precondition this must be called before RibbonWidget::add, while the widget is not yet displayed
+         *  \precondition only valid for ribbons that take icon contents
+         */
+        void addIconChild(const wchar_t* text, const std::string id,
+                          const int w, const int h, const std::string icon,
+                          const IconButtonWidget::IconPathType iconPathType=IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     };
 
 }
