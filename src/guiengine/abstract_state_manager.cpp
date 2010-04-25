@@ -163,9 +163,6 @@ void AbstractStateManager::popMenu()
     
     if (m_menu_stack[m_menu_stack.size()-1] == "race")
     {
-        //FIXME: I check that the top item is 'race', then push it again so it's there twice??? WTF??
-        m_menu_stack.push_back("race");
-
         setGameState(GAME);
         GUIEngine::cleanForGame();
     }
