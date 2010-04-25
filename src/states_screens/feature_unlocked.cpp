@@ -30,7 +30,7 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
 {
     setNeeds3D(true);
     
-    throttleFPS = false;
+    m_throttle_FPS = false;
 }
 
 // -------------------------------------------------------------------------------------

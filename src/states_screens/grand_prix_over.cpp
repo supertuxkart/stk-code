@@ -33,7 +33,7 @@ GrandPrixOver::GrandPrixOver() : Screen("grand_prix_over.stkgui")
 {
     setNeeds3D(true);
     
-    throttleFPS = false;
+    m_throttle_FPS = false;
     
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;

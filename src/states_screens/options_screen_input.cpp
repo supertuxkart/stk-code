@@ -42,6 +42,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenInput );
 
 OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 {
+    m_inited = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -269,10 +270,10 @@ void OptionsScreenInput::init()
     DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
     assert( devices != NULL );
     
-    if (!this->m_inited)
+    if (!m_inited)
     {        
         buildDeviceList();        
-        this->m_inited = true;
+        m_inited = true;
     }
     devices->updateItemDisplay();
     
@@ -380,11 +381,13 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
 }
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenInput::tearDown()
 {
 }
 
 // -----------------------------------------------------------------------------
+
 void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     //const std::string& screen_name = this->getName();
@@ -510,5 +513,13 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         
     }
 
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput::forgetWhatWasLoaded()
+{
+    Screen::forgetWhatWasLoaded();
+    m_inited = false;
 }
 

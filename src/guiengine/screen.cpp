@@ -44,14 +44,11 @@ Screen::Screen(const char* file)
 {
     m_magic_number = 0xCAFEC001;
 
-    throttleFPS = true;
+    m_throttle_FPS = true;
     
-    m_mouse_x = 0;
-    m_mouse_y = 0;
     this->m_filename = file;
     m_loaded = false;
     loadFromFile();
-    m_inited = false;
     m_render_3d = false;
 }
 
@@ -59,10 +56,7 @@ Screen::Screen()
 {
     m_magic_number = 0xCAFEC001;
 
-    m_mouse_x = 0;
-    m_mouse_y = 0;
     m_loaded = false;
-    m_inited = false;
     m_render_3d = false;
 }
 
@@ -81,7 +75,6 @@ void Screen::forgetWhatWasLoaded()
     }
     
     m_loaded = false;
-    m_inited = false;
     m_widgets.clearAndDeleteAll();
 }
 
@@ -384,6 +377,8 @@ void Screen::manualRemoveWidget(Widget* w)
 }
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
 #if 0
 #pragma mark -
 #pragma mark Getting widgets
@@ -393,7 +388,16 @@ Widget* Screen::getWidget(const char* name)
 {
     return getWidget(name, &m_widgets);
 }
+
 // -----------------------------------------------------------------------------
+
+Widget* Screen::getWidget(const int id)
+{
+    return getWidget(id, &m_widgets);
+}
+
+// -----------------------------------------------------------------------------
+
 Widget* Screen::getWidget(const char* name, ptr_vector<Widget>* within_vector)
 {
     const unsigned short widgets_amount = within_vector->size();

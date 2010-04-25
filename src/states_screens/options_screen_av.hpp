@@ -35,6 +35,8 @@ struct Input;
 class OptionsScreenAV : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenAV>
 {
     OptionsScreenAV();
+    bool m_inited;
+    
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenAV>;
     
@@ -42,6 +44,8 @@ public:
         
     void init();
     void tearDown();
+    
+    virtual void forgetWhatWasLoaded();
 };
 
 #endif

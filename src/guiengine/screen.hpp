@@ -88,6 +88,7 @@ namespace GUIEngine
      */
     class Screen
     {
+    protected:
         friend class Skin;
         
         bool m_loaded;
@@ -100,24 +101,16 @@ namespace GUIEngine
         /** Will be called to determine if the 3D scene must be rendered when at this screen. */
         bool m_render_3d;
         
-        
+        /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
-    public:
-        bool throttleFPS;
         
+        /** the widgets in this screen */
         ptr_vector<Widget, HOLD> m_widgets;
         
-        // current mouse position, read-only...
-        int m_mouse_x, m_mouse_y;
+        bool m_throttle_FPS;
+
+    public:
         
-        /** this variable is not used by the Screen object itself; it's the routines creating
-         * screens that may use it to perform some operations only once. initialized to false.
-         */
-        bool m_inited;
-        
-        /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
-         (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
-        virtual void forgetWhatWasLoaded();
         
         /** \brief creates a dummy incomplete object; only use to override behaviour in sub-class */
         Screen();
@@ -136,6 +129,11 @@ namespace GUIEngine
         /** returns an object by name, or NULL if not found */
         Widget* getWidget(const char* name);
         
+        /** returns an object by irrlicht ID, or NULL if not found */
+        Widget* getWidget(const int id);
+
+        bool throttleFPS() const { return m_throttle_FPS; }
+        
         /** returns an object by name, casted to specified type, or NULL if not found/wrong type */
         template <typename T> T* getWidget(const char* name)
         {
@@ -151,6 +149,7 @@ namespace GUIEngine
         
         static Widget* getWidget(const char* name, ptr_vector<Widget>* within_vector);
         static Widget* getWidget(const int id, ptr_vector<Widget>* within_vector);
+        
         
         Widget* getFirstWidget(ptr_vector<Widget>* within_vector=NULL);
         Widget* getLastWidget(ptr_vector<Widget>* within_vector=NULL);
@@ -170,7 +169,15 @@ namespace GUIEngine
         /** \return the name of this menu (which is the name of the file) */
         const std::string& getName() const { return m_filename; }
         
+        /** 
+          * \brief invoked when irrlicht widgets added to the screen have been deleted
+          * so that we can drop any pointer to them we had (they are now dangling pointers)
+          */
         void elementsWereDeleted(ptr_vector<Widget>* within_vector = NULL);
+        
+        /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
+         (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
+        virtual void forgetWhatWasLoaded();
         
         /** Will be called to determine if the 3D scene must be rendered when at this screen */
         bool needs3D() { return m_render_3d; }

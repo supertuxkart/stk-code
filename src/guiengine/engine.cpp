@@ -765,7 +765,8 @@ void renderLoading()
     
 } // renderLoading
     
-// -----------------------------------------------------------------------------    
+// -----------------------------------------------------------------------------
+    
 Widget* getWidget(const char* name)
 {
     // if a modal dialog is shown, search within it too
@@ -779,9 +780,11 @@ Widget* getWidget(const char* name)
     
     if (screen == NULL) return NULL;
     
-    return Screen::getWidget(name,  &screen->m_widgets);
+    return screen->getWidget(name);
 }
-// -----------------------------------------------------------------------------    
+    
+// -----------------------------------------------------------------------------
+    
 Widget* getWidget(const int id)
 {
     // if a modal dialog is shown, search within it too
@@ -795,7 +798,7 @@ Widget* getWidget(const int id)
     
     if (screen == NULL) return NULL;
     
-    return Screen::getWidget(id,  &screen->m_widgets);
+    return screen->getWidget(id);
 }
 
         

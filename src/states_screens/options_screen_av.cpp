@@ -39,6 +39,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenAV );
 
 OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 {
+    m_inited = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ void OptionsScreenAV::init()
         
         
         // --- get resolution list from irrlicht the first time
-        if(!this->m_inited)
+        if (!m_inited)
         {
             const std::vector<VideoMode>& modes = irr_driver->getVideoModes();
             const int amount = modes.size();
@@ -231,3 +232,12 @@ void OptionsScreenAV::tearDown()
 }
 
 // -----------------------------------------------------------------------------
+
+void OptionsScreenAV::forgetWhatWasLoaded()
+{
+    Screen::forgetWhatWasLoaded();
+    m_inited = false;
+}
+
+// -----------------------------------------------------------------------------
+

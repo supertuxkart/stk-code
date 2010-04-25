@@ -128,7 +128,7 @@ CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
 {
     reset();
     
-    throttleFPS = false;
+    m_throttle_FPS = false;
     
     std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
     

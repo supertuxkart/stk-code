@@ -37,6 +37,8 @@ class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
     OptionsScreenInput();
 
+    bool m_inited;
+    
     void updateInputButtons(DeviceConfig* config);
     void buildDeviceList();
     
@@ -48,6 +50,8 @@ public:
     void gotSensedInput(Input* sensedInput);
     void rebuildDeviceList();
 
+    virtual void forgetWhatWasLoaded();
+    
     void init();
     void tearDown();
 };
