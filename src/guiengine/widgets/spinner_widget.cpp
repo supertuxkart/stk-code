@@ -48,7 +48,6 @@ void SpinnerWidget::add()
     std::string max_s = m_properties[PROP_MAX_VALUE];
     
     m_warp_around = (m_properties[PROP_WARP_AROUND] == "true");
-    std::cout << "SpinnerWidget::add() : m_warp_around=" << m_warp_around << " (" << m_properties[PROP_WARP_AROUND].c_str() << ")"<< std::endl;
     
     {
         int i;
