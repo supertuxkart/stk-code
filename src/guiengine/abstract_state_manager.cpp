@@ -27,6 +27,8 @@
 using namespace GUIEngine;
 
 
+const char* RACE_STATE_NAME = "race";
+
 AbstractStateManager::AbstractStateManager()
 {
     m_game_mode = MENU;
@@ -43,7 +45,7 @@ void AbstractStateManager::enterGameState()
 {
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
-    m_menu_stack.push_back("race");
+    m_menu_stack.push_back(RACE_STATE_NAME);
     setGameState(GAME);
     GUIEngine::cleanForGame();
     
@@ -161,7 +163,7 @@ void AbstractStateManager::popMenu()
         
     std::cout << "-- switching to screen " << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
     
-    if (m_menu_stack[m_menu_stack.size()-1] == "race")
+    if (m_menu_stack[m_menu_stack.size()-1] == RACE_STATE_NAME)
     {
         setGameState(GAME);
         GUIEngine::cleanForGame();
