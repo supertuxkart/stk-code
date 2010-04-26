@@ -117,6 +117,9 @@ namespace GUIEngine
         friend class EventHandler;
         friend class Screen;
         friend class Skin;
+        friend class RibbonWidget;
+        friend class SpinnerWidget;
+        friend class DynamicRibbonWidget;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
@@ -283,6 +286,11 @@ namespace GUIEngine
         void resetAllBadges()
         {
             m_badges = 0;
+        }
+        
+        int getBadges() const
+        {
+            return m_badges;
         }
         
         /** Set to false if widget is something that should not receieve focus */

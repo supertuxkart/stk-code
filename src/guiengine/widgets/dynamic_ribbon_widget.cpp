@@ -707,7 +707,7 @@ void DynamicRibbonWidget::updateItemDisplay()
                 icon->m_properties[PROP_ID]   = m_items[icon_id].m_code_name;
                 icon->setLabel(m_items[icon_id].m_user_name);
                 icon->m_text                  = m_items[icon_id].m_user_name;
-                icon->m_badges                = m_items[icon_id].m_badges;
+                icon->m_badges                = m_items[icon_id].getBadges();
                 
                 //std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
                 
