@@ -115,11 +115,8 @@ namespace GUIEngine
         unsigned int m_magic_number;
 
         friend class EventHandler;
-        friend class RibbonWidget;
         friend class Screen;
-        friend class SpinnerWidget;
         friend class Skin;
-        friend class DynamicRibbonWidget;
         
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
