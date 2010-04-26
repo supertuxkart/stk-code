@@ -20,6 +20,7 @@
 #define HEADER_TRACKINFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 
 static const int HIGHSCORE_COUNT = 3;
 
