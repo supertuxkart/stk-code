@@ -573,7 +573,7 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
 
 // -----------------------------------------------------------------------------
 
-void EventHandler::sendEventToUser(Widget* widget, std::string& name, const int playerID)
+void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name, const int playerID)
 {
     getCurrentScreen()->eventCallback(widget, name, playerID);
 }
