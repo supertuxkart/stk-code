@@ -104,6 +104,29 @@ float AIBaseController::steerToPoint(const Vec3 &point)
     Vec3 p  = point - m_kart->getXYZ();
     Vec3 lc = quatRotate(q, p);
 
+    // The point the kart is aiming at can be reached 'incorrectly' if the
+    // point is below the y=x line: Instead of aiming at that point directly
+    // the point will be reached on its way 'back' after a more than 90 
+    // degree turn in the circle, i.e.:
+    // |                 So the point p (belolw the y=x line) can not be
+    // |  ---\           reached on any circle directly, so it is reached
+    // | /    \          on the indicated way. Since this is not the way
+    // |/      p         we expect a kart to drive (it will result in the 
+    // +--------------   kart doing slaloms, not driving straight), the
+    // kart will trigger skidding to allow for sharper turns, and hopefully
+    // the situation will change so that the point p can then be reached
+    // with a normal turn (it usually works out this way quite easily).
+    if(fabsf(lc.getX()) > fabsf(lc.getZ()))
+    {
+        // Explicitely set the steering angle high enough to that the
+        // steer function will request skidding. 0.1 is added in case
+        // of floating point errors.
+        if(lc.getX()>0)
+            return  m_kart->getMaxSteerAngle()*m_skidding_threshold+0.1f;
+        else
+            return -m_kart->getMaxSteerAngle()*m_skidding_threshold-0.1f;
+    }
+
     // Now compute the nexessary radius for the turn. After getting the
     // kart local coordinates for the point to aim at, the kart is at
     // (0,0) facing straight ahead. The center of the rotation is then
