@@ -70,14 +70,6 @@ namespace GUIEngine
     };
     
     /**
-     * \ingroup guiengine
-     * \brief Loads a GUI screen from its XML file.
-     * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
-     * with little analysis or layout performed on them.
-     */
-    void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
-    
-    /**
      * \brief Represents a single GUI screen.
      * Mainly responsible of its children widgets; Screen lays them
      * out, asks them to add themselves, asks them to remove themselves, etc.
@@ -109,6 +101,14 @@ namespace GUIEngine
         
         bool m_throttle_FPS;
 
+        /**
+         * \ingroup guiengine
+         * \brief Loads a GUI screen from its XML file.
+         * Builds a hierarchy of Widget objects whose contents are a direct transcription of the XML file,
+         * with little analysis or layout performed on them.
+         */
+        static void parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
+        
     public:
         
         
@@ -226,6 +226,8 @@ namespace GUIEngine
         virtual void eventCallback(Widget* widget, const std::string& name, const int playerID) = 0;
         
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
+        
+        
     };
     
 }

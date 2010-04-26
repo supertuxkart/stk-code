@@ -111,9 +111,7 @@ namespace GUIEngine
       */
     class Widget : public SkinWidgetContainer
     {
-    protected:
-        friend void GUIEngine::parseScreenFileDiv(irr::io::IrrXMLReader* xml, ptr_vector<Widget>& append_to);
-        
+    protected:        
         unsigned int m_magic_number;
 
         friend class EventHandler;
