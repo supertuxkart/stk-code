@@ -27,8 +27,7 @@
 #include <irrlicht.h>
 #include <string>
 
-#include "guiengine/abstract_state_manager.hpp"
-#include "guiengine/widgets.hpp"
+#include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
 /**
@@ -42,6 +41,8 @@ namespace GUIEngine
     class Screen;
     class CutScene;
     class Widget;
+    class Skin;
+    class AbstractStateManager;
     
     /** \brief Returns the widget currently focused by given player, or NULL if none.
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
@@ -76,7 +77,7 @@ namespace GUIEngine
         extern irr::gui::IGUIFont* g_font;
         extern irr::gui::IGUIFont* g_title_font;
 
-        extern IrrlichtDevice* g_device;
+        extern irr::IrrlichtDevice* g_device;
         extern irr::video::IVideoDriver* g_driver;
         extern Screen* g_current_screen;
         extern AbstractStateManager* g_state_manager;
@@ -104,7 +105,7 @@ namespace GUIEngine
     /**
       * \return the irrlicht device object
       */
-    inline IrrlichtDevice*            getDevice()        { return Private::g_device;         }
+    inline irr::IrrlichtDevice*       getDevice()        { return Private::g_device;         }
     
     /**
       * \return the irrlicht GUI environment object

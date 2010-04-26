@@ -18,7 +18,9 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"

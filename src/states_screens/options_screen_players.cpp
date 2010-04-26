@@ -25,6 +25,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"

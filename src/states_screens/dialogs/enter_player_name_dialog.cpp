@@ -19,7 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"

@@ -21,6 +21,9 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "io/file_manager.hpp"

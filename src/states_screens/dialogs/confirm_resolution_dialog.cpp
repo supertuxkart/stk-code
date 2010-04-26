@@ -17,8 +17,9 @@
 
 
 #include "config/player.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"

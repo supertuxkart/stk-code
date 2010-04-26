@@ -1,6 +1,7 @@
 #ifndef HEADER_FEATURE_UNLOCKED_HPP
 #define HEADER_FEATURE_UNLOCKED_HPP
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/screen.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -36,12 +37,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
         
         irr::core::stringw m_unlock_message;
         
-        UnlockedThing(KartProperties* kart, irr::core::stringw msg)
-        {
-            m_unlocked_kart = kart;
-            m_unlock_message = msg;
-            m_curr_image = -1;
-        }
+        UnlockedThing(KartProperties* kart, irr::core::stringw msg);
         
         /**
           * Creates a 'picture' reward.
@@ -49,15 +45,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
           * \param w     width of the picture to display
           * \param y     height of the picture to display
           */
-        UnlockedThing(irr::video::ITexture* pict, float w, float h, irr::core::stringw msg)
-        {
-            m_unlocked_kart = NULL;
-            m_pictures.push_back(pict);
-            m_w = w;
-            m_h = h;
-            m_unlock_message = msg;
-            m_curr_image = -1;
-        }
+        UnlockedThing(irr::video::ITexture* pict, float w, float h, irr::core::stringw msg);
         
         /**
          * Creates a 'picture slideshow' reward.
@@ -65,21 +53,9 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
          * \param w     width of the pictures to display
          * \param y     height of the pictures to display
          */
-        UnlockedThing(std::vector<irr::video::ITexture*> picts, float w, float h, irr::core::stringw msg)
-        {
-            m_unlocked_kart = NULL;
-            m_pictures = picts;
-            m_w = w;
-            m_h = h;
-            m_unlock_message = msg;
-            m_curr_image = 0;
-        }
+        UnlockedThing(std::vector<irr::video::ITexture*> picts, float w, float h, irr::core::stringw msg);
         
-        ~UnlockedThing()
-        {
-            if (m_root_gift_node != NULL) irr_driver->removeNode(m_root_gift_node);
-            m_root_gift_node = NULL;
-        }
+        ~UnlockedThing();
     };
     ptr_vector<UnlockedThing, HOLD> m_unlocked_stuff;
     

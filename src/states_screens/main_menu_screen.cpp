@@ -17,7 +17,7 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "input/device_manager.hpp"

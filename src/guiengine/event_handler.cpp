@@ -22,6 +22,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
 

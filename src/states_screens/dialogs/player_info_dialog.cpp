@@ -18,7 +18,7 @@
 
 #include "config/player.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "states_screens/dialogs/player_info_dialog.hpp"
 #include "states_screens/options_screen_players.hpp"
 #include "states_screens/state_manager.hpp"

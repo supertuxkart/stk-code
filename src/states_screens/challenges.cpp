@@ -22,6 +22,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"

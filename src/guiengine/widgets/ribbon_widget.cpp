@@ -17,6 +17,9 @@
 
 #include "guiengine/widgets/ribbon_widget.hpp"
 
+#include "graphics/irr_driver.hpp"
+#include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp" //FIXME: needs to be removed
 #include "guiengine/engine.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -326,6 +329,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     }
     
     // if we reached a filler item, move again
+    // FIXME: why is a constant from DynamicRibbon used here??
     if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
     {
         rightPressed(playerID);

@@ -15,9 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+
 using namespace GUIEngine;
 using namespace irr::video;
 using namespace irr::core;

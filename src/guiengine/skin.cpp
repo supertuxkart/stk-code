@@ -17,11 +17,12 @@
 
 
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include <cassert>

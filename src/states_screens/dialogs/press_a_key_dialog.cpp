@@ -17,7 +17,7 @@
 
 
 #include "guiengine/engine.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "utils/translation.hpp"

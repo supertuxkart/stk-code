@@ -18,7 +18,9 @@
 #include <irrlicht.h>
 
 #include "challenges/unlock_manager.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"

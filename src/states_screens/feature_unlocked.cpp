@@ -25,6 +25,61 @@ using namespace irr::video;
 DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
 
 // -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+
+#if 0
+#pragma mark FeatureUnlockedCutScene::UnlockedThing
+#endif
+
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart, irr::core::stringw msg)
+{
+    m_unlocked_kart = kart;
+    m_unlock_message = msg;
+    m_curr_image = -1;
+}
+
+// -------------------------------------------------------------------------------------
+
+
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict,
+                                                      float w, float h, irr::core::stringw msg)
+{
+    m_unlocked_kart = NULL;
+    m_pictures.push_back(pict);
+    m_w = w;
+    m_h = h;
+    m_unlock_message = msg;
+    m_curr_image = -1;
+}
+
+// -------------------------------------------------------------------------------------
+
+FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::ITexture*> picts,
+                                                      float w, float h, irr::core::stringw msg)
+{
+    m_unlocked_kart = NULL;
+    m_pictures = picts;
+    m_w = w;
+    m_h = h;
+    m_unlock_message = msg;
+    m_curr_image = 0;
+}
+
+// -------------------------------------------------------------------------------------
+
+FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
+{
+    if (m_root_gift_node != NULL) irr_driver->removeNode(m_root_gift_node);
+    m_root_gift_node = NULL;
+}
+
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark FeatureUnlockedCutScene
+#endif
 
 FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.stkgui")
 {

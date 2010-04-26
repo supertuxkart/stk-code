@@ -20,6 +20,7 @@
 #include "states_screens/help_screen_3.hpp"
 
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;

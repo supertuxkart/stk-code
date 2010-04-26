@@ -18,7 +18,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/widget.hpp"
+#include "guiengine/widgets.hpp"
 #include "utils/translation.hpp"
 #include <irrlicht.h>
 #include <iostream>
