@@ -245,6 +245,10 @@ int handleCmdLine(int argc, char **argv)
         {
             UserConfigParams::m_track_debug=1;
         }
+        else if(!strcmp(argv[i], "--camera-debug"))
+        {
+            UserConfigParams::m_camera_debug=1;
+        }
         else if(!strcmp(argv[i], "--kartsize-debug"))
         {
             UserConfigParams::m_print_kart_sizes=true;

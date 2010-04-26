@@ -205,17 +205,6 @@ void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
     {
         sfx_manager->positionListener(current_position,  current_target - current_position);
     }
-
-    // The following settings give a debug camera which shows the track from
-    // high above the kart straight down.
-#undef DEBUG_CAMERA
-#ifdef DEBUG_CAMERA
-    core::vector3df xyz = m_kart->getXYZ().toIrrVector();
-    xyz = core::vector3df(17.5, 0, 0);
-    m_camera->setTarget(xyz);
-    xyz.Y = xyz.Y+30;
-    m_camera->setPosition(xyz);
-#endif
 }   // smoothMoveCamera
 
 //-----------------------------------------------------------------------------
@@ -255,6 +244,17 @@ void Camera::computeNormalCameraPosition(Vec3 *wanted_position,
  */
 void Camera::update(float dt)
 {
+    // The following settings give a debug camera which shows the track from
+    // high above the kart straight down.
+    if(UserConfigParams::m_camera_debug)
+    {
+        core::vector3df xyz = m_kart->getXYZ().toIrrVector();
+        m_camera->setTarget(xyz);
+        xyz.Y = xyz.Y+30;
+        m_camera->setPosition(xyz);
+        return;
+    }
+
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
     // Each case should set wanted_position and wanted_target according to 

@@ -247,6 +247,9 @@ namespace UserConfigParams
     /** If the kart sizes should be printed at startup. */
     PARAM_PREFIX bool                       m_print_kart_sizes  PARAM_DEFAULT( false );
     
+    /** Special debug camera being high over the kart. */
+    PARAM_PREFIX bool                       m_camera_debug      PARAM_DEFAULT( false );
+
     /** Verbosity level for debug messages. Note that error and important warnings
      *  must always be printed. */
     PARAM_PREFIX int                        m_verbosity         PARAM_DEFAULT( 0 );
