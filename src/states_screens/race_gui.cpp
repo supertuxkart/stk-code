@@ -47,15 +47,21 @@ using namespace irr;
  */
 RaceGUI::RaceGUI()
 {
-    m_marker_rendered_size  =  32;
-    m_marker_ai_size        =  14;
-    m_marker_player_size    =  16;
-    m_map_rendered_width    = 128;
-    m_map_rendered_height   = 128;
-    m_map_width             = 100;
-    m_map_height            = 100;
-    m_map_left              =  10;
-    m_map_bottom            =  10;
+    // Originally m_map_height was 100, and we take 480 as minimum res
+    const float scaling = irr_driver->getFrameSize().Height / 480.0;
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_marker_ai_size        =  14.0 * scaling;
+    m_marker_player_size    =  16.0 * scaling;
+    m_map_width             = 100.0 * scaling;
+    m_map_height            = 100.0 * scaling;
+    m_map_left              =  10.0 * scaling;
+    m_map_bottom            =  10.0 * scaling;
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
     m_max_font_height       = GUIEngine::getFontHeight() + 10;
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
 
@@ -64,9 +70,9 @@ RaceGUI::RaceGUI()
     {
         m_map_left = UserConfigParams::m_width - m_map_width;
     }
-    
+
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");    
+    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     m_plunger_face     = material_manager->getMaterial("plungerface.png");
     m_music_icon       = material_manager->getMaterial("notes.png");
     createMarkerTexture();
