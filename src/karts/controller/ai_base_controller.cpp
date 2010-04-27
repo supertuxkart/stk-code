@@ -148,8 +148,15 @@ float AIBaseController::steerToPoint(const Vec3 &point)
         return -m_kart->getMaxSteerAngle()*m_skidding_threshold-0.1f;
     if(sin_steer_angle >=  1.0f) 
         return  m_kart->getMaxSteerAngle()*m_skidding_threshold+0.1f;
-    float steer_angle     = asin(sin_steer_angle);    
-    return steer_angle;
+    float steer_angle     = asin(sin_steer_angle);
+
+    // After doing the exact computation, we now return an 'oversteered'
+    // value. This actually helps in making tighter turns, and also in
+    // very tight turns on narrow roads (where following the circle might
+    // actually take the kart off track) it forces smaller turns.
+    // It does not actually hurt to steer too much, since the steering
+    // will be adjusted every frame.
+    return steer_angle*2.0f;
 }   // steerToPoint
 
 //-----------------------------------------------------------------------------
