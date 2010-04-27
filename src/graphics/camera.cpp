@@ -252,6 +252,7 @@ void Camera::update(float dt)
         m_camera->setTarget(xyz);
         xyz.Y = xyz.Y+30;
         m_camera->setPosition(xyz);
+        m_camera->setNearValue(52.0); // To view inside tunnels (FIXME 52>30 why??? makes no sense)
         return;
     }
 
