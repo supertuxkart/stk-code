@@ -28,15 +28,18 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, unsigned int item_id)
 {
     setType(type);
-    m_event_handler    = NULL;
-    m_xyz              = xyz;
-    m_deactive_time    = 0;
+    m_event_handler     = NULL;
+    m_xyz               = xyz;
+    m_deactive_time     = 0;
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    Vec3  hpr          = Vec3(0, normal);
-    m_item_id          = item_id;
-    m_original_type    = ITEM_NONE;
-    m_collected        = false;
-    m_time_till_return = 0.0f;  // not strictly necessary, see isCollected()
+    Vec3  hpr           = Vec3(0, normal);
+    m_item_id           = item_id;
+    m_original_type     = ITEM_NONE;
+    m_collected         = false;
+    m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
+    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
+                        ? stk_config->m_bubble_gum_counter
+                        : -1 ;
     m_original_mesh    = mesh;
     m_node             = irr_driver->addMesh(mesh);
     m_node->setPosition(xyz.toIrrVector());
@@ -62,7 +65,7 @@ void Item::setType(ItemType type)
  */
 void Item::switchTo(ItemType type, scene::IMesh *mesh)
 {
-    m_original_type    = m_type;
+    m_original_type = m_type;
     setType(type);
     m_node->setMesh(mesh);
 }   // switchTo
@@ -97,9 +100,12 @@ Item::~Item()
  */
 void Item::reset()
 {
-    m_collected        = false;
-    m_time_till_return = 0.0f;
-    m_deactive_time    = 0.0f;
+    m_collected         = false;
+    m_time_till_return  = 0.0f;
+    m_deactive_time     = 0.0f;
+    m_disappear_counter = m_type==ITEM_BUBBLEGUM 
+                        ? stk_config->m_bubble_gum_counter
+                        : -1 ;
     if(m_original_type!=ITEM_NONE)
     {
         setType(m_original_type);
@@ -168,8 +174,9 @@ void Item::collected(const Kart *kart, float t)
 {
     m_collected     = true;
     m_event_handler = kart;
-    if(m_type==ITEM_BUBBLEGUM)
+    if(m_type==ITEM_BUBBLEGUM && m_disappear_counter>0)
     {
+        m_disappear_counter --;
         // Deactivates the item for a certain amount of time. It is used to
         // prevent bubble gum from hitting a kart over and over again (in each
         // frame) by giving it time to drive away.

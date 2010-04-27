@@ -34,9 +34,12 @@
 
 
 //-----------------------------------------------------------------------------
-Powerup::Powerup(Kart* kart_)
+/** Constructor, stores the kart to which this powerup belongs. 
+ *  \param kart The kart to which this powerup belongs. 
+ */
+Powerup::Powerup(Kart* kart)
 {
-    m_owner               = kart_;
+    m_owner               = kart;
     m_sound_use           = NULL;
     reset();
 }   // Powerup
@@ -50,6 +53,8 @@ Powerup::~Powerup()
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
+/** Resets the powerup, called at begin of a race.
+ */
 void Powerup::reset()
 {
     m_type = POWERUP_NOTHING;
@@ -61,6 +66,12 @@ void Powerup::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Sets the collected items. The number of items is increased if the same
+ *  item is currently collected, otherwise replaces the existing item. It also
+ *  sets item specific sounds.
+ *  \param type Thew new type.
+ *  \param n Number of items of the given type.
+ */
 void Powerup::set(PowerupType type, int n)
 {
     if (m_type==type)
@@ -113,6 +124,9 @@ void Powerup::set(PowerupType type, int n)
 }  // set
 
 //-----------------------------------------------------------------------------
+/** Returns the icon for the currently collected powerup. Used in the
+ *  race_gui to display the collected item.
+ */
 Material *Powerup::getIcon() const
 {
     // Check if it's one of the types which have a separate
@@ -121,6 +135,8 @@ Material *Powerup::getIcon() const
 }
 
 //-----------------------------------------------------------------------------
+/** Use (fire) this powerup.
+ */
 void Powerup::use()
 {
     // Play custom kart sound when collectible is used
@@ -136,7 +152,7 @@ void Powerup::use()
     
     m_number--;
     World *world = World::getWorld();
-    RaceGUI* gui = World::getWorld()->getRaceGUI();
+    RaceGUI* gui = world->getRaceGUI();
     switch (m_type)
     {
     case POWERUP_ZIPPER:   m_owner->handleZipper();
@@ -214,7 +230,7 @@ void Powerup::use()
     case POWERUP_PARACHUTE:
         {
             Kart* player_kart = NULL;
-            //Attach a parachutte(that last as twice as the
+            //Attach a parachutte(that last twice as long as the
             //one from the bananas) to all the karts that
             //are in front of this one.
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
@@ -257,6 +273,18 @@ void Powerup::use()
 }   // use
 
 //-----------------------------------------------------------------------------
+/** This function is called when a bnous box is it. This function can be
+ *  called on a server (in which case item and add_info are not used),
+ *  or on a client, in which case the item and additional info is used
+ *  to make sure server and clients are synched correctly.
+ *  \param n
+ *  \param item The item (bonux box) that was hit. This is necessary
+ *         for servers so that the clients can be informed which item
+ *         was collected.
+ *  \param add_info Additional information. This is used for network games
+ *         so that the server can overwrite which item is collectted 
+ *         (otherwise a random choice is done).
+ */
 void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
     World *world = World::getWorld();

@@ -92,7 +92,13 @@ private:
     /** Optionally if item was placed by a kart, a timer can be used to 
      *  temporarly deactivate collision so a kart is not hit by its own item */
     float         m_deactive_time;
-    
+
+    /** Counts how often an item is used before it disappears. Used for 
+     *  bubble gum to make them disappear after a while. A value >0
+     *  indicates that the item still exists, =0 that the item can be
+     *  deleted, and <0 that the item will never be deleted. */
+    int           m_disappear_counter;
+
     void          setType(ItemType type);
 public:
                   Item (ItemType type, const Vec3& xyz, const Vec3& normal,
@@ -113,9 +119,22 @@ public:
     }   // hitKart
 
     // ------------------------------------------------------------------------
+    /** Returns the index of this item in the item manager list. */
     unsigned int  getItemId()    const { return m_item_id;  }
+    // ------------------------------------------------------------------------
+    /** Returns the type of this item. */
     ItemType      getType()      const { return m_type;     }
+    // ------------------------------------------------------------------------
+    /** Returns true if this item is currently collected. */
     bool          wasCollected() const { return m_collected;}    
+    // ------------------------------------------------------------------------
+    /** Returns true if this item is used up and can be removed. */
+    bool          isUsedUp()     const {return m_disappear_counter==0; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this item can be used up, and therefore needs to
+     *  be removed when the game is reset. */
+    bool          canBeUsedUp()  const {return m_disappear_counter>-1; }
+    // ------------------------------------------------------------------------
     void          setParent(Kart* parent);
     void          reset();
     void          switchTo(ItemType type, scene::IMesh *mesh);

@@ -138,15 +138,25 @@ void ItemManager::loadDefaultItems()
 Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz, 
                            const Vec3 &normal, Kart *parent)
 {
+    // Find where the item can be stored in the index list: either in a
+    // previously deleted entry, otherwise at the end.
+    int index = -1;
+    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+
+    if(index==-1) index = m_all_items.size();
     Item* item;
-    item = new Item(type, xyz, normal, m_item_mesh[type], m_all_items.size());
+    item = new Item(type, xyz, normal, m_item_mesh[type], index);
     if(parent != NULL) item->setParent(parent);
     if(m_switch_time>=0)
     {
         Item::ItemType new_type = m_switch_to[item->getType()];
         item->switchTo(new_type, m_item_mesh[(int)new_type]);
     }
-    m_all_items.push_back(item);
+    if(index<(int)m_all_items.size())
+        m_all_items[index] = item;
+    else
+        m_all_items.push_back(item);
+
     return item;
 }   // newItem
 
@@ -157,12 +167,17 @@ Item* ItemManager::newItem(Item::ItemType type, const Vec3& xyz,
 void ItemManager::collectedItem(int item_id, Kart *kart, int add_info)
 {
     Item *item=m_all_items[item_id];
+    assert(item);
     item->collected(kart);
     kart->collectedItem(*item, add_info);
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
-void  ItemManager::hitItem(Kart* kart)
+/** Checks if any item was collected by the given kart. This function calls
+ *  collectedItem if an item was collected.
+ *  \param kart Pointer to the kart. 
+ */
+void  ItemManager::checkItemHit(Kart* kart)
 {
     // Only do this on the server
     if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
@@ -170,13 +185,13 @@ void  ItemManager::hitItem(Kart* kart)
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        if((*i)->wasCollected()) continue;
+        if((!*i) || (*i)->wasCollected()) continue;
         if((*i)->hitKart(kart))
         {
             collectedItem(i-m_all_items.begin(), kart);
         }   // if hit
     }   // for m_all_items
-}   // hitItem
+}   // checkItemHit
 
 //-----------------------------------------------------------------------------
 /** Remove all item instances, and the track specific models. This is used
@@ -187,7 +202,8 @@ void ItemManager::cleanup()
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        delete *i;
+        if(*i)
+            delete *i;
     }
     m_all_items.clear();
 }   // cleanup
@@ -203,14 +219,17 @@ void ItemManager::reset()
     {
         for(AllItemTypes::iterator i =m_all_items.begin(); 
                                    i!=m_all_items.end(); i++)
-            (*i)->switchBack();
+        {
+            if(*i) (*i)->switchBack();
+        }
         m_switch_time = -1.0f;
 
     }
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
-        if((*i)->getType()==Item::ITEM_BUBBLEGUM)
+        if(!*i) continue;
+        if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
             Item *b=*i;
             AllItemTypes::iterator i_next = m_all_items.erase(i); 
@@ -239,7 +258,7 @@ void ItemManager::update(float dt)
             for(AllItemTypes::iterator i =m_all_items.begin();
                 i!=m_all_items.end();  i++)
             {   
-                (*i)->switchBack();
+                if(*i) (*i)->switchBack();
             }   // for m_all_items
         }   // m_switch_time < 0
     }   // m_switch_time>=0
@@ -247,7 +266,15 @@ void ItemManager::update(float dt)
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
-        (*i)->update(dt);
+        if(*i)
+        {
+            (*i)->update(dt);
+            if( (*i)->isUsedUp())
+            {
+                delete *i;
+                m_all_items[i-m_all_items.begin()] = NULL;
+            }   // if usedUp
+        }   // if *i
     }   // for m_all_items
 }   // update
 
@@ -260,12 +287,11 @@ void ItemManager::switchItems()
     for(AllItemTypes::iterator i =m_all_items.begin();
         i!=m_all_items.end();  i++)
     {
+        if(!*i) continue;
         Item::ItemType new_type = m_switch_to[(*i)->getType()];
 
         if(m_switch_time<0)
             (*i)->switchTo(new_type, m_item_mesh[(int)new_type]);
-        // FIXME: if switch is used while items are switched: 
-        // switch back - but that doesn't work properly yet
         else
             (*i)->switchBack();
     }   // for m_all_items

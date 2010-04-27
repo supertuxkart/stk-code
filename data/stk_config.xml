@@ -68,6 +68,9 @@
              Order: item, banana, big-nitro, small-nitro, bubble-bum -->
   <switch time="5"  items="1 0 4 4 2"/>
 
+  <!-- How often bubble gum get driven over before it disappears. --> 
+  <bubble-gum disappear-counter="1"/>
+
   <!-- impulse is the push from explosions when karts aren't hit directly.  
        explosion-impulse-objects is the impulse for physics objects (smaller
        ones like the cone, will be pushed way too far with normal impulse). -->

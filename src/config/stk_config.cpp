@@ -103,6 +103,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_zipper_speed_gain,         "zipper-speed-gain"          );
     CHECK_NEG(m_zipper_max_speed_fraction, "zipper-max-speed-fraction"  );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
+    CHECK_NEG(m_bubble_gum_counter,        "bubblegum disappear counter");
     CHECK_NEG(m_explosion_impulse,         "explosion-impulse"          );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
     CHECK_NEG(m_max_history,               "max-history"                );
@@ -137,6 +138,7 @@ void STKConfig::init_defaults()
         m_explosion_impulse    = m_explosion_impulse_objects =
         m_delay_finish_time    = m_skid_fadeout_time         =
         m_near_ground          = m_item_switch_time          = UNDEFINED;
+    m_bubble_gum_counter       = -100;
     m_max_karts                = -100;
     m_gp_order                 = -100;
     m_max_history              = -100;
@@ -246,6 +248,11 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         switch_node->get("items", &m_switch_items    );
         switch_node->get("time",  &m_item_switch_time);
+    }
+
+    if(const XMLNode *bubble_gum_node= root->getNode("bubble-gum"))
+    {
+        bubble_gum_node->get("disappear-counter", &m_bubble_gum_counter);
     }
 
     if(const XMLNode *explosion_node= root->getNode("explosion"))

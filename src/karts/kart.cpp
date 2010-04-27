@@ -537,7 +537,7 @@ void Kart::collectedItem(const Item &item, int add_info)
             // In wheelie style, karts get more items depending on energy,
             // in nitro mode it's only one item.
             int n = 1;
-            m_powerup.hitBonusBox(n, item,add_info);
+            m_powerup.hitBonusBox(n, item, add_info);
             break;
         }
     case Item::ITEM_BUBBLEGUM:
@@ -769,7 +769,7 @@ void Kart::update(float dt)
     }   // if there is material
 
     // Check if any item was hit.
-    item_manager->hitItem(this);
+    item_manager->checkItemHit(this);
     if(m_kart_properties->hasSkidmarks())
         m_skidmarks->update(dt);
 

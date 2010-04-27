@@ -60,7 +60,7 @@ public:
     Item*          newItem         (Item::ItemType type, const Vec3& xyz, 
                                     const Vec3 &normal, Kart* parent=NULL);
     void           update          (float delta);
-    void           hitItem         (Kart* kart);
+    void           checkItemHit    (Kart* kart);
     void           cleanup         ();
     void           reset           ();
     void           removeTextures  ();
