@@ -542,25 +542,13 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
                                                meter_texture->getOriginalSize());
     video->draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL, NULL, true);
 
-    // Indicate when the kart is off ground
-    // ------------------------------------
-    if ( !kart->isOnGround() )
-    {
-        static video::SColor color = video::SColor(255, 255, 255, 255);
-        core::rect<s32> pos(offset.X-(int)(30*minRatio), 
-                            offset.Y-(int)(10*minRatio),
-                            offset.X-(int)(30*minRatio), 
-                            offset.Y-(int)(10*minRatio) );
-        GUIEngine::getFont()->draw(core::stringw("!").c_str(), pos, color);
-    }
-
     const float speed =  kart->getSpeed();
     if(speed <=0) return;  // Nothing to do if speed is negative.
 
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
     float speed_ratio = speed/KILOMETERS_PER_HOUR/110.0f;
-    if(speed_ratio>1) speed_ratio = 1;
+    if(speed_ratio>1 || !kart->isOnGround()) speed_ratio = 1;
 
     video::ITexture   *bar_texture = m_speed_bar_icon->getTexture();
     core::dimension2du bar_size    = bar_texture->getOriginalSize();
