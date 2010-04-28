@@ -224,7 +224,8 @@ public:
     /** called when a bonus box is hit, to determine which types of powerups are allowed
         in each game mode. By default all are accepted, override in child classes to get
         a different behaviour  */
-    virtual bool acceptPowerup(const PowerupType type) const { return true; }
+    virtual bool acceptPowerup(const PowerupManager::PowerupType type) const 
+                                    { return true; }
     
     /** Called by the code that draws the list of karts on the race GUI
       * to know what needs to be drawn in the current mode

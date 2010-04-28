@@ -268,7 +268,8 @@ void DefaultAIController::update(float dt)
     }
     // If we are supposed to use nitro, but have a zipper, 
     // use the zipper instead
-    if(m_controls->m_nitro && m_kart->getPowerup()->getType()==POWERUP_ZIPPER && 
+    if(m_controls->m_nitro && 
+        m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER && 
         m_kart->getSpeed()>1.0f && m_kart->getZipperTimeLeft()<=0)
     {
         // Make sure that not all AI karts use the zipper at the same
@@ -470,7 +471,8 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
 {
     m_controls->m_fire = false;
     if(m_kart->playingEmergencyAnimation() || 
-        m_kart->getPowerup()->getType() == POWERUP_NOTHING ) return;
+        m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING ) 
+        return;
 
     m_time_since_last_shot += DELTA;
 
@@ -490,12 +492,12 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
     // -------------------
     switch( m_kart->getPowerup()->getType() )
     {
-    case POWERUP_ZIPPER:
+    case PowerupManager::POWERUP_ZIPPER:
         // Do nothing. Further up a zipper is used if nitro should be selected,
         // saving the (potential more valuable nitro) for later
         break;
 
-    case POWERUP_BUBBLEGUM:
+    case PowerupManager::POWERUP_BUBBLEGUM:
         // Either use the bubble gum after 10 seconds, or if the next kart 
         // behind is 'close' but not too close (too close likely means that the
         // kart is not behind but more to the side of this kart and so won't 
@@ -512,11 +514,11 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead. And some of them can fire backwards, too - which
     // isn't yet supported for AI karts.
-    case POWERUP_CAKE:
+    case PowerupManager::POWERUP_CAKE:
         m_controls->m_fire = (m_kart_ahead && m_distance_ahead < 20.0f) ||
                              m_time_since_last_shot > 10.0f;
         break;
-    case POWERUP_BOWLING:
+    case PowerupManager::POWERUP_BOWLING:
         {
             // Bowling balls slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
@@ -533,7 +535,7 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
                 m_controls->m_look_back = fire_backwards;
             break;
         }
-    case POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_PLUNGER:
         {
             // Plungers can be fired backwards and are faster,
             // so allow more distance for shooting.
@@ -548,7 +550,7 @@ void DefaultAIController::handleItems( const float DELTA, const int STEPS )
                 m_controls->m_look_back = fire_backwards;
             break;
         }
-    case POWERUP_ANVIL:
+    case PowerupManager::POWERUP_ANVIL:
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             m_controls->m_fire = m_world->getTime()<1.0f && 
@@ -711,8 +713,9 @@ void DefaultAIController::handleNitroAndZipper()
     // Don't compute nitro usage if we don't have nitro or are not supposed
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
-    if( (m_kart->getEnergy()==0                          || m_nitro_level==NITRO_NONE)  &&
-        (m_kart->getPowerup()->getType()!=POWERUP_ZIPPER || m_item_tactic==IT_TEN_SECONDS) )
+    if( (m_kart->getEnergy()==0 || m_nitro_level==NITRO_NONE)  &&
+        (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER ||
+          m_item_tactic==IT_TEN_SECONDS                                    ) )
         return;
 
     // If a parachute or anvil is attached, the nitro doesn't give much

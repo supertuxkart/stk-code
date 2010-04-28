@@ -264,7 +264,8 @@ void NewAIController::update(float dt)
     }
     // If we are supposed to use nitro, but have a zipper, 
     // use the zipper instead
-    if(m_controls->m_nitro && m_kart->getPowerup()->getType()==POWERUP_ZIPPER && 
+    if(m_controls->m_nitro && 
+        m_kart->getPowerup()->getType()==PowerupManager::POWERUP_ZIPPER && 
         m_kart->getSpeed()>1.0f && m_kart->getZipperTimeLeft()<=0)
     {
         // Make sure that not all AI karts use the zipper at the same
@@ -310,7 +311,7 @@ void NewAIController::handleBraking()
         kart_ang_diff = normalizeAngle(kart_ang_diff);
         kart_ang_diff = fabsf(kart_ang_diff);
 
-        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD*20.0f;
+        const float MIN_TRACK_ANGLE = DEGREE_TO_RAD*190.0f;
         const float CURVE_INSIDE_PERC = 0.25f;
 
         //Brake only if the road does not goes somewhat straight.
@@ -371,11 +372,11 @@ void NewAIController::handleSteering(float dt)
     if( fabsf(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ))  >
        0.5f* m_quad_graph->getNode(m_track_node).getPathWidth()+1.0f )
     {
-        steer_angle = steerToPoint(m_quad_graph->getQuad(next).getCenter());
+        steer_angle = steerToPoint(m_last_target_point);
 
 #ifdef AI_DEBUG
-        m_debug_sphere->setPosition(m_quad_graph->getQuad(next).getCenter().toIrrVector());
-        std::cout << "- Outside of road: steer to center point." <<
+        m_debug_sphere->setPosition(m_last_target_point.toIrrVector());
+        std::cout << "- Outside of road: steer to last aimed at point." <<
             std::endl;
 #endif
     }
@@ -455,7 +456,8 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
 {
     m_controls->m_fire = false;
     if(m_kart->playingEmergencyAnimation() || 
-        m_kart->getPowerup()->getType() == POWERUP_NOTHING ) return;
+        m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING ) 
+        return;
 
     m_time_since_last_shot += DELTA;
 
@@ -475,12 +477,12 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
     // -------------------
     switch(m_kart->getPowerup()->getType() )
     {
-    case POWERUP_ZIPPER:
+    case PowerupManager::POWERUP_ZIPPER:
         // Do nothing. Further up a zipper is used if nitro should be selected,
         // saving the (potential more valuable nitro) for later
         break;
 
-    case POWERUP_BUBBLEGUM:
+    case PowerupManager::POWERUP_BUBBLEGUM:
         // Either use the bubble gum after 10 seconds, or if the next kart 
         // behind is 'close' but not too close (too close likely means that the
         // kart is not behind but more to the side of this kart and so won't 
@@ -497,11 +499,11 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
     // All the thrown/fired items might be improved by considering the angle
     // towards m_kart_ahead. And some of them can fire backwards, too - which
     // isn't yet supported for AI karts.
-    case POWERUP_CAKE:
+    case PowerupManager::POWERUP_CAKE:
         m_controls->m_fire = (m_kart_ahead && m_distance_ahead < 20.0f) ||
                              m_time_since_last_shot > 10.0f;
         break;
-    case POWERUP_BOWLING:
+    case PowerupManager::POWERUP_BOWLING:
         {
             // Bowling balls slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
@@ -518,7 +520,7 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
                 m_controls->m_look_back = fire_backwards;
             break;
         }
-    case POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_PLUNGER:
         {
             // Plungers can be fired backwards and are faster,
             // so allow more distance for shooting.
@@ -533,7 +535,7 @@ void NewAIController::handleItems( const float DELTA, const int STEPS )
                 m_controls->m_look_back = fire_backwards;
             break;
         }
-    case POWERUP_ANVIL:
+    case PowerupManager::POWERUP_ANVIL:
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             m_controls->m_fire = m_world->getTime()<1.0f && m_kart->getPosition()>2;
@@ -695,8 +697,9 @@ void NewAIController::handleNitroAndZipper()
     // Don't compute nitro usage if we don't have nitro or are not supposed
     // to use it, and we don't have a zipper or are not supposed to use
     // it (calculated).
-    if( (m_kart->getEnergy()==0                           || m_nitro_level==NITRO_NONE)  &&
-        (m_kart->getPowerup()->getType()!=POWERUP_ZIPPER  || m_item_tactic==IT_TEN_SECONDS) )
+    if( (m_kart->getEnergy()==0 || m_nitro_level==NITRO_NONE)  &&
+        (m_kart->getPowerup()->getType()!=PowerupManager::POWERUP_ZIPPER  ||
+         m_item_tactic==IT_TEN_SECONDS                                      ) )
         return;
 
     // If a parachute or anvil is attached, the nitro doesn't give much
@@ -838,10 +841,20 @@ float NewAIController::findNonCrashingAngle()
     Vec3 final_right  = q[2];
     Vec3 final_left   = q[3];
 
+    float sign        = 1;
     float very_right  = -atan2(right.getX()-xyz.getX(),
-                              right.getZ()-xyz.getZ());
+                               right.getZ()-xyz.getZ());
     float very_left   = -atan2(left.getX()-xyz.getX(),
-                              left.getZ()-xyz.getZ());
+                               left.getZ()-xyz.getZ());
+    if(very_left < very_right || very_right>M_PI*0.5f ||
+        very_left < -M_PI*0.5f)
+    {
+        sign = -1;
+        very_right  = -atan2(-right.getX()+xyz.getX(),
+                             -right.getZ()+xyz.getZ());
+        very_left   = -atan2(-left.getX()+xyz.getX(),
+                             -left.getZ()+xyz.getZ());
+    }
     float dist        = 0;
 
     while(dist<40.0f)
@@ -850,13 +863,14 @@ float NewAIController::findNonCrashingAngle()
         const Vec3 &right = q[2];
         const Vec3 &left  = q[3];
 
-        float angle_right = -atan2(right.getX()-xyz.getX(),
-                                  right.getZ()-xyz.getZ())
-                                  ;//- m_kart->getHeading();
-        float angle_left  = -atan2(left.getX()-xyz.getX(),
-                                  left.getZ()-xyz.getZ())
-                                  ;//- m_kart->getHeading();
-
+        float angle_right = -atan2(sign*(right.getX()-xyz.getX()),
+                                   sign*(right.getZ()-xyz.getZ()));
+        float angle_left  = -atan2(sign*(left.getX()-xyz.getX()),
+                                   sign*(left.getZ()-xyz.getZ()));
+#ifdef DO_PRINTS
+        printf("angle %f %f %f %f\n",
+            very_left, angle_left, angle_right, very_right);
+#endif
         // Stop if the left and the right beam overlap.
         if(angle_left<very_right ||
             angle_right>very_left) 
@@ -880,73 +894,15 @@ float NewAIController::findNonCrashingAngle()
                                                 m_successor_index[current_sector]);
         current_sector = m_next_node_index[current_sector];
     }
-    Vec3 middle=(final_left+final_right)*0.5f;
-    float steer_angle=steerToPoint(middle);
+    m_last_target_point = (final_left+final_right)*0.5f;
+    float steer_angle   = steerToPoint(m_last_target_point);
 #ifdef AI_DEBUG
     m_debug_left->setPosition(final_left.toIrrVector());
     m_debug_right->setPosition(final_right.toIrrVector());
-    m_debug_sphere->setPosition(middle.toIrrVector());
+    m_debug_sphere->setPosition(m_last_target_point.toIrrVector());
 #endif
     return steer_angle;
 }   // findNonCrashingAngle
-
-//-----------------------------------------------------------------------------
-/** Find the sector that at the longest distance from the kart, that can be
- *  driven to without crashing with the track, then find towards which of
- *  the two edges of the track is closest to the next curve after wards,
- *  and return the position of that edge.
- */
-void NewAIController::findNonCrashingPoint(Vec3 *result)
-{    
-    unsigned int sector = m_next_node_index[m_track_node];
-    int target_sector;
-
-    Vec3 direction;
-    Vec3 step_track_coord;
-    float distance;
-    int steps;
-
-    //We exit from the function when we have found a solution
-    while( 1 )
-    {
-        //target_sector is the sector at the longest distance that we can drive
-        //to without crashing with the track.
-        target_sector = m_next_node_index[sector];
-
-        //direction is a vector from our kart to the sectors we are testing
-        direction = m_quad_graph->getQuad(target_sector).getCenter() - m_kart->getXYZ();
-
-        float len=direction.length_2d();
-        steps = int( len / m_kart_length );
-        if( steps < 3 ) steps = 3;
-
-        //Protection against having vel_normal with nan values
-        if(len>0.0f) {
-            direction*= 1.0f/len;
-        }
-
-        Vec3 step_coord;
-        //Test if we crash if we drive towards the target sector
-        for( int i = 2; i < steps; ++i )
-        {
-            step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
-
-            m_quad_graph->spatialToTrack(&step_track_coord, step_coord,
-                                                   sector );
- 
-            distance = fabsf(step_track_coord[0]);
-
-            //If we are outside, the previous sector is what we are looking for
-            if ( distance + m_kart_width * 0.5f 
-                 > m_quad_graph->getNode(sector).getPathWidth() )
-            {
-                *result = m_quad_graph->getQuad(sector).getCenter();
-                return;
-            }
-        }
-        sector = target_sector;
-    }
-}   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
 void NewAIController::reset()

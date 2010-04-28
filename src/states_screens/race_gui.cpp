@@ -48,15 +48,15 @@ using namespace irr;
 RaceGUI::RaceGUI()
 {
     // Originally m_map_height was 100, and we take 480 as minimum res
-    const float scaling = irr_driver->getFrameSize().Height / 480.0;
+    const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_ai_size        =  14.0 * scaling;
-    m_marker_player_size    =  16.0 * scaling;
-    m_map_width             = 100.0 * scaling;
-    m_map_height            = 100.0 * scaling;
-    m_map_left              =  10.0 * scaling;
-    m_map_bottom            =  10.0 * scaling;
+    m_marker_ai_size        = (int)( 14.0f * scaling);
+    m_marker_player_size    = (int)( 16.0f * scaling);
+    m_map_width             = (int)(100.0f * scaling);
+    m_map_height            = (int)(100.0f * scaling);
+    m_map_left              = (int)( 10.0f * scaling);
+    m_map_bottom            = (int)( 10.0f * scaling);
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
     m_map_rendered_width    = map_texture;
@@ -429,7 +429,7 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
 {
     // If player doesn't have anything, do nothing.
     const Powerup* powerup = kart->getPowerup();
-    if(powerup->getType() == POWERUP_NOTHING) return;
+    if(powerup->getType() == PowerupManager::POWERUP_NOTHING) return;
     int n  = kart->getNumPowerup() ;
     if(n<1) return;    // shouldn't happen, but just in case
     if(n>5) n=5;       // Display at most 5 items

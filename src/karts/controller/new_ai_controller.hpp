@@ -130,15 +130,20 @@ private:
     
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
+
     /** For each node in the graph this list contains the chosen next node.
      *  For normal lap track without branches we always have 
      *  m_next_node_index[i] = (i+1) % size;
      *  but if a branch is possible, the AI will select one option here. 
      *  If the node is not used, m_next_node_index will be -1. */
     std::vector<int> m_next_node_index;
+
     /** For each graph node this list contains a list of the next X
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
+
+    /** The point the kart was aiming at when it was on track last. */
+    Vec3  m_last_target_point;
 
     float m_time_since_stuck;
 
@@ -163,7 +168,6 @@ private:
     void  handleNitroAndZipper();
     void  computeNearestKarts();
     void  checkCrashes(const int STEPS, const Vec3& pos);
-    void  findNonCrashingPoint(Vec3 *result);
     float findNonCrashingAngle();
 
     int   calcSteps();

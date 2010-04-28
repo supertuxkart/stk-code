@@ -22,39 +22,62 @@
 
 #include "irrlicht.h"
 
-#include "btBulletDynamicsCommon.h"
 #include <string>
+#include <vector>
+
+#include "btBulletDynamicsCommon.h"
 
 class Material;
 class XMLNode;
-
-// The anvil and parachute must be at the end of the enum, and the
-// zipper just before them (see Powerup::hitBonusBox).
-enum PowerupType {POWERUP_NOTHING,
-                  POWERUP_FIRST, 
-                  POWERUP_BUBBLEGUM = POWERUP_FIRST, 
-                  POWERUP_CAKE,
-                  POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
-                  POWERUP_SWITCH,
-                  POWERUP_PARACHUTE, 
-                  POWERUP_ANVIL,      //powerup.cpp assumes these two come last
-                  POWERUP_LAST=POWERUP_ANVIL,
-                  POWERUP_MAX};
 
 /**
   * \ingroup items
   */
 class PowerupManager
 {
+public:
+    // The anvil and parachute must be at the end of the enum, and the
+    // zipper just before them (see Powerup::hitBonusBox).
+    enum PowerupType {POWERUP_NOTHING,
+                      POWERUP_FIRST, 
+                      POWERUP_BUBBLEGUM = POWERUP_FIRST, 
+                      POWERUP_CAKE,
+                      POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
+                      POWERUP_SWITCH,
+                      POWERUP_PARACHUTE, 
+                      POWERUP_ANVIL,      //powerup.cpp assumes these two come last
+                      POWERUP_LAST=POWERUP_ANVIL,
+                      POWERUP_MAX
+    };
+
 private:
+    /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
-    float         m_all_max_distance[POWERUP_MAX];    // if a target is closer than this
-    float         m_all_force_to_target[POWERUP_MAX]; // apply this force to move towards
-                                                     // the target
-    float         m_all_max_turn_angle[POWERUP_MAX];  // maximum turn angle for homing
+
+    /** A maximum distance for homing powerups. */
+    float         m_all_max_distance[POWERUP_MAX];
+
+    /** A force to steer a powerup towards a target. */
+    float         m_all_force_to_target[POWERUP_MAX];
+
+    /** Maximum turn angle for steering of homing powerups. */
+    float         m_all_max_turn_angle[POWERUP_MAX];
+
+    /** The mesh for each model (if the powerup has a model), e.g. a switch
+        has none. */
     irr::scene::IMesh *m_all_meshes[POWERUP_MAX];
+
+    /** Size of the corresponding mesh. */
     btVector3     m_all_extends[POWERUP_MAX];
-    PowerupType   getPowerupType(const std::string &name);
+
+    /** For each powerup the weight (probability) used depending on the
+     *  number of players. */
+    //std::vector<int> m_weight[POWERUP_MAX];
+
+    PowerupType   getPowerupType(const std::string &name) const;
+
+    void          loadWeights(const XMLNode &node);
+
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();

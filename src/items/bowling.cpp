@@ -27,7 +27,8 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
+Bowling::Bowling(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_BOWLING, 
+                                       50.0f /* mass */)
 {
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getY()/2.0f;
     
@@ -76,7 +77,7 @@ Bowling::Bowling(Kart *kart) : Flyable(kart, POWERUP_BOWLING, 50.0f /* mass */)
  */
 void Bowling::init(const XMLNode &node, scene::IMesh *bowling)
 {
-    Flyable::init(node, bowling, POWERUP_BOWLING);
+    Flyable::init(node, bowling, PowerupManager::POWERUP_BOWLING);
     m_st_max_distance         = 20.0f;
     m_st_max_distance_squared = 20.0f * 20.0f;
     m_st_force_to_target      = 10.0f;

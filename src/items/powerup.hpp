@@ -35,24 +35,30 @@ class SFXBase;
 class Powerup
 {
 private:
-    RandomGenerator            m_random;
-    SFXBase                   *m_sound_use;
-    PowerupType                m_type;
-    int                        m_number;
+    RandomGenerator             m_random;
+    SFXBase                    *m_sound_use;
+    PowerupManager::PowerupType m_type;
+    int                         m_number;
     
 protected:
-    Kart*                      m_owner;
+    Kart*                       m_owner;
 
 public:
-                    Powerup  (Kart* kart_);
-                   ~Powerup  ();
-    void            set          (PowerupType _type, int n=1);
+                    Powerup      (Kart* kart_);
+                   ~Powerup      ();
+    void            set          (PowerupManager::PowerupType _type, int n=1);
     void            reset        ();
-    int             getNum       () const {return m_number;}
-    PowerupType     getType      () const {return m_type;  }
-    void            hitBonusBox  (int n, const Item &item, int newC=-1);
     Material*       getIcon      () const;
     void            use          ();
+
+    /** Returns the number of powerups. */
+    int             getNum       () const {return m_number;}
+    // ------------------------------------------------------------------------
+    /** Returns the type of this powerup. */
+    PowerupManager::PowerupType     
+                    getType      () const {return m_type;  }
+    // ------------------------------------------------------------------------
+    void            hitBonusBox  (int n, const Item &item, int newC=-1);
 };
 
 #endif

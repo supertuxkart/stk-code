@@ -70,7 +70,7 @@ public:
     virtual RaceGUI::KartIconDisplayInfo* getKartsDisplayInfo();
     virtual bool raceHasLaps(){ return false; }
     virtual void moveKartAfterRescue(Kart* kart);
-    virtual bool acceptPowerup(const PowerupType type) const;
+    virtual bool acceptPowerup(const PowerupManager::PowerupType type) const;
     
     virtual std::string getIdent() const;
     

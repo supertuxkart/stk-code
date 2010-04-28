@@ -222,7 +222,7 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Sets a new powerup. */
-    void setPowerup (PowerupType t, int n)
+    void setPowerup (PowerupManager::PowerupType t, int n)
     { 
         m_powerup.set(t, n);
     }   // setPowerup

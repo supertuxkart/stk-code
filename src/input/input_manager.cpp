@@ -104,50 +104,49 @@ void InputManager::handleStaticAction(int key, int value)
             if (race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_BUBBLEGUM, 10000);
-                kart->handleExplosion(kart->getXYZ(), true);
+                kart->setPowerup(PowerupManager::POWERUP_BUBBLEGUM, 10000);
             }
             break;
         case KEY_F2:
             if (race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_PLUNGER, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
         case KEY_F3:
             if (race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_CAKE, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_CAKE, 10000);
             }
             break;
         case KEY_F4:
             if (race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_SWITCH, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_SWITCH, 10000);
             }
             break;
         case KEY_F5:
             if (race_manager->getNumPlayers() ==1 )
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_BOWLING, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_BOWLING, 10000);
             }
             break;
         case KEY_F6:
             if (race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_PARACHUTE, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_PARACHUTE, 10000);
             }
             break;
         case KEY_F7:
             if (race_manager->getNumPlayers() == 1)
             {
                 Kart* kart = world->getLocalPlayerKart(0);
-                kart->setPowerup(POWERUP_ZIPPER, 10000);
+                kart->setPowerup(PowerupManager::POWERUP_ZIPPER, 10000);
             }
             break;
         case KEY_F11:

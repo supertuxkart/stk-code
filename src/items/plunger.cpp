@@ -34,7 +34,7 @@
 #include "utils/string_utils.hpp"
 
 // -----------------------------------------------------------------------------
-Plunger::Plunger(Kart *kart) : Flyable(kart, POWERUP_PLUNGER)
+Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     const float gravity = 0.0f;
 
@@ -108,7 +108,7 @@ Plunger::~Plunger()
 // -----------------------------------------------------------------------------
 void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 {
-    Flyable::init(node, plunger_model, POWERUP_PLUNGER);
+    Flyable::init(node, plunger_model, PowerupManager::POWERUP_PLUNGER);
 }   // init
 
 // -----------------------------------------------------------------------------

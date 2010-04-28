@@ -615,7 +615,7 @@ void World::removeKart(int kart_number, bool notifyOfElimination)
 //-----------------------------------------------------------------------------
 void World::getDefaultCollectibles(int& collectible_type, int& amount )
 {
-    collectible_type = POWERUP_NOTHING;
+    collectible_type = PowerupManager::POWERUP_NOTHING;
     amount = 0;
 }
 //-----------------------------------------------------------------------------

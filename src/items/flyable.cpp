@@ -36,15 +36,16 @@
 #include "utils/string_utils.hpp"
 
 // static variables:
-float         Flyable::m_st_speed[POWERUP_MAX];
-scene::IMesh* Flyable::m_st_model[POWERUP_MAX];
-float         Flyable::m_st_min_height[POWERUP_MAX];
-float         Flyable::m_st_max_height[POWERUP_MAX];
-float         Flyable::m_st_force_updown[POWERUP_MAX];
-Vec3          Flyable::m_st_extend[POWERUP_MAX];
+float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
+scene::IMesh* Flyable::m_st_model       [PowerupManager::POWERUP_MAX];
+float         Flyable::m_st_min_height  [PowerupManager::POWERUP_MAX];
+float         Flyable::m_st_max_height  [PowerupManager::POWERUP_MAX];
+float         Flyable::m_st_force_updown[PowerupManager::POWERUP_MAX];
+Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(Kart *kart, PowerupType type, float mass) : Moveable()
+Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type, float mass) 
+       : Moveable()
 {
     // get the appropriate data from the static fields
     m_speed                        = m_st_speed[type];
@@ -128,7 +129,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
 }   // createPhysics
 // -----------------------------------------------------------------------------
 void Flyable::init(const XMLNode &node, scene::IMesh *model,
-                   PowerupType type)
+                   PowerupManager::PowerupType type)
 {
     m_st_speed[type]        = 25.0f;
     m_st_max_height[type]   = 1.0f;
@@ -353,15 +354,16 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
         RaceGUI* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
         switch(m_type) {
-            case POWERUP_CAKE:
+            case PowerupManager::POWERUP_CAKE:
                 hit_message += StringUtils::insertValues(_("%s eats too much of %s's cake"),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();
             break;
-            case POWERUP_PLUNGER: // Handled by plunger.cpp Plunger::hit
+            case PowerupManager::POWERUP_PLUNGER: 
+                // Handled by plunger.cpp Plunger::hit
             break;
-            case POWERUP_BOWLING:
+            case PowerupManager::POWERUP_BOWLING:
                 hit_message += StringUtils::insertValues(_("%s will not play bowling with %s again"),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()

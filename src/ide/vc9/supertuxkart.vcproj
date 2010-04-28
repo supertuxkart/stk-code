@@ -219,6 +219,15 @@
 				<File
 					RelativePath="..\..\guiengine\event_handler.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							GeneratePreprocessedFile="0"
+							KeepComments="false"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\guiengine\modaldialog.cpp"

@@ -57,12 +57,12 @@ Powerup::~Powerup()
  */
 void Powerup::reset()
 {
-    m_type = POWERUP_NOTHING;
+    m_type = PowerupManager::POWERUP_NOTHING;
     m_number = 0;
     
     int type, number;
     World::getWorld()->getDefaultCollectibles( type, number );
-    set( (PowerupType)type, number );
+    set( (PowerupManager::PowerupType)type, number );
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void Powerup::reset()
  *  \param type Thew new type.
  *  \param n Number of items of the given type.
  */
-void Powerup::set(PowerupType type, int n)
+void Powerup::set(PowerupManager::PowerupType type, int n)
 {
     if (m_type==type)
     {
@@ -90,32 +90,32 @@ void Powerup::set(PowerupType type, int n)
     
     switch (m_type)
     {
-        case POWERUP_ZIPPER:
+        case PowerupManager::POWERUP_ZIPPER:
             break ;
             
-        case POWERUP_BOWLING:
+        case PowerupManager::POWERUP_BOWLING:
             m_sound_use          = sfx_manager->createSoundSource("bowling_roll");
             break ;
             
-        case POWERUP_ANVIL:
+        case PowerupManager::POWERUP_ANVIL:
             m_sound_use          = sfx_manager->createSoundSource("use_anvil");
             break;
             
-        case POWERUP_PARACHUTE:
+        case PowerupManager::POWERUP_PARACHUTE:
             m_sound_use          = sfx_manager->createSoundSource("use_parachute");
             break;
             
-        case POWERUP_BUBBLEGUM:
+        case PowerupManager::POWERUP_BUBBLEGUM:
             m_sound_use          = sfx_manager->createSoundSource("goo");
             break ;
             
-        case POWERUP_SWITCH:
+        case PowerupManager::POWERUP_SWITCH:
             m_sound_use          = sfx_manager->createSoundSource("swap");
             break;
             
-        case POWERUP_NOTHING:
-        case POWERUP_CAKE:
-        case POWERUP_PLUNGER:
+        case PowerupManager::POWERUP_NOTHING:
+        case PowerupManager::POWERUP_CAKE:
+        case PowerupManager::POWERUP_PLUNGER:
         default :
             m_sound_use          = sfx_manager->createSoundSource("shot");
             break ;
@@ -140,7 +140,9 @@ Material *Powerup::getIcon() const
 void Powerup::use()
 {
     // Play custom kart sound when collectible is used
-    if (m_type != POWERUP_NOTHING && m_type != POWERUP_ZIPPER) m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
+    if (m_type != PowerupManager::POWERUP_NOTHING && 
+        m_type != PowerupManager::POWERUP_ZIPPER) 
+        m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
@@ -155,9 +157,9 @@ void Powerup::use()
     RaceGUI* gui = world->getRaceGUI();
     switch (m_type)
     {
-    case POWERUP_ZIPPER:   m_owner->handleZipper();
+    case PowerupManager::POWERUP_ZIPPER:   m_owner->handleZipper();
         break ;
-    case POWERUP_SWITCH:
+    case PowerupManager::POWERUP_SWITCH:
         item_manager->switchItems();
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
@@ -165,16 +167,16 @@ void Powerup::use()
         gui->addMessage(_("Magic, son. Nothing else in the world smells like that."), NULL, 3.0f, 40,
                         video::SColor(255, 255, 255, 255), false);
         break;
-    case POWERUP_CAKE:
-    case POWERUP_BOWLING:
-    case POWERUP_PLUNGER:
+    case PowerupManager::POWERUP_CAKE:
+    case PowerupManager::POWERUP_BOWLING:
+    case PowerupManager::POWERUP_PLUNGER:
         
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
         projectile_manager->newProjectile(m_owner, m_type);
         break ;
         
-    case POWERUP_BUBBLEGUM:
+    case PowerupManager::POWERUP_BUBBLEGUM:
         {
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
@@ -192,7 +194,7 @@ void Powerup::use()
         }
         break;
         
-    case POWERUP_ANVIL:
+    case PowerupManager::POWERUP_ANVIL:
         
         //Attach an anvil(twice as good as the one given
         //by the bananas) to the kart in the 1st position.
@@ -227,7 +229,7 @@ void Powerup::use()
 
         break;
 
-    case POWERUP_PARACHUTE:
+    case PowerupManager::POWERUP_PARACHUTE:
         {
             Kart* player_kart = NULL;
             //Attach a parachutte(that last twice as long as the
@@ -261,14 +263,14 @@ void Powerup::use()
         }
         break;
 
-    case POWERUP_NOTHING:
+    case PowerupManager::POWERUP_NOTHING:
     default :              break ;
     }
 
     if ( m_number <= 0 )
     {
         m_number = 0;
-        m_type   = POWERUP_NOTHING;
+        m_type   = PowerupManager::POWERUP_NOTHING;
     }
 }   // use
 
@@ -291,15 +293,16 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     //The probabilities of getting the anvil or the parachute increase
     //depending on how bad the owner's position is. For the first
     //driver the posibility is none, for the last player is 15 %.
-    if(m_owner->getPosition() != 1 && m_type == POWERUP_NOTHING &&
-       world->acceptPowerup(POWERUP_PARACHUTE) &&
-       world->acceptPowerup(POWERUP_ANVIL))
+    if(m_owner->getPosition() != 1 && 
+       m_type == PowerupManager::POWERUP_NOTHING &&
+       world->acceptPowerup(PowerupManager::POWERUP_PARACHUTE) &&
+       world->acceptPowerup(PowerupManager::POWERUP_ANVIL))
     {
         // On client: just set the value
         if(network_manager->getMode()==NetworkManager::NW_CLIENT)
         {
             m_random.get(100);    // keep random numbers in sync
-            set( (PowerupType)add_info, 1);
+            set( (PowerupManager::PowerupType)add_info, 1);
             return;
         }
         const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
@@ -315,7 +318,7 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
                 if(kart->isEliminated() || kart == m_owner) continue;
                 if(kart->getPosition() == 1 && kart->hasFinishedRace())
                 {
-                    set(POWERUP_PARACHUTE, 1);
+                    set(PowerupManager::POWERUP_PARACHUTE, 1);
                     if(network_manager->getMode()==NetworkManager::NW_SERVER)
                     {
                         race_state->itemCollected(m_owner->getWorldKartId(), 
@@ -326,7 +329,8 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
                 }
             }
 
-            set( (m_random.get(2) == 0 ? POWERUP_ANVIL : POWERUP_PARACHUTE), 1 );
+            set( (m_random.get(2) == 0 ? PowerupManager::POWERUP_ANVIL 
+                                       : PowerupManager::POWERUP_PARACHUTE),1);
 
             if(network_manager->getMode()==NetworkManager::NW_SERVER)
             {
@@ -343,11 +347,11 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     // dependent on the server informaion:
     if(network_manager->getMode()==NetworkManager::NW_CLIENT)
     {
-        if(m_type==POWERUP_NOTHING)
+        if(m_type==PowerupManager::POWERUP_NOTHING)
         {
-            set( (PowerupType)add_info, n  );
+            set( (PowerupManager::PowerupType)add_info, n  );
         }
-        else if((PowerupType)add_info==m_type)
+        else if((PowerupManager::PowerupType)add_info==m_type)
         {
             m_number+=n;
             if(m_number > MAX_POWERUPS) m_number = MAX_POWERUPS;
@@ -363,10 +367,11 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
     //(POWERUP_MAX - 1) is the last valid id. We substract 2 because because we have to
     //exclude the anvil and the parachute which are handled above, but later we
     //have to add 1 to prevent having a value of 0 since that isn't a valid powerup.
-    PowerupType newC;
+    PowerupManager::PowerupType newC;
     while(true)
     {
-        newC = (PowerupType)(m_random.get(POWERUP_MAX - 1 - 2) + 1);
+        newC = (PowerupManager::PowerupType)
+                  (m_random.get(PowerupManager::POWERUP_MAX - 1 - 2) + 1);
         // allow the game mode to allow or disallow this type of powerup
         if(world->acceptPowerup(newC)) break;
     }
@@ -380,14 +385,15 @@ void Powerup::hitBonusBox(int n, const Item &item, int add_info)
                                   newC);
     }
 
-    if(m_type==POWERUP_NOTHING)
+    if(m_type==PowerupManager::POWERUP_NOTHING)
     {
         set( newC, n );
     }
     else if(newC==m_type)
     {
         m_number+=n;
-        if(m_number > MAX_POWERUPS) m_number = MAX_POWERUPS;
+        if(m_number > MAX_POWERUPS) 
+            m_number = MAX_POWERUPS;
     }
     // Ignore new powerup if it is different from the current one
 }   // hitBonusBox

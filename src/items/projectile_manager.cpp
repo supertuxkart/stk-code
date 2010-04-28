@@ -168,15 +168,15 @@ void ProjectileManager::updateClient(float dt)
 
 }   // updateClient
 // -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(Kart *kart, PowerupType type)
+Flyable *ProjectileManager::newProjectile(Kart *kart, 
+                                          PowerupManager::PowerupType type)
 {
     Flyable *f;
     switch(type) 
     {
-        case POWERUP_BOWLING: f = new Bowling(kart); break;
-        case POWERUP_PLUNGER: f = new Plunger(kart); break;
-        case POWERUP_CAKE:    f = new Cake(kart);  break;
-       // case POWERUP_BUBBLEGUM: f = new BubbleGum(kart); break;
+        case PowerupManager::POWERUP_BOWLING: f = new Bowling(kart); break;
+        case PowerupManager::POWERUP_PLUNGER: f = new Plunger(kart); break;
+        case PowerupManager::POWERUP_CAKE:    f = new Cake(kart);  break;
         default:              return NULL;
     }
     m_active_projectiles.push_back(f);
@@ -186,7 +186,8 @@ Flyable *ProjectileManager::newProjectile(Kart *kart, PowerupType type)
 // -----------------------------------------------------------------------------
 /** See if there is an old, unused explosion object available. If so,
  *  reuse this object, otherwise create a new one. */
-Explosion* ProjectileManager::newExplosion(const Vec3& coord, const char* explosion_sound)
+Explosion* ProjectileManager::newExplosion(const Vec3& coord, 
+                                           const char* explosion_sound)
 {
     Explosion *e = new Explosion(coord, explosion_sound);
     m_active_explosions.push_back(e);

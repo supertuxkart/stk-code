@@ -304,7 +304,7 @@ void PlayerController::update(float dt)
 
     if ( m_controls->m_fire && !m_kart->playingEmergencyAnimation())
     {
-        if (m_kart->getPowerup()->getType()==POWERUP_NOTHING) 
+        if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING) 
             m_kart->beep();
     }
     

@@ -35,6 +35,7 @@
 PowerupManager* powerup_manager=0;
 
 //-----------------------------------------------------------------------------
+/** The constructor initialises everything to zero. */
 PowerupManager::PowerupManager()
 {
     for(int i=0; i<POWERUP_MAX; i++)
@@ -45,6 +46,7 @@ PowerupManager::PowerupManager()
 }   // PowerupManager
 
 //-----------------------------------------------------------------------------
+/** Destructor, frees all meshes. */
 PowerupManager::~PowerupManager()
 {
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -52,10 +54,11 @@ PowerupManager::~PowerupManager()
         if(m_all_meshes[(PowerupType)i])
             m_all_meshes[(PowerupType)i]->drop();
     }
- 
 }   // ~PowerupManager
 
 //-----------------------------------------------------------------------------
+/** Removes any textures so that they can be reloaded. FIXME: missing atm.
+ */
 void PowerupManager::removeTextures()
 {
 }   // removeTextures
@@ -65,7 +68,7 @@ void PowerupManager::removeTextures()
  *  \param name Name of the powerup to look up.
  *  \return The type, or POWERUP_NOTHING if the name is not found
  */
-PowerupType PowerupManager::getPowerupType(const std::string &name)
+PowerupManager::PowerupType PowerupManager::getPowerupType(const std::string &name) const
 {
     // Must match the order of PowerupType in powerup_manager.hpp!!
     static std::string powerup_names[] = {
@@ -139,4 +142,15 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);    break;
         default:;
     }   // switch
+    
+    const XMLNode *n1 = node.getNode("first"); loadWeights(*n1);
+    const XMLNode *n2 = node.getNode("top33"); loadWeights(*n2);
+    const XMLNode *n3 = node.getNode("mid33"); loadWeights(*n3);
+    const XMLNode *n4 = node.getNode("end33"); loadWeights(*n4);
+    const XMLNode *n5 = node.getNode("last");  loadWeights(*n5);
 }   // LoadNode
+
+// ----------------------------------------------------------------------------
+void PowerupManager::loadWeights(const XMLNode &node)
+{
+}   // loadWeights

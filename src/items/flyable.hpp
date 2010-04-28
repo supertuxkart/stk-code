@@ -54,26 +54,59 @@ private:
     bool              m_adjust_up_velocity;
 
 protected:
-    Kart*             m_owner;              // the kart which released this flyable
-    PowerupType       m_type;               // cake, ball, etc
+    /** Kart which shot this flyable. */
+    Kart*             m_owner;
+
+    /** Type of the powerup. */
+    PowerupManager::PowerupType       
+                      m_type; 
+
+    /** Collision shape of this Flyable. */
     btCollisionShape *m_shape;
+
+    /** Maximum height above terrain. */
     float             m_max_height;
+
+    /** Minimum height above terrain. */
     float             m_min_height;
-    float             m_average_height;     // average of m_{min,ax}_height
+
+    /** Average of average of m_{min,ax}_height. */
+    float             m_average_height;
+
+    /** Force pushing the Flyable up. */
     float             m_force_updown;
+
+    /** Speed of this Flyable. */
     float             m_speed;
+
+    /** Mass of this Flyable. */
     float             m_mass;
+
+    /** Size of this flyable. */
     Vec3              m_extend;
+
     // The flyable class stores the values for each flyable type, e.g.
     // speed, min_height, max_height. These variables must be static,
     // so we need arrays of these variables to have different values
     // for bowling balls, missiles, ...
-    static float      m_st_speed[POWERUP_MAX];         // Speed of the projectile
-    static scene::IMesh *m_st_model[POWERUP_MAX];         // 3d model
-    static float      m_st_min_height[POWERUP_MAX];    // min height above track
-    static float      m_st_max_height[POWERUP_MAX];    // max height above track
-    static float      m_st_force_updown[POWERUP_MAX];  // force pushing up/down
-    static Vec3       m_st_extend[POWERUP_MAX];        // size of the model
+
+    /** Speed of the projectile. */
+    static float      m_st_speed[PowerupManager::POWERUP_MAX];
+
+    /** The mesh of this Flyable. */
+    static scene::IMesh *m_st_model[PowerupManager::POWERUP_MAX];
+
+    /** Minimum height above track. */
+    static float      m_st_min_height[PowerupManager::POWERUP_MAX];
+
+    /**Max height above track. */
+    static float      m_st_max_height[PowerupManager::POWERUP_MAX];
+
+    /** Force pushing up/down. */
+    static float      m_st_force_updown[PowerupManager::POWERUP_MAX];
+
+    /** Size of the model. */
+    static Vec3       m_st_extend[PowerupManager::POWERUP_MAX];
 
     /** time since thrown. used so a kart can't hit himself when trying something,
         and also to put some time limit to some collectibles */
@@ -105,14 +138,15 @@ protected:
                                     const btTransform* customDirection=NULL);
 public:
 
-                 Flyable     (Kart* kart, PowerupType type, float mass=1.0f);
+                 Flyable     (Kart* kart, PowerupManager::PowerupType type, 
+                              float mass=1.0f);
     virtual     ~Flyable     ();
     /** Enables/disables adjusting ov velocity depending on height above
      *  terrain. Missiles can 'follow the terrain' with this adjustment,
      *  but gravity will basically be disabled.                          */
     void         setAdjustUpVelocity(bool f) { m_adjust_up_velocity = f; }
     static void  init        (const XMLNode &node, scene::IMesh *model,
-                              PowerupType type);
+                              PowerupManager::PowerupType type);
     virtual void update      (float);
     void         updateFromServer(const FlyableInfo &f, float dt);
 

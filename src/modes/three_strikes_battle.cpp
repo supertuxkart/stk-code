@@ -324,12 +324,15 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
 }   // raceResultOrder
 
 //-----------------------------------------------------------------------------
-bool ThreeStrikesBattle::acceptPowerup(const PowerupType type) const
+bool ThreeStrikesBattle::acceptPowerup(const PowerupManager::PowerupType type) const
 {
     // these powerups don't make much sense in battle mode
-    if (type == POWERUP_PARACHUTE || type == POWERUP_ANVIL ||
-        type == POWERUP_BUBBLEGUM || type == POWERUP_ZIPPER ||
-        type == POWERUP_SWITCH    || type == POWERUP_PLUNGER)
+    if (type == PowerupManager::POWERUP_PARACHUTE || 
+        type == PowerupManager::POWERUP_ANVIL     ||
+        type == PowerupManager::POWERUP_BUBBLEGUM || 
+        type == PowerupManager::POWERUP_ZIPPER    ||
+        type == PowerupManager::POWERUP_SWITCH    || 
+        type == PowerupManager::POWERUP_PLUNGER)
     {
        return false;
     }
