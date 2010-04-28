@@ -149,7 +149,6 @@ supertuxkart_SOURCES = \
  items/projectile_manager.hpp \
  items/rubber_band.cpp \
  items/rubber_band.hpp \
- karts/auto_kart.hpp \
  karts/controller/ai_base_controller.cpp \
  karts/controller/ai_base_controller.hpp \
  karts/controller/controller.cpp \
@@ -167,7 +166,6 @@ supertuxkart_SOURCES = \
  karts/controller/player_controller.hpp \
  karts/kart.cpp \
  karts/kart.hpp \
- karts/kart_control.hpp \
  karts/kart_model.cpp \
  karts/kart_model.hpp \
  karts/kart_properties.cpp \
@@ -354,6 +352,4 @@ supertuxkart_LDADD = \
         $(irrlicht_LIBS) $(bullet_LIBS) $(enet_LIBS) \
         $(opengl_LIBS) $(openal_LIBS) $(oggvorbis_LIBS) \
         $(INTLLIBS)
-
-EXTRA_DIST = robots/empty_robot.cpp robots/empty_robot.hpp
 
