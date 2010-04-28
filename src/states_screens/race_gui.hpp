@@ -121,9 +121,14 @@ private:
     // -------------------------
     /** The mini map of the track. */
     video::ITexture *m_mini_map;
+    
+    /** used to render lap count next to the map without overlap */
+    int              m_map_right_side_x;
+    bool             m_minimap_on_left;
+    
     /** The size of a single marker in pixels, must be a power of 2. */
     int              m_marker_rendered_size;
-
+    
     /** The size of a single marker on the screen for AI karts, 
      *  need not be a power of 2. */
     int              m_marker_ai_size;

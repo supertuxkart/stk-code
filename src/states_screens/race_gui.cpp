@@ -47,6 +47,8 @@ using namespace irr;
  */
 RaceGUI::RaceGUI()
 {
+    m_map_right_side_x = 0;
+    
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
@@ -57,6 +59,8 @@ RaceGUI::RaceGUI()
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
     m_map_bottom            = (int)( 10.0f * scaling);
+    m_minimap_on_left       = true;
+    
     // Minimap is also rendered bigger via OpenGL, so find power-of-two again
     const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
     m_map_rendered_width    = map_texture;
@@ -69,6 +73,7 @@ RaceGUI::RaceGUI()
     if (race_manager->getNumLocalPlayers() == 3)
     {
         m_map_left = UserConfigParams::m_width - m_map_width;
+        m_minimap_on_left = false;
     }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
@@ -329,7 +334,8 @@ void RaceGUI::drawGlobalMiniMap()
                          m_map_left + m_map_width, lower_y);
     core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
     irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
-    
+    m_map_right_side_x = dest.LowerRightCorner.X;
+
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const Kart *kart = world->getKart(i);
@@ -608,8 +614,31 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
     if(lap<0) return;  // don't display 'lap 0/...'
 
     core::recti pos;
-    pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.15f*UserConfigParams::m_width);
     pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
+
+    // place lap count somewhere on the left of the screen
+    if (m_minimap_on_left)
+    {
+        // check if mini-map is within Y coords of this player.
+        // if the mini-map is not even in the viewport of this player, don't bother placing
+        // the lap text at the right of the minimap.
+        if (UserConfigParams::m_height - m_map_bottom - m_map_height > viewport.LowerRightCorner.Y)
+        {
+            pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.1f*UserConfigParams::m_width);
+        }
+        else
+        {
+            // place lap text at the right of the mini-map
+            const int calculated_x = viewport.UpperLeftCorner.X + (int)(0.05f*UserConfigParams::m_width);
+            pos.UpperLeftCorner.X  = std::max(calculated_x, m_map_right_side_x + 15); // don't overlap minimap
+        }
+    }
+    else
+    {
+        // mini-map is on the right, and lap text on right, so no overlap possible
+        pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.05f*UserConfigParams::m_width);
+    }
+    
     gui::IGUIFont* font    = GUIEngine::getFont();
     
     int font_height        = (int)(font->getDimension(L"X").Height);
