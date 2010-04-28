@@ -282,7 +282,7 @@ void RaceGUI::renderPlayerView(const Kart *kart)
     drawPowerupIcons    (kart, viewport, scaling);
     drawEnergyMeter     (kart, viewport, scaling);
     drawSpeed           (kart, viewport, scaling);
-    drawLap             (info, kart, viewport, scaling);
+    drawLap             (info, kart, viewport);
 
 }   // renderPlayerView
 
@@ -598,8 +598,7 @@ void RaceGUI::drawSpeed(const Kart* kart, const core::recti &viewport,
 
 //-----------------------------------------------------------------------------
 void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart, 
-                      const core::recti &viewport, 
-                      const core::vector2df &scaling)
+                      const core::recti &viewport)
 {
     // Don't display laps in follow the leader mode
     if(!World::getWorld()->raceHasLaps()) return;
@@ -609,14 +608,11 @@ void RaceGUI::drawLap(const KartIconDisplayInfo* info, const Kart* kart,
     if(lap<0) return;  // don't display 'lap 0/...'
 
     core::recti pos;
-    pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X 
-                           + (int)(0.15f*UserConfigParams::m_width*scaling.X);
+    pos.UpperLeftCorner.X  = viewport.UpperLeftCorner.X + (int)(0.15f*UserConfigParams::m_width);
     pos.UpperLeftCorner.Y  = viewport.LowerRightCorner.Y;
     gui::IGUIFont* font    = GUIEngine::getFont();
     
-    //FIXME: font height is multiplied by "scaling.Y" here, but the font itself is actually not scaled,
-    //       resulting in overlapping of the two lines
-    int font_height        = (int)(font->getDimension(L"X").Height*scaling.Y);
+    int font_height        = (int)(font->getDimension(L"X").Height);
     
     if (kart->hasFinishedRace())
     {

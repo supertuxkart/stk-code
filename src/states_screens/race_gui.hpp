@@ -173,8 +173,7 @@ private:
     void drawSpeed             (const Kart* kart, const core::recti &viewport, 
                                 const core::vector2df &scaling);
     void drawLap               (const KartIconDisplayInfo* info, const Kart* kart,
-                                const core::recti &viewport, 
-                                const core::vector2df &scaling);
+                                const core::recti &viewport);
     void drawGlobalPlayerIcons (const KartIconDisplayInfo* info);
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
