@@ -131,10 +131,15 @@ void CheckStructure::trigger(unsigned int kart_index)
                           cs->m_is_active[kart_index] = !cs->m_is_active[kart_index];
                           if(UserConfigParams::m_check_debug)
                           {
+                              // At least on gcc 4.3.2 we can't simply print 
+                              // cs->m_is_active[kart_index] ("cannot pass objects of
+                              // non-POD type ‘struct std::_Bit_reference’ through ‘...’; 
+                              // call will abort at runtime"). So we use this somewhat
+                              // unusual but portable construct.
                               printf("CHECK: %s %d triggered, setting %d to %d.\n",
                                      World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                                      m_index, m_activate_check_index,
-                                     cs->m_is_active[kart_index]);
+                                     cs->m_is_active[kart_index]==true);
                           }
                           break;
                       }
