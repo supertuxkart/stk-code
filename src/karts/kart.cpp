@@ -1221,12 +1221,21 @@ void Kart::updatePhysics(float dt)
     // when going faster, use higher pitch for engine
     if(m_engine_sound && sfx_manager->sfxAllowed())
     {
-        if(isOnGround()) 
+        if(isOnGround())
         {
-            m_engine_sound->speed(0.6f + (float)(m_speed / max_speed)*0.7f);
+            // Engine noise is based half in total speed, half in fake gears:
+            // With a sawtooth graph like /|/|/| we get 3 even spaced gears,
+            // ignoring the gear settings from stk_config, but providing a
+            // good enough brrrBRRRbrrrBRRR sound effect. Speed factor makes
+            // it a "staired sawtooth", so more acoustically rich.
+            float gears = 3.0f * fmod((float)(m_speed / max_speed), 0.333334f);
+            m_engine_sound->speed(0.6f +
+                                  (float)(m_speed / max_speed) * 0.35f +
+                                  gears * 0.35f);
         }
         else
         {
+            // When flying, fixed and fast engine noise to make it more scary
             m_engine_sound->speed(1.4f);
         }
         m_engine_sound->position(getXYZ());
