@@ -21,7 +21,7 @@
         <div width="75%" height="40" layout="horizontal-row" >
             <label proportion="2" height="100%"
                     I18N="Section in the audio/video settings submenu" text="Music"/>
-            <checkbox id="music_enabled" width="40" icon="gui/glasscheckbox.png" height="40"/>
+            <checkbox id="music_enabled" width="40" height="40"/>
             <spacer width="20" height="100%" />
             <label proportion="1" height="100%" I18N="Next to checkbox in settings menu" text="Enabled"/>
         </div>
