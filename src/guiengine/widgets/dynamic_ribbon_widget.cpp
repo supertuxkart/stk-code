@@ -202,7 +202,8 @@ void DynamicRibbonWidget::setSubElements()
     float ratio_zoom = (float)row_height / (float)(m_child_height - m_label_height);
     m_col_amount = (int)round( w / ( m_child_width*ratio_zoom ) );
     
-    // ajust column amount to not add more items slot than we actually need
+    
+    // ajust column amount to not add more item slots than we actually need
     const int item_count = m_items.size();
     //std::cout << "item_count=" << item_count << ", row_amount*m_col_amount=" << m_row_amount*m_col_amount << std::endl;
     if (m_row_amount*m_col_amount > item_count)
@@ -210,7 +211,6 @@ void DynamicRibbonWidget::setSubElements()
         m_col_amount = (int)ceil((float)item_count/(float)m_row_amount);
         //std::cout << "Adjusting m_col_amount to be " << m_col_amount << std::endl;
     }
-    
         
     // Hide arrows when everything is visible
     if (item_count <= m_row_amount*m_col_amount)
@@ -666,25 +666,61 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::updateItemDisplay()
 {
-    // Check if we need to update the number of icons in the ribbon
+    // ---- Check if we need to update the number of icons in the ribbon
     if ((int)m_items.size() != m_previous_item_count)
     {
         setSubElements();
         m_previous_item_count = m_items.size();
     }
     
+    // ---- some variables
     int icon_id = 0;
     
     const int row_amount = m_rows.size();
     const int item_amount = m_items.size();
     
+    //FIXME: isn't this set by 'setSubElements' already?
     m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
     
-    const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
+    //const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
     
+    // the number of items that fit perfectly the number of rows we have
+    // (this value will be useful to compute scrolling)
+    int fitting_item_amount = m_needed_cols * row_amount;
+    
+    // ---- to determine which items go in which cell of the dynamic ribbon now,
+    //      we create a temporary 2D table and fill them with the ID of the item
+    //      they need to display.
+    int item_placement[row_amount][m_needed_cols];
+    int counter = 0;
+    for (int c=0; c<m_needed_cols; c++)
+    {
+        for (int r=0; r<row_amount; r++)
+        {
+            const int items_in_row = m_rows[r].m_children.size();
+            if (c >= items_in_row)
+            {
+                item_placement[r][c] = -1;
+                //std::cout << item_placement[r][c] << "  ";
+                continue;
+            }
+            
+            int newVal = counter + m_scroll_offset*row_amount;
+            while (newVal >= fitting_item_amount) newVal -= fitting_item_amount;
+            item_placement[r][c] = newVal;
+            
+            //std::cout << newVal << "  ";
+            counter++;
+        }
+        //std::cout << std::endl;
+    }
+    
+    // ---- iterate through the rows, and set the items of each row to match those of the table
     for (int n=0; n<row_amount; n++)
     {
         RibbonWidget& row = m_rows[n];
+        
+        //std::cout << "Row " << n << "\n{\n";
         
         const int items_in_row = row.m_children.size();
         for (int i=0; i<items_in_row; i++)
@@ -692,12 +728,9 @@ void DynamicRibbonWidget::updateItemDisplay()
             IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
             assert(icon != NULL);
             
-            int col_scroll = i + m_scroll_offset;
-            while (col_scroll > max_scroll) col_scroll -= max_scroll+1;
+            icon_id = item_placement[n][i];
             
-            icon_id = (col_scroll)*row_amount + n;
-            
-            if (icon_id < item_amount)
+            if (icon_id < item_amount && icon_id != -1)
             {
                 std::string item_icon = (m_items[icon_id].m_animated ?
                                          m_items[icon_id].m_all_images[0] :
@@ -709,6 +742,8 @@ void DynamicRibbonWidget::updateItemDisplay()
                 icon->m_text                  = m_items[icon_id].m_user_name;
                 icon->m_badges                = m_items[icon_id].m_badges;
                 
+                //std::cout << "    item " << i << " is " << m_items[icon_id].m_code_name << "\n";
+                
                 //std::wcout << L"Setting widget text '" << icon->m_text.c_str() << L"'\n";
                 
                 // if the ribbon has no "ribbon-wide" label, call will do nothing
@@ -718,6 +753,7 @@ void DynamicRibbonWidget::updateItemDisplay()
             {
                 icon->setImage( "textures/transparence.png", IconButtonWidget::ICON_PATH_TYPE_RELATIVE );
                 icon->m_properties[PROP_ID] = NO_ITEM_ID;
+                //std::cout << "    item " << i << " is a FILLER\n";
             }
         } // next column
     } // next row
