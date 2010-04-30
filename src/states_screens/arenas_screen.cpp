@@ -68,6 +68,24 @@ ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 
 // ------------------------------------------------------------------------------------------------------
 
+void ArenasScreen::init()
+{
+    buildTrackList();
+    
+    // select something by default for the game master
+    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
+    assert( w != NULL );
+    w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
+}   // init
+
+// ------------------------------------------------------------------------------------------------------
+
+void ArenasScreen::tearDown()
+{
+}   // tearDown
+
+// ------------------------------------------------------------------------------------------------------
+
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "tracks")
@@ -79,9 +97,34 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         if (UserConfigParams::m_verbosity>=5)
             std::cout << "Clicked on arena " << selection.c_str() << std::endl;
 
+        
         if (selection == "random_track")
         {
-            // TODO: random arena selection
+            RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+            assert( tabs != NULL );
+            
+            const std::vector<int>& curr_group = track_manager->getArenasInGroup(
+                    tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) );
+            
+            RandomGenerator random;
+            const int randomID = random.get(curr_group.size());
+            
+            Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
+            if (clickedTrack != NULL)
+            {
+                ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
+                
+                new TrackInfoDialog( clickedTrack->getIdent(), clickedTrack->getName().c_str(),
+                                    screenshot, 0.8f, 0.7f);
+            }
+            
+        }    
+        else if (selection == "locked")
+        {
+            unlock_manager->playLockSound();
+        }
+        else if (selection == DynamicRibbonWidget::NO_ITEM_ID)
+        {
         }
         else
         {
@@ -102,18 +145,6 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     
 }   // eventCallback
-
-// ------------------------------------------------------------------------------------------------------
-
-void ArenasScreen::init()
-{
-    buildTrackList();
- 
-    // select something by default for the game master
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( w != NULL );
-    w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true); 
-}   // init
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -181,19 +212,12 @@ void ArenasScreen::buildTrackList()
 
 // ------------------------------------------------------------------------------------------------------
 
-void ArenasScreen::tearDown()
-{
-}   // tearDown
-
-// ------------------------------------------------------------------------------------------------------
-
 void ArenasScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
     
-    // FIXME: don't hardcode player 0?
-    w->setSelection(trackName, 0, true); 
+    w->setSelection(trackName, PLAYER_ID_GAME_MASTER, true); 
 }   // setFOxuOnTrack
 
 // ------------------------------------------------------------------------------------------------------

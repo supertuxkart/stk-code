@@ -35,10 +35,16 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     void buildTrackList();
 
 public:
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    void init();
-    void tearDown();
     
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+
     void setFocusOnTrack(const std::string& trackName);
 };
 
