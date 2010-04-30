@@ -597,6 +597,7 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     
     const unsigned int kart_count = world->m_battle_events[0].m_kart_info.size();
     
+    // find max values
     for (unsigned int n=0; n<evt_count; ++n)
     {
         const float time = world->m_battle_events[n].m_time;
@@ -616,6 +617,10 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     assert(lastEventTime > 0.0f);
     assert(max_life_count > 0);
     
+    std::vector<int> kart_y_at_mid_time(kart_count);
+    const float mid_time = lastEventTime/2.0f;
+    
+    // render graph
     for (unsigned int n=1; n<evt_count; ++n)
     {
         const float previous_time = world->m_battle_events[n-1].m_time;
@@ -628,6 +633,8 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
                 
         assert(world->m_battle_events[n].m_kart_info.size() == kart_count);
 
+        const bool midTime = (previous_time < mid_time && time >= mid_time);
+        
         for (unsigned int k=0; k<kart_count; k++)
         {
             const int kart_lives          = world->m_battle_events[n].m_kart_info[k].m_lives;
@@ -639,6 +646,11 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
             const int event_y          = y + h - (int)(h * (float)kart_lives / (float)max_life_count);
             const int previous_event_y = y + h - (int)(h * (float)kart_previous_lives / (float)max_life_count);
 
+            if (midTime)
+            {
+                kart_y_at_mid_time[k] = previous_event_y;
+            }
+            
             const video::SColor& color = world->getKart(k)->getKartProperties()->getColor();
             
             irr_driver->getVideoDriver()->draw2DLine( core::position2d<s32>(previous_event_x, previous_event_y),
@@ -649,6 +661,34 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
         }
     }
     
+    // draw kart icons
+    const int middleX = x + w/2;
+    const int iconSize = h/10;
+    for (unsigned int k=0; k<kart_count; k++)
+    {
+        const Kart* current_kart = world->getKart(k);
+
+        const KartProperties* prop = current_kart->getKartProperties();
+        std::string icon_path = file_manager->getDataDir() ;
+        icon_path += "/karts/" + prop->getIdent() + "/" + prop->getIconFile();
+        ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+        
+        /*
+        draw2DImage  (const video::ITexture  *texture, const core::rect<  s32  > &destRect,
+                      const core::rect<  s32  > &sourceRect, const core::rect<  s32  > *clipRect=0,
+                      const video::SColor  *const colors=0, bool useAlphaChannelOfTexture=false)=0
+         */
+        
+        core::rect< s32 > dest(middleX,            kart_y_at_mid_time[k] - iconSize/2,
+                               middleX + iconSize, kart_y_at_mid_time[k] + iconSize/2);
+        core::rect< s32 > src(core::position2d<s32>(0, 0),
+                              kart_icon_texture->getSize() );
+        irr_driver->getVideoDriver()->draw2DImage(kart_icon_texture, dest, src,
+                                                  NULL /* clip */, NULL /* colors */, true /* alpha */ );
+        
+    }
+    
+    // draw axes names
     {
     core::rect<s32> pos(x, y + h, x + w, y + y + h + 100);
     GUIEngine::getSmallFont()->draw( _("Time"), pos, video::SColor(255,0,0,0),
