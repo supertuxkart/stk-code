@@ -24,11 +24,15 @@
 #include "tracks/track.hpp"
 
 //-----------------------------------------------------------------------------
+
 ThreeStrikesBattle::ThreeStrikesBattle() : World()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
 }
+
+//-----------------------------------------------------------------------------
+
 void ThreeStrikesBattle::init()
 {
     World::init();

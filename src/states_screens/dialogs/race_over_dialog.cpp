@@ -571,6 +571,7 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     assert(x >= 0);
     assert(y >= 0);
     
+    //FIXME: don't render everything from scratch everytime, but use RTT?
     ThreeStrikesBattle* world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
     assert(world != NULL);
     
@@ -648,4 +649,14 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
         }
     }
     
+    {
+    core::rect<s32> pos(x, y + h, x + w, y + y + h + 100);
+    GUIEngine::getSmallFont()->draw( _("Time"), pos, video::SColor(255,0,0,0),
+                                    true /* hcenter */, false /* vcenter */ );
+    }
+    {
+    core::rect<s32> pos(x, y, x + w, y + h);
+    GUIEngine::getSmallFont()->draw( _("Energy"), pos, video::SColor(255,0,0,0),
+                                    false /* hcenter */, true /* vcenter */ );
+    }
 }
