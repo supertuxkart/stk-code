@@ -691,7 +691,12 @@ void DynamicRibbonWidget::updateItemDisplay()
     // ---- to determine which items go in which cell of the dynamic ribbon now,
     //      we create a temporary 2D table and fill them with the ID of the item
     //      they need to display.
-    int item_placement[row_amount][m_needed_cols];
+    //int item_placement[row_amount][m_needed_cols];
+    std::vector<std::vector<int> > item_placement;
+    item_placement.resize(row_amount);
+    for(int i=0; i<row_amount; i++)
+        item_placement[i].resize(m_needed_cols);
+
     int counter = 0;
     for (int c=0; c<m_needed_cols; c++)
     {
