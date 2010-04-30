@@ -289,12 +289,11 @@ void Powerup::use()
  */
 void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
-    unsigned int position = m_owner->getPosition();
-
+    int position = m_owner->getPosition();
+    assert(position != -1);
+    
     PowerupManager::PowerupType new_powerup = 
         powerup_manager->getRandomPowerup(position);
-
-    World *world = World::getWorld();
 
     if(m_type==PowerupManager::POWERUP_NOTHING)
     {

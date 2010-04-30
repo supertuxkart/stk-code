@@ -90,6 +90,7 @@ Kart::Kart (const std::string& ident, int position,
     m_saved_controller     = NULL;
 
     m_view_blocked_by_plunger = 0;
+    m_race_position           = -1;
 
     // Initialize custom sound vector (TODO: add back when properly done)
     // m_custom_sounds.resize(SFXManager::NUM_CUSTOMS);
