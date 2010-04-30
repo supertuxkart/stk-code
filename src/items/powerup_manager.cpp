@@ -198,7 +198,7 @@ void PowerupManager::loadWeights(const XMLNode &root,
         printf("Incorrect number of weights found in class '%s':\n", 
                class_name.c_str());
         printf("%d instead of %d - probabilities will be incorrect.\n",
-               weight_list.size(), (int)POWERUP_LAST);
+               (int)weight_list.size(), (int)POWERUP_LAST);
         return;
     }
 
