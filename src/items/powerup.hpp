@@ -35,12 +35,19 @@ class SFXBase;
 class Powerup
 {
 private:
+    /** A synchronised random number generator for network games. */
     RandomGenerator             m_random;
+
+    /** Sound effect that is being played. */
     SFXBase                    *m_sound_use;
+
+    /** The powerup type. */
     PowerupManager::PowerupType m_type;
+
+    /** Number of collected powerups. */
     int                         m_number;
-    
-protected:
+
+    /** The owner (kart) of this powerup. */
     Kart*                       m_owner;
 
 public:
@@ -50,6 +57,7 @@ public:
     void            reset        ();
     Material*       getIcon      () const;
     void            use          ();
+    void            hitBonusBox  (int n, const Item &item, int newC=-1);
 
     /** Returns the number of powerups. */
     int             getNum       () const {return m_number;}
@@ -58,7 +66,6 @@ public:
     PowerupManager::PowerupType     
                     getType      () const {return m_type;  }
     // ------------------------------------------------------------------------
-    void            hitBonusBox  (int n, const Item &item, int newC=-1);
 };
 
 #endif

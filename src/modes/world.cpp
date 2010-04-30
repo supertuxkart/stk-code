@@ -152,6 +152,7 @@ void World::init()
     if(!history->replayHistory()) history->initRecording();
     network_manager->worldLoaded();
     
+    powerup_manager->updateWeightsForRace(num_karts);
     // erase messages left over
     RaceGUI* m = World::getWorld()->getRaceGUI();
     if (m) m->clearAllMessages();

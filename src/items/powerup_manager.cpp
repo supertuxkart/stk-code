@@ -31,6 +31,9 @@
 #include "items/bowling.hpp" 
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
+#include "modes/world.hpp"
+#include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 PowerupManager* powerup_manager=0;
 
@@ -97,8 +100,15 @@ void PowerupManager::loadAllPowerups()
         std::string name;
         node->get("name", &name);
         PowerupType type = getPowerupType(name);
-        LoadPowerup(type, *node);
+        // The weight nodes will be also included in this list, so ignore those
+        if(type!=POWERUP_NOTHING)
+            LoadPowerup(type, *node);
     }
+    loadWeights(*root, "first", POSITION_FIRST);
+    loadWeights(*root, "top33", POSITION_TOP33);
+    loadWeights(*root, "mid33", POSITION_MID33);
+    loadWeights(*root, "end33", POSITION_END33);
+    loadWeights(*root, "last" , POSITION_LAST );
 }  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
@@ -142,15 +152,127 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);    break;
         default:;
     }   // switch
-    
-    const XMLNode *n1 = node.getNode("first"); loadWeights(*n1);
-    const XMLNode *n2 = node.getNode("top33"); loadWeights(*n2);
-    const XMLNode *n3 = node.getNode("mid33"); loadWeights(*n3);
-    const XMLNode *n4 = node.getNode("end33"); loadWeights(*n4);
-    const XMLNode *n5 = node.getNode("last");  loadWeights(*n5);
 }   // LoadNode
 
 // ----------------------------------------------------------------------------
-void PowerupManager::loadWeights(const XMLNode &node)
+/** Loads a weight list specified in powerup.xml. The different position
+ *  classes must be loaded in the right order
+ *  \param root The root node of powerup.xml 
+ *  \param class_name The name of the position class to load.
+ *  \param position_class The class for which the weights are read.
+ */
+void PowerupManager::loadWeights(const XMLNode &root,
+                                 const std::string &class_name,
+                                 PositionClass position_class)
 {
+    const XMLNode *node = root.getNode(class_name);
+    std::string s("");
+    if(node) node->get("w", &s);
+
+    if(!node || s=="")
+    {
+        printf("No weights found for class '%s' - probabilities will be incorrect.\n",
+               class_name.c_str());
+        return;
+    }
+
+    std::vector<std::string> weight_list = StringUtils::split(s, ' ');
+
+    std::vector<std::string>::iterator i=weight_list.begin();
+    while(i!=weight_list.end())
+    {
+        if(*i=="")
+        {
+            std::vector<std::string>::iterator next=weight_list.erase(i);
+            i=next;
+        }
+        else
+            i++;
+    }
+    // Fill missing entries with 0s
+    while(weight_list.size()<(int)POWERUP_LAST)
+        weight_list.push_back(0);
+
+    if(weight_list.size()!=(int)POWERUP_LAST)
+    {
+        printf("Incorrect number of weights found in class '%s':\n", 
+               class_name.c_str());
+        printf("%d instead of %d - probabilities will be incorrect.\n",
+               weight_list.size(), (int)POWERUP_LAST);
+        return;
+    }
+
+    for(unsigned int i=0; i<weight_list.size(); i++)
+    {
+        int w = atoi(weight_list[i].c_str());
+        m_weights[position_class].push_back(w);
+    }
+
 }   // loadWeights
+
+// ----------------------------------------------------------------------------
+/** This function set up various arrays for faster lookup later. It first
+ *  determines which race position correspond to which position class, and
+ *  then filters which powerups are available (not all powerups might be
+ *  available in all races). It sets up two arrays: m_position_to_class
+ *  which maps which race position corresponds to which position class
+ *  \param num_kart Number of karts.
+ */
+void PowerupManager::updateWeightsForRace(unsigned int num_karts)
+{
+    m_position_to_class.clear();
+    const World *world = World::getWorld();
+    for(unsigned int position =1; position <= num_karts; position++)
+    {
+        // Set up the mapping of position to position class:
+        // -------------------------------------------------
+        PositionClass pos_class = convertPositionToClass(num_karts, position);
+        m_position_to_class.push_back(pos_class);
+
+        // Then determine which items are available:
+        m_powerups_for_position[pos_class].clear();
+        unsigned int sum = 0;
+        for(unsigned int i= POWERUP_FIRST; i<=POWERUP_LAST; i++)
+        {
+            PowerupType type=(PowerupType)i;
+            if(!world->acceptPowerup(type)) continue;
+            unsigned int w =m_weights[pos_class][i-POWERUP_FIRST]; 
+            sum += w;
+            for(unsigned int i=0; i<w; i++)
+                m_powerups_for_position[pos_class].push_back(type);
+        }   // for type in [POWERUP_FIRST, POWERUP_LAST]
+    }
+
+}   // updateWeightsForRace
+
+// ----------------------------------------------------------------------------
+/** Determines the position class for a 
+ */
+PowerupManager::PositionClass 
+               PowerupManager::convertPositionToClass(unsigned int num_karts, 
+                                                     unsigned int position)
+{
+    if(position==1)         return POSITION_FIRST;
+    if(position==num_karts) return POSITION_LAST;
+
+    // Now num_karts must be >2, since position <=num_players
+    
+    unsigned int third = (unsigned int)floor((float)(num_karts-1)/3.0f);
+    // 1 < Position <= 1+third is top33
+    if(position <= 1 + third) return POSITION_TOP33;
+
+    // num_players-third < position is end33
+    if(num_karts - third <= position) return POSITION_END33;
+
+    return POSITION_MID33;
+}   // convertPositionToClass
+
+// ----------------------------------------------------------------------------
+PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos)
+{
+    // Positions start with 1, while the index starts with 0 - so subtract 1
+    PositionClass pos_class = m_position_to_class[pos-1];
+
+    int random = rand()%m_powerups_for_position[pos_class].size();
+    return m_powerups_for_position[pos_class][random];
+}   // getRandomPowerup

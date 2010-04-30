@@ -140,7 +140,7 @@ namespace StringUtils
                     
                     start=i+1;
                 } 
-                else
+                else   // end of string reached
                 {
                     if (keepSplitChar) result.push_back(std::string(s,start-1));
                     else result.push_back(std::string(s,start));

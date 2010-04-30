@@ -289,107 +289,18 @@ void Powerup::use()
  */
 void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
+    unsigned int position = m_owner->getPosition();
+
+    PowerupManager::PowerupType new_powerup = 
+        powerup_manager->getRandomPowerup(position);
+
     World *world = World::getWorld();
-    //The probabilities of getting the anvil or the parachute increase
-    //depending on how bad the owner's position is. For the first
-    //driver the posibility is none, for the last player is 15 %.
-    if(m_owner->getPosition() != 1 && 
-       m_type == PowerupManager::POWERUP_NOTHING &&
-       world->acceptPowerup(PowerupManager::POWERUP_PARACHUTE) &&
-       world->acceptPowerup(PowerupManager::POWERUP_ANVIL))
-    {
-        // On client: just set the value
-        if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-        {
-            m_random.get(100);    // keep random numbers in sync
-            set( (PowerupManager::PowerupType)add_info, 1);
-            return;
-        }
-        const int SPECIAL_PROB = (int)(15.0 / ((float)world->getCurrentNumKarts() /
-                                         (float)m_owner->getPosition()));
-        const int RAND_NUM = m_random.get(100);
-        if(RAND_NUM <= SPECIAL_PROB)
-        {
-            //If the driver in the first position has finished, give the driver
-            //the parachute.
-            for(unsigned int i=0; i < world->getNumKarts(); ++i)
-            {
-                Kart *kart = world->getKart(i);
-                if(kart->isEliminated() || kart == m_owner) continue;
-                if(kart->getPosition() == 1 && kart->hasFinishedRace())
-                {
-                    set(PowerupManager::POWERUP_PARACHUTE, 1);
-                    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-                    {
-                        race_state->itemCollected(m_owner->getWorldKartId(), 
-                                                  item.getItemId(), 
-                                                  m_type);
-                    }
-                    return;
-                }
-            }
-
-            set( (m_random.get(2) == 0 ? PowerupManager::POWERUP_ANVIL 
-                                       : PowerupManager::POWERUP_PARACHUTE),1);
-
-            if(network_manager->getMode()==NetworkManager::NW_SERVER)
-            {
-                race_state->itemCollected(m_owner->getWorldKartId(), 
-                                          item.getItemId(), 
-                                          (char)m_type);
-            }
-            return;
-        }
-    }
-
-
-    // If no special case is done: on the client just adjust the number
-    // dependent on the server informaion:
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        if(m_type==PowerupManager::POWERUP_NOTHING)
-        {
-            set( (PowerupManager::PowerupType)add_info, n  );
-        }
-        else if((PowerupManager::PowerupType)add_info==m_type)
-        {
-            m_number+=n;
-            if(m_number > MAX_POWERUPS) m_number = MAX_POWERUPS;
-        }
-        // Ignore new powerup if it is different from the current one
-        m_random.get(100);    // keep random numbers in synch
-
-        return;
-    }   // if network client
-
-    // Otherwise (server or no network): determine powerup randomly
-
-    //(POWERUP_MAX - 1) is the last valid id. We substract 2 because because we have to
-    //exclude the anvil and the parachute which are handled above, but later we
-    //have to add 1 to prevent having a value of 0 since that isn't a valid powerup.
-    PowerupManager::PowerupType newC;
-    while(true)
-    {
-        newC = (PowerupManager::PowerupType)
-                  (m_random.get(PowerupManager::POWERUP_MAX - 1 - 2) + 1);
-        // allow the game mode to allow or disallow this type of powerup
-        if(world->acceptPowerup(newC)) break;
-    }
-    
-    // Save the information about the powerup in the race state
-    // so that the clients can be updated.
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-    {
-        race_state->itemCollected(m_owner->getWorldKartId(), 
-                                  item.getItemId(), 
-                                  newC);
-    }
 
     if(m_type==PowerupManager::POWERUP_NOTHING)
     {
-        set( newC, n );
+        set( new_powerup, n );
     }
-    else if(newC==m_type)
+    else if(new_powerup==m_type)
     {
         m_number+=n;
         if(m_number > MAX_POWERUPS) 

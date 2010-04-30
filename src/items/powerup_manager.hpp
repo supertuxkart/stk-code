@@ -33,6 +33,37 @@ class XMLNode;
 /**
   * \ingroup items
   */
+
+/** This class manages all powerups. It reads in powerup.xml to get the data,
+ *  initialise the static member of some flyables (i.e. powerup.xml contains
+ *  info about cakes, plunger etc which needs to be stored), and maintains
+ *  the 'weights' (used in randomly chosing which item was collected) for all 
+ *  items depending on position. The latter is done so that as the first player
+ *  you get less advantageous items (but no useless ones either, e.g. anchor),
+ *  while as the last you get more useful ones.
+ *  The weight distribution works as follow:
+ *  The position in a race is mapped to one of five position classes:
+ *  first, top, middle, bottom, last - e.g. for a 6 player game the distribution
+ *  is:
+ *  position  1     2   3      4      5      6 
+ *  class     first top middle middle bottom last
+ *  For each class the weight distribution is read in from powerup.xml:
+ *   <!--      bubble cake bowl zipper plunger switch para anvil -->
+ *   <last  w="0      1    1    2      2       0      2    2"     />
+ *  So a (well, in this case 'the') player belonging to the class 'last'
+ *  will not get a bubble gum or switch. Cakes and bowling balls have
+ *  lower probability. 
+ *  At the start of each race two mappings are computed in updateWeightsForRace:
+ *  m_position_to_class maps each postion to the class using the function
+ *                      convertPositionToClass.
+ *  m_powerups_for_position contains a list of items for each class. A item
+ *  with higher weight is included more than once, so at runtime we can
+ *  just pick a random item from this list to get the right distribution.
+ *  In the example above the list for 'last' will be:
+ *  [cake, bowling,zipper,zipper,plunger,plunger,parachute,parachute,
+ *   anvil,anvil.
+ */
+
 class PowerupManager
 {
 public:
@@ -49,6 +80,15 @@ public:
                       POWERUP_LAST=POWERUP_ANVIL,
                       POWERUP_MAX
     };
+
+    /** The different position classes, used to map a kart's position to a
+     *  weight distribution for the different powerups. */
+    enum PositionClass {POSITION_FIRST,
+                        POSITION_TOP33,
+                        POSITION_MID33,
+                        POSITION_END33,
+                        POSITION_LAST,
+                        POSITION_COUNT};
 
 private:
     /** The icon for each powerup. */
@@ -72,26 +112,46 @@ private:
 
     /** For each powerup the weight (probability) used depending on the
      *  number of players. */
-    //std::vector<int> m_weight[POWERUP_MAX];
+    std::vector<int> m_weights[POSITION_COUNT];
+
+    /** A list of all powerups for a specific class. If a powerup
+     *  has weight 5, it will be listed 5 times in this list, so
+     *  randomly picking an entry from this for a position class will
+     *  result in the right distribution of items. */
+    std::vector<PowerupType> m_powerups_for_position[POSITION_COUNT];
+
+    /** The mapping of each position to the corresponding position class.
+     *  There is one map for each different number of players, so it is
+     *  used like  m_position_to_class[number_players][position] */
+    std::vector<PositionClass> m_position_to_class;
 
     PowerupType   getPowerupType(const std::string &name) const;
 
-    void          loadWeights(const XMLNode &node);
-
+    void          loadWeights(const XMLNode &root, 
+                              const std::string &class_name,
+                              PositionClass position_class);
+    PositionClass convertPositionToClass(unsigned int num_karts, 
+                                         unsigned int position);
 public:
                   PowerupManager  ();
                  ~PowerupManager  ();
     void          loadAllPowerups ();
     void          removeTextures  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
-    Material*     getIcon         (int type) const {return m_all_icons [type];      }
+    void          updateWeightsForRace(unsigned int num_karts);
+    Material*     getIcon         (int type) const {return m_all_icons [type];}
+    PowerupManager::PowerupType 
+                  getRandomPowerup(unsigned int pos);
     /** Returns the mesh for a certain powerup. 
      *  \param type Mesh type for which the model is returned. */
-    irr::scene::IMesh *getMesh         (int type) const {return m_all_meshes[type];      }
-    float         getForceToTarget(int type) const {return m_all_force_to_target[type]; }
+    irr::scene::IMesh 
+                 *getMesh         (int type) const {return m_all_meshes[type];}
+    float         getForceToTarget(int type) const {return m_all_force_to_target[type];}
     float         getMaxDistance  (int type) const {return m_all_max_distance[type];}
     float         getMaxTurnAngle (int type) const {return m_all_max_turn_angle[type];}
-    const btVector3& getExtend    (int type) const {return m_all_extends[type];     }
+    const btVector3& 
+                  getExtend       (int type) const {return m_all_extends[type];}
+
 };
 
 extern PowerupManager* powerup_manager;
