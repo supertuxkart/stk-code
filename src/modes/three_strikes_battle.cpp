@@ -201,7 +201,15 @@ void ThreeStrikesBattle::restartRace()
         m_karts[n]->setPosition(-1);
     }// next kart
     
+    // remove old battle events
     m_battle_events.clear();
+
+    // add initial battle event
+    BattleEvent evt;
+    evt.m_time = 0.0f;
+    evt.m_kart_info = m_kart_info;
+    m_battle_events.push_back(evt);  
+    
 }   // restartRace
 
 //-----------------------------------------------------------------------------
