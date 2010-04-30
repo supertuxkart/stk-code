@@ -308,7 +308,8 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-    
+    if (m_children.size() < 2) return EVENT_LET; // empty ribbon, or only one item (can't move right)
+
     m_selection[playerID]++;
     if (m_selection[playerID] >= m_children.size())
     {
@@ -328,11 +329,14 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
     
-    // if we reached a filler item, move again
+    // if we reached a filler item, move again (but don't warp)
     // FIXME: why is a constant from DynamicRibbon used here??
     if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
     {
-        rightPressed(playerID);
+        if (m_selection[playerID] + 1 < m_children.size())
+        {
+            rightPressed(playerID);
+        }
     }
     
     if (m_ribbon_type != RIBBON_TOOLBAR)
@@ -349,7 +353,8 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-    
+    if (m_children.size() < 2) return EVENT_LET; // empty ribbon, or only one item (can't move left)
+
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
     {
@@ -369,10 +374,10 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
         }
     }
     
-    // if we reached a filler item, move again
+    // if we reached a filler item, move again (but don't warp)
     if (getSelectionIDString(playerID) == DynamicRibbonWidget::NO_ITEM_ID) 
     {
-        leftPressed(playerID);
+        if (m_selection[playerID] > 0) leftPressed(playerID);
     }
     
     if (m_ribbon_type != RIBBON_TOOLBAR)
