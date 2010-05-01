@@ -45,6 +45,7 @@
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
 InputManager *input_manager;
 
 using GUIEngine::EventPropagation;
@@ -422,9 +423,18 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
             // early menus where we accept every input because players are not set-up yet
             if (m_master_player_only && player == NULL)
             {
-                //I18N: message shown when a player that isn't game master tries to modify options that
-                //I18N: only the game master is allowed to               
-                GUIEngine::showMessage(_("Only the Game Master may act at this point!"));
+                if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON ||
+                    type == Input::IT_STICKHAT)
+                {
+                    GamePadDevice* gp = getDeviceList()->getGamePadFromIrrID(deviceID);
+
+                    if (gp != NULL)
+                    {
+                        //I18N: message shown when an input device is used but is not associated to any player
+                        GUIEngine::showMessage(StringUtils::insertValues(_("Ignoring '%s', you needed to join earlier to play!"),
+                                                                         irr::core::stringw(gp->m_name.c_str()).c_str() ).c_str());
+                    }
+                }
                 return;
             }
             
@@ -436,11 +446,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     m_timer_in_use = true;
                     m_timer = 0.25;
                 }
-                
+                                
+                // player may be NULL in early menus, before player setup has been performed
                 int playerID = (player == NULL ? 0 : player->getID());
                 
                 // If only the master player can act, and this player is not the master, ignore his input
-                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only && playerID != 0)
+                if (m_device_manager->getAssignMode() == ASSIGN && m_master_player_only &&
+                    playerID != PLAYER_ID_GAME_MASTER)
                 {
                     //I18N: message shown when a player that isn't game master tries to modify options that
                     //I18N: only the game master is allowed to        
@@ -448,6 +460,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                     return;
                 }
                 
+                // all is good, pass the translated input event on to the event handler
                 GUIEngine::EventHandler::get()->processAction(action, abs(value), type, playerID);
             }
         }
@@ -507,7 +520,7 @@ EventPropagation InputManager::input(const SEvent& event)
 
             // FIXME - AD_NEGATIVE/AD_POSITIVE are probably useless since value contains that info too
             if (value < 0)
-                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick , axis_id, Input::AD_NEGATIVE, value);
+                dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_NEGATIVE, value);
             else
                 dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick, axis_id, Input::AD_POSITIVE, value);
         }
