@@ -231,13 +231,12 @@ void Track::loadTrackInfo()
         m_all_modes.push_back(tm);
     }
 
-    if(m_groups.size()==0)
-        m_groups.push_back("standard");
+    if(m_groups.size()==0) m_groups.push_back("standard");
     const XMLNode *xml_node = root->getNode("curves");
-        if(xml_node)
-                loadCurves(*xml_node);
+    
+    if(xml_node) loadCurves(*xml_node);
 
-        // Set the correct paths
+    // Set the correct paths
     m_screenshot = m_root+"/"+m_screenshot;
     delete root;
 
