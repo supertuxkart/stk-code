@@ -114,7 +114,8 @@ void AbstractStateManager::pushScreen(Screen* screen)
 void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 {
     assert(m_game_mode != GAME);
-    
+
+    if (!screen->isLoaded()) screen->loadFromFile();
     std::string name = screen->getName();
     
     // Send tear-down event to previous menu
@@ -143,7 +144,9 @@ void AbstractStateManager::reshowTopMostMenu()
     switchToScreen( m_menu_stack[m_menu_stack.size()-1].c_str() );
     
     // Send init event to new menu
-    getCurrentScreen()->init();
+    Screen* screen = getCurrentScreen();
+    if (!screen->isLoaded()) screen->loadFromFile();
+    screen->init();
 }
 
 // -----------------------------------------------------------------------------
@@ -173,7 +176,10 @@ void AbstractStateManager::popMenu()
     {
         setGameState(MENU);
         switchToScreen(m_menu_stack[m_menu_stack.size()-1].c_str());
-        getCurrentScreen()->init();
+        
+        Screen* screen = getCurrentScreen();
+        if (!screen->isLoaded()) screen->loadFromFile();
+        screen->init();
     }
 }
 
