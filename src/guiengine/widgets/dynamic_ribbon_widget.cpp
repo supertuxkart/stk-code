@@ -777,26 +777,30 @@ void DynamicRibbonWidget::update(float dt)
         for (int i=0; i<items_in_row; i++)
         {
             int col_scroll = i + m_scroll_offset;
-            int icon_id = (col_scroll)*row_amount + n;
-
+            int item_id = (col_scroll)*row_amount + n;
+            if (item_id >= (int)m_items.size()) item_id -= m_items.size();
+            
+            assert(item_id >= 0);
+            assert(item_id < (int)m_items.size());
+            
             //m_items[icon_id].
             
-            if (m_items[icon_id].m_animated)
+            if (m_items[item_id].m_animated)
             {
-                const int frameBefore = (int)(m_items[icon_id].m_curr_time / m_items[icon_id].m_time_per_frame);
+                const int frameBefore = (int)(m_items[item_id].m_curr_time / m_items[item_id].m_time_per_frame);
 
-                m_items[icon_id].m_curr_time += dt;
-                int frameAfter = (int)(m_items[icon_id].m_curr_time / m_items[icon_id].m_time_per_frame);
+                m_items[item_id].m_curr_time += dt;
+                int frameAfter = (int)(m_items[item_id].m_curr_time / m_items[item_id].m_time_per_frame);
                 if (frameAfter == frameBefore) continue; // no frame change yet
                 
-                if (frameAfter >= (int)m_items[icon_id].m_all_images.size())
+                if (frameAfter >= (int)m_items[item_id].m_all_images.size())
                 {
-                    m_items[icon_id].m_curr_time = 0;
+                    m_items[item_id].m_curr_time = 0;
                     frameAfter = 0;
                 }
                 
                 IconButtonWidget* icon = dynamic_cast<IconButtonWidget*>(&row.m_children[i]);
-                icon->setImage( m_items[icon_id].m_all_images[frameAfter].c_str() );
+                icon->setImage( m_items[item_id].m_all_images[frameAfter].c_str() );
             }
 
         }
