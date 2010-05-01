@@ -56,12 +56,27 @@ void ArenasScreen::loadedFromFile()
     //FIXME: this returns groups for arenas but tracks too. this means that some of them
     //       may contain only tracks, no arenas, and thus add an empty tab here...
     const std::vector<std::string>& groups = track_manager->getAllGroups();
-    
     const int group_amount = groups.size();
+
+    // add standard group first
     for (int n=0; n<group_amount; n++)
     {
-        //FIXME: group name not translated
-        tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n]);
+        if (groups[n] == DEFAULT_GROUP_NAME)
+        {
+            //FIXME: group name not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n]);
+            break;
+        }
+    }
+    
+    // add others after
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] != DEFAULT_GROUP_NAME)
+        {
+            //FIXME: group name not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n]);
+        }
     }
     
     if (group_amount > 1)

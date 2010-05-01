@@ -56,12 +56,27 @@ void TracksScreen::loadedFromFile()
     tabs->clearAllChildren();
     
     const std::vector<std::string>& groups = track_manager->getAllGroups();
-    
     const int group_amount = groups.size();
+    
+    // add standard group first
     for (int n=0; n<group_amount; n++)
     {
-        // FIXME: group name is not translated
-        tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
+        if (groups[n] == DEFAULT_GROUP_NAME)
+        {
+            // FIXME: group name is not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
+            break;
+        }
+    }
+    
+    // add others after
+    for (int n=0; n<group_amount; n++)
+    {
+        if (groups[n] != DEFAULT_GROUP_NAME)
+        {
+            // FIXME: group name is not translated
+            tabs->addTextChild( stringw(groups[n].c_str()).c_str(), groups[n] );
+        }
     }
     
     if (group_amount > 1)
