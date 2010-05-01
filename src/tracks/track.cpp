@@ -231,7 +231,7 @@ void Track::loadTrackInfo()
         m_all_modes.push_back(tm);
     }
 
-    if(m_groups.size()==0) m_groups.push_back("standard");
+    if(m_groups.size()==0) m_groups.push_back(DEFAULT_GROUP_NAME);
     const XMLNode *xml_node = root->getNode("curves");
     
     if(xml_node) loadCurves(*xml_node);

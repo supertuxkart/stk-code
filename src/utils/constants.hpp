@@ -51,5 +51,6 @@ const int MAX_PLAYER_COUNT = 4;
 
 extern bool IS_LITTLE_ENDIAN;
 
+#define DEFAULT_GROUP_NAME "standard"
 
 #endif

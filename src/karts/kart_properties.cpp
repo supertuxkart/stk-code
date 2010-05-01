@@ -30,6 +30,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "io/xml_node.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -129,7 +130,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     // Set a default group (that has to happen after init_default and load)
     if(m_groups.size()==0)
-        m_groups.push_back("standard");
+        m_groups.push_back(DEFAULT_GROUP_NAME);
 
 
     // Load material

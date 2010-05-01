@@ -46,6 +46,7 @@ const int CURRENT_CONFIG_VERSION = 8;
 #include <fstream>
 
 #include "input/input.hpp"
+#include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
 class XMLNode;
@@ -287,9 +288,9 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style", "Name of the .items file to use.") );
     
     PARAM_PREFIX StringUserConfigParam      m_kart_group
-            PARAM_DEFAULT(  StringUserConfigParam("standard", "kart_group", "Last selected kart group") );
+            PARAM_DEFAULT(  StringUserConfigParam(DEFAULT_GROUP_NAME, "kart_group", "Last selected kart group") );
     PARAM_PREFIX StringUserConfigParam      m_track_group
-            PARAM_DEFAULT(  StringUserConfigParam("standard", "track_group", "Last selected track group") ); 
+            PARAM_DEFAULT(  StringUserConfigParam(DEFAULT_GROUP_NAME, "track_group", "Last selected track group") ); 
     PARAM_PREFIX StringUserConfigParam      m_last_track
             PARAM_DEFAULT(  StringUserConfigParam("jungle", "last_track", "Name of the last track used.") ); 
     
