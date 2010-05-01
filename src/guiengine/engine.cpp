@@ -457,7 +457,16 @@ namespace GUIEngine
     
     void showMessage(const wchar_t* message, const float time)
     {
+        // check for duplicates
+        const int count = gui_messages.size();
+        for (int n=0; n<count; n++)
+        {
+            if (gui_messages[n].m_message == message) return;
+        }
+        
+        // add message
         gui_messages.push_back( MenuMessage(message, time) );
+
     }
     
     Widget* getFocusForPlayer(const int playerID)
