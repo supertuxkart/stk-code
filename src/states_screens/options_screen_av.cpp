@@ -48,6 +48,13 @@ OptionsScreenAV::OptionsScreenAV() : Screen("options_av.stkgui")
 
 // -----------------------------------------------------------------------------
 
+void OptionsScreenAV::loadedFromFile()
+{
+    m_inited = false;
+}
+
+// -----------------------------------------------------------------------------
+
 void OptionsScreenAV::init()
 {
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
@@ -237,9 +244,8 @@ void OptionsScreenAV::tearDown()
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenAV::forgetWhatWasLoaded()
+void OptionsScreenAV::unloaded()
 {
-    Screen::forgetWhatWasLoaded();
     m_inited = false;
 }
 

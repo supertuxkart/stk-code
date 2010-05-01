@@ -49,6 +49,12 @@ MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
 
 // ------------------------------------------------------------------------------------------------------
 
+void MainMenuScreen::loadedFromFile()
+{
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void MainMenuScreen::init()
 {
     // reset in case we're coming back from a race

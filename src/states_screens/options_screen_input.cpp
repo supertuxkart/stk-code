@@ -50,6 +50,13 @@ OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
 
 // -----------------------------------------------------------------------------
 
+void OptionsScreenInput::loadedFromFile()
+{
+    m_inited = false;
+}
+
+// -----------------------------------------------------------------------------
+
 void OptionsScreenInput::updateInputButtons(DeviceConfig* config)
 {
     
@@ -520,9 +527,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput::forgetWhatWasLoaded()
+void OptionsScreenInput::unloaded()
 {
-    Screen::forgetWhatWasLoaded();
     m_inited = false;
 }
 

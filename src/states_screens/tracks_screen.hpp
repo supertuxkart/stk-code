@@ -37,9 +37,18 @@ class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     void buildTrackList();
     
 public:
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-    void init();
-    void tearDown();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
     
     void setFocusOnTrack(const std::string& trackName);
     void setFocusOnGP(const std::string& gpName);

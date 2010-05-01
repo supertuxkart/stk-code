@@ -35,10 +35,19 @@ class ChallengesScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingl
     
 public:
 
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
+    
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
     void onUpdate(float dt, irr::video::IVideoDriver*);
     
+    /** \brief implement callback from parent class GUIEngine::Screen */
     void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
     void tearDown();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
     void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
 };
 

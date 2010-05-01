@@ -707,7 +707,14 @@ KartHoverListener* karthoverListener = NULL;
 #endif
     
 // -----------------------------------------------------------------------------
+
 KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
+{
+}
+
+// -----------------------------------------------------------------------------
+
+void KartSelectionScreen::loadedFromFile()
 {
     g_dispatcher = new FocusDispatcher(this);
     m_player_confirmed = false;
@@ -721,6 +728,7 @@ KartSelectionScreen::KartSelectionScreen() : Screen("karts.stkgui")
     const std::vector<std::string>& groups = kart_properties_manager->getAllGroups();
     
     const int group_amount = groups.size();
+    
     for (int n=0; n<group_amount; n++)
     {
         //FIXME: group name not translated
@@ -802,10 +810,8 @@ void KartSelectionScreen::tearDown()
 
 // -----------------------------------------------------------------------------
 
-void KartSelectionScreen::forgetWhatWasLoaded()
-{    
-    Screen::forgetWhatWasLoaded();
-    
+void KartSelectionScreen::unloaded()
+{        
     // these pointers are no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
     karthoverListener = NULL;

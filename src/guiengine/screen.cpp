@@ -40,25 +40,29 @@ using namespace io;
 using namespace gui;
 using namespace GUIEngine;
 
+// -----------------------------------------------------------------------------
+
 Screen::Screen(const char* file)
 {
-    m_magic_number = 0xCAFEC001;
+    m_magic_number   = 0xCAFEC001;
 
-    m_throttle_FPS = true;
-    
     this->m_filename = file;
-    m_loaded = false;
-    loadFromFile();
-    m_render_3d = false;
+    m_throttle_FPS   = true;
+    m_render_3d      = false;
+    m_loaded         = false;
 }
+
+// -----------------------------------------------------------------------------
 
 Screen::Screen()
 {
     m_magic_number = 0xCAFEC001;
 
-    m_loaded = false;
-    m_render_3d = false;
+    m_loaded       = false;
+    m_render_3d    = false;
 }
+
+// -----------------------------------------------------------------------------
 
 Screen::~Screen()
 {
@@ -66,7 +70,30 @@ Screen::~Screen()
     m_magic_number = 0xDEADBEEF;
 }
 
-void Screen::forgetWhatWasLoaded()
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Load/Init
+#endif
+
+
+void Screen::loadFromFile()
+{
+    assert(m_magic_number == 0xCAFEC001);
+    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
+    parseScreenFileDiv(xml, m_widgets);
+    m_loaded = true;
+    calculateLayout();
+    
+    // invoke callback so that the class deriving from Screen is aware of this event
+    loadedFromFile();
+}
+
+// -----------------------------------------------------------------------------
+
+void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
     for (int n=0; n<m_widgets.size(); n++)
@@ -76,23 +103,13 @@ void Screen::forgetWhatWasLoaded()
     
     m_loaded = false;
     m_widgets.clearAndDeleteAll();
+    
+    // invoke callback so that the class deriving from Screen is aware of this event
+    unloaded();
 }
 
-#if 0
-#pragma mark -
-#pragma mark Load/Init
-#endif
+// -----------------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------
-void Screen::loadFromFile()
-{
-    assert(m_magic_number == 0xCAFEC001);
-    IrrXMLReader* xml = irr::io::createIrrXMLReader( (file_manager->getGUIDir() + "/" + m_filename).c_str() );
-    parseScreenFileDiv(xml, m_widgets);
-    m_loaded = true;
-    calculateLayout();
-}
-// -----------------------------------------------------------------------------
 /* small shortcut so this method can be called without arguments */
 void Screen::calculateLayout()
 {
@@ -100,12 +117,9 @@ void Screen::calculateLayout()
     // build layout
     calculateLayout( m_widgets );
 }
+
 // -----------------------------------------------------------------------------
-/*
- * Recursive call that lays out children widget within parent (or screen if none)
- * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
- * of the remaining children, as well as absolute sizes and locations.
- */
+
 void Screen::calculateLayout(ptr_vector<Widget>& widgets, Widget* parent)
 {
     assert(m_magic_number == 0xCAFEC001);

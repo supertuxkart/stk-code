@@ -104,6 +104,7 @@ void AbstractStateManager::pushMenu(std::string name)
 
 void AbstractStateManager::pushScreen(Screen* screen)
 {
+    if (!screen->isLoaded()) screen->loadFromFile();
     pushMenu(screen->getName());
     screen->init();
 }

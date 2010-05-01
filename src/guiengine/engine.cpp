@@ -378,6 +378,11 @@
  Note that the same instance of your object may be entered/left more than once, so make sure that one instance
  of your object can be used several times if the same screen is visited several times.
  
+ Note that the same instance of your object may be unloaded then loaded back later. It is thus important to
+ do set-up in the 'loadedFromFile' callback rather than in the constructor (after the creation of Screen
+ object, it may be unloaded then loaded back at will, this is why it's important to not rely on the constructor
+ to perform set-up).
+ 
  You can also explore the various methods in GUIEngine::Screen to discover more optional callbacks you
  can use.
  
@@ -531,14 +536,11 @@ void switchToScreen(const char* screen_name)
         }
     }
     
-    // screen not found in list of existing ones, so let's create it
+    // screen not found in list of existing ones
     if (g_current_screen == NULL)
     {
         assert(false);
         return;
-        //GUIEngine::Screen* new_screen = new GUIEngine::Screen(screen_name);
-        //g_loaded_screens.push_back(new_screen);
-        //g_current_screen = new_screen;
     }
     
     
@@ -566,9 +568,10 @@ void cleanUp()
 {
     if (g_skin != NULL) delete g_skin;
     g_skin = NULL;
+
     for (int i=0; i<g_loaded_screens.size(); i++)
     {
-        g_loaded_screens[i].forgetWhatWasLoaded();
+        g_loaded_screens[i].unload();
     }
     
     g_current_screen = NULL;

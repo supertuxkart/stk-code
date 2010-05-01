@@ -38,6 +38,8 @@ using namespace GUIEngine;
 const float TIME_SECTION_FADE = 0.8f;
 const float ENTRIES_FADE_TIME = 0.3f;
 
+// ---------------------------------------------------------------------------------------------------
+
 class CreditsEntry
 {
 public:
@@ -50,6 +52,7 @@ public:
     }
 };
 
+// ---------------------------------------------------------------------------------------------------
 
 class CreditsSection
 {
@@ -72,10 +75,14 @@ public:
     }
 };
 
+// ---------------------------------------------------------------------------------------------------
+
 CreditsSection* CreditsScreen::getCurrentSection()
 {
     return m_sections.get(m_sections.size()-1);
 }
+
+// ---------------------------------------------------------------------------------------------------
 
 bool getWideLine(std::ifstream& file, stringw* out)
 {
@@ -124,7 +131,21 @@ bool getWideLine(std::ifstream& file, stringw* out)
     return true;
 }
 
+// ---------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark CreditsScreen
+#endif
+
 CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
+{
+}
+
+// ---------------------------------------------------------------------------------------------------
+
+void CreditsScreen::loadedFromFile()
 {
     reset();
     
@@ -178,6 +199,25 @@ CreditsScreen::CreditsScreen() : Screen("credits.stkgui")
     
 }
 
+// ---------------------------------------------------------------------------------------------------
+
+void CreditsScreen::init()
+{
+    Widget* w = getWidget<Widget>("animated_area");
+    assert(w != NULL);
+    
+    reset();
+    setArea(w->x, w->y, w->w, w->h);
+}
+
+// ---------------------------------------------------------------------------------------------------
+
+void CreditsScreen::tearDown()
+{
+}
+
+// ---------------------------------------------------------------------------------------------------
+
 void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
 {
     this->x = x;
@@ -188,6 +228,8 @@ void CreditsScreen::setArea(const int x, const int y, const int w, const int h)
     m_section_rect = core::rect< s32 >( x, y, x+w, y+h/6 );
 }
 
+// ---------------------------------------------------------------------------------------------------
+
 void CreditsScreen::reset()
 {
     m_curr_section = 0;
@@ -195,6 +237,8 @@ void CreditsScreen::reset()
     time_before_next_step = TIME_SECTION_FADE;
     m_time_element = 2.5f;
 }
+
+// ---------------------------------------------------------------------------------------------------
 
 void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
 {
@@ -315,18 +359,7 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
      */
 }
 
-void CreditsScreen::init()
-{
-    Widget* w = getWidget<Widget>("animated_area");
-    assert(w != NULL);
-    
-    reset();
-    setArea(w->x, w->y, w->w, w->h);
-}
-
-void CreditsScreen::tearDown()
-{
-}
+// ---------------------------------------------------------------------------------------------------
 
 void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID)
 {
@@ -335,4 +368,6 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget, const std::string& 
         StateManager::get()->escapePressed();
     }
 }
+
+// ---------------------------------------------------------------------------------------------------
 

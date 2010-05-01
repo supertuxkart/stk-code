@@ -35,6 +35,12 @@ HelpScreen1::HelpScreen1() : Screen("help1.stkgui")
 
 // ------------------------------------------------------------------------------------------------------
 
+void HelpScreen1::loadedFromFile()
+{
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")

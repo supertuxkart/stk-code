@@ -41,6 +41,12 @@ const char* ALL_ARENA_GROUPS_ID = "all";
 
 ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 {
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+void ArenasScreen::loadedFromFile()
+{
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );

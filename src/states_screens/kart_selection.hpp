@@ -73,24 +73,27 @@ class KartSelectionScreen : public GUIEngine::Screen, public GUIEngine::ScreenSi
     
 public:
     
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
+    
     /** Called when a player hits 'fire' on his device to join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
     
     /** Called when a player hits 'rescue' on his device to leave the game */
     bool playerQuit(StateManager::ActivePlayer* player);
     
-    /** Standard 'Screen' callback before screen is entered */
-    void init();
+     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
     
-    /** Standard 'Screen' callback before screen is left */
-    void tearDown();
+     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
     
-    /** Standard 'Screen' callback when an event occurs*/
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
-    /** Standard 'Screen' callback every frame */
-    void onUpdate(float dt, irr::video::IVideoDriver*);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onUpdate(float dt, irr::video::IVideoDriver*);
     
-    /** overload */
-    virtual void forgetWhatWasLoaded();
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual void unloaded();
 };

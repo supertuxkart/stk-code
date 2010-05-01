@@ -50,6 +50,12 @@ ChallengesScreen::ChallengesScreen() : Screen("challenges.stkgui")
 
 // ------------------------------------------------------------------------------------------------------
 
+void ChallengesScreen::loadedFromFile()
+{
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void ChallengesScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
 {
 }

@@ -43,6 +43,12 @@ DEFINE_SCREEN_SINGLETON( TracksScreen );
 
 TracksScreen::TracksScreen() : Screen("tracks.stkgui")
 {
+}
+
+// -----------------------------------------------------------------------------------------------
+
+void TracksScreen::loadedFromFile()
+{
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     assert( tabs != NULL );

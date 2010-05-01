@@ -40,17 +40,24 @@ class OptionsScreenPlayers : public GUIEngine::Screen, public GUIEngine::ScreenS
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenPlayers>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
     
     /**
-     * Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
-     * @return  whether adding was successful (can fail e.g. if trying to add a duplicate)
+     * \brief Adds a new player (if 'player' is NULL) or renames an existing player (if 'player' is not NULL)
+     * \return  whether adding was successful (can fail e.g. if trying to add a duplicate)
      */
     bool gotNewPlayerName(const irr::core::stringw& newName,  PlayerProfile* player=NULL);
     void deletePlayer(PlayerProfile* player);
     
-    void init();
-    void tearDown();
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
 };
 
 #endif

@@ -85,9 +85,15 @@ namespace GUIEngine
         
         bool m_loaded;
         std::string m_filename;
-        void loadFromFile();
         
         static void addWidgetsRecursively(ptr_vector<Widget>& widgets, Widget* parent=NULL);
+        
+        /**
+          * @brief Recursive call that lays out children widget within parent (or screen if none).
+          *
+          * Manages 'horizontal-row' and 'vertical-row' layouts, along with the proportions
+          * of the remaining children, as well as absolute sizes and locations.
+          */
         void calculateLayout(ptr_vector<Widget>& widgets, Widget* parent=NULL);
         
         /** Will be called to determine if the 3D scene must be rendered when at this screen. */
@@ -125,6 +131,12 @@ namespace GUIEngine
         virtual ~Screen();
         
         bool operator ==(const char* filename) const { return m_filename == filename; }
+        
+        /** \brief loads this Screen from the file passed to the constructor */
+        void loadFromFile();
+        
+        /** \return whether this screen is currently loaded */
+        bool isLoaded() const { return m_loaded; }
         
         /** returns an object by name, or NULL if not found */
         Widget* getWidget(const char* name);
@@ -177,7 +189,7 @@ namespace GUIEngine
         
         /** Next time this menu needs to be shown, don't use cached values, re-calculate everything.
          (useful e.g. on reschange, when sizes have changed and must be re-calculated) */
-        virtual void forgetWhatWasLoaded();
+        virtual void unload();
         
         /** Will be called to determine if the 3D scene must be rendered when at this screen */
         bool needs3D() { return m_render_3d; }
@@ -193,9 +205,33 @@ namespace GUIEngine
         void setNeeds3D(bool needs3D) { m_render_3d = needs3D; }
         
         /** 
+          * \brief callback invoked when loading this menu
+          *
+          * \precondition Children widgets of this menu have been created by the time this callback
+          *               is invoked.
+          * \note this method is not called everytime the screen is shown. Screen::init is.
+          *       use this method for persistent setup code (namely, that deals with settupping
+          *       children widget objects and needs not be done everytime we visit the screen).
+          * \note a Screen object instance may be unloaded then loaded back. This method might thus
+          *       be called more than once in the lifetime of a Screen object, however there will always
+          *       be an 'unload' event in-between calls to this method.
+          */
+        virtual void loadedFromFile() = 0;
+        
+        /**
+          * \brief callback invoked when this screen is being unloaded
+          * Override this method in children classes if you need to be notified of this.
+          * \note a Screen object instance may be unloaded then loaded back at will.
+          * \note an unloaded Screen object does not have its children widgets anymore, it only
+          *       retains its members (most importantly the path to its GUI file) so that it can be
+          *       loaded back later.
+          */
+        virtual void unloaded() {}
+        
+        /** 
           * \brief callback invoked when entering this menu
           *
-          * @note the same instance of your object may be entered/left more than once, so make sure that
+          * \note the same instance of your object may be entered/left more than once, so make sure that
           * one instance of your object can be used several times if the same screen is visited several
           * times.
           */
@@ -217,7 +253,7 @@ namespace GUIEngine
         virtual bool onEscapePressed() { return true; }
         
         /**
-         * will be called everytime sometimes happens.
+         * \brief will be called everytime sometimes happens.
          * Events are generally a widget state change. In this case, a pointer to the said widget is passed along its
          * name, so you get its new state and/or act. There are two special events, passed with a NULL widget, and which
          * bear the anmes "init" and "tearDown", called respectively when a screen is being made visible and when it's
@@ -225,6 +261,9 @@ namespace GUIEngine
          */
         virtual void eventCallback(Widget* widget, const std::string& name, const int playerID) = 0;
         
+        /**
+          * \brief optional callback you can override to be notified at every frame.
+          */
         virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
         
         

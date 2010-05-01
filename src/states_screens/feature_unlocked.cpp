@@ -90,6 +90,12 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene() : Screen("feature_unlocked.st
 
 // -------------------------------------------------------------------------------------
 
+void FeatureUnlockedCutScene::loadedFromFile()
+{
+}
+
+// -------------------------------------------------------------------------------------
+
 void FeatureUnlockedCutScene::addUnlockedKart(KartProperties* unlocked_kart, irr::core::stringw msg)
 {
     assert(unlocked_kart != NULL);

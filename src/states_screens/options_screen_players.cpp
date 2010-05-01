@@ -49,6 +49,12 @@ OptionsScreenPlayers::OptionsScreenPlayers() : Screen("options_players.stkgui")
 
 // -----------------------------------------------------------------------------
 
+void OptionsScreenPlayers::loadedFromFile()
+{
+}
+
+// -----------------------------------------------------------------------------
+
 void OptionsScreenPlayers::init()
 {
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");

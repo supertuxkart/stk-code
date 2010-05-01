@@ -45,15 +45,32 @@ class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSin
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
     
-    void gotSensedInput(Input* sensedInput);
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual void unloaded();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
+    
+    /** 
+     * \brief invoke if the list of devices changed after the creation of this screen.
+     * This will cause the displayed list to be updated accordingly with the data in the device manager.
+     */
     void rebuildDeviceList();
-
-    virtual void forgetWhatWasLoaded();
     
-    void init();
-    void tearDown();
+    /**
+      * \brief invoke in "input sensing" mode, when input was sensed.
+      * Updates the input bindings accordingly with the sensed input.
+      */
+    void gotSensedInput(Input* sensedInput);
 };
 
 #endif

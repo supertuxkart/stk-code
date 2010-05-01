@@ -40,12 +40,20 @@ class OptionsScreenAV : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenAV>;
     
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
-        
-    void init();
-    void tearDown();
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void loadedFromFile();
     
-    virtual void forgetWhatWasLoaded();
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+        
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void init();
+    
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void tearDown();
+    
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual void unloaded();
 };
 
 #endif
