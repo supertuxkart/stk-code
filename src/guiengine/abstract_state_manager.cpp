@@ -118,8 +118,10 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
     if (!screen->isLoaded()) screen->loadFromFile();
     std::string name = screen->getName();
     
+    assert(m_menu_stack.size() > 0);
+    
     // Send tear-down event to previous menu
-    if (m_menu_stack.size() > 0) getCurrentScreen()->tearDown();
+    getCurrentScreen()->tearDown();
     
     m_menu_stack[m_menu_stack.size()-1] = name;
     switchToScreen(name.c_str());
