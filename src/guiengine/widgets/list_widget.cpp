@@ -39,6 +39,7 @@ void ListWidget::add()
     rect<s32> widget_size = rect<s32>(x, y, x + w, y + h);
     
     IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
+    list->setAutoScrollEnabled(false);
     
     if (m_use_icons)
     {
@@ -112,6 +113,40 @@ void ListWidget::unfocused(const int playerID)
 
     // remove selection when leaving list
     if (list != NULL) list->setSelected(-1);
+}
+
+// -----------------------------------------------------------------------------
+
+int ListWidget::getSelectionID() const
+{
+    return getIrrlichtElement<IGUIListBox>()->getSelected();
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::setSelectionID(const int index)
+{
+    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    
+    // auto-scroll to item when selecting something, don't auto-scroll when selecting nothing
+    if (index != -1)
+    {
+        irritem->setAutoScrollEnabled(true);
+    }
+    
+    irritem->setSelected(index);
+    
+    if (index != -1)
+    {
+        irritem->setAutoScrollEnabled(false);
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+int ListWidget::getItemCount() const
+{
+    return getIrrlichtElement<IGUIListBox>()->getItemCount();
 }
 
 // -----------------------------------------------------------------------------

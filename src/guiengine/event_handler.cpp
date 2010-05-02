@@ -22,6 +22,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -389,19 +390,18 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     // components
     if (w != NULL && w->m_type == WTYPE_LIST)
     {
-        IGUIListBox* list = (IGUIListBox*)(w->m_element);
-        assert(list != NULL);
+        ListWidget* list = (ListWidget*)w;
         
-        const bool stay_within_list = list->getSelected() > 0;
+        const bool stay_within_list = list->getSelectionID() > 0;
         
         if (stay_within_list)
         {
-            list->setSelected(list->getSelected()-1);
+            list->setSelectionID(list->getSelectionID()-1);
             return;
         }
         else
         {
-            list->setSelected(-1);
+            list->setSelectionID(-1);
         }
     }
     
@@ -496,19 +496,18 @@ void EventHandler::navigateDown(const int playerID, Input::InputType type, const
     // components
     if (w != NULL && w->m_type == WTYPE_LIST)
     {
-        IGUIListBox* list = w->getIrrlichtElement<IGUIListBox>();
-        assert(list != NULL);
+        ListWidget* list = (ListWidget*)w;
         
-        const bool stay_within_list = list->getSelected() < (int)list->getItemCount()-1;
+        const bool stay_within_list = list->getSelectionID() < list->getItemCount()-1;
             
         if (stay_within_list)
         {
-            list->setSelected(list->getSelected()+1);
+            list->setSelectionID(list->getSelectionID()+1);
             return;
         }
         else
         {
-            list->setSelected(-1);
+            list->setSelectionID(-1);
         }
     }
     

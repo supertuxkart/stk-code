@@ -47,6 +47,18 @@ namespace GUIEngine
         int getSelection() const;
         std::string getSelectionName() const;
         void clear();
+        
+        /** \return the number of items in the list */
+        int getItemCount() const;
+        
+        /** \return the index of the selected element within the list, or -1 if none */
+        int getSelectionID() const;
+        
+        /**
+          * \brief change the selected item
+          * \param index the index of the element to select within the list, or -1 to select nothing
+          */
+        void setSelectionID(const int index);
     };
 }
 
