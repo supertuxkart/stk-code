@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_OPTIONS_SCREEN_INPUT_HPP__
-#define __HEADER_OPTIONS_SCREEN_INPUT_HPP__
+#ifndef __HEADER_OPTIONS_SCREEN_INPUT2_HPP__
+#define __HEADER_OPTIONS_SCREEN_INPUT2_HPP__
 
 #include <string>
 #include "irrlicht.h"
@@ -35,17 +35,18 @@ struct Input;
   * \brief Input options screen
   * \ingroup states_screens
   */
-class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput>
+class OptionsScreenInput2 : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput2>
 {
-    OptionsScreenInput();
+    OptionsScreenInput2();
     
-    void updateInputButtons(DeviceConfig* config);
-    void buildDeviceList();
-    
-    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    void updateInputButtons();
+
+    DeviceConfig* m_config;
     
 public:
-    friend class GUIEngine::ScreenSingleton<OptionsScreenInput>;
+    friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
+    
+    void setDevice(DeviceConfig* config) { m_config = config; }
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
@@ -62,12 +63,11 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
     
-    /** 
-     * \brief invoke if the list of devices changed after the creation of this screen.
-     * This will cause the displayed list to be updated accordingly with the data in the device manager.
-     */
-    void rebuildDeviceList();
-
+    /**
+      * \brief invoke in "input sensing" mode, when input was sensed.
+      * Updates the input bindings accordingly with the sensed input.
+      */
+    void gotSensedInput(Input* sensedInput);
 };
 
 #endif

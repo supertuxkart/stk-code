@@ -25,14 +25,24 @@
 #include "guiengine/widget.hpp"
 #include "utils/ptr_vector.hpp"
 
+namespace irr { namespace gui { class STKModifiedSpriteBank; } }
+
 namespace GUIEngine
 {
     /** \brief A vertical list widget with text entries
       * \ingroup widgets
+      * \note items you add to a list are not kept after the the list is in was removed
+      *       (i.e. you need to add items everytime the screen is shown)
       */
     class ListWidget : public Widget
     {
+        /** \brief whether this list has icons */
         bool m_use_icons;
+        
+        /** \brief if m_use_icons is true, this will contain the icon bank */
+        irr::gui::STKModifiedSpriteBank* m_icons;
+        
+        std::map< irr::core::stringw /*label*/, std::string /* internal name */> m_internal_names;
         
     public:
         ListWidget();
@@ -45,26 +55,63 @@ namespace GUIEngine
         /** \brief implement callback from base class GUIEngine::Widget */
         virtual void unfocused(const int playerID);
         
+        /** \brief set the icon bank to use for list entries.
+          * The height of list entries will be ajusted to the size of the highest icon.
+          * Icons must therefore be at least as high as text.
+          * \note  the list widget does NOT take ownership of the bank, dso you must delete it when
+          *        you're done with it (but do not delete it when the list widget is still active)
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
+        void setIcons(irr::gui::STKModifiedSpriteBank* icons);
+        
         // ---- contents management
         
-        /** \brief add an item to the list */
-        void addItem(const char* item);
+        /**
+          * \brief add an item to the list
+          * \param item   name of the item
+          * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
+        void addItem(const irr::core::stringw item, const int icon=-1);
 
-        /** \brief erases all items in the list */
+        /**
+         * \brief add an item to the list
+         * \param item   name of the item
+         * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
+         * \precondition may only be called after the widget has been added to the screen with add()
+         */
+        void addItem(const std::string internalName, const irr::core::stringw item, const int icon=-1);
+        
+        /**
+          * \brief erases all items in the list
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         void clear();
         
-        /** \return the number of items in the list */
+        /**
+          * \return the number of items in the list
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         int getItemCount() const;
         
-        /** \return the index of the selected element within the list, or -1 if none */
+        /**
+          * \return the index of the selected element within the list, or -1 if none
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
         int getSelectionID() const;
         
-        /** \return the text of the selected item */
-        std::string getSelectionName() const;
+        /**
+          * \return the text of the selected item
+          * \precondition may only be called after the widget has been added to the screen with add()
+          */
+        std::string getSelectionInternalName();
+        
+        irr::core::stringw getSelectionLabel() const;
         
         /**
           * \brief change the selected item
           * \param index the index of the element to select within the list, or -1 to select nothing
+          * \precondition may only be called after the widget has been added to the screen with add()
           */
         void setSelectionID(const int index);
     };

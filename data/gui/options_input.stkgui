@@ -16,97 +16,21 @@
     
     <box proportion="1" width="100%" layout="vertical-row">
     
-        <scrollable_ribbon id="devices" proportion="3" label_location="each" width="100%"
-                    square_items="false" align="center" child_width="256" child_height="128" />
-        
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Accelerate" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_up" proportion="3" height="100%"
-                    I18N="Unbound key binding"  text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Brake" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_down" proportion="3" height="100%"
-                    I18N="Unbound key binding" text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Left" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_left" proportion="3" height="100%"
-                    I18N="Unbound key binding"  text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Right" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_right" proportion="3" height="100%"
-                    I18N="Unbound key binding" text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Fire" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_fire" proportion="3" height="100%"
-                    I18N="Unbound key binding"   text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center" >
-            <label proportion="2" height="100%" I18N="Key binding" text="Nitro" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_nitro" proportion="3" height="100%"
-                    I18N="Unbound key binding"  text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Sharp Turn" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_drift" proportion="3" height="100%"
-                    I18N="Unbound key binding" text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Rescue" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_rescue" proportion="3" height="100%"
-                    I18N="Unbound key binding"  text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
-        <spacer height="5" width="10"/>
-        
-        <div width="85%" proportion="1" layout="horizontal-row" align="center">
-            <label proportion="2" height="100%" I18N="Key binding" text="Look Back" text_align="right"/>
-            <spacer proportion="1" height="100%" />
-            <button id="binding_look_back" proportion="3" height="100%"
-                    I18N="Unbound key binding"  text="[none]"/>
-            <spacer proportion="1" height="100%" />
-        </div>
+       <spacer width="5" height="5"/>
+    
+        <label width="100%"
+            I18N="In key bindings configuration menu"  
+            text="Press enter or double-click on a device to configure it"
+            text_align="center" />
 
-        <spacer width="50" height="10" /> 
+        <spacer width="5" height="20"/>
+        <list id="devices" proportion="5" width="75%" align="center"/>
+        <spacer width="50" height="25" /> 
  
-        <button id="add_device" proportion="1" I18N="In the input configuration screen"  text="Add a device"/>
+        <button id="add_device" I18N="In the input configuration screen"  text="Add a device"/>
        
         <label text="* Which config to use will be inferred from which 'fire' key is pressed to join the game."
-               proportion="3" word_wrap="true"/>
+               proportion="2" word_wrap="true"/>
     </box>
     
  <spacer width="50" height="40" /> 

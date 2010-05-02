@@ -39,6 +39,8 @@ namespace GUIEngine
     /** \brief A static text/icons/tabs bar widget.
       * The contents of this ribbon are static.
       * \ingroup widgets
+      * \note items you add to a list are kept after the the ribbon was in is removed
+      *       (i.e. you don't need to add items everytime the screen is shown, only upon loading)
       */
     class RibbonWidget : public Widget
     {

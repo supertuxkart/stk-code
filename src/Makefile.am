@@ -296,6 +296,8 @@ supertuxkart_SOURCES = \
  states_screens/options_screen_av.hpp \
  states_screens/options_screen_input.cpp \
  states_screens/options_screen_input.hpp \
+ states_screens/options_screen_input2.cpp \
+ states_screens/options_screen_input2.hpp \
  states_screens/options_screen_players.cpp \
  states_screens/options_screen_players.hpp \
  states_screens/race_gui.cpp \

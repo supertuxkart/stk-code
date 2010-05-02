@@ -161,7 +161,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         ListWidget* players = this->getWidget<ListWidget>("players");
         assert(players != NULL);
         
-        std::string selectedPlayer = players->getSelectionName();
+        std::string selectedPlayer = stringc( players->getSelectionLabel().c_str() ).c_str();
         const int playerAmount = UserConfigParams::m_all_players.size();
         for (int n=0; n<playerAmount; n++)
         {

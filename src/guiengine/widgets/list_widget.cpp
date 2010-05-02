@@ -31,7 +31,40 @@ using namespace irr::gui;
 
 ListWidget::ListWidget() : Widget(WTYPE_LIST)
 {
-    m_use_icons = false; //TODO: make configurable if needed
+    m_use_icons = false;
+    m_icons = NULL;
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::setIcons(STKModifiedSpriteBank* icons)
+{
+    m_use_icons = (icons != NULL);
+    m_icons = icons;
+    
+    if (m_use_icons)
+    {
+        IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+        assert(list != NULL);
+        
+        list->setSpriteBank(m_icons);
+        
+        // determine needed height
+        int item_height = 0;
+        const core::array< core::rect<s32> >& rects = m_icons->getPositions();
+        const int count = rects.size();
+        for (int n=0; n<count; n++)
+        {
+            const int h = rects[n].getHeight();
+            if (h > item_height) item_height = h;
+        }
+        
+        if (item_height > 0)
+        {
+            list->setItemHeight( item_height );
+        }
+    }
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -42,19 +75,6 @@ void ListWidget::add()
     
     IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
     list->setAutoScrollEnabled(false);
-    
-    if (m_use_icons)
-    {
-        //TODO: allow choosing which icons to use
-        video::ITexture* icon = irr_driver->getTexture( file_manager->getGUIDir() + "/difficulty_medium.png" );
-        
-        // TODO: delete the bank when done using, it currently leaks
-        STKModifiedSpriteBank* bank = new STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
-        bank->setScale(0.5f);
-        bank->addTextureAsSprite(icon);
-        list->setSpriteBank(bank);
-        list->setItemHeight( icon->getSize().Height*0.5f );
-    }
     
     m_element = list;
 }
@@ -67,35 +87,52 @@ void ListWidget::clear()
     assert(list != NULL);
     
     list->clear();
+    m_internal_names.clear();
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::addItem(const char* item)
+void ListWidget::addItem(const stringw item, const int icon)
 {
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     
-    if (m_use_icons)
+    if (m_use_icons && icon != -1)
     {
-        //TODO: allow choosing which icon to use
-        u32 newItem = list->addItem( stringw(item).c_str(), 0 /* icon */ );
+        u32 newItem = list->addItem( item.c_str(), icon );
         list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
         list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
     }
     else
     {
-        list->addItem( stringw(item).c_str() );
+        list->addItem( item.c_str() );
     }
 }
 
 // -----------------------------------------------------------------------------
 
-std::string ListWidget::getSelectionName() const
+void ListWidget::addItem(const std::string internalName, const irr::core::stringw item, const int icon)
+{
+    m_internal_names[item] = internalName;
+    addItem(item, icon);
+}
+
+// -----------------------------------------------------------------------------
+
+std::string ListWidget::getSelectionInternalName()
 {
     const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
-    return stringc( list->getListItem( list->getSelected() ) ).c_str();
+    return m_internal_names[ list->getListItem( list->getSelected() ) ];
+}
+
+// -----------------------------------------------------------------------------
+
+irr::core::stringw ListWidget::getSelectionLabel() const
+{
+    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    assert(list != NULL);
+    return list->getListItem( list->getSelected() );
 }
 
 // -----------------------------------------------------------------------------

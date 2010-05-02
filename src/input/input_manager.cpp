@@ -43,7 +43,7 @@
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_input2.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 InputManager *input_manager;
@@ -214,7 +214,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 
         if (type == Input::IT_KEYBOARD)
         {
-            OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+            OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
             return;
         }
         else if (type == Input::IT_STICKMOTION)
@@ -230,7 +230,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
 
             if (abs(value) > Input::MAX_VALUE/2.0f)
             {
-                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
                 return;
             }
         }
@@ -249,12 +249,12 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && id_has_high_value )
             {
-                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
             }
             else if ( abs(value) < Input::MAX_VALUE/8.0f && inverse_id_has_high_value )
             {
                 m_sensed_input->axisDirection = (axisDirection?0:-1);
-                OptionsScreenInput::getInstance()->gotSensedInput(m_sensed_input);
+                OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
             }
         }
     }

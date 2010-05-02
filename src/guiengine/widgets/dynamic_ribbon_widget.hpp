@@ -62,6 +62,8 @@ namespace GUIEngine
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
       * scrolling, multiple-row layouts.
       * \ingroup widgets
+      * \note items you add to a list are kept after the the ribbon was in is removed
+      *       (i.e. you don't need to add items everytime the screen is shown, only upon loading)
       */
     class DynamicRibbonWidget : public Widget, public RibbonWidget::IRibbonListener
     {

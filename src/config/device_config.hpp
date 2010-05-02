@@ -20,6 +20,12 @@ struct KeyBinding
     
 };
 
+enum DeviceConfigType
+{
+    DEVICE_CONFIG_TYPE_GAMEPAD,
+    DEVICE_CONFIG_TYPE_KEYBOARD
+};
+
 
 //==== D E V I C E C O N F I G =================================================
 
@@ -32,18 +38,26 @@ class DeviceConfig
 private:
     
     KeyBinding  m_bindings[PA_COUNT];
-    bool        m_inuse;  //!< Is there a device connected to the system which uses this config?
+    bool        m_plugged;  //!< Is there a device connected to the system which uses this config?
     
 protected:
     
     std::string m_name;
     
+    DeviceConfigType m_type;
+    
+    DeviceConfig(DeviceConfigType type)
+    {
+        m_type = type;
+    }
+    
 public:
     
-    std::string getName()           const { return m_name; };
-    irr::core::stringw getBindingAsString  (const PlayerAction action) const;
-    irr::core::stringw toString     ();
-    
+    std::string        getName           () const { return m_name; };
+    irr::core::stringw toString          ();
+    DeviceConfigType   getType           () const { return m_type; }
+    irr::core::stringw getBindingAsString(const PlayerAction action) const;
+
     void        serialize           (std::ofstream& stream);
     bool        deserializeAction   (irr::io::IrrXMLReader* xml);
     
@@ -52,8 +66,8 @@ public:
                                      const int              id,
                                      Input::AxisDirection   direction = Input::AD_NEUTRAL);
     
-    void        setInUse            (bool inuse) {m_inuse = inuse;}
-    bool        isInUse            () {return m_inuse;}
+    void        setPlugged            (bool plugged) {m_plugged = plugged;}
+    bool        isPlugged           () {return m_plugged;}
     
     /**
       * Don't call this directly unless you are KeyboardDevice or GamepadDevice
