@@ -279,7 +279,6 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
             }
         }
         
-        // extract gamepad ID from name
         GamepadConfig* config =  (GamepadConfig*)m_config;
         config->setBinding(binding_to_set, sensedInput->type, sensedInput->btnID,
                            (Input::AxisDirection)sensedInput->axisDirection);
