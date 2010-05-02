@@ -334,7 +334,9 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     
     if (keyboard)
     {
-        std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
+		if(UserConfigParams::m_verbosity>=5)
+			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
+				      << " : setting to keyboard key " << sensedInput->btnID << " \n\n";
         
         // extract keyboard ID from name
         int configID = -1;
@@ -348,7 +350,9 @@ void OptionsScreenInput::gotSensedInput(Input* sensedInput)
     }
     else if (gamepad)
     {
-        std::cout << "% Binding " << KartActionStrings[binding_to_set] << " : setting to gamepad #" << sensedInput->deviceID << " : ";
+		if(UserConfigParams::m_verbosity>=5)
+			std::cout << "% Binding " << KartActionStrings[binding_to_set] 
+		              << " : setting to gamepad #" << sensedInput->deviceID << " : ";
         if (sensedInput->type == Input::IT_STICKMOTION)
         {
             std::cout << "axis " << sensedInput->btnID << " direction " <<
@@ -503,7 +507,10 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         
         DynamicRibbonWidget* devices = this->getWidget<DynamicRibbonWidget>("devices");
         assert( devices != NULL );
-        std::cout << "\n% Entering sensing mode for " << devices->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str() << std::endl;
+		if(UserConfigParams::m_verbosity>=5)
+			std::cout << "\n% Entering sensing mode for " 
+			          << devices->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str() 
+					  << std::endl;
         
         new PressAKeyDialog(0.4f, 0.4f);
         
