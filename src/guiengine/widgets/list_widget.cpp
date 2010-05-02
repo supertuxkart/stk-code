@@ -91,15 +91,6 @@ void ListWidget::addItem(const char* item)
 
 // -----------------------------------------------------------------------------
 
-int ListWidget::getSelection() const
-{
-    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
-    assert(list != NULL);
-    return list->getSelected();
-}
-
-// -----------------------------------------------------------------------------
-
 std::string ListWidget::getSelectionName() const
 {
     const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();

@@ -39,13 +39,18 @@ namespace GUIEngine
         
         SkinWidgetContainer m_selection_skin_info;
                 
-        void add();
-        void addItem(const char* item);
+        /** \brief implement add method from base class GUIEngine::Widget */
+        virtual void add();
         
+        /** \brief implement callback from base class GUIEngine::Widget */
         virtual void unfocused(const int playerID);
+        
+        // ---- contents management
+        
+        /** \brief add an item to the list */
+        void addItem(const char* item);
 
-        int getSelection() const;
-        std::string getSelectionName() const;
+        /** \brief erases all items in the list */
         void clear();
         
         /** \return the number of items in the list */
@@ -53,6 +58,9 @@ namespace GUIEngine
         
         /** \return the index of the selected element within the list, or -1 if none */
         int getSelectionID() const;
+        
+        /** \return the text of the selected item */
+        std::string getSelectionName() const;
         
         /**
           * \brief change the selected item
