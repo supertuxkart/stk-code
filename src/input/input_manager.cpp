@@ -403,7 +403,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
                 return;
             }
             
-            ((PlayerController*)pk->getController())->action(action, abs(value));
+            ((Controller*)pk->getController())->action(action, abs(value));
         }
         // ... when in menus
         else

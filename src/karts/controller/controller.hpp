@@ -62,7 +62,10 @@ public:
     virtual void  finishedRace       (float time) {};
     virtual bool  isPlayerController () const {return false;}
     virtual bool  isNetworkController() const {return false;}
+    /** Default: ignore actions. Only PlayerController get them. */
+    virtual void  action             (PlayerAction action, int value) {}
     virtual const irr::core::stringw& getNamePostfix() const;
+
 };   // Controller
 
 #endif
