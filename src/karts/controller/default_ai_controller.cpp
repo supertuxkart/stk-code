@@ -111,7 +111,7 @@ DefaultAIController::DefaultAIController(Kart *kart) : AIBaseController(kart)
         m_fallback_tactic    = FT_AVOID_TRACK_CRASH;
         m_item_tactic        = IT_TEN_SECONDS;
         m_max_start_delay    = 0.5f;
-        m_min_steps          = 0;
+        m_min_steps          = 1;
         m_nitro_level        = NITRO_NONE;
         m_handle_bomb        = false;
         setSkiddingFraction(4.0f);
