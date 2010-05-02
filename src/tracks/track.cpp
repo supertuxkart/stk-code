@@ -811,7 +811,7 @@ void Track::loadTrackModel(World* parent, unsigned int mode_id)
      */
 
     // ---- Fog
-    if (m_use_fog)
+    if (m_use_fog && !UserConfigParams::m_camera_debug)
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start 
            and end do not matter */
