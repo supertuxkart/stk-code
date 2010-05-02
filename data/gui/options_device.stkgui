@@ -1,0 +1,117 @@
+<stkgui>
+
+<div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+
+    <header text_align="center" width="100%" text="SuperTuxKart Options"/>
+    <spacer height="15" width="10"/>
+    
+    <tabs id="options_choice" height="10%" max_height="110" width="100%" align="center">
+        <icon-button id="tab_audio_video" width="128" height="128" icon="gui/options_audio_video.png"
+                I18N="Section in the settings menu"  text="Audio/Video"/>
+        <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"
+                I18N="Section in the settings menu"  text="Players"/>
+        <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"
+                I18N="Section in the settings menu" text="Controls"/>
+    </tabs>
+    
+    <box proportion="1" width="100%" layout="vertical-row">
+    
+        <spacer height="6" width="10"/>
+        <label id="title" width="100%" text_align="center" text="[none]" />
+        <spacer height="6" width="10"/>
+
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Accelerate" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_up" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Brake" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_down" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Left" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_left" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Right" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_right" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Fire" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_fire" proportion="3" height="100%"
+                    I18N="Unbound key binding"   text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center" >
+            <label proportion="2" height="100%" I18N="Key binding" text="Nitro" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_nitro" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Sharp Turn" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_drift" proportion="3" height="100%"
+                    I18N="Unbound key binding" text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Rescue" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_rescue" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Look Back" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="binding_look_back" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+
+        <spacer width="50" height="10" /> 
+ 
+        <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
+        
+        <spacer width="50" height="10" /> 
+    </box>
+    
+ <spacer width="50" height="40" /> 
+</div>
+
+<button id="back" x="20" y="-40" width="250" height="35" align="left"
+        I18N="In the options menu, to go back to the main menu or game" text="Back"/>
+
+</stkgui>
