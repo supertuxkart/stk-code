@@ -112,7 +112,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 const int playerID = input_manager->getPlayerKeyboardID();
-                if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
                 else if (playerID != -1) return onWidgetActivated(w, playerID);
                 else break;
             }    

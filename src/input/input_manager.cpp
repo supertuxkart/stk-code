@@ -561,14 +561,17 @@ EventPropagation InputManager::input(const SEvent& event)
             }
             // 'backspace' in a text control must never be mapped, since user can be in a text
             // area trying to erase text (and if it's mapped to rescue that would dismiss the
-            // dialog instead of erasing a single letter). Same for spacebar.
-            if (key == KEY_BACK && GUIEngine::isWithinATextBox())
+            // dialog instead of erasing a single letter). Same for spacebar. Same for letters.
+            if (GUIEngine::isWithinATextBox())
             {
-                return EVENT_LET;
-            }
-            if (key == KEY_SPACE && GUIEngine::isWithinATextBox())
-            {
-                return EVENT_LET;
+                if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
+                {
+                    return EVENT_LET;
+                }
+                if (key >= KEY_KEY_0 && key <= KEY_KEY_Z)
+                {
+                    return EVENT_LET;
+                }
             }
             
             const bool wasInTextBox = GUIEngine::isWithinATextBox();
@@ -594,6 +597,21 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else
         {
+            // 'backspace' in a text control must never be mapped, since user can be in a text
+            // area trying to erase text (and if it's mapped to rescue that would dismiss the
+            // dialog instead of erasing a single letter). Same for spacebar. Same for letters.
+            if (GUIEngine::isWithinATextBox())
+            {
+                if (key == KEY_BACK || key == KEY_SPACE || key == KEY_SHIFT)
+                {
+                    return EVENT_LET;
+                }
+                if (key >= KEY_KEY_0 && key <= KEY_KEY_Z)
+                {
+                    return EVENT_LET;
+                }
+            }
+            
             dispatchInput(Input::IT_KEYBOARD, 0, key, 0, 0);
             return EVENT_BLOCK; // Don't propagate key up events
         }
@@ -623,7 +641,9 @@ EventPropagation InputManager::input(const SEvent& event)
     }
 #endif
     
-    // block events in all modes but initial menus (except in text boxes to allow typing, and except in modal dialogs in-game)
+    // block events in all modes but initial menus (except in text boxes to allow typing,
+    // and except in modal dialogs in-game)
+    // FIXME: 1) that's awful logic 2) that's not what the code below does, events are never blocked in menus
     if (getDeviceList()->getAssignMode() != NO_ASSIGN && !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() && StateManager::get()->getGameState() == GUIEngine::GAME))
     {
