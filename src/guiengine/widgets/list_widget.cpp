@@ -21,6 +21,8 @@
 
 #include "io/file_manager.hpp"
 
+#include "guiengine/CGUISpriteBank.h"
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -46,12 +48,12 @@ void ListWidget::add()
         //TODO: allow choosing which icons to use
         video::ITexture* icon = irr_driver->getTexture( file_manager->getGUIDir() + "/difficulty_medium.png" );
         
-        //FIXME: I have no clue what the parameter to 'addEmptySpriteBank' is for
-        //FIXME: remember the created bank for future 'add's, since a bank must be created once only
-        IGUISpriteBank* bank = GUIEngine::getGUIEnv()->addEmptySpriteBank( file_manager->getGUIDir().c_str() );
+        // TODO: delete the bank when done using, it currently leaks
+        STKModifiedSpriteBank* bank = new STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
+        bank->setScale(0.5f);
         bank->addTextureAsSprite(icon);
         list->setSpriteBank(bank);
-        list->setItemHeight( icon->getSize().Height );
+        list->setItemHeight( icon->getSize().Height*0.5f );
     }
     
     m_element = list;

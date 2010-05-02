@@ -77,6 +77,8 @@ supertuxkart_SOURCES = \
  graphics/water_splash.cpp \
  guiengine/CGUIFont.cpp \
  guiengine/CGUIFont.h \
+ guiengine/CGUISpriteBank.cpp \
+ guiengine/CGUISpriteBank.h \
  guiengine/abstract_state_manager.cpp \
  guiengine/abstract_state_manager.hpp \
  guiengine/engine.cpp \
