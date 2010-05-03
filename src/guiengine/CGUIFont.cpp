@@ -585,6 +585,13 @@ void ScalableFont::draw(const core::stringw& text, const core::rect<s32>& positi
 	{
 		wchar_t c = text[i];
 
+        //hack: one tab character is supported, it moves the cursor to the middle of the area
+        if (c == L'\t')
+        {
+            offset.X = position.UpperLeftCorner.X + position.getWidth()/2;
+            continue;
+        }
+        
 		bool lineBreak=false;
 		if (c == L'\r') // Windows breaks
 		{

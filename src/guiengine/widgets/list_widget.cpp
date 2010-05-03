@@ -87,43 +87,51 @@ void ListWidget::clear()
     assert(list != NULL);
     
     list->clear();
-    m_internal_names.clear();
+    m_items.clear();
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::addItem(const stringw item, const int icon)
+void ListWidget::addItem(const std::string internalName, const irr::core::stringw name, const int icon)
 {
+    ListItem newItem;
+    newItem.m_label = name;
+    newItem.m_internal_name = internalName;
+    
     IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
     assert(list != NULL);
     
     if (m_use_icons && icon != -1)
     {
-        u32 newItem = list->addItem( item.c_str(), icon );
-        list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
-        list->setItemOverrideColor( newItem, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
+        u32 itemID = list->addItem( name.c_str(), icon );
+        list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
+        list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
+        newItem.m_current_id = itemID;
     }
     else
     {
-        list->addItem( item.c_str() );
+        newItem.m_current_id = list->addItem( name.c_str() );
     }
+    m_items.push_back(newItem);
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::addItem(const std::string internalName, const irr::core::stringw item, const int icon)
+void ListWidget::renameItem(const int itemID, const irr::core::stringw newName, const int icon)
 {
-    m_internal_names[item] = internalName;
-    addItem(item, icon);
+    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    assert(list != NULL);
+    
+    m_items[itemID].m_label = newName;
+    list->setItem(itemID, newName.c_str(), icon);
 }
 
 // -----------------------------------------------------------------------------
 
 std::string ListWidget::getSelectionInternalName()
 {
-    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
-    assert(list != NULL);
-    return m_internal_names[ list->getListItem( list->getSelected() ) ];
+    return m_items[ getSelectionID() ].m_internal_name;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -176,7 +184,16 @@ void ListWidget::setSelectionID(const int index)
 
 int ListWidget::getItemCount() const
 {
-    return getIrrlichtElement<IGUIListBox>()->getItemCount();
+    const int count = getIrrlichtElement<IGUIListBox>()->getItemCount();
+    assert((int)m_items.size() == count);
+    
+    return count;
 }
 
 // -----------------------------------------------------------------------------
+
+void ListWidget::elementRemoved()
+{
+    Widget::elementRemoved();
+    m_items.clear();
+}

@@ -49,6 +49,7 @@ DEFINE_SCREEN_SINGLETON( OptionsScreenInput2 );
 OptionsScreenInput2::OptionsScreenInput2() : Screen("options_device.stkgui")
 {
     m_config = NULL;
+    
 }
 
 // -----------------------------------------------------------------------------
@@ -59,175 +60,118 @@ void OptionsScreenInput2::loadedFromFile()
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput2::updateInputButtons()
-{
-    assert(m_config != NULL);
-    
-    // to detect duplicate entries
-    std::set<core::stringw> existing_bindings;
-    
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_up");
-        core::stringw binding_name = m_config->getBindingAsString(PA_ACCEL);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_down");
-        core::stringw binding_name = m_config->getBindingAsString(PA_BRAKE);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_left");
-        core::stringw binding_name = m_config->getBindingAsString(PA_STEER_LEFT);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_right");
-        core::stringw binding_name = m_config->getBindingAsString(PA_STEER_RIGHT);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    
-    std::set<core::stringw>::iterator it;
-    
-    
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_fire");
-        core::stringw binding_name = m_config->getBindingAsString(PA_FIRE);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-            //std::cout << "Setting bad badge!!!!\n";
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_nitro");
-        core::stringw binding_name = m_config->getBindingAsString(PA_NITRO);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_drift");
-        core::stringw binding_name = m_config->getBindingAsString(PA_DRIFT);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_rescue");
-        core::stringw binding_name = m_config->getBindingAsString(PA_RESCUE);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-    {
-        ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_look_back");
-        core::stringw binding_name = m_config->getBindingAsString(PA_LOOK_BACK);
-        btn->setLabel( binding_name );
-        
-        // check if another binding already uses this key
-        if (existing_bindings.find(binding_name) != existing_bindings.end())
-        {
-            btn->setBadge(BAD_BADGE);
-        }
-        else
-        {
-            existing_bindings.insert(binding_name);
-            btn->resetAllBadges();
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------
-
 void OptionsScreenInput2::init()
 {
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
-
-    updateInputButtons();
+    
     
     LabelWidget* label = this->getWidget<LabelWidget>("title");
     label->setText( m_config->getName().c_str() );
+    
+    GUIEngine::ListWidget* actions = this->getWidget<GUIEngine::ListWidget>("actions");
+    assert( actions != NULL );
+   
+    // ---- create list skeleton (right number of items, right internal names)
+    //      their actualy contents will be adapted as needed after
+    
+    //I18N: Key binding section
+    actions->addItem("game_keys_section", _("Game Keys") );
+    actions->addItem(KartActionStrings[PA_STEER_LEFT],  L"" );
+    actions->addItem(KartActionStrings[PA_STEER_RIGHT], L"" );
+    actions->addItem(KartActionStrings[PA_ACCEL],       L"" );
+    actions->addItem(KartActionStrings[PA_BRAKE],       L"" );
+    actions->addItem(KartActionStrings[PA_FIRE],        L"" );
+    actions->addItem(KartActionStrings[PA_NITRO],       L"" );
+    actions->addItem(KartActionStrings[PA_DRIFT],       L"" );
+    actions->addItem(KartActionStrings[PA_LOOK_BACK],   L"" );
+    actions->addItem(KartActionStrings[PA_RESCUE],      L"" );
+    
+
+    //I18N: Key binding section
+    actions->addItem("menu_keys_section", _("Menu Keys") );
+    actions->addItem(KartActionStrings[PA_MENU_UP],     L"" );
+    actions->addItem(KartActionStrings[PA_MENU_DOWN],   L"" );
+    actions->addItem(KartActionStrings[PA_MENU_LEFT],   L"" );
+    actions->addItem(KartActionStrings[PA_MENU_RIGHT],  L"" );
+    actions->addItem(KartActionStrings[PA_MENU_SELECT], L"");
+    actions->addItem(KartActionStrings[PA_MENU_CANCEL], L"" );
+    
+    updateInputButtons();
+}
+
+// -----------------------------------------------------------------------------
+
+irr::core::stringw OptionsScreenInput2::makeLabel(const irr::core::stringw translatedName,
+                                                  PlayerAction action) const
+{
+    //hack: one tab character is supported by out font object, it moves the cursor to the middle of the area
+    core::stringw out = irr::core::stringw("    ") + translatedName + L"\t";
+    
+    out += m_config->getBindingAsString(action);
+    return out;
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput2::updateInputButtons()
+{
+    assert(m_config != NULL);
+    
+    //TODO: detect duplicates
+    
+    GUIEngine::ListWidget* actions = this->getWidget<GUIEngine::ListWidget>("actions");
+    assert( actions != NULL );
+    
+    // item 0 is a section header
+    
+    //I18N: Key binding name
+    actions->renameItem(1, makeLabel( _("Steer Left"), PA_STEER_LEFT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(2, makeLabel( _("Steer Right"), PA_STEER_RIGHT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(3, makeLabel( _("Accelerate"), PA_ACCEL) );
+    
+    //I18N: Key binding name
+    actions->renameItem(4, makeLabel( _("Brake"), PA_BRAKE) );
+    
+    //I18N: Key binding name
+    actions->renameItem(5, makeLabel( _("Fire"), PA_FIRE) );
+    
+    //I18N: Key binding name
+    actions->renameItem(6, makeLabel( _("Nitro"), PA_NITRO) );
+    
+    //I18N: Key binding name
+    actions->renameItem(7, makeLabel( _("Sharp Turn"), PA_DRIFT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(8, makeLabel( _("Look Back"), PA_LOOK_BACK) );
+    
+    //I18N: Key binding name
+    actions->renameItem(9, makeLabel( _("Rescue"), PA_RESCUE) );
+    
+    
+    // item 10 is a section header
+    
+    //I18N: Key binding name
+    actions->renameItem(11, makeLabel( _("Up"), PA_MENU_UP) );
+    
+    //I18N: Key binding name
+    actions->renameItem(12, makeLabel( _("Down"), PA_MENU_DOWN) );
+    
+    //I18N: Key binding name
+    actions->renameItem(13, makeLabel( _("Left"), PA_MENU_LEFT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(14, makeLabel( _("Right"), PA_MENU_RIGHT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(15, makeLabel( _("Select"), PA_MENU_SELECT) );
+    
+    //I18N: Key binding name
+    actions->renameItem(16, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
 }
 
 // -----------------------------------------------------------------------------
@@ -255,7 +199,7 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
         keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD, sensedInput->btnID, Input::AD_NEUTRAL);
         
         // refresh display
-        init();
+        updateInputButtons();
     }
     else if (gamepad)
     {
@@ -284,7 +228,7 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
                            (Input::AxisDirection)sensedInput->axisDirection);
         
         // refresh display
-        init();
+        updateInputButtons();
     }
     else
     {
@@ -294,9 +238,9 @@ void OptionsScreenInput2::gotSensedInput(Input* sensedInput)
     ModalDialog::dismiss();
     input_manager->setMode(InputManager::MENU);
     
-    // re-select the previous button
-    ButtonWidget* btn = this->getWidget<ButtonWidget>(binding_to_set_button.c_str());
-    if(btn != NULL) btn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    // re-select the previous button (TODO!)
+    //ButtonWidget* btn = this->getWidget<ButtonWidget>(binding_to_set_button.c_str());
+    //if(btn != NULL) btn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     
     // save new binding to file
     input_manager->getDeviceList()->serialize();
@@ -338,6 +282,47 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
+    else if (name == "actions")
+    {
+        GUIEngine::ListWidget* actions = this->getWidget<GUIEngine::ListWidget>("actions");
+        assert( actions != NULL );
+        
+        // a player action in the list was clicked. find which one
+        const std::string& clicked = actions->getSelectionInternalName();
+        for (int n=PA_BEFORE_FIRST+1; n<PA_COUNT; n++)
+        {
+            if (KartActionStrings[n] == clicked)
+            {                
+                // we found which one. show the "press a key" dialog.
+                if (UserConfigParams::m_verbosity>=5)
+                {
+                    std::cout << "\n% Entering sensing mode for " 
+                              << m_config->getName().c_str() 
+                              << std::endl;
+                }
+                
+                binding_to_set = (PlayerAction)n;
+                
+                new PressAKeyDialog(0.4f, 0.4f);
+                
+                if (m_config->getType() == DEVICE_CONFIG_TYPE_KEYBOARD)
+                {
+                    input_manager->setMode(InputManager::INPUT_SENSE_KEYBOARD);
+                }
+                else if (m_config->getType() == DEVICE_CONFIG_TYPE_GAMEPAD)
+                {
+                    input_manager->setMode(InputManager::INPUT_SENSE_GAMEPAD);
+                }
+                else
+                {
+                    std::cerr << "unknown selection device in options : " << m_config->getName().c_str() << std::endl;
+                }                
+                break;
+            }
+        }
+    }
+    //TODO!
+    /*
     else if(name.find("binding_") != std::string::npos)
     {
         binding_to_set_button = name;
@@ -406,8 +391,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
         {
             std::cerr << "unknown selection device in options : " << m_config->getName().c_str() << std::endl;
         }
-        
-    }
+    }*/
 
 }
 

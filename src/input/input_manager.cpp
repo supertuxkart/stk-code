@@ -296,11 +296,27 @@ int InputManager::getPlayerKeyboardID() const
  */
 void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID, int axisDirection, int value)
 {
+    // Act different in input sensing mode.
+    if (m_mode == INPUT_SENSE_KEYBOARD ||
+        m_mode == INPUT_SENSE_GAMEPAD)
+    {
+        inputSensing(type, deviceID, btnID, axisDirection,  value);
+        return;
+    }
+    
     StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
     bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value,
-                                                          /*m_mode*/INGAME, &player, &action);
+                                                          m_mode, &player, &action);
 
+    // if didn't find a _menu_ action, try finding a corresponding game action as fallback
+    // (the GUI can handle them too)
+    if (!action_found && m_mode == MENU)
+    {
+        action_found = m_device_manager->translateInput(type, deviceID, btnID, axisDirection, value,
+                                                        INGAME, &player, &action);
+    }
+    
     // in menus, some keyboard keys are standard (before each player selected his device)
     // So if a key could not be mapped to any known binding, fall back to check the defaults.
     if (!action_found && StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD &&
@@ -327,14 +343,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
         }
     }
     
-    // Act different in input sensing mode.
-    if (m_mode == INPUT_SENSE_KEYBOARD ||
-        m_mode == INPUT_SENSE_GAMEPAD)
-    {
-        inputSensing(type, deviceID, btnID, axisDirection,  value);
-    }
-    // Otherwise, do something with the key if it matches a binding
-    else if (action_found)
+    // do something with the key if it matches a binding
+    if (action_found)
     {
         // If we're in the kart menu awaiting new players, do special things
         // when a device presses fire or rescue

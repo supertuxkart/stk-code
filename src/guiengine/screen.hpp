@@ -155,6 +155,7 @@ namespace GUIEngine
             {
                 fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s' cannot be casted to "
                         "requested type '%s'!\n", name, typeid(*out).name(), typeid(T).name()); 
+                abort();
             }
             return outCasted;
         }

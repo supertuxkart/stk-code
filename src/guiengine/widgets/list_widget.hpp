@@ -41,9 +41,15 @@ namespace GUIEngine
         
         /** \brief if m_use_icons is true, this will contain the icon bank */
         irr::gui::STKModifiedSpriteBank* m_icons;
-        
-        std::map< irr::core::stringw /*label*/, std::string /* internal name */> m_internal_names;
-        
+                
+        struct ListItem
+        {
+            std::string m_internal_name;
+            irr::core::stringw m_label;
+            int m_current_id;
+        };
+        std::vector< ListItem > m_items;
+
     public:
         ListWidget();
         
@@ -66,21 +72,14 @@ namespace GUIEngine
         
         // ---- contents management
         
-        /**
-          * \brief add an item to the list
-          * \param item   name of the item
-          * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
-          * \precondition may only be called after the widget has been added to the screen with add()
-          */
-        void addItem(const irr::core::stringw item, const int icon=-1);
 
         /**
          * \brief add an item to the list
-         * \param item   name of the item
+         * \param name   user-visible, potentially translated, name of the item
          * \param icon   ID of the icon within the icon bank. Only used if an icon bank was passed.
          * \precondition may only be called after the widget has been added to the screen with add()
          */
-        void addItem(const std::string internalName, const irr::core::stringw item, const int icon=-1);
+        void addItem(const std::string internalName, const irr::core::stringw name, const int icon=-1);
         
         /**
           * \brief erases all items in the list
@@ -114,6 +113,10 @@ namespace GUIEngine
           * \precondition may only be called after the widget has been added to the screen with add()
           */
         void setSelectionID(const int index);
+        
+        void renameItem(const int itemID, const irr::core::stringw newName, const int icon=-1);
+        
+        virtual void elementRemoved();
     };
 }
 

@@ -43,6 +43,8 @@ class OptionsScreenInput2 : public GUIEngine::Screen, public GUIEngine::ScreenSi
 
     DeviceConfig* m_config;
     
+    irr::core::stringw makeLabel(const irr::core::stringw translatedName, PlayerAction action) const;
+
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
     

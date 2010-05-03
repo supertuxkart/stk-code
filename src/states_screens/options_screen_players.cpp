@@ -66,7 +66,8 @@ void OptionsScreenPlayers::init()
     const int playerAmount = UserConfigParams::m_all_players.size();
     for(int n=0; n<playerAmount; n++)
     {
-        players->addItem( UserConfigParams::m_all_players[n].getName() );
+        players->addItem( UserConfigParams::m_all_players[n].getName(),
+                          UserConfigParams::m_all_players[n].getName() );
     }
 }
 
@@ -91,7 +92,7 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         // add new player
         UserConfigParams::m_all_players.push_back( new PlayerProfile(newNameC.c_str()) );
         
-        players->addItem( newNameC.c_str() );
+        players->addItem( newNameC.c_str(), newNameC.c_str() );
     }
     else // ---- Rename existing player
     {
@@ -102,7 +103,8 @@ bool OptionsScreenPlayers::gotNewPlayerName(const stringw& newName, PlayerProfil
         const int playerAmount =  UserConfigParams::m_all_players.size();
         for(int n=0; n<playerAmount; n++)
         {
-            players->addItem(UserConfigParams::m_all_players[n].getName());
+            players->addItem(UserConfigParams::m_all_players[n].getName(),
+                             UserConfigParams::m_all_players[n].getName());
         }
         
     }
@@ -123,7 +125,8 @@ void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
     const int playerAmount =  UserConfigParams::m_all_players.size();
     for(int n=0; n<playerAmount; n++)
     {
-        players->addItem(UserConfigParams::m_all_players[n].getName());
+        players->addItem(UserConfigParams::m_all_players[n].getName(),
+                         UserConfigParams::m_all_players[n].getName());
     }
 }
 

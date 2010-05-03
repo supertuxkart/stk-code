@@ -18,8 +18,9 @@
     
         <spacer height="6" width="10"/>
         <label id="title" width="100%" text_align="center" text="[none]" />
-        <spacer height="6" width="10"/>
+        <spacer height="16" width="10"/>
 
+<!--
         <div width="85%" proportion="1" layout="horizontal-row" align="center">
             <label proportion="2" height="100%" I18N="Key binding" text="Accelerate" text_align="right"/>
             <spacer proportion="1" height="100%" />
@@ -100,8 +101,68 @@
                     I18N="Unbound key binding"  text="[none]"/>
             <spacer proportion="1" height="100%" />
         </div>
+        <spacer height="5" width="10"/>
+        
 
-        <spacer width="50" height="10" /> 
+        <label id="subtitle" width="100%" text="Menu Keys" />
+
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Left" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_left" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Right" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_right" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Up" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_up" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Down" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_down" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Select" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_select" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        <spacer height="5" width="10"/>
+        
+        <div width="85%" proportion="1" layout="horizontal-row" align="center">
+            <label proportion="2" height="100%" I18N="Key binding" text="Cancel" text_align="right"/>
+            <spacer proportion="1" height="100%" />
+            <button id="menu_cancel" proportion="3" height="100%"
+                    I18N="Unbound key binding"  text="[none]"/>
+            <spacer proportion="1" height="100%" />
+        </div>
+        -->
+        
+        <list id="actions" proportion="5" width="75%" align="center"/>
+         
+        <spacer width="50" height="20" /> 
  
         <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
         
