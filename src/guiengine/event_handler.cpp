@@ -95,190 +95,6 @@ bool EventHandler::OnEvent (const SEvent &event)
 
 // -----------------------------------------------------------------------------
 
-EventPropagation EventHandler::onGUIEvent(const SEvent& event)
-{    
-    if (event.EventType == EET_GUI_EVENT)
-    {
-        const s32 id = event.GUIEvent.Caller->getID();
-        
-        switch (event.GUIEvent.EventType)
-        {
-            case EGET_BUTTON_CLICKED:
-            case EGET_SCROLL_BAR_CHANGED:
-            case EGET_CHECKBOX_CHANGED:
-            case EGET_LISTBOX_SELECTED_AGAIN:
-            {
-                Widget* w = GUIEngine::getWidget(id);
-                if (w == NULL) break;
-                
-                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
-                
-                // These events are only triggered by keyboard/mouse (or so I hope...)
-                const int playerID = input_manager->getPlayerKeyboardID();
-                if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
-                else if (playerID != -1) return onWidgetActivated(w, playerID);
-                else break;
-            }    
-            case EGET_ELEMENT_HOVERED:
-            {
-                Widget* w = GUIEngine::getWidget(id);
-                if (w == NULL) break;
-                
-                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
-                
-                // When a modal dialog is shown, don't select widgets out of the dialog
-                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
-                {
-                    // check for parents too before discarding event
-                    if (w->m_event_handler != NULL)
-                    {
-                        if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler)) break;
-                    }
-                }
-                
-                // select ribbons on hover
-                if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
-                {
-                    RibbonWidget* ribbon = (RibbonWidget*)(w->m_event_handler);
-                    if (ribbon == NULL) break;
-                    const int playerID = input_manager->getPlayerKeyboardID();
-                    if (playerID == -1) break;
-                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
-                    
-                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
-                    if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
-                    ribbon->setFocusForPlayer(playerID);
-                }
-                else
-                {
-                    // focus on hover for other widgets
-                    const int playerID = input_manager->getPlayerKeyboardID();
-                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
-                    if (playerID != -1)
-                    {
-                        // lists don't like that combined with scrollbars
-                        // (FIXME: find why instead of working around)
-                        if (w->getType() != WTYPE_LIST)
-                        {
-                            w->setFocusForPlayer(playerID);
-                        }
-                    }
-                }
-                
-                break;
-            }
-                /*
-                 case EGET_ELEMENT_LEFT:
-                 {
-                 Widget* el = getWidget(id);
-                 if(el == NULL) break;
-                 
-                 break;
-                 }
-                 */
-
-            case EGET_ELEMENT_FOCUSED: 
-            {
-                Widget* w = GUIEngine::getWidget(id);
-                if (w == NULL) break;
-                
-                // forbid list for gaining "irrLicht focus", then they will process key events and
-                // we don't want that since we do our own custom processing for keys
-                if (w->m_type == WTYPE_LIST)
-                {
-                    // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
-                    // Obviously will not work if the list is the first item of the screen.
-                    GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
-                    return EVENT_BLOCK; // confirms to irrLicht that we processed it
-                }
-                
-                
-                break;
-            }
-                
-            case EGET_LISTBOX_CHANGED:
-            {
-                Widget* w = GUIEngine::getWidget(id);
-                if (w == NULL) break;
-                assert(w->getType() == WTYPE_LIST);
-                
-                const int playerID = input_manager->getPlayerKeyboardID();
-                if (input_manager->masterPlayerOnly() && playerID != 0) break;
-                if (!w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
-
-                break;
-            }
-            case EGET_EDITBOX_ENTER:
-            {
-                // currently, enter pressed in text ctrl events can only happen in dialogs.
-                // FIXME : find a cleaner way to route the event to its proper location
-                if (ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
-                break;
-            }
-            default:
-                break;
-        } // end switch
-    }
-    
-    /*
-     EGET_BUTTON_CLICKED, EGET_SCROLL_BAR_CHANGED, EGET_CHECKBOX_CHANGED, EGET_TAB_CHANGED,
-     EGET_MENU_ITEM_SELECTED, EGET_COMBO_BOX_CHANGED, EGET_SPINBOX_CHANGED, EGET_EDITBOX_ENTER,
-     
-     EGET_LISTBOX_CHANGED, EGET_LISTBOX_SELECTED_AGAIN,
-     EGET_FILE_SELECTED, EGET_FILE_CHOOSE_DIALOG_CANCELLED,
-     EGET_MESSAGEBOX_YES, EGET_MESSAGEBOX_NO, EGET_MESSAGEBOX_OK, EGET_MESSAGEBOX_CANCEL,
-     EGET_TABLE_CHANGED, EGET_TABLE_HEADER_CHANGED, EGET_TABLE_SELECTED_AGAIN
-     EGET_ELEMENT_FOCUS_LOST, EGET_ELEMENT_FOCUSED, EGET_ELEMENT_HOVERED, EGET_ELEMENT_LEFT,
-     EGET_ELEMENT_CLOSED,
-     */
-    return EVENT_LET;        
-}
-
-// -----------------------------------------------------------------------------
-
-EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
-{
-    if (ModalDialog::isADialogActive())
-    {
-        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
-        if (w->m_event_handler == NULL) return EVENT_LET;
-    }
-    
-    //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
-    
-    Widget* parent = w->m_event_handler;
-    if (w->m_event_handler != NULL)
-    {
-        /* Find all parents. Stop looping if a widget event handler's is itself, to not fall
-         in an infinite loop (this can happen e.g. in checkboxes, where they need to be
-         notified of clicks onto themselves so they can toggle their state. ) */
-        while (parent->m_event_handler != NULL && parent->m_event_handler != parent)
-        {
-            parent->transmitEvent(w, w->m_properties[PROP_ID], playerID);
-            
-            parent = parent->m_event_handler;
-        }
-        
-        /* notify the found event event handler, and also notify the main callback if the
-         parent event handler says so */
-        if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
-        {
-            // notify modal dialog too
-            if (ModalDialog::isADialogActive())
-            {
-                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
-            }
-            
-            sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
-        }
-    }
-    else sendEventToUser(w, w->m_properties[PROP_ID], playerID);
-    
-    return EVENT_BLOCK;
-}
-
-// -----------------------------------------------------------------------------
-
 void EventHandler::processGUIAction(const PlayerAction action, const unsigned int value,
                                     Input::InputType type, const int playerID)
 {
@@ -369,6 +185,26 @@ void EventHandler::processGUIAction(const PlayerAction action, const unsigned in
 }
 
 // -----------------------------------------------------------------------------
+
+EventHandler* event_handler_singleton = NULL;
+
+EventHandler* EventHandler::get()
+{
+    if (event_handler_singleton == NULL)
+    {
+        event_handler_singleton = new EventHandler();
+    }
+    return event_handler_singleton;
+}
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+#if 0
+#pragma mark -
+#pragma mark Private methods
+#endif
 
 void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
 {
@@ -579,13 +415,187 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 // -----------------------------------------------------------------------------
 
-EventHandler* event_handler_singleton = NULL;
-
-EventHandler* EventHandler::get()
+EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if (event_handler_singleton == NULL)
+    if (ModalDialog::isADialogActive())
     {
-        event_handler_singleton = new EventHandler();
+        if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
+        if (w->m_event_handler == NULL) return EVENT_LET;
     }
-    return event_handler_singleton;
+    
+    //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
+    
+    Widget* parent = w->m_event_handler;
+    if (w->m_event_handler != NULL)
+    {
+        /* Find all parents. Stop looping if a widget event handler's is itself, to not fall
+         in an infinite loop (this can happen e.g. in checkboxes, where they need to be
+         notified of clicks onto themselves so they can toggle their state. ) */
+        while (parent->m_event_handler != NULL && parent->m_event_handler != parent)
+        {
+            parent->transmitEvent(w, w->m_properties[PROP_ID], playerID);
+            
+            parent = parent->m_event_handler;
+        }
+        
+        /* notify the found event event handler, and also notify the main callback if the
+         parent event handler says so */
+        if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
+        {
+            // notify modal dialog too
+            if (ModalDialog::isADialogActive())
+            {
+                if (ModalDialog::getCurrent()->processEvent(parent->m_properties[PROP_ID]) == EVENT_BLOCK) return EVENT_BLOCK;
+            }
+            
+            sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
+        }
+    }
+    else sendEventToUser(w, w->m_properties[PROP_ID], playerID);
+    
+    return EVENT_BLOCK;
 }
+
+// -----------------------------------------------------------------------------
+
+EventPropagation EventHandler::onGUIEvent(const SEvent& event)
+{    
+    if (event.EventType == EET_GUI_EVENT)
+    {
+        const s32 id = event.GUIEvent.Caller->getID();
+        
+        switch (event.GUIEvent.EventType)
+        {
+            case EGET_BUTTON_CLICKED:
+            case EGET_SCROLL_BAR_CHANGED:
+            case EGET_CHECKBOX_CHANGED:
+            case EGET_LISTBOX_SELECTED_AGAIN:
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
+                
+                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
+                
+                // These events are only triggered by keyboard/mouse (or so I hope...)
+                const int playerID = input_manager->getPlayerKeyboardID();
+                if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
+                else if (playerID != -1) return onWidgetActivated(w, playerID);
+                else break;
+            }    
+            case EGET_ELEMENT_HOVERED:
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
+                
+                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
+                
+                // When a modal dialog is shown, don't select widgets out of the dialog
+                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
+                {
+                    // check for parents too before discarding event
+                    if (w->m_event_handler != NULL)
+                    {
+                        if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler)) break;
+                    }
+                }
+                
+                // select ribbons on hover
+                if (w->m_event_handler != NULL && w->m_event_handler->m_type == WTYPE_RIBBON)
+                {
+                    RibbonWidget* ribbon = (RibbonWidget*)(w->m_event_handler);
+                    if (ribbon == NULL) break;
+                    const int playerID = input_manager->getPlayerKeyboardID();
+                    if (playerID == -1) break;
+                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                    
+                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
+                    ribbon->setFocusForPlayer(playerID);
+                }
+                else
+                {
+                    // focus on hover for other widgets
+                    const int playerID = input_manager->getPlayerKeyboardID();
+                    if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                    if (playerID != -1)
+                    {
+                        // lists don't like that combined with scrollbars
+                        // (FIXME: find why instead of working around)
+                        if (w->getType() != WTYPE_LIST)
+                        {
+                            w->setFocusForPlayer(playerID);
+                        }
+                    }
+                }
+                
+                break;
+            }
+                /*
+                 case EGET_ELEMENT_LEFT:
+                 {
+                 Widget* el = getWidget(id);
+                 if(el == NULL) break;
+                 
+                 break;
+                 }
+                 */
+                
+            case EGET_ELEMENT_FOCUSED: 
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
+                
+                // forbid list for gaining "irrLicht focus", then they will process key events and
+                // we don't want that since we do our own custom processing for keys
+                if (w->m_type == WTYPE_LIST)
+                {
+                    // cheap way to remove the focus from the element (nope, IGUIEnv::removeFocus doesn't work)
+                    // Obviously will not work if the list is the first item of the screen.
+                    GUIEngine::getGUIEnv()->setFocus( getCurrentScreen()->getFirstWidget()->getIrrlichtElement() );
+                    return EVENT_BLOCK; // confirms to irrLicht that we processed it
+                }
+                
+                
+                break;
+            }
+                
+            case EGET_LISTBOX_CHANGED:
+            {
+                Widget* w = GUIEngine::getWidget(id);
+                if (w == NULL) break;
+                assert(w->getType() == WTYPE_LIST);
+                
+                const int playerID = input_manager->getPlayerKeyboardID();
+                if (input_manager->masterPlayerOnly() && playerID != 0) break;
+                if (!w->isFocusedForPlayer(playerID)) w->setFocusForPlayer(playerID);
+                
+                break;
+            }
+            case EGET_EDITBOX_ENTER:
+            {
+                // currently, enter pressed in text ctrl events can only happen in dialogs.
+                // FIXME : find a cleaner way to route the event to its proper location
+                if (ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
+                break;
+            }
+            default:
+                break;
+        } // end switch
+    }
+    
+    /*
+     EGET_BUTTON_CLICKED, EGET_SCROLL_BAR_CHANGED, EGET_CHECKBOX_CHANGED, EGET_TAB_CHANGED,
+     EGET_MENU_ITEM_SELECTED, EGET_COMBO_BOX_CHANGED, EGET_SPINBOX_CHANGED, EGET_EDITBOX_ENTER,
+     
+     EGET_LISTBOX_CHANGED, EGET_LISTBOX_SELECTED_AGAIN,
+     EGET_FILE_SELECTED, EGET_FILE_CHOOSE_DIALOG_CANCELLED,
+     EGET_MESSAGEBOX_YES, EGET_MESSAGEBOX_NO, EGET_MESSAGEBOX_OK, EGET_MESSAGEBOX_CANCEL,
+     EGET_TABLE_CHANGED, EGET_TABLE_HEADER_CHANGED, EGET_TABLE_SELECTED_AGAIN
+     EGET_ELEMENT_FOCUS_LOST, EGET_ELEMENT_FOCUSED, EGET_ELEMENT_HOVERED, EGET_ELEMENT_LEFT,
+     EGET_ELEMENT_CLOSED,
+     */
+    return EVENT_LET;        
+}
+
+// -----------------------------------------------------------------------------
+
