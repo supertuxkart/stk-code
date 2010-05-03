@@ -213,6 +213,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\guiengine\CGUISpriteBank.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\guiengine\engine.cpp"
 					>
 				</File>
@@ -859,6 +863,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\options_screen_input.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_input2.cpp"
 					>
 				</File>
 				<File
@@ -1657,6 +1665,10 @@
 				</File>
 				<File
 					RelativePath="..\..\states_screens\options_screen_input.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\states_screens\options_screen_input2.hpp"
 					>
 				</File>
 				<File
