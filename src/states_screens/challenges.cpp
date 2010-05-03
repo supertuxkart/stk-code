@@ -96,8 +96,14 @@ void ChallengesScreen::init()
     }
     
     
+    w->updateItemDisplay();
     
-    w->updateItemDisplay();  
+    if (w->getItems().empty())
+    {
+        fprintf(stderr, "Error, no challenge!\n");
+        return;
+    }
+    w->setSelection(0 /* whatever is first */, PLAYER_ID_GAME_MASTER, true /* focus it */);
 }
 
 // ------------------------------------------------------------------------------------------------------
