@@ -62,8 +62,8 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
     {
         copy.push_back(
                        core::rect<s32>(Rectangles[n].UpperLeftCorner,
-                                        core::dimension2d<s32>(Rectangles[n].getWidth()*m_scale,
-                                                        Rectangles[n].getHeight()*m_scale) )
+                                        core::dimension2d<s32>((int)(Rectangles[n].getWidth()*m_scale),
+                                                        (int)(Rectangles[n].getHeight()*m_scale)) )
                        );
     }
     
@@ -192,7 +192,8 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index, const core::position2di& pos
 
     const core::dimension2d<s32>& dim = r.getSize();
     
-    core::rect<s32> dest( pos, core::dimension2d<s32>(dim.Width*m_scale, dim.Height*m_scale) );
+    core::rect<s32> dest( pos, core::dimension2d<s32>((int)(dim.Width*m_scale), 
+                                                      (int)(dim.Height*m_scale)) );
 	if (center)
 	{
 		dest -= dest.getSize() / 2;
