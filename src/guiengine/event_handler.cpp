@@ -48,12 +48,14 @@ EventHandler::~EventHandler()
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
-    if (event.EventType == EET_GUI_EVENT ||
-       (GUIEngine::getStateManager()->getGameState() != GUIEngine::GAME && event.EventType != EET_KEY_INPUT_EVENT &&
-         event.EventType != EET_JOYSTICK_INPUT_EVENT)
-       )
+    if (event.EventType == EET_GUI_EVENT)
     {
         return onGUIEvent(event) == EVENT_BLOCK;
+    }
+    else if (GUIEngine::getStateManager()->getGameState() != GUIEngine::GAME &&
+             event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT)
+    {
+        return false; // EVENT_LET
     }
     else if (event.EventType == EET_MOUSE_INPUT_EVENT ||
              event.EventType == EET_KEY_INPUT_EVENT   ||
