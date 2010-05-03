@@ -63,6 +63,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown();
     
+    /** \brief implement optional callback from parent class GUIEngine::Screen */
+    virtual bool onEscapePressed();
+
     /**
       * \brief invoke in "input sensing" mode, when input was sensed.
       * Updates the input bindings accordingly with the sensed input.

@@ -417,3 +417,12 @@ void OptionsScreenInput2::unloaded()
 {
 }
 
+// -----------------------------------------------------------------------------
+
+bool OptionsScreenInput2::onEscapePressed()
+{
+    StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+    return false; // don't use standard escape key handler, we handled it differently
+}
+
+// -----------------------------------------------------------------------------
