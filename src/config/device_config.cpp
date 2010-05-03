@@ -48,15 +48,38 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
 //------------------------------------------------------------------------------
 
 // Don't call this directly unless you are KeyboardDevice or GamepadDevice
-bool DeviceConfig::getAction  ( Input::InputType    type,
-                                const int           id,
-                                const int           value,
-                                PlayerAction*       action /* out */ )
+bool DeviceConfig::getGameAction(Input::InputType    type,
+                                 const int           id,
+                                 const int           value,
+                                 PlayerAction*       action /* out */ )
+{
+    return doGetAction(type, id, value, PA_FIRST_GAME_ACTION, PA_LAST_GAME_ACTION, action);
+}
+
+//------------------------------------------------------------------------------
+
+// Don't call this directly unless you are KeyboardDevice or GamepadDevice
+bool DeviceConfig::getMenuAction(Input::InputType    type,
+                                 const int           id,
+                                 const int           value,
+                                 PlayerAction*       action /* out */ )
+{
+    return doGetAction(type, id, value, PA_FIRST_MENU_ACTION, PA_LAST_MENU_ACTION, action);
+}
+
+//------------------------------------------------------------------------------
+
+bool DeviceConfig::doGetAction(Input::InputType    type,
+                               const int           id,
+                               const int           value,
+                               const PlayerAction  firstActionToCheck,
+                               const PlayerAction  lastActionToCheck,
+                               PlayerAction*       action /* out */ )
 {
     bool success = false;
     int  n;
 
-    for (n = 0; ((n < PA_COUNT) && (!success)); n++)
+    for (n = firstActionToCheck; ((n <= lastActionToCheck) && (!success)); n++)
     {
         if ((m_bindings[n].type == type) && (m_bindings[n].id == id))
         {
@@ -64,7 +87,7 @@ bool DeviceConfig::getAction  ( Input::InputType    type,
             if (type == Input::IT_STICKMOTION)
             {
                 if ( ((m_bindings[n].dir == Input::AD_POSITIVE) && (value > 0)) ||
-                     ((m_bindings[n].dir == Input::AD_NEGATIVE) && (value < 0))    )
+                     ((m_bindings[n].dir == Input::AD_NEGATIVE) && (value < 0)) )
                 {
                     success = true;
                    *action = (PlayerAction)n;
@@ -163,6 +186,11 @@ bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
                     printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
                 }
             } // end if binding_id != -1
+            else
+            {
+                printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n", name_string);
+            }
+            
         } // end if name_string != NULL ...
     } // end if xml == NULL ... else
 
@@ -189,12 +217,20 @@ void KeyboardConfig::setDefaultBinds()
     setBinding(PA_NITRO,       Input::IT_KEYBOARD, KEY_KEY_N);
     setBinding(PA_ACCEL,       Input::IT_KEYBOARD, KEY_UP);
     setBinding(PA_BRAKE,       Input::IT_KEYBOARD, KEY_DOWN);
-    setBinding(PA_LEFT,        Input::IT_KEYBOARD, KEY_LEFT);
-    setBinding(PA_RIGHT,       Input::IT_KEYBOARD, KEY_RIGHT);
+    setBinding(PA_STEER_LEFT,  Input::IT_KEYBOARD, KEY_LEFT);
+    setBinding(PA_STEER_RIGHT, Input::IT_KEYBOARD, KEY_RIGHT);
     setBinding(PA_DRIFT,       Input::IT_KEYBOARD, KEY_KEY_V);
     setBinding(PA_RESCUE,      Input::IT_KEYBOARD, KEY_BACK);
     setBinding(PA_FIRE,        Input::IT_KEYBOARD, KEY_SPACE);
     setBinding(PA_LOOK_BACK,   Input::IT_KEYBOARD, KEY_KEY_B);
+    
+    
+    setBinding(PA_MENU_UP,     Input::IT_KEYBOARD, KEY_UP);
+    setBinding(PA_MENU_DOWN,   Input::IT_KEYBOARD, KEY_DOWN);
+    setBinding(PA_MENU_LEFT,   Input::IT_KEYBOARD, KEY_LEFT);
+    setBinding(PA_MENU_RIGHT,  Input::IT_KEYBOARD, KEY_RIGHT);
+    setBinding(PA_MENU_SELECT, Input::IT_KEYBOARD, KEY_RETURN);
+    setBinding(PA_MENU_CANCEL, Input::IT_KEYBOARD, KEY_BACK);
 }
 
 //------------------------------------------------------------------------------
@@ -219,8 +255,8 @@ void GamepadConfig::serialize (std::ofstream& stream)
 
 void GamepadConfig::setDefaultBinds ()
 {
-    setBinding(PA_LEFT,         Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
-    setBinding(PA_RIGHT,        Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
+    setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
+    setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
     setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
     setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
     setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
@@ -228,6 +264,13 @@ void GamepadConfig::setDefaultBinds ()
     setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
     setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
     setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
+    
+    setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
+    setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
+    setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
+    setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
+    setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
+    setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
 }
 
 //------------------------------------------------------------------------------

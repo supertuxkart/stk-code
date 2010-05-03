@@ -6,13 +6,15 @@
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
-#include "io/file_manager.hpp"
+#include "utils/translation.hpp"
 
 #define INPUT_MODE_DEBUG 0
 
-const char* INPUT_FILE_NAME = "input.xml";
+const char* INPUT_FILE_NAME    = "input.xml";
+const int   INPUT_FILE_VERSION = 1;
 
 DeviceManager::DeviceManager()
 {
@@ -195,7 +197,7 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 }
 // -----------------------------------------------------------------------------
 
-InputDevice* DeviceManager::mapKeyboardInput( int btnID,
+InputDevice* DeviceManager::mapKeyboardInput( int btnID, InputManager::InputDriverMode mode,
                                               StateManager::ActivePlayer **player /* out */,
                                               PlayerAction *action /* out */ )
 {
@@ -207,7 +209,7 @@ InputDevice* DeviceManager::mapKeyboardInput( int btnID,
     {
         KeyboardDevice *keyboard = m_keyboards.get(n);
 
-        if (keyboard->hasBinding(btnID, action))
+        if (keyboard->hasBinding(btnID, mode, action))
         {
             //std::cout << "   binding found in keyboard #"  << (n+1) << "; action is " << KartActionStrings[*action] << "\n";
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
@@ -231,6 +233,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
                                              int btnID,
                                              int axisDir,
                                              int value,
+                                             InputManager::InputDriverMode mode,
                                              StateManager::ActivePlayer **player /* out */,
                                              PlayerAction *action /* out */)
 {
@@ -238,7 +241,7 @@ InputDevice *DeviceManager::mapGamepadInput( Input::InputType type,
 
     if (gPad != NULL) 
     {
-        if (gPad->hasBinding(type, btnID, value, gPad->getPlayer(), action))
+        if (gPad->hasBinding(type, btnID, value, mode, gPad->getPlayer(), action))
         {
             if (m_assign_mode == NO_ASSIGN) // Don't set the player in NO_ASSIGN mode
             {
@@ -261,6 +264,7 @@ bool DeviceManager::translateInput( Input::InputType type,
                                     int btnID,
                                     int axisDir,
                                     int value,
+                                    InputManager::InputDriverMode mode,
                                     StateManager::ActivePlayer** player /* out */,
                                     PlayerAction* action /* out */ )
 {
@@ -270,30 +274,20 @@ bool DeviceManager::translateInput( Input::InputType type,
     switch (type)
     {
         case Input::IT_KEYBOARD:
-            device = mapKeyboardInput(btnID, player, action);
+            device = mapKeyboardInput(btnID, mode, player, action);
             break;
         case Input::IT_STICKBUTTON:
         case Input::IT_STICKMOTION:
-            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, player, action);
+            device = mapGamepadInput(type, deviceID, btnID, axisDir, value, mode, player, action);
             break;
         default:
             break;
     };
 
-    //if (*player != NULL) std::cout << "btn " << btnID << " belongs to player " << (*player)->m_id << std::endl;
-    
-    /*
-    if (device != NULL)
-    {
-        std::cout << "   binding found; action is " << KartActionStrings[*action] << "\n";
-    }*/
     
     // Return true if input was successfully translated to an action and player
     if (device != NULL && abs(value) > Input::MAX_VALUE/2)
     {
-        //std::cout<< "========== Setting latest device " << (device->getType() == DT_KEYBOARD ? "keyboard" : "gamepad")
-        //  << " #" << deviceID << " button=" << btnID << " value=" << value << " ==========\n";
-
         m_latest_used_device = device;
     }
     return (device != NULL);
@@ -348,6 +342,18 @@ bool DeviceManager::deserialize()
                     
                 case irr::io::EXN_ELEMENT:
                 {
+                    if (strcmp("input", xml->getNodeName()) == 0)
+                    {
+                        const char *version_string = xml->getAttributeValue("version");
+                        if (version_string == NULL || atoi(version_string) != INPUT_FILE_VERSION)
+                        {
+                            //I18N: shown when config file is too old
+                            GUIEngine::showMessage( _("Please re-configure your key bindings.") );
+                            
+                            GUIEngine::showMessage( _("Your input config file is not compatible with this version of STK.") );
+                            return false;
+                        }
+                    }
                     if (strcmp("keyboard", xml->getNodeName()) == 0)
                     {
                         keyboard_config = new KeyboardConfig();
@@ -364,13 +370,13 @@ bool DeviceManager::deserialize()
                         {
                             if(keyboard_config != NULL)
                                 if(!keyboard_config->deserializeAction(xml))
-                                    std::cerr << "Ignoring an ill-formed action in input config.\n";
+                                    std::cerr << "Ignoring an ill-formed keyboard action in input config.\n";
                         }
                         else if(reading_now == GAMEPAD) 
                         {
                             if(gamepad_config != NULL)
                                 if(!gamepad_config->deserializeAction(xml))
-                                    std::cerr << "Ignoring an ill-formed action in input config.\n";
+                                    std::cerr << "Ignoring an ill-formed gamepad action in input config.\n";
                         }
                         else std::cerr << "Warning: An action is placed in an unexpected area in the input config file.\n";
                     }
@@ -430,7 +436,7 @@ void DeviceManager::serialize()
     }
     
     
-    configfile << "<input>\n\n";
+    configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
     
     for(int n=0; n<m_keyboard_configs.size(); n++)
     {

@@ -104,7 +104,8 @@ void EventHandler::processGUIAction(const PlayerAction action, const unsigned in
     
     switch (action)
     {
-        case PA_LEFT:
+        case PA_STEER_LEFT:
+        case PA_MENU_LEFT:
         {
             Widget* w = GUIEngine::getFocusForPlayer(playerID);
             if (w == NULL) break;
@@ -132,7 +133,8 @@ void EventHandler::processGUIAction(const PlayerAction action, const unsigned in
         }
         break;
             
-        case PA_RIGHT:
+        case PA_STEER_RIGHT:
+        case PA_MENU_RIGHT:
         {
             Widget* w = GUIEngine::getFocusForPlayer(playerID);
             if (w == NULL) break;
@@ -159,18 +161,22 @@ void EventHandler::processGUIAction(const PlayerAction action, const unsigned in
         break;
             
         case PA_ACCEL:
+        case PA_MENU_UP:
             navigateUp(playerID, type, pressedDown);
             break;
             
         case PA_BRAKE:
+        case PA_MENU_DOWN:
             navigateDown(playerID, type, pressedDown);
             break;
             
         case PA_RESCUE:
+        case PA_MENU_CANCEL:
             if (pressedDown) GUIEngine::getStateManager()->escapePressed();
             break;
             
         case PA_FIRE:
+        case PA_MENU_SELECT:
             if (pressedDown && !isWithinATextBox())
             {
                 Widget* w = GUIEngine::getFocusForPlayer(playerID);

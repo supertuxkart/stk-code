@@ -44,6 +44,7 @@ private:
       *
       * \param[out]  player     Which player this input belongs to (only set in ASSIGN mode)
       * \param[out]  action     Which action is related to this input trigger
+      * \param       mode       Used to determine whether to determine menu actions or game actions
       * \return                 The device to which this input belongs
       */
     InputDevice *mapGamepadInput      ( Input::InputType type,
@@ -51,6 +52,7 @@ private:
                                         int btnID,
                                         int axisDir,
                                         int value,
+                                        InputManager::InputDriverMode mode,
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
 
@@ -59,9 +61,10 @@ private:
      *
      * \param[out]  player     Which player this input belongs to (only set in ASSIGN mode)
      * \param[out]  action     Which action is related to this input trigger
+     * \param       mode       Used to determine whether to determine menu actions or game actions
      * \return                 The device to which this input belongs
      */
-    InputDevice *mapKeyboardInput     ( int btnID,
+    InputDevice *mapKeyboardInput     ( int btnID, InputManager::InputDriverMode mode,
                                         StateManager::ActivePlayer **player /* out */,
                                         PlayerAction *action /* out */);
 
@@ -102,15 +105,20 @@ public:
 
        
     /** Given some input, finds to which device it belongs and, using the corresponding device object,
-      * maps this input to the corresponding player and game action. returns false if player/action could not be set.
-      * Special case : can return true but set action to PA_FIRST if the input was used but is not associated to an
-      * action and a player
+      * maps this input to the corresponding player and game action. 
+      *
+      * \return false if player/action could not be set.
+      * \note   Special case : can return 'true' but set action to PA_BEFORE_FIRST if the input was used but
+      *         is not associated to an action and a player
+      *
+      * \param mode used to determine whether to map game actions or menu actions
       */
     bool translateInput( Input::InputType type,
                          int deviceID,
                          int btnID,
                          int axisDir,
                          int value,
+                         InputManager::InputDriverMode mode,
                          StateManager::ActivePlayer** player /* out */,
                          PlayerAction* action /* out */ );
 

@@ -7,6 +7,7 @@
 
 #include "config/device_config.hpp"
 #include "input/input.hpp"
+#include "input/input_manager.hpp"
 #include "io/xml_node.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -33,7 +34,7 @@ protected:
     DeviceConfig* m_configuration;
 
 public:
-    std::string m_name; // if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart
+    std::string m_name; //!< if device has a name; unused for keyboards since AFAIK we can't tell keyboards apart
     
     InputDevice();
     void setConfiguration(DeviceConfig *config) {m_configuration = config;}
@@ -61,9 +62,10 @@ public:
      * Checks if this key belongs to this device. if yes, sets action and returns true; otherwise returns false
      *
      * \param      id      ID of the key that was pressed   
+     * \param      mode    Used to determine whether to bind menu actions or game actions
      * \param[out] action  The action associated to this input (only check this value if method returned true)
      */
-    bool hasBinding(const int id, PlayerAction* action);
+    bool hasBinding(const int id, InputManager::InputDriverMode mode, PlayerAction* action);
     
 };
 
@@ -83,21 +85,28 @@ public:
     int                   m_axis_count;
     int                   m_button_count;
         
-    GamePadDevice(const int irrIndex, const std::string name, const int axis_number, const int btnAmount, GamepadConfig *configuration);
+    /** Constructor for GamePadDevice from a connected gamepad for which no configuration existed
+      * (defaults will be used)
+      *  \param irrIndex Index of stick as given by irrLicht.
+      */
+    GamePadDevice(const int irrIndex, const std::string name, const int axis_number,
+                  const int btnAmount, GamepadConfig *configuration);
     ~GamePadDevice();
     
     bool isButtonPressed(const int i);
     void setButtonPressed(const int i, bool isButtonPressed);
     
     /**
-     * Checks if this key belongs to this device. if yes, sets action and returns true; otherwise returns false.
+     * \return Checks if this key belongs to this device.
+     * If yes, sets action and returns true; otherwise returns false.
      *
      * \param      player  Only passed to know where to send 'axis reset's when necessary
      * \param      id      ID of the key that was pressed or of the axis that was triggered (depending on
      *                     the value of the 'type' parameter)
+     * \param      mode    Used to determine whether to map menu actions or game actions
      * \param[out] action  The action associated to this input (only check this value if method returned true)
      */
-    bool hasBinding(Input::InputType type, const int id, const int value,
+    bool hasBinding(Input::InputType type, const int id, const int value, InputManager::InputDriverMode mode,
                     StateManager::ActivePlayer* player, PlayerAction* action);
 
 };

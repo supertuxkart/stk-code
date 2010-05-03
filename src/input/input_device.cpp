@@ -45,12 +45,23 @@ KeyboardDevice::KeyboardDevice()
 }
 
 // -----------------------------------------------------------------------------
-bool KeyboardDevice::hasBinding(const int id, PlayerAction* action /* out */)
-{
-    return m_configuration->getAction(Input::IT_KEYBOARD, id, 0, action);
-}
-// -----------------------------------------------------------------------------
 
+bool KeyboardDevice::hasBinding(const int id, InputManager::InputDriverMode mode,
+                                PlayerAction* action /* out */)
+{
+    if (mode == InputManager::INGAME)
+    {
+        return m_configuration->getGameAction(Input::IT_KEYBOARD, id, 0, action);
+    }
+    else
+    {
+        assert(mode == InputManager::MENU); // bindings can only be accessed in game and menu modes
+        return m_configuration->getMenuAction(Input::IT_KEYBOARD, id, 0, action);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
@@ -58,10 +69,6 @@ bool KeyboardDevice::hasBinding(const int id, PlayerAction* action /* out */)
 #endif
 
 
-/** Constructor for GamePadDevice from a connected gamepad for which no configuration existed
-* (defaults will be used)
- *  \param sdlIndex Index of stick.
- */
 GamePadDevice::GamePadDevice(const int irrIndex, const std::string name, const int axis_count, const int btnAmount, GamepadConfig *configuration)
 {
     m_type                  = DT_GAMEPAD;
@@ -87,10 +94,14 @@ bool GamePadDevice::isButtonPressed(const int i)
 {
     return m_buttonPressed[i];
 }
+
+// -----------------------------------------------------------------------------
+
 void GamePadDevice::setButtonPressed(const int i, bool isButtonPressed)
 {
     m_buttonPressed[i] = isButtonPressed;
 }
+
 // -----------------------------------------------------------------------------
 
 void GamePadDevice::resetAxisDirection(const int axis, 
@@ -118,15 +129,11 @@ void GamePadDevice::resetAxisDirection(const int axis,
     }
 
 }
+
 // -----------------------------------------------------------------------------
 
-/**
-  * Player ID can either be a player ID or -1. If -1, the method only returns whether a binding exists for this player.
-  * If it's a player name, it also handles axis resets, direction changes, etc.
-  */
-
-
 bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int value,
+                               InputManager::InputDriverMode mode,
                                StateManager::ActivePlayer* player, PlayerAction* action /* out */)
 {
     bool success = false;
@@ -184,17 +191,27 @@ bool GamePadDevice::hasBinding(Input::InputType type, const int id, const int va
 
     if (m_configuration != NULL)
     {
-        success = m_configuration->getAction(type, id, value, action);
+        if (mode == InputManager::INGAME)
+        {
+            success = m_configuration->getGameAction(type, id, value, action);
+        }
+        else
+        {
+            assert(mode == InputManager::MENU); // bindings can only be accessed in game and menu modes
+            success = m_configuration->getMenuAction(type, id, value, action);
+        }
     }
     else
     {
-        printf("hasBinding() called on improperly initialized GamePadDevice\n");
+        fprintf(stderr, "hasBinding() called on improperly initialized GamePadDevice\n");
         abort();
     }
 
     return success;
 }
+
 // -----------------------------------------------------------------------------
+
 /** Destructor for GamePadDevice.
  */
 GamePadDevice::~GamePadDevice()
@@ -203,3 +220,5 @@ GamePadDevice::~GamePadDevice()
 
     // FIXME - any need to close devices?
 }   // ~GamePadDevice
+
+// -----------------------------------------------------------------------------

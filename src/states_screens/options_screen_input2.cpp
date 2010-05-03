@@ -100,7 +100,7 @@ void OptionsScreenInput2::updateInputButtons()
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_left");
-        core::stringw binding_name = m_config->getBindingAsString(PA_LEFT);
+        core::stringw binding_name = m_config->getBindingAsString(PA_STEER_LEFT);
         btn->setLabel( binding_name );
         
         // check if another binding already uses this key
@@ -116,7 +116,7 @@ void OptionsScreenInput2::updateInputButtons()
     }
     {
         ButtonWidget* btn = this->getWidget<ButtonWidget>("binding_right");
-        core::stringw binding_name = m_config->getBindingAsString(PA_RIGHT);
+        core::stringw binding_name = m_config->getBindingAsString(PA_STEER_RIGHT);
         btn->setLabel( binding_name );
         
         // check if another binding already uses this key
@@ -352,11 +352,11 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
         }
         else if(name == "binding_left")
         {
-            binding_to_set = PA_LEFT;
+            binding_to_set = PA_STEER_LEFT;
         }
         else if(name == "binding_right")
         {
-            binding_to_set = PA_RIGHT;
+            binding_to_set = PA_STEER_RIGHT;
         }
         else if(name == "binding_fire")
         {

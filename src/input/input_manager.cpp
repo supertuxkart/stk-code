@@ -298,28 +298,29 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
 {
     StateManager::ActivePlayer*   player = NULL;
     PlayerAction    action;
-    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value, &player, &action);
+    bool action_found = m_device_manager->translateInput( type, deviceID, btnID, axisDirection, value,
+                                                          /*m_mode*/INGAME, &player, &action);
 
     // in menus, some keyboard keys are standard (before each player selected his device)
     // So if a key could not be mapped to any known binding, fall back to check the defaults.
     if (!action_found && StateManager::get()->getGameState() != GUIEngine::GAME && type == Input::IT_KEYBOARD &&
         m_mode == MENU && m_device_manager->getAssignMode() == NO_ASSIGN)
     {
-        action = PA_FIRST;
+        action = PA_BEFORE_FIRST;
 
-        if      (btnID == KEY_UP)     action = PA_ACCEL;
-        else if (btnID == KEY_DOWN)   action = PA_BRAKE;
-        else if (btnID == KEY_LEFT)   action = PA_LEFT;
-        else if (btnID == KEY_RIGHT)  action = PA_RIGHT;
-        else if (btnID == KEY_SPACE)  action = PA_FIRE;
-        else if (btnID == KEY_RETURN) action = PA_FIRE;
+        if      (btnID == KEY_UP)     action = PA_MENU_UP;
+        else if (btnID == KEY_DOWN)   action = PA_MENU_DOWN;
+        else if (btnID == KEY_LEFT)   action = PA_MENU_LEFT;
+        else if (btnID == KEY_RIGHT)  action = PA_MENU_RIGHT;
+        else if (btnID == KEY_SPACE)  action = PA_MENU_SELECT;
+        else if (btnID == KEY_RETURN) action = PA_MENU_SELECT;
 
         if (btnID == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
             GUIEngine::ModalDialog::onEnterPressed();
         }
         
-        if (action != PA_FIRST)
+        if (action != PA_BEFORE_FIRST)
         {
             action_found = true;
             player = NULL;

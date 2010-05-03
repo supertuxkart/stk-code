@@ -106,10 +106,10 @@ struct Input
   */
 enum PlayerAction
 {
-    PA_FIRST = -1,
+    PA_BEFORE_FIRST = -1,
     
-    PA_LEFT = 0,
-    PA_RIGHT,
+    PA_STEER_LEFT = 0,
+    PA_STEER_RIGHT,
     PA_ACCEL,
     PA_BRAKE,
     PA_NITRO,
@@ -118,21 +118,40 @@ enum PlayerAction
     PA_FIRE,
     PA_LOOK_BACK,
     
+    PA_MENU_UP,
+    PA_MENU_DOWN,
+    PA_MENU_LEFT,
+    PA_MENU_RIGHT,
+    PA_MENU_SELECT,
+    PA_MENU_CANCEL,
+    
     PA_COUNT
 };
+
+const PlayerAction PA_FIRST_GAME_ACTION = PA_STEER_LEFT;
+const PlayerAction PA_LAST_GAME_ACTION = PA_LOOK_BACK;
+const PlayerAction PA_FIRST_MENU_ACTION = PA_MENU_UP;
+const PlayerAction PA_LAST_MENU_ACTION = PA_MENU_CANCEL;
 
 /**
   * \brief  human-readable strings for each PlayerAction
   * \ingroup input
   */
-static std::string KartActionStrings[PA_COUNT] = {std::string("left"), 
-                                                  std::string("right"),
+static std::string KartActionStrings[PA_COUNT] = {std::string("steerLeft"), 
+                                                  std::string("steerRight"),
                                                   std::string("accel"),
                                                   std::string("brake"),
                                                   std::string("nitro"),
                                                   std::string("drift"),
                                                   std::string("rescue"),
                                                   std::string("fire"),
-                                                  std::string("lookBack")};
+                                                  std::string("lookBack"),
+                                                  std::string("menuUp"),
+                                                  std::string("menuDown"),
+                                                  std::string("menuLeft"),
+                                                  std::string("menuRight"),
+                                                  std::string("menuSelect"),
+                                                  std::string("menuCancel")
+                                                  };
 
 #endif

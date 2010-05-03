@@ -51,6 +51,16 @@ protected:
         m_type = type;
     }
     
+    /**
+      * \brief internal helper method for DeviceConfig::getGameAction and DeviceConfig::getMenuAction
+      */
+    bool doGetAction(Input::InputType    type,
+                     const int           id,
+                     const int           value,
+                     const PlayerAction  firstActionToCheck,
+                     const PlayerAction  lastActionToCheck,
+                     PlayerAction*       action /* out */ );
+    
 public:
     
     std::string        getName           () const { return m_name; };
@@ -70,14 +80,27 @@ public:
     bool        isPlugged           () {return m_plugged;}
     
     /**
-      * Don't call this directly unless you are KeyboardDevice or GamepadDevice
+      * \brief              Searches for a game actions associated with the given input event
+      * \note               Don't call this directly unless you are KeyboardDevice or GamepadDevice
       * \param[out] action  the result, only set if method returned true
       * \return             whether finding an action associated to this input was successful
       */
-    bool        getAction           (Input::InputType       type, 
+    bool        getGameAction       (Input::InputType       type, 
                                      const int              id,
                                      const int              value,
                                      PlayerAction*          action /* out */);
+    
+    /**
+      * \brief              Searches for a game actions associated with the given input event
+      * \note Don't call this directly unless you are KeyboardDevice or GamepadDevice
+      * \param[out] action  the result, only set if method returned true
+      * \return             whether finding an action associated to this input was successful
+      */
+    bool        getMenuAction       (Input::InputType       type, 
+                                     const int              id,
+                                     const int              value,
+                                     PlayerAction*          action /* out */);
+    
     KeyBinding  getBinding          (int i) {return m_bindings[i];}
     
     bool hasBindingFor(const int buttonID) const;

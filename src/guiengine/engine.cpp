@@ -724,10 +724,12 @@ void render(float elapsed_time)
             {
                 (*it).m_time -= dt;
                 
+                core::rect<s32> msgRect(core::position2d<s32>(0, y_from - count*text_height),
+                                        core::dimension2d<s32>(screen_size.Width, text_height) );
                 
+                Private::g_driver->draw2DRectangle( SColor(255,252,248,230), msgRect);
                 Private::g_font->draw((*it).m_message.c_str(),
-                                      core::rect<s32>( core::position2d<s32>(0, y_from - count*text_height),
-                                                      core::dimension2d<s32>(screen_size.Width, text_height) ),
+                                      msgRect,
                                       video::SColor(255, 255, 0, 0),
                                       true /* hcenter */, true /* vcenter */);  
                 count++;
