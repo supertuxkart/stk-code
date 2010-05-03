@@ -80,7 +80,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 #ifdef DEBUG
                 printf("The following message will not be printed in release mode:\n");
 #else
-            return EVENT_BLOCK;
+            return true; // EVENT_BLOCK
 #endif
             printf("Level %d: %s\n",
                    event.LogEvent.Level,event.LogEvent.Text);
