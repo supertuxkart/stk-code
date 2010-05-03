@@ -279,10 +279,8 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
 
 // -----------------------------------------------------------------------------
 
-/**
- * Called by the input module
- */
-void EventHandler::processAction(const int action, const unsigned int value, Input::InputType type, const int playerID)
+void EventHandler::processGUIAction(const PlayerAction action, const unsigned int value,
+                                    Input::InputType type, const int playerID)
 {
     const bool pressedDown = value > Input::MAX_VALUE*2/3;
     

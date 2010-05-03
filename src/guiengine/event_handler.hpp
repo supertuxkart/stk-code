@@ -40,6 +40,7 @@ namespace GUIEngine
     
     /**
      * \brief Class to handle irrLicht events (GUI and input as well)
+     *
      * input events will be redirected to the input module in game mode.
      * In menu mode, input is mapped to game actions with the help of the input
      * module, then calls are made to move focus / trigger an event / etc.
@@ -79,7 +80,8 @@ namespace GUIEngine
          * and this action needs to be applied to the GUI (e.g. fire pressed, left
          * pressed, etc.) this method is called back by the input module.
          */
-        void processAction(const int action, const unsigned int value, Input::InputType type, const int playerID);
+        void processGUIAction(const PlayerAction action, const unsigned int value,
+                              Input::InputType type, const int playerID);
         
         /** singleton access */
         static EventHandler* get();
