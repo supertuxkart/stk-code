@@ -212,7 +212,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, 
         m_sensed_input->btnID = btnID;
         m_sensed_input->axisDirection = axisDirection;
 
-        if (type == Input::IT_KEYBOARD)
+        if (type == Input::IT_KEYBOARD && value > Input::MAX_VALUE/2)
         {
             OptionsScreenInput2::getInstance()->gotSensedInput(m_sensed_input);
             return;
