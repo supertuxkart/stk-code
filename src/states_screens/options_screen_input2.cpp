@@ -315,7 +315,8 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
                 }
                 else
                 {
-                    std::cerr << "unknown selection device in options : " << m_config->getName().c_str() << std::endl;
+                    std::cerr << "unknown selection device in options : "
+                              << m_config->getName().c_str() << std::endl;
                 }                
                 break;
             }

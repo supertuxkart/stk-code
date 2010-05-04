@@ -76,10 +76,10 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
     
-    /** Called when a player hits 'fire' on his device to join the game */
+    /** \brief Called when a player hits 'fire'/'select' on his device to join the game */
     bool playerJoin(InputDevice* device, bool firstPlayer);
     
-    /** Called when a player hits 'rescue' on his device to leave the game */
+    /** \brief Called when a player hits 'rescue'/'cancel' on his device to leave the game */
     bool playerQuit(StateManager::ActivePlayer* player);
     
      /** \brief implement callback from parent class GUIEngine::Screen */

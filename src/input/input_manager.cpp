@@ -372,7 +372,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
             else if (player == NULL)
             {
                 // New player is joining
-                if (action == PA_FIRE)
+                if (action == PA_FIRE || action == PA_MENU_SELECT)
                 {
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
