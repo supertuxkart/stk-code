@@ -44,6 +44,10 @@ private:
     /** The texture matrix for the slipstream effect. */
     core::matrix4     *m_matrix;
 
+    /** The length of the slipstream cylinder. This is used to scale
+     *  the actual scene node correctly. */
+    float              m_length;
+
     void         createMesh(const video::SMaterial &m);
 public:
                  SlipStream  (Kart* kart);

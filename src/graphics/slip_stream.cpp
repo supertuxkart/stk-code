@@ -71,7 +71,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
 {
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
-    float radius[] = {3.0f, 2.0f, 1.0f, 0.0f};
+    float radius[] = {1.5f, 1.0f, 0.5f, 0.0f};
 
     // The distance of each of the circle from the kart. The number of
     // entries in this array must be the same as the number of non-zero 
@@ -83,11 +83,11 @@ void SlipStream::createMesh(const video::SMaterial &material)
 
     // Loop through all given radius to determine the number 
     // of segments to create.
-    unsigned int num_circles;
-    for(num_circles=0; radius[num_circles]!=0; num_circles++) ;
+    unsigned int num_circles=0;
+    while(radius[num_circles]) num_circles++;
 
     // Length is distance of last circle to distance of first circle:
-    float length = distance[num_circles-1] - distance[0];
+    m_length = distance[num_circles-1] - distance[0];
 
     // The number of points for each circle. Since part of the slip stream
     // might be under the ground (esp. first and last segment), specify
@@ -111,7 +111,7 @@ void SlipStream::createMesh(const video::SMaterial &material)
             v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
             v.Pos.Z = distance[j];
             v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
-            v.TCoords.X = curr_distance/length;
+            v.TCoords.X = curr_distance/m_length;
             v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment);
             buffer->Vertices.push_back(v);
         }   // for i<num_segments
@@ -149,11 +149,6 @@ void SlipStream::createMesh(const video::SMaterial &material)
  */
 void SlipStream::setIntensity(float f, const Kart *kart)
 {
-    // For now: disable them permanently
-    m_node->setVisible(false);
-    return;
-
-
     if(!kart)
     {
         m_node->setVisible(false);
@@ -170,11 +165,13 @@ void SlipStream::setIntensity(float f, const Kart *kart)
     core::vector3df diff =   other_pos - my_pos;
     core::vector3df rotation = diff.getHorizontalAngle();
     m_node->setRotation(rotation);
+    float fs = diff.getLength()/m_length;
+    m_node->setScale(core::vector3df(1, 1, fs));
 
     // For real testing in game: this needs some tuning!
-    //m_node->setVisible(f!=0);
-    //MovingTexture::setSpeed(f, 0);
-    //return;
+    m_node->setVisible(f!=0);
+    MovingTexture::setSpeed(f, 0);
+    return;
     // For debugging: make the slip stream effect visible all the time
     m_node->setVisible(true);
     MovingTexture::setSpeed(1.0f, 0.0f);
@@ -186,10 +183,11 @@ void SlipStream::setIntensity(float f, const Kart *kart)
  */
 void SlipStream::update(float dt)
 {
+    MovingTexture::update(dt);
+return;
     core::vector3df pos = m_kart->getNode()->getPosition();
     pos.Y = m_kart->getHoT()+0.2f;
     m_node->setPosition(pos);
-
     core::vector3df f = core::vector3df(0, 0, 10) - f;
     core::vector3df r = f.getHorizontalAngle();
     m_node->setRotation(r);
@@ -202,5 +200,4 @@ void SlipStream::update(float dt)
     core::vector3df interp;
     new_rot.toEuler(interp);
     m_node->setRotation(interp);
-    MovingTexture::update(dt);
 }   // update

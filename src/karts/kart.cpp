@@ -858,15 +858,17 @@ float Kart::handleSlipstream(float dt)
     // ------------------------------------------------------------------
     m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
 
-    World *world       = World::getWorld();
-    unsigned int n     = world->getNumKarts();
-    bool is_sstreaming = false;
+    World *world           = World::getWorld();
+    unsigned int num_karts = world->getNumKarts();
+    bool is_sstreaming     = false;
     Kart *target_kart;
-    for(unsigned int i=0; i<n; i++)
+    for(unsigned int i=0; i<num_karts; i++)
     {
         target_kart = world->getKart(i);
         // Don't test for slipstream with itself.
-        if(target_kart==this) continue;
+        if(target_kart==this            || 
+            target_kart->isEliminated() || 
+            target_kart->hasFinishedRace()) continue;
 
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart 
@@ -881,13 +883,12 @@ float Kart::handleSlipstream(float dt)
         float l    = target_kart->m_kart_properties->getSlipstreamLength() 
                    + target_kart->getKartLength()*0.5f;
         if(delta.length2_2d() > l*l) continue;
-
         if(target_kart->m_slipstream_quad->pointInQuad(getXYZ()))
         {
             is_sstreaming     = true;
             break;
         }
-    }   //
+    }   // for i < num_karts
 
     if(!is_sstreaming)
     {
@@ -907,6 +908,8 @@ float Kart::handleSlipstream(float dt)
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
         m_slipstream_mode = SS_USE;
+        handleZipper();
+        return 0;
         return m_kart_properties->getSlipstreamAddPower();
     }
     return 0;
