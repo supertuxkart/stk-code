@@ -228,7 +228,11 @@ void ItemManager::reset()
     AllItemTypes::iterator i=m_all_items.begin();
     while(i!=m_all_items.end())
     {
-        if(!*i) continue;
+        if(!*i) 
+        {
+            i++;
+            continue;
+        }
         if((*i)->canBeUsedUp() || (*i)->getType()==Item::ITEM_BUBBLEGUM)
         {
             Item *b=*i;
@@ -241,7 +245,7 @@ void ItemManager::reset()
             (*i)->reset();
             i++;
         }
-    }  // for i
+    }  // whilem_all_items.end() i
 
     m_switch_time = -1;
 }   // reset
