@@ -89,7 +89,7 @@ Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
+    if( m_reverse_mode || race_manager->isBattleMode() )
         m_rubber_band = NULL;
     else
     {
@@ -151,7 +151,7 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if( m_reverse_mode || race_manager->isBattleMode(race_manager->getMinorMode()) )
+    if( m_reverse_mode || race_manager->isBattleMode() )
     {
         if(kart) {
             kart->blockViewWithPlunger();

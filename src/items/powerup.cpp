@@ -289,8 +289,9 @@ void Powerup::use()
  */
 void Powerup::hitBonusBox(int n, const Item &item, int add_info)
 {
+    // Position can be -1 in case of a battle mode (which doesn't have 
+    // positions), but this case is properly handled in getRandomPowerup.
     int position = m_owner->getPosition();
-    assert(position != -1);
     
     PowerupManager::PowerupType new_powerup = 
         powerup_manager->getRandomPowerup(position);

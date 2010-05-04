@@ -88,7 +88,7 @@ PowerupManager::PowerupType PowerupManager::getPowerupType(const std::string &na
 }   // getPowerupType
 
 //-----------------------------------------------------------------------------
-/** Loads all projectiles from the powerup.xml file.
+/** Loads all powerups from the powerup.xml file.
  */
 void PowerupManager::loadAllPowerups()
 {
@@ -104,14 +104,21 @@ void PowerupManager::loadAllPowerups()
         if(type!=POWERUP_NOTHING)
             LoadPowerup(type, *node);
     }
-    loadWeights(*root, "first", POSITION_FIRST);
-    loadWeights(*root, "top33", POSITION_TOP33);
-    loadWeights(*root, "mid33", POSITION_MID33);
-    loadWeights(*root, "end33", POSITION_END33);
-    loadWeights(*root, "last" , POSITION_LAST );
+    loadWeights(*root, "first",   POSITION_FIRST      );
+    loadWeights(*root, "top33",   POSITION_TOP33      );
+    loadWeights(*root, "mid33",   POSITION_MID33      );
+    loadWeights(*root, "end33",   POSITION_END33      );
+    loadWeights(*root, "last" ,   POSITION_LAST       );
+    loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
 }  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
+/** Loads the data for one particular powerup. For bowling ball, plunger, and
+ *  cake static members in the appropriate classes are called to store 
+ *  additional information for those objects.
+ *  \param type The type of the powerup.
+ *  \param node The XML node with the data for this powerup.
+ */
 void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 {
     std::string icon_file(""); 
@@ -222,6 +229,8 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 {
     m_position_to_class.clear();
     const World *world = World::getWorld();
+    // In battle mode no positions exist, so use only position 1
+    unsigned int end_position = (race_manager->isBattleMode()) ? 1 : num_karts;
     for(unsigned int position =1; position <= num_karts; position++)
     {
         // Set up the mapping of position to position class:
@@ -235,7 +244,6 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
         for(unsigned int i= POWERUP_FIRST; i<=POWERUP_LAST; i++)
         {
             PowerupType type=(PowerupType)i;
-            if(!world->acceptPowerup(type)) continue;
             unsigned int w =m_weights[pos_class][i-POWERUP_FIRST]; 
             sum += w;
             for(unsigned int i=0; i<w; i++)
@@ -246,12 +254,18 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 }   // updateWeightsForRace
 
 // ----------------------------------------------------------------------------
-/** Determines the position class for a 
+/** Determines the position class for a given position. If the race is a 
+ *  battle mode (in which case we don't have a position), always return
+ *  'POSITION_BATTLE_MODE' (and in this case only position 1 will be used
+ *  for all karts).
+ *  \param num_karts  Number of karts in the race.
+ *  \param position The position for which to determine the position class.
  */
 PowerupManager::PositionClass 
                PowerupManager::convertPositionToClass(unsigned int num_karts, 
                                                      unsigned int position)
 {
+    if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
     if(position==1)         return POSITION_FIRST;
     if(position==num_karts) return POSITION_LAST;
 
@@ -268,10 +282,19 @@ PowerupManager::PositionClass
 }   // convertPositionToClass
 
 // ----------------------------------------------------------------------------
+/** Returns a random powerup for a kart at a given position. If the race mode
+ *  is a battle, the position is actually not used and a randomly selected
+ *  item for POSITION_BATTLE_MODE is returned. This function takes the weights
+ *  specified for all items into account by using a list which contains all
+ *  items depending on the weights defined. See updateWeightsForRace()
+ *  \param pos Position of the kart (1<=pos<=number of karts) - ignored in
+ *         case of a battle mode.
+ */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos)
 {
     // Positions start with 1, while the index starts with 0 - so subtract 1
-    PositionClass pos_class = m_position_to_class[pos-1];
+    PositionClass pos_class = race_manager->isBattleMode() ? POSITION_BATTLE_MODE 
+                                                           : m_position_to_class[pos-1];
 
     int random = rand()%m_powerups_for_position[pos_class].size();
     return m_powerups_for_position[pos_class][random];

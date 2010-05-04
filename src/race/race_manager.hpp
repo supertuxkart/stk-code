@@ -89,8 +89,7 @@ public:
 #define LINEAR_RACE(ID, COUNT_LAPSES) (1000+ID+100*COUNT_LAPSES)
 #define BATTLE_ARENA(ID) (2000+ID)
     /** Minor variants to the major types of race.
-      * Make sure to use the 'LINEAR_RACE/BATTLE_ARENA' macros
-      */
+     *  Make sure to use the 'LINEAR_RACE/BATTLE_ARENA' macros. */
     enum MinorRaceModeType
     {
         MINOR_MODE_NONE          = -1,
@@ -102,6 +101,9 @@ public:
         MINOR_MODE_3_STRIKES     = BATTLE_ARENA(0)
     };
 
+    /** Returns a string identifier for each minor race mode.
+     *  \param mode Minor race mode.
+     */
     static const char* getIdentOf(const MinorRaceModeType mode)
     {
         switch (mode)
@@ -112,8 +114,12 @@ public:
             case MINOR_MODE_3_STRIKES:      return STRIKES_IDENT;
             default: assert(false); return NULL;
         }
-    }
+    }   // getIdentOf
     
+    // ------------------------------------------------------------------------
+    /** Returns the icon for a minor race mode. 
+     *  \param mode Minor race mode. 
+     */
     static const char* getIconOf(const MinorRaceModeType mode)
     {
         switch (mode)
@@ -124,7 +130,12 @@ public:
             case MINOR_MODE_3_STRIKES:      return "/gui/mode_3strikes.png";
             default: assert(false); return NULL;
         }
-    }
+    }   // getIconOf
+
+    // ------------------------------------------------------------------------
+    /** Returns a (translated) name of a minor race mode.
+     *  \param mode Minor race mode.
+     */
     static const wchar_t* getNameOf(const MinorRaceModeType mode)
     {
         switch (mode)
@@ -141,6 +152,11 @@ public:
         }
     }
     
+    // ------------------------------------------------------------------------
+    /** Returns the minor mode id from a string identifier. This function is
+     *  used from challenge_data, which reads the mode from a challenge file.
+     *  \param name The name of the minor mode.
+     */
     static const MinorRaceModeType getModeIDFromInternalName(const char* name)
     {
         if      (strcmp(name, IDENT_STD)     == 0) return MINOR_MODE_NORMAL_RACE;
@@ -155,7 +171,7 @@ public:
 #undef LINEAR_RACE
 #undef BATTLE_ARENA
     
-    /** Difficulty. */
+    /** Game difficulty. */
     enum Difficulty     { RD_EASY, RD_MEDIUM, RD_HARD };
 
     /** Different kart types: A local player, a player connected via network,
@@ -163,6 +179,9 @@ public:
      *  (currently not used). */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER, KT_GHOST };
 private:
+
+    /** This data structure accumulates kart data and race result data from
+     *  each race. */
     struct KartStatus
     {
         std::string m_ident;            // The .tkkf filename without the .tkkf
@@ -188,9 +207,16 @@ private:
         
     };   // KartStatus
 
+    /** The kart status data for each kart. */
     std::vector<KartStatus>          m_kart_status;
+
+    /** The selected difficulty. */
     Difficulty                       m_difficulty;
+
+    /** The major mode (single race, GP). */
     MajorRaceModeType                m_major_mode;
+
+    /** The minor mode (race, time trial, ftl, battle mode). */
     MinorRaceModeType                m_minor_mode;
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
@@ -281,52 +307,55 @@ public:
     void         setRandomKartList(const std::vector<std::string>& rkl)
                                                 { m_random_kart_list = rkl;              }
     void         computeRandomKartList();
-
-    void         setMirror() {/*FIXME*/}
-    void         setReverse(){/*FIXME*/}
-    void startNew();         // start new race/GP/...
-    void next();             // start the next race or go back to the start screen
-    void rerunRace();        // Rerun the same race again
-    void exitRace();         // exit a race (and don't start the next one)
+    void         startNew();         // start new race/GP/...
+    void         next();             // start the next race or go back to the start screen
+    void         rerunRace();        // Rerun the same race again
+    void         exitRace();         // exit a race (and don't start the next one)
     
     /** get information about given mode (returns true if 'mode' is of linear races type)
-        info is stored in its ID for conveniance, see the macros above for exact meaning
-        */
-    static bool isLinearRaceMode(const MinorRaceModeType type)
+     *  info is stored in its ID for conveniance, see the macros LINEAR_RACE and
+     *  BATTLE_ARENA above for exact meaning.
+     */
+    bool isLinearRaceMode()
     {
-        const int id = (int)type;
+        const int id = (int)m_minor_mode;
         if(id > 999 && id < 2000) return true;
         else return false;
     }
-    
-    /** get information about given mode (returns true if 'mode' is of battle type)
-        info is stored in its ID for conveniance, see the macros above for exact meaning
-        */
-    static bool isBattleMode(const MinorRaceModeType type)
+
+    // ------------------------------------------------------------------------
+    /** Returns true if the current mode is a battle mode. This uses the 
+     *  numerical id of the mode, see the macros LINEAR_RACE and BATTLE_ARENA 
+     *  above for exact meaning.
+     */
+    bool isBattleMode()
     {
-        const int id = (int)type;
+        const int id = (int)m_minor_mode;
         if (id >= 2000) return true;
         else            return false;
     }
     
-    /** get information about given mode (returns true if 'mode' requires lap counting)
-        info is stored in its ID for conveniance, see the macros above for exact meaning
+    // ------------------------------------------------------------------------
+    /** Returns true if the current mode has laps. If uses the numeric id based
+     *  on the macros
         */
-    static bool modeHasLaps(const MinorRaceModeType type)
+    bool modeHasLaps()
     {
-        if (isBattleMode(type)) return false;
-        const int id = (int)type;
+        if (isBattleMode()) return false;
+        const int id = (int)m_minor_mode;
         const int answer = (id-1000)/100;
         return answer!=0;
     }
-    
-    static bool modeHasHighscores(const MinorRaceModeType type)
+    // ------------------------------------------------------------------------
+    /** Returns true if the currently selected minor mode has highscores. */
+    bool modeHasHighscores()
     {
         //FIXME: this information is duplicated. RaceManager knows about it, and
         //       each World may set m_use_highscores to true or false. The reason
         //       for this duplication is that we might want to know whether to
         //       display highscores without creating a World.
-        return type != MINOR_MODE_3_STRIKES && type != MINOR_MODE_FOLLOW_LEADER;
+        return m_minor_mode != MINOR_MODE_3_STRIKES && 
+               m_minor_mode != MINOR_MODE_FOLLOW_LEADER;
     }
 };
 

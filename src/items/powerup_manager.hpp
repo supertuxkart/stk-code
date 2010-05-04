@@ -82,12 +82,16 @@ public:
     };
 
     /** The different position classes, used to map a kart's position to a
-     *  weight distribution for the different powerups. */
+     *  weight distribution for the different powerups. The battle mode is
+     *  listed as a separate 'position' - this way the same implementation
+     *  as used for normal racing can be used to define which items are 
+     *  available in battle mode*/
     enum PositionClass {POSITION_FIRST,
                         POSITION_TOP33,
                         POSITION_MID33,
                         POSITION_END33,
                         POSITION_LAST,
+                        POSITION_BATTLE_MODE,
                         POSITION_COUNT};
 
 private:

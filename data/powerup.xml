@@ -25,11 +25,12 @@
   <!-- Distribution of the items depending on position of the 
        kart. The order must correspond to powerup_manager.hpp -->
   <!--      bubble cake bowl zipper plunger switch para anvil -->
-  <first w="1      0    0    0      0       1      0    0"     />
-  <top33 w="1      1    1    1      1       1      1    0"     />
-  <mid33 w="1      1    1    1      1       1      1    0"     />
-  <end33 w="0      1    1    1      1       1      1    1"     />
-  <last  w="0      1    1    2      2       0      2    2"     />
+  <first  w="1      0    0    0      0       1      0    0"    />
+  <top33  w="1      1    1    1      1       1      1    0"    />
+  <mid33  w="1      1    1    1      1       1      1    0"    />
+  <end33  w="0      1    1    1      1       1      1    1"    />
+  <last   w="0      1    1    2      2       0      2    2"    />
+  <battle w="0      2    1    0      0       0      0    0"    />
 
 </powerup>
 

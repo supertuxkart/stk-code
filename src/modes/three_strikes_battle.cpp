@@ -334,21 +334,3 @@ void ThreeStrikesBattle::raceResultOrder( int* order )
         order[pos] = kart_id;
     }
 }   // raceResultOrder
-
-//-----------------------------------------------------------------------------
-bool ThreeStrikesBattle::acceptPowerup(const PowerupManager::PowerupType type) const
-{
-    // these powerups don't make much sense in battle mode
-    if (type == PowerupManager::POWERUP_PARACHUTE || 
-        type == PowerupManager::POWERUP_ANVIL     ||
-        type == PowerupManager::POWERUP_BUBBLEGUM || 
-        type == PowerupManager::POWERUP_ZIPPER    ||
-        type == PowerupManager::POWERUP_SWITCH    || 
-        type == PowerupManager::POWERUP_PLUNGER)
-    {
-       return false;
-    }
-    
-    return true;
-}   // acceptPowerup
-
