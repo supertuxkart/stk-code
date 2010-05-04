@@ -977,7 +977,7 @@ int DefaultAIController::calcSteps()
         steps += WIDTH_STEPS;
     }
 #endif
-    return steps;
+    return steps + m_kart->getWorldKartId()%2==0 ? 0 : 5;
 }   // calcSteps
 
 //-----------------------------------------------------------------------------
