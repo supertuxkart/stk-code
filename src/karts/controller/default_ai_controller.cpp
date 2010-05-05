@@ -977,7 +977,9 @@ int DefaultAIController::calcSteps()
         steps += WIDTH_STEPS;
     }
 #endif
-    return steps + m_kart->getWorldKartId()%2==0 ? 0 : 5;
+    // The AI is driving significantly better with more steps, so for now
+    // add 5 additional steps.
+    return steps+5;
 }   // calcSteps
 
 //-----------------------------------------------------------------------------
