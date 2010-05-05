@@ -31,7 +31,6 @@
 #include "input/input_device.hpp"
 #include "items/item_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
