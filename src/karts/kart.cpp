@@ -908,11 +908,12 @@ float Kart::handleSlipstream(float dt)
     if(m_slipstream_time>m_kart_properties->getSlipstreamCollectTime())
     {
         m_slipstream_mode = SS_USE;
-        handleZipper();
-        return 0;
+        //handleZipper(); // FIXME(/REMOVE?) Zipper gives a sharp push, maybe too sharp
+        //return 0;       // see below about abusing m_zipper_time_left without zipper
         return m_kart_properties->getSlipstreamAddPower();
     }
-    return 0;
+    m_zipper_time_left = 5.0f; // FIXME, this is a hack to test higher speed limit without zipper, better would be own counter
+    return m_kart_properties->getSlipstreamAddPower();
 }   // handleSlipstream
 
 
