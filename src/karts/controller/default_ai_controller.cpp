@@ -186,6 +186,15 @@ void DefaultAIController::update(float dt)
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
 
+    // Having a non-moving AI can be useful for debugging, e.g. aiming
+    // or slipstreaming.
+#undef AI_DOES_NOT_MOVE_FOR_DEBUGGING
+#ifdef AI_DOES_NOT_MOVE_FOR_DEBUGGING
+    m_controls->m_accel     = 0;
+    m_controls->m_steer     = 0;
+    return;
+#endif
+
     // Update the current node:
     if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
     {
