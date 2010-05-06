@@ -338,11 +338,11 @@ namespace StringUtils
      */
     std::string timeToString(float time)
     {
-        int min     = (int) floor ( time / 60.0 ) ;
-        int sec     = (int) floor ( time - (double) ( 60 * min ) ) ;
-        int tenths  = (int) floor ( 10.0f * (time - (double)(sec + 60* min)));
+        int min        = (int) floor ( time / 60.0 ) ;
+        int sec        = (int) floor ( time - (double) ( 60 * min ) ) ;
+        int hundredths = (int) floor ( 100.0f * (time - (double)(sec + 60* min)));
         char s[9];
-        sprintf ( s, "%d:%02d:%d", min,  sec,  tenths ) ;
+        sprintf ( s, "%02d:%02d:%02d", min,  sec,  hundredths) ;
         return std::string(s);
     }   // timeToString
     

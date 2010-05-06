@@ -133,18 +133,14 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         
         const Kart *current_kart = world->getKart(order[i]);
         const stringw& kart_name = current_kart->getName();
-                
-        char sTime[20];
-        sTime[0]=0;
+
+        std::string time_string;
         
         const float time      = current_kart->getFinishTime();
         
         if (display_time)
         {
-            const int min     = (int) floor ( time / 60.0 ) ;
-            const int sec     = (int) floor ( time - (double) ( 60 * min ) ) ;
-            const int tenths  = (int) floor ( 10.0f * (time - (double)(sec + 60* min)));
-            sprintf ( sTime, "%d:%02d:%d", min,  sec,  tenths ) ;
+            time_string = StringUtils::timeToString(time);
         }
         
         //This shows position + driver name + time + points earned + total points
@@ -156,7 +152,8 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             if (display_time)
             {
                 kart_results_line = StringUtils::insertValues( L"#%i. %s %s (%i + %i = %i)",
-                                                              current_kart->getPosition(), sTime,
+                                                              current_kart->getPosition(), 
+                                                              time_string.c_str(),
                                                               kart_name.c_str(), prev_score,
                                                               (new_score - prev_score), new_score);
             }
@@ -174,13 +171,15 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             //I18N: the second %s is where the time is inserted
             kart_results_line = StringUtils::insertValues( _("%i. %s : survived for %s"),
                                                           current_kart->getPosition(),
-                                                          kart_name.c_str(), sTime);
+                                                          kart_name.c_str(), 
+                                                          time_string.c_str());
         }
         else
         {
             kart_results_line = StringUtils::insertValues( L"%i. %s %s",
                                                           current_kart->getPosition(),
-                                                          kart_name.c_str(), sTime);
+                                                          kart_name.c_str(),
+                                                          time_string.c_str());
         }
         
         const KartProperties* prop = current_kart->getKartProperties();
@@ -227,16 +226,13 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
             
             unsigned int num_scores = hs->getNumberEntries();
                     
-            char timebuffer[64];
+            std::string timebuffer;
             for (unsigned int i=0; i<num_scores; i++)
             {            
                 std::string kart_name, name;
                 float T;
                 hs->getEntry(i, kart_name, name, &T);
-                const int   MINS   = (int) floor ( T / 60.0 ) ;
-                const int   SECS   = (int) floor ( T - (float) ( 60 * MINS ) ) ;
-                const int   TENTHS = (int) floor ( 10.0f * (T - (float)(SECS + 60*MINS)));
-                sprintf(timebuffer, "%2d:%02d.%01d", MINS, SECS, TENTHS);
+                timebuffer = StringUtils::timeToString(T);
                             
                 const int line_from = lines_from_y + text_height*(i*3);
                 
@@ -249,7 +245,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
                                                        m_irrlicht_window);
                 core::rect< s32 > linearea2(m_area.getWidth()*2/3, line_from + text_height,
                                            m_area.getWidth(), line_from + text_height*2);
-                GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer).c_str(),
+                GUIEngine::getGUIEnv()->addStaticText( stringw(timebuffer.c_str()).c_str(),
                                                       linearea2, false, false, // border, word warp
                                                       m_irrlicht_window);
             } // next score
