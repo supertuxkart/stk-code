@@ -282,7 +282,7 @@ void KartModel::update(float rotation, float visual_steer,
         clamped_suspension[i] = ratio*suspension_length;
     }   // for i<4
 
-    core::vector3df wheel_rear (-rotation, 0, 0);
+    core::vector3df wheel_rear (-rotation*RAD_TO_DEGREE, 0, 0);
     core::vector3df wheel_steer(0, visual_steer, 0);
     core::vector3df wheel_front = wheel_rear+wheel_steer;
 
