@@ -42,7 +42,7 @@ SlipStream::SlipStream(Kart* kart) : MovingTexture(0, 0), m_kart(kart)
     //m.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
     //m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-    
+
     createMesh(m);
     m_node = irr_driver->addMesh(m_mesh);
     //m_node->setParent(m_kart->getNode());
@@ -76,7 +76,20 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // The distance of each of the circle from the kart. The number of
     // entries in this array must be the same as the number of non-zero 
     // entries in the radius[] array above. No 'end of list' entry required.
-    float distance[] = {2.0f, 6.0f, 14.0f };
+    // Note also that in order to avoid a 'bent' in the texture the
+    // difference between the distances must be linearly correlated to the
+    // difference in the corresponding radius, see the following sideview:
+    //            +
+    //       +    |
+    //  +    |    |    three radius
+    //  |    |    |
+    //  +----+----+
+    //  0    1    2
+    //  distances
+    // (radius1-radius0)/(distance1-distance0) = (radius2-radius1)/(distnace2-distance0)
+    // This way the line connecting the upper "+" is a straight line,
+    // and so the 3d cone shape will not be disturbed.
+    float distance[] = {2.0f, 6.0f, 10.0f };
 
     // The alpha values for the rings, no 'end of list' entry required.
     int alphas[]     = {0, 255, 0};
@@ -107,8 +120,8 @@ void SlipStream::createMesh(const video::SMaterial &material)
             video::S3DVertex v;
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
-            v.Pos.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
-            v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
+            v.Pos.X =  sin(i*f)*radius[j];
+            v.Pos.Y = -cos(i*f)*radius[j];
             v.Pos.Z = distance[j];
             v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
             v.TCoords.X = curr_distance/m_length;
