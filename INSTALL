@@ -7,7 +7,7 @@ General
 First, make sure that you have the following packages installed:
 
   * OpenGL (or Mesa 3.0 or later)
-  * Irrlicht 1.6
+  * Irrlicht 1.7 or later
   * OpenAL
 
 Unpack the files from the tarball like this:
