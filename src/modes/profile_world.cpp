@@ -38,9 +38,15 @@ ProfileWorld::ProfileWorld()
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - otherwise just a high number.
     race_manager->setNumLaps(m_profile_mode==PROFILE_LAPS ? m_num_laps : 99999);
-    m_phase       = RACE_PHASE;
-    m_frame_count = 0;
-    m_start_time  = irr_driver->getRealTime();
+    m_phase            = RACE_PHASE;
+    m_frame_count      = 0;
+    m_start_time       = irr_driver->getRealTime();
+    m_num_triangles    = 0;
+    m_num_culls        = 0;
+    m_num_solid        = 0;
+    m_num_transparent  = 0; 
+    m_num_trans_effect = 0;
+    m_num_calls        = 0;
 }   // ProfileWorld
 
 //-----------------------------------------------------------------------------
@@ -118,6 +124,15 @@ void ProfileWorld::update(float dt)
 {
     StandardRace::update(dt);
     m_frame_count++;
+    video::IVideoDriver *driver = irr_driver->getVideoDriver();
+    io::IAttributes   *attr = irr_driver->getSceneManager()->getParameters();
+    m_num_triangles    += (int)(driver->getPrimitiveCountDrawn( 0 ) * ( 1.f / 1000.f ));
+    m_num_calls        += attr->getAttributeAsInt("calls");
+    m_num_culls        += attr->getAttributeAsInt("culled" );
+    m_num_solid        += attr->getAttributeAsInt("drawn_solid" );
+    m_num_transparent  += attr->getAttributeAsInt("drawn_transparent" );
+    m_num_trans_effect += attr->getAttributeAsInt("drawn_transparent_effect" );
+
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -154,6 +169,17 @@ void ProfileWorld::enterRaceOverState()
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
+    printf("Average #nodes drawn            %f k\n",
+            (float)m_num_triangles/m_frame_count);
+    printf("Average # culled nodes:         %f k\n",
+            (float)m_num_culls/m_frame_count);
+    printf("Average # solid nodes:          %f k\n",
+            (float)m_num_solid/m_frame_count);
+    printf("Average # transparent nodes:    %f\n",
+            (float)m_num_transparent/m_frame_count);
+    printf("Average # transp. effect nodes: %f\n",
+            (float)m_num_trans_effect/m_frame_count);
+
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)

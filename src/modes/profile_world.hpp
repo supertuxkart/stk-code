@@ -33,16 +33,39 @@ class ProfileWorld : public StandardRace
 private:
     /** Profiling modes. */
     enum        ProfileType {PROFILE_NONE, PROFILE_TIME, PROFILE_LAPS};
+
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
+
     /** In laps based profiling: number of laps to run. */
     static int   m_num_laps;
+
     /** In time based profiling only: time to run. */
     static float m_time;
+
     /** Return value of real time at start of race. */
     unsigned int m_start_time;
+
     /** Number of frames. For statistics only. */
     int          m_frame_count;
+
+    /** Number of primitives drawn (in 1000). */
+    long long    m_num_triangles;
+
+    /** Number of culled triangles. */
+    long long    m_num_culls;
+
+    /** Numer of solid triangles drawn. */
+    long long    m_num_solid;
+
+    /** Number of transparent triangles drawn. */
+    long long    m_num_transparent; 
+
+    /** Number of transparent effect triangles drawn. */
+    long long    m_num_trans_effect;
+
+    /** Number of calls to draw. */
+    long long    m_num_calls;
 
 protected:
 
