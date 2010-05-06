@@ -169,7 +169,7 @@ void ProfileWorld::enterRaceOverState()
     float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
     printf("Number of frames: %d time %f, Average FPS: %f\n",
            m_frame_count, runtime, (float)m_frame_count/runtime);
-    printf("Average #nodes drawn            %f k\n",
+    printf("Average # drawn nodes           %f k\n",
             (float)m_num_triangles/m_frame_count);
     printf("Average # culled nodes:         %f k\n",
             (float)m_num_culls/m_frame_count);
@@ -179,7 +179,6 @@ void ProfileWorld::enterRaceOverState()
             (float)m_num_transparent/m_frame_count);
     printf("Average # transp. effect nodes: %f\n",
             (float)m_num_trans_effect/m_frame_count);
-
 
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
     for ( KartList::size_type i = 0; i < m_karts.size(); ++i)
