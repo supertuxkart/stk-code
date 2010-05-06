@@ -379,7 +379,7 @@ void World::resetAllKarts()
 
 //-----------------------------------------------------------------------------
 /** This is the main interface to update the world. This function calls
- *  update(), and checks for the end of the race. Note that race over 
+ *  update(), and checks then for the end of the race. Note that race over 
  *  handling can not necessarily be done in update(), since not all
  *  data structures might have been updated (e.g.LinearWorld must
  *  call World::update() first, to get updated kart positions. If race
@@ -400,6 +400,9 @@ void World::updateWorld(float dt)
 #define MEASURE_FPS 0
 
 //-----------------------------------------------------------------------------
+/** Updates the physics, all karts, the track, and projectile manager.
+ *  \param dt Time step size.
+ */
 void World::update(float dt)
 {
 #if MEASURE_FPS

@@ -143,6 +143,10 @@ void LinearWorld::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
+/** General update function called once per frame. This updates the kart
+ *  sectors, which are then used to determine the kart positions.
+ *  \param dt Time step size.
+ */
 void LinearWorld::update(float delta)
 {
     // run generic parent stuff that applies to all modes. It
