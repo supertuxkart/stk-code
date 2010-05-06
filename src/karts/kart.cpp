@@ -839,7 +839,6 @@ float Kart::handleSlipstream(float dt)
     // -------------------------------------------------------------------
     if(m_slipstream_mode==SS_USE)
     {
-        //printf("Using slipstream\n");
         m_slipstream_time -= dt;
         if(m_slipstream_time<0) m_slipstream_mode=SS_NONE;
         m_slip_stream->setIntensity(2.0f, NULL);
@@ -848,12 +847,17 @@ float Kart::handleSlipstream(float dt)
 
     // If this kart is too slow for slipstreaming taking effect, do nothing
     // --------------------------------------------------------------------
+
+    // Define this to get slipstream effect shown even when the karts are
+    // not moving. This is useful for debugging the graphics of SS-ing.
+#undef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
+#ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(getSpeed()<m_kart_properties->getSlipstreamMinSpeed())
     {
         m_slip_stream->setIntensity(0, NULL);
         return 0;
     }
-
+#endif
     // Then test if this kart is in the slipstream range of another kart:
     // ------------------------------------------------------------------
     m_slipstream_original_quad->transform(getTrans(), m_slipstream_quad);
@@ -875,8 +879,10 @@ float Kart::handleSlipstream(float dt)
         // against the minimum slipstream speed kart of this kart - not 
         // entirely sure if this makes sense, but it makes it easier to 
         // give karts different slipstream properties.
+#ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
         if(target_kart->getSpeed()<m_kart_properties->getSlipstreamMinSpeed()) 
             continue;
+#endif
         // Quick test: the kart must be not more than
         // slipstream length+kart_length() away from the other kart
         Vec3 delta = getXYZ() - target_kart->getXYZ();
