@@ -329,7 +329,7 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
     // there are no more karts in the current group
     while(count>0 && karts.size()>0)
     {
-        used[karts.back()] = true;
+        //used[karts.back()] = true;
         random_karts.push_back(m_karts_properties[karts.back()]->getIdent());
         karts.pop_back();
         count --;
@@ -347,13 +347,34 @@ std::vector<std::string> KartPropertiesManager::getRandomKartList(int count,
             karts.push_back(i);
     }
     std::random_shuffle(karts.begin(), karts.end());
+    
     // Then fill up the remaining empty spaces
-    while(count>0 && karts.size()>0)
+    do
     {
-        random_karts.push_back(m_karts_properties[karts.back()]->getIdent());
-        karts.pop_back();
-        count --;
-    }
+        while(count>0 && karts.size()>0)
+        {
+            random_karts.push_back(m_karts_properties[karts.back()]->getIdent());
+            karts.pop_back();
+            count --;
+        }
+        
+        // we used all karts but still need more... we'll have no choice but
+        // to use the same karts more than once.
+        if (count>0 && karts.size() == 0)
+        {
+            for(unsigned int i=0; i<getNumberOfKarts(); i++)
+            {
+                std::cout << "Refill : i=" << i << ", used[i]=" << used[i] << ", m_kart_available[i]=" << m_kart_available[i] << std::endl;
+                if(!used[i] && m_kart_available[i] &&
+                   !unlock_manager->isLocked(m_karts_properties[i]->getIdent()) )
+                    karts.push_back(i);
+            }
+            assert(karts.size() > 0);
+            std::random_shuffle(karts.begin(), karts.end());
+        }
+        
+    } while(count>0);
+    
     // There should always be enough karts
     assert(count==0);
     return random_karts;

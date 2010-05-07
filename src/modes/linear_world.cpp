@@ -215,19 +215,20 @@ void LinearWorld::update(float delta)
     
 #ifdef DEBUG
     // FIXME: Debug output in case that the double position error occurs again.
-    int pos_used[10];
-    for(int i=0; i<10; i++) pos_used[i]=-99;
+    int pos_used[kart_amount+1];
+    for(int i=0; i<=kart_amount; i++) pos_used[i]=-99;
     for(unsigned int i=0; i<kart_amount; i++)
     {
         if(pos_used[m_karts[i]->getPosition()]!=-99)
         {
             for(unsigned int j =0; j<kart_amount; j++)
             {
-                printf("kart id=%d, position=%d, finished=%d, laps=%d, distanceDownTrack=%f\n",
+                printf("kart id=%d, position=%d, finished=%d, laps=%d, distanceDownTrack=%f %s\n",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_race_lap,
-                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()));
+                    getDistanceDownTrackForKart(m_karts[j]->getWorldKartId()),
+                    (m_karts[j]->getPosition() == m_karts[i]->getPosition() ? "<--- !!!" : ""));
             }
         }
         pos_used[m_karts[i]->getPosition()]=i;
