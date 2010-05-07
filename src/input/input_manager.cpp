@@ -26,25 +26,20 @@
 #include <algorithm>
 
 #include "main_loop.hpp"
-#include "config/player.hpp"
-#include "config/user_config.hpp"
-#include "guiengine/modaldialog.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
-#include "items/item_manager.hpp"
-#include "items/projectile_manager.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "race/history.hpp"
-#include "race/race_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/options_screen_input2.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
+
 InputManager *input_manager;
 
 using GUIEngine::EventPropagation;
