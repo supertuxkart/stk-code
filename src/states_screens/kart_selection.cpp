@@ -698,7 +698,6 @@ public:
         m_parent->validateKartChoices();
     }
 };
-KartHoverListener* karthoverListener = NULL;
 
 #if 0
 #pragma mark -
@@ -773,11 +772,10 @@ void KartSelectionScreen::init()
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     
-    if (karthoverListener == NULL)
-    {
-        karthoverListener = new KartHoverListener(this);
-        w->registerHoverListener(karthoverListener);
-    }
+
+    KartHoverListener* karthoverListener = new KartHoverListener(this);
+    w->registerHoverListener(karthoverListener);
+
     
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
@@ -827,7 +825,6 @@ void KartSelectionScreen::unloaded()
 {        
     // these pointers are no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
-    karthoverListener = NULL;
 }
 
 // -----------------------------------------------------------------------------

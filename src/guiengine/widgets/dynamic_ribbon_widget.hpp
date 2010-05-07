@@ -207,8 +207,12 @@ namespace GUIEngine
             'updateItemDisplay' to update the display. */
         void clearItems();
         
-        /** Register a listener to be notified of selection changes within the ribbon.
-          * The ribbon takes ownership of this listener and will delete it. */
+        /** 
+          * \brief Register a listener to be notified of selection changes within the ribbon.
+          * \note  The ribbon takes ownership of this listener and will delete it.
+          * \note  The listener will be deleted upon leaving the screen, so you will likely
+          *        want to add a listener in the "init" callback of your screen.
+          */
         void registerHoverListener(DynamicRibbonHoverListener* listener);
         
         /** Called when right key is pressed */
