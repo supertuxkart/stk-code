@@ -105,9 +105,9 @@ void SlipStream::createMesh(const video::SMaterial &material)
     // The number of points for each circle. Since part of the slip stream
     // might be under the ground (esp. first and last segment), specify
     // which one is the first and last to be actually drawn.
-    const unsigned int  num_segments   = 7;
+    const unsigned int  num_segments   = 15;
     const unsigned int  first_segment  = 0;
-    const unsigned int  last_segment   = 6;
+    const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer *buffer         = new scene::SMeshBuffer();
     buffer->Material                   = material;
@@ -120,12 +120,13 @@ void SlipStream::createMesh(const video::SMaterial &material)
             video::S3DVertex v;
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
-            v.Pos.X =  sin(i*f)*radius[j];
-            v.Pos.Y = -cos(i*f)*radius[j];
+            v.Pos.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
+            v.Pos.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
             v.Pos.Z = distance[j];
             v.Color = video::SColor(alphas[j], alphas[j], alphas[j], alphas[j]);
             v.TCoords.X = curr_distance/m_length;
-            v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment);
+            v.TCoords.Y = (float)(i-first_segment)/(last_segment-first_segment)
+                          + (j%2)*(.5f/num_segments);
             buffer->Vertices.push_back(v);
         }   // for i<num_segments
     }   // while radius[num_circles]!=0
