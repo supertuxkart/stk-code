@@ -140,7 +140,7 @@ public:
                   PowerupManager  ();
                  ~PowerupManager  ();
     void          loadAllPowerups ();
-    void          removeTextures  ();
+    void          unloadPowerups  ();
     void          LoadPowerup     (PowerupType type, const XMLNode &node);
     void          updateWeightsForRace(unsigned int num_karts);
     Material*     getIcon         (int type) const {return m_all_icons [type];}

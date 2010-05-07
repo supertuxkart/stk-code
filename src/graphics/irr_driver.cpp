@@ -311,7 +311,7 @@ void IrrDriver::doApplyResSettings()
     projectile_manager      -> removeTextures();
     item_manager            -> removeTextures();
     kart_properties_manager -> unloadAllKarts();
-    powerup_manager         -> removeTextures();
+    powerup_manager         -> unloadPowerups();
     GUIEngine::clear();
     GUIEngine::cleanUp(); //FIXME: cleanUp is not called when exiting normally, only when changing resolution!
 

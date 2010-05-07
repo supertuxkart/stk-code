@@ -62,8 +62,16 @@ PowerupManager::~PowerupManager()
 //-----------------------------------------------------------------------------
 /** Removes any textures so that they can be reloaded. FIXME: missing atm.
  */
-void PowerupManager::removeTextures()
+void PowerupManager::unloadPowerups()
 {
+    for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
+    {
+        if(m_all_meshes[(PowerupType)i])
+            m_all_meshes[(PowerupType)i]->drop();
+        
+        //FIXME: I'm not sure if this is OK or if I need to ->drop(), or delete them, or...
+        m_all_icons[i]  = (Material*)NULL;
+    }
 }   // removeTextures
 
 //-----------------------------------------------------------------------------
@@ -110,6 +118,7 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "end33",   POSITION_END33      );
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
+    
 }  // loadAllPowerups
 
 //-----------------------------------------------------------------------------
@@ -128,6 +137,9 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
                                   /*make_permanent */ true); 
 
 
+    assert(m_all_icons[type] != NULL);
+    assert(m_all_icons[type]->getTexture() != NULL);
+    
     std::string model(""); 
     node.get("model", &model);
     if(model.size()>0)

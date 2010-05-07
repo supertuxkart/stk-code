@@ -449,7 +449,10 @@ void RaceGUI::drawPowerupIcons(const Kart* kart,
     int y1 = viewport.UpperLeftCorner.Y 
            + (int)(20 * scaling.Y);
 
+    assert(powerup != NULL);
+    assert(powerup->getIcon() != NULL);
     video::ITexture *t=powerup->getIcon()->getTexture();
+    assert(t != NULL);
     core::rect<s32> rect(core::position2di(0, 0), t->getOriginalSize());
     
     for ( int i = 0 ; i < n ; i++ )
