@@ -176,7 +176,8 @@ void InputManager::handleStaticAction(int key, int value)
 /**
   *  Handles input when an input sensing mode (when configuring input)
   */
-void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID, int axisDirection,  int value)
+void InputManager::inputSensing(Input::InputType type, int deviceID, int btnID,
+                                Input::AxisDirection axisDirection, int value)
 {
 #if INPUT_MODE_DEBUG
     std::cout << "INPUT SENSING... ";
@@ -288,7 +289,8 @@ int InputManager::getPlayerKeyboardID() const
  * Note: It is the obligation of the called menu to switch of the sense mode.
  *
  */
-void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID, int axisDirection, int value)
+void InputManager::dispatchInput(Input::InputType type, int deviceID, int btnID,
+                                 Input::AxisDirection axisDirection, int value)
 {
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
@@ -545,7 +547,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // Only report button events when the state of the button changes
             if ((!gp->isButtonPressed(i) && isButtonPressed) || (gp->isButtonPressed(i) && !isButtonPressed))
             {
-                dispatchInput(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, 0,
+                dispatchInput(Input::IT_STICKBUTTON, event.JoystickEvent.Joystick, i, Input::AD_POSITIVE,
                               isButtonPressed ? Input::MAX_VALUE : 0);
             }
             gp->setButtonPressed(i, isButtonPressed);
@@ -590,7 +592,7 @@ EventPropagation InputManager::input(const SEvent& event)
                   // (till user_config is migrated to full irrlicht support)
                   // we pass the 0 here artifically so that keyboard handling
                   // works.
-                  0,  // FIXME: was ev.key.keysym.unicode,
+                  Input::AD_POSITIVE,  // FIXME: was ev.key.keysym.unicode,
                   Input::MAX_VALUE);
             
             // if this action took us into a text box, don't let event continue (FIXME not the cleanest solution)
@@ -617,7 +619,7 @@ EventPropagation InputManager::input(const SEvent& event)
                 }
             }
             
-            dispatchInput(Input::IT_KEYBOARD, 0, key, 0, 0);
+            dispatchInput(Input::IT_KEYBOARD, 0, key, Input::AD_POSITIVE, 0);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
