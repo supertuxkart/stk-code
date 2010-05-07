@@ -120,6 +120,7 @@ void DynamicRibbonWidget::add()
     right_arrow->setTabStop(false);
     m_right_widget->m_element = right_arrow;
     m_right_widget->m_event_handler = this;
+    m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
     m_right_widget->id = right_arrow->getID();
     m_children.push_back( m_right_widget );
@@ -134,6 +135,7 @@ void DynamicRibbonWidget::add()
     left_arrow->setTabStop(false);
     m_left_widget->m_element = left_arrow;
     m_left_widget->m_event_handler = this;
+    m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
     m_left_widget->id = left_arrow->getID();
     m_children.push_back( m_left_widget );
