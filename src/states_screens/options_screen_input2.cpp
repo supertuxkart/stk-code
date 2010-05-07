@@ -343,7 +343,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "back")
     {
-        StateManager::get()->escapePressed();
+        StateManager::get()->popMenu();
     }
     else if (name == "actions")
     {
