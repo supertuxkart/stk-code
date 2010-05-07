@@ -760,6 +760,8 @@ void InputManager::setMode(InputDriverMode new_mode)
                     m_sensed_input = 0;
 
                     break;
+                    
+                    /*
                 case LOWLEVEL:
                     // Leaving lowlevel mode.
                     //irr_driver->showPointer();
@@ -767,6 +769,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                     m_mode = MENU;
 
                     break;
+                     */
                 default:
                     ;
                     // Something is broken.
@@ -810,6 +813,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             m_mode = new_mode;
 
             break;
+            /*
         case LOWLEVEL:
 #if INPUT_MODE_DEBUG
             std::cout << "====== InputManager::setMode(LOWLEVEL) ======\n";
@@ -822,6 +826,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             m_mode = LOWLEVEL;
 
             break;
+             */
         default:
             // Invalid mode.
             assert(false);

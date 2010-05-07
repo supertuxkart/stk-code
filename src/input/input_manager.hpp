@@ -45,7 +45,7 @@ public:
         INPUT_SENSE_GAMEPAD,
         //INPUT_SENSE_PREFER_AXIS,
         //INPUT_SENSE_PREFER_BUTTON,
-        LOWLEVEL,
+        //LOWLEVEL,
         BOOTSTRAP
     };
 
