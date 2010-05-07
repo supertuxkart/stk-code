@@ -28,7 +28,6 @@
 #include "main_loop.hpp"
 #include "config/player.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -736,7 +735,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                     // supresses to the notification of them as an input.
                     m_mouse_val_x = m_mouse_val_y = 0;
 
-                    irr_driver->showPointer();
+                    //irr_driver->showPointer();
                     m_mode = MENU;
                     break;
                     
@@ -754,7 +753,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                 case INPUT_SENSE_GAMEPAD:
                     // Leaving input sense mode.
 
-                    irr_driver->showPointer();
+                    //irr_driver->showPointer();
                     m_sensed_input_high.clear();
 
                     // The order is deliberate just in case someone starts to make
@@ -768,7 +767,7 @@ void InputManager::setMode(InputDriverMode new_mode)
                     break;
                 case LOWLEVEL:
                     // Leaving lowlevel mode.
-                    irr_driver->showPointer();
+                    //irr_driver->showPointer();
 
                     m_mode = MENU;
 
@@ -793,7 +792,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             // Installs the action map for the ingame mode.
             // m_action_map = UserConfigParams::newIngameActionMap();
 
-            irr_driver->hidePointer();
+            //irr_driver->hidePointer();
 
             m_mode = INGAME;
 
@@ -811,7 +810,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             m_mouse_val_x      = m_mouse_val_y = 0;
             m_sensed_input     = new Input();
 
-            irr_driver->hidePointer();
+            //irr_driver->hidePointer();
 
             m_mode = new_mode;
 
@@ -823,7 +822,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
-            irr_driver->hidePointer();
+            //irr_driver->hidePointer();
 
             m_mode = LOWLEVEL;
 
