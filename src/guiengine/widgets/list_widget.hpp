@@ -108,14 +108,38 @@ namespace GUIEngine
         irr::core::stringw getSelectionLabel() const;
         
         /**
+          * \brief Finds the ID of the item that has a given internal name
+          */
+        int getItemID(const std::string internalName) const;
+        
+        /**
           * \brief change the selected item
           * \param index the index of the element to select within the list, or -1 to select nothing
           * \precondition may only be called after the widget has been added to the screen with add()
           */
         void setSelectionID(const int index);
         
+        /** \brief rename an item and/or change its icon based on its ID */
         void renameItem(const int itemID, const irr::core::stringw newName, const int icon=-1);
         
+        /** \brief rename an item and/or change its icon based on its internal name */
+        void renameItem(const std::string internalName, const irr::core::stringw newName,
+                        const int icon=-1)
+        {
+            const int id = getItemID(internalName);
+            assert(id != -1);
+            renameItem( id, newName, icon );
+        }
+        
+        void markItemRed(const int id);
+        
+        void markItemRed(const std::string internalName)
+        {
+            const int id = getItemID(internalName);
+            assert(id != -1);
+            markItemRed( id );
+        }
+
         virtual void elementRemoved();
     };
 }

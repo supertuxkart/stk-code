@@ -124,6 +124,9 @@ void ListWidget::renameItem(const int itemID, const irr::core::stringw newName, 
     
     m_items[itemID].m_label = newName;
     list->setItem(itemID, newName.c_str(), icon);
+    
+    list->setItemOverrideColor( itemID, EGUI_LBC_TEXT          , video::SColor(255,0,0,0) );
+    list->setItemOverrideColor( itemID, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
 }
 
 // -----------------------------------------------------------------------------
@@ -197,3 +200,29 @@ void ListWidget::elementRemoved()
     Widget::elementRemoved();
     m_items.clear();
 }
+
+// -----------------------------------------------------------------------------
+
+int ListWidget::getItemID(const std::string internalName) const
+{
+    const int count = m_items.size();
+    
+    for (int i=0; i<count; i++)
+    {
+        if (m_items[i].m_internal_name == internalName) return i;
+    }
+    
+    return -1;
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::markItemRed(const int id)
+{
+    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    
+    irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );
+    irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,0,0) );
+}
+
+// -----------------------------------------------------------------------------

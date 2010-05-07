@@ -172,6 +172,69 @@ void OptionsScreenInput2::updateInputButtons()
     
     //I18N: Key binding name
     actions->renameItem(16, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
+    
+    
+    // ---- make sure there are no binding conflicts (same key used for two actions)
+    std::set<irr::core::stringw> currentlyUsedKeys;
+    for (PlayerAction action = PA_FIRST_GAME_ACTION;
+         action <= PA_LAST_GAME_ACTION;
+         action=PlayerAction(action+1))
+    {
+        const irr::core::stringw item = m_config->getBindingAsString(action);
+        if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
+        {
+            currentlyUsedKeys.insert( item );
+        }
+        else
+        {            
+            // binding conflict!
+            actions->markItemRed( KartActionStrings[action] );
+            
+            // also mark others
+            for (PlayerAction others = PA_FIRST_GAME_ACTION;
+                 others < action; others=PlayerAction(others+1))
+            {
+                const irr::core::stringw others_item = m_config->getBindingAsString(others);
+                if (others_item == item)
+                {
+                    actions->markItemRed( KartActionStrings[others] );
+                }
+            }
+            
+            //actions->renameItem( KartActionStrings[action], _("Binding Conflict!") ); 
+        }
+    }
+    
+    // menu keys and game keys can overlap, no problem, so forget game keys before checking menu keys
+    currentlyUsedKeys.clear();
+    for (PlayerAction action = PA_FIRST_MENU_ACTION;
+         action <= PA_LAST_MENU_ACTION;
+         action=PlayerAction(action+1))
+    {
+        const irr::core::stringw item = m_config->getBindingAsString(action);
+        if (currentlyUsedKeys.find(item) == currentlyUsedKeys.end())
+        {
+            currentlyUsedKeys.insert( item );
+        }
+        else
+        {            
+            // binding conflict!
+            actions->markItemRed( KartActionStrings[action] );
+
+            // also mark others
+            for (PlayerAction others = PA_FIRST_MENU_ACTION;
+                 others < action; others=PlayerAction(others+1))
+            {
+                const irr::core::stringw others_item = m_config->getBindingAsString(others);
+                if (others_item == item)
+                {
+                    actions->markItemRed( KartActionStrings[others] );
+                }
+            }
+            
+            //actions->renameItem( KartActionStrings[action], _("Binding Conflict!") ); 
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
