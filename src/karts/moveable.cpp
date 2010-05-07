@@ -90,6 +90,7 @@ void Moveable::reset()
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
+    m_velocityLC  = Vec3(0, 0, 0);
 
 }   // reset
 
