@@ -74,8 +74,7 @@ public:
     void       grandPrixFinished ();
     void       lockFeature       (Challenge* challenge);
     bool       isLocked          (const std::string& feature);
-    void       check             () const;
-    
+
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
     

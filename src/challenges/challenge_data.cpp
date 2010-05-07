@@ -189,7 +189,14 @@ void ChallengeData::check() const
     }
     else if(m_major==RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        if(!grand_prix_manager->getGrandPrix(m_gp_id))
+        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_id);
+        
+        if (gp == NULL)
+        {
+            error("gp");
+        }
+        const bool gp_ok = gp->checkConsistency(false);
+        if (!gp_ok)
         {
             error("gp");
         }

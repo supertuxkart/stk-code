@@ -77,7 +77,7 @@ public:
     size_t             getTrackCount()           const {return m_tracks.size(); }
     const int&         getLaps(size_t lap_index) const {assert(lap_index < m_tracks.size()); 
                                                         return m_laps[lap_index];}
-    bool               checkConsistency();
+    bool               checkConsistency(bool chatty=true) const;
 }
 ;   // GrandPrixData
 

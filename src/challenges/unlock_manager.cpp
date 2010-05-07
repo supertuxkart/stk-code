@@ -140,10 +140,9 @@ UnlockManager::UnlockManager()
 
     // Hard coded challenges can be added here.
 
-    computeActive();
+    computeActive(); //FIXME: 'load' calls 'computeActive', not sure this call here is needed 
     load();
-    // Disable challenges that can not be done - e.g. due to missing tracks...
-    check();
+
 }   // UnlockManager
 
 //-----------------------------------------------------------------------------
@@ -171,30 +170,18 @@ void UnlockManager::addChallenge(const std::string& filename)
     try
     {
         newChallenge = new ChallengeData(filename);
+        newChallenge->check();
     }
     catch (std::runtime_error& ex)
     {
         std::cerr << "\n/!\\ An error occurred while loading challenge file '" << filename << "' : "
-        << ex.what() << " : challenge will be ignored.\n\n"; 
+                  << ex.what() << " : challenge will be ignored.\n\n"; 
+        if (newChallenge != NULL) delete newChallenge;
         return;
     }
     addChallenge(newChallenge);
     
 }   // addChallenge
-
-//-----------------------------------------------------------------------------
-/** Checks if all challenges are valid, i.e. contain a valid track or GP. 
- *  If not, STK is aborted with an error message.
- */
-void UnlockManager::check() const
-{
-    for(AllChallengesType::const_iterator i =m_all_challenges.begin(); 
-                                    i!=m_all_challenges.end();  i++)
-    {
-        i->second->check();
-    }   // for i
-           
-}   // check
 
 //-----------------------------------------------------------------------------
 std::vector<const Challenge*> UnlockManager::getActiveChallenges()
