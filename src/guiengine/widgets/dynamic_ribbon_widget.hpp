@@ -82,6 +82,11 @@ namespace GUIEngine
         /** Whether this ribbon contains at least one animated item */
         bool m_animated_contents;
         
+        /** Whether there are more items than can fit in a single screen; arrows will then appear
+          * on each side of the ribbon to scroll the contents
+          */
+        bool m_scrolling_enabled;
+        
         /** Used to keep track of item count changes */
         int m_previous_item_count;
         

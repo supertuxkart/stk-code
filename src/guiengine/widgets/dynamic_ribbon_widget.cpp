@@ -45,6 +45,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_right_widget         = NULL;
     m_check_inside_me      = true;
     m_supports_multiplayer = true;
+    m_scrolling_enabled    = true;
     
     // by default, set all players to have no selection in this ribbon
     for (int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -217,11 +218,13 @@ void DynamicRibbonWidget::buildInternalStructure()
     // Hide arrows when everything is visible
     if (item_count <= m_row_amount*m_col_amount)
     {
+        m_scrolling_enabled = false;
         m_left_widget->m_element->setVisible(false);
         m_right_widget->m_element->setVisible(false);
     }
     else
     {
+        m_scrolling_enabled = true;
         m_left_widget->m_element->setVisible(true);
         m_right_widget->m_element->setVisible(true);
     }
@@ -277,13 +280,41 @@ void DynamicRibbonWidget::buildInternalStructure()
             added_item_count++;
             
             // stop adding columns when we have enough items
-            if (added_item_count >= item_count) break; 
+            if (added_item_count == item_count)
+            {
+                assert(!m_scrolling_enabled); // we can see all items, so scrolling must be off
+                break; 
+            }
+            else if (added_item_count > item_count)
+            {
+                assert(false);
+                break;
+            }
         }
         m_children.push_back( ribbon );
         m_rows.push_back( ribbon );
         ribbon->add();
+        
+        // stop filling rows when we have enough items
+        if (added_item_count == item_count)
+        {
+            assert(!m_scrolling_enabled); // we can see all items, so scrolling must be off
+            break; 
+        }
     }
     
+#ifdef DEBUG
+    if (!m_scrolling_enabled)
+    {
+        // debug checks
+        int childrenCount = 0;
+        for (int n=0; n<m_rows.size(); n++)
+        {
+            childrenCount += m_rows[n].m_children.size();
+        }
+        assert(childrenCount == (int)m_items.size());
+    }
+#endif
  }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
@@ -667,7 +698,12 @@ void DynamicRibbonWidget::updateLabel(RibbonWidget* from_this_ribbon)
     if (selection_id == NO_ITEM_ID) m_label->setText( L"" );
     else                            m_label->setText( L"Unknown Item" );
 }
+
 // -----------------------------------------------------------------------------
+
+/** Set to 1 if you wish information about item placement within the ribbon to be printed */
+#define CHATTY_ABOUT_ITEM_PLACEMENT 0
+
 void DynamicRibbonWidget::updateItemDisplay()
 {
     // ---- Check if we need to update the number of icons in the ribbon
@@ -690,7 +726,7 @@ void DynamicRibbonWidget::updateItemDisplay()
     
     // the number of items that fit perfectly the number of rows we have
     // (this value will be useful to compute scrolling)
-    int fitting_item_amount = m_needed_cols * row_amount;
+    int fitting_item_amount = (m_scrolling_enabled ? m_needed_cols * row_amount : m_items.size());
     
     // ---- to determine which items go in which cell of the dynamic ribbon now,
     //      we create a temporary 2D table and fill them with the ID of the item
@@ -700,17 +736,30 @@ void DynamicRibbonWidget::updateItemDisplay()
     item_placement.resize(row_amount);
     for(int i=0; i<row_amount; i++)
         item_placement[i].resize(m_needed_cols);
-
+    
     int counter = 0;
+    
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+    std::cout << m_items.size() << " items to be placed:\n{\n";
+#endif
+    
     for (int c=0; c<m_needed_cols; c++)
     {
         for (int r=0; r<row_amount; r++)
         {
+            
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+            std::cout << "    ";
+#endif
+            
             const int items_in_row = m_rows[r].m_children.size();
             if (c >= items_in_row)
             {
                 item_placement[r][c] = -1;
-                //std::cout << item_placement[r][c] << "  ";
+                
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+                std::cout << item_placement[r][c] << "  ";
+#endif
                 continue;
             }
             
@@ -718,11 +767,22 @@ void DynamicRibbonWidget::updateItemDisplay()
             while (newVal >= fitting_item_amount) newVal -= fitting_item_amount;
             item_placement[r][c] = newVal;
             
-            //std::cout << newVal << "  ";
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+            std::cout << newVal << "  ";
+#endif
+            
             counter++;
         }
-        //std::cout << std::endl;
+        
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+        std::cout << "\n";
+#endif
+        
     }
+    
+#if CHATTY_ABOUT_ITEM_PLACEMENT
+    std::cout << "}\n";
+#endif
     
     // ---- iterate through the rows, and set the items of each row to match those of the table
     for (int n=0; n<row_amount; n++)
