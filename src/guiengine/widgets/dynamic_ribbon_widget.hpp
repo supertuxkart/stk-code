@@ -142,7 +142,7 @@ namespace GUIEngine
         EventPropagation focused(const int playerID);
                 
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
-        void setSubElements();
+        void buildInternalStructure();
 
         /** Call this to scroll within a scrollable ribbon */
         void scroll(const int x_delta);

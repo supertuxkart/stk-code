@@ -178,12 +178,12 @@ void DynamicRibbonWidget::add()
         //std::cout << "ribbon : getNewID returns " <<  m_ids[i] << std::endl;
     }
     
-    setSubElements();
+    buildInternalStructure();
 }
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::setSubElements()
+void DynamicRibbonWidget::buildInternalStructure()
 {
-    //printf("****DynamicRibbonWidget::setSubElements()****\n");
+    //printf("****DynamicRibbonWidget::buildInternalStructure()****\n");
     
     // ---- Clean-up what was previously there
     for (int i=0; i<m_children.size(); i++)
@@ -673,7 +673,7 @@ void DynamicRibbonWidget::updateItemDisplay()
     // ---- Check if we need to update the number of icons in the ribbon
     if ((int)m_items.size() != m_previous_item_count)
     {
-        setSubElements();
+        buildInternalStructure();
         m_previous_item_count = m_items.size();
     }
     
@@ -683,7 +683,7 @@ void DynamicRibbonWidget::updateItemDisplay()
     const int row_amount = m_rows.size();
     const int item_amount = m_items.size();
     
-    //FIXME: isn't this set by 'setSubElements' already?
+    //FIXME: isn't this set by 'buildInternalStructure' already?
     m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
     
     //const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;
