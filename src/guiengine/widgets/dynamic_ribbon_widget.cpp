@@ -504,7 +504,7 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
 EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w, std::string& originator, const int playerID)
 {
     if (m_deactivated) return EVENT_LET;
-
+    
     if (originator=="left")
     {
         scroll(-1);
