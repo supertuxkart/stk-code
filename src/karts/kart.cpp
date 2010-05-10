@@ -1383,8 +1383,9 @@ void Kart::updateGraphics(const Vec3& offset_xyz,
     if(m_smoke_system)
     {
         float f=0.0f;
-        if(getMaterial() && getMaterial()->hasSmoke() && fabsf(m_controls.m_steer) > 0.8 &&
-            isOnGround())
+        if(getMaterial() && getMaterial()->hasSmoke() && 
+            fabsf(m_controls.m_steer) > 0.8           &&
+            isOnGround()                                  )
             f=250.0f;
         m_smoke_system->setCreationRate((m_skidding-1)*f);
     }
