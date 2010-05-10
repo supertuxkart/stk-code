@@ -39,16 +39,6 @@ namespace irr
 class DefaultAIController : public AIBaseController
 {
 private:
-    enum FallbackTactic
-    {
-        FT_AVOID_TRACK_CRASH, //Only steer to avoid getting out of the road,
-                              //otherwise, don't steer at all
-        FT_PARALLEL,    //Stay parallel to the road
-        FT_FAREST_POINT //Drive towards the farest non-crashing point that
-                        //the kart can drive to in a straight line without
-                        //crashing with the track.
-    };
-
     /** How the AI uses nitro. */
     enum {NITRO_NONE, NITRO_SOME, NITRO_ALL} m_nitro_level;
     enum ItemTactic
@@ -82,10 +72,6 @@ private:
     float m_max_handicap_accel; //The allowed maximum speed, in percentage,
                                 //from 0.0 to 1.0. Used only when
                                 //m_wait_for_players == true.
-    FallbackTactic m_fallback_tactic; //General steering procedure. Used
-                                      //mostly on straight lines and on curves
-                                      //that re too small to need special
-                                      //handling.
     
     ItemTactic m_item_tactic; //How are items going to be used?
 

@@ -50,33 +50,20 @@ NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
 {
     m_next_node_index.reserve(m_quad_graph->getNumNodes());
     m_successor_index.reserve(m_quad_graph->getNumNodes());
+    std::vector<unsigned int> next;
 
-    // Initialise the fields with -1
     for(unsigned int i=0; i<m_quad_graph->getNumNodes(); i++)
     {
-        m_next_node_index.push_back(-1);
-        m_successor_index.push_back(-1);
-    }
-    // For now pick one part on random, which is not adjusted during the run
-    std::vector<unsigned int> next;
-    int count=0;
-    int current_node=0;
-    while (1)
-    {
         next.clear();
-        m_quad_graph->getSuccessors(current_node, next);
+        m_quad_graph->getSuccessors(i, next);
+        // For now pick one part on random, which is not adjusted during the 
+        // race. Long term statistics might be gathered to determine the
+        // best way, potentially depending on race position etc.
         int indx = rand() % next.size();
-        m_successor_index[current_node] = indx;
-        m_next_node_index[current_node] = next[indx];
-        current_node = next[indx];
-        if(current_node==0) break;
-        count++;
-        if(count>(int)m_quad_graph->getNumNodes())
-        {
-            fprintf(stderr, "AI can't find a loop going back to node 0, aborting.\n");
-            exit(-1);
-        }
-    };
+        m_successor_index.push_back(indx);
+        m_next_node_index.push_back(next[indx]);
+
+    }
 
     const unsigned int look_ahead=10;
     // Now compute for each node in the graph the list of the next 'look_ahead'
@@ -94,7 +81,6 @@ NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
         for(unsigned int j=0; j<look_ahead; j++)
         {
             int next = m_next_node_index[current];
-            if(next==-1) break;
             l.push_back(m_next_node_index[current]);
             current = m_next_node_index[current];
         }   // for j<look_ahead
@@ -108,7 +94,6 @@ NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_EASY:
         m_wait_for_players   = true;
         m_max_handicap_accel = 0.9f;
-        m_fallback_tactic    = FT_AVOID_TRACK_CRASH;
         m_item_tactic        = IT_TEN_SECONDS;
         m_max_start_delay    = 0.5f;
         m_min_steps          = 0;
@@ -119,10 +104,6 @@ NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_MEDIUM:
         m_wait_for_players   = true;
         m_max_handicap_accel = 0.95f;
-        // FT_PARALLEL had problems on some tracks when suddenly a smaller 
-        // section occurred (e.g. bridge in stone track): the AI would drive
-        // over and over into the river
-        m_fallback_tactic    = FT_FAREST_POINT;
         m_item_tactic        = IT_CALCULATE;
         m_max_start_delay    = 0.4f;
         m_min_steps          = 1;
@@ -133,7 +114,6 @@ NewAIController::NewAIController(Kart *kart) : AIBaseController(kart)
     case RaceManager::RD_HARD:
         m_wait_for_players   = false;
         m_max_handicap_accel = 1.0f;
-        m_fallback_tactic    = FT_FAREST_POINT;
         m_item_tactic        = IT_CALCULATE;
         m_max_start_delay    = 0.1f;
         m_min_steps          = 2;
@@ -420,33 +400,9 @@ void NewAIController::handleSteering(float dt)
     else
     {
         m_start_kart_crash_direction = 0;
-        switch( m_fallback_tactic )
-        {
-        case FT_FAREST_POINT:
-            {
-                Vec3 straight_point;
-                steer_angle = findNonCrashingAngle();
-            }
-            break;
-
-        case FT_PARALLEL:
-            steer_angle = steerToAngle(next, 0.0f );
-            break;
-
-        case FT_AVOID_TRACK_CRASH:
-            if( m_crashes.m_road )
-            {
-                steer_angle = steerToAngle(m_track_node, 0.0f );
-            }
-            else steer_angle = 0.0f;
-
-            break;
-        }
-
+        Vec3 straight_point;
+        steer_angle = findNonCrashingAngle();
     }
-    // avoid steer vibrations
-    //if (fabsf(steer_angle) < 1.0f*3.1415/180.0f)
-    //    steer_angle = 0.f;
 
     setSteering(steer_angle, dt);
 }   // handleSteering
