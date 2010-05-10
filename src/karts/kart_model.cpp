@@ -312,10 +312,10 @@ void KartModel::update(float rotation, float visual_steer,
     static int last_end=-1;
     if(steer>0.0f)       end = m_animation_frame[AF_STRAIGHT]
                              - (int)( ( m_animation_frame[AF_STRAIGHT]
-                                       -m_animation_frame[AF_LEFT]    )*steer);
+                                       -m_animation_frame[AF_RIGHT]    )*steer);
     else if(steer<0.0f)  end = m_animation_frame[AF_STRAIGHT]
                              + (int) ( (m_animation_frame[AF_STRAIGHT] 
-                                       -m_animation_frame[AF_RIGHT]   )*steer);
+                                       -m_animation_frame[AF_LEFT]   )*steer);
     else                 end = m_animation_frame[AF_STRAIGHT];
 
     // No changes to current frame loop
