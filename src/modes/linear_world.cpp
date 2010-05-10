@@ -215,8 +215,8 @@ void LinearWorld::update(float delta)
     
 #ifdef DEBUG
     // FIXME: Debug output in case that the double position error occurs again.
-    int pos_used[kart_amount+1];
-    for(int i=0; i<=kart_amount; i++) pos_used[i]=-99;
+    std::vector<int> pos_used;
+    pos_used.resize(kart_amount+1, -99);
     for(unsigned int i=0; i<kart_amount; i++)
     {
         if(pos_used[m_karts[i]->getPosition()]!=-99)
