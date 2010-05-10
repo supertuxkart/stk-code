@@ -172,9 +172,9 @@ bool TrackManager::loadTrack(const std::string& dirname)
 }   // loadTrack
 
 // ----------------------------------------------------------------------------
-/** Updates the groups after a track was read in.
- *  \param track Pointer to the new track, whose groups are now analysed.
- */
+/** \brief Updates the groups after a track was read in.
+  * \param track Pointer to the new track, whose groups are now analysed.
+  */
 void TrackManager::updateGroups(const Track* track)
 {
     const std::vector<std::string>& new_groups = track->getGroups();
@@ -183,14 +183,24 @@ void TrackManager::updateGroups(const Track* track)
     const unsigned int groups_amount = new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
-        // if we didn't yet have this group in memory, add it to the global list
-        if(m_groups.find(new_groups[i])==m_groups.end() &&
-           m_arena_groups.find(new_groups[i])==m_arena_groups.end())
-            m_all_groups.push_back(new_groups[i]);
-        
-        // add this track to its group
-        if(isArena) m_arena_groups[new_groups[i]].push_back(m_tracks.size()-1);
-        else m_groups[new_groups[i]].push_back(m_tracks.size()-1);
+        if (isArena)
+        {
+            // update the list of group names if necessary
+            const bool isInArenaGroupsList = (m_arena_groups.find(new_groups[i]) != m_arena_groups.end());
+            if (!isInArenaGroupsList) m_arena_group_names.push_back(new_groups[i]);
+
+            // add this track to its group
+            m_arena_groups[new_groups[i]].push_back(m_tracks.size()-1);
+        }
+        else
+        {
+            // update the list of group names if necessary
+            const bool isInTrackGroupsList = (m_track_groups.find(new_groups[i]) != m_track_groups.end());
+            if (!isInTrackGroupsList) m_track_group_names.push_back(new_groups[i]);
+
+            // add this track to its group
+            m_track_groups[new_groups[i]].push_back(m_tracks.size()-1);
+        }
     }
 }   // updateGroups
 

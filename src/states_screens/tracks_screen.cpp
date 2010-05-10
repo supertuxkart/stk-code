@@ -55,7 +55,7 @@ void TracksScreen::loadedFromFile()
     
     tabs->clearAllChildren();
     
-    const std::vector<std::string>& groups = track_manager->getAllGroups();
+    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     const int group_amount = groups.size();
     
     // add standard group first

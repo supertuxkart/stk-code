@@ -45,14 +45,20 @@ private:
     Tracks                                   m_tracks;
     
     /** List of all racing track groups. */
-    std::map<std::string, std::vector<int> > m_groups;
+    std::map<std::string, std::vector<int> > m_track_groups;
     
     /** List of all arena groups. */
     std::map<std::string, std::vector<int> > m_arena_groups;
     
     /** List of all groups (for both normal tracks and arenas) */
-    std::vector<std::string>                 m_all_groups;
+    //std::vector<std::string>                 m_all_group_names;
     
+    /** List of the names of all groups containing tracks */
+    std::vector<std::string>                 m_track_group_names;
+    
+    /** List of the names of all groups containing arenas */
+    std::vector<std::string>                 m_arena_group_names;
+
     /** Flag if this track is available or not. Tracks are set unavailable
      *  if they are not available on all clients (applies only to network mode)
      */
@@ -67,13 +73,21 @@ public:
 
     static void   addTrackSearchDir(const std::string &dir);
     
-    /** Returns a list of all directories that contain a track. */
+    /** \brief Returns a list of all directories that contain a track. */
     const std::vector<std::string>*  getAllTrackDirs() const 
                                             { return &m_all_track_dirs; }
     
-    /** Returns a list of all used track groups. */
+    /** \brief Returns a list of the names of all used groups (for tracks or arenas) */
+    //const std::vector<std::string>&
+    //              getAllGroups()      const { return m_all_group_names; }
+    
+    /** \brief Returns a list of the names of all used track groups. */
     const std::vector<std::string>&
-                  getAllGroups()      const { return m_all_groups;    }
+                  getAllTrackGroups() const { return m_track_group_names; }
+    
+    /** \brief Returns a list of the names of all used arena groups. */
+    const std::vector<std::string>&
+                  getAllArenaGroups() const { return m_arena_group_names; }
     
     /** Returns the number of tracks. */
     size_t        getNumberOfTracks() const { return m_tracks.size(); }
@@ -96,7 +110,7 @@ public:
     /** Returns a list of all tracks in a given group.
      *  \param g Name of the group. */
     const std::vector<int>& 
-                  getTracksInGroup(const std::string& g) {return m_groups[g];}
+                  getTracksInGroup(const std::string& g) {return m_track_groups[g];}
     
     /** Returns a list of all arenas in a given group. 
      *  \param g Name of the group. */
