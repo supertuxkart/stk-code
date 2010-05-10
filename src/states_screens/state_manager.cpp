@@ -203,7 +203,8 @@ void StateManager::onGameStateChange(GameState previousState, GameState newState
         else if (newState == INGAME_MENU)
         {
             // pause game when an in-game menu is shown
-            if (World::getWorld() != NULL) World::getWorld()->pause();
+            if (World::getWorld() != NULL) 
+                World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
         }
     }    
 }

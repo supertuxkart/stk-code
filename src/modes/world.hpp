@@ -208,8 +208,8 @@ public:
         
     virtual bool useFastMusicNearEnd() const { return true; }
     
-    void  pause();
-    void  unpause();
+    virtual void  pause(Phase phase);
+    virtual void  unpause();
     
     /**
       * The code that draws the timer should call this first to know

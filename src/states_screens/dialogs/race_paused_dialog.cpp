@@ -41,7 +41,7 @@ using namespace irr::gui;
 RacePausedDialog::RacePausedDialog(const float percentWidth, const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
-    World::getWorld()->pause();
+    World::getWorld()->pause(WorldStatus::IN_GAME_MENU_PHASE);
     
     IGUIFont* font = GUIEngine::getTitleFont();
     const int text_height = GUIEngine::getFontHeight();

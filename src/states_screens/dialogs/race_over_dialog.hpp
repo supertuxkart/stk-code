@@ -29,7 +29,9 @@ class RaceOverDialog : public GUIEngine::ModalDialog
 
     int m_buttons_y_from;
     int m_rankings_y_bottom;
-    
+
+    /** A timer to make this display shown for a certain amount of time. */
+    float m_auxiliary_timer;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -42,6 +44,7 @@ public:
     virtual void escapePressed();
     
     virtual void onUpdate(float dt);
+    bool    menuIsFinished();
 };
 
 

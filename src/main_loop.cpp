@@ -30,7 +30,6 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_manager.hpp"
-#include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -109,11 +108,7 @@ void MainLoop::updateRace(float dt)
     if(!World::getWorld()->isFinishPhase())
         network_manager->receiveUpdates();
 
-    if ( World::getWorld()->getPhase() != WorldStatus::LIMBO_PHASE)
-    {
-        history->update(dt);
-        World::getWorld()->updateWorld(dt);
-    }   // phase != limbo phase
+    World::getWorld()->updateWorld(dt);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
@@ -122,7 +117,7 @@ void MainLoop::updateRace(float dt)
 void MainLoop::run()
 {
     IrrlichtDevice* device = irr_driver->getDevice();
-    
+
     bool music_on = false;
     m_curr_time = device->getTimer()->getRealTime();
     while(!m_abort)

@@ -20,6 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "network/network_manager.hpp"
 #include "states_screens/dialogs/race_over_dialog.hpp"
 
@@ -78,8 +79,8 @@ void WorldStatus::enterRaceOverState()
 {
     // Don't
     if(    m_phase == DELAY_FINISH_PHASE
-        || m_phase == FINISH_PHASE 
-        || m_phase == LIMBO_PHASE        ) return;
+        || m_phase == RESULT_DISPLAY_PHASE
+        || m_phase == FINISH_PHASE          ) return;
     
     m_phase = DELAY_FINISH_PHASE;
     m_auxiliary_timer = 0.0f;
@@ -92,6 +93,7 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
+    pause(RESULT_DISPLAY_PHASE);
     if(network_manager->getMode()==NetworkManager::NW_SERVER)
         network_manager->sendRaceResults();
 }   // terminateRace
@@ -146,21 +148,33 @@ void WorldStatus::update(const float dt)
                 m_phase=RACE_PHASE;  
             m_auxiliary_timer += dt;
             break;
+        case RACE_PHASE:
+            // Nothing to do for race phase, switch to delay finish phase
+            // happens when 
+            break;
         case DELAY_FINISH_PHASE :
         {
             m_auxiliary_timer += dt;
             
-            // Nothing more to do if delay time is not over yet
-            if(m_auxiliary_timer < stk_config->m_delay_finish_time) break;
-            
-            m_phase = FINISH_PHASE;
-            // NOTE: no break, fall through to FINISH_PHASE handling!!
+            // Change to next phase if delay is over
+            if(m_auxiliary_timer > stk_config->m_delay_finish_time)
+            {
+                m_phase           = RESULT_DISPLAY_PHASE;
+                new RaceOverDialog(0.6f, 0.9f);
+            }
+            break;
         }
+        case RESULT_DISPLAY_PHASE : 
+            if(((RaceOverDialog*)GUIEngine::ModalDialog::getCurrent())->menuIsFinished())
+            {
+                terminateRace();
+                m_phase = FINISH_PHASE;
+            }
+            break;
         case FINISH_PHASE:
-            terminateRace();
-            new RaceOverDialog(0.6f, 0.9f);
-            return;
-        default: break;  // default for RACE_PHASE, LIMBO_PHASE
+            // Nothing to do here.
+            break;
+        default: break;
     }
     
     switch(m_clock_mode)
@@ -170,7 +184,7 @@ void WorldStatus::update(const float dt)
             break;
         case CLOCK_COUNTDOWN:
             // stop countdown when race is over
-            if (m_phase == DELAY_FINISH_PHASE || m_phase == FINISH_PHASE || m_phase == LIMBO_PHASE)
+            if (m_phase == RESULT_DISPLAY_PHASE || m_phase == FINISH_PHASE)
             {
                 m_time = 0.0f;
                 break;
@@ -199,15 +213,23 @@ void WorldStatus::setTime(const float time)
 }   // setTime
 
 //-----------------------------------------------------------------------------
-void WorldStatus::pause()
+/** Pauses the game and switches to the specified phase.
+ *  \param phase Phase to switch to.
+ */
+void WorldStatus::pause(Phase phase)
 {
+    assert(m_previous_phase==SETUP_PHASE);
     m_previous_phase = m_phase;
-    m_phase          = LIMBO_PHASE;
+    m_phase          = phase;
 }   // pause
 
 //-----------------------------------------------------------------------------
+/** Switches back from a pause state to the previous state.
+ */
 void WorldStatus::unpause()
 {
-    m_phase = m_previous_phase;
+    m_phase          = m_previous_phase;
+    // Set m_previous_phase so that we can use an assert
+    // in pause to detect incorrect pause/unpause sequences.
+    m_previous_phase = SETUP_PHASE;
 }
-

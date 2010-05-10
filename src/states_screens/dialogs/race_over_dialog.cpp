@@ -31,8 +31,6 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
-//#include "tracks/track_manager.hpp"
-//#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -81,6 +79,7 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
                                const float percentHeight) 
               : ModalDialog(percentWidth, percentHeight)
 {
+    m_auxiliary_timer = 0;
     // Switch to barrier mode: server waits for ack from each client
     network_manager->beginRaceResultBarrier();
 
@@ -437,13 +436,13 @@ RaceOverDialog::RaceOverDialog(const float percentWidth,
         assert(false);
     }
 
-}
+}   // RaceOverDialog
 
 // ------------------------------------------------------------------------------------------------------
 
 void RaceOverDialog::onEnterPressedInternal()
 {
-}
+}   // onEnterPressedInternal
 
 // ------------------------------------------------------------------------------------------------------
 
@@ -513,7 +512,7 @@ GUIEngine::EventPropagation RaceOverDialog::processEvent(const std::string& even
     }
     
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 //-----------------------------------------------------------------------------
 
@@ -538,12 +537,14 @@ void RaceOverDialog::escapePressed()
     {
         assert(false);
     }
-}
+}   // escapePressed
 
 //-----------------------------------------------------------------------------
 
 void RaceOverDialog::onUpdate(float dt)
 {
+    m_auxiliary_timer +=dt;
+
     // Draw battle report (if relevant)
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
@@ -695,4 +696,13 @@ void RaceOverDialog::renderThreeStrikesGraph(const int x, const int y, const int
     GUIEngine::getSmallFont()->draw( _("Energy"), pos, video::SColor(255,0,0,0),
                                     false /* hcenter */, true /* vcenter */ );
     }
-}
+}   // renderThreeStrikesGraph
+
+// ----------------------------------------------------------------------------
+/** Called by WorldStatus to see when the race results have been completely
+ *  displayed, which means that the next phase can start.
+ */
+bool RaceOverDialog::menuIsFinished()
+{
+    return m_auxiliary_timer>stk_config->m_delay_finish_time;
+}   // menuIsFinished

@@ -39,26 +39,38 @@ public:
     enum Phase {
         // Game setup, e.g. track loading
         SETUP_PHASE,
+
         // 'Ready' is displayed
         READY_PHASE,
+
         // 'Set' is displayed
         SET_PHASE,
+
         // 'Go' is displayed, but this is already race phase
         GO_PHASE,
+
         // Race is started, 'go' is gone, but music name is still there
         MUSIC_PHASE,
+
         // the actual race has started, no ready/set/go is displayed anymore
         RACE_PHASE,
+
         // All players have finished, now wait a certain amount of time for AI
         // karts to finish. If they do not finish in that time, finish the race
+        // and estimate their arrival time.
         DELAY_FINISH_PHASE,
+
+        // Display the results, while world is still being updated to
+        // show the end animation
+        RESULT_DISPLAY_PHASE,
+
         // The player crossed the finishing line and his and the time of
         // the other players is displayed, controll is automatic
         FINISH_PHASE,
-        // Phase while playing the end (win/lose) animation.
-        END_ANIMATION_PHASE, 
-        // The state after finish where no calculations are done.
-        LIMBO_PHASE,
+
+        // Display the in-game menu, but no update of world or anything
+        IN_GAME_MENU_PHASE,
+
     };
 protected:
     SFXBase    *m_prestart_sound;
@@ -76,48 +88,53 @@ protected:
       * Remember previous phase e.g. on pause
       */
     Phase          m_previous_phase;
-public:
-             WorldStatus();
-    virtual ~WorldStatus();
-    
-    void reset();
-    
-    // Note: GO_PHASE is both: start phase and race phase
-    bool    isStartPhase() const  { return m_phase<GO_PHASE;               }
-    bool    isRacePhase()  const  { return m_phase>=GO_PHASE && 
-                                           m_phase<FINISH_PHASE;           }
-    /** While the race menu is being displayed, m_phase is limbo, and
-     *  m_previous_phase is finish. So we have to test this case, too.  */
-    bool    isFinishPhase() const { return m_phase==FINISH_PHASE ||
-                                          (m_phase==LIMBO_PHASE &&
-                                           m_previous_phase==FINISH_PHASE);}
-    const Phase getPhase() const  { return m_phase;                        }
-    
+
     /**
      * Counts time during the initial 'ready/set/go' phase, or at the end of a race.
      * This timer basically kicks in when we need to calculate non-race time like labels.
      */
     float           m_auxiliary_timer;
+
+public:
+             WorldStatus();
+    virtual ~WorldStatus();
     
-    /**
-     * Call to specify what kind of clock you want. The second argument
-     * can be used to specify the initial time value (especially useful
-                                                      * for countdowns)
-     */
+    void     reset();
+    
+    // Note: GO_PHASE is both: start phase and race phase
+    bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
+    bool     isRacePhase()  const  { return m_phase>=GO_PHASE && 
+                                            m_phase<FINISH_PHASE;           }
+    /** While the race menu is being displayed, m_phase is limbo, and
+     *  m_previous_phase is finish. So we have to test this case, too.  */
+    bool     isFinishPhase() const { return m_phase==FINISH_PHASE ||
+                                           (m_phase==IN_GAME_MENU_PHASE &&
+                                            m_previous_phase==FINISH_PHASE);}
+    const Phase getPhase() const  { return m_phase;                        }
+    
+    /** Call to specify what kind of clock you want. The second argument
+     *  can be used to specify the initial time value (especially useful
+     *  for countdowns). */
     void    setClockMode(const ClockType mode, const float initial_time=0.0f);
+
+    /** Returns the current clock mode. */
     int     getClockMode() const { return m_clock_mode; }
+
+    /** Returns the current race time. */
+    float   getTime() const      { return m_time; }
+
+    /** Returns the value of the auxiliary timer. */
+    float   getAuxiliaryTimer() const {return m_auxiliary_timer; }
     /**
         * Call each frame, with the elapsed time as argument.
      */
     void    update(const float dt);
     
-    float   getTime() const                 { return m_time; }
     void    setTime(const float time);
     
-    void    pause();
-    void    unpause();
+    virtual void pause(Phase phase);
+    virtual void unpause();
     virtual void enterRaceOverState();
-
     virtual void terminateRace();
     
     /*

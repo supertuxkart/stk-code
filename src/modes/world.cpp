@@ -291,7 +291,6 @@ void World::terminateRace()
         }
     }   // i<kart_amount
     updateHighscores();
-    WorldStatus::pause();
     unlock_manager->raceFinished();
     
     RaceGUI* m = World::getWorld()->getRaceGUI();
@@ -389,6 +388,11 @@ void World::resetAllKarts()
  */
 void World::updateWorld(float dt)
 {
+    // Don't update world if a menu is shown or the race is over.
+    if( m_phase == FINISH_PHASE         ||
+        m_phase == RESULT_DISPLAY_PHASE ||
+        m_phase == IN_GAME_MENU_PHASE      )  return;
+
     update(dt);
     if( (!isFinishPhase()) && isRaceOver())
     {
@@ -415,6 +419,7 @@ void World::update(float dt)
     }
 #endif
 
+    history->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     // Clear race state so that new information can be stored
@@ -650,11 +655,13 @@ void World::restartRace()
 }   // restartRace
 
 //-----------------------------------------------------------------------------
-void  World::pause()
+/** Pauses the music (and then pauses WorldStatus).
+ */
+void  World::pause(Phase phase)
 {
     music_manager->pauseMusic();
     sfx_manager->pauseAll();
-    WorldStatus::pause();
+    WorldStatus::pause(phase);
 }   // pause
 
 //-----------------------------------------------------------------------------
