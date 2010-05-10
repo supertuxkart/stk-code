@@ -20,6 +20,8 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 
+#include <assert.h>
+
 #include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
@@ -166,6 +168,10 @@ float AIBaseController::steerToPoint(const Vec3 &point)
  */
 float AIBaseController::normalizeAngle(float angle)
 {
+    // Add an assert here since we had cases in which an invalid angle
+    // was given, resulting in an endless loop (floating point precision,
+    // e.g.: 1E17 - 2*M_PI = 1E17
+    assert(angle >= -4*M_PI && angle <= 4*M_PI);
     while( angle >  2*M_PI ) angle -= 2*M_PI;
     while( angle < -2*M_PI ) angle += 2*M_PI;
 
