@@ -341,7 +341,16 @@ namespace StringUtils
         int min        = (int) floor ( time / 60.0 ) ;
         int sec        = (int) floor ( time - (double) ( 60 * min ) ) ;
         int hundredths = (int) floor ( 100.0f * (time - (double)(sec + 60* min)));
-        char s[9];
+        // The proper c++ way would be:
+        // std::ostringstream s;
+        // s<<std::setw(2)<<std::setfill(' ')<<min<<":"
+        //     <<std::setw(2)<<std::setfill('0')<<sec<<":"
+        //     <<std::setw(2)<<std::setfill(' ')<<hundredths;
+        // return s.str();
+        // but that appears to be awfully complicated and slow, compared to
+        // which admittedly only works for min < 100000 - which is about 68 
+        // days - good enough.
+        char s[12];
         sprintf ( s, "%02d:%02d:%02d", min,  sec,  hundredths) ;
         return std::string(s);
     }   // timeToString
