@@ -327,9 +327,19 @@ void IrrDriver::doApplyResSettings()
 
     material_manager->reInit();
 
-    powerup_manager         -> loadAllPowerups();
+    file_manager->pushTextureSearchPath(file_manager->getModelFile(""));
+    const std::string materials_file = file_manager->getModelFile("materials.xml");
+    if(materials_file!="")
+        material_manager->pushTempMaterial(materials_file);
+    {
+        powerup_manager         -> loadAllPowerups ();
+        item_manager            -> loadDefaultItems();
+    }
+    if(materials_file!="")
+        material_manager->popTempMaterial();
+    file_manager->popTextureSearchPath();
+
     kart_properties_manager -> loadAllKarts();
-    item_manager            -> loadDefaultItems();
     projectile_manager      -> loadData();
     attachment_manager      -> loadModels();
 
