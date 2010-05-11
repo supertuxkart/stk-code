@@ -1202,6 +1202,7 @@ void Kart::updatePhysics(float dt)
 
         velocity.setZ( velocity.getZ() * velocity_ratio );
         velocity.setX( velocity.getX() * velocity_ratio );
+        velocity.setY( velocity.getY() * velocity_ratio ); // Up-down too
 
         getVehicle()->getRigidBody()->setLinearVelocity( velocity );
 
