@@ -33,6 +33,23 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+const wchar_t* getPlungerInFaceString()
+{
+    const int PLUNGER_IN_FACE_STRING_AMOUNT = 2;
+
+    RandomGenerator r;
+    const int id = r.get(PLUNGER_IN_FACE_STRING_AMOUNT);
+                                                                    
+    switch (id)
+    {
+        //I18N: shown when a player receives a plunger in his face
+        case 0: return _("%0 gets a fancy mask from %1");
+        //I18N: shown when a player receives a plunger in his face
+        case 1: return _("%1 merges %0's face with a plunger");
+        default:assert(false);
+    }
+}
+
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
@@ -153,10 +170,11 @@ void Plunger::hit(Kart *kart, PhysicalObject *obj)
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode() )
     {
-        if(kart) {
+        if(kart)
+        {
             kart->blockViewWithPlunger();
 
-            hit_message += StringUtils::insertValues(_("%s gets a fancy mask from %s"),
+            hit_message += StringUtils::insertValues(getPlungerInFaceString(),
                                                      kart->getName().c_str(),
                                                      m_owner->getName().c_str()
                                                     ).c_str();
