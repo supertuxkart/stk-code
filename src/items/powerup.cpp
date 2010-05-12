@@ -35,7 +35,7 @@
 
 const wchar_t* getAnchorString()
 {
-    const int ANCHOR_STRINGS_COUNT = 2;
+    const int ANCHOR_STRINGS_COUNT = 3;
 
     RandomGenerator r;
     const int id = r.get(ANCHOR_STRINGS_COUNT);
@@ -44,7 +44,8 @@ const wchar_t* getAnchorString()
     {
         //I18N: shown when anchor applied. %s is the victim.
         case 0: return _("Arrr, the %s dropped anchor, Captain!");
-        case 1: return _("Another round of grog, %s arrived in harbour!");
+        case 1: return _("%s pays the next round of grog!");
+        case 2: return _("%s is a mighty pirate!");
         default: assert(false);
     }
 }
@@ -52,7 +53,7 @@ const wchar_t* getAnchorString()
 
 const wchar_t* getParachuteString()
 {
-    const int PARACHUTE_STRINGS_COUNT = 2;
+    const int PARACHUTE_STRINGS_COUNT = 3;
 
     RandomGenerator r;
     const int id = r.get(PARACHUTE_STRINGS_COUNT);
@@ -61,6 +62,7 @@ const wchar_t* getParachuteString()
     {
         case 0: return _("Geronimo!!!"); // Parachutist shout
         case 1: return _("The Space Shuttle has landed!");
+        case 2: return _("Do you want to fly kites?");
         default: assert(false);
     }
 }

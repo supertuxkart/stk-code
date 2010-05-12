@@ -32,7 +32,7 @@
 
 const wchar_t* getPlungerString()
 {
-    const int PLUNGER_STRINGS_AMOUNT = 2;
+    const int PLUNGER_STRINGS_AMOUNT = 3;
 
     RandomGenerator r;
     const int id = r.get(PLUNGER_STRINGS_AMOUNT);
@@ -40,10 +40,11 @@ const wchar_t* getPlungerString()
     switch (id)
     {
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 0 : return _("%0 bites %1's bait");
+        case 0: return _("%0 bites %1's bait");
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 1 : return _("%1 latches onto %0 for a free ride");
-
+        case 1: return _("%1 latches onto %0 for a free ride");
+        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
+        case 2: return _("%1 tests a tractor beam on %0");
         default: assert(false);
     }
 }
@@ -58,7 +59,7 @@ const wchar_t* getPlungerString()
  *  \param kart    Reference to the kart.
  */
 RubberBand::RubberBand(Plunger *plunger, const Kart &kart) :
-            m_plunger(plunger), m_owner(kart)   
+            m_plunger(plunger), m_owner(kart)
 {
     video::SColor color(77, 179, 0, 0);
     video::SMaterial m;

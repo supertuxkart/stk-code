@@ -38,7 +38,7 @@
 
 const wchar_t* getCakeString()
 {
-    const int CAKE_STRINGS_AMOUNT = 2;
+    const int CAKE_STRINGS_AMOUNT = 3;
 
     RandomGenerator r;
     const int id = r.get(CAKE_STRINGS_AMOUNT);
@@ -49,6 +49,8 @@ const wchar_t* getCakeString()
         case 0: return _("%0 eats too much of %1's cake");
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
         case 1: return _("%0 is dubious of %1's cooking skills");
+        //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
+        case 2: return _("%0 should not play with %1's lunch");
         default: assert(false);
     }
 }
