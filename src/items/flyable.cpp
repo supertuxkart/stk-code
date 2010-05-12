@@ -35,9 +35,15 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-const wchar_t* getCakeString(const int n)
+
+const wchar_t* getCakeString()
 {
-    switch (n)
+    const int CAKE_STRINGS_AMOUNT = 2;
+
+    RandomGenerator r;
+    const int id = r.get(CAKE_STRINGS_AMOUNT);
+
+    switch (id)
     {
         //I18N: shown when hit by cake. %1 is the attacker, %0 is the victim.
         case 0: return _("%0 eats too much of %1's cake");
@@ -46,11 +52,16 @@ const wchar_t* getCakeString(const int n)
         default: assert(false);
     }
 }
-const int CAKE_STRINGS_AMOUNT = 2;
 
-const wchar_t* getBowlingString(const int n)
+
+const wchar_t* getBowlingString()
 {
-    switch (n)
+    const int BOWLING_STRINGS_AMOUNT = 3;
+
+    RandomGenerator r;
+    const int id = r.get(BOWLING_STRINGS_AMOUNT);
+
+    switch (id)
     {
         //I18N: shown when hit by bowling ball. %1 is the attacker, %0 is the victim.
         case 0 : return _("%0 will not play bowling with %1 again");
@@ -61,7 +72,7 @@ const wchar_t* getBowlingString(const int n)
         default: assert(false);
     }
 }
-const int BOWLING_STRINGS_AMOUNT = 3;
+
 
 // static variables:
 float         Flyable::m_st_speed       [PowerupManager::POWERUP_MAX];
@@ -385,9 +396,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
         {
             case PowerupManager::POWERUP_CAKE:
             {
-                RandomGenerator r;
-                const int messageID = r.get(CAKE_STRINGS_AMOUNT);
-                hit_message += StringUtils::insertValues(getCakeString(messageID),
+                hit_message += StringUtils::insertValues(getCakeString(),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();
@@ -398,10 +407,7 @@ void Flyable::hit(Kart *kart_hit, PhysicalObject* object)
             break;
             case PowerupManager::POWERUP_BOWLING:
             {
-                RandomGenerator r;
-                const int messageID = r.get(BOWLING_STRINGS_AMOUNT);
-                
-                hit_message += StringUtils::insertValues(getBowlingString(messageID),
+                hit_message += StringUtils::insertValues(getBowlingString(),
                                                          kart_hit->getName().c_str(),
                                                          m_owner->getName().c_str()
                                                         ).c_str();

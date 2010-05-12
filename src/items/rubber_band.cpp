@@ -29,9 +29,15 @@
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
-const wchar_t* getPlungerString(const int n)
+
+const wchar_t* getPlungerString()
 {
-    switch (n)
+    const int PLUNGER_STRINGS_AMOUNT = 2;
+
+    RandomGenerator r;
+    const int id = r.get(PLUNGER_STRINGS_AMOUNT);
+
+    switch (id)
     {
         //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
         case 0 : return _("%0 bites %1's bait");
@@ -41,7 +47,7 @@ const wchar_t* getPlungerString(const int n)
         default: assert(false);
     }
 }
-const int PLUNGER_STRINGS_AMOUNT = 2;
+
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
@@ -227,12 +233,9 @@ void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
 
-        RandomGenerator r;
-        const int messageID = r.get(PLUNGER_STRINGS_AMOUNT);
-        
         RaceGUI* gui = World::getWorld()->getRaceGUI();
         irr::core::stringw hit_message;
-        hit_message += StringUtils::insertValues(getPlungerString(messageID),
+        hit_message += StringUtils::insertValues(getPlungerString(),
                                                  kart_hit->getName().c_str(),
                                                  m_owner.getName().c_str()
                                                 ).c_str();

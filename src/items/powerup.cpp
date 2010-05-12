@@ -32,22 +32,52 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
-// we can't use string array constants here because gettext should not be invoked too
-// early when STK starts.
 
-//I18N: message shown when using the anchor weapon; %s is the name of the victim
-#define ANCHOR_STRING_0    _("Arrr, the %s dropped anchor, Captain!")
-
-//I18N: message shown when using the parachute weapon
-#define PARACHUTE_STRING_0 _("Geronimo!!!")
-
-const int SWAPPER_STRING_COUNT = 2;
-const wchar_t* getSwapperString(const int id)
+const wchar_t* getAnchorString()
 {
+    const int ANCHOR_STRINGS_COUNT = 2;
+
+    RandomGenerator r;
+    const int id = r.get(ANCHOR_STRINGS_COUNT);
+
+    switch (id)
+    {
+        //I18N: shown when anchor applied. %s is the victim.
+        case 0: return _("Arrr, the %s dropped anchor, Captain!");
+        case 1: return _("Another round of grog, %s arrived in harbour!");
+        default: assert(false);
+    }
+}
+
+
+const wchar_t* getParachuteString()
+{
+    const int PARACHUTE_STRINGS_COUNT = 2;
+
+    RandomGenerator r;
+    const int id = r.get(PARACHUTE_STRINGS_COUNT);
+
+    switch (id)
+    {
+        case 0: return _("Geronimo!!!"); // Parachutist shout
+        case 1: return _("The Space Shuttle has landed!");
+        default: assert(false);
+    }
+}
+
+
+const wchar_t* getSwapperString()
+{
+    const int SWAPPER_STRINGS_COUNT = 3;
+
+    RandomGenerator r;
+    const int id = r.get(SWAPPER_STRINGS_COUNT);
+
     switch (id)
     {
         case 0: return _("Magic, son. Nothing else in the world smells like that.");
         case 1: return _("A wizard did it!");
+        case 2: return _("Banana? Box? Banana? Box? Banana? Box?");
         default: assert(false);
     }
 }
@@ -184,10 +214,7 @@ void Powerup::use()
         m_sound_use->position(m_owner->getXYZ());
         m_sound_use->play();
 
-        RandomGenerator random;
-        const int message = random.get(SWAPPER_STRING_COUNT);
-        
-        gui->addMessage(getSwapperString(message), NULL, 3.0f, 40,
+        gui->addMessage(getSwapperString(), NULL, 3.0f, 40,
                         video::SColor(255, 255, 255, 255), false);
         break;
         }
@@ -245,7 +272,7 @@ void Powerup::use()
                 m_sound_use->play();
 
                 irr::core::stringw anchor_message;
-                anchor_message += StringUtils::insertValues(ANCHOR_STRING_0, kart->getName().c_str()).c_str();
+                anchor_message += StringUtils::insertValues(getAnchorString(), kart->getName().c_str()).c_str();
                 gui->addMessage(anchor_message, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
                 break;
             }
@@ -282,8 +309,7 @@ void Powerup::use()
                 m_sound_use->position(player_kart->getXYZ());
             m_sound_use->play();
 
-            // Parachutist shout
-            gui->addMessage(PARACHUTE_STRING_0, NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
+            gui->addMessage(getParachuteString(), NULL, 3.0f, 40, video::SColor(255, 255, 255, 255), false);
         }
         break;
 

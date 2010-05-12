@@ -33,13 +33,14 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+
 const wchar_t* getPlungerInFaceString()
 {
-    const int PLUNGER_IN_FACE_STRING_AMOUNT = 2;
+    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
 
     RandomGenerator r;
-    const int id = r.get(PLUNGER_IN_FACE_STRING_AMOUNT);
-                                                                    
+    const int id = r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT);
+
     switch (id)
     {
         //I18N: shown when a player receives a plunger in his face
@@ -49,6 +50,7 @@ const wchar_t* getPlungerInFaceString()
         default:assert(false);
     }
 }
+
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(Kart *kart) : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
